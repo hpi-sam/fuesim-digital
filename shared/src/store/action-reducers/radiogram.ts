@@ -77,7 +77,7 @@ export namespace RadiogramActionReducers {
                 acceptRadiogram(draftState, radiogramId, clientId);
                 return draftState;
             },
-            rights: 'participant',
+            rights: 'trainer',
         };
 
     export const returnRadiogramReducer: ActionReducer<ReturnRadiogramAction> =
@@ -87,7 +87,7 @@ export namespace RadiogramActionReducers {
                 returnRadiogram(draftState, radiogramId);
                 return draftState;
             },
-            rights: 'participant',
+            rights: 'trainer',
         };
 
     export const markDoneReducer: ActionReducer<MarkDoneRadiogramAction> = {
@@ -131,7 +131,7 @@ export namespace RadiogramActionReducers {
 
             return draftState;
         },
-        rights: 'participant',
+        rights: 'trainer',
     };
 
     export const acceptResourceRequestRadiogramReducer: ActionReducer<AcceptResourceRequestRadiogramAction> =
@@ -180,7 +180,7 @@ export namespace RadiogramActionReducers {
 
                 return draftState;
             },
-            rights: 'participant',
+            rights: 'trainer',
         };
 
     export const denyResourceRequestRadiogramReducer: ActionReducer<DenyResourceRequestRadiogramAction> =
@@ -229,6 +229,6 @@ export namespace RadiogramActionReducers {
 
                 return draftState;
             },
-            rights: 'participant',
+            rights: 'trainer',
         };
 }

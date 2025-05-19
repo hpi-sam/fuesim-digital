@@ -51,6 +51,9 @@ export class ImageStyleHelper extends StyleHelper<Style, Feature> {
         const imageStyle = initialStyle;
         imageStyle.setGeometry(feature.getGeometry()!);
         const image = imageStyle.getImage();
+
+        if (!image) return imageStyle;
+
         const normalizedImageScale =
             // OpenLayers typings are not accurate
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

@@ -16,6 +16,7 @@ import type { AppState } from 'src/app/state/app.state';
 import { selectTransferLines } from 'src/app/state/application/selectors/exercise.selectors';
 import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import type RenderFeature from 'ol/render/Feature';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -25,7 +26,7 @@ export class TransferLinesFeatureManager
     extends ElementManager<TransferLine, LineString>
     implements FeatureManager<LineString>
 {
-    public readonly layer: VectorLayer<VectorSource<LineString>>;
+    public readonly layer: VectorLayer<VectorSource<Feature<LineString>>>;
     constructor(
         private readonly store: Store<AppState>,
         private readonly transferLinesService: TransferLinesService,
@@ -118,7 +119,10 @@ export class TransferLinesFeatureManager
     }
 
     getFeatureFromElement(element: TransferLine) {
-        return this.layer.getSource()!.getFeatureById(element.id) ?? undefined;
+        const feature = this.layer.getSource()!.getFeatureById(element.id);
+        return (
+            (feature as Exclude<typeof feature, RenderFeature[]>) ?? undefined
+        );
     }
 
     isFeatureTranslatable(feature: Feature<LineString>) {

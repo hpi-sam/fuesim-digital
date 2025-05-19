@@ -11,6 +11,7 @@ import type { FeatureLike } from 'ol/Feature';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
 import type Style from 'ol/style/Style';
+import type RenderFeature from 'ol/render/Feature';
 import type { FeatureManager } from '../utility/feature-manager';
 import type {
     GeometryHelper,
@@ -36,7 +37,7 @@ export abstract class MoveableFeatureManager<
     implements FeatureManager<FeatureType>
 {
     protected movementAnimator: MovementAnimator<FeatureType>;
-    public layer: VectorLayer<VectorSource<FeatureType>>;
+    public layer: VectorLayer<VectorSource<Feature<FeatureType>>>;
     constructor(
         protected readonly olMap: OlMap,
         private readonly proposeMovementAction: (
@@ -109,7 +110,10 @@ export abstract class MoveableFeatureManager<
     getFeatureFromElement(
         element: ManagedElement
     ): Feature<FeatureType> | undefined {
-        return this.layer.getSource()!.getFeatureById(element.id) ?? undefined;
+        const feature = this.layer.getSource()!.getFeatureById(element.id);
+        return (
+            (feature as Exclude<typeof feature, RenderFeature[]>) ?? undefined
+        );
     }
 
     protected addMarking(

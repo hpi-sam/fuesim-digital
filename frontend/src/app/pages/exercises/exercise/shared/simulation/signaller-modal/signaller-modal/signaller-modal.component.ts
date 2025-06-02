@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { HotkeysService } from 'src/app/shared/services/hotkeys.service';
 import {
-    EOC_ID,
-    OVERVIEW_ID,
+    eocId,
+    overviewId,
     SelectSignallerRegionService,
 } from '../select-signaller-region.service';
 
@@ -15,10 +15,10 @@ import {
 })
 export class SignallerModalComponent {
     public get eocId() {
-        return EOC_ID;
+        return eocId;
     }
     public get overviewId() {
-        return OVERVIEW_ID;
+        return overviewId;
     }
 
     constructor(

@@ -6,12 +6,10 @@ import { ReplaySubject, Subject, takeUntil } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectSimulatedRegion } from 'src/app/state/application/selectors/exercise.selectors';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const EOC_ID = 'emergencyOperationsCenter';
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const OVERVIEW_ID = 'overview';
+export const eocId = 'emergencyOperationsCenter';
+export const overviewId = 'overview';
 
-export type SignallerRegionID = UUID | typeof EOC_ID | typeof OVERVIEW_ID;
+export type SignallerRegionID = UUID | typeof eocId | typeof overviewId;
 
 @Injectable()
 export class SelectSignallerRegionService implements OnDestroy {
@@ -25,7 +23,7 @@ export class SelectSignallerRegionService implements OnDestroy {
     public selectSimulatedRegion(id: SignallerRegionID) {
         this.selectedSimulatedRegion$.next(id);
 
-        if (id !== EOC_ID && id !== OVERVIEW_ID) {
+        if (id !== eocId && id !== overviewId) {
             this.store
                 .select(createSelectSimulatedRegion(id))
                 .pipe(takeUntil(this.changeOrDestroy$))

@@ -13,8 +13,8 @@ import { selectSimulatedRegions } from 'src/app/state/application/selectors/exer
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
 import {
-    EOC_ID,
-    OVERVIEW_ID,
+    eocId,
+    overviewId,
     SelectSignallerRegionService,
 } from '../select-signaller-region.service';
 
@@ -57,7 +57,7 @@ export class SignallerModalRegionSelectorComponent
             .select(selectSimulatedRegions)
             .pipe(
                 map((simulatedRegions) => [
-                    { key: EOC_ID, name: 'Leitstelle' },
+                    { key: eocId, name: 'Leitstelle' },
                     ...Object.entries(simulatedRegions)
                         .sort(([, regionA], [, regionB]) =>
                             regionA.name.localeCompare(regionB.name)
@@ -96,6 +96,6 @@ export class SignallerModalRegionSelectorComponent
     }
 
     public selectOverview() {
-        this.selectRegionService.selectSimulatedRegion(OVERVIEW_ID);
+        this.selectRegionService.selectSimulatedRegion(overviewId);
     }
 }

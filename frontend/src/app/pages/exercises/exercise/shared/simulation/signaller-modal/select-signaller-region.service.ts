@@ -16,7 +16,7 @@ export class SelectSignallerRegionService implements OnDestroy {
     public readonly selectedSimulatedRegion$ =
         new ReplaySubject<SignallerRegionID | null>(1);
 
-    private readonly changeOrDestroy$ = new Subject<void>();
+    private readonly destroy$ = new Subject<void>();
 
     constructor(private readonly store: Store<AppState>) {}
 
@@ -26,7 +26,7 @@ export class SelectSignallerRegionService implements OnDestroy {
         if (id !== eocId && id !== overviewId) {
             this.store
                 .select(createSelectSimulatedRegion(id))
-                .pipe(takeUntil(this.changeOrDestroy$))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe((simulatedRegion) => {
                     // The simulatedRegion could be undefined if the ID is invalid (e.g., the region was deleted)
                     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -38,6 +38,6 @@ export class SelectSignallerRegionService implements OnDestroy {
     }
 
     ngOnDestroy() {
-        this.changeOrDestroy$.next();
+        this.destroy$.next();
     }
 }

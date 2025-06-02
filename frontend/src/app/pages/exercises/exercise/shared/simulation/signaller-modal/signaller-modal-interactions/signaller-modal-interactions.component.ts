@@ -239,6 +239,9 @@ export class SignallerModalInteractionsComponent
         if (this.hotkeyLayer) {
             this.hotkeysService.removeLayer(this.hotkeyLayer);
         }
+        if (this.filterLayer) {
+            this.hotkeysService.removeLayer(this.filterLayer);
+        }
 
         this.destroy$.next();
     }

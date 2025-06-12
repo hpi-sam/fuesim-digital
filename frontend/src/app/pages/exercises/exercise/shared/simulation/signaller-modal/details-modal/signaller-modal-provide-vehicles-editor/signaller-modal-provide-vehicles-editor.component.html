@@ -61,6 +61,7 @@
         <label class="flex-shrink-1 text-nowrap">nach</label>
         <button
             [ngbPopover]="selectTargetTemplate"
+            autoClose="outside"
             #selectTargetPopover="ngbPopover"
             placement="bottom"
             [disabled]="((availableTargets$ | async)?.length ?? 0) === 0"

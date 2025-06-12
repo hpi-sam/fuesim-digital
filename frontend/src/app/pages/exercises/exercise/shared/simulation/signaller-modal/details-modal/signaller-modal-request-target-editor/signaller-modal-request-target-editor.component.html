@@ -5,6 +5,7 @@
 <form (ngSubmit)="updateTarget()" class="mt-3">
     <button
         [ngbPopover]="selectTargetTemplate"
+        autoClose="outside"
         #selectTargetPopover="ngbPopover"
         placement="bottom"
         [disabled]="((availableTargets$ | async)?.length ?? 0) === 0"

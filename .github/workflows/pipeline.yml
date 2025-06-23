@@ -17,7 +17,7 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    build:
+    build-shared:
         timeout-minutes: 5
         runs-on: ubuntu-latest
 
@@ -35,11 +35,43 @@ jobs:
             - name: Build shared
               run: cd shared && npm run build && cd ..
 
+    build-frontend:
+        timeout-minutes: 5
+        runs-on: ubuntu-latest
+
+        needs: build-shared
+
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: '22'
+            - name: Cache node modules and shared/dist
+              uses: ./.github/actions/cache-build
+            - name: Build frontend
+              run: cd frontend && npm run build && cd ..
+
+    build-backend:
+        timeout-minutes: 5
+        runs-on: ubuntu-latest
+
+        needs: build-shared
+
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: '22'
+            - name: Cache node modules and shared/dist
+              uses: ./.github/actions/cache-build
+            - name: Build backend
+              run: cd backend && npm run build && cd ..
+
     lint:
         timeout-minutes: 5
         runs-on: ubuntu-latest
 
-        needs: build
+        needs: build-shared
 
         steps:
             - uses: actions/checkout@v3
@@ -58,7 +90,7 @@ jobs:
         timeout-minutes: 10
         runs-on: ubuntu-latest
 
-        needs: build
+        needs: build-shared
 
         continue-on-error: true
 
@@ -86,7 +118,7 @@ jobs:
         timeout-minutes: 4
         runs-on: ubuntu-latest
 
-        needs: build
+        needs: build-shared
 
         services:
             postgres:
@@ -146,7 +178,7 @@ jobs:
         timeout-minutes: 4
         runs-on: ubuntu-latest
 
-        needs: build
+        needs: build-shared
 
         services:
             postgres:
@@ -194,7 +226,7 @@ jobs:
         timeout-minutes: 20
         runs-on: ${{ matrix.os }}
 
-        needs: build
+        needs: build-shared
 
         services:
             postgres:
@@ -266,6 +298,9 @@ jobs:
     tests-done:
         if: always()
         needs:
+            - build-shared
+            - build-frontend
+            - build-backend
             - test
             - cypress
             - lint

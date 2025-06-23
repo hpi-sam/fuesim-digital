@@ -217,10 +217,8 @@ jobs:
               run: cd backend && npm run migration:run && cd ..
             - name: Fetch Test Scenarios
               run: git submodule update --init --recursive
-              if: always()
             - name: Run Migration Tests
               run: cd backend && npm run test:ci-migration; cd ..
-              if: always()
 
     cypress:
         timeout-minutes: 20

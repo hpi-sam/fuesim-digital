@@ -96,13 +96,15 @@ jobs:
                     POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
                     POSTGRES_USER: ${{ env.POSTGRES_USER }}
                 ports:
-                    - 5432:5432
+                    - 5432/tcp
                 # Set health checks to wait until postgres has started
+                # Mount tmpfs as data directory to speed up db operations, tests don't need persistence
                 options: >-
                     --health-cmd pg_isready
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
+                    --tmpfs /var/lib/postgresql/data
 
         steps:
             - uses: actions/checkout@v3
@@ -117,6 +119,7 @@ jobs:
                   | sed -e "s/^DFM_DB_USER=.*$/DFM_DB_USER=${{ env.POSTGRES_USER }}/"
                   | sed -e "s/^#DFM_DB_PASSWORD=.*$/DFM_DB_PASSWORD=${{ env.POSTGRES_PASSWORD }}/"
                   | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
+                  | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
                   | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/" > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run && cd ..
@@ -153,13 +156,15 @@ jobs:
                     POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
                     POSTGRES_USER: ${{ env.POSTGRES_USER }}
                 ports:
-                    - 5432:5432
+                    - 5432/tcp
                 # Set health checks to wait until postgres has started
+                # Mount tmpfs as data directory to speed up db operations, tests don't need persistence
                 options: >-
                     --health-cmd pg_isready
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
+                    --tmpfs /var/lib/postgresql/data
 
         steps:
             - uses: actions/checkout@v3
@@ -174,6 +179,7 @@ jobs:
                   | sed -e "s/^DFM_DB_USER=.*$/DFM_DB_USER=${{ env.POSTGRES_USER }}/"
                   | sed -e "s/^#DFM_DB_PASSWORD=.*$/DFM_DB_PASSWORD=${{ env.POSTGRES_PASSWORD }}/"
                   | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
+                  | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
                   | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/" > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run && cd ..
@@ -198,13 +204,15 @@ jobs:
                     POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
                     POSTGRES_USER: ${{ env.POSTGRES_USER }}
                 ports:
-                    - 5432:5432
+                    - 5432/tcp
                 # Set health checks to wait until postgres has started
+                # Mount tmpfs as data directory to speed up db operations, tests don't need persistence
                 options: >-
                     --health-cmd pg_isready
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
+                    --tmpfs /var/lib/postgresql/data
 
         strategy:
             matrix:
@@ -234,6 +242,7 @@ jobs:
                   | sed -e "s/^DFM_DB_USER=.*$/DFM_DB_USER=${{ env.POSTGRES_USER }}/"
                   | sed -e "s/^#DFM_DB_PASSWORD=.*$/DFM_DB_PASSWORD=${{ env.POSTGRES_PASSWORD }}/"
                   | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
+                  | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
                   | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/" > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run && cd ..

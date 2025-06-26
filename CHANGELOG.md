@@ -11,6 +11,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - In the patient popup, there is a now a tab with a QR Code of the patient identifier. It is also
   possible to set custom QR code contents for each patient to support complexer systems.
+- Berliner Feuerwehr is now mentioned as member of the project consortium.
 
 ### Fixed
 

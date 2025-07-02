@@ -1,7 +1,6 @@
 import type { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { AssignLeaderBehaviorState } from 'digital-fuesim-manv-shared';
 import { personnelTypeNames } from 'digital-fuesim-manv-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
@@ -38,7 +37,6 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
         const simulatedRegions$ = this.store.select(selectSimulatedRegions);
         const personnel$ = this.store.select(selectPersonnel);
 
-        // @ts-expect-error Typescript does not detect the return type of `regions.sort` correctly, so the assignment to `this.regions$` would fail
         this.regions$ = combineLatest([simulatedRegions$, personnel$]).pipe(
             map(([simulatedRegions, personnel]) =>
                 Object.values(simulatedRegions).map((simulatedRegion) => {
@@ -47,18 +45,24 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
                     );
 
                     if (!assignLeaderBehavior?.leaderId) {
-                        return { name: simulatedRegion.name, hasLeader: false };
+                        return {
+                            name: simulatedRegion.name,
+                            hasLeader: false as const,
+                        };
                     }
 
                     const leader = personnel[assignLeaderBehavior.leaderId];
 
                     if (!leader) {
-                        return { name: simulatedRegion.name, hasLeader: false };
+                        return {
+                            name: simulatedRegion.name,
+                            hasLeader: false as const,
+                        };
                     }
 
                     return {
                         name: simulatedRegion.name,
-                        hasLeader: true,
+                        hasLeader: true as const,
                         leaderName: personnelTypeNames[leader.personnelType],
                         leaderVehicleName: leader.vehicleName,
                     };

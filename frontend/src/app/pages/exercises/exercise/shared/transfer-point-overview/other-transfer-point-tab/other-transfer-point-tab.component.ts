@@ -1,4 +1,4 @@
-import type { OnDestroy, OnInit } from '@angular/core';
+import type { OnInit } from '@angular/core';
 import { Component, Input, ViewChild } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
@@ -8,11 +8,6 @@ import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
-import {
-    Hotkey,
-    HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
 import type { AppState } from 'src/app/state/app.state';
 import {
     createSelectTransferPoint,
@@ -25,7 +20,7 @@ import {
     styleUrls: ['./other-transfer-point-tab.component.scss'],
     standalone: false,
 })
-export class OtherTransferPointTabComponent implements OnInit, OnDestroy {
+export class OtherTransferPointTabComponent implements OnInit {
     @Input() public transferPointId!: UUID;
 
     @ViewChild(NgbPopover) popover!: NgbPopover;
@@ -41,15 +36,9 @@ export class OtherTransferPointTabComponent implements OnInit, OnDestroy {
      */
     public transferPointsToBeAdded$!: Observable<SearchableDropdownOption[]>;
 
-    private hotkeyLayer!: HotkeyLayer;
-    public addConnectionHotkey = new Hotkey('+', false, (event) => {
-        this.popover.open();
-    });
-
     constructor(
         private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly hotkeysService: HotkeysService
+        private readonly exerciseService: ExerciseService
     ) {}
 
     ngOnInit() {
@@ -90,13 +79,6 @@ export class OtherTransferPointTabComponent implements OnInit, OnDestroy {
                     .sort((a, b) => a.name.localeCompare(b.name))
             )
         );
-
-        this.hotkeyLayer = this.hotkeysService.createLayer();
-        this.hotkeyLayer.addHotkey(this.addConnectionHotkey);
-    }
-
-    ngOnDestroy() {
-        this.hotkeysService.removeLayer(this.hotkeyLayer);
     }
 
     public connectTransferPoint(transferPointId: UUID, duration?: number) {

@@ -60,28 +60,30 @@
             </li>
         </ul>
     </div>
-    <button
-        type="button"
-        class="btn btn-outline-primary"
-        [ngbPopover]="selectTargetTemplate"
-        autoClose="outside"
-        #selectTargetPopover="ngbPopover"
-        [disabled]="((transferPointsToBeAdded$ | async)?.length ?? 0) === 0"
-        [tabIndex]="
-            (transferPoint.reachableTransferPoints | values).length * 2 + 1
-        "
-        data-cy="transferPointPopupAddOtherTransferPointButton"
-    >
-        <span class="bi-plus me-1"></span>
-        Hinzufügen
-        <app-hotkey-indicator [hotkey]="addConnectionHotkey" />
-    </button>
-    <ng-template #selectTargetTemplate>
-        <app-searchable-dropdown
-            [options]="(transferPointsToBeAdded$ | async)!"
-            (selected)="
-                connectTransferPoint($event.key); selectTargetPopover.close()
+    <div class="d-inline-block">
+        <button
+            type="button"
+            class="btn btn-outline-primary"
+            [ngbPopover]="selectTargetTemplate"
+            autoClose="outside"
+            #selectTargetPopover="ngbPopover"
+            [disabled]="((transferPointsToBeAdded$ | async)?.length ?? 0) === 0"
+            [tabIndex]="
+                (transferPoint.reachableTransferPoints | values).length * 2 + 1
             "
-        />
-    </ng-template>
+            data-cy="transferPointPopupAddOtherTransferPointButton"
+        >
+            <span class="bi-plus me-1"></span>
+            Hinzufügen
+        </button>
+        <ng-template #selectTargetTemplate>
+            <app-searchable-dropdown
+                [options]="(transferPointsToBeAdded$ | async)!"
+                (selected)="
+                    connectTransferPoint($event.key);
+                    selectTargetPopover.close()
+                "
+            />
+        </ng-template>
+    </div>
 </div>

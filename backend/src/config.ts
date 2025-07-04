@@ -123,9 +123,9 @@ export class Config {
             DFM_DB_LOG: bool({ default: false }),
             DFM_DB_LOG_TESTING: bool({ default: undefined }),
             DFM_DB_HOST: str({ default: '127.0.0.1' }),
-            DFM_DB_HOST_TESTING: str({ default: '127.0.0.1' }),
+            DFM_DB_HOST_TESTING: str({ default: undefined }),
             DFM_DB_PORT: tcpPortValidator({ default: 5432 }),
-            DFM_DB_PORT_TESTING: tcpPortValidator({ default: 5432 }),
+            DFM_DB_PORT_TESTING: tcpPortValidator({ default: undefined }),
         });
     }
 
@@ -172,8 +172,14 @@ export class Config {
             testing && env.DFM_DB_LOG_TESTING
                 ? env.DFM_DB_LOG_TESTING
                 : env.DFM_DB_LOG;
-        this._dbHost = testing ? env.DFM_DB_HOST_TESTING : env.DFM_DB_HOST;
-        this._dbPort = testing ? env.DFM_DB_PORT_TESTING : env.DFM_DB_PORT;
+        this._dbHost =
+            testing && env.DFM_DB_HOST_TESTING
+                ? env.DFM_DB_HOST_TESTING
+                : env.DFM_DB_HOST;
+        this._dbPort =
+            testing && env.DFM_DB_PORT_TESTING
+                ? env.DFM_DB_PORT_TESTING
+                : env.DFM_DB_PORT;
         this.isInitialized = true;
     }
 }

@@ -28,7 +28,8 @@ import { addTransferInitiatingRegionToRequestEvents35 } from './35-add-transfer-
 import { addAlarmGroupIdToAlarmGroupStartPoint36 } from './36-add-alarm-group-id-to-alarm-group-start-point.js';
 import { addPatientIdentifiers37 } from './37-add-patient-identifiers.js';
 import { deterministicAlarmGroups38 } from './38-deterministic-alarm-groups.js';
-import { adaptInterfaceSignallerUI39 } from './39-adapt-interface-signaller-ui.js';
+import { addCustomPatientQRCode39 } from './39-add-custom-patient-qr-code.js';
+import { adaptInterfaceSignallerUI40 } from './40-adapt-interface-signaller-ui.js';
 import { removeSetParticipantIdAction4 } from './4-remove-set-participant-id-action.js';
 import { removeStatistics5 } from './5-remove-statistics.js';
 import { removeStateHistory6 } from './6-remove-state-history.js';
@@ -100,5 +101,6 @@ export const migrations: {
     36: addAlarmGroupIdToAlarmGroupStartPoint36,
     37: addPatientIdentifiers37,
     38: deterministicAlarmGroups38,
-    39: adaptInterfaceSignallerUI39,
+    39: addCustomPatientQRCode39,
+    40: adaptInterfaceSignallerUI40,
 };

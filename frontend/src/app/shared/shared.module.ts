@@ -8,6 +8,7 @@ import {
     NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
+import { QrCodeComponent } from 'ng-qrcode';
 import { HospitalNameComponent } from './components/hospital-name/hospital-name.component';
 import { PatientStatusDataFieldComponent } from './components/patient-status-displayl/patient-status-data-field/patient-status-data-field.component';
 import { PatientStatusDisplayComponent } from './components/patient-status-displayl/patient-status-display/patient-status-display.component';
@@ -111,6 +112,7 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
         NgbNavModule,
         NgbTooltip,
         NgbPopover,
+        QrCodeComponent,
     ],
     exports: [
         AutofocusDirective,

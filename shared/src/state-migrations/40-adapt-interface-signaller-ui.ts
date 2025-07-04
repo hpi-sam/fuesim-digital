@@ -108,7 +108,7 @@ interface VehicleResource {
  * - Rename `reportTreatmentProgressChanges` to `reportChanges` on `UpdateReportTreatmentStatusChangesAction`
  * - Add `sent` property to `AlarmGroup`
  */
-export const adaptInterfaceSignallerUI39: Migration = {
+export const adaptInterfaceSignallerUI40: Migration = {
     action: (intermediaryState, action) => {
         switch ((action as { type: string }).type) {
             // Add `sent`-property to `AlarmGroup`

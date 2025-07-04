@@ -8,7 +8,7 @@ import type {
 import type { UUID } from 'digital-fuesim-manv-shared';
 import {
     StrictObject,
-    getKeyDetails,
+    getInformationRequestKeyDetails,
     isAccepted,
     isInterfaceSignallerKeyForClient,
     isUnread,
@@ -190,7 +190,7 @@ export class SignallerModalInteractionsComponent
                 map((radiograms) =>
                     radiograms.filter((radiogram) =>
                         isInterfaceSignallerKeyForClient(
-                            radiogram.key,
+                            radiogram.informationRequestKey,
                             this.clientId
                         )
                     )
@@ -207,7 +207,9 @@ export class SignallerModalInteractionsComponent
 
                     setLoadingState(
                         this.interactions,
-                        getKeyDetails(radiogram.key!),
+                        getInformationRequestKeyDetails(
+                            radiogram.informationRequestKey!
+                        ),
                         false
                     );
                 });
@@ -221,7 +223,7 @@ export class SignallerModalInteractionsComponent
                 radiograms.filter(
                     (radiogram) =>
                         isInterfaceSignallerKeyForClient(
-                            radiogram.key,
+                            radiogram.informationRequestKey,
                             this.clientId
                         ) &&
                         radiogram.simulatedRegionId === this.simulatedRegionId
@@ -229,7 +231,9 @@ export class SignallerModalInteractionsComponent
             ),
             map((radiograms) =>
                 groupBy(radiograms, (radiogram) =>
-                    getKeyDetails(radiogram.key!)
+                    getInformationRequestKeyDetails(
+                        radiogram.informationRequestKey!
+                    )
                 )
             )
         );

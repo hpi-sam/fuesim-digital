@@ -7,5 +7,5 @@ export class Radiogram {
     readonly simulatedRegionId!: UUID;
     readonly status!: ExerciseRadiogramStatus;
     readonly informationAvailable!: boolean;
-    readonly key!: string | null;
+    readonly informationRequestKey!: string | null;
 }

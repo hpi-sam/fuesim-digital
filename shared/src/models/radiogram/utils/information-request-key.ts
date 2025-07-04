@@ -2,7 +2,7 @@ import type { UUID } from '../../../utils/uuid.js';
 
 const interfaceSignallerPrefix = 'interfaceSignaller';
 
-export function getKeyDetails(key: string) {
+export function getInformationRequestKeyDetails(key: string) {
     return key.split('_').slice(2).join('_');
 }
 

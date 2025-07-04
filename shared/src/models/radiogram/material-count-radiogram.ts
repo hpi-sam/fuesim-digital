@@ -38,7 +38,7 @@ export class MaterialCountRadiogram implements Radiogram {
 
     @IsString()
     @ValidateIf((_, value) => value !== null)
-    public readonly key: string | null;
+    public readonly informationRequestKey: string | null;
 
     @ValidateNested()
     @Type(() => CanCaterFor)
@@ -55,7 +55,7 @@ export class MaterialCountRadiogram implements Radiogram {
     ) {
         this.id = id;
         this.simulatedRegionId = simulatedRegionId;
-        this.key = key;
+        this.informationRequestKey = key;
         this.status = status;
         this.materialForPatients = {
             red: 0,

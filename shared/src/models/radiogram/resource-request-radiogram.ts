@@ -43,7 +43,7 @@ export class ResourceRequestRadiogram implements Radiogram {
 
     @IsString()
     @ValidateIf((_, value) => value !== null)
-    public readonly key: string | null;
+    public readonly informationRequestKey: string | null;
 
     @Type(() => VehicleResource)
     @ValidateNested()
@@ -55,10 +55,10 @@ export class ResourceRequestRadiogram implements Radiogram {
     readonly alreadyPromisedResource: VehicleResource | null = null;
 
     @IsBoolean()
-    readonly canBeAccepted: boolean = true;
+    readonly canBeGranted: boolean = true;
 
     @IsString()
-    readonly requestKey: string = '';
+    readonly resourceRequestKey: string = '';
 
     /**
      * @deprecated Use {@link create} instead
@@ -71,7 +71,7 @@ export class ResourceRequestRadiogram implements Radiogram {
     ) {
         this.id = id;
         this.simulatedRegionId = simulatedRegionId;
-        this.key = key;
+        this.informationRequestKey = key;
         this.status = status;
     }
 

@@ -40,7 +40,7 @@ export class PersonnelCountRadiogram implements Radiogram {
 
     @IsString()
     @ValidateIf((_, value) => value !== null)
-    public readonly key: string | null;
+    public readonly informationRequestKey: string | null;
 
     @IsPersonnelCount()
     readonly personnelCount: PersonnelCount;
@@ -56,7 +56,7 @@ export class PersonnelCountRadiogram implements Radiogram {
     ) {
         this.id = id;
         this.simulatedRegionId = simulatedRegionId;
-        this.key = key;
+        this.informationRequestKey = key;
         this.status = status;
         this.personnelCount = {
             gf: 0,

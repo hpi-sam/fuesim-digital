@@ -1,7 +1,7 @@
 <ng-container *ngIf="radiogram$ | async as radiogram">
     <h5>
         {{
-            radiogram.canBeAccepted
+            radiogram.canBeGranted
                 ? 'Anfrage von Ressourcen'
                 : 'Benötigte Ressourcen'
         }}
@@ -51,7 +51,7 @@
                 </tr>
             </tbody>
         </table>
-        <ng-container *ngIf="radiogram.canBeAccepted">
+        <ng-container *ngIf="radiogram.canBeGranted">
             <ng-container *ngIf="showAnswer$ | async; else actionButtons">
                 <p class="card-text mt-3">
                     <ng-container
@@ -100,7 +100,7 @@
     </ng-container>
 
     <ng-template #noResourcesSpecified>
-        <ng-container *ngIf="radiogram.canBeAccepted; else noResourcesRequired">
+        <ng-container *ngIf="radiogram.canBeGranted; else noResourcesRequired">
             <!-- Before migration 39, the radiogram did not specify the exact resources needed -->
             <p class="card-text">
                 Es werden weitere Ressourcen benötigt, aber es ist keine genaue

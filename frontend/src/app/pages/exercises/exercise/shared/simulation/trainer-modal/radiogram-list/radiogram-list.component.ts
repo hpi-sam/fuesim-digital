@@ -85,7 +85,10 @@ export class RadiogramListComponent implements OnInit {
         )
             return false;
 
-        if (isUnread(radiogram) && isInterfaceSignallerKey(radiogram.key))
+        if (
+            isUnread(radiogram) &&
+            isInterfaceSignallerKey(radiogram.informationRequestKey)
+        )
             return false;
 
         return true;

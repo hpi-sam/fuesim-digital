@@ -37,7 +37,7 @@ export class TransferConnectionsRadiogram implements Radiogram {
 
     @IsString()
     @ValidateIf((_, value) => value !== null)
-    public readonly key: string | null;
+    public readonly informationRequestKey: string | null;
 
     @IsStringMap(Number)
     public readonly connectedRegions: { [key: UUID]: number } = {};
@@ -53,7 +53,7 @@ export class TransferConnectionsRadiogram implements Radiogram {
     ) {
         this.id = id;
         this.simulatedRegionId = simulatedRegionId;
-        this.key = key;
+        this.informationRequestKey = key;
         this.status = status;
     }
 

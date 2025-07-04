@@ -202,7 +202,7 @@ export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
                             )
                         );
                         radiogram.informationAvailable = true;
-                        radiogram.canBeAccepted = false;
+                        radiogram.canBeGranted = false;
                         break;
                     }
                     default:

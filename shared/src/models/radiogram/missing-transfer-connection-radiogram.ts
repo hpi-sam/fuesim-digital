@@ -36,7 +36,7 @@ export class MissingTransferConnectionRadiogram implements Radiogram {
 
     @IsString()
     @ValidateIf((_, value) => value !== null)
-    public readonly key: string | null = null;
+    public readonly informationRequestKey: string | null = null;
 
     @IsUUID(4, uuidValidationOptions)
     readonly targetTransferPointId: UUID;

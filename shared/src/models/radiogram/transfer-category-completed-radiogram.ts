@@ -40,7 +40,7 @@ export class TransferCategoryCompletedRadiogram implements Radiogram {
 
     @IsString()
     @ValidateIf((_, value) => value !== null)
-    public readonly key: string | null = null;
+    public readonly informationRequestKey: string | null = null;
 
     @IsLiteralUnion(patientStatusAllowedValues)
     readonly completedCategory: PatientStatus = 'white';

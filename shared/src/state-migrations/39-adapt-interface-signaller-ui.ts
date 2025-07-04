@@ -78,18 +78,19 @@ type ExerciseRadiogram = GenericRadiogram | ResourceRequestRadiogram;
 
 interface GenericRadiogram {
     type: "This kind of radiogram does not actually exist. It's a catch-all for the migration";
-    key: string | null;
+    informationRequestKey: string | null;
 }
 
 interface ResourceRequestRadiogram {
     type: 'resourceRequestRadiogram';
 
-    key: string | null;
-    requestKey: string;
+    key?: string | null;
+    informationRequestKey: string | null;
+    resourceRequestKey: string;
 
     requiredResource: VehicleResource;
     alreadyPromisedResource: null;
-    canBeAccepted: boolean;
+    canBeGranted: boolean;
 }
 
 interface VehicleResource {
@@ -100,10 +101,10 @@ interface VehicleResource {
 /**
  * This migration performs several changes as part of the addition of the interface signaller modal, namely:
  *
- * - Rename `key` to `resourceKey` on `ResourceRequestRadiogram`
- * - Add `key` property (with value `null`) to all radiograms
+ * - Rename `key` to `resourceRequestKey` on `ResourceRequestRadiogram`
+ * - Add `informationRequestKey` property (with value `null`) to all radiograms
  * - Add `interfaceSignallerKey` (with value `null`) to `StartCollectingInformationEvent` and `CreateReportAction`
- * - Several additional properties on `ResourceRequestRadiogram` (`requiredResource`, `alreadyPromisedResource`, `canBeAccepted`)
+ * - Several additional properties on `ResourceRequestRadiogram` (`requiredResource`, `alreadyPromisedResource`, `canBeGranted`)
  * - Rename `reportTreatmentProgressChanges` to `reportChanges` on `UpdateReportTreatmentStatusChangesAction`
  * - Add `sent` property to `AlarmGroup`
  */
@@ -153,10 +154,12 @@ export const adaptInterfaceSignallerUI39: Migration = {
             );
         });
 
-        // Rename `key` to `requestKey` on `ResourceRequestRadiogram`
+        // Rename `key` to `resourceRequestKey` on `ResourceRequestRadiogram`
         forEachRadiogram(typedState, (radiogram) => {
-            if (radiogram.type === 'resourceRequestRadiogram')
-                radiogram.requestKey = radiogram.key!;
+            if (radiogram.type === 'resourceRequestRadiogram') {
+                radiogram.resourceRequestKey = radiogram.key!;
+                delete radiogram.key;
+            }
         });
 
         // Add `interfaceSignallerKey` to `StartCollectingInformationEvent`
@@ -175,13 +178,13 @@ export const adaptInterfaceSignallerUI39: Migration = {
                 radiogram.alreadyPromisedResource = null;
 
                 // This is the "original" behavior of the radiogram (actively requesting resources)
-                radiogram.canBeAccepted = true;
+                radiogram.canBeGranted = true;
             }
         });
 
         // Add `key` to radiograms
         forEachRadiogram(typedState, (radiogram) => {
-            radiogram.key = null;
+            radiogram.informationRequestKey = null;
         });
     },
 };

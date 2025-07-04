@@ -1,2 +1,2 @@
 export * from './transfer-progress-scope.js';
-export * from './keys.js';
+export * from './information-request-key.js';

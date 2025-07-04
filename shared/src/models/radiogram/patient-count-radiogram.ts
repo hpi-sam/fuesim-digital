@@ -40,7 +40,7 @@ export class PatientCountRadiogram implements Radiogram {
 
     @IsString()
     @ValidateIf((_, value) => value !== null)
-    public readonly key: string | null;
+    public readonly informationRequestKey: string | null;
 
     @IsResourceDescription(patientStatusAllowedValues)
     readonly patientCount: ResourceDescription<PatientStatus>;
@@ -56,7 +56,7 @@ export class PatientCountRadiogram implements Radiogram {
     ) {
         this.id = id;
         this.simulatedRegionId = simulatedRegionId;
-        this.key = key;
+        this.informationRequestKey = key;
         this.status = status;
         this.patientCount = {
             red: 0,

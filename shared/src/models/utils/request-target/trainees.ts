@@ -39,7 +39,7 @@ export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfigura
                 (radiogram) =>
                     radiogram.type === 'resourceRequestRadiogram' &&
                     isUnread(radiogram) &&
-                    radiogram.requestKey === key
+                    radiogram.resourceRequestKey === key
             ) as Mutable<ResourceRequestRadiogram> | undefined;
             if (unreadRadiogram) {
                 if (isEmptyResource(requestedResource)) {
@@ -55,7 +55,7 @@ export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfigura
                     .filter(
                         (radiogram) =>
                             radiogram.type === 'resourceRequestRadiogram' &&
-                            radiogram.requestKey === key
+                            radiogram.resourceRequestKey === key
                     )
                     .every(isDone) &&
                 !isEmptyResource(requestedResource)
@@ -69,7 +69,7 @@ export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfigura
                     )
                 );
                 radiogram.requiredResource = requestedResource;
-                radiogram.requestKey = key;
+                radiogram.resourceRequestKey = key;
                 radiogram.informationAvailable = true;
                 publishRadiogram(draftState, radiogram);
                 // eslint-disable-next-line no-useless-return

@@ -11,7 +11,7 @@
 <div class="modal-body">
     <ng-container [ngTemplateOutlet]="body" />
 </div>
-<div class="modal-footer text-muted">
+<div *ngIf="hotkeysEnabled" class="modal-footer text-muted">
     <small>
         <app-hotkey-indicator keys="Leertaste" />: Aktuelles Steuerelement
         an-/ausschalten

@@ -16,8 +16,9 @@ import {
 export class SignallerModalDetailsModalComponent implements OnInit, OnDestroy {
     @Input() title = '';
     @Input() body!: TemplateRef<any>;
+    @Input() hotkeysEnabled = true;
 
-    private hotkeyLayer!: HotkeyLayer;
+    private hotkeyLayer?: HotkeyLayer;
     private readonly closeHotkey = new Hotkey('Esc', false, () => this.close());
 
     constructor(
@@ -26,12 +27,14 @@ export class SignallerModalDetailsModalComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit() {
-        this.hotkeyLayer = this.hotkeysService.createLayer(true);
-        this.hotkeyLayer.addHotkey(this.closeHotkey);
+        if (this.hotkeysEnabled) {
+            this.hotkeyLayer = this.hotkeysService.createLayer(true);
+            this.hotkeyLayer.addHotkey(this.closeHotkey);
+        }
     }
 
     ngOnDestroy() {
-        this.hotkeysService.removeLayer(this.hotkeyLayer);
+        if (this.hotkeyLayer) this.hotkeysService.removeLayer(this.hotkeyLayer);
     }
 
     public close() {

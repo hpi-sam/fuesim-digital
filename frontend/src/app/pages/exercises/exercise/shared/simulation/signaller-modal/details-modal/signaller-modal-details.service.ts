@@ -10,7 +10,7 @@ export class SignallerModalDetailsService {
 
     constructor(private readonly ngbModalService: NgbModal) {}
 
-    public open(title: string, body: TemplateRef<any>) {
+    public open(title: string, body: TemplateRef<any>, hotkeysEnabled = true) {
         const modal = this.ngbModalService.open(
             SignallerModalDetailsModalComponent,
             {
@@ -23,6 +23,7 @@ export class SignallerModalDetailsService {
 
         component.title = title;
         component.body = body;
+        component.hotkeysEnabled = hotkeysEnabled;
 
         this.modals.push(modal);
     }

@@ -99,14 +99,16 @@ export class SignallerModalEocComponent {
     requestAlarmGroupsSent() {
         this.detailsModal.open(
             'Bereit alarmierte Alarmgruppen',
-            this.alarmGroupsSentDisplay
+            this.alarmGroupsSentDisplay,
+            false
         );
     }
 
     requestArrivingVehicles() {
         this.detailsModal.open(
             'Fahrzeuge auf Anfahrt',
-            this.arrivingVehiclesDisplay
+            this.arrivingVehiclesDisplay,
+            false
         );
     }
 

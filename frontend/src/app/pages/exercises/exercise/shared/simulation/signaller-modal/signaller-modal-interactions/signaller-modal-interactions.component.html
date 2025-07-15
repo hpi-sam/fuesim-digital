@@ -64,9 +64,7 @@
                     class="btn btn-primary"
                     [class.btn-primary]="index !== selectedIndex"
                     [class.btn-outline-light]="index === selectedIndex"
-                    (click)="
-                        interaction.hotkey.callback(undefined!, undefined!)
-                    "
+                    (click)="interaction.hotkey.callback(undefined, undefined)"
                 >
                     {{ primaryActionLabel }}
                     <span
@@ -94,8 +92,8 @@
                     class="btn btn-secondary ms-1"
                     (click)="
                         interaction.secondaryHotkey?.callback(
-                            undefined!,
-                            undefined!
+                            undefined,
+                            undefined
                         )
                     "
                 >

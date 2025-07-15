@@ -295,8 +295,8 @@ export class SignallerModalInteractionsComponent
             this.selectedIndex < this.filteredInteractions.length
         ) {
             this.filteredInteractions[this.selectedIndex]?.hotkey.callback(
-                undefined!,
-                undefined!
+                undefined,
+                undefined
             );
         }
     }
@@ -308,7 +308,7 @@ export class SignallerModalInteractionsComponent
         ) {
             this.filteredInteractions[
                 this.selectedIndex
-            ]?.secondaryHotkey?.callback(undefined!, undefined!);
+            ]?.secondaryHotkey?.callback(undefined, undefined);
         }
     }
 }

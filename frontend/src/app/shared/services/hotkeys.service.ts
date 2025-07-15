@@ -12,8 +12,8 @@ export class Hotkey {
         public readonly keys: string,
         public readonly isCombo: boolean,
         public readonly callback: (
-            keyboardEvent: KeyboardEvent,
-            hotkeysEvent: HotkeysEvent
+            keyboardEvent?: KeyboardEvent,
+            hotkeysEvent?: HotkeysEvent
         ) => void
     ) {}
 

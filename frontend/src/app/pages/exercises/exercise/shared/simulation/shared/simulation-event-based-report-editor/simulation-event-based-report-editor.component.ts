@@ -142,15 +142,13 @@ export class SimulationEventBasedReportEditorComponent
     }
 
     toggleEventBasedReport(eventId: EventId) {
-        // ESLint seems to be wrong here. Without the type assertion, we receive an ExerciseSimulationBehaviorState
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        const reportBehavior = selectStateSnapshot(
+        const reportBehavior = selectStateSnapshot<ReportBehaviorState>(
             createSelectBehaviorState(
                 this.simulatedRegionId,
                 this.reportBehaviorId
             ),
             this.store
-        ) as ReportBehaviorState;
+        );
 
         this.exerciseService.proposeAction({
             type: eventBasedReportData[eventId].actionType,

@@ -278,7 +278,8 @@ export class SignallerModalInteractionsComponent
     }
 
     decreaseSelectedIndex() {
-        if (this.selectedIndex - 1 >= -1) this.selectedIndex--;
+        // This is a check for greater-*equal* on purpose. `selectedIndex == -1` is a valid option (no selection)
+        if (this.selectedIndex >= 0) this.selectedIndex--;
     }
 
     resetSelectedIndex() {

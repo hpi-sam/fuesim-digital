@@ -38,7 +38,11 @@ export class SignallerModalStartTransferOfCategoryModalComponent
 
     loadingCount = 0;
 
-    allowedStatuses = ['red', 'yellow', 'green'] as const;
+    allowedStatuses = [
+        'red',
+        'yellow',
+        'green',
+    ] as const satisfies PatientStatusForTransport[];
 
     constructor(
         private readonly exerciseService: ExerciseService,

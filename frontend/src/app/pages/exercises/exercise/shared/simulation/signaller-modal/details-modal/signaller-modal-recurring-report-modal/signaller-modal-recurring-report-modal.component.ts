@@ -38,7 +38,7 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
     public reportBehaviorId: UUID | null = null;
     public recurringActivityId: UUID | null = null;
     public reportsEnabled = false;
-    public reportInterval = defaultInterval;
+    public reportIntervalMilliseconds = defaultInterval;
 
     public loading = false;
 
@@ -75,13 +75,14 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
 
             this.reportsEnabled = !!recurringActivity;
             this.recurringActivityId = recurringActivity?.id ?? null;
-            this.reportInterval =
+            this.reportIntervalMilliseconds =
                 recurringActivity?.recurrenceIntervalTime ?? defaultInterval;
         }
     }
 
-    public updateInterval(newInterval: string) {
-        this.reportInterval = Number(newInterval) * 60 * 1000;
+    public updateInterval(newIntervalMinutes: string) {
+        this.reportIntervalMilliseconds =
+            Number(newIntervalMinutes) * 60 * 1000;
     }
 
     public submit() {
@@ -99,7 +100,7 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
                 simulatedRegionId: this.simulatedRegionId,
                 behaviorId: this.reportBehaviorId,
                 informationType: this.informationType,
-                interval: this.reportInterval,
+                interval: this.reportIntervalMilliseconds,
             });
         } else if (this.reportsEnabled && this.recurringActivityId) {
             // Reports are currently enabled and should still be
@@ -108,7 +109,7 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
                 simulatedRegionId: this.simulatedRegionId,
                 behaviorId: this.reportBehaviorId,
                 informationType: this.informationType,
-                interval: this.reportInterval,
+                interval: this.reportIntervalMilliseconds,
             });
         } else if (!this.reportsEnabled && this.recurringActivityId) {
             // Reports are currently enabled but should not be

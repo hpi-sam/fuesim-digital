@@ -22,7 +22,7 @@
                 type="text"
                 [disabled]="!reportsEnabled"
                 name="reportInterval"
-                [ngModel]="reportInterval / 60 / 1000"
+                [ngModel]="reportIntervalMilliseconds / 60 / 1000"
                 (ngModelChange)="updateInterval($event)"
                 tabindex="2"
             />

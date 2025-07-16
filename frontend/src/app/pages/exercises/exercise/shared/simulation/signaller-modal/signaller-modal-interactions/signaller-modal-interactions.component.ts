@@ -86,17 +86,19 @@ export class SignallerModalInteractionsComponent
     selectedIndex = -1;
 
     get filteredInteractions() {
-        const lowerFilter = this.filter.toLowerCase();
+        const lowerFilterPhrases = this.filter.toLowerCase().split(/\s+/u);
 
-        return this.interactions.filter(
-            (interaction) =>
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                interaction.name.toLowerCase().includes(lowerFilter) ||
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                interaction.details?.toLowerCase().includes(lowerFilter) ||
-                interaction.keywords?.some((keyword) =>
-                    keyword.toLowerCase().includes(lowerFilter)
-                )
+        return this.interactions.filter((interaction) =>
+            lowerFilterPhrases.every(
+                (phrase) =>
+                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                    interaction.name.toLowerCase().includes(phrase) ||
+                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                    interaction.details?.toLowerCase().includes(phrase) ||
+                    interaction.keywords?.some((keyword) =>
+                        keyword.toLowerCase().includes(phrase)
+                    )
+            )
         );
     }
 

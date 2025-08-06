@@ -94,7 +94,6 @@ export class SignallerModalStartTransferOfCategoryModalComponent
 
         // loadingCount has to be fully increased before actually proposing the first action. Otherwise, it could become 0 in between.
         // Hence, all actions to be proposed are collected here and proposed in the end.
-        // const actionProposers: (() => void)[] = [];
         const actionsToPropose: ExerciseAction[] = [];
 
         if (

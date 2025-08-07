@@ -14,7 +14,7 @@ import {
     isUnread,
 } from 'digital-fuesim-manv-shared';
 import { groupBy } from 'lodash-es';
-import type { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Subject, map, takeUntil } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
@@ -34,15 +34,31 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 export type InterfaceSignallerInteraction = Omit<
     SearchableDropdownOption,
     'backgroundColor' | 'color'
-> & {
-    details?: string;
-    keywords?: string[];
-    hotkey: Hotkey;
-    secondaryHotkey?: Hotkey;
-    requiredBehaviors: ExerciseSimulationBehaviorType[];
-    errorMessage?: string;
-    loading$?: BehaviorSubject<boolean>;
-};
+> &
+    (
+        | {
+              details?: string;
+              keywords?: string[];
+              hotkeyKeys: string;
+              callback: () => void;
+              hasSecondaryAction: false;
+              requiredBehaviors: ExerciseSimulationBehaviorType[];
+              errorMessage?: string;
+              loading$?: BehaviorSubject<boolean>;
+          }
+        | {
+              details?: string;
+              keywords?: string[];
+              hotkeyKeys: string;
+              callback: () => void;
+              hasSecondaryAction: true;
+              secondaryHotkeyKeys: string;
+              secondaryCallback: () => void;
+              requiredBehaviors: ExerciseSimulationBehaviorType[];
+              errorMessage?: string;
+              loading$?: BehaviorSubject<boolean>;
+          }
+    );
 
 export function setLoadingState(
     interactions: InterfaceSignallerInteraction[],
@@ -77,8 +93,16 @@ export class SignallerModalInteractionsComponent
     @ViewChild('filterInput')
     filterInput!: ElementRef;
 
+    private interactionHotkeys: {
+        [key: string]: { primary: Hotkey; secondary?: Hotkey };
+    } = {};
+    private interactionRequestable: {
+        [key: string]: BehaviorSubject<boolean>;
+    } = {};
+
     private hotkeyLayer: HotkeyLayer | null = null;
     private filterLayer: HotkeyLayer | null = null;
+
     private clientId!: UUID;
 
     filter = '';
@@ -88,18 +112,24 @@ export class SignallerModalInteractionsComponent
     get filteredInteractions() {
         const lowerFilterPhrases = this.filter.toLowerCase().split(/\s+/u);
 
-        return this.interactions.filter((interaction) =>
-            lowerFilterPhrases.every(
-                (phrase) =>
-                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                    interaction.name.toLowerCase().includes(phrase) ||
-                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                    interaction.details?.toLowerCase().includes(phrase) ||
-                    interaction.keywords?.some((keyword) =>
-                        keyword.toLowerCase().includes(phrase)
-                    )
-            )
-        );
+        return this.interactions
+            .map((interaction) => ({
+                ...interaction,
+                hotkeys: this.interactionHotkeys[interaction.key]!,
+                requestable$: this.interactionRequestable[interaction.key]!,
+            }))
+            .filter((interaction) =>
+                lowerFilterPhrases.every(
+                    (phrase) =>
+                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                        interaction.name.toLowerCase().includes(phrase) ||
+                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                        interaction.details?.toLowerCase().includes(phrase) ||
+                        interaction.keywords?.some((keyword) =>
+                            keyword.toLowerCase().includes(phrase)
+                        )
+                )
+            );
     }
 
     filterHotkey!: Hotkey;
@@ -121,8 +151,9 @@ export class SignallerModalInteractionsComponent
         this.filterInput.nativeElement.blur();
     });
 
-    requestable$!: Observable<{ [key: string]: boolean }>;
     requestedRadiograms$!: Observable<{ [key: string]: ExerciseRadiogram[] }>;
+
+    private readonly changeOrDestroy$ = new Subject<void>();
     private readonly destroy$ = new Subject<void>();
 
     constructor(
@@ -136,17 +167,37 @@ export class SignallerModalInteractionsComponent
     }
 
     ngOnChanges() {
+        this.changeOrDestroy$.next();
+
         if (this.hotkeyLayer) {
             this.hotkeysService.removeLayer(this.hotkeyLayer);
         }
         this.hotkeyLayer = this.hotkeysService.createLayer();
 
-        this.interactions.forEach((interaction) => {
-            this.hotkeyLayer!.addHotkey(interaction.hotkey);
+        this.interactionHotkeys = {};
+        this.interactionRequestable = {};
 
-            if (interaction.secondaryHotkey) {
-                this.hotkeyLayer!.addHotkey(interaction.secondaryHotkey);
+        this.interactions.forEach((interaction) => {
+            const hotkeys = {
+                primary: new Hotkey(interaction.hotkeyKeys, false, () => {
+                    this.callPrimaryAction(interaction);
+                }),
+                secondary: undefined as Hotkey | undefined,
+            };
+            this.hotkeyLayer!.addHotkey(hotkeys.primary);
+
+            if (interaction.hasSecondaryAction) {
+                hotkeys.secondary = new Hotkey(
+                    interaction.secondaryHotkeyKeys,
+                    false,
+                    () => {
+                        this.callSecondaryAction(interaction);
+                    }
+                );
+                this.hotkeyLayer!.addHotkey(hotkeys.secondary);
             }
+
+            this.interactionHotkeys[interaction.key] = hotkeys;
         });
 
         if (this.filterHotkeyKeys && this.filterHotkeyKeys !== '') {
@@ -161,22 +212,35 @@ export class SignallerModalInteractionsComponent
                 createSelectBehaviorStates(this.simulatedRegionId)
             );
 
-            this.requestable$ = behaviors$.pipe(
-                map((behaviors) =>
-                    Object.fromEntries(
-                        this.interactions.map((interaction) => [
-                            interaction.key,
-                            interaction.requiredBehaviors.every(
-                                (requiredBehavior) =>
-                                    behaviors.some(
-                                        (behavior) =>
-                                            behavior.type === requiredBehavior
-                                    )
-                            ),
-                        ])
+            this.interactions.forEach((interaction) => {
+                const requestable$ = behaviors$.pipe(
+                    map((behaviors) =>
+                        interaction.requiredBehaviors.every(
+                            (requiredBehavior) =>
+                                behaviors.some(
+                                    (behavior) =>
+                                        behavior.type === requiredBehavior
+                                )
+                        )
                     )
-                )
-            );
+                );
+
+                const requestableBehaviorSubject$ = new BehaviorSubject(false);
+
+                requestable$
+                    .pipe(takeUntil(this.changeOrDestroy$))
+                    .subscribe((requestable) =>
+                        requestableBehaviorSubject$.next(requestable)
+                    );
+
+                this.interactionRequestable[interaction.key] =
+                    requestableBehaviorSubject$;
+            });
+        } else {
+            this.interactions.forEach((interaction) => {
+                this.interactionRequestable[interaction.key] =
+                    new BehaviorSubject(true);
+            });
         }
 
         const radiograms$ = this.store
@@ -249,6 +313,7 @@ export class SignallerModalInteractionsComponent
             this.hotkeysService.removeLayer(this.filterLayer);
         }
 
+        this.changeOrDestroy$.next();
         this.destroy$.next();
     }
 
@@ -297,9 +362,8 @@ export class SignallerModalInteractionsComponent
             this.selectedIndex > -1 &&
             this.selectedIndex < this.filteredInteractions.length
         ) {
-            this.filteredInteractions[this.selectedIndex]?.hotkey.callback(
-                undefined,
-                undefined
+            this.callPrimaryAction(
+                this.filteredInteractions[this.selectedIndex]!
             );
         }
     }
@@ -309,9 +373,31 @@ export class SignallerModalInteractionsComponent
             this.selectedIndex > -1 &&
             this.selectedIndex < this.filteredInteractions.length
         ) {
-            this.filteredInteractions[
-                this.selectedIndex
-            ]?.secondaryHotkey?.callback(undefined, undefined);
+            this.callSecondaryAction(
+                this.filteredInteractions[this.selectedIndex]!
+            );
         }
+    }
+
+    isInteractionEnabled(interaction: InterfaceSignallerInteraction) {
+        if (interaction.loading$)
+            return (
+                this.interactionRequestable[interaction.key]!.getValue() &&
+                !interaction.loading$.getValue()
+            );
+
+        return this.interactionRequestable[interaction.key]!.getValue();
+    }
+
+    callPrimaryAction(interaction: InterfaceSignallerInteraction) {
+        if (this.isInteractionEnabled(interaction)) interaction.callback();
+    }
+
+    callSecondaryAction(interaction: InterfaceSignallerInteraction) {
+        if (
+            interaction.hasSecondaryAction &&
+            this.isInteractionEnabled(interaction)
+        )
+            interaction.secondaryCallback();
     }
 }

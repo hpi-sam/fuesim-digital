@@ -1,8 +1,5 @@
 import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Hotkey } from 'src/app/shared/services/hotkeys.service';
-import { Store } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
 import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
 
@@ -36,7 +33,9 @@ export class SignallerModalEocComponent {
                 'gestartet',
                 'gesendet',
             ],
-            hotkey: new Hotkey('A', false, () => this.requestAlarmGroupsSent()),
+            hotkeyKeys: 'A',
+            callback: () => this.requestAlarmGroupsSent(),
+            hasSecondaryAction: false,
             requiredBehaviors: [],
             loading$: new BehaviorSubject<boolean>(false),
         },
@@ -60,9 +59,9 @@ export class SignallerModalEocComponent {
                 'anzahl',
                 'menge',
             ],
-            hotkey: new Hotkey('B', false, () =>
-                this.requestArrivingVehicles()
-            ),
+            hotkeyKeys: 'B',
+            callback: () => this.requestArrivingVehicles(),
+            hasSecondaryAction: false,
             requiredBehaviors: [],
             loading$: new BehaviorSubject<boolean>(false),
         },
@@ -85,30 +84,27 @@ export class SignallerModalEocComponent {
                 'senden',
                 'erhöhen',
             ],
-            hotkey: new Hotkey('1', false, () => this.sendAlarmGroup()),
+            hotkeyKeys: '1',
+            callback: () => this.sendAlarmGroup(),
+            hasSecondaryAction: false,
             requiredBehaviors: [],
             loading$: new BehaviorSubject<boolean>(false),
         },
     ];
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly detailsModal: SignallerModalDetailsService
-    ) {}
+    constructor(private readonly detailsModal: SignallerModalDetailsService) {}
 
     requestAlarmGroupsSent() {
         this.detailsModal.open(
             'Bereit alarmierte Alarmgruppen',
-            this.alarmGroupsSentDisplay,
-            false
+            this.alarmGroupsSentDisplay
         );
     }
 
     requestArrivingVehicles() {
         this.detailsModal.open(
             'Fahrzeuge auf Anfahrt',
-            this.arrivingVehiclesDisplay,
-            false
+            this.arrivingVehiclesDisplay
         );
     }
 

@@ -32,21 +32,17 @@
         [class.active]="index === selectedIndex"
     >
         <div
-            *appLet="
-                this.simulatedRegionId
-                    ? (requestable$ | async)?.[interaction.key]
-                    : true as enabled
-            "
+            *appLet="interaction.requestable$ | async as requestable"
             class="d-flex flex-row mb-2"
         >
             <div class="flex-grow-1">
-                <span [class.text-muted]="!enabled">
+                <span [class.text-muted]="!requestable">
                     <strong>{{ interaction.name }}</strong>
                     <span *ngIf="interaction.details as details">
                         {{ details }}
                     </span>
                 </span>
-                <ng-container *ngIf="!enabled && interaction.errorMessage">
+                <ng-container *ngIf="!requestable && interaction.errorMessage">
                     <br />
                     <span class="text-warning">{{
                         interaction.errorMessage
@@ -60,11 +56,11 @@
                             ? false
                             : (interaction.loading$ | async) as loading
                     "
-                    [disabled]="!enabled || loading"
+                    [disabled]="!requestable || loading"
                     class="btn btn-primary"
                     [class.btn-primary]="index !== selectedIndex"
                     [class.btn-outline-light]="index === selectedIndex"
-                    (click)="interaction.hotkey.callback(undefined, undefined)"
+                    (click)="callPrimaryAction(interaction)"
                 >
                     {{ primaryActionLabel }}
                     <span
@@ -76,7 +72,7 @@
                     <ng-template #hotkeys>
                         <app-hotkey-indicator
                             *ngIf="index !== selectedIndex"
-                            [hotkey]="interaction.hotkey"
+                            [hotkey]="interaction.hotkeys.primary"
                         />
                         <app-hotkey-indicator
                             *ngIf="index === selectedIndex"
@@ -86,22 +82,15 @@
                 </button>
                 <button
                     *ngIf="showSecondaryButton"
-                    [disabled]="
-                        !enabled || interaction.secondaryHotkey === undefined
-                    "
+                    [disabled]="!requestable || !interaction.hasSecondaryAction"
                     class="btn btn-secondary ms-1"
-                    (click)="
-                        interaction.secondaryHotkey?.callback(
-                            undefined,
-                            undefined
-                        )
-                    "
+                    (click)="callSecondaryAction(interaction)"
                 >
                     <i class="bi bi-clock-history"></i>
-                    <ng-container *ngIf="interaction.secondaryHotkey">
+                    <ng-container *ngIf="interaction.hotkeys.secondary">
                         <app-hotkey-indicator
                             *ngIf="index !== selectedIndex"
-                            [hotkey]="interaction.secondaryHotkey"
+                            [hotkey]="interaction.hotkeys.secondary"
                             class="ms-1"
                         />
                         <app-hotkey-indicator

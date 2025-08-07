@@ -3,7 +3,6 @@ import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import type { ExerciseSimulationBehaviorType } from 'digital-fuesim-manv-shared';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { isInSpecificSimulatedRegion } from 'digital-fuesim-manv-shared';
-import { Hotkey } from 'src/app/shared/services/hotkeys.service';
 import { Store, createSelector } from '@ngrx/store';
 import type { AppState } from 'src/app/state/app.state';
 import { map, type Observable } from 'rxjs';
@@ -60,7 +59,9 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
                 'kennen',
                 'bekannt',
             ],
-            hotkey: new Hotkey('1', true, () => this.editTransferConnections()),
+            hotkeyKeys: '1',
+            callback: () => this.editTransferConnections(),
+            hasSecondaryAction: false,
             requiredBehaviors: [],
         },
         {
@@ -79,9 +80,9 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
                 'auswahl',
                 'abtransport',
             ],
-            hotkey: new Hotkey('2', true, () =>
-                this.editTransferPatientTrays()
-            ),
+            hotkeyKeys: '2',
+            callback: () => this.editTransferPatientTrays(),
+            hasSecondaryAction: false,
             requiredBehaviors: ['managePatientTransportToHospitalBehavior'],
             errorMessage: 'Dieser Bereich verwaltet keine Transporte',
         },
@@ -98,9 +99,9 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
                 'transfer',
                 'krankenhaus',
             ],
-            hotkey: new Hotkey('3', false, () =>
-                this.startTransportOfCategory()
-            ),
+            hotkeyKeys: '3',
+            callback: () => this.startTransportOfCategory(),
+            hasSecondaryAction: false,
             requiredBehaviors: ['managePatientTransportToHospitalBehavior'],
             errorMessage: 'Dieser Bereich verwaltet keine Transporte',
         },
@@ -119,7 +120,9 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
                 'abrufen',
                 'transfer',
             ],
-            hotkey: new Hotkey('4', false, () => this.provideVehicles()),
+            hotkeyKeys: '4',
+            callback: () => this.provideVehicles(),
+            hasSecondaryAction: false,
             requiredBehaviors: ['transferBehavior'],
             errorMessage: 'Dieser Bereich kann keine Fahrzeuge bereitstellen',
         },
@@ -142,7 +145,9 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
                 'einsatzleitung',
                 'leitung',
             ],
-            hotkey: new Hotkey('5', false, () => this.setRequestTarget()),
+            hotkeyKeys: '5',
+            callback: () => this.setRequestTarget(),
+            hasSecondaryAction: false,
             requiredBehaviors: ['requestBehavior'],
             errorMessage: 'Dieser Bereich fragt keine Fahrzeuge an',
         },

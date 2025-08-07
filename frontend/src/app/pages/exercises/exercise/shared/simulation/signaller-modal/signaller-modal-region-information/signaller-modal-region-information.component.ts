@@ -6,7 +6,6 @@ import type { UUID } from 'digital-fuesim-manv-shared';
 import { makeInterfaceSignallerKey } from 'digital-fuesim-manv-shared';
 import { type Observable, BehaviorSubject, map } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
-import { Hotkey } from 'src/app/shared/services/hotkeys.service';
 import type { AppState } from 'src/app/state/app.state';
 import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
@@ -50,10 +49,12 @@ export class SignallerModalRegionInformationComponent
                 'zählen',
                 'menge',
             ],
-            hotkey: new Hotkey('A', false, () => this.requestPatientCount()),
-            secondaryHotkey: new Hotkey('⇧ + A', true, () =>
-                this.openRecurringReportModal('patientCount')
-            ),
+            hotkeyKeys: 'A',
+            callback: () => this.requestPatientCount(),
+            hasSecondaryAction: true,
+            secondaryHotkeyKeys: '⇧ + A',
+            secondaryCallback: () =>
+                this.openRecurringReportModal('patientCount'),
             requiredBehaviors: ['treatPatientsBehavior'],
             errorMessage: 'Dieser Bereich behandelt keine Patienten',
             loading$: new BehaviorSubject<boolean>(false),
@@ -69,14 +70,14 @@ export class SignallerModalRegionInformationComponent
                 'abtransport',
             ],
             details: 'für von hier verwaltete Bereiche',
-            hotkey: new Hotkey('B', false, () =>
-                this.requestFullTransportProgress()
-            ),
-            secondaryHotkey: new Hotkey('⇧ + B', true, () =>
+            hotkeyKeys: 'B',
+            callback: () => this.requestFullTransportProgress(),
+            hasSecondaryAction: true,
+            secondaryHotkeyKeys: '⇧ + B',
+            secondaryCallback: () =>
                 this.openRecurringReportModal(
                     'transportManagementTransferCounts'
-                )
-            ),
+                ),
             requiredBehaviors: ['managePatientTransportToHospitalBehavior'],
             errorMessage: 'Dieser Bereich verwaltet keine Transporte',
             loading$: new BehaviorSubject<boolean>(false),
@@ -92,12 +93,12 @@ export class SignallerModalRegionInformationComponent
                 'abtransport',
             ],
             details: 'für diesen Bereich',
-            hotkey: new Hotkey('C', false, () =>
-                this.requestRegionTransportProgress()
-            ),
-            secondaryHotkey: new Hotkey('⇧ + C', true, () =>
-                this.openRecurringReportModal('singleRegionTransferCounts')
-            ),
+            hotkeyKeys: 'C',
+            callback: () => this.requestRegionTransportProgress(),
+            hasSecondaryAction: true,
+            secondaryHotkeyKeys: '⇧ + C',
+            secondaryCallback: () =>
+                this.openRecurringReportModal('singleRegionTransferCounts'),
             requiredBehaviors: ['transferToHospitalBehavior'],
             errorMessage: 'Dieser Bereich verwaltet keine Transporte',
             loading$: new BehaviorSubject<boolean>(false),
@@ -115,10 +116,12 @@ export class SignallerModalRegionInformationComponent
                 'menge',
             ],
             details: 'nach Typ',
-            hotkey: new Hotkey('D', false, () => this.requestVehicleCount()),
-            secondaryHotkey: new Hotkey('⇧ + D', true, () =>
-                this.openRecurringReportModal('vehicleCount')
-            ),
+            hotkeyKeys: 'D',
+            callback: () => this.requestVehicleCount(),
+            hasSecondaryAction: true,
+            secondaryHotkeyKeys: '⇧ + D',
+            secondaryCallback: () =>
+                this.openRecurringReportModal('vehicleCount'),
             requiredBehaviors: [],
             loading$: new BehaviorSubject<boolean>(false),
         },
@@ -140,12 +143,12 @@ export class SignallerModalRegionInformationComponent
             ],
             details:
                 'um alle Patienten zu behandeln (PA) oder Anfragen zu erfüllen (B-Raum)',
-            hotkey: new Hotkey('E', false, () =>
-                this.requestRequiredResources()
-            ),
-            secondaryHotkey: new Hotkey('⇧ + E', true, () =>
-                this.openRecurringReportModal('requiredResources')
-            ),
+            hotkeyKeys: 'E',
+            callback: () => this.requestRequiredResources(),
+            hasSecondaryAction: true,
+            secondaryHotkeyKeys: '⇧ + E',
+            secondaryCallback: () =>
+                this.openRecurringReportModal('requiredResources'),
             requiredBehaviors: ['requestBehavior'],
             errorMessage:
                 'Dieser Bereich benötigt keine Fahrzeuge für seine Arbeit',
@@ -169,10 +172,12 @@ export class SignallerModalRegionInformationComponent
                 'zustand',
             ],
             details: '(Erstversorgung sichergestellt?)',
-            hotkey: new Hotkey('F', false, () => this.requestTreatmentStatus()),
-            secondaryHotkey: new Hotkey('⇧ + F', true, () =>
-                this.openRecurringReportModal('treatmentStatus')
-            ),
+            hotkeyKeys: 'F',
+            callback: () => this.requestTreatmentStatus(),
+            hasSecondaryAction: true,
+            secondaryHotkeyKeys: '⇧ + F',
+            secondaryCallback: () =>
+                this.openRecurringReportModal('treatmentStatus'),
             requiredBehaviors: ['treatPatientsBehavior'],
             errorMessage: 'Dieser Bereich behandelt keine Patienten',
             loading$: new BehaviorSubject<boolean>(false),
@@ -193,12 +198,12 @@ export class SignallerModalRegionInformationComponent
             ],
             details:
                 'für welche Aufgaben die verfügbaren Fahrzeuge gerade genutzt werden',
-            hotkey: new Hotkey('G', false, () =>
-                this.requestVehicleOccupations()
-            ),
-            secondaryHotkey: new Hotkey('⇧ + G', true, () =>
-                this.openRecurringReportModal('vehicleOccupations')
-            ),
+            hotkeyKeys: 'G',
+            callback: () => this.requestVehicleOccupations(),
+            hasSecondaryAction: true,
+            secondaryHotkeyKeys: '⇧ + G',
+            secondaryCallback: () =>
+                this.openRecurringReportModal('vehicleOccupations'),
             requiredBehaviors: [],
             loading$: new BehaviorSubject<boolean>(false),
         },
@@ -223,12 +228,12 @@ export class SignallerModalRegionInformationComponent
             ],
             details:
                 '(welche anderen Bereiche sind bekannt, sodass z.B. Fahrzeuge dorthin fahren können?)',
-            hotkey: new Hotkey('H', false, () =>
-                this.requestTransferConnections()
-            ),
-            secondaryHotkey: new Hotkey('⇧ + H', true, () =>
-                this.openRecurringReportModal('transferConnections')
-            ),
+            hotkeyKeys: 'H',
+            callback: () => this.requestTransferConnections(),
+            hasSecondaryAction: true,
+            secondaryHotkeyKeys: '⇧ + H',
+            secondaryCallback: () =>
+                this.openRecurringReportModal('transferConnections'),
             requiredBehaviors: [],
             loading$: new BehaviorSubject<boolean>(false),
         },
@@ -246,10 +251,12 @@ export class SignallerModalRegionInformationComponent
                 'menge',
             ],
             details: 'nach Typ',
-            hotkey: new Hotkey('I', false, () => this.requestPersonnelCount()),
-            secondaryHotkey: new Hotkey('⇧ + I', true, () =>
-                this.openRecurringReportModal('personnelCount')
-            ),
+            hotkeyKeys: 'I',
+            callback: () => this.requestPersonnelCount(),
+            hasSecondaryAction: true,
+            secondaryHotkeyKeys: '⇧ + I',
+            secondaryCallback: () =>
+                this.openRecurringReportModal('personnelCount'),
             requiredBehaviors: [],
             loading$: new BehaviorSubject<boolean>(false),
         },

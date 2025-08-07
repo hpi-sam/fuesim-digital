@@ -24,7 +24,10 @@
         <ng-container [ngSwitch]="status$ | async">
             <ng-container *ngSwitchCase="'unread'">
                 <span>Bereit zur Durchsage</span>
-                <button class="btn btn-primary float-end" (click)="accept()">
+                <button
+                    class="btn btn-primary float-end"
+                    (click)="acceptRadiogram()"
+                >
                     Durchsagen
                     <app-hotkey-indicator
                         *ngIf="first && shownInSignallerModal"
@@ -38,7 +41,7 @@
                     <div class="btn-group float-end">
                         <button
                             class="btn btn-outline-secondary"
-                            (click)="return()"
+                            (click)="returnRadiogram()"
                         >
                             Zurücklegen
                             <app-hotkey-indicator
@@ -46,7 +49,10 @@
                                 [hotkey]="returnHotkey"
                             />
                         </button>
-                        <button class="btn btn-success" (click)="markAsDone()">
+                        <button
+                            class="btn btn-success"
+                            (click)="markRadiogramAsDone()"
+                        >
                             Fertig
                             <app-hotkey-indicator
                                 *ngIf="first && shownInSignallerModal"
@@ -65,7 +71,7 @@
                     durchgesagt
                     <button
                         class="btn btn-secondary float-end"
-                        (click)="accept()"
+                        (click)="acceptRadiogram()"
                     >
                         Übernehmen
                     </button>

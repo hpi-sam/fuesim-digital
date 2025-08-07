@@ -51,6 +51,7 @@ export function returnRadiogram(
         type: 'unreadRadiogramStatus',
         publishTime: publishTimeOf(radiogram),
     };
+    radiogram.informationRequestKey = null;
     logRadiogram(
         draftState,
         [createRadiogramActionTag(draftState, radiogram.status.type)],

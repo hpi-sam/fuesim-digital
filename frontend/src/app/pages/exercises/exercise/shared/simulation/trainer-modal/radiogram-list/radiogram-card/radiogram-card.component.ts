@@ -74,7 +74,7 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
                 )
             )
         ) {
-            this.return();
+            this.returnRadiogram();
         }
     });
 
@@ -164,13 +164,13 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
                 )
             )
         ) {
-            this.markAsDone();
+            this.markRadiogramAsDone();
         } else {
-            this.accept();
+            this.acceptRadiogram();
         }
     }
 
-    accept() {
+    acceptRadiogram() {
         this.exerciseService
             .proposeAction({
                 type: '[Radiogram] Accept radiogram',
@@ -189,14 +189,14 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
             });
     }
 
-    return() {
+    returnRadiogram() {
         this.exerciseService.proposeAction({
             type: '[Radiogram] Return radiogram',
             radiogramId: this.radiogramId,
         });
     }
 
-    markAsDone() {
+    markRadiogramAsDone() {
         this.exerciseService.proposeAction({
             type: '[Radiogram] Mark as done',
             clientId: this.ownClientId,

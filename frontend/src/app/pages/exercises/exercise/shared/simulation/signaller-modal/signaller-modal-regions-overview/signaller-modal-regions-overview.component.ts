@@ -2,14 +2,7 @@ import type { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { personnelTypeNames } from 'digital-fuesim-manv-shared';
-import { isEqual } from 'lodash-es';
-import {
-    combineLatest,
-    distinctUntilChanged,
-    map,
-    Subject,
-    type Observable,
-} from 'rxjs';
+import { combineLatest, map, type Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import {
     selectPersonnel,
@@ -37,8 +30,6 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
               }
         )[]
     >;
-
-    private readonly destroy$ = new Subject<void>();
 
     constructor(private readonly store: Store<AppState>) {}
 
@@ -70,6 +61,7 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
                     }
 
                     return {
+                        id: simulatedRegion.id,
                         name: simulatedRegion.name,
                         hasLeader: true as const,
                         leaderName: personnelTypeNames[leader.personnelType],
@@ -79,9 +71,6 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
             ),
             map((regions) =>
                 regions.sort((a, b) => a.name.localeCompare(b.name))
-            ),
-            distinctUntilChanged((previous, current) =>
-                isEqual(previous, current)
             )
         );
     }

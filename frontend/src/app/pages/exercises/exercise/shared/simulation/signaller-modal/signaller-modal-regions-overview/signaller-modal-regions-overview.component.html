@@ -14,7 +14,12 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let region of regions$ | async">
+        <tr
+            *ngFor="
+                let region of regions$ | async;
+                trackBy: 'id' | appTrackByProperty
+            "
+        >
             <td>{{ region.name }}</td>
             <ng-container *ngIf="region.hasLeader; else noLeader">
                 <td>{{ region.leaderName }}</td>

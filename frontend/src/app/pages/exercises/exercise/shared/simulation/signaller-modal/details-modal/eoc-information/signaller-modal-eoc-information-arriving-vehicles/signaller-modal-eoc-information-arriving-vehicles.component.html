@@ -29,7 +29,12 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let arrivingVehicle of arrivingVehicles">
+            <tr
+                *ngFor="
+                    let arrivingVehicle of arrivingVehicles;
+                    trackBy: 'id' | appTrackByProperty
+                "
+            >
                 <td>{{ arrivingVehicle.name }}</td>
                 <td>{{ arrivingVehicle.remainingMinutes }} Minuten</td>
             </tr>

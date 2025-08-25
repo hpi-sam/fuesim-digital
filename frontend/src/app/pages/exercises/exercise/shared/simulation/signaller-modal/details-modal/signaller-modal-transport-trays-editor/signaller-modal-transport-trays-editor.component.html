@@ -14,8 +14,7 @@
                 *ngFor="
                     let managedRegion of managedRegions$ | async;
                     index as index;
-                    trackBy: 'key'
-                        | appTrackByProperty: (managedRegions$ | async)
+                    trackBy: 'key' | appTrackByProperty
                 "
                 class="list-group-item d-flex align-items-center flex-nowrap p-0"
             >

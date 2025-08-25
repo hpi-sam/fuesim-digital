@@ -27,7 +27,11 @@
 
 <ul class="list-group list-group-flush mt-2">
     <li
-        *ngFor="let interaction of filteredInteractions; index as index"
+        *ngFor="
+            let interaction of filteredInteractions;
+            index as index;
+            trackBy: 'key' | appTrackByProperty
+        "
         class="list-group-item"
         [class.active]="index === selectedIndex"
     >
@@ -108,10 +112,7 @@
                 let radiogram of (requestedRadiograms$ | async)?.[
                     interaction.key
                 ] ?? [];
-                trackBy: 'id'
-                    | appTrackByProperty
-                        : (requestedRadiograms$ | async)?.[interaction.key] ??
-                              []
+                trackBy: 'id' | appTrackByProperty
             "
             [radiogramId]="radiogram.id"
             [first]="false"

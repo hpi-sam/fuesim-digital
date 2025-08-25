@@ -2,7 +2,14 @@
     <p>Folgende Alarmgruppen wurden bereits alarmiert:</p>
 
     <ul>
-        <li *ngFor="let alarmGroup of alarmGroupsSent">{{ alarmGroup }}</li>
+        <li
+            *ngFor="
+                let alarmGroup of alarmGroupsSent;
+                trackBy: 'id' | appTrackByProperty
+            "
+        >
+            {{ alarmGroup }}
+        </li>
     </ul>
 </ng-container>
 <ng-template #noAlarmGroupsSent>

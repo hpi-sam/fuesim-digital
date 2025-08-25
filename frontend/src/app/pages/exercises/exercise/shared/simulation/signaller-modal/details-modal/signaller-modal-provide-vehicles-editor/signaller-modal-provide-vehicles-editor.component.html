@@ -5,7 +5,8 @@
         *ngFor="
             let vehicleTemplate of vehicleTemplates$ | async;
             first as first;
-            index as index
+            index as index;
+            trackBy: 'id' | appTrackByProperty
         "
         class="row"
         [class.mt-2]="!first"

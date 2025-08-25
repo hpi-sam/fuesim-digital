@@ -7,7 +7,13 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { StrictObject } from 'digital-fuesim-manv-shared';
-import type { Observable } from 'rxjs';
+import {
+    BehaviorSubject,
+    map,
+    Subject,
+    takeUntil,
+    type Observable,
+} from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
 import {
@@ -15,10 +21,13 @@ import {
     HotkeysService,
 } from 'src/app/shared/services/hotkeys.service';
 import type { AppState } from 'src/app/state/app.state';
-import { createSelectBehaviorState } from 'src/app/state/application/selectors/exercise.selectors';
+import {
+    createSelectBehaviorState,
+    createSelectBehaviorStates,
+} from 'src/app/state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 
-type EnabledKey = Exclude<
+type ReportPropertyName = Exclude<
     keyof ReportBehaviorState,
     keyof SimulationBehaviorState | 'activityIds'
 >;
@@ -26,25 +35,28 @@ type EnabledKey = Exclude<
 const eventBasedReportData = {
     treatmentProgressChange: {
         actionType: '[ReportBehavior] Update report treatment status changes',
-        enabledKey: 'reportTreatmentProgressChanges',
+        propertyName: 'reportTreatmentProgressChanges',
         description: 'Wenn sich der Behandlungsstatus ändert',
         hotkeyKeys: 'J',
+        requiredBehaviors: ['treatPatientsBehavior'],
     },
     transferOfCategoryInSingleRegionCompleted: {
         actionType:
             '[ReportBehavior] Update report transfer of category in single region completed',
-        enabledKey: 'reportTransferOfCategoryInSingleRegionCompleted',
+        propertyName: 'reportTransferOfCategoryInSingleRegionCompleted',
         description:
             'Wenn in dieser Patientenablage alle Patienten einer SK abtransportiert wurden',
         hotkeyKeys: 'K',
+        requiredBehaviors: ['treatPatientsBehavior'],
     },
     transferOfCategoryInMultipleRegionsCompleted: {
         actionType:
             '[ReportBehavior] Update report transfer of category in multiple regions completed',
-        enabledKey: 'reportTransferOfCategoryInMultipleRegionsCompleted',
+        propertyName: 'reportTransferOfCategoryInMultipleRegionsCompleted',
         description:
             'Wenn in allen Patientenablagen dieser Transportorganisation alle Patienten einer SK abtransportiert wurden',
         hotkeyKeys: 'L',
+        requiredBehaviors: ['managePatientTransportToHospitalBehavior'],
     },
 } as const;
 
@@ -53,7 +65,7 @@ type EventId = keyof typeof eventBasedReportData;
 interface EventBasedReport {
     eventId: EventId;
     description: string;
-    enabledKey: EnabledKey;
+    propertyName: ReportPropertyName;
     changeCallback: (isEnabled: boolean) => void;
     hotkey: Hotkey;
 }
@@ -73,9 +85,16 @@ export class SimulationEventBasedReportEditorComponent
 
     private hotkeyLayer: HotkeyLayer | null = null;
 
-    eventBasedReports: EventBasedReport[];
+    eventBasedReports: EventBasedReport[] = [];
 
     reportBehaviorState$!: Observable<ReportBehaviorState>;
+    canReport$!: BehaviorSubject<
+        Partial<{
+            [key in keyof typeof eventBasedReportData]: boolean;
+        }>
+    >;
+
+    private readonly updateOrDestroy$ = new Subject<void>();
 
     constructor(
         private readonly exerciseService: ExerciseService,
@@ -85,7 +104,7 @@ export class SimulationEventBasedReportEditorComponent
         this.eventBasedReports = StrictObject.entries(eventBasedReportData).map(
             ([eventId, eventDetails]) => ({
                 eventId,
-                enabledKey: eventDetails.enabledKey,
+                propertyName: eventDetails.propertyName,
                 description: eventDetails.description,
                 changeCallback: (isEnabled) =>
                     this.updateEventBasedReport(eventId, isEnabled),
@@ -108,12 +127,39 @@ export class SimulationEventBasedReportEditorComponent
         }
 
         if ('simulatedRegionId' in changes || 'reportBehaviorId' in changes) {
+            this.updateOrDestroy$.next();
+
             this.reportBehaviorState$ = this.store.select(
                 createSelectBehaviorState<ReportBehaviorState>(
                     this.simulatedRegionId,
                     this.reportBehaviorId
                 )
             );
+
+            this.canReport$ = new BehaviorSubject({});
+            this.store
+                .select(createSelectBehaviorStates(this.simulatedRegionId))
+                .pipe(
+                    map((behaviors) =>
+                        StrictObject.fromEntries(
+                            StrictObject.entries(eventBasedReportData).map(
+                                ([eventId, eventDetails]) => [
+                                    eventId,
+                                    eventDetails.requiredBehaviors.every(
+                                        (requiredBehavior) =>
+                                            behaviors.some(
+                                                (behavior) =>
+                                                    behavior.type ===
+                                                    requiredBehavior
+                                            )
+                                    ),
+                                ]
+                            )
+                        )
+                    ),
+                    takeUntil(this.updateOrDestroy$)
+                )
+                .subscribe(this.canReport$);
         }
     }
 
@@ -122,6 +168,8 @@ export class SimulationEventBasedReportEditorComponent
             this.hotkeysService.removeLayer(this.hotkeyLayer);
             this.hotkeyLayer = null;
         }
+
+        this.updateOrDestroy$.next();
     }
 
     registerHotkeys() {
@@ -142,6 +190,8 @@ export class SimulationEventBasedReportEditorComponent
     }
 
     toggleEventBasedReport(eventId: EventId) {
+        if (!this.canReport$.getValue()[eventId]) return;
+
         const reportBehavior = selectStateSnapshot<ReportBehaviorState>(
             createSelectBehaviorState(
                 this.simulatedRegionId,
@@ -155,7 +205,7 @@ export class SimulationEventBasedReportEditorComponent
             simulatedRegionId: this.simulatedRegionId,
             behaviorId: this.reportBehaviorId,
             reportChanges:
-                !reportBehavior[eventBasedReportData[eventId].enabledKey],
+                !reportBehavior[eventBasedReportData[eventId].propertyName],
         });
     }
 }

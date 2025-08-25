@@ -456,7 +456,14 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                                 );
                             const expectedManagedPatients = Object.values(
                                 expectedPatientsPerRegion
-                            ).reduce(addResourceDescription);
+                            ).reduce(addResourceDescription, {
+                                black: 0,
+                                blue: 0,
+                                green: 0,
+                                red: 0,
+                                white: 0,
+                                yellow: 0,
+                            });
 
                             radiogram.transferredPatientsCounts =
                                 behaviorState.transferredPatientCounts;

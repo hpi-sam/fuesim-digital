@@ -17,6 +17,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - When moving an element on the map fails, the element will now be moved back to its previous location
 - The transfer overview now uses the names of the personnel types instead of their internal abbreviations
+- When requesting the transport progress while there are no regions to manage the transport of, the report now correctly reports zero patients instead of crashing
 
 ## [0.8.1] - 2025-04-29
 

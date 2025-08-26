@@ -104,10 +104,9 @@
             </div>
             <app-display-validation [ngModelInput]="firstVehiclesInput" />
             <div class="d-flex flex-row align-items-center mt-2">
-                <label class="flex-shrink-1 text-nowrap"
-                    >Die ersten {{ firstVehiclesCount }} Fahrzeuge fahren
-                    nach:</label
-                >
+                <label class="flex-shrink-1 text-nowrap">
+                    {{ firstVehiclesCount === 1 ? "Das erste Fahrzeug fährt nach:" : `Die ersten ${firstVehiclesCount} Fahrzeuge fahren nach:` }}
+                </label>
                 <button
                     [ngbPopover]="selectFirstVehiclesTargetTemplate"
                     #selectFirstVehiclesTargetPopover="ngbPopover"
@@ -149,7 +148,7 @@
                 </ng-template>
             </div>
             <span
-                *ngIf="firstVehiclesCount > 0"
+                *ngIf="firstVehiclesCount > 1"
                 class="row g-0 mt-2 text-muted"
             >
                 Sollte die aktuelle Alarmgruppe weniger als

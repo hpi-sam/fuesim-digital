@@ -29,7 +29,7 @@ export class SignallerModalRegionSelectorComponent
 {
     public simulatedRegionNames$!: Observable<SearchableDropdownOption[]>;
 
-    private baseLayer!: HotkeyLayer;
+    private hotkeyLayer!: HotkeyLayer;
 
     @ViewChild(NgbPopover, { static: true }) popover!: NgbPopover;
 
@@ -69,9 +69,9 @@ export class SignallerModalRegionSelectorComponent
                 ])
             );
 
-        this.baseLayer = this.hotkeys.createLayer();
-        this.baseLayer.addHotkey(this.switchSimulatedRegionHotkey);
-        this.baseLayer.addHotkey(this.openOverviewHotkey);
+        this.hotkeyLayer = this.hotkeys.createLayer();
+        this.hotkeyLayer.addHotkey(this.switchSimulatedRegionHotkey);
+        this.hotkeyLayer.addHotkey(this.openOverviewHotkey);
 
         this.selectRegionService.selectedSimulatedRegion$
             .pipe(takeUntil(this.destroy$))
@@ -87,7 +87,7 @@ export class SignallerModalRegionSelectorComponent
     }
 
     ngOnDestroy() {
-        this.hotkeys.removeLayer(this.baseLayer);
+        this.hotkeys.removeLayer(this.hotkeyLayer);
         this.destroy$.next();
     }
 

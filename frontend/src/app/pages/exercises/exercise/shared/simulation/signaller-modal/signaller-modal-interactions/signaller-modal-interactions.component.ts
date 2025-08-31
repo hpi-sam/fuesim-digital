@@ -14,7 +14,7 @@ import {
     isUnread,
 } from 'digital-fuesim-manv-shared';
 import { groupBy } from 'lodash-es';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { Subject, map, takeUntil } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
@@ -97,11 +97,11 @@ export class SignallerModalInteractionsComponent
         [key: string]: { primary: Hotkey; secondary?: Hotkey };
     } = {};
     private interactionRequestable: {
-        [key: string]: BehaviorSubject<boolean>;
+        [key: string]: Observable<boolean>;
     } = {};
 
-    private hotkeyLayer: HotkeyLayer | null = null;
-    private filterLayer: HotkeyLayer | null = null;
+    private readonly hotkeyLayer!: HotkeyLayer;
+    private filterLayer!: HotkeyLayer;
 
     private clientId!: UUID;
 
@@ -160,52 +160,28 @@ export class SignallerModalInteractionsComponent
         private readonly exerciseService: ExerciseService,
         private readonly store: Store<AppState>,
         private readonly hotkeysService: HotkeysService
-    ) {}
+    ) {
+        this.hotkeyLayer = this.hotkeysService.createLayer();
+    }
 
     ngOnInit() {
         this.clientId = selectStateSnapshot(selectOwnClientId, this.store)!;
+
+        this.filterLayer = this.hotkeysService.createLayer(true, false);
+        this.filterLayer.addHotkey(this.exitFilterHotkey);
+        this.filterLayer.addHotkey(this.upHotkey);
+        this.filterLayer.addHotkey(this.downHotkey);
+        this.filterLayer.addHotkey(this.confirmHotkey);
+        this.filterLayer.addHotkey(this.confirmSecondaryHotkey);
     }
 
     ngOnChanges() {
         this.changeOrDestroy$.next();
 
-        if (this.hotkeyLayer) {
-            this.hotkeysService.removeLayer(this.hotkeyLayer);
-        }
-        this.hotkeyLayer = this.hotkeysService.createLayer();
+        this.hotkeyLayer.removeAllHotkeys();
 
         this.interactionHotkeys = {};
         this.interactionRequestable = {};
-
-        this.interactions.forEach((interaction) => {
-            const hotkeys = {
-                primary: new Hotkey(interaction.hotkeyKeys, false, () => {
-                    this.callPrimaryAction(interaction);
-                }),
-                secondary: undefined as Hotkey | undefined,
-            };
-            this.hotkeyLayer!.addHotkey(hotkeys.primary);
-
-            if (interaction.hasSecondaryAction) {
-                hotkeys.secondary = new Hotkey(
-                    interaction.secondaryHotkeyKeys,
-                    false,
-                    () => {
-                        this.callSecondaryAction(interaction);
-                    }
-                );
-                this.hotkeyLayer!.addHotkey(hotkeys.secondary);
-            }
-
-            this.interactionHotkeys[interaction.key] = hotkeys;
-        });
-
-        if (this.filterHotkeyKeys && this.filterHotkeyKeys !== '') {
-            this.filterHotkey = new Hotkey(this.filterHotkeyKeys, false, () => {
-                this.filterInput.nativeElement.focus();
-            });
-            this.hotkeyLayer.addHotkey(this.filterHotkey);
-        }
 
         if (this.simulatedRegionId) {
             const behaviors$ = this.store.select(
@@ -213,7 +189,7 @@ export class SignallerModalInteractionsComponent
             );
 
             this.interactions.forEach((interaction) => {
-                const requestable$ = behaviors$.pipe(
+                this.interactionRequestable[interaction.key] = behaviors$.pipe(
                     map((behaviors) =>
                         interaction.requiredBehaviors.every(
                             (requiredBehavior) =>
@@ -224,23 +200,52 @@ export class SignallerModalInteractionsComponent
                         )
                     )
                 );
-
-                const requestableBehaviorSubject$ = new BehaviorSubject(false);
-
-                requestable$
-                    .pipe(takeUntil(this.changeOrDestroy$))
-                    .subscribe((requestable) =>
-                        requestableBehaviorSubject$.next(requestable)
-                    );
-
-                this.interactionRequestable[interaction.key] =
-                    requestableBehaviorSubject$;
             });
         } else {
             this.interactions.forEach((interaction) => {
-                this.interactionRequestable[interaction.key] =
-                    new BehaviorSubject(true);
+                this.interactionRequestable[interaction.key] = of(true);
             });
+        }
+
+        this.interactions.forEach((interaction) => {
+            const enabled$ = combineLatest([
+                interaction.loading$ ?? of(false),
+                this.interactionRequestable[interaction.key]!,
+            ]).pipe(map(([loading, requestable]) => !loading && requestable));
+
+            const hotkeys = {
+                primary: new Hotkey(
+                    interaction.hotkeyKeys,
+                    false,
+                    () => {
+                        interaction.callback();
+                    },
+                    enabled$
+                ),
+                secondary: undefined as Hotkey | undefined,
+            };
+            this.hotkeyLayer.addHotkey(hotkeys.primary);
+
+            if (interaction.hasSecondaryAction) {
+                hotkeys.secondary = new Hotkey(
+                    interaction.secondaryHotkeyKeys,
+                    false,
+                    () => {
+                        this.tryCallSecondaryAction(interaction);
+                    },
+                    enabled$
+                );
+                this.hotkeyLayer.addHotkey(hotkeys.secondary);
+            }
+
+            this.interactionHotkeys[interaction.key] = hotkeys;
+        });
+
+        if (this.filterHotkeyKeys && this.filterHotkeyKeys !== '') {
+            this.filterHotkey = new Hotkey(this.filterHotkeyKeys, false, () => {
+                this.filterInput.nativeElement.focus();
+            });
+            this.hotkeyLayer.addHotkey(this.filterHotkey);
         }
 
         const radiograms$ = this.store
@@ -306,12 +311,8 @@ export class SignallerModalInteractionsComponent
     }
 
     ngOnDestroy() {
-        if (this.hotkeyLayer) {
-            this.hotkeysService.removeLayer(this.hotkeyLayer);
-        }
-        if (this.filterLayer) {
-            this.hotkeysService.removeLayer(this.filterLayer);
-        }
+        this.hotkeysService.removeLayer(this.filterLayer);
+        this.hotkeysService.removeLayer(this.hotkeyLayer);
 
         this.changeOrDestroy$.next();
         this.destroy$.next();
@@ -320,12 +321,8 @@ export class SignallerModalInteractionsComponent
     onFilterFocus() {
         this.filterActive = true;
 
-        this.filterLayer = this.hotkeysService.createLayer(true);
-        this.filterLayer.addHotkey(this.exitFilterHotkey);
-        this.filterLayer.addHotkey(this.upHotkey);
-        this.filterLayer.addHotkey(this.downHotkey);
-        this.filterLayer.addHotkey(this.confirmHotkey);
-        this.filterLayer.addHotkey(this.confirmSecondaryHotkey);
+        this.filterLayer.enabled = true;
+        this.hotkeysService.elevateLayer(this.filterLayer);
     }
 
     onFilterBlur() {
@@ -333,10 +330,7 @@ export class SignallerModalInteractionsComponent
         this.filter = '';
         this.selectedIndex = -1;
 
-        if (this.filterLayer) {
-            this.hotkeysService.removeLayer(this.filterLayer);
-            this.filterLayer = null;
-        }
+        this.filterLayer.enabled = false;
     }
 
     increaseSelectedIndex() {
@@ -358,46 +352,15 @@ export class SignallerModalInteractionsComponent
     }
 
     selectionPrimaryAction() {
-        if (
-            this.selectedIndex > -1 &&
-            this.selectedIndex < this.filteredInteractions.length
-        ) {
-            this.callPrimaryAction(
-                this.filteredInteractions[this.selectedIndex]!
-            );
-        }
+        this.filteredInteractions[this.selectedIndex]?.callback();
     }
 
     selectionSecondaryAction() {
-        if (
-            this.selectedIndex > -1 &&
-            this.selectedIndex < this.filteredInteractions.length
-        ) {
-            this.callSecondaryAction(
-                this.filteredInteractions[this.selectedIndex]!
-            );
-        }
+        const interaction = this.filteredInteractions[this.selectedIndex];
+        if (interaction) this.tryCallSecondaryAction(interaction);
     }
 
-    isInteractionEnabled(interaction: InterfaceSignallerInteraction) {
-        if (interaction.loading$)
-            return (
-                this.interactionRequestable[interaction.key]!.getValue() &&
-                !interaction.loading$.getValue()
-            );
-
-        return this.interactionRequestable[interaction.key]!.getValue();
-    }
-
-    callPrimaryAction(interaction: InterfaceSignallerInteraction) {
-        if (this.isInteractionEnabled(interaction)) interaction.callback();
-    }
-
-    callSecondaryAction(interaction: InterfaceSignallerInteraction) {
-        if (
-            interaction.hasSecondaryAction &&
-            this.isInteractionEnabled(interaction)
-        )
-            interaction.secondaryCallback();
+    tryCallSecondaryAction(interaction: InterfaceSignallerInteraction) {
+        if (interaction.hasSecondaryAction) interaction.secondaryCallback();
     }
 }

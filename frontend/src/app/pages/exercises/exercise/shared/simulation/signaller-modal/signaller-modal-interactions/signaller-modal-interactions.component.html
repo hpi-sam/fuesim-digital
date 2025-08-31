@@ -64,7 +64,7 @@
                     class="btn btn-primary"
                     [class.btn-primary]="index !== selectedIndex"
                     [class.btn-outline-light]="index === selectedIndex"
-                    (click)="callPrimaryAction(interaction)"
+                    (click)="interaction.callback()"
                 >
                     {{ primaryActionLabel }}
                     <span
@@ -88,7 +88,7 @@
                     *ngIf="showSecondaryButton"
                     [disabled]="!requestable || !interaction.hasSecondaryAction"
                     class="btn btn-secondary ms-1"
-                    (click)="callSecondaryAction(interaction)"
+                    (click)="tryCallSecondaryAction(interaction)"
                 >
                     <i class="bi bi-clock-history"></i>
                     <ng-container *ngIf="interaction.hotkeys.secondary">

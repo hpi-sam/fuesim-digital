@@ -61,7 +61,7 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
     >;
     acceptingClient$!: Observable<Client | undefined>;
 
-    private hotkeyLayer: HotkeyLayer | null = null;
+    private readonly hotkeyLayer: HotkeyLayer;
     readonly acceptHotkey = new Hotkey('F1', false, () => {
         this.acceptOrMarkAsDone();
     });
@@ -83,7 +83,11 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
         private readonly exerciseService: ExerciseService,
         private readonly hotkeyService: HotkeysService,
         private readonly selectRegionService: SelectSignallerRegionService
-    ) {}
+    ) {
+        this.hotkeyLayer = this.hotkeyService.createLayer(false, false);
+        this.hotkeyLayer.addHotkey(this.acceptHotkey);
+        this.hotkeyLayer.addHotkey(this.returnHotkey);
+    }
 
     ngOnInit(): void {
         this.ownClientId = selectStateSnapshot(selectOwnClientId, this.store)!;
@@ -127,32 +131,16 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
         );
 
         this.acceptingClient$ = this.store.select(selectClient);
-
-        this.initializeHotkeyLayer();
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        this.initializeHotkeyLayer();
-
         if ('first' in changes) {
-            if (this.first && this.shownInSignallerModal) {
-                this.hotkeyLayer!.addHotkey(this.acceptHotkey);
-                this.hotkeyLayer!.addHotkey(this.returnHotkey);
-            } else {
-                this.hotkeyLayer!.removeHotkey(this.acceptHotkey);
-                this.hotkeyLayer!.removeHotkey(this.returnHotkey);
-            }
+            this.hotkeyLayer.enabled = this.first && this.shownInSignallerModal;
         }
     }
 
     ngOnDestroy() {
-        if (this.hotkeyLayer) {
-            this.hotkeyService.removeLayer(this.hotkeyLayer);
-        }
-    }
-
-    initializeHotkeyLayer() {
-        this.hotkeyLayer ??= this.hotkeyService.createLayer();
+        this.hotkeyService.removeLayer(this.hotkeyLayer);
     }
 
     acceptOrMarkAsDone() {

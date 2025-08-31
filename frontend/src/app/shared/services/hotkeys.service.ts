@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { StrictObject, uuid } from 'digital-fuesim-manv-shared';
-import { ReplaySubject } from 'rxjs';
+import {
+    BehaviorSubject,
+    combineLatest,
+    map,
+    Observable,
+    of,
+    Subject,
+    takeUntil,
+} from 'rxjs';
+// eslint-disable-next-line no-restricted-imports
 import { HotkeysService as NgNeatHotkeysService } from '@ngneat/hotkeys';
 
 const hotkeyReplacements = {
@@ -10,21 +19,74 @@ const hotkeyReplacements = {
     '+': '.',
 };
 
+export type HotkeyState = 'disabled' | 'enabled' | 'overridden';
+
 export class Hotkey {
-    public readonly enabled = new ReplaySubject<boolean>(1);
+    /**
+     * Whether the layer of this hotkey is currently enabled.
+     * Has to be set by the layer via {@link onLayerEnabled} and {@link onLayerDisabled}
+     */
+    private readonly layerEnabled$ = new Subject<boolean>();
+
+    /**
+     * Whether the hotkey is currently active.
+     * Derived from the hotkey's and its layer's enabled state
+     */
+    public readonly state$ = new BehaviorSubject<HotkeyState>('overridden');
+
+    private readonly destroy$ = new Subject<void>();
 
     constructor(
         public readonly keys: string,
         public readonly isCombo: boolean,
-        public readonly callback: (keyboardEvent: KeyboardEvent) => void
-    ) {}
-
-    public enable() {
-        this.enabled.next(true);
+        private readonly callback: (keyboardEvent: KeyboardEvent) => void,
+        private readonly enabled$: Observable<boolean> = of(true)
+    ) {
+        combineLatest([this.layerEnabled$, this.enabled$])
+            .pipe(
+                map(([layerEnabled, enabled]) =>
+                    layerEnabled
+                        ? enabled
+                            ? 'enabled'
+                            : 'disabled'
+                        : 'overridden'
+                ),
+                takeUntil(this.destroy$)
+            )
+            .subscribe(this.state$);
     }
 
-    public disable() {
-        this.enabled.next(false);
+    /**
+     * To be called by the {@link HotkeyLayer} when it gets disabled.
+     */
+    public onLayerEnabled() {
+        this.layerEnabled$.next(true);
+    }
+
+    /**
+     * To be called by the {@link HotkeyLayer} when it gets enabled.
+     */
+    public onLayerDisabled() {
+        this.layerEnabled$.next(false);
+    }
+
+    /**
+     * To be called by the {@link HotkeysService} if the keys of this hot key got pressed.
+     *
+     * The hotkey will only call its callback if it is currently enabled.
+     * @param keyboardEvent The {@link KeyboardEvent} of the keyDown that triggered this hotkey
+     */
+    public onHotkey(keyboardEvent: KeyboardEvent) {
+        if (this.state$.value === 'enabled') this.callback(keyboardEvent);
+    }
+
+    /**
+     * Cancels all subscriptions to observables registered by this hotkey.
+     *
+     * To be called by the {@link HotkeyLayer} when the it gets destroyed.
+     */
+    public destroy() {
+        this.destroy$.next();
     }
 
     /**
@@ -32,7 +94,6 @@ export class Hotkey {
      * This allows changing the library without updating all hotkey definitions in the code.
      *
      * Additionally, the string is normalized (lowercase, whitespace) to be able to detect hotkey collisions.
-     * @param hotkey The hotkey to determine the correct definition for
      * @returns A string that correctly defines the hotkey for the currently used library
      */
     public getKeysToRegister() {
@@ -53,8 +114,20 @@ export class HotkeyLayer {
 
     constructor(
         private readonly service: HotkeysService,
-        public readonly disableAll: boolean
+        public readonly disableAllLower: boolean,
+        private _enabled = true
     ) {}
+
+    public get enabled() {
+        return this._enabled;
+    }
+
+    public set enabled(value: boolean) {
+        if (value !== this._enabled) {
+            this._enabled = value;
+            this.service.recomputeHandlers();
+        }
+    }
 
     public addHotkey(hotkey: Hotkey) {
         this.hotkeys.push(hotkey);
@@ -62,18 +135,20 @@ export class HotkeyLayer {
         this.service.recomputeHandlers();
     }
 
-    public removeHotkey(hotkey: Hotkey) {
-        this.removeHotkeyByKeys(hotkey.keys);
-    }
-
-    public removeHotkeyByKeys(keys: string) {
-        const index = this.hotkeys.findIndex((hotkey) => hotkey.keys === keys);
-
-        if (index !== -1) {
-            this.hotkeys.splice(index, 1);
-        }
+    public removeAllHotkeys() {
+        this.hotkeys.forEach((hotkey) => {
+            hotkey.destroy();
+        });
+        this.hotkeys.splice(0);
 
         this.service.recomputeHandlers();
+    }
+
+    /**
+     * Destroys all hotkeys in this layer
+     */
+    public destroy() {
+        this.hotkeys.forEach((hotkey) => hotkey.destroy());
     }
 }
 
@@ -86,19 +161,47 @@ export class HotkeysService {
 
     constructor(private readonly ngNeatHotkeysService: NgNeatHotkeysService) {}
 
-    public createLayer(disableAll: boolean = false) {
-        const layer = new HotkeyLayer(this, disableAll);
+    /**
+     * Creates a new layer and registers it at this service.
+     * @param disableAllLower Whether all lower layers should be completely disabled. Defaults to `false`.
+     * @param enabled Whether all hotkeys in this service should be enabled by default. Defaults to `true`.
+     * @returns The new layer
+     */
+    public createLayer(
+        disableAllLower: boolean = false,
+        enabled: boolean = true
+    ) {
+        const layer = new HotkeyLayer(this, disableAllLower, enabled);
         this.layers.push(layer);
 
         return layer;
     }
 
+    /**
+     * Moves a layer to the top of the layer stack to ensure that its hotkeys have the highest priority
+     * @param layer The layer to elevate
+     */
+    public elevateLayer(layer: HotkeyLayer) {
+        const index = this.layers.findIndex((l) => l.id === layer.id);
+
+        if (index !== -1) {
+            this.layers.splice(index, 1);
+            this.layers.push(layer);
+            this.recomputeHandlers();
+        }
+    }
+
+    /**
+     * Removes a layer from the hotkey system, which disables and destroys all hotkeys that are part of this layer.
+     * @param layer The layer to remove
+     */
     public removeLayer(layer: HotkeyLayer) {
         const index = this.layers.findIndex((l) => l.id === layer.id);
 
         if (index !== -1) {
             this.layers.splice(index, 1);
             this.recomputeHandlers();
+            layer.destroy();
         }
     }
 
@@ -115,6 +218,7 @@ export class HotkeysService {
                 const keysToRegister = hotkey.getKeysToRegister();
                 if (
                     !(keysToRegister in this.registeredHotkeys) &&
+                    layer.enabled &&
                     !disableAll
                 ) {
                     this.ngNeatHotkeysService
@@ -122,16 +226,16 @@ export class HotkeysService {
                             keys: keysToRegister,
                             allowIn: ['INPUT', 'TEXTAREA', 'SELECT'],
                         })
-                        .subscribe((event) => hotkey.callback(event));
+                        .subscribe((event) => hotkey.onHotkey(event));
 
                     this.registeredHotkeys[keysToRegister] = hotkey.isCombo;
-                    hotkey.enable();
+                    hotkey.onLayerEnabled();
                 } else {
-                    hotkey.disable();
+                    hotkey.onLayerDisabled();
                 }
             });
 
-            if (layer.disableAll) {
+            if (layer.enabled && layer.disableAllLower) {
                 disableAll = true;
             }
         });

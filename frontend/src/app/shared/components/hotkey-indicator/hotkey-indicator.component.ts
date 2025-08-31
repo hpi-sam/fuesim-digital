@@ -2,11 +2,11 @@ import {
     ChangeDetectorRef,
     Component,
     Input,
+    OnChanges,
     OnDestroy,
-    OnInit,
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import type { Hotkey } from '../../services/hotkeys.service';
+import type { Hotkey, HotkeyState } from '../../services/hotkeys.service';
 
 @Component({
     selector: 'app-hotkey-indicator',
@@ -14,26 +14,28 @@ import type { Hotkey } from '../../services/hotkeys.service';
     styleUrls: ['./hotkey-indicator.component.scss'],
     standalone: false,
 })
-export class HotkeyIndicatorComponent implements OnInit, OnDestroy {
+export class HotkeyIndicatorComponent implements OnChanges, OnDestroy {
     @Input() hotkey: Hotkey | null = null;
     @Input() keys: string | null = null;
 
-    public enabled = false;
+    public state: HotkeyState = 'overridden';
 
-    private readonly destroy$ = new Subject<void>();
+    private readonly updateOrDestroy$ = new Subject<void>();
 
     constructor(private readonly changeDetectorRef: ChangeDetectorRef) {}
 
-    ngOnInit(): void {
-        this.hotkey?.enabled
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((enabled) => {
-                this.enabled = enabled;
+    ngOnChanges(): void {
+        this.updateOrDestroy$.next();
+
+        this.hotkey?.state$
+            .pipe(takeUntil(this.updateOrDestroy$))
+            .subscribe((state) => {
+                this.state = state;
                 this.changeDetectorRef.detectChanges();
             });
     }
 
     ngOnDestroy(): void {
-        this.destroy$.next();
+        this.updateOrDestroy$.next();
     }
 }

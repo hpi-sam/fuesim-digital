@@ -1,5 +1,11 @@
 <ng-container *ngIf="hotkey; else plainKeys">
-    <kbd class="badge text-bg-dark" [class.opacity-0]="!enabled">
+    <kbd
+        class="badge text-bg-dark"
+        [ngClass]="{
+            'opacity-0': state === 'overridden',
+            'text-secondary': state === 'disabled',
+        }"
+    >
         <small>{{ hotkey.keys }}</small>
     </kbd>
 </ng-container>

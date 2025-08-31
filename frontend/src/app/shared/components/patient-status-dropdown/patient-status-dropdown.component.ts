@@ -7,15 +7,13 @@ import type { PatientStatus } from 'digital-fuesim-manv-shared';
     styleUrls: ['./patient-status-dropdown.component.scss'],
     standalone: false,
 })
-export class PatientStatusDropdownComponent {
-    @Input() patientStatus!: PatientStatus;
-    @Input() allowedStatuses: readonly PatientStatus[] = [
-        'green',
-        'yellow',
-        'red',
-    ];
+export class PatientStatusDropdownComponent<
+    AllowedStatus extends PatientStatus,
+> {
+    @Input() patientStatus!: AllowedStatus;
+    @Input() allowedStatuses!: readonly AllowedStatus[];
     @Input() placement: 'end' | 'start' = 'start';
     @Input() tabIndex = -1;
 
-    @Output() readonly statusChanged = new EventEmitter<PatientStatus>();
+    @Output() readonly statusChanged = new EventEmitter<AllowedStatus>();
 }

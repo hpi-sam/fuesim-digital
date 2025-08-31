@@ -3,7 +3,6 @@ import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseAction,
-    PatientStatus,
     PatientStatusForTransport,
 } from 'digital-fuesim-manv-shared';
 import type { UUID } from 'digital-fuesim-manv-shared';
@@ -80,8 +79,8 @@ export class SignallerModalStartTransferOfCategoryModalComponent
         )[0];
     }
 
-    public updateMaximumStatus(newStatus: PatientStatus) {
-        this.maximumStatus = newStatus as PatientStatusForTransport;
+    public updateMaximumStatus(newStatus: PatientStatusForTransport) {
+        this.maximumStatus = newStatus;
     }
 
     public submit() {

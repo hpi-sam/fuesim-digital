@@ -10,12 +10,7 @@ import {
 } from 'digital-fuesim-manv-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import { MessageService } from 'src/app/core/messages/message.service';
-import type {
-    ColorCode,
-    PatientStatus,
-    UUID,
-    VehicleTemplate,
-} from 'digital-fuesim-manv-shared';
+import type { UUID, VehicleTemplate } from 'digital-fuesim-manv-shared';
 import type { AppState } from 'src/app/state/app.state';
 import {
     selectVehicleTemplates,
@@ -41,7 +36,8 @@ import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-templ
  * A wrapper around the map that provides trainers with more options and tools.
  */
 export class TrainerMapEditorComponent {
-    public currentCategory: ColorCode = 'X';
+    public currentCategory: (typeof this.colorCodeOfCategories)[(typeof this.categories)[number]] =
+        'X';
     public readonly categories = ['green', 'yellow', 'red'] as const;
     public readonly colorCodeOfCategories = {
         green: 'X',
@@ -100,11 +96,8 @@ export class TrainerMapEditorComponent {
         openEditVehicleTemplateModal(this.ngbModalService, mapImageTemplateId);
     }
 
-    public setCurrentCategory(category: PatientStatus) {
-        this.currentCategory =
-            this.colorCodeOfCategories[
-                category as Exclude<PatientStatus, 'black' | 'blue' | 'white'>
-            ];
+    public setCurrentCategory(category: (typeof this.categories)[number]) {
+        this.currentCategory = this.colorCodeOfCategories[category];
     }
 
     public async vehicleOnMouseDown(

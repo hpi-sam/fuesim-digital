@@ -39,7 +39,7 @@
             [ngbPopover]="addRegionTemplate"
             autoClose="outside"
             #addRegionPopover="ngbPopover"
-            [disabled]="((unmanagedRegions$ | async)?.length ?? 0) === 0"
+            [disabled]="(canAdd$ | async) !== true"
             [tabIndex]="((managedRegions$ | async)?.length ?? 0) + 1"
             [appAutofocus]="true"
         >
@@ -59,7 +59,7 @@
             [ngbPopover]="removeRegionTemplate"
             autoClose="outside"
             #removeRegionPopover="ngbPopover"
-            [disabled]="((managedRegions$ | async)?.length ?? 0) === 0"
+            [disabled]="(canRemove$ | async) !== true"
             [tabIndex]="((managedRegions$ | async)?.length ?? 0) + 2"
         >
             <span class="bi-plus me-1"></span>

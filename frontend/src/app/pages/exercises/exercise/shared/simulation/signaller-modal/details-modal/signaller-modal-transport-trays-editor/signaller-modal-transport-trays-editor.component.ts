@@ -6,7 +6,13 @@ import type { ManagePatientTransportToHospitalBehaviorState } from 'digital-fues
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { StrictObject } from 'digital-fuesim-manv-shared';
 import { difference } from 'lodash-es';
-import { combineLatest, map, type Observable } from 'rxjs';
+import {
+    combineLatest,
+    map,
+    ReplaySubject,
+    switchMap,
+    type Observable,
+} from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
@@ -36,17 +42,21 @@ export class SignallerModalTransportTraysEditorComponent
     @ViewChild('addRegionPopover') addRegionPopover!: NgbPopover;
     @ViewChild('removeRegionPopover') removeRegionPopover!: NgbPopover;
 
+    private readonly inputs$ = new ReplaySubject<{
+        simulatedRegionId: UUID;
+        transportBehaviorId: UUID;
+    }>(1);
+
     manageTransportBehavior$!: Observable<ManagePatientTransportToHospitalBehaviorState>;
     managedRegions$!: Observable<SearchableDropdownOption[]>;
     unmanagedRegions$!: Observable<SearchableDropdownOption[]>;
 
+    canAdd$!: Observable<boolean>;
+    canRemove$!: Observable<boolean>;
+
     private hotkeyLayer!: HotkeyLayer;
-    addRegionHotkey = new Hotkey('+', false, () => {
-        this.addRegionPopover.open();
-    });
-    removeRegionHotkey = new Hotkey('-', false, () => {
-        this.removeRegionPopover.open();
-    });
+    addRegionHotkey!: Hotkey;
+    removeRegionHotkey!: Hotkey;
     finishHotkey = new Hotkey('Enter', false, () => {
         this.close();
     });
@@ -59,31 +69,31 @@ export class SignallerModalTransportTraysEditorComponent
     ) {}
 
     ngOnInit() {
-        this.hotkeyLayer = this.hotkeysService.createLayer();
-        this.hotkeyLayer.addHotkey(this.addRegionHotkey);
-        this.hotkeyLayer.addHotkey(this.removeRegionHotkey);
-        this.hotkeyLayer.addHotkey(this.finishHotkey);
-    }
-
-    ngOnChanges() {
-        this.manageTransportBehavior$ = this.store.select(
-            createSelectBehaviorState(
-                this.simulatedRegionId,
-                this.transportBehaviorId
+        this.manageTransportBehavior$ = this.inputs$.pipe(
+            switchMap(({ simulatedRegionId, transportBehaviorId }) =>
+                this.store.select(
+                    createSelectBehaviorState<ManagePatientTransportToHospitalBehaviorState>(
+                        simulatedRegionId,
+                        transportBehaviorId
+                    )
+                )
             )
         );
 
-        const otherSimulatedRegions$ = this.store
-            .select(selectSimulatedRegions)
-            .pipe(
-                map((regions) =>
-                    StrictObject.fromEntries(
-                        StrictObject.entries(regions).filter(
-                            ([id]) => id !== this.simulatedRegionId
-                        )
+        const allRegions$ = this.store.select(selectSimulatedRegions);
+
+        const otherSimulatedRegions$ = combineLatest([
+            this.inputs$,
+            allRegions$,
+        ]).pipe(
+            map(([{ simulatedRegionId }, allRegions]) =>
+                StrictObject.fromEntries(
+                    StrictObject.entries(allRegions).filter(
+                        ([id]) => id !== simulatedRegionId
                     )
                 )
-            );
+            )
+        );
 
         this.managedRegions$ = combineLatest([
             this.manageTransportBehavior$,
@@ -110,6 +120,42 @@ export class SignallerModalTransportTraysEditorComponent
                 }))
             )
         );
+
+        this.canAdd$ = this.unmanagedRegions$.pipe(
+            map((unmanagedRegions) => unmanagedRegions.length > 0)
+        );
+        this.canRemove$ = this.managedRegions$.pipe(
+            map((managedRegions) => managedRegions.length > 0)
+        );
+
+        this.addRegionHotkey = new Hotkey(
+            '+',
+            false,
+            () => {
+                this.addRegionPopover.open();
+            },
+            this.canAdd$
+        );
+        this.removeRegionHotkey = new Hotkey(
+            '-',
+            false,
+            () => {
+                this.removeRegionPopover.open();
+            },
+            this.canRemove$
+        );
+
+        this.hotkeyLayer = this.hotkeysService.createLayer();
+        this.hotkeyLayer.addHotkey(this.addRegionHotkey);
+        this.hotkeyLayer.addHotkey(this.removeRegionHotkey);
+        this.hotkeyLayer.addHotkey(this.finishHotkey);
+    }
+
+    ngOnChanges() {
+        this.inputs$.next({
+            simulatedRegionId: this.simulatedRegionId,
+            transportBehaviorId: this.transportBehaviorId,
+        });
     }
 
     ngOnDestroy() {

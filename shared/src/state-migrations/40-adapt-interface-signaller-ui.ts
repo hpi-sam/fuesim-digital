@@ -109,7 +109,7 @@ interface VehicleResource {
  * - Add `sent` property to `AlarmGroup`
  */
 export const adaptInterfaceSignallerUI40: Migration = {
-    action: (intermediaryState, action) => {
+    action: (_intermediaryState, action) => {
         switch ((action as { type: string }).type) {
             // Add `sent`-property to `AlarmGroup`
             case '[AlarmGroup] Add AlarmGroup': {

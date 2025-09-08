@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
+import { IsBoolean, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
 import { Patient } from '../../models/patient.js';
 import type { PatientStatus } from '../../models/utils/index.js';
 import {
@@ -125,7 +125,32 @@ export class SetCustomQRCodeAction implements Action {
     public readonly customQRCode!: string;
 }
 
+export class SetPatientTransportPriorityAction implements Action {
+    @IsValue('[Patient] Set Transport Priority' as const)
+    public readonly type = '[Patient] Set Transport Priority';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly patientId!: UUID;
+
+    @IsBoolean()
+    public readonly isTransportPriority!: boolean;
+}
+
 export namespace PatientActionReducers {
+    export const setPatientTransportPriority: ActionReducer<SetPatientTransportPriorityAction> =
+            {
+                action: SetPatientTransportPriorityAction,
+                reducer: (draftState, { patientId, isTransportPriority }) => {
+                    const patient = getElement(draftState, 'patient', patientId);
+                    if (patient.isTransportPriority !== isTransportPriority) {
+                        patient.isTransportPriority = isTransportPriority;
+                    }
+
+                    return draftState;
+                },
+                rights: 'participant',
+            };
+
     export const addPatient: ActionReducer<AddPatientAction> = {
         action: AddPatientAction,
         reducer: (draftState, { patient }) => {

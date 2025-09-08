@@ -1,15 +1,21 @@
-<ng-container>
-    <h5 class="popover-header">
-        <app-patient-identifier [patientId]="patientId" />
-        <span>{{ ' ' }}</span>
-        <app-patient-health-point-display [patientId]="patientId" />
-        <button
-            (click)="closePopup()"
-            type="button"
-            class="btn-close float-end"
-        ></button>
-    </h5>
-    <div class="popover-body p-0" style="max-width: 350px">
-        <app-patients-details [patientId]="patientId" />
+<ng-container *ngIf="patient$ | async as patient">
+    <div [class.tp-highlight]="patient.isTransportPriority">
+        <h5 class="popover-header d-flex align-items-center gap-1">
+            <app-patient-identifier [patientId]="patientId" />
+            <span>{{ ' ' }}</span>
+            <app-patient-health-point-display [patientId]="patientId" />
+            @if (patient.isTransportPriority) {
+                <div class="tp-marker">TP</div>
+            }
+            <div class="flex-grow-1"></div>
+            <button
+                (click)="closePopup()"
+                type="button"
+                class="btn-close float-end"
+            ></button>
+        </h5>
+        <div class="popover-body p-0" style="max-width: 350px">
+            <app-patients-details [patientId]="patientId" />
+        </div>
     </div>
 </ng-container>

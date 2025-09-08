@@ -148,6 +148,22 @@
                         </td>
                     </tr>
                     <tr>
+                        <th scope="col">Transportpriorität</th>
+                        <td class="font-monospace">
+                            <div class="form-switch">
+                                <input
+                                    [ngModel]="patient.isTransportPriority"
+                                    (ngModelChange)="
+                                        setTransportPriority($event)
+                                    "
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    data-cy="settingsTransportPriorityCheckbox"
+                                />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
                         <th scope="col">Verletzungen</th>
                         <td class="font-monospace">
                             {{ patient.pretriageInformation.injuries }}

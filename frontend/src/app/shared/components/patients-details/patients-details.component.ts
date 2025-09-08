@@ -69,6 +69,14 @@ export class PatientsDetailsComponent implements OnChanges {
         });
     }
 
+    setTransportPriority(priority: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[Patient] Set Transport Priority',
+            patientId: this.patientId,
+            isTransportPriority: priority,
+        });
+    }
+
     updateRemarks(remarks: string) {
         this.exerciseService.proposeAction({
             type: '[Patient] Set Remarks',

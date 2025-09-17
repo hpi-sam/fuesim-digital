@@ -18,11 +18,11 @@
 <ng-template #transferTraysEditor>
     <app-signaller-modal-transport-trays-editor
         *ngIf="
-            manageTransportBehaviorId$ | async as transferPointId;
+            manageTransportBehaviorId$ | async as transportBehaviorId;
             else noTransportBehavior
         "
         [simulatedRegionId]="simulatedRegionId"
-        [transportBehaviorId]="transferPointId"
+        [transportBehaviorId]="transportBehaviorId"
     />
     <ng-template #noTransportBehavior>
         <span class="text-danger"

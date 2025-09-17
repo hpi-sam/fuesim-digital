@@ -82,22 +82,9 @@ export class SignallerModalTransportTraysEditorComponent
 
         const allRegions$ = this.store.select(selectSimulatedRegions);
 
-        const otherSimulatedRegions$ = combineLatest([
-            this.inputs$,
-            allRegions$,
-        ]).pipe(
-            map(([{ simulatedRegionId }, allRegions]) =>
-                StrictObject.fromEntries(
-                    StrictObject.entries(allRegions).filter(
-                        ([id]) => id !== simulatedRegionId
-                    )
-                )
-            )
-        );
-
         this.managedRegions$ = combineLatest([
             this.manageTransportBehavior$,
-            otherSimulatedRegions$,
+            allRegions$,
         ]).pipe(
             map(([behavior, regions]) =>
                 Object.keys(behavior.simulatedRegionsToManage).map((id) => ({
@@ -108,7 +95,7 @@ export class SignallerModalTransportTraysEditorComponent
         );
         this.unmanagedRegions$ = combineLatest([
             this.managedRegions$,
-            otherSimulatedRegions$,
+            allRegions$,
         ]).pipe(
             map(([managedRegions, allRegions]) =>
                 difference(

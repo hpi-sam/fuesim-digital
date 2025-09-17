@@ -141,8 +141,7 @@ export class SignallerModalRegionInformationComponent
                 'erfordert',
                 'erforderlich',
             ],
-            details:
-                'um alle Patienten zu behandeln (PA) oder Anfragen zu erfüllen (B-Raum)',
+            details: 'um alle Patienten in dieser PA zu behandeln',
             hotkeyKeys: 'E',
             callback: () => this.requestRequiredResources(),
             hasSecondaryAction: true,

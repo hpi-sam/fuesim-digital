@@ -66,3 +66,19 @@
         <span class="text-danger">Dieser Bereich fragt keine Fahrzeuge an</span>
     </ng-template>
 </ng-template>
+
+<ng-template #transportRequestTargetEditor>
+    <app-signaller-modal-transport-request-target-editor
+        *ngIf="
+            manageTransportBehaviorId$ | async as transportBehaviorId;
+            else noTransportBehavior
+        "
+        [simulatedRegionId]="simulatedRegionId"
+        [transportBehaviorId]="transportBehaviorId"
+    />
+    <ng-template #noTransportBehavior>
+        <span class="text-danger"
+            >Dieser Bereich verwaltet keine Transporte</span
+        >
+    </ng-template>
+</ng-template>

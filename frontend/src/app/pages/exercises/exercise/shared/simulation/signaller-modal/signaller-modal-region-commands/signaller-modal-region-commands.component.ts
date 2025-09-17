@@ -33,6 +33,8 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
     provideVehiclesEditor!: TemplateRef<any>;
     @ViewChild('requestTargetEditor')
     requestTargetEditor!: TemplateRef<any>;
+    @ViewChild('transportRequestTargetEditor')
+    transportRequestTargetEditor!: TemplateRef<any>;
 
     ownTransferPointId$!: Observable<UUID>;
     manageTransportBehaviorId$!: Observable<UUID | null>;
@@ -129,7 +131,7 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
         // TODO: Radio channels
         {
             key: 'setRequestTarget',
-            name: 'Ziel für Fahrzeuganfragen festlegen',
+            name: 'Ziel für Fahrzeuganfragen (von PA/B-Raum) festlegen',
             details:
                 '(ob Fahrzeuge bei Einsatzleitung oder B-Raum angefragt werden sollen)',
             keywords: [
@@ -150,6 +152,31 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
             hasSecondaryAction: false,
             requiredBehaviors: ['requestBehavior'],
             errorMessage: 'Dieser Bereich fragt keine Fahrzeuge an',
+        },
+        {
+            key: 'setTransportRequestTarget',
+            name: 'Ziel für Fahrzeuganfragen (für Transport) festlegen',
+            details:
+                '(von welchem B-Raum Fahrzeuge für den Patiententransport abgerufen werden sollen)',
+            keywords: [
+                'ziel',
+                'anfrage',
+                'anfragen',
+                'bereitstellen',
+                'bereitstellung',
+                'raum',
+                'b-raum',
+                'b raum',
+                'bereitstellungsraum',
+                'transport',
+                'organisation',
+                'transportorganisation',
+            ],
+            hotkeyKeys: '6',
+            callback: () => this.setTransportRequestTarget(),
+            hasSecondaryAction: false,
+            requiredBehaviors: ['managePatientTransportToHospitalBehavior'],
+            errorMessage: 'Dieser Bereich verwaltet keine Transporte',
         },
     ];
 
@@ -220,8 +247,15 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
 
     setRequestTarget() {
         this.detailsModal.open(
-            'Ziel für Fahrzeuganfragen',
+            'Ziel für Fahrzeuganfragen (PA/B-Raum)',
             this.requestTargetEditor
+        );
+    }
+
+    setTransportRequestTarget() {
+        this.detailsModal.open(
+            'Ziel für Fahrzeuganfragen (Transport)',
+            this.transportRequestTargetEditor
         );
     }
 }

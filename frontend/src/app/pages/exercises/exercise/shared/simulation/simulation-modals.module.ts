@@ -85,6 +85,7 @@ import { SignallerModalRegionsOverviewComponent } from './signaller-modal/signal
 import { SignallerModalEocInformationAlarmGroupsSentComponent } from './signaller-modal/details-modal/eoc-information/signaller-modal-eoc-information-alarm-groups-sent/signaller-modal-eoc-information-alarm-groups-sent.component';
 import { SignallerModalEocInformationArrivingVehiclesComponent } from './signaller-modal/details-modal/eoc-information/signaller-modal-eoc-information-arriving-vehicles/signaller-modal-eoc-information-arriving-vehicles.component';
 import { RadiogramCardContentVehicleOccupationsComponent } from './trainer-modal/radiogram-list/radiogram-card/radiogram-card-content-vehicle-occupations/radiogram-card-content-vehicle-occupations.component';
+import { SignallerModalTransportRequestTargetEditorComponent } from './signaller-modal/details-modal/signaller-modal-transport-request-target-editor/signaller-modal-transport-request-target-editor.component';
 
 @NgModule({
     declarations: [
@@ -152,6 +153,7 @@ import { RadiogramCardContentVehicleOccupationsComponent } from './trainer-modal
         SignallerModalTransportTraysEditorComponent,
         SignallerModalProvideVehiclesEditorComponent,
         SignallerModalRequestDestinationEditorComponent,
+        SignallerModalTransportRequestTargetEditorComponent,
         SignallerModalTransferConnectionsEditorComponent,
         SignallerModalRegionsOverviewComponent,
         SignallerModalEocInformationAlarmGroupsSentComponent,

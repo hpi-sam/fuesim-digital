@@ -33,6 +33,7 @@
     <app-radiogram-card-content-resource-request
         *ngSwitchCase="'resourceRequestRadiogram'"
         [radiogramId]="radiogram.id"
+        [shownInSignallerModal]="shownInSignallerModal"
     />
     <app-radiogram-card-content-transfer-connections
         *ngSwitchCase="'transferConnectionsRadiogram'"

@@ -9,4 +9,5 @@ import type { ExerciseRadiogram } from 'digital-fuesim-manv-shared';
 })
 export class RadiogramCardContentComponent {
     @Input() radiogram!: ExerciseRadiogram;
+    @Input() shownInSignallerModal = false;
 }

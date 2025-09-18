@@ -6,6 +6,11 @@ import type { UUID } from 'digital-fuesim-manv-shared';
 import { isAccepted, isDone } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
+import {
+    Hotkey,
+    HotkeyLayer,
+    HotkeysService,
+} from 'src/app/shared/services/hotkeys.service';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectRadiogram } from 'src/app/state/application/selectors/exercise.selectors';
 
@@ -17,15 +22,23 @@ import { createSelectRadiogram } from 'src/app/state/application/selectors/exerc
 })
 export class RadigoramCardContentResourceRequestComponent implements OnInit {
     @Input() radiogramId!: UUID;
+    @Input() shownInSignallerModal = false;
 
     radiogram$!: Observable<ResourceRequestRadiogram>;
     enableActionButtons$!: Observable<boolean>;
     showAnswer$!: Observable<boolean>;
 
+    private readonly hotkeyLayer: HotkeyLayer;
+    acceptHotkey!: Hotkey;
+    denyHotkey!: Hotkey;
+
     constructor(
         private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
+        private readonly exerciseService: ExerciseService,
+        private readonly hotkeyService: HotkeysService
+    ) {
+        this.hotkeyLayer = this.hotkeyService.createLayer(false, false);
+    }
 
     acceptRequest() {
         this.exerciseService.proposeAction({
@@ -54,5 +67,25 @@ export class RadigoramCardContentResourceRequestComponent implements OnInit {
         this.showAnswer$ = this.store.select(
             createSelector(selectRadiogram, (radiogram) => isDone(radiogram))
         );
+
+        this.acceptHotkey = new Hotkey(
+            '+',
+            false,
+            () => {
+                this.acceptRequest();
+            },
+            this.enableActionButtons$
+        );
+        this.denyHotkey = new Hotkey(
+            '-',
+            false,
+            () => {
+                this.denyRequest();
+            },
+            this.enableActionButtons$
+        );
+        this.hotkeyLayer.addHotkey(this.acceptHotkey);
+        this.hotkeyLayer.addHotkey(this.denyHotkey);
+        this.hotkeyLayer.enabled = this.shownInSignallerModal;
     }
 }

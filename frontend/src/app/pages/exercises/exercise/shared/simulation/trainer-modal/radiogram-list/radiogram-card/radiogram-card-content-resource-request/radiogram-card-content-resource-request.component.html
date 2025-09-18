@@ -86,6 +86,7 @@
                         class="btn btn-danger col-sm mx-1"
                     >
                         Ablehnen
+                        <app-hotkey-indicator [hotkey]="denyHotkey" />
                     </button>
                     <button
                         type="button"
@@ -93,6 +94,7 @@
                         class="btn btn-success col-sm mx-1"
                     >
                         Akzeptieren
+                        <app-hotkey-indicator [hotkey]="acceptHotkey" />
                     </button>
                 </div>
             </ng-template>

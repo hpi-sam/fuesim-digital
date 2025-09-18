@@ -9,6 +9,7 @@
         <div *ngIf="radiogram$ | async as radiogram" class="position-relative">
             <app-radiogram-card-content
                 [radiogram]="radiogram!"
+                [shownInSignallerModal]="shownInSignallerModal"
             ></app-radiogram-card-content>
             <div
                 *ngIf="(status$ | async) === 'unread'"

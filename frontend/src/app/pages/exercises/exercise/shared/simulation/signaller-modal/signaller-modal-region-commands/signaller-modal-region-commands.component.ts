@@ -128,7 +128,6 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
             requiredBehaviors: ['transferBehavior'],
             errorMessage: 'Dieser Bereich kann keine Fahrzeuge bereitstellen',
         },
-        // TODO: Radio channels
         {
             key: 'setRequestTarget',
             name: 'Ziel für Fahrzeuganfragen (von PA/B-Raum) festlegen',

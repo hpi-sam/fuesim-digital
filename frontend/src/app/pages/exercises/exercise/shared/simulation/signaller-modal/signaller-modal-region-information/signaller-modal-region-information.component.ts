@@ -181,7 +181,6 @@ export class SignallerModalRegionInformationComponent
             errorMessage: 'Dieser Bereich behandelt keine Patienten',
             loading$: new BehaviorSubject<boolean>(false),
         },
-        // TODO: Location
         {
             key: 'vehicleOccupations',
             name: 'Nutzung der Fahrzeuge',
@@ -236,7 +235,6 @@ export class SignallerModalRegionInformationComponent
             requiredBehaviors: [],
             loading$: new BehaviorSubject<boolean>(false),
         },
-        // TODO: Patient treatments
         {
             key: 'personnelCount',
             name: 'Anzahl Personal',
@@ -259,7 +257,6 @@ export class SignallerModalRegionInformationComponent
             requiredBehaviors: [],
             loading$: new BehaviorSubject<boolean>(false),
         },
-        // TODO: Patient details
     ];
     reportBehaviorId$!: Observable<UUID | null>;
 

@@ -30,11 +30,13 @@ export class SignallerModalRegionLeaderComponent
     @Output() readonly hasLeader = new EventEmitter<boolean>();
 
     leader$!: Observable<Personnel | null>;
-    private readonly destroy$ = new Subject<void>();
+    private readonly changeOrDestroy$ = new Subject<void>();
 
     constructor(private readonly store: Store<AppState>) {}
 
     ngOnChanges() {
+        this.changeOrDestroy$.next();
+
         const assignLeaderBehaviorState$ = this.store
             .select(
                 createSelectBehaviorStatesByType(
@@ -62,12 +64,12 @@ export class SignallerModalRegionLeaderComponent
             .pipe(
                 map((personnel) => !!personnel),
                 distinctUntilChanged(),
-                takeUntil(this.destroy$)
+                takeUntil(this.changeOrDestroy$)
             )
             .subscribe((personnel) => this.hasLeader.emit(!!personnel));
     }
 
     ngOnDestroy() {
-        this.destroy$.next();
+        this.changeOrDestroy$.next();
     }
 }

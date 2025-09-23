@@ -1,4 +1,10 @@
-import { IsBoolean, IsUUID, ValidateNested } from 'class-validator';
+import {
+    IsBoolean,
+    IsString,
+    IsUUID,
+    ValidateIf,
+    ValidateNested,
+} from 'class-validator';
 import type { UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
@@ -31,6 +37,10 @@ export class TransferCategoryCompletedRadiogram implements Radiogram {
 
     @IsBoolean()
     readonly informationAvailable: boolean = false;
+
+    @IsString()
+    @ValidateIf((_, value) => value !== null)
+    public readonly informationRequestKey: string | null = null;
 
     @IsLiteralUnion(patientStatusAllowedValues)
     readonly completedCategory: PatientStatus = 'white';

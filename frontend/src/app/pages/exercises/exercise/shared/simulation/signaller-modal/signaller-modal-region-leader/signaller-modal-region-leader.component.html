@@ -1,0 +1,9 @@
+<ng-container *ngIf="leader$ | async as leader; else noLeader">
+    Führungskraft:
+    <strong>{{ leader.personnelType | personnelName }}</strong>
+    von
+    <strong>{{ leader.vehicleName }}</strong>
+</ng-container>
+<ng-template #noLeader>
+    <span class="text-danger">Keine Führungskraft</span>
+</ng-template>

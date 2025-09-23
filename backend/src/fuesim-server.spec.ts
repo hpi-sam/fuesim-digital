@@ -40,6 +40,7 @@ describe('Exercise saving', () => {
                             id: uuid(),
                             type: 'alarmGroup',
                             name: 'Alarm Group',
+                            sent: false,
                         },
                     },
                     null

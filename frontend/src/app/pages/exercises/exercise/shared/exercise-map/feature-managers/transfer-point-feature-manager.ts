@@ -36,11 +36,14 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
         super(
             olMap,
             (targetPosition, transferPoint) => {
-                exerciseService.proposeAction({
-                    type: '[TransferPoint] Move TransferPoint',
-                    transferPointId: transferPoint.id,
-                    targetPosition,
-                });
+                exerciseService.proposeAction(
+                    {
+                        type: '[TransferPoint] Move TransferPoint',
+                        transferPointId: transferPoint.id,
+                        targetPosition,
+                    },
+                    true
+                );
             },
             new PointGeometryHelper(),
             600

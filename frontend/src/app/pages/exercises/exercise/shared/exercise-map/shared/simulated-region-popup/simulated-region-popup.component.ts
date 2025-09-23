@@ -7,7 +7,7 @@ import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectSimulatedRegion } from 'src/app/state/application/selectors/exercise.selectors';
 import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
-import { openSimulatedRegionsModal } from '../../../simulated-region-overview/open-simulated-regions-modal';
+import { openSimulationTrainerModal } from '../../../simulation/trainer-modal/open-simulation-trainer-modal';
 import { PopupService } from '../../utility/popup.service';
 
 @Component({
@@ -37,7 +37,7 @@ export class SimulatedRegionPopupComponent implements OnInit {
 
     openInModal() {
         this.popupService.closePopup();
-        openSimulatedRegionsModal(this.modalService, this.simulatedRegionId);
+        openSimulationTrainerModal(this.modalService, this.simulatedRegionId);
     }
 
     public closePopup() {

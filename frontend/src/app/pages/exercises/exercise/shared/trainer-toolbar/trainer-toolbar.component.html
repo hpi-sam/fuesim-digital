@@ -73,10 +73,17 @@
             </button>
             <button
                 ngbDropdownItem
-                (click)="openSimulatedRegions()"
+                (click)="openSimulationTrainerModal()"
                 class="btn btn-primary"
             >
-                Simulationsübersicht
+                Simulationseinstellungen (Übungsleitung)
+            </button>
+            <button
+                ngbDropdownItem
+                (click)="openSimulationSignallerModal()"
+                class="btn btn-primary"
+            >
+                Simulationsübersicht (Funker)
             </button>
         </div>
     </div>

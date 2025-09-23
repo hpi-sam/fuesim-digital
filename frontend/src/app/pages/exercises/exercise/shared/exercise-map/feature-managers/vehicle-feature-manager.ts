@@ -81,11 +81,14 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
         super(
             olMap,
             (targetPosition, vehicle) => {
-                exerciseService.proposeAction({
-                    type: '[Vehicle] Move vehicle',
-                    vehicleId: vehicle.id,
-                    targetPosition,
-                });
+                exerciseService.proposeAction(
+                    {
+                        type: '[Vehicle] Move vehicle',
+                        vehicleId: vehicle.id,
+                        targetPosition,
+                    },
+                    true
+                );
             },
             new PointGeometryHelper(),
             1000

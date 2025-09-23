@@ -34,6 +34,9 @@ export class HospitalPatient {
     @IsString()
     public readonly identifier: string;
 
+    @IsString()
+    public readonly customQRCode: string = '';
+
     /**
      * the vehicle that a patient was transported with
      */
@@ -97,6 +100,7 @@ export class HospitalPatient {
     constructor(
         patientId: UUID,
         identifier: string,
+        customQRCode: string,
         vehicleType: string,
         startTime: number,
         arrivalTime: number,
@@ -112,6 +116,7 @@ export class HospitalPatient {
     ) {
         this.patientId = patientId;
         this.identifier = identifier;
+        this.customQRCode = customQRCode;
         this.vehicleType = vehicleType;
         this.startTime = startTime;
         this.arrivalTime = arrivalTime;
@@ -145,6 +150,7 @@ export class HospitalPatient {
             HospitalPatient.create(
                 patient.id,
                 patient.identifier,
+                patient.customQRCode,
                 vehicleType,
                 startTime,
                 arrivalTime,

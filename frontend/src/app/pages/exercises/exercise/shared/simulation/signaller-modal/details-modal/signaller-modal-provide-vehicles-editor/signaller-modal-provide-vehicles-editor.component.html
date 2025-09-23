@@ -1,0 +1,116 @@
+<form (ngSubmit)="startTransfer()" class="container">
+    <h5>Anzahl zu sendender Fahrzeuge</h5>
+
+    <div
+        *ngFor="
+            let vehicleTemplate of vehicleTemplates$ | async;
+            first as first;
+            index as index;
+            trackBy: 'id' | appTrackByProperty
+        "
+        class="row"
+        [class.mt-2]="!first"
+    >
+        <ng-container
+            *appLet="
+                (availableVehicles$ | async)?.[vehicleTemplate.vehicleType] ??
+                0 as availableVehicles
+            "
+        >
+            <label class="col text-nowrap"
+                >{{ vehicleTemplate.name }}<br /><span class="text-muted">
+                    ({{ availableVehicles }} verfügbar)</span
+                ></label
+            >
+            <input
+                [ngModel]="vehicleAmounts[vehicleTemplate.vehicleType] ?? 0"
+                (ngModelChange)="
+                    vehicleAmounts[vehicleTemplate.vehicleType] = $event
+                "
+                [name]="vehicleTemplate.vehicleType + 'Count'"
+                [tabIndex]="index + 1"
+                #amountInput="ngModel"
+                required
+                appIntegerValidator
+                type="number"
+                min="0"
+                [max]="availableVehicles"
+                step="1"
+                class="form-control col ms-2"
+                style="width: 1px"
+            />
+            <div class="btn-group col-auto ms-2" role="group">
+                <button
+                    type="button"
+                    class="btn btn-outline-success"
+                    (click)="increaseAmount(vehicleTemplate.vehicleType)"
+                >
+                    +
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="decreaseAmount(vehicleTemplate.vehicleType)"
+                >
+                    -
+                </button>
+            </div>
+            <app-display-validation [ngModelInput]="amountInput" />
+        </ng-container>
+    </div>
+    <div class="mt-2 d-flex flex-row align-items-center">
+        <label class="flex-shrink-1 text-nowrap">nach</label>
+        <button
+            [ngbPopover]="selectTargetTemplate"
+            autoClose="outside"
+            #selectTargetPopover="ngbPopover"
+            placement="bottom"
+            [disabled]="((availableTargets$ | async)?.length ?? 0) === 0"
+            [tabindex]="
+                ((vehicleTemplates$ | async)?.length ?? 0) === 0
+                    ? -1
+                    : (vehicleTemplates$ | async)!.length + 1
+            "
+            class="btn btn-outline-primary flex-grow-1 flex-shrink-1 ms-2 d-flex flex-row"
+            style="width: 1px"
+            type="button"
+        >
+            <span
+                class="flex-grow-1 flex-shrink-1 text-nowrap overflow-hidden"
+                style="text-overflow: ellipsis; width: 1px"
+            >
+                {{ selectedTarget ? selectedTarget.name : 'Ziel auswählen' }}
+            </span>
+            <app-hotkey-indicator
+                [hotkey]="selectTargetHotkey"
+                class="flex-shrink-1 ms-1"
+            />
+            <i class="bi bi-caret-down-fill flex-shrink-1 ms-1"></i>
+        </button>
+        <ng-template #selectTargetTemplate>
+            <app-searchable-dropdown
+                *ngIf="((availableTargets$ | async)?.length ?? 0) !== 0"
+                [options]="(availableTargets$ | async)!"
+                (selected)="selectTarget($event); selectTargetPopover.close()"
+            />
+        </ng-template>
+    </div>
+    <button
+        [disabled]="!canSend || loading"
+        class="btn btn-primary mt-2 row g-0 w-100"
+        [tabIndex]="
+            canSend ? ((vehicleTemplates$ | async)?.length ?? 0) + 2 : -1
+        "
+    >
+        Sende Fahrzeuge
+        <span
+            *ngIf="loading; else hotkey"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+        ></span>
+        <ng-template #hotkey>
+            <app-hotkey-indicator [hotkey]="submitHotkey" class="ms-1" />
+        </ng-template>
+    </button>
+</form>

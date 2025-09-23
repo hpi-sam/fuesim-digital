@@ -76,4 +76,12 @@ export class PatientsDetailsComponent implements OnChanges {
             remarks,
         });
     }
+
+    updateCustomQRCode(customQRCode: string) {
+        this.exerciseService.proposeAction({
+            type: '[Patient] Set Custom QR Code',
+            patientId: this.patientId,
+            customQRCode,
+        });
+    }
 }

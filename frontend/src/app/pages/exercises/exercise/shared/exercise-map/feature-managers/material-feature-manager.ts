@@ -71,11 +71,14 @@ export class MaterialFeatureManager extends MoveableFeatureManager<Material> {
         super(
             olMap,
             (targetPosition, material) => {
-                exerciseService.proposeAction({
-                    type: '[Material] Move material',
-                    materialId: material.id,
-                    targetPosition,
-                });
+                exerciseService.proposeAction(
+                    {
+                        type: '[Material] Move material',
+                        materialId: material.id,
+                        targetPosition,
+                    },
+                    true
+                );
             },
             new PointGeometryHelper()
         );

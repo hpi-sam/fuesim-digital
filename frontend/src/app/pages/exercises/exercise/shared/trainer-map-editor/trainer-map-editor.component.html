@@ -149,43 +149,14 @@
                 <li class="list-group-item">
                     <h5>
                         Patienten
-                        <div
-                            ngbDropdown
-                            placement="bottom-end"
-                            class="d-inline-block float-end"
-                        >
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-outline-secondary mb-2"
-                                style="min-width: 100px"
-                                ngbDropdownToggle
-                            >
-                                <app-patient-status-badge
-                                    [status]="
-                                        currentCategory | patientStatusColor
-                                    "
-                                >
-                                </app-patient-status-badge>
-                            </button>
-                            <div
-                                ngbDropdownMenu
-                                class="position-absolute"
-                                style="min-width: 100px"
-                            >
-                                <button
-                                    *ngFor="let category of categories"
-                                    ngbDropdownItem
-                                    (click)="setCurrentCategory(category)"
-                                    class="btn-outline-secondary"
-                                >
-                                    <app-patient-status-badge
-                                        [status]="category | patientStatusColor"
-                                        class="float-end"
-                                    >
-                                    </app-patient-status-badge>
-                                </button>
-                            </div>
-                        </div>
+                        <app-patient-status-dropdown
+                            [patientStatus]="
+                                currentCategory | patientStatusColor
+                            "
+                            [allowedStatuses]="categories"
+                            placement="end"
+                            (statusChanged)="setCurrentCategory($event)"
+                        />
                     </h5>
                     <!-- 20px more height than the sum of the children to have room for the scrollbar -->
                     <div

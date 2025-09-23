@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsUUID, ValidateNested } from 'class-validator';
+import {
+    IsBoolean,
+    IsString,
+    IsUUID,
+    ValidateIf,
+    ValidateNested,
+} from 'class-validator';
 import type { UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
@@ -30,6 +36,10 @@ export class MaterialCountRadiogram implements Radiogram {
     @IsBoolean()
     readonly informationAvailable: boolean = false;
 
+    @IsString()
+    @ValidateIf((_, value) => value !== null)
+    public readonly informationRequestKey: string | null;
+
     @ValidateNested()
     @Type(() => CanCaterFor)
     readonly materialForPatients: CanCaterFor;
@@ -40,10 +50,12 @@ export class MaterialCountRadiogram implements Radiogram {
     constructor(
         id: UUID,
         simulatedRegionId: UUID,
+        key: string | null,
         status: ExerciseRadiogramStatus
     ) {
         this.id = id;
         this.simulatedRegionId = simulatedRegionId;
+        this.informationRequestKey = key;
         this.status = status;
         this.materialForPatients = {
             red: 0,

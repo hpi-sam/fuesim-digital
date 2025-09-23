@@ -1,0 +1,15 @@
+<h5>Transferverbindungen</h5>
+
+<ng-container *appLet="connectedRegions$ | async as connectedRegions">
+    Dieser Bereich hat Transferverbindungen zu
+
+    <ul *ngIf="connectedRegions.length > 0; else noConnections">
+        <li *ngFor="let connectedRegion of connectedRegions">
+            {{ connectedRegion.name }}
+            <span class="text-muted">
+                (Dauer: {{ connectedRegion.duration | formatDuration }})
+            </span>
+        </li>
+    </ul>
+    <ng-template #noConnections>keinem anderen Bereich.</ng-template>
+</ng-container>

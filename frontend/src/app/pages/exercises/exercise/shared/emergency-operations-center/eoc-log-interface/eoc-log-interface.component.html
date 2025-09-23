@@ -1,54 +1,47 @@
-<div class="card">
-    <h5 class="card-header">Einsatztagebuch</h5>
-
-    <div class="p-3 border-bottom">
-        <textarea
-            [(ngModel)]="newLogEntry"
-            [appAutofocus]="true"
-            maxlength="65535"
-            placeholder="Schreiben Sie den neuen Eintrag in dieses Feld..."
-            class="form-control no-validation mb-3"
-        ></textarea>
-        <button
-            type="button"
-            class="btn btn-primary w-100"
-            [disabled]="newLogEntry === ''"
-            (click)="addEocLogEntry()"
-        >
-            Eintrag speichern
-        </button>
-    </div>
-    <ng-container *ngIf="eocLogEntries$ | async as eocLogEntries">
-        <div *ngIf="eocLogEntries.length === 0" class="text-muted p-3">
-            Es sind noch keine Einträge vorhanden.
-        </div>
-
-        <ul
-            *ngIf="eocLogEntries.length > 0"
-            style="max-height: 50vh; overflow: auto"
-            class="list-group list-group-flush"
-        >
-            <li
-                *ngFor="let eocLogEntry of eocLogEntries"
-                class="list-group-item"
-            >
-                <div class="row">
-                    <div class="col-2">
-                        <span class="fw-bold">
-                            {{ eocLogEntry.exerciseTimestamp | formatDuration }}
-                        </span>
-                        <br />
-                        von
-                        <span class="font-monospace">
-                            {{ eocLogEntry.clientName }}
-                        </span>
-                    </div>
-
-                    <div class="col" style="white-space: pre-wrap">
-                        {{ eocLogEntry.message }}
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </ng-container>
+<div class="p-3 border-bottom">
+    <textarea
+        [(ngModel)]="newLogEntry"
+        [appAutofocus]="true"
+        maxlength="65535"
+        placeholder="Schreiben Sie den neuen Eintrag in dieses Feld..."
+        class="form-control no-validation mb-3"
+    ></textarea>
+    <button
+        type="button"
+        class="btn btn-primary w-100"
+        [disabled]="newLogEntry === ''"
+        (click)="addEocLogEntry()"
+    >
+        Eintrag speichern
+    </button>
 </div>
+<ng-container *ngIf="eocLogEntries$ | async as eocLogEntries">
+    <div *ngIf="eocLogEntries.length === 0" class="text-muted p-3">
+        Es sind noch keine Einträge vorhanden.
+    </div>
+
+    <ul
+        *ngIf="eocLogEntries.length > 0"
+        style="max-height: 50vh; overflow: auto"
+        class="list-group list-group-flush"
+    >
+        <li *ngFor="let eocLogEntry of eocLogEntries" class="list-group-item">
+            <div class="row">
+                <div class="col-2">
+                    <span class="fw-bold">
+                        {{ eocLogEntry.exerciseTimestamp | formatDuration }}
+                    </span>
+                    <br />
+                    von
+                    <span class="font-monospace">
+                        {{ eocLogEntry.clientName }}
+                    </span>
+                </div>
+
+                <div class="col" style="white-space: pre-wrap">
+                    {{ eocLogEntry.message }}
+                </div>
+            </div>
+        </li>
+    </ul>
+</ng-container>

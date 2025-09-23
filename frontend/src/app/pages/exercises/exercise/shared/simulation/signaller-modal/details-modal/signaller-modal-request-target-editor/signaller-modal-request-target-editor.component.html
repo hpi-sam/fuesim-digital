@@ -1,0 +1,50 @@
+<h5>Aktuelles Ziel</h5>
+
+{{ (currentTargetName$ | async) ?? 'unbekannt' }}
+
+<form (ngSubmit)="updateTarget()" class="mt-3">
+    <button
+        [ngbPopover]="selectTargetTemplate"
+        autoClose="outside"
+        #selectTargetPopover="ngbPopover"
+        placement="bottom"
+        [disabled]="((availableTargets$ | async)?.length ?? 0) === 0"
+        [appAutofocus]="true"
+        tabindex="1"
+        class="btn btn-outline-primary w-100 overflow-hidden"
+        style="width: 1px"
+        type="button"
+    >
+        <span
+            class="flex-grow-1 flex-shrink-1 text-nowrap overflow-hidden"
+            style="text-overflow: ellipsis; width: 1px"
+        >
+            {{ selectedTarget ? selectedTarget.name : 'Ziel auswählen' }}
+        </span>
+        <app-hotkey-indicator keys="Leertaste" class="flex-shrink-1 ms-1" />
+        <i class="bi bi-caret-down-fill flex-shrink-1 ms-1"></i>
+    </button>
+    <ng-template #selectTargetTemplate>
+        <app-searchable-dropdown
+            *ngIf="((availableTargets$ | async)?.length ?? 0) !== 0"
+            [options]="(availableTargets$ | async)!"
+            (selected)="selectTarget($event); selectTargetPopover.close()"
+        />
+    </ng-template>
+    <button
+        [disabled]="selectedTarget === null || loading"
+        class="btn btn-primary mt-2 row g-0 w-100"
+        [tabIndex]="selectedTarget !== null ? 2 : -1"
+    >
+        Anfrageziel ändern
+        <span
+            *ngIf="loading; else hotkey"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+        ></span>
+        <ng-template #hotkey>
+            <app-hotkey-indicator [hotkey]="submitHotkey" class="ms-1" />
+        </ng-template>
+    </button>
+</form>

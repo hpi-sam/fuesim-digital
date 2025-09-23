@@ -9,7 +9,7 @@ import {
 import { MessagesModule } from 'src/app/feature/messages/messages.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { TransferPointOverviewModule } from '../transfer-point-overview/transfer-point-overview.module';
-import { SimulatedRegionOverviewModule } from '../simulated-region-overview/simulated-region-overview.module';
+import { SimulationModalsModule } from '../simulation/simulation-modals.module';
 import { ExerciseMapComponent } from './exercise-map.component';
 import { ChooseTransferTargetPopupComponent } from './shared/choose-transfer-target-popup/choose-transfer-target-popup.component';
 import { MapImagePopupComponent } from './shared/map-image-popup/map-image-popup.component';
@@ -47,7 +47,7 @@ import { PatientNameComponent } from './shared/patient-name/patient-name.compone
         NgbNavModule,
         NgbTooltipModule,
         MessagesModule,
-        SimulatedRegionOverviewModule,
+        SimulationModalsModule,
         TransferPointOverviewModule,
     ],
 })

@@ -1,0 +1,39 @@
+<h5>Abtransport von Patienten</h5>
+
+<form (ngSubmit)="submit()">
+    <div class="form-check form-switch">
+        <input
+            class="form-check-input no-validation"
+            type="checkbox"
+            role="switch"
+            name="reportsEnabled"
+            [(ngModel)]="transportStarted"
+            [appAutofocus]="true"
+            tabindex="1"
+        />
+        <label>Patienten abtransportieren</label>
+    </div>
+
+    <div class="mt-2">
+        <label class="me-2">Bis einschließlich Sichtungskategorie</label>
+        <app-patient-status-dropdown
+            [patientStatus]="maximumStatus"
+            [allowedStatuses]="allowedStatuses"
+            [tabIndex]="2"
+            (statusChanged)="updateMaximumStatus($event)"
+        />
+    </div>
+
+    <button class="btn btn-primary w-100 mt-2" tabindex="3">
+        Speichern
+        <span
+            *ngIf="loadingCount > 0; else hotkey"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+        ></span>
+        <ng-template #hotkey>
+            <app-hotkey-indicator keys="Enter" />
+        </ng-template>
+    </button>
+</form>

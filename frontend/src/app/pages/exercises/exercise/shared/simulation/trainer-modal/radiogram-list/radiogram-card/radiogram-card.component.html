@@ -1,0 +1,86 @@
+<div
+    class="card mb-3"
+    [ngClass]="(status$ | async) === 'ownAccepted' ? 'border-success' : ''"
+>
+    <h6 class="card-header">
+        {{ (simulatedRegion$ | async)?.name ?? 'Gelöschter Bereich' }}
+    </h6>
+    <div class="card-body">
+        <div *ngIf="radiogram$ | async as radiogram" class="position-relative">
+            <app-radiogram-card-content
+                [radiogram]="radiogram!"
+                [shownInSignallerModal]="shownInSignallerModal"
+            ></app-radiogram-card-content>
+            <div
+                *ngIf="(status$ | async) === 'unread'"
+                class="position-absolute top-0 left-0 w-100 h-100"
+                style="
+                    background-color: rgba(255, 255, 255, 0.25);
+                    backdrop-filter: blur(3px);
+                "
+            ></div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <ng-container [ngSwitch]="status$ | async">
+            <ng-container *ngSwitchCase="'unread'">
+                <span>Bereit zur Durchsage</span>
+                <button
+                    class="btn btn-primary float-end"
+                    (click)="acceptRadiogram()"
+                >
+                    Durchsagen
+                    <app-hotkey-indicator
+                        *ngIf="first && shownInSignallerModal"
+                        [hotkey]="acceptHotkey"
+                    />
+                </button>
+            </ng-container>
+            <ng-container *ngSwitchCase="'ownAccepted'">
+                <span class="text-success"
+                    >Wird von <span class="fw-semibold">Ihnen</span> durchgesagt
+                    <div class="btn-group float-end">
+                        <button
+                            class="btn btn-outline-secondary"
+                            (click)="returnRadiogram()"
+                        >
+                            Zurücklegen
+                            <app-hotkey-indicator
+                                *ngIf="first && shownInSignallerModal"
+                                [hotkey]="returnHotkey"
+                            />
+                        </button>
+                        <button
+                            class="btn btn-success"
+                            (click)="markRadiogramAsDone()"
+                        >
+                            Fertig
+                            <app-hotkey-indicator
+                                *ngIf="first && shownInSignallerModal"
+                                [hotkey]="acceptHotkey"
+                            />
+                        </button>
+                    </div>
+                </span>
+            </ng-container>
+            <ng-container *ngSwitchCase="'otherAccepted'">
+                <span class="card-text">
+                    Wird von
+                    <span class="fw-semibold">{{
+                        (acceptingClient$ | async)?.name
+                    }}</span>
+                    durchgesagt
+                    <button
+                        class="btn btn-secondary float-end"
+                        (click)="acceptRadiogram()"
+                    >
+                        Übernehmen
+                    </button>
+                </span>
+            </ng-container>
+            <ng-container *ngSwitchCase="'done'">
+                <span>Wurde bereits durchgesagt</span>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>

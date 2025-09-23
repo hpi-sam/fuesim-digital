@@ -71,11 +71,14 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
         super(
             olMap,
             (targetPosition, personnel) => {
-                exerciseService.proposeAction({
-                    type: '[Personnel] Move personnel',
-                    personnelId: personnel.id,
-                    targetPosition,
-                });
+                exerciseService.proposeAction(
+                    {
+                        type: '[Personnel] Move personnel',
+                        personnelId: personnel.id,
+                        targetPosition,
+                    },
+                    true
+                );
             },
             new PointGeometryHelper()
         );

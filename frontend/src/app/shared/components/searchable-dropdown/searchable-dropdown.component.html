@@ -1,8 +1,5 @@
 <input
     [(ngModel)]="filter"
-    (keydown.arrowDown)="increaseSelectedIndex()"
-    (keydown.arrowUp)="decreaseSelectedIndex()"
-    (keydown.enter)="confirmSelection()"
     (input)="resetSelectedIndex()"
     type="search"
     class="form-control w-100 mb-2 no-validation"
@@ -15,13 +12,14 @@
     <!-- Using mousedown instead of click events since click events do not work reliably in bootstrap popovers. -->
     <button
         *ngFor="let option of filteredOptions; index as i"
-        (mousedown)="selected.emit(option.identifier)"
+        (mousedown)="selected.emit(option)"
         type="button"
         class="list-group-item list-group-item-action"
         [class.active]="selectedIndex === i"
+        data-cy="searchableDropdownOptionButton"
     >
         <span
-            (mousedown)="selected.emit(option.identifier)"
+            (mousedown)="selected.emit(option)"
             class="badge"
             [style.color]="option.color ?? 'inherit'"
             [style.backgroundColor]="option.backgroundColor ?? 'inherit'"
@@ -29,4 +27,8 @@
             {{ option.name }}
         </span>
     </button>
+    <small class="text-muted">
+        <app-hotkey-indicator keys="Enter" />: Bestätigen,
+        <app-hotkey-indicator keys="Esc" />: Abbrechen
+    </small>
 </div>

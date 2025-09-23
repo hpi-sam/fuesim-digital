@@ -1,3 +1,4 @@
+import { IsString, ValidateIf } from 'class-validator';
 import { getCreate } from '../../models/utils/get-create.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { ReportableInformation } from '../behaviors/utils.js';
@@ -10,11 +11,20 @@ export class StartCollectingInformationEvent implements SimulationEvent {
 
     @IsLiteralUnion(reportableInformationAllowedValues)
     readonly informationType: ReportableInformation;
+
+    @IsString()
+    @ValidateIf((_, value) => value !== null)
+    public readonly interfaceSignallerKey!: string | null;
+
     /**
      * @deprecated Use {@link create} instead.
      */
-    constructor(informationType: ReportableInformation) {
+    constructor(
+        informationType: ReportableInformation,
+        interfaceSignallerKey: string | null = null
+    ) {
         this.informationType = informationType;
+        this.interfaceSignallerKey = interfaceSignallerKey;
     }
 
     static readonly create = getCreate(this);

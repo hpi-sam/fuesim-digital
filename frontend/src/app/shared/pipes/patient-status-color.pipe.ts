@@ -15,7 +15,9 @@ const colorCodeMap = {
     standalone: false,
 })
 export class PatientStatusColorPipe implements PipeTransform {
-    transform(value: ColorCode): (typeof colorCodeMap)[ColorCode] {
+    transform<AllowedCode extends ColorCode>(
+        value: AllowedCode
+    ): (typeof colorCodeMap)[AllowedCode] {
         return colorCodeMap[value];
     }
 }

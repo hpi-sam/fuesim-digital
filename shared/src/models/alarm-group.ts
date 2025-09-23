@@ -1,4 +1,4 @@
-import { IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsString, IsUUID } from 'class-validator';
 import type { UUID } from '../utils/index.js';
 import { uuid, uuidValidationOptions } from '../utils/index.js';
 import { IsValue } from '../utils/validators/index.js';
@@ -18,6 +18,9 @@ export class AlarmGroup {
 
     @IsIdMap(AlarmGroupVehicle)
     public alarmGroupVehicles: { readonly [key: UUID]: AlarmGroupVehicle } = {};
+
+    @IsBoolean()
+    public readonly sent: boolean = false;
 
     /**
      * @deprecated Use {@link create} instead

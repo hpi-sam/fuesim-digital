@@ -57,11 +57,14 @@ export class SimulatedRegionFeatureManager
         super(
             olMap,
             (targetPositions, simulatedRegion) => {
-                exerciseService.proposeAction({
-                    type: '[SimulatedRegion] Move simulated region',
-                    simulatedRegionId: simulatedRegion.id,
-                    targetPosition: targetPositions[0]![0]!,
-                });
+                exerciseService.proposeAction(
+                    {
+                        type: '[SimulatedRegion] Move simulated region',
+                        simulatedRegionId: simulatedRegion.id,
+                        targetPosition: targetPositions[0]![0]!,
+                    },
+                    true
+                );
             },
             new PolygonGeometryHelper()
         );

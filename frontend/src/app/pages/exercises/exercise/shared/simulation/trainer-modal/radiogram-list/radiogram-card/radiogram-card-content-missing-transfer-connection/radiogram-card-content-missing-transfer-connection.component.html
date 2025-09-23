@@ -1,0 +1,8 @@
+<ng-container *ngIf="transferPointName$ | async as transferPointName">
+    <h5 class="card-title">Ziel-Standort unbekannt</h5>
+    <span class="card-text"
+        >Fahrzeuge sollten nach <em>{{ transferPointName }}</em> gesendet
+        werden, aber der Standort von <em>{{ transferPointName }}</em> ist nicht
+        bekannt.</span
+    >
+</ng-container>

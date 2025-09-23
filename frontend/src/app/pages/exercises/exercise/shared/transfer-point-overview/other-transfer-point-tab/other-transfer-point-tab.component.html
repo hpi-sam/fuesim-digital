@@ -14,6 +14,7 @@
                 *ngFor="
                     let reachableTransferPoint of reachableTransferPoints$
                         | async;
+                    index as index;
                     trackBy: 'id'
                         | appTrackByProperty: (reachableTransferPoints$ | async)
                 "
@@ -38,6 +39,7 @@
                             $event * 1000 * 60
                         )
                     "
+                    [tabIndex]="index * 2 + 1"
                     style="width: 125px"
                     class="form-control form-control-sm"
                     type="number"
@@ -49,6 +51,7 @@
                 <button
                     class="btn btn-link text-danger text-decoration-none"
                     title="Verbindung löschen"
+                    [tabIndex]="index * 2 + 2"
                     (click)="disconnectTransferPoint(reachableTransferPoint.id)"
                     data-cy="transferPointPopupRemoveOtherTransferPointButton"
                 >
@@ -57,40 +60,30 @@
             </li>
         </ul>
     </div>
-    <div
-        *ngIf="(transferPointsToBeAdded$ | async | values)?.length !== 0"
-        ngbDropdown
-        placement="bottom-start"
-        autoClose="outside"
-        class="d-inline-block"
-    >
+    <div class="d-inline-block">
         <button
-            ngbDropdownToggle
             type="button"
             class="btn btn-outline-primary"
+            [ngbPopover]="selectTargetTemplate"
+            autoClose="outside"
+            #selectTargetPopover="ngbPopover"
+            [disabled]="((transferPointsToBeAdded$ | async)?.length ?? 0) === 0"
+            [tabIndex]="
+                (transferPoint.reachableTransferPoints | values).length * 2 + 1
+            "
             data-cy="transferPointPopupAddOtherTransferPointButton"
         >
             <span class="bi-plus me-1"></span>
             Hinzufügen
         </button>
-        <div ngbDropdownMenu>
-            <button
-                *ngFor="
-                    let transferPoint of transferPointsToBeAdded$
-                        | async
-                        | values
-                        | orderBy: getTransferPointOrderByValue;
-                    trackBy: 'id' | appTrackByProperty
+        <ng-template #selectTargetTemplate>
+            <app-searchable-dropdown
+                [options]="(transferPointsToBeAdded$ | async)!"
+                (selected)="
+                    connectTransferPoint($event.key);
+                    selectTargetPopover.close()
                 "
-                ngbDropdownItem
-                (click)="connectTransferPoint(transferPoint.id)"
-                data-cy="transferPointPopupAddOtherTransferPointDropdownButton"
-            >
-                <span class="bi-plus me-1"></span>
-                <app-transfer-point-name
-                    [transferPointId]="transferPoint.id"
-                ></app-transfer-point-name>
-            </button>
-        </div>
+            />
+        </ng-template>
     </div>
 </div>

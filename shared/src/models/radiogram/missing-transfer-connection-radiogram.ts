@@ -1,4 +1,10 @@
-import { IsBoolean, IsUUID, ValidateNested } from 'class-validator';
+import {
+    IsBoolean,
+    IsString,
+    IsUUID,
+    ValidateIf,
+    ValidateNested,
+} from 'class-validator';
 import type { UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
@@ -27,6 +33,10 @@ export class MissingTransferConnectionRadiogram implements Radiogram {
 
     @IsBoolean()
     readonly informationAvailable: boolean = true;
+
+    @IsString()
+    @ValidateIf((_, value) => value !== null)
+    public readonly informationRequestKey: string | null = null;
 
     @IsUUID(4, uuidValidationOptions)
     readonly targetTransferPointId: UUID;

@@ -1,0 +1,12 @@
+<div class="d-flex justify-content-center align-items-center h-100">
+    <div class="d-inline-block">
+        <h5 class="text-danger">
+            Dieser Bereich hat keine Führungskraft und kann daher keine
+            Funksprüche absetzen oder entgegennehmen.
+        </h5>
+        <button class="btn btn-primary w-100" (click)="this.accept.emit()">
+            Trotzdem fortfahren
+            <app-hotkey-indicator [hotkey]="acceptHotkey" />
+        </button>
+    </div>
+</div>

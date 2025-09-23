@@ -29,3 +29,4 @@ export * from './occupations/index.js';
 export * from './tag-helpers.js';
 export * from './material-type.js';
 export * from './vehicle-parameters.js';
+export * from './resource-description.js';

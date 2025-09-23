@@ -155,6 +155,7 @@ export namespace EmergencyOperationCenterActionReducers {
             });
 
             logAlarmGroupSent(draftState, alarmGroupId);
+            alarmGroup.sent = true;
 
             return draftState;
         },

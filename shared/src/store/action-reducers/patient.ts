@@ -113,6 +113,18 @@ export class SetUserTextAction implements Action {
     public readonly remarks!: string;
 }
 
+export class SetCustomQRCodeAction implements Action {
+    @IsValue('[Patient] Set Custom QR Code' as const)
+    public readonly type = '[Patient] Set Custom QR Code';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly patientId!: UUID;
+
+    @IsString()
+    @MaxLength(65535)
+    public readonly customQRCode!: string;
+}
+
 export namespace PatientActionReducers {
     export const addPatient: ActionReducer<AddPatientAction> = {
         action: AddPatientAction,
@@ -262,6 +274,16 @@ export namespace PatientActionReducers {
         reducer: (draftState, { patientId, remarks }) => {
             const patient = getElement(draftState, 'patient', patientId);
             patient.remarks = remarks;
+            return draftState;
+        },
+        rights: 'participant',
+    };
+
+    export const setCustomQRCodeAction: ActionReducer<SetCustomQRCodeAction> = {
+        action: SetCustomQRCodeAction,
+        reducer: (draftState, { patientId, customQRCode }) => {
+            const patient = getElement(draftState, 'patient', patientId);
+            patient.customQRCode = customQRCode;
             return draftState;
         },
         rights: 'participant',

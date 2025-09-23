@@ -97,11 +97,14 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
         super(
             olMap,
             (targetPosition, patient) => {
-                exerciseService.proposeAction({
-                    type: '[Patient] Move patient',
-                    patientId: patient.id,
-                    targetPosition,
-                });
+                exerciseService.proposeAction(
+                    {
+                        type: '[Patient] Move patient',
+                        patientId: patient.id,
+                        targetPosition,
+                    },
+                    true
+                );
             },
             new PointGeometryHelper()
         );

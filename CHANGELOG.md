@@ -7,6 +7,21 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.9.0] - 2025-09-23
+
+### Added
+
+- In the patient popup, there is a now a tab with a QR Code of the patient identifier. It is also
+  possible to set custom QR code contents for each patient to support complexer systems.
+- Berliner Feuerwehr is now mentioned as member of the project consortium.
+- There is a dedicated view for "interface signallers" to participate in an exercise with simulated regions. Interface signallers can request information from simulated regions on behalf of the incident command and forward instructions back to the simulated regions.
+
+### Fixed
+
+- When moving an element on the map fails, the element will now be moved back to its previous location
+- The transfer overview now uses the names of the personnel types instead of their internal abbreviations
+- When requesting the transport progress while there are no regions to manage the transport of, the report now correctly reports zero patients instead of crashing
+
 ## [0.8.1] - 2025-04-29
 
 ### Fixed
@@ -297,7 +312,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.1...HEAD
+[unreleased]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.0...v0.7.1

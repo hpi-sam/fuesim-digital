@@ -44,11 +44,14 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
         super(
             olMap,
             (targetPosition, mapImage) => {
-                exerciseService.proposeAction({
-                    type: '[MapImage] Move MapImage',
-                    mapImageId: mapImage.id,
-                    targetPosition,
-                });
+                exerciseService.proposeAction(
+                    {
+                        type: '[MapImage] Move MapImage',
+                        mapImageId: mapImage.id,
+                        targetPosition,
+                    },
+                    true
+                );
             },
             new PointGeometryHelper(),
             10_000

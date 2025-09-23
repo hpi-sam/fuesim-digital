@@ -42,6 +42,24 @@ export function acceptRadiogram(
     );
 }
 
+export function returnRadiogram(
+    draftState: Mutable<ExerciseState>,
+    radiogramId: UUID
+) {
+    const radiogram = getExerciseRadiogramById(draftState, radiogramId);
+    radiogram.status = {
+        type: 'unreadRadiogramStatus',
+        publishTime: publishTimeOf(radiogram),
+    };
+    radiogram.informationRequestKey = null;
+    logRadiogram(
+        draftState,
+        [createRadiogramActionTag(draftState, radiogram.status.type)],
+        'Der Funkspruch wurde zurückgelegt.',
+        radiogram.id
+    );
+}
+
 export function markRadiogramDone(
     draftState: Mutable<ExerciseState>,
     radiogramId: UUID

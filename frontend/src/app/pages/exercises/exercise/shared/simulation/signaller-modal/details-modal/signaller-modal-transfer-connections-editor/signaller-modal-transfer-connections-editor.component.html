@@ -1,0 +1,73 @@
+<h5>Bereits bekannte Standorte</h5>
+
+<ul
+    *ngIf="
+        ((connectedTransferPointNames$ | async)?.length ?? 0) !== 0;
+        else noConnectedTransferPoints
+    "
+>
+    <li
+        *ngFor="
+            let connectedTransferPointName of connectedTransferPointNames$
+                | async
+        "
+    >
+        {{ connectedTransferPointName }}
+    </li>
+</ul>
+<ng-template #noConnectedTransferPoints>
+    <p class="text-muted">Aktuell sind keine Standorte bekannt.</p>
+</ng-template>
+
+<form (ngSubmit)="addConnection()" class="mt-3">
+    <button
+        [ngbPopover]="selectTransferPointTemplate"
+        autoClose="outside"
+        #selectTransferPointPopover="ngbPopover"
+        placement="bottom"
+        [disabled]="((transferPointsToBeAdded$ | async)?.length ?? 0) === 0"
+        [appAutofocus]="true"
+        tabindex="1"
+        class="btn btn-outline-primary w-100 overflow-hidden"
+        style="width: 1px"
+        type="button"
+    >
+        <span
+            class="flex-grow-1 flex-shrink-1 text-nowrap overflow-hidden"
+            style="text-overflow: ellipsis; width: 1px"
+        >
+            {{
+                selectedTransferPoint
+                    ? selectedTransferPoint.name
+                    : 'Standort auswählen'
+            }}
+        </span>
+        <app-hotkey-indicator keys="Leertaste" class="flex-shrink-1 ms-1" />
+        <i class="bi bi-caret-down-fill flex-shrink-1 ms-1"></i>
+    </button>
+    <ng-template #selectTransferPointTemplate>
+        <app-searchable-dropdown
+            *ngIf="((transferPointsToBeAdded$ | async)?.length ?? 0) !== 0"
+            [options]="(transferPointsToBeAdded$ | async)!"
+            (selected)="
+                selectTransferPoint($event); selectTransferPointPopover.close()
+            "
+        />
+    </ng-template>
+    <button
+        [disabled]="selectedTransferPoint === null || loading"
+        class="btn btn-primary mt-2 row g-0 w-100"
+        [tabIndex]="selectedTransferPoint !== null ? 2 : -1"
+    >
+        Standort bekannt machen
+        <span
+            *ngIf="loading; else hotkey"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+        ></span>
+        <ng-template #hotkey>
+            <app-hotkey-indicator [hotkey]="submitHotkey" class="ms-1" />
+        </ng-template>
+    </button>
+</form>

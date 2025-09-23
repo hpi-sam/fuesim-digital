@@ -1,4 +1,9 @@
-import { TransferCountsRadiogram } from '../../models/radiogram/index.js';
+import {
+    ResourceRequestRadiogram,
+    TransferConnectionsRadiogram,
+    TransferCountsRadiogram,
+    VehicleOccupationsRadiogram,
+} from '../../models/radiogram/index.js';
 import type { ExerciseRadiogram } from '../../models/radiogram/exercise-radiogram.js';
 import { MaterialCountRadiogram } from '../../models/radiogram/material-count-radiogram.js';
 import { PatientCountRadiogram } from '../../models/radiogram/patient-count-radiogram.js';
@@ -13,13 +18,16 @@ import type { ExerciseSimulationBehaviorType } from './exercise-simulation-behav
 
 export const reportableInformationAllowedValues: AllowedValues<ReportableInformation> =
     {
+        materialCount: true,
         patientCount: true,
         personnelCount: true,
-        vehicleCount: true,
+        requiredResources: true,
         singleRegionTransferCounts: true,
+        transferConnections: true,
         transportManagementTransferCounts: true,
         treatmentStatus: true,
-        materialCount: true,
+        vehicleCount: true,
+        vehicleOccupations: true,
     };
 
 export const reportableInformations = StrictObject.keys(
@@ -30,25 +38,32 @@ export type ReportableInformation =
     | 'materialCount'
     | 'patientCount'
     | 'personnelCount'
+    | 'requiredResources'
     | 'singleRegionTransferCounts'
+    | 'transferConnections'
     | 'transportManagementTransferCounts'
     | 'treatmentStatus'
-    | 'vehicleCount';
+    | 'vehicleCount'
+    | 'vehicleOccupations';
 
 export const createRadiogramMap: {
     [Key in ReportableInformation]: (
         id: UUID,
         simulatedRegionId: UUID,
+        key: string | null,
         status: ExerciseRadiogramStatus
     ) => ExerciseRadiogram;
 } = {
+    materialCount: MaterialCountRadiogram.create,
     patientCount: PatientCountRadiogram.create,
     personnelCount: PersonnelCountRadiogram.create,
-    vehicleCount: VehicleCountRadiogram.create,
+    requiredResources: ResourceRequestRadiogram.create,
     singleRegionTransferCounts: TransferCountsRadiogram.create,
+    transferConnections: TransferConnectionsRadiogram.create,
     transportManagementTransferCounts: TransferCountsRadiogram.create,
     treatmentStatus: TreatmentStatusRadiogram.create,
-    materialCount: MaterialCountRadiogram.create,
+    vehicleCount: VehicleCountRadiogram.create,
+    vehicleOccupations: VehicleOccupationsRadiogram.create,
 };
 
 export const behaviorTypeToGermanNameDictionary: {
@@ -70,13 +85,16 @@ export const behaviorTypeToGermanNameDictionary: {
 export const reportableInformationTypeToGermanNameDictionary: {
     [Key in ReportableInformation]: string;
 } = {
-    patientCount: 'Anzahl an Patienten',
-    vehicleCount: 'Anzahl an Fahrzeugen',
-    personnelCount: 'Anzahl an Rettungskräften',
     materialCount: 'Anzahl an Material',
-    treatmentStatus: 'Behandlungsstatus',
+    patientCount: 'Anzahl an Patienten',
+    personnelCount: 'Anzahl an Rettungskräften',
+    requiredResources: 'Aktuell benötigte Fahrzeuge',
     singleRegionTransferCounts:
         'Anzahl aus diesem Bereich in Krankenhäuser abtransportierter Patienten',
+    transferConnections: 'Transferverbindungen',
     transportManagementTransferCounts:
         'Anzahl unter dieser Transportorganisation in Krankenhäuser abtransportierter Patienten',
+    treatmentStatus: 'Behandlungsstatus',
+    vehicleCount: 'Anzahl an Fahrzeugen',
+    vehicleOccupations: 'Nutzung der Fahrzeuge',
 };

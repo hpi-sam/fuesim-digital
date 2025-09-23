@@ -46,6 +46,9 @@ export class Patient {
     @IsString()
     public readonly identifier: string = '';
 
+    @IsString()
+    public readonly customQRCode: string = '';
+
     @ValidateNested()
     @Type(() => PersonalInformation)
     public readonly personalInformation: PersonalInformation;

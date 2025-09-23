@@ -61,11 +61,14 @@ export class ViewportFeatureManager
         super(
             olMap,
             (targetPositions, viewport) => {
-                exerciseService.proposeAction({
-                    type: '[Viewport] Move viewport',
-                    viewportId: viewport.id,
-                    targetPosition: targetPositions[0]![0]!,
-                });
+                exerciseService.proposeAction(
+                    {
+                        type: '[Viewport] Move viewport',
+                        viewportId: viewport.id,
+                        targetPosition: targetPositions[0]![0]!,
+                    },
+                    true
+                );
             },
             new PolygonGeometryHelper()
         );

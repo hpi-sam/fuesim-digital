@@ -1,4 +1,10 @@
-import { IsBoolean, IsUUID, ValidateNested } from 'class-validator';
+import {
+    IsBoolean,
+    IsString,
+    IsUUID,
+    ValidateIf,
+    ValidateNested,
+} from 'class-validator';
 import type { TreatmentProgress } from '../../simulation/utils/treatment.js';
 import { treatmentProgressAllowedValues } from '../../simulation/utils/treatment.js';
 import type { UUID } from '../../utils/index.js';
@@ -30,6 +36,10 @@ export class TreatmentStatusRadiogram implements Radiogram {
     @IsBoolean()
     readonly informationAvailable: boolean = false;
 
+    @IsString()
+    @ValidateIf((_, value) => value !== null)
+    public readonly informationRequestKey: string | null;
+
     @IsLiteralUnion(treatmentProgressAllowedValues)
     readonly treatmentStatus: TreatmentProgress;
 
@@ -42,10 +52,12 @@ export class TreatmentStatusRadiogram implements Radiogram {
     constructor(
         id: UUID,
         simulatedRegionId: UUID,
+        key: string | null,
         status: ExerciseRadiogramStatus
     ) {
         this.id = id;
         this.simulatedRegionId = simulatedRegionId;
+        this.informationRequestKey = key;
         this.status = status;
         this.treatmentStatus = 'noTreatment';
     }

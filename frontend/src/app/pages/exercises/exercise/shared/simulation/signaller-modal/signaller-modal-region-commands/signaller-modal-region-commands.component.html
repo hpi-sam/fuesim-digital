@@ -1,0 +1,84 @@
+<h5>Befehle</h5>
+
+<app-signaller-modal-interactions
+    [simulatedRegionId]="simulatedRegionId"
+    [interactions]="commandInteractions"
+    primaryActionLabel="Anordnen"
+    [showSecondaryButton]="false"
+    filterHotkeyKeys="F4"
+/>
+
+<ng-template #transferConnectionsEditor>
+    <app-signaller-modal-transfer-connections-editor
+        *ngIf="ownTransferPointId$ | async as transferPointId"
+        [transferPointId]="transferPointId"
+    />
+</ng-template>
+
+<ng-template #transferTraysEditor>
+    <app-signaller-modal-transport-trays-editor
+        *ngIf="
+            manageTransportBehaviorId$ | async as transportBehaviorId;
+            else noTransportBehavior
+        "
+        [simulatedRegionId]="simulatedRegionId"
+        [transportBehaviorId]="transportBehaviorId"
+    />
+    <ng-template #noTransportBehavior>
+        <span class="text-danger"
+            >Dieser Bereich verwaltet keine Transporte</span
+        >
+    </ng-template>
+</ng-template>
+
+<ng-template #transportOfCategoryEditor>
+    <app-signaller-modal-start-transfer-of-category-modal
+        [simulatedRegionId]="simulatedRegionId"
+    />
+</ng-template>
+
+<ng-template #provideVehiclesEditor>
+    <app-signaller-modal-provide-vehicles-editor
+        *ngIf="
+            transferVehiclesBehaviorId$ | async as transferVehiclesBehaviorId;
+            else noTransferBehavior
+        "
+        [simulatedRegionId]="simulatedRegionId"
+        [transferBehaviorId]="transferVehiclesBehaviorId"
+    />
+    <ng-template #noTransferBehavior>
+        <span class="text-danger"
+            >Dieser Bereich kann keine Fahrzeuge bereitstellen</span
+        >
+    </ng-template>
+</ng-template>
+
+<ng-template #requestTargetEditor>
+    <app-signaller-modal-request-target-editor
+        *ngIf="
+            requestBehaviorId$ | async as requestBehaviorId;
+            else noRequestBehavior
+        "
+        [simulatedRegionId]="simulatedRegionId"
+        [requestBehaviorId]="requestBehaviorId"
+    />
+    <ng-template #noRequestBehavior>
+        <span class="text-danger">Dieser Bereich fragt keine Fahrzeuge an</span>
+    </ng-template>
+</ng-template>
+
+<ng-template #transportRequestTargetEditor>
+    <app-signaller-modal-transport-request-target-editor
+        *ngIf="
+            manageTransportBehaviorId$ | async as transportBehaviorId;
+            else noTransportBehavior
+        "
+        [simulatedRegionId]="simulatedRegionId"
+        [transportBehaviorId]="transportBehaviorId"
+    />
+    <ng-template #noTransportBehavior>
+        <span class="text-danger"
+            >Dieser Bereich verwaltet keine Transporte</span
+        >
+    </ng-template>
+</ng-template>

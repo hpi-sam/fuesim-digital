@@ -6,6 +6,7 @@ import {
     IsString,
     IsUUID,
     Min,
+    ValidateIf,
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -26,6 +27,7 @@ import {
     updateBehaviorsRequestInterval,
     reportableInformationAllowedValues,
     RecurringEventActivityState,
+    TransferVehiclesRequestEvent,
 } from '../../simulation/index.js';
 import { StartCollectingInformationEvent } from '../../simulation/events/start-collecting.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
@@ -63,6 +65,8 @@ import {
 } from '../../models/index.js';
 import type { TransferDestination } from '../../simulation/utils/transfer-destination.js';
 import { transferDestinationTypeAllowedValues } from '../../simulation/utils/transfer-destination.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
 import { getActivityById, getBehaviorById, getElement } from './utils/index.js';
 import { logBehavior } from './utils/log.js';
 
@@ -147,6 +151,10 @@ export class CreateReportAction implements Action {
 
     @IsLiteralUnion(reportableInformationAllowedValues)
     public readonly informationType!: ReportableInformation;
+
+    @IsString()
+    @ValidateIf((_, value) => value !== null)
+    public readonly interfaceSignallerKey!: string | null;
 }
 
 export class UpdateReportTreatmentStatusChangesAction implements Action {
@@ -161,7 +169,7 @@ export class UpdateReportTreatmentStatusChangesAction implements Action {
     public readonly behaviorId!: UUID;
 
     @IsBoolean()
-    public readonly reportTreatmentProgressChanges!: boolean;
+    public readonly reportChanges!: boolean;
 }
 
 export class UpdateReportTransferOfCategoryInSingleRegionCompletedAction
@@ -409,6 +417,26 @@ export class SendTransferRequestEventAction implements Action {
 
     @IsUUIDSet()
     public readonly patients!: UUIDSet;
+}
+
+export class TransferVehiclesAction implements Action {
+    @IsValue('[TransferBehavior] Transfer Vehicles')
+    public readonly type = '[TransferBehavior] Transfer Vehicles';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly simulatedRegionId!: UUID;
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly behaviorId!: UUID;
+
+    @IsResourceDescription()
+    readonly requestedVehicles!: ResourceDescription;
+
+    @IsLiteralUnion(transferDestinationTypeAllowedValues)
+    public readonly destinationType!: TransferDestination;
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly destinationId!: UUID;
 }
 
 export class ChangeTransportRequestTargetAction implements Action {
@@ -802,7 +830,10 @@ export namespace SimulationActionReducers {
 
     export const createReport: ActionReducer<CreateReportAction> = {
         action: CreateReportAction,
-        reducer(draftState, { simulatedRegionId, informationType }) {
+        reducer(
+            draftState,
+            { simulatedRegionId, informationType, interfaceSignallerKey }
+        ) {
             const simulatedRegion = getElement(
                 draftState,
                 'simulatedRegion',
@@ -810,7 +841,10 @@ export namespace SimulationActionReducers {
             );
             sendSimulationEvent(
                 simulatedRegion,
-                StartCollectingInformationEvent.create(informationType)
+                StartCollectingInformationEvent.create(
+                    informationType,
+                    interfaceSignallerKey
+                )
             );
 
             return draftState;
@@ -823,11 +857,7 @@ export namespace SimulationActionReducers {
             action: UpdateReportTreatmentStatusChangesAction,
             reducer(
                 draftState,
-                {
-                    simulatedRegionId,
-                    behaviorId,
-                    reportTreatmentProgressChanges,
-                }
+                { simulatedRegionId, behaviorId, reportChanges }
             ) {
                 const simulatedRegion = getElement(
                     draftState,
@@ -851,14 +881,14 @@ export namespace SimulationActionReducers {
                     } Verhalten im Bereich ${
                         simulatedRegion.name
                     } wird Behandlungsfortschrittsänderungen ${
-                        reportTreatmentProgressChanges ? '' : 'nicht '
+                        reportChanges ? '' : 'nicht '
                     }melden.`,
                     simulatedRegionId,
                     behaviorId
                 );
 
                 reportBehaviorState.reportTreatmentProgressChanges =
-                    reportTreatmentProgressChanges;
+                    reportChanges;
 
                 return draftState;
             },
@@ -1667,6 +1697,36 @@ export namespace SimulationActionReducers {
             },
             rights: 'trainer',
         };
+
+    export const transferVehicles: ActionReducer<TransferVehiclesAction> = {
+        action: TransferVehiclesAction,
+        reducer(
+            draftState,
+            {
+                simulatedRegionId,
+                requestedVehicles,
+                destinationType,
+                destinationId,
+            }
+        ) {
+            const simulatedRegion = getElement(
+                draftState,
+                'simulatedRegion',
+                simulatedRegionId
+            );
+
+            sendSimulationEvent(
+                simulatedRegion,
+                TransferVehiclesRequestEvent.create(
+                    requestedVehicles,
+                    destinationType,
+                    destinationId
+                )
+            );
+            return draftState;
+        },
+        rights: 'trainer',
+    };
 
     export const changeTransportRequestTarget: ActionReducer<ChangeTransportRequestTargetAction> =
         {

@@ -1,0 +1,49 @@
+<div class="flex-shrink-1 d-flex flex-row">
+    <div class="flex-shrink-1 text-nowrap">
+        <button
+            class="btn btn-primary h-100 text-nowrap me-1"
+            [ngbPopover]="selectRegionTemplate"
+            autoClose="outside"
+            #selectRegionPopover="ngbPopover"
+        >
+            <i class="bi bi-arrow-left-right me-1"></i>
+            Wechseln
+            <app-hotkey-indicator [hotkey]="switchSimulatedRegionHotkey" />
+        </button>
+
+        <ng-template #selectRegionTemplate>
+            <app-searchable-dropdown
+                [options]="(simulatedRegionNames$ | async)!"
+                (selected)="selectRegion($event); selectRegionPopover.close()"
+            />
+        </ng-template>
+
+        <button
+            class="btn btn-secondary h-100 text-nowrap me-2"
+            (click)="selectOverview()"
+        >
+            <i class="bi bi-list-columns me-1"></i>
+            Übersicht
+            <app-hotkey-indicator [hotkey]="openOverviewHotkey" />
+        </button>
+    </div>
+    <ul
+        class="flex-grow-1 flex-shrink-1 list-group list-group-horizontal overflow-auto"
+    >
+        <button
+            *ngFor="
+                let simulatedRegion of simulatedRegionNames$ | async;
+                trackBy: 'key' | appTrackByProperty
+            "
+            [id]="'signaller-modal-simulated-region-tab-' + simulatedRegion.key"
+            class="list-group-item list-group-item-action w-auto text-nowrap"
+            [class.active]="
+                simulatedRegion.key ===
+                (selectRegionService.selectedSimulatedRegion$ | async)
+            "
+            (click)="selectRegion(simulatedRegion)"
+        >
+            {{ simulatedRegion.name }}
+        </button>
+    </ul>
+</div>

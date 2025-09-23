@@ -1,0 +1,31 @@
+<h5>Informationen</h5>
+
+<p *ngIf="(reportBehaviorId$ | async) === null" class="text-danger">
+    Diesem Bereich wurde die Verhaltensweise <em>Berichte erstellen</em> nicht
+    zugewiesen. Daher können manche der unten genannten Informationen
+    gegebenenfalls nicht abgefragt werden.
+</p>
+
+<app-signaller-modal-interactions
+    [simulatedRegionId]="simulatedRegionId"
+    [interactions]="informationInteractions"
+    primaryActionLabel="Anfragen"
+    filterHotkeyKeys="F3"
+/>
+
+<ng-template #recurringReportEditor>
+    <app-signaller-modal-recurring-report-modal
+        *ngIf="informationTypeToEdit !== null"
+        [simulatedRegionId]="simulatedRegionId"
+        [informationType]="informationTypeToEdit"
+    />
+</ng-template>
+
+<h5>Automatische Berichte bei Ereignissen</h5>
+
+<app-simulation-event-based-report-editor
+    *ngIf="(reportBehaviorId$ | async) !== null"
+    [simulatedRegionId]="simulatedRegionId"
+    [reportBehaviorId]="(reportBehaviorId$ | async)!"
+    [useHotkeys]="true"
+/>

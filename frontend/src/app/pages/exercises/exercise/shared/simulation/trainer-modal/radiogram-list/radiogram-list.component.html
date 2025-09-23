@@ -1,0 +1,64 @@
+<div class="d-flex flex-column w-100 h-100">
+    <div class="flex-shrink-1 p-4 pb-0">
+        <h5>Funksprüche</h5>
+        <div class="mb-3 form-check form-switch">
+            <label class="from-check-label" for="showDoneSwitch">
+                Durchgesagte Funksprüche anzeigen
+            </label>
+            <input
+                [ngModel]="radiogramListService.showDone$ | async"
+                (ngModelChange)="radiogramListService.setShowDone($event)"
+                type="checkbox"
+                role="switch"
+                class="form-check-input"
+                id="showDoneSwitch"
+            />
+        </div>
+        <div class="mb-3 form-check form-switch">
+            <label class="from-check-label" for="showOthersSwitch">
+                Funksprüche aller Nutzer anzeigen
+            </label>
+            <input
+                [ngModel]="radiogramListService.showOtherClients$ | async"
+                (ngModelChange)="
+                    radiogramListService.setShowOtherClients($event)
+                "
+                type="checkbox"
+                role="switch"
+                class="form-check-input"
+                id="showOthersSwitch"
+            />
+        </div>
+    </div>
+    <div class="overflow-auto p-4">
+        <ng-container
+            *ngIf="(visibleRadiograms$ | async)?.length; else noRadiograms"
+        ></ng-container>
+        <app-radiogram-card
+            *ngFor="
+                let radiogram of visibleRadiograms$ | async;
+                first as first;
+                trackBy: 'id' | appTrackByProperty: (visibleRadiograms$ | async)
+            "
+            [radiogramId]="radiogram.id"
+            [first]="first"
+            [shownInSignallerModal]="shownInSignallerModal"
+        ></app-radiogram-card>
+        <ng-template #noRadiograms>
+            <div
+                *ngIf="
+                    radiogramListService.showDone$ | async;
+                    else noNotDoneRadiograms
+                "
+                class="text-muted mt-3 mb-3"
+            >
+                Es sind noch keine Funksprüche vorhanden.
+            </div>
+            <ng-template #noNotDoneRadiograms>
+                <div class="text-muted mt-3 mb-3">
+                    Es sind keine ausstehenden Funksprüche vorhanden.
+                </div>
+            </ng-template>
+        </ng-template>
+    </div>
+</div>

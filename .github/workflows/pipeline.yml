@@ -6,6 +6,10 @@ on:
             - main
             - dev
     pull_request:
+        # The first three types are the default value (see https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request).
+        # `ready_for_review` is needed since actions from pipelines (such as the PRs created by the release pipeline) don't trigger additional pipelines.
+        # Hence, we let the release pipeline create draft PRs that we then can mark as ready manually.
+        types: [opened, synchronize, reopened, ready_for_review]
 
 env:
     POSTGRES_USER: dfm

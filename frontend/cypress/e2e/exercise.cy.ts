@@ -246,8 +246,14 @@ describe('A trainer on the exercise page', () => {
         cy.dragToMap('[data-cy=draggableTransferPointDiv]');
         cy.get('[data-cy=trainerToolbarExecutionButton]').click();
         cy.get('[data-cy=trainerToolbarControlCenterButton]').click();
+        cy.get('[data-cy=sendAlarmGroupChooseAlarmGroupButton]')
+            .first()
+            .click();
+        cy.get('[data-cy=searchableDropdownOptionButton] > :nth-child(1)')
+            .first()
+            .click();
         cy.get('[data-cy=sendAlarmGroupChooseTargetButton]').first().click();
-        cy.get('[data-cy=sendAlarmGroupChooseTargetSelect] > :nth-child(1)')
+        cy.get('[data-cy=searchableDropdownOptionButton] > :nth-child(1)')
             .first()
             .click();
         cy.get('[data-cy=sendAlarmGroupSendButton]').click();
@@ -474,9 +480,7 @@ describe('A trainer on the exercise page', () => {
         cy.get(
             '[data-cy=transferPointPopupAddOtherTransferPointButton]'
         ).click();
-        cy.get(
-            '[data-cy=transferPointPopupAddOtherTransferPointDropdownButton]'
-        )
+        cy.get('[data-cy=searchableDropdownOptionButton]')
             .first()
             .click({ force: true });
 
@@ -519,9 +523,7 @@ describe('A trainer on the exercise page', () => {
         cy.get(
             '[data-cy=transferPointPopupAddOtherTransferPointButton]'
         ).click();
-        cy.get(
-            '[data-cy=transferPointPopupAddOtherTransferPointDropdownButton]'
-        )
+        cy.get('[data-cy=searchableDropdownOptionButton]')
             .first()
             .click({ force: true });
         cy.get('[data-cy=transferPointPopupDurationInput]')

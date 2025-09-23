@@ -1,0 +1,36 @@
+<div class="d-flex flex-column h-100 w-100">
+    <div class="flex-shrink-1 py-2">
+        <h3 class="d-inline-block">
+            {{ (simulatedRegion$ | async)?.name }}
+        </h3>
+        <h4 class="d-inline-block ms-4">
+            <app-signaller-modal-region-leader
+                [simulatedRegionId]="simulatedRegionId"
+                (hasLeader)="setNoLeaderOverlayState(!$event)"
+            />
+        </h4>
+    </div>
+    <div
+        *ngIf="!noLeaderOverlayVisible; else noLeaderOverlay"
+        class="flex-shrink-1 flex-grow-1 d-flex flex-row"
+        style="height: 1px"
+    >
+        <div class="flex-grow-1 overflow-auto" style="max-width: 50%">
+            <app-signaller-modal-region-information
+                [simulatedRegionId]="simulatedRegionId"
+            />
+        </div>
+        <div class="vr mx-1 h-100"></div>
+        <div class="flex-grow-1 overflow-auto" style="max-width: 50%">
+            <app-signaller-modal-region-commands
+                [simulatedRegionId]="simulatedRegionId"
+            />
+        </div>
+    </div>
+    <ng-template #noLeaderOverlay>
+        <app-signaller-modal-no-leader-overlay
+            class="h-100"
+            (accept)="setNoLeaderOverlayState(false)"
+        />
+    </ng-template>
+</div>

@@ -1,0 +1,46 @@
+<ng-container *ngIf="arrivingVehicles.length > 0; else noArrivingVehicles">
+    <p>
+        Aktuell sind folgende
+        <strong>{{ arrivingVehicles.length }} Fahrzeuge</strong> auf Anfahrt:
+    </p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Fahrzeugtyp</th>
+                <th scope="col">Anzahl</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let arrivingVehicleGroup of arrivingVehicleGroups">
+                <td>{{ arrivingVehicleGroup.type }}</td>
+                <td>{{ arrivingVehicleGroup.count }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Die Anfahrtszeiten lauten wie folgt:</p>
+
+    <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+                <th scope="col">Fahrzeug</th>
+                <th scope="col">Ankunft in ca.</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr
+                *ngFor="
+                    let arrivingVehicle of arrivingVehicles;
+                    trackBy: 'id' | appTrackByProperty
+                "
+            >
+                <td>{{ arrivingVehicle.name }}</td>
+                <td>{{ arrivingVehicle.remainingMinutes }} Minuten</td>
+            </tr>
+        </tbody>
+    </table>
+</ng-container>
+<ng-template #noArrivingVehicles>
+    <p>Aktuell sind <strong>keine</strong> Fahrzeuge auf Anfahrt.</p>
+</ng-template>

@@ -121,6 +121,12 @@ module.exports = {
                         message:
                             'You probably want to import this from lodash-es instead.',
                     },
+                    {
+                        name: '@ngneat/hotkeys',
+                        importNames: ['HotkeysService'],
+                        message:
+                            'Please use the abstraction layer from frontend/src/app/shared/services/hotkeys.service.ts instead.',
+                    },
                 ],
                 patterns: [
                     {

@@ -1,11 +1,13 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { TransferPoint } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
+import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { AppState } from 'src/app/state/app.state';
 import {
     createSelectTransferPoint,
@@ -21,6 +23,8 @@ import {
 export class OtherTransferPointTabComponent implements OnInit {
     @Input() public transferPointId!: UUID;
 
+    @ViewChild(NgbPopover) popover!: NgbPopover;
+
     public transferPoint$!: Observable<TransferPoint>;
 
     public reachableTransferPoints$!: Observable<
@@ -30,9 +34,7 @@ export class OtherTransferPointTabComponent implements OnInit {
     /**
      * All transferPoints that are neither connected to this one nor this one itself
      */
-    public transferPointsToBeAdded$!: Observable<{
-        [key: UUID]: TransferPoint;
-    }>;
+    public transferPointsToBeAdded$!: Observable<SearchableDropdownOption[]>;
 
     constructor(
         private readonly store: Store<AppState>,
@@ -50,13 +52,16 @@ export class OtherTransferPointTabComponent implements OnInit {
             map((transferPoints) => {
                 const currentTransferPoint =
                     transferPoints[this.transferPointId]!;
-                return Object.fromEntries(
-                    Object.entries(transferPoints).filter(
+                return Object.entries(transferPoints)
+                    .filter(
                         ([key]) =>
                             key !== this.transferPointId &&
                             !currentTransferPoint.reachableTransferPoints[key]
                     )
-                );
+                    .map(([id, transferPoint]) => ({
+                        key: id,
+                        name: TransferPoint.getFullName(transferPoint),
+                    }));
             })
         );
 

@@ -2,7 +2,7 @@
     class="d-flex justify-content-between align-items-center"
     *appLet="occupation$ | async as occupation"
 >
-    <span>{{ occupationToGermanDictionary[occupation.type] }}.</span>
+    <span>{{ occupation.type | occupationName }}.</span>
     <button
         type="button"
         class="btn btn-outline-danger ms-3"

@@ -1,0 +1,116 @@
+<ng-container *ngIf="radiogram$ | async as radiogram">
+    <h5>
+        {{
+            radiogram.canBeGranted
+                ? 'Anfrage von Ressourcen'
+                : 'Benötigte Ressourcen'
+        }}
+    </h5>
+
+    <ng-container
+        *ngIf="
+            (radiogram.requiredResource.vehicleCounts | keys).length > 0;
+            else noResourcesSpecified
+        "
+    >
+        <table class="table card-text mb-1">
+            <thead>
+                <tr>
+                    <th class="w-50">Kategorie</th>
+                    <th class="w-25">Anzahl</th>
+                    <th
+                        *ngIf="radiogram.alreadyPromisedResource !== null"
+                        class="w-25"
+                    >
+                        Bereits angefragt
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    *ngFor="
+                        let vehicleType of radiogram.requiredResource
+                            .vehicleCounts | keys
+                    "
+                >
+                    <td>{{ vehicleType }}</td>
+                    <td>
+                        {{
+                            radiogram.requiredResource.vehicleCounts[
+                                vehicleType
+                            ]
+                        }}
+                    </td>
+                    <td *ngIf="radiogram.alreadyPromisedResource !== null">
+                        {{
+                            radiogram.alreadyPromisedResource.vehicleCounts[
+                                vehicleType
+                            ] ?? 0
+                        }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <ng-container *ngIf="radiogram.canBeGranted">
+            <ng-container *ngIf="showAnswer$ | async; else actionButtons">
+                <p class="card-text mt-3">
+                    <ng-container
+                        *ngIf="
+                            radiogram.resourcesPromised !== undefined;
+                            else noAnswer
+                        "
+                    >
+                        Die Resource wurde
+                        <ng-container *ngIf="!radiogram.resourcesPromised">
+                            nicht
+                        </ng-container>
+                        zugesagt.
+                    </ng-container>
+                    <ng-template #noAnswer>
+                        Es ist keine Antwort zu dieser Anfrage bekannt
+                    </ng-template>
+                </p>
+            </ng-container>
+            <ng-template #actionButtons>
+                <div
+                    *ngIf="
+                        {
+                            value: enableActionButtons$ | async,
+                        }.value
+                    "
+                    class="d-flex row mt-3"
+                >
+                    <button
+                        type="button"
+                        (click)="denyRequest()"
+                        class="btn btn-danger col-sm mx-1"
+                    >
+                        Ablehnen
+                        <app-hotkey-indicator [hotkey]="denyHotkey" />
+                    </button>
+                    <button
+                        type="button"
+                        (click)="acceptRequest()"
+                        class="btn btn-success col-sm mx-1"
+                    >
+                        Akzeptieren
+                        <app-hotkey-indicator [hotkey]="acceptHotkey" />
+                    </button>
+                </div>
+            </ng-template>
+        </ng-container>
+    </ng-container>
+
+    <ng-template #noResourcesSpecified>
+        <ng-container *ngIf="radiogram.canBeGranted; else noResourcesRequired">
+            <!-- Before migration 39, the radiogram did not specify the exact resources needed -->
+            <p class="card-text">
+                Es werden weitere Ressourcen benötigt, aber es ist keine genaue
+                Aufstellung vorhanden.
+            </p>
+        </ng-container>
+        <ng-template #noResourcesRequired>
+            <p class="card-text">Es werden keine Ressourcen benötigt.</p>
+        </ng-template>
+    </ng-template>
+</ng-container>

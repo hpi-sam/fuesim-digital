@@ -11,6 +11,8 @@ import { ResourceRequestRadiogram } from './resource-request-radiogram.js';
 import { TransferCountsRadiogram } from './transfer-counts-radiogram.js';
 import { TransferCategoryCompletedRadiogram } from './transfer-category-completed-radiogram.js';
 import { NewPatientDataRequestedRadiogram } from './new-patient-data-requested-radiogram.js';
+import { TransferConnectionsRadiogram } from './transfer-connections-radiogram.js';
+import { VehicleOccupationsRadiogram } from './vehicle-occupations-radiogram.js';
 
 export const radiograms = {
     MaterialCountRadiogram,
@@ -19,9 +21,11 @@ export const radiograms = {
     PersonnelCountRadiogram,
     ResourceRequestRadiogram,
     TransferCategoryCompletedRadiogram,
+    TransferConnectionsRadiogram,
     TransferCountsRadiogram,
     TreatmentStatusRadiogram,
     VehicleCountRadiogram,
+    VehicleOccupationsRadiogram,
     NewPatientDataRequestedRadiogram,
 };
 
@@ -40,9 +44,11 @@ export const radiogramDictionary: ExerciseRadiogramDictionary = {
     personnelCountRadiogram: PersonnelCountRadiogram,
     resourceRequestRadiogram: ResourceRequestRadiogram,
     transferCategoryCompletedRadiogram: TransferCategoryCompletedRadiogram,
+    transferConnectionsRadiogram: TransferConnectionsRadiogram,
     transferCountsRadiogram: TransferCountsRadiogram,
     treatmentStatusRadiogram: TreatmentStatusRadiogram,
     vehicleCountRadiogram: VehicleCountRadiogram,
+    vehicleOccupationsRadiogram: VehicleOccupationsRadiogram,
     newPatientDataRequestedRadiogram: NewPatientDataRequestedRadiogram,
 };
 
@@ -72,8 +78,10 @@ export const radiogramTypeToGermanDictionary: {
     personnelCountRadiogram: 'Personalstatus',
     resourceRequestRadiogram: 'Anfrage von Ressourcen',
     transferCategoryCompletedRadiogram: 'Transport für SK abgeschlossen',
+    transferConnectionsRadiogram: 'Transferverbindungen',
     transferCountsRadiogram: 'Transportstatus',
     treatmentStatusRadiogram: 'Behandlungsphase',
     vehicleCountRadiogram: 'Meldung über Fahrzeuganzahlen',
+    vehicleOccupationsRadiogram: 'Meldung über Fahrzeugnutzung',
     newPatientDataRequestedRadiogram: 'Anfrage nach Patientenzahlen',
 };

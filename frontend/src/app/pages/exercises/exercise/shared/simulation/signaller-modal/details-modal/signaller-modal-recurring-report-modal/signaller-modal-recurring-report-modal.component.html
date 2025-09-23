@@ -1,0 +1,56 @@
+<ng-container *ngIf="reportBehaviorId; else noReports">
+    <h5>{{ humanReadableReportType }}</h5>
+
+    <form (ngSubmit)="submit()">
+        <div class="form-check form-switch">
+            <input
+                class="form-check-input no-validation"
+                type="checkbox"
+                role="switch"
+                name="reportsEnabled"
+                [(ngModel)]="reportsEnabled"
+                [appAutofocus]="true"
+                tabindex="1"
+            />
+            <label>Automatisch in regelmäßigen Zeitabständen berichten</label>
+        </div>
+
+        <div class="input-group mt-2">
+            <label class="input-group-text">Berichte alle</label>
+            <input
+                class="form-control no-validation"
+                type="text"
+                [disabled]="!reportsEnabled"
+                name="reportInterval"
+                [ngModel]="reportIntervalMilliseconds / 60 / 1000"
+                (ngModelChange)="updateInterval($event)"
+                tabindex="2"
+            />
+            <label class="input-group-text">Minuten</label>
+        </div>
+
+        <button
+            class="btn btn-primary w-100 mt-2"
+            tabindex="3"
+            [disabled]="loading"
+        >
+            Speichern
+            <span
+                *ngIf="loading; else hotkey"
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+            ></span>
+            <ng-template #hotkey>
+                <app-hotkey-indicator keys="Enter" />
+            </ng-template>
+        </button>
+    </form>
+</ng-container>
+<ng-template #noReports>
+    <div class="modal-body">
+        <span class="text-danger">
+            Der gewünschte simulierte Bereich kann keine Berichte erstellen.
+        </span>
+    </div>
+</ng-template>

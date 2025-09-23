@@ -67,6 +67,7 @@ export const reportBehavior: SimulationBehavior<ReportBehaviorState> = {
                         createRadiogramMap[event.informationType](
                             nextUUID(draftState),
                             simulatedRegion.id,
+                            event.interfaceSignallerKey,
                             RadiogramUnpublishedStatus.create()
                         ),
                         CollectInformationEvent.create(
@@ -90,6 +91,7 @@ export const reportBehavior: SimulationBehavior<ReportBehaviorState> = {
                     TreatmentStatusRadiogram.create(
                         nextUUID(draftState),
                         simulatedRegion.id,
+                        null,
                         RadiogramUnpublishedStatus.create()
                     )
                 );

@@ -34,6 +34,7 @@ import {
     addPartialResourceDescriptions,
     subtractPartialResourceDescriptions,
 } from '../../models/utils/resource-description.js';
+import type { ResourceRequestRadiogram } from '../../models/radiogram/index.js';
 import type {
     SimulationBehavior,
     SimulationBehaviorState,
@@ -174,6 +175,41 @@ export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
                 );
                 break;
             }
+            case 'collectInformationEvent': {
+                switch (event.informationType) {
+                    case 'requiredResources': {
+                        const radiogram = getActivityById(
+                            draftState,
+                            simulatedRegion.id,
+                            event.generateReportActivityId,
+                            'generateReportActivity'
+                        ).radiogram as Mutable<ResourceRequestRadiogram>;
+
+                        const requiredResources =
+                            getRequiredResources(behaviorState);
+                        const alreadyPromisedResources = getPromisedResources(
+                            draftState,
+                            behaviorState
+                        );
+                        radiogram.requiredResource = cloneDeepMutable(
+                            VehicleResource.create(
+                                requiredResources as ResourceDescription
+                            )
+                        );
+                        radiogram.alreadyPromisedResource = cloneDeepMutable(
+                            VehicleResource.create(
+                                alreadyPromisedResources as ResourceDescription
+                            )
+                        );
+                        radiogram.informationAvailable = true;
+                        radiogram.canBeGranted = false;
+                        break;
+                    }
+                    default:
+                    // Ignore event
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -231,16 +267,18 @@ export function updateBehaviorsRequestInterval(
     behaviorState.requestInterval = requestInterval;
 }
 
-export function getResourcesToRequest(
-    draftState: Mutable<ExerciseState>,
-    behaviorState: Mutable<RequestBehaviorState>
-) {
-    const requestedResources = addPartialResourceDescriptions(
+function getRequiredResources(behaviorState: Mutable<RequestBehaviorState>) {
+    return addPartialResourceDescriptions(
         StrictObject.values(behaviorState.requestedResources).map(
             (resource) => resource.vehicleCounts
         )
     );
+}
 
+function getPromisedResources(
+    draftState: Mutable<ExerciseState>,
+    behaviorState: Mutable<RequestBehaviorState>
+) {
     // remove invalidated resources
     let firstValidIndex = behaviorState.promisedResources.findIndex(
         (promise) =>
@@ -251,11 +289,20 @@ export function getResourcesToRequest(
         firstValidIndex = behaviorState.promisedResources.length;
     behaviorState.promisedResources.splice(0, firstValidIndex);
 
-    const promisedResources = addPartialResourceDescriptions(
+    return addPartialResourceDescriptions(
         behaviorState.promisedResources.map(
             (promise) => promise.resource.vehicleCounts
         )
     );
+}
+
+export function getResourcesToRequest(
+    draftState: Mutable<ExerciseState>,
+    behaviorState: Mutable<RequestBehaviorState>
+) {
+    const requestedResources = getRequiredResources(behaviorState);
+    const promisedResources = getPromisedResources(draftState, behaviorState);
+
     return subtractPartialResourceDescriptions(
         requestedResources,
         promisedResources

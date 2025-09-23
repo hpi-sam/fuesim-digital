@@ -9,7 +9,7 @@ import {
 import { IsPosition } from '../utils/validators/is-position.js';
 import type { ImageProperties } from './utils/index.js';
 import type { Position } from './utils/index.js';
-import { getCreate } from './utils/index.js';
+import { getCreate, isInSimulatedRegion } from './utils/index.js';
 
 export class TransferPoint {
     @IsUUID(4, uuidValidationOptions)
@@ -63,6 +63,11 @@ export class TransferPoint {
     };
 
     public static getFullName(transferPoint: TransferPoint): string {
+        if (isInSimulatedRegion(transferPoint)) {
+            // Transfer points in simulated regions don't have an internal name and we don't want to show empty parentheses
+            return transferPoint.externalName;
+        }
+
         return `${transferPoint.externalName} (${transferPoint.internalName})`;
     }
 }

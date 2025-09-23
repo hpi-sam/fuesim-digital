@@ -12,6 +12,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - In the patient popup, there is a now a tab with a QR Code of the patient identifier. It is also
   possible to set custom QR code contents for each patient to support complexer systems.
 - Berliner Feuerwehr is now mentioned as member of the project consortium.
+- There is a dedicated view for "interface signallers" to participate in an exercise with simulated regions. Interface signallers can request information from simulated regions on behalf of the incident command and forward instructions back to the simulated regions.
 
 ### Fixed
 

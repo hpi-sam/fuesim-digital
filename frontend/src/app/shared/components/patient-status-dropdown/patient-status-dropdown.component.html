@@ -1,0 +1,30 @@
+<div
+    ngbDropdown
+    [placement]="'bottom-' + placement"
+    class="d-inline-block"
+    [class.float-end]="placement === 'end'"
+>
+    <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary mb-2"
+        style="min-width: 100px"
+        ngbDropdownToggle
+        [tabIndex]="tabIndex"
+    >
+        <app-patient-status-badge [status]="patientStatus" />
+    </button>
+    <div ngbDropdownMenu class="position-absolute" style="min-width: 100px">
+        <button
+            *ngFor="let status of allowedStatuses"
+            type="button"
+            ngbDropdownItem
+            (click)="statusChanged.emit(status)"
+            class="btn-outline-secondary"
+        >
+            <app-patient-status-badge
+                [status]="status"
+                [class.float-end]="placement === 'end'"
+            />
+        </button>
+    </div>
+</div>

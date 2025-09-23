@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ title }}</h4>
+    <button
+        type="button"
+        class="btn-close"
+        (click)="close()"
+        [appAutofocus]="false"
+        tabindex="-1"
+    ></button>
+</div>
+<div class="modal-body">
+    <ng-container [ngTemplateOutlet]="body" />
+</div>
+<div *ngIf="hotkeysEnabled" class="modal-footer text-muted">
+    <small>
+        <app-hotkey-indicator keys="Leertaste" />: Aktuelles Steuerelement
+        an-/ausschalten
+        <br />
+        <app-hotkey-indicator keys="Tab" />: Nächstes Steuerelement auswählen
+        <br />
+        <app-hotkey-indicator keys="Esc" />: Schließen
+    </small>
+</div>

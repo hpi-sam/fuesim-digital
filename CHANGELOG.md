@@ -7,6 +7,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.9.0] - 2025-09-23
+
 ### Added
 
 - In the patient popup, there is a now a tab with a QR Code of the patient identifier. It is also
@@ -310,7 +312,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.1...HEAD
+[unreleased]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.0...v0.7.1

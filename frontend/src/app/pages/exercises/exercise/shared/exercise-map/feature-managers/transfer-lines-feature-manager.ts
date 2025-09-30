@@ -7,7 +7,6 @@ import LineString from 'ol/geom/LineString';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
-import type VectorSource from 'ol/source/Vector';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
@@ -16,7 +15,6 @@ import type { AppState } from 'src/app/state/app.state';
 import { selectTransferLines } from 'src/app/state/application/selectors/exercise.selectors';
 import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import type RenderFeature from 'ol/render/Feature';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -26,7 +24,7 @@ export class TransferLinesFeatureManager
     extends ElementManager<TransferLine, LineString>
     implements FeatureManager<LineString>
 {
-    public readonly layer: VectorLayer<VectorSource<Feature<LineString>>>;
+    public readonly layer: VectorLayer<Feature<LineString>>;
     constructor(
         private readonly store: Store<AppState>,
         private readonly transferLinesService: TransferLinesService,
@@ -119,10 +117,7 @@ export class TransferLinesFeatureManager
     }
 
     getFeatureFromElement(element: TransferLine) {
-        const feature = this.layer.getSource()!.getFeatureById(element.id);
-        return (
-            (feature as Exclude<typeof feature, RenderFeature[]>) ?? undefined
-        );
+        return this.layer.getSource()!.getFeatureById(element.id) ?? undefined;
     }
 
     isFeatureTranslatable(feature: Feature<LineString>) {

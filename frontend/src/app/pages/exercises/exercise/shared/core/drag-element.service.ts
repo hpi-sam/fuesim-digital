@@ -23,7 +23,6 @@ import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Pixel } from 'ol/pixel';
-import type VectorSource from 'ol/source/Vector';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import {
@@ -45,7 +44,7 @@ import type { FeatureManager } from '../exercise-map/utility/feature-manager';
 export class DragElementService {
     private olMap?: OlMap;
     layerFeatureManagerDictionary?: Map<
-        VectorLayer<VectorSource>,
+        VectorLayer<Feature>,
         FeatureManager<any>
     >;
 
@@ -60,7 +59,7 @@ export class DragElementService {
 
     public registerLayerFeatureManagerDictionary(
         layerFeatureManagerDictionary: Map<
-            VectorLayer<VectorSource>,
+            VectorLayer<Feature>,
             FeatureManager<any>
         >
     ) {
@@ -340,7 +339,7 @@ export class DragElementService {
             }
             // We stop propagating the event as soon as the onFeatureDropped function returns true
             return this.layerFeatureManagerDictionary
-                .get(layer as VectorLayer<VectorSource>)!
+                .get(layer as VectorLayer<Feature>)!
                 .onFeatureDrop(createdElement, droppedOnFeature as Feature);
         });
     }

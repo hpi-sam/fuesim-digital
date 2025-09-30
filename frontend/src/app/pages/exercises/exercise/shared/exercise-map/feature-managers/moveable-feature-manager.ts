@@ -3,7 +3,6 @@ import type Point from 'ol/geom/Point';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
-import type VectorSource from 'ol/source/Vector';
 import type { Observable, Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element, UUID } from 'digital-fuesim-manv-shared';
@@ -11,7 +10,6 @@ import type { FeatureLike } from 'ol/Feature';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
 import type Style from 'ol/style/Style';
-import type RenderFeature from 'ol/render/Feature';
 import type { FeatureManager } from '../utility/feature-manager';
 import type {
     GeometryHelper,
@@ -37,7 +35,7 @@ export abstract class MoveableFeatureManager<
     implements FeatureManager<FeatureType>
 {
     protected movementAnimator: MovementAnimator<FeatureType>;
-    public layer: VectorLayer<VectorSource<Feature<FeatureType>>>;
+    public layer: VectorLayer<Feature<FeatureType>>;
     constructor(
         protected readonly olMap: OlMap,
         private readonly proposeMovementAction: (
@@ -110,10 +108,7 @@ export abstract class MoveableFeatureManager<
     getFeatureFromElement(
         element: ManagedElement
     ): Feature<FeatureType> | undefined {
-        const feature = this.layer.getSource()!.getFeatureById(element.id);
-        return (
-            (feature as Exclude<typeof feature, RenderFeature[]>) ?? undefined
-        );
+        return this.layer.getSource()!.getFeatureById(element.id) ?? undefined;
     }
 
     protected addMarking(

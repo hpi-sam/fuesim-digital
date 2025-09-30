@@ -5,7 +5,6 @@ import LineString from 'ol/geom/LineString';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
-import type VectorSource from 'ol/source/Vector';
 import type { Subject } from 'rxjs';
 import { rgbColorPalette } from 'src/app/shared/functions/colors';
 import type { CateringLine } from 'src/app/shared/types/catering-line';
@@ -13,7 +12,6 @@ import type { AppState } from 'src/app/state/app.state';
 import { selectVisibleCateringLines } from 'src/app/state/application/selectors/shared.selectors';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from 'digital-fuesim-manv-shared';
-import type RenderFeature from 'ol/render/Feature';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { LineStyleHelper } from '../utility/style-helper/line-style-helper';
@@ -29,7 +27,7 @@ export class CateringLinesFeatureManager
         }),
         0.05
     );
-    public readonly layer: VectorLayer<VectorSource<Feature<LineString>>>;
+    public readonly layer: VectorLayer<Feature<LineString>>;
 
     constructor(
         private readonly store: Store<AppState>,
@@ -114,9 +112,6 @@ export class CateringLinesFeatureManager
     }
 
     getFeatureFromElement(element: CateringLine) {
-        const feature = this.layer.getSource()!.getFeatureById(element.id);
-        return (
-            (feature as Exclude<typeof feature, RenderFeature[]>) ?? undefined
-        );
+        return this.layer.getSource()!.getFeatureById(element.id) ?? undefined;
     }
 }

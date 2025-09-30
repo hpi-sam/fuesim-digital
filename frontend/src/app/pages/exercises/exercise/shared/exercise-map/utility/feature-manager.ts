@@ -2,7 +2,6 @@ import type { Feature, MapBrowserEvent } from 'ol';
 import type { Geometry } from 'ol/geom';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
-import type VectorSource from 'ol/source/Vector';
 import type { Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from 'digital-fuesim-manv-shared';
@@ -12,7 +11,7 @@ import type { OlMapInteractionsManager } from './ol-map-interactions-manager';
  * The Api to interact with a feature
  */
 export interface FeatureManager<T extends Geometry> {
-    readonly layer: VectorLayer<VectorSource>;
+    readonly layer: VectorLayer<Feature<T>>;
 
     /**
      * This method is called when the user clicks on a feature on this layer.

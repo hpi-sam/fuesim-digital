@@ -3,8 +3,8 @@
     "version": "0.9.0",
     "type": "module",
     "scripts": {
-        "lint": "eslint --max-warnings 0 --ignore-path .gitignore \"./**/*.{ts,js,yml,html}\"",
-        "lint:fix": "eslint --ignore-path .gitignore --fix \"./**/*.{ts,js,yml,html}\"",
+        "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,html}\"",
+        "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,html}\"",
         "benchmark:linux-macos": "NODE_ENV=production tsx src/app.ts",
         "benchmark:windows": "set NODE_ENV=production&& tsx src/app.ts",
         "benchmark": "(pwd && npm run benchmark:linux-macos) || npm run benchmark:windows"
@@ -20,17 +20,17 @@
         "lodash-es": "^4.17.21"
     },
     "devDependencies": {
+        "@eslint/compat": "^1.4.0",
+        "@eslint/js": "^9.36.0",
         "@types/lodash-es": "^4.17.12",
         "@types/node": "^22.14.0",
-        "@typescript-eslint/eslint-plugin": "^8.29.0",
-        "@typescript-eslint/parser": "^8.29.0",
-        "eslint": "^8.57.1",
+        "eslint": "^9.36.0",
         "eslint-config-prettier": "^10.1.1",
         "eslint-plugin-import": "~2.31.0",
-        "eslint-plugin-total-functions": "^7.1.0",
         "eslint-plugin-unicorn": "^56.0.1",
         "ts-node": "^10.9.1",
         "tsx": "^4.19.3",
-        "typescript": "~5.8.2"
+        "typescript": "~5.8.2",
+        "typescript-eslint": "^8.45.0"
     }
 }

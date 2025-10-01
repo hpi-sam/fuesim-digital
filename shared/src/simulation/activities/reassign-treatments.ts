@@ -763,8 +763,6 @@ function assignTreatments(
     });
 
     const [secured, missingPersonnel] = calculateMissingPersonnel(
-        // False positive
-        // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
         groupedPatients,
         cateringPersonnel,
         personnelTreatments,

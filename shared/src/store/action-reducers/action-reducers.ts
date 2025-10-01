@@ -63,7 +63,6 @@ export function getExerciseActionTypeDictionary(): ExerciseActionTypeDictionary 
     }
     const dictionary = {} as any;
     // fill in the dictionary
-    // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
     Object.values(actionReducers)
         .map(
             (actionReducer) =>

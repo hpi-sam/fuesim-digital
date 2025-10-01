@@ -28,7 +28,6 @@ export function combineDecorators<T, Each extends boolean>(
                 continue;
             }
             (decorator as MethodDecorator | PropertyDecorator)(
-                // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
                 target,
                 propertyKey!,
                 descriptor!

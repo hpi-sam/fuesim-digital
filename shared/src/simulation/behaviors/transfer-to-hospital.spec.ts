@@ -305,7 +305,6 @@ describe('transfer to hospital behavior', () => {
                 });
 
                 const activity = Object.values(
-                    // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
                     afterState.simulatedRegions[beforeSimulatedRegion.id]!
                         .activities
                 )[0] as TransferPatientToHospitalActivityState;
@@ -363,7 +362,6 @@ describe('transfer to hospital behavior', () => {
                 });
 
                 const activity = Object.values(
-                    // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
                     afterState.simulatedRegions[beforeSimulatedRegion.id]!
                         .activities
                 )[0] as TransferPatientToHospitalActivityState;
@@ -426,7 +424,6 @@ describe('transfer to hospital behavior', () => {
                 });
 
                 const activity = Object.values(
-                    // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
                     afterState.simulatedRegions[beforeSimulatedRegion.id]!
                         .activities
                 )[0] as TransferPatientToHospitalActivityState;
@@ -504,7 +501,6 @@ describe('transfer to hospital behavior', () => {
             );
 
             const activity = Object.values(
-                // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
                 afterState.simulatedRegions[beforeSimulatedRegion.id]!
                     .activities
             )[0] as DelayEventActivityState;

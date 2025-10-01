@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsUUID, ValidateNested } from 'class-validator';
-import type { StartPoint } from '../../models/utils/index.js';
+import type { StartPoint, MapPosition } from '../../models/utils/index.js';
 import {
     isPositionOnMap,
     isInTransfer,
@@ -13,7 +13,6 @@ import {
     createVehicleActionTag,
     createTransferPointTag,
 } from '../../models/utils/index.js';
-import type { MapPosition } from '../../models/utils/index.js';
 import {
     changePosition,
     offsetMapPositionBy,

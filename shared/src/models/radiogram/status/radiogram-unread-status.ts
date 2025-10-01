@@ -14,7 +14,7 @@ export class RadiogramUnreadStatus implements RadiogramStatus {
     /**
      * @deprecated Use {@link create} instead.
      */
-    // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-empty-function
+
     constructor(publishTime: number) {
         this.publishTime = publishTime;
     }

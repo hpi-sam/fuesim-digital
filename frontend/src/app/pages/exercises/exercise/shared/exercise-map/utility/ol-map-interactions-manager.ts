@@ -14,14 +14,13 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { ExerciseStatus, Role, UUID } from 'digital-fuesim-manv-shared';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type { Pixel } from 'ol/pixel';
-import type { Geometry } from 'ol/geom';
 import { featureElementKey } from '../feature-managers/element-manager';
 import { TranslateInteraction } from './translate-interaction';
 import type { PopupManager } from './popup-manager';
 import type { FeatureManager } from './feature-manager';
 
 export class OlMapInteractionsManager {
-    private readonly featureLayers: VectorLayer<Feature>[] = [];
+    private readonly featureLayers: VectorLayer[] = [];
     private readonly trainerInteractions: Interaction[] = [];
     private translateInteraction: TranslateInteraction =
         new TranslateInteraction();
@@ -37,7 +36,7 @@ export class OlMapInteractionsManager {
         private readonly popupManager: PopupManager,
         private readonly olMap: OlMap,
         private readonly layerFeatureManagerDictionary: Map<
-            VectorLayer<Feature>,
+            VectorLayer,
             FeatureManager<any>
         >,
         private readonly destroy$: Subject<void>
@@ -46,8 +45,8 @@ export class OlMapInteractionsManager {
         this.registerInteractionEnablementHandler();
     }
 
-    public addFeatureLayer<T extends Geometry>(layer: VectorLayer<Feature<T>>) {
-        this.featureLayers.push(layer as unknown as VectorLayer<Feature>);
+    public addFeatureLayer(layer: VectorLayer) {
+        this.featureLayers.push(layer);
         this.syncInteractionsAndHandler();
     }
 
@@ -69,7 +68,7 @@ export class OlMapInteractionsManager {
             hitTolerance: 10,
             filter: (feature, layer) => {
                 const featureManager = this.layerFeatureManagerDictionary.get(
-                    layer as VectorLayer<Feature>
+                    layer as VectorLayer
                 );
                 return featureManager === undefined
                     ? false
@@ -172,7 +171,7 @@ export class OlMapInteractionsManager {
 
             // We stop propagating the event as soon as the onFeatureDropped function returns true
             return this.layerFeatureManagerDictionary
-                .get(layer as VectorLayer<Feature>)!
+                .get(layer as VectorLayer)!
                 .onFeatureDrop(
                     this.getElementFromFeature(droppedFeature),
                     droppedOnFeature as Feature,

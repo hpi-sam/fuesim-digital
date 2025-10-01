@@ -3,7 +3,6 @@ import {
     upperLeftCornerOf,
     lowerRightCornerOf,
 } from 'digital-fuesim-manv-shared';
-import type { Feature } from 'ol';
 import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
@@ -59,7 +58,7 @@ export class OlMapManager {
      * ```
      */
     public readonly layerFeatureManagerDictionary = new Map<
-        VectorLayer<Feature>,
+        VectorLayer,
         FeatureManager<any>
     >();
 

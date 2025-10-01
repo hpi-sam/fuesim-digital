@@ -27,7 +27,7 @@ export class CateringLinesFeatureManager
         }),
         0.05
     );
-    public readonly layer: VectorLayer<Feature<LineString>>;
+    public readonly layer: VectorLayer;
 
     constructor(
         private readonly store: Store<AppState>,

@@ -11,7 +11,7 @@ import type { OlMapInteractionsManager } from './ol-map-interactions-manager';
  * The Api to interact with a feature
  */
 export interface FeatureManager<T extends Geometry> {
-    readonly layer: VectorLayer<Feature<T>>;
+    readonly layer: VectorLayer;
 
     /**
      * This method is called when the user clicks on a feature on this layer.

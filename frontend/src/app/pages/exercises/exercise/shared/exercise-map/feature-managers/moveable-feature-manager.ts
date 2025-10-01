@@ -35,7 +35,7 @@ export abstract class MoveableFeatureManager<
     implements FeatureManager<FeatureType>
 {
     protected movementAnimator: MovementAnimator<FeatureType>;
-    public layer: VectorLayer<Feature<FeatureType>>;
+    public layer: VectorLayer;
     constructor(
         protected readonly olMap: OlMap,
         private readonly proposeMovementAction: (

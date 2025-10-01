@@ -24,7 +24,7 @@ export class TransferLinesFeatureManager
     extends ElementManager<TransferLine, LineString>
     implements FeatureManager<LineString>
 {
-    public readonly layer: VectorLayer<Feature<LineString>>;
+    public readonly layer: VectorLayer;
     constructor(
         private readonly store: Store<AppState>,
         private readonly transferLinesService: TransferLinesService,

@@ -22,7 +22,7 @@ export class MovementAnimator<T extends GeometryWithCoordinates> {
 
     constructor(
         private readonly olMap: OlMap,
-        private readonly layer: VectorLayer<Feature<T>>,
+        private readonly layer: VectorLayer,
         private readonly interpolateCoordinates: (
             positions: CoordinatePair<T>,
             progress: number

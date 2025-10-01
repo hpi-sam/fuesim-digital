@@ -70,10 +70,7 @@ export class PopupManager {
     public registerPopupTriggers(
         olMap: OlMap,
         openLayersContainer: HTMLDivElement,
-        layerFeatureManagerDictionary: Map<
-            VectorLayer<Feature>,
-            FeatureManager<any>
-        >,
+        layerFeatureManagerDictionary: Map<VectorLayer, FeatureManager<any>>,
         featureNameFeatureManagerDictionary: Map<string, FeatureManager<any>>
     ) {
         this.featureNameFeatureManagerDictionary =
@@ -93,7 +90,7 @@ export class PopupManager {
                         return false;
                     }
                     layerFeatureManagerDictionary
-                        .get(layer as VectorLayer<Feature>)!
+                        .get(layer as VectorLayer)!
                         .onFeatureClicked(event, feature as Feature);
                     // we only want the top one -> a truthy return breaks this loop
                     return true;

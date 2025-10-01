@@ -43,10 +43,7 @@ import type { FeatureManager } from '../exercise-map/utility/feature-manager';
  */
 export class DragElementService {
     private olMap?: OlMap;
-    layerFeatureManagerDictionary?: Map<
-        VectorLayer<Feature>,
-        FeatureManager<any>
-    >;
+    layerFeatureManagerDictionary?: Map<VectorLayer, FeatureManager<any>>;
 
     constructor(
         private readonly exerciseService: ExerciseService,
@@ -58,10 +55,7 @@ export class DragElementService {
     }
 
     public registerLayerFeatureManagerDictionary(
-        layerFeatureManagerDictionary: Map<
-            VectorLayer<Feature>,
-            FeatureManager<any>
-        >
+        layerFeatureManagerDictionary: Map<VectorLayer, FeatureManager<any>>
     ) {
         this.layerFeatureManagerDictionary = layerFeatureManagerDictionary;
     }
@@ -339,7 +333,7 @@ export class DragElementService {
             }
             // We stop propagating the event as soon as the onFeatureDropped function returns true
             return this.layerFeatureManagerDictionary
-                .get(layer as VectorLayer<Feature>)!
+                .get(layer as VectorLayer)!
                 .onFeatureDrop(createdElement, droppedOnFeature as Feature);
         });
     }

@@ -7,7 +7,6 @@ import LineString from 'ol/geom/LineString';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
-import type VectorSource from 'ol/source/Vector';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
@@ -25,7 +24,7 @@ export class TransferLinesFeatureManager
     extends ElementManager<TransferLine, LineString>
     implements FeatureManager<LineString>
 {
-    public readonly layer: VectorLayer<VectorSource<LineString>>;
+    public readonly layer: VectorLayer;
     constructor(
         private readonly store: Store<AppState>,
         private readonly transferLinesService: TransferLinesService,

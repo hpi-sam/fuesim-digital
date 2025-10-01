@@ -3,7 +3,6 @@ import type Point from 'ol/geom/Point';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
-import type VectorSource from 'ol/source/Vector';
 import type { Observable, Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element, UUID } from 'digital-fuesim-manv-shared';
@@ -36,7 +35,7 @@ export abstract class MoveableFeatureManager<
     implements FeatureManager<FeatureType>
 {
     protected movementAnimator: MovementAnimator<FeatureType>;
-    public layer: VectorLayer<VectorSource<FeatureType>>;
+    public layer: VectorLayer;
     constructor(
         protected readonly olMap: OlMap,
         private readonly proposeMovementAction: (

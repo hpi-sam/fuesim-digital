@@ -1,5 +1,4 @@
 import type VectorLayer from 'ol/layer/Vector';
-import type VectorSource from 'ol/source/Vector';
 import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
 import type { Interaction } from 'ol/interaction';
 import { defaults as defaultInteractions } from 'ol/interaction';
@@ -21,7 +20,7 @@ import type { PopupManager } from './popup-manager';
 import type { FeatureManager } from './feature-manager';
 
 export class OlMapInteractionsManager {
-    private readonly featureLayers: VectorLayer<VectorSource>[] = [];
+    private readonly featureLayers: VectorLayer[] = [];
     private readonly trainerInteractions: Interaction[] = [];
     private translateInteraction: TranslateInteraction =
         new TranslateInteraction();
@@ -37,7 +36,7 @@ export class OlMapInteractionsManager {
         private readonly popupManager: PopupManager,
         private readonly olMap: OlMap,
         private readonly layerFeatureManagerDictionary: Map<
-            VectorLayer<VectorSource>,
+            VectorLayer,
             FeatureManager<any>
         >,
         private readonly destroy$: Subject<void>
@@ -46,7 +45,7 @@ export class OlMapInteractionsManager {
         this.registerInteractionEnablementHandler();
     }
 
-    public addFeatureLayer(layer: VectorLayer<VectorSource>) {
+    public addFeatureLayer(layer: VectorLayer) {
         this.featureLayers.push(layer);
         this.syncInteractionsAndHandler();
     }
@@ -69,7 +68,7 @@ export class OlMapInteractionsManager {
             hitTolerance: 10,
             filter: (feature, layer) => {
                 const featureManager = this.layerFeatureManagerDictionary.get(
-                    layer as VectorLayer<VectorSource>
+                    layer as VectorLayer
                 );
                 return featureManager === undefined
                     ? false
@@ -172,7 +171,7 @@ export class OlMapInteractionsManager {
 
             // We stop propagating the event as soon as the onFeatureDropped function returns true
             return this.layerFeatureManagerDictionary
-                .get(layer as VectorLayer<VectorSource>)!
+                .get(layer as VectorLayer)!
                 .onFeatureDrop(
                     this.getElementFromFeature(droppedFeature),
                     droppedOnFeature as Feature,

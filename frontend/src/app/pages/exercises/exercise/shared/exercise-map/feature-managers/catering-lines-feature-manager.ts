@@ -5,7 +5,6 @@ import LineString from 'ol/geom/LineString';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
-import type VectorSource from 'ol/source/Vector';
 import type { Subject } from 'rxjs';
 import { rgbColorPalette } from 'src/app/shared/functions/colors';
 import type { CateringLine } from 'src/app/shared/types/catering-line';
@@ -28,7 +27,7 @@ export class CateringLinesFeatureManager
         }),
         0.05
     );
-    public readonly layer: VectorLayer<VectorSource<LineString>>;
+    public readonly layer: VectorLayer;
 
     constructor(
         private readonly store: Store<AppState>,

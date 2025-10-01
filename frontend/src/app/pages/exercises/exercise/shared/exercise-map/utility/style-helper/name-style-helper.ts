@@ -52,6 +52,9 @@ export class NameStyleHelper extends StyleHelper<Style, Feature> {
         feature: Feature
     ) {
         const text = initialStyle.getText();
+
+        if (!text) return initialStyle;
+
         text.setScale(this.scale / zoom);
         text.setOffsetY(this.getNameAndOffset(feature).offsetY / zoom);
         return initialStyle;

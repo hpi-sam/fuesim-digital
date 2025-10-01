@@ -35,6 +35,9 @@ export class LineStyleHelper extends StyleHelper<Style, Feature> {
         feature: Feature
     ) {
         const stroke = initialStyle.getStroke();
+
+        if (!stroke) return initialStyle;
+
         // It is not possible to use stroke.getWidth() here because this function mutates the style object
         // -> the next width would be different from the initial one
         stroke.setWidth(this.width / zoom);

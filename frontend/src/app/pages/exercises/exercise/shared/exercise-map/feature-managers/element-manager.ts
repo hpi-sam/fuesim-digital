@@ -103,7 +103,7 @@ export abstract class ElementManager<
             updateWhileAnimating: true,
             updateWhileInteracting: true,
             renderBuffer,
-            source: new VectorSource<LayerGeometry>(),
+            source: new VectorSource<Feature<LayerGeometry>>(),
         });
     }
 

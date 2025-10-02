@@ -1,8 +1,7 @@
 import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { SimulatedRegion } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { SimulatedRegion, UUID } from 'digital-fuesim-manv-shared';
 import { isInSpecificSimulatedRegion } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';

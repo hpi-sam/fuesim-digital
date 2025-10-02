@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import type {
     ReportBehaviorState,
     SimulationBehaviorState,
+    UUID,
 } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
 import { StrictObject } from 'digital-fuesim-manv-shared';
 import {
     map,

@@ -1,8 +1,7 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Role } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { Role, UUID } from 'digital-fuesim-manv-shared';
 import { isInSpecificVehicle } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, startWith, switchMap } from 'rxjs';

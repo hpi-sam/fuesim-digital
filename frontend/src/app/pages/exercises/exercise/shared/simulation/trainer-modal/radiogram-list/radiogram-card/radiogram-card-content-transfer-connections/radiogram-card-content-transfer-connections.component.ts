@@ -1,8 +1,10 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { TransferConnectionsRadiogram } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type {
+    TransferConnectionsRadiogram,
+    UUID,
+} from 'digital-fuesim-manv-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import {

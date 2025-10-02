@@ -1,8 +1,7 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input } from '@angular/core';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID, ExerciseOccupation } from 'digital-fuesim-manv-shared';
 import { NoOccupation } from 'digital-fuesim-manv-shared';
-import type { ExerciseOccupation } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { Store } from '@ngrx/store';

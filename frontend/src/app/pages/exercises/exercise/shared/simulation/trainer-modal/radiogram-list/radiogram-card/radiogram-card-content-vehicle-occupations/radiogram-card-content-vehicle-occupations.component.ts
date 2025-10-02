@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import type {
     ExerciseOccupationType,
     VehicleOccupationsRadiogram,
+    UUID,
 } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectRadiogram } from 'src/app/state/application/selectors/exercise.selectors';

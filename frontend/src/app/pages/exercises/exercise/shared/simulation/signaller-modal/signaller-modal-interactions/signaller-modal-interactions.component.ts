@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
     ExerciseSimulationBehaviorType,
+    UUID,
 } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
 import {
     StrictObject,
     getInformationRequestKeyDetails,
@@ -14,8 +14,15 @@ import {
     isUnread,
 } from 'digital-fuesim-manv-shared';
 import { groupBy } from 'lodash-es';
-import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
-import { Subject, map, takeUntil } from 'rxjs';
+import {
+    BehaviorSubject,
+    combineLatest,
+    Observable,
+    of,
+    Subject,
+    map,
+    takeUntil,
+} from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
@@ -121,7 +128,6 @@ export class SignallerModalInteractionsComponent
             .filter((interaction) =>
                 lowerFilterPhrases.every(
                     (phrase) =>
-                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                         interaction.name.toLowerCase().includes(phrase) ||
                         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                         interaction.details?.toLowerCase().includes(phrase) ||

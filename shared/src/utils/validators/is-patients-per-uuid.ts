@@ -15,7 +15,6 @@ export const isPatientsPerUUID = createMapValidator<
 >({
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     keyValidator: <(key: unknown) => key is UUID>((key) => isUUID(key, 4)),
-
     valueValidator: (
         value: unknown
     ): value is ResourceDescription<PatientStatus> =>

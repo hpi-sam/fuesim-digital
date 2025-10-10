@@ -14,7 +14,6 @@ export class RadiogramUnreadStatus implements RadiogramStatus {
     /**
      * @deprecated Use {@link create} instead.
      */
-
     constructor(publishTime: number) {
         this.publishTime = publishTime;
     }

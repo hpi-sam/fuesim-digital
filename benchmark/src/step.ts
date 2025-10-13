@@ -5,7 +5,7 @@ export abstract class Step<
     Name extends keyof State = keyof State,
     Value extends State[Name] = State[Name],
 > {
-    constructor(
+    protected constructor(
         public readonly name: Name,
         /**
          * Whether a column with the values of this step should be added to the printed table at the end

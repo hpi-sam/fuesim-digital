@@ -10,7 +10,7 @@ export class ActionWrapper extends NormalType<
     ActionWrapper,
     ActionWrapperEntity
 > {
-    async asEntity(
+    public async asEntity(
         save: boolean,
         entityManager?: EntityManager,
         exerciseEntity?: ExerciseWrapperEntity
@@ -75,7 +75,7 @@ export class ActionWrapper extends NormalType<
             : this.databaseService.transaction(operations);
     }
 
-    static createFromEntity(
+    public static createFromEntity(
         entity: ActionWrapperEntity,
         databaseService: DatabaseService,
         exercise: ExerciseWrapper
@@ -95,7 +95,7 @@ export class ActionWrapper extends NormalType<
     /**
      * @param emitterId `null` iff the emitter was the server, the client id otherwise
      */
-    constructor(
+    public constructor(
         databaseService: DatabaseService,
         public readonly action: ExerciseAction,
         public readonly emitterId: UUID | null,

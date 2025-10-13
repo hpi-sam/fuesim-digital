@@ -505,14 +505,14 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             💻
             <br />
-            <small>Contributor #1109<small>
+            <small>Contributor <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
         </td>
         <td style="text-align: center">
             Konstantin Ebeling
             <br />
             💻
             <br />
-            <small>Contributor #1109<small>
+            <small>Contributor <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
         </td>
     </tr>
     <tr>
@@ -521,7 +521,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             👀
             <br />
-            <small>Reviewer #1109<small>
+            <small>Reviewer <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
         </td>
     </tr>
 </table>

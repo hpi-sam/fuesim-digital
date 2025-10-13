@@ -7,8 +7,7 @@ import {
     uuidValidationOptions,
 } from '../utils/index.js';
 import { IsIdMap, IsValue } from '../utils/validators/index.js';
-import type { PatientStatusCode } from './utils/index.js';
-import type { HealthPoints } from './utils/index.js';
+import type { PatientStatusCode, HealthPoints } from './utils/index.js';
 import {
     BiometricInformation,
     getCreate,

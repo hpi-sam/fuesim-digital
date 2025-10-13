@@ -7,8 +7,7 @@ import {
     IsValue,
 } from '../utils/validators/index.js';
 import { IsPosition } from '../utils/validators/is-position.js';
-import type { ImageProperties } from './utils/index.js';
-import type { Position } from './utils/index.js';
+import type { ImageProperties, Position } from './utils/index.js';
 import { getCreate, isInSimulatedRegion } from './utils/index.js';
 
 export class TransferPoint {

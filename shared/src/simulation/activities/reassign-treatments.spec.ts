@@ -962,7 +962,6 @@ describe('reassign treatment', () => {
             expect(terminate).toBeCalled();
             expect(
                 Object.keys(
-                    // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
                     newState.personnel[catererId]?.assignedPatientIds ?? {}
                 )
             ).toBeArrayOfSize(2);
@@ -1010,7 +1009,6 @@ describe('reassign treatment', () => {
             expect(terminate).toBeCalled();
             expect(
                 Object.keys(
-                    // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
                     newState.personnel[catererId]?.assignedPatientIds ?? {}
                 )
             ).toBeArrayOfSize(1);

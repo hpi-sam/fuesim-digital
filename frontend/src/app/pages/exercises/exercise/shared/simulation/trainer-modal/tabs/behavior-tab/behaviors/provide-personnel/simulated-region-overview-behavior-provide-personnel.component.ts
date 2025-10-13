@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import type {
     ProvidePersonnelBehaviorState,
     VehicleTemplate,
+    UUID,
 } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject, takeUntil } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';

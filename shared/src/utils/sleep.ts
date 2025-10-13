@@ -10,6 +10,6 @@
  * @returns a Promise that resolves after {@link time}.
  */
 export async function sleep(time: number) {
-    // eslint-disable-next-line no-promise-executor-return, total-functions/no-unsafe-readonly-mutable-assignment
+    // eslint-disable-next-line no-promise-executor-return
     return new Promise((resolve) => setTimeout(resolve, time));
 }

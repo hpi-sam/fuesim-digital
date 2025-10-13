@@ -2,8 +2,10 @@ import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { Component, Input, ViewChild } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import type { ManagePatientTransportToHospitalBehaviorState } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type {
+    ManagePatientTransportToHospitalBehaviorState,
+    UUID,
+} from 'digital-fuesim-manv-shared';
 import { difference } from 'lodash-es';
 import {
     combineLatest,

@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import type {
     RecurringEventActivityState,
     RequestBehaviorState,
+    UUID,
 } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
 import {
     SimulatedRegionRequestTargetConfiguration,
     TraineesRequestTargetConfiguration,

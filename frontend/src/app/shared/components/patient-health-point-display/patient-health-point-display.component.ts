@@ -1,8 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { PatientStatus } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
 import {
     healthPointsDefaults,
     Patient,

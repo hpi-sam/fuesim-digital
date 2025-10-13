@@ -5,8 +5,8 @@ import type {
     RecurringEventActivityState,
     ReportableInformation,
     ReportBehaviorState,
+    UUID,
 } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
 import {
     reportableInformationTypeToGermanNameDictionary,
     reportableInformations,

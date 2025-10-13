@@ -1,8 +1,7 @@
 import type { OnChanges, OnDestroy } from '@angular/core';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Personnel } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { Personnel, UUID } from 'digital-fuesim-manv-shared';
 import {
     combineLatest,
     map,

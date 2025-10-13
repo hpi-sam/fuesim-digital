@@ -1,7 +1,9 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
-import type { ExerciseSimulationBehaviorType } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type {
+    ExerciseSimulationBehaviorType,
+    UUID,
+} from 'digital-fuesim-manv-shared';
 import { isInSpecificSimulatedRegion } from 'digital-fuesim-manv-shared';
 import { Store, createSelector } from '@ngrx/store';
 import type { AppState } from 'src/app/state/app.state';

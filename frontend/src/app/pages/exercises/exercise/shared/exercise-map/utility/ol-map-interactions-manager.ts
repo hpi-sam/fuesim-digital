@@ -98,7 +98,7 @@ export class OlMapInteractionsManager {
     private applyInteractions() {
         this.mapInteractions.clear();
         // We just want to modify this for the Map not do anything with it after so we ignore the returned value
-        // eslint-disable-next-line rxjs/no-ignored-observable
+        // eslint-disable-next-line rxjs-x/no-floating-observables
         this.mapInteractions.extend(this.interactions.getArray());
     }
 

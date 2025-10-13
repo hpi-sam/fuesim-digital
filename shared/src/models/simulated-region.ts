@@ -10,8 +10,11 @@ import type { ExerciseSimulationActivityState } from '../simulation/activities/e
 import { getSimulationActivityConstructor } from '../simulation/activities/exercise-simulation-activity.js';
 import type { ExerciseSimulationBehaviorState } from '../simulation/behaviors/exercise-simulation-behavior.js';
 import { simulationBehaviorTypeOptions } from '../simulation/behaviors/exercise-simulation-behavior.js';
-import type { ImageProperties, MapCoordinates } from './utils/index.js';
-import type { Position } from './utils/index.js';
+import type {
+    ImageProperties,
+    MapCoordinates,
+    Position,
+} from './utils/index.js';
 import { getCreate, MapPosition, Size } from './utils/index.js';
 
 export class SimulatedRegion {

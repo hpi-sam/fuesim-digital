@@ -9,8 +9,8 @@ import { createSelector, Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
     SimulatedRegion,
+    UUID,
 } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
 import {
     Client,
     currentParticipantIdOf,

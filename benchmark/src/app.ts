@@ -68,7 +68,6 @@ async function benchmarkFile(
     const path = `${pathToData}/${fileName}`;
     let data;
     try {
-        // eslint-disable-next-line no-await-in-loop
         data = await fs.readFile(path, 'utf8');
     } catch {
         print(`Could not read file ${fileName}\n`, 'red');

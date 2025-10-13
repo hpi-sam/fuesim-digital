@@ -9,8 +9,8 @@ import type {
     TransferPoint,
     UUIDSet,
     Vehicle,
+    UUID,
 } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
 import {
     cloneDeepMutable,
     isInSpecificVehicle,

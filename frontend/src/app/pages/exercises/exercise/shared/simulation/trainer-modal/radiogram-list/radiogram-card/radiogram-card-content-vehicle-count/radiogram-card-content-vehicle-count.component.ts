@@ -1,8 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { VehicleCountRadiogram } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { VehicleCountRadiogram, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';

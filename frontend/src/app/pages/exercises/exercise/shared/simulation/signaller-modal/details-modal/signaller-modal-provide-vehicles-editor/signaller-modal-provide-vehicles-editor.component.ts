@@ -1,8 +1,7 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { Component, Input, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ResourceDescription } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { ResourceDescription, UUID } from 'digital-fuesim-manv-shared';
 import {
     TransferPoint,
     isInSpecificSimulatedRegion,

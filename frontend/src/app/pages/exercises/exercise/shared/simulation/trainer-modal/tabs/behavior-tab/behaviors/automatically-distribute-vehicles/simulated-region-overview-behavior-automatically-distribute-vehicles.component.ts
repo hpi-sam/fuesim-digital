@@ -1,12 +1,14 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type {
+    UUID,
+    AutomaticallyDistributeVehiclesBehaviorState,
+} from 'digital-fuesim-manv-shared';
 import {
     isInSpecificSimulatedRegion,
     TransferPoint,
 } from 'digital-fuesim-manv-shared';
-import type { AutomaticallyDistributeVehiclesBehaviorState } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';

@@ -500,6 +500,29 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Supervisor 2021-23<small>
         </td>
+        <td style="text-align: center">
+            Cristian Pasca
+            <br />
+            💻
+            <br />
+            <small>Contributor <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
+        </td>
+        <td style="text-align: center">
+            Konstantin Ebeling
+            <br />
+            💻
+            <br />
+            <small>Contributor <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center">
+            Jan Berndt
+            <br />
+            👀
+            <br />
+            <small>Reviewer <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
+        </td>
     </tr>
 </table>
 <!-- markdownlint-restore -->

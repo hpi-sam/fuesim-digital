@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Added
+
+- Trainees can mark patients for transport priority. Those patients show a red outline around their popup.
+
 ## [0.9.0] - 2025-09-23
 
 ### Added

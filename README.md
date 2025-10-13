@@ -500,6 +500,29 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Supervisor 2021-23<small>
         </td>
+        <td style="text-align: center">
+            Cristian Pasca
+            <br />
+            💻
+            <br />
+            <small>Contributor #1109<small>
+        </td>
+        <td style="text-align: center">
+            Konstantin Ebeling
+            <br />
+            💻
+            <br />
+            <small>Contributor #1109<small>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center">
+            Jan Berndt
+            <br />
+            👀
+            <br />
+            <small>Reviewer #1109<small>
+        </td>
     </tr>
 </table>
 <!-- markdownlint-restore -->

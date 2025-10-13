@@ -62,7 +62,7 @@ export class Patient {
     public readonly pretriageInformation: PretriageInformation;
 
     @IsBoolean()
-    public readonly isTransportPriority: boolean = false;
+    public readonly hasTransportPriority: boolean = false;
     /**
      * A description of the expected patient behaviour over time
      * For the trainer

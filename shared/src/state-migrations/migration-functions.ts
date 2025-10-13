@@ -37,6 +37,7 @@ import { addPatientRemarks7 } from './7-add-patient-remarks.js';
 import { treatmentSystemImprovements8 } from './8-treatment-system-improvements.js';
 import { removeIsBeingTreated9 } from './9-remove-is-being-treated.js';
 import { impossibleMigration } from './impossible-migration.js';
+import { addPatientTransportPriority41 } from './41-add-patient-transport-prio.js';
 
 /**
  * Migrate a single action
@@ -103,4 +104,5 @@ export const migrations: {
     38: deterministicAlarmGroups38,
     39: addCustomPatientQRCode39,
     40: adaptInterfaceSignallerUI40,
+    41: addPatientTransportPriority41,
 };

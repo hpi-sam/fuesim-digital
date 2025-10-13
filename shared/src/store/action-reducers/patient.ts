@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
+import {
+    IsBoolean,
+    IsString,
+    IsUUID,
+    MaxLength,
+    ValidateNested,
+} from 'class-validator';
 import { Patient } from '../../models/patient.js';
 import type { PatientStatus } from '../../models/utils/index.js';
 import {
@@ -133,23 +139,23 @@ export class SetPatientTransportPriorityAction implements Action {
     public readonly patientId!: UUID;
 
     @IsBoolean()
-    public readonly isTransportPriority!: boolean;
+    public readonly hasTransportPriority!: boolean;
 }
 
 export namespace PatientActionReducers {
     export const setPatientTransportPriority: ActionReducer<SetPatientTransportPriorityAction> =
-            {
-                action: SetPatientTransportPriorityAction,
-                reducer: (draftState, { patientId, isTransportPriority }) => {
-                    const patient = getElement(draftState, 'patient', patientId);
-                    if (patient.isTransportPriority !== isTransportPriority) {
-                        patient.isTransportPriority = isTransportPriority;
-                    }
+        {
+            action: SetPatientTransportPriorityAction,
+            reducer: (draftState, { patientId, hasTransportPriority }) => {
+                const patient = getElement(draftState, 'patient', patientId);
+                if (patient.hasTransportPriority !== hasTransportPriority) {
+                    patient.hasTransportPriority = hasTransportPriority;
+                }
 
-                    return draftState;
-                },
-                rights: 'participant',
-            };
+                return draftState;
+            },
+            rights: 'participant',
+        };
 
     export const addPatient: ActionReducer<AddPatientAction> = {
         action: AddPatientAction,

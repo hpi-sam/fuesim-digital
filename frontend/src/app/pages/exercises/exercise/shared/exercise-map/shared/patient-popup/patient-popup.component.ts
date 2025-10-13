@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import type { Patient, UUID } from 'digital-fuesim-manv-shared';
 import { AppState } from 'src/app/state/app.state';
 import { createSelectPatient } from 'src/app/state/application/selectors/exercise.selectors';
@@ -12,7 +12,7 @@ import { PopupService } from '../../utility/popup.service';
     styleUrls: ['./patient-popup.component.scss'],
     standalone: false,
 })
-export class PatientPopupComponent {
+export class PatientPopupComponent implements OnInit {
     // These properties are only set after OnInit
     public patientId!: UUID;
     patient$!: Observable<Patient>;

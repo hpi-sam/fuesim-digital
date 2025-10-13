@@ -73,7 +73,7 @@ export class PatientsDetailsComponent implements OnChanges {
         this.exerciseService.proposeAction({
             type: '[Patient] Set Transport Priority',
             patientId: this.patientId,
-            isTransportPriority: priority,
+            hasTransportPriority: priority,
         });
     }
 

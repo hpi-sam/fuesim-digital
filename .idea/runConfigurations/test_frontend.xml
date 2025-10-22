@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="test-frontend" type="JavaScriptTestRunnerJest">
+    <config-file value="$PROJECT_DIR$/frontend/jest.config.js" />
+    <node-interpreter value="project" />
+    <jest-package value="$PROJECT_DIR$/frontend/node_modules/jest" />
+    <working-dir value="$PROJECT_DIR$/frontend" />
+    <jest-options value="--runInBand --coverage --verbose" />
+    <envs />
+    <scope-kind value="ALL" />
+    <method v="2" />
+  </configuration>
+</component>

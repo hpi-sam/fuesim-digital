@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Start all but database" type="CompoundRunConfigurationType">
+    <toRun name="start-backend" type="js.build_tools.npm" />
+    <toRun name="start-frontend" type="js.build_tools.npm" />
+    <toRun name="watch-shared" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -15,8 +15,6 @@ import {
     personnelTypeAllowedValues,
     getCreate,
 } from './utils/index.js';
-import type { MaterialType } from './utils/material-type.js';
-import { materialTypeAllowedValues } from './utils/material-type.js';
 
 export class VehicleTemplate {
     @IsUUID(4, uuidValidationOptions)
@@ -45,10 +43,9 @@ export class VehicleTemplate {
     public readonly personnel: readonly PersonnelType[];
 
     @IsArray()
-    @IsLiteralUnion(materialTypeAllowedValues, {
-        each: true,
-    })
-    public readonly materials: readonly MaterialType[];
+    @IsString({ each: true })
+    // TODO Suitable validation
+    public readonly materials: readonly string[];
 
     /**
      * @deprecated Use {@link create} instead
@@ -59,7 +56,7 @@ export class VehicleTemplate {
         image: ImageProperties,
         patientCapacity: number,
         personnel: readonly PersonnelType[],
-        materials: readonly MaterialType[]
+        materials: readonly string[]
     ) {
         this.vehicleType = vehicleType;
         this.name = name;

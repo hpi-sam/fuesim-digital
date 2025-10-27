@@ -9,7 +9,6 @@ import {
 import { VehicleTemplate } from '../../models/index.js';
 import type { PersonnelType } from '../../models/utils/index.js';
 import { ImageProperties } from '../../models/utils/index.js';
-import type { MaterialType } from '../../models/utils/material-type.js';
 import type { ExerciseState } from '../../state.js';
 import type { Mutable, UUID } from '../../utils/index.js';
 import { uuidValidationOptions, cloneDeepMutable } from '../../utils/index.js';
@@ -48,7 +47,7 @@ export class EditVehicleTemplateAction implements Action {
 
     @IsString({ each: true })
     @IsArray()
-    public readonly materials!: readonly MaterialType[];
+    public readonly materials!: readonly string[];
 
     @IsString({ each: true })
     @IsArray()

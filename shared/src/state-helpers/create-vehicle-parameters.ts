@@ -4,7 +4,6 @@ import type { MaterialTemplate } from '../models/material-template.js';
 import type { PersonnelTemplate } from '../models/personnel-template.js';
 import type { PersonnelType, MapCoordinates } from '../models/utils/index.js';
 import { MapPosition } from '../models/utils/position/map-position.js';
-import type { MaterialType } from '../models/utils/material-type.js';
 import { VehiclePosition } from '../models/utils/position/vehicle-position.js';
 
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
@@ -19,21 +18,24 @@ export function createVehicleParameters(
     vehicleId: UUID,
     vehicleTemplate: VehicleTemplate,
     materialTemplates: {
-        [Key in MaterialType]: MaterialTemplate;
+        [Key in string]: MaterialTemplate;
     },
     personnelTemplates: {
         [Key in PersonnelType]: PersonnelTemplate;
     },
     vehiclePosition: MapCoordinates
 ): VehicleParameters {
-    const materials = vehicleTemplate.materials.map((currentMaterial) =>
-        Material.generateMaterial(
-            materialTemplates[currentMaterial],
-            vehicleId,
-            vehicleTemplate.name,
-            VehiclePosition.create(vehicleId)
-        )
-    );
+    const materials: Material[] = vehicleTemplate.materials
+        .map((currentMaterial) => {
+            if (!materialTemplates[currentMaterial]) return null;
+            return Material.generateMaterial(
+                materialTemplates[currentMaterial],
+                vehicleId,
+                vehicleTemplate.name,
+                VehiclePosition.create(vehicleId)
+            );
+        })
+        .filter((val) => val !== null);
     const personnel = vehicleTemplate.personnel.map((currentPersonnel) =>
         Personnel.generatePersonnel(
             personnelTemplates[currentPersonnel],

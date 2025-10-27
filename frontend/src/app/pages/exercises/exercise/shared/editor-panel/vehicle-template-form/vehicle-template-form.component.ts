@@ -3,14 +3,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     MaterialTemplate,
-    MaterialType,
     PersonnelTemplate,
     PersonnelType,
 } from 'digital-fuesim-manv-shared';
-import {
-    materialTypeNames,
-    personnelTypeNames,
-} from 'digital-fuesim-manv-shared';
+import { personnelTypeNames } from 'digital-fuesim-manv-shared';
 import { cloneDeep } from 'lodash-es';
 import type { Observable } from 'rxjs';
 import { MessageService } from 'src/app/core/messages/message.service';
@@ -41,7 +37,7 @@ export class VehicleTemplateFormComponent implements OnChanges {
     public values?: EditableVehicleTemplateValues;
 
     public materialTemplates$: Observable<{
-        readonly [type in MaterialType]: MaterialTemplate;
+        readonly [type in string]: MaterialTemplate;
     }> = this.store.select(selectMaterialTemplates);
     public personnelTemplates$: Observable<{
         readonly [type in PersonnelType]: PersonnelTemplate;
@@ -104,7 +100,7 @@ export class VehicleTemplateFormComponent implements OnChanges {
         this.values.personnelTypes.splice(index, 1);
     }
 
-    public addMaterial(type: MaterialType) {
+    public addMaterial(type: string) {
         if (!this.values) {
             return;
         }
@@ -121,9 +117,6 @@ export class VehicleTemplateFormComponent implements OnChanges {
     public get personnelTypeNames() {
         return personnelTypeNames;
     }
-    public get materialTypeNames() {
-        return materialTypeNames;
-    }
 }
 
 export interface EditableVehicleTemplateValues {
@@ -132,7 +125,7 @@ export interface EditableVehicleTemplateValues {
     url: string | null;
     height: number;
     patientCapacity: number;
-    materialTypes: MaterialType[];
+    materialTypes: string[];
     personnelTypes: PersonnelType[];
 }
 
@@ -143,6 +136,6 @@ export interface ChangedVehicleTemplateValues {
     aspectRatio: number;
     height: number;
     patientCapacity: number;
-    materialTypes: MaterialType[];
+    materialTypes: string[];
     personnelTypes: PersonnelType[];
 }

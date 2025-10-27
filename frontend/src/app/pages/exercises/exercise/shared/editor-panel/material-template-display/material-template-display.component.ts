@@ -1,11 +1,7 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type {
-    MaterialTemplate,
-    MaterialType,
-} from 'digital-fuesim-manv-shared';
-import { materialTypeNames } from 'digital-fuesim-manv-shared';
+import type { MaterialTemplate } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectMaterialTemplate } from 'src/app/state/application/selectors/exercise.selectors';
@@ -17,7 +13,7 @@ import { createSelectMaterialTemplate } from 'src/app/state/application/selector
     standalone: false,
 })
 export class MaterialTemplateDisplayComponent implements OnChanges {
-    @Input() materialTemplateType!: MaterialType;
+    @Input() materialTemplateType!: string;
 
     public materialTemplate$?: Observable<MaterialTemplate>;
 
@@ -28,8 +24,4 @@ export class MaterialTemplateDisplayComponent implements OnChanges {
     }
 
     constructor(private readonly store: Store<AppState>) {}
-
-    public get materialTypeNames() {
-        return materialTypeNames;
-    }
 }

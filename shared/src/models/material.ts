@@ -25,6 +25,12 @@ export class Material {
     @IsValue('material' as const)
     public readonly type = 'material';
 
+    @IsString()
+    public readonly materialType: string;
+
+    @IsString()
+    public readonly name: string;
+
     @IsUUID(4, uuidValidationOptions)
     public readonly vehicleId: UUID;
 
@@ -73,6 +79,8 @@ export class Material {
      * @deprecated Use {@link create} instead
      */
     constructor(
+        materialType: string,
+        name: string,
         vehicleId: UUID,
         vehicleName: string,
         assignedPatientIds: UUIDSet,
@@ -82,6 +90,8 @@ export class Material {
         overrideTreatmentRange: number,
         position: Position
     ) {
+        this.materialType = materialType;
+        this.name = name;
         this.vehicleId = vehicleId;
         this.vehicleName = vehicleName;
         this.assignedPatientIds = assignedPatientIds;
@@ -101,6 +111,8 @@ export class Material {
         position: Position
     ): Material {
         return this.create(
+            materialTemplate.materialType,
+            materialTemplate.name,
             vehicleId,
             vehicleName,
             {},

@@ -40,7 +40,6 @@ import {
     getCreate,
     SpatialTree,
 } from './models/utils/index.js';
-import type { MaterialType } from './models/utils/material-type.js';
 import {
     RandomState,
     seededRandomState,
@@ -128,7 +127,7 @@ export class ExerciseState {
     public readonly vehicleTemplates = defaultVehicleTemplates;
     @IsObject()
     public readonly materialTemplates: {
-        [Key in MaterialType]: MaterialTemplate;
+        [Key in string]: MaterialTemplate;
     } = defaultMaterialTemplates;
     @IsObject()
     public readonly personnelTemplates: {

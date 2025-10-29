@@ -8,13 +8,8 @@ import {
 } from 'class-validator';
 import type { UUID } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../utils/validators/index.js';
-import type { PersonnelType } from './utils/index.js';
-import {
-    ImageProperties,
-    personnelTypeAllowedValues,
-    getCreate,
-} from './utils/index.js';
+import { IsValue } from '../utils/validators/index.js';
+import { ImageProperties, getCreate } from './utils/index.js';
 
 export class VehicleTemplate {
     @IsUUID(4, uuidValidationOptions)
@@ -37,10 +32,9 @@ export class VehicleTemplate {
     public readonly patientCapacity: number;
 
     @IsArray()
-    @IsLiteralUnion(personnelTypeAllowedValues, {
-        each: true,
-    })
-    public readonly personnel: readonly PersonnelType[];
+    @IsString({ each: true })
+    // TODO Suitable validation
+    public readonly personnel: readonly string[];
 
     @IsArray()
     @IsString({ each: true })
@@ -55,7 +49,7 @@ export class VehicleTemplate {
         name: string,
         image: ImageProperties,
         patientCapacity: number,
-        personnel: readonly PersonnelType[],
+        personnel: readonly string[],
         materials: readonly string[]
     ) {
         this.vehicleType = vehicleType;

@@ -4,9 +4,7 @@ import { Store } from '@ngrx/store';
 import type {
     MaterialTemplate,
     PersonnelTemplate,
-    PersonnelType,
 } from 'digital-fuesim-manv-shared';
-import { personnelTypeNames } from 'digital-fuesim-manv-shared';
 import { cloneDeep } from 'lodash-es';
 import type { Observable } from 'rxjs';
 import { MessageService } from 'src/app/core/messages/message.service';
@@ -40,7 +38,7 @@ export class VehicleTemplateFormComponent implements OnChanges {
         readonly [type in string]: MaterialTemplate;
     }> = this.store.select(selectMaterialTemplates);
     public personnelTemplates$: Observable<{
-        readonly [type in PersonnelType]: PersonnelTemplate;
+        readonly [type in string]: PersonnelTemplate;
     }> = this.store.select(selectPersonnelTemplates);
 
     constructor(
@@ -86,7 +84,7 @@ export class VehicleTemplateFormComponent implements OnChanges {
             });
     }
 
-    public addPersonnel(type: PersonnelType) {
+    public addPersonnel(type: string) {
         if (!this.values) {
             return;
         }
@@ -113,10 +111,6 @@ export class VehicleTemplateFormComponent implements OnChanges {
         }
         this.values.materialTypes.splice(index, 1);
     }
-
-    public get personnelTypeNames() {
-        return personnelTypeNames;
-    }
 }
 
 export interface EditableVehicleTemplateValues {
@@ -126,7 +120,7 @@ export interface EditableVehicleTemplateValues {
     height: number;
     patientCapacity: number;
     materialTypes: string[];
-    personnelTypes: PersonnelType[];
+    personnelTypes: string[];
 }
 
 export interface ChangedVehicleTemplateValues {
@@ -137,5 +131,5 @@ export interface ChangedVehicleTemplateValues {
     height: number;
     patientCapacity: number;
     materialTypes: string[];
-    personnelTypes: PersonnelType[];
+    personnelTypes: string[];
 }

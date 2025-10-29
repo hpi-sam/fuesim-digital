@@ -10,12 +10,11 @@ import { uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import { IsPersonnelCount } from '../../utils/validators/is-personnel-count.js';
 import { IsRadiogramStatus } from '../../utils/validators/is-radiogram-status.js';
-import type { PersonnelType } from '../utils/index.js';
 import { getCreate } from '../utils/get-create.js';
 import type { Radiogram } from './radiogram.js';
 import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
 
-export type PersonnelCount = { [key in PersonnelType]: number };
+export type PersonnelCount = { [key in string]: number };
 
 export class PersonnelCountRadiogram implements Radiogram {
     @IsUUID(4, uuidValidationOptions)

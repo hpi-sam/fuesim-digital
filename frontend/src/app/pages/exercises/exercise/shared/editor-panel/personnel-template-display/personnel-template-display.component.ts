@@ -1,11 +1,7 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type {
-    PersonnelTemplate,
-    PersonnelType,
-} from 'digital-fuesim-manv-shared';
-import { personnelTypeNames } from 'digital-fuesim-manv-shared';
+import type { PersonnelTemplate } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectPersonnelTemplate } from 'src/app/state/application/selectors/exercise.selectors';
@@ -17,7 +13,7 @@ import { createSelectPersonnelTemplate } from 'src/app/state/application/selecto
     standalone: false,
 })
 export class PersonnelTemplateDisplayComponent implements OnChanges {
-    @Input() personnelTemplateType!: PersonnelType;
+    @Input() personnelTemplateType!: string;
 
     public personnelTemplate$?: Observable<PersonnelTemplate>;
 
@@ -28,8 +24,4 @@ export class PersonnelTemplateDisplayComponent implements OnChanges {
     }
 
     constructor(private readonly store: Store<AppState>) {}
-
-    public get personnelTypeNames() {
-        return personnelTypeNames;
-    }
 }

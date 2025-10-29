@@ -1,7 +1,6 @@
 import { LogEntry } from '../../../models/log-entry.js';
 import type { ExerciseRadiogram } from '../../../models/radiogram/index.js';
 import type { Tag } from '../../../models/tag.js';
-import { personnelTypeNames } from '../../../models/utils/personnel-type.js';
 import { statusNames } from '../../../models/utils/patient-status.js';
 import {
     createAlarmGroupTag,
@@ -218,8 +217,8 @@ export function logSimulatedRegionAddElement(
 
                 logSimulatedRegion(
                     state,
-                    [createPersonnelTypeTag(state, element.personnelType)],
-                    `Dem Bereich wurde ein ${element.personnelType} hinzugefügt`,
+                    [createPersonnelTypeTag(state, element)],
+                    `Dem Bereich wurde ein ${element.name} hinzugefügt`,
                     simulatedRegionId
                 );
             }
@@ -451,10 +450,7 @@ export function logElementAddedToTransfer(
                             : createTransferPointTag(state, transferTargetId)
                         : createHospitalTag(state, transferTargetId),
                     elementType === 'personnel'
-                        ? createPersonnelTypeTag(
-                              state,
-                              (element as Personnel).personnelType
-                          )
+                        ? createPersonnelTypeTag(state, element as Personnel)
                         : createVehicleTypeTag(
                               state,
                               (element as Vehicle).vehicleType
@@ -494,10 +490,7 @@ export function logElementAddedToTransfer(
                             : createTransferPointTag(state, transferTargetId)
                         : createHospitalTag(state, transferTargetId),
                     elementType === 'personnel'
-                        ? createPersonnelTypeTag(
-                              state,
-                              (element as Personnel).personnelType
-                          )
+                        ? createPersonnelTypeTag(state, element as Personnel)
                         : createVehicleTypeTag(
                               state,
                               (element as Vehicle).vehicleType
@@ -542,10 +535,7 @@ export function logTransferEdited(
         state,
         [
             elementType === 'personnel'
-                ? createPersonnelTypeTag(
-                      state,
-                      (element as Personnel).personnelType
-                  )
+                ? createPersonnelTypeTag(state, element as Personnel)
                 : createVehicleTypeTag(state, (element as Vehicle).vehicleType),
             ...(newTransferTargetId === oldTransferTargetId
                 ? []
@@ -582,10 +572,7 @@ export function logTransferFinished(
         state,
         [
             elementType === 'personnel'
-                ? createPersonnelTypeTag(
-                      state,
-                      (element as Personnel).personnelType
-                  )
+                ? createPersonnelTypeTag(state, element as Personnel)
                 : createVehicleTypeTag(state, (element as Vehicle).vehicleType),
             ...(elementType === 'vehicle'
                 ? [createVehicleTag(state, elementId)]
@@ -616,10 +603,7 @@ export function logTransferPause(
         state,
         [
             elementType === 'personnel'
-                ? createPersonnelTypeTag(
-                      state,
-                      (element as Personnel).personnelType
-                  )
+                ? createPersonnelTypeTag(state, element as Personnel)
                 : createVehicleTypeTag(state, (element as Vehicle).vehicleType),
             ...(elementType === 'vehicle'
                 ? [createVehicleTag(state, elementId)]
@@ -860,7 +844,7 @@ function createRadiogramDescription(
         case 'personnelCountRadiogram': {
             return `In dieser Region gab es die folgenden Einsatzkräfte: ${generateCountString(
                 radiogram.personnelCount,
-                (type) => personnelTypeNames[type]
+                (type) => state.personnelTemplates[type]?.name ?? type
             )}.`;
         }
         case 'resourceRequestRadiogram': {

@@ -34,7 +34,7 @@ import type { MaterialTemplate } from './models/material-template.js';
 import type { PersonnelTemplate } from './models/personnel-template.js';
 import type { ExerciseRadiogram } from './models/radiogram/exercise-radiogram.js';
 import { getRadiogramConstructor } from './models/radiogram/exercise-radiogram.js';
-import type { PersonnelType, ExerciseStatus } from './models/utils/index.js';
+import type { ExerciseStatus } from './models/utils/index.js';
 import {
     exerciseStatusAllowedValues,
     getCreate,
@@ -131,7 +131,7 @@ export class ExerciseState {
     } = defaultMaterialTemplates;
     @IsObject()
     public readonly personnelTemplates: {
-        [Key in PersonnelType]: PersonnelTemplate;
+        [Key in string]: PersonnelTemplate;
     } = defaultPersonnelTemplates;
     @IsArray()
     @ValidateNested()

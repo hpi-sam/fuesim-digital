@@ -6,15 +6,15 @@ import {
     IsInt,
     IsPositive,
 } from 'class-validator';
-import type { Personnel, PersonnelType, Vehicle } from '../../models/index.js';
-import { PartialExport } from '../../export-import/file-format/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import {
+    getPersonnelTypes,
+    Personnel,
+    Vehicle,
     createPersonnelTypeTag,
-    personnelTypeAllowedValues,
-    personnelTypeNames,
     Patient,
 } from '../../models/index.js';
+import { PartialExport } from '../../export-import/file-format/index.js';
+import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import {
     getStatus,
     isNotInTransfer,
@@ -287,19 +287,18 @@ export function preparePartialExportForImport(
 }
 
 export interface TreatmentAssignment {
-    [patientId: UUID]: { [personnelType in PersonnelType]: number };
+    [patientId: UUID]: { [personnelType in string]: number };
 }
 
 function calculateTreatmentAssignment(
     draftState: Mutable<ExerciseState>
 ): TreatmentAssignment {
+    const personnelTypes = getPersonnelTypes(draftState);
     const treatmentAssignment = StrictObject.fromEntries(
         Object.keys(draftState.patients).map((patientId) => [
             patientId,
             StrictObject.fromEntries(
-                StrictObject.keys(personnelTypeAllowedValues).map(
-                    (personnelType) => [personnelType, 0]
-                )
+                personnelTypes.map((personnelType) => [personnelType, 0])
             ),
         ])
     ) as TreatmentAssignment;
@@ -311,7 +310,7 @@ function calculateTreatmentAssignment(
         StrictObject.keys(personnel.assignedPatientIds)
             .filter((patientId) => treatmentAssignment[patientId])
             .forEach((patientId) => {
-                treatmentAssignment[patientId]![personnel.personnelType] +=
+                treatmentAssignment[patientId]![personnel.personnelType]! +=
                     1 / assignedPatientCount;
             });
     });
@@ -324,10 +323,10 @@ function evaluateTreatmentReassignment(
     newTreatmentAssignment: TreatmentAssignment
 ) {
     if (!draftState.previousTreatmentAssignment) return;
-
+    const personnelTypes = getPersonnelTypes(draftState);
     Object.keys(newTreatmentAssignment)
         .filter((patientId) =>
-            StrictObject.keys(personnelTypeAllowedValues).some(
+            personnelTypes.some(
                 (personnelType) =>
                     newTreatmentAssignment[patientId]![personnelType] !==
                     draftState.previousTreatmentAssignment![patientId]?.[
@@ -341,7 +340,10 @@ function evaluateTreatmentReassignment(
                 StrictObject.entries(newTreatmentAssignment[patientId]!)
                     .filter(([, count]) => count > 0)
                     .map(([personnelType]) =>
-                        createPersonnelTypeTag(draftState, personnelType)
+                        createPersonnelTypeTag(
+                            draftState,
+                            draftState.personnelTemplates[personnelType]!
+                        )
                     ),
                 `Diese Einsatzkräfte wurden dem Patienten neu zugeteilt: ${
                     StrictObject.entries(newTreatmentAssignment[patientId]!)
@@ -349,7 +351,8 @@ function evaluateTreatmentReassignment(
                         .map(
                             ([personnelType, count]) =>
                                 `${+count.toFixed(2)} ${
-                                    personnelTypeNames[personnelType]
+                                    draftState.personnelTemplates[personnelType]
+                                        ?.name ?? personnelType
                                 }`
                         )
                         .join(', ') || 'Keine Einsatzkräfte'

@@ -22,7 +22,6 @@ import { LeaderChangedEvent } from '../events/leader-changed.js';
 import type { ExerciseState } from '../../state.js';
 import { nextUUID } from '../utils/randomness.js';
 import { getCreate } from '../../models/utils/get-create.js';
-import type { PersonnelType } from '../../models/utils/personnel-type.js';
 import {
     currentSimulatedRegionIdOf,
     isInSimulatedRegion,
@@ -51,7 +50,7 @@ export class AssignLeaderBehaviorState implements SimulationBehaviorState {
     static readonly create = getCreate(this);
 }
 
-const personnelPriorities: { [Key in PersonnelType]: number } = {
+const personnelPriorities: { [Key in string]: number } = {
     notarzt: 0,
     san: 1,
     rettSan: 2,
@@ -198,17 +197,17 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                         personnel,
                                         (person) => person.personnelType
                                     );
-                                    personnelCount.gf =
+                                    personnelCount['gf'] =
                                         groupedPersonnel['gf']?.length ?? 0;
-                                    personnelCount.notSan =
+                                    personnelCount['notSan'] =
                                         groupedPersonnel['notSan']?.length ?? 0;
-                                    personnelCount.notarzt =
+                                    personnelCount['notarzt'] =
                                         groupedPersonnel['notarzt']?.length ??
                                         0;
-                                    personnelCount.rettSan =
+                                    personnelCount['rettSan'] =
                                         groupedPersonnel['rettSan']?.length ??
                                         0;
-                                    personnelCount.san =
+                                    personnelCount['san'] =
                                         groupedPersonnel['san']?.length ?? 0;
 
                                     radiogram.informationAvailable = true;
@@ -365,8 +364,8 @@ function selectNewLeader(
 
     personnel.sort(
         (a, b) =>
-            personnelPriorities[b.personnelType] -
-            personnelPriorities[a.personnelType]
+            (personnelPriorities[b.personnelType] ?? 0) -
+            (personnelPriorities[a.personnelType] ?? 0)
     );
     changeLeader(draftState, simulatedRegion, behaviorState, personnel[0]?.id);
 }

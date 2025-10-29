@@ -1,20 +1,23 @@
 import { Type } from 'class-transformer';
-import { IsNumber, Max, Min, ValidateNested } from 'class-validator';
+import { IsNumber, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
-import { IsLiteralUnion, IsValue } from '../utils/validators/index.js';
-import type { PersonnelType } from './utils/personnel-type.js';
-import { personnelTypeAllowedValues } from './utils/personnel-type.js';
+import { IsValue } from '../utils/validators/index.js';
 import { CanCaterFor } from './utils/cater-for.js';
 import { ImageProperties } from './utils/image-properties.js';
 import { getCreate } from './utils/get-create.js';
 
-// TODO: These are not (yet) saved in the state -> Decide whether they should and if not move this file from the models folder away
 export class PersonnelTemplate {
     @IsValue('personnelTemplate' as const)
     public readonly type = 'personnelTemplate';
 
-    @IsLiteralUnion(personnelTypeAllowedValues)
-    public readonly personnelType: PersonnelType;
+    @IsString()
+    public readonly personnelType: string;
+
+    @IsString()
+    public readonly name: string;
+
+    @IsString()
+    public readonly abbreviation: string = '';
 
     @ValidateNested()
     @Type(() => CanCaterFor)
@@ -46,17 +49,21 @@ export class PersonnelTemplate {
      * @deprecated Use {@link create} instead
      */
     constructor(
-        personnelType: PersonnelType,
+        personnelType: string,
+        name: string,
         image: ImageProperties,
         canCaterFor: CanCaterFor,
         overrideTreatmentRange: number,
-        treatmentRange: number
+        treatmentRange: number,
+        abbreviation: string = ''
     ) {
         this.personnelType = personnelType;
+        this.name = name;
         this.image = image;
         this.canCaterFor = canCaterFor;
         this.overrideTreatmentRange = overrideTreatmentRange;
         this.treatmentRange = treatmentRange;
+        this.abbreviation = abbreviation;
     }
 
     static readonly create = getCreate(this);

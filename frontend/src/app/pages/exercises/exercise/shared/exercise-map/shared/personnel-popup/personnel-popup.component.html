@@ -1,6 +1,6 @@
 <ng-container *ngIf="personnel$ | async as personnel">
     <h5 class="popover-header">
-        {{ personnel.personnelType | personnelName }}
+        {{ personnel.name }}
         von
         {{ personnel.vehicleName }}
         <button

@@ -1,7 +1,7 @@
 import type {
     PatientStatus,
-    PersonnelType,
     Vehicle,
+    Personnel,
 } from 'digital-fuesim-manv-shared';
 
 /**
@@ -26,7 +26,7 @@ export interface AreaStatistics {
      * The number of disembarked personnel that is not in transfer per personnelType.
      */
     readonly personnel: {
-        readonly [personnelType in PersonnelType]?: number;
+        readonly [personnelType in string]?: number;
     };
 
     readonly numberOfActiveParticipants: number;

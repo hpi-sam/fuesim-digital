@@ -5,10 +5,10 @@
     <div class="card-body px-1 pb-0 pt-2">
         <h6
             class="text-truncate"
-            [ngbTooltip]="personnelTypeNames[personnelTemplate.personnelType]"
+            [ngbTooltip]="personnelTemplate.name"
             placement="bottom"
         >
-            {{ personnelTypeNames[personnelTemplate.personnelType] }}
+            {{ personnelTemplate.name }}
         </h6>
     </div>
 </ng-container>

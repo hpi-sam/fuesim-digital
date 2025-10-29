@@ -10,17 +10,11 @@ import {
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import type { UUID, UUIDSet } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
-import {
-    IsLiteralUnion,
-    IsUUIDSet,
-    IsValue,
-} from '../utils/validators/index.js';
+import { IsUUIDSet, IsValue } from '../utils/validators/index.js';
 import { IsPosition } from '../utils/validators/is-position.js';
 import type { PersonnelTemplate } from './personnel-template.js';
-import type { PersonnelType } from './utils/index.js';
 import { CanCaterFor, ImageProperties, getCreate } from './utils/index.js';
 import type { Position } from './utils/position/position.js';
-import { personnelTypeAllowedValues } from './utils/personnel-type.js';
 
 export class Personnel {
     @IsUUID(4, uuidValidationOptions)
@@ -32,8 +26,14 @@ export class Personnel {
     @IsUUID(4, uuidValidationOptions)
     public readonly vehicleId: UUID;
 
-    @IsLiteralUnion(personnelTypeAllowedValues)
-    public readonly personnelType: PersonnelType;
+    @IsString()
+    public readonly personnelType: string;
+
+    @IsString()
+    public readonly name: string;
+
+    @IsString()
+    public readonly abbreviation: string = '';
 
     @IsString()
     public readonly vehicleName: string;
@@ -82,23 +82,27 @@ export class Personnel {
     constructor(
         vehicleId: UUID,
         vehicleName: string,
-        personnelType: PersonnelType,
+        personnelType: string,
+        name: string,
         assignedPatientIds: UUIDSet,
         image: ImageProperties,
         canCaterFor: CanCaterFor,
         treatmentRange: number,
         overrideTreatmentRange: number,
-        position: Position
+        position: Position,
+        abbreviation: string = ''
     ) {
         this.vehicleId = vehicleId;
         this.vehicleName = vehicleName;
         this.personnelType = personnelType;
+        this.name = name;
         this.assignedPatientIds = assignedPatientIds;
         this.image = image;
         this.canCaterFor = canCaterFor;
         this.treatmentRange = treatmentRange;
         this.overrideTreatmentRange = overrideTreatmentRange;
         this.position = position;
+        this.abbreviation = abbreviation;
     }
 
     static readonly create = getCreate(this);
@@ -113,12 +117,14 @@ export class Personnel {
             vehicleId,
             vehicleName,
             personnelTemplate.personnelType,
+            personnelTemplate.name,
             {},
             personnelTemplate.image,
             personnelTemplate.canCaterFor,
             personnelTemplate.treatmentRange,
             personnelTemplate.overrideTreatmentRange,
-            position
+            position,
+            personnelTemplate.abbreviation
         );
     }
 }

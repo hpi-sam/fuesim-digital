@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import type { PersonnelCountRadiogram, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
-import { createSelectRadiogram } from 'src/app/state/application/selectors/exercise.selectors';
+import { createSelectRadiogram, selectPersonnelTemplates } from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-radiogram-card-content-personnel-count',
@@ -17,13 +17,9 @@ export class RadiogramCardContentPersonnelCountComponent implements OnInit {
 
     radiogram$!: Observable<PersonnelCountRadiogram>;
 
-    readonly personnelCategories = [
-        'notarzt',
-        'notSan',
-        'rettSan',
-        'san',
-        'gf',
-    ] as const;
+    public readonly personnelTemplates$ = this.store.select(
+        selectPersonnelTemplates
+    );
 
     constructor(private readonly store: Store<AppState>) {}
 

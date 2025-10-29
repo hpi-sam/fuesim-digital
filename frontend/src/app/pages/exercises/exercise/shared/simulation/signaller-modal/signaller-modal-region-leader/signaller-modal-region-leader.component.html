@@ -1,6 +1,6 @@
 <ng-container *ngIf="leader$ | async as leader; else noLeader">
     Führungskraft:
-    <strong>{{ leader.personnelType | personnelName }}</strong>
+    <strong>{{ leader.name }}</strong>
     von
     <strong>{{ leader.vehicleName }}</strong>
 </ng-container>

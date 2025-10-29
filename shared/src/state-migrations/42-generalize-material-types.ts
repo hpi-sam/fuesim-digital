@@ -2,6 +2,16 @@ import type { UUID } from '../utils/index.js';
 import type { ImageProperties } from '../models/index.js';
 import type { Migration } from './migration-functions.js';
 
+interface PersonnelTemplate {
+    personnelType: PersonnelType;
+    name?: string;
+    abbreviation?: string;
+}
+interface Personnel {
+    personnelType: PersonnelType;
+    name?: string;
+    abbreviation?: string;
+}
 interface MaterialTemplate {
     materialType: MaterialType;
     name?: string;
@@ -13,15 +23,35 @@ interface Material {
 }
 interface VehicleParameters {
     materials: Material[];
-    // personnel: Personnel[];
+    personnel: Personnel[];
 }
 type MaterialType = 'big' | 'standard';
-
+type PersonnelType = 'gf' | 'notarzt' | 'notSan' | 'rettSan' | 'san';
 const materialTypeNames: {
     [key in MaterialType]: string;
 } = {
     big: 'Erweitertes Material',
     standard: 'Standardmaterial',
+};
+
+const personnelTypeAbbreviations: {
+    [Key in string]: string;
+} = {
+    gf: 'GF',
+    notarzt: 'NA',
+    notSan: 'NFS',
+    rettSan: 'RS',
+    san: 'San',
+};
+
+export const personnelTypeNames: {
+    [key in string]: string;
+} = {
+    gf: 'Gruppenführer',
+    notarzt: 'Notarzt',
+    notSan: 'Notfallsanitäter',
+    rettSan: 'Rettungssanitäter',
+    san: 'Sanitäter',
 };
 export const generalizeMaterialTypes42: Migration = {
     action: (_, action) => {
@@ -35,6 +65,11 @@ export const generalizeMaterialTypes42: Migration = {
                         ? 'standard'
                         : 'big';
                 material.name = materialTypeNames[material.materialType];
+            });
+            typedAction.vehicleParameters.personnel.forEach((personnel) => {
+                personnel.name = personnelTypeNames[personnel.personnelType];
+                personnel.abbreviation =
+                    personnelTypeAbbreviations[personnel.personnelType];
             });
         }
 
@@ -56,6 +91,15 @@ export const generalizeMaterialTypes42: Migration = {
                             materialTypeNames[material.materialType];
                     })
             );
+            Object.values(typedAction.sortedVehicleParameters).forEach(
+                (vehicleParameters) =>
+                    vehicleParameters.personnel.forEach((personnel) => {
+                        personnel.name =
+                            personnelTypeNames[personnel.personnelType];
+                        personnel.abbreviation =
+                            personnelTypeAbbreviations[personnel.personnelType];
+                    })
+            );
         }
 
         return true;
@@ -66,10 +110,10 @@ export const generalizeMaterialTypes42: Migration = {
                 [Key in MaterialType]: MaterialTemplate;
             };
             materials: { [key: UUID]: Material };
-            // personnelTemplates: {
-            //     [Key in PersonnelType]: PersonnelTemplate;
-            // };
-            // personnel: { [key: UUID]: Personnel };
+            personnelTemplates: {
+                [Key in PersonnelType]: PersonnelTemplate;
+            };
+            personnel: { [key: UUID]: Personnel };
         };
 
         Object.values(typedState.materialTemplates).forEach((template) => {
@@ -81,6 +125,16 @@ export const generalizeMaterialTypes42: Migration = {
                     ? 'standard'
                     : 'big';
             material.name = materialTypeNames[material.materialType];
+        });
+        Object.values(typedState.personnelTemplates).forEach((template) => {
+            template.name = personnelTypeNames[template.personnelType];
+            template.abbreviation =
+                personnelTypeAbbreviations[template.personnelType];
+        });
+        Object.values(typedState.personnel).forEach((personnel) => {
+            personnel.name = personnelTypeNames[personnel.personnelType];
+            personnel.abbreviation =
+                personnelTypeAbbreviations[personnel.personnelType];
         });
     },
 };

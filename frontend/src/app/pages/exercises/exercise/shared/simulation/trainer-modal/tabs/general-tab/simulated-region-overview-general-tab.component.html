@@ -96,17 +96,19 @@
                     ></ng-template>
                     Personal
                 </th>
-                <th class="w-25">{{ (personnel.all$ | async)?.length }}</th>
+                <th class="w-25">
+                    {{ ((personnel$ | async) ?? {})['all']?.length }}
+                </th>
             </tr>
             <tr
-                *ngFor="let personnelCategory of personnelCategories"
+                *ngFor="let template of personnelTemplates$ | async | values"
                 #collapse="ngbCollapse"
                 [(ngbCollapse)]="personnelCollapsed"
             >
-                <td class="ps-4">{{ personnelCategory | personnelName }}</td>
+                <td class="ps-4">{{ template.name }}</td>
                 <td>
                     {{
-                        (personnel[personnelCategory | withDollar] | async)
+                        ((personnel$ | async) ?? {})[template.personnelType]
                             ?.length
                     }}
                 </td>

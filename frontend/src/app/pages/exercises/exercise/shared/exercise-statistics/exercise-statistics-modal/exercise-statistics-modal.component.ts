@@ -4,9 +4,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
     PatientStatus,
-    PersonnelType,
     UUID,
     LogEntry,
+    Personnel,
 } from 'digital-fuesim-manv-shared';
 import { statusNames } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -136,7 +136,7 @@ export class ExerciseStatisticsModalComponent implements OnInit {
 
     // Personnel statistics
     private readonly personnelConfig: {
-        [key in PersonnelType]: { label: string; color: string };
+        [key in string]: { label: string; color: string };
     } = {
         // The order is important (the first key is at the bottom of the chart)
         // The colors are taken from bootstrap
@@ -170,9 +170,8 @@ export class ExerciseStatisticsModalComponent implements OnInit {
                         label,
                         data: statistics.map(
                             (statisticEntry) =>
-                                statisticEntry.value.personnel[
-                                    personnelType as PersonnelType
-                                ] ?? null
+                                statisticEntry.value.personnel[personnelType] ??
+                                null
                         ),
                         backgroundColor: color,
                     })

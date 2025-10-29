@@ -3,8 +3,8 @@ import { Component, Input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     PatientStatus,
-    PersonnelType,
     UUID,
+    PersonnelTemplate,
 } from 'digital-fuesim-manv-shared';
 import { Patient } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -33,7 +33,12 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
     @Input() cateringsActive!: boolean;
 
     public caterings$!: Observable<
-        { personnelType: PersonnelType; assignedPatientCount: number }[]
+        {
+            personnelType: string;
+            name: string;
+            abbreviation: string;
+            assignedPatientCount: number;
+        }[]
     >;
     public visibleStatus$?: Observable<PatientStatus>;
     public patient$!: Observable<Patient>;
@@ -58,6 +63,8 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
                             .filter((person) => person !== undefined)
                             .map((person) => ({
                                 personnelType: person.personnelType,
+                                name: person.name,
+                                abbreviation: person.abbreviation,
                                 assignedPatientCount: Object.values(
                                     person.assignedPatientIds
                                 ).length,

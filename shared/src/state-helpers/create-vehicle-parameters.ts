@@ -2,7 +2,7 @@ import type { Vehicle, VehicleTemplate } from '../models/index.js';
 import { VehicleParameters, Material, Personnel } from '../models/index.js';
 import type { MaterialTemplate } from '../models/material-template.js';
 import type { PersonnelTemplate } from '../models/personnel-template.js';
-import type { PersonnelType, MapCoordinates } from '../models/utils/index.js';
+import type { MapCoordinates } from '../models/utils/index.js';
 import { MapPosition } from '../models/utils/position/map-position.js';
 import { VehiclePosition } from '../models/utils/position/vehicle-position.js';
 
@@ -21,7 +21,7 @@ export function createVehicleParameters(
         [Key in string]: MaterialTemplate;
     },
     personnelTemplates: {
-        [Key in PersonnelType]: PersonnelTemplate;
+        [Key in string]: PersonnelTemplate;
     },
     vehiclePosition: MapCoordinates
 ): VehicleParameters {
@@ -38,7 +38,7 @@ export function createVehicleParameters(
         .filter((val) => val !== null);
     const personnel = vehicleTemplate.personnel.map((currentPersonnel) =>
         Personnel.generatePersonnel(
-            personnelTemplates[currentPersonnel],
+            personnelTemplates[currentPersonnel]!,
             vehicleId,
             vehicleTemplate.name,
             VehiclePosition.create(vehicleId)

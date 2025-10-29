@@ -1,7 +1,6 @@
 import type { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { personnelTypeNames } from 'digital-fuesim-manv-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import {
@@ -64,7 +63,7 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
                         id: simulatedRegion.id,
                         name: simulatedRegion.name,
                         hasLeader: true as const,
-                        leaderName: personnelTypeNames[leader.personnelType],
+                        leaderName: leader.name,
                         leaderVehicleName: leader.vehicleName,
                     };
                 })

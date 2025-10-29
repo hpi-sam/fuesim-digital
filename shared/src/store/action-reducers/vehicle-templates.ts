@@ -7,7 +7,6 @@ import {
     IsArray,
 } from 'class-validator';
 import { VehicleTemplate } from '../../models/index.js';
-import type { PersonnelType } from '../../models/utils/index.js';
 import { ImageProperties } from '../../models/utils/index.js';
 import type { ExerciseState } from '../../state.js';
 import type { Mutable, UUID } from '../../utils/index.js';
@@ -51,7 +50,7 @@ export class EditVehicleTemplateAction implements Action {
 
     @IsString({ each: true })
     @IsArray()
-    public readonly personnelTypes!: readonly PersonnelType[];
+    public readonly personnelTypes!: readonly string[];
 }
 
 export class DeleteVehicleTemplateAction implements Action {

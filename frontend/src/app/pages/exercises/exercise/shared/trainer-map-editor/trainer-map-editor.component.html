@@ -5,12 +5,12 @@
         </div>
         <div class="card col-3 p-0 rounded-0 rounded-end">
             <div class="card-header text-center">
-                <h5 class="mb-0 d-flex">
+                <h5 class="mb-0 d-flex align-items-center">
                     Editor
                     <span class="ms-auto">
-                        <label class="btn btn-outline-primary btn-sm ms-3">
+                        <label class="btn btn-outline-primary btn-sm">
                             <i class="bi-cloud-upload me-2"> </i>
-                            Vorlagen Importieren
+                            Vorlagen importieren
                             <span
                                 *ngIf="importingTemplates"
                                 class="spinner-border spinner-border-sm"
@@ -31,81 +31,46 @@
                 style="flex: auto; height: 0; overflow-y: auto"
             >
                 <li class="list-group-item">
-                    <h5>Ansicht/Transferpunkt</h5>
-                    <div
-                        class="overflow-auto w-100"
-                        style="white-space: nowrap"
-                    >
-                        <div
-                            class="d-inline-block card text-center"
-                            style="width: 10rem; text-overflow: ellipsis"
-                            (mousedown)="
-                                dragElementService.onMouseDown($event, {
-                                    type: 'viewport',
-                                    template: viewportTemplate,
-                                })
+                    <div class="form-check form-switch float-end">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            [ngModel]="
+                                transferLinesService.displayTransferLines
                             "
-                            data-cy="draggableViewportDiv"
-                        >
-                            <div class="preview-image-container bg-secondary">
-                                <img
-                                    [src]="viewportTemplate.image.url"
-                                    class="card-img-top"
-                                />
-                            </div>
-                            <div class="card-body">
-                                <h5
-                                    class="card-title text-truncate"
-                                    [title]="'Ansicht'"
-                                >
-                                    Ansicht
-                                </h5>
-                            </div>
-                        </div>
-                        <div
-                            class="d-inline-block card text-center"
-                            style="width: 10rem; text-overflow: ellipsis"
-                            (mousedown)="
-                                dragElementService.onMouseDown($event, {
-                                    type: 'transferPoint',
-                                    template: transferPointTemplate,
-                                })
-                            "
-                            data-cy="draggableTransferPointDiv"
-                        >
-                            <div class="preview-image-container">
-                                <img
-                                    [src]="transferPointTemplate.image.url"
-                                    class="card-img-top"
-                                />
-                            </div>
-                            <div class="card-body">
-                                <h5
-                                    class="card-title text-truncate"
-                                    [title]="'Transferpunkt'"
-                                >
-                                    Transferpunkt
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="p-2">
-                            <div class="form-check form-switch">
-                                <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    [ngModel]="
-                                        transferLinesService.displayTransferLines
-                                    "
-                                    (ngModelChange)="
-                                        changeDisplayTransferLines($event)
-                                    "
-                                />
-                                <label class="form-check-label"
-                                    >Verbindungen Anzeigen</label
-                                >
-                            </div>
-                        </div>
+                            (ngModelChange)="changeDisplayTransferLines($event)"
+                        />
+                        <label class="form-check-label">
+                            Verbindungen anzeigen
+                        </label>
                     </div>
+                    <h5>Ansicht/Transferpunkt</h5>
+                    <app-map-editor-card
+                        [title]="'Ansicht'"
+                        [imageUrl]="viewportTemplate.image.url"
+                        [darkBackground]="true"
+                        [dataCy]="'draggableViewportDiv'"
+                        (elementMousedown)="
+                            dragElementService.onMouseDown($event, {
+                                type: 'viewport',
+                                template: viewportTemplate,
+                            })
+                        "
+                    >
+                    </app-map-editor-card>
+
+                    <app-map-editor-card
+                        [title]="'Transferpunkt'"
+                        [imageUrl]="transferPointTemplate.image.url"
+                        [dataCy]="'draggableTransferPointDiv'"
+                        (elementMousedown)="
+                            dragElementService.onMouseDown($event, {
+                                type: 'transferPoint',
+                                template: transferPointTemplate,
+                            })
+                        "
+                    >
+                    </app-map-editor-card>
                 </li>
                 <li class="list-group-item">
                     <h5>Simulierte Bereiche</h5>
@@ -113,37 +78,22 @@
                         class="overflow-auto w-100"
                         style="white-space: nowrap"
                     >
-                        <div
+                        <app-map-editor-card
                             *ngFor="
                                 let simulatedRegionTemplate of simulatedRegionTemplates
                             "
-                            class="d-inline-block card text-center"
-                            style="width: 10rem; text-overflow: ellipsis"
-                            (mousedown)="
+                            (elementMousedown)="
                                 dragElementService.onMouseDown($event, {
                                     type: 'simulatedRegion',
                                     template: simulatedRegionTemplate,
                                 })
                             "
-                            data-cy="draggableSimulatedRegionDiv"
+                            [dataCy]="'draggableSimulatedRegionDiv'"
+                            [imageUrl]="simulatedRegionTemplate.image.url"
+                            [darkBackground]="true"
+                            [title]="simulatedRegionTemplate.stereotype.name"
                         >
-                            <div class="preview-image-container bg-secondary">
-                                <img
-                                    [src]="simulatedRegionTemplate.image.url"
-                                    class="card-img-top"
-                                />
-                            </div>
-                            <div class="card-body">
-                                <h5
-                                    class="card-title text-truncate"
-                                    [title]="'Simulierter Bereich'"
-                                >
-                                    {{
-                                        simulatedRegionTemplate.stereotype.name
-                                    }}
-                                </h5>
-                            </div>
-                        </div>
+                        </app-map-editor-card>
                     </div>
                 </li>
                 <li class="list-group-item">
@@ -165,7 +115,7 @@
                             white-space: nowrap;
                             flex-direction: column;
                             align-content: flex-start;
-                            height: 280px;
+                            height: 220px;
                         "
                     >
                         <div
@@ -174,68 +124,65 @@
                                     | async
                             "
                         >
-                            <div
+                            <app-map-editor-card
                                 *ngIf="
                                     patientCategory.name.firstField
                                         .colorCode === currentCategory
                                 "
-                                class="d-inline-block card text-center flex-shrink-0"
-                                style="
-                                    width: 10rem;
-                                    text-overflow: ellipsis;
-                                    height: 130px;
-                                "
-                                (mousedown)="
+                                (elementMousedown)="
                                     dragElementService.onMouseDown($event, {
                                         type: 'patient',
                                         template: patientCategory,
                                     })
                                 "
-                                data-cy="draggablePatientDiv"
+                                [dataCy]="'draggablePatientDiv'"
                             >
-                                <div
-                                    class="preview-image-container small-image card-img-top"
-                                >
-                                    <img [src]="patientCategory.image.url" />
-                                </div>
-                                <div
-                                    class="p-1 text-wrap lh-1 fs-5"
-                                    style="overflow: auto"
-                                >
-                                    <app-patient-status-display
-                                        [patientStatus]="patientCategory.name"
-                                    >
-                                    </app-patient-status-display>
-                                </div>
-                                <p
-                                    *ngIf="
-                                        patientCategory.patientTemplates
-                                            .length === 1
+                                <span
+                                    class="badge text-bg-secondary m-1"
+                                    style="
+                                        position: absolute;
+                                        top: 1px;
+                                        right: 1px;
                                     "
-                                >
-                                    Eine Variante
-                                </p>
-
-                                <p
-                                    *ngIf="
-                                        patientCategory.patientTemplates
-                                            .length > 1
-                                    "
-                                >
-                                    {{
+                                    [ngbTooltip]="
+            patientCategory.patientTemplates.length === 1 ? 'Eine Variante' : `${patientCategory.patientTemplates.length} Varianten`
+        "
+                                    >{{
                                         patientCategory.patientTemplates.length
-                                    }}
-                                    Varianten
-                                </p>
-                            </div>
+                                    }}</span
+                                >
+                                <div style="height: 100px">
+                                    <div
+                                        class="preview-image-container small-image d-flex justify-content-center"
+                                    >
+                                        <img
+                                            [src]="patientCategory.image.url"
+                                        />
+                                    </div>
+                                    <div
+                                        class="p-1 text-wrap lh-1 fs-5"
+                                        style="overflow: auto"
+                                    >
+                                        <app-patient-status-display
+                                            [patientStatus]="
+                                                patientCategory.name
+                                            "
+                                        >
+                                        </app-patient-status-display>
+                                    </div>
+                                </div>
+                            </app-map-editor-card>
                         </div>
                     </div>
                 </li>
                 <li class="list-group-item">
-                    <h5>
+                    <h5
+                        class="d-flex justify-content-between align-items-center"
+                    >
                         Fahrzeuge
+
                         <button
-                            class="ms-3 btn btn-sm btn-link text-decoration-none"
+                            class="btn btn-sm btn-outline-primary"
                             (click)="addVehicleTemplate()"
                         >
                             <i class="bi bi-plus"></i>
@@ -246,48 +193,31 @@
                         class="overflow-auto w-100"
                         style="white-space: nowrap"
                     >
-                        <div
+                        <app-map-editor-card
                             *ngFor="
                                 let vehicleTemplate of vehicleTemplates$ | async
                             "
-                            class="d-inline-block card text-center"
-                            style="width: 10rem; text-overflow: ellipsis"
-                            (mousedown)="
+                            (elementMousedown)="
                                 vehicleOnMouseDown($event, vehicleTemplate)
                             "
-                            data-cy="draggableVehicleDiv"
+                            [dataCy]="'draggableVehicleDiv'"
+                            [imageUrl]="vehicleTemplate.image.url"
+                            (elementEdit)="
+                                editVehicleTemplate(vehicleTemplate.id)
+                            "
+                            [enableEditButton]="true"
+                            [title]="vehicleTemplate.vehicleType"
                         >
-                            <div class="preview-image-container card-img-top">
-                                <img [src]="vehicleTemplate.image.url" />
-                            </div>
-
-                            <!-- (mousedown) instead of (click) to be able to stop the propagation-->
-                            <button
-                                (mousedown)="
-                                    editVehicleTemplate(vehicleTemplate.id);
-                                    $event.stopPropagation()
-                                "
-                                class="btn btn-outline-warning position-absolute"
-                                style="top: 0; right: 0"
-                            >
-                                <i class="bi bi-pencil-fill"></i>
-                            </button>
-                            <div class="card-body">
-                                <h5
-                                    class="card-title text-truncate"
-                                    [title]="vehicleTemplate.vehicleType"
-                                >
-                                    {{ vehicleTemplate.vehicleType }}
-                                </h5>
-                            </div>
-                        </div>
+                        </app-map-editor-card>
                     </div>
                 </li>
                 <li class="list-group-item">
-                    <h5>
+                    <h5
+                        class="d-flex justify-content-between align-items-center"
+                    >
                         Bilder
                         <button
-                            class="ms-3 btn btn-sm btn-link text-decoration-none"
+                            class="btn btn-sm btn-outline-primary"
                             (click)="addImageTemplate()"
                         >
                             <i class="bi bi-plus"></i>
@@ -298,45 +228,26 @@
                         class="overflow-auto w-100"
                         style="white-space: nowrap"
                     >
-                        <div
+                        <app-map-editor-card
                             *ngFor="
                                 let mapImageTemplate of mapImageTemplates$
                                     | async
                             "
-                            class="d-inline-block card text-center"
-                            style="width: 10rem; text-overflow: ellipsis"
-                            (mousedown)="
+                            (elementMousedown)="
                                 dragElementService.onMouseDown($event, {
                                     type: 'mapImage',
                                     template: mapImageTemplate,
                                 })
                             "
-                            data-cy="draggableMapImageDiv"
+                            (elementEdit)="
+                                editMapImageTemplate(mapImageTemplate.id)
+                            "
+                            [dataCy]="'draggableMapImageDiv'"
+                            [imageUrl]="mapImageTemplate.image.url"
+                            [title]="mapImageTemplate.name"
+                            [enableEditButton]="true"
                         >
-                            <div class="preview-image-container card-img-top">
-                                <img [src]="mapImageTemplate.image.url" />
-                            </div>
-
-                            <!-- (mousedown) instead of (click) to be able to stop the propagation-->
-                            <button
-                                (mousedown)="
-                                    editMapImageTemplate(mapImageTemplate.id);
-                                    $event.stopPropagation()
-                                "
-                                class="btn btn-outline-warning position-absolute"
-                                style="top: 0; right: 0"
-                            >
-                                <i class="bi bi-pencil-fill"></i>
-                            </button>
-                            <div class="card-body">
-                                <h5
-                                    class="card-title text-truncate"
-                                    [title]="mapImageTemplate.name"
-                                >
-                                    {{ mapImageTemplate.name }}
-                                </h5>
-                            </div>
-                        </div>
+                        </app-map-editor-card>
                         <span
                             *ngIf="
                                 (mapImageTemplates$ | async | keyvalue)

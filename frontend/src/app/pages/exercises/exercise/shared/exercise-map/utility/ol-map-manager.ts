@@ -36,6 +36,7 @@ import {
     isInViewport,
     ViewportFeatureManager,
 } from '../feature-managers/viewport-feature-manager';
+import { RestrictedZoneFeatureManager } from '../feature-managers/restricted-zone-feature-manager';
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
@@ -304,6 +305,13 @@ export class OlMapManager {
             this.olMap
         );
 
+        const restrictedZoneFeatureMananger = new RestrictedZoneFeatureManager(
+            this.olMap,
+            this.exerciseService,
+            this.store,
+            this.popupService
+        );
+
         const viewportFeatureManager = new ViewportFeatureManager(
             this.olMap,
             this.exerciseService,
@@ -328,6 +336,7 @@ export class OlMapManager {
 
         this.featureManagers = [
             deleteFeatureManager,
+            restrictedZoneFeatureMananger,
             transferLinesFeatureManager,
             simulatedRegionFeatureManager,
             mapImageFeatureManager,
@@ -375,6 +384,10 @@ export class OlMapManager {
         this.featureNameFeatureManagerDictionary.set(
             'viewport',
             viewportFeatureManager
+        );
+        this.featureNameFeatureManagerDictionary.set(
+            'restrictedZone',
+            restrictedZoneFeatureMananger
         );
         this.featureNameFeatureManagerDictionary.set(
             'delete',

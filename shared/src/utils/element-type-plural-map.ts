@@ -8,6 +8,7 @@ export const elementTypePluralMap = {
     alarmGroup: 'alarmGroups',
     client: 'clients',
     hospital: 'hospitals',
+    restrictedZone: 'restrictedZones',
     mapImage: 'mapImages',
     material: 'materials',
     patient: 'patients',

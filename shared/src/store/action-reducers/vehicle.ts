@@ -16,6 +16,9 @@ import {
     type MapCoordinates,
     VehicleParameters,
     mapCoordinatesSchema,
+    newVehiclePositionIn,
+    RestrictedZone,
+    newSimulatedRegionPositionIn,
 } from '../../models/index.js';
 import {
     changePosition,
@@ -42,10 +45,6 @@ import {
     VehicleRemovedEvent,
 } from '../../simulation/index.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import {
-    newVehiclePositionIn,
-    newSimulatedRegionPositionIn,
-} from '../../models/index.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
 import { getElement } from './utils/index.js';
@@ -113,6 +112,18 @@ export function deleteVehicle(
         );
     }
 
+    if (vehicle.restrictedZoneId !== undefined) {
+        const restrictedZone = getElement(
+            draftState,
+            'restrictedZone',
+            vehicle.restrictedZoneId
+        );
+        restrictedZone.vehicleIds = restrictedZone.vehicleIds.filter(
+            (restrictedZoneVehicleId) => restrictedZoneVehicleId !== vehicleId
+        );
+        vehicle.restrictedZoneId = undefined;
+    }
+
     // Delete the vehicle
     delete draftState.vehicles[vehicleId];
 }
@@ -124,6 +135,16 @@ export class AddVehicleAction implements Action {
     @ValidateNested()
     @Type(() => VehicleParameters)
     public readonly vehicleParameters!: VehicleParameters;
+}
+
+export class AssignRestrictedZoneToVehicleAction implements Action {
+    @IsValue('[Vehicle] Assign restricted zone to vehicle' as const)
+    public readonly type = '[Vehicle] Assign restricted zone to vehicle';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly vehicleId!: UUID;
+    @IsUUID(4, uuidValidationOptions)
+    public readonly restrictedZoneId!: UUID;
 }
 
 export class RenameVehicleAction implements Action {
@@ -200,6 +221,17 @@ export class RemoveVehicleFromSimulatedRegionAction implements Action {
     public readonly simulatedRegionId!: UUID;
 }
 
+export class RemoveVehicleFromRestrictedZoneAction implements Action {
+    @IsValue('[Vehicle] Remove from restricted zone' as const)
+    public readonly type = '[Vehicle] Remove from restricted zone';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly vehicleId!: UUID;
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly restrictedZoneId!: UUID;
+}
+
 export class SetVehicleOccupationAction implements Action {
     @IsValue('[Vehicle] Set occupation' as const)
     public readonly type = '[Vehicle] Set occupation';
@@ -209,6 +241,25 @@ export class SetVehicleOccupationAction implements Action {
 
     @IsZodSchema(exerciseOccupationSchema)
     public readonly occupation!: ExerciseOccupation;
+}
+
+function removeVehicleFromCurrentRestrictedZone(
+    draftState: Mutable<ExerciseState>,
+    vehicleId: UUID
+) {
+    const vehicle = getElement(draftState, 'vehicle', vehicleId);
+
+    if (vehicle.restrictedZoneId !== undefined) {
+        const restrictedZone = getElement(
+            draftState,
+            'restrictedZone',
+            vehicle.restrictedZoneId
+        );
+        restrictedZone.vehicleIds = restrictedZone.vehicleIds.filter(
+            (restrictedZoneVehicleId) => restrictedZoneVehicleId !== vehicleId
+        );
+        vehicle.restrictedZoneId = undefined;
+    }
 }
 
 export namespace VehicleActionReducers {
@@ -267,15 +318,72 @@ export namespace VehicleActionReducers {
         rights: 'trainer',
     };
 
+    export const assignRestrictedZoneToVehicle: ActionReducer<AssignRestrictedZoneToVehicleAction> =
+        {
+            action: AssignRestrictedZoneToVehicleAction,
+            reducer: (draftState, { vehicleId, restrictedZoneId }) => {
+                const vehicle = getElement(draftState, 'vehicle', vehicleId);
+
+                if (vehicle.restrictedZoneId === restrictedZoneId) {
+                    return draftState;
+                }
+
+                if (vehicle.restrictedZoneId) {
+                    const oldRestrictedZone = getElement(
+                        draftState,
+                        'restrictedZone',
+                        vehicle.restrictedZoneId
+                    );
+                    oldRestrictedZone.vehicleIds =
+                        oldRestrictedZone.vehicleIds.filter(
+                            (id) => id !== vehicleId
+                        );
+                }
+
+                vehicle.restrictedZoneId = restrictedZoneId;
+                const restrictedZone = getElement(
+                    draftState,
+                    'restrictedZone',
+                    restrictedZoneId
+                );
+                restrictedZone.vehicleIds = [
+                    ...restrictedZone.vehicleIds,
+                    vehicleId,
+                ];
+                return draftState;
+            },
+            rights: 'participant',
+        };
+
     export const moveVehicle: ActionReducer<MoveVehicleAction> = {
         action: MoveVehicleAction,
         reducer: (draftState, { vehicleId, targetPosition }) => {
+            const vehicle = getElement(draftState, 'vehicle', vehicleId);
             changePositionWithId(
                 vehicleId,
                 newMapPositionAt(targetPosition),
                 'vehicle',
                 draftState
             );
+
+            if (vehicle.restrictedZoneId !== undefined) {
+                const restrictedZone = getElement(
+                    draftState,
+                    'restrictedZone',
+                    vehicle.restrictedZoneId
+                );
+                if (
+                    !RestrictedZone.isInRestrictedZone(
+                        restrictedZone,
+                        targetPosition
+                    )
+                ) {
+                    removeVehicleFromCurrentRestrictedZone(
+                        draftState,
+                        vehicleId
+                    );
+                }
+            }
             return draftState;
         },
         rights: 'participant',
@@ -581,6 +689,16 @@ export namespace VehicleActionReducers {
                 return draftState;
             },
             rights: 'trainer',
+        };
+
+    export const removeVehicleFromRestrictedZone: ActionReducer<RemoveVehicleFromRestrictedZoneAction> =
+        {
+            action: RemoveVehicleFromRestrictedZoneAction,
+            reducer: (draftState, { vehicleId }) => {
+                removeVehicleFromCurrentRestrictedZone(draftState, vehicleId);
+                return draftState;
+            },
+            rights: 'participant',
         };
 
     export const setVehicleOccupation: ActionReducer<SetVehicleOccupationAction> =

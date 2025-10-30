@@ -24,3 +24,7 @@ export * from './log-entry.js';
 export * from './tag.js';
 export { MaterialTemplate } from './material-template.js';
 export { PersonnelTemplate } from './personnel-template.js';
+export {
+    RestrictedZone,
+    type VehicleRestrictionType,
+} from './restricted-zone.js';

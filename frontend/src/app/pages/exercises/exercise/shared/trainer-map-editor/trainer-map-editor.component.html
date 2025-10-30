@@ -138,6 +138,50 @@
                         </div>
                     </div>
                 </div>
+                <div ngbAccordionItem="restrictedZones">
+                    <h5 ngbAccordionHeader>
+                        <button
+                            ngbAccordionButton
+                            data-cy="restrictedZonesAccordionButton"
+                        >
+                            Zonen
+                        </button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="cards">
+                                    @for (
+                                        restrictedZoneTemplate of restrictedZoneTemplates;
+                                        track restrictedZoneTemplate
+                                    ) {
+                                        <app-map-editor-card
+                                            (elementMousedown)="
+                                                dragElementService.onMouseDown(
+                                                    $event,
+                                                    {
+                                                        type: 'restrictedZone',
+                                                        template:
+                                                            restrictedZoneTemplate,
+                                                    }
+                                                )
+                                            "
+                                            dataCy="draggablerestrictedZoneDiv"
+                                            [imageUrl]="
+                                                restrictedZoneTemplate.image.url
+                                            "
+                                            [darkBackground]="true"
+                                            [title]="
+                                                restrictedZoneTemplate
+                                                    .stereotype.name
+                                            "
+                                        />
+                                    }
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
                 <div ngbAccordionItem="patients">
                     <h5 ngbAccordionHeader>
                         <button

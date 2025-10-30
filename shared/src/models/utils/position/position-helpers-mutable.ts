@@ -37,6 +37,7 @@ type MovableType =
     | 'material'
     | 'patient'
     | 'personnel'
+    | 'restrictedZone'
     | 'simulatedRegion'
     | 'transferPoint'
     | 'vehicle'

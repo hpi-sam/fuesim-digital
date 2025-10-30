@@ -18,6 +18,7 @@ import {
     EocLogEntry,
     Hospital,
     HospitalPatient,
+    RestrictedZone,
     MapImage,
     MapImageTemplate,
     Material,
@@ -98,6 +99,9 @@ export class ExerciseState {
     public readonly patients: { readonly [key: UUID]: Patient } = {};
     @IsIdMap(Material)
     public readonly materials: { readonly [key: UUID]: Material } = {};
+    @IsIdMap(RestrictedZone)
+    public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
+        {};
     @IsIdMap(MapImage)
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
     @IsIdMap(TransferPoint)
@@ -191,5 +195,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 44;
+    static readonly currentStateVersion = 45;
 }

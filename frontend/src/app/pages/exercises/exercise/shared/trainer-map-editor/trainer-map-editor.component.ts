@@ -28,6 +28,7 @@ import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-
 import { openPartialImportOverwriteModal } from '../partial-import/open-partial-import-overwrite-modal';
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
 import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
+import { restrictedZoneDragTemplates } from '../editor-panel/templates/restricted-zone';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -118,6 +119,8 @@ export class TrainerMapEditorComponent implements OnInit {
     ) {}
 
     public readonly simulatedRegionTemplates = simulatedRegionDragTemplates;
+
+    public readonly restrictedZoneTemplates = restrictedZoneDragTemplates;
 
     public readonly viewportTemplate = {
         image: Viewport.image,

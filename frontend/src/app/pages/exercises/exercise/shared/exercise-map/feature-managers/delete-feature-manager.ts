@@ -133,6 +133,13 @@ export class DeleteFeatureManager implements FeatureManager<Point> {
                 });
                 return true;
             }
+            case 'restrictedZone': {
+                this.exerciseService.proposeAction({
+                    type: '[RestrictedZone] Remove restricted zone',
+                    restrictedZoneId: id,
+                });
+                return true;
+            }
             default: {
                 return false;
             }

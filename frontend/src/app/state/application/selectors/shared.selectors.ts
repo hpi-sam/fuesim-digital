@@ -9,6 +9,7 @@ import type {
     UUID,
     Vehicle,
     WithPosition,
+    RestrictedZone,
 } from 'digital-fuesim-manv-shared';
 import {
     currentCoordinatesOf,
@@ -21,6 +22,7 @@ import type { AppState } from '../../app.state';
 import { selectOwnClientId } from './application.selectors';
 import {
     selectClients,
+    selectRestrictedZone,
     selectMapImages,
     selectMaterials,
     selectPatients,
@@ -117,6 +119,8 @@ export const selectVisibleTransferPoints =
     selectVisibleElementsFactory<TransferPoint>(selectTransferPoints);
 export const selectVisibleSimulatedRegions =
     selectVisibleElementsFactory<SimulatedRegion>(selectSimulatedRegions);
+export const selectVisibleRestrictedZone =
+    selectVisibleElementsFactory<RestrictedZone>(selectRestrictedZone);
 
 export const selectVisibleCateringLines = createSelector(
     selectRestrictedViewport,

@@ -46,7 +46,7 @@
         "pg": "^8.14.1",
         "socket.io": "^4.8.1",
         "supertest": "^7.1.0",
-        "typeorm": "^0.3.22"
+        "typeorm": "^0.3.26"
     },
     "devDependencies": {
         "@eslint/compat": "^1.4.0",

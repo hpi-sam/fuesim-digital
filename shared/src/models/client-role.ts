@@ -15,12 +15,12 @@ export class ClientRole {
     public readonly mainRole: Role;
 
     @IsLiteralUnion(specificRolesAllowedValues)
-    public readonly specificRole: SpecificRole | null;
+    public readonly specificRole: SpecificRole;
 
     /**
      * @deprecated Use {@link create} instead
      */
-    constructor(mainRole: Role, specificRole: SpecificRole | null) {
+    constructor(mainRole: Role, specificRole: SpecificRole) {
         this.mainRole = mainRole;
         this.specificRole = specificRole;
     }

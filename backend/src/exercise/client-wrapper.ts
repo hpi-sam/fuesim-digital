@@ -33,7 +33,7 @@ export class ClientWrapper {
             clientName,
             ClientRole.create(
                 role,
-                role === 'participant' ? 'map-operator' : role
+                role === 'trainer' ? 'trainer' : 'map-operator'
             ),
             undefined
         );

@@ -1,5 +1,5 @@
 export class DatabaseError extends Error {
-    constructor(
+    public constructor(
         message: string,
         private readonly innerError?: Error
     ) {

@@ -36,6 +36,11 @@ export default defineConfig([
         plugins: {
             unicorn,
         },
+
+        rules: {
+            // TODO: Temporarily disabled, see #1121
+            '@typescript-eslint/explicit-member-accessibility': 'off',
+        },
     },
     {
         files: ['**/*.js'],

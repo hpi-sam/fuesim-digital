@@ -17,7 +17,7 @@ export class BenchmarkStep<
         ? T
         : never,
 > extends Step<State, Name, State[Name]> {
-    constructor(
+    public constructor(
         name: Name,
         /**
          * Will be run multiple times and must therefore be deterministic

@@ -50,6 +50,11 @@ export default defineConfig([
         },
 
         processor: angular.processInlineTemplates,
+
+        rules: {
+            // TODO: Temporarily disabled, see #1121
+            '@typescript-eslint/explicit-member-accessibility': 'off',
+        },
     },
     {
         files: ['**/*.js', 'cypress.config.ts'],

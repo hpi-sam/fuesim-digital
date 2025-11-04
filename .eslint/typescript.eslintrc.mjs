@@ -285,12 +285,7 @@ export default {
         ],
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
-        '@typescript-eslint/explicit-member-accessibility': [
-            'off',
-            {
-                accessibility: 'explicit',
-            },
-        ],
+        '@typescript-eslint/explicit-member-accessibility': 'warn',
         '@typescript-eslint/member-ordering': [
             'warn',
             {
@@ -405,12 +400,6 @@ export default {
         '@typescript-eslint/no-useless-constructor': ['warn'],
         '@typescript-eslint/require-await': ['off'],
         '@typescript-eslint/return-await': ['warn'],
-        '@typescript-eslint/explicit-member-accessibility': [
-            'off',
-            {
-                accessibility: 'explicit',
-            },
-        ],
         '@typescript-eslint/no-inferrable-types': [
             'warn',
             {

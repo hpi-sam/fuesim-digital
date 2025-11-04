@@ -16,38 +16,38 @@ export class ExerciseWrapperEntity extends BaseEntity<
         default: 0,
     })
     @IsInt()
-    tickCounter = 0;
+    public tickCounter = 0;
 
     @Column({
         type: 'json',
     })
     @IsJSON()
-    initialStateString!: string;
+    public initialStateString!: string;
 
     @Column({ type: 'char', length: 6 })
     @IsString()
     @MinLength(6)
     @MaxLength(6)
-    participantId!: string;
+    public participantId!: string;
 
     @Column({ type: 'char', length: 8 })
     @IsString()
     @MinLength(8)
     @MaxLength(8)
-    trainerId!: string;
+    public trainerId!: string;
 
     @Column({
         type: 'json',
     })
     @IsJSON()
-    currentStateString!: string;
+    public currentStateString!: string;
 
     @Column({ type: 'integer', default: 0 })
     @IsInt()
-    stateVersion!: number;
+    public stateVersion!: number;
 
     // This is not used by typeorm as this would clash with the approach of not saving every action in RAM.
-    actions?: ActionWrapperEntity[];
+    public actions?: ActionWrapperEntity[];
 
     private constructor() {
         super();
@@ -57,11 +57,11 @@ export class ExerciseWrapperEntity extends BaseEntity<
      * Be very careful when using this. - Use {@link create} instead for most use cases.
      * This method does not guarantee a valid entity.
      */
-    static createNew() {
+    public static createNew() {
         return new ExerciseWrapperEntity();
     }
 
-    static async create(
+    public static async create(
         participantId: string,
         trainerId: string,
         databaseService: DatabaseService,

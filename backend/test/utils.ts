@@ -50,7 +50,7 @@ type AllServerToClientEvents = MergeIntersection<
 type ExerciseClientSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 export class WebsocketClient {
-    constructor(private readonly socket: ExerciseClientSocket) {}
+    public constructor(private readonly socket: ExerciseClientSocket) {}
 
     public async emit<
         EventKey extends keyof ClientToServerEvents,

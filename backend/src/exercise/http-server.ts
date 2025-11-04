@@ -18,7 +18,7 @@ export class ExerciseHttpServer {
     /**
      * @param uploadLimit in Megabyte can be set via ENV DFM_UPLOAD_LIMIT
      */
-    constructor(app: Express, databaseService: DatabaseService) {
+    public constructor(app: Express, databaseService: DatabaseService) {
         // TODO: Temporary allow all
         app.use(cors());
 

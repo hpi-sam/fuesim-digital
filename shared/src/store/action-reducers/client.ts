@@ -3,8 +3,10 @@ import { IsBoolean, IsOptional, IsUUID, ValidateNested } from 'class-validator';
 import { Client } from '../../models/client.js';
 import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
+import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
+import type { SpecificRole } from '../../models/utils/role.js';
+import { specificRolesAllowedValues } from '../../models/utils/role.js';
 import { getElement } from './utils/get-element.js';
 
 export class AddClientAction implements Action {
@@ -39,6 +41,15 @@ export class SetWaitingRoomAction implements Action {
     public readonly clientId!: UUID;
     @IsBoolean()
     public readonly shouldBeInWaitingRoom!: boolean;
+}
+
+export class ChangeSpecificClientRoleAction implements Action {
+    @IsValue('[Client] Change specific client role' as const)
+    public readonly type = '[Client] Change specific client role';
+    @IsUUID(4, uuidValidationOptions)
+    public readonly clientId!: UUID;
+    @IsLiteralUnion(specificRolesAllowedValues)
+    public readonly newRole!: SpecificRole;
 }
 
 export namespace ClientActionReducers {
@@ -86,4 +97,15 @@ export namespace ClientActionReducers {
         },
         rights: 'trainer',
     };
+
+    export const changeSpecificClientRole: ActionReducer<ChangeSpecificClientRoleAction> =
+        {
+            action: ChangeSpecificClientRoleAction,
+            reducer: (draftState, { clientId, newRole }) => {
+                const client = getElement(draftState, 'client', clientId);
+                client.role.specificRole = newRole;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
 }

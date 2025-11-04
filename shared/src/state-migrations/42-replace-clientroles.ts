@@ -21,7 +21,7 @@ function migrateClientRole(oldRole: OldRole): ClientRole {
     };
 }
 
-export const addPatientTransportPriority41: Migration = {
+export const replaceClientRoles42: Migration = {
     action: (_, action) => {
         if ((action as { type: string }).type === '[Client] Add client') {
             const client = (action as { client: Client }).client;

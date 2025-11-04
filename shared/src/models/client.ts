@@ -47,7 +47,12 @@ export class Client {
         this.name = name;
         this.role = role;
         this.viewRestrictedToViewportId = viewRestrictedToViewportId;
-        this.isInWaitingRoom = this.role.mainRole === 'participant';
+        this.isInWaitingRoom =
+            // class-transformer likes to pass undefined here
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            this.role !== undefined
+                ? this.role.mainRole === 'participant'
+                : true;
     }
 
     static readonly create = getCreate(this);

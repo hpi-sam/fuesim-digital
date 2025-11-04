@@ -601,6 +601,48 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             <small>Reviewer <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
         </td>
+        <td style="text-align: center">
+            <a href="https://github.com/Tim-08">
+                <img
+                    src="https://avatars.githubusercontent.com/u/64322264?v=4?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>Tim Siemer</b></sub>
+            </a>
+            <br />
+            💻
+            <br />
+            <small>Student 2025<small>
+        </td>
+        <td style="text-align: center">
+            <a href="https://github.com/CmdShiftMarkus">
+                <img
+                    src="https://avatars.githubusercontent.com/u/58256184?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>CmdShiftMarkus</b></sub>
+            </a>
+            <br />
+            💻
+            <br />
+            <small>Student 2025<small>
+        </td>
+            <td style="text-align: center">
+            <a href="https://github.com/polarfuchs23">
+                <img
+                    src="https://avatars.githubusercontent.com/u/73428431?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>polarfuchs23</b></sub>
+            </a>
+            <br />
+            💻
+            <br />
+            <small>Student 2025<small>
+        </td>
     </tr>
 </table>
 <!-- markdownlint-restore -->

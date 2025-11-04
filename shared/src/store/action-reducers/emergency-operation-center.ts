@@ -121,7 +121,12 @@ export namespace EmergencyOperationCenterActionReducers {
                 );
                 logEntry += ` Die ersten ${firstVehiclesCount} Fahrzeuge wurden zu ${firstVehiclesTargetTransferPoint.externalName} alarmiert!`;
 
-                for (let i = 0; i < firstVehiclesCount; i++) {
+                for (
+                    let i = 0;
+                    i < firstVehiclesCount &&
+                    i < sortedVehicleParameters.length;
+                    i++
+                ) {
                     sendAlarmGroupVehicle(
                         draftState,
                         sortedVehicleParameters[i]!,

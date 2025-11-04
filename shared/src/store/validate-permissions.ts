@@ -19,9 +19,21 @@ export function validatePermissions(
 ) {
     const rights = exerciseActionTypeDictionary[action.type].rights;
 
-    if (rights === 'server') return false;
-    if (rights === client.role.mainRole || rights === client.role.specificRole)
+    if (rights === 'server') {
+        return false;
+    }
+    if (
+        client.role.mainRole === 'participant' &&
+        (rights === 'participant' || rights === client.role.specificRole)
+    ) {
         return true;
+    }
+    if (
+        client.role.mainRole === 'trainer' ||
+        client.role.specificRole === rights
+    ) {
+        return true;
+    }
 
     return false;
 }

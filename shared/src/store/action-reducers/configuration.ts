@@ -38,6 +38,23 @@ export class SetPatientIdentifierPrefixAction implements Action {
     public readonly patientIdentifierPrefix!: string;
 }
 
+export class SetVehicleStatusHighlightEnabled implements Action {
+    @IsValue('[Configuration] Set vehicleStatusHighlightEnabled' as const)
+    public readonly type = '[Configuration] Set vehicleStatusHighlightEnabled';
+
+    @IsBoolean()
+    public readonly vehicleStatusHighlightEnabled!: boolean;
+}
+
+export class SetVehicleStatusInSkColorEnabled implements Action {
+    @IsValue('[Configuration] Set SetVehicleStatusInSkColorEnabled' as const)
+    public readonly type =
+        '[Configuration] Set SetVehicleStatusInSkColorEnabled';
+
+    @IsBoolean()
+    public readonly vehicleStatusInSkColorEnabled!: boolean;
+}
+
 export namespace ConfigurationActionReducers {
     export const setTileMapProperties: ActionReducer<SetTileMapPropertiesAction> =
         {
@@ -76,6 +93,28 @@ export namespace ConfigurationActionReducers {
             reducer(draftState, { patientIdentifierPrefix }) {
                 draftState.configuration.patientIdentifierPrefix =
                     patientIdentifierPrefix;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setVehicleStatusHighlight: ActionReducer<SetVehicleStatusHighlightEnabled> =
+        {
+            action: SetVehicleStatusHighlightEnabled,
+            reducer(draftState, { vehicleStatusHighlightEnabled }) {
+                draftState.configuration.vehicleStatusHighlight =
+                    vehicleStatusHighlightEnabled;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setVehicleStatusInSkColor: ActionReducer<SetVehicleStatusInSkColorEnabled> =
+        {
+            action: SetVehicleStatusInSkColorEnabled,
+            reducer(draftState, { vehicleStatusInSkColorEnabled }) {
+                draftState.configuration.vehicleStatusInSkColor =
+                    vehicleStatusInSkColorEnabled;
                 return draftState;
             },
             rights: 'trainer',

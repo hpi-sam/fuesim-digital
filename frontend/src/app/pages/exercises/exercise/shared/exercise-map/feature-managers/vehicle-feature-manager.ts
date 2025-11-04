@@ -14,7 +14,12 @@ import type { Subject } from 'rxjs';
 import type { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { selectVisibleVehicles } from 'src/app/state/application/selectors/shared.selectors';
-import { Fill, Stroke } from 'ol/style';
+import { Fill, Stroke, Style, Text as OlText } from 'ol/style';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import {
+    selectConfiguration,
+    selectExerciseState,
+} from 'src/app/state/application/selectors/exercise.selectors';
 import { VehiclePopupComponent } from '../shared/vehicle-popup/vehicle-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
@@ -98,6 +103,15 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
                 this.nameStyleHelper.getStyle(feature as Feature, resolution),
                 this.imageStyleHelper.getStyle(feature as Feature, resolution),
             ];
+
+            // Statusbar-Styles hinzufügen (ohne Zeitangabe)
+            const statusBarStyle = this.statusBarStyleHelper(
+                feature as Feature
+            );
+            if (statusBarStyle) {
+                styles.push(...statusBarStyle);
+            }
+
             this.addMarking(
                 feature,
                 styles,
@@ -174,4 +188,99 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             )
         );
     }
+
+    /**
+     * Erzeugt die Statusbar-Styles für ein Fahrzeug-Feature.
+     * Zeigt Belegung (filled/capacity) und färbt optional nach kritischster Patienten-SK.
+     * Keine Zeitangabe.
+     */
+    private readonly statusBarStyleHelper = (
+        feature: Feature<any>
+    ): Style[] | undefined => {
+        const config = selectStateSnapshot(selectConfiguration, this.store);
+        if (!config.vehicleStatusHighlight) {
+            return undefined;
+        }
+
+        const vehicle = this.getElementFromFeature(feature) as Vehicle;
+        if (vehicle.patientCapacity <= 0) {
+            return undefined;
+        }
+
+        const filled = Object.keys(vehicle.patientIds).length;
+        const text = `${filled}/${vehicle.patientCapacity}`;
+
+        // Farben bestimmen (optional nach kritischster SK)
+        let backgroundColor = 'rgba(255, 255, 255, 0.85)';
+        let backgroundStroke = 'rgb(255, 255, 255)';
+        let color = 'black';
+
+        if (config.vehicleStatusInSkColor && filled > 0) {
+            const state = selectStateSnapshot(selectExerciseState, this.store);
+            const patients = Object.keys(vehicle.patientIds)
+                .map((id) => state.patients[id])
+                .filter(Boolean);
+
+            // Sichtbarer Status je Konfiguration
+            const getStatus = (p: any) =>
+                config.pretriageEnabled ? p.pretriageStatus : p.realStatus;
+
+            let sk: 'black' | 'blue' | 'green' | 'red' | 'yellow' | undefined;
+            if (patients.some((p) => p && getStatus(p) === 'red')) sk = 'red';
+            else if (patients.some((p) => p && getStatus(p) === 'yellow'))
+                sk = 'yellow';
+            else if (patients.some((p) => p && getStatus(p) === 'green'))
+                sk = 'green';
+            else if (patients.some((p) => p && getStatus(p) === 'blue'))
+                sk = 'blue';
+            else if (patients.some((p) => p && getStatus(p) === 'black'))
+                sk = 'black';
+
+            if (sk === 'red') {
+                backgroundColor = 'rgba(220, 53, 69, 0.85)';
+                backgroundStroke = 'rgb(220, 53, 69)';
+                color = 'white';
+            } else if (sk === 'yellow') {
+                backgroundColor = 'rgba(255, 193, 7, 0.85)';
+                backgroundStroke = 'rgb(255, 193, 7)';
+                color = 'black';
+            } else if (sk === 'green') {
+                backgroundColor = 'rgba(40, 167, 69, 0.85)';
+                backgroundStroke = 'rgb(40, 167, 69)';
+                color = 'white';
+            } else if (sk === 'black') {
+                backgroundColor = 'rgba(15, 15, 15, 0.85)';
+                backgroundStroke = 'rgb(15, 15, 15)';
+                color = 'white';
+            } else if (sk === 'blue') {
+                backgroundColor = 'rgba(0, 123, 255, 0.85)';
+                backgroundStroke = 'rgb(0, 123, 255)';
+                color = 'white';
+            }
+        }
+
+        // Text-Style über dem Fahrzeug rendern
+        const resolution = this.olMap.getView().getResolution() ?? 1;
+        const scale = 1 / resolution;
+        const fontPx = 2 * scale;
+
+        const textStyle = new Style({
+            text: new OlText({
+                text,
+                font: `${fontPx}px sans-serif`,
+                fill: new Fill({ color }),
+                backgroundFill: new Fill({ color: backgroundColor }),
+                backgroundStroke: new Stroke({
+                    color: backgroundStroke,
+                    width: 0.5 * scale,
+                }),
+                offsetY: -6 * scale,
+                padding: [0.3 * scale, 2 * scale, 0 * scale, 2 * scale],
+                textAlign: 'center',
+                textBaseline: 'middle',
+            }),
+        });
+
+        return [textStyle];
+    };
 }

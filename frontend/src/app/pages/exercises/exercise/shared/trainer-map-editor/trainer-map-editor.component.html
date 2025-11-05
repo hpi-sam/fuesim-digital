@@ -46,10 +46,10 @@
                     </div>
                     <h5>Ansicht/Transferpunkt</h5>
                     <app-map-editor-card
-                        [title]="'Ansicht'"
+                        title="Ansicht"
                         [imageUrl]="viewportTemplate.image.url"
                         [darkBackground]="true"
-                        [dataCy]="'draggableViewportDiv'"
+                        dataCy="draggableViewportDiv"
                         (elementMousedown)="
                             dragElementService.onMouseDown($event, {
                                 type: 'viewport',
@@ -60,9 +60,9 @@
                     </app-map-editor-card>
 
                     <app-map-editor-card
-                        [title]="'Transferpunkt'"
+                        title="Transferpunkt"
                         [imageUrl]="transferPointTemplate.image.url"
-                        [dataCy]="'draggableTransferPointDiv'"
+                        dataCy="draggableTransferPointDiv"
                         (elementMousedown)="
                             dragElementService.onMouseDown($event, {
                                 type: 'transferPoint',
@@ -88,7 +88,7 @@
                                     template: simulatedRegionTemplate,
                                 })
                             "
-                            [dataCy]="'draggableSimulatedRegionDiv'"
+                            dataCy="draggableSimulatedRegionDiv"
                             [imageUrl]="simulatedRegionTemplate.image.url"
                             [darkBackground]="true"
                             [title]="simulatedRegionTemplate.stereotype.name"
@@ -135,7 +135,7 @@
                                         template: patientCategory,
                                     })
                                 "
-                                [dataCy]="'draggablePatientDiv'"
+                                dataCy="draggablePatientDiv"
                             >
                                 <span
                                     class="badge text-bg-secondary m-1"
@@ -147,10 +147,12 @@
                                     [ngbTooltip]="
             patientCategory.patientTemplates.length === 1 ? 'Eine Variante' : `${patientCategory.patientTemplates.length} Varianten`
         "
-                                    >{{
-                                        patientCategory.patientTemplates.length
-                                    }}</span
                                 >
+                                    <i class="bi bi-collection me-1"></i>
+                                    {{
+                                        patientCategory.patientTemplates.length
+                                    }}
+                                </span>
                                 <div style="height: 100px">
                                     <div
                                         class="preview-image-container small-image d-flex justify-content-center"
@@ -198,9 +200,12 @@
                                 let vehicleTemplate of vehicleTemplates$ | async
                             "
                             (elementMousedown)="
-                                vehicleOnMouseDown($event, vehicleTemplate)
+                                dragElementService.onMouseDown($event, {
+                                    type: 'vehicle',
+                                    template: vehicleTemplate,
+                                })
                             "
-                            [dataCy]="'draggableVehicleDiv'"
+                            dataCy="draggableVehicleDiv"
                             [imageUrl]="vehicleTemplate.image.url"
                             (elementEdit)="
                                 editVehicleTemplate(vehicleTemplate.id)
@@ -242,7 +247,7 @@
                             (elementEdit)="
                                 editMapImageTemplate(mapImageTemplate.id)
                             "
-                            [dataCy]="'draggableMapImageDiv'"
+                            dataCy="draggableMapImageDiv"
                             [imageUrl]="mapImageTemplate.image.url"
                             [title]="mapImageTemplate.name"
                             [enableEditButton]="true"

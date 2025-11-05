@@ -10,7 +10,7 @@ import {
 } from 'digital-fuesim-manv-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import { MessageService } from 'src/app/core/messages/message.service';
-import type { UUID, VehicleTemplate } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'digital-fuesim-manv-shared';
 import type { AppState } from 'src/app/state/app.state';
 import {
     selectVehicleTemplates,
@@ -98,16 +98,6 @@ export class TrainerMapEditorComponent {
 
     public setCurrentCategory(category: (typeof this.categories)[number]) {
         this.currentCategory = this.colorCodeOfCategories[category];
-    }
-
-    public async vehicleOnMouseDown(
-        event: MouseEvent,
-        vehicleTemplate: VehicleTemplate
-    ) {
-        this.dragElementService.onMouseDown(event, {
-            type: 'vehicle',
-            template: vehicleTemplate,
-        });
     }
 
     public importingTemplates = false;

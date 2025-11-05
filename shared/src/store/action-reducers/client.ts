@@ -6,7 +6,7 @@ import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { SpecificRole } from '../../models/utils/role.js';
-import { specificRolesAllowedValues } from '../../models/utils/role.js';
+import { specificRoleAllowedValues } from '../../models/utils/role.js';
 import { getElement } from './utils/get-element.js';
 
 export class AddClientAction implements Action {
@@ -48,7 +48,7 @@ export class ChangeSpecificClientRoleAction implements Action {
     public readonly type = '[Client] Change specific client role';
     @IsUUID(4, uuidValidationOptions)
     public readonly clientId!: UUID;
-    @IsLiteralUnion(specificRolesAllowedValues)
+    @IsLiteralUnion(specificRoleAllowedValues)
     public readonly newRole!: SpecificRole;
 }
 

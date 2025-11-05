@@ -4,17 +4,17 @@ import { getCreate } from './utils/index.js';
 import {
     roleAllowedValues,
     type SpecificRole,
-    specificRolesAllowedValues,
+    specificRoleAllowedValues,
 } from './utils/role.js';
 
 export class ClientRole {
-    @IsValue('clientrole' as const)
-    public readonly type = 'clientrole';
+    @IsValue('clientRole' as const)
+    public readonly type = 'clientRole';
 
     @IsLiteralUnion(roleAllowedValues)
     public readonly mainRole: Role;
 
-    @IsLiteralUnion(specificRolesAllowedValues)
+    @IsLiteralUnion(specificRoleAllowedValues)
     public readonly specificRole: SpecificRole;
 
     /**

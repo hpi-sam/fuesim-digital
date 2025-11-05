@@ -41,7 +41,7 @@ import { SelectSignallerRegionService } from '../../../signaller-modal/select-si
 // This is a fallback to show something useful in the UI
 const unavailableClient = Client.create(
     'Unbekannt',
-    ClientRole.create('participant', 'map-operator')
+    ClientRole.create('participant', 'mapOperator')
 );
 
 @Component({

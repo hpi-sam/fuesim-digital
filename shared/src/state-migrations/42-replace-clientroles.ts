@@ -4,9 +4,9 @@ import type { Migration } from './migration-functions.js';
 type OldRole = 'participant' | 'trainer';
 
 interface ClientRole {
-    type: 'clientrole';
+    type: 'clientRole';
     mainRole: 'participant' | 'trainer';
-    specificRole: 'map-operator' | 'trainer';
+    specificRole: 'mapOperator' | 'trainer';
 }
 
 interface Client {
@@ -15,9 +15,9 @@ interface Client {
 
 function migrateClientRole(oldRole: OldRole): ClientRole {
     return {
-        type: 'clientrole',
+        type: 'clientRole',
         mainRole: oldRole,
-        specificRole: oldRole === 'trainer' ? 'trainer' : 'map-operator',
+        specificRole: oldRole === 'trainer' ? 'trainer' : 'mapOperator',
     };
 }
 

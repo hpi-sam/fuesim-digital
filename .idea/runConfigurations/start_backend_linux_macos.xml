@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="start-backend" type="js.build_tools.npm" folderName="backend">
+  <configuration default="false" name="start-backend-linux-macos" type="js.build_tools.npm" folderName="backend">
     <package-json value="$PROJECT_DIR$/backend/package.json" />
     <command value="run" />
     <scripts>

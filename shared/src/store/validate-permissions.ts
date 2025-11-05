@@ -28,7 +28,7 @@ export function validatePermissions(
     ) {
         return true;
     }
-    if (client.role.mainRole === rights) {
+    if (client.role.mainRole === 'trainer') {
         return true;
     }
 

@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import {
-    selectCurrentRole,
+    selectCurrentMainRole,
     selectRestrictedViewport,
 } from 'src/app/state/application/selectors/shared.selectors';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -41,7 +41,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     public readonly restrictedToViewport$ = this.store.select(
         selectRestrictedViewport
     );
-    public readonly currentRole$ = this.store.select(selectCurrentRole);
+    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
     constructor(
         private readonly store: Store<AppState>,

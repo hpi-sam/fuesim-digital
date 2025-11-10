@@ -11,7 +11,7 @@ import {
     createSelectPatient,
     selectConfiguration,
 } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-patients-details',
@@ -22,7 +22,7 @@ import { selectCurrentRole } from 'src/app/state/application/selectors/shared.se
 export class PatientsDetailsComponent implements OnChanges {
     @Input() patientId!: UUID;
 
-    readonly currentRole$ = this.store.select(selectCurrentRole);
+    readonly currentRole$ = this.store.select(selectCurrentMainRole);
     configuration$ = this.store.select(selectConfiguration);
     patient$!: Observable<Patient>;
     visibleStatus$!: Observable<PatientStatus>;

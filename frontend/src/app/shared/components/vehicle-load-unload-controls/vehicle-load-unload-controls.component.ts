@@ -13,7 +13,7 @@ import {
     createSelectPersonnel,
     createSelectVehicle,
 } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-vehicle-load-unload-controls',
@@ -26,7 +26,7 @@ export class VehicleLoadUnloadControlsComponent implements OnChanges {
     vehicleId!: UUID;
 
     vehicleLoadState$?: Observable<{ loadable: boolean; unloadable: boolean }>;
-    currentRole$!: Observable<Role | 'timeTravel' | undefined>;
+    currentRole$!: Observable<Role | undefined>;
 
     constructor(
         private readonly store: Store<AppState>,
@@ -36,7 +36,7 @@ export class VehicleLoadUnloadControlsComponent implements OnChanges {
     ngOnChanges(): void {
         const vehicle$ = this.store.select(createSelectVehicle(this.vehicleId));
 
-        this.currentRole$ = this.store.select(selectCurrentRole);
+        this.currentRole$ = this.store.select(selectCurrentMainRole);
 
         this.vehicleLoadState$ = vehicle$.pipe(
             switchMap((vehicle) => {

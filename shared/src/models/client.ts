@@ -4,13 +4,14 @@ import {
     IsString,
     IsUUID,
     MaxLength,
+    ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import type { UUID } from '../utils/index.js';
 import { uuid, uuidValidationOptions } from '../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../utils/validators/index.js';
-import type { Role } from './utils/index.js';
+import { IsValue } from '../utils/validators/index.js';
 import { getCreate } from './utils/index.js';
-import { roleAllowedValues } from './utils/role.js';
+import { ClientRole } from './client-role.js';
 
 export class Client {
     @IsUUID(4, uuidValidationOptions)
@@ -24,8 +25,9 @@ export class Client {
     @MaxLength(255)
     public readonly name: string;
 
-    @IsLiteralUnion(roleAllowedValues)
-    public readonly role: Role;
+    @ValidateNested()
+    @Type(() => ClientRole)
+    public readonly role: ClientRole;
 
     @IsUUID(4, uuidValidationOptions)
     @IsOptional()
@@ -37,11 +39,15 @@ export class Client {
     /**
      * @deprecated Use {@link create} instead
      */
-    constructor(name: string, role: Role, viewRestrictedToViewportId?: UUID) {
+    constructor(
+        name: string,
+        role: ClientRole,
+        viewRestrictedToViewportId?: UUID
+    ) {
         this.name = name;
         this.role = role;
         this.viewRestrictedToViewportId = viewRestrictedToViewportId;
-        this.isInWaitingRoom = this.role === 'participant';
+        this.isInWaitingRoom = this.role.mainRole === 'participant';
     }
 
     static readonly create = getCreate(this);

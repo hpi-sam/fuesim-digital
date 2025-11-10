@@ -21,7 +21,9 @@
                     Teilnehmerlink teilen
                 </button>
                 <button
-                    *ngIf="(ownClient$ | async)?.role !== 'participant'"
+                    *ngIf="
+                        (ownClient$ | async)?.role?.mainRole !== 'participant'
+                    "
                     (click)="shareExercise('trainerId')"
                     class="btn btn-outline-warning ms-3"
                 >
@@ -139,11 +141,11 @@
                     *ngIf="!ownClient.isInWaitingRoom; else waitingRoomTemplate"
                 >
                     <app-exercise-map
-                        *ngIf="ownClient.role === 'participant'"
+                        *ngIf="ownClient.role.mainRole === 'participant'"
                         class="h-100 rounded overflow-hidden"
                     ></app-exercise-map>
                     <app-trainer-map-editor
-                        *ngIf="ownClient.role === 'trainer'"
+                        *ngIf="ownClient.role.mainRole === 'trainer'"
                     ></app-trainer-map-editor>
                 </ng-container>
                 <ng-template #waitingRoomTemplate>

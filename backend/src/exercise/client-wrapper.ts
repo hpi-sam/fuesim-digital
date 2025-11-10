@@ -1,5 +1,5 @@
 import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
-import { Client } from 'digital-fuesim-manv-shared';
+import { Client, ClientRole } from 'digital-fuesim-manv-shared';
 import type { ExerciseSocket } from '../exercise-server.js';
 import { exerciseMap } from './exercise-map.js';
 import type { ExerciseWrapper } from './exercise-wrapper.js';
@@ -29,7 +29,14 @@ export class ClientWrapper {
         // as the provided id is guaranteed to be one of the ids of the exercise as the exercise
         // was fetched with this exact id from the exercise map.
         const role = this.chosenExercise.getRoleFromUsedId(exerciseId);
-        this.relatedExerciseClient = Client.create(clientName, role, undefined);
+        this.relatedExerciseClient = Client.create(
+            clientName,
+            ClientRole.create(
+                role,
+                role === 'participant' ? 'map-operator' : role
+            ),
+            undefined
+        );
         this.chosenExercise.addClient(this);
         return this.relatedExerciseClient.id;
     }

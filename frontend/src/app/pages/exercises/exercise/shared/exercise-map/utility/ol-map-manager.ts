@@ -15,7 +15,7 @@ import {
     selectViewports,
 } from 'src/app/state/application/selectors/exercise.selectors';
 import {
-    selectCurrentRole,
+    selectCurrentMainRole,
     selectRestrictedViewport,
 } from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
@@ -216,7 +216,7 @@ export class OlMapManager {
 
     public tryGoToCoordinates(latitude: number, longitude: number) {
         if (
-            selectStateSnapshot(selectCurrentRole, this.store) ===
+            selectStateSnapshot(selectCurrentMainRole, this.store) ===
                 'participant' &&
             selectStateSnapshot(selectRestrictedViewport, this.store) !==
                 undefined

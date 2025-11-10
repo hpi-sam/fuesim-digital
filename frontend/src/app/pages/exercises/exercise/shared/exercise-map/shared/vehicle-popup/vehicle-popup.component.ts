@@ -5,7 +5,7 @@ import type { Vehicle, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectVehicle } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { PopupService } from '../../utility/popup.service';
 
 @Component({
@@ -19,7 +19,7 @@ export class VehiclePopupComponent implements OnInit {
     public vehicleId!: UUID;
 
     public vehicle$?: Observable<Vehicle>;
-    public readonly currentRole$ = this.store.select(selectCurrentRole);
+    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
     constructor(
         private readonly store: Store<AppState>,

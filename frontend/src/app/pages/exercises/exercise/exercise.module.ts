@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import {
     NgbDropdownModule,
     NgbTooltipModule,
+    NgbAccordionModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ExerciseComponent } from './exercise/exercise.component';
@@ -71,6 +72,7 @@ import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/ma
         EmergencyOperationsCenterModule,
         CoordinatePickerModule,
         NgbTooltipModule,
+        NgbAccordionModule,
     ],
     providers: [provideHttpClient(withInterceptorsFromDi())],
 })

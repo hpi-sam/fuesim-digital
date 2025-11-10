@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
@@ -10,13 +10,14 @@ import {
 } from 'digital-fuesim-manv-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import { MessageService } from 'src/app/core/messages/message.service';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { PatientCategory, UUID } from 'digital-fuesim-manv-shared';
 import type { AppState } from 'src/app/state/app.state';
 import {
     selectVehicleTemplates,
     selectPatientCategories,
     selectMapImagesTemplates,
 } from 'src/app/state/application/selectors/exercise.selectors';
+import { map, Observable } from 'rxjs';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
@@ -35,7 +36,7 @@ import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-templ
 /**
  * A wrapper around the map that provides trainers with more options and tools.
  */
-export class TrainerMapEditorComponent {
+export class TrainerMapEditorComponent implements OnInit {
     public currentCategory: (typeof this.colorCodeOfCategories)[(typeof this.categories)[number]] =
         'X';
     public readonly categories = ['green', 'yellow', 'red'] as const;
@@ -49,16 +50,32 @@ export class TrainerMapEditorComponent {
         selectVehicleTemplates
     );
 
-    public readonly patientCategories$ = this.store.select(
-        selectPatientCategories
-    );
-
     public readonly mapImageTemplates$ = this.store.select(
         selectMapImagesTemplates
     );
 
+    public patientCategories$?: Observable<PatientCategory[]>;
+
+    ngOnInit() {
+        this.updatePatientCategories();
+    }
+
     public changeDisplayTransferLines(newValue: boolean) {
         this.transferLinesService.displayTransferLines = newValue;
+    }
+
+    private updatePatientCategories() {
+        this.patientCategories$ = this.store
+            .select(selectPatientCategories)
+            .pipe(
+                map((patientCategories) =>
+                    patientCategories.filter(
+                        (patientCategory) =>
+                            patientCategory.name.firstField.colorCode ===
+                            this.currentCategory
+                    )
+                )
+            );
     }
 
     constructor(
@@ -98,6 +115,7 @@ export class TrainerMapEditorComponent {
 
     public setCurrentCategory(category: (typeof this.categories)[number]) {
         this.currentCategory = this.colorCodeOfCategories[category];
+        this.updatePatientCategories();
     }
 
     public importingTemplates = false;

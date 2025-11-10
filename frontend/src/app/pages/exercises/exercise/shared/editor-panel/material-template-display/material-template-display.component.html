@@ -2,5 +2,9 @@
     <div class="preview-image-container pb-0">
         <img [src]="materialTemplate.image.url" />
     </div>
-    {{ materialTypeNames[materialTemplate.materialType] }}
+    <div class="card-body px-1 pb-0 pt-2">
+        <h6 class="text-truncate">
+            {{ materialTypeNames[materialTemplate.materialType] }}
+        </h6>
+    </div>
 </ng-container>

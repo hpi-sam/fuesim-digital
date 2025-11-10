@@ -24,8 +24,10 @@
 // Controls the size of images
 .preview-image-container {
     // TODO: Set the height depending on the current grid tier https://getbootstrap.com/docs/5.1/layout/breakpoints/
-    height: 100px !important;
-    padding: map-get($spacers, 3);
+    height: 70px !important;
+    padding: map-get($spacers, 2);
+    padding-left: map-get($spacers, 3);
+    padding-right: map-get($spacers, 3);
     img {
         // fill out the whole container
         max-width: 100%;

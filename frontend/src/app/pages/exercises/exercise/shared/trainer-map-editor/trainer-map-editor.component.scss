@@ -1,0 +1,15 @@
+.accordion-button {
+    font-size: 1.25rem !important;
+    padding: 0.6rem !important;
+}
+
+.accordion-body {
+    padding: 0.5rem !important;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 25%);
+    justify-content: start;
+    align-items: start;
+}

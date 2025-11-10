@@ -3,7 +3,10 @@
         <div class="col p-0 rounded-start overflow-hidden">
             <app-exercise-map></app-exercise-map>
         </div>
-        <div class="card col-3 p-0 rounded-0 rounded-end">
+        <div
+            class="card col-3 p-0 rounded-0 rounded-end"
+            style="min-width: 400px"
+        >
             <div class="card-header text-center">
                 <h5 class="mb-0 d-flex align-items-center">
                     Editor
@@ -26,245 +29,290 @@
                 </h5>
             </div>
             <!-- We want the editor panel to overflow, if it is too high -->
-            <ul
-                class="list-group list-group-flush"
+            <div
+                ngbAccordion
+                [closeOthers]="true"
                 style="flex: auto; height: 0; overflow-y: auto"
             >
-                <li class="list-group-item">
-                    <div class="form-check form-switch float-end">
-                        <input
-                            class="form-check-input"
-                            type="checkbox"
-                            [ngModel]="
-                                transferLinesService.displayTransferLines
-                            "
-                            (ngModelChange)="changeDisplayTransferLines($event)"
-                        />
-                        <label class="form-check-label">
-                            Verbindungen anzeigen
-                        </label>
-                    </div>
-                    <h5>Ansicht/Transferpunkt</h5>
-                    <app-map-editor-card
-                        title="Ansicht"
-                        [imageUrl]="viewportTemplate.image.url"
-                        [darkBackground]="true"
-                        dataCy="draggableViewportDiv"
-                        (elementMousedown)="
-                            dragElementService.onMouseDown($event, {
-                                type: 'viewport',
-                                template: viewportTemplate,
-                            })
-                        "
-                    >
-                    </app-map-editor-card>
-
-                    <app-map-editor-card
-                        title="Transferpunkt"
-                        [imageUrl]="transferPointTemplate.image.url"
-                        dataCy="draggableTransferPointDiv"
-                        (elementMousedown)="
-                            dragElementService.onMouseDown($event, {
-                                type: 'transferPoint',
-                                template: transferPointTemplate,
-                            })
-                        "
-                    >
-                    </app-map-editor-card>
-                </li>
-                <li class="list-group-item">
-                    <h5>Simulierte Bereiche</h5>
-                    <div
-                        class="overflow-auto w-100"
-                        style="white-space: nowrap"
-                    >
-                        <app-map-editor-card
-                            *ngFor="
-                                let simulatedRegionTemplate of simulatedRegionTemplates
-                            "
-                            (elementMousedown)="
-                                dragElementService.onMouseDown($event, {
-                                    type: 'simulatedRegion',
-                                    template: simulatedRegionTemplate,
-                                })
-                            "
-                            dataCy="draggableSimulatedRegionDiv"
-                            [imageUrl]="simulatedRegionTemplate.image.url"
-                            [darkBackground]="true"
-                            [title]="simulatedRegionTemplate.stereotype.name"
-                        >
-                        </app-map-editor-card>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <h5>
-                        Patienten
-                        <app-patient-status-dropdown
-                            [patientStatus]="
-                                currentCategory | patientStatusColor
-                            "
-                            [allowedStatuses]="categories"
-                            placement="end"
-                            (statusChanged)="setCurrentCategory($event)"
-                        />
+                <div ngbAccordionItem="viewports" [collapsed]="false">
+                    <h5 ngbAccordionHeader>
+                        <button ngbAccordionButton class="p-2 h5">
+                            Ansicht/Transferpunkt
+                        </button>
                     </h5>
-                    <!-- 20px more height than the sum of the children to have room for the scrollbar -->
-                    <div
-                        class="overflow-auto w-100 d-flex flex-wrap"
-                        style="
-                            white-space: nowrap;
-                            flex-direction: column;
-                            align-content: flex-start;
-                            height: 220px;
-                        "
-                    >
-                        <div
-                            *ngFor="
-                                let patientCategory of patientCategories$
-                                    | async
-                            "
-                        >
-                            <app-map-editor-card
-                                *ngIf="
-                                    patientCategory.name.firstField
-                                        .colorCode === currentCategory
-                                "
-                                (elementMousedown)="
-                                    dragElementService.onMouseDown($event, {
-                                        type: 'patient',
-                                        template: patientCategory,
-                                    })
-                                "
-                                dataCy="draggablePatientDiv"
-                            >
-                                <span
-                                    class="badge text-bg-secondary m-1"
-                                    style="
-                                        position: absolute;
-                                        top: 1px;
-                                        right: 1px;
+
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <div class="cards">
+                                <app-map-editor-card
+                                    title="Ansicht"
+                                    [imageUrl]="viewportTemplate.image.url"
+                                    [darkBackground]="true"
+                                    dataCy="draggableViewportDiv"
+                                    (elementMousedown)="
+                                        dragElementService.onMouseDown($event, {
+                                            type: 'viewport',
+                                            template: viewportTemplate,
+                                        })
                                     "
-                                    [ngbTooltip]="
-            patientCategory.patientTemplates.length === 1 ? 'Eine Variante' : `${patientCategory.patientTemplates.length} Varianten`
-        "
                                 >
-                                    <i class="bi bi-collection me-1"></i>
-                                    {{
-                                        patientCategory.patientTemplates.length
-                                    }}
-                                </span>
-                                <div style="height: 100px">
-                                    <div
-                                        class="preview-image-container small-image d-flex justify-content-center"
-                                    >
-                                        <img
-                                            [src]="patientCategory.image.url"
-                                        />
-                                    </div>
-                                    <div
-                                        class="p-1 text-wrap lh-1 fs-5"
-                                        style="overflow: auto"
-                                    >
-                                        <app-patient-status-display
-                                            [patientStatus]="
-                                                patientCategory.name
-                                            "
-                                        >
-                                        </app-patient-status-display>
-                                    </div>
-                                </div>
-                            </app-map-editor-card>
+                                </app-map-editor-card>
+
+                                <app-map-editor-card
+                                    title="Transferpunkt"
+                                    [imageUrl]="transferPointTemplate.image.url"
+                                    dataCy="draggableTransferPointDiv"
+                                    (elementMousedown)="
+                                        dragElementService.onMouseDown($event, {
+                                            type: 'transferPoint',
+                                            template: transferPointTemplate,
+                                        })
+                                    "
+                                >
+                                </app-map-editor-card>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    [ngModel]="
+                                        transferLinesService.displayTransferLines
+                                    "
+                                    (ngModelChange)="
+                                        changeDisplayTransferLines($event)
+                                    "
+                                />
+                                <label class="form-check-label">
+                                    Verbindungen anzeigen
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </li>
-                <li class="list-group-item">
+                </div>
+                <div ngbAccordionItem="simulatedRegions">
+                    <h5 ngbAccordionHeader>
+                        <button ngbAccordionButton>Simulierte Bereiche</button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="cards">
+                                    <app-map-editor-card
+                                        *ngFor="
+                                            let simulatedRegionTemplate of simulatedRegionTemplates
+                                        "
+                                        (elementMousedown)="
+                                            dragElementService.onMouseDown(
+                                                $event,
+                                                {
+                                                    type: 'simulatedRegion',
+                                                    template:
+                                                        simulatedRegionTemplate,
+                                                }
+                                            )
+                                        "
+                                        dataCy="draggableSimulatedRegionDiv"
+                                        [imageUrl]="
+                                            simulatedRegionTemplate.image.url
+                                        "
+                                        [darkBackground]="true"
+                                        [title]="
+                                            simulatedRegionTemplate.stereotype
+                                                .name
+                                        "
+                                    >
+                                    </app-map-editor-card>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+                <div ngbAccordionItem="patients">
+                    <h5 ngbAccordionHeader>
+                        <button ngbAccordionButton>Patienten</button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <app-patient-status-dropdown
+                                    [patientStatus]="
+                                        currentCategory | patientStatusColor
+                                    "
+                                    [allowedStatuses]="categories"
+                                    (statusChanged)="setCurrentCategory($event)"
+                                />
+                                <div class="cards">
+                                    <app-map-editor-card
+                                        *ngFor="
+                                            let patientCategory of patientCategories$
+                                                | async
+                                        "
+                                        (elementMousedown)="
+                                            dragElementService.onMouseDown(
+                                                $event,
+                                                {
+                                                    type: 'patient',
+                                                    template: patientCategory,
+                                                }
+                                            )
+                                        "
+                                        dataCy="draggablePatientDiv"
+                                    >
+                                        <span
+                                            class="badge text-bg-secondary m-1"
+                                            style="
+                                                position: absolute;
+                                                top: 1px;
+                                                right: 1px;
+                                            "
+                                            [ngbTooltip]="
+            patientCategory.patientTemplates.length === 1 ? 'Eine Variante' : `${patientCategory.patientTemplates.length} Varianten`
+        "
+                                        >
+                                            <i
+                                                class="bi bi-collection me-1"
+                                            ></i>
+                                            {{
+                                                patientCategory.patientTemplates
+                                                    .length
+                                            }}
+                                        </span>
+                                        <div style="height: 100px">
+                                            <div
+                                                class="preview-image-container small-image d-flex justify-content-center"
+                                            >
+                                                <img
+                                                    [src]="
+                                                        patientCategory.image
+                                                            .url
+                                                    "
+                                                />
+                                            </div>
+                                            <div
+                                                class="p-1 text-wrap lh-1 fs-5"
+                                                style="overflow: auto"
+                                            >
+                                                <app-patient-status-display
+                                                    [patientStatus]="
+                                                        patientCategory.name
+                                                    "
+                                                >
+                                                </app-patient-status-display>
+                                            </div>
+                                        </div>
+                                    </app-map-editor-card>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+                <div ngbAccordionItem="vehicles">
                     <h5
+                        ngbAccordionHeader
                         class="d-flex justify-content-between align-items-center"
                     >
-                        Fahrzeuge
-
-                        <button
-                            class="btn btn-sm btn-outline-primary"
-                            (click)="addVehicleTemplate()"
-                        >
-                            <i class="bi bi-plus"></i>
-                            Hinzufügen
-                        </button>
+                        <button ngbAccordionButton>Fahrzeuge</button>
                     </h5>
-                    <div
-                        class="overflow-auto w-100"
-                        style="white-space: nowrap"
-                    >
-                        <app-map-editor-card
-                            *ngFor="
-                                let vehicleTemplate of vehicleTemplates$ | async
-                            "
-                            (elementMousedown)="
-                                dragElementService.onMouseDown($event, {
-                                    type: 'vehicle',
-                                    template: vehicleTemplate,
-                                })
-                            "
-                            dataCy="draggableVehicleDiv"
-                            [imageUrl]="vehicleTemplate.image.url"
-                            (elementEdit)="
-                                editVehicleTemplate(vehicleTemplate.id)
-                            "
-                            [enableEditButton]="true"
-                            [title]="vehicleTemplate.vehicleType"
-                        >
-                        </app-map-editor-card>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="mb-2">
+                                    <button
+                                        class="btn btn-sm btn-outline-primary"
+                                        (click)="addVehicleTemplate()"
+                                    >
+                                        <i class="bi bi-plus"></i>
+                                        Hinzufügen
+                                    </button>
+                                </div>
+                                <div class="cards">
+                                    <app-map-editor-card
+                                        *ngFor="
+                                            let vehicleTemplate of vehicleTemplates$
+                                                | async
+                                        "
+                                        (elementMousedown)="
+                                            dragElementService.onMouseDown(
+                                                $event,
+                                                {
+                                                    type: 'vehicle',
+                                                    template: vehicleTemplate,
+                                                }
+                                            )
+                                        "
+                                        dataCy="draggableVehicleDiv"
+                                        [imageUrl]="vehicleTemplate.image.url"
+                                        (elementEdit)="
+                                            editVehicleTemplate(
+                                                vehicleTemplate.id
+                                            )
+                                        "
+                                        [enableEditButton]="true"
+                                        [title]="vehicleTemplate.vehicleType"
+                                    >
+                                    </app-map-editor-card>
+                                </div>
+                            </ng-template>
+                        </div>
                     </div>
-                </li>
-                <li class="list-group-item">
-                    <h5
-                        class="d-flex justify-content-between align-items-center"
-                    >
-                        Bilder
-                        <button
-                            class="btn btn-sm btn-outline-primary"
-                            (click)="addImageTemplate()"
-                        >
-                            <i class="bi bi-plus"></i>
-                            Hinzufügen
-                        </button>
+                </div>
+                <div ngbAccordionItem="images">
+                    <h5 ngbAccordionHeader>
+                        <button ngbAccordionButton>Bilder</button>
                     </h5>
-                    <div
-                        class="overflow-auto w-100"
-                        style="white-space: nowrap"
-                    >
-                        <app-map-editor-card
-                            *ngFor="
-                                let mapImageTemplate of mapImageTemplates$
-                                    | async
-                            "
-                            (elementMousedown)="
-                                dragElementService.onMouseDown($event, {
-                                    type: 'mapImage',
-                                    template: mapImageTemplate,
-                                })
-                            "
-                            (elementEdit)="
-                                editMapImageTemplate(mapImageTemplate.id)
-                            "
-                            dataCy="draggableMapImageDiv"
-                            [imageUrl]="mapImageTemplate.image.url"
-                            [title]="mapImageTemplate.name"
-                            [enableEditButton]="true"
-                        >
-                        </app-map-editor-card>
-                        <span
-                            *ngIf="
-                                (mapImageTemplates$ | async | keyvalue)
-                                    ?.length === 0
-                            "
-                            class="text-muted"
-                        >
-                            Keine Bilder vorhanden
-                        </span>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="mb-2">
+                                    <button
+                                        class="btn btn-sm btn-outline-primary"
+                                        (click)="addImageTemplate()"
+                                    >
+                                        <i class="bi bi-plus"></i>
+                                        Hinzufügen
+                                    </button>
+                                </div>
+                                <div class="cards">
+                                    <app-map-editor-card
+                                        *ngFor="
+                                            let mapImageTemplate of mapImageTemplates$
+                                                | async
+                                        "
+                                        (elementMousedown)="
+                                            dragElementService.onMouseDown(
+                                                $event,
+                                                {
+                                                    type: 'mapImage',
+                                                    template: mapImageTemplate,
+                                                }
+                                            )
+                                        "
+                                        (elementEdit)="
+                                            editMapImageTemplate(
+                                                mapImageTemplate.id
+                                            )
+                                        "
+                                        dataCy="draggableMapImageDiv"
+                                        [imageUrl]="mapImageTemplate.image.url"
+                                        [title]="mapImageTemplate.name"
+                                        [enableEditButton]="true"
+                                    >
+                                    </app-map-editor-card>
+                                </div>
+                                <span
+                                    *ngIf="
+                                        (mapImageTemplates$ | async | keyvalue)
+                                            ?.length === 0
+                                    "
+                                    class="text-muted"
+                                >
+                                    Keine Bilder vorhanden
+                                </span>
+                            </ng-template>
+                        </div>
                     </div>
-                </li>
-            </ul>
+                </div>
+            </div>
         </div>
     </div>
     <app-trainer-toolbar></app-trainer-toolbar>

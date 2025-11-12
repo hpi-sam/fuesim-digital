@@ -134,74 +134,121 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
-                                <app-patient-status-dropdown
-                                    [patientStatus]="
-                                        currentCategory | patientStatusColor
+                                <ng-container
+                                    *appLet="
+                                        selectedCategories$
+                                            | async as selectedCategories
                                     "
-                                    [allowedStatuses]="categories"
-                                    (statusChanged)="setCurrentCategory($event)"
-                                />
-                                <div class="cards">
-                                    <app-map-editor-card
-                                        *ngFor="
-                                            let patientCategory of patientCategories$
-                                                | async
-                                        "
-                                        (elementMousedown)="
-                                            dragElementService.onMouseDown(
-                                                $event,
-                                                {
-                                                    type: 'patient',
-                                                    template: patientCategory,
-                                                }
-                                            )
-                                        "
-                                        dataCy="draggablePatientDiv"
+                                >
+                                    <div
+                                        class="btn-group btn-group-sm mb-2"
+                                        role="group"
                                     >
-                                        <span
-                                            class="badge text-bg-secondary m-1"
-                                            style="
-                                                position: absolute;
-                                                top: 1px;
-                                                right: 1px;
-                                            "
-                                            [ngbTooltip]="
-            patientCategory.patientTemplates.length === 1 ? 'Eine Variante' : `${patientCategory.patientTemplates.length} Varianten`
-        "
+                                        <ng-container
+                                            *ngFor="let category of categories"
                                         >
-                                            <i
-                                                class="bi bi-collection me-1"
-                                            ></i>
-                                            {{
-                                                patientCategory.patientTemplates
-                                                    .length
-                                            }}
-                                        </span>
-                                        <div style="height: 100px">
-                                            <div
-                                                class="preview-image-container small-image d-flex justify-content-center"
+                                            <input
+                                                type="checkbox"
+                                                class="btn-check"
+                                                [id]="`patient-status-filter-${category}`"
+                                                autocomplete="off"
+                                                [ngModel]="
+                                                    selectedCategories[
+                                                        colorCodeOfCategories[
+                                                            category
+                                                        ]
+                                                    ]
+                                                "
+                                                (ngModelChange)="
+                                                    setCurrentCategory(
+                                                        category,
+                                                        $event
+                                                    )
+                                                "
+                                            />
+                                            <label
+                                                class="btn btn-outline-primary"
+                                                [for]="`patient-status-filter-${category}`"
                                             >
-                                                <img
-                                                    [src]="
-                                                        patientCategory.image
-                                                            .url
-                                                    "
+                                                <app-patient-status-badge
+                                                    [status]="category"
                                                 />
-                                            </div>
-                                            <div
-                                                class="p-1 text-wrap lh-1 fs-5"
-                                                style="overflow: auto"
+                                            </label>
+                                        </ng-container>
+                                    </div>
+                                    <ng-container
+                                        *ngFor="
+                                            let item of patientCategories$
+                                                | async
+                                                | keyvalue;
+                                            last as isLast
+                                        "
+                                    >
+                                        <div class="cards">
+                                            <app-map-editor-card
+                                                *ngFor="
+                                                    let patientCategory of item.value
+                                                "
+                                                (elementMousedown)="
+                                                    dragElementService.onMouseDown(
+                                                        $event,
+                                                        {
+                                                            type: 'patient',
+                                                            template:
+                                                                patientCategory,
+                                                        }
+                                                    )
+                                                "
+                                                dataCy="draggablePatientDiv"
                                             >
-                                                <app-patient-status-display
-                                                    [patientStatus]="
-                                                        patientCategory.name
+                                                <span
+                                                    class="badge text-bg-secondary m-1"
+                                                    style="
+                                                        position: absolute;
+                                                        top: 1px;
+                                                        right: 1px;
                                                     "
+                                                    [ngbTooltip]="
+                                                patientCategory.patientTemplates.length === 1 ? 'Eine Variante' : `${patientCategory.patientTemplates.length} Varianten`
+                                            "
                                                 >
-                                                </app-patient-status-display>
-                                            </div>
+                                                    <i
+                                                        class="bi bi-collection me-1"
+                                                    ></i>
+                                                    {{
+                                                        patientCategory
+                                                            .patientTemplates
+                                                            .length
+                                                    }}
+                                                </span>
+                                                <div style="height: 100px">
+                                                    <div
+                                                        class="preview-image-container small-image d-flex justify-content-center"
+                                                    >
+                                                        <img
+                                                            [src]="
+                                                                patientCategory
+                                                                    .image.url
+                                                            "
+                                                        />
+                                                    </div>
+                                                    <div
+                                                        class="p-1 text-wrap lh-1 fs-5"
+                                                        style="overflow: auto"
+                                                    >
+                                                        <app-patient-status-display
+                                                            [patientStatus]="
+                                                                patientCategory.name
+                                                            "
+                                                        >
+                                                        </app-patient-status-display>
+                                                    </div>
+                                                </div>
+                                            </app-map-editor-card>
                                         </div>
-                                    </app-map-editor-card>
-                                </div>
+                                        <hr *ngIf="!isLast" class="mt-1 mb-2" />
+                                    </ng-container>
+                                </ng-container>
                             </ng-template>
                         </div>
                     </div>

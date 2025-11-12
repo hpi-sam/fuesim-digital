@@ -17,7 +17,7 @@ import {
     selectPatientCategories,
     selectMapImagesTemplates,
 } from 'src/app/state/application/selectors/exercise.selectors';
-import { map, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
@@ -26,6 +26,16 @@ import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-
 import { openPartialImportOverwriteModal } from '../partial-import/open-partial-import-overwrite-modal';
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
 import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
+
+const categories = ['green', 'yellow', 'red'] as const;
+const colorCodeOfCategories = {
+    green: 'X',
+    yellow: 'Y',
+    red: 'Z',
+} as const;
+
+type FilterCategory =
+    (typeof colorCodeOfCategories)[(typeof categories)[number]];
 
 @Component({
     selector: 'app-trainer-map-editor',
@@ -37,15 +47,24 @@ import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-templ
  * A wrapper around the map that provides trainers with more options and tools.
  */
 export class TrainerMapEditorComponent implements OnInit {
-    public currentCategory: (typeof this.colorCodeOfCategories)[(typeof this.categories)[number]] =
-        'X';
-    public readonly categories = ['green', 'yellow', 'red'] as const;
-    public readonly colorCodeOfCategories = {
-        green: 'X',
-        yellow: 'Y',
-        red: 'Z',
-    } as const;
+    public selectedCategories$: BehaviorSubject<{
+        [key in FilterCategory]: boolean;
+    }> = new BehaviorSubject<{ [key in FilterCategory]: boolean }>({
+        X: true,
+        Y: true,
+        Z: true,
+    });
 
+    public get categories() {
+        return categories;
+    }
+    public get colorCodeOfCategories() {
+        return colorCodeOfCategories;
+    }
+
+    private readonly allPatientCategories$ = this.store.select(
+        selectPatientCategories
+    );
     public readonly vehicleTemplates$ = this.store.select(
         selectVehicleTemplates
     );
@@ -54,28 +73,37 @@ export class TrainerMapEditorComponent implements OnInit {
         selectMapImagesTemplates
     );
 
-    public patientCategories$?: Observable<PatientCategory[]>;
+    public patientCategories$?: Observable<{
+        [key in FilterCategory]?: PatientCategory[];
+    }>;
 
     ngOnInit() {
-        this.updatePatientCategories();
+        this.patientCategories$ = combineLatest([
+            this.allPatientCategories$,
+            this.selectedCategories$,
+        ]).pipe(
+            map(([patientCategories, selectedCategories]) => {
+                const filteredCategories: {
+                    [key in FilterCategory]?: PatientCategory[];
+                } = {};
+                for (const category of Object.keys(
+                    selectedCategories
+                ) as FilterCategory[]) {
+                    if (!selectedCategories[category]) continue;
+                    filteredCategories[category] = patientCategories.filter(
+                        (patientCategory) =>
+                            category ===
+                            (patientCategory.name.firstField
+                                .colorCode as FilterCategory)
+                    );
+                }
+                return filteredCategories;
+            })
+        );
     }
 
     public changeDisplayTransferLines(newValue: boolean) {
         this.transferLinesService.displayTransferLines = newValue;
-    }
-
-    private updatePatientCategories() {
-        this.patientCategories$ = this.store
-            .select(selectPatientCategories)
-            .pipe(
-                map((patientCategories) =>
-                    patientCategories.filter(
-                        (patientCategory) =>
-                            patientCategory.name.firstField.colorCode ===
-                            this.currentCategory
-                    )
-                )
-            );
     }
 
     constructor(
@@ -113,9 +141,14 @@ export class TrainerMapEditorComponent implements OnInit {
         openEditVehicleTemplateModal(this.ngbModalService, mapImageTemplateId);
     }
 
-    public setCurrentCategory(category: (typeof this.categories)[number]) {
-        this.currentCategory = this.colorCodeOfCategories[category];
-        this.updatePatientCategories();
+    public setCurrentCategory(
+        category: (typeof this.categories)[number],
+        status: boolean
+    ) {
+        this.selectedCategories$.next({
+            ...this.selectedCategories$.value,
+            [this.colorCodeOfCategories[category]]: status,
+        });
     }
 
     public importingTemplates = false;

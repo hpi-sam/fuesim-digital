@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { AlarmGroup, AlarmGroupVehicle } from 'digital-fuesim-manv-shared';
@@ -16,7 +16,7 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
     styleUrls: ['./alarm-group-item.component.scss'],
     standalone: false,
 })
-export class AlarmGroupItemComponent {
+export class AlarmGroupItemComponent implements OnInit {
     @Input() alarmGroup!: AlarmGroup;
 
     constructor(
@@ -24,9 +24,31 @@ export class AlarmGroupItemComponent {
         private readonly store: Store<AppState>
     ) {}
 
+    ngOnInit() {
+        this.hasTriggerLimit = this.alarmGroup.triggerLimit !== null;
+        this.triggerLimit = this.alarmGroup.triggerLimit ?? 1;
+    }
+
     public readonly vehicleTemplates$ = this.store.select(
         selectVehicleTemplates
     );
+
+    public triggerLimit: number | null = null;
+    public hasTriggerLimit = false;
+
+    public toggleTriggerLimit(value: boolean) {
+        const prev = this.hasTriggerLimit;
+        this.hasTriggerLimit = value;
+        if (!value) {
+            this.triggerLimit = null;
+        } else if (this.alarmGroup.triggerLimit === null) {
+            this.triggerLimit = 1;
+        }
+
+        if (prev !== value) {
+            this.limitAlarmGroup(this.triggerLimit);
+        }
+    }
 
     public renameAlarmGroup(name: string) {
         this.exerciseService.proposeAction(
@@ -37,6 +59,14 @@ export class AlarmGroupItemComponent {
             },
             true
         );
+    }
+
+    public limitAlarmGroup(limit: number | null) {
+        this.exerciseService.proposeAction({
+            type: '[AlarmGroup] Limit AlarmGroup',
+            alarmGroupId: this.alarmGroup.id,
+            triggerLimit: this.hasTriggerLimit ? (limit ?? null) : null,
+        });
     }
 
     public removeAlarmGroup() {

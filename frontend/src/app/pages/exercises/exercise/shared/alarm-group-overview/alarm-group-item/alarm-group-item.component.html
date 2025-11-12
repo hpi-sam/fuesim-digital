@@ -35,6 +35,28 @@
             }
         </div>
     </div>
+    <div class="form-check w-auto d-inline-block ms-3" style="font-size: 1rem">
+        <label class="d-flex flex-row gap-2 align-items-center">
+            <input
+                class="form-check-input no-validation"
+                type="checkbox"
+                role="switch"
+                [ngModel]="hasTriggerLimit"
+                (ngModelChange)="toggleTriggerLimit($event)"
+                tabindex="1"
+            />
+            <span>max. Auslösungen</span>
+            <input
+                [hidden]="!hasTriggerLimit"
+                [ngModel]="triggerLimit"
+                (appSaveOnTyping)="limitAlarmGroup($event)"
+                class="form-control"
+                type="number"
+                placeholder="z.B. 1"
+                style="width: 8rem"
+            />
+        </label>
+    </div>
 
     <button
         (click)="removeAlarmGroup()"

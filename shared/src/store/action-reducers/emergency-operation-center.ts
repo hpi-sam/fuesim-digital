@@ -170,7 +170,7 @@ export namespace EmergencyOperationCenterActionReducers {
             });
 
             logAlarmGroupSent(draftState, alarmGroupId);
-            alarmGroup.sent = true;
+            alarmGroup.triggerCount += 1;
 
             return draftState;
         },

@@ -117,6 +117,10 @@
                 "
                 style="width: 8rem"
             >
+                <app-material-template-display
+                    [materialTemplateType]="materialTypes"
+                >
+                </app-material-template-display>
                 <button
                     (click)="removeMaterial(index)"
                     class="btn btn-sm btn-outline-danger position-absolute"
@@ -124,10 +128,6 @@
                 >
                     <i class="bi bi-trash"></i>
                 </button>
-                <app-material-template-display
-                    [materialTemplateType]="materialTypes"
-                >
-                </app-material-template-display>
             </app-map-editor-card>
         </div>
         <ng-template #noMaterialTemplates>
@@ -176,6 +176,10 @@
                 "
                 style="width: 8rem"
             >
+                <app-personnel-template-display
+                    [personnelTemplateType]="personnelType"
+                >
+                </app-personnel-template-display>
                 <button
                     (click)="removePersonnel(index)"
                     class="btn btn-outline-danger btn-sm position-absolute"
@@ -183,10 +187,6 @@
                 >
                     <i class="bi bi-trash"></i>
                 </button>
-                <app-personnel-template-display
-                    [personnelTemplateType]="personnelType"
-                >
-                </app-personnel-template-display>
             </app-map-editor-card>
         </div>
         <ng-template #noPersonnelTemplates>

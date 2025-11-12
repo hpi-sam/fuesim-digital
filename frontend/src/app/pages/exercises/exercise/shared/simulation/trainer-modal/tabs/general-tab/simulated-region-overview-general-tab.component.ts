@@ -123,16 +123,16 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
                     categorizedPersonnel['all'] = [];
 
-                    Object.values(personnelTemplates).forEach((template) => {
-                        categorizedPersonnel[template.personnelType] ??= [];
+                    personnelTemplates.forEach((template) => {
+                        categorizedPersonnel[template.id] ??= [];
                     });
 
                     personnel.forEach((singlePersonnel) => {
-                        categorizedPersonnel[singlePersonnel.personnelType] ??=
+                        categorizedPersonnel[singlePersonnel.baseTemplateId] ??=
                             [];
 
                         categorizedPersonnel[
-                            singlePersonnel.personnelType
+                            singlePersonnel.baseTemplateId
                         ]!.push(singlePersonnel);
 
                         categorizedPersonnel['all']!.push(singlePersonnel);

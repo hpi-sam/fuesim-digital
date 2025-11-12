@@ -4,9 +4,9 @@ import { Store } from '@ngrx/store';
 import type {
     MaterialTemplate,
     PersonnelTemplate,
+    UUID,
 } from 'digital-fuesim-manv-shared';
 import { cloneDeep } from 'lodash-es';
-import type { Observable } from 'rxjs';
 import { MessageService } from 'src/app/core/messages/message.service';
 import { getImageAspectRatio } from 'src/app/shared/functions/get-image-aspect-ratio';
 import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
@@ -34,12 +34,8 @@ export class VehicleTemplateFormComponent implements OnChanges {
 
     public values?: EditableVehicleTemplateValues;
 
-    public materialTemplates$: Observable<{
-        readonly [type in string]: MaterialTemplate;
-    }> = this.store.select(selectMaterialTemplates);
-    public personnelTemplates$: Observable<{
-        readonly [type in string]: PersonnelTemplate;
-    }> = this.store.select(selectPersonnelTemplates);
+    public materialTemplates$ = this.store.select(selectMaterialTemplates);
+    public personnelTemplates$ = this.store.select(selectPersonnelTemplates);
 
     constructor(
         private readonly messageService: MessageService,
@@ -71,8 +67,12 @@ export class VehicleTemplateFormComponent implements OnChanges {
                     aspectRatio,
                     height: valuesOnSubmit.height,
                     patientCapacity: valuesOnSubmit.patientCapacity,
-                    materialTypes: valuesOnSubmit.materialTypes,
-                    personnelTypes: valuesOnSubmit.personnelTypes,
+                    materialTemplateIds: valuesOnSubmit.materialTemplates.map(
+                        (template) => template.id
+                    ),
+                    personnelTemplateIds: valuesOnSubmit.personnelTemplates.map(
+                        (template) => template.id
+                    ),
                 });
             })
             .catch((error) => {
@@ -84,32 +84,32 @@ export class VehicleTemplateFormComponent implements OnChanges {
             });
     }
 
-    public addPersonnel(type: string) {
+    public addPersonnel(personnelTemplate: PersonnelTemplate) {
         if (!this.values) {
             return;
         }
-        this.values.personnelTypes.push(type);
+        this.values.personnelTemplates.push(personnelTemplate);
     }
 
     public removePersonnel(index: number) {
         if (!this.values) {
             return;
         }
-        this.values.personnelTypes.splice(index, 1);
+        this.values.personnelTemplates.splice(index, 1);
     }
 
-    public addMaterial(type: string) {
+    public addMaterial(materialTemplate: MaterialTemplate) {
         if (!this.values) {
             return;
         }
-        this.values.materialTypes.push(type);
+        this.values.materialTemplates.push(materialTemplate);
     }
 
     public removeMaterial(index: number) {
         if (!this.values) {
             return;
         }
-        this.values.materialTypes.splice(index, 1);
+        this.values.materialTemplates.splice(index, 1);
     }
 }
 
@@ -119,8 +119,8 @@ export interface EditableVehicleTemplateValues {
     url: string | null;
     height: number;
     patientCapacity: number;
-    materialTypes: string[];
-    personnelTypes: string[];
+    materialTemplates: MaterialTemplate[];
+    personnelTemplates: PersonnelTemplate[];
 }
 
 export interface ChangedVehicleTemplateValues {
@@ -130,6 +130,6 @@ export interface ChangedVehicleTemplateValues {
     aspectRatio: number;
     height: number;
     patientCapacity: number;
-    materialTypes: string[];
-    personnelTypes: string[];
+    materialTemplateIds: UUID[];
+    personnelTemplateIds: UUID[];
 }

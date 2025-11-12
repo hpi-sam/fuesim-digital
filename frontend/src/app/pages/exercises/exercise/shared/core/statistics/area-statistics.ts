@@ -1,8 +1,4 @@
-import type {
-    PatientStatus,
-    Vehicle,
-    Personnel,
-} from 'digital-fuesim-manv-shared';
+import type { PatientStatus, Vehicle } from 'digital-fuesim-manv-shared';
 
 /**
  * The statistics for an area in the exercise (e.g. a viewport or the whole exercise).

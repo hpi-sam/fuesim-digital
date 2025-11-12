@@ -1,5 +1,6 @@
 import { VehicleTemplate } from '../../models/index.js';
 import type { ImageProperties } from '../../models/utils/index.js';
+import { defaultMaterialTemplates } from './material-templates.js';
 
 const rtwImage: ImageProperties = {
     url: '/assets/rtw-vehicle.png',
@@ -49,7 +50,7 @@ const rtwVehicleTemplate = VehicleTemplate.create(
     rtwImage,
     1,
     ['notSan', 'rettSan'],
-    ['standard']
+    [defaultMaterialTemplates.standard.id]
 );
 
 const nawVehicleTemplate = VehicleTemplate.create(
@@ -58,7 +59,7 @@ const nawVehicleTemplate = VehicleTemplate.create(
     nawImage,
     1,
     ['notarzt', 'notSan', 'rettSan'],
-    ['standard']
+    [defaultMaterialTemplates.standard.id]
 );
 
 const ktwVehicleTemplate = VehicleTemplate.create(
@@ -67,7 +68,7 @@ const ktwVehicleTemplate = VehicleTemplate.create(
     ktwImage,
     1,
     ['san', 'rettSan'],
-    ['standard']
+    [defaultMaterialTemplates.standard.id]
 );
 
 const carryingUnitVehicleTemplate = VehicleTemplate.create(
@@ -85,7 +86,7 @@ const ktwKatSchutzVehicleTemplate = VehicleTemplate.create(
     ktwImage,
     2,
     ['san', 'rettSan'],
-    ['standard']
+    [defaultMaterialTemplates.standard.id]
 );
 
 const gwSanVehicleTemplate = VehicleTemplate.create(
@@ -94,7 +95,12 @@ const gwSanVehicleTemplate = VehicleTemplate.create(
     gwSanImage,
     0,
     ['gf', 'rettSan', 'rettSan', 'san', 'san', 'notarzt'],
-    ['big', 'big', 'big', 'big']
+    [
+        defaultMaterialTemplates.big.id,
+        defaultMaterialTemplates.big.id,
+        defaultMaterialTemplates.big.id,
+        defaultMaterialTemplates.big.id,
+    ]
 );
 
 const nefVehicleTemplate = VehicleTemplate.create(
@@ -103,7 +109,7 @@ const nefVehicleTemplate = VehicleTemplate.create(
     nefImage,
     0,
     ['notarzt', 'notSan'],
-    ['standard']
+    [defaultMaterialTemplates.standard.id]
 );
 
 const rthVehicleTemplate = VehicleTemplate.create(
@@ -112,7 +118,7 @@ const rthVehicleTemplate = VehicleTemplate.create(
     rthImage,
     1,
     ['notarzt', 'notSan'],
-    ['standard']
+    [defaultMaterialTemplates.standard.id]
 );
 
 export const defaultVehicleTemplates: readonly VehicleTemplate[] = [

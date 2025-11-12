@@ -29,6 +29,9 @@ export class Personnel {
     @IsString()
     public readonly personnelType: string;
 
+    @IsUUID()
+    public readonly baseTemplateId: UUID;
+
     @IsString()
     public readonly name: string;
 
@@ -83,6 +86,7 @@ export class Personnel {
         vehicleId: UUID,
         vehicleName: string,
         personnelType: string,
+        baseTemplateId: UUID,
         name: string,
         assignedPatientIds: UUIDSet,
         image: ImageProperties,
@@ -95,6 +99,7 @@ export class Personnel {
         this.vehicleId = vehicleId;
         this.vehicleName = vehicleName;
         this.personnelType = personnelType;
+        this.baseTemplateId = baseTemplateId;
         this.name = name;
         this.assignedPatientIds = assignedPatientIds;
         this.image = image;
@@ -118,6 +123,7 @@ export class Personnel {
             vehicleName,
             personnelTemplate.personnelType,
             personnelTemplate.name,
+            personnelTemplate.id,
             {},
             personnelTemplate.image,
             personnelTemplate.canCaterFor,

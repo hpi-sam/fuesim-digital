@@ -17,33 +17,38 @@ import type { UUID } from '../utils/index.js';
 export function createVehicleParameters(
     vehicleId: UUID,
     vehicleTemplate: VehicleTemplate,
-    materialTemplates: {
-        [Key in string]: MaterialTemplate;
-    },
-    personnelTemplates: {
-        [Key in string]: PersonnelTemplate;
-    },
+    materialTemplates: readonly MaterialTemplate[],
+    personnelTemplates: readonly PersonnelTemplate[],
     vehiclePosition: MapCoordinates
 ): VehicleParameters {
-    const materials: Material[] = vehicleTemplate.materials
-        .map((currentMaterial) => {
-            if (!materialTemplates[currentMaterial]) return null;
+    const materials: Material[] = vehicleTemplate.materialTemplateIds
+        .map((materialTemplateId: UUID) => {
+            const materialTemplate = materialTemplates.find(
+                (template) => template.id === materialTemplateId
+            );
+            if (!materialTemplate) return null;
             return Material.generateMaterial(
-                materialTemplates[currentMaterial],
+                materialTemplate,
                 vehicleId,
                 vehicleTemplate.name,
                 VehiclePosition.create(vehicleId)
             );
         })
         .filter((val) => val !== null);
-    const personnel = vehicleTemplate.personnel.map((currentPersonnel) =>
-        Personnel.generatePersonnel(
-            personnelTemplates[currentPersonnel]!,
-            vehicleId,
-            vehicleTemplate.name,
-            VehiclePosition.create(vehicleId)
-        )
-    );
+    const personnel = vehicleTemplate.personnelTemplateIds
+        .map((personnelTemplateId: UUID) => {
+            const personnelTemplate = personnelTemplates.find(
+                (template) => template.id === personnelTemplateId
+            );
+            if (!personnelTemplate) return null;
+            return Personnel.generatePersonnel(
+                personnelTemplate,
+                vehicleId,
+                vehicleTemplate.name,
+                VehiclePosition.create(vehicleId)
+            );
+        })
+        .filter((val) => val !== null);
 
     const vehicle: Vehicle = {
         id: vehicleId,

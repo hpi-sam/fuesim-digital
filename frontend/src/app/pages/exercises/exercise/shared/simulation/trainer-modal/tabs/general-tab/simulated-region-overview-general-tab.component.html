@@ -101,16 +101,13 @@
                 </th>
             </tr>
             <tr
-                *ngFor="let template of personnelTemplates$ | async | values"
+                *ngFor="let template of personnelTemplates$ | async"
                 #collapse="ngbCollapse"
                 [(ngbCollapse)]="personnelCollapsed"
             >
                 <td class="ps-4">{{ template.name }}</td>
                 <td>
-                    {{
-                        ((personnel$ | async) ?? {})[template.personnelType]
-                            ?.length
-                    }}
+                    {{ ((personnel$ | async) ?? {})[template.id]?.length }}
                 </td>
             </tr>
         </tbody>

@@ -2,12 +2,7 @@ import type { OnInit } from '@angular/core';
 import { Component, ViewEncapsulation } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import type {
-    PatientStatus,
-    UUID,
-    LogEntry,
-    Personnel,
-} from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID, LogEntry } from 'digital-fuesim-manv-shared';
 import { statusNames } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';

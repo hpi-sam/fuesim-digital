@@ -101,12 +101,6 @@ export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
         (radiograms) => radiograms[id] as R
     );
 }
-export const createSelectMaterialTemplate = createSelectElementFromMapFactory(
-    selectMaterialTemplates
-);
-export const createSelectPersonnelTemplate = createSelectElementFromMapFactory(
-    selectPersonnelTemplates
-);
 
 function createSelectElementFromArrayFactory<Element extends { id: UUID }>(
     elementsSelector: (state: AppState) => readonly Element[]
@@ -125,6 +119,11 @@ export const createSelectMapImageTemplate = createSelectElementFromArrayFactory(
 export const createSelectVehicleTemplate = createSelectElementFromArrayFactory(
     selectVehicleTemplates
 );
+export const createSelectMaterialTemplate = createSelectElementFromArrayFactory(
+    selectMaterialTemplates
+);
+export const createSelectPersonnelTemplate =
+    createSelectElementFromArrayFactory(selectPersonnelTemplates);
 
 // Misc selectors
 

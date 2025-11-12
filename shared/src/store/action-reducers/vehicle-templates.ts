@@ -44,13 +44,13 @@ export class EditVehicleTemplateAction implements Action {
     @Type(() => ImageProperties)
     public readonly image!: ImageProperties;
 
-    @IsString({ each: true })
+    @IsUUID(4, { each: true })
     @IsArray()
-    public readonly materials!: readonly string[];
+    public readonly materialTemplateIds!: readonly UUID[];
 
-    @IsString({ each: true })
+    @IsUUID(4, { each: true })
     @IsArray()
-    public readonly personnelTypes!: readonly string[];
+    public readonly personnelTemplateIds!: readonly UUID[];
 }
 
 export class DeleteVehicleTemplateAction implements Action {
@@ -91,8 +91,8 @@ export namespace VehicleTemplateActionReducers {
                     vehicleType,
                     image,
                     patientCapacity,
-                    materials,
-                    personnelTypes,
+                    materialTemplateIds,
+                    personnelTemplateIds,
                 }
             ) => {
                 const vehicleTemplate = getVehicleTemplate(draftState, id);
@@ -100,8 +100,10 @@ export namespace VehicleTemplateActionReducers {
                 vehicleTemplate.name = name;
                 vehicleTemplate.patientCapacity = patientCapacity;
                 vehicleTemplate.vehicleType = vehicleType;
-                vehicleTemplate.materials = cloneDeepMutable(materials);
-                vehicleTemplate.personnel = cloneDeepMutable(personnelTypes);
+                vehicleTemplate.materialTemplateIds =
+                    cloneDeepMutable(materialTemplateIds);
+                vehicleTemplate.personnelTemplateIds =
+                    cloneDeepMutable(personnelTemplateIds);
 
                 return draftState;
             },

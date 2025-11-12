@@ -160,7 +160,7 @@ function personnelInVehicleTemplate(
         (tp) => tp.id === templateId
     )[0];
     if (template) {
-        template.personnel.forEach((pt) => {
+        template.personnelTemplateIds.forEach((pt) => {
             resource[pt]!++;
         });
     }

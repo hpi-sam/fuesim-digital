@@ -30,8 +30,8 @@ import {
     Viewport,
 } from './models/index.js';
 import { ExerciseConfiguration } from './models/exercise-configuration.js';
-import type { MaterialTemplate } from './models/material-template.js';
-import type { PersonnelTemplate } from './models/personnel-template.js';
+import { MaterialTemplate } from './models/material-template.js';
+import { PersonnelTemplate } from './models/personnel-template.js';
 import type { ExerciseRadiogram } from './models/radiogram/exercise-radiogram.js';
 import { getRadiogramConstructor } from './models/radiogram/exercise-radiogram.js';
 import type { ExerciseStatus } from './models/utils/index.js';
@@ -125,14 +125,16 @@ export class ExerciseState {
     @ValidateNested()
     @Type(() => VehicleTemplate)
     public readonly vehicleTemplates = defaultVehicleTemplates;
-    @IsObject()
-    public readonly materialTemplates: {
-        [Key in string]: MaterialTemplate;
-    } = defaultMaterialTemplates;
-    @IsObject()
-    public readonly personnelTemplates: {
-        [Key in string]: PersonnelTemplate;
-    } = defaultPersonnelTemplates;
+    @IsArray()
+    @ValidateNested()
+    @Type(() => MaterialTemplate)
+    public readonly materialTemplates: readonly MaterialTemplate[] =
+        Object.values(defaultMaterialTemplates);
+    @IsArray()
+    @ValidateNested()
+    @Type(() => PersonnelTemplate)
+    public readonly personnelTemplates: readonly PersonnelTemplate[] =
+        Object.values(defaultPersonnelTemplates);
     @IsArray()
     @ValidateNested()
     @Type(() => MapImageTemplate)

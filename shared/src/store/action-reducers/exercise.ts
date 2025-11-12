@@ -342,7 +342,10 @@ function evaluateTreatmentReassignment(
                     .map(([personnelType]) =>
                         createPersonnelTypeTag(
                             draftState,
-                            draftState.personnelTemplates[personnelType]!
+                            draftState.personnelTemplates.find(
+                                (template) =>
+                                    template.personnelType === personnelType
+                            )!
                         )
                     ),
                 `Diese Einsatzkräfte wurden dem Patienten neu zugeteilt: ${
@@ -351,8 +354,11 @@ function evaluateTreatmentReassignment(
                         .map(
                             ([personnelType, count]) =>
                                 `${+count.toFixed(2)} ${
-                                    draftState.personnelTemplates[personnelType]
-                                        ?.name ?? personnelType
+                                    draftState.personnelTemplates.find(
+                                        (template) =>
+                                            template.personnelType ===
+                                            personnelType
+                                    )!.name
                                 }`
                         )
                         .join(', ') || 'Keine Einsatzkräfte'

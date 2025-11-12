@@ -32,14 +32,12 @@ export class VehicleTemplate {
     public readonly patientCapacity: number;
 
     @IsArray()
-    @IsString({ each: true })
-    // TODO Suitable validation
-    public readonly personnel: readonly string[];
+    @IsUUID(4, { each: true })
+    public readonly personnelTemplateIds: readonly UUID[];
 
     @IsArray()
-    @IsString({ each: true })
-    // TODO Suitable validation
-    public readonly materials: readonly string[];
+    @IsUUID(4, { each: true })
+    public readonly materialTemplateIds: readonly UUID[];
 
     /**
      * @deprecated Use {@link create} instead
@@ -49,15 +47,15 @@ export class VehicleTemplate {
         name: string,
         image: ImageProperties,
         patientCapacity: number,
-        personnel: readonly string[],
-        materials: readonly string[]
+        personnelTemplateIds: readonly UUID[],
+        materialTemplateIds: readonly UUID[]
     ) {
         this.vehicleType = vehicleType;
         this.name = name;
         this.image = image;
         this.patientCapacity = patientCapacity;
-        this.personnel = personnel;
-        this.materials = materials;
+        this.personnelTemplateIds = personnelTemplateIds;
+        this.materialTemplateIds = materialTemplateIds;
     }
 
     static readonly create = getCreate(this);

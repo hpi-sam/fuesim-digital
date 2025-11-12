@@ -6,7 +6,6 @@ import {
 } from './default-treatment-range.js';
 
 const standardMaterialTemplate = MaterialTemplate.create(
-    'standard',
     'Standardmaterial',
     {
         url: '/assets/material.svg',
@@ -19,7 +18,6 @@ const standardMaterialTemplate = MaterialTemplate.create(
 );
 
 const bigMaterialTemplate = MaterialTemplate.create(
-    'big',
     'Erweitertes Material',
     {
         url: '/assets/big-material.svg',
@@ -32,7 +30,7 @@ const bigMaterialTemplate = MaterialTemplate.create(
 );
 
 export const defaultMaterialTemplates: {
-    [key in string]: MaterialTemplate;
+    [key in 'big' | 'standard']: MaterialTemplate;
 } = {
     standard: standardMaterialTemplate,
     big: bigMaterialTemplate,

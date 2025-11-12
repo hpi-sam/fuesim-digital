@@ -4,14 +4,10 @@
 
 <table *ngIf="radiogram$ | async as radiogram" class="table table-sm">
     <tbody>
-        <tr
-            *ngFor="
-                let personnelTemplate of personnelTemplates$ | async | values
-            "
-        >
+        <tr *ngFor="let personnelTemplate of personnelTemplates$ | async">
             <td>{{ personnelTemplate.name }}</td>
             <td>
-                {{ radiogram.personnelCount[personnelTemplate.personnelType] }}
+                {{ radiogram.personnelCount[personnelTemplate.id] }}
             </td>
         </tr>
     </tbody>

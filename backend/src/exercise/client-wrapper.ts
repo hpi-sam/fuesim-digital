@@ -35,6 +35,7 @@ export class ClientWrapper {
                 role,
                 role === 'trainer' ? 'trainer' : 'mapOperator'
             ),
+            role !== 'trainer',
             undefined
         );
         this.chosenExercise.addClient(this);

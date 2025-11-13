@@ -3,9 +3,9 @@ import {
     currentSimulatedRegionIdOf,
     isInSimulatedRegion,
     isInSpecificVehicle,
-    isNotInTransfer,
-    VehiclePosition,
-} from '../../../models/utils/index.js';
+    isInTransfer,
+    newVehiclePositionIn,
+} from '../../../models/index.js';
 import {
     changePosition,
     changePositionWithId,
@@ -13,7 +13,7 @@ import {
 import {
     MaterialRemovedEvent,
     PersonnelRemovedEvent,
-} from '../../../simulation/events/index.js';
+} from '../../../simulation/index.js';
 import { sendSimulationEvent } from '../../../simulation/events/utils.js';
 import type { ExerciseState } from '../../../state.js';
 import type { Mutable } from '../../../utils/index.js';
@@ -70,7 +70,7 @@ export function completelyLoadVehicle(
         ? getElement(draftState, 'simulatedRegion', simulatedRegionId!)
         : undefined;
 
-    const vehiclePosition = VehiclePosition.create(vehicle.id);
+    const vehiclePosition = newVehiclePositionIn(vehicle.id);
 
     Object.keys(vehicle.materialIds).forEach((materialId) => {
         changePositionWithId(
@@ -91,7 +91,7 @@ export function completelyLoadVehicle(
     Object.keys(vehicle.personnelIds).forEach((personnelId) => {
         const personnel = getElement(draftState, 'personnel', personnelId);
 
-        if (isNotInTransfer(personnel)) {
+        if (!isInTransfer(personnel)) {
             changePosition(personnel, vehiclePosition, draftState);
 
             if (inSimulation) {

@@ -1,10 +1,9 @@
 import { IsInt, IsUUID, Min } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
 import {
+    getCreate,
     changeOccupation,
     isUnoccupied,
-} from '../../models/utils/occupations/occupation-helpers-mutable.js';
-import { UnloadingOccupation } from '../../models/utils/occupations/unloading-occupation.js';
+} from '../../models/index.js';
 import type { UUID } from '../../utils/index.js';
 import {
     StrictObject,
@@ -14,7 +13,7 @@ import {
 import { IsValue } from '../../utils/validators/index.js';
 import type { UUIDSquaredMap } from '../../utils/validators/is-uuid-uuid-map.js';
 import { IsUUIDSquaredMap } from '../../utils/validators/is-uuid-uuid-map.js';
-import { UnloadVehicleActivityState } from '../activities/unload-vehicle.js';
+import { UnloadVehicleActivityState } from '../activities/index.js';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
 import { tryGetElement } from '../../store/action-reducers/utils/index.js';
@@ -78,11 +77,9 @@ export const unloadArrivingVehiclesBehavior: SimulationBehavior<UnloadArrivingVe
                         const activityId = nextUUID(draftState);
                         behaviorState.vehicleActivityMap[event.vehicleId] =
                             activityId;
-                        changeOccupation(
-                            draftState,
-                            vehicle,
-                            UnloadingOccupation.create()
-                        );
+                        changeOccupation(draftState, vehicle, {
+                            type: 'unloadingOccupation',
+                        });
                         addActivity(
                             simulatedRegion,
                             UnloadVehicleActivityState.create(

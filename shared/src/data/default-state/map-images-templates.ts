@@ -1,16 +1,17 @@
-import { MapImageTemplate } from '../../models/map-image-template.js';
-import { ImageProperties } from '../../models/utils/index.js';
+import { MapImageTemplate } from '../../models/index.js';
 import type { UUID } from '../../utils/index.js';
 
-const fireMapImageTemplate = MapImageTemplate.create(
-    'Feuer',
-    ImageProperties.create('/assets/fire.svg', 427, 313 / 427)
-);
+const fireMapImageTemplate = MapImageTemplate.create('Feuer', {
+    url: '/assets/fire.svg',
+    height: 427,
+    aspectRatio: 313 / 427,
+});
 
-const houseFireMapImageTemplate = MapImageTemplate.create(
-    'Brennendes Haus',
-    ImageProperties.create('/assets/house-fire.svg', 623, 393 / 623)
-);
+const houseFireMapImageTemplate = MapImageTemplate.create('Brennendes Haus', {
+    url: '/assets/house-fire.svg',
+    height: 623,
+    aspectRatio: 393 / 623,
+});
 
 export const defaultMapImagesTemplates: readonly MapImageTemplate[] = [
     fireMapImageTemplate,

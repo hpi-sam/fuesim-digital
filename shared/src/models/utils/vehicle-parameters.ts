@@ -2,12 +2,13 @@ import { Type } from 'class-transformer';
 import { ValidateNested, IsArray } from 'class-validator';
 import { Material } from '../material.js';
 import { Personnel } from '../personnel.js';
-import { Vehicle } from '../vehicle.js';
+import { vehicleSchema } from '../vehicle.js';
+import type { Vehicle } from '../vehicle.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { getCreate } from './get-create.js';
 
 export class VehicleParameters {
-    @ValidateNested()
-    @Type(() => Vehicle)
+    @IsZodSchema(vehicleSchema)
     public readonly vehicle!: Vehicle;
 
     @IsArray()

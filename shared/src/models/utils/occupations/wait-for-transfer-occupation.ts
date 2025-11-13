@@ -1,10 +1,9 @@
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../get-create.js';
-import type { Occupation } from './occupation.js';
+import * as z from 'zod';
 
-export class WaitForTransferOccupation implements Occupation {
-    @IsValue('waitForTransferOccupation')
-    readonly type = 'waitForTransferOccupation';
+export const waitForTransferOccupationSchema = z.strictObject({
+    type: z.literal('waitForTransferOccupation'),
+});
 
-    static readonly create = getCreate(this);
+export interface WaitForTransferOccupation {
+    type: 'waitForTransferOccupation';
 }

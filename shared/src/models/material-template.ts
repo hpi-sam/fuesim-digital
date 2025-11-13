@@ -8,10 +8,16 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
 import { IsValue } from '../utils/validators/index.js';
 import type { UUID } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
-import { CanCaterFor, getCreate, ImageProperties } from './utils/index.js';
+import {
+    CanCaterFor,
+    imagePropertiesSchema,
+    getCreate,
+    type ImageProperties,
+} from './utils/index.js';
 
 export class MaterialTemplate {
     @IsUUID(4, uuidValidationOptions)
@@ -45,8 +51,7 @@ export class MaterialTemplate {
     @Max(maxTreatmentRange)
     public readonly treatmentRange: number;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
     /**

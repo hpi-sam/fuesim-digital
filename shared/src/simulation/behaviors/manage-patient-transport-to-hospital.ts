@@ -11,14 +11,13 @@ import { Type } from 'class-transformer';
 import type {
     PatientStatus,
     PatientStatusForTransport,
-} from '../../models/utils/index.js';
+} from '../../models/index.js';
 import {
-    PatientTransferOccupation,
     currentSimulatedRegionOf,
     getCreate,
     isInSpecificSimulatedRegion,
     patientStatusAllowedValues,
-} from '../../models/utils/index.js';
+} from '../../models/index.js';
 import type { Mutable, UUID, UUIDSet } from '../../utils/index.js';
 import {
     StrictObject,
@@ -282,9 +281,11 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                                     targetTransferPoint.id,
                                     simulatedRegion.id,
                                     undefined,
-                                    PatientTransferOccupation.create(
-                                        simulatedRegion.id
-                                    )
+                                    {
+                                        type: 'patientTransferOccupation',
+                                        transportManagementRegionId:
+                                            simulatedRegion.id,
+                                    }
                                 )
                             )
                         );

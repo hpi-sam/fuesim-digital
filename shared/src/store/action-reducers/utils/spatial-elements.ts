@@ -1,15 +1,14 @@
-import type { MapCoordinates } from '../../../models/utils/index.js';
 import {
+    type MapCoordinates,
     currentCoordinatesOf,
-    isNotOnMap,
     isOnMap,
-} from '../../../models/utils/position/position-helpers.js';
-import { SpatialTree } from '../../../models/utils/spatial-tree.js';
+    SpatialTree,
+} from '../../../models/index.js';
 import type { ExerciseState } from '../../../state.js';
-import { cloneDeepMutable } from '../../../utils/clone-deep.js';
+import { cloneDeepMutable } from '../../../utils/index.js';
 import type { ElementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
-import type { Mutable } from '../../../utils/immutability.js';
+import type { Mutable } from '../../../utils/index.js';
 import type { UUID } from '../../../utils/uuid.js';
 import { removeTreatmentsOfElement } from './calculate-treatments.js';
 import { getElement } from './get-element.js';
@@ -33,7 +32,7 @@ export function addElementPosition(
     elementId: UUID
 ) {
     const element = getElement(state, elementType, elementId);
-    if (isNotOnMap(element)) {
+    if (!isOnMap(element)) {
         return;
     }
     SpatialTree.addElement(
@@ -81,7 +80,7 @@ export function removeElementPosition(
 ) {
     const element = getElement(state, elementType, elementId);
     removeTreatmentsOfElement(state, element);
-    if (isNotOnMap(element)) {
+    if (!isOnMap(element)) {
         return;
     }
     SpatialTree.removeElement(

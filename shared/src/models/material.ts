@@ -11,12 +11,18 @@ import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import type { UUID, UUIDSet } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
 import { IsUUIDSet, IsValue } from '../utils/validators/index.js';
-import { IsPosition } from '../utils/validators/is-position.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
 import type { MaterialTemplate } from './material-template.js';
-import type { Position } from './utils/position/position.js';
-import { CanCaterFor } from './utils/cater-for.js';
-import { ImageProperties } from './utils/image-properties.js';
-import { getCreate } from './utils/get-create.js';
+import {
+    type Position,
+    type ImageProperties,
+    IsPosition,
+} from './utils/index.js';
+import {
+    imagePropertiesSchema,
+    getCreate,
+    CanCaterFor,
+} from './utils/index.js';
 
 export class Material {
     @IsUUID(4, uuidValidationOptions)
@@ -68,11 +74,9 @@ export class Material {
      * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
      */
     @IsPosition()
-    @ValidateNested()
     public readonly position: Position;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
     /**

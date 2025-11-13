@@ -7,18 +7,18 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { Patient } from '../../models/patient.js';
-import type { PatientStatus } from '../../models/utils/index.js';
 import {
+    newMapPositionAt,
+    type PatientStatus,
     isOnMap,
-    MapPosition,
     patientStatusAllowedValues,
-    MapCoordinates,
-    isNotInSimulatedRegion,
+    type MapCoordinates,
     currentSimulatedRegionIdOf,
     currentCoordinatesOf,
     isInSimulatedRegion,
     currentSimulatedRegionOf,
-} from '../../models/utils/index.js';
+    mapCoordinatesSchema,
+} from '../../models/index.js';
 import {
     changePosition,
     changePositionWithId,
@@ -33,10 +33,11 @@ import {
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
-import { PatientRemovedEvent } from '../../simulation/events/index.js';
+import { PatientRemovedEvent } from '../../simulation/index.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { updateTreatments } from './utils/calculate-treatments.js';
-import { getElement } from './utils/get-element.js';
+import { getElement } from './utils/index.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
 import { logPatientAdded, logPatientRemoved } from './utils/log.js';
 
@@ -76,8 +77,7 @@ export class MovePatientAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly patientId!: UUID;
 
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -211,7 +211,7 @@ export namespace PatientActionReducers {
         reducer: (draftState, { patientId, targetPosition }) => {
             changePositionWithId(
                 patientId,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 'patient',
                 draftState
             );
@@ -226,7 +226,7 @@ export namespace PatientActionReducers {
             reducer: (draftState, { patientId }) => {
                 const patient = getElement(draftState, 'patient', patientId);
 
-                if (isNotInSimulatedRegion(patient)) {
+                if (!isInSimulatedRegion(patient)) {
                     throw new ReducerError(
                         `Patient with Id: ${patientId} was expected to be in simulated region but position was of type: ${patient.position.type}`
                     );
@@ -253,7 +253,7 @@ export namespace PatientActionReducers {
 
                 changePositionWithId(
                     patientId,
-                    MapPosition.create(coordinates),
+                    newMapPositionAt(coordinates),
                     'patient',
                     draftState
                 );

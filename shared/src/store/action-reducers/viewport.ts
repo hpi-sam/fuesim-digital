@@ -1,7 +1,12 @@
 import { Type } from 'class-transformer';
 import { IsString, IsUUID, ValidateNested } from 'class-validator';
-import { Viewport } from '../../models/index.js';
-import { MapCoordinates, MapPosition, Size } from '../../models/utils/index.js';
+import type { MapCoordinates } from '../../models/index.js';
+import {
+    newMapPositionAt,
+    Viewport,
+    Size,
+    mapCoordinatesSchema,
+} from '../../models/index.js';
 import {
     changePosition,
     changePositionWithId,
@@ -10,7 +15,8 @@ import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
-import { getElement } from './utils/get-element.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { getElement } from './utils/index.js';
 
 export class AddViewportAction implements Action {
     @IsValue('[Viewport] Add viewport' as const)
@@ -32,8 +38,7 @@ export class MoveViewportAction implements Action {
     public readonly type = '[Viewport] Move viewport';
     @IsUUID(4, uuidValidationOptions)
     public readonly viewportId!: UUID;
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -42,8 +47,7 @@ export class ResizeViewportAction implements Action {
     public readonly type = '[Viewport] Resize viewport';
     @IsUUID(4, uuidValidationOptions)
     public readonly viewportId!: UUID;
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
     @ValidateNested()
     @Type(() => Size)
@@ -86,7 +90,7 @@ export namespace ViewportActionReducers {
         reducer: (draftState, { viewportId, targetPosition }) => {
             changePositionWithId(
                 viewportId,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 'viewport',
                 draftState
             );
@@ -101,7 +105,7 @@ export namespace ViewportActionReducers {
             const viewport = getElement(draftState, 'viewport', viewportId);
             changePosition(
                 viewport,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 draftState
             );
             viewport.size = cloneDeepMutable(newSize);

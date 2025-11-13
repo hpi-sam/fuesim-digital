@@ -1,7 +1,9 @@
 import { Type } from 'class-transformer';
 import { IsString, IsUUID, ValidateNested } from 'class-validator';
-import type { ExerciseOccupation } from '../../models/utils/index.js';
 import {
+    newMapPositionAt,
+    type ExerciseOccupation,
+    exerciseOccupationSchema,
     changeOccupation,
     currentCoordinatesOf,
     currentSimulatedRegionIdOf,
@@ -11,19 +13,16 @@ import {
     isInTransfer,
     isInVehicle,
     isOnMap,
-    MapCoordinates,
-    MapPosition,
-    occupationTypeOptions,
-    SimulatedRegionPosition,
+    type MapCoordinates,
     VehicleParameters,
-    VehiclePosition,
-} from '../../models/utils/index.js';
+    mapCoordinatesSchema,
+} from '../../models/index.js';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
-import { imageSizeToPosition } from '../../state-helpers/image-size-to-position.js';
+import { imageSizeToPosition } from '../../state-helpers/index.js';
 import type { Mutable, UUID } from '../../utils/index.js';
 import {
     cloneDeepMutable,
@@ -41,10 +40,15 @@ import {
     PersonnelAvailableEvent,
     PersonnelRemovedEvent,
     VehicleRemovedEvent,
-} from '../../simulation/events/index.js';
+} from '../../simulation/index.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import {
+    newVehiclePositionIn,
+    newSimulatedRegionPositionIn,
+} from '../../models/index.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
-import { getElement } from './utils/get-element.js';
+import { getElement } from './utils/index.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
 import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
 
@@ -139,8 +143,7 @@ export class MoveVehicleAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly vehicleId!: UUID;
 
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -204,8 +207,7 @@ export class SetVehicleOccupationAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly vehicleId!: UUID;
 
-    @Type(...occupationTypeOptions)
-    @ValidateNested()
+    @IsZodSchema(exerciseOccupationSchema)
     public readonly occupation!: ExerciseOccupation;
 }
 
@@ -244,7 +246,7 @@ export namespace VehicleActionReducers {
             for (const material of cloneDeepMutable(materials)) {
                 changePosition(
                     material,
-                    VehiclePosition.create(vehicle.id),
+                    newVehiclePositionIn(vehicle.id),
                     draftState
                 );
                 draftState.materials[material.id] = material;
@@ -252,7 +254,7 @@ export namespace VehicleActionReducers {
             for (const person of cloneDeepMutable(personnel)) {
                 changePosition(
                     person,
-                    VehiclePosition.create(vehicle.id),
+                    newVehiclePositionIn(vehicle.id),
                     draftState
                 );
                 draftState.personnel[person.id] = person;
@@ -270,7 +272,7 @@ export namespace VehicleActionReducers {
         reducer: (draftState, { vehicleId, targetPosition }) => {
             changePositionWithId(
                 vehicleId,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 'vehicle',
                 draftState
             );
@@ -339,9 +341,7 @@ export namespace VehicleActionReducers {
                     x += space;
                     changePositionWithId(
                         patientId,
-                        MapPosition.create(
-                            MapCoordinates.create(x, unloadPosition.y)
-                        ),
+                        newMapPositionAt({ x, y: unloadPosition.y }),
                         'patient',
                         draftState
                     );
@@ -358,9 +358,7 @@ export namespace VehicleActionReducers {
                     if (isInVehicle(personnel)) {
                         changePositionWithId(
                             personnelId,
-                            MapPosition.create(
-                                MapCoordinates.create(x, unloadPosition.y)
-                            ),
+                            newMapPositionAt({ x, y: unloadPosition.y }),
                             'personnel',
                             draftState
                         );
@@ -377,9 +375,7 @@ export namespace VehicleActionReducers {
                     if (isInVehicle(material)) {
                         changePosition(
                             material,
-                            MapPosition.create(
-                                MapCoordinates.create(x, unloadPosition.y)
-                            ),
+                            newMapPositionAt({ x, y: unloadPosition.y }),
                             draftState
                         );
                     }
@@ -396,7 +392,7 @@ export namespace VehicleActionReducers {
                 for (const patientId of patientIds) {
                     changePositionWithId(
                         patientId,
-                        SimulatedRegionPosition.create(simulatedRegionId),
+                        { type: 'simulatedRegion', simulatedRegionId },
                         'patient',
                         draftState
                     );
@@ -417,7 +413,7 @@ export namespace VehicleActionReducers {
                     if (isInVehicle(personnel)) {
                         changePositionWithId(
                             personnelId,
-                            SimulatedRegionPosition.create(simulatedRegionId),
+                            newSimulatedRegionPositionIn(simulatedRegionId),
                             'personnel',
                             draftState
                         );
@@ -438,7 +434,7 @@ export namespace VehicleActionReducers {
                     if (isInVehicle(material)) {
                         changePosition(
                             material,
-                            SimulatedRegionPosition.create(simulatedRegionId),
+                            newSimulatedRegionPositionIn(simulatedRegionId),
                             draftState
                         );
                         sendSimulationEvent(
@@ -475,7 +471,7 @@ export namespace VehicleActionReducers {
                     }
                     changePosition(
                         material,
-                        VehiclePosition.create(vehicleId),
+                        newVehiclePositionIn(vehicleId),
                         draftState
                     );
                     break;
@@ -498,7 +494,7 @@ export namespace VehicleActionReducers {
                     }
                     changePosition(
                         personnel,
-                        VehiclePosition.create(vehicleId),
+                        newVehiclePositionIn(vehicleId),
                         draftState
                     );
                     break;
@@ -520,7 +516,7 @@ export namespace VehicleActionReducers {
                     vehicle.patientIds[elementToBeLoadedId] = true;
                     changePosition(
                         patient,
-                        VehiclePosition.create(vehicleId),
+                        newVehiclePositionIn(vehicleId),
                         draftState
                     );
 
@@ -577,7 +573,7 @@ export namespace VehicleActionReducers {
 
                 changePositionWithId(
                     vehicleId,
-                    MapPosition.create(coordinates),
+                    newMapPositionAt(coordinates),
                     'vehicle',
                     draftState
                 );

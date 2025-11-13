@@ -1,4 +1,4 @@
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 import type { UUID, UUIDSet } from '../utils/index.js';
 import { uuid, uuidValidationOptions } from '../utils/index.js';
 import {
@@ -6,9 +6,8 @@ import {
     IsUUIDSet,
     IsValue,
 } from '../utils/validators/index.js';
-import { IsPosition } from '../utils/validators/is-position.js';
+import { IsPosition, getCreate, isInSimulatedRegion } from './utils/index.js';
 import type { ImageProperties, Position } from './utils/index.js';
-import { getCreate, isInSimulatedRegion } from './utils/index.js';
 
 export class TransferPoint {
     @IsUUID(4, uuidValidationOptions)
@@ -20,7 +19,6 @@ export class TransferPoint {
     /**
      * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
      */
-    @ValidateNested()
     @IsPosition()
     public readonly position: Position;
 

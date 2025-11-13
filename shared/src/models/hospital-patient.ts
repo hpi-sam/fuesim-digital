@@ -10,14 +10,20 @@ import {
 import type { Mutable, UUID } from '../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../utils/index.js';
 import { IsIdMap, IsLiteralUnion, IsValue } from '../utils/validators/index.js';
-import type { HealthPoints, PatientStatus } from './utils/index.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
+import type {
+    HealthPoints,
+    PatientStatus,
+    ImageProperties,
+} from './utils/index.js';
 import {
     getCreate,
-    ImageProperties,
     IsValidHealthPoint,
     patientStatusAllowedValues,
+    BiometricInformation,
+    imagePropertiesSchema,
 } from './utils/index.js';
-import { BiometricInformation } from './utils/biometric-information.js';
+
 import { PersonalInformation } from './utils/personal-information.js';
 import { PatientHealthState } from './patient-health-state.js';
 import type { Patient } from './index.js';
@@ -73,8 +79,7 @@ export class HospitalPatient {
     @IsBoolean()
     public readonly hasTransportPriority: boolean;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
     @IsIdMap(PatientHealthState)

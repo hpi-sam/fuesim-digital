@@ -13,7 +13,10 @@ import {
     getCreate,
     isInSimulatedRegion,
     isInSpecificSimulatedRegion,
-} from '../../models/utils/index.js';
+    changeOccupation,
+    isUnoccupied,
+    isUnoccupiedOrIntermediarilyOccupied,
+} from '../../models/index.js';
 import type { UUID } from '../../utils/index.js';
 import {
     cloneDeepMutable,
@@ -32,23 +35,16 @@ import {
     LoadVehicleActivityState,
     RecurringEventActivityState,
     SendRemoteEventActivityState,
+    TransferVehicleActivityState,
 } from '../activities/index.js';
-import {
-    changeOccupation,
-    isUnoccupied,
-    isUnoccupiedOrIntermediarilyOccupied,
-} from '../../models/utils/occupations/occupation-helpers-mutable.js';
 import { amountOfResourcesInVehicle } from '../../models/utils/amount-of-resources-in-vehicle.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import type { ResourceDescription } from '../../models/index.js';
 import {
     DoTransferEvent,
     RequestReceivedEvent,
     StartTransferEvent,
     VehiclesSentEvent,
 } from '../events/index.js';
-import { LoadOccupation } from '../../models/utils/occupations/load-occupation.js';
-import { WaitForTransferOccupation } from '../../models/utils/occupations/wait-for-transfer-occupation.js';
-import { TransferVehicleActivityState } from '../activities/transfer-vehicle.js';
 import type {
     SimulationBehavior,
     SimulationBehaviorState,
@@ -150,11 +146,10 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                                 behaviorState.personnelLoadTime
                             )
                         );
-                        changeOccupation(
-                            draftState,
-                            vehicleToLoad,
-                            LoadOccupation.create(activityId)
-                        );
+                        changeOccupation(draftState, vehicleToLoad, {
+                            type: 'loadOccupation',
+                            loadingActivityId: activityId,
+                        });
                     }
                 }
                 break;
@@ -189,11 +184,10 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                             behaviorState.personnelLoadTime
                         )
                     );
-                    changeOccupation(
-                        draftState,
-                        vehicle,
-                        LoadOccupation.create(activityId)
-                    );
+                    changeOccupation(draftState, vehicle, {
+                        type: 'loadOccupation',
+                        loadingActivityId: activityId,
+                    });
                 }
                 break;
             case 'transferSpecificVehicleRequestEvent':
@@ -226,11 +220,10 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                             event.successorOccupation
                         )
                     );
-                    changeOccupation(
-                        draftState,
-                        vehicle,
-                        LoadOccupation.create(activityId)
-                    );
+                    changeOccupation(draftState, vehicle, {
+                        type: 'loadOccupation',
+                        loadingActivityId: activityId,
+                    });
                 }
                 break;
             case 'transferVehiclesRequestEvent':
@@ -308,7 +301,10 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                                 changeOccupation(
                                     draftState,
                                     loadableVehicles![index]!,
-                                    LoadOccupation.create(activityId)
+                                    {
+                                        type: 'loadOccupation',
+                                        loadingActivityId: activityId,
+                                    }
                                 );
                                 sentVehicles[vehicleType]++;
                             }
@@ -399,11 +395,9 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                     if (vehicle === undefined) {
                         break;
                     }
-                    changeOccupation(
-                        draftState,
-                        vehicle,
-                        WaitForTransferOccupation.create()
-                    );
+                    changeOccupation(draftState, vehicle, {
+                        type: 'waitForTransferOccupation',
+                    });
 
                     behaviorState.startTransferEventQueue.push(event);
                 }

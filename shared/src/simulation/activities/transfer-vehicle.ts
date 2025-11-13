@@ -1,21 +1,19 @@
 import { IsOptional, IsString, IsUUID } from 'class-validator';
-import { Type } from 'class-transformer';
 import {
     MissingTransferConnectionRadiogram,
     RadiogramUnpublishedStatus,
 } from '../../models/radiogram/index.js';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
-import type { ExerciseOccupation } from '../../models/utils/index.js';
+import type { ExerciseOccupation } from '../../models/index.js';
 import {
+    exerciseOccupationSchema,
+    ResourceDescription,
     changeOccupation,
     getCreate,
     isInSpecificSimulatedRegion,
     isInSpecificVehicle,
-    NoOccupation,
-    occupationTypeOptions,
-    TransferStartPoint,
-} from '../../models/utils/index.js';
-import { VehicleResource } from '../../models/utils/rescue-resource.js';
+    VehicleResource,
+} from '../../models/index.js';
 import { TransferActionReducers } from '../../store/action-reducers/transfer.js';
 import {
     getElement,
@@ -34,7 +32,7 @@ import { nextUUID } from '../utils/randomness.js';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeAllowedValues } from '../utils/transfer-destination.js';
 import { HospitalActionReducers } from '../../store/action-reducers/hospital.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type {
     SimulationActivity,
     SimulationActivityState,
@@ -56,8 +54,7 @@ export class TransferVehicleActivityState implements SimulationActivityState {
     @IsUUID(4, uuidValidationOptions)
     readonly transferDestinationId: UUID;
 
-    @IsOptional()
-    @Type(...occupationTypeOptions)
+    @IsZodSchema(exerciseOccupationSchema.optional())
     readonly successorOccupation?: ExerciseOccupation;
 
     @IsOptional()
@@ -136,7 +133,7 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
             changeOccupation(
                 draftState,
                 vehicle,
-                activityState.successorOccupation ?? NoOccupation.create()
+                activityState.successorOccupation ?? { type: 'noOccupation' }
             );
 
             switch (activityState.transferDestinationType) {
@@ -183,9 +180,10 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
                         type: '[Transfer] Add to transfer',
                         elementType: 'vehicle',
                         elementId: activityState.vehicleId,
-                        startPoint: TransferStartPoint.create(
-                            ownTransferPoint.id
-                        ),
+                        startPoint: {
+                            type: 'transferStartPoint',
+                            transferPointId: ownTransferPoint.id,
+                        },
                         targetTransferPointId:
                             activityState.transferDestinationId,
                     });

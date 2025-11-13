@@ -1,13 +1,12 @@
-import { IsOptional, IsUUID } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsUUID } from 'class-validator';
 import type { UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeAllowedValues } from '../utils/transfer-destination.js';
-import type { ExerciseOccupation } from '../../models/utils/occupations/exercise-occupation.js';
-import { occupationTypeOptions } from '../../models/utils/occupations/exercise-occupation.js';
-import { getCreate } from '../../models/utils/get-create.js';
+import type { ExerciseOccupation } from '../../models/index.js';
+import { exerciseOccupationSchema, getCreate } from '../../models/index.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type { SimulationEvent } from './simulation-event.js';
 
 export class TransferSpecificVehicleRequestEvent implements SimulationEvent {
@@ -26,8 +25,7 @@ export class TransferSpecificVehicleRequestEvent implements SimulationEvent {
     @IsUUID(4, uuidValidationOptions)
     readonly transferDestinationId: UUID;
 
-    @IsOptional()
-    @Type(...occupationTypeOptions)
+    @IsZodSchema(exerciseOccupationSchema.optional())
     readonly successorOccupation?: ExerciseOccupation;
 
     /**

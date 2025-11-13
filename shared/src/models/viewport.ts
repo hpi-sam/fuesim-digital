@@ -2,19 +2,19 @@ import { Type } from 'class-transformer';
 import { IsString, IsUUID, ValidateNested } from 'class-validator';
 import type { UUID } from '../utils/index.js';
 import { uuid, uuidValidationOptions } from '../utils/index.js';
-import { IsPosition } from '../utils/validators/is-position.js';
 import { IsValue } from '../utils/validators/index.js';
+import {
+    IsPosition,
+    getCreate,
+    lowerRightCornerOf,
+    Size,
+    upperLeftCornerOf,
+    newMapPositionAt,
+} from './utils/index.js';
 import type {
     Position,
     ImageProperties,
     MapCoordinates,
-} from './utils/index.js';
-import {
-    getCreate,
-    lowerRightCornerOf,
-    MapPosition,
-    Size,
-    upperLeftCornerOf,
 } from './utils/index.js';
 
 export class Viewport {
@@ -29,7 +29,6 @@ export class Viewport {
      *
      * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
      */
-    @ValidateNested()
     @IsPosition()
     public readonly position: Position;
 
@@ -45,7 +44,7 @@ export class Viewport {
      * @deprecated Use {@link create} instead
      */
     constructor(position: MapCoordinates, size: Size, name: string) {
-        this.position = MapPosition.create(position);
+        this.position = newMapPositionAt(position);
         this.size = size;
         this.name = name;
     }

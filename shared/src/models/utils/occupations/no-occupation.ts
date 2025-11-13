@@ -1,10 +1,9 @@
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../get-create.js';
-import type { Occupation } from './occupation.js';
+import * as z from 'zod';
 
-export class NoOccupation implements Occupation {
-    @IsValue('noOccupation')
-    readonly type = 'noOccupation';
+export const noOccupationSchema = z.strictObject({
+    type: z.literal('noOccupation'),
+});
 
-    static readonly create = getCreate(this);
+export interface NoOccupation {
+    type: 'noOccupation';
 }

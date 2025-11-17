@@ -110,27 +110,25 @@
             *ngIf="values.materialTypes.length > 0; else noMaterialTemplates"
             class="d-flex flex-wrap"
         >
-            <div
+            <app-map-editor-card
                 *ngFor="
                     let materialTypes of values.materialTypes;
                     let index = index
                 "
-                class="card text-center m-1"
-                style="width: 10rem; text-overflow: ellipsis; height: auto"
+                style="width: 8rem"
             >
-                <div>
-                    <button
-                        (click)="removeMaterial(index)"
-                        class="btn btn-sm btn-outline-danger float-end"
-                    >
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
                 <app-material-template-display
                     [materialTemplateType]="materialTypes"
                 >
                 </app-material-template-display>
-            </div>
+                <button
+                    (click)="removeMaterial(index)"
+                    class="btn btn-sm btn-outline-danger position-absolute"
+                    style="top: 0; right: 0"
+                >
+                    <i class="bi bi-trash"></i>
+                </button>
+            </app-map-editor-card>
         </div>
         <ng-template #noMaterialTemplates>
             <div class="text-muted mt-3 mb-3">Keine Materialien zugewiesen</div>
@@ -171,27 +169,25 @@
             *ngIf="values.personnelTypes.length > 0; else noPersonnelTemplates"
             class="d-flex flex-wrap"
         >
-            <div
+            <app-map-editor-card
                 *ngFor="
                     let personnelType of values.personnelTypes;
                     let index = index
                 "
-                class="card text-center m-1"
-                style="width: 10rem; text-overflow: ellipsis; height: auto"
+                style="width: 8rem"
             >
-                <div>
-                    <button
-                        (click)="removePersonnel(index)"
-                        class="btn btn-sm btn-outline-danger float-end"
-                    >
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
                 <app-personnel-template-display
                     [personnelTemplateType]="personnelType"
                 >
                 </app-personnel-template-display>
-            </div>
+                <button
+                    (click)="removePersonnel(index)"
+                    class="btn btn-outline-danger btn-sm position-absolute"
+                    style="top: 0; right: 0"
+                >
+                    <i class="bi bi-trash"></i>
+                </button>
+            </app-map-editor-card>
         </div>
         <ng-template #noPersonnelTemplates>
             <div class="text-muted mt-3 mb-3">Kein Personal zugewiesen</div>

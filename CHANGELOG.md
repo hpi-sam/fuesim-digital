@@ -11,6 +11,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Trainees can mark patients for transport priority. Those patients show a red outline around their popup.
 
+### Changed
+
+- The design of the map editor has been slightly updated: It consumes less space and is more consistent.
+
 ### Fixed
 
 - Sending an alarm group with a higher first vehicle count than total alarm group vehicles is now handled gracefully.

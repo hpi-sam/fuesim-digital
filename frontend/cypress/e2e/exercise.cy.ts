@@ -12,8 +12,10 @@ describe('A trainer on the exercise page', () => {
     });
 
     it('can load and unload vehicles', () => {
+        cy.get('[data-cy=vehiclesAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableVehicleDiv]');
 
+        cy.get('[data-cy=patientsAccordionButton]').click();
         cy.log('load a patient to a vehicle').dragToMap(
             '[data-cy=draggablePatientDiv]'
         );
@@ -66,6 +68,7 @@ describe('A trainer on the exercise page', () => {
     });
 
     it('can interact with the map', () => {
+        cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.log('drag a viewport to the map').dragToMap(
             '[data-cy=draggableViewportDiv]'
         );
@@ -79,6 +82,7 @@ describe('A trainer on the exercise page', () => {
             .its('viewports')
             .should('not.be.empty');
 
+        cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.log('drag a transfer point to the map').dragToMap(
             '[data-cy=draggableTransferPointDiv]'
         );
@@ -96,6 +100,7 @@ describe('A trainer on the exercise page', () => {
             .its('transferPoints')
             .should('not.be.empty');
 
+        cy.get('[data-cy=mapImagesAccordionButton]').click();
         cy.log('drag a map image to the map').dragToMap(
             '[data-cy=draggableMapImageDiv]'
         );
@@ -109,6 +114,7 @@ describe('A trainer on the exercise page', () => {
             .its('mapImages')
             .should('not.be.empty');
 
+        cy.get('[data-cy=patientsAccordionButton]').click();
         cy.log('load a patient to the map').dragToMap(
             '[data-cy=draggablePatientDiv]'
         );
@@ -141,6 +147,7 @@ describe('A trainer on the exercise page', () => {
             .firstElement()
             .should('have.property', 'pretriageStatus', 'green');
 
+        cy.get('[data-cy=vehiclesAccordionButton]').click();
         cy.log('drag a vehicle to the map').dragToMap(
             '[data-cy=draggableVehicleDiv]'
         );
@@ -156,6 +163,7 @@ describe('A trainer on the exercise page', () => {
             .its('vehicles')
             .should('not.be.empty');
 
+        cy.get('[data-cy=simulatedRegionsAccordionButton]').click();
         cy.log('drag a simulated region to the map').dragToMap(
             '[data-cy=draggableSimulatedRegionDiv]'
         );
@@ -243,6 +251,7 @@ describe('A trainer on the exercise page', () => {
             .first()
             .click();
         cy.get('[data-cy=alarmGroupClosePopupButton]').click({ force: true });
+        cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableTransferPointDiv]');
         cy.get('[data-cy=trainerToolbarExecutionButton]').click();
         cy.get('[data-cy=trainerToolbarControlCenterButton]').click();
@@ -382,6 +391,7 @@ describe('A trainer on the exercise page', () => {
 
         cy.get('[data-cy=hospitalClosePopupButton]').click({ force: true });
 
+        cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableTransferPointDiv]');
         cy.get('[data-cy=openLayersContainer]').click();
         cy.get('[data-cy=transferPointPopupHospitalNav]').click();
@@ -407,7 +417,9 @@ describe('A trainer on the exercise page', () => {
             .should('not.be.empty');
 
         cy.get('[data-cy=transferPointPopupCloseButton]').click();
+        cy.get('[data-cy=vehiclesAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableVehicleDiv]');
+        cy.get('[data-cy=patientsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggablePatientDiv]');
 
         cy.get('[data-cy=chooseTransferTargetPopupHospitalDropdown]')
@@ -470,7 +482,9 @@ describe('A trainer on the exercise page', () => {
     });
 
     it('can manage transfer points (within simulated regions) and transfer vehicles', () => {
+        cy.get('[data-cy=simulatedRegionsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableSimulatedRegionDiv]');
+        cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableTransferPointDiv]');
 
         cy.wait(commonErrorTimeout);
@@ -549,6 +563,7 @@ describe('A trainer on the exercise page', () => {
             .firstElement()
             .should('have.property', 'duration', 30000);
 
+        cy.get('[data-cy=vehiclesAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableVehicleDiv]');
         cy.get('[data-cy=chooseTransferTargetPopupOtherTransferPointDropdown]')
             .first()
@@ -720,6 +735,7 @@ describe('A trainer on the exercise page', () => {
             .itsValues()
             .should('have.length', 3);
 
+        cy.get('[data-cy=viewportsTransferPointsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableViewportDiv]');
 
         cy.get('[data-cy=trainerToolbarExecutionButton]').click();

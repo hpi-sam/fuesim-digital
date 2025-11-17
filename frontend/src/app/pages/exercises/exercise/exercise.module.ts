@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import {
     NgbDropdownModule,
     NgbTooltipModule,
+    NgbAccordionModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ExerciseComponent } from './exercise/exercise.component';
@@ -34,10 +35,12 @@ import { TransferOverviewModule } from './shared/transfer-overview/transfer-over
 import { CoordinatePickerModule } from './shared/coordinate-picker/coordinate-picker.module';
 import { PersonnelTemplateDisplayComponent } from './shared/editor-panel/personnel-template-display/personnel-template-display.component';
 import { MaterialTemplateDisplayComponent } from './shared/editor-panel/material-template-display/material-template-display.component';
+import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/map-editor-card.component';
 
 @NgModule({
     declarations: [
         ExerciseComponent,
+        MapEditorCardComponent,
         TrainerMapEditorComponent,
         TrainerToolbarComponent,
         ExerciseStateBadgeComponent,
@@ -69,6 +72,7 @@ import { MaterialTemplateDisplayComponent } from './shared/editor-panel/material
         EmergencyOperationsCenterModule,
         CoordinatePickerModule,
         NgbTooltipModule,
+        NgbAccordionModule,
     ],
     providers: [provideHttpClient(withInterceptorsFromDi())],
 })

@@ -6,6 +6,7 @@ import {
     NgbNavModule,
     NgbPopover,
     NgbTooltip,
+    NgbAccordionModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { QrCodeComponent } from 'ng-qrcode';
@@ -111,6 +112,7 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
         NgbDropdownModule,
         NgbNavModule,
         NgbTooltip,
+        NgbAccordionModule,
         NgbPopover,
         QrCodeComponent,
     ],

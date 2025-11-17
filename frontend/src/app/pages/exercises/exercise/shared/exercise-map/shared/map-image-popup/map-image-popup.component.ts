@@ -11,7 +11,7 @@ import { firstValueFrom } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectMapImage } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { PopupService } from '../../utility/popup.service';
 
 @Component({
@@ -25,7 +25,7 @@ export class MapImagePopupComponent implements OnInit {
     public mapImageId!: UUID;
 
     public mapImage$?: Observable<MapImage>;
-    public readonly currentRole$ = this.store.select(selectCurrentRole);
+    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
     public url?: string;
 

@@ -9,6 +9,7 @@ export { Material } from './material.js';
 export { Patient } from './patient.js';
 export * from './patient-health-state.js';
 export { PatientTemplate } from './patient-template.js';
+export { ClientRole } from './client-role.js';
 export { Personnel } from './personnel.js';
 export { TransferPoint } from './transfer-point.js';
 export { Vehicle } from './vehicle.js';

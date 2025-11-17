@@ -10,7 +10,7 @@ import type { Subject } from 'rxjs';
 import type { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import {
-    selectCurrentRole,
+    selectCurrentMainRole,
     selectVisibleTransferPoints,
 } from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
@@ -161,7 +161,9 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
     ): void {
         super.onFeatureClicked(event, feature);
 
-        if (selectStateSnapshot(selectCurrentRole, this.store) !== 'trainer') {
+        if (
+            selectStateSnapshot(selectCurrentMainRole, this.store) !== 'trainer'
+        ) {
             return;
         }
         this.popupService.openPopup(
@@ -180,6 +182,8 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
     }
 
     override isFeatureTranslatable(feature: Feature<Point>): boolean {
-        return selectStateSnapshot(selectCurrentRole, this.store) === 'trainer';
+        return (
+            selectStateSnapshot(selectCurrentMainRole, this.store) === 'trainer'
+        );
     }
 }

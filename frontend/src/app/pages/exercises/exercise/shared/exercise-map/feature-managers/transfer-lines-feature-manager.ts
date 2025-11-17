@@ -13,7 +13,7 @@ import type { Subject } from 'rxjs';
 import type { TransferLine } from 'src/app/shared/types/transfer-line';
 import type { AppState } from 'src/app/state/app.state';
 import { selectTransferLines } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import type { FeatureManager } from '../utility/feature-manager';
@@ -48,7 +48,9 @@ export class TransferLinesFeatureManager
     ) {
         this.olMap.addLayer(this.layer);
         mapInteractionsManager.addFeatureLayer(this.layer);
-        if (selectStateSnapshot(selectCurrentRole, this.store) === 'trainer') {
+        if (
+            selectStateSnapshot(selectCurrentMainRole, this.store) === 'trainer'
+        ) {
             this.registerChangeHandlers(
                 this.store.select(selectTransferLines),
                 destroy$,

@@ -6,7 +6,7 @@ import type { UUID, SimulatedRegion } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectSimulatedRegion } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { openSimulationTrainerModal } from '../../../simulation/trainer-modal/open-simulation-trainer-modal';
 import { PopupService } from '../../utility/popup.service';
 
@@ -21,7 +21,7 @@ export class SimulatedRegionPopupComponent implements OnInit {
     public simulatedRegionId!: UUID;
 
     public simulatedRegion$?: Observable<SimulatedRegion>;
-    public readonly currentRole$ = this.store.select(selectCurrentRole);
+    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
     constructor(
         private readonly store: Store<AppState>,

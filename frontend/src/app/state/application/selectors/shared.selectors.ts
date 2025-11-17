@@ -18,10 +18,7 @@ import {
 import { pickBy } from 'lodash-es';
 import type { CateringLine } from 'src/app/shared/types/catering-line';
 import type { AppState } from '../../app.state';
-import {
-    selectExerciseStateMode,
-    selectOwnClientId,
-} from './application.selectors';
+import { selectOwnClientId } from './application.selectors';
 import {
     selectClients,
     selectMapImages,
@@ -48,9 +45,13 @@ export const selectOwnClient = createSelector(
  * Do not use this to distinguish between the exerciseStateModes
  */
 export const selectCurrentRole = createSelector(
-    selectExerciseStateMode,
     selectOwnClient,
-    (mode, ownClient) => (mode === 'exercise' ? ownClient!.role : mode)
+    (ownClient) => ownClient!.role
+);
+
+export const selectCurrentMainRole = createSelector(
+    selectCurrentRole,
+    (currentRole) => currentRole.mainRole
 );
 
 export const selectRestrictedViewport = createSelector(

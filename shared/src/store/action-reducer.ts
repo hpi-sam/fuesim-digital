@@ -1,11 +1,12 @@
 import type { Role } from '../models/utils/index.js';
+import type { SpecificRole } from '../models/utils/role.js';
 import type { ExerciseState } from '../state.js';
 import type { Constructor, Mutable } from '../utils/index.js';
 
 export interface ActionReducer<A extends Action = Action> {
     readonly action: Constructor<A>;
     readonly reducer: ReducerFunction<InstanceType<this['action']>>;
-    readonly rights: Role | 'server';
+    readonly rights: Role | SpecificRole | 'server';
 }
 
 /**

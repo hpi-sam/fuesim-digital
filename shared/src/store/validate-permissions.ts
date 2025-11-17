@@ -18,13 +18,19 @@ export function validatePermissions(
     state: ExerciseState
 ) {
     const rights = exerciseActionTypeDictionary[action.type].rights;
-    // Check role permissions
-    if (
-        (client.role === 'participant' && rights !== 'participant') ||
-        rights === 'server'
-    ) {
+
+    if (rights === 'server') {
         return false;
     }
-    // TODO: Validate e.g. only actions in own viewport
-    return true;
+    if (
+        client.role.mainRole === 'participant' &&
+        (rights === 'participant' || rights === client.role.specificRole)
+    ) {
+        return true;
+    }
+    if (client.role.mainRole === 'trainer') {
+        return true;
+    }
+
+    return false;
 }

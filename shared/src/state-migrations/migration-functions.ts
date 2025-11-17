@@ -38,6 +38,7 @@ import { treatmentSystemImprovements8 } from './8-treatment-system-improvements.
 import { removeIsBeingTreated9 } from './9-remove-is-being-treated.js';
 import { impossibleMigration } from './impossible-migration.js';
 import { addPatientTransportPriority41 } from './41-add-patient-transport-prio.js';
+import { replaceClientRoles42 } from './42-replace-clientroles.js';
 
 /**
  * Migrate a single action
@@ -105,4 +106,5 @@ export const migrations: {
     39: addCustomPatientQRCode39,
     40: adaptInterfaceSignallerUI40,
     41: addPatientTransportPriority41,
+    42: replaceClientRoles42,
 };

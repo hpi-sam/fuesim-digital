@@ -1,5 +1,5 @@
 import type VectorLayer from 'ol/layer/Vector';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import type { Interaction } from 'ol/interaction';
 import { defaults as defaultInteractions } from 'ol/interaction';
 import type { Subject } from 'rxjs';
@@ -14,6 +14,7 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { ExerciseStatus, Role, UUID } from 'digital-fuesim-manv-shared';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type { Pixel } from 'ol/pixel';
+import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
 import { featureElementKey } from '../feature-managers/element-manager';
 import { TranslateInteraction } from './translate-interaction';
 import type { PopupManager } from './popup-manager';
@@ -28,7 +29,8 @@ export class OlMapInteractionsManager {
     private interactions: Collection<Interaction> =
         new Collection<Interaction>();
     private lastStatus: ExerciseStatus | undefined;
-    private lastRole: Role | 'timeTravel' | undefined;
+    private lastRole: Role | undefined;
+    private lastExerciseStateMode: 'exercise' | 'timeTravel' | undefined;
 
     constructor(
         private readonly mapInteractions: Collection<Interaction>,
@@ -59,7 +61,11 @@ export class OlMapInteractionsManager {
         this.updateInteractions();
         this.registerDropHandler();
         this.applyInteractions();
-        this.updateInteractionEnablement(this.lastStatus, this.lastRole);
+        this.updateInteractionEnablement(
+            this.lastStatus,
+            this.lastRole,
+            this.lastExerciseStateMode
+        );
     }
 
     private updateTranslateInteraction() {
@@ -89,7 +95,7 @@ export class OlMapInteractionsManager {
             altShiftDragRotate: false,
             keyboard: true,
         }).extend(
-            selectStateSnapshot(selectCurrentRole, this.store) === 'trainer'
+            selectStateSnapshot(selectCurrentMainRole, this.store) === 'trainer'
                 ? [...this.participantInteractions, ...this.trainerInteractions]
                 : [...this.participantInteractions]
         );
@@ -106,25 +112,32 @@ export class OlMapInteractionsManager {
     private registerInteractionEnablementHandler() {
         combineLatest([
             this.store.select(selectExerciseStatus),
-            this.store.select(selectCurrentRole),
+            this.store.select(selectCurrentMainRole),
+            this.store.select(selectExerciseStateMode),
         ])
             .pipe(takeUntil(this.destroy$))
-            .subscribe(([status, currentRole]) => {
-                this.updateInteractionEnablement(status, currentRole);
+            .subscribe(([status, currentRole, exerciseStateMode]) => {
+                this.updateInteractionEnablement(
+                    status,
+                    currentRole,
+                    exerciseStateMode
+                );
             });
     }
 
     // this shows a paused overlay and disables interactions for participants when the exercise is paused
     private updateInteractionEnablement(
         status: ExerciseStatus | undefined,
-        currentRole: Role | 'timeTravel' | undefined
+        currentRole: Role | undefined,
+        exerciseStateMode: 'exercise' | 'timeTravel' | undefined
     ) {
         this.lastRole = currentRole;
         this.lastStatus = status;
+        this.lastExerciseStateMode = exerciseStateMode;
         const isPausedAndParticipant =
             status !== 'running' && currentRole === 'participant';
         const areInteractionsActive =
-            !isPausedAndParticipant && currentRole !== 'timeTravel';
+            !isPausedAndParticipant && exerciseStateMode !== 'timeTravel';
         this.participantInteractions.forEach((interaction) => {
             interaction.setActive(areInteractionsActive);
         });

@@ -264,8 +264,7 @@ export const treatPatientsBehavior: SimulationBehavior<TreatPatientsBehaviorStat
                             treatmentStatusRadiogram.treatmentStatus =
                                 behaviorState.treatmentProgress;
 
-                            treatmentStatusRadiogram.informationAvailable =
-                                true;
+                            treatmentStatusRadiogram.informationAvailable = true;
                             break;
                         }
                         default:

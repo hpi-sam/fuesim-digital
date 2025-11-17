@@ -90,7 +90,7 @@ export const unloadVehicleActivity: SimulationActivity<UnloadVehicleActivityStat
                 'vehicle',
                 activity.vehicleId
             );
-            if (vehicle && vehicle.occupation.type === 'unloadingOccupation') {
+            if (vehicle?.occupation.type === 'unloadingOccupation') {
                 changeOccupation(draftState, vehicle, NoOccupation.create());
             }
         },

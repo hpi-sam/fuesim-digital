@@ -36,7 +36,10 @@
             >
                 <div ngbAccordionItem="viewports" [collapsed]="false">
                     <h5 ngbAccordionHeader>
-                        <button ngbAccordionButton>
+                        <button
+                            ngbAccordionButton
+                            data-cy="viewportsTransferPointsAccordionButton"
+                        >
                             Ansicht/Transferpunkt
                         </button>
                     </h5>
@@ -91,7 +94,12 @@
                 </div>
                 <div ngbAccordionItem="simulatedRegions">
                     <h5 ngbAccordionHeader>
-                        <button ngbAccordionButton>Simulierte Bereiche</button>
+                        <button
+                            ngbAccordionButton
+                            data-cy="simulatedRegionsAccordionButton"
+                        >
+                            Simulierte Bereiche
+                        </button>
                     </h5>
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
@@ -129,7 +137,12 @@
                 </div>
                 <div ngbAccordionItem="patients">
                     <h5 ngbAccordionHeader>
-                        <button ngbAccordionButton>Patienten</button>
+                        <button
+                            ngbAccordionButton
+                            data-cy="patientsAccordionButton"
+                        >
+                            Patienten
+                        </button>
                     </h5>
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
@@ -258,7 +271,12 @@
                         ngbAccordionHeader
                         class="d-flex justify-content-between align-items-center"
                     >
-                        <button ngbAccordionButton>Fahrzeuge</button>
+                        <button
+                            ngbAccordionButton
+                            data-cy="vehiclesAccordionButton"
+                        >
+                            Fahrzeuge
+                        </button>
                     </h5>
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
@@ -305,7 +323,12 @@
                 </div>
                 <div ngbAccordionItem="images">
                     <h5 ngbAccordionHeader>
-                        <button ngbAccordionButton>Bilder</button>
+                        <button
+                            ngbAccordionButton
+                            data-cy="mapImagesAccordionButton"
+                        >
+                            Bilder
+                        </button>
                     </h5>
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>

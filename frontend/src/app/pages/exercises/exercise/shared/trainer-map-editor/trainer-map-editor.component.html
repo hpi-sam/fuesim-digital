@@ -163,7 +163,9 @@
                                             <input
                                                 type="checkbox"
                                                 class="btn-check"
-                                                [id]="`patient-status-filter-${category}`"
+                                                [id]="
+                                                    `patient-status-filter-${category}`
+                                                "
                                                 autocomplete="off"
                                                 [ngModel]="
                                                     selectedCategories[
@@ -181,7 +183,9 @@
                                             />
                                             <label
                                                 class="btn btn-outline-primary"
-                                                [for]="`patient-status-filter-${category}`"
+                                                [for]="
+                                                    `patient-status-filter-${category}`
+                                                "
                                             >
                                                 <app-patient-status-badge
                                                     [status]="category"
@@ -222,8 +226,12 @@
                                                         right: 1px;
                                                     "
                                                     [ngbTooltip]="
-                                                patientCategory.patientTemplates.length === 1 ? 'Eine Variante' : `${patientCategory.patientTemplates.length} Varianten`
-                                            "
+                                                        patientCategory
+                                                            .patientTemplates
+                                                            .length === 1
+                                                            ? 'Eine Variante'
+                                                            : `${patientCategory.patientTemplates.length} Varianten`
+                                                    "
                                                 >
                                                     <i
                                                         class="bi bi-collection me-1"

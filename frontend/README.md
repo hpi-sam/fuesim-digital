@@ -34,9 +34,7 @@ Keep in mind that it is also possible to add a [proxy](https://angular.io/guide/
 ### Templates
 
 - Order of attributes in the Angular templates
-
     - As long as eslint doesn't have [a lint rule for it](https://github.com/angular-eslint/angular-eslint/pull/605) it is just encouraged to use the following order of attributes.
-
     1. Structural directive (e.g. `*ngIf`)
     2. Template reference (e.g. `#myId`)
     3. Component inputs (e.g. `[myInput]`)

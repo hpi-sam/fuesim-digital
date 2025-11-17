@@ -74,10 +74,7 @@ export const transferPatientToHospitalActivity: SimulationActivity<TransferPatie
                 'vehicle',
                 activityState.vehicleId
             );
-            if (
-                vehicle === undefined ||
-                vehicle.occupation.type !== 'patientTransferOccupation'
-            ) {
+            if (vehicle?.occupation.type !== 'patientTransferOccupation') {
                 terminate();
                 return;
             }

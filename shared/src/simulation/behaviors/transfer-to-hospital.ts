@@ -73,8 +73,7 @@ export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBe
                     );
 
                     if (
-                        vehicle === undefined ||
-                        vehicle.occupation.type !== 'patientTransferOccupation'
+                        vehicle?.occupation.type !== 'patientTransferOccupation'
                     ) {
                         // This vehicle is not meant to be used for patient transfer
                         break;

@@ -17,6 +17,7 @@
                     *ngIf="participantId$ | async"
                     (click)="shareExercise('participantId')"
                     class="btn btn-light ms-3"
+                    ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen von Ihnen bestätigt werden."
                 >
                     Teilnehmerlink teilen
                 </button>
@@ -26,6 +27,7 @@
                     "
                     (click)="shareExercise('trainerId')"
                     class="btn btn-outline-warning ms-3"
+                    ngbTooltip="Über diesen Link können weitere Personen diese Übung verwalten. Teilen Sie diesen Link nicht mit Teilnehmenden!"
                 >
                     Übungsleiterlink teilen
                 </button>

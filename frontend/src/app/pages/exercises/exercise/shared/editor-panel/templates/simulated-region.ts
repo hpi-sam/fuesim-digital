@@ -23,6 +23,7 @@ import {
 } from 'digital-fuesim-manv-shared';
 
 export interface SimulatedRegionDragTemplate {
+    editorName: string;
     image: ImageProperties;
     stereotype: SimulatedRegion;
 }
@@ -131,6 +132,9 @@ export const simulatedRegionDragTemplates: SimulatedRegionDragTemplate[] =
     stereotypes.map((stereotype) => ({
         stereotype,
         image: coloredImageUrl(stereotype.borderColor),
+        editorName: stereotype.name.endsWith(' ???')
+            ? stereotype.name.slice(0, -4)
+            : stereotype.name,
     }));
 
 function reconstituteBehavior(

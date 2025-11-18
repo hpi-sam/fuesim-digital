@@ -53,6 +53,7 @@ export function createVehicleParameters(
     const vehicle: Vehicle = {
         id: vehicleId,
         type: 'vehicle',
+        baseTemplateId: vehicleTemplate.id,
         materialIds: arrayToUUIDSet(materials.map((m) => m.id)),
         vehicleType: vehicleTemplate.vehicleType,
         name: vehicleTemplate.name,

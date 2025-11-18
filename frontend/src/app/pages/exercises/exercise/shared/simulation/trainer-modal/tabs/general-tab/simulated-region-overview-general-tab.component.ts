@@ -21,6 +21,7 @@ import {
     selectVehicles,
     createSelectByPredicate,
     selectPersonnelTemplates,
+    selectMaterialTemplates,
 } from 'src/app/state/application/selectors/exercise.selectors';
 
 const patientCategories = ['red', 'yellow', 'green', 'black'] as const;
@@ -41,6 +42,9 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
     public readonly personnelTemplates$ = this.store.select(
         selectPersonnelTemplates
     );
+    public readonly materialTemplates$ = this.store.select(
+        selectMaterialTemplates
+    );
 
     public readonly patientCategories = patientCategories;
 
@@ -52,11 +56,12 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
     personnel$?: Observable<{ [Key in string]?: Personnel[] }>;
 
-    material$?: Observable<Material[]>;
+    materials$?: Observable<{ [Key in string]?: Material[] }>;
 
     public patientsCollapsed = true;
     public vehiclesCollapsed = true;
     public personnelCollapsed = true;
+    public materialsCollapsed = true;
 
     constructor(
         private readonly exerciseService: ExerciseService,
@@ -92,14 +97,12 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
                     categorizedVehicles['all'] = [];
 
-                    vehicleTemplates.forEach((template) => {
-                        categorizedVehicles[template.vehicleType] ??= [];
-                    });
-
                     vehicles.forEach((vehicle) => {
-                        categorizedVehicles[vehicle.vehicleType] ??= [];
+                        categorizedVehicles[vehicle.baseTemplateId] ??= [];
 
-                        categorizedVehicles[vehicle.vehicleType]!.push(vehicle);
+                        categorizedVehicles[vehicle.baseTemplateId]!.push(
+                            vehicle
+                        );
 
                         categorizedVehicles['all']!.push(vehicle);
                     });
@@ -123,10 +126,6 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
                     categorizedPersonnel['all'] = [];
 
-                    personnelTemplates.forEach((template) => {
-                        categorizedPersonnel[template.id] ??= [];
-                    });
-
                     personnel.forEach((singlePersonnel) => {
                         categorizedPersonnel[singlePersonnel.baseTemplateId] ??=
                             [];
@@ -143,10 +142,32 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
             )
         );
 
-        this.material$ = this.store.select(
-            createSelectElementsInSimulatedRegion(
-                selectMaterials,
-                this.simulatedRegion.id
+        this.materials$ = this.store.select(
+            createSelector(
+                selectMaterialTemplates,
+                createSelectElementsInSimulatedRegion(
+                    selectMaterials,
+                    this.simulatedRegion.id
+                ),
+                (materialTemplates, materials) => {
+                    const categorizedMaterials: {
+                        [Key in string]?: Material[];
+                    } = {};
+
+                    categorizedMaterials['all'] = [];
+
+                    materials.forEach((material) => {
+                        categorizedMaterials[material.baseTemplateId] ??= [];
+
+                        categorizedMaterials[material.baseTemplateId]!.push(
+                            material
+                        );
+
+                        categorizedMaterials['all']!.push(material);
+                    });
+
+                    return categorizedMaterials;
+                }
             )
         );
     }
@@ -155,12 +176,6 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
         status: PatientStatus
     ): (patient: Patient) => boolean {
         return (patient) => patient.realStatus === status;
-    }
-
-    createPersonnelTypePredicate(
-        type: string
-    ): (personnel: Personnel) => boolean {
-        return (patient) => patient.personnelType === type;
     }
 
     public async renameSimulatedRegion(newName: string) {

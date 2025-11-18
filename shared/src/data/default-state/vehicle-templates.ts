@@ -1,6 +1,7 @@
 import { VehicleTemplate } from '../../models/index.js';
 import type { ImageProperties } from '../../models/utils/index.js';
 import { defaultMaterialTemplates } from './material-templates.js';
+import { defaultPersonnelTemplates } from './personnel-templates.js';
 
 const rtwImage: ImageProperties = {
     url: '/assets/rtw-vehicle.png',
@@ -49,7 +50,7 @@ const rtwVehicleTemplate = VehicleTemplate.create(
     `RTW ???`,
     rtwImage,
     1,
-    ['notSan', 'rettSan'],
+    [defaultPersonnelTemplates.notSan.id, defaultPersonnelTemplates.rettSan.id],
     [defaultMaterialTemplates.standard.id]
 );
 
@@ -58,7 +59,11 @@ const nawVehicleTemplate = VehicleTemplate.create(
     `NAW ???`,
     nawImage,
     1,
-    ['notarzt', 'notSan', 'rettSan'],
+    [
+        defaultPersonnelTemplates.notarzt.id,
+        defaultPersonnelTemplates.notSan.id,
+        defaultPersonnelTemplates.rettSan.id,
+    ],
     [defaultMaterialTemplates.standard.id]
 );
 
@@ -67,7 +72,7 @@ const ktwVehicleTemplate = VehicleTemplate.create(
     `KTW ???`,
     ktwImage,
     1,
-    ['san', 'rettSan'],
+    [defaultPersonnelTemplates.san.id, defaultPersonnelTemplates.rettSan.id],
     [defaultMaterialTemplates.standard.id]
 );
 
@@ -85,7 +90,7 @@ const ktwKatSchutzVehicleTemplate = VehicleTemplate.create(
     `KTW (KatSchutz) ???`,
     ktwImage,
     2,
-    ['san', 'rettSan'],
+    [defaultPersonnelTemplates.san.id, defaultPersonnelTemplates.rettSan.id],
     [defaultMaterialTemplates.standard.id]
 );
 
@@ -94,7 +99,14 @@ const gwSanVehicleTemplate = VehicleTemplate.create(
     `GW-San ???`,
     gwSanImage,
     0,
-    ['gf', 'rettSan', 'rettSan', 'san', 'san', 'notarzt'],
+    [
+        defaultPersonnelTemplates.gf.id,
+        defaultPersonnelTemplates.rettSan.id,
+        defaultPersonnelTemplates.rettSan.id,
+        defaultPersonnelTemplates.san.id,
+        defaultPersonnelTemplates.san.id,
+        defaultPersonnelTemplates.notarzt.id,
+    ],
     [
         defaultMaterialTemplates.big.id,
         defaultMaterialTemplates.big.id,
@@ -108,7 +120,7 @@ const nefVehicleTemplate = VehicleTemplate.create(
     `NEF ???`,
     nefImage,
     0,
-    ['notarzt', 'notSan'],
+    [defaultPersonnelTemplates.notarzt.id, defaultPersonnelTemplates.notSan.id],
     [defaultMaterialTemplates.standard.id]
 );
 
@@ -117,7 +129,7 @@ const rthVehicleTemplate = VehicleTemplate.create(
     `RTH ???`,
     rthImage,
     1,
-    ['notarzt', 'notSan'],
+    [defaultPersonnelTemplates.notarzt.id, defaultPersonnelTemplates.notSan.id],
     [defaultMaterialTemplates.standard.id]
 );
 

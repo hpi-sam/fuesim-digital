@@ -25,7 +25,7 @@ export class Material {
     @IsValue('material' as const)
     public readonly type = 'material';
 
-    @IsUUID()
+    @IsUUID(4, uuidValidationOptions)
     public readonly baseTemplateId: UUID;
 
     @IsString()

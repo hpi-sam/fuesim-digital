@@ -76,7 +76,7 @@ const gfPersonnelTemplate = PersonnelTemplate.create(
 );
 
 export const defaultPersonnelTemplates: {
-    [key in string]: PersonnelTemplate;
+    [key in 'gf' | 'notarzt' | 'notSan' | 'rettSan' | 'san']: PersonnelTemplate;
 } = {
     san: sanPersonnelTemplate,
     rettSan: rettSanPersonnelTemplate,

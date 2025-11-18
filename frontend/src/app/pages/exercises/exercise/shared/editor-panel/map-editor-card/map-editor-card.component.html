@@ -18,6 +18,14 @@
         >
             <i class="bi bi-pencil-fill"></i>
         </button>
+        <button
+            *ngIf="enableDeleteButton"
+            (mousedown)="elementDelete.emit(); $event.stopPropagation()"
+            class="btn btn-outline-danger btn-sm position-absolute"
+            style="top: 0; right: 0"
+        >
+            <i class="bi bi-trash"></i>
+        </button>
         <div class="card-body px-1 pb-0 pt-2">
             <h6 class="text-truncate" [ngbTooltip]="title" placement="bottom">
                 {{ title }}

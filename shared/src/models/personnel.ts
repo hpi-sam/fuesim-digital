@@ -29,7 +29,7 @@ export class Personnel {
     @IsString()
     public readonly personnelType: string;
 
-    @IsUUID()
+    @IsUUID(4, uuidValidationOptions)
     public readonly baseTemplateId: UUID;
 
     @IsString()
@@ -122,8 +122,8 @@ export class Personnel {
             vehicleId,
             vehicleName,
             personnelTemplate.personnelType,
-            personnelTemplate.name,
             personnelTemplate.id,
+            personnelTemplate.name,
             {},
             personnelTemplate.image,
             personnelTemplate.canCaterFor,

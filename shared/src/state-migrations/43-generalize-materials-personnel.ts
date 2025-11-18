@@ -80,7 +80,7 @@ export const personnelTypeNames: {
     rettSan: 'Rettungssanitäter',
     san: 'Sanitäter',
 };
-export const generalizeMaterialTypes42: Migration = {
+export const generalizeMaterialsPersonnel43: Migration = {
     action: (_, action) => {
         const actionType = (action as { type: string }).type;
 

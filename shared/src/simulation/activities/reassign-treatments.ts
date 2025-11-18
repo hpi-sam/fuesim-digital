@@ -321,9 +321,9 @@ const capacities = Object.fromEntries(
     )
 ) as { [key in string]: ResourceDescription<TreatablePatientStatus> };
 capacities['notarzt'] = {
-    green: defaultPersonnelTemplates['notarzt']?.canCaterFor.green ?? 2,
-    red: defaultPersonnelTemplates['notarzt']?.canCaterFor.red ?? 2,
-    yellow: defaultPersonnelTemplates['notarzt']?.canCaterFor.yellow ?? 2,
+    green: defaultPersonnelTemplates.notarzt.canCaterFor.green,
+    red: defaultPersonnelTemplates.notarzt.canCaterFor.red,
+    yellow: defaultPersonnelTemplates.notarzt.canCaterFor.yellow,
 };
 
 const minimumRequiredPersonnel: {

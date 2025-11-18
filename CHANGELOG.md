@@ -14,6 +14,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Changed
 
 - The design of the map editor has been slightly updated: It consumes less space and is more consistent.
+- Some texts shown in the frontend have been added or reworded to be easier to understand.
 
 ### Fixed
 

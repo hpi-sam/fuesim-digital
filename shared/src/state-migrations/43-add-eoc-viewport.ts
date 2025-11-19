@@ -31,19 +31,13 @@ export const addEmergencyOperationsCenterViewport43: Migration = {
             }[];
         };
 
-        let hasEmergencyOperationsCenter = false;
         for (const viewportId of Object.keys(typedState.viewports)) {
             const viewport = typedState.viewports[viewportId]!;
-            if (viewport.viewportType === 'eoc') {
-                hasEmergencyOperationsCenter = true;
-            } else {
-                viewport.viewportType = 'default';
-            }
+            viewport.viewportType = 'default';
         }
-        if (!hasEmergencyOperationsCenter) {
-            typedState.viewports[emergencyOperationsViewportId] =
-                createEmergencyOperationsViewport();
-        }
+
+        typedState.viewports[emergencyOperationsViewportId] =
+            createEmergencyOperationsViewport();
 
         for (const logEntry of typedState.eocLog) {
             logEntry.isPrivate ??= true;

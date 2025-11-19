@@ -37,13 +37,7 @@ export class PersonnelResource {
      * @deprecated Use {@link create} instead
      */
     constructor(personnelCounts?: ResourceDescription) {
-        this.personnelCounts = personnelCounts ?? {
-            gf: 0,
-            notarzt: 0,
-            notSan: 0,
-            rettSan: 0,
-            san: 0,
-        };
+        this.personnelCounts = personnelCounts ?? {};
     }
 
     static readonly create = getCreate(this);

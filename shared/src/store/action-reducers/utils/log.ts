@@ -218,7 +218,7 @@ export function logSimulatedRegionAddElement(
                 logSimulatedRegion(
                     state,
                     [createPersonnelTypeTag(state, element)],
-                    `Dem Bereich wurde ein ${element.name} hinzugefügt`,
+                    `Dem Bereich wurde ein ${element.typeName} hinzugefügt`,
                     simulatedRegionId
                 );
             }
@@ -844,10 +844,7 @@ function createRadiogramDescription(
         case 'personnelCountRadiogram': {
             return `In dieser Region gab es die folgenden Einsatzkräfte: ${generateCountString(
                 radiogram.personnelCount,
-                (type) =>
-                    state.personnelTemplates.find(
-                        (template) => template.personnelType === type
-                    )?.typeName ?? type
+                (id) => state.personnelTemplates[id]?.name ?? ''
             )}.`;
         }
         case 'resourceRequestRadiogram': {

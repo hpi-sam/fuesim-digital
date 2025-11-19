@@ -39,6 +39,7 @@ import { removeIsBeingTreated9 } from './9-remove-is-being-treated.js';
 import { impossibleMigration } from './impossible-migration.js';
 import { addPatientTransportPriority41 } from './41-add-patient-transport-prio.js';
 import { replaceClientRoles42 } from './42-replace-clientroles.js';
+import { addEmergencyOperationsCenterViewport43 } from './43-add-eoc-viewport.js';
 
 /**
  * Migrate a single action
@@ -107,4 +108,5 @@ export const migrations: {
     40: adaptInterfaceSignallerUI40,
     41: addPatientTransportPriority41,
     42: replaceClientRoles42,
+    43: addEmergencyOperationsCenterViewport43,
 };

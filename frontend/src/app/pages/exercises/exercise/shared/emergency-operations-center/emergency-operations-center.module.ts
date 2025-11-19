@@ -8,12 +8,19 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { EmergencyOperationsCenterModalComponent } from './emergency-operations-center-modal/emergency-operations-center-modal.component';
 import { EocLogInterfaceComponent } from './eoc-log-interface/eoc-log-interface.component';
+import { EmergencyOperationsCenterFullComponent } from './emergency-operations-center-full/emergency-operations-center-full.component';
+import { TransferTargetDropdownComponent } from './transfer-target-dropdown/transfer-target-dropdown.component';
+import { EocAlarmGroupTriggersComponent } from './eoc-alarm-group-triggers/eoc-alarm-group-triggers.component';
 
 @NgModule({
     declarations: [
         EmergencyOperationsCenterModalComponent,
+        EmergencyOperationsCenterFullComponent,
         EocLogInterfaceComponent,
+        EocAlarmGroupTriggersComponent,
+        TransferTargetDropdownComponent,
     ],
+    exports: [EmergencyOperationsCenterFullComponent],
     imports: [
         CommonModule,
         FormsModule,

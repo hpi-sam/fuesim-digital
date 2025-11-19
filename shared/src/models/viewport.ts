@@ -3,7 +3,11 @@ import { IsString, IsUUID, ValidateNested } from 'class-validator';
 import type { UUID } from '../utils/index.js';
 import { uuid, uuidValidationOptions } from '../utils/index.js';
 import { IsPosition } from '../utils/validators/is-position.js';
-import { IsValue } from '../utils/validators/index.js';
+import {
+    AllowedValues,
+    IsLiteralUnion,
+    IsValue,
+} from '../utils/validators/index.js';
 import type {
     Position,
     ImageProperties,
@@ -17,12 +21,22 @@ import {
     upperLeftCornerOf,
 } from './utils/index.js';
 
+export type ViewportType = 'default' | 'eoc';
+
+export const viewportTypeAllowedValues: AllowedValues<ViewportType> = {
+    default: true,
+    eoc: true,
+};
+
 export class Viewport {
     @IsUUID(4, uuidValidationOptions)
     public readonly id: UUID = uuid();
 
     @IsValue('viewport' as const)
     public readonly type = 'viewport';
+
+    @IsLiteralUnion(viewportTypeAllowedValues)
+    public readonly viewportType: ViewportType = 'default';
 
     /**
      * top-left position
@@ -44,10 +58,17 @@ export class Viewport {
      * @param position top-left position
      * @deprecated Use {@link create} instead
      */
-    constructor(position: MapCoordinates, size: Size, name: string) {
+    constructor(
+        position: MapCoordinates,
+        size: Size,
+        name: string,
+        opts?: { viewportType?: ViewportType; overrideId?: UUID }
+    ) {
         this.position = MapPosition.create(position);
         this.size = size;
         this.name = name;
+        this.id = opts?.overrideId ?? this.id;
+        this.viewportType = opts?.viewportType ?? 'default';
     }
 
     static readonly create = getCreate(this);

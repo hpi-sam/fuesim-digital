@@ -17,7 +17,11 @@ export function validatePermissions(
     action: ExerciseAction,
     state: ExerciseState
 ) {
-    const rights = exerciseActionTypeDictionary[action.type].rights;
+    let rights = exerciseActionTypeDictionary[action.type].rights;
+
+    if (typeof rights === 'function') {
+        rights = rights(client, action);
+    }
 
     if (rights === 'server') {
         return false;

@@ -1,5 +1,6 @@
 import {
     IsArray,
+    IsBoolean,
     IsInt,
     IsOptional,
     IsString,
@@ -11,6 +12,7 @@ import {
 import { Type } from 'class-transformer';
 import {
     AlarmGroupStartPoint,
+    Client,
     EocLogEntry,
     VehicleParameters,
 } from '../../models/index.js';
@@ -27,6 +29,8 @@ import { getElement } from './utils/index.js';
 import { VehicleActionReducers } from './vehicle.js';
 import { TransferActionReducers } from './transfer.js';
 import { logAlarmGroupSent } from './utils/log.js';
+import { emergencyOperationsViewportId } from '../../data/default-state/emergency-operations-viewport.js';
+import { ExerciseAction } from './index.js';
 
 export class AddLogEntryAction implements Action {
     @IsValue('[Emergency Operation Center] Add Log Entry' as const)
@@ -37,6 +41,8 @@ export class AddLogEntryAction implements Action {
     @IsString()
     @MaxLength(65535)
     public readonly message!: string;
+    @IsBoolean()
+    public readonly isPrivate: boolean = false;
 }
 
 export class SendAlarmGroupAction implements Action {
@@ -67,19 +73,39 @@ export class SendAlarmGroupAction implements Action {
     public readonly firstVehiclesTargetTransferPointId: UUID | undefined;
 }
 
+const emergencyOperationsCenterRights = (
+    client: Client,
+    action: ExerciseAction
+) => {
+    if (client.viewRestrictedToViewportId == emergencyOperationsViewportId) {
+        return 'participant';
+    }
+
+    return 'trainer';
+};
+
 export namespace EmergencyOperationCenterActionReducers {
     export const addLogEntry: ActionReducer<AddLogEntryAction> = {
         action: AddLogEntryAction,
-        reducer: (draftState, { name, message }) => {
+        reducer: (draftState, { name, message, isPrivate }) => {
             const logEntry = EocLogEntry.create(
                 draftState.currentTime,
                 message,
-                name
+                name,
+                isPrivate
             );
             draftState.eocLog.push(cloneDeepMutable(logEntry));
             return draftState;
         },
-        rights: 'trainer',
+        rights: (client, action) => {
+            if (
+                action.type === '[Emergency Operation Center] Add Log Entry' &&
+                action.isPrivate
+            ) {
+                return 'trainer';
+            }
+            return emergencyOperationsCenterRights(client, action);
+        },
     };
     export const sendAlarmGroup: ActionReducer<SendAlarmGroupAction> = {
         action: SendAlarmGroupAction,
@@ -157,6 +183,7 @@ export namespace EmergencyOperationCenterActionReducers {
                 type: '[Emergency Operation Center] Add Log Entry',
                 message: logEntry,
                 name: clientName,
+                isPrivate: false,
             });
 
             logAlarmGroupSent(draftState, alarmGroupId);
@@ -164,7 +191,7 @@ export namespace EmergencyOperationCenterActionReducers {
 
             return draftState;
         },
-        rights: 'trainer',
+        rights: emergencyOperationsCenterRights,
     };
 }
 

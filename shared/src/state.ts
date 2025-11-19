@@ -62,6 +62,10 @@ import { defaultVehicleTemplates } from './data/default-state/vehicle-templates.
 import { defaultMapImagesTemplates } from './data/default-state/map-images-templates.js';
 import type { LogEntry } from './models/log-entry.js';
 import type { TreatmentAssignment } from './store/action-reducers/exercise.js';
+import {
+    createEmergencyOperationsViewport,
+    emergencyOperationsViewportId,
+} from './data/default-state/emergency-operations-viewport.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -84,7 +88,9 @@ export class ExerciseState {
     public readonly randomState: RandomState = seededRandomState();
 
     @IsIdMap(Viewport)
-    public readonly viewports: { readonly [key: UUID]: Viewport } = {};
+    public readonly viewports: { readonly [key: UUID]: Viewport } = {
+        [emergencyOperationsViewportId]: createEmergencyOperationsViewport(),
+    };
     @IsIdMap(SimulatedRegion)
     public readonly simulatedRegions: {
         readonly [key: UUID]: SimulatedRegion;
@@ -188,5 +194,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 42;
+    static readonly currentStateVersion = 43;
 }

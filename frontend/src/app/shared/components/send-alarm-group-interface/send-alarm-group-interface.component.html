@@ -1,7 +1,10 @@
 <ng-container *ngIf="alarmGroups$ | async as alarmGroups">
     <ng-container *appLet="transferPoints$ | async as transferPoints">
-        <form (ngSubmit)="sendAlarmGroup()">
-            <div class="d-flex flex-row align-items-center">
+        <form (ngSubmit)="!useAlarmGroupButtons && sendAlarmGroup()">
+            <div
+                *ngIf="!useAlarmGroupButtons"
+                class="d-flex flex-row align-items-center"
+            >
                 <label class="flex-shrink-1 text-nowrap">Alarmgruppe:</label>
                 <button
                     [ngbPopover]="selectAlarmGroupTemplate"
@@ -161,6 +164,7 @@
                 Fahrzeugen für die nächste Alarmgruppe übernommen.
             </span>
             <button
+                *ngIf="!useAlarmGroupButtons"
                 class="btn btn-primary mt-4 row g-0 w-100"
                 [tabIndex]="5"
                 [disabled]="!canSubmit"
@@ -180,7 +184,32 @@
                     />
                 </ng-template>
             </button>
-            <span class="row g-0 mt-2 text-muted">
+            <div
+                *ngIf="useAlarmGroupButtons"
+                class="d-flex flex-row flex-wrap gap-2 mt-4"
+            >
+                <button
+                    *ngFor="
+                        let alarmGroup of alarmGroups;
+                        trackBy: 'key' | appTrackByProperty: alarmGroups
+                    "
+                    [disabled]="!selectedTarget"
+                    class="btn btn-primary g-0"
+                    (click)="selectedAlarmGroup = alarmGroup; sendAlarmGroup()"
+                >
+                    {{ alarmGroup.name }}
+                </button>
+                <div *ngIf="alarmGroups.length <= 0" class="text-muted">
+                    Es sind keine Alarmierungsgruppen vorhanden.
+                </div>
+            </div>
+            <span
+                class="row g-0 mt-2 text-muted"
+                *ngIf="
+                    !useAlarmGroupButtons ||
+                    (useAlarmGroupButtons && alarmGroups.length > 0)
+                "
+            >
                 Sie können mehrere Alarmgruppen nacheinander starten.
             </span>
         </form>

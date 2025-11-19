@@ -11,7 +11,10 @@
     <div class="card">
         <h5 class="card-header">Alarmieren</h5>
         <div class="card-body">
-            <app-send-alarm-group-interface />
+            <app-send-alarm-group-interface
+                [useHotkeys]="false"
+                [useAlarmGroupButtons]="true"
+            />
         </div>
     </div>
     <br />

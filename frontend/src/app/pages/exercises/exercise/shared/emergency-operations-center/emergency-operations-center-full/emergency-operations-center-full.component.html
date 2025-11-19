@@ -1,10 +1,23 @@
-<div class="modal-body" style="min-height: 60vh">
-    <app-eoc-alarm-group-triggers />
-    <br />
-    <div class="card">
-        <h5 class="card-header">Einsatztagebuch</h5>
-        <div class="card-body">
-            <app-eoc-log-interface />
+<div class="container" style="min-height: 60vh">
+    <div class="flex-row-reverse row">
+        <div class="col-lg-6 mt-3">
+            <div class="card">
+                <h5 class="card-header">Alarmieren</h5>
+                <div class="card-body">
+                    <app-send-alarm-group-interface
+                        [useHotkeys]="false"
+                        [useAlarmGroupButtons]="true"
+                    />
+                </div>
+            </div>
+        </div>
+        <div class="col mt-3">
+            <div class="card">
+                <h5 class="card-header">Einsatztagebuch</h5>
+                <div class="card-body">
+                    <app-eoc-log-interface />
+                </div>
+            </div>
         </div>
     </div>
 </div>

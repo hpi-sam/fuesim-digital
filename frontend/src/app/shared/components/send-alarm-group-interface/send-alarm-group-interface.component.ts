@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     createVehicleParameters,
@@ -42,6 +42,12 @@ let firstVehiclesCount = 0;
     standalone: false,
 })
 export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
+    @Input()
+    useHotkeys = true;
+
+    @Input()
+    useAlarmGroupButtons = false;
+
     private readonly destroy$ = new Subject<void>();
 
     @ViewChild('selectAlarmGroupPopover')
@@ -177,10 +183,12 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
-        this.hotkeyLayer.addHotkey(this.selectAlarmGroupHotkey);
-        this.hotkeyLayer.addHotkey(this.selectTargetHotkey);
-        this.hotkeyLayer.addHotkey(this.selectFirstVehiclesTargetHotkey);
-        this.hotkeyLayer.addHotkey(this.submitHotkey);
+        if (this.useHotkeys) {
+            this.hotkeyLayer.addHotkey(this.selectAlarmGroupHotkey);
+            this.hotkeyLayer.addHotkey(this.selectTargetHotkey);
+            this.hotkeyLayer.addHotkey(this.selectFirstVehiclesTargetHotkey);
+            this.hotkeyLayer.addHotkey(this.submitHotkey);
+        }
     }
 
     ngOnDestroy() {

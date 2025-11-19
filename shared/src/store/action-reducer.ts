@@ -3,15 +3,11 @@ import type { Role } from '../models/utils/index.js';
 import type { SpecificRole } from '../models/utils/role.js';
 import type { ExerciseState } from '../state.js';
 import type { Constructor, Mutable } from '../utils/index.js';
-import type { ExerciseAction } from './action-reducers/index.js';
 
 export interface ActionReducer<A extends Action = Action> {
     readonly action: Constructor<A>;
     readonly reducer: ReducerFunction<InstanceType<this['action']>>;
-    readonly rights:
-        | Role
-        | 'server'
-        | ((client: Client, action: ExerciseAction) => Role | 'server');
+    readonly rights: ReducerRights<InstanceType<this['action']>>;
 }
 
 /**
@@ -76,3 +72,9 @@ type ReducerFunction<A extends Action> = (
     draftState: Mutable<ExerciseState>,
     action: A
 ) => Mutable<ExerciseState>;
+
+export type ReducerRights<A extends Action> =
+    | Role
+    | boolean
+    | 'server'
+    | ((client: Client, action: A) => Role | boolean);

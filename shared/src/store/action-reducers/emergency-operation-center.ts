@@ -98,11 +98,8 @@ export namespace EmergencyOperationCenterActionReducers {
             return draftState;
         },
         rights: (client, action) => {
-            if (
-                action.type === '[Emergency Operation Center] Add Log Entry' &&
-                action.isPrivate
-            ) {
-                return 'trainer';
+            if (action.isPrivate && client.role === 'participant') {
+                return false;
             }
             return emergencyOperationsCenterRights(client, action);
         },

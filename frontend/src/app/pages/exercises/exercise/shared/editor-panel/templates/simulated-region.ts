@@ -144,9 +144,9 @@ function reconstituteBehavior(
     behavior.id = uuid();
     switch (behavior.type) {
         case 'providePersonnelBehavior':
-            behavior.vehicleTemplatePriorities = state.vehicleTemplates.map(
-                (template) => template.id
-            );
+            behavior.vehicleTemplatePriorities = Object.values(
+                state.vehicleTemplates
+            ).map((template) => template.id);
             break;
         default:
             break;

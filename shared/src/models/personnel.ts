@@ -26,17 +26,20 @@ export class Personnel {
     @IsUUID(4, uuidValidationOptions)
     public readonly vehicleId: UUID;
 
+    /**
+     * @deprecated This will be refactored into a capability-based system. Please already consider using {@link templateId} if you only need an opaque identifier of the type and you don't assert any properties of the personnel.
+     */
     @IsString()
     public readonly personnelType: string;
 
     @IsUUID(4, uuidValidationOptions)
-    public readonly baseTemplateId: UUID;
+    public readonly templateId: UUID;
 
     @IsString()
-    public readonly name: string;
+    public readonly typeName: string;
 
     @IsString()
-    public readonly abbreviation: string = '';
+    public readonly typeAbbreviation: string = '';
 
     @IsString()
     public readonly vehicleName: string;
@@ -73,42 +76,42 @@ export class Personnel {
     public readonly image: ImageProperties;
 
     /**
-     * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
-     */
-    @IsPosition()
-    @ValidateNested()
-    public readonly position: Position;
-
-    /**
      * @deprecated Use {@link create} instead
      */
     constructor(
         vehicleId: UUID,
         vehicleName: string,
         personnelType: string,
-        baseTemplateId: UUID,
-        name: string,
+        templateId: UUID,
+        typeName: string,
+        typeAbbreviation: string,
         assignedPatientIds: UUIDSet,
         image: ImageProperties,
         canCaterFor: CanCaterFor,
         treatmentRange: number,
         overrideTreatmentRange: number,
-        position: Position,
-        abbreviation: string = ''
+        position: Position
     ) {
         this.vehicleId = vehicleId;
         this.vehicleName = vehicleName;
         this.personnelType = personnelType;
-        this.baseTemplateId = baseTemplateId;
-        this.name = name;
+        this.templateId = templateId;
+        this.typeName = typeName;
+        this.typeAbbreviation = typeAbbreviation;
         this.assignedPatientIds = assignedPatientIds;
         this.image = image;
         this.canCaterFor = canCaterFor;
         this.treatmentRange = treatmentRange;
         this.overrideTreatmentRange = overrideTreatmentRange;
         this.position = position;
-        this.abbreviation = abbreviation;
     }
+
+    /**
+     * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
+     */
+    @IsPosition()
+    @ValidateNested()
+    public readonly position: Position;
 
     static readonly create = getCreate(this);
 
@@ -124,13 +127,13 @@ export class Personnel {
             personnelTemplate.personnelType,
             personnelTemplate.id,
             personnelTemplate.name,
+            personnelTemplate.abbreviation,
             {},
             personnelTemplate.image,
             personnelTemplate.canCaterFor,
             personnelTemplate.treatmentRange,
             personnelTemplate.overrideTreatmentRange,
-            position,
-            personnelTemplate.abbreviation
+            position
         );
     }
 }

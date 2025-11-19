@@ -9,8 +9,8 @@ import {
     Min,
     ValidateNested,
 } from 'class-validator';
-import { defaultMaterialTemplates } from './data/default-state/material-templates.js';
-import { defaultPersonnelTemplates } from './data/default-state/personnel-templates.js';
+import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
+import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
 import {
     AlarmGroup,
     Client,
@@ -57,7 +57,7 @@ import {
     catchAllHospitalId,
 } from './data/default-state/catch-all-hospital.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
-import { defaultVehicleTemplates } from './data/default-state/vehicle-templates.js';
+import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { defaultMapImagesTemplates } from './data/default-state/map-images-templates.js';
 import type { LogEntry } from './models/log-entry.js';
 import type { TreatmentAssignment } from './store/action-reducers/exercise.js';
@@ -121,20 +121,18 @@ export class ExerciseState {
     @ValidateNested()
     @Type(() => PatientCategory)
     public readonly patientCategories = defaultPatientCategories;
-    @IsArray()
-    @ValidateNested()
-    @Type(() => VehicleTemplate)
-    public readonly vehicleTemplates = defaultVehicleTemplates;
-    @IsArray()
-    @ValidateNested()
-    @Type(() => MaterialTemplate)
-    public readonly materialTemplates: readonly MaterialTemplate[] =
-        Object.values(defaultMaterialTemplates);
-    @IsArray()
-    @ValidateNested()
-    @Type(() => PersonnelTemplate)
-    public readonly personnelTemplates: readonly PersonnelTemplate[] =
-        Object.values(defaultPersonnelTemplates);
+    @IsIdMap(VehicleTemplate)
+    public readonly vehicleTemplates: {
+        readonly [key: UUID]: VehicleTemplate;
+    } = defaultVehicleTemplatesById;
+    @IsIdMap(MaterialTemplate)
+    public readonly materialTemplates: {
+        readonly [key: UUID]: MaterialTemplate;
+    } = defaultMaterialTemplatesById;
+    @IsIdMap(PersonnelTemplate)
+    public readonly personnelTemplates: {
+        readonly [key: UUID]: PersonnelTemplate;
+    } = defaultPersonnelTemplatesById;
     @IsArray()
     @ValidateNested()
     @Type(() => MapImageTemplate)

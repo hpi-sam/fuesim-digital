@@ -17,15 +17,13 @@ import type { UUID } from '../utils/index.js';
 export function createVehicleParameters(
     vehicleId: UUID,
     vehicleTemplate: VehicleTemplate,
-    materialTemplates: readonly MaterialTemplate[],
-    personnelTemplates: readonly PersonnelTemplate[],
+    materialTemplates: { readonly [key in UUID]: MaterialTemplate },
+    personnelTemplates: { readonly [key in UUID]: PersonnelTemplate },
     vehiclePosition: MapCoordinates
 ): VehicleParameters {
     const materials: Material[] = vehicleTemplate.materialTemplateIds
         .map((materialTemplateId: UUID) => {
-            const materialTemplate = materialTemplates.find(
-                (template) => template.id === materialTemplateId
-            );
+            const materialTemplate = materialTemplates[materialTemplateId];
             if (!materialTemplate) return null;
             return Material.generateMaterial(
                 materialTemplate,
@@ -37,9 +35,7 @@ export function createVehicleParameters(
         .filter((val) => val !== null);
     const personnel = vehicleTemplate.personnelTemplateIds
         .map((personnelTemplateId: UUID) => {
-            const personnelTemplate = personnelTemplates.find(
-                (template) => template.id === personnelTemplateId
-            );
+            const personnelTemplate = personnelTemplates[personnelTemplateId];
             if (!personnelTemplate) return null;
             return Personnel.generatePersonnel(
                 personnelTemplate,
@@ -53,7 +49,7 @@ export function createVehicleParameters(
     const vehicle: Vehicle = {
         id: vehicleId,
         type: 'vehicle',
-        baseTemplateId: vehicleTemplate.id,
+        templateId: vehicleTemplate.id,
         materialIds: arrayToUUIDSet(materials.map((m) => m.id)),
         vehicleType: vehicleTemplate.vehicleType,
         name: vehicleTemplate.name,

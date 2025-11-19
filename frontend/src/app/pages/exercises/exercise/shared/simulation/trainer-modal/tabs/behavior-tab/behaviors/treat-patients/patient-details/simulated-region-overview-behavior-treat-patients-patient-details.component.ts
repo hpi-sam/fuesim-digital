@@ -31,8 +31,8 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
     public caterings$!: Observable<
         {
             personnelType: string;
-            name: string;
-            abbreviation: string;
+            typeName: string;
+            typeAbbreviation: string;
             assignedPatientCount: number;
         }[]
     >;
@@ -59,8 +59,8 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
                             .filter((person) => person !== undefined)
                             .map((person) => ({
                                 personnelType: person.personnelType,
-                                name: person.name,
-                                abbreviation: person.abbreviation,
+                                typeName: person.typeName,
+                                typeAbbreviation: person.typeAbbreviation,
                                 assignedPatientCount: Object.values(
                                     person.assignedPatientIds
                                 ).length,

@@ -4,6 +4,7 @@ import { uuid } from '../utils/index.js';
 import type { Migration } from './migration-functions.js';
 
 interface VehicleTemplate {
+    id: UUID;
     materials?: MaterialType[];
     personnel?: PersonnelType[];
     materialTemplateIds?: UUID[];
@@ -16,18 +17,18 @@ interface PersonnelTemplate {
     abbreviation?: string;
 }
 interface Personnel {
-    baseTemplateId?: UUID;
+    templateId?: UUID;
     personnelType: PersonnelType;
-    name?: string;
-    abbreviation?: string;
+    typeName?: string;
+    typeAbbreviation?: string;
 }
 interface MaterialTemplate {
     id?: UUID;
     materialType?: MaterialType;
-    name?: string;
+    typeName?: string;
 }
 interface Material {
-    baseTemplateId?: UUID;
+    templateId?: UUID;
     name?: string;
     image: ImageProperties;
 }
@@ -93,14 +94,15 @@ export const generalizeMaterialsPersonnel43: Migration = {
                     material.image.url === '/assets/material.svg'
                         ? 'standard'
                         : 'big';
-                material.baseTemplateId = materialTemplateIds[materialType];
+                material.templateId = materialTemplateIds[materialType];
                 material.name = materialTypeNames[materialType];
             });
             typedAction.vehicleParameters.personnel.forEach((personnel) => {
-                personnel.name = personnelTypeNames[personnel.personnelType];
-                personnel.baseTemplateId =
+                personnel.typeName =
+                    personnelTypeNames[personnel.personnelType];
+                personnel.templateId =
                     personnelTemplateIds[personnel.personnelType];
-                personnel.abbreviation =
+                personnel.typeAbbreviation =
                     personnelTypeAbbreviations[personnel.personnelType];
             });
         } else if (
@@ -116,19 +118,18 @@ export const generalizeMaterialsPersonnel43: Migration = {
                             material.image.url === '/assets/material.svg'
                                 ? 'standard'
                                 : 'big';
-                        material.baseTemplateId =
-                            materialTemplateIds[materialType];
+                        material.templateId = materialTemplateIds[materialType];
                         material.name = materialTypeNames[materialType];
                     })
             );
             Object.values(typedAction.sortedVehicleParameters).forEach(
                 (vehicleParameters) =>
                     vehicleParameters.personnel.forEach((personnel) => {
-                        personnel.name =
+                        personnel.typeName =
                             personnelTypeNames[personnel.personnelType];
-                        personnel.baseTemplateId =
+                        personnel.templateId =
                             personnelTemplateIds[personnel.personnelType];
-                        personnel.abbreviation =
+                        personnel.typeAbbreviation =
                             personnelTypeAbbreviations[personnel.personnelType];
                     })
             );
@@ -154,19 +155,23 @@ export const generalizeMaterialsPersonnel43: Migration = {
     state: (state) => {
         const typedState = state as {
             materialTemplates: {
-                [Key in MaterialType]: MaterialTemplate;
+                [Key in MaterialType | UUID]: MaterialTemplate;
             };
-            vehicleTemplates: VehicleTemplate[];
+            vehicleTemplates:
+                | VehicleTemplate[]
+                | { [Key in MaterialType | UUID]: VehicleTemplate };
             materials: { [key: UUID]: Material };
             personnelTemplates: {
-                [Key in PersonnelType]: PersonnelTemplate;
+                [Key in PersonnelType | UUID]: PersonnelTemplate;
             };
             personnel: { [key: UUID]: Personnel };
         };
 
         Object.values(typedState.materialTemplates).forEach((template) => {
             template.id = materialTemplateIds[template.materialType!];
-            template.name = materialTypeNames[template.materialType!];
+            template.typeName = materialTypeNames[template.materialType!];
+            typedState.materialTemplates[template.id] = template;
+            delete typedState.materialTemplates[template.materialType!];
             delete template.materialType;
         });
         Object.values(typedState.materials).forEach((material) => {
@@ -174,33 +179,42 @@ export const generalizeMaterialsPersonnel43: Migration = {
                 material.image.url === '/assets/material.svg'
                     ? 'standard'
                     : 'big';
-            material.baseTemplateId = materialTemplateIds[materialType];
+            material.templateId = materialTemplateIds[materialType];
             material.name = materialTypeNames[materialType];
         });
+
         Object.values(typedState.personnelTemplates).forEach((template) => {
             template.name = personnelTypeNames[template.personnelType];
             template.id = personnelTemplateIds[template.personnelType];
             template.abbreviation =
                 personnelTypeAbbreviations[template.personnelType];
+            typedState.personnelTemplates[template.id] = template;
+            delete typedState.personnelTemplates[template.personnelType];
         });
         Object.values(typedState.personnel).forEach((personnel) => {
-            personnel.name = personnelTypeNames[personnel.personnelType];
-            personnel.baseTemplateId =
+            personnel.typeName = personnelTypeNames[personnel.personnelType];
+            personnel.templateId =
                 personnelTemplateIds[personnel.personnelType];
-            personnel.abbreviation =
+            personnel.typeAbbreviation =
                 personnelTypeAbbreviations[personnel.personnelType];
         });
-        typedState.vehicleTemplates.forEach((vehicleTemplate) => {
-            vehicleTemplate.materialTemplateIds =
-                vehicleTemplate.materials!.map(
-                    (materialType) => materialTemplateIds[materialType]
-                );
-            delete vehicleTemplate.materials;
-            vehicleTemplate.personnelTemplateIds =
-                vehicleTemplate.personnel!.map(
-                    (personnelType) => personnelTemplateIds[personnelType]
-                );
-            delete vehicleTemplate.personnel;
-        });
+
+        const newVehicleTemplates: { [key in UUID]: VehicleTemplate } = {};
+        (typedState.vehicleTemplates as VehicleTemplate[]).forEach(
+            (vehicleTemplate) => {
+                vehicleTemplate.materialTemplateIds =
+                    vehicleTemplate.materials!.map(
+                        (materialType) => materialTemplateIds[materialType]
+                    );
+                delete vehicleTemplate.materials;
+                vehicleTemplate.personnelTemplateIds =
+                    vehicleTemplate.personnel!.map(
+                        (personnelType) => personnelTemplateIds[personnelType]
+                    );
+                delete vehicleTemplate.personnel;
+                newVehicleTemplates[vehicleTemplate.id] = vehicleTemplate;
+            }
+        );
+        typedState.vehicleTemplates = newVehicleTemplates;
     },
 };

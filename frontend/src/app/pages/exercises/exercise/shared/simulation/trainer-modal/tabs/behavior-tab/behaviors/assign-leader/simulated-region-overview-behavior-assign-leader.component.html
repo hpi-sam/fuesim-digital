@@ -1,7 +1,7 @@
 <h6>Aktuell zugewiesene Führungskraft</h6>
 
 <p *ngIf="currentLeader; else noLeader">
-    {{ (currentLeader | async)?.name }}
+    {{ (currentLeader | async)?.typeName }}
 </p>
 
 <ng-template #noLeader>

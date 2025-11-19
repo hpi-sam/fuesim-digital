@@ -63,7 +63,7 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
                         id: simulatedRegion.id,
                         name: simulatedRegion.name,
                         hasLeader: true as const,
-                        leaderName: leader.name,
+                        leaderName: leader.typeName,
                         leaderVehicleName: leader.vehicleName,
                     };
                 })

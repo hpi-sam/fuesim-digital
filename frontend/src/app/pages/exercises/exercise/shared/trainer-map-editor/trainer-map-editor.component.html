@@ -302,6 +302,7 @@
                                         *ngFor="
                                             let vehicleTemplate of vehicleTemplates$
                                                 | async
+                                                | values
                                         "
                                         (elementMousedown)="
                                             dragElementService.onMouseDown(

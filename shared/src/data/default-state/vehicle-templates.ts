@@ -143,3 +143,7 @@ export const defaultVehicleTemplates: readonly VehicleTemplate[] = [
     rthVehicleTemplate,
     nawVehicleTemplate,
 ];
+
+export const defaultVehicleTemplatesById = Object.fromEntries(
+    defaultVehicleTemplates.map((template) => [template.id, template])
+);

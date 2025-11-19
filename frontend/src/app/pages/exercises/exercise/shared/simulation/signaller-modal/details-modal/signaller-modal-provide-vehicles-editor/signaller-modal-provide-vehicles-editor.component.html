@@ -3,7 +3,7 @@
 
     <div
         *ngFor="
-            let vehicleTemplate of vehicleTemplates$ | async;
+            let vehicleTemplate of vehicleTemplates$ | async | values;
             first as first;
             index as index;
             trackBy: 'id' | appTrackByProperty
@@ -67,9 +67,9 @@
             placement="bottom"
             [disabled]="((availableTargets$ | async)?.length ?? 0) === 0"
             [tabindex]="
-                ((vehicleTemplates$ | async)?.length ?? 0) === 0
+                ((vehicleTemplates$ | async | values)?.length ?? 0) === 0
                     ? -1
-                    : (vehicleTemplates$ | async)!.length + 1
+                    : (vehicleTemplates$ | async | values)!.length + 1
             "
             class="btn btn-outline-primary flex-grow-1 flex-shrink-1 ms-2 d-flex flex-row"
             style="width: 1px"
@@ -99,7 +99,9 @@
         [disabled]="!canSend || loading"
         class="btn btn-primary mt-2 row g-0 w-100"
         [tabIndex]="
-            canSend ? ((vehicleTemplates$ | async)?.length ?? 0) + 2 : -1
+            canSend
+                ? ((vehicleTemplates$ | async | values)?.length ?? 0) + 2
+                : -1
         "
     >
         Sende Fahrzeuge

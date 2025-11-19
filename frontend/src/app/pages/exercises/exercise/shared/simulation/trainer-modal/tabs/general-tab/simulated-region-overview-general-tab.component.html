@@ -67,7 +67,9 @@
                     {{ ((vehicles$ | async) ?? {})['all']?.length }}
                 </th>
             </tr>
-            <ng-container *ngFor="let template of vehicleTemplates$ | async">
+            <ng-container
+                *ngFor="let template of vehicleTemplates$ | async | values"
+            >
                 <tr
                     *ngIf="
                         ((vehicles$ | async) ?? {})[template.id]
@@ -102,7 +104,9 @@
                     {{ ((personnel$ | async) ?? {})['all']?.length }}
                 </th>
             </tr>
-            <ng-container *ngFor="let template of personnelTemplates$ | async">
+            <ng-container
+                *ngFor="let template of personnelTemplates$ | async | values"
+            >
                 <tr
                     *ngIf="
                         ((personnel$ | async) ?? {})[template.id]
@@ -137,7 +141,9 @@
                     {{ ((materials$ | async) ?? {})['all']?.length }}
                 </th>
             </tr>
-            <ng-container *ngFor="let template of materialTemplates$ | async">
+            <ng-container
+                *ngFor="let template of materialTemplates$ | async | values"
+            >
                 <tr
                     *ngIf="
                         ((materials$ | async) ?? {})[template.id]

@@ -59,17 +59,14 @@ export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
         );
         this.vehicleTemplatesCurrent$ = combineLatest(
             [availableVehicleTemplates$, ownVehicleTemplateIds$],
-            (templates, ownIds) => {
-                const templateMap = Object.fromEntries(
-                    templates.map((template) => [template.id, template])
-                );
-                return ownIds.map((id) => templateMap[id]!);
-            }
+            (templates, ownIds) => ownIds.map((id) => templates[id]!)
         );
         this.vehicleTemplatesToAdd$ = combineLatest(
             [availableVehicleTemplates$, ownVehicleTemplateIds$],
             (templates, ownIds) =>
-                templates.filter((template) => !ownIds.includes(template.id))
+                Object.values(templates).filter(
+                    (template) => !ownIds.includes(template.id)
+                )
         );
 
         ownVehicleTemplateIds$

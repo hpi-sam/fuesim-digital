@@ -24,7 +24,7 @@ export class Vehicle {
     public readonly name: string;
 
     @IsUUID(4, uuidValidationOptions)
-    public readonly baseTemplateId: UUID;
+    public readonly templateId: UUID;
 
     @IsUUIDSet()
     public readonly materialIds: UUIDSet = {};
@@ -59,7 +59,7 @@ export class Vehicle {
     constructor(
         vehicleType: string,
         name: string,
-        baseTemplateId: UUID,
+        templateId: UUID,
         materialIds: UUIDSet,
         patientCapacity: number,
         image: ImageProperties,
@@ -68,7 +68,7 @@ export class Vehicle {
     ) {
         this.vehicleType = vehicleType;
         this.name = name;
-        this.baseTemplateId = baseTemplateId;
+        this.templateId = templateId;
         this.materialIds = materialIds;
         this.patientCapacity = patientCapacity;
         this.image = image;

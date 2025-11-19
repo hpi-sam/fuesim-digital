@@ -96,7 +96,7 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
             selectVehicleTemplates,
             presentVehicleTypesSelector,
             (vehicleTemplates, presentVehicleTypes) =>
-                vehicleTemplates
+                Object.values(vehicleTemplates)
                     .map((vehicleTemplate) => vehicleTemplate.vehicleType)
                     .filter(
                         (vehicleType) =>

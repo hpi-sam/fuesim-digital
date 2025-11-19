@@ -1,6 +1,6 @@
 <ng-container *ngIf="material$ | async as material">
     <h5 class="popover-header">
-        <strong>{{ material.name }}</strong>
+        <strong>{{ material.typeName }}</strong>
         aus {{ material.vehicleName }}
         <button
             (click)="closePopup()"

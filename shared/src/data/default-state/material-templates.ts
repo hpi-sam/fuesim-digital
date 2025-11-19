@@ -29,9 +29,14 @@ const bigMaterialTemplate = MaterialTemplate.create(
     10
 );
 
-export const defaultMaterialTemplates: {
-    [key in 'big' | 'standard']: MaterialTemplate;
-} = {
+export const defaultMaterialTemplates = {
     standard: standardMaterialTemplate,
     big: bigMaterialTemplate,
-};
+} as const;
+
+export const defaultMaterialTemplatesById = Object.fromEntries(
+    Object.values(defaultMaterialTemplates).map((template) => [
+        template.id,
+        template,
+    ])
+);

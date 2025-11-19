@@ -98,11 +98,9 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
                     categorizedVehicles['all'] = [];
 
                     vehicles.forEach((vehicle) => {
-                        categorizedVehicles[vehicle.baseTemplateId] ??= [];
+                        categorizedVehicles[vehicle.templateId] ??= [];
 
-                        categorizedVehicles[vehicle.baseTemplateId]!.push(
-                            vehicle
-                        );
+                        categorizedVehicles[vehicle.templateId]!.push(vehicle);
 
                         categorizedVehicles['all']!.push(vehicle);
                     });
@@ -127,12 +125,11 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
                     categorizedPersonnel['all'] = [];
 
                     personnel.forEach((singlePersonnel) => {
-                        categorizedPersonnel[singlePersonnel.baseTemplateId] ??=
-                            [];
+                        categorizedPersonnel[singlePersonnel.templateId] ??= [];
 
-                        categorizedPersonnel[
-                            singlePersonnel.baseTemplateId
-                        ]!.push(singlePersonnel);
+                        categorizedPersonnel[singlePersonnel.templateId]!.push(
+                            singlePersonnel
+                        );
 
                         categorizedPersonnel['all']!.push(singlePersonnel);
                     });
@@ -157,9 +154,9 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
                     categorizedMaterials['all'] = [];
 
                     materials.forEach((material) => {
-                        categorizedMaterials[material.baseTemplateId] ??= [];
+                        categorizedMaterials[material.templateId] ??= [];
 
-                        categorizedMaterials[material.baseTemplateId]!.push(
+                        categorizedMaterials[material.templateId]!.push(
                             material
                         );
 

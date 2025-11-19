@@ -49,19 +49,17 @@ export class EditVehicleTemplateModalComponent implements OnInit {
             )
         );
         this.materialTemplates = cloneDeepMutable(
-            selectStateSnapshot(selectMaterialTemplates, this.store).filter(
-                (template) =>
-                    this.vehicleTemplate!.materialTemplateIds.includes(
-                        template.id
-                    )
+            Object.values(
+                selectStateSnapshot(selectMaterialTemplates, this.store)
+            ).filter((template) =>
+                this.vehicleTemplate!.materialTemplateIds.includes(template.id)
             )
         );
         this.personnelTemplates = cloneDeepMutable(
-            selectStateSnapshot(selectPersonnelTemplates, this.store).filter(
-                (template) =>
-                    this.vehicleTemplate!.personnelTemplateIds.includes(
-                        template.id
-                    )
+            Object.values(
+                selectStateSnapshot(selectPersonnelTemplates, this.store)
+            ).filter((template) =>
+                this.vehicleTemplate!.personnelTemplateIds.includes(template.id)
             )
         );
     }

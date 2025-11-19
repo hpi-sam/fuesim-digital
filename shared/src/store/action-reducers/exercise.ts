@@ -345,7 +345,7 @@ function evaluateTreatmentReassignment(
                             draftState.personnelTemplates.find(
                                 (template) =>
                                     template.personnelType === personnelType
-                            )!
+                            )
                         )
                     ),
                 `Diese Einsatzkräfte wurden dem Patienten neu zugeteilt: ${
@@ -358,7 +358,7 @@ function evaluateTreatmentReassignment(
                                         (template) =>
                                             template.personnelType ===
                                             personnelType
-                                    )!.name
+                                    )!.typeName
                                 }`
                         )
                         .join(', ') || 'Keine Einsatzkräfte'

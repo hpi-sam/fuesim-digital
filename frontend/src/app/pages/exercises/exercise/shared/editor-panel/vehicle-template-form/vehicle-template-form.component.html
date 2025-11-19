@@ -91,7 +91,9 @@
                 <div ngbDropdownMenu>
                     <button
                         *ngFor="
-                            let materialTemplate of materialTemplates$ | async
+                            let materialTemplate of materialTemplates$
+                                | async
+                                | values
                         "
                         ngbDropdownItem
                         (click)="addMaterial(materialTemplate)"
@@ -141,7 +143,9 @@
                 <div ngbDropdownMenu>
                     <button
                         *ngFor="
-                            let personnelTemplate of personnelTemplates$ | async
+                            let personnelTemplate of personnelTemplates$
+                                | async
+                                | values
                         "
                         ngbDropdownItem
                         (click)="addPersonnel(personnelTemplate)"

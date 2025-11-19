@@ -75,12 +75,17 @@ const gfPersonnelTemplate = PersonnelTemplate.create(
     'GF'
 );
 
-export const defaultPersonnelTemplates: {
-    [key in 'gf' | 'notarzt' | 'notSan' | 'rettSan' | 'san']: PersonnelTemplate;
-} = {
+export const defaultPersonnelTemplates = {
     san: sanPersonnelTemplate,
     rettSan: rettSanPersonnelTemplate,
     notSan: notSanPersonnelTemplate,
     notarzt: notarztPersonnelTemplate,
     gf: gfPersonnelTemplate,
-};
+} as const;
+
+export const defaultPersonnelTemplatesById = Object.fromEntries(
+    Object.values(defaultPersonnelTemplates).map((template) => [
+        template.id,
+        template,
+    ])
+);

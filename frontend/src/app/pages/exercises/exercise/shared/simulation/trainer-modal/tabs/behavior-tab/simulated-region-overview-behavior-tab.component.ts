@@ -99,9 +99,9 @@ export class SimulatedRegionOverviewBehaviorTabComponent
         switch (behaviorType) {
             case 'providePersonnelBehavior':
                 args.push(
-                    selectStateSnapshot(selectVehicleTemplates, this.store).map(
-                        (template) => template.id
-                    )
+                    Object.values(
+                        selectStateSnapshot(selectVehicleTemplates, this.store)
+                    ).map((template) => template.id)
                 );
                 break;
             default:

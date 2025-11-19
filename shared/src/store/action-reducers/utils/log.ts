@@ -847,7 +847,7 @@ function createRadiogramDescription(
                 (type) =>
                     state.personnelTemplates.find(
                         (template) => template.personnelType === type
-                    )?.name ?? type
+                    )?.typeName ?? type
             )}.`;
         }
         case 'resourceRequestRadiogram': {

@@ -48,6 +48,9 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
     @Input()
     useAlarmGroupButtons = false;
 
+    @Input()
+    useFirstVehicles = true;
+
     private readonly destroy$ = new Subject<void>();
 
     @ViewChild('selectAlarmGroupPopover')
@@ -152,7 +155,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     public get canSubmit() {
         return (
-            !(this.firstVehiclesInput?.invalid ?? true) &&
+            !(this.firstVehiclesInput?.invalid ?? false) &&
             selectedAlarmGroup !== null &&
             selectedTarget !== null &&
             (firstVehiclesCount === 0 || selectedFirstVehiclesTarget !== null)

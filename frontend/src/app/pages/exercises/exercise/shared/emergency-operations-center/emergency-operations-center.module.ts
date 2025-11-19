@@ -9,11 +9,13 @@ import { FormsModule } from '@angular/forms';
 import { EmergencyOperationsCenterModalComponent } from './emergency-operations-center-modal/emergency-operations-center-modal.component';
 import { EocLogInterfaceComponent } from './eoc-log-interface/eoc-log-interface.component';
 import { EmergencyOperationsCenterFullComponent } from './emergency-operations-center-full/emergency-operations-center-full.component';
+import { SendAlarmGroupsCardComponent } from './send-alarm-groups-card/send-alarm-groups-card.component';
 @NgModule({
     declarations: [
         EmergencyOperationsCenterModalComponent,
         EmergencyOperationsCenterFullComponent,
         EocLogInterfaceComponent,
+        SendAlarmGroupsCardComponent,
     ],
     exports: [EmergencyOperationsCenterFullComponent],
     imports: [

@@ -22,7 +22,7 @@
     "private": true,
     "engines": {
         "node": ">=22",
-        "npm": ">=10"
+        "npm": ">=11"
     },
     "dependencies": {
         "@noble/hashes": "^1.7.1",

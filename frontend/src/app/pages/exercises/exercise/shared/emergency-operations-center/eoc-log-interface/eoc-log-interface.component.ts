@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { first, firstValueFrom, map } from 'rxjs';
+import { map } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { selectEocLogEntries } from 'src/app/state/application/selectors/exercise.selectors';
@@ -22,10 +22,8 @@ export class EocLogInterfaceComponent {
     public newLogEntry = '';
 
     public sendingPrivateLog = true;
-    public readonly clientisTrainer$ = this.store.select(selectOwnClient).pipe(
-        first(),
-        map((client) => client?.role === 'trainer')
-    );
+    public readonly clientisTrainer =
+        selectStateSnapshot(selectOwnClient, this.store)?.role === 'trainer';
 
     constructor(
         private readonly exerciseService: ExerciseService,
@@ -37,9 +35,7 @@ export class EocLogInterfaceComponent {
             type: '[Emergency Operation Center] Add Log Entry',
             message: this.newLogEntry,
             name: selectStateSnapshot(selectOwnClient, this.store)!.name,
-            isPrivate: (await firstValueFrom(this.clientisTrainer$))
-                ? this.sendingPrivateLog
-                : false,
+            isPrivate: this.clientisTrainer ? this.sendingPrivateLog : false,
         });
         if (response.success) {
             this.newLogEntry = '';

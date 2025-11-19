@@ -6,5 +6,4 @@ import { Component } from '@angular/core';
     styleUrls: ['./emergency-operations-center-full.component.scss'],
     standalone: false,
 })
-export class EmergencyOperationsCenterFullComponent {
-}
+export class EmergencyOperationsCenterFullComponent {}

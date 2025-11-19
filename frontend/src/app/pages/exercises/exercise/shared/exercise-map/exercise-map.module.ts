@@ -10,6 +10,7 @@ import { MessagesModule } from 'src/app/feature/messages/messages.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { TransferPointOverviewModule } from '../transfer-point-overview/transfer-point-overview.module';
 import { SimulationModalsModule } from '../simulation/simulation-modals.module';
+import { EmergencyOperationsCenterModule } from '../emergency-operations-center/emergency-operations-center.module';
 import { ExerciseMapComponent } from './exercise-map.component';
 import { ChooseTransferTargetPopupComponent } from './shared/choose-transfer-target-popup/choose-transfer-target-popup.component';
 import { MapImagePopupComponent } from './shared/map-image-popup/map-image-popup.component';
@@ -22,7 +23,6 @@ import { MaterialPopupComponent } from './shared/material-popup/material-popup.c
 import { CaterCapacityComponent } from './shared/cater-capacity/cater-capacity.component';
 import { SimulatedRegionPopupComponent } from './shared/simulated-region-popup/simulated-region-popup.component';
 import { PatientNameComponent } from './shared/patient-name/patient-name.component';
-import { EmergencyOperationsCenterModule } from '../emergency-operations-center/emergency-operations-center.module';
 
 @NgModule({
     declarations: [

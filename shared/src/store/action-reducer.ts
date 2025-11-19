@@ -1,9 +1,9 @@
-import { Client } from '../models/client.js';
+import type { Client } from '../models/client.js';
 import type { Role } from '../models/utils/index.js';
 import type { SpecificRole } from '../models/utils/role.js';
 import type { ExerciseState } from '../state.js';
 import type { Constructor, Mutable } from '../utils/index.js';
-import { ExerciseAction } from './action-reducers/index.js';
+import type { ExerciseAction } from './action-reducers/index.js';
 
 export interface ActionReducer<A extends Action = Action> {
     readonly action: Constructor<A>;

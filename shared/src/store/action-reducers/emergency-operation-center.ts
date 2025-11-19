@@ -25,11 +25,11 @@ import {
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
+import { emergencyOperationsViewportId } from '../../data/default-state/emergency-operations-viewport.js';
 import { getElement } from './utils/index.js';
 import { VehicleActionReducers } from './vehicle.js';
 import { TransferActionReducers } from './transfer.js';
 import { logAlarmGroupSent } from './utils/log.js';
-import { emergencyOperationsViewportId } from '../../data/default-state/emergency-operations-viewport.js';
 import { ExerciseAction } from './index.js';
 
 export class AddLogEntryAction implements Action {
@@ -77,7 +77,7 @@ const emergencyOperationsCenterRights = (
     client: Client,
     action: ExerciseAction
 ) => {
-    if (client.viewRestrictedToViewportId == emergencyOperationsViewportId) {
+    if (client.viewRestrictedToViewportId === emergencyOperationsViewportId) {
         return 'participant';
     }
 

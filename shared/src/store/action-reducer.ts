@@ -75,6 +75,7 @@ type ReducerFunction<A extends Action> = (
 
 export type ReducerRights<A extends Action> =
     | Role
+    | SpecificRole
     | boolean
     | 'server'
     | ((client: Client, action: A) => Role | boolean);

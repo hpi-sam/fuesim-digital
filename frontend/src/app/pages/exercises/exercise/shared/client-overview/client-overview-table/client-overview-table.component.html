@@ -17,27 +17,64 @@
             <td class="align-middle">
                 {{ client.name }}
             </td>
-            <td class="align-middle">
-                {{
-                    client.role.mainRole === 'trainer'
-                        ? 'Übungsleiter'
-                        : 'Teilnehmer'
-                }}
-            </td>
+            <ng-container *ngIf="client.role.mainRole === 'trainer'">
+                <td class="align-middle">
+                    {{
+                        client.role.mainRole === 'trainer'
+                            ? 'Übungsleiter'
+                            : 'Teilnehmer'
+                    }}
+                </td>
+            </ng-container>
+            <ng-container *ngIf="client.role.mainRole === 'participant'">
+                <td ngbDropdown>
+                    <button
+                        class="btn btn-outline-primary btn-sm"
+                        ngbDropdownToggle
+                        data-cy="clientPopupSetRoleButton"
+                    >
+                        {{ client.role.specificRole | specificRoleDisplayName }}
+                    </button>
+                    <div ngbDropdownMenu>
+                        <button
+                            ngbDropdownItem
+                            (click)="
+                                changeToSpecificRole(client.id, 'mapOperator')
+                            "
+                        >
+                            <span>Kartenansicht</span>
+                        </button>
+                        <button
+                            ngbDropdownItem
+                            (click)="changeToSpecificRole(client.id, 'eoc')"
+                        >
+                            <span>Leitstelle</span>
+                        </button>
+                    </div>
+                </td>
+            </ng-container>
             <!-- Choose the viewport -->
             <td ngbDropdown>
                 <button
+                    [disabled]="
+                        client.role.specificRole !== 'mapOperator' &&
+                        client.role.mainRole !== 'trainer'
+                    "
                     class="btn btn-outline-primary btn-sm"
                     ngbDropdownToggle
                     data-cy="clientPopupSetViewportButton"
                 >
                     <ng-container
                         *ngIf="
-                            client.viewRestrictedToViewportId as viewportId;
+                            client.viewRestrictedToViewportId;
                             else noViewportId
                         "
                     >
-                        {{ (viewports$ | async)?.[viewportId]?.name }}
+                        {{
+                            (viewports$ | async)?.[
+                                client.viewRestrictedToViewportId!
+                            ]?.name
+                        }}
                     </ng-container>
                 </button>
                 <div ngbDropdownMenu>

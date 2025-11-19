@@ -141,14 +141,18 @@
             <ng-container *ngIf="ownClient$ | async as ownClient">
                 <ng-container
                     *ngIf="!ownClient.isInWaitingRoom; else waitingRoomTemplate"
+                    [ngSwitch]="ownClient.role.specificRole"
                 >
                     <app-exercise-map
-                        *ngIf="ownClient.role.mainRole === 'participant'"
+                        *ngSwitchCase="'mapOperator'"
                         class="h-100 rounded overflow-hidden"
                     ></app-exercise-map>
                     <app-trainer-map-editor
-                        *ngIf="ownClient.role.mainRole === 'trainer'"
+                        *ngSwitchCase="'trainer'"
                     ></app-trainer-map-editor>
+                    <app-emergency-operations-center-full
+                        *ngSwitchCase="'eoc'"
+                    ></app-emergency-operations-center-full>
                 </ng-container>
                 <ng-template #waitingRoomTemplate>
                     <div class="container">

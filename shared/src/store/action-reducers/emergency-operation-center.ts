@@ -12,7 +12,6 @@ import {
 import { Type } from 'class-transformer';
 import {
     AlarmGroupStartPoint,
-    Client,
     EocLogEntry,
     VehicleParameters,
 } from '../../models/index.js';
@@ -25,12 +24,10 @@ import {
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
-import { emergencyOperationsViewportId } from '../../data/default-state/emergency-operations-viewport.js';
 import { getElement } from './utils/index.js';
 import { VehicleActionReducers } from './vehicle.js';
 import { TransferActionReducers } from './transfer.js';
 import { logAlarmGroupSent } from './utils/log.js';
-import { ExerciseAction } from './index.js';
 
 export class AddLogEntryAction implements Action {
     @IsValue('[Emergency Operation Center] Add Log Entry' as const)
@@ -73,17 +70,6 @@ export class SendAlarmGroupAction implements Action {
     public readonly firstVehiclesTargetTransferPointId: UUID | undefined;
 }
 
-const emergencyOperationsCenterRights = (
-    client: Client,
-    action: ExerciseAction
-) => {
-    if (client.viewRestrictedToViewportId === emergencyOperationsViewportId) {
-        return 'participant';
-    }
-
-    return 'trainer';
-};
-
 export namespace EmergencyOperationCenterActionReducers {
     export const addLogEntry: ActionReducer<AddLogEntryAction> = {
         action: AddLogEntryAction,
@@ -98,10 +84,10 @@ export namespace EmergencyOperationCenterActionReducers {
             return draftState;
         },
         rights: (client, action) => {
-            if (action.isPrivate && client.role === 'participant') {
+            if (action.isPrivate && client.role.mainRole === 'participant') {
                 return false;
             }
-            return emergencyOperationsCenterRights(client, action);
+            return 'eoc';
         },
     };
     export const sendAlarmGroup: ActionReducer<SendAlarmGroupAction> = {
@@ -188,7 +174,7 @@ export namespace EmergencyOperationCenterActionReducers {
 
             return draftState;
         },
-        rights: emergencyOperationsCenterRights,
+        rights: 'eoc',
     };
 }
 

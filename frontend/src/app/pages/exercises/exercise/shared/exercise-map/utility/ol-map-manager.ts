@@ -137,11 +137,6 @@ export class OlMapManager {
             .select(selectRestrictedViewport)
             .pipe(takeUntil(this.destroy$))
             .subscribe((viewport) => {
-                if (viewport?.viewportType === 'eoc') {
-                    // Do not restrict the view for EOCs, since it's not a map (no size)
-                    return;
-                }
-
                 const view = this.olMap.getView();
                 view.set('extent', undefined);
                 view.setMinZoom(0);
@@ -186,9 +181,7 @@ export class OlMapManager {
             return;
         }
         const elements = [
-            ...Object.values(
-                selectStateSnapshot(selectViewports, this.store)
-            ).filter((v) => v.viewportType !== 'eoc'),
+            ...Object.values(selectStateSnapshot(selectViewports, this.store)),
             ...Object.values(
                 selectStateSnapshot(selectSimulatedRegions, this.store)
             ),

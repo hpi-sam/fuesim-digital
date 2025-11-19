@@ -1,7 +1,3 @@
-import {
-    createEmergencyOperationsViewport,
-    emergencyOperationsViewportId,
-} from '../data/default-state/emergency-operations-viewport.js';
 import type { Migration } from './migration-functions.js';
 
 export const addEmergencyOperationsCenterViewport43: Migration = {
@@ -23,21 +19,10 @@ export const addEmergencyOperationsCenterViewport43: Migration = {
 
     state: (state) => {
         const typedState = state as {
-            viewports: {
-                [uuid: string]: { viewportType: 'default' | 'eoc' };
-            };
             eocLog: {
                 isPrivate?: boolean;
             }[];
         };
-
-        for (const viewportId of Object.keys(typedState.viewports)) {
-            const viewport = typedState.viewports[viewportId]!;
-            viewport.viewportType = 'default';
-        }
-
-        typedState.viewports[emergencyOperationsViewportId] =
-            createEmergencyOperationsViewport();
 
         for (const logEntry of typedState.eocLog) {
             logEntry.isPrivate ??= true;

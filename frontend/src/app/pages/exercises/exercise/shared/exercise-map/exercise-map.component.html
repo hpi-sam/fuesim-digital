@@ -1,11 +1,6 @@
-<app-emergency-operations-center-full
-    *ngIf="(restrictedToViewport$ | async)?.viewportType === 'eoc'"
-/>
-
 <!-- We want keyboard events to go to the OpenLayers map, not the container -> tabindex="-1" -->
 <div
     #openLayersContainer
-    [hidden]="(restrictedToViewport$ | async)?.viewportType === 'eoc'"
     class="h-100 w-100 position-relative"
     tabindex="-1"
     data-cy="openLayersContainer"

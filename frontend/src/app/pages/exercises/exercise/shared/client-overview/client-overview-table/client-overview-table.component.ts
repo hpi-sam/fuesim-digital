@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
+import { SpecificRole } from 'digital-fuesim-manv-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import {
@@ -31,6 +32,14 @@ export class ClientOverviewTableComponent {
             type: '[Client] Restrict to viewport',
             clientId,
             viewportId,
+        });
+    }
+
+    public async changeToSpecificRole(clientId: UUID, newRole: SpecificRole) {
+        this.exerciseService.proposeAction({
+            type: '[Client] Change specific client role',
+            clientId,
+            newRole,
         });
     }
 

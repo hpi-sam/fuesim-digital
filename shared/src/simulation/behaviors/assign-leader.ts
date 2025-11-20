@@ -51,13 +51,13 @@ export class AssignLeaderBehaviorState implements SimulationBehaviorState {
     static readonly create = getCreate(this);
 }
 
-const personnelPriorities: { [Key in string]: number } = {
+const personnelPriorities = {
     notarzt: 0,
     san: 1,
     rettSan: 2,
     notSan: 3,
     gf: 4,
-};
+} as const;
 
 export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState> =
     {
@@ -360,8 +360,8 @@ function selectNewLeader(
 
     personnel.sort(
         (a, b) =>
-            (personnelPriorities[b.personnelType] ?? 0) -
-            (personnelPriorities[a.personnelType] ?? 0)
+            (personnelPriorities[b.personnelType] ?? -1) -
+            (personnelPriorities[a.personnelType] ?? -1)
     );
     changeLeader(draftState, simulatedRegion, behaviorState, personnel[0]?.id);
 }

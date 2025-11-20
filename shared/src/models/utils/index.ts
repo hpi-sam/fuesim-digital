@@ -9,7 +9,6 @@ export * from './position/position-helpers.js';
 export * from './patient-status.js';
 export { Size } from './size.js';
 export type { Role } from './role.js';
-export * from './personnel-type.js';
 export { CanCaterFor } from './cater-for.js';
 export * from './exercise-status.js';
 export { Transfer } from './transfer.js';

@@ -296,13 +296,13 @@ function createCateringMaterials(
     }));
 }
 
-const personnelPriorities: { [Key in string]: number } = {
+const personnelPriorities = {
     gf: 0,
     san: 1,
     rettSan: 2,
     notSan: 3,
     notarzt: 4,
-};
+} as const;
 
 // Estimation for required personnel based on the 7/2/1 rule.
 const estimatedSkDistribution = { green: 7 / 10, yellow: 2 / 10, red: 1 / 10 };
@@ -377,7 +377,7 @@ function createCateringPersonnel(
 ): CateringPersonnel[] {
     return personnel.map((pers) => ({
         personnel: pers,
-        priority: personnelPriorities[pers.personnelType] ?? 0,
+        priority: personnelPriorities[pers.personnelType] ?? -1,
         catersFor: {
             red: 0,
             yellow: 0,

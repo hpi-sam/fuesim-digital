@@ -112,12 +112,11 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
         this.personnel$ = this.store.select(
             createSelector(
-                selectPersonnelTemplates,
                 createSelectElementsInSimulatedRegion(
                     selectPersonnel,
                     this.simulatedRegion.id
                 ),
-                (personnelTemplates, personnel) => {
+                (personnel) => {
                     const categorizedPersonnel: {
                         [Key in string]?: Personnel[];
                     } = {};
@@ -141,12 +140,11 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
         this.materials$ = this.store.select(
             createSelector(
-                selectMaterialTemplates,
                 createSelectElementsInSimulatedRegion(
                     selectMaterials,
                     this.simulatedRegion.id
                 ),
-                (materialTemplates, materials) => {
+                (materials) => {
                     const categorizedMaterials: {
                         [Key in string]?: Material[];
                     } = {};

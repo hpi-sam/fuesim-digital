@@ -188,7 +188,7 @@ function personnelInUnloadingVehicles(
                 tryGetElement(draftState, 'personnel', personnelId)
                     ?.personnelType
         )
-        .filter((pt): pt is string => pt !== undefined)
+        .filter((pt) => pt !== undefined)
         .forEach((pt) => resource[pt]!++);
     return resource;
 }

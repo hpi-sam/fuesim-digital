@@ -1,8 +1,10 @@
 import type { UUID } from '../utils/index.js';
-import type { ImageProperties } from '../models/index.js';
 import { uuid } from '../utils/index.js';
 import type { Migration } from './migration-functions.js';
 
+interface ImageProperties {
+    url: string;
+}
 interface VehicleTemplate {
     id: UUID;
     materials?: MaterialType[];
@@ -36,8 +38,17 @@ interface VehicleParameters {
     materials: Material[];
     personnel: Personnel[];
 }
+interface MapImageTemplate {
+    id: UUID;
+}
+interface MapImage {
+    id?: UUID;
+    image: ImageProperties;
+}
+
 type MaterialType = 'big' | 'standard';
 type PersonnelType = 'gf' | 'notarzt' | 'notSan' | 'rettSan' | 'san';
+
 const materialTypeNames: {
     [key in MaterialType]: string;
 } = {
@@ -63,7 +74,7 @@ const personnelTemplateIds: {
 };
 
 const personnelTypeAbbreviations: {
-    [Key in string]: string;
+    [Key in PersonnelType]: string;
 } = {
     gf: 'GF',
     notarzt: 'NA',
@@ -72,8 +83,8 @@ const personnelTypeAbbreviations: {
     san: 'San',
 };
 
-export const personnelTypeNames: {
-    [key in string]: string;
+const personnelTypeNames: {
+    [key in PersonnelType]: string;
 } = {
     gf: 'Gruppenführer',
     notarzt: 'Notarzt',
@@ -81,6 +92,45 @@ export const personnelTypeNames: {
     rettSan: 'Rettungssanitäter',
     san: 'Sanitäter',
 };
+
+const mapImageTemplateIds: {
+    [key in string]: UUID;
+} = {
+    '/assets/fire.svg': uuid(),
+    '/assets/house-fire.svg': uuid(),
+};
+
+function migrateVehicleTemplate(vehicleTemplate: VehicleTemplate) {
+    vehicleTemplate.materialTemplateIds = vehicleTemplate.materials!.map(
+        (materialType) => materialTemplateIds[materialType]
+    );
+    delete vehicleTemplate.materials;
+    vehicleTemplate.personnelTemplateIds = vehicleTemplate.personnel!.map(
+        (personnelType) => personnelTemplateIds[personnelType]
+    );
+    delete vehicleTemplate.personnel;
+    return vehicleTemplate;
+}
+
+function migrateMapImage(mapImage: MapImage) {
+    mapImage.id = mapImageTemplateIds[mapImage.image.url];
+}
+
+function migrateMaterial(material: Material) {
+    const materialType: MaterialType =
+        material.image.url === '/assets/material.svg' ? 'standard' : 'big';
+    material.templateId = materialTemplateIds[materialType];
+    material.name = materialTypeNames[materialType];
+    return material;
+}
+
+function migratePersonnel(personnel: Personnel) {
+    personnel.typeName = personnelTypeNames[personnel.personnelType];
+    personnel.templateId = personnelTemplateIds[personnel.personnelType];
+    personnel.typeAbbreviation =
+        personnelTypeAbbreviations[personnel.personnelType];
+}
+
 export const generalizeMaterialsPersonnel43: Migration = {
     action: (_, action) => {
         const actionType = (action as { type: string }).type;
@@ -89,22 +139,8 @@ export const generalizeMaterialsPersonnel43: Migration = {
             const typedAction = action as {
                 vehicleParameters: VehicleParameters;
             };
-            typedAction.vehicleParameters.materials.forEach((material) => {
-                const materialType: MaterialType =
-                    material.image.url === '/assets/material.svg'
-                        ? 'standard'
-                        : 'big';
-                material.templateId = materialTemplateIds[materialType];
-                material.name = materialTypeNames[materialType];
-            });
-            typedAction.vehicleParameters.personnel.forEach((personnel) => {
-                personnel.typeName =
-                    personnelTypeNames[personnel.personnelType];
-                personnel.templateId =
-                    personnelTemplateIds[personnel.personnelType];
-                personnel.typeAbbreviation =
-                    personnelTypeAbbreviations[personnel.personnelType];
-            });
+            typedAction.vehicleParameters.materials.forEach(migrateMaterial);
+            typedAction.vehicleParameters.personnel.forEach(migratePersonnel);
         } else if (
             actionType === '[Emergency Operation Center] Send Alarm Group'
         ) {
@@ -113,26 +149,17 @@ export const generalizeMaterialsPersonnel43: Migration = {
             };
             Object.values(typedAction.sortedVehicleParameters).forEach(
                 (vehicleParameters) =>
-                    vehicleParameters.materials.forEach((material) => {
-                        const materialType: MaterialType =
-                            material.image.url === '/assets/material.svg'
-                                ? 'standard'
-                                : 'big';
-                        material.templateId = materialTemplateIds[materialType];
-                        material.name = materialTypeNames[materialType];
-                    })
+                    vehicleParameters.materials.forEach(migrateMaterial)
             );
             Object.values(typedAction.sortedVehicleParameters).forEach(
                 (vehicleParameters) =>
-                    vehicleParameters.personnel.forEach((personnel) => {
-                        personnel.typeName =
-                            personnelTypeNames[personnel.personnelType];
-                        personnel.templateId =
-                            personnelTemplateIds[personnel.personnelType];
-                        personnel.typeAbbreviation =
-                            personnelTypeAbbreviations[personnel.personnelType];
-                    })
+                    vehicleParameters.personnel.forEach(migratePersonnel)
             );
+        } else if (actionType === '[VehicleTemplate] Add vehicleTemplate') {
+            const typedAction = action as {
+                vehicleTemplate: VehicleTemplate;
+            };
+            migrateVehicleTemplate(typedAction.vehicleTemplate);
         } else if (actionType === '[VehicleTemplate] Edit vehicleTemplate') {
             const typedAction = action as {
                 materials?: MaterialType[];
@@ -148,6 +175,11 @@ export const generalizeMaterialsPersonnel43: Migration = {
                 (personnelType) => personnelTemplateIds[personnelType]
             );
             delete typedAction.personnelTypes;
+        } else if (actionType === '[MapImage] Add MapImage') {
+            const typedAction = action as {
+                mapImage: MapImage;
+            };
+            migrateMapImage(typedAction.mapImage);
         }
 
         return true;
@@ -159,12 +191,16 @@ export const generalizeMaterialsPersonnel43: Migration = {
             };
             vehicleTemplates:
                 | VehicleTemplate[]
-                | { [Key in MaterialType | UUID]: VehicleTemplate };
+                | { [Key in UUID]: VehicleTemplate };
             materials: { [key: UUID]: Material };
             personnelTemplates: {
                 [Key in PersonnelType | UUID]: PersonnelTemplate;
             };
             personnel: { [key: UUID]: Personnel };
+            mapImageTemplates:
+                | MapImageTemplate[]
+                | { [Key in UUID]: MapImageTemplate };
+            mapImages: { [key: UUID]: MapImage };
         };
 
         Object.values(typedState.materialTemplates).forEach((template) => {
@@ -174,14 +210,7 @@ export const generalizeMaterialsPersonnel43: Migration = {
             delete typedState.materialTemplates[template.materialType!];
             delete template.materialType;
         });
-        Object.values(typedState.materials).forEach((material) => {
-            const materialType: MaterialType =
-                material.image.url === '/assets/material.svg'
-                    ? 'standard'
-                    : 'big';
-            material.templateId = materialTemplateIds[materialType];
-            material.name = materialTypeNames[materialType];
-        });
+        Object.values(typedState.materials).forEach(migrateMaterial);
 
         Object.values(typedState.personnelTemplates).forEach((template) => {
             template.name = personnelTypeNames[template.personnelType];
@@ -191,30 +220,26 @@ export const generalizeMaterialsPersonnel43: Migration = {
             typedState.personnelTemplates[template.id] = template;
             delete typedState.personnelTemplates[template.personnelType];
         });
-        Object.values(typedState.personnel).forEach((personnel) => {
-            personnel.typeName = personnelTypeNames[personnel.personnelType];
-            personnel.templateId =
-                personnelTemplateIds[personnel.personnelType];
-            personnel.typeAbbreviation =
-                personnelTypeAbbreviations[personnel.personnelType];
-        });
+        Object.values(typedState.personnel).forEach(migratePersonnel);
 
         const newVehicleTemplates: { [key in UUID]: VehicleTemplate } = {};
         (typedState.vehicleTemplates as VehicleTemplate[]).forEach(
             (vehicleTemplate) => {
-                vehicleTemplate.materialTemplateIds =
-                    vehicleTemplate.materials!.map(
-                        (materialType) => materialTemplateIds[materialType]
-                    );
-                delete vehicleTemplate.materials;
-                vehicleTemplate.personnelTemplateIds =
-                    vehicleTemplate.personnel!.map(
-                        (personnelType) => personnelTemplateIds[personnelType]
-                    );
-                delete vehicleTemplate.personnel;
-                newVehicleTemplates[vehicleTemplate.id] = vehicleTemplate;
+                newVehicleTemplates[vehicleTemplate.id] =
+                    migrateVehicleTemplate(vehicleTemplate);
             }
         );
         typedState.vehicleTemplates = newVehicleTemplates;
+
+        Object.values(typedState.mapImages).forEach((mapImage) => {
+            migrateMapImage(mapImage);
+        });
+
+        const newMapImageTemplates: { [key in UUID]: MapImageTemplate } = {};
+        (typedState.mapImageTemplates as MapImageTemplate[]).forEach(
+            (mapImageTemplate) => {
+                newMapImageTemplates[mapImageTemplate.id] = mapImageTemplate;
+            }
+        );
     },
 };

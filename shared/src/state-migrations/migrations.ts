@@ -55,9 +55,17 @@ export function migratePartialExport(
     const stateExport = cloneDeepMutable(
         new StateExport({
             ...cloneDeepMutable(ExerciseState.create('123456')),
-            mapImageTemplates: mutablePartialExport.mapImageTemplates ?? [],
+            mapImageTemplates: Object.fromEntries(
+                (mutablePartialExport.mapImageTemplates ?? []).map(
+                    (template) => [template.id, template]
+                )
+            ),
             patientCategories: mutablePartialExport.patientCategories ?? [],
-            vehicleTemplates: mutablePartialExport.vehicleTemplates ?? [],
+            vehicleTemplates: Object.fromEntries(
+                (mutablePartialExport.vehicleTemplates ?? []).map(
+                    (template) => [template.id, template]
+                )
+            ),
         })
     );
     stateExport.fileVersion = mutablePartialExport.fileVersion;
@@ -68,8 +76,11 @@ export function migratePartialExport(
     // `undefined` will be ignored while `[]` would remove all existing entries.
     const mapImageTemplates =
         mutablePartialExport.mapImageTemplates !== undefined
-            ? (migratedStateExport.currentState
-                  .mapImageTemplates as MapImageTemplate[])
+            ? Object.values(
+                  migratedStateExport.currentState.mapImageTemplates as {
+                      [key in UUID]: MapImageTemplate;
+                  }
+              )
             : undefined;
     const patientCategories =
         mutablePartialExport.patientCategories !== undefined
@@ -78,8 +89,11 @@ export function migratePartialExport(
             : undefined;
     const vehicleTemplates =
         mutablePartialExport.vehicleTemplates !== undefined
-            ? (migratedStateExport.currentState
-                  .vehicleTemplates as VehicleTemplate[])
+            ? Object.values(
+                  migratedStateExport.currentState.vehicleTemplates as {
+                      [key in UUID]: VehicleTemplate;
+                  }
+              )
             : undefined;
     const migratedPartialExport = new PartialExport(
         patientCategories,

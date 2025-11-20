@@ -1,9 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsOptional, ValidateNested } from 'class-validator';
 import { MapImageTemplate, VehicleTemplate } from '../../models/index.js';
-import { IsIdMap, IsValue } from '../../utils/validators/index.js';
+import { IsValue } from '../../utils/validators/index.js';
 import { PatientCategory } from '../../models/patient-category.js';
-import { UUID } from '../../utils/index.js';
 import { BaseExportImportFile } from './base-file.js';
 
 export class PartialExport extends BaseExportImportFile {
@@ -16,11 +15,10 @@ export class PartialExport extends BaseExportImportFile {
     @Type(() => PatientCategory)
     public readonly patientCategories?: PatientCategory[];
 
-    @IsOptional()
-    @IsIdMap(VehicleTemplate)
-    public readonly vehicleTemplates?: {
-        readonly [key in UUID]: VehicleTemplate;
-    };
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => VehicleTemplate)
+    public readonly vehicleTemplates?: VehicleTemplate[];
 
     @IsOptional()
     @IsArray()
@@ -30,9 +28,7 @@ export class PartialExport extends BaseExportImportFile {
 
     public constructor(
         patientCategories?: PatientCategory[],
-        vehicleTemplates?: {
-            [key in UUID]: VehicleTemplate;
-        },
+        vehicleTemplates?: VehicleTemplate[],
         mapImageTemplates?: MapImageTemplate[]
     ) {
         super();

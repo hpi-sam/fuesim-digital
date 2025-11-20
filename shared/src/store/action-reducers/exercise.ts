@@ -7,11 +7,11 @@ import {
     IsPositive,
 } from 'class-validator';
 import {
-    getPersonnelTypes,
     Personnel,
     Vehicle,
     createPersonnelTypeTag,
     Patient,
+    ResourceDescription,
 } from '../../models/index.js';
 import { PartialExport } from '../../export-import/file-format/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
@@ -181,13 +181,12 @@ export namespace ExerciseActionReducers {
         reducer: (draftState, { mode, partialExport }) => {
             const mutablePartialExport = cloneDeepMutable(partialExport);
             if (mutablePartialExport.mapImageTemplates !== undefined) {
-                if (mode === 'append') {
-                    draftState.mapImageTemplates.push(
-                        ...mutablePartialExport.mapImageTemplates
-                    );
-                } else {
-                    draftState.mapImageTemplates =
-                        mutablePartialExport.mapImageTemplates;
+                if (mode !== 'append') {
+                    draftState.mapImageTemplates = {};
+                }
+                for (const mapImageTemplate of mutablePartialExport.mapImageTemplates) {
+                    draftState.mapImageTemplates[mapImageTemplate.id] =
+                        mapImageTemplate;
                 }
             }
             if (mutablePartialExport.patientCategories !== undefined) {
@@ -201,19 +200,18 @@ export namespace ExerciseActionReducers {
                 }
             }
             if (mutablePartialExport.vehicleTemplates !== undefined) {
-                if (mode === 'append') {
-                    draftState.vehicleTemplates.push(
-                        ...mutablePartialExport.vehicleTemplates
-                    );
-                } else {
+                if (mode !== 'append') {
                     // Remove all vehicles from all alarm groups as all existing vehicle templates are being removed
                     for (const alarmGroup of Object.values(
                         draftState.alarmGroups
                     )) {
                         alarmGroup.alarmGroupVehicles = {};
                     }
-                    draftState.vehicleTemplates =
-                        mutablePartialExport.vehicleTemplates;
+                    draftState.vehicleTemplates = {};
+                }
+                for (const vehicleTemplate of mutablePartialExport.vehicleTemplates) {
+                    draftState.vehicleTemplates[vehicleTemplate.id] =
+                        vehicleTemplate;
                 }
             }
             return draftState;
@@ -287,18 +285,20 @@ export function preparePartialExportForImport(
 }
 
 export interface TreatmentAssignment {
-    [patientId: UUID]: { [personnelType in string]: number };
+    [patientId: UUID]: ResourceDescription;
 }
 
 function calculateTreatmentAssignment(
     draftState: Mutable<ExerciseState>
 ): TreatmentAssignment {
-    const personnelTypes = getPersonnelTypes(draftState);
     const treatmentAssignment = StrictObject.fromEntries(
         Object.keys(draftState.patients).map((patientId) => [
             patientId,
             StrictObject.fromEntries(
-                personnelTypes.map((personnelType) => [personnelType, 0])
+                Object.values(draftState.personnelTemplates).map((template) => [
+                    template.id,
+                    0,
+                ])
             ),
         ])
     ) as TreatmentAssignment;
@@ -310,7 +310,7 @@ function calculateTreatmentAssignment(
         StrictObject.keys(personnel.assignedPatientIds)
             .filter((patientId) => treatmentAssignment[patientId])
             .forEach((patientId) => {
-                treatmentAssignment[patientId]![personnel.personnelType]! +=
+                treatmentAssignment[patientId]![personnel.templateId]! +=
                     1 / assignedPatientCount;
             });
     });
@@ -323,14 +323,13 @@ function evaluateTreatmentReassignment(
     newTreatmentAssignment: TreatmentAssignment
 ) {
     if (!draftState.previousTreatmentAssignment) return;
-    const personnelTypes = getPersonnelTypes(draftState);
     Object.keys(newTreatmentAssignment)
         .filter((patientId) =>
-            personnelTypes.some(
-                (personnelType) =>
-                    newTreatmentAssignment[patientId]![personnelType] !==
+            Object.values(draftState.personnelTemplates).some(
+                (personnelTemplate) =>
+                    newTreatmentAssignment[patientId]![personnelTemplate.id] !==
                     draftState.previousTreatmentAssignment![patientId]?.[
-                        personnelType
+                        personnelTemplate.id
                     ]
             )
         )
@@ -339,26 +338,21 @@ function evaluateTreatmentReassignment(
                 draftState,
                 StrictObject.entries(newTreatmentAssignment[patientId]!)
                     .filter(([, count]) => count > 0)
-                    .map(([personnelType]) =>
+                    .map(([personnelTemplateId]) =>
                         createPersonnelTypeTag(
                             draftState,
-                            draftState.personnelTemplates.find(
-                                (template) =>
-                                    template.personnelType === personnelType
-                            )
+                            draftState.personnelTemplates[personnelTemplateId]!
                         )
                     ),
                 `Diese Einsatzkräfte wurden dem Patienten neu zugeteilt: ${
                     StrictObject.entries(newTreatmentAssignment[patientId]!)
                         .filter(([, count]) => count > 0)
                         .map(
-                            ([personnelType, count]) =>
+                            ([personnelTemplateId, count]) =>
                                 `${+count.toFixed(2)} ${
-                                    draftState.personnelTemplates.find(
-                                        (template) =>
-                                            template.personnelType ===
-                                            personnelType
-                                    )!.typeName
+                                    draftState.personnelTemplates[
+                                        personnelTemplateId
+                                    ]!.name
                                 }`
                         )
                         .join(', ') || 'Keine Einsatzkräfte'

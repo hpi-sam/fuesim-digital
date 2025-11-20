@@ -58,7 +58,7 @@ import {
 } from './data/default-state/catch-all-hospital.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
-import { defaultMapImagesTemplates } from './data/default-state/map-images-templates.js';
+import { defaultMapImagesTemplatesById } from './data/default-state/map-images-templates.js';
 import type { LogEntry } from './models/log-entry.js';
 import type { TreatmentAssignment } from './store/action-reducers/exercise.js';
 
@@ -121,6 +121,7 @@ export class ExerciseState {
     @ValidateNested()
     @Type(() => PatientCategory)
     public readonly patientCategories = defaultPatientCategories;
+
     @IsIdMap(VehicleTemplate)
     public readonly vehicleTemplates: {
         readonly [key: UUID]: VehicleTemplate;
@@ -133,10 +134,11 @@ export class ExerciseState {
     public readonly personnelTemplates: {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;
-    @IsArray()
-    @ValidateNested()
-    @Type(() => MapImageTemplate)
-    public readonly mapImageTemplates = defaultMapImagesTemplates;
+    @IsIdMap(MapImageTemplate)
+    public readonly mapImageTemplates: {
+        readonly [key: UUID]: MapImageTemplate;
+    } = defaultMapImagesTemplatesById;
+
     @IsArray()
     @ValidateNested()
     @Type(() => EocLogEntry)

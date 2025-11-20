@@ -44,10 +44,10 @@ export class PartialExportModalComponent {
             ? currentState.patientCategories
             : undefined;
         const vehicleTemplates = this.configuration.vehicleTemplates
-            ? currentState.vehicleTemplates
+            ? Object.values(currentState.vehicleTemplates)
             : undefined;
         const mapImageTemplates = this.configuration.mapImageTemplates
-            ? currentState.mapImageTemplates
+            ? Object.values(currentState.mapImageTemplates)
             : undefined;
         const blob = new Blob([
             JSON.stringify(

@@ -50,9 +50,9 @@ export const selectPersonnelTemplates =
     selectPropertyFactory('personnelTemplates');
 export const selectMaterialTemplates =
     selectPropertyFactory('materialTemplates');
-// Array properties
 export const selectMapImagesTemplates =
     selectPropertyFactory('mapImageTemplates');
+// Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');
 // Misc properties
@@ -104,27 +104,15 @@ export const createSelectMaterialTemplate = createSelectElementFromMapFactory(
 export const createSelectPersonnelTemplate = createSelectElementFromMapFactory(
     selectPersonnelTemplates
 );
+export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
+    selectMapImagesTemplates
+);
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,
         (radiograms) => radiograms[id] as R
     );
 }
-
-function createSelectElementFromArrayFactory<Element extends { id: UUID }>(
-    elementsSelector: (state: AppState) => readonly Element[]
-) {
-    return (id: UUID) =>
-        createSelector(
-            elementsSelector,
-            (elements) => elements.find((element) => element.id === id)!
-        );
-}
-
-// Element from Array
-export const createSelectMapImageTemplate = createSelectElementFromArrayFactory(
-    selectMapImagesTemplates
-);
 
 // Misc selectors
 

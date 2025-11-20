@@ -240,10 +240,11 @@ export class DragElementService {
 
             case 'mapImage':
                 {
-                    const template = this.transferringTemplate.template.image;
+                    const template = this.transferringTemplate.template;
                     const mapImage = MapImage.create(
+                        template.id,
                         position,
-                        template,
+                        template.image,
                         false,
                         0
                     );

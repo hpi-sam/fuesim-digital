@@ -156,9 +156,7 @@ function personnelInVehicleTemplate(
     const resource = cloneDeepMutable(
         PersonnelResource.create()
     ).personnelCounts;
-    const template = draftState.vehicleTemplates.filter(
-        (tp) => tp.id === templateId
-    )[0];
+    const template = draftState.vehicleTemplates[templateId];
     if (template) {
         template.personnelTemplateIds.forEach((pt) => {
             resource[pt]!++;

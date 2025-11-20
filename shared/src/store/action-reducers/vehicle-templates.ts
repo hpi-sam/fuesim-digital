@@ -65,16 +65,13 @@ export namespace VehicleTemplateActionReducers {
     export const addVehicleTemplate: ActionReducer<AddVehicleTemplateAction> = {
         action: AddVehicleTemplateAction,
         reducer: (draftState, { vehicleTemplate }) => {
-            if (
-                draftState.vehicleTemplates.some(
-                    (template) => template.id === vehicleTemplate.id
-                )
-            ) {
+            if (draftState.vehicleTemplates[vehicleTemplate.id]) {
                 throw new ReducerError(
                     `VehicleTemplate with id ${vehicleTemplate.id} already exists`
                 );
             }
-            draftState.vehicleTemplates.push(cloneDeepMutable(vehicleTemplate));
+            draftState.vehicleTemplates[vehicleTemplate.id] =
+                cloneDeepMutable(vehicleTemplate);
             return draftState;
         },
         rights: 'trainer',
@@ -115,10 +112,7 @@ export namespace VehicleTemplateActionReducers {
             action: DeleteVehicleTemplateAction,
             reducer: (draftState, { id }) => {
                 getVehicleTemplate(draftState, id);
-                draftState.vehicleTemplates =
-                    draftState.vehicleTemplates.filter(
-                        (template) => template.id !== id
-                    );
+                delete draftState.vehicleTemplates[id];
                 // Delete this template from every alarm group
                 for (const alarmGroup of Object.values(
                     draftState.alarmGroups
@@ -139,9 +133,7 @@ function getVehicleTemplate(
     state: Mutable<ExerciseState>,
     id: UUID
 ): Mutable<VehicleTemplate> {
-    const vehicleTemplate = state.vehicleTemplates.find(
-        (template) => template.id === id
-    );
+    const vehicleTemplate = state.vehicleTemplates[id];
     if (!vehicleTemplate) {
         throw new ReducerError(`VehicleTemplate with id ${id} does not exist`);
     }

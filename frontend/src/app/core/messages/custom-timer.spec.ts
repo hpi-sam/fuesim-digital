@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { CustomTimer } from './custom-timer.js';
 
 describe('CustomTimer', () => {

@@ -17,9 +17,9 @@
         "watch": "ng build --watch --configuration development",
         "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,css,sccs,html,angular}\"",
         "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,css,sccs,html,angular}\"",
-        "test:ci": "jest --runInBand --coverage --verbose --ci",
-        "test": "jest --runInBand --coverage --verbose",
-        "test:watch": "jest --runInBand --verbose --watch"
+        "test:ci": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci",
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose",
+        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --verbose --watch"
     },
     "private": true,
     "engines": {

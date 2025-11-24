@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { handleChanges } from './handle-changes.js';
 
 describe('HandleChanges', () => {

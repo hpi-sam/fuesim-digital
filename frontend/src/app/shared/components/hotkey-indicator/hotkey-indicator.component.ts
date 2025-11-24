@@ -6,7 +6,7 @@ import {
     OnDestroy,
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import type { Hotkey, HotkeyState } from '../../services/hotkeys.service';
+import type { Hotkey, HotkeyState } from '../../services/hotkeys.service.js';
 
 @Component({
     selector: 'app-hotkey-indicator',

@@ -1,4 +1,4 @@
-import { environment } from 'src/environments/environment';
+import { environment } from 'src/environments/environment.js';
 
 const isSecureProtocol = window.location.protocol === 'https:';
 

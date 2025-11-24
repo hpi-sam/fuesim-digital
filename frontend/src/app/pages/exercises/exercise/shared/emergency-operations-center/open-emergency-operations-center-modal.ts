@@ -1,5 +1,5 @@
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EmergencyOperationsCenterModalComponent } from './emergency-operations-center-modal/emergency-operations-center-modal.component';
+import { EmergencyOperationsCenterModalComponent } from './emergency-operations-center-modal/emergency-operations-center-modal.component.js';
 
 export function openEmergencyOperationsCenterModal(ngbModalService: NgbModal) {
     ngbModalService.open(EmergencyOperationsCenterModalComponent, {

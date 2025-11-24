@@ -11,8 +11,8 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import { SimulatedRegion } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     createSelectElementsInSimulatedRegion,
     selectMaterials,
@@ -21,7 +21,7 @@ import {
     selectVehicleTemplates,
     selectVehicles,
     createSelectByPredicate,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
 
 const patientCategories = ['red', 'yellow', 'green', 'black'] as const;
 export type PatientCategory = (typeof patientCategories)[number];

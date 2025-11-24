@@ -1,12 +1,12 @@
 import type { Immutable, JsonObject } from 'digital-fuesim-manv-shared';
 import type { Feature } from 'ol';
-import type { Geometry, Point } from 'ol/geom';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
+import type { Geometry, Point } from 'ol/geom.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import VectorSource from 'ol/source/Vector.js';
 import type { Observable, Subject } from 'rxjs';
 import { pairwise, startWith, takeUntil } from 'rxjs';
-import { handleChanges } from 'src/app/shared/functions/handle-changes';
-import { generateChangedProperties } from '../utility/generate-changed-properties';
+import { handleChanges } from 'src/app/shared/functions/handle-changes.js';
+import { generateChangedProperties } from '../utility/generate-changed-properties.js';
 
 /**
  * Provides an Api to update a feature based on changes to an element (patient, vehicle, etc.).

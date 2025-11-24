@@ -4,43 +4,43 @@ import {
     lowerRightCornerOf,
 } from 'digital-fuesim-manv-shared';
 import { Collection, View } from 'ol';
-import type { Interaction } from 'ol/interaction';
-import type VectorLayer from 'ol/layer/Vector';
-import OlMap from 'ol/Map';
+import type { Interaction } from 'ol/interaction.js';
+import type VectorLayer from 'ol/layer/Vector.js';
+import OlMap from 'ol/Map.js';
 import { Subject, takeUntil } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import type { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     selectSimulatedRegions,
     selectViewports,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
 import {
     selectCurrentMainRole,
     selectRestrictedViewport,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { fromLonLat } from 'ol/proj';
-import type { TransferLinesService } from '../../core/transfer-lines.service';
-import { startingPosition } from '../../starting-position';
-import { CateringLinesFeatureManager } from '../feature-managers/catering-lines-feature-manager';
-import { DeleteFeatureManager } from '../feature-managers/delete-feature-manager';
-import { MapImageFeatureManager } from '../feature-managers/map-images-feature-manager';
-import { MaterialFeatureManager } from '../feature-managers/material-feature-manager';
-import { PatientFeatureManager } from '../feature-managers/patient-feature-manager';
-import { PersonnelFeatureManager } from '../feature-managers/personnel-feature-manager';
-import { SimulatedRegionFeatureManager } from '../feature-managers/simulated-region-feature-manager';
-import { TransferLinesFeatureManager } from '../feature-managers/transfer-lines-feature-manager';
-import { TransferPointFeatureManager } from '../feature-managers/transfer-point-feature-manager';
-import { VehicleFeatureManager } from '../feature-managers/vehicle-feature-manager';
+} from 'src/app/state/application/selectors/shared.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import { fromLonLat } from 'ol/proj.js';
+import type { TransferLinesService } from '../../core/transfer-lines.service.js';
+import { startingPosition } from '../../starting-position.js';
+import { CateringLinesFeatureManager } from '../feature-managers/catering-lines-feature-manager.js';
+import { DeleteFeatureManager } from '../feature-managers/delete-feature-manager.js';
+import { MapImageFeatureManager } from '../feature-managers/map-images-feature-manager.js';
+import { MaterialFeatureManager } from '../feature-managers/material-feature-manager.js';
+import { PatientFeatureManager } from '../feature-managers/patient-feature-manager.js';
+import { PersonnelFeatureManager } from '../feature-managers/personnel-feature-manager.js';
+import { SimulatedRegionFeatureManager } from '../feature-managers/simulated-region-feature-manager.js';
+import { TransferLinesFeatureManager } from '../feature-managers/transfer-lines-feature-manager.js';
+import { TransferPointFeatureManager } from '../feature-managers/transfer-point-feature-manager.js';
+import { VehicleFeatureManager } from '../feature-managers/vehicle-feature-manager.js';
 import {
     isInViewport,
     ViewportFeatureManager,
-} from '../feature-managers/viewport-feature-manager';
-import type { FeatureManager } from './feature-manager';
-import type { PopupManager } from './popup-manager';
-import { OlMapInteractionsManager } from './ol-map-interactions-manager';
-import { SatelliteLayerManager } from './satellite-layer-manager';
-import type { PopupService } from './popup.service';
+} from '../feature-managers/viewport-feature-manager.js';
+import type { FeatureManager } from './feature-manager.js';
+import type { PopupManager } from './popup-manager.js';
+import { OlMapInteractionsManager } from './ol-map-interactions-manager.js';
+import { SatelliteLayerManager } from './satellite-layer-manager.js';
+import type { PopupService } from './popup.service.js';
 
 export class OlMapManager {
     private readonly _olMap: OlMap;

@@ -1,6 +1,6 @@
 import { uuid } from 'digital-fuesim-manv-shared';
 import { Subject } from 'rxjs';
-import { CustomTimer } from './custom-timer';
+import { CustomTimer } from './custom-timer.js';
 
 export interface MessageConfig {
     title: string;

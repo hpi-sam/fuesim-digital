@@ -7,8 +7,8 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import { materialTypeNames } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectMaterialTemplate } from 'src/app/state/application/selectors/exercise.selectors';
+import type { AppState } from 'src/app/state/app.state.js';
+import { createSelectMaterialTemplate } from 'src/app/state/application/selectors/exercise.selectors.js';
 
 @Component({
     selector: 'app-material-template-display',

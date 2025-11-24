@@ -8,24 +8,24 @@ import {
     migratePartialExport,
     validateExerciseExport,
 } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { MessageService } from 'src/app/core/messages/message.service';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import { MessageService } from 'src/app/core/messages/message.service.js';
 import type { PatientCategory, UUID } from 'digital-fuesim-manv-shared';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     selectVehicleTemplates,
     selectPatientCategories,
     selectMapImagesTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
-import { DragElementService } from '../core/drag-element.service';
-import { TransferLinesService } from '../core/transfer-lines.service';
-import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
-import { openCreateVehicleTemplateModal } from '../editor-panel/create-vehicle-template-modal/open-create-vehicle-template-modal';
-import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-modal/open-edit-image-template-modal';
-import { openPartialImportOverwriteModal } from '../partial-import/open-partial-import-overwrite-modal';
-import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
-import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
+import { DragElementService } from '../core/drag-element.service.js';
+import { TransferLinesService } from '../core/transfer-lines.service.js';
+import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal.js';
+import { openCreateVehicleTemplateModal } from '../editor-panel/create-vehicle-template-modal/open-create-vehicle-template-modal.js';
+import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-modal/open-edit-image-template-modal.js';
+import { openPartialImportOverwriteModal } from '../partial-import/open-partial-import-overwrite-modal.js';
+import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region.js';
+import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal.js';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {

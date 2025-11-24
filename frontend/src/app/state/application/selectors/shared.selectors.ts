@@ -16,9 +16,9 @@ import {
     Viewport,
 } from 'digital-fuesim-manv-shared';
 import { pickBy } from 'lodash-es';
-import type { CateringLine } from 'src/app/shared/types/catering-line';
-import type { AppState } from '../../app.state';
-import { selectOwnClientId } from './application.selectors';
+import type { CateringLine } from 'src/app/shared/types/catering-line.js';
+import type { AppState } from '../../app.state.js';
+import { selectOwnClientId } from './application.selectors.js';
 import {
     selectClients,
     selectMapImages,
@@ -29,7 +29,7 @@ import {
     selectTransferPoints,
     selectVehicles,
     selectViewports,
-} from './exercise.selectors';
+} from './exercise.selectors.js';
 
 /**
  * All selectors in here use exercise- as well as application-selectors

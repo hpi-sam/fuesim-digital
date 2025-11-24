@@ -14,19 +14,19 @@ import {
     switchMap,
     type Observable,
 } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component.js';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
+} from 'src/app/shared/services/hotkeys.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     createSelectBehaviorState,
     selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service.js';
 
 @Component({
     selector: 'app-signaller-modal-transport-trays-editor',

@@ -1,8 +1,8 @@
 import type { Feature } from 'ol';
-import type { Options } from 'ol/style/Stroke';
-import Stroke from 'ol/style/Stroke';
-import Style from 'ol/style/Style';
-import { StyleHelper } from './style-helper';
+import type { Options } from 'ol/style/Stroke.js';
+import Stroke from 'ol/style/Stroke.js';
+import Style from 'ol/style/Style.js';
+import { StyleHelper } from './style-helper.js';
 
 export class LineStyleHelper extends StyleHelper<Style, Feature> {
     /**

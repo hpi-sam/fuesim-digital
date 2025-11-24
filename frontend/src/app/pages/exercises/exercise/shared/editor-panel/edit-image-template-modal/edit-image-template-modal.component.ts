@@ -8,11 +8,11 @@ import type {
     UUID,
 } from 'digital-fuesim-manv-shared';
 import { cloneDeep } from 'lodash-es';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectMapImageTemplate } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import type { ChangedImageTemplateValues } from '../image-template-form/image-template-form.component';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import { createSelectMapImageTemplate } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import type { ChangedImageTemplateValues } from '../image-template-form/image-template-form.component.js';
 
 @Component({
     selector: 'app-edit-image-template-modal',

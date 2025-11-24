@@ -7,8 +7,8 @@ import {
     Output,
     ViewChild,
 } from '@angular/core';
-import type { HotkeyLayer } from '../../services/hotkeys.service';
-import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
+import type { HotkeyLayer } from '../../services/hotkeys.service.js';
+import { Hotkey, HotkeysService } from '../../services/hotkeys.service.js';
 
 export interface SearchableDropdownOption {
     key: string;

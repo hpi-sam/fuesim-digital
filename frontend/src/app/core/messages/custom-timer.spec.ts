@@ -1,4 +1,4 @@
-import { CustomTimer } from './custom-timer';
+import { CustomTimer } from './custom-timer.js';
 
 describe('CustomTimer', () => {
     jest.useFakeTimers();

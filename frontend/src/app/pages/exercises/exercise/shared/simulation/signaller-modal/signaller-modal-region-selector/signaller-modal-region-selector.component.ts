@@ -1,22 +1,22 @@
 import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, ViewChild } from '@angular/core';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
+} from 'src/app/shared/services/hotkeys.service.js';
 import type { Observable } from 'rxjs';
 import { map, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
-import { selectSimulatedRegions } from 'src/app/state/application/selectors/exercise.selectors';
+import type { AppState } from 'src/app/state/app.state.js';
+import { selectSimulatedRegions } from 'src/app/state/application/selectors/exercise.selectors.js';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component.js';
 import {
     eocId,
     overviewId,
     SelectSignallerRegionService,
-} from '../select-signaller-region.service';
+} from '../select-signaller-region.service.js';
 
 @Component({
     selector: 'app-signaller-modal-region-selector',

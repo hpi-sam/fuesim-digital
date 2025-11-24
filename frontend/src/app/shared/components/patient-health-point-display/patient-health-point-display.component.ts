@@ -8,12 +8,12 @@ import {
     statusNames,
 } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     createSelectPatient,
     selectConfiguration,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors.js';
 
 @Component({
     selector: 'app-patient-health-point-display',

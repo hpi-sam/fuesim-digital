@@ -3,8 +3,8 @@ import { Component, Input } from '@angular/core';
 import { Store, createSelector } from '@ngrx/store';
 import type { StartPoint } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectAlarmGroup } from 'src/app/state/application/selectors/exercise.selectors';
+import type { AppState } from 'src/app/state/app.state.js';
+import { createSelectAlarmGroup } from 'src/app/state/application/selectors/exercise.selectors.js';
 
 @Component({
     selector: 'app-start-point-name',

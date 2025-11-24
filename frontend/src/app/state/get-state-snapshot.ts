@@ -1,6 +1,6 @@
 import type { Store } from '@ngrx/store';
 import { first } from 'rxjs';
-import type { AppState } from './app.state';
+import type { AppState } from './app.state.js';
 
 /**
  * A helper function to get the current immutable state synchronously.

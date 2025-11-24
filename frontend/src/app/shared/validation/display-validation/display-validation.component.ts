@@ -1,6 +1,6 @@
 import { Input, Component } from '@angular/core';
 import { NgModel } from '@angular/forms';
-import type { CustomValidationErrors } from '../custom-validation-errors';
+import type { CustomValidationErrors } from '../custom-validation-errors.js';
 
 @Component({
     selector: 'app-display-validation',

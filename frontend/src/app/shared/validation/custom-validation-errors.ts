@@ -1,6 +1,6 @@
-import type { CustomValidators } from './custom-validators';
-import type { ExerciseExistsValidatorError } from './exercise-exists-validator.directive';
-import type { ImageExistsValidatorError } from './image-exists-validator.directive';
+import type { CustomValidators } from './custom-validators.js';
+import type { ExerciseExistsValidatorError } from './exercise-exists-validator.directive.js';
+import type { ImageExistsValidatorError } from './image-exists-validator.directive.js';
 
 /**
  * A strongly typed version of the ValidationErrors interface.

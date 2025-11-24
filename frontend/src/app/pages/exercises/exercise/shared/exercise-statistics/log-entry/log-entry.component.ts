@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { LogEntry } from 'digital-fuesim-manv-shared';
-import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
+import { StatisticsTimeSelectionService } from '../statistics-time-selection.service.js';
 
 @Component({
     selector: 'app-log-entry',

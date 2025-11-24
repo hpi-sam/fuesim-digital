@@ -3,11 +3,11 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { personnelTypeNames } from 'digital-fuesim-manv-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     selectPersonnel,
     selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
 
 @Component({
     selector: 'app-signaller-modal-regions-overview',

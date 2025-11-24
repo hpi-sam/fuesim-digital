@@ -1,4 +1,4 @@
-import type { Environment } from './environment-type';
+import type { Environment } from './environment-type.js';
 
 export const environment: Environment = {
     production: true,

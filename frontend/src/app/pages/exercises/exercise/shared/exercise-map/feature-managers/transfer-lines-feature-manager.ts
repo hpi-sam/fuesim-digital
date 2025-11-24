@@ -3,22 +3,22 @@ import type { Store } from '@ngrx/store';
 import type { Element } from 'digital-fuesim-manv-shared';
 import type { MapBrowserEvent } from 'ol';
 import { Feature } from 'ol';
-import LineString from 'ol/geom/LineString';
-import type { TranslateEvent } from 'ol/interaction/Translate';
-import type VectorLayer from 'ol/layer/Vector';
-import type OlMap from 'ol/Map';
-import Stroke from 'ol/style/Stroke';
-import Style from 'ol/style/Style';
+import LineString from 'ol/geom/LineString.js';
+import type { TranslateEvent } from 'ol/interaction/Translate.js';
+import type VectorLayer from 'ol/layer/Vector.js';
+import type OlMap from 'ol/Map.js';
+import Stroke from 'ol/style/Stroke.js';
+import Style from 'ol/style/Style.js';
 import type { Subject } from 'rxjs';
-import type { TransferLine } from 'src/app/shared/types/transfer-line';
-import type { AppState } from 'src/app/state/app.state';
-import { selectTransferLines } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import type { TransferLinesService } from '../../core/transfer-lines.service';
-import type { FeatureManager } from '../utility/feature-manager';
-import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
-import { ElementManager } from './element-manager';
+import type { TransferLine } from 'src/app/shared/types/transfer-line.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import { selectTransferLines } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import type { TransferLinesService } from '../../core/transfer-lines.service.js';
+import type { FeatureManager } from '../utility/feature-manager.js';
+import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager.js';
+import { ElementManager } from './element-manager.js';
 
 export class TransferLinesFeatureManager
     extends ElementManager<TransferLine, LineString>

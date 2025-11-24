@@ -6,12 +6,12 @@ import type {
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { ApiService } from 'src/app/core/api.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { tryToJoinExercise } from '../shared/join-exercise-modal/try-to-join-exercise';
+import { ApiService } from 'src/app/core/api.service.js';
+import { MessageService } from 'src/app/core/messages/message.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import { tryToJoinExercise } from '../shared/join-exercise-modal/try-to-join-exercise.js';
 
 @Injectable({
     providedIn: 'root',

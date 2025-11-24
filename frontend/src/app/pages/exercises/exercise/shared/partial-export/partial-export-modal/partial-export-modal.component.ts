@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { cloneDeepMutable, PartialExport } from 'digital-fuesim-manv-shared';
-import { saveBlob } from 'src/app/shared/functions/save-blob';
-import type { AppState } from 'src/app/state/app.state';
-import { selectExerciseState } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { saveBlob } from 'src/app/shared/functions/save-blob.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import { selectExerciseState } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
 
 interface PartialExportConfiguration {
     patientCategories: boolean;

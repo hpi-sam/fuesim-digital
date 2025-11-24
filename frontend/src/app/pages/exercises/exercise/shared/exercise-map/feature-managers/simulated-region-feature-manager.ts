@@ -7,29 +7,29 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import { MapCoordinates, Size } from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
-import type { Polygon } from 'ol/geom';
-import type { TranslateEvent } from 'ol/interaction/Translate';
-import type OlMap from 'ol/Map';
-import { Fill } from 'ol/style';
-import Stroke from 'ol/style/Stroke';
-import Style from 'ol/style/Style';
+import type { Polygon } from 'ol/geom.js';
+import type { TranslateEvent } from 'ol/interaction/Translate.js';
+import type OlMap from 'ol/Map.js';
+import { Fill } from 'ol/style.js';
+import Stroke from 'ol/style/Stroke.js';
+import Style from 'ol/style/Style.js';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import type { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     selectCurrentMainRole,
     selectVisibleSimulatedRegions,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { SimulatedRegionPopupComponent } from '../shared/simulated-region-popup/simulated-region-popup.component';
-import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
-import type { FeatureManager } from '../utility/feature-manager';
-import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
-import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
-import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction';
-import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
-import type { PopupService } from '../utility/popup.service';
-import { MoveableFeatureManager } from './moveable-feature-manager';
+} from 'src/app/state/application/selectors/shared.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import { SimulatedRegionPopupComponent } from '../shared/simulated-region-popup/simulated-region-popup.component.js';
+import { calculatePopupPositioning } from '../utility/calculate-popup-positioning.js';
+import type { FeatureManager } from '../utility/feature-manager.js';
+import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager.js';
+import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper.js';
+import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction.js';
+import { NameStyleHelper } from '../utility/style-helper/name-style-helper.js';
+import type { PopupService } from '../utility/popup.service.js';
+import { MoveableFeatureManager } from './moveable-feature-manager.js';
 
 export class SimulatedRegionFeatureManager
     extends MoveableFeatureManager<SimulatedRegion, Polygon>

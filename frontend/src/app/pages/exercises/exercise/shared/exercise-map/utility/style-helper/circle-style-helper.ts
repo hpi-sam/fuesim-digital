@@ -1,9 +1,9 @@
 import type { Feature } from 'ol';
-import { Circle } from 'ol/style';
-import type { Options } from 'ol/style/Circle';
-import type ImageStyle from 'ol/style/Image';
-import Style from 'ol/style/Style';
-import { StyleHelper } from './style-helper';
+import { Circle } from 'ol/style.js';
+import type { Options } from 'ol/style/Circle.js';
+import type ImageStyle from 'ol/style/Image.js';
+import Style from 'ol/style/Style.js';
+import { StyleHelper } from './style-helper.js';
 
 export class CircleStyleHelper extends StyleHelper<Style, Feature> {
     /**

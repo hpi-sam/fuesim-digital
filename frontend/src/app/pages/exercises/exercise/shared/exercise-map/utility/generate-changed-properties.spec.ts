@@ -1,4 +1,4 @@
-import { generateChangedProperties } from './generate-changed-properties';
+import { generateChangedProperties } from './generate-changed-properties.js';
 
 describe('GenerateChangedProperties', () => {
     it('should generate the right properties if the objects are different', () => {

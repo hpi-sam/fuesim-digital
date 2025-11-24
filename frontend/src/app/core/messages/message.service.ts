@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { isEqual } from 'lodash-es';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
-import type { MessageConfig } from './message';
-import { Message } from './message';
+import type { MessageConfig } from './message.js';
+import { Message } from './message.js';
 
 @Injectable({ providedIn: 'root' })
 export class MessageService {

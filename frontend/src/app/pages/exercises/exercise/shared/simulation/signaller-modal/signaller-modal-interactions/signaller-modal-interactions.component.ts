@@ -23,20 +23,20 @@ import {
     map,
     takeUntil,
 } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component.js';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
+} from 'src/app/shared/services/hotkeys.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors.js';
 import {
     createSelectBehaviorStates,
     selectRadiograms,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
 
 export type InterfaceSignallerInteraction = Omit<
     SearchableDropdownOption,

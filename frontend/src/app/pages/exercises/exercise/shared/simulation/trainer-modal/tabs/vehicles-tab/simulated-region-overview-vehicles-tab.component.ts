@@ -15,7 +15,7 @@ import {
 import { groupBy } from 'lodash-es';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     createSelectElementsInSimulatedRegion,
     selectConfiguration,
@@ -23,10 +23,10 @@ import {
     selectPersonnel,
     selectVehicleTemplates,
     selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { PatientWithVisibleStatus } from '../../patients-table/simulated-region-overview-patients-table.component';
-import { StartTransferService } from '../../start-transfer.service';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { PatientWithVisibleStatus } from '../../patients-table/simulated-region-overview-patients-table.component.js';
+import { StartTransferService } from '../../start-transfer.service.js';
 
 @Component({
     selector: 'app-simulated-region-overview-vehicles-tab',

@@ -8,12 +8,12 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject, takeUntil } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     createSelectBehaviorState,
     selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({

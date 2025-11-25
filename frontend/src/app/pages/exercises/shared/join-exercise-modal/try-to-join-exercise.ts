@@ -1,6 +1,6 @@
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
-import { JoinExerciseModalComponent } from './join-exercise-modal.component';
+import { JoinExerciseModalComponent } from './join-exercise-modal.component.js';
 
 /**
  * @returns Whether the exercise was successfully joined.

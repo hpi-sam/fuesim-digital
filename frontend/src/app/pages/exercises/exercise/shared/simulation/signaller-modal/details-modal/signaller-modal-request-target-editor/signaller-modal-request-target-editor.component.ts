@@ -10,21 +10,21 @@ import {
     SimulatedRegionRequestTargetConfiguration,
     TraineesRequestTargetConfiguration,
 } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component.js';
 import { map, tap, type Observable, combineLatest } from 'rxjs';
 import {
     createSelectBehaviorState,
     selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+} from 'src/app/shared/services/hotkeys.service.js';
+import { MessageService } from 'src/app/core/messages/message.service.js';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service.js';
 
 @Component({
     selector: 'app-signaller-modal-request-target-editor',

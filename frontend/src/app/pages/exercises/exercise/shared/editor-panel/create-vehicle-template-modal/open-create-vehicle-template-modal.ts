@@ -1,5 +1,5 @@
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { CreateVehicleTemplateModalComponent } from './create-vehicle-template-modal.component';
+import { CreateVehicleTemplateModalComponent } from './create-vehicle-template-modal.component.js';
 
 export async function openCreateVehicleTemplateModal(
     ngbModalService: NgbModal

@@ -1,4 +1,5 @@
-import { CustomTimer } from './custom-timer';
+import { jest } from '@jest/globals';
+import { CustomTimer } from './custom-timer.js';
 
 describe('CustomTimer', () => {
     jest.useFakeTimers();
@@ -13,9 +14,9 @@ describe('CustomTimer', () => {
         const time = 1000;
         const callback = jest.fn();
         timer = new CustomTimer(callback, time);
-        expect(callback).not.toBeCalled();
+        expect(callback).not.toHaveBeenCalled();
         jest.advanceTimersByTime(time - 1);
-        expect(callback).not.toBeCalled();
+        expect(callback).not.toHaveBeenCalled();
         jest.advanceTimersByTime(1);
         expect(callback).toHaveBeenCalledTimes(1);
         jest.advanceTimersByTime(time);

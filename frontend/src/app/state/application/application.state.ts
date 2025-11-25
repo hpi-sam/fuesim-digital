@@ -1,5 +1,5 @@
 import type { ExerciseState, UUID } from 'digital-fuesim-manv-shared';
-import type { TimeConstraints } from 'src/app/core/time-travel-helper';
+import type { TimeConstraints } from 'src/app/core/time-travel-helper.js';
 
 export class ApplicationState {
     /**

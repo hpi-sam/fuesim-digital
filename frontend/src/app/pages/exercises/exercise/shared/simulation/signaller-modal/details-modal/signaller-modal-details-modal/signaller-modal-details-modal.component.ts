@@ -1,11 +1,11 @@
 import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, Input, TemplateRef } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
+} from 'src/app/shared/services/hotkeys.service.js';
 
 @Component({
     selector: 'app-signaller-modal-details-modal',

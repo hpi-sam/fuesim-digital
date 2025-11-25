@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import { trackByPropertyPipeTransform } from './track-by-property-pipe-transform';
+import { trackByPropertyPipeTransform } from './track-by-property-pipe-transform.js';
 
 /**
  * An Angular pipe that makes it more convenient to use the [trackByFunction](https://angular.io/api/common/NgForOf#ngForTrackBy) to improve performance of the `*ngFor` structural directive.

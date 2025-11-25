@@ -1,8 +1,8 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { toLonLat } from 'ol/proj';
-import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
+import { toLonLat } from 'ol/proj.js';
+import { OlMapManager } from '../../exercise-map/utility/ol-map-manager.js';
 
 @Component({
     selector: 'app-coordinate-picker-modal',

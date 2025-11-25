@@ -1,10 +1,10 @@
 import type { AfterViewInit, OnChanges, OnDestroy } from '@angular/core';
 import { Component, ElementRef, Input, NgZone, ViewChild } from '@angular/core';
-import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
+import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic.js';
 import { Subject, takeUntil } from 'rxjs';
-import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
-import type { StackedBarChartDatasets } from './time-line-area-chart';
-import { StackedBarChart } from './time-line-area-chart';
+import { StatisticsTimeSelectionService } from '../statistics-time-selection.service.js';
+import type { StackedBarChartDatasets } from './time-line-area-chart.js';
+import { StackedBarChart } from './time-line-area-chart.js';
 
 @Component({
     selector: 'app-stacked-bar-chart',

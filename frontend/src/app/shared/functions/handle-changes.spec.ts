@@ -1,4 +1,5 @@
-import { handleChanges } from './handle-changes';
+import { jest } from '@jest/globals';
+import { handleChanges } from './handle-changes.js';
 
 describe('HandleChanges', () => {
     let oldDictionary: { readonly [key: string]: { readonly id: string } };

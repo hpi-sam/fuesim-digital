@@ -1,21 +1,21 @@
 import type { Store } from '@ngrx/store';
 import type { MapBrowserEvent } from 'ol';
 import { Feature } from 'ol';
-import LineString from 'ol/geom/LineString';
-import type { TranslateEvent } from 'ol/interaction/Translate';
-import type VectorLayer from 'ol/layer/Vector';
-import type OlMap from 'ol/Map';
+import LineString from 'ol/geom/LineString.js';
+import type { TranslateEvent } from 'ol/interaction/Translate.js';
+import type VectorLayer from 'ol/layer/Vector.js';
+import type OlMap from 'ol/Map.js';
 import type { Subject } from 'rxjs';
-import { rgbColorPalette } from 'src/app/shared/functions/colors';
-import type { CateringLine } from 'src/app/shared/types/catering-line';
-import type { AppState } from 'src/app/state/app.state';
-import { selectVisibleCateringLines } from 'src/app/state/application/selectors/shared.selectors';
+import { rgbColorPalette } from 'src/app/shared/functions/colors.js';
+import type { CateringLine } from 'src/app/shared/types/catering-line.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import { selectVisibleCateringLines } from 'src/app/state/application/selectors/shared.selectors.js';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from 'digital-fuesim-manv-shared';
-import type { FeatureManager } from '../utility/feature-manager';
-import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
-import { LineStyleHelper } from '../utility/style-helper/line-style-helper';
-import { ElementManager } from './element-manager';
+import type { FeatureManager } from '../utility/feature-manager.js';
+import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager.js';
+import { LineStyleHelper } from '../utility/style-helper/line-style-helper.js';
+import { ElementManager } from './element-manager.js';
 
 export class CateringLinesFeatureManager
     extends ElementManager<CateringLine, LineString>

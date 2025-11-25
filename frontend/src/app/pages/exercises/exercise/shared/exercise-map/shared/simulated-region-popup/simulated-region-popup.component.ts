@@ -4,11 +4,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID, SimulatedRegion } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectSimulatedRegion } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
-import { openSimulationTrainerModal } from '../../../simulation/trainer-modal/open-simulation-trainer-modal';
-import { PopupService } from '../../utility/popup.service';
+import type { AppState } from 'src/app/state/app.state.js';
+import { createSelectSimulatedRegion } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors.js';
+import { openSimulationTrainerModal } from '../../../simulation/trainer-modal/open-simulation-trainer-modal.js';
+import { PopupService } from '../../utility/popup.service.js';
 
 @Component({
     selector: 'app-simulated-region-popup',

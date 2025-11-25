@@ -8,24 +8,24 @@ import {
     StateHistoryCompound,
 } from 'digital-fuesim-manv-shared';
 import { Subject } from 'rxjs';
-import { ApiService } from 'src/app/core/api.service';
-import { ApplicationService } from 'src/app/core/application.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { saveBlob } from 'src/app/shared/functions/save-blob';
-import type { AppState } from 'src/app/state/app.state';
+import { ApiService } from 'src/app/core/api.service.js';
+import { ApplicationService } from 'src/app/core/application.service.js';
+import { MessageService } from 'src/app/core/messages/message.service.js';
+import { saveBlob } from 'src/app/shared/functions/save-blob.js';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     selectExerciseStateMode,
     selectTimeConstraints,
     selectExerciseId,
-} from 'src/app/state/application/selectors/application.selectors';
+} from 'src/app/state/application/selectors/application.selectors.js';
 import {
     selectParticipantId,
     selectExerciseState,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import Package from 'package.json';
-import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import Package from 'package.json' with { type: 'json' };
+import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal.js';
 
 @Component({
     selector: 'app-exercise',

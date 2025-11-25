@@ -1,6 +1,6 @@
 import { Component, Input, output } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from 'src/app/state/app.state.js';
 
 @Component({
     selector: 'app-map-editor-card',

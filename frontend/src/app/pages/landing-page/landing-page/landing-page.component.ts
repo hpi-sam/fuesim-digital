@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import type { ExportImportFile } from 'digital-fuesim-manv-shared';
 import { escapeRegExp } from 'lodash-es';
-import { ApiService } from 'src/app/core/api.service';
-import { MessageService } from 'src/app/core/messages/message.service';
+import { ApiService } from 'src/app/core/api.service.js';
+import { MessageService } from 'src/app/core/messages/message.service.js';
 
 @Component({
     selector: 'app-landing-page',

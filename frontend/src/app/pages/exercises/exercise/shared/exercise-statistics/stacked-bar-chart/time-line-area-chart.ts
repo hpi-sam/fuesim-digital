@@ -9,7 +9,7 @@ import {
     Tooltip,
 } from 'chart.js';
 import { formatDuration } from 'digital-fuesim-manv-shared';
-import { rgbColorPalette } from 'src/app/shared/functions/colors';
+import { rgbColorPalette } from 'src/app/shared/functions/colors.js';
 
 Chart.register(
     CategoryScale,

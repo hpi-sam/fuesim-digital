@@ -14,11 +14,11 @@ import {
 } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
-import { selectRadiograms } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { RadiogramListService } from './radiogram-list.service';
+import type { AppState } from 'src/app/state/app.state.js';
+import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors.js';
+import { selectRadiograms } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import { RadiogramListService } from './radiogram-list.service.js';
 
 @Component({
     selector: 'app-radiogram-list',

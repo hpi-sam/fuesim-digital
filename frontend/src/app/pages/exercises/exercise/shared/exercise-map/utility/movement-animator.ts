@@ -1,15 +1,15 @@
-import type VectorLayer from 'ol/layer/Vector';
-import type OlMap from 'ol/Map';
-import type RenderEvent from 'ol/render/Event';
+import type VectorLayer from 'ol/layer/Vector.js';
+import type OlMap from 'ol/Map.js';
+import type RenderEvent from 'ol/render/Event.js';
 import type { Feature } from 'ol';
-import { getVectorContext } from 'ol/render';
+import { getVectorContext } from 'ol/render.js';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { isEqual } from 'lodash-es';
 import type {
     Coordinates,
     CoordinatePair,
     GeometryWithCoordinates,
-} from './geometry-helper';
+} from './geometry-helper.js';
 
 /**
  * Animates the movement of a feature to a new position.

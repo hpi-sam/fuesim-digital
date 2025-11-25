@@ -7,14 +7,14 @@ import type {
     UUID,
 } from 'digital-fuesim-manv-shared';
 import { Subject } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
-import { HotkeysService } from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectBehaviorStatesByType } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
+import { HotkeysService } from 'src/app/shared/services/hotkeys.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import { createSelectBehaviorStatesByType } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import { MessageService } from 'src/app/core/messages/message.service.js';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service.js';
 
 @Component({
     selector: 'app-signaller-modal-start-transfer-of-category-modal',

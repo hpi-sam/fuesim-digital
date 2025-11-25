@@ -3,8 +3,8 @@ import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferPoint, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectTransferPoint } from 'src/app/state/application/selectors/exercise.selectors';
+import type { AppState } from 'src/app/state/app.state.js';
+import { createSelectTransferPoint } from 'src/app/state/application/selectors/exercise.selectors.js';
 
 @Component({
     selector: 'app-transfer-point-name',

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
-import { ConfirmationModalComponent } from './confirmation-modal.component';
+import { ConfirmationModalComponent } from './confirmation-modal.component.js';
 
 @Injectable({
     providedIn: 'root',

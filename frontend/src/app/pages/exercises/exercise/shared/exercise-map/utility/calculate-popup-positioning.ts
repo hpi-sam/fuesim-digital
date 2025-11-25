@@ -1,5 +1,5 @@
-import type { Coordinate } from 'ol/coordinate';
-import type { Positioning } from '../../utils/types/positioning';
+import type { Coordinate } from 'ol/coordinate.js';
+import type { Positioning } from '../../utils/types/positioning.js';
 
 /**
  *

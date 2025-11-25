@@ -1,23 +1,23 @@
 import type { Store } from '@ngrx/store';
 import type { MapBrowserEvent, View } from 'ol';
 import { Feature } from 'ol';
-import { getTopRight } from 'ol/extent';
-import { Point } from 'ol/geom';
-import type { TranslateEvent } from 'ol/interaction/Translate';
-import VectorLayer from 'ol/layer/Vector';
-import type OlMap from 'ol/Map';
-import VectorSource from 'ol/source/Vector';
-import Icon from 'ol/style/Icon';
-import Style from 'ol/style/Style';
+import { getTopRight } from 'ol/extent.js';
+import { Point } from 'ol/geom.js';
+import type { TranslateEvent } from 'ol/interaction/Translate.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import type OlMap from 'ol/Map.js';
+import VectorSource from 'ol/source/Vector.js';
+import Icon from 'ol/style/Icon.js';
+import Style from 'ol/style/Style.js';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import type { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from 'digital-fuesim-manv-shared';
-import type { FeatureManager } from '../utility/feature-manager';
-import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
+import type { FeatureManager } from '../utility/feature-manager.js';
+import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager.js';
 
 function calculateTopRightViewPoint(view: View) {
     const extent = getTopRight(view.calculateExtent());

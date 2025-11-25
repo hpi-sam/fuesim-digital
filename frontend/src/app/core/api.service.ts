@@ -8,11 +8,11 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import { freeze } from 'immer';
 import { lastValueFrom } from 'rxjs';
-import type { AppState } from '../state/app.state';
-import { selectExerciseId } from '../state/application/selectors/application.selectors';
-import { selectStateSnapshot } from '../state/get-state-snapshot';
-import { httpOrigin } from './api-origins';
-import { MessageService } from './messages/message.service';
+import type { AppState } from '../state/app.state.js';
+import { selectExerciseId } from '../state/application/selectors/application.selectors.js';
+import { selectStateSnapshot } from '../state/get-state-snapshot.js';
+import { httpOrigin } from './api-origins.js';
+import { MessageService } from './messages/message.service.js';
 
 @Injectable({
     providedIn: 'root',

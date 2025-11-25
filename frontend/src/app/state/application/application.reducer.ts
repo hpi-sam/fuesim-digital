@@ -8,8 +8,8 @@ import {
     createLeaveExerciseAction,
     createSetExerciseStateAction,
     createStartTimeTravelAction,
-} from './application.actions';
-import { ApplicationState } from './application.state';
+} from './application.actions.js';
+import { ApplicationState } from './application.state.js';
 
 export const applicationReducer = createReducer(
     new ApplicationState(),

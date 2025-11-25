@@ -1,5 +1,5 @@
 import type { UUID } from 'digital-fuesim-manv-shared';
-import type { AreaStatistics } from './area-statistics';
+import type { AreaStatistics } from './area-statistics.js';
 
 export interface StatisticsEntry {
     readonly id: UUID;

@@ -6,13 +6,13 @@ import {
     NgbNavModule,
     NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { ExerciseStatisticsModalComponent } from './exercise-statistics-modal/exercise-statistics-modal.component';
-import { HospitalPatientsTableComponent } from './hospital-patients-table/hospital-patients-table.component';
-import { StackedBarChartComponent } from './stacked-bar-chart/stacked-bar-chart.component';
-import { LogEntryComponent } from './log-entry/log-entry.component';
-import { TagComponent } from './tag/tag.component';
-import { LogTableComponent } from './log-table/log-table.component';
+import { SharedModule } from 'src/app/shared/shared.module.js';
+import { ExerciseStatisticsModalComponent } from './exercise-statistics-modal/exercise-statistics-modal.component.js';
+import { HospitalPatientsTableComponent } from './hospital-patients-table/hospital-patients-table.component.js';
+import { StackedBarChartComponent } from './stacked-bar-chart/stacked-bar-chart.component.js';
+import { LogEntryComponent } from './log-entry/log-entry.component.js';
+import { TagComponent } from './tag/tag.component.js';
+import { LogTableComponent } from './log-table/log-table.component.js';
 
 @NgModule({
     declarations: [

@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import type { PartialExport } from 'digital-fuesim-manv-shared';
 import { preparePartialExportForImport } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { MessageService } from 'src/app/core/messages/message.service';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import { MessageService } from 'src/app/core/messages/message.service.js';
 
 @Component({
     selector: 'app-partial-import-modal',

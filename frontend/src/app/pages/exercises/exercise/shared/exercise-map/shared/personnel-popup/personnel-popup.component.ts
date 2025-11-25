@@ -3,9 +3,9 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Personnel } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectPersonnel } from 'src/app/state/application/selectors/exercise.selectors';
-import { PopupService } from '../../utility/popup.service';
+import type { AppState } from 'src/app/state/app.state.js';
+import { createSelectPersonnel } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { PopupService } from '../../utility/popup.service.js';
 
 @Component({
     selector: 'app-personnel-popup',

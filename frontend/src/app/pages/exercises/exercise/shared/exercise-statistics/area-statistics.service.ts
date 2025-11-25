@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
-import type { AreaStatistics } from '../core/statistics/area-statistics';
-import { StatisticsService } from '../core/statistics/statistics.service';
+import type { AreaStatistics } from '../core/statistics/area-statistics.js';
+import { StatisticsService } from '../core/statistics/statistics.service.js';
 
 @Injectable({
     providedIn: 'root',

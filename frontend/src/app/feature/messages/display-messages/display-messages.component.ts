@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { fade } from '../animations/fade';
+import { MessageService } from 'src/app/core/messages/message.service.js';
+import { fade } from '../animations/fade.js';
 
 /**
  * This component displays all the messages from the MessageService.

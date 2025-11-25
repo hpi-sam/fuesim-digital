@@ -15,16 +15,16 @@ import {
     generateRandomRgbaColor,
     getRgbaColor,
     rgbColorPalette,
-} from 'src/app/shared/functions/colors';
-import type { AppState } from 'src/app/state/app.state';
+} from 'src/app/shared/functions/colors.js';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     selectSimulatedRegions,
     selectViewports,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { StatisticsService } from '../../core/statistics/statistics.service';
-import { AreaStatisticsService } from '../area-statistics.service';
-import type { StackedBarChartStatistics } from '../stacked-bar-chart/stacked-bar-chart.component';
-import { StackedBarChart } from '../stacked-bar-chart/time-line-area-chart';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
+import { StatisticsService } from '../../core/statistics/statistics.service.js';
+import { AreaStatisticsService } from '../area-statistics.service.js';
+import type { StackedBarChartStatistics } from '../stacked-bar-chart/stacked-bar-chart.component.js';
+import { StackedBarChart } from '../stacked-bar-chart/time-line-area-chart.js';
 
 @Component({
     selector: 'app-exercise-statistics-modal',

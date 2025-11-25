@@ -4,16 +4,16 @@ import { Store } from '@ngrx/store';
 import type { ReportableInformation, UUID } from 'digital-fuesim-manv-shared';
 import { makeInterfaceSignallerKey } from 'digital-fuesim-manv-shared';
 import { type Observable, BehaviorSubject, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { createSelectBehaviorStates } from 'src/app/state/application/selectors/exercise.selectors';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
+import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import { createSelectBehaviorStates } from 'src/app/state/application/selectors/exercise.selectors.js';
 import {
     setLoadingState,
     type InterfaceSignallerInteraction,
-} from '../signaller-modal-interactions/signaller-modal-interactions.component';
-import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
+} from '../signaller-modal-interactions/signaller-modal-interactions.component.js';
+import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service.js';
 
 @Component({
     selector: 'app-signaller-modal-region-information',

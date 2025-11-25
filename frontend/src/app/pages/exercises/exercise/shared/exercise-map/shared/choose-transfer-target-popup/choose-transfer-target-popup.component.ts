@@ -3,12 +3,12 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Hospital, TransferPoint, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     createSelectReachableHospitals,
     createSelectReachableTransferPoints,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { PopupService } from '../../utility/popup.service';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
+import { PopupService } from '../../utility/popup.service.js';
 
 @Component({
     selector: 'app-choose-transfer-target-popup',

@@ -4,11 +4,11 @@ import { Store } from '@ngrx/store';
 import { statusNames } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, startWith, Subject } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     selectHospitalPatients,
     selectHospitals,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
 
 @Component({
     selector: 'app-hospital-patients-table',

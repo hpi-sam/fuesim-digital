@@ -1,26 +1,26 @@
 import type { Feature, MapBrowserEvent } from 'ol';
-import type Point from 'ol/geom/Point';
-import type { TranslateEvent } from 'ol/interaction/Translate';
-import type VectorLayer from 'ol/layer/Vector';
-import type OlMap from 'ol/Map';
+import type Point from 'ol/geom/Point.js';
+import type { TranslateEvent } from 'ol/interaction/Translate.js';
+import type VectorLayer from 'ol/layer/Vector.js';
+import type OlMap from 'ol/Map.js';
 import type { Observable, Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element, UUID } from 'digital-fuesim-manv-shared';
-import type { FeatureLike } from 'ol/Feature';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
-import type Style from 'ol/style/Style';
-import type { FeatureManager } from '../utility/feature-manager';
+import type { FeatureLike } from 'ol/Feature.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors.js';
+import type Style from 'ol/style/Style.js';
+import type { FeatureManager } from '../utility/feature-manager.js';
 import type {
     GeometryHelper,
     GeometryWithCoordinates,
     PositionableElement,
     Positions,
-} from '../utility/geometry-helper';
-import { MovementAnimator } from '../utility/movement-animator';
-import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
-import { TranslateInteraction } from '../utility/translate-interaction';
-import { ElementManager } from './element-manager';
+} from '../utility/geometry-helper.js';
+import { MovementAnimator } from '../utility/movement-animator.js';
+import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager.js';
+import { TranslateInteraction } from '../utility/translate-interaction.js';
+import { ElementManager } from './element-manager.js';
 
 /**
  * Manages the position of the element.

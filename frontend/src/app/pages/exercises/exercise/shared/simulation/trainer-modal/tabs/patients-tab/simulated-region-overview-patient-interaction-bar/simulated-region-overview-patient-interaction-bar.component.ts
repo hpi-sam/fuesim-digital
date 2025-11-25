@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import type { Mutable, UUIDSet, UUID } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { SelectPatientService } from '../../../select-patient.service';
-import { StartTransferService } from '../../../start-transfer.service';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import { SelectPatientService } from '../../../select-patient.service.js';
+import { StartTransferService } from '../../../start-transfer.service.js';
 
 @Component({
     selector: 'app-simulated-region-overview-patient-interaction-bar',

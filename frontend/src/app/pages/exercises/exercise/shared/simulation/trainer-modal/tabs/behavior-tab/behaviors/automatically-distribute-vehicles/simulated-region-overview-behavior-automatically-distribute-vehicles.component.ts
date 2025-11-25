@@ -10,13 +10,13 @@ import {
     TransferPoint,
 } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { ExerciseService } from 'src/app/core/exercise.service.js';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     createSelectBehaviorState,
     selectTransferPoints,
     selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
 
 @Component({
     selector:

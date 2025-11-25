@@ -1,6 +1,6 @@
 import { createSelector } from '@ngrx/store';
-import type { AppState } from '../../app.state';
-import type { ApplicationState } from '../application.state';
+import type { AppState } from '../../app.state.js';
+import type { ApplicationState } from '../application.state.js';
 
 const selectApplication = (state: AppState) => state.application;
 

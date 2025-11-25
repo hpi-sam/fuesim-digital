@@ -1,4 +1,4 @@
-import { objectToHash } from './object-to-hash';
+import { objectToHash } from './object-to-hash.js';
 
 describe('object to hash', () => {
     it('creates the same hash for the same input', () => {

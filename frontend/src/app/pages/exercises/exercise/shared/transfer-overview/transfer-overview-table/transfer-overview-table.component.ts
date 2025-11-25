@@ -4,12 +4,12 @@ import {
     currentTransferOf,
     personnelTypeNames,
 } from 'digital-fuesim-manv-shared';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from 'src/app/state/app.state.js';
 import {
     selectExerciseStatus,
     selectPersonnelInTransfer,
     selectVehiclesInTransfer,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors.js';
 
 @Component({
     selector: 'app-transfer-overview-table',

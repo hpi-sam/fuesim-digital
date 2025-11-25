@@ -1,4 +1,4 @@
-import { calculatePopupPositioning } from './calculate-popup-positioning';
+import { calculatePopupPositioning } from './calculate-popup-positioning.js';
 
 const defaultViewCenter = [2, 2];
 const defaultConstraints = { width: 1, height: 1 };

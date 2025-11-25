@@ -2,7 +2,7 @@ import type { TemplateRef } from '@angular/core';
 import { Injectable } from '@angular/core';
 import type { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { SignallerModalDetailsModalComponent } from './signaller-modal-details-modal/signaller-modal-details-modal.component';
+import { SignallerModalDetailsModalComponent } from './signaller-modal-details-modal/signaller-modal-details-modal.component.js';
 
 @Injectable()
 export class SignallerModalDetailsService {

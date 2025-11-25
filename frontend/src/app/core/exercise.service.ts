@@ -20,28 +20,28 @@ import {
 } from 'rxjs';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
-import { handleChanges } from '../shared/functions/handle-changes';
-import type { AppState } from '../state/app.state';
+import { handleChanges } from '../shared/functions/handle-changes.js';
+import type { AppState } from '../state/app.state.js';
 import {
     createApplyServerActionAction,
     createJoinExerciseAction,
     createLeaveExerciseAction,
     createSetExerciseStateAction,
-} from '../state/application/application.actions';
-import { selectExerciseStateMode } from '../state/application/selectors/application.selectors';
+} from '../state/application/application.actions.js';
+import { selectExerciseStateMode } from '../state/application/selectors/application.selectors.js';
 import {
     selectClients,
     selectExerciseState,
-} from '../state/application/selectors/exercise.selectors';
+} from '../state/application/selectors/exercise.selectors.js';
 import {
     selectCurrentMainRole,
     selectOwnClient,
     selectVisibleVehicles,
-} from '../state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from '../state/get-state-snapshot';
-import { websocketOrigin } from './api-origins';
-import { MessageService } from './messages/message.service';
-import { OptimisticActionHandler } from './optimistic-action-handler';
+} from '../state/application/selectors/shared.selectors.js';
+import { selectStateSnapshot } from '../state/get-state-snapshot.js';
+import { websocketOrigin } from './api-origins.js';
+import { MessageService } from './messages/message.service.js';
+import { OptimisticActionHandler } from './optimistic-action-handler.js';
 
 /**
  * This Service deals with the state synchronization of a live exercise.

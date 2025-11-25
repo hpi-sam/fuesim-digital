@@ -1,12 +1,12 @@
 import type { Type } from '@angular/core';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import type { Feature } from 'ol';
-import type { Point } from 'ol/geom';
-import type Layer from 'ol/layer/Layer';
-import type OlMap from 'ol/Map';
-import type { Pixel } from 'ol/pixel';
-import { calculatePopupPositioning } from './calculate-popup-positioning';
-import type { OpenPopupOptions } from './popup-manager';
+import type { Point } from 'ol/geom.js';
+import type Layer from 'ol/layer/Layer.js';
+import type OlMap from 'ol/Map.js';
+import type { Pixel } from 'ol/pixel.js';
+import { calculatePopupPositioning } from './calculate-popup-positioning.js';
+import type { OpenPopupOptions } from './popup-manager.js';
 
 /**
  * Images in OpenLayers are {@link Point}s that have an icon style.

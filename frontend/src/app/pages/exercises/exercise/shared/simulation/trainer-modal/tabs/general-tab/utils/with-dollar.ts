@@ -3,7 +3,7 @@ import { Pipe } from '@angular/core';
 import type {
     PatientCategory,
     PersonnelCategory,
-} from '../simulated-region-overview-general-tab.component';
+} from '../simulated-region-overview-general-tab.component.js';
 
 @Pipe({
     name: 'withDollar',

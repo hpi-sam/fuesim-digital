@@ -3,8 +3,8 @@ import type {
     ExerciseTimeline,
 } from 'digital-fuesim-manv-shared';
 import { jumpToTime } from 'digital-fuesim-manv-shared';
-import { environment } from 'src/environments/environment';
-import { TimeLineCache } from './time-line-cache';
+import { environment } from 'src/environments/environment.js';
+import { TimeLineCache } from './time-line-cache.js';
 
 export class TimeJumpHelper {
     private readonly exerciseStateCache = new TimeLineCache<{

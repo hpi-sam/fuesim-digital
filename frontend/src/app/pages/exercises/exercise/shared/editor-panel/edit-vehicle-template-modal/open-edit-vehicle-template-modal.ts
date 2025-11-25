@@ -1,6 +1,6 @@
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import type { UUID } from 'digital-fuesim-manv-shared';
-import { EditVehicleTemplateModalComponent } from './edit-vehicle-template-modal.component';
+import { EditVehicleTemplateModalComponent } from './edit-vehicle-template-modal.component.js';
 
 export async function openEditVehicleTemplateModal(
     ngbModalService: NgbModal,

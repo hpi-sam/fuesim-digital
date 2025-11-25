@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from 'src/app/shared/shared.module';
+import { SharedModule } from 'src/app/shared/shared.module.js';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { HospitalEditorModalComponent } from './hospital-editor-modal/hospital-editor-modal.component';
+import { HospitalEditorModalComponent } from './hospital-editor-modal/hospital-editor-modal.component.js';
 
 @NgModule({
     declarations: [HospitalEditorModalComponent],

@@ -4,20 +4,20 @@ import { Store } from '@ngrx/store';
 import type { ExerciseTimeline } from 'digital-fuesim-manv-shared';
 import { freeze } from 'immer';
 import { lastValueFrom } from 'rxjs';
-import type { AppState } from '../state/app.state';
+import type { AppState } from '../state/app.state.js';
 import {
     createJumpToTimeAction,
     createStartTimeTravelAction,
-} from '../state/application/application.actions';
+} from '../state/application/application.actions.js';
 import {
     selectExerciseId,
     selectTimeConstraints,
-} from '../state/application/selectors/application.selectors';
-import { selectCurrentTime } from '../state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from '../state/get-state-snapshot';
-import { httpOrigin } from './api-origins';
-import { MessageService } from './messages/message.service';
-import { TimeJumpHelper } from './time-jump-helper';
+} from '../state/application/selectors/application.selectors.js';
+import { selectCurrentTime } from '../state/application/selectors/exercise.selectors.js';
+import { selectStateSnapshot } from '../state/get-state-snapshot.js';
+import { httpOrigin } from './api-origins.js';
+import { MessageService } from './messages/message.service.js';
+import { TimeJumpHelper } from './time-jump-helper.js';
 
 /**
  * This service deals with the timeTravel functionality.

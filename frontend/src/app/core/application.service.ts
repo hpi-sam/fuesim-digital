@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { assertExhaustiveness } from 'digital-fuesim-manv-shared';
-import type { AppState } from '../state/app.state';
+import type { AppState } from '../state/app.state.js';
 import {
     selectExerciseId,
     selectExerciseStateMode,
     selectLastClientName,
-} from '../state/application/selectors/application.selectors';
-import { selectStateSnapshot } from '../state/get-state-snapshot';
-import { ExerciseService } from './exercise.service';
-import { TimeTravelService } from './time-travel.service';
+} from '../state/application/selectors/application.selectors.js';
+import { selectStateSnapshot } from '../state/get-state-snapshot.js';
+import { ExerciseService } from './exercise.service.js';
+import { TimeTravelService } from './time-travel.service.js';
 
 /**
  * This service encapsulates the logic for switching between the live exercise, timeTravel and an empty state (e.g. on the landing page).

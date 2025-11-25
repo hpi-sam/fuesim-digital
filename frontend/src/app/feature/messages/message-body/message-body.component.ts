@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Message } from 'src/app/core/messages/message';
+import { Message } from 'src/app/core/messages/message.js';
 
 /**
  * Displays the body of a message (for a toast or alert)

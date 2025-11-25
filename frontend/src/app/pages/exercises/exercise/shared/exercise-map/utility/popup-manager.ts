@@ -1,14 +1,14 @@
 import type { Type, ViewContainerRef } from '@angular/core';
-import type { Feature } from 'ol';
+import type { Feature, MapBrowserEvent } from 'ol';
 import { Overlay } from 'ol';
-import type VectorLayer from 'ol/layer/Vector';
+import type VectorLayer from 'ol/layer/Vector.js';
 import { Subject, takeUntil } from 'rxjs';
-import type OlMap from 'ol/Map';
+import type OlMap from 'ol/Map.js';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { isEqual } from 'lodash-es';
-import type { Positioning } from '../../utils/types/positioning';
-import type { FeatureManager } from './feature-manager';
-import type { PopupService } from './popup.service';
+import type { Positioning } from '../../utils/types/positioning.js';
+import type { FeatureManager } from './feature-manager.js';
+import type { PopupService } from './popup.service.js';
 
 /**
  * A class that manages the creation and destruction of a single popup with freely customizable content
@@ -75,7 +75,7 @@ export class PopupManager {
     ) {
         this.featureNameFeatureManagerDictionary =
             featureNameFeatureManagerDictionary;
-        olMap.on('singleclick', (event) => {
+        olMap.on('singleclick', (event: MapBrowserEvent) => {
             if (!this.popupsEnabled) {
                 return;
             }

@@ -1,3 +1,4 @@
+import { stringCompare } from 'digital-fuesim-manv-shared';
 import { hashString } from './hash-string.js';
 
 /**
@@ -13,6 +14,6 @@ export function objectToHash(anObject: {
         allKeys.push(key);
         return value;
     });
-    allKeys.sort((a, b) => a.localeCompare(b));
+    allKeys.sort((a, b) => stringCompare(a, b));
     return hashString(JSON.stringify(anObject, allKeys));
 }

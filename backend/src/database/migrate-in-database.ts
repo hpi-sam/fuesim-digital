@@ -1,32 +1,39 @@
-import type { ExerciseState, Mutable, UUID } from 'digital-fuesim-manv-shared';
+import type {
+    ExerciseAction,
+    ExerciseState,
+    Mutable,
+    UUID,
+} from 'digital-fuesim-manv-shared';
 import { applyMigrations } from 'digital-fuesim-manv-shared';
-import type { EntityManager } from 'typeorm';
+import { eq, asc, and, inArray } from 'drizzle-orm';
 import { RestoreError } from '../utils/restore-error.js';
-import { ActionWrapperEntity } from './entities/action-wrapper.entity.js';
-import { ExerciseWrapperEntity } from './entities/exercise-wrapper.entity.js';
+import { exerciseWrapperTable, actionWrapperTable } from './schema.js';
+import type { DatabaseTransaction } from './services/database-service.js';
 
 export async function migrateInDatabase(
     exerciseId: UUID,
-    entityManager: EntityManager
+    transaction: DatabaseTransaction
 ): Promise<void> {
-    const exercise = await entityManager.findOne(ExerciseWrapperEntity, {
-        where: { id: exerciseId },
-    });
-    if (exercise === null) {
+    const exercises = await transaction
+        .select()
+        .from(exerciseWrapperTable)
+        .where(eq(exerciseWrapperTable.id, exerciseId));
+    if (exercises.length === 0 && exercises[0] === undefined) {
         throw new RestoreError(
             'Cannot find exercise to convert in database',
             exerciseId
         );
     }
-    const loadedInitialState = JSON.parse(exercise.initialStateString);
-    const loadedCurrentState = JSON.parse(exercise.currentStateString);
+    const exercise = exercises[0]!;
+    const loadedInitialState = exercise.initialStateString as object;
+    const loadedCurrentState = exercise.currentStateString as object;
     const loadedActions = (
-        await entityManager.find(ActionWrapperEntity, {
-            where: { exercise: { id: exerciseId } },
-            select: { actionString: true },
-            order: { index: 'ASC' },
-        })
-    ).map((action) => JSON.parse(action.actionString));
+        await transaction
+            .select({ actionString: actionWrapperTable.actionString })
+            .from(actionWrapperTable)
+            .where(eq(actionWrapperTable.exerciseId, exerciseId))
+            .orderBy(asc(actionWrapperTable.index))
+    ).map((action) => action.actionString as object);
     const {
         newVersion,
         migratedProperties: { currentState, history },
@@ -42,24 +49,22 @@ export async function migrateInDatabase(
     const actions = history?.actions ?? [];
 
     exercise.stateVersion = newVersion;
-    // Save exercise wrapper
-    const patch: Partial<ExerciseWrapperEntity> = {
-        stateVersion: exercise.stateVersion,
-        initialStateString: JSON.stringify(initialState),
-        currentStateString: JSON.stringify(currentState),
-    };
-    await entityManager.update(
-        ExerciseWrapperEntity,
-        { id: exerciseId },
-        patch
-    );
+
+    await transaction
+        .update(exerciseWrapperTable)
+        .set({
+            stateVersion: exercise.stateVersion,
+            initialStateString: initialState,
+            currentStateString: currentState,
+        })
+        .where(eq(exerciseWrapperTable.id, exerciseId));
     // Save actions
     let patchedActionsIndex = 0;
     const indicesToRemove: number[] = [];
     const actionsToUpdate: {
         previousIndex: number;
         newIndex: number;
-        actionString: string;
+        actionString: ExerciseAction;
     }[] = [];
     if (actions.length > 0) {
         actions.forEach((action, i) => {
@@ -70,40 +75,44 @@ export async function migrateInDatabase(
             actionsToUpdate.push({
                 previousIndex: i,
                 newIndex: patchedActionsIndex++,
-                actionString: JSON.stringify(action),
+                actionString: action,
             });
         });
         if (indicesToRemove.length > 0) {
-            await entityManager
-                .createQueryBuilder()
-                .delete()
-                .from(ActionWrapperEntity)
-                // eslint-disable-next-line unicorn/string-content
-                .where('index IN (:...ids)', { ids: indicesToRemove })
-                .andWhere({ exercise: { id: exerciseId } })
-                .execute();
+            await transaction
+                .delete(actionWrapperTable)
+                .where(
+                    and(
+                        eq(actionWrapperTable.exerciseId, exerciseId),
+                        inArray(actionWrapperTable.index, indicesToRemove)
+                    )
+                );
         }
         if (actionsToUpdate.length > 0) {
             await Promise.all(
                 actionsToUpdate.map(
                     async ({ previousIndex, newIndex, actionString }) =>
-                        entityManager.update(
-                            ActionWrapperEntity,
-                            {
-                                index: previousIndex,
-                                exercise: { id: exerciseId },
-                            },
-                            { actionString, index: newIndex }
-                        )
+                        transaction
+                            .update(actionWrapperTable)
+                            .set({
+                                index: newIndex,
+                                actionString,
+                            })
+                            .where(
+                                and(
+                                    eq(
+                                        actionWrapperTable.exerciseId,
+                                        exerciseId
+                                    ),
+                                    eq(actionWrapperTable.index, previousIndex)
+                                )
+                            )
                 )
             );
         }
     } else {
-        await entityManager
-            .createQueryBuilder()
-            .delete()
-            .from(ActionWrapperEntity)
-            .where({ exercise: { id: exerciseId } })
-            .execute();
+        await transaction
+            .delete(actionWrapperTable)
+            .where(eq(actionWrapperTable.exerciseId, exerciseId));
     }
 }

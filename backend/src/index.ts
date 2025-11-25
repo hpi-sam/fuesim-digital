@@ -1,31 +1,29 @@
 import * as util from 'node:util';
 import { ReducerError } from 'digital-fuesim-manv-shared';
+import { DatabaseService } from 'database/services/database-service.js';
 import { ValidationErrorWrapper } from './utils/validation-error-wrapper.js';
 import { RestoreError } from './utils/restore-error.js';
 import { ExerciseWrapper } from './exercise/exercise-wrapper.js';
 import { Config } from './config.js';
-import { createNewDataSource } from './database/data-source.js';
-import { DatabaseService } from './database/services/database-service.js';
 import { FuesimServer } from './fuesim-server.js';
 
 async function main() {
     Config.initialize();
 
-    const dataSource = createNewDataSource();
-    if (Config.useDb) {
-        try {
-            await dataSource.initialize();
-        } catch (e: unknown) {
-            console.error('Error connecting to the database:', e);
-            return;
-        }
-        console.log('Successfully connected to the database.');
-    } else {
+    if (!Config.useDb) {
         console.warn(
             'Note that no database gets used. This means any data created will be stored in-memory until the exercise gets deleted or the server stops, and in case the server stops all data is gone.'
         );
     }
-    const databaseService = new DatabaseService(dataSource);
+
+    let databaseService: DatabaseService;
+    try {
+        databaseService = new DatabaseService();
+    } catch (e: unknown) {
+        console.error('Error connecting to the database:', e);
+        return;
+    }
+    console.log('Successfully connected to the database.');
     if (Config.useDb) {
         try {
             console.log('Loading exercises from database…');

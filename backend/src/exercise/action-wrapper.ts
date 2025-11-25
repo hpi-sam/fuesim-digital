@@ -1,110 +1,80 @@
 import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
-import type { EntityManager } from 'typeorm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import { actionWrapperTable } from 'database/schema.js';
+import type { DatabaseTransaction } from 'database/services/database-service.js';
 import { NormalType } from '../database/normal-type.js';
-import { ActionWrapperEntity } from '../database/entities/action-wrapper.entity.js';
 import type { DatabaseService } from '../database/services/database-service.js';
-import type { ExerciseWrapperEntity } from '../database/entities/exercise-wrapper.entity.js';
 import type { ExerciseWrapper } from './exercise-wrapper.js';
 
-export class ActionWrapper extends NormalType<
-    ActionWrapper,
-    ActionWrapperEntity
-> {
-    public async asEntity(
-        save: boolean,
-        entityManager?: EntityManager,
-        exerciseEntity?: ExerciseWrapperEntity
-    ): Promise<ActionWrapperEntity> {
-        const operations = async (manager: EntityManager) => {
-            const getFromDatabase = async () =>
-                this.databaseService.actionWrapperService.getFindById(this.id!)(
-                    manager
-                );
-            const getNew = () => ActionWrapperEntity.createNew();
-            const copyData = async (entity: ActionWrapperEntity) => {
-                entity.actionString = JSON.stringify(this.action);
-                entity.index = this.index;
-                entity.exercise =
-                    exerciseEntity ??
-                    (await this.exercise.asEntity(save, manager));
-                entity.emitterId = this.emitterId;
-            };
-            const getDto = (entity: ActionWrapperEntity) => ({
-                actionString: entity.actionString,
-                emitterId: entity.emitterId,
-                exerciseId: entity.exercise.id,
-                index: entity.index,
-            });
-            const existed = this.id !== undefined;
-            if (save && existed) {
-                const entity = await getFromDatabase();
-                entity.id = this.id!;
-                await copyData(entity);
+export class ActionWrapper extends NormalType<typeof actionWrapperTable> {
+    public override async save(
+        database?: DatabaseTransaction | null
+    ): Promise<any> {
+        if (this.exercise.entity.id === undefined) {
+            await this.exercise.save();
+        }
 
-                const savedEntity =
-                    await this.databaseService.actionWrapperService.getUpdate(
-                        entity.id,
-                        getDto(entity)
-                    )(manager);
-                this.id = savedEntity.id;
-                return savedEntity;
-            } else if (save && !existed) {
-                const entity = getNew();
-                await copyData(entity);
-
-                const savedEntity =
-                    await this.databaseService.actionWrapperService.getCreate(
-                        getDto(entity)
-                    )(manager);
-                this.id = savedEntity.id;
-                return savedEntity;
-            } else if (!save && existed) {
-                const entity = await getFromDatabase();
-                entity.id = this.id!;
-                await copyData(entity);
-                return entity;
-                // eslint-disable-next-line no-else-return
-            } else {
-                const entity = getNew();
-                await copyData(entity);
-                return entity;
-            }
+        const patch: InferInsertModel<typeof actionWrapperTable> = {
+            actionString: this.entity.actionString,
+            emitterId: this.entity.emitterId,
+            // id expected to be set after save, see above
+            exerciseId: this.exercise.entity.id!,
+            index: this.entity.index,
         };
-        return entityManager
-            ? operations(entityManager)
-            : this.databaseService.transaction(operations);
+
+        if (this.entity.id !== undefined) {
+            patch.id = this.entity.id;
+        }
+
+        const insert = await (database ?? this.databaseService)
+            .insert(actionWrapperTable)
+            .values(patch)
+            .onConflictDoUpdate({
+                target: actionWrapperTable.id,
+                set: patch,
+            })
+            .returning();
+
+        if (insert.length > 0 && insert[0]?.id !== undefined) {
+            this.entity.id = insert[0].id;
+        }
     }
 
-    public static createFromEntity(
-        entity: ActionWrapperEntity,
+    public static createFromDatabase(
+        dbEntry: InferSelectModel<typeof actionWrapperTable>,
         databaseService: DatabaseService,
         exercise: ExerciseWrapper
     ): ActionWrapper {
         return new ActionWrapper(
             databaseService,
-            JSON.parse(entity.actionString),
-            entity.emitterId,
+            dbEntry.actionString,
+            dbEntry.emitterId,
             exercise,
-            entity.index,
-            entity.id
+            dbEntry.index,
+            dbEntry.id
         );
     }
-
-    public readonly index: number;
 
     /**
      * @param emitterId `null` iff the emitter was the server, the client id otherwise
      */
     public constructor(
         databaseService: DatabaseService,
-        public readonly action: ExerciseAction,
-        public readonly emitterId: UUID | null,
+        action: ExerciseAction,
+        emitterId: UUID | null,
         public readonly exercise: ExerciseWrapper,
         index?: number,
         id?: UUID
     ) {
         super(databaseService);
-        if (id) this.id = id;
-        this.index = index ?? exercise.incrementIdGenerator.next();
+
+        this.entity = {
+            actionString: action,
+            emitterId,
+            index: index ?? exercise.incrementIdGenerator.next(),
+            id: id ?? undefined,
+            // safe, bc actions reference different exercise variable for saving to DB
+            exerciseId: exercise.entity.id ?? '',
+        };
     }
 }

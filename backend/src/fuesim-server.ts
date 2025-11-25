@@ -25,39 +25,24 @@ export class FuesimServer {
         if (exercisesToSave.length === 0) {
             return;
         }
-        await this.databaseService.transaction(async (manager) => {
-            const exerciseEntities = await Promise.all(
-                exercisesToSave.map(async (exercise) => {
+        await this.databaseService.databaseConnection.transaction(
+            async (transaction) => {
+                exercisesToSave.forEach(async (exercise) => {
                     exercise.markAsAboutToBeSaved();
-                    return exercise.asEntity(false, manager);
-                })
-            );
-            const actionEntities = exerciseEntities.flatMap(
-                (exercise) => exercise.actions ?? []
-            );
-            // First save the exercises...
-            await manager.save(exerciseEntities);
-            // ...and then the actions
-            await manager.save(actionEntities);
-            // Re-map database id to instance
-            exercisesToSave.forEach((exercise) => {
-                exercise.id ??= exerciseEntities.find(
-                    (entity) => entity.trainerId === exercise.trainerId
-                )?.id;
-            });
-            exercisesToSave
-                .flatMap((exercise) => exercise.temporaryActionHistory)
-                .forEach((action) => {
-                    action.id ??= actionEntities.find(
-                        (entity) =>
-                            entity.index === action.index &&
-                            entity.exercise.id === action.exercise.id
-                    )?.id;
                 });
-            exercisesToSave.forEach((exercise) => {
-                exercise.markAsSaved();
-            });
-        });
+
+                // Saves Exercises and Actions
+                await Promise.all(
+                    exercisesToSave.map(async (exercise) =>
+                        exercise.save(transaction)
+                    )
+                );
+
+                exercisesToSave.forEach((exercise) => {
+                    exercise.markAsSaved();
+                });
+            }
+        );
     };
 
     private readonly saveTickInterval = 10_000;

@@ -16,11 +16,11 @@ import {
     validateExerciseAction,
     validateExerciseState,
 } from 'digital-fuesim-manv-shared';
-import type { EntityManager } from 'typeorm';
-import { LessThan } from 'typeorm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import { asc, eq, lt } from 'drizzle-orm';
+import { actionWrapperTable, exerciseWrapperTable } from 'database/schema.js';
+import type { DatabaseTransaction } from 'database/services/database-service.js';
 import { Config } from '../config.js';
-import type { ActionWrapperEntity } from '../database/entities/action-wrapper.entity.js';
-import { ExerciseWrapperEntity } from '../database/entities/exercise-wrapper.entity.js';
 import { migrateInDatabase } from '../database/migrate-in-database.js';
 import { NormalType } from '../database/normal-type.js';
 import type { DatabaseService } from '../database/services/database-service.js';
@@ -35,10 +35,7 @@ import { exerciseMap } from './exercise-map.js';
 import { patientTick } from './patient-ticking.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
 
-export class ExerciseWrapper extends NormalType<
-    ExerciseWrapper,
-    ExerciseWrapperEntity
-> {
+export class ExerciseWrapper extends NormalType<typeof exerciseWrapperTable> {
     private _changedSinceSave = true;
 
     public get changedSinceSave() {
@@ -67,13 +64,10 @@ export class ExerciseWrapper extends NormalType<
         this._changedSinceSave = true;
     }
 
-    private async saveActions(
-        entityManager: EntityManager,
-        exerciseEntity: ExerciseWrapperEntity
-    ): Promise<ActionWrapperEntity[]> {
+    private async saveActions(database?: DatabaseTransaction | null) {
         const entities = await Promise.all(
             this.temporaryActionHistory.map(async (action) =>
-                action.asEntity(true, entityManager, exerciseEntity)
+                action.save(database)
             )
         );
         this.temporaryActionHistory.splice(
@@ -83,103 +77,58 @@ export class ExerciseWrapper extends NormalType<
         return entities;
     }
 
-    public async asEntity(
-        save: boolean,
-        entityManager?: EntityManager
-    ): Promise<ExerciseWrapperEntity> {
-        const operations = async (manager: EntityManager) => {
-            if (save) this.markAsAboutToBeSaved();
-            const getFromDatabase = async () =>
-                this.databaseService.exerciseWrapperService.getFindById(
-                    this.id!
-                )(manager);
-            const getNew = () => ExerciseWrapperEntity.createNew();
-            const copyData = async (entity: ExerciseWrapperEntity) => {
-                entity.actions = await Promise.all(
-                    this.temporaryActionHistory.map(async (action) =>
-                        action.asEntity(false, manager, entity)
-                    )
-                );
-                entity.initialStateString = JSON.stringify(this.initialState);
-                entity.currentStateString = JSON.stringify(this.currentState);
-                entity.participantId = this.participantId;
-                entity.tickCounter = this.tickCounter;
-                entity.trainerId = this.trainerId;
-                entity.stateVersion = this.stateVersion;
-            };
-            const getDto = (entity: ExerciseWrapperEntity) => ({
-                initialStateString: entity.initialStateString,
-                currentStateString: entity.currentStateString,
-                participantId: entity.participantId,
-                tickCounter: entity.tickCounter,
-                trainerId: entity.trainerId,
-                stateVersion: entity.stateVersion,
-            });
-            const existed = this.id !== undefined;
-            if (save && existed) {
-                const entity = await getFromDatabase();
-                entity.id = this.id!;
-                await copyData(entity);
-
-                const savedEntity =
-                    await this.databaseService.exerciseWrapperService.getUpdate(
-                        entity.id,
-                        getDto(entity)
-                    )(manager);
-                this.id = savedEntity.id;
-                await this.saveActions(manager, savedEntity);
-                this.markAsSaved();
-                return savedEntity;
-            } else if (save && !existed) {
-                const entity = getNew();
-                await copyData(entity);
-
-                const savedEntity =
-                    await this.databaseService.exerciseWrapperService.getCreate(
-                        getDto(entity)
-                    )(manager);
-                this.id = savedEntity.id;
-                await this.saveActions(manager, savedEntity);
-                this.markAsSaved();
-                return savedEntity;
-            } else if (!save && existed) {
-                const entity = await getFromDatabase();
-                entity.id = this.id!;
-                await copyData(entity);
-
-                return entity;
-                // eslint-disable-next-line no-else-return
-            } else {
-                const entity = getNew();
-                await copyData(entity);
-                return entity;
-            }
+    public async save(database?: DatabaseTransaction | null) {
+        const patch: InferInsertModel<typeof exerciseWrapperTable> = {
+            initialStateString: this.entity.initialStateString,
+            currentStateString: this.entity.currentStateString,
+            participantId: this.entity.participantId,
+            trainerId: this.entity.trainerId,
+            stateVersion: this.entity.stateVersion,
+            tickCounter: this.entity.tickCounter,
         };
-        return entityManager
-            ? operations(entityManager)
-            : this.databaseService.transaction(operations);
+
+        if (this.entity.id !== undefined) {
+            patch.id = this.entity.id;
+        }
+
+        const insert = await (database ?? this.databaseService)
+            .insert(exerciseWrapperTable)
+            .values(patch)
+            .onConflictDoUpdate({
+                target: exerciseWrapperTable.id,
+                set: patch,
+            })
+            .returning();
+
+        if (insert.length > 0 && insert[0]?.id !== undefined) {
+            this.entity.id = insert[0].id;
+        }
+
+        await this.saveActions(database);
     }
 
-    private static createFromEntity(
-        entity: ExerciseWrapperEntity,
+    private static createFromDatabase(
+        dbEntry: InferSelectModel<typeof exerciseWrapperTable> & {
+            actions?: InferSelectModel<typeof actionWrapperTable>[];
+        },
         databaseService: DatabaseService
     ): ExerciseWrapper {
         const actionsInWrapper: ActionWrapper[] = [];
         const normal = new ExerciseWrapper(
-            entity.participantId,
-            entity.trainerId,
+            dbEntry.participantId,
+            dbEntry.trainerId,
             actionsInWrapper,
             databaseService,
-            entity.stateVersion,
-            JSON.parse(entity.initialStateString) as ExerciseState,
-            JSON.parse(entity.currentStateString) as ExerciseState
+            dbEntry.stateVersion,
+            dbEntry.initialStateString,
+            dbEntry.currentStateString
         );
-        normal.id = entity.id;
-        if (entity.actions) {
+        normal.entity = dbEntry;
+        if (dbEntry.actions) {
             pushAll(
                 actionsInWrapper,
-                entity.actions.map((action) =>
-                    ActionWrapper.createFromEntity(
+                dbEntry.actions.map((action) =>
+                    ActionWrapper.createFromDatabase(
                         action,
                         databaseService,
                         normal
@@ -187,7 +136,7 @@ export class ExerciseWrapper extends NormalType<
                 )
             );
         }
-        normal.tickCounter = entity.tickCounter;
+        normal.tickCounter = dbEntry.tickCounter;
         normal.markAsSaved();
         return normal;
     }
@@ -261,15 +210,24 @@ export class ExerciseWrapper extends NormalType<
      * This constructor does not guarantee a valid entity.
      */
     private constructor(
-        public readonly participantId: string,
-        public readonly trainerId: string,
+        participantId: string,
+        trainerId: string,
         public readonly temporaryActionHistory: ActionWrapper[],
         databaseService: DatabaseService,
-        private readonly stateVersion: number,
-        private readonly initialState = ExerciseState.create(participantId),
-        private currentState: ExerciseState = initialState
+        stateVersion: number,
+        initialState = ExerciseState.create(participantId),
+        currentState: ExerciseState = initialState
     ) {
         super(databaseService);
+
+        this.entity = {
+            currentStateString: currentState,
+            initialStateString: initialState,
+            participantId,
+            trainerId,
+            stateVersion,
+            tickCounter: 0,
+        };
     }
 
     /**
@@ -280,45 +238,45 @@ export class ExerciseWrapper extends NormalType<
         file: StateExport,
         exerciseIds: ExerciseIds
     ): Promise<ExerciseWrapper> {
-        const importOperations = async (manager: EntityManager | undefined) => {
-            const newInitialState = (file.history?.initialState ??
-                file.currentState) as Mutable<ExerciseState>;
-            const newCurrentState = file.currentState as Mutable<ExerciseState>;
-            // Set new participant id
-            newInitialState.participantId = exerciseIds.participantId;
-            newCurrentState.participantId = exerciseIds.participantId;
-            const exercise = new ExerciseWrapper(
-                exerciseIds.participantId,
-                exerciseIds.trainerId,
-                [],
-                databaseService,
-                ExerciseState.currentStateVersion,
-                newInitialState,
-                newCurrentState
-            );
-            const actions = (file.history?.actionHistory ?? []).map(
-                (action) =>
-                    new ActionWrapper(
-                        databaseService,
-                        action,
-                        exercise.emitterId,
-                        exercise
-                    )
-            );
-            pushAll(exercise.temporaryActionHistory, actions);
-            // The actions haven't been saved in the database yet -> keep them
-            exercise.restore(true);
-            exercise.tickCounter = actions.filter(
-                (action) => action.action.type === '[Exercise] Tick'
-            ).length;
-            if (manager !== undefined) {
-                await exercise.save(manager);
-            }
-            return exercise;
-        };
-        return Config.useDb
-            ? databaseService.transaction(importOperations)
-            : importOperations(undefined);
+        const newInitialState = file.history?.initialState ?? file.currentState;
+        const newCurrentState = file.currentState;
+        // Set new participant id
+        newInitialState.participantId = exerciseIds.participantId;
+        newCurrentState.participantId = exerciseIds.participantId;
+        const exercise = new ExerciseWrapper(
+            exerciseIds.participantId,
+            exerciseIds.trainerId,
+            [],
+            databaseService,
+            ExerciseState.currentStateVersion,
+            newInitialState,
+            newCurrentState
+        );
+        const actions = (file.history?.actionHistory ?? []).map(
+            (action) =>
+                new ActionWrapper(
+                    databaseService,
+                    action,
+                    exercise.emitterId,
+                    exercise
+                )
+        );
+        pushAll(exercise.temporaryActionHistory, actions);
+        // The actions haven't been saved in the database yet -> keep them
+        exercise.restore(true);
+        exercise.tickCounter = actions.filter(
+            (action) => action.entity.actionString.type === '[Exercise] Tick'
+        ).length;
+
+        await databaseService.insert(exerciseWrapperTable).values({
+            initialStateString: exercise.entity.initialStateString,
+            participantId: exercise.entity.participantId,
+            trainerId: exercise.entity.trainerId,
+            currentStateString: exercise.entity.currentStateString,
+            stateVersion: exercise.entity.stateVersion,
+            tickCounter: exercise.entity.tickCounter,
+        });
+        return exercise;
     }
 
     public static create(
@@ -340,10 +298,10 @@ export class ExerciseWrapper extends NormalType<
     }
 
     private restore(keepActions: boolean): void {
-        if (this.stateVersion !== ExerciseState.currentStateVersion) {
+        if (this.entity.stateVersion !== ExerciseState.currentStateVersion) {
             throw new RestoreError(
-                `The exercise was created with an incompatible version of the state (got version ${this.stateVersion}, required version ${ExerciseState.currentStateVersion})`,
-                this.id!
+                `The exercise was created with an incompatible version of the state (got version ${this.entity.stateVersion}, required version ${ExerciseState.currentStateVersion})`,
+                this.entity.id!
             );
         }
         this.validateInitialState();
@@ -357,25 +315,28 @@ export class ExerciseWrapper extends NormalType<
 
      */
     private restoreState(keepActions: boolean) {
-        let currentState = cloneDeepMutable(this.initialState);
+        let currentState = cloneDeepMutable(this.entity.initialStateString);
         this.temporaryActionHistory.forEach((actionWrapper) => {
-            this.validateAction(actionWrapper.action);
+            this.validateAction(actionWrapper.entity.actionString);
             try {
-                currentState = applyAction(currentState, actionWrapper.action);
+                currentState = applyAction(
+                    currentState,
+                    actionWrapper.entity.actionString
+                );
             } catch (e: unknown) {
                 if (e instanceof ReducerError) {
                     throw new RestoreError(
                         `A reducer error occurred while restoring (Action ${
-                            actionWrapper.index
-                        }: \`${JSON.stringify(actionWrapper.action)}\`)`,
-                        this.id ?? 'unknown id',
+                            actionWrapper.entity.index
+                        }: \`${JSON.stringify(actionWrapper.entity.actionString)}\`)`,
+                        this.entity.id ?? 'unknown id',
                         e
                     );
                 }
                 throw e;
             }
         });
-        this.currentState = currentState;
+        this.entity.currentStateString = currentState;
         this.incrementIdGenerator.setCurrent(
             this.temporaryActionHistory.length
         );
@@ -387,7 +348,7 @@ export class ExerciseWrapper extends NormalType<
             );
         }
         // Pause exercise
-        if (this.currentState.currentStatus === 'running')
+        if (this.entity.currentStateString.currentStatus === 'running')
             this.reduce(
                 {
                     type: '[Exercise] Pause',
@@ -395,56 +356,92 @@ export class ExerciseWrapper extends NormalType<
                 this.emitterId
             );
         // Remove all clients from state
-        Object.values(this.currentState.clients).forEach((client) => {
-            const removeClientAction: ExerciseAction = {
-                type: '[Client] Remove client',
-                clientId: client.id,
-            };
-            this.reduce(removeClientAction, this.emitterId);
-        });
+        Object.values(this.entity.currentStateString.clients).forEach(
+            (client) => {
+                const removeClientAction: ExerciseAction = {
+                    type: '[Client] Remove client',
+                    clientId: client.id,
+                };
+                this.reduce(removeClientAction, this.emitterId);
+            }
+        );
     }
 
     public static async restoreAllExercises(
         databaseService: DatabaseService
     ): Promise<ExerciseWrapper[]> {
-        return databaseService.transaction(async (manager) => {
-            const outdatedExercises =
-                await databaseService.exerciseWrapperService.getFindAll({
-                    where: {
-                        stateVersion: LessThan(
-                            ExerciseState.currentStateVersion
-                        ),
-                    },
-                })(manager);
+        return databaseService.transaction(async (dbtx) => {
+            const outdatedExercises = await dbtx
+                .select()
+                .from(exerciseWrapperTable)
+                .where(
+                    lt(
+                        exerciseWrapperTable.stateVersion,
+                        ExerciseState.currentStateVersion
+                    )
+                );
             await Promise.all(
                 outdatedExercises.map(async (exercise) => {
-                    await migrateInDatabase(exercise.id, manager);
+                    await migrateInDatabase(exercise.id, dbtx);
                 })
             );
 
             const exercises = await Promise.all(
-                (
-                    await databaseService.exerciseWrapperService.getFindAll()(
-                        manager
-                    )
+                Object.values(
+                    (
+                        await dbtx
+                            .select()
+                            .from(exerciseWrapperTable)
+                            .leftJoin(
+                                actionWrapperTable,
+                                eq(
+                                    exerciseWrapperTable.id,
+                                    actionWrapperTable.exerciseId
+                                )
+                            )
+                    ).reduce<{
+                        [key: string]: {
+                            exercise: InferSelectModel<
+                                typeof exerciseWrapperTable
+                            >;
+                            actions: InferSelectModel<
+                                typeof actionWrapperTable
+                            >[];
+                        };
+                    }>((acc, row) => {
+                        const exercise = row.exercise_wrapper_entity;
+                        const action = row.action_wrapper_entity;
+
+                        acc[exercise.id] ??= { exercise, actions: [] };
+
+                        if (action) {
+                            acc[exercise.id]!.actions.push(action);
+                        }
+                        return acc;
+                    }, {})
                 ).map(async (exerciseEntity) => {
-                    const exercise = ExerciseWrapper.createFromEntity(
-                        exerciseEntity,
+                    const exercise = ExerciseWrapper.createFromDatabase(
+                        exerciseEntity.exercise,
                         databaseService
                     );
                     removeAll(exercise.temporaryActionHistory);
+
                     // Load all actions
                     pushAll(
                         exercise.temporaryActionHistory,
                         (
-                            await databaseService.actionWrapperService.getFindAll(
-                                {
-                                    where: { exercise: { id: exercise.id } },
-                                    order: { index: 'ASC' },
-                                }
-                            )(manager)
+                            await dbtx
+                                .select()
+                                .from(actionWrapperTable)
+                                .where(
+                                    eq(
+                                        actionWrapperTable.exerciseId,
+                                        exercise.entity.id!
+                                    )
+                                )
+                                .orderBy(asc(actionWrapperTable.index))
                         ).map((actionEntity) =>
-                            ActionWrapper.createFromEntity(
+                            ActionWrapper.createFromDatabase(
                                 actionEntity,
                                 databaseService,
                                 exercise
@@ -459,8 +456,8 @@ export class ExerciseWrapper extends NormalType<
                 exercises.map(async (exercise) => exercise.restore(false))
             );
             exercises.forEach((exercise) => {
-                exerciseMap.set(exercise.participantId, exercise);
-                exerciseMap.set(exercise.trainerId, exercise);
+                exerciseMap.set(exercise.entity.participantId, exercise);
+                exerciseMap.set(exercise.entity.trainerId, exercise);
             });
             UserReadableIdGenerator.lock([...exerciseMap.keys()]);
             return exercises;
@@ -475,19 +472,19 @@ export class ExerciseWrapper extends NormalType<
      */
     public getRoleFromUsedId(id: string): Role {
         switch (id) {
-            case this.participantId:
+            case this.entity.participantId:
                 return 'participant';
-            case this.trainerId:
+            case this.entity.trainerId:
                 return 'trainer';
             default:
                 throw new RangeError(
-                    `Incorrect id: ${id} where pid=${this.participantId} and tid=${this.trainerId}`
+                    `Incorrect id: ${id} where pid=${this.entity.participantId} and tid=${this.entity.trainerId}`
                 );
         }
     }
 
     public getStateSnapshot(): ExerciseState {
-        return this.currentState;
+        return this.entity.currentStateString;
     }
 
     // TODO: To more generic function
@@ -525,7 +522,7 @@ export class ExerciseWrapper extends NormalType<
         });
         if (
             this.clients.size === 0 &&
-            this.currentState.currentStatus === 'running'
+            this.entity.currentStateString.currentStatus === 'running'
         ) {
             // Pause the exercise
             this.applyAction(
@@ -565,7 +562,10 @@ export class ExerciseWrapper extends NormalType<
      * @throws Error if the action is not applicable on the current state
      */
     private reduce(action: ExerciseAction, emitterId: UUID | null): void {
-        const newState = reduceExerciseState(this.currentState, action);
+        const newState = reduceExerciseState(
+            this.entity.currentStateString,
+            action
+        );
         this.setState(newState, action, emitterId);
         if (action.type === '[Exercise] Pause') {
             this.pause();
@@ -575,7 +575,7 @@ export class ExerciseWrapper extends NormalType<
     }
 
     private validateInitialState() {
-        const errors = validateExerciseState(this.initialState);
+        const errors = validateExerciseState(this.entity.initialStateString);
         if (errors.length > 0) {
             throw new ValidationErrorWrapper(errors);
         }
@@ -593,7 +593,9 @@ export class ExerciseWrapper extends NormalType<
         action: ExerciseAction,
         emitterId: UUID | null
     ): void {
-        this.currentState = newExerciseState;
+        // TODO: @Quixelation --> maybe not do this sync, but keep the old patterns of having a js object and updating the database every 10s
+
+        this.entity.currentStateString = newExerciseState;
         this.temporaryActionHistory.push(
             new ActionWrapper(this.databaseService, action, emitterId, this)
         );
@@ -604,27 +606,26 @@ export class ExerciseWrapper extends NormalType<
         this.clients.forEach((client) => client.disconnect());
         // Pause the exercise to stop the tick
         this.pause();
-        exerciseMap.delete(this.participantId);
-        exerciseMap.delete(this.trainerId);
-        if (this.id !== undefined && Config.useDb) {
-            await this.databaseService.transaction(
-                this.databaseService.exerciseWrapperService.getRemove(this.id)
-            );
+        exerciseMap.delete(this.entity.participantId);
+        exerciseMap.delete(this.entity.trainerId);
+        if (this.entity.id !== undefined) {
+            await this.databaseService
+                .delete(exerciseWrapperTable)
+                .where(eq(exerciseWrapperTable.id, this.entity.id));
             this.markAsSaved();
         }
     }
 
     public async getTimeLine(): Promise<ExerciseTimeline> {
         const completeHistory = [
-            ...(this.id !== undefined && Config.useDb
-                ? await this.databaseService.transaction(
-                      this.databaseService.actionWrapperService.getFindAll({
-                          where: { exercise: { id: this.id } },
-                      })
-                  )
+            ...(this.entity.id !== undefined && Config.useDb
+                ? await this.databaseService
+                      .select()
+                      .from(actionWrapperTable)
+                      .where(eq(actionWrapperTable.exerciseId, this.entity.id))
                 : []
             ).map((action) =>
-                ActionWrapper.createFromEntity(
+                ActionWrapper.createFromDatabase(
                     action,
                     this.databaseService,
                     this
@@ -633,13 +634,13 @@ export class ExerciseWrapper extends NormalType<
             ...this.temporaryActionHistory,
         ]
             // TODO: Is this necessary?
-            .sort((a, b) => a.index - b.index);
+            .sort((a, b) => a.entity.index - b.entity.index);
         return {
-            initialState: this.initialState,
+            initialState: this.entity.initialStateString,
             actionsWrappers: completeHistory.map((action) => ({
-                action: action.action,
-                emitterId: action.emitterId,
-                time: action.index,
+                action: action.entity.actionString,
+                emitterId: action.entity.emitterId ?? null,
+                time: action.entity.index,
             })),
         };
     }

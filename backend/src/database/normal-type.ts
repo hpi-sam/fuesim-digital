@@ -1,26 +1,18 @@
-import type { UUID } from 'digital-fuesim-manv-shared';
-import type { EntityManager } from 'typeorm';
-import type { BaseEntity } from './entities/base-entity.js';
-import type { DatabaseService } from './services/database-service.js';
+import type { AnyPgTable } from 'drizzle-orm/pg-core';
+import type { InferInsertModel } from 'drizzle-orm';
+import type {
+    DatabaseService,
+    DatabaseTransaction,
+} from './services/database-service.js';
 
-export abstract class NormalType<
-    TSelf extends NormalType<TSelf, EntityType>,
-    EntityType extends BaseEntity<any, TSelf>,
-> {
+export abstract class NormalType<Table extends AnyPgTable> {
     protected constructor(
         protected readonly databaseService: DatabaseService
     ) {}
-    public id?: UUID;
-
-    public abstract asEntity(
-        save: boolean,
-        entityManager?: EntityManager
-    ): Promise<EntityType>;
+    public entity!: InferInsertModel<Table>;
 
     /**
      * Creates or updates the object in the database
      */
-    public async save(entityManager?: EntityManager): Promise<EntityType> {
-        return this.asEntity(true, entityManager);
-    }
+    public abstract save(database?: DatabaseTransaction | null): Promise<any>;
 }

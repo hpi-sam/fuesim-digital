@@ -319,6 +319,84 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
 <!-- markdownlint-disable -->
 <table>
     <tr>
+        <td style="text-align: center">
+            <a href="https://github.com/fekoch">
+                <img
+                    src="https://avatars.githubusercontent.com/u/45557700?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>Felix Koch</b></sub>
+            </a>
+            <br />
+            <a
+                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=fekoch"
+                title="Code"
+                >💻</a
+            >
+            <span title="Review">👀</span>
+            <br />
+            <small>Student 2025/26<small>
+        </td>
+        <td style="text-align: center">
+            <a href="https://github.com/JohannesPotzi">
+                <img
+                    src="https://avatars.githubusercontent.com/u/119885768?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>Johannes Potzi</b></sub>
+            </a>
+            <br />
+            <a
+                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=JohannesPotzi"
+                title="Code"
+                >💻</a
+            >
+            <span title="Review">👀</span>
+            <br />
+            <small>Student 2025/26<small>
+        </td>
+        <td style="text-align: center">
+            <a href="https://github.com/Quixelation">
+                <img
+                    src="https://avatars.githubusercontent.com/u/58915890?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>Robert Stündl</b></sub>
+            </a>
+            <br />
+            <a
+                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=Quixelation"
+                title="Code"
+                >💻</a
+            >
+            <span title="Review">👀</span>
+            <br />
+            <small>Student 2025/26<small>
+        </td>
+        <td style="text-align: center">
+            <a href="https://github.com/hansegucker">
+                <img
+                    src="https://avatars.githubusercontent.com/u/24552951?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>Jonathan Weth</b></sub>
+            </a>
+            <br />
+            <a
+                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=hansegucker"
+                title="Code"
+                >💻</a
+            >
+            <span title="Review">👀</span>
+            <br />
+            <small>Student 2025/26<small>
+        </td>
+        </tr>
+    <tr>
     <td style="text-align: center">
             <a href="https://github.com/Greenscreen23">
                 <img
@@ -484,7 +562,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             📆
             <br />
-            <small>Supervisor 2021-23<small>
+            <small>Supervisor 2021-26</small>
         </td>
         <td style="text-align: center">
             <a href="https://github.com/christianschaeffer">
@@ -498,7 +576,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             📆
             <br />
-            <small>Supervisor 2021-23<small>
+            <small>Supervisor 2021-26<small>
         </td>
         <td style="text-align: center">
             Cristian Pasca

@@ -51,13 +51,13 @@ export class AssignLeaderBehaviorState implements SimulationBehaviorState {
     static readonly create = getCreate(this);
 }
 
-const personnelPriorities = {
+const personnelPriorities: { [key in string]: number } = {
     notarzt: 0,
     san: 1,
     rettSan: 2,
     notSan: 3,
     gf: 4,
-} as const;
+};
 
 export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState> =
     {

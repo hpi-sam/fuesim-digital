@@ -296,13 +296,13 @@ function createCateringMaterials(
     }));
 }
 
-const personnelPriorities = {
+const personnelPriorities: { [key in string]: number } = {
     gf: 0,
     san: 1,
     rettSan: 2,
     notSan: 3,
     notarzt: 4,
-} as const;
+};
 
 // Estimation for required personnel based on the 7/2/1 rule.
 const estimatedSkDistribution = { green: 7 / 10, yellow: 2 / 10, red: 1 / 10 };

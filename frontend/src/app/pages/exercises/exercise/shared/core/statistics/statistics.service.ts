@@ -178,14 +178,14 @@ export class StatisticsService {
                     client.role.mainRole === 'participant'
             ).length,
             patients: countBy(patients, (patient) => patient.realStatus),
-            vehicles: countBy(vehicles, (vehicle) => vehicle.vehicleType),
+            vehicles: countBy(vehicles, (vehicle) => vehicle.templateId),
             personnel: countBy(
                 personnel.filter(
                     (_personnel) =>
                         isNotInVehicle(_personnel) &&
                         isNotInTransfer(_personnel)
                 ),
-                (_personnel) => _personnel.personnelType
+                (_personnel) => _personnel.templateId
             ),
         };
     }

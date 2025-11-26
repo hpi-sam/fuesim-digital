@@ -4,16 +4,13 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { PatientStatus, UUID, LogEntry } from 'digital-fuesim-manv-shared';
 import { statusNames } from 'digital-fuesim-manv-shared';
-import type { Observable } from 'rxjs';
-import { map } from 'rxjs';
-import {
-    generateRandomRgbaColor,
-    getRgbaColor,
-    rgbColorPalette,
-} from 'src/app/shared/functions/colors';
+import { combineLatest, Observable, map } from 'rxjs';
+import { getRgbaColor } from 'src/app/shared/functions/colors';
 import type { AppState } from 'src/app/state/app.state';
 import {
+    selectPersonnelTemplates,
     selectSimulatedRegions,
+    selectVehicleTemplates,
     selectViewports,
 } from 'src/app/state/application/selectors/exercise.selectors';
 import { StatisticsService } from '../../core/statistics/statistics.service';
@@ -86,93 +83,64 @@ export class ExerciseStatisticsModalComponent implements OnInit {
             }))
         );
 
-    // Vehicle statistics
-    private readonly colorKeys = Object.keys(
-        rgbColorPalette
-    ) as (keyof typeof rgbColorPalette)[];
-
-    private getColor(index: number) {
-        if (index >= this.colorKeys.length) {
-            return generateRandomRgbaColor(StackedBarChart.backgroundAlpha);
-        }
-        return getRgbaColor(
-            this.colorKeys[index]!,
-            StackedBarChart.backgroundAlpha
-        );
-    }
-
     public vehiclesStatistics$: Observable<StackedBarChartStatistics> =
-        this.areaStatisticsService.areaStatistics$.pipe(
-            map((statistics) => {
-                // Get all vehicle types
-                const vehicleTypes = new Set<string>();
+        combineLatest([
+            this.areaStatisticsService.areaStatistics$,
+            this.store.select(selectVehicleTemplates),
+        ]).pipe(
+            map(([statistics, vehicleTemplates]) => {
+                // Get all vehicle template IDs
+                const vehicleTemplateIds = new Set<UUID>();
                 for (const statistic of statistics) {
-                    for (const vehicleType of Object.keys(
+                    for (const templateId of Object.keys(
                         statistic.value.vehicles
                     )) {
-                        vehicleTypes.add(vehicleType);
+                        vehicleTemplateIds.add(templateId);
                     }
                 }
 
                 return {
-                    datasets: [...vehicleTypes].map((vehicleType, index) => ({
-                        label: vehicleType,
+                    datasets: [...vehicleTemplateIds].map((templateId) => ({
+                        label: vehicleTemplates[templateId]?.vehicleType ?? '',
                         data: statistics.map(
                             (statisticEntry) =>
-                                statisticEntry.value.vehicles[vehicleType] ??
+                                statisticEntry.value.vehicles[templateId] ??
                                 null
                         ),
-                        backgroundColor: this.getColor(index),
                     })),
                     labels: statistics.map(({ exerciseTime }) => exerciseTime),
                 };
             })
         );
 
-    // Personnel statistics
-    private readonly personnelConfig: {
-        [key in string]: { label: string; color: string };
-    } = {
-        // The order is important (the first key is at the bottom of the chart)
-        // The colors are taken from bootstrap
-        notarzt: {
-            label: 'Notarzt',
-            color: getRgbaColor('red', StackedBarChart.backgroundAlpha),
-        },
-        gf: {
-            label: 'GF',
-            color: getRgbaColor('blue', StackedBarChart.backgroundAlpha),
-        },
-        notSan: {
-            label: 'NotSan',
-            color: getRgbaColor('green', StackedBarChart.backgroundAlpha),
-        },
-        rettSan: {
-            label: 'RettSan',
-            color: getRgbaColor('purple', StackedBarChart.backgroundAlpha),
-        },
-        san: {
-            label: 'San',
-            color: getRgbaColor('yellow', StackedBarChart.backgroundAlpha),
-        },
-    };
-
     public personnelStatistics$: Observable<StackedBarChartStatistics> =
-        this.areaStatisticsService.areaStatistics$.pipe(
-            map((statistics) => ({
-                datasets: Object.entries(this.personnelConfig).map(
-                    ([personnelType, { color, label }]) => ({
-                        label,
+        combineLatest([
+            this.areaStatisticsService.areaStatistics$,
+            this.store.select(selectPersonnelTemplates),
+        ]).pipe(
+            map(([statistics, personnelTemplates]) => {
+                // Get all vehicle template IDs
+                const personnelTemplateIds = new Set<UUID>();
+                for (const statistic of statistics) {
+                    for (const templateId of Object.keys(
+                        statistic.value.personnel
+                    )) {
+                        personnelTemplateIds.add(templateId);
+                    }
+                }
+
+                return {
+                    datasets: [...personnelTemplateIds].map((templateId) => ({
+                        label: personnelTemplates[templateId]?.name ?? '',
                         data: statistics.map(
                             (statisticEntry) =>
-                                statisticEntry.value.personnel[personnelType] ??
+                                statisticEntry.value.personnel[templateId] ??
                                 null
                         ),
-                        backgroundColor: color,
-                    })
-                ),
-                labels: statistics.map(({ exerciseTime }) => exerciseTime),
-            }))
+                    })),
+                    labels: statistics.map(({ exerciseTime }) => exerciseTime),
+                };
+            })
         );
 
     public logEntries$: Observable<readonly LogEntry[]> =

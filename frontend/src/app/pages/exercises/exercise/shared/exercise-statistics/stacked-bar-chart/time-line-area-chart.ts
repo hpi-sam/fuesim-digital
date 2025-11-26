@@ -7,6 +7,7 @@ import {
     Legend,
     LinearScale,
     Tooltip,
+    Colors,
 } from 'chart.js';
 import { formatDuration } from 'digital-fuesim-manv-shared';
 import { rgbColorPalette } from 'src/app/shared/functions/colors';
@@ -17,7 +18,8 @@ Chart.register(
     BarElement,
     BarController,
     Tooltip,
-    Legend
+    Legend,
+    Colors
 );
 
 type Data = number | null;

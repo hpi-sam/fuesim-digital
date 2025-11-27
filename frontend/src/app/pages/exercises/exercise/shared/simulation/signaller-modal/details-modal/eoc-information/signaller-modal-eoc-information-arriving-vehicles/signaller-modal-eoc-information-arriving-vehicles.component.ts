@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { currentTransferOf, UUID } from 'digital-fuesim-manv-shared';
 import { groupBy } from 'lodash-es';
-import type { AppState } from 'src/app/state/app.state.js';
+import type { AppState } from 'src/app/state/app.state';
 import {
     selectCurrentTime,
     selectVehiclesInTransfer,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 
 interface ArrivingVehicle {
     id: UUID;

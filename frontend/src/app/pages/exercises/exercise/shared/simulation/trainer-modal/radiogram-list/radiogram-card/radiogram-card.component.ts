@@ -21,21 +21,21 @@ import {
 } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state.js';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors.js';
+import type { AppState } from 'src/app/state/app.state';
+import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
 import {
     createSelectRadiogram,
     selectClients,
     selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service.js';
-import { SelectSignallerRegionService } from '../../../signaller-modal/select-signaller-region.service.js';
+} from 'src/app/shared/services/hotkeys.service';
+import { SelectSignallerRegionService } from '../../../signaller-modal/select-signaller-region.service';
 
 // Clients that leave are lost from the state but radiograms might point to them.
 // This is a fallback to show something useful in the UI

@@ -1,9 +1,9 @@
 import type { Feature } from 'ol';
-import Fill from 'ol/style/Fill.js';
-import Stroke from 'ol/style/Stroke.js';
-import Style from 'ol/style/Style.js';
-import OlText from 'ol/style/Text.js';
-import { StyleHelper } from './style-helper.js';
+import Fill from 'ol/style/Fill';
+import Stroke from 'ol/style/Stroke';
+import Style from 'ol/style/Style';
+import OlText from 'ol/style/Text';
+import { StyleHelper } from './style-helper';
 
 export class NameStyleHelper extends StyleHelper<Style, Feature> {
     constructor(

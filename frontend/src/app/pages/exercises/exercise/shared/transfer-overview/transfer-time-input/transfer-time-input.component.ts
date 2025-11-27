@@ -2,9 +2,9 @@ import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { Transfer } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
-import { selectCurrentTime } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import type { AppState } from 'src/app/state/app.state';
+import { selectCurrentTime } from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-transfer-time-input',

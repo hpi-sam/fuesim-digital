@@ -6,22 +6,22 @@ import {
     NgbNavModule,
     NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { MessagesModule } from 'src/app/feature/messages/messages.module.js';
-import { SharedModule } from 'src/app/shared/shared.module.js';
-import { TransferPointOverviewModule } from '../transfer-point-overview/transfer-point-overview.module.js';
-import { SimulationModalsModule } from '../simulation/simulation-modals.module.js';
-import { ExerciseMapComponent } from './exercise-map.component.js';
-import { ChooseTransferTargetPopupComponent } from './shared/choose-transfer-target-popup/choose-transfer-target-popup.component.js';
-import { MapImagePopupComponent } from './shared/map-image-popup/map-image-popup.component.js';
-import { PatientPopupComponent } from './shared/patient-popup/patient-popup.component.js';
-import { TransferPointPopupComponent } from './shared/transfer-point-popup/transfer-point-popup.component.js';
-import { VehiclePopupComponent } from './shared/vehicle-popup/vehicle-popup.component.js';
-import { ViewportPopupComponent } from './shared/viewport-popup/viewport-popup.component.js';
-import { PersonnelPopupComponent } from './shared/personnel-popup/personnel-popup.component.js';
-import { MaterialPopupComponent } from './shared/material-popup/material-popup.component.js';
-import { CaterCapacityComponent } from './shared/cater-capacity/cater-capacity.component.js';
-import { SimulatedRegionPopupComponent } from './shared/simulated-region-popup/simulated-region-popup.component.js';
-import { PatientNameComponent } from './shared/patient-name/patient-name.component.js';
+import { MessagesModule } from 'src/app/feature/messages/messages.module';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { TransferPointOverviewModule } from '../transfer-point-overview/transfer-point-overview.module';
+import { SimulationModalsModule } from '../simulation/simulation-modals.module';
+import { ExerciseMapComponent } from './exercise-map.component';
+import { ChooseTransferTargetPopupComponent } from './shared/choose-transfer-target-popup/choose-transfer-target-popup.component';
+import { MapImagePopupComponent } from './shared/map-image-popup/map-image-popup.component';
+import { PatientPopupComponent } from './shared/patient-popup/patient-popup.component';
+import { TransferPointPopupComponent } from './shared/transfer-point-popup/transfer-point-popup.component';
+import { VehiclePopupComponent } from './shared/vehicle-popup/vehicle-popup.component';
+import { ViewportPopupComponent } from './shared/viewport-popup/viewport-popup.component';
+import { PersonnelPopupComponent } from './shared/personnel-popup/personnel-popup.component';
+import { MaterialPopupComponent } from './shared/material-popup/material-popup.component';
+import { CaterCapacityComponent } from './shared/cater-capacity/cater-capacity.component';
+import { SimulatedRegionPopupComponent } from './shared/simulated-region-popup/simulated-region-popup.component';
+import { PatientNameComponent } from './shared/patient-name/patient-name.component';
 
 @NgModule({
     declarations: [

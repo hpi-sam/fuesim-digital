@@ -8,7 +8,7 @@ import {
     Input,
     ViewChild,
 } from '@angular/core';
-import type { HeightChangeObservationStrategies } from './height-change-observation-strategies.js';
+import type { HeightChangeObservationStrategies } from './height-change-observation-strategies';
 
 /**
  * Automatically determines whether the content passed via ng-content is larger than the provided defaultHeight

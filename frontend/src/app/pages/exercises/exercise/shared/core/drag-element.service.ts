@@ -20,20 +20,20 @@ import {
     MapPosition,
 } from 'digital-fuesim-manv-shared';
 import type { Feature } from 'ol';
-import type VectorLayer from 'ol/layer/Vector.js';
-import type OlMap from 'ol/Map.js';
-import type { Pixel } from 'ol/pixel.js';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
+import type VectorLayer from 'ol/layer/Vector';
+import type OlMap from 'ol/Map';
+import type { Pixel } from 'ol/pixel';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import type { AppState } from 'src/app/state/app.state';
 import {
     selectExerciseState,
     selectMaterialTemplates,
     selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
-import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region.js';
-import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region.js';
-import type { FeatureManager } from '../exercise-map/utility/feature-manager.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region';
+import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region';
+import type { FeatureManager } from '../exercise-map/utility/feature-manager';
 
 @Injectable({
     providedIn: 'root',

@@ -3,15 +3,15 @@ import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, ReportableInformation } from 'digital-fuesim-manv-shared';
 import { reportableInformationTypeToGermanNameDictionary } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import type { AppState } from 'src/app/state/app.state';
 import {
     createSelectActivityStatesByType,
     createSelectBehaviorStatesByType,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
-import { MessageService } from 'src/app/core/messages/message.service.js';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { MessageService } from 'src/app/core/messages/message.service';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 
 const defaultInterval = 15 * 60 * 1000; // 15 minutes
 

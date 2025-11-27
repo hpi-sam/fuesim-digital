@@ -23,12 +23,12 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import { countBy } from 'lodash-es';
 import { ReplaySubject } from 'rxjs';
-import { ApiService } from 'src/app/core/api.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
-import { selectCurrentTime } from 'src/app/state/application/selectors/exercise.selectors.js';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
-import type { AreaStatistics } from './area-statistics.js';
-import type { StatisticsEntry } from './statistics-entry.js';
+import { ApiService } from 'src/app/core/api.service';
+import type { AppState } from 'src/app/state/app.state';
+import { selectCurrentTime } from 'src/app/state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import type { AreaStatistics } from './area-statistics';
+import type { StatisticsEntry } from './statistics-entry';
 
 @Injectable({
     providedIn: 'root',

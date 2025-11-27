@@ -5,8 +5,8 @@ import type {
     UUID,
 } from 'digital-fuesim-manv-shared';
 import type { Feature } from 'ol';
-import type { Coordinate } from 'ol/coordinate.js';
-import type { Geometry } from 'ol/geom.js';
+import type { Coordinate } from 'ol/coordinate';
+import type { Geometry } from 'ol/geom';
 
 export interface PositionableElement {
     readonly id: UUID;

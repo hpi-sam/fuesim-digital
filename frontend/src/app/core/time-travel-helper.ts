@@ -3,7 +3,7 @@ import type {
     ExerciseTimeline,
 } from 'digital-fuesim-manv-shared';
 import { BehaviorSubject } from 'rxjs';
-import { TimeJumpHelper } from './time-jump-helper.js';
+import { TimeJumpHelper } from './time-jump-helper';
 
 export class TimeTravelHelper {
     private readonly timeJumpHelper = new TimeJumpHelper(this.exerciseTimeLine);

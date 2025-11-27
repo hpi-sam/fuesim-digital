@@ -8,8 +8,8 @@ import {
 import type { OnChanges, OnDestroy } from '@angular/core';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ReplaySubject, Subject, delay, switchMap, takeUntil, tap } from 'rxjs';
-import { CustomTimer } from 'src/app/core/messages/custom-timer.js';
-import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic.js';
+import { CustomTimer } from 'src/app/core/messages/custom-timer';
+import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
 
 @Component({
     selector: 'app-custom-timer-progress-bar',

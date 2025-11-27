@@ -1,5 +1,5 @@
 import type { SocketResponse } from 'digital-fuesim-manv-shared';
-import { OptimisticActionHandler } from './optimistic-action-handler.js';
+import { OptimisticActionHandler } from './optimistic-action-handler';
 
 class AddLetterAction {
     public readonly type = 'addLetter';

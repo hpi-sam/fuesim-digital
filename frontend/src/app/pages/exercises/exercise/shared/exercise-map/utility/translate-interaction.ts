@@ -1,9 +1,8 @@
 import { isEqual } from 'lodash-es';
 import type { Feature, MapBrowserEvent } from 'ol';
-import type { Point } from 'ol/geom.js';
-import { Translate } from 'ol/interaction.js';
-import type { TranslateEvent } from 'ol/interaction/Translate.js';
-import type { GeometryWithCoordinates, Positions } from './geometry-helper.js';
+import type { Point } from 'ol/geom';
+import { Translate } from 'ol/interaction';
+import type { GeometryWithCoordinates, Positions } from './geometry-helper';
 
 /**
  * Translates (moves) a feature to a new position.
@@ -20,7 +19,7 @@ export class TranslateInteraction extends Translate {
         super(...args);
         // Clicking on an element shouldn't trigger a `translateend` event
         // This must be the first event listener to stop the event-propagation to following event listeners
-        this.on('translateend', (event: TranslateEvent) => {
+        this.on('translateend', (event) => {
             if (isEqual(event.coordinate, event.startCoordinate)) {
                 event.stopPropagation();
             }
@@ -33,7 +32,7 @@ export class TranslateInteraction extends Translate {
             'translateend',
         ] as const;
         for (const eventName of translateEvents) {
-            this.on(eventName, (event: TranslateEvent) => {
+            this.on(eventName, (event) => {
                 event.features.forEach((feature: Feature) => {
                     feature.dispatchEvent(event);
                 });

@@ -1,11 +1,11 @@
 import type { Feature, MapBrowserEvent } from 'ol';
-import type { Geometry } from 'ol/geom.js';
-import type { TranslateEvent } from 'ol/interaction/Translate.js';
-import type VectorLayer from 'ol/layer/Vector.js';
+import type { Geometry } from 'ol/geom';
+import type { TranslateEvent } from 'ol/interaction/Translate';
+import type VectorLayer from 'ol/layer/Vector';
 import type { Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from 'digital-fuesim-manv-shared';
-import type { OlMapInteractionsManager } from './ol-map-interactions-manager.js';
+import type { OlMapInteractionsManager } from './ol-map-interactions-manager';
 
 /**
  * The Api to interact with a feature

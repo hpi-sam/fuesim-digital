@@ -1,6 +1,6 @@
 import { get } from 'lodash-es';
 import type { TrackByFunction } from '@angular/core';
-import { objectToHash } from './object-to-hash.js';
+import { objectToHash } from './object-to-hash';
 
 // TODO: This is a workaround to be able to test this function in the jest tests which are not setup for angular (via e.g. jest-preset-angular) and can therefore not parse angular pipes.
 export function trackByPropertyPipeTransform<

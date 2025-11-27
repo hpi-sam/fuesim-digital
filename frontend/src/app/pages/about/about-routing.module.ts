@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import type { Routes } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { ImprintComponent } from './imprint/imprint.component.js';
-import { LicenseComponent } from './license/license.component.js';
-import { PrivacyComponent } from './privacy/privacy.component.js';
-import { TermsComponent } from './terms/terms.component.js';
+import { ImprintComponent } from './imprint/imprint.component';
+import { LicenseComponent } from './license/license.component';
+import { PrivacyComponent } from './privacy/privacy.component';
+import { TermsComponent } from './terms/terms.component';
 
 const routes: Routes = [
     {

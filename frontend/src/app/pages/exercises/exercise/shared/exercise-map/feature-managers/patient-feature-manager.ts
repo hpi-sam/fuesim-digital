@@ -2,22 +2,22 @@ import type { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { Patient } from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
-import type OlMap from 'ol/Map.js';
-import { Fill, Stroke } from 'ol/style.js';
+import type OlMap from 'ol/Map';
+import { Fill, Stroke } from 'ol/style';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
-import { selectConfiguration } from 'src/app/state/application/selectors/exercise.selectors.js';
-import { selectVisiblePatients } from 'src/app/state/application/selectors/shared.selectors.js';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
-import { PatientPopupComponent } from '../shared/patient-popup/patient-popup.component.js';
-import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager.js';
-import { PointGeometryHelper } from '../utility/point-geometry-helper.js';
-import { ImagePopupHelper } from '../utility/popup-helper.js';
-import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper.js';
-import { ImageStyleHelper } from '../utility/style-helper/image-style-helper.js';
-import type { PopupService } from '../utility/popup.service.js';
-import { MoveableFeatureManager } from './moveable-feature-manager.js';
+import type { ExerciseService } from 'src/app/core/exercise.service';
+import type { AppState } from 'src/app/state/app.state';
+import { selectConfiguration } from 'src/app/state/application/selectors/exercise.selectors';
+import { selectVisiblePatients } from 'src/app/state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { PatientPopupComponent } from '../shared/patient-popup/patient-popup.component';
+import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
+import { PointGeometryHelper } from '../utility/point-geometry-helper';
+import { ImagePopupHelper } from '../utility/popup-helper';
+import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
+import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
+import type { PopupService } from '../utility/popup.service';
+import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
     public register(

@@ -8,12 +8,12 @@ import type {
     VehicleTemplate,
 } from 'digital-fuesim-manv-shared';
 import { cloneDeepMutable } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
-import { createSelectVehicleTemplate } from 'src/app/state/application/selectors/exercise.selectors.js';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
-import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service.js';
-import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehicle-template-form.component.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import type { AppState } from 'src/app/state/app.state';
+import { createSelectVehicleTemplate } from 'src/app/state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
+import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehicle-template-form.component';
 
 @Component({
     selector: 'app-edit-vehicle-template-modal',

@@ -3,10 +3,10 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state.js';
-import { createSelectVehicle } from 'src/app/state/application/selectors/exercise.selectors.js';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors.js';
-import { PopupService } from '../../utility/popup.service.js';
+import type { AppState } from 'src/app/state/app.state';
+import { createSelectVehicle } from 'src/app/state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
+import { PopupService } from '../../utility/popup.service';
 
 @Component({
     selector: 'app-vehicle-popup',

@@ -3,6 +3,8 @@
     "extends": "../tsconfig.base.json",
     "compileOnSave": false,
     "compilerOptions": {
+        "module": "ES2022",
+        "moduleResolution": "node",
         "esModuleInterop": true,
         "baseUrl": "./",
         "outDir": "./dist/out-tsc",

@@ -19,8 +19,8 @@ import {
 } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import type { AppState } from 'src/app/state/app.state';
 import {
     createSelectActivityStatesByType,
     createSelectBehaviorState,
@@ -31,9 +31,9 @@ import {
     selectPatients,
     selectTransferPoints,
     selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { comparePatientsByVisibleStatus } from '../../../compare-patients.js';
-import type { TransferOptions } from '../../../../start-transfer.service.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { comparePatientsByVisibleStatus } from '../../../compare-patients';
+import type { TransferOptions } from '../../../../start-transfer.service';
 
 let globalLastInformationCollapsed = true;
 let globalLastSettingsCollapsed = true;

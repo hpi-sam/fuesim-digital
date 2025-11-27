@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { uuid } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
 import type {
     ChangedVehicleTemplateValues,
     EditableVehicleTemplateValues,
-} from '../vehicle-template-form/vehicle-template-form.component.js';
+} from '../vehicle-template-form/vehicle-template-form.component';
 
 @Component({
     selector: 'app-create-vehicle-template-modal',

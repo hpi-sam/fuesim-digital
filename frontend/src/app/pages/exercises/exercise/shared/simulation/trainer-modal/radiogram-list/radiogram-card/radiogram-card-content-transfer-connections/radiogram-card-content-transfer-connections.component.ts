@@ -6,11 +6,11 @@ import type {
     UUID,
 } from 'digital-fuesim-manv-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state.js';
+import type { AppState } from 'src/app/state/app.state';
 import {
     createSelectRadiogram,
     selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-radiogram-card-content-transfer-connections',

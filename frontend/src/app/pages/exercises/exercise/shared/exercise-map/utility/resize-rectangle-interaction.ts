@@ -1,10 +1,10 @@
 import type { Feature, MapBrowserEvent } from 'ol';
-import type { Coordinate } from 'ol/coordinate.js';
-import { distance } from 'ol/coordinate.js';
-import BaseEvent from 'ol/events/Event.js';
-import type { Polygon } from 'ol/geom.js';
-import PointerInteraction from 'ol/interaction/Pointer.js';
-import type VectorSource from 'ol/source/Vector.js';
+import type { Coordinate } from 'ol/coordinate';
+import { distance } from 'ol/coordinate';
+import BaseEvent from 'ol/events/Event';
+import type { Polygon } from 'ol/geom';
+import PointerInteraction from 'ol/interaction/Pointer';
+import type VectorSource from 'ol/source/Vector';
 
 /**
  * Provides the ability to resize a rectangle by dragging any of its corners.

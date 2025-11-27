@@ -1,7 +1,7 @@
 import { Directive } from '@angular/core';
 import type { AbstractControl, AsyncValidator } from '@angular/forms';
 import { NG_ASYNC_VALIDATORS } from '@angular/forms';
-import { getImageAspectRatio } from '../functions/get-image-aspect-ratio.js';
+import { getImageAspectRatio } from '../functions/get-image-aspect-ratio';
 
 @Directive({
     selector: '[appImageExistsValidator]',

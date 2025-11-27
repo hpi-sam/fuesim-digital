@@ -1,9 +1,9 @@
 import type { ImageProperties } from 'digital-fuesim-manv-shared';
 import { normalZoom } from 'digital-fuesim-manv-shared';
 import type { Feature } from 'ol';
-import Icon from 'ol/style/Icon.js';
-import Style from 'ol/style/Style.js';
-import { StyleHelper } from './style-helper.js';
+import Icon from 'ol/style/Icon';
+import Style from 'ol/style/Style';
+import { StyleHelper } from './style-helper';
 
 export class ImageStyleHelper extends StyleHelper<Style, Feature> {
     /**

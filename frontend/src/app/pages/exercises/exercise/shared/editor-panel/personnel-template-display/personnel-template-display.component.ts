@@ -7,8 +7,8 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import { personnelTypeNames } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state.js';
-import { createSelectPersonnelTemplate } from 'src/app/state/application/selectors/exercise.selectors.js';
+import type { AppState } from 'src/app/state/app.state';
+import { createSelectPersonnelTemplate } from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-personnel-template-display',

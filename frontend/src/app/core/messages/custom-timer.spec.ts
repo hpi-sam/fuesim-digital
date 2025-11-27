@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { CustomTimer } from './custom-timer.js';
+import { CustomTimer } from './custom-timer';
 
 describe('CustomTimer', () => {
     jest.useFakeTimers();

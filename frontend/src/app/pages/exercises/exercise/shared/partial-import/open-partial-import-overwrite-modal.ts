@@ -1,6 +1,6 @@
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import type { PartialExport } from 'digital-fuesim-manv-shared';
-import { PartialImportModalComponent } from './partial-import-modal/partial-import-modal.component.js';
+import { PartialImportModalComponent } from './partial-import-modal/partial-import-modal.component';
 
 /**
  *

@@ -1,4 +1,4 @@
-import { hashString } from './hash-string.js';
+import { hashString } from './hash-string';
 
 describe('hashString', () => {
     it('creates the same hash for the same input', () => {

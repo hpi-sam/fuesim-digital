@@ -1,4 +1,4 @@
-import { trackByPropertyPipeTransform } from './track-by-property-pipe-transform.js';
+import { trackByPropertyPipeTransform } from './track-by-property-pipe-transform';
 
 describe('AppTrackByPropertyPipe', () => {
     it('returns a function', () => {

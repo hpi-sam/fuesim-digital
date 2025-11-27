@@ -13,14 +13,14 @@ import {
 } from 'digital-fuesim-manv-shared';
 import { cloneDeep } from 'lodash-es';
 import type { Observable } from 'rxjs';
-import { MessageService } from 'src/app/core/messages/message.service.js';
-import { getImageAspectRatio } from 'src/app/shared/functions/get-image-aspect-ratio.js';
-import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic.js';
-import type { AppState } from 'src/app/state/app.state.js';
+import { MessageService } from 'src/app/core/messages/message.service';
+import { getImageAspectRatio } from 'src/app/shared/functions/get-image-aspect-ratio';
+import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
+import type { AppState } from 'src/app/state/app.state';
 import {
     selectMaterialTemplates,
     selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-vehicle-template-form',

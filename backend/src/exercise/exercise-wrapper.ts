@@ -18,12 +18,17 @@ import {
 } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { asc, eq, lt } from 'drizzle-orm';
-import { actionWrapperTable, exerciseWrapperTable } from 'database/schema.js';
-import type { DatabaseTransaction } from 'database/services/database-service.js';
+import {
+    actionWrapperTable,
+    exerciseWrapperTable,
+} from '../database/schema.js';
+import type {
+    DatabaseTransaction,
+    DatabaseService,
+} from '../database/services/database-service.js';
 import { Config } from '../config.js';
 import { migrateInDatabase } from '../database/migrate-in-database.js';
 import { NormalType } from '../database/normal-type.js';
-import type { DatabaseService } from '../database/services/database-service.js';
 import { pushAll, removeAll } from '../utils/array.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { RestoreError } from '../utils/restore-error.js';
@@ -70,10 +75,6 @@ export class ExerciseWrapper extends NormalType<typeof exerciseWrapperTable> {
                 action.save(database)
             )
         );
-        this.temporaryActionHistory.splice(
-            0,
-            this.temporaryActionHistory.length
-        );
         return entities;
     }
 
@@ -105,6 +106,7 @@ export class ExerciseWrapper extends NormalType<typeof exerciseWrapperTable> {
         }
 
         await this.saveActions(database);
+        this.markAsSaved();
     }
 
     private static createFromDatabase(

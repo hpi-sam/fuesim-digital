@@ -1,10 +1,7 @@
-import { jest } from '@jest/globals';
-import { Config } from 'config';
 import { uuid } from 'digital-fuesim-manv-shared';
-import { exerciseMap } from 'exercise/exercise-map';
-import { EntityManager } from 'typeorm';
 import { createExercise, createTestEnvironment } from '../test/utils.js';
-import { pushAll } from './utils/array.js';
+import { Config } from './config.js';
+import { exerciseMap } from './exercise/exercise-map.js';
 
 describe('Exercise saving', () => {
     const environment = createTestEnvironment();
@@ -23,40 +20,27 @@ describe('Exercise saving', () => {
         const exercideIds = await createExercise(environment);
         const exercise = exerciseMap.get(exercideIds.trainerId)!;
 
+        exercise.markAsAboutToBeSaved();
+
+        exercise.applyAction(
+            {
+                type: '[AlarmGroup] Add AlarmGroup',
+                alarmGroup: {
+                    alarmGroupVehicles: {},
+                    id: uuid(),
+                    type: 'alarmGroup',
+                    name: 'Alarm Group',
+                    sent: false,
+                },
+            },
+            null
+        );
+
         const saveTick: () => Promise<void> = (environment.server as any)
             .saveTick;
-
-        const savedEntities: unknown[] = [];
-
-        const saveMock = jest
-            .spyOn(EntityManager.prototype, 'save')
-            .mockImplementation((async (entities: unknown[]) => {
-                // Simulate adding an action while asynchronously waiting
-                exercise.applyAction(
-                    {
-                        type: '[AlarmGroup] Add AlarmGroup',
-                        alarmGroup: {
-                            alarmGroupVehicles: {},
-                            id: uuid(),
-                            type: 'alarmGroup',
-                            name: 'Alarm Group',
-                            sent: false,
-                        },
-                    },
-                    null
-                );
-                pushAll(savedEntities, entities);
-                return entities;
-                // TODO: Better type
-            }) as any);
-
         await saveTick();
 
-        expect(saveMock).toHaveBeenCalledTimes(2);
-
-        // One saved exercise, two actions added while saving
-        expect(
-            savedEntities.length + exercise.temporaryActionHistory.length
-        ).toBe(3);
+        // one action still unsaved
+        expect(exercise.temporaryActionHistory.length).toBe(1);
     });
 });

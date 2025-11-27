@@ -18,7 +18,8 @@ async function main() {
 
     let databaseService: DatabaseService;
     try {
-        databaseService = new DatabaseService();
+        const connection = await DatabaseService.createNewDatabaseConnection();
+        databaseService = new DatabaseService(connection);
     } catch (e: unknown) {
         console.error('Error connecting to the database:', e);
         return;

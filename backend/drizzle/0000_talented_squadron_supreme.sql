@@ -1,6 +1,3 @@
--- Current sql file was generated after introspecting the database
--- If you want to run this migration please uncomment this code before executing migrations
-/*
 CREATE TABLE "migrations" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"timestamp" bigint NOT NULL,
@@ -26,4 +23,3 @@ CREATE TABLE "exercise_wrapper_entity" (
 );
 --> statement-breakpoint
 ALTER TABLE "action_wrapper_entity" ADD CONSTRAINT "FK_180a58767f06b503216ba2b0982" FOREIGN KEY ("exerciseId") REFERENCES "public"."exercise_wrapper_entity"("id") ON DELETE cascade ON UPDATE cascade;
-*/

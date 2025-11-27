@@ -1,12 +1,18 @@
 import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { actionWrapperTable } from 'database/schema.js';
-import type { DatabaseTransaction } from 'database/services/database-service.js';
+import { actionWrapperTable } from '../database/schema.js';
+import type {
+    DatabaseTransaction,
+    DatabaseService,
+} from '../database/services/database-service.js';
 import { NormalType } from '../database/normal-type.js';
-import type { DatabaseService } from '../database/services/database-service.js';
 import type { ExerciseWrapper } from './exercise-wrapper.js';
 
 export class ActionWrapper extends NormalType<typeof actionWrapperTable> {
+    public get isInDatabase() {
+        return this.entity.id !== undefined;
+    }
+
     public override async save(
         database?: DatabaseTransaction | null
     ): Promise<any> {
@@ -35,6 +41,8 @@ export class ActionWrapper extends NormalType<typeof actionWrapperTable> {
             })
             .returning();
 
+        // If we call this function again, we dont want to create a new action
+        // --> save id and update instead
         if (insert.length > 0 && insert[0]?.id !== undefined) {
             this.entity.id = insert[0].id;
         }

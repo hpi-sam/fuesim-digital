@@ -37,10 +37,6 @@ export class FuesimServer {
                         exercise.save(transaction)
                     )
                 );
-
-                exercisesToSave.forEach((exercise) => {
-                    exercise.markAsSaved();
-                });
             }
         );
     };

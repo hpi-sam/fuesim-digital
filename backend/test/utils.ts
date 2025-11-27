@@ -8,12 +8,10 @@ import { sleep, socketIoTransports } from 'digital-fuesim-manv-shared';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import request from 'supertest';
-import type { DataSource } from 'typeorm';
-import { DatabaseService } from '../src/database/services/database-service.js';
 import {
-    createNewDataSource,
+    DatabaseService,
     testingDatabaseName,
-} from '../src/database/data-source.js';
+} from '../src/database/services/database-service.js';
 import { Config } from '../src/config.js';
 import type { HttpMethod } from '../src/exercise/http-handler/secure-http.js';
 import { FuesimServer } from '../src/fuesim-server.js';
@@ -152,46 +150,60 @@ class TestEnvironment {
 export const createTestEnvironment = (): TestEnvironment => {
     Config.initialize(true);
     const environment = new TestEnvironment();
-    let dataSource: DataSource;
+    let databaseService: DatabaseService;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
-        dataSource = await setupDatabase();
-        const databaseService = new DatabaseService(dataSource);
+        databaseService = await setupDatabase();
         environment.init(databaseService);
     });
     afterEach(async () => {
         // Prevent the dataSource from being closed too soon.
         await sleep(200);
         await environment.server.destroy();
-        if (dataSource.isInitialized) {
-            await dataSource.destroy();
-        }
+
+        await databaseService.destroy();
     });
 
     return environment;
 };
 
-async function setupDatabase() {
+async function setupDatabase(): Promise<DatabaseService> {
     if (!Config.useDb) {
-        return createNewDataSource('testing');
+        const memoryConnection =
+            await DatabaseService.createNewDatabaseConnection('testing');
+        await memoryConnection.execute(
+            `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
+        );
+        return new DatabaseService(memoryConnection);
     }
-    const baselineDataSource =
-        await createNewDataSource('baseline').initialize();
+
+    const connection =
+        await DatabaseService.createNewDatabaseConnection('baseline');
+    const baselineDataSource = new DatabaseService(connection);
     // Re-create the test database
-    await baselineDataSource.query(
+    await baselineDataSource.execute(
         `DROP DATABASE IF EXISTS "${testingDatabaseName}"`
     );
-    await baselineDataSource.query(`CREATE DATABASE "${testingDatabaseName}"`);
+    await baselineDataSource.execute(
+        `CREATE DATABASE "${testingDatabaseName}"`
+    );
     await baselineDataSource.destroy();
 
-    const testDataSource = createNewDataSource('testing');
-    await testDataSource.initialize();
+    const testDatabaseConnection =
+        await DatabaseService.createNewDatabaseConnection('testing');
+
+    // Ensure required Postgres extensions are available in the test DB
+    // (e.g. uuid_generate_v4() comes from the "uuid-ossp" extension)
+    const testDatabaseService = new DatabaseService(testDatabaseConnection);
+    await testDatabaseService.execute(
+        `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
+    );
 
     // Apply the migrations on the newly created database
-    await testDataSource.runMigrations({ transaction: 'all' });
+    await DatabaseService.migrate(testDatabaseConnection);
 
-    return testDataSource;
+    return testDatabaseService;
 }
 
 export async function createExercise(

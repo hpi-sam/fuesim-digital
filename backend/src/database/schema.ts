@@ -42,9 +42,7 @@ export const actionWrapperTable = pgTable(
         // You can use { mode: "bigint" } if numbers are exceeding js number limitations
         index: bigint({ mode: 'number' }).notNull(),
         actionString: json().$type<ExerciseAction>().notNull(),
-        exerciseId: uuid()
-            .notNull()
-            .references(() => exerciseWrapperTable.id),
+        exerciseId: uuid().notNull(),
     },
     (table) => [
         foreignKey({

@@ -172,9 +172,6 @@ async function setupDatabase(): Promise<DatabaseService> {
     if (!Config.useDb) {
         const memoryConnection =
             await DatabaseService.createNewDatabaseConnection('testing');
-        await memoryConnection.execute(
-            `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
-        );
         return new DatabaseService(memoryConnection);
     }
 

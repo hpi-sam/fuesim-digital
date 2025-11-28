@@ -4,6 +4,8 @@ import type { AnyPgTable } from 'drizzle-orm/pg-core';
 import { migrate as migratePgLite } from 'drizzle-orm/pglite/migrator';
 import { migrate as migratePostgres } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
+import { PGlite } from '@electric-sql/pglite';
+import { uuid_ossp } from '@electric-sql/pglite/contrib/uuid_ossp';
 import * as schema from '../schema.js';
 import { Config } from '../../config.js';
 
@@ -75,14 +77,26 @@ export class DatabaseService {
             });
         }
 
-        const db = pgliteDrizzle({ schema, logger: Config.dbLogging });
+        const pgLite = new PGlite({
+            extensions: { uuid_ossp },
+        });
+        const db = pgliteDrizzle({
+            client: pgLite,
+            schema,
+            logger: Config.dbLogging,
+        });
+        await db.execute(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
         await this.migrate(db);
         return db;
     }
 
+    public static isInMemoryConnection(db: DatabaseConnection) {
+        return db instanceof PgliteDatabase;
+    }
+
     public static async migrate(db: DatabaseConnection) {
         const migrationsFolder = './drizzle/';
-        if (db instanceof PgliteDatabase) {
+        if (this.isInMemoryConnection(db)) {
             await migratePgLite(db, { migrationsFolder });
         } else {
             await migratePostgres(db, { migrationsFolder });

@@ -1,10 +1,10 @@
-CREATE TABLE "migrations" (
+CREATE TABLE IF NOT EXISTS "migrations" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"timestamp" bigint NOT NULL,
 	"name" varchar NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "action_wrapper_entity" (
+CREATE TABLE IF NOT EXISTS "action_wrapper_entity" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"emitterId" uuid,
 	"index" bigint NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE "action_wrapper_entity" (
 	"exerciseId" uuid NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "exercise_wrapper_entity" (
+CREATE TABLE IF NOT EXISTS "exercise_wrapper_entity" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"tickCounter" integer DEFAULT 0 NOT NULL,
 	"initialStateString" json NOT NULL,
@@ -22,4 +22,14 @@ CREATE TABLE "exercise_wrapper_entity" (
 	"stateVersion" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "action_wrapper_entity" ADD CONSTRAINT "FK_180a58767f06b503216ba2b0982" FOREIGN KEY ("exerciseId") REFERENCES "public"."exercise_wrapper_entity"("id") ON DELETE cascade ON UPDATE cascade;
+--https://stackoverflow.com/questions/6801919/postgres-add-constraint-if-it-doesnt-already-exist
+DO $$
+BEGIN
+  BEGIN
+    ALTER TABLE "action_wrapper_entity" ADD CONSTRAINT "FK_180a58767f06b503216ba2b0982" FOREIGN KEY ("exerciseId") REFERENCES "public"."exercise_wrapper_entity"("id") ON DELETE cascade ON UPDATE cascade;
+  EXCEPTION
+    WHEN duplicate_table THEN  -- postgres raises duplicate_table at surprising times. Ex.: for UNIQUE constraints.
+    WHEN duplicate_object THEN
+      RAISE NOTICE 'Table constraint on action_wrapper_entitiy already exists';
+  END;
+END $$;

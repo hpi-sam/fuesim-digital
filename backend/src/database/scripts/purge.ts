@@ -1,4 +1,4 @@
-import { exerciseWrapperTable } from 'database/schema.js';
+import { exerciseWrapperTable } from './../schema.js';
 import { DatabaseService } from '../services/database-service.js';
 
 const dataSource = await DatabaseService.createNewDatabaseConnection();
@@ -6,16 +6,17 @@ const dataSource = await DatabaseService.createNewDatabaseConnection();
 const databaseService = new DatabaseService(dataSource);
 
 await databaseService.transaction(async (manager) => {
-    const deleteResult = await databaseService.delete(exerciseWrapperTable);
+    if (DatabaseService.isInMemoryConnection(dataSource)) {
+        console.info(
+            'PURGING IN-MEMORY DATABASE! --> Set DFM_USE_DB=true to purge Postgres Database.'
+        );
+    }
+    const deleteResult = await databaseService.delete(exerciseWrapperTable).returning();
 
-    // TODO: @Quixelation
-    console.log(deleteResult);
+    console.log(
+        `Successfully deleted ${deleteResult.length ?? 0} exercises.`
+    );
 
-    /* console.log(
-        `Successfully deleted ${deleteResult.reduce(
-            (currentAffectedCount, currentDeleteResult) =>
-                currentAffectedCount + (currentDeleteResult.affected ?? 0),
-            0
-        )} of ${exercises.length} exercises.`
-    );*/
+    const remaining = await databaseService.select().from(exerciseWrapperTable);
+    console.log(`${remaining.length} exercises remaining in database.`)
 });

@@ -21,8 +21,8 @@ async function main() {
         const connection = await DatabaseService.createNewDatabaseConnection();
         databaseService = new DatabaseService(connection);
     } catch (e: unknown) {
-        console.error('Error connecting to the database:', e);
-        return;
+        console.error('Error connecting to the database:');
+        throw e;
     }
     console.log('Successfully connected to the database.');
     if (Config.useDb) {

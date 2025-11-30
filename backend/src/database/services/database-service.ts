@@ -57,7 +57,7 @@ export class DatabaseService {
         if (Config.useDb) {
             const defaultDatabaseName = `${Config.dbName}`;
             testingDatabaseName = `${Config.dbName}_TESTING`;
-            return postgresDrizzle({
+            const connection =  postgresDrizzle({
                 connection: {
                     host: Config.dbHost,
                     port: Config.dbPort,
@@ -75,6 +75,8 @@ export class DatabaseService {
                 logger: Config.dbLogging,
                 schema,
             });
+            await this.testConnection(connection);
+            return connection;
         }
 
         const pgLite = new PGlite({
@@ -85,9 +87,14 @@ export class DatabaseService {
             schema,
             logger: Config.dbLogging,
         });
+        await this.testConnection(db);
         await db.execute(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
         await this.migrate(db);
         return db;
+    }
+
+    public static async testConnection(connection: DatabaseConnection) {
+        await connection.execute('SELECT 1');
     }
 
     public static isInMemoryConnection(db: DatabaseConnection) {

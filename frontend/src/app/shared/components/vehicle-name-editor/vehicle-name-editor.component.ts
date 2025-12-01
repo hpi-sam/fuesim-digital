@@ -3,9 +3,9 @@ import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
-import { createSelectVehicle } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import type { AppState } from 'src/app/state/app.state';
+import { createSelectVehicle } from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-vehicle-name-editor',

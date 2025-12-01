@@ -10,10 +10,10 @@ import {
 } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { Subject, map, takeUntil } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import { MessageService } from 'src/app/core/messages/message.service.js';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component.js';
-import type { AppState } from 'src/app/state/app.state.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import { MessageService } from 'src/app/core/messages/message.service';
+import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { AppState } from 'src/app/state/app.state';
 import {
     createSelectAlarmGroup,
     selectAlarmGroups,
@@ -21,13 +21,13 @@ import {
     selectPersonnelTemplates,
     selectTransferPoints,
     selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors.js';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { NgModel } from '@angular/forms';
-import type { HotkeyLayer } from '../../services/hotkeys.service.js';
-import { Hotkey, HotkeysService } from '../../services/hotkeys.service.js';
+import type { HotkeyLayer } from '../../services/hotkeys.service';
+import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
 
 // We want to remember this
 let selectedAlarmGroup: SearchableDropdownOption | null = null;

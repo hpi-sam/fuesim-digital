@@ -9,12 +9,12 @@ import type {
 import { Patient } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state.js';
+import type { AppState } from 'src/app/state/app.state';
 import {
     createSelectPatient,
     selectConfiguration,
     selectPersonnel,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector:

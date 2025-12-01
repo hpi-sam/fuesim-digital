@@ -4,14 +4,14 @@ import {
     currentCoordinatesOf,
 } from 'digital-fuesim-manv-shared';
 import { Feature } from 'ol';
-import { Point } from 'ol/geom.js';
+import { Point } from 'ol/geom';
 import type {
     CoordinatePair,
     Coordinates,
     GeometryHelper,
     Positions,
-} from './geometry-helper.js';
-import { interpolate } from './geometry-helper.js';
+} from './geometry-helper';
+import { interpolate } from './geometry-helper';
 
 export class PointGeometryHelper implements GeometryHelper<Point> {
     create = (element: WithPosition): Feature<Point> =>

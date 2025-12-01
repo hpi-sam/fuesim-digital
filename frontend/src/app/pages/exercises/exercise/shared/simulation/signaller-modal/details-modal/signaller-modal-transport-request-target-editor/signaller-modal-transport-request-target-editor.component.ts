@@ -5,20 +5,20 @@ import type {
     UUID,
 } from 'digital-fuesim-manv-shared';
 import { Observable, map, combineLatest, tap } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import { MessageService } from 'src/app/core/messages/message.service.js';
-import { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import { MessageService } from 'src/app/core/messages/message.service';
+import { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
 import {
     HotkeyLayer,
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service.js';
-import { AppState } from 'src/app/state/app.state.js';
+} from 'src/app/shared/services/hotkeys.service';
+import { AppState } from 'src/app/state/app.state';
 import {
     selectSimulatedRegions,
     createSelectBehaviorState,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 
 @Component({
     selector: 'app-signaller-modal-transport-request-target-editor',

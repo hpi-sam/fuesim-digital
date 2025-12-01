@@ -2,7 +2,7 @@ import type { OnDestroy } from '@angular/core';
 import { Directive, EventEmitter, Output } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { Subject, debounceTime, filter, takeUntil, tap } from 'rxjs';
-import { isBeingTestedByCypress } from '../functions/cypress.js';
+import { isBeingTestedByCypress } from '../functions/cypress';
 
 /**
  * This directive should be used when values should be autosaved while the user types into the input.

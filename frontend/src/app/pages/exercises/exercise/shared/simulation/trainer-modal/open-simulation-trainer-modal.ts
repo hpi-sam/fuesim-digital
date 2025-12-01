@@ -1,6 +1,6 @@
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import type { UUID } from 'digital-fuesim-manv-shared';
-import { SimulatedRegionsModalComponent } from './simulated-regions-modal/simulated-regions-modal.component.js';
+import { SimulatedRegionsModalComponent } from './simulated-regions-modal/simulated-regions-modal.component';
 
 export function openSimulationTrainerModal(
     ngbModalService: NgbModal,

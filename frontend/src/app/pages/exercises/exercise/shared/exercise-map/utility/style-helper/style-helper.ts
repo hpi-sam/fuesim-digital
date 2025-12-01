@@ -1,5 +1,5 @@
 import type { Feature } from 'ol';
-import type { StyleLike } from 'ol/style/Style.js';
+import type { StyleLike } from 'ol/style/Style';
 
 /**
  * Trivial implementations generate a new style for each object at every render.

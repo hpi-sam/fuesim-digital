@@ -1,7 +1,7 @@
 import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component.js';
-import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service.js';
+import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component';
+import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
 
 @Component({
     selector: 'app-signaller-modal-eoc',

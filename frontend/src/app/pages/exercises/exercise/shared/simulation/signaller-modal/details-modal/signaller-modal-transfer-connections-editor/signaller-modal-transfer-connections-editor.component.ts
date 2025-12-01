@@ -5,20 +5,20 @@ import type { UUID } from 'digital-fuesim-manv-shared';
 import { TransferPoint } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component.js';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
+} from 'src/app/shared/services/hotkeys.service';
+import type { AppState } from 'src/app/state/app.state';
 import {
     createSelectTransferPoint,
     selectTransferPoints,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { MessageService } from 'src/app/core/messages/message.service.js';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { MessageService } from 'src/app/core/messages/message.service';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 
 @Component({
     selector: 'app-signaller-modal-transfer-connections-editor',

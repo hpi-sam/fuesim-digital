@@ -3,6 +3,8 @@
     "extends": "../tsconfig.base.json",
     "compileOnSave": false,
     "compilerOptions": {
+        "module": "preserve",
+        "moduleResolution": "bundler",
         "esModuleInterop": true,
         "baseUrl": "./",
         "outDir": "./dist/out-tsc",

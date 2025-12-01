@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { uuid } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
 import type {
     ChangedImageTemplateValues,
     EditableImageTemplateValues,
-} from '../image-template-form/image-template-form.component.js';
+} from '../image-template-form/image-template-form.component';
 
 @Component({
     selector: 'app-create-image-template-modal',

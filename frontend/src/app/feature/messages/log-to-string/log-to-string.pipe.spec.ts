@@ -1,4 +1,4 @@
-import { logToStringPipeTransform } from './log-to-string-pipe-transform.js';
+import { logToStringPipeTransform } from './log-to-string-pipe-transform';
 
 describe('LogToStringPipe', () => {
     it('converts strings correctly', () => {

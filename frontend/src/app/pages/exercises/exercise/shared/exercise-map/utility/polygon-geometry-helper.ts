@@ -3,15 +3,15 @@ import {
     MapCoordinates,
 } from 'digital-fuesim-manv-shared';
 import { Feature } from 'ol';
-import { Polygon } from 'ol/geom.js';
+import { Polygon } from 'ol/geom';
 import type {
     CoordinatePair,
     Coordinates,
     GeometryHelper,
     Positions,
     ResizableElement,
-} from './geometry-helper.js';
-import { interpolate } from './geometry-helper.js';
+} from './geometry-helper';
+import { interpolate } from './geometry-helper';
 
 export class PolygonGeometryHelper
     implements GeometryHelper<Polygon, ResizableElement>

@@ -5,14 +5,14 @@ import type { SimulatedRegion, UUID } from 'digital-fuesim-manv-shared';
 import { isInSpecificSimulatedRegion } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state.js';
+import type { AppState } from 'src/app/state/app.state';
 import {
     selectTransferPoints,
     createSelectSimulatedRegion,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { SelectPatientService } from '../select-patient.service.js';
-import type { TransferOptions } from '../start-transfer.service.js';
-import { StartTransferService } from '../start-transfer.service.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { SelectPatientService } from '../select-patient.service';
+import type { TransferOptions } from '../start-transfer.service';
+import { StartTransferService } from '../start-transfer.service';
 
 type NavIds =
     | 'behaviors'

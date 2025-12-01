@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import type { Personnel } from 'digital-fuesim-manv-shared';
 import { AssignLeaderBehaviorState } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state.js';
-import { createSelectPersonnel } from 'src/app/state/application/selectors/exercise.selectors.js';
+import type { AppState } from 'src/app/state/app.state';
+import { createSelectPersonnel } from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-assign-leader',

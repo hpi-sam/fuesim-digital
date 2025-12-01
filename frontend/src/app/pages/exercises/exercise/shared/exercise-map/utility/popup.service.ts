@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import type { OpenPopupOptions } from './popup-manager.js';
+import type { OpenPopupOptions } from './popup-manager';
 
 @Injectable({
     providedIn: 'root',

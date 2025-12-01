@@ -1,24 +1,24 @@
-import type VectorLayer from 'ol/layer/Vector.js';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors.js';
-import type { Interaction } from 'ol/interaction.js';
-import { defaults as defaultInteractions } from 'ol/interaction.js';
+import type VectorLayer from 'ol/layer/Vector';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
+import type { Interaction } from 'ol/interaction';
+import { defaults as defaultInteractions } from 'ol/interaction';
 import type { Subject } from 'rxjs';
 import { combineLatest, takeUntil } from 'rxjs';
-import { selectExerciseStatus } from 'src/app/state/application/selectors/exercise.selectors.js';
+import { selectExerciseStatus } from 'src/app/state/application/selectors/exercise.selectors';
 import type { Feature } from 'ol';
 import { Collection } from 'ol';
-import type OlMap from 'ol/Map.js';
-import type { AppState } from 'src/app/state/app.state.js';
+import type OlMap from 'ol/Map';
+import type { AppState } from 'src/app/state/app.state';
 import type { Store } from '@ngrx/store';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { ExerciseStatus, Role, UUID } from 'digital-fuesim-manv-shared';
-import type { TranslateEvent } from 'ol/interaction/Translate.js';
-import type { Pixel } from 'ol/pixel.js';
-import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors.js';
-import { featureElementKey } from '../feature-managers/element-manager.js';
-import { TranslateInteraction } from './translate-interaction.js';
-import type { PopupManager } from './popup-manager.js';
-import type { FeatureManager } from './feature-manager.js';
+import type { TranslateEvent } from 'ol/interaction/Translate';
+import type { Pixel } from 'ol/pixel';
+import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
+import { featureElementKey } from '../feature-managers/element-manager';
+import { TranslateInteraction } from './translate-interaction';
+import type { PopupManager } from './popup-manager';
+import type { FeatureManager } from './feature-manager';
 
 export class OlMapInteractionsManager {
     private readonly featureLayers: VectorLayer[] = [];
@@ -148,16 +148,11 @@ export class OlMapInteractionsManager {
     }
 
     private registerDropHandler() {
-        this.translateInteraction.on(
-            'translateend',
-            (event: TranslateEvent) => {
-                const pixel = this.olMap.getPixelFromCoordinate(
-                    event.coordinate
-                );
-                const droppedFeature: Feature = event.features.getArray()[0]!;
-                this.handleTranslateEnd(pixel, droppedFeature, event);
-            }
-        );
+        this.translateInteraction.on('translateend', (event) => {
+            const pixel = this.olMap.getPixelFromCoordinate(event.coordinate);
+            const droppedFeature: Feature = event.features.getArray()[0]!;
+            this.handleTranslateEnd(pixel, droppedFeature, event);
+        });
     }
 
     private handleTranslateEnd(

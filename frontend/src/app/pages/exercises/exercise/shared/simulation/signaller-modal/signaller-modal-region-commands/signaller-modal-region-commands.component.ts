@@ -6,14 +6,14 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import { isInSpecificSimulatedRegion } from 'digital-fuesim-manv-shared';
 import { Store, createSelector } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state.js';
+import type { AppState } from 'src/app/state/app.state';
 import { map, type Observable } from 'rxjs';
 import {
     createSelectBehaviorStatesByType,
     selectTransferPoints,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
-import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service.js';
-import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
+import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 
 @Component({
     selector: 'app-signaller-modal-region-commands',

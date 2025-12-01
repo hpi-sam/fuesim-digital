@@ -4,11 +4,11 @@ import type {
     RouterStateSnapshot,
 } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { ApplicationService } from 'src/app/core/application.service.js';
-import { MessageService } from 'src/app/core/messages/message.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
-import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors.js';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot.js';
+import { ApplicationService } from 'src/app/core/application.service';
+import { MessageService } from 'src/app/core/messages/message.service';
+import type { AppState } from 'src/app/state/app.state';
+import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 
 @Injectable({
     providedIn: 'root',

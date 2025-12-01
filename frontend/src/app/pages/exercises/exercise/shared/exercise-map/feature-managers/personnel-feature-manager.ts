@@ -2,22 +2,22 @@ import type { Store } from '@ngrx/store';
 import type { Personnel, UUID } from 'digital-fuesim-manv-shared';
 import { normalZoom } from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
-import type OlMap from 'ol/Map.js';
+import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
-import { selectVisiblePersonnel } from 'src/app/state/application/selectors/shared.selectors.js';
-import Fill from 'ol/style/Fill.js';
-import Stroke from 'ol/style/Stroke.js';
-import { PersonnelPopupComponent } from '../shared/personnel-popup/personnel-popup.component.js';
-import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager.js';
-import { PointGeometryHelper } from '../utility/point-geometry-helper.js';
-import { ImagePopupHelper } from '../utility/popup-helper.js';
-import { ImageStyleHelper } from '../utility/style-helper/image-style-helper.js';
-import { NameStyleHelper } from '../utility/style-helper/name-style-helper.js';
-import type { PopupService } from '../utility/popup.service.js';
-import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper.js';
-import { MoveableFeatureManager } from './moveable-feature-manager.js';
+import type { ExerciseService } from 'src/app/core/exercise.service';
+import type { AppState } from 'src/app/state/app.state';
+import { selectVisiblePersonnel } from 'src/app/state/application/selectors/shared.selectors';
+import Fill from 'ol/style/Fill';
+import Stroke from 'ol/style/Stroke';
+import { PersonnelPopupComponent } from '../shared/personnel-popup/personnel-popup.component';
+import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
+import { PointGeometryHelper } from '../utility/point-geometry-helper';
+import { ImagePopupHelper } from '../utility/popup-helper';
+import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
+import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
+import type { PopupService } from '../utility/popup.service';
+import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
+import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
     public register(

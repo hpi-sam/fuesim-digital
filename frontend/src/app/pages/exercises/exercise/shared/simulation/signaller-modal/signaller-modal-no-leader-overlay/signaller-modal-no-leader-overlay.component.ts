@@ -1,10 +1,10 @@
 import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, EventEmitter, Output } from '@angular/core';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service.js';
+} from 'src/app/shared/services/hotkeys.service';
 
 @Component({
     selector: 'app-signaller-modal-no-leader-overlay',

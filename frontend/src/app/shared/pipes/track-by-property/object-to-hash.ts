@@ -1,5 +1,5 @@
 import { stringCompare } from 'digital-fuesim-manv-shared';
-import { hashString } from './hash-string.js';
+import { hashString } from './hash-string';
 
 /**
  * @returns a deterministic string representation of all objects, that are deepEqual (by value) to each other

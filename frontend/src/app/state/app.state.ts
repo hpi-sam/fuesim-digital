@@ -1,4 +1,4 @@
-import type { ApplicationState } from './application/application.state.js';
+import type { ApplicationState } from './application/application.state';
 
 export interface AppState {
     readonly application: ApplicationState;

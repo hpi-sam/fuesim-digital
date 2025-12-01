@@ -1,7 +1,7 @@
 import { Directive } from '@angular/core';
 import type { AbstractControl, Validator } from '@angular/forms';
 import { NG_VALIDATORS } from '@angular/forms';
-import { CustomValidators } from './custom-validators.js';
+import { CustomValidators } from './custom-validators';
 
 @Directive({
     selector: '[appGeographicCoordinateValidator]',

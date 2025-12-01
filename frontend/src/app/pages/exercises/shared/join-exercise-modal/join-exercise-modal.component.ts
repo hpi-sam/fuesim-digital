@@ -2,7 +2,7 @@ import type { OnDestroy } from '@angular/core';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
-import { ApplicationService } from 'src/app/core/application.service.js';
+import { ApplicationService } from 'src/app/core/application.service';
 
 @Component({
     selector: 'app-join-exercise-modal',

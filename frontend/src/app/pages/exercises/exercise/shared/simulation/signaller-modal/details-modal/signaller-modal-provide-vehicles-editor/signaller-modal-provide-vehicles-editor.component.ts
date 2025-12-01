@@ -7,25 +7,25 @@ import {
     isInSpecificSimulatedRegion,
     isUnoccupiedImmutable,
 } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service.js';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service.js';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service.js';
-import type { AppState } from 'src/app/state/app.state.js';
+} from 'src/app/shared/services/hotkeys.service';
+import type { AppState } from 'src/app/state/app.state';
 import { combineLatest, map, tap, type Observable } from 'rxjs';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component.js';
+import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
 import {
     selectCurrentTime,
     selectTransferPoints,
     selectVehicleTemplates,
     selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors.js';
+} from 'src/app/state/application/selectors/exercise.selectors';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { MessageService } from 'src/app/core/messages/message.service.js';
+import { MessageService } from 'src/app/core/messages/message.service';
 import { groupBy } from 'lodash-es';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service.js';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 
 @Component({
     selector: 'app-signaller-modal-provide-vehicles-editor',

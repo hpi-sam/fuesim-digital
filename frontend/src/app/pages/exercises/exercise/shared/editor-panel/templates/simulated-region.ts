@@ -20,6 +20,7 @@ import {
     RequestBehaviorState,
     TreatPatientsBehaviorState,
     UnloadArrivingVehiclesBehaviorState,
+    StrictObject,
 } from 'digital-fuesim-manv-shared';
 
 export interface SimulatedRegionDragTemplate {
@@ -144,7 +145,7 @@ function reconstituteBehavior(
     behavior.id = uuid();
     switch (behavior.type) {
         case 'providePersonnelBehavior':
-            behavior.vehicleTemplatePriorities = Object.values(
+            behavior.vehicleTemplatePriorities = StrictObject.values(
                 state.vehicleTemplates
             ).map((template) => template.id);
             break;

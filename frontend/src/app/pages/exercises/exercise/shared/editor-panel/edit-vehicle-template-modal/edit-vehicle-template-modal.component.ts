@@ -48,20 +48,26 @@ export class EditVehicleTemplateModalComponent implements OnInit {
                 this.store
             )
         );
+
+        const materialTemplates = selectStateSnapshot(
+            selectMaterialTemplates,
+            this.store
+        );
         this.materialTemplates = cloneDeepMutable(
-            Object.values(
-                selectStateSnapshot(selectMaterialTemplates, this.store)
-            ).filter((template) =>
-                this.vehicleTemplate!.materialTemplateIds.includes(template.id)
+            this.vehicleTemplate.materialTemplateIds.map(
+                (templateId) => materialTemplates[templateId]
             )
+        ).filter((template) => template !== undefined);
+
+        const personnelTemplates = selectStateSnapshot(
+            selectPersonnelTemplates,
+            this.store
         );
         this.personnelTemplates = cloneDeepMutable(
-            Object.values(
-                selectStateSnapshot(selectPersonnelTemplates, this.store)
-            ).filter((template) =>
-                this.vehicleTemplate!.personnelTemplateIds.includes(template.id)
+            this.vehicleTemplate.personnelTemplateIds.map(
+                (templateId) => personnelTemplates[templateId]
             )
-        );
+        ).filter((template) => template !== undefined);
     }
 
     public async deleteVehicleTemplate(): Promise<void> {

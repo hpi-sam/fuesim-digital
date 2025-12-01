@@ -158,8 +158,11 @@ function personnelInVehicleTemplate(
     ).personnelCounts;
     const template = draftState.vehicleTemplates[templateId];
     if (template) {
-        template.personnelTemplateIds.forEach((pt) => {
-            resource[pt]!++;
+        template.personnelTemplateIds.forEach((personnelTemplateId) => {
+            const personnelTemplate =
+                draftState.personnelTemplates[personnelTemplateId];
+            if (!personnelTemplate) return;
+            resource[personnelTemplate.personnelType]!++;
         });
     }
     return { vehicleType: template?.vehicleType, vehiclePersonnel: resource };

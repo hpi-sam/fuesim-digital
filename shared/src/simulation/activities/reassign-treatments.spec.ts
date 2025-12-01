@@ -4,7 +4,7 @@ import {
     SimulatedRegion,
     TransferPoint,
 } from '../../models/index.js';
-import type { PatientStatus, PersonnelType } from '../../models/utils/index.js';
+import type { PatientStatus } from '../../models/utils/index.js';
 import {
     CanCaterFor,
     MapCoordinates,
@@ -672,6 +672,8 @@ describe('reassign treatment', () => {
             );
 
             expect(terminate).toHaveBeenCalled();
+
+            console.log(simulatedRegion?.inEvents);
 
             const event = simulatedRegion?.inEvents.find(
                 (element) => element.type === 'treatmentProgressChangedEvent'
@@ -1357,7 +1359,7 @@ describe('reassign treatment', () => {
                 readonly count: number;
             }[],
             personnel: readonly {
-                readonly type: PersonnelType;
+                readonly type: keyof typeof defaultPersonnelTemplates;
                 readonly count: number;
             }[]
         ) {

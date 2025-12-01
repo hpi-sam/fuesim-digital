@@ -304,6 +304,10 @@ const personnelPriorities: { [key in string]: number } = {
     notarzt: 4,
 };
 
+const emptyPersonnelCounts = Object.fromEntries(
+    Object.keys(personnelPriorities).map((personnelType) => [personnelType, 0])
+);
+
 // Estimation for required personnel based on the 7/2/1 rule.
 const estimatedSkDistribution = { green: 7 / 10, yellow: 2 / 10, red: 1 / 10 };
 
@@ -429,7 +433,7 @@ function triage(
     const cateringPersonnel = createCateringPersonnel(personnel).sort(
         (a, b) => a.priority - b.priority
     );
-    const emptyPersonnelCount = PersonnelResource.create().personnelCounts;
+    const emptyPersonnelCount = { ...emptyPersonnelCounts };
     const triagePersonnelSubstitution: PersonnelSubstitution[] = [];
 
     patients.forEach((patient) => {
@@ -903,8 +907,7 @@ function calculateMissingPersonnel(
         (['red', 'yellow', 'green'] as const).map((patientStatus) => {
             const patients = groupedPatients[patientStatus] ?? [];
 
-            let statusMissingPersonnel =
-                PersonnelResource.create().personnelCounts;
+            let statusMissingPersonnel = { ...emptyPersonnelCounts };
             patients.forEach((patient) => {
                 const patientMissingPersonnel = cloneDeepMutable(
                     minimumRequiredPersonnel[patientStatus]

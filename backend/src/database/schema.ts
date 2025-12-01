@@ -55,13 +55,6 @@ export const actionWrapperTable = pgTable(
     ]
 );
 
-export const migrations = pgTable('migrations', {
-    id: serial().primaryKey().notNull(),
-    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-    timestamp: bigint({ mode: 'number' }).notNull(),
-    name: varchar().notNull(),
-});
-
 export const actionWrapperEntityRelations = relations(
     actionWrapperTable,
     ({ one }) => ({

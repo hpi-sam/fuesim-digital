@@ -71,9 +71,9 @@ export class ExerciseWrapper extends NormalType<typeof exerciseWrapperTable> {
 
     private async saveActions(database?: DatabaseTransaction | null) {
         const entities = await Promise.all(
-            this.temporaryActionHistory.slice(0, this.numberOfActionsToBeSaved).map(async (action) =>
-                action.save(database)
-            )
+            this.temporaryActionHistory
+                .slice(0, this.numberOfActionsToBeSaved)
+                .map(async (action) => action.save(database))
         );
         return entities;
     }
@@ -328,7 +328,8 @@ export class ExerciseWrapper extends NormalType<typeof exerciseWrapperTable> {
             } catch (e: unknown) {
                 if (e instanceof ReducerError) {
                     throw new RestoreError(
-                        `A reducer error occurred while restoring (Action ${actionWrapper.entity.index
+                        `A reducer error occurred while restoring (Action ${
+                            actionWrapper.entity.index
                         }: \`${JSON.stringify(actionWrapper.entity.actionString)}\`)`,
                         this.entity.id ?? 'unknown id',
                         e
@@ -621,9 +622,9 @@ export class ExerciseWrapper extends NormalType<typeof exerciseWrapperTable> {
         const completeHistory = [
             ...(this.entity.id !== undefined && Config.useDb
                 ? await this.databaseService
-                    .select()
-                    .from(actionWrapperTable)
-                    .where(eq(actionWrapperTable.exerciseId, this.entity.id))
+                      .select()
+                      .from(actionWrapperTable)
+                      .where(eq(actionWrapperTable.exerciseId, this.entity.id))
                 : []
             ).map((action) =>
                 ActionWrapper.createFromDatabase(

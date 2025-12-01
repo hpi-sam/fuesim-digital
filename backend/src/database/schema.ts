@@ -8,8 +8,6 @@ import {
     json,
     bigint,
     foreignKey,
-    serial,
-    varchar,
 } from 'drizzle-orm/pg-core';
 
 export class BaseEntity {

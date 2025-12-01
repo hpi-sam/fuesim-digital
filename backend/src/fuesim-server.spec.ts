@@ -1,7 +1,6 @@
-import { jest } from "@jest/globals";
+import { jest } from '@jest/globals';
 import { uuid } from 'digital-fuesim-manv-shared';
 import { createExercise, createTestEnvironment } from '../test/utils.js';
-import { Config } from './config.js';
 import { exerciseMap } from './exercise/exercise-map.js';
 import { ExerciseWrapper } from './exercise/exercise-wrapper.js';
 
@@ -18,11 +17,16 @@ describe('Exercise saving', () => {
     it('does not throw away actions while saving', async () => {
         const exercideIds = await createExercise(environment);
         const exercise = exerciseMap.get(exercideIds.trainerId)!;
-        const markAsAboutToBeSaved = exercise.markAsAboutToBeSaved.bind(exercise);
+        const markAsAboutToBeSaved =
+            exercise.markAsAboutToBeSaved.bind(exercise);
 
         // remove implementation to prevent calling this again
         // simulates adding action after calling "markAsAboutToBeSaved", see above
-        const markAsAboutToBeSavedMock = jest.spyOn(ExerciseWrapper.prototype, "markAsAboutToBeSaved").mockImplementation(async () => { })
+        const markAsAboutToBeSavedMock = jest
+            .spyOn(ExerciseWrapper.prototype, 'markAsAboutToBeSaved')
+            .mockImplementation(() => {
+                /* empty */
+            });
 
         markAsAboutToBeSaved();
         exercise.applyAction(
@@ -48,7 +52,7 @@ describe('Exercise saving', () => {
         expect(exercise.temporaryActionHistory.length).toBe(1);
 
         markAsAboutToBeSaved();
-        await saveTick()
+        await saveTick();
         expect(markAsAboutToBeSavedMock).toHaveBeenCalledTimes(2);
         expect(exercise.temporaryActionHistory.length).toBe(0);
     });

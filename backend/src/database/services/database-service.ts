@@ -57,7 +57,7 @@ export class DatabaseService {
         if (Config.useDb) {
             const defaultDatabaseName = `${Config.dbName}`;
             testingDatabaseName = `${Config.dbName}_TESTING`;
-            const connection =  postgresDrizzle({
+            const connection = postgresDrizzle({
                 connection: {
                     host: Config.dbHost,
                     port: Config.dbPort,

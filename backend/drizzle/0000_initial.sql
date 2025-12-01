@@ -1,3 +1,6 @@
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "migrations" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"timestamp" bigint NOT NULL,

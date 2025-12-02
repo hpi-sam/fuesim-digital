@@ -70,12 +70,8 @@
         "@istanbuljs/load-nyc-config": {
             "js-yaml": "^4.1.1"
         },
-        "drizzle-kit": {
-            "@esbuild-kit/esm-loader": {
-                "@esbuild-kit/core-utils": {
-                    "esbuild": "0.27.0"
-                }
-            }
+        "@esbuild-kit/core-utils": {
+            "esbuild": "0.27.0"
         }
     }
 }

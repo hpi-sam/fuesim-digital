@@ -50,7 +50,7 @@ interface MapImageTemplate {
     image: ImageProperties;
 }
 interface MapImage {
-    id?: UUID;
+    templateId?: UUID;
     image: ImageProperties;
 }
 
@@ -140,7 +140,7 @@ function migrateMapImage(
     mapImage: MapImage,
     mapImageTemplateIds: { [key in string]: UUID }
 ) {
-    mapImage.id = mapImageTemplateIds[mapImage.image.url];
+    mapImage.templateId = mapImageTemplateIds[mapImage.image.url];
 }
 
 function migrateVehicle(

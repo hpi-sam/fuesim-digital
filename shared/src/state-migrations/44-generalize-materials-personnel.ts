@@ -165,7 +165,7 @@ function migratePersonnel(personnel: Personnel) {
         personnelTypeAbbreviations[personnel.personnelType];
 }
 
-export const generalizeMaterialsPersonnel43: Migration = {
+export const generalizeMaterialsPersonnel44: Migration = {
     action: (state, action) => {
         const actionType = (action as { type: string }).type;
         const typedState = state as {

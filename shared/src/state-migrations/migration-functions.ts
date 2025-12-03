@@ -40,7 +40,7 @@ import { impossibleMigration } from './impossible-migration.js';
 import { addPatientTransportPriority41 } from './41-add-patient-transport-prio.js';
 import { replaceClientRoles42 } from './42-replace-clientroles.js';
 import { addEmergencyOperationsCenterViewport43 } from './43-add-eoc-viewport.js';
-import { generalizeMaterialsPersonnel43 } from './43-generalize-materials-personnel.js';
+import { generalizeMaterialsPersonnel44 } from './44-generalize-materials-personnel.js';
 
 /**
  * Migrate a single action
@@ -110,5 +110,5 @@ export const migrations: {
     41: addPatientTransportPriority41,
     42: replaceClientRoles42,
     43: addEmergencyOperationsCenterViewport43,
-    43: generalizeMaterialsPersonnel43,
+    44: generalizeMaterialsPersonnel44,
 };

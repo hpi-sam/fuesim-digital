@@ -12,8 +12,9 @@ interface VehicleParameters {
     personnel?: Personnel[];
 }
 
-type ImagePropertiesStub = unknown;
-
+interface ImageProperties {
+    url: string;
+}
 type Position = MapPosition | VehiclePosition;
 
 interface MapPosition {
@@ -38,13 +39,24 @@ interface CanCaterFor {
 
 type MaterialType = 'big' | 'standard';
 
-interface MaterialTemplate {
+interface MaterialTemplateIntermediary {
+    id?: UUID;
     type: 'materialTemplate';
     materialType: MaterialType;
     canCaterFor: CanCaterFor;
     overrideTreatmentRange: number;
     treatmentRange: number;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
+}
+
+interface MaterialTemplate {
+    id?: UUID;
+    type: 'materialTemplate';
+    materialType: MaterialType;
+    canCaterFor: CanCaterFor;
+    overrideTreatmentRange: number;
+    treatmentRange: number;
+    image: ImageProperties;
 }
 
 interface Material {
@@ -57,10 +69,20 @@ interface Material {
     overrideTreatmentRange: number;
     treatmentRange: number;
     position: Position;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
 }
 
 type PersonnelType = 'gf' | 'notarzt' | 'notSan' | 'rettSan' | 'san';
+
+interface PersonnelTemplateIntermediary {
+    id?: UUID;
+    type: 'personnelTemplate';
+    personnelType: PersonnelType;
+    canCaterFor: CanCaterFor;
+    overrideTreatmentRange: number;
+    treatmentRange: number;
+    image: ImageProperties;
+}
 
 interface PersonnelTemplate {
     type: 'personnelTemplate';
@@ -68,7 +90,7 @@ interface PersonnelTemplate {
     canCaterFor: CanCaterFor;
     overrideTreatmentRange: number;
     treatmentRange: number;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
 }
 
 interface Personnel {
@@ -81,19 +103,19 @@ interface Personnel {
     canCaterFor: CanCaterFor;
     overrideTreatmentRange: number;
     treatmentRange: number;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
     position: Position;
 }
 
-interface VehicleTemplate {
+interface VehicleTemplateIntermediary {
     id: UUID;
     type: 'vehicleTemplate';
     vehicleType: string;
     name: string;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
     patientCapacity: number;
-    personnel: PersonnelType[];
-    materials: MaterialType[];
+    personnelTemplateIds: UUID[];
+    materialTemplateIds: UUID[];
 }
 
 interface Vehicle {
@@ -104,7 +126,7 @@ interface Vehicle {
     materialIds: UUIDSet;
     patientCapacity: number;
     position: Position;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
     personnelIds: UUIDSet;
     patientIds: UUIDSet;
     occupation: { type: 'noOccupation' };
@@ -153,29 +175,31 @@ function createPersonnel(
 
 function createVehicleParameters(
     vehicleId: UUID,
-    vehicleTemplate: VehicleTemplate,
+    vehicleTemplate: VehicleTemplateIntermediary,
     materialTemplates: {
-        [Key in MaterialType]: MaterialTemplate;
+        [Key in UUID]: MaterialTemplate;
     },
     personnelTemplates: {
-        [Key in PersonnelType]: PersonnelTemplate;
+        [Key in UUID]: PersonnelTemplate;
     }
 ): VehicleParameters {
-    const materials = vehicleTemplate.materials.map((currentMaterial) =>
-        createMaterial(
-            materialTemplates[currentMaterial],
-            vehicleId,
-            vehicleTemplate.name,
-            { type: 'vehicle', vehicleId }
-        )
+    const materials = vehicleTemplate.materialTemplateIds.map(
+        (materialTemplateId) =>
+            createMaterial(
+                materialTemplates[materialTemplateId]!,
+                vehicleId,
+                vehicleTemplate.name,
+                { type: 'vehicle', vehicleId }
+            )
     );
-    const personnel = vehicleTemplate.personnel.map((currentPersonnel) =>
-        createPersonnel(
-            personnelTemplates[currentPersonnel],
-            vehicleId,
-            vehicleTemplate.name,
-            { type: 'vehicle', vehicleId }
-        )
+    const personnel = vehicleTemplate.personnelTemplateIds.map(
+        (personnelTemplateId) =>
+            createPersonnel(
+                personnelTemplates[personnelTemplateId]!,
+                vehicleId,
+                vehicleTemplate.name,
+                { type: 'vehicle', vehicleId }
+            )
     );
 
     const vehicle: Vehicle = {
@@ -224,12 +248,14 @@ export const deterministicAlarmGroups38: Migration = {
                 };
                 const typedState = intermediaryState as {
                     materialTemplates: {
-                        [Key in MaterialType]: MaterialTemplate;
+                        [Key in UUID]: MaterialTemplateIntermediary;
                     };
                     personnelTemplates: {
-                        [Key in PersonnelType]: PersonnelTemplate;
+                        [Key in UUID]: PersonnelTemplateIntermediary;
                     };
-                    vehicleTemplates: VehicleTemplate[];
+                    vehicleTemplates: {
+                        [Key in UUID]: VehicleTemplateIntermediary;
+                    };
                 };
 
                 const alarmGroup = getElement(
@@ -249,11 +275,45 @@ export const deterministicAlarmGroups38: Migration = {
                     }
                 );
 
-                const vehicleTemplatesById = Object.fromEntries(
-                    typedState.vehicleTemplates.map((template) => [
-                        template.id,
-                        template,
-                    ])
+                // Build personnel templates and material templates from current state as state version 38
+                const personnelTemplates = Object.fromEntries(
+                    Object.values(typedState.personnelTemplates).map(
+                        (template) => [
+                            template.id,
+                            {
+                                personnelType: template.personnelType,
+                                type: template.type,
+                                canCaterFor: template.canCaterFor,
+                                overrideTreatmentRange:
+                                    template.overrideTreatmentRange,
+                                treatmentRange: template.treatmentRange,
+                                image: template.image,
+                            } satisfies PersonnelTemplate,
+                        ]
+                    )
+                );
+
+                const materialTemplates = Object.fromEntries(
+                    Object.values(typedState.materialTemplates).map(
+                        (template) => {
+                            const materialType: MaterialType =
+                                template.image.url === '/assets/material.svg'
+                                    ? 'standard'
+                                    : 'big';
+                            return [
+                                template.id,
+                                {
+                                    materialType,
+                                    type: template.type,
+                                    canCaterFor: template.canCaterFor,
+                                    overrideTreatmentRange:
+                                        template.overrideTreatmentRange,
+                                    treatmentRange: template.treatmentRange,
+                                    image: template.image,
+                                } satisfies MaterialTemplate,
+                            ];
+                        }
+                    )
                 );
 
                 // We're trying to restore the original vehicle IDs that were generated with `nextUUID`.
@@ -282,13 +342,13 @@ export const deterministicAlarmGroups38: Migration = {
                         createVehicleParameters(
                             vehicleIds[alarmGroupVehicle.id]!,
                             {
-                                ...vehicleTemplatesById[
+                                ...typedState.vehicleTemplates[
                                     alarmGroupVehicle.vehicleTemplateId
                                 ]!,
                                 name: alarmGroupVehicle.name,
                             },
-                            typedState.materialTemplates,
-                            typedState.personnelTemplates
+                            materialTemplates,
+                            personnelTemplates
                         )
                 );
 

@@ -5,17 +5,22 @@ import type { Mutable, UUID } from '../utils/index.js';
 import { cloneDeepMutable } from '../utils/index.js';
 import {
     PartialExport,
-    StateExport,
+    CompleteExport,
 } from '../export-import/file-format/index.js';
 import type { MapImageTemplate, VehicleTemplate } from '../models/index.js';
 import type { PatientCategory } from '../models/patient-category.js';
 import type { Migration } from './migration-functions.js';
 import { migrations } from './migration-functions.js';
 
-export function migrateStateExport(
-    stateExportToMigrate: StateExport
-): Mutable<StateExport> {
-    const stateExport = cloneDeepMutable(stateExportToMigrate);
+/**
+ * Migrates a {@link CompleteExport} to the current state version
+ * @param completeExportToMigrate The export to migrate
+ * @returns An export object that is compatible with the current state version
+ */
+export function migrateCompleteExport(
+    completeExportToMigrate: CompleteExport
+): Mutable<CompleteExport> {
+    const stateExport = cloneDeepMutable(completeExportToMigrate);
     const {
         newVersion,
         migratedProperties: { currentState, history },
@@ -47,13 +52,19 @@ export function migrateStateExport(
     }
     return stateExport;
 }
+
+/**
+ * Migrates a {@link PartialExport} to the current state version
+ * @param partialExportToMigrate The export to migrate
+ * @returns An export object that is compatible with the current state version
+ */
 export function migratePartialExport(
     partialExportToMigrate: PartialExport
 ): Mutable<PartialExport> {
     // Encapsulate the partial export in a state export and migrate it
     const mutablePartialExport = cloneDeepMutable(partialExportToMigrate);
     const stateExport = cloneDeepMutable(
-        new StateExport({
+        new CompleteExport({
             ...cloneDeepMutable(ExerciseState.create('123456')),
             mapImageTemplates: mutablePartialExport.mapImageTemplates ?? [],
             patientCategories: mutablePartialExport.patientCategories ?? [],
@@ -62,7 +73,9 @@ export function migratePartialExport(
     );
     stateExport.fileVersion = mutablePartialExport.fileVersion;
     stateExport.dataVersion = mutablePartialExport.dataVersion;
-    const migratedStateExport = migrateStateExport(stateExport as StateExport);
+    const migratedStateExport = migrateCompleteExport(
+        stateExport as CompleteExport
+    );
     // Check for `undefined` in the original partial export here as `undefined` has the meaning of `no changes`
     // compared to `[]` with the meaning of `nothing`. If later choosing to override using this partial export,
     // `undefined` will be ignored while `[]` would remove all existing entries.
@@ -90,53 +103,99 @@ export function migratePartialExport(
 }
 
 /**
+ * An optional, not migrated {@link StateHistoryCompound}
+ */
+type History = { initialState: object; actions: (object | null)[] } | undefined;
+
+type MigratedHistory<H extends History> = H extends undefined
+    ? undefined
+    :
+          | {
+                initialState: MigratedState<'current'>;
+                actions: (Mutable<ExerciseAction> | null)[];
+            }
+          | undefined;
+
+/**
+ * An optional, not migrated {@link CompleteExport}
+ */
+interface PropertiesToMigrate<H extends History> {
+    currentState: object;
+    history: H;
+}
+
+/**
+ * The target version of a migration.
+ *
+ * Can be `current` (the current state version) or `intermediary` (a state version prior to the current version)
+ */
+type Target = 'current' | 'intermediary';
+
+type MigratedState<T extends Target> = T extends 'current'
+    ? Mutable<ExerciseState>
+    : object;
+
+interface MigratedProperties<H extends History, T extends Target> {
+    currentState: MigratedState<T>;
+    history: T extends 'current' ? MigratedHistory<H> : H | undefined;
+}
+
+/**
  * Migrates {@link propertiesToMigrate} to the newest version ({@link ExerciseState.currentStateVersion})
  * Might mutate the input.
  * @returns The new state version
  */
-export function applyMigrations<
-    H extends { initialState: object; actions: (object | null)[] } | undefined,
->(
+export function applyMigrations<H extends History>(
     currentStateVersion: number,
-    propertiesToMigrate: {
-        currentState: object;
-        history: H;
-    }
+    propertiesToMigrate: PropertiesToMigrate<H>
 ): {
     newVersion: number;
-    migratedProperties: {
-        currentState: Mutable<ExerciseState>;
-        history: H extends undefined
-            ? undefined
-            :
-                  | {
-                        initialState: Mutable<ExerciseState>;
-                        actions: (Mutable<ExerciseAction> | null)[];
-                    }
-                  | undefined;
-    };
+    migratedProperties: MigratedProperties<H, 'current'>;
 } {
-    const newVersion = ExerciseState.currentStateVersion;
+    const targetVersion = ExerciseState.currentStateVersion;
 
-    const migrationsToApply: Migration[] = [];
-    for (let i = currentStateVersion + 1; i <= newVersion; i++) {
-        migrationsToApply.push(migrations[i]!);
+    let intermediaryProperties: MigratedProperties<
+        H | undefined,
+        'intermediary'
+    > = propertiesToMigrate;
+
+    for (let i = currentStateVersion + 1; i <= targetVersion; i++) {
+        intermediaryProperties = applySingleMigration(
+            migrations[i]!,
+            intermediaryProperties
+        );
     }
 
+    return {
+        newVersion: targetVersion,
+        migratedProperties: {
+            currentState:
+                intermediaryProperties.currentState as Mutable<ExerciseState>,
+            history: intermediaryProperties.history as MigratedHistory<H>,
+        },
+    };
+}
+
+function applySingleMigration<H extends History>(
+    migration: Migration,
+    propertiesToMigrate: PropertiesToMigrate<H>
+): MigratedProperties<H, 'intermediary'> {
     const history = propertiesToMigrate.history;
+
     if (history) {
-        migrateState(migrationsToApply, history.initialState);
+        if (migration.state) migration.state(history.initialState);
+
         const intermediaryState = cloneDeepMutable(
             history.initialState
         ) as Mutable<ExerciseState>;
+
         try {
             history.actions.forEach((action, index) => {
                 if (action !== null) {
-                    const deleteAction = !migrateAction(
-                        migrationsToApply,
-                        intermediaryState,
-                        action
-                    );
+                    const deleteAction = migration.action
+                        ? migration.action(intermediaryState, action)
+                        : false;
+
                     if (!deleteAction) {
                         try {
                             applyAction(
@@ -157,13 +216,15 @@ export function applyMigrations<
                     }
                 }
             });
+
+            // Remove actions that are marked to be removed by the migrations
+            history.actions = history.actions.filter(
+                (action) => action !== null
+            );
+
             return {
-                newVersion,
-                migratedProperties: {
-                    currentState: intermediaryState,
-                    // history has been migrated in place
-                    history: history as any,
-                },
+                currentState: intermediaryState,
+                history,
             };
         } catch (e: unknown) {
             if (e instanceof ReducerError) {
@@ -178,36 +239,11 @@ export function applyMigrations<
             }
         }
     }
-    migrateState(migrationsToApply, propertiesToMigrate.currentState);
-    const currentState =
-        propertiesToMigrate.currentState as Mutable<ExerciseState>;
+
+    if (migration.state) migration.state(propertiesToMigrate.currentState);
+
     return {
-        newVersion,
-        migratedProperties: {
-            currentState,
-            history: undefined as any,
-        },
+        currentState: propertiesToMigrate.currentState,
+        history: undefined,
     };
-}
-
-function migrateState(migrationsToApply: Migration[], currentState: object) {
-    migrationsToApply.forEach((migration) => {
-        if (migration.state) migration.state(currentState);
-    });
-}
-
-/**
- * @returns true if all went well and false if the action should be deleted
- */
-function migrateAction(
-    migrationsToApply: Migration[],
-    intermediaryState: object,
-    action: object
-): boolean {
-    return migrationsToApply.every((migration) => {
-        if (migration.action) {
-            return migration.action(intermediaryState, action);
-        }
-        return true;
-    });
 }

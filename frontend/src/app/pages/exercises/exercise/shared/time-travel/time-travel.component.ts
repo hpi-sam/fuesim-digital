@@ -2,7 +2,7 @@ import type { OnDestroy } from '@angular/core';
 import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { cloneDeepMutable, StateExport } from 'digital-fuesim-manv-shared';
+import { cloneDeepMutable, CompleteExport } from 'digital-fuesim-manv-shared';
 import { throttle } from 'lodash-es';
 import { ApiService } from 'src/app/core/api.service';
 import { MessageService } from 'src/app/core/messages/message.service';
@@ -117,7 +117,7 @@ export class TimeTravelComponent implements OnDestroy {
             this.store
         );
         const { trainerId } = await this.apiService.importExercise(
-            new StateExport(cloneDeepMutable(currentExerciseState))
+            new CompleteExport(cloneDeepMutable(currentExerciseState))
         );
         this.messageService.postMessage({
             color: 'success',

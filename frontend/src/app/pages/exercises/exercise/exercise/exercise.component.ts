@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
-    StateExport,
+    CompleteExport,
     cloneDeepMutable,
     StateHistoryCompound,
 } from 'digital-fuesim-manv-shared';
@@ -98,7 +98,7 @@ export class ExerciseComponent implements OnDestroy {
         );
         const blob = new Blob([
             JSON.stringify(
-                new StateExport(
+                new CompleteExport(
                     cloneDeepMutable(currentState),
                     new StateHistoryCompound(
                         history.actionsWrappers.map(
@@ -122,7 +122,7 @@ export class ExerciseComponent implements OnDestroy {
             this.store
         );
         const blob = new Blob([
-            JSON.stringify(new StateExport(cloneDeepMutable(currentState))),
+            JSON.stringify(new CompleteExport(cloneDeepMutable(currentState))),
         ]);
         saveBlob(blob, `exercise-state-${currentState.participantId}.json`);
     }

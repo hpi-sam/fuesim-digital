@@ -1,6 +1,6 @@
-import type { ExerciseIds, StateExport } from 'digital-fuesim-manv-shared';
+import type { ExerciseIds, CompleteExport } from 'digital-fuesim-manv-shared';
 import {
-    migrateStateExport,
+    migrateCompleteExport,
     ReducerError,
     validateExerciseExport,
 } from 'digital-fuesim-manv-shared';
@@ -9,11 +9,11 @@ import { ExerciseWrapper } from '../exercise/exercise-wrapper.js';
 import type { HttpResponse } from '../exercise/http-handler/utils.js';
 
 export async function importExercise(
-    importObject: StateExport,
+    importObject: CompleteExport,
     ids: ExerciseIds,
     databaseService: DatabaseService
 ): Promise<ExerciseWrapper | HttpResponse<ExerciseIds>> {
-    const migratedImportObject = migrateStateExport(importObject);
+    const migratedImportObject = migrateCompleteExport(importObject);
     const validationErrors = validateExerciseExport(migratedImportObject);
     if (validationErrors.length > 0) {
         return {

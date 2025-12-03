@@ -7,6 +7,10 @@ import type { ExerciseAction } from '../../store/action-reducers/action-reducers
 import { IsExerciseAction } from '../../store/validate-exercise-action.js';
 import { BaseExportImportFile } from './base-file.js';
 
+/**
+ * A combination of an initial {@link ExerciseState} ({@link initialState}) and a list of actions ({@link actionHistory})
+ * that together describe the full history of an exercise.
+ */
 export class StateHistoryCompound {
     @IsArray()
     @IsExerciseAction({ each: true })
@@ -25,7 +29,12 @@ export class StateHistoryCompound {
     }
 }
 
-export class StateExport extends BaseExportImportFile {
+/**
+ * A full exercise export that contains at least the {@link currentState} of the exercise at the time of the export.
+ *
+ * Optionally, it can also contain a {@link history} consisting of the initial state and a list of actions that will lead to the {@link currentState}.
+ */
+export class CompleteExport extends BaseExportImportFile {
     @IsValue('complete' as const)
     public readonly type: 'complete' = 'complete';
 

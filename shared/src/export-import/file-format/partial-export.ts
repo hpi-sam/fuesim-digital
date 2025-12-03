@@ -5,6 +5,9 @@ import { IsValue } from '../../utils/validators/index.js';
 import { PatientCategory } from '../../models/patient-category.js';
 import { BaseExportImportFile } from './base-file.js';
 
+/**
+ * A partial export containing templates that can be added to an existing exercise.
+ */
 export class PartialExport extends BaseExportImportFile {
     @IsValue('partial' as const)
     public readonly type: 'partial' = 'partial';

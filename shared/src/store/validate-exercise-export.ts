@@ -4,7 +4,7 @@ import { validateSync } from 'class-validator';
 import type { ExportImportFile } from '../export-import/file-format/index.js';
 import {
     PartialExport,
-    StateExport,
+    CompleteExport,
 } from '../export-import/file-format/index.js';
 import type { Constructor } from '../utils/index.js';
 import { defaultValidateOptions } from './validation-options.js';
@@ -21,9 +21,10 @@ export function validateExerciseExport(
     if (typeof exportImportFile.type !== 'string') {
         return ['Export/import type is not a string.'];
     }
-    const exportImportClass = { complete: StateExport, partial: PartialExport }[
-        exportImportFile.type
-    ];
+    const exportImportClass = {
+        complete: CompleteExport,
+        partial: PartialExport,
+    }[exportImportFile.type];
     // if the exportImportFile.type is not a valid exportImportClass type, the exportImportClass is undefined.
     // Defensive, see comment above
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

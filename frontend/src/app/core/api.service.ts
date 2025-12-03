@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import type {
     ExerciseIds,
     ExerciseTimeline,
-    StateExport,
+    CompleteExport,
 } from 'digital-fuesim-manv-shared';
 import { freeze } from 'immer';
 import { lastValueFrom } from 'rxjs';
@@ -30,7 +30,7 @@ export class ApiService {
         );
     }
 
-    public async importExercise(exportedState: StateExport) {
+    public async importExercise(exportedState: CompleteExport) {
         return lastValueFrom(
             this.httpClient.post<ExerciseIds>(
                 `${httpOrigin}/api/exercise`,

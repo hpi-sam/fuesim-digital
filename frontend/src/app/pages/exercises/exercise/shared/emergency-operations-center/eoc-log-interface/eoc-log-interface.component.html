@@ -17,16 +17,16 @@
             >
                 Eintrag speichern
             </button>
-            <div class="form-check form-switch mt-2" *ngIf="clientisTrainer">
+            <div class="form-check form-switch mt-2" *ngIf="clientIsTrainer">
                 <input
                     class="form-check-input"
                     type="checkbox"
                     [ngModel]="!sendingPrivateLog"
                     (ngModelChange)="sendingPrivateLog = !$event"
                 />
-                <label class="form-check-label"
-                    >Als öffentliche Leitstellen-Notiz speichern</label
-                >
+                <label class="form-check-label">
+                    Als öffentliche Leitstellen-Notiz speichern
+                </label>
             </div>
         </div>
         <ng-container *ngIf="eocLogEntries$ | async as eocLogEntries">
@@ -46,7 +46,7 @@
                         [style.border-left-color]="
                             eocLogEntry.isPrivate ? '#0b02bf' : '#aaaaaa'
                         "
-                        *ngIf="clientisTrainer || !eocLogEntry.isPrivate"
+                        *ngIf="clientIsTrainer || !eocLogEntry.isPrivate"
                     >
                         <div class="row">
                             <div class="col-2">
@@ -74,8 +74,8 @@
                                     *ngIf="eocLogEntry.isPrivate"
                                     style="display: block; opacity: 0.8"
                                 >
-                                    [Private Übungsnotiz]</em
-                                >
+                                    [Private Übungsnotiz]
+                                </em>
                                 {{ eocLogEntry.message }}
                             </div>
                         </div>

@@ -25,7 +25,7 @@ export class EocLogInterfaceComponent {
     public newLogEntry = '';
 
     public sendingPrivateLog = true;
-    public readonly clientisTrainer =
+    public readonly clientIsTrainer =
         selectStateSnapshot(selectCurrentMainRole, this.store) === 'trainer';
 
     constructor(
@@ -38,7 +38,7 @@ export class EocLogInterfaceComponent {
             type: '[Emergency Operation Center] Add Log Entry',
             message: this.newLogEntry,
             name: selectStateSnapshot(selectOwnClient, this.store)!.name,
-            isPrivate: this.clientisTrainer ? this.sendingPrivateLog : false,
+            isPrivate: this.clientIsTrainer ? this.sendingPrivateLog : false,
         });
         if (response.success) {
             this.newLogEntry = '';

@@ -9,8 +9,12 @@ import {
 import { VehicleTemplate } from '../../models/index.js';
 import { ImageProperties } from '../../models/utils/index.js';
 import type { ExerciseState } from '../../state.js';
+import {
+    uuidArrayValidationOptions,
+    uuidValidationOptions,
+    cloneDeepMutable,
+} from '../../utils/index.js';
 import type { Mutable, UUID } from '../../utils/index.js';
-import { uuidValidationOptions, cloneDeepMutable } from '../../utils/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsValue } from '../../utils/validators/is-value.js';
@@ -44,11 +48,11 @@ export class EditVehicleTemplateAction implements Action {
     @Type(() => ImageProperties)
     public readonly image!: ImageProperties;
 
-    @IsUUID(4, { each: true })
+    @IsUUID(4, uuidArrayValidationOptions)
     @IsArray()
     public readonly materialTemplateIds!: readonly UUID[];
 
-    @IsUUID(4, { each: true })
+    @IsUUID(4, uuidArrayValidationOptions)
     @IsArray()
     public readonly personnelTemplateIds!: readonly UUID[];
 }

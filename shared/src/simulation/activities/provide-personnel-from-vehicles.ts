@@ -1,10 +1,6 @@
 import { IsString, IsUUID } from 'class-validator';
 import type { SimulatedRegion } from '../../models/index.js';
-import {
-    PersonnelResource,
-    VehicleResource,
-    getCreate,
-} from '../../models/utils/index.js';
+import { VehicleResource, getCreate } from '../../models/utils/index.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import {
     addResourceDescription,
@@ -13,7 +9,6 @@ import {
 import type { ExerciseState } from '../../state.js';
 import type { UUID } from '../../utils/index.js';
 import {
-    cloneDeepMutable,
     StrictObject,
     uuidArrayValidationOptions,
     uuidValidationOptions,
@@ -153,15 +148,14 @@ function personnelInVehicleTemplate(
     vehicleType: string | undefined;
     vehiclePersonnel: ResourceDescription;
 } {
-    const resource = cloneDeepMutable(
-        PersonnelResource.create()
-    ).personnelCounts;
+    const resource: ResourceDescription = {};
     const template = draftState.vehicleTemplates[templateId];
     if (template) {
         template.personnelTemplateIds.forEach((personnelTemplateId) => {
             const personnelTemplate =
                 draftState.personnelTemplates[personnelTemplateId];
             if (!personnelTemplate) return;
+            resource[personnelTemplate.personnelType] ??= 0;
             resource[personnelTemplate.personnelType]!++;
         });
     }
@@ -172,9 +166,7 @@ function personnelInUnloadingVehicles(
     draftState: ExerciseState,
     simulatedRegion: SimulatedRegion
 ): ResourceDescription {
-    const resource = cloneDeepMutable(
-        PersonnelResource.create()
-    ).personnelCounts;
+    const resource: ResourceDescription = {};
     StrictObject.values(simulatedRegion.activities)
         .filter(
             (a): a is UnloadVehicleActivityState =>
@@ -191,7 +183,10 @@ function personnelInUnloadingVehicles(
                 tryGetElement(draftState, 'personnel', personnelId)
                     ?.personnelType
         )
-        .filter((pt) => pt !== undefined)
-        .forEach((pt) => resource[pt]!++);
+        .filter((personnelType) => personnelType !== undefined)
+        .forEach((personnelType) => {
+            resource[personnelType] ??= 0;
+            resource[personnelType]++;
+        });
     return resource;
 }

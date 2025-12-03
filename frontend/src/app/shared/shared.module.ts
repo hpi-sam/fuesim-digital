@@ -56,6 +56,7 @@ import { PatientStatusDropdownComponent } from './components/patient-status-drop
 import { SendAlarmGroupInterfaceComponent } from './components/send-alarm-group-interface/send-alarm-group-interface.component';
 import { OccupationNamePipe } from './pipes/occupation-name.pipe';
 import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
+import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.pipe';
 
 @NgModule({
     declarations: [
@@ -104,6 +105,7 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
         SendAlarmGroupInterfaceComponent,
         OccupationNamePipe,
         OccupationShortNamePipe,
+        SpecificRoleDisplayNamePipe,
     ],
     imports: [
         CommonModule,
@@ -117,6 +119,7 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
         QrCodeComponent,
     ],
     exports: [
+        SpecificRoleDisplayNamePipe,
         AutofocusDirective,
         AppSaveOnTypingDirective,
         DisplayValidationComponent,

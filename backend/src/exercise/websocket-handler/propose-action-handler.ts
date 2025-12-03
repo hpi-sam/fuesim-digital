@@ -43,6 +43,7 @@ export const registerProposeActionHandler = (
                 });
                 return;
             }
+
             if (!clientWrapper.client) {
                 callback({
                     success: false,
@@ -51,10 +52,24 @@ export const registerProposeActionHandler = (
                 });
                 return;
             }
+
+            const exerciseClient =
+                exerciseWrapper.getStateSnapshot().clients[
+                    clientWrapper.client.id
+                ];
+            if (!exerciseClient) {
+                callback({
+                    success: false,
+                    message: 'Client not part of the exercise',
+                    expected: false,
+                });
+                return;
+            }
+
             // 3. validate user permissions
             if (
                 !validatePermissions(
-                    clientWrapper.client,
+                    exerciseClient,
                     action,
                     exerciseWrapper.getStateSnapshot()
                 )

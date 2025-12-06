@@ -89,19 +89,17 @@ export class ExerciseStatisticsModalComponent implements OnInit {
             this.store.select(selectVehicleTemplates),
         ]).pipe(
             map(([statistics, vehicleTemplates]) => {
-                // Get all vehicle template IDs
-                const vehicleTemplateIds = new Set<UUID>();
-                for (const statistic of statistics) {
-                    for (const templateId of Object.keys(
-                        statistic.value.vehicles
-                    )) {
-                        vehicleTemplateIds.add(templateId);
-                    }
-                }
+                const vehicleTemplateIds = new Set<UUID>(
+                    statistics.flatMap((statistic) =>
+                        Object.keys(statistic.value.vehicles)
+                    )
+                );
 
                 return {
                     datasets: [...vehicleTemplateIds].map((templateId) => ({
-                        label: vehicleTemplates[templateId]?.vehicleType ?? '',
+                        label:
+                            vehicleTemplates[templateId]?.vehicleType ??
+                            'unbekannt',
                         data: statistics.map(
                             (statisticEntry) =>
                                 statisticEntry.value.vehicles[templateId] ??
@@ -119,19 +117,16 @@ export class ExerciseStatisticsModalComponent implements OnInit {
             this.store.select(selectPersonnelTemplates),
         ]).pipe(
             map(([statistics, personnelTemplates]) => {
-                // Get all vehicle template IDs
-                const personnelTemplateIds = new Set<UUID>();
-                for (const statistic of statistics) {
-                    for (const templateId of Object.keys(
-                        statistic.value.personnel
-                    )) {
-                        personnelTemplateIds.add(templateId);
-                    }
-                }
+                const personnelTemplateIds = new Set<UUID>(
+                    statistics.flatMap((statistic) =>
+                        Object.keys(statistic.value.personnel)
+                    )
+                );
 
                 return {
                     datasets: [...personnelTemplateIds].map((templateId) => ({
-                        label: personnelTemplates[templateId]?.name ?? '',
+                        label:
+                            personnelTemplates[templateId]?.name ?? 'unbekannt',
                         data: statistics.map(
                             (statisticEntry) =>
                                 statisticEntry.value.personnel[templateId] ??

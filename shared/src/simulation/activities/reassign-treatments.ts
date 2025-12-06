@@ -284,7 +284,7 @@ type PersonnelToPatientCategoryDict = {
 
 interface PersonnelSubstitution {
     from: ResourceDescription;
-    to: Mutable<string>;
+    to: string;
 }
 
 function createCateringMaterials(
@@ -844,12 +844,12 @@ function estimateRequiredPersonnel(
     personnel: Personnel[]
 ): ResourceDescription {
     const groupedPersonnel = groupBy(personnel, (p) => p.personnelType);
-    const havePersonnel = Object.fromEntries(
+    const havePersonnel: ResourceDescription = Object.fromEntries(
         StrictObject.keys(personnelPriorities).map((pt) => [
             pt,
             groupedPersonnel[pt]?.length ?? 0,
         ])
-    ) as ResourceDescription;
+    );
     const wantPersonnel = requiredPersonnelForPatients(
         scaleResourceDescription(estimatedSkDistribution, patientCount)
     );

@@ -21,7 +21,7 @@ export function createVehicleParameters(
     personnelTemplates: { readonly [key in UUID]: PersonnelTemplate },
     vehiclePosition: MapCoordinates
 ): VehicleParameters {
-    const materials: Material[] = vehicleTemplate.materialTemplateIds
+    const materials = vehicleTemplate.materialTemplateIds
         .map((materialTemplateId: UUID) => {
             const materialTemplate = materialTemplates[materialTemplateId];
             if (!materialTemplate) return null;

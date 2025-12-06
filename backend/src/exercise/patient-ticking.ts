@@ -12,7 +12,7 @@ import {
 /**
  * The count of assigned personnel and material that cater for a {@link Patient}.
  */
-type Catering = { [key in string | 'material']: number };
+type Catering = { [key in string]: number } & { material: number };
 
 /**
  * Apply the patient tick to the {@link state}
@@ -99,7 +99,7 @@ function getNextPatientHealthPoints(
     treatedBy: Catering,
     patientTickInterval: number
 ): HealthPoints {
-    let material = treatedBy['material'] ?? 0;
+    let material = treatedBy.material;
     const notarzt = treatedBy['notarzt'] ?? 0;
     const notSan = treatedBy['notSan'] ?? 0;
     const rettSan = treatedBy['rettSan'] ?? 0;

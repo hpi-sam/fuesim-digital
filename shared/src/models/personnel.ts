@@ -76,6 +76,13 @@ export class Personnel {
     public readonly image: ImageProperties;
 
     /**
+     * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
+     */
+    @IsPosition()
+    @ValidateNested()
+    public readonly position: Position;
+
+    /**
      * @deprecated Use {@link create} instead
      */
     constructor(
@@ -105,13 +112,6 @@ export class Personnel {
         this.overrideTreatmentRange = overrideTreatmentRange;
         this.position = position;
     }
-
-    /**
-     * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
-     */
-    @IsPosition()
-    @ValidateNested()
-    public readonly position: Position;
 
     static readonly create = getCreate(this);
 

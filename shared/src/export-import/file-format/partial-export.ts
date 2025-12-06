@@ -15,6 +15,7 @@ export class PartialExport extends BaseExportImportFile {
     @Type(() => PatientCategory)
     public readonly patientCategories?: PatientCategory[];
 
+    @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => VehicleTemplate)

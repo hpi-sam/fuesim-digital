@@ -4,8 +4,13 @@ import { RouterModule } from '@angular/router';
 import { ExerciseComponent } from './exercise/exercise/exercise.component';
 import { JoinExerciseGuard } from './guards/join-exercise.guard';
 import { LeaveExerciseGuard } from './guards/leave-exercise.guard';
+import { ExerciseListComponent } from './list/exercise-list.component';
 
 const routes: Routes = [
+    {
+        path: '',
+        component: ExerciseListComponent,
+    },
     {
         path: ':exerciseId',
         canActivate: [JoinExerciseGuard],

@@ -56,6 +56,7 @@ import { OccupationNamePipe } from './pipes/occupation-name.pipe';
 import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
 import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.pipe';
 import { UserAccountNavbarItemComponent } from './components/user-account-navbar-item/user-account-navbar-item.component';
+import { HeaderComponent } from './components/header/header.component';
 
 @NgModule({
     declarations: [
@@ -83,6 +84,7 @@ import { UserAccountNavbarItemComponent } from './components/user-account-navbar
         CaterCapacityCountPipe,
         FileInputDirective,
         FooterComponent,
+        HeaderComponent,
         PatientHealthPointDisplayComponent,
         PatientsDetailsComponent,
         PatientStatusColorPipe,
@@ -141,6 +143,7 @@ import { UserAccountNavbarItemComponent } from './components/user-account-navbar
         PatientStatusBadgeComponent,
         FileInputDirective,
         FooterComponent,
+        HeaderComponent,
         PatientHealthPointDisplayComponent,
         PatientsDetailsComponent,
         PatientStatusColorPipe,

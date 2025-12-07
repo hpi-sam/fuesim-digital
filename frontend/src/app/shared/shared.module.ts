@@ -56,6 +56,7 @@ import { SendAlarmGroupInterfaceComponent } from './components/send-alarm-group-
 import { OccupationNamePipe } from './pipes/occupation-name.pipe';
 import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
 import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.pipe';
+import { HeaderComponent } from './components/header/header.component';
 
 @NgModule({
     declarations: [
@@ -83,6 +84,7 @@ import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.
         CaterCapacityCountPipe,
         FileInputDirective,
         FooterComponent,
+        HeaderComponent,
         PatientHealthPointDisplayComponent,
         PatientsDetailsComponent,
         PatientStatusColorPipe,
@@ -141,6 +143,7 @@ import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.
         PatientStatusBadgeComponent,
         FileInputDirective,
         FooterComponent,
+        HeaderComponent,
         PatientHealthPointDisplayComponent,
         PatientsDetailsComponent,
         PatientStatusColorPipe,

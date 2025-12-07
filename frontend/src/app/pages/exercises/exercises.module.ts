@@ -6,9 +6,10 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ExercisesRoutingModule } from './exercises-routing.module';
 import { ExerciseModule } from './exercise/exercise.module';
 import { JoinExerciseModalComponent } from './shared/join-exercise-modal/join-exercise-modal.component';
+import { ExerciseListComponent } from './list/exercise-list.component';
 
 @NgModule({
-    declarations: [JoinExerciseModalComponent],
+    declarations: [JoinExerciseModalComponent, ExerciseListComponent],
     imports: [
         CommonModule,
         ExercisesRoutingModule,

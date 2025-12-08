@@ -57,6 +57,8 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
 import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.pipe';
 import { UserAccountNavbarItemComponent } from './components/user-account-navbar-item/user-account-navbar-item.component';
 import { HeaderComponent } from './components/header/header.component';
+import { TimesPipe } from './pipes/times.pipe';
+import { ExerciseCardComponent } from './components/exercise-card/exercise-card.component';
 
 @NgModule({
     declarations: [
@@ -106,6 +108,8 @@ import { HeaderComponent } from './components/header/header.component';
         OccupationNamePipe,
         OccupationShortNamePipe,
         SpecificRoleDisplayNamePipe,
+        TimesPipe,
+        ExerciseCardComponent,
     ],
     imports: [
         CommonModule,
@@ -161,6 +165,8 @@ import { HeaderComponent } from './components/header/header.component';
         SendAlarmGroupInterfaceComponent,
         OccupationNamePipe,
         OccupationShortNamePipe,
+        TimesPipe,
+        ExerciseCardComponent,
     ],
     providers: [HotkeysService],
 })

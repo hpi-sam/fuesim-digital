@@ -3,6 +3,7 @@ import cors from 'cors';
 import type { Express } from 'express';
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import type { ExerciseList } from 'digital-fuesim-manv-shared';
 import { Config } from '../config.js';
 import type { DatabaseService } from '../database/services/database-service.js';
 import type { AuthService } from '../auth/auth-service.js';
@@ -76,6 +77,25 @@ export class ExerciseHttpServer {
                 req,
                 res
             )
+        );
+
+        app.get('/api/exercises/', async (req, res) =>
+            secureHttp(() => {
+                const exercises = [
+                    {
+                        participantId: '123456',
+                        trainerId: '12345678',
+                        lastUsedAt: '2025-12-07T16:42:02.718Z',
+                    },
+                    {
+                        participantId: '789123',
+                        trainerId: '78912345',
+                        lastUsedAt: '2025-12-03T16:42:02.718Z',
+                    },
+                ] satisfies ExerciseList;
+
+                return { statusCode: 200, body: exercises };
+            }, res)
         );
 
         app.use('/api/auth', new AuthHttpRouter(authService).router);

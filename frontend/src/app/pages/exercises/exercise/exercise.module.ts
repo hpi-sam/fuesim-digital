@@ -1,8 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-    provideHttpClient,
-    withInterceptorsFromDi,
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
@@ -70,6 +67,6 @@ import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/ma
         NgbTooltipModule,
         NgbAccordionModule,
     ],
-    providers: [provideHttpClient(withInterceptorsFromDi())],
+    providers: [provideHttpClient(withInterceptors([]))],
 })
 export class ExerciseModule {}

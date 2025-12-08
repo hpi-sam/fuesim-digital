@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, httpResource } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseAccessIds,
+    ExerciseList,
     ExerciseTimeline,
     StateExport,
 } from 'digital-fuesim-manv-shared';
@@ -80,5 +81,9 @@ export class ApiService {
                 }
                 return false;
             });
+    }
+
+    public getExercisesResource() {
+        return httpResource<ExerciseList>(() => `${httpOrigin}/api/exercises/`);
     }
 }

@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
     title: Digital Fuesim MANV HTTP API
     description: HTTP API of the digital-fuesim-manv project
-    version: 0.9.0
+    version: 0.10.0
 paths:
     /api/health:
         get:

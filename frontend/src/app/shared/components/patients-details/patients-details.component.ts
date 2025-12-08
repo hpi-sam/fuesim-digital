@@ -1,8 +1,7 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { PatientStatus } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
 import { Patient } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
@@ -12,7 +11,7 @@ import {
     createSelectPatient,
     selectConfiguration,
 } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-patients-details',
@@ -23,7 +22,7 @@ import { selectCurrentRole } from 'src/app/state/application/selectors/shared.se
 export class PatientsDetailsComponent implements OnChanges {
     @Input() patientId!: UUID;
 
-    readonly currentRole$ = this.store.select(selectCurrentRole);
+    readonly currentRole$ = this.store.select(selectCurrentMainRole);
     configuration$ = this.store.select(selectConfiguration);
     patient$!: Observable<Patient>;
     visibleStatus$!: Observable<PatientStatus>;
@@ -66,6 +65,14 @@ export class PatientsDetailsComponent implements OnChanges {
             type: '[Patient] Set Visible Status',
             patientId: this.patientId,
             patientStatus,
+        });
+    }
+
+    setTransportPriority(priority: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[Patient] Set Transport Priority',
+            patientId: this.patientId,
+            hasTransportPriority: priority,
         });
     }
 

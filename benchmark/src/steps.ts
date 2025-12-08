@@ -73,7 +73,7 @@ export class StepState {
     // The key is used as the column-name in the table, therefore the weird name
     public readonly '#actions'?: number;
 
-    constructor(public readonly data: StateExport) {}
+    public constructor(public readonly data: StateExport) {}
 }
 
 /**

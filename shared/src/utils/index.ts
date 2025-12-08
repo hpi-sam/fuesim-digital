@@ -11,3 +11,4 @@ export * from './sleep.js';
 export * from './assert-exhaustiveness.js';
 export * from './sort-object.js';
 export * from './format-duration.js';
+export * from './string-compare.js';

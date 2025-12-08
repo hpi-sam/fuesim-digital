@@ -7,8 +7,12 @@ import RBush from 'rbush';
 // or look out for a newer version here: https://github.com/mourner/rbush-knn#changelog
 // @ts-expect-error doesn't have a type
 import knn from 'rbush-knn';
-import type { Mutable, UUID, JsonObject } from '../../utils/index.js';
-import type { Immutable } from '../../utils/index.js';
+import type {
+    Mutable,
+    UUID,
+    JsonObject,
+    Immutable,
+} from '../../utils/index.js';
 import { getCreate } from './get-create.js';
 import type { MapCoordinates } from './position/map-coordinates.js';
 import type { Size } from './size.js';
@@ -98,7 +102,6 @@ export class SpatialTree {
         targetPosition: MapCoordinates
     ) {
         // TODO: use the move function from RBush, when available: https://github.com/mourner/rbush/issues/28
-        // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
         this.removeElement(spatialTree, elementId, startPosition);
         this.addElement(spatialTree, elementId, targetPosition);
     }

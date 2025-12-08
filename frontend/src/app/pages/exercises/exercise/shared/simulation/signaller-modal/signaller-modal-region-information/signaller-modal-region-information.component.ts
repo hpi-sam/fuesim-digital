@@ -1,8 +1,7 @@
 import type { OnChanges, OnInit } from '@angular/core';
 import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ReportableInformation } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { ReportableInformation, UUID } from 'digital-fuesim-manv-shared';
 import { makeInterfaceSignallerKey } from 'digital-fuesim-manv-shared';
 import { type Observable, BehaviorSubject, map } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';

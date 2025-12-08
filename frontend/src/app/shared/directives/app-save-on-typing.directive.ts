@@ -1,8 +1,7 @@
 import type { OnDestroy } from '@angular/core';
 import { Directive, EventEmitter, Output } from '@angular/core';
 import { NgModel } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { debounceTime, filter, takeUntil, tap } from 'rxjs/operators';
+import { Subject, debounceTime, filter, takeUntil, tap } from 'rxjs';
 import { isBeingTestedByCypress } from '../functions/cypress';
 
 /**

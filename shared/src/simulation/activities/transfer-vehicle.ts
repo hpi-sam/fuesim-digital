@@ -104,8 +104,7 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
             );
 
             if (
-                vehicle === undefined ||
-                vehicle.occupation.type !== 'waitForTransferOccupation' ||
+                vehicle?.occupation.type !== 'waitForTransferOccupation' ||
                 !isInSpecificSimulatedRegion(vehicle, simulatedRegion.id)
             ) {
                 terminate();

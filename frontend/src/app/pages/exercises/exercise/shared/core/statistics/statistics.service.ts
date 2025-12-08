@@ -174,7 +174,8 @@ export class StatisticsService {
         return {
             numberOfActiveParticipants: clients.filter(
                 (client) =>
-                    !client.isInWaitingRoom && client.role === 'participant'
+                    !client.isInWaitingRoom &&
+                    client.role.mainRole === 'participant'
             ).length,
             patients: countBy(patients, (patient) => patient.realStatus),
             vehicles: countBy(vehicles, (vehicle) => vehicle.vehicleType),

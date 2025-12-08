@@ -1,5 +1,4 @@
 import type VectorLayer from 'ol/layer/Vector';
-import type VectorSource from 'ol/source/Vector';
 import type OlMap from 'ol/Map';
 import type RenderEvent from 'ol/render/Event';
 import type { Feature } from 'ol';
@@ -23,7 +22,7 @@ export class MovementAnimator<T extends GeometryWithCoordinates> {
 
     constructor(
         private readonly olMap: OlMap,
-        private readonly layer: VectorLayer<VectorSource>,
+        private readonly layer: VectorLayer,
         private readonly interpolateCoordinates: (
             positions: CoordinatePair<T>,
             progress: number

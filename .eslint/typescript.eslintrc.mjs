@@ -1,21 +1,12 @@
-module.exports = {
-    plugins: [
-        'eslint-plugin-import',
-        'eslint-plugin-unicorn',
-        '@typescript-eslint',
-    ],
-    extends: [
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended',
-        'plugin:import/typescript',
-        // TODO: doesn't work for some reason from this config and has to be imported separately
-        // 'prettier',
-    ],
-    ignorePatterns: [
+export default {
+    files: ['**/*.ts', '**/*.js'],
+
+    ignores: [
         '**/migrations/**/*.ts',
         '**/migrations/**/*.js',
         'jest.config.js',
     ],
+
     rules: {
         /**
          * eslint
@@ -49,8 +40,7 @@ module.exports = {
         'no-implicit-globals': 'warn',
         'no-iterator': 'warn',
         'no-labels': 'warn',
-        // Disabled because of false positives
-        'no-lone-blocks': 'off',
+        'no-lone-blocks': 'off', // Disabled because of false positives
         'no-magic-numbers': 'off',
         'no-new': 'warn',
         'no-new-func': 'warn',
@@ -62,7 +52,6 @@ module.exports = {
         'no-script-url': 'warn',
         'no-self-compare': 'warn',
         'no-sequences': 'warn',
-        // "no-unmodified-loop-condition": "warn",
         'no-useless-call': 'warn',
         'no-useless-concat': 'warn',
         'no-useless-return': 'warn',
@@ -128,6 +117,7 @@ module.exports = {
                             'Please use the abstraction layer from frontend/src/app/shared/services/hotkeys.service.ts instead.',
                     },
                 ],
+
                 patterns: [
                     {
                         group: ['*/dist/*'],
@@ -136,7 +126,12 @@ module.exports = {
                 ],
             },
         ],
-        'no-useless-computed-key': ['warn', { enforceForClassMembers: true }],
+        'no-useless-computed-key': [
+            'warn',
+            {
+                enforceForClassMembers: true,
+            },
+        ],
         'no-useless-rename': 'warn',
         'no-var': 'warn',
         'object-shorthand': 'warn',
@@ -146,8 +141,7 @@ module.exports = {
         'prefer-rest-params': 'warn',
         'prefer-spread': 'warn',
         'prefer-template': 'warn',
-        // eslint-plugin-import does that instead (with autofix)
-        'sort-imports': 'off',
+        'sort-imports': 'off', // eslint-plugin-import does that instead (with autofix)
         'symbol-description': 'warn',
         'id-match': 'warn',
         'no-bitwise': 'warn',
@@ -176,6 +170,7 @@ module.exports = {
                 markers: ['/'],
             },
         ],
+
         // Disabled because @typescript-eslint implements them
         'dot-notation': 'off',
         'no-empty-function': 'off',
@@ -205,7 +200,6 @@ module.exports = {
         'unicorn/error-message': 'warn',
         'unicorn/escape-case': 'warn',
         'unicorn/expiring-todo-comments': 'off',
-        'unicorn/import-index': 'warn',
         'unicorn/no-for-loop': 'warn',
         'unicorn/no-keyword-prefix': 'off',
         'unicorn/no-unsafe-regex': 'off',
@@ -255,18 +249,18 @@ module.exports = {
                 },
             },
         ],
+
         /**
          * eslint-plugin-import
          */
         'import/no-deprecated': 'warn',
         'import/order': 'warn',
         'import/no-cycle': 'warn',
+        'import/no-unresolved': 'off', // Causes false positives with import resolution of Angular/Vite and TypeScript
 
         /**
          * @typescript-eslint
          */
-        // TODO: false positive
-        // '@typescript-eslint/array-type': ['warn', 'array'],
         '@typescript-eslint/prefer-as-const': 'off',
         '@typescript-eslint/ban-tslint-comment': 'warn',
         '@typescript-eslint/class-literal-property-style': ['warn', 'fields'],
@@ -330,20 +324,23 @@ module.exports = {
         '@typescript-eslint/no-confusing-non-null-assertion': 'warn',
         '@typescript-eslint/no-namespace': 'off',
         '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
-        // TODO: deprecated rule, to be replaced
-        '@typescript-eslint/sort-type-constituents': 'warn',
+        '@typescript-eslint/sort-type-constituents': 'warn', // TODO: deprecated rule, to be replaced
         '@typescript-eslint/no-confusing-void-expression': [
             'warn',
-            { ignoreArrowShorthand: true },
+            {
+                ignoreArrowShorthand: true,
+            },
         ],
         '@typescript-eslint/no-empty-interface': 'off',
         '@typescript-eslint/no-explicit-any': ['off'],
         '@typescript-eslint/no-extraneous-class': [
             'warn',
-            { allowWithDecorator: true, allowStaticOnly: true },
+            {
+                allowWithDecorator: true,
+                allowStaticOnly: true,
+            },
         ],
-        // maybe turn on later...
-        '@typescript-eslint/no-floating-promises': 'off',
+        '@typescript-eslint/no-floating-promises': 'off', // maybe turn on later...
         '@typescript-eslint/no-invalid-void-type': 'warn',
         '@typescript-eslint/no-parameter-properties': 'off',
         '@typescript-eslint/no-require-imports': 'warn',
@@ -373,6 +370,7 @@ module.exports = {
             { considerDefaultExhaustiveForUnions: true },
         ],
         '@typescript-eslint/unified-signatures': 'warn',
+
         // Extension rules that should be used instead of the eslint ones:
         '@typescript-eslint/default-param-last': 'warn',
         '@typescript-eslint/dot-notation': 'warn',
@@ -392,17 +390,16 @@ module.exports = {
         ],
         '@typescript-eslint/no-throw-literal': 'off',
         '@typescript-eslint/no-unused-expressions': 'warn',
-        '@typescript-eslint/no-unused-vars': ['warn', { args: 'none' }],
+        '@typescript-eslint/no-unused-vars': [
+            'warn',
+            {
+                args: 'none',
+            },
+        ],
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-useless-constructor': ['warn'],
         '@typescript-eslint/require-await': ['off'],
         '@typescript-eslint/return-await': ['warn'],
-        '@typescript-eslint/explicit-member-accessibility': [
-            'off',
-            {
-                accessibility: 'explicit',
-            },
-        ],
         '@typescript-eslint/no-inferrable-types': [
             'warn',
             {

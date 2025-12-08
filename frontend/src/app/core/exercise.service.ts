@@ -34,7 +34,7 @@ import {
     selectExerciseState,
 } from '../state/application/selectors/exercise.selectors';
 import {
-    selectCurrentRole,
+    selectCurrentMainRole,
     selectOwnClient,
     selectVisibleVehicles,
 } from '../state/application/selectors/shared.selectors';
@@ -221,7 +221,7 @@ export class ExerciseService {
     private startNotifications() {
         // If the user is a trainer, display a message for each joined or disconnected client
         this.store
-            .select(selectCurrentRole)
+            .select(selectCurrentMainRole)
             .pipe(
                 filter((role) => role === 'trainer'),
                 switchMap(() => this.store.select(selectClients)),
@@ -233,7 +233,7 @@ export class ExerciseService {
                     createHandler: (newClient) => {
                         this.messageService.postMessage({
                             title: `${newClient.name} ist als ${
-                                newClient.role === 'trainer'
+                                newClient.role.mainRole === 'trainer'
                                     ? 'Trainer'
                                     : 'Teilnehmer'
                             } beigetreten.`,

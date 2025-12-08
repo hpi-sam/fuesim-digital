@@ -1,19 +1,4 @@
-/**
- * This extension should be imported in projects with angular components.
- * Be aware that the `typescript.eslintrc.cjs` file should be imported afterwards.
- */
-module.exports = {
-    plugins: [
-        'eslint-plugin-rxjs-angular',
-        'eslint-plugin-rxjs',
-        '@angular-eslint/eslint-plugin',
-    ],
-    extends: [
-        'plugin:@angular-eslint/recommended',
-        'plugin:rxjs/recommended',
-        // TODO: doesn't work for some reason from this config and has to be imported separately
-        // 'prettier',
-    ],
+export default {
     rules: {
         /**
          * @angular-eslint
@@ -26,6 +11,7 @@ module.exports = {
                 style: 'camelCase',
             },
         ],
+
         '@angular-eslint/component-selector': [
             'warn',
             {
@@ -53,26 +39,33 @@ module.exports = {
         '@angular-eslint/use-component-selector': 'warn',
         '@angular-eslint/use-lifecycle-interface': 'warn',
         '@angular-eslint/use-pipe-transform-interface': 'warn',
+
         /**
          * eslint-plugin-rxjs
          */
-        'rxjs/ban-observables': 'warn',
-        'rxjs/ban-operators': 'warn',
-        'rxjs/no-connectable': 'warn',
-        'rxjs/no-cyclic-action': 'warn',
-        'rxjs/no-finnish': 'off',
-        'rxjs/no-ignored-observable': 'warn',
-        'rxjs/no-ignored-subscribe': 'warn',
-        'rxjs/no-unsafe-catch': 'warn',
-        'rxjs/no-unsafe-first': 'warn',
-        'rxjs/throw-error': 'warn',
-        'rxjs/no-implicit-any-catch': ['warn', { allowExplicitAny: true }],
-        'rxjs/no-nested-subscribe': 'warn',
-        'rxjs/no-unsafe-subject-next': 'off',
+        'rxjs-x/ban-observables': 'warn',
+        'rxjs-x/ban-operators': 'warn',
+        'rxjs-x/no-connectable': 'warn',
+        'rxjs-x/no-cyclic-action': 'warn',
+        'rxjs-x/no-finnish': 'off',
+        'rxjs-x/no-floating-observables': 'warn',
+        'rxjs-x/no-ignored-subscribe': 'warn',
+        'rxjs-x/no-unsafe-catch': 'warn',
+        'rxjs-x/no-unsafe-first': 'warn',
+        'rxjs-x/throw-error': 'warn',
+        'rxjs-x/no-implicit-any-catch': [
+            'warn',
+            {
+                allowExplicitAny: true,
+            },
+        ],
+        'rxjs-x/no-nested-subscribe': 'warn',
+        'rxjs-x/no-unsafe-subject-next': 'off',
+
         /**
          * eslint-plugin-rxjs-angular
          */
-        'rxjs-angular/prefer-takeuntil': [
+        'rxjs-angular-x/prefer-takeuntil': [
             'warn',
             {
                 alias: ['destroyed'],

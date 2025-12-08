@@ -1,6 +1,5 @@
 import type { Vehicle, VehicleTemplate } from '../models/index.js';
-import { VehicleParameters } from '../models/index.js';
-import { Material, Personnel } from '../models/index.js';
+import { VehicleParameters, Material, Personnel } from '../models/index.js';
 import type { MaterialTemplate } from '../models/material-template.js';
 import type { PersonnelTemplate } from '../models/personnel-template.js';
 import type { PersonnelType, MapCoordinates } from '../models/utils/index.js';

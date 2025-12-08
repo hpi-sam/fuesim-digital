@@ -2,6 +2,7 @@ import type { Client } from '../models/index.js';
 import type { ExerciseState } from '../state.js';
 import type { ExerciseAction } from './action-reducers/index.js';
 import { getExerciseActionTypeDictionary } from './action-reducers/action-reducers.js';
+import type { ReducerRights } from './action-reducer.js';
 
 const exerciseActionTypeDictionary = getExerciseActionTypeDictionary();
 
@@ -17,14 +18,31 @@ export function validatePermissions(
     action: ExerciseAction,
     state: ExerciseState
 ) {
-    const rights = exerciseActionTypeDictionary[action.type].rights;
-    // Check role permissions
-    if (
-        (client.role === 'participant' && rights !== 'participant') ||
-        rights === 'server'
-    ) {
+    const reducer = exerciseActionTypeDictionary[action.type];
+    let rights = reducer.rights as ReducerRights<
+        InstanceType<typeof reducer.action>
+    >;
+
+    if (typeof rights === 'function') {
+        rights = rights(client, action);
+    }
+
+    if (typeof rights === 'boolean') {
+        return rights;
+    }
+
+    if (rights === 'server') {
         return false;
     }
-    // TODO: Validate e.g. only actions in own viewport
-    return true;
+    if (
+        client.role.mainRole === 'participant' &&
+        (rights === 'participant' || rights === client.role.specificRole)
+    ) {
+        return true;
+    }
+    if (client.role.mainRole === 'trainer') {
+        return true;
+    }
+
+    return false;
 }

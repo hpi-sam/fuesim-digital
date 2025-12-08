@@ -7,7 +7,7 @@ import {
     tryToCaterFor,
 } from '../../store/action-reducers/utils/calculate-treatments.js';
 import type { Immutable, Mutable } from '../../utils/immutability.js';
-import type { UUID } from '../../utils/index.js';
+import { stringCompare, type UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/uuid.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { TreatmentProgress } from '../utils/treatment.js';
@@ -88,7 +88,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                 .filter((patient) =>
                     isInSpecificSimulatedRegion(patient, simulatedRegion.id)
                 )
-                .sort((a, b) => a.id.localeCompare(b.id));
+                .sort((a, b) => stringCompare(a.id, b.id));
             let personnel = Object.values(draftState.personnel).filter((pers) =>
                 isInSpecificSimulatedRegion(pers, simulatedRegion.id)
             );
@@ -763,8 +763,6 @@ function assignTreatments(
     });
 
     const [secured, missingPersonnel] = calculateMissingPersonnel(
-        // False positive
-        // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
         groupedPatients,
         cateringPersonnel,
         personnelTreatments,

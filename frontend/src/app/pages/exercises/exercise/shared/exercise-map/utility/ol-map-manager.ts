@@ -7,7 +7,6 @@ import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
 import OlMap from 'ol/Map';
-import type VectorSource from 'ol/source/Vector';
 import { Subject, takeUntil } from 'rxjs';
 import type { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
@@ -16,7 +15,7 @@ import {
     selectViewports,
 } from 'src/app/state/application/selectors/exercise.selectors';
 import {
-    selectCurrentRole,
+    selectCurrentMainRole,
     selectRestrictedViewport,
 } from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
@@ -59,7 +58,7 @@ export class OlMapManager {
      * ```
      */
     public readonly layerFeatureManagerDictionary = new Map<
-        VectorLayer<VectorSource>,
+        VectorLayer,
         FeatureManager<any>
     >();
 
@@ -217,7 +216,7 @@ export class OlMapManager {
 
     public tryGoToCoordinates(latitude: number, longitude: number) {
         if (
-            selectStateSnapshot(selectCurrentRole, this.store) ===
+            selectStateSnapshot(selectCurrentMainRole, this.store) ===
                 'participant' &&
             selectStateSnapshot(selectRestrictedViewport, this.store) !==
                 undefined

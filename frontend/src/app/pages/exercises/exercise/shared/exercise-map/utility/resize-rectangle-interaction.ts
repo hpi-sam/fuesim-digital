@@ -21,7 +21,7 @@ export class ResizeRectangleInteraction extends PointerInteraction {
      */
     private currentResizeValues?: CurrentResizeValues;
 
-    constructor(private readonly source: VectorSource<Polygon>) {
+    constructor(private readonly source: VectorSource<Feature<Polygon>>) {
         super({
             handleDownEvent: (event) => this._handleDownEvent(event),
             handleDragEvent: (event) => this._handleDragEvent(event),
@@ -33,8 +33,6 @@ export class ResizeRectangleInteraction extends PointerInteraction {
         const mouseCoordinate = event.coordinate;
         const feature =
             this.source.getClosestFeatureToCoordinate(mouseCoordinate);
-        // OpenLayers type definitions are incorrect, feature may be `null`
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!feature) {
             return false;
         }

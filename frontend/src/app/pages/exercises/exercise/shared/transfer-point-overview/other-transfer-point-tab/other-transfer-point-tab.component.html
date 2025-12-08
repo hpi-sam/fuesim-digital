@@ -85,5 +85,11 @@
                 "
             />
         </ng-template>
+        <span
+            *ngIf="((transferPointsToBeAdded$ | async)?.length ?? 0) === 0"
+            class="text-muted ms-2"
+        >
+            Alle verfügbaren Ziele sind bereits verbunden.
+        </span>
     </div>
 </div>

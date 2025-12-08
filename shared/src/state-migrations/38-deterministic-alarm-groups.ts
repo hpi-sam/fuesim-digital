@@ -2,8 +2,8 @@ import { nextUUID } from '../simulation/utils/randomness.js';
 import type { ExerciseState } from '../state.js';
 import { getElement } from '../store/action-reducers/utils/index.js';
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
-import type { Mutable } from '../utils/index.js';
-import { uuid, type UUID } from '../utils/index.js';
+import type { Mutable, UUID } from '../utils/index.js';
+import { uuid } from '../utils/index.js';
 import type { Migration } from './migration-functions.js';
 
 interface VehicleParameters {

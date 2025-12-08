@@ -1,6 +1,6 @@
 {
     "name": "digital-fuesim-manv-backend",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "type": "module",
     "scripts": {
         "start:once:linux-macos": "NODE_ENV=production node dist/src/index.js",
@@ -10,8 +10,8 @@
         "start:windows": "set NODE_ENV=development&& tsx watch src/index.ts 127.0.0.1",
         "start": "(pwd && npm run start:linux-macos) || npm run start:windows",
         "build": "tsc --project ./tsconfig.build.json",
-        "lint": "eslint --max-warnings 0 --ignore-path .gitignore \"./**/*.{ts,js,yml,html}\"",
-        "lint:fix": "eslint --ignore-path .gitignore --fix \"./**/*.{ts,js,yml,html}\"",
+        "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,html}\"",
+        "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,html}\"",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose",
         "test:migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose ./test/http-migration.spec.ts",
         "test:ci-no-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci --testPathIgnorePatterns ./test/http-migration.spec.ts",
@@ -32,7 +32,7 @@
     "private": true,
     "engines": {
         "node": ">=22",
-        "npm": ">=10"
+        "npm": ">=11"
     },
     "dependencies": {
         "class-transformer": "^0.5.1",
@@ -46,26 +46,32 @@
         "pg": "^8.14.1",
         "socket.io": "^4.8.1",
         "supertest": "^7.1.0",
-        "typeorm": "^0.3.22"
+        "typeorm": "^0.3.26"
     },
     "devDependencies": {
+        "@eslint/compat": "^1.4.0",
+        "@eslint/js": "^9.36.0",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",
-        "@types/jest": "^29.5.14",
+        "@types/jest": "^30.0.0",
         "@types/lodash-es": "^4.17.6",
         "@types/node": "^22",
         "@types/supertest": "^6.0.3",
-        "@typescript-eslint/eslint-plugin": "^8.29.0",
-        "@typescript-eslint/parser": "^8.29.0",
-        "eslint": "^8.57.1",
+        "eslint": "^9.36.0",
         "eslint-config-prettier": "^10.1.1",
         "eslint-plugin-import": "~2.31.0",
         "eslint-plugin-unicorn": "^56.0.1",
-        "jest": "^29.7.0",
+        "jest": "^30.2.0",
         "socket.io-client": "^4.5.4",
-        "ts-jest": "^29.3.1",
+        "ts-jest": "^29.4.5",
         "ts-node": "^10.9.2",
         "tsx": "^4.19.3",
-        "typescript": "~5.8.2"
+        "typescript": "~5.8.2",
+        "typescript-eslint": "^8.45.0"
+    },
+    "overrides": {
+        "@istanbuljs/load-nyc-config": {
+            "js-yaml": "^4.1.1"
+        }
     }
 }

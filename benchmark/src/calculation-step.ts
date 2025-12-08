@@ -11,7 +11,7 @@ export class CalculationStep<
     Name extends keyof State = keyof State,
     Value extends State[Name] = State[Name],
 > extends Step<State> {
-    constructor(
+    public constructor(
         name: Name,
         public readonly calculate: (state: State) => Value,
         printColumn = true

@@ -66,7 +66,7 @@ export class ExerciseWrapper extends NormalType<
         this._changedSinceSave = true;
     }
 
-    async saveActions(
+    private async saveActions(
         entityManager: EntityManager,
         exerciseEntity: ExerciseWrapperEntity
     ): Promise<ActionWrapperEntity[]> {
@@ -82,7 +82,7 @@ export class ExerciseWrapper extends NormalType<
         return entities;
     }
 
-    async asEntity(
+    public async asEntity(
         save: boolean,
         entityManager?: EntityManager
     ): Promise<ExerciseWrapperEntity> {
@@ -159,7 +159,7 @@ export class ExerciseWrapper extends NormalType<
             : this.databaseService.transaction(operations);
     }
 
-    static createFromEntity(
+    private static createFromEntity(
         entity: ExerciseWrapperEntity,
         databaseService: DatabaseService
     ): ExerciseWrapper {
@@ -191,7 +191,7 @@ export class ExerciseWrapper extends NormalType<
         return normal;
     }
 
-    tickCounter = 0;
+    private tickCounter = 0;
 
     /**
      * The server always uses `null` as their emitter id.
@@ -259,7 +259,7 @@ export class ExerciseWrapper extends NormalType<
      * Be very careful when using this. - Use {@link create} instead for most use cases.
      * This constructor does not guarantee a valid entity.
      */
-    constructor(
+    private constructor(
         public readonly participantId: string,
         public readonly trainerId: string,
         public readonly temporaryActionHistory: ActionWrapper[],
@@ -274,7 +274,7 @@ export class ExerciseWrapper extends NormalType<
     /**
      * @param file A **valid** import file
      */
-    static async importFromFile(
+    public static async importFromFile(
         databaseService: DatabaseService,
         file: StateExport,
         exerciseIds: ExerciseIds
@@ -320,7 +320,7 @@ export class ExerciseWrapper extends NormalType<
             : importOperations(undefined);
     }
 
-    static create(
+    public static create(
         participantId: string,
         trainerId: string,
         databaseService: DatabaseService,
@@ -403,7 +403,7 @@ export class ExerciseWrapper extends NormalType<
         });
     }
 
-    static async restoreAllExercises(
+    public static async restoreAllExercises(
         databaseService: DatabaseService
     ): Promise<ExerciseWrapper[]> {
         return databaseService.transaction(async (manager) => {

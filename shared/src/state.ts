@@ -34,8 +34,7 @@ import type { MaterialTemplate } from './models/material-template.js';
 import type { PersonnelTemplate } from './models/personnel-template.js';
 import type { ExerciseRadiogram } from './models/radiogram/exercise-radiogram.js';
 import { getRadiogramConstructor } from './models/radiogram/exercise-radiogram.js';
-import type { PersonnelType } from './models/utils/index.js';
-import type { ExerciseStatus } from './models/utils/index.js';
+import type { PersonnelType, ExerciseStatus } from './models/utils/index.js';
 import {
     exerciseStatusAllowedValues,
     getCreate,
@@ -189,5 +188,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 40;
+    static readonly currentStateVersion = 43;
 }

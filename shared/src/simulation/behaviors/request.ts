@@ -8,9 +8,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { IsStringMap } from '../../utils/validators/is-string-map.js';
-import type { UUID } from '../../utils/index.js';
+import type { UUID, Mutable } from '../../utils/index.js';
 import { cloneDeepMutable, StrictObject, uuid } from '../../utils/index.js';
-import type { Mutable } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import {
     getActivityById,

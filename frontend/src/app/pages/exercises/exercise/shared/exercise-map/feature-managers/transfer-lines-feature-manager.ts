@@ -7,14 +7,13 @@ import LineString from 'ol/geom/LineString';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
-import type VectorSource from 'ol/source/Vector';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
 import type { TransferLine } from 'src/app/shared/types/transfer-line';
 import type { AppState } from 'src/app/state/app.state';
 import { selectTransferLines } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import type { FeatureManager } from '../utility/feature-manager';
@@ -25,7 +24,7 @@ export class TransferLinesFeatureManager
     extends ElementManager<TransferLine, LineString>
     implements FeatureManager<LineString>
 {
-    public readonly layer: VectorLayer<VectorSource<LineString>>;
+    public readonly layer: VectorLayer;
     constructor(
         private readonly store: Store<AppState>,
         private readonly transferLinesService: TransferLinesService,
@@ -49,7 +48,9 @@ export class TransferLinesFeatureManager
     ) {
         this.olMap.addLayer(this.layer);
         mapInteractionsManager.addFeatureLayer(this.layer);
-        if (selectStateSnapshot(selectCurrentRole, this.store) === 'trainer') {
+        if (
+            selectStateSnapshot(selectCurrentMainRole, this.store) === 'trainer'
+        ) {
             this.registerChangeHandlers(
                 this.store.select(selectTransferLines),
                 destroy$,

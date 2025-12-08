@@ -9,10 +9,11 @@ import { createSelector, Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
     SimulatedRegion,
+    UUID,
 } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
 import {
     Client,
+    ClientRole,
     currentParticipantIdOf,
     isAccepted,
     isDone,
@@ -38,7 +39,10 @@ import { SelectSignallerRegionService } from '../../../signaller-modal/select-si
 
 // Clients that leave are lost from the state but radiograms might point to them.
 // This is a fallback to show something useful in the UI
-const unavailableClient = Client.create('Unbekannt', 'participant');
+const unavailableClient = Client.create(
+    'Unbekannt',
+    ClientRole.create('participant', 'mapOperator')
+);
 
 @Component({
     selector: 'app-radiogram-card',

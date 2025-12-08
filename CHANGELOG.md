@@ -7,6 +7,24 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.10.0] - 2025-12-08
+
+### Added
+
+- Trainees can mark patients for transport priority. Those patients show a red outline around their popup.
+- Participants can now be assigned to an emergency operations view, allowing them to send alarm groups and write public messages to the emergency operations center log.
+- The emergency operations center log now differentiates between public messages and private messages only visible to trainers.
+
+### Changed
+
+- The design of the map editor has been slightly updated: It consumes less space and is more consistent.
+- Some texts shown in the frontend have been added or reworded to be easier to understand.
+
+### Fixed
+
+- Sending an alarm group with a higher first vehicle count than total alarm group vehicles is now handled gracefully.
+- Fixed a bug where different clients might see different behavior of the simulation when they're using different locales.
+
 ## [0.9.0] - 2025-09-23
 
 ### Added
@@ -312,7 +330,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.9.0...HEAD
+[unreleased]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.1...v0.8.0

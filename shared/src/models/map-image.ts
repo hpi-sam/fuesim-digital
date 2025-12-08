@@ -4,8 +4,7 @@ import type { UUID } from '../utils/index.js';
 import { uuid, uuidValidationOptions } from '../utils/index.js';
 import { IsValue } from '../utils/validators/index.js';
 import { IsPosition } from '../utils/validators/is-position.js';
-import type { MapCoordinates } from './utils/index.js';
-import type { Position } from './utils/index.js';
+import type { MapCoordinates, Position } from './utils/index.js';
 import { MapPosition, getCreate, ImageProperties } from './utils/index.js';
 
 export class MapImage {

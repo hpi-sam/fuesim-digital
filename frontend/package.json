@@ -1,6 +1,6 @@
 {
     "name": "digital-fuesim-manv-frontend",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "type": "module",
     "scripts": {
         "cy:open": "cypress open",
@@ -15,27 +15,27 @@
         "build": "ng build",
         "build:deployment": "ng build --configuration deployment",
         "watch": "ng build --watch --configuration development",
-        "lint": "eslint --max-warnings 0 --ignore-path .gitignore \"./**/*.{ts,js,yml,css,sccs,html,angular}\"",
-        "lint:fix": "eslint --ignore-path .gitignore --fix \"./**/*.{ts,js,yml,css,sccs,html,angular}\"",
-        "test:ci": "jest --runInBand --coverage --verbose --ci",
-        "test": "jest --runInBand --coverage --verbose",
-        "test:watch": "jest --runInBand --verbose --watch"
+        "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,css,sccs,html,angular}\"",
+        "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,css,sccs,html,angular}\"",
+        "test:ci": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci",
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose",
+        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --verbose --watch"
     },
     "private": true,
     "engines": {
         "node": ">=22",
-        "npm": ">=10"
+        "npm": ">=11"
     },
     "dependencies": {
-        "@angular/animations": "~19.2.5",
-        "@angular/common": "~19.2.5",
-        "@angular/compiler": "~19.2.5",
-        "@angular/core": "~19.2.5",
-        "@angular/forms": "~19.2.5",
+        "@angular/animations": "~19.2.17",
+        "@angular/common": "~19.2.17",
+        "@angular/compiler": "~19.2.17",
+        "@angular/core": "~19.2.17",
+        "@angular/forms": "~19.2.17",
         "@angular/material": "^19.2.8",
-        "@angular/platform-browser": "~19.2.5",
-        "@angular/platform-browser-dynamic": "~19.2.5",
-        "@angular/router": "~19.2.5",
+        "@angular/platform-browser": "~19.2.17",
+        "@angular/platform-browser-dynamic": "~19.2.17",
+        "@angular/router": "~19.2.17",
         "@ng-bootstrap/ng-bootstrap": "^18.0.0",
         "@ngneat/hotkeys": "^4.1.0",
         "@ngrx/store": "^19.1.0",
@@ -48,37 +48,38 @@
         "immer": "^10.1.1",
         "lodash-es": "4.17.21",
         "ng-qrcode": "^19.0.1",
-        "ol": "^7.5.2",
+        "ol": "^10.6.1",
         "rxjs": "~7.8.0",
         "socket.io-client": "^4.8.1",
         "tslib": "^2.8.1"
     },
     "devDependencies": {
-        "@angular-eslint/builder": "19.3.0",
-        "@angular-eslint/eslint-plugin": "19.3.0",
-        "@angular-eslint/eslint-plugin-template": "19.3.0",
-        "@angular-eslint/schematics": "19.3.0",
-        "@angular-eslint/template-parser": "19.3.0",
-        "@angular/build": "^19.2.17",
+        "@angular/build": "^19.2.19",
         "@angular/cli": "~19.2.10",
-        "@angular/compiler-cli": "~19.2.5",
-        "@angular/localize": "~19.2.5",
+        "@angular/compiler-cli": "~19.2.17",
+        "@angular/localize": "~19.2.17",
+        "@eslint/compat": "^1.4.0",
+        "@eslint/js": "^9.36.0",
         "@types/chart.js": "^2.9.41",
-        "@types/jest": "^29.5.14",
+        "@types/jest": "^30.0.0",
         "@types/lodash-es": "^4.17.12",
         "@types/node": "^22.14.0",
-        "@typescript-eslint/eslint-plugin": "^8.29.0",
-        "@typescript-eslint/parser": "^8.29.0",
+        "angular-eslint": "19.8.1",
         "cypress": "^14.3.0",
-        "eslint": "^8.57.1",
+        "eslint": "^9.28.0",
         "eslint-config-prettier": "^10.1.1",
         "eslint-plugin-import": "~2.31.0",
-        "eslint-plugin-rxjs": "^5.0.3",
-        "eslint-plugin-rxjs-angular": "^2.0.1",
+        "eslint-plugin-rxjs-angular-x": "^0.0.3",
+        "eslint-plugin-rxjs-x": "^0.7.7",
         "eslint-plugin-unicorn": "^56.0.1",
-        "jest": "^29.7.0",
-        "lodash": "^4.17.21",
-        "ts-jest": "^29.3.1",
-        "typescript": "~5.8.2"
+        "jest": "^30.2.0",
+        "ts-jest": "^29.4.5",
+        "typescript": "~5.8.2",
+        "typescript-eslint": "8.33.1"
+    },
+    "overrides": {
+        "@istanbuljs/load-nyc-config": {
+            "js-yaml": "^4.1.1"
+        }
     }
 }

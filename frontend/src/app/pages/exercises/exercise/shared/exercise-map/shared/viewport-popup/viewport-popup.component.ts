@@ -6,7 +6,7 @@ import type { Observable } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectViewport } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { PopupService } from '../../utility/popup.service';
 
 @Component({
@@ -20,7 +20,7 @@ export class ViewportPopupComponent implements OnInit {
     public viewportId!: UUID;
 
     public viewport$?: Observable<Viewport>;
-    public readonly currentRole$ = this.store.select(selectCurrentRole);
+    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
     constructor(
         private readonly store: Store<AppState>,

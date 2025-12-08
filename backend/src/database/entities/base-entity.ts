@@ -10,5 +10,5 @@ export abstract class BaseEntity<
 > {
     @PrimaryGeneratedColumn('uuid')
     @IsUUID(4, uuidValidationOptions)
-    id!: UUID;
+    public id!: UUID;
 }

@@ -117,6 +117,9 @@ jobs:
             - name: Audit backend
               if: always()
               run: cd backend; npm audit; cd ..
+            - name: Audit benchmark
+              if: always()
+              run: cd benchmark; npm audit; cd ..
 
     test:
         timeout-minutes: 4

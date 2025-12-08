@@ -4,6 +4,7 @@ import { IsValue } from '../../utils/validators/is-value.js';
 import type { Mutable, UUID, UUIDSet } from '../../utils/index.js';
 import {
     StrictObject,
+    stringCompare,
     uuid,
     uuidValidationOptions,
 } from '../../utils/index.js';
@@ -73,8 +74,7 @@ export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBe
                     );
 
                     if (
-                        vehicle === undefined ||
-                        vehicle.occupation.type !== 'patientTransferOccupation'
+                        vehicle?.occupation.type !== 'patientTransferOccupation'
                     ) {
                         // This vehicle is not meant to be used for patient transfer
                         break;
@@ -90,7 +90,7 @@ export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBe
                                         behaviorState.patientIdsSelectedForTransfer
                                     ).includes(patient.id)
                             )
-                            .sort((a, b) => a.id.localeCompare(b.id)),
+                            .sort((a, b) => stringCompare(a.id, b.id)),
                         (patient) =>
                             getVisiblePatientStatus(patient, draftState)
                     );

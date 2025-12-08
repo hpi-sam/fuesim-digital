@@ -2,7 +2,6 @@ import type { Type, ViewContainerRef } from '@angular/core';
 import type { Feature } from 'ol';
 import { Overlay } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
-import type VectorSource from 'ol/source/Vector';
 import { Subject, takeUntil } from 'rxjs';
 import type OlMap from 'ol/Map';
 import type { UUID } from 'digital-fuesim-manv-shared';
@@ -71,10 +70,7 @@ export class PopupManager {
     public registerPopupTriggers(
         olMap: OlMap,
         openLayersContainer: HTMLDivElement,
-        layerFeatureManagerDictionary: Map<
-            VectorLayer<VectorSource>,
-            FeatureManager<any>
-        >,
+        layerFeatureManagerDictionary: Map<VectorLayer, FeatureManager<any>>,
         featureNameFeatureManagerDictionary: Map<string, FeatureManager<any>>
     ) {
         this.featureNameFeatureManagerDictionary =
@@ -94,7 +90,7 @@ export class PopupManager {
                         return false;
                     }
                     layerFeatureManagerDictionary
-                        .get(layer as VectorLayer<VectorSource>)!
+                        .get(layer as VectorLayer)!
                         .onFeatureClicked(event, feature as Feature);
                     // we only want the top one -> a truthy return breaks this loop
                     return true;

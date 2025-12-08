@@ -6,7 +6,7 @@ import type { Observable } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectTransferPoint } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { PopupService } from '../../utility/popup.service';
 
 type NavIds = 'hospitals' | 'names' | 'transferPoints';
@@ -28,7 +28,7 @@ export class TransferPointPopupComponent implements OnInit {
 
     public transferPoint$?: Observable<TransferPoint>;
 
-    public readonly currentRole$ = this.store.select(selectCurrentRole);
+    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
     public get activeNavId() {
         return activeNavId;

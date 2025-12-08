@@ -67,7 +67,7 @@ export class FuesimServer {
         this.saveTickInterval
     );
 
-    constructor(private readonly databaseService: DatabaseService) {
+    public constructor(private readonly databaseService: DatabaseService) {
         const app = express();
         this._websocketServer = new ExerciseWebsocketServer(app);
         this._httpServer = new ExerciseHttpServer(app, databaseService);

@@ -4,7 +4,11 @@ import type { UUID } from '../utils/index.js';
 import { uuid, uuidValidationOptions } from '../utils/index.js';
 import { IsPosition } from '../utils/validators/is-position.js';
 import { IsValue } from '../utils/validators/index.js';
-import type { Position } from './utils/index.js';
+import type {
+    Position,
+    ImageProperties,
+    MapCoordinates,
+} from './utils/index.js';
 import {
     getCreate,
     lowerRightCornerOf,
@@ -12,7 +16,6 @@ import {
     Size,
     upperLeftCornerOf,
 } from './utils/index.js';
-import type { ImageProperties, MapCoordinates } from './utils/index.js';
 
 export class Viewport {
     @IsUUID(4, uuidValidationOptions)

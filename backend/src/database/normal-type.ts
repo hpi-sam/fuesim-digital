@@ -10,9 +10,9 @@ export abstract class NormalType<
     protected constructor(
         protected readonly databaseService: DatabaseService
     ) {}
-    id?: UUID;
+    public id?: UUID;
 
-    abstract asEntity(
+    public abstract asEntity(
         save: boolean,
         entityManager?: EntityManager
     ): Promise<EntityType>;
@@ -20,7 +20,7 @@ export abstract class NormalType<
     /**
      * Creates or updates the object in the database
      */
-    async save(entityManager?: EntityManager): Promise<EntityType> {
+    public async save(entityManager?: EntityManager): Promise<EntityType> {
         return this.asEntity(true, entityManager);
     }
 }

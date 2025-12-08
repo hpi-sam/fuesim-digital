@@ -7,8 +7,7 @@ import {
 } from '@angular/animations';
 import type { OnChanges, OnDestroy } from '@angular/core';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ReplaySubject, Subject } from 'rxjs';
-import { delay, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { ReplaySubject, Subject, delay, switchMap, takeUntil, tap } from 'rxjs';
 import { CustomTimer } from 'src/app/core/messages/custom-timer';
 import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
 

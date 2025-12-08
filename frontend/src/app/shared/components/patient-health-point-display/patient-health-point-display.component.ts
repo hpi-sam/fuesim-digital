@@ -1,8 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { PatientStatus } from 'digital-fuesim-manv-shared';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
 import {
     healthPointsDefaults,
     Patient,
@@ -14,7 +13,7 @@ import {
     createSelectPatient,
     selectConfiguration,
 } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentRole } from 'src/app/state/application/selectors/shared.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-patient-health-point-display',
@@ -31,7 +30,7 @@ export class PatientHealthPointDisplayComponent implements OnInit {
         health: number;
     }>;
 
-    public readonly currentRole$ = this.store.select(selectCurrentRole);
+    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
     public readonly healthPointsDefaults = healthPointsDefaults;
 

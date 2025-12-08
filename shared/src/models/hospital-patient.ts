@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+    IsBoolean,
     IsNumber,
     IsString,
     IsUUID,
@@ -69,6 +70,9 @@ export class HospitalPatient {
     @IsLiteralUnion(patientStatusAllowedValues)
     public readonly realStatus: PatientStatus;
 
+    @IsBoolean()
+    public readonly hasTransportPriority: boolean;
+
     @ValidateNested()
     @Type(() => ImageProperties)
     public readonly image: ImageProperties;
@@ -108,6 +112,7 @@ export class HospitalPatient {
         biometricInformation: BiometricInformation,
         pretriageStatus: PatientStatus,
         realStatus: PatientStatus,
+        hasTransportPriority: boolean,
         healthStates: { readonly [stateId: UUID]: PatientHealthState },
         currentHealthStateId: UUID,
         image: ImageProperties,
@@ -124,6 +129,7 @@ export class HospitalPatient {
         this.biometricInformation = biometricInformation;
         this.pretriageStatus = pretriageStatus;
         this.realStatus = realStatus;
+        this.hasTransportPriority = hasTransportPriority;
         this.healthStates = healthStates;
         this.currentHealthStateId = currentHealthStateId;
         this.image = image;
@@ -158,6 +164,7 @@ export class HospitalPatient {
                 patient.biometricInformation,
                 patient.pretriageStatus,
                 patient.realStatus,
+                patient.hasTransportPriority,
                 patient.healthStates,
                 patient.currentHealthStateId,
                 patient.image,

@@ -26,7 +26,7 @@ export class ActionWrapperEntity extends BaseEntity<
     @Column({ type: 'uuid', nullable: true })
     @IsOptional()
     @IsUUID(4, uuidValidationOptions)
-    emitterId!: UUID | null;
+    public emitterId!: UUID | null;
 
     @ManyToOne(() => ExerciseWrapperEntity, {
         onDelete: 'CASCADE',
@@ -37,17 +37,17 @@ export class ActionWrapperEntity extends BaseEntity<
     })
     @ValidateNested()
     @Type(() => ExerciseWrapperEntity)
-    exercise!: ExerciseWrapperEntity;
+    public exercise!: ExerciseWrapperEntity;
 
     @Column({ type: 'bigint' })
     @IsInt()
-    index!: number;
+    public index!: number;
 
     @Column({
         type: 'json',
     })
     @IsJSON()
-    actionString!: string;
+    public actionString!: string;
 
     private constructor() {
         super();
@@ -57,11 +57,11 @@ export class ActionWrapperEntity extends BaseEntity<
      * Be very careful when using this. - Use {@link create} instead for most use cases.
      * This method does not guarantee a valid entity.
      */
-    static createNew() {
+    public static createNew() {
         return new ActionWrapperEntity();
     }
 
-    static async create(
+    public static async create(
         action: ExerciseAction,
         emitterId: UUID | null,
         exercise: ExerciseWrapperEntity,

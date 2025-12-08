@@ -5,8 +5,19 @@
  */
 export default {
     moduleFileExtensions: ['js', 'json', 'ts'],
+    // See https://kulshekhar.github.io/ts-jest/docs/next/guides/esm-support/
+    // and https://jestjs.io/docs/ecmascript-modules
+    extensionsToTreatAsEsm: ['.ts'],
     transform: {
-        '^.+\\.ts$': 'ts-jest',
+        '\\.ts$': [
+            'ts-jest',
+            {
+                useESM: true,
+            },
+        ],
+    },
+    moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.js$': '$1',
     },
     moduleDirectories: ['node_modules', 'src'],
     testEnvironment: 'node',

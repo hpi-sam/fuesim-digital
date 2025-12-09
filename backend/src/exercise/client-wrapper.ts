@@ -1,11 +1,14 @@
 import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
 import { Client, ClientRole } from 'digital-fuesim-manv-shared';
+import type { ExerciseService } from 'database/services/exercise-service.js';
 import type { ExerciseSocket } from '../exercise-server.js';
-import { exerciseMap } from './exercise-map.js';
 import type { ExerciseWrapper } from './exercise-wrapper.js';
 
 export class ClientWrapper {
-    public constructor(private readonly socket: ExerciseSocket) {}
+    public constructor(
+        private readonly socket: ExerciseSocket,
+        private readonly exerciseService: ExerciseService
+    ) {}
 
     private chosenExercise?: ExerciseWrapper;
 
@@ -20,7 +23,7 @@ export class ClientWrapper {
         exerciseId: string,
         clientName: string
     ): UUID | undefined {
-        const exercise = exerciseMap.get(exerciseId);
+        const exercise = this.exerciseService.getExerciseById(exerciseId);
         if (!exercise) {
             return undefined;
         }
@@ -50,7 +53,11 @@ export class ClientWrapper {
             // The client has not joined an exercise. Do nothing.
             return;
         }
-        this.chosenExercise.removeClient(this);
+        // TODO: @Quixelation --> this is ugly now --> (use Wrapper instead of Id?)
+        this.exerciseService.leaveExercise(
+            this.chosenExercise.getExercise().participantId,
+            this
+        );
     }
 
     public get exercise(): ExerciseWrapper | undefined {

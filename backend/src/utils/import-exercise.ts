@@ -1,46 +1,33 @@
 import type { ExerciseIds, StateExport } from 'digital-fuesim-manv-shared';
-import {
-    migrateStateExport,
-    ReducerError,
-    validateExerciseExport,
-} from 'digital-fuesim-manv-shared';
-import type { DatabaseService } from '../database/services/database-service.js';
-import { ExerciseWrapper } from '../exercise/exercise-wrapper.js';
+import { ReducerError } from 'digital-fuesim-manv-shared';
+import { ExerciseFactory } from 'exercise/exercise-factory.js';
+import type { ExerciseWrapper } from '../exercise/exercise-wrapper.js';
 import type { HttpResponse } from '../exercise/http-handler/utils.js';
+import { ValidationErrorWrapper } from './validation-error-wrapper.js';
 
-export async function importExercise(
+export function importExercise(
     importObject: StateExport,
-    ids: ExerciseIds,
-    databaseService: DatabaseService
-): Promise<ExerciseWrapper | HttpResponse<ExerciseIds>> {
-    const migratedImportObject = migrateStateExport(importObject);
-    const validationErrors = validateExerciseExport(migratedImportObject);
-    if (validationErrors.length > 0) {
-        return {
-            statusCode: 400,
-            body: {
-                message: `The validation of the import failed: ${validationErrors}`,
-            },
-        };
-    }
+    ids: ExerciseIds
+): ExerciseWrapper | HttpResponse<ExerciseIds> {
     try {
-        return await ExerciseWrapper.importFromFile(
-            databaseService,
-            migratedImportObject,
-            {
-                participantId: ids.participantId,
-                trainerId: ids.trainerId,
-            }
-        );
-    } catch (e: unknown) {
-        if (e instanceof ReducerError) {
+        return ExerciseFactory.fromFile(importObject, ids);
+    } catch (err) {
+        if (err instanceof ValidationErrorWrapper) {
             return {
                 statusCode: 400,
                 body: {
-                    message: `Error importing exercise: ${e.message}`,
+                    message: `The validation of the import failed: ${err.errors}`,
                 },
             };
         }
-        throw e;
+        if (err instanceof ReducerError) {
+            return {
+                statusCode: 400,
+                body: {
+                    message: `Error importing exercise: ${err.message}`,
+                },
+            };
+        }
+        throw err;
     }
 }

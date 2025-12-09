@@ -6,6 +6,7 @@ import { migrate as migratePostgres } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
 import { PGlite } from '@electric-sql/pglite';
 import { uuid_ossp } from '@electric-sql/pglite/contrib/uuid_ossp';
+import { getTableColumns, sql } from 'drizzle-orm';
 import * as schema from '../schema.js';
 import { Config } from '../../config.js';
 
@@ -22,27 +23,6 @@ export class DatabaseService {
         this._initialized = true;
     }
 
-    public get select() {
-        return this.databaseConnection.select.bind(this.databaseConnection);
-    }
-    public get insert() {
-        return this.databaseConnection.insert.bind(this.databaseConnection);
-    }
-    public get update() {
-        return this.databaseConnection.update.bind(this.databaseConnection);
-    }
-    public get delete() {
-        return this.databaseConnection.delete.bind(this.databaseConnection);
-    }
-    public get transaction() {
-        return this.databaseConnection.transaction.bind(
-            this.databaseConnection
-        );
-    }
-    public get execute() {
-        return this.databaseConnection.execute.bind(this.databaseConnection);
-    }
-
     public get isInitialized() {
         return this._initialized;
     }
@@ -52,7 +32,7 @@ export class DatabaseService {
      */
     public static async createNewDatabaseConnection(
         mode: DatabaseConnectionMode = 'default'
-    ) {
+    ): Promise<DatabaseService> {
         Config.initialize();
         if (Config.useDb) {
             const defaultDatabaseName = `${Config.dbName}`;
@@ -76,7 +56,7 @@ export class DatabaseService {
                 schema,
             });
             await this.testConnection(connection);
-            return connection;
+            return new DatabaseService(connection);
         }
 
         const pgLite = new PGlite({
@@ -90,7 +70,7 @@ export class DatabaseService {
         await this.testConnection(db);
         await db.execute(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
         await this.migrate(db);
-        return db;
+        return new DatabaseService(db);
     }
 
     public static async testConnection(connection: DatabaseConnection) {
@@ -122,9 +102,18 @@ export class DatabaseService {
 }
 
 export type DatabaseConnection = Awaited<
-    ReturnType<typeof DatabaseService.createNewDatabaseConnection>
+    ReturnType<typeof pgliteDrizzle | typeof postgresDrizzle>
 >;
 export type DatabaseTable = AnyPgTable;
 export type DatabaseTransaction = Parameters<
     Parameters<DatabaseConnection['transaction']>[0]
 >[0];
+
+export function upsertHelper(table: DatabaseTable) {
+    return Object.fromEntries(
+        Object.entries(getTableColumns(table)).map(([key, value]) => [
+            key,
+            sql`EXCLUDED.${value.name}`,
+        ])
+    );
+}

@@ -1,4 +1,5 @@
 import type { ExerciseAction, ExerciseState } from 'digital-fuesim-manv-shared';
+import type { InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
 import {
     char,
@@ -28,6 +29,7 @@ export const exerciseWrapperTable = pgTable('exercise_wrapper_entity', {
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
 });
+export type ExerciseEntry = InferSelectModel<typeof exerciseWrapperTable>;
 
 export const actionWrapperTable = pgTable(
     'action_wrapper_entity',
@@ -52,6 +54,7 @@ export const actionWrapperTable = pgTable(
             .onDelete('cascade'),
     ]
 );
+export type ActionEntry = InferSelectModel<typeof actionWrapperTable>;
 
 export const actionWrapperEntityRelations = relations(
     actionWrapperTable,

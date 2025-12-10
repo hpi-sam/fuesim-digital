@@ -15,21 +15,31 @@ type ReadonlyResourceDescription<K extends string = string> = {
     readonly [key in K]: number;
 };
 
+function getKeys<K extends string>(
+    a: Partial<ResourceDescription<K>>,
+    b: Partial<ResourceDescription<K>>
+) {
+    return [...new Set([...StrictObject.keys(a), ...StrictObject.keys(b)])];
+}
+
 export function createCombine(transform: (a: number, b: number) => number) {
     return <K extends string>(
-        a: ResourceDescription<K>,
-        b: ResourceDescription<K>
+        a: Partial<ResourceDescription<K>>,
+        b: Partial<ResourceDescription<K>>
     ) =>
         Object.fromEntries(
-            StrictObject.keys(a).map((key) => [key, transform(a[key], b[key])])
+            getKeys(a, b).map((key) => [
+                key,
+                transform(a[key] ?? 0, b[key] ?? 0),
+            ])
         ) as ResourceDescription<K>;
 }
 
 export function createCompare(comparator: (a: number, b: number) => boolean) {
     return <K extends string>(
-        a: ReadonlyResourceDescription<K>,
-        b: ReadonlyResourceDescription<K>
-    ) => StrictObject.keys(a).every((key) => comparator(a[key], b[key]));
+        a: Partial<ReadonlyResourceDescription<K>>,
+        b: Partial<ReadonlyResourceDescription<K>>
+    ) => getKeys(a, b).every((key) => comparator(a[key] ?? 0, b[key] ?? 0));
 }
 
 export function createMap(fn: (a: number, ...args: any) => number) {

@@ -302,6 +302,7 @@
                                         *ngFor="
                                             let vehicleTemplate of vehicleTemplates$
                                                 | async
+                                                | values
                                         "
                                         (elementMousedown)="
                                             dragElementService.onMouseDown(
@@ -354,6 +355,7 @@
                                         *ngFor="
                                             let mapImageTemplate of mapImageTemplates$
                                                 | async
+                                                | values
                                         "
                                         (elementMousedown)="
                                             dragElementService.onMouseDown(

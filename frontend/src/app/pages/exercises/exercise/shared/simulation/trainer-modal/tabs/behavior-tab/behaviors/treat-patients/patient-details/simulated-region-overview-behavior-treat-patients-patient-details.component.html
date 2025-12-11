@@ -47,7 +47,7 @@
             <span
                 [ngbTooltip]="
                     'Dieser ' +
-                    (person.personnelType | personnelName) +
+                    person.typeName +
                     ' schenkt diesem Patienten ' +
                     (1 / person.assignedPatientCount) * 100 +
                     '% seiner Aufmerksamkeit.'
@@ -56,9 +56,7 @@
                 [closeDelay]="100"
                 style="grid-column: 1; grid-row: 1"
                 class="h-100 w-100 flex-grow-1 text-center"
-                >{{
-                    person.personnelType | personnelTypeToGermanAbbreviation
-                }}</span
+                >{{ person.typeAbbreviation }}</span
             >
         </div>
     </div>

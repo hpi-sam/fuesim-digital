@@ -13,10 +13,12 @@ export class MapEditorCardComponent {
 
     readonly elementMousedown = output<MouseEvent>();
     readonly elementEdit = output();
+    readonly elementDelete = output();
 
     @Input() dataCy = '';
     @Input() title!: string;
     @Input() imageUrl!: string;
     @Input() darkBackground = false;
     @Input() enableEditButton = false;
+    @Input() enableDeleteButton = false;
 }

@@ -22,7 +22,6 @@ import { SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent } from '
 import { TreatmentProgressToGermanNamePipe } from './trainer-modal/tabs/behavior-tab/utils/treatment-progress-to-german-name.pipe';
 import { SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent } from './trainer-modal/tabs/behavior-tab/behaviors/treat-patients/patient-details/simulated-region-overview-behavior-treat-patients-patient-details.component';
 import { WithDollarPipe } from './trainer-modal/tabs/general-tab/utils/with-dollar';
-import { PersonnelTypeToGermanAbbreviationPipe } from './trainer-modal/tabs/behavior-tab/utils/personnel-type-to-german-abbreviation.pipe';
 import { SimulatedRegionsModalComponent } from './trainer-modal/simulated-regions-modal/simulated-regions-modal.component';
 import { SimulatedRegionOverviewPatientsTabComponent } from './trainer-modal/tabs/patients-tab/simulated-region-overview-patients-tab/simulated-region-overview-patients-tab.component';
 import { SelectPatientService } from './trainer-modal/select-patient.service';
@@ -99,7 +98,6 @@ import { SignallerModalTransportRequestTargetEditorComponent } from './signaller
         TreatmentProgressToGermanNamePipe,
         SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent,
         WithDollarPipe,
-        PersonnelTypeToGermanAbbreviationPipe,
         SimulatedRegionsModalComponent,
         SimulatedRegionOverviewPatientsTabComponent,
         RadiogramListComponent,

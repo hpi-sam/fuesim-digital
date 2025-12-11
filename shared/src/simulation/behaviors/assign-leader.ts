@@ -22,7 +22,6 @@ import { LeaderChangedEvent } from '../events/leader-changed.js';
 import type { ExerciseState } from '../../state.js';
 import { nextUUID } from '../utils/randomness.js';
 import { getCreate } from '../../models/utils/get-create.js';
-import type { PersonnelType } from '../../models/utils/personnel-type.js';
 import {
     currentSimulatedRegionIdOf,
     isInSimulatedRegion,
@@ -32,6 +31,7 @@ import type { SimulatedRegion } from '../../models/simulated-region.js';
 import { addActivity } from '../activities/utils.js';
 import { DelayEventActivityState } from '../activities/delay-event.js';
 import { VehicleOccupationsRadiogram } from '../../models/radiogram/vehicle-occupations-radiogram.js';
+import { ResourceDescription } from '../../models/index.js';
 import type {
     SimulationBehavior,
     SimulationBehaviorState,
@@ -51,7 +51,7 @@ export class AssignLeaderBehaviorState implements SimulationBehaviorState {
     static readonly create = getCreate(this);
 }
 
-const personnelPriorities: { [Key in PersonnelType]: number } = {
+const personnelPriorities: { [key in string]: number } = {
     notarzt: 0,
     san: 1,
     rettSan: 2,
@@ -184,8 +184,6 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                         'generateReportActivity'
                                     )
                                         .radiogram as Mutable<PersonnelCountRadiogram>;
-                                    const personnelCount =
-                                        radiogram.personnelCount;
                                     const personnel = Object.values(
                                         draftState.personnel
                                     ).filter((person) =>
@@ -196,20 +194,17 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     );
                                     const groupedPersonnel = groupBy(
                                         personnel,
-                                        (person) => person.personnelType
+                                        (person) => person.templateId
                                     );
-                                    personnelCount.gf =
-                                        groupedPersonnel['gf']?.length ?? 0;
-                                    personnelCount.notSan =
-                                        groupedPersonnel['notSan']?.length ?? 0;
-                                    personnelCount.notarzt =
-                                        groupedPersonnel['notarzt']?.length ??
-                                        0;
-                                    personnelCount.rettSan =
-                                        groupedPersonnel['rettSan']?.length ??
-                                        0;
-                                    personnelCount.san =
-                                        groupedPersonnel['san']?.length ?? 0;
+                                    radiogram.personnelCount =
+                                        StrictObject.fromEntries(
+                                            Object.entries(
+                                                groupedPersonnel
+                                            ).map(([key, value]) => [
+                                                key,
+                                                value.length,
+                                            ])
+                                        ) as ResourceDescription;
 
                                     radiogram.informationAvailable = true;
                                 }
@@ -365,8 +360,8 @@ function selectNewLeader(
 
     personnel.sort(
         (a, b) =>
-            personnelPriorities[b.personnelType] -
-            personnelPriorities[a.personnelType]
+            (personnelPriorities[b.personnelType] ?? -1) -
+            (personnelPriorities[a.personnelType] ?? -1)
     );
     changeLeader(draftState, simulatedRegion, behaviorState, personnel[0]?.id);
 }

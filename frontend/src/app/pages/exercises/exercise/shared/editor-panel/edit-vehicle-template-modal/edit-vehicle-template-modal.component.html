@@ -10,8 +10,8 @@
             url: vehicleTemplate.image.url,
             height: vehicleTemplate.image.height,
             patientCapacity: vehicleTemplate.patientCapacity,
-            materialTypes: vehicleTemplate.materials,
-            personnelTypes: vehicleTemplate.personnel,
+            materialTemplates: materialTemplates || [],
+            personnelTemplates: personnelTemplates || [],
         }"
         (submitVehicleTemplate)="editVehicleTemplate($event)"
         [btnText]="'Speichern'"

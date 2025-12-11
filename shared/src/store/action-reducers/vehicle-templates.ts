@@ -7,12 +7,14 @@ import {
     IsArray,
 } from 'class-validator';
 import { VehicleTemplate } from '../../models/index.js';
-import type { PersonnelType } from '../../models/utils/index.js';
 import { ImageProperties } from '../../models/utils/index.js';
-import type { MaterialType } from '../../models/utils/material-type.js';
 import type { ExerciseState } from '../../state.js';
+import {
+    uuidArrayValidationOptions,
+    uuidValidationOptions,
+    cloneDeepMutable,
+} from '../../utils/index.js';
 import type { Mutable, UUID } from '../../utils/index.js';
-import { uuidValidationOptions, cloneDeepMutable } from '../../utils/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsValue } from '../../utils/validators/is-value.js';
@@ -46,13 +48,13 @@ export class EditVehicleTemplateAction implements Action {
     @Type(() => ImageProperties)
     public readonly image!: ImageProperties;
 
-    @IsString({ each: true })
+    @IsUUID(4, uuidArrayValidationOptions)
     @IsArray()
-    public readonly materials!: readonly MaterialType[];
+    public readonly materialTemplateIds!: readonly UUID[];
 
-    @IsString({ each: true })
+    @IsUUID(4, uuidArrayValidationOptions)
     @IsArray()
-    public readonly personnelTypes!: readonly PersonnelType[];
+    public readonly personnelTemplateIds!: readonly UUID[];
 }
 
 export class DeleteVehicleTemplateAction implements Action {
@@ -67,16 +69,13 @@ export namespace VehicleTemplateActionReducers {
     export const addVehicleTemplate: ActionReducer<AddVehicleTemplateAction> = {
         action: AddVehicleTemplateAction,
         reducer: (draftState, { vehicleTemplate }) => {
-            if (
-                draftState.vehicleTemplates.some(
-                    (template) => template.id === vehicleTemplate.id
-                )
-            ) {
+            if (draftState.vehicleTemplates[vehicleTemplate.id]) {
                 throw new ReducerError(
                     `VehicleTemplate with id ${vehicleTemplate.id} already exists`
                 );
             }
-            draftState.vehicleTemplates.push(cloneDeepMutable(vehicleTemplate));
+            draftState.vehicleTemplates[vehicleTemplate.id] =
+                cloneDeepMutable(vehicleTemplate);
             return draftState;
         },
         rights: 'trainer',
@@ -93,8 +92,8 @@ export namespace VehicleTemplateActionReducers {
                     vehicleType,
                     image,
                     patientCapacity,
-                    materials,
-                    personnelTypes,
+                    materialTemplateIds,
+                    personnelTemplateIds,
                 }
             ) => {
                 const vehicleTemplate = getVehicleTemplate(draftState, id);
@@ -102,8 +101,10 @@ export namespace VehicleTemplateActionReducers {
                 vehicleTemplate.name = name;
                 vehicleTemplate.patientCapacity = patientCapacity;
                 vehicleTemplate.vehicleType = vehicleType;
-                vehicleTemplate.materials = cloneDeepMutable(materials);
-                vehicleTemplate.personnel = cloneDeepMutable(personnelTypes);
+                vehicleTemplate.materialTemplateIds =
+                    cloneDeepMutable(materialTemplateIds);
+                vehicleTemplate.personnelTemplateIds =
+                    cloneDeepMutable(personnelTemplateIds);
 
                 return draftState;
             },
@@ -115,10 +116,7 @@ export namespace VehicleTemplateActionReducers {
             action: DeleteVehicleTemplateAction,
             reducer: (draftState, { id }) => {
                 getVehicleTemplate(draftState, id);
-                draftState.vehicleTemplates =
-                    draftState.vehicleTemplates.filter(
-                        (template) => template.id !== id
-                    );
+                delete draftState.vehicleTemplates[id];
                 // Delete this template from every alarm group
                 for (const alarmGroup of Object.values(
                     draftState.alarmGroups
@@ -139,9 +137,7 @@ function getVehicleTemplate(
     state: Mutable<ExerciseState>,
     id: UUID
 ): Mutable<VehicleTemplate> {
-    const vehicleTemplate = state.vehicleTemplates.find(
-        (template) => template.id === id
-    );
+    const vehicleTemplate = state.vehicleTemplates[id];
     if (!vehicleTemplate) {
         throw new ReducerError(`VehicleTemplate with id ${id} does not exist`);
     }

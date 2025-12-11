@@ -21,7 +21,9 @@
         </button>
         <div ngbDropdownMenu data-cy="alarmGroupAddVehicleSelect">
             <button
-                *ngFor="let vehicleTemplate of vehicleTemplates$ | async"
+                *ngFor="
+                    let vehicleTemplate of vehicleTemplates$ | async | values
+                "
                 ngbDropdownItem
                 (click)="createAlarmGroupVehicle(vehicleTemplate.id)"
                 type="button"

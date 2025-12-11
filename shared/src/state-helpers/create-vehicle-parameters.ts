@@ -2,9 +2,8 @@ import type { Vehicle, VehicleTemplate } from '../models/index.js';
 import { VehicleParameters, Material, Personnel } from '../models/index.js';
 import type { MaterialTemplate } from '../models/material-template.js';
 import type { PersonnelTemplate } from '../models/personnel-template.js';
-import type { PersonnelType, MapCoordinates } from '../models/utils/index.js';
+import type { MapCoordinates } from '../models/utils/index.js';
 import { MapPosition } from '../models/utils/position/map-position.js';
-import type { MaterialType } from '../models/utils/material-type.js';
 import { VehiclePosition } from '../models/utils/position/vehicle-position.js';
 
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
@@ -18,34 +17,39 @@ import type { UUID } from '../utils/index.js';
 export function createVehicleParameters(
     vehicleId: UUID,
     vehicleTemplate: VehicleTemplate,
-    materialTemplates: {
-        [Key in MaterialType]: MaterialTemplate;
-    },
-    personnelTemplates: {
-        [Key in PersonnelType]: PersonnelTemplate;
-    },
+    materialTemplates: { readonly [key in UUID]: MaterialTemplate },
+    personnelTemplates: { readonly [key in UUID]: PersonnelTemplate },
     vehiclePosition: MapCoordinates
 ): VehicleParameters {
-    const materials = vehicleTemplate.materials.map((currentMaterial) =>
-        Material.generateMaterial(
-            materialTemplates[currentMaterial],
-            vehicleId,
-            vehicleTemplate.name,
-            VehiclePosition.create(vehicleId)
-        )
-    );
-    const personnel = vehicleTemplate.personnel.map((currentPersonnel) =>
-        Personnel.generatePersonnel(
-            personnelTemplates[currentPersonnel],
-            vehicleId,
-            vehicleTemplate.name,
-            VehiclePosition.create(vehicleId)
-        )
-    );
+    const materials = vehicleTemplate.materialTemplateIds
+        .map((materialTemplateId: UUID) => {
+            const materialTemplate = materialTemplates[materialTemplateId];
+            if (!materialTemplate) return null;
+            return Material.generateMaterial(
+                materialTemplate,
+                vehicleId,
+                vehicleTemplate.name,
+                VehiclePosition.create(vehicleId)
+            );
+        })
+        .filter((val) => val !== null);
+    const personnel = vehicleTemplate.personnelTemplateIds
+        .map((personnelTemplateId: UUID) => {
+            const personnelTemplate = personnelTemplates[personnelTemplateId];
+            if (!personnelTemplate) return null;
+            return Personnel.generatePersonnel(
+                personnelTemplate,
+                vehicleId,
+                vehicleTemplate.name,
+                VehiclePosition.create(vehicleId)
+            );
+        })
+        .filter((val) => val !== null);
 
     const vehicle: Vehicle = {
         id: vehicleId,
         type: 'vehicle',
+        templateId: vehicleTemplate.id,
         materialIds: arrayToUUIDSet(materials.map((m) => m.id)),
         vehicleType: vehicleTemplate.vehicleType,
         name: vehicleTemplate.name,

@@ -24,6 +24,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Sending an alarm group with a higher first vehicle count than total alarm group vehicles is now handled gracefully.
 - Fixed a bug where different clients might see different behavior of the simulation when they're using different locales.
+- Name of material is shown in the material popup.
 
 ## [0.9.0] - 2025-09-23
 

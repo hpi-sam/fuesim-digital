@@ -16,8 +16,10 @@ import {
     selectVehicleTemplates,
     selectPatientCategories,
     selectMapImagesTemplates,
+    selectExerciseState,
 } from 'src/app/state/application/selectors/exercise.selectors';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
@@ -163,8 +165,10 @@ export class TrainerMapEditorComponent implements OnInit {
             const importedPlainObject = JSON.parse(
                 importedText
             ) as PartialExport;
-            const migratedPartialExport =
-                migratePartialExport(importedPlainObject);
+            const migratedPartialExport = migratePartialExport(
+                importedPlainObject,
+                selectStateSnapshot(selectExerciseState, this.store)
+            );
             const validation = validateExerciseExport(migratedPartialExport);
             if (validation.length > 0) {
                 throw Error(
@@ -175,6 +179,10 @@ export class TrainerMapEditorComponent implements OnInit {
                 this.ngbModalService,
                 migratedPartialExport
             );
+        } catch {
+            this.messageService.postError({
+                title: 'Fehler beim Importieren von Vorlagen',
+            });
         } finally {
             this.importingTemplates = false;
         }

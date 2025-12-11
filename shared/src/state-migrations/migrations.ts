@@ -3,19 +3,20 @@ import type { ExerciseAction } from '../store/index.js';
 import { ReducerError, applyAction } from '../store/index.js';
 import type { Mutable, UUID } from '../utils/index.js';
 import { cloneDeepMutable } from '../utils/index.js';
+import type { MigratedStateExport } from '../export-import/file-format/index.js';
 import {
     PartialExport,
     StateExport,
 } from '../export-import/file-format/index.js';
-import type { MapImageTemplate, VehicleTemplate } from '../models/index.js';
-import type { PatientCategory } from '../models/patient-category.js';
 import type { Migration } from './migration-functions.js';
 import { migrations } from './migration-functions.js';
 
 export function migrateStateExport(
     stateExportToMigrate: StateExport
-): Mutable<StateExport> {
-    const stateExport = cloneDeepMutable(stateExportToMigrate);
+): Mutable<MigratedStateExport> {
+    const stateExport = cloneDeepMutable(
+        stateExportToMigrate
+    ) as Mutable<MigratedStateExport>;
     const {
         newVersion,
         migratedProperties: { currentState, history },
@@ -48,16 +49,33 @@ export function migrateStateExport(
     return stateExport;
 }
 export function migratePartialExport(
-    partialExportToMigrate: PartialExport
+    partialExportToMigrate: PartialExport,
+    currentState: ExerciseState
 ): Mutable<PartialExport> {
     // Encapsulate the partial export in a state export and migrate it
     const mutablePartialExport = cloneDeepMutable(partialExportToMigrate);
+    const dummyState = cloneDeepMutable(ExerciseState.create('123456'));
     const stateExport = cloneDeepMutable(
         new StateExport({
-            ...cloneDeepMutable(ExerciseState.create('123456')),
+            ...dummyState,
             mapImageTemplates: mutablePartialExport.mapImageTemplates ?? [],
             patientCategories: mutablePartialExport.patientCategories ?? [],
             vehicleTemplates: mutablePartialExport.vehicleTemplates ?? [],
+            // We need this hotfix since otherwise migration 44 is not happy
+            materialTemplates: Object.fromEntries(
+                Object.entries(dummyState.materialTemplates).map(
+                    ([id, template]) => [
+                        id,
+                        {
+                            ...template,
+                            materialType:
+                                template.image.url === '/assets/material.svg'
+                                    ? 'standard'
+                                    : 'big',
+                        },
+                    ]
+                )
+            ),
         })
     );
     stateExport.fileVersion = mutablePartialExport.fileVersion;
@@ -68,19 +86,39 @@ export function migratePartialExport(
     // `undefined` will be ignored while `[]` would remove all existing entries.
     const mapImageTemplates =
         mutablePartialExport.mapImageTemplates !== undefined
-            ? (migratedStateExport.currentState
-                  .mapImageTemplates as MapImageTemplate[])
+            ? Object.values(migratedStateExport.currentState.mapImageTemplates)
             : undefined;
     const patientCategories =
         mutablePartialExport.patientCategories !== undefined
-            ? (migratedStateExport.currentState
-                  .patientCategories as PatientCategory[])
+            ? migratedStateExport.currentState.patientCategories
             : undefined;
-    const vehicleTemplates =
+    let vehicleTemplates =
         mutablePartialExport.vehicleTemplates !== undefined
-            ? (migratedStateExport.currentState
-                  .vehicleTemplates as VehicleTemplate[])
+            ? Object.values(migratedStateExport.currentState.vehicleTemplates)
             : undefined;
+
+    // Fix template id lookups, since migration 44 always computes new template IDs
+    if (vehicleTemplates)
+        vehicleTemplates = vehicleTemplates.map((t) => ({
+            ...t,
+            personnelTemplateIds: t.personnelTemplateIds.map((id) => {
+                const requiredType =
+                    migratedStateExport.currentState.personnelTemplates[id]!
+                        .personnelType;
+                return Object.values(currentState.personnelTemplates).find(
+                    (pt) => pt.personnelType === requiredType
+                )!.id;
+            }),
+            materialTemplateIds: t.materialTemplateIds.map((id) => {
+                const requiredType =
+                    migratedStateExport.currentState.materialTemplates[id]!
+                        .image.url;
+                return Object.values(currentState.materialTemplates).find(
+                    (mt) => mt.image.url === requiredType
+                )!.id;
+            }),
+        }));
+
     const migratedPartialExport = new PartialExport(
         patientCategories,
         vehicleTemplates,
@@ -201,7 +239,7 @@ function migrateState(migrationsToApply: Migration[], currentState: object) {
  */
 function migrateAction(
     migrationsToApply: Migration[],
-    intermediaryState: object,
+    intermediaryState: ExerciseState,
     action: object
 ): boolean {
     return migrationsToApply.every((migration) => {

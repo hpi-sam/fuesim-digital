@@ -227,9 +227,6 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
             selectVehicleTemplates,
             this.store
         );
-        const vehicleTemplatesById = Object.fromEntries(
-            vehicleTemplates.map((template) => [template.id, template])
-        );
 
         const materialTemplates = selectStateSnapshot(
             selectMaterialTemplates,
@@ -255,7 +252,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
                 createVehicleParameters(
                     uuid(),
                     {
-                        ...vehicleTemplatesById[
+                        ...vehicleTemplates[
                             alarmGroupVehicle.vehicleTemplateId
                         ]!,
                         name: alarmGroupVehicle.name,

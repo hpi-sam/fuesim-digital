@@ -32,14 +32,3 @@ export function getRgbaColor(
         .replace('rgb', 'rgba')
         .replace(')', `, ${alpha})`);
 }
-
-/**
- *
- * @returns a random color with the provided alpha value like `rgba(23, 12, 252, 0.75)`
- */
-export function generateRandomRgbaColor(alpha: number): string {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}

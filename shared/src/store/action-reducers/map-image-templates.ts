@@ -46,18 +46,13 @@ export namespace MapImageTemplatesActionReducers {
         {
             action: AddMapImageTemplateAction,
             reducer: (draftState, { mapImageTemplate }) => {
-                if (
-                    draftState.mapImageTemplates.some(
-                        (template) => template.id === mapImageTemplate.id
-                    )
-                ) {
+                if (draftState.mapImageTemplates[mapImageTemplate.id]) {
                     throw new ReducerError(
                         `MapImageTemplate with id ${mapImageTemplate.id} already exists`
                     );
                 }
-                draftState.mapImageTemplates.push(
-                    cloneDeepMutable(mapImageTemplate)
-                );
+                draftState.mapImageTemplates[mapImageTemplate.id] =
+                    cloneDeepMutable(mapImageTemplate);
                 return draftState;
             },
             rights: 'trainer',
@@ -80,10 +75,7 @@ export namespace MapImageTemplatesActionReducers {
             action: DeleteMapImageTemplateAction,
             reducer: (draftState, { id }) => {
                 getMapImageTemplate(draftState, id);
-                draftState.mapImageTemplates =
-                    draftState.mapImageTemplates.filter(
-                        (template) => template.id !== id
-                    );
+                delete draftState.mapImageTemplates[id];
                 return draftState;
             },
             rights: 'trainer',
@@ -94,9 +86,7 @@ function getMapImageTemplate(
     state: Mutable<ExerciseState>,
     id: UUID
 ): Mutable<MapImageTemplate> {
-    const mapImageTemplate = state.mapImageTemplates.find(
-        (template) => template.id === id
-    );
+    const mapImageTemplate = state.mapImageTemplates[id];
     if (!mapImageTemplate) {
         throw new ReducerError(`MapImageTemplate with id ${id} does not exist`);
     }

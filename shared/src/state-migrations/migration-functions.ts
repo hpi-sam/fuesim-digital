@@ -1,3 +1,4 @@
+import type { ExerciseState } from '../state.js';
 import { renameDeleteTransferAction10 } from './10-rename-delete-transfer-action.js';
 import { addMapImageIsLocked11 } from './11-add-map-image-is-locked.js';
 import { renameIncorrectPatientImages12 } from './12-rename-incorrect-patient-images.js';
@@ -40,6 +41,7 @@ import { impossibleMigration } from './impossible-migration.js';
 import { addPatientTransportPriority41 } from './41-add-patient-transport-prio.js';
 import { replaceClientRoles42 } from './42-replace-clientroles.js';
 import { addEmergencyOperationsCenterViewport43 } from './43-add-eoc-viewport.js';
+import { generalizeMaterialsPersonnel44 } from './44-generalize-materials-personnel.js';
 
 /**
  * Migrate a single action
@@ -49,7 +51,7 @@ import { addEmergencyOperationsCenterViewport43 } from './43-add-eoc-viewport.js
  * @throws a {@link RestoreError} when a migration is not possible.
  */
 type MigrateActionFunction = (
-    intermediaryState: object,
+    intermediaryState: ExerciseState,
     action: object
 ) => boolean;
 
@@ -109,4 +111,5 @@ export const migrations: {
     41: addPatientTransportPriority41,
     42: replaceClientRoles42,
     43: addEmergencyOperationsCenterViewport43,
+    44: generalizeMaterialsPersonnel44,
 };

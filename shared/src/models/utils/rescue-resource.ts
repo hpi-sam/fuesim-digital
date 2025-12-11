@@ -3,8 +3,6 @@ import { StrictObject } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
 import { getCreate } from './get-create.js';
-import type { PersonnelType } from './personnel-type.js';
-import { personnelTypeAllowedValues } from './personnel-type.js';
 import type { ResourceDescription } from './resource-description.js';
 
 class RescueResource {
@@ -32,20 +30,14 @@ export class PersonnelResource {
     @IsValue('personnelResource' as const)
     public readonly type = 'personnelResource';
 
-    @IsResourceDescription(personnelTypeAllowedValues)
-    public readonly personnelCounts: ResourceDescription<PersonnelType>;
+    @IsResourceDescription()
+    public readonly personnelCounts: ResourceDescription;
 
     /**
      * @deprecated Use {@link create} instead
      */
-    constructor(personnelCounts?: ResourceDescription<PersonnelType>) {
-        this.personnelCounts = personnelCounts ?? {
-            gf: 0,
-            notarzt: 0,
-            notSan: 0,
-            rettSan: 0,
-            san: 0,
-        };
+    constructor(personnelCounts?: ResourceDescription) {
+        this.personnelCounts = personnelCounts ?? {};
     }
 
     static readonly create = getCreate(this);

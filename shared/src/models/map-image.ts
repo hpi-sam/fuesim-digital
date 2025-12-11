@@ -14,6 +14,9 @@ export class MapImage {
     @IsValue('mapImage' as const)
     public readonly type = 'mapImage';
 
+    @IsUUID(4, uuidValidationOptions)
+    public readonly templateId: UUID;
+
     /**
      * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
      */
@@ -44,11 +47,13 @@ export class MapImage {
      * @deprecated Use {@link create} instead
      */
     constructor(
+        templateId: UUID,
         topLeft: MapCoordinates,
         image: ImageProperties,
         isLocked: boolean,
         zIndex: number
     ) {
+        this.templateId = templateId;
         this.position = MapPosition.create(topLeft);
         this.image = image;
         this.isLocked = isLocked;

@@ -1,17 +1,27 @@
 import { Type } from 'class-transformer';
-import { IsNumber, Max, Min, ValidateNested } from 'class-validator';
+import {
+    IsNumber,
+    IsString,
+    IsUUID,
+    Max,
+    Min,
+    ValidateNested,
+} from 'class-validator';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
-import { IsLiteralUnion, IsValue } from '../utils/validators/index.js';
+import { IsValue } from '../utils/validators/index.js';
+import type { UUID } from '../utils/index.js';
+import { uuidValidationOptions, uuid } from '../utils/index.js';
 import { CanCaterFor, getCreate, ImageProperties } from './utils/index.js';
-import type { MaterialType } from './utils/material-type.js';
-import { materialTypeAllowedValues } from './utils/material-type.js';
 
 export class MaterialTemplate {
+    @IsUUID(4, uuidValidationOptions)
+    public readonly id: UUID = uuid();
+
     @IsValue('materialTemplate' as const)
     public readonly type = 'materialTemplate';
 
-    @IsLiteralUnion(materialTypeAllowedValues)
-    public readonly materialType: MaterialType;
+    @IsString()
+    public readonly name: string;
 
     @ValidateNested()
     @Type(() => CanCaterFor)
@@ -43,13 +53,13 @@ export class MaterialTemplate {
      * @deprecated Use {@link create} instead
      */
     constructor(
-        materialType: MaterialType,
+        name: string,
         image: ImageProperties,
         canCaterFor: CanCaterFor,
         overrideTreatmentRange: number,
         treatmentRange: number
     ) {
-        this.materialType = materialType;
+        this.name = name;
         this.image = image;
         this.canCaterFor = canCaterFor;
         this.overrideTreatmentRange = overrideTreatmentRange;

@@ -67,19 +67,23 @@
                     {{ ((vehicles$ | async) ?? {})['all']?.length }}
                 </th>
             </tr>
-            <tr
-                *ngFor="let template of vehicleTemplates$ | async"
-                #collapse="ngbCollapse"
-                [(ngbCollapse)]="vehiclesCollapsed"
+            <ng-container
+                *ngFor="let template of vehicleTemplates$ | async | values"
             >
-                <td class="ps-4">{{ template.vehicleType }}</td>
-                <td>
-                    {{
-                        ((vehicles$ | async) ?? {})[template.vehicleType]
-                            ?.length
-                    }}
-                </td>
-            </tr>
+                <tr
+                    *ngIf="
+                        ((vehicles$ | async) ?? {})[template.id]
+                            ?.length as vehiclesCount
+                    "
+                    #collapse="ngbCollapse"
+                    [(ngbCollapse)]="vehiclesCollapsed"
+                >
+                    <td class="ps-4">{{ template.vehicleType }}</td>
+                    <td>
+                        {{ vehiclesCount }}
+                    </td>
+                </tr>
+            </ng-container>
         </tbody>
         <tbody>
             <tr
@@ -96,27 +100,64 @@
                     ></ng-template>
                     Personal
                 </th>
-                <th class="w-25">{{ (personnel.all$ | async)?.length }}</th>
+                <th class="w-25">
+                    {{ ((personnel$ | async) ?? {})['all']?.length }}
+                </th>
             </tr>
-            <tr
-                *ngFor="let personnelCategory of personnelCategories"
-                #collapse="ngbCollapse"
-                [(ngbCollapse)]="personnelCollapsed"
+            <ng-container
+                *ngFor="let template of personnelTemplates$ | async | values"
             >
-                <td class="ps-4">{{ personnelCategory | personnelName }}</td>
-                <td>
-                    {{
-                        (personnel[personnelCategory | withDollar] | async)
-                            ?.length
-                    }}
-                </td>
-            </tr>
+                <tr
+                    *ngIf="
+                        ((personnel$ | async) ?? {})[template.id]
+                            ?.length as personnelCount
+                    "
+                    #collapse="ngbCollapse"
+                    [(ngbCollapse)]="personnelCollapsed"
+                >
+                    <td class="ps-4">{{ template.name }}</td>
+                    <td>
+                        {{ personnelCount }}
+                    </td>
+                </tr>
+            </ng-container>
         </tbody>
         <tbody>
-            <tr>
-                <th scope="rowgroup" class="w-75">Material</th>
-                <th class="w-25">{{ (material$ | async)?.length }}</th>
+            <tr
+                (click)="materialsCollapsed = !materialsCollapsed"
+                style="cursor: pointer"
+            >
+                <th scope="rowgroup" class="w-75">
+                    <i
+                        *ngIf="materialsCollapsed; else materialsExpanded"
+                        class="bi bi-caret-right-fill"
+                    ></i>
+                    <ng-template #materialsExpanded
+                        ><i class="bi bi-caret-down-fill"></i
+                    ></ng-template>
+                    Material
+                </th>
+                <th class="w-25">
+                    {{ ((materials$ | async) ?? {})['all']?.length }}
+                </th>
             </tr>
+            <ng-container
+                *ngFor="let template of materialTemplates$ | async | values"
+            >
+                <tr
+                    *ngIf="
+                        ((materials$ | async) ?? {})[template.id]
+                            ?.length as materialsCount
+                    "
+                    #collapse="ngbCollapse"
+                    [(ngbCollapse)]="materialsCollapsed"
+                >
+                    <td class="ps-4">{{ template.name }}</td>
+                    <td>
+                        {{ materialsCount }}
+                    </td>
+                </tr>
+            </ng-container>
         </tbody>
     </table>
 </div>

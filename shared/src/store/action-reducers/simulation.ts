@@ -1494,9 +1494,8 @@ export namespace SimulationActionReducers {
 
                 const prioritiesString = priorities
                     .map((priority, i) => {
-                        const vehicleType = draftState.vehicleTemplates.find(
-                            (vehicleTemplate) => vehicleTemplate.id === priority
-                        )!.vehicleType;
+                        const vehicleType =
+                            draftState.vehicleTemplates[priority]!.vehicleType;
                         return `${i + 1}. ${vehicleType}`;
                     })
                     .join(' ');

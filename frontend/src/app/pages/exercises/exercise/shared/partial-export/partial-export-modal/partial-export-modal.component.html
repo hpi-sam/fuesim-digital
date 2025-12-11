@@ -3,48 +3,17 @@
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
 <div class="modal-body">
-    <p>Wählen Sie aus, welche Vorlagen exportiert werden sollen.</p>
-    <ul class="list-group list-group-flush">
-        <li class="list-group-item">
-            <input
-                [(ngModel)]="configuration.patientCategories"
-                class="form-check-input me-1"
-                type="checkbox"
-                id="export-patient-templates"
-            />
-            <label for="export-patient-templates"> Patientenvorlagen </label>
-        </li>
-        <li class="list-group-item">
-            <input
-                [(ngModel)]="configuration.vehicleTemplates"
-                class="form-check-input me-1"
-                type="checkbox"
-                id="export-vehicle-templates"
-            />
-            <label for="export-vehicle-templates"> Fahrzeugvorlagen </label>
-        </li>
-        <li class="list-group-item">
-            <input
-                [(ngModel)]="configuration.mapImageTemplates"
-                class="form-check-input me-1"
-                type="checkbox"
-                id="export-image-templates"
-            />
-            <label for="export-image-templates"> Bildvorlagen </label>
-        </li>
-    </ul>
-    <br />
-    <button
-        (click)="partialExport()"
-        [disabled]="
-            !(
-                configuration.mapImageTemplates ||
-                configuration.patientCategories ||
-                configuration.vehicleTemplates
-            )
-        "
-        class="btn btn-primary"
-    >
-        Exportieren
-    </button>
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-triangle me-3"></i>
+        <div>
+            Leider steht der <strong>partielle Export</strong> aufgrund von
+            Umbauarbeiten für eine neue Version der Software, welche
+            umfangreiche Funktionen zum Verwalten von Vorlagen enthalten wird,
+            <strong>nicht mehr zur Verfügung</strong>. Bitte benutzen Sie
+            alternativ die Möglichkeit, einen kompletten Übungsexport
+            durchzuführen und nach dem Import nicht benötigte Elemente zu
+            löschen. Der Import von alten partiellen Exporten ist weiterhin
+            unter <em>Vorlagen importieren</em> möglich.
+        </div>
+    </div>
 </div>

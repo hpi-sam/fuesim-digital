@@ -20,12 +20,12 @@ import { radiogramTypeToGermanDictionary } from '../radiogram/exercise-radiogram
 import type { ExerciseRadiogramStatus } from '../radiogram/status/exercise-radiogram-status.js';
 import { radiogramStatusTypeToGermanDictionary } from '../radiogram/status/exercise-radiogram-status.js';
 import { Tag } from '../tag.js';
+import type { Personnel } from '../personnel.js';
+import type { PersonnelTemplate } from '../personnel-template.js';
 import type { ExerciseOccupation } from './occupations/index.js';
 import { occupationToGermanDictionary } from './occupations/exercise-occupation.js';
 import { statusNames } from './patient-status.js';
 import type { PatientStatus } from './patient-status.js';
-import type { PersonnelType } from './personnel-type.js';
-import { personnelTypeNames } from './personnel-type.js';
 import {
     currentSimulatedRegionIdOf,
     isInSimulatedRegion,
@@ -284,13 +284,17 @@ export function createBehaviorTag(
 }
 export function createPersonnelTypeTag(
     _draftState: Mutable<ExerciseState>,
-    personnelType: PersonnelType
+    personnel: Personnel | PersonnelTemplate
 ): Tag {
     return new Tag(
         'Personaltyp',
         'chocolate',
         'white',
-        personnelTypeNames[personnelType],
-        personnelType
+        personnel.type === 'personnelTemplate'
+            ? personnel.name
+            : personnel.typeName,
+        personnel.type === 'personnelTemplate'
+            ? personnel.id
+            : personnel.templateId
     );
 }

@@ -71,7 +71,7 @@
                         <h6>Personal</h6>
                         <ul>
                             <li *ngFor="let personnel of selection.personnel">
-                                {{ personnel.personnelType | personnelName }}
+                                {{ personnel.typeName }}
                                 <span
                                     *ngIf="
                                         personnel.isInVehicle;

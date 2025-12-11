@@ -1,16 +1,13 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type {
-    PatientCategory,
-    PersonnelCategory,
-} from '../simulated-region-overview-general-tab.component';
+import type { PatientCategory } from '../simulated-region-overview-general-tab.component';
 
 @Pipe({
     name: 'withDollar',
     standalone: false,
 })
 export class WithDollarPipe implements PipeTransform {
-    transform<Category extends PatientCategory | PersonnelCategory>(
+    transform<Category extends PatientCategory>(
         value: Category
     ): `${Category}$` {
         return `${value}$`;

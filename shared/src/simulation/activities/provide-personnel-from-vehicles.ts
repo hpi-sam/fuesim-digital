@@ -1,12 +1,6 @@
 import { IsString, IsUUID } from 'class-validator';
 import type { SimulatedRegion } from '../../models/index.js';
-import { personnelTypeAllowedValues } from '../../models/utils/personnel-type.js';
-import type { PersonnelType } from '../../models/utils/index.js';
-import {
-    PersonnelResource,
-    VehicleResource,
-    getCreate,
-} from '../../models/utils/index.js';
+import { VehicleResource, getCreate } from '../../models/utils/index.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import {
     addResourceDescription,
@@ -15,7 +9,6 @@ import {
 import type { ExerciseState } from '../../state.js';
 import type { UUID } from '../../utils/index.js';
 import {
-    cloneDeepMutable,
     StrictObject,
     uuidArrayValidationOptions,
     uuidValidationOptions,
@@ -40,8 +33,8 @@ export class ProvidePersonnelFromVehiclesActivityState
     @IsUUID(4, uuidValidationOptions)
     public readonly id: UUID;
 
-    @IsResourceDescription(personnelTypeAllowedValues)
-    public readonly requiredPersonnelCounts: ResourceDescription<PersonnelType>;
+    @IsResourceDescription()
+    public readonly requiredPersonnelCounts: ResourceDescription;
 
     @IsUUID(4, uuidArrayValidationOptions)
     public readonly vehiclePriorities: readonly UUID[];
@@ -54,7 +47,7 @@ export class ProvidePersonnelFromVehiclesActivityState
      */
     constructor(
         id: UUID,
-        requiredPersonnelCounts: ResourceDescription<PersonnelType>,
+        requiredPersonnelCounts: ResourceDescription,
         vehiclePriorities: UUID[],
         key: string
     ) {
@@ -91,15 +84,15 @@ export const providePersonnelFromVehiclesActivity: SimulationActivity<ProvidePer
                         priority
                     ): priority is {
                         vehicleType: string;
-                        vehiclePersonnel: ResourceDescription<PersonnelType>;
+                        vehiclePersonnel: ResourceDescription;
                     } => priority.vehicleType !== undefined
                 );
             const missingVehicleCounts: ResourceDescription = {};
 
             const personnelStillMissing = ([personnelType, personnelCount]: [
-                PersonnelType,
+                string,
                 number,
-            ]) => personnelCount > availablePersonnel[personnelType];
+            ]) => personnelCount > (availablePersonnel[personnelType] ?? 0);
 
             while (
                 !greaterEqualResourceDescription(
@@ -115,7 +108,7 @@ export const providePersonnelFromVehiclesActivity: SimulationActivity<ProvidePer
                         vehiclePriorities.findIndex(
                             // Match requested personnel type exactly, no better personnel is accepted as substitute
                             ({ vehiclePersonnel: personnel }) =>
-                                personnel[personnelType] > 0
+                                (personnel[personnelType] ?? 0) > 0
                         )
                     );
                 // We use max here because we need the vehicle with the highest value in this list anyways and might
@@ -153,17 +146,17 @@ function personnelInVehicleTemplate(
     templateId: UUID
 ): {
     vehicleType: string | undefined;
-    vehiclePersonnel: ResourceDescription<PersonnelType>;
+    vehiclePersonnel: ResourceDescription;
 } {
-    const resource = cloneDeepMutable(
-        PersonnelResource.create()
-    ).personnelCounts;
-    const template = draftState.vehicleTemplates.filter(
-        (tp) => tp.id === templateId
-    )[0];
+    const resource: ResourceDescription = {};
+    const template = draftState.vehicleTemplates[templateId];
     if (template) {
-        template.personnel.forEach((pt) => {
-            resource[pt]++;
+        template.personnelTemplateIds.forEach((personnelTemplateId) => {
+            const personnelTemplate =
+                draftState.personnelTemplates[personnelTemplateId];
+            if (!personnelTemplate) return;
+            resource[personnelTemplate.personnelType] ??= 0;
+            resource[personnelTemplate.personnelType]!++;
         });
     }
     return { vehicleType: template?.vehicleType, vehiclePersonnel: resource };
@@ -172,10 +165,8 @@ function personnelInVehicleTemplate(
 function personnelInUnloadingVehicles(
     draftState: ExerciseState,
     simulatedRegion: SimulatedRegion
-): ResourceDescription<PersonnelType> {
-    const resource = cloneDeepMutable(
-        PersonnelResource.create()
-    ).personnelCounts;
+): ResourceDescription {
+    const resource: ResourceDescription = {};
     StrictObject.values(simulatedRegion.activities)
         .filter(
             (a): a is UnloadVehicleActivityState =>
@@ -192,7 +183,10 @@ function personnelInUnloadingVehicles(
                 tryGetElement(draftState, 'personnel', personnelId)
                     ?.personnelType
         )
-        .filter((pt): pt is PersonnelType => pt !== undefined)
-        .forEach((pt) => resource[pt]++);
+        .filter((personnelType) => personnelType !== undefined)
+        .forEach((personnelType) => {
+            resource[personnelType] ??= 0;
+            resource[personnelType]++;
+        });
     return resource;
 }

@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsOptional, ValidateNested } from 'class-validator';
+import { IsArray, IsObject, IsOptional, ValidateNested } from 'class-validator';
 import { ExerciseState } from '../../state.js';
 import type { Mutable } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
@@ -29,9 +29,8 @@ export class StateExport extends BaseExportImportFile {
     @IsValue('complete' as const)
     public readonly type: 'complete' = 'complete';
 
-    @ValidateNested()
-    @Type(() => ExerciseState)
-    public currentState: Mutable<ExerciseState>;
+    @IsObject()
+    public currentState: object;
 
     @IsOptional()
     @ValidateNested()
@@ -39,11 +38,25 @@ export class StateExport extends BaseExportImportFile {
     public readonly history?: StateHistoryCompound;
 
     public constructor(
-        currentState: Mutable<ExerciseState>,
+        currentState: object,
         stateHistory?: StateHistoryCompound
     ) {
         super();
         this.currentState = currentState;
         this.history = stateHistory;
+    }
+}
+
+export class MigratedStateExport extends StateExport {
+    @ValidateNested()
+    @Type(() => ExerciseState)
+    public override currentState: Mutable<ExerciseState>;
+
+    public constructor(
+        currentState: Mutable<ExerciseState>,
+        stateHistory?: StateHistoryCompound
+    ) {
+        super(currentState, stateHistory);
+        this.currentState = currentState;
     }
 }

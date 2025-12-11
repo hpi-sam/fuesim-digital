@@ -56,23 +56,9 @@ export function migratePartialExport(
     const stateExport = cloneDeepMutable(
         new StateExport({
             ...cloneDeepMutable(ExerciseState.create('123456')),
-            mapImageTemplates:
-                mutablePartialExport.dataVersion < 44
-                    ? (mutablePartialExport.mapImageTemplates ?? [])
-                    : Object.fromEntries(
-                          (mutablePartialExport.mapImageTemplates ?? []).map(
-                              (template) => [template.id, template]
-                          )
-                      ),
+            mapImageTemplates: mutablePartialExport.mapImageTemplates ?? [],
             patientCategories: mutablePartialExport.patientCategories ?? [],
-            vehicleTemplates:
-                mutablePartialExport.dataVersion < 44
-                    ? (mutablePartialExport.vehicleTemplates ?? [])
-                    : Object.fromEntries(
-                          (mutablePartialExport.vehicleTemplates ?? []).map(
-                              (template) => [template.id, template]
-                          )
-                      ),
+            vehicleTemplates: mutablePartialExport.vehicleTemplates ?? [],
         })
     );
     stateExport.fileVersion = mutablePartialExport.fileVersion;

@@ -3,19 +3,20 @@ import type { ExerciseAction } from '../store/index.js';
 import { ReducerError, applyAction } from '../store/index.js';
 import type { Mutable, UUID } from '../utils/index.js';
 import { cloneDeepMutable } from '../utils/index.js';
+import type { MigratedStateExport } from '../export-import/file-format/index.js';
 import {
     PartialExport,
     StateExport,
 } from '../export-import/file-format/index.js';
-import type { MapImageTemplate, VehicleTemplate } from '../models/index.js';
-import type { PatientCategory } from '../models/patient-category.js';
 import type { Migration } from './migration-functions.js';
 import { migrations } from './migration-functions.js';
 
 export function migrateStateExport(
     stateExportToMigrate: StateExport
-): Mutable<StateExport> {
-    const stateExport = cloneDeepMutable(stateExportToMigrate);
+): Mutable<MigratedStateExport> {
+    const stateExport = cloneDeepMutable(
+        stateExportToMigrate
+    ) as Mutable<MigratedStateExport>;
     const {
         newVersion,
         migratedProperties: { currentState, history },
@@ -55,17 +56,23 @@ export function migratePartialExport(
     const stateExport = cloneDeepMutable(
         new StateExport({
             ...cloneDeepMutable(ExerciseState.create('123456')),
-            mapImageTemplates: Object.fromEntries(
-                (mutablePartialExport.mapImageTemplates ?? []).map(
-                    (template) => [template.id, template]
-                )
-            ),
+            mapImageTemplates:
+                mutablePartialExport.dataVersion < 44
+                    ? (mutablePartialExport.mapImageTemplates ?? [])
+                    : Object.fromEntries(
+                          (mutablePartialExport.mapImageTemplates ?? []).map(
+                              (template) => [template.id, template]
+                          )
+                      ),
             patientCategories: mutablePartialExport.patientCategories ?? [],
-            vehicleTemplates: Object.fromEntries(
-                (mutablePartialExport.vehicleTemplates ?? []).map(
-                    (template) => [template.id, template]
-                )
-            ),
+            vehicleTemplates:
+                mutablePartialExport.dataVersion < 44
+                    ? (mutablePartialExport.vehicleTemplates ?? [])
+                    : Object.fromEntries(
+                          (mutablePartialExport.vehicleTemplates ?? []).map(
+                              (template) => [template.id, template]
+                          )
+                      ),
         })
     );
     stateExport.fileVersion = mutablePartialExport.fileVersion;
@@ -76,24 +83,15 @@ export function migratePartialExport(
     // `undefined` will be ignored while `[]` would remove all existing entries.
     const mapImageTemplates =
         mutablePartialExport.mapImageTemplates !== undefined
-            ? Object.values(
-                  migratedStateExport.currentState.mapImageTemplates as {
-                      [key in UUID]: MapImageTemplate;
-                  }
-              )
+            ? Object.values(migratedStateExport.currentState.mapImageTemplates)
             : undefined;
     const patientCategories =
         mutablePartialExport.patientCategories !== undefined
-            ? (migratedStateExport.currentState
-                  .patientCategories as PatientCategory[])
+            ? migratedStateExport.currentState.patientCategories
             : undefined;
     const vehicleTemplates =
         mutablePartialExport.vehicleTemplates !== undefined
-            ? Object.values(
-                  migratedStateExport.currentState.vehicleTemplates as {
-                      [key in UUID]: VehicleTemplate;
-                  }
-              )
+            ? Object.values(migratedStateExport.currentState.vehicleTemplates)
             : undefined;
     const migratedPartialExport = new PartialExport(
         patientCategories,
@@ -215,7 +213,7 @@ function migrateState(migrationsToApply: Migration[], currentState: object) {
  */
 function migrateAction(
     migrationsToApply: Migration[],
-    intermediaryState: object,
+    intermediaryState: ExerciseState,
     action: object
 ): boolean {
     return migrationsToApply.every((migration) => {

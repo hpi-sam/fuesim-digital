@@ -1,5 +1,6 @@
-import type { UUID } from '../utils/index.js';
+import type { Mutable, UUID } from '../utils/index.js';
 import { uuid } from '../utils/index.js';
+import type { ExerciseState } from '../state.js';
 import type { Migration } from './migration-functions.js';
 
 interface ImageProperties {
@@ -101,25 +102,19 @@ const personnelTypeNames: {
     san: 'Sanitäter',
 };
 
-function getTemplateIds(typedState: {
-    vehicleTemplates: VehicleTemplate[] | { [Key in UUID]: VehicleTemplate };
-    mapImageTemplates: MapImageTemplate[] | { [Key in UUID]: MapImageTemplate };
-}) {
+function getTemplateIds(
+    vehicleTemplates: VehicleTemplate[],
+    mapImageTemplates: MapImageTemplate[]
+) {
     const vehicleTemplateIds: {
         [key in string]: UUID;
     } = Object.fromEntries(
-        (typedState.vehicleTemplates as VehicleTemplate[]).map((template) => [
-            template.vehicleType,
-            template.id,
-        ])
+        vehicleTemplates.map((template) => [template.vehicleType, template.id])
     );
     const mapImageTemplateIds: {
         [key in string]: UUID;
     } = Object.fromEntries(
-        (typedState.mapImageTemplates as MapImageTemplate[]).map((template) => [
-            template.image.url,
-            template.id,
-        ])
+        mapImageTemplates.map((template) => [template.image.url, template.id])
     );
     return { vehicleTemplateIds, mapImageTemplateIds };
 }
@@ -166,17 +161,15 @@ function migratePersonnel(personnel: Personnel) {
 }
 
 export const generalizeMaterialsPersonnel44: Migration = {
-    action: (state, action) => {
+    action: (intermediaryState, action) => {
         const actionType = (action as { type: string }).type;
-        const typedState = state as {
-            vehicleTemplates: { [Key in UUID]: VehicleTemplate };
-            mapImageTemplates: { [Key in UUID]: MapImageTemplate };
-        };
+        const mutableIntermediaryState =
+            intermediaryState as Mutable<ExerciseState>;
 
-        const { mapImageTemplateIds, vehicleTemplateIds } = getTemplateIds({
-            mapImageTemplates: Object.values(typedState.mapImageTemplates),
-            vehicleTemplates: Object.values(typedState.vehicleTemplates),
-        });
+        const { mapImageTemplateIds, vehicleTemplateIds } = getTemplateIds(
+            Object.values(mutableIntermediaryState.vehicleTemplates),
+            Object.values(mutableIntermediaryState.mapImageTemplates)
+        );
         if (actionType === '[Vehicle] Add vehicle') {
             const typedAction = action as {
                 vehicleParameters: VehicleParameters;
@@ -252,8 +245,10 @@ export const generalizeMaterialsPersonnel44: Migration = {
             mapImages: { [key: UUID]: MapImage };
         };
 
-        const { mapImageTemplateIds, vehicleTemplateIds } =
-            getTemplateIds(typedState);
+        const { mapImageTemplateIds, vehicleTemplateIds } = getTemplateIds(
+            typedState.vehicleTemplates as VehicleTemplate[],
+            typedState.mapImageTemplates as MapImageTemplate[]
+        );
 
         Object.values(typedState.materialTemplates).forEach((template) => {
             template.id = materialTemplateIds[template.materialType!];

@@ -2,6 +2,7 @@ import type {
     ExerciseAction,
     ExerciseIds,
     ExerciseTimeline,
+    Mutable,
     Role,
     StateExport,
     UUID,
@@ -280,9 +281,9 @@ export class ExerciseWrapper extends NormalType<
         exerciseIds: ExerciseIds
     ): Promise<ExerciseWrapper> {
         const importOperations = async (manager: EntityManager | undefined) => {
-            const newInitialState =
-                file.history?.initialState ?? file.currentState;
-            const newCurrentState = file.currentState;
+            const newInitialState = (file.history?.initialState ??
+                file.currentState) as Mutable<ExerciseState>;
+            const newCurrentState = file.currentState as Mutable<ExerciseState>;
             // Set new participant id
             newInitialState.participantId = exerciseIds.participantId;
             newCurrentState.participantId = exerciseIds.participantId;

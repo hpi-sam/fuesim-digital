@@ -1,3 +1,4 @@
+import type { ExerciseState } from '../state.js';
 import { renameDeleteTransferAction10 } from './10-rename-delete-transfer-action.js';
 import { addMapImageIsLocked11 } from './11-add-map-image-is-locked.js';
 import { renameIncorrectPatientImages12 } from './12-rename-incorrect-patient-images.js';
@@ -50,7 +51,7 @@ import { generalizeMaterialsPersonnel44 } from './44-generalize-materials-person
  * @throws a {@link RestoreError} when a migration is not possible.
  */
 type MigrateActionFunction = (
-    intermediaryState: object,
+    intermediaryState: ExerciseState,
     action: object
 ) => boolean;
 

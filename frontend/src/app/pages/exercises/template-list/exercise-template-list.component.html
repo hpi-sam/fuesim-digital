@@ -1,0 +1,47 @@
+<app-header />
+<div class="container">
+    <h1>
+        Meine Übungsvorlagen
+        <button class="btn btn-primary float-end">
+            Neue Übungsvorlage erstellen
+        </button>
+    </h1>
+    @if (exerciseTemplates.isLoading()) {
+        <div class="row row-cols-3">
+            @for (time of 3 | times; track $index) {
+                <div class="col">
+                    <div class="card" aria-hidden="true">
+                        <div class="card-body">
+                            <h2 class="card-title h4 placeholder-glow">
+                                <span class="placeholder col-6"></span>
+                            </h2>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-4"></span>
+                            </p>
+                            <a
+                                class="btn btn-primary disabled placeholder col-6"
+                                aria-disabled="true"
+                            ></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @if (exerciseTemplates.hasValue()) {
+        <div class="row row-cols-3">
+            @for (
+                exerciseTemplate of exerciseTemplates.value();
+                track exerciseTemplate.trainerId
+            ) {
+                <div class="col">
+                    <app-exercise-template-card
+                        [exerciseTemplate]="exerciseTemplate"
+                    />
+                </div>
+            }
+        </div>
+    }
+</div>
+<app-footer />

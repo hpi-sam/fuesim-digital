@@ -1,11 +1,12 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type {
-    ExerciseAccessIds,
-    ExerciseList,
-    ExerciseTimeline,
-    StateExport,
+import {
+    exercisesSchema,
+    exerciseTemplatesSchema,
+    type ExerciseAccessIds,
+    type ExerciseTimeline,
+    type StateExport,
 } from 'digital-fuesim-manv-shared';
 import { freeze } from 'immer';
 import { lastValueFrom } from 'rxjs';
@@ -84,6 +85,13 @@ export class ApiService {
     }
 
     public getExercisesResource() {
-        return httpResource<ExerciseList>(() => `${httpOrigin}/api/exercises/`);
+        return httpResource(() => `${httpOrigin}/api/exercises/`, {
+            parse: exercisesSchema.parse,
+        });
+    }
+    public getExerciseTemplatesResource() {
+        return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
+            parse: exerciseTemplatesSchema.parse,
+        });
     }
 }

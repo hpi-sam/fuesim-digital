@@ -42,7 +42,8 @@
         "lodash-es": "4.17.21",
         "pg": "^8.14.1",
         "socket.io": "^4.8.1",
-        "supertest": "^7.1.0"
+        "supertest": "^7.1.0",
+        "zod": "^4.1.13"
     },
     "devDependencies": {
         "@eslint/compat": "^1.4.0",

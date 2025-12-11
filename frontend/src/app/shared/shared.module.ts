@@ -58,7 +58,9 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
 import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.pipe';
 import { HeaderComponent } from './components/header/header.component';
 import { TimesPipe } from './pipes/times.pipe';
-import { ExerciseCardComponent } from './components/exercise-card/exercise-card.component';
+import { ExerciseTemplateCardComponent } from './components/exercise-card/exercise-template-card.component';
+import { ExerciseCardComponent } from './components/exercise-template-card/exercise-card.component';
+import { InlineTextEditorComponent } from './components/inline-text-editor/inline-text-editor.component';
 
 @NgModule({
     declarations: [
@@ -110,6 +112,8 @@ import { ExerciseCardComponent } from './components/exercise-card/exercise-card.
         SpecificRoleDisplayNamePipe,
         TimesPipe,
         ExerciseCardComponent,
+        ExerciseTemplateCardComponent,
+        InlineTextEditorComponent,
     ],
     imports: [
         CommonModule,
@@ -167,6 +171,8 @@ import { ExerciseCardComponent } from './components/exercise-card/exercise-card.
         OccupationShortNamePipe,
         TimesPipe,
         ExerciseCardComponent,
+        ExerciseTemplateCardComponent,
+        InlineTextEditorComponent,
     ],
     providers: [HotkeysService],
 })

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import type { ExerciseList } from 'digital-fuesim-manv-shared';
+import type { Exercises } from 'digital-fuesim-manv-shared';
 import { ApiService } from 'src/app/core/api.service';
 import { HttpResourceRef } from '@angular/common/http';
 
@@ -10,7 +10,7 @@ import { HttpResourceRef } from '@angular/common/http';
     standalone: false,
 })
 export class ExerciseListComponent {
-    exercises: HttpResourceRef<ExerciseList | undefined>;
+    exercises: HttpResourceRef<Exercises | undefined>;
 
     constructor(private readonly apiService: ApiService) {
         this.exercises = apiService.getExercisesResource();

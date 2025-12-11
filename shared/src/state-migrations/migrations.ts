@@ -49,16 +49,33 @@ export function migrateStateExport(
     return stateExport;
 }
 export function migratePartialExport(
-    partialExportToMigrate: PartialExport
+    partialExportToMigrate: PartialExport,
+    currentState: ExerciseState
 ): Mutable<PartialExport> {
     // Encapsulate the partial export in a state export and migrate it
     const mutablePartialExport = cloneDeepMutable(partialExportToMigrate);
+    const dummyState = cloneDeepMutable(ExerciseState.create('123456'));
     const stateExport = cloneDeepMutable(
         new StateExport({
-            ...cloneDeepMutable(ExerciseState.create('123456')),
+            ...dummyState,
             mapImageTemplates: mutablePartialExport.mapImageTemplates ?? [],
             patientCategories: mutablePartialExport.patientCategories ?? [],
             vehicleTemplates: mutablePartialExport.vehicleTemplates ?? [],
+            // We need this hotfix since otherwise migration 44 is not happy
+            materialTemplates: Object.fromEntries(
+                Object.entries(dummyState.materialTemplates).map(
+                    ([id, template]) => [
+                        id,
+                        {
+                            ...template,
+                            materialType:
+                                template.image.url === '/assets/material.svg'
+                                    ? 'standard'
+                                    : 'big',
+                        },
+                    ]
+                )
+            ),
         })
     );
     stateExport.fileVersion = mutablePartialExport.fileVersion;
@@ -75,10 +92,33 @@ export function migratePartialExport(
         mutablePartialExport.patientCategories !== undefined
             ? migratedStateExport.currentState.patientCategories
             : undefined;
-    const vehicleTemplates =
+    let vehicleTemplates =
         mutablePartialExport.vehicleTemplates !== undefined
             ? Object.values(migratedStateExport.currentState.vehicleTemplates)
             : undefined;
+
+    // Fix template id lookups, since migration 44 always computes new template IDs
+    if (vehicleTemplates)
+        vehicleTemplates = vehicleTemplates.map((t) => ({
+            ...t,
+            personnelTemplateIds: t.personnelTemplateIds.map((id) => {
+                const requiredType =
+                    migratedStateExport.currentState.personnelTemplates[id]!
+                        .personnelType;
+                return Object.values(currentState.personnelTemplates).find(
+                    (pt) => pt.personnelType === requiredType
+                )!.id;
+            }),
+            materialTemplateIds: t.materialTemplateIds.map((id) => {
+                const requiredType =
+                    migratedStateExport.currentState.materialTemplates[id]!
+                        .image.url;
+                return Object.values(currentState.materialTemplates).find(
+                    (mt) => mt.image.url === requiredType
+                )!.id;
+            }),
+        }));
+
     const migratedPartialExport = new PartialExport(
         patientCategories,
         vehicleTemplates,

@@ -2,8 +2,11 @@ import type { Server as HttpServer } from 'node:http';
 import cors from 'cors';
 import type { Express } from 'express';
 import express from 'express';
+import {
+    exercisesSchema,
+    exerciseTemplatesSchema,
+} from 'digital-fuesim-manv-shared';
 import cookieParser from 'cookie-parser';
-import type { ExerciseList } from 'digital-fuesim-manv-shared';
 import { Config } from '../config.js';
 import type { DatabaseService } from '../database/services/database-service.js';
 import type { AuthService } from '../auth/auth-service.js';
@@ -85,16 +88,49 @@ export class ExerciseHttpServer {
                     {
                         participantId: '123456',
                         trainerId: '12345678',
-                        lastUsedAt: '2025-12-07T16:42:02.718Z',
+                        lastUsedAt: new Date('2025-12-07T16:42:02.718Z'),
                     },
                     {
                         participantId: '789123',
                         trainerId: '78912345',
-                        lastUsedAt: '2025-12-03T16:42:02.718Z',
+                        lastUsedAt: new Date('2025-12-03T16:42:02.718Z'),
                     },
-                ] satisfies ExerciseList;
+                ];
 
-                return { statusCode: 200, body: exercises };
+                return {
+                    statusCode: 200,
+                    body: exercisesSchema.encode(exercises),
+                };
+            }, res)
+        );
+
+        app.get('/api/exercise_templates/', async (req, res) =>
+            secureHttp(() => {
+                const exercises = [
+                    {
+                        trainerId: '12345678',
+                        lastExerciseCreatedAt: new Date(
+                            '2025-12-07T16:42:02.718Z'
+                        ),
+                        name: 'MANV 25 mit Verkehrsunfall',
+                        description:
+                            'Diverse eingeklemmte Personen nach einem Busunfall',
+                    },
+                    {
+                        trainerId: '78912345',
+                        lastExerciseCreatedAt: new Date(
+                            '2025-12-03T16:42:02.718Z'
+                        ),
+                        name: 'MANV 50 am Brandenburger Tor',
+                        description:
+                            'Viele leichtverletzte Personen nach einem Gedränge',
+                    },
+                ];
+
+                return {
+                    statusCode: 200,
+                    body: exerciseTemplatesSchema.encode(exercises),
+                };
             }, res)
         );
 

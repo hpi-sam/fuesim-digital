@@ -1,7 +1,12 @@
 @if (exerciseTemplate(); as exerciseTemplate) {
     <div class="card">
         <div class="card-body">
-            <h2 class="card-title h4">{{ exerciseTemplate.name }}</h2>
+            <h2 class="card-title h4 d-flex">
+                <app-inline-text-editor
+                    class="flex-grow-1"
+                    [value]="exerciseTemplate.name"
+                />
+            </h2>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">

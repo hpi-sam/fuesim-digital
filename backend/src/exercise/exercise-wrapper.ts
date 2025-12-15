@@ -7,9 +7,27 @@ import type { ClientWrapper } from './client-wrapper.js';
 import { patientTick } from './patient-ticking.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
 
-export class ExerciseWrapper {
-    private readonly exercise: Omit<ExerciseEntry, 'id'> &
-        Partial<Pick<ExerciseEntry, 'id'>>;
+export class ActiveExercise {
+    private readonly exercise: Omit<ExerciseEntry, 'id'>;
+
+    // We need to make sure this is set by
+    // the ExerciseService when creating/loading
+    // the exercise or the ExerciseFactory when
+    // restoring an exercise
+    private _exerciseId!: string;
+
+    public get exerciseId(): string {
+        return this._exerciseId;
+    }
+
+    public setExerciseId(value: string) {
+        // the strictness is only valid, if the id is immediately set
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (this._exerciseId !== undefined) {
+            throw new Error('Exercise ID has already been set.');
+        }
+        this._exerciseId = value;
+    }
 
     public getExercise() {
         return this.exercise;
@@ -121,8 +139,8 @@ export class ExerciseWrapper {
         participantId: string,
         trainerId: string,
         initialState: ExerciseState = ExerciseState.create(participantId)
-    ): ExerciseWrapper {
-        const exercise = new ExerciseWrapper(
+    ): ActiveExercise {
+        const exercise = new ActiveExercise(
             participantId,
             trainerId,
             [],

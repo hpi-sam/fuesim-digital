@@ -1,9 +1,9 @@
 import express from 'express';
-import type { ExerciseService } from 'database/services/exercise-service.js';
 import { PeriodicEventHandler } from './exercise/periodic-events/periodic-event-handler.js';
 import { ExerciseWebsocketServer } from './exercise/websocket.js';
 import { ExerciseHttpServer } from './exercise/http-server.js';
 import type { DatabaseService } from './database/services/database-service.js';
+import type { ExerciseService } from './database/services/exercise-service.js';
 
 export class FuesimServer {
     private readonly _httpServer: ExerciseHttpServer;
@@ -12,6 +12,10 @@ export class FuesimServer {
     private readonly saveTickInterval = 10_000;
 
     private readonly saveHandler: PeriodicEventHandler;
+
+    public async saveTick() {
+        await this.exerciseService.saveUnsavedExercises();
+    }
 
     public constructor(
         private readonly databaseService: DatabaseService,
@@ -29,9 +33,7 @@ export class FuesimServer {
         );
 
         this.saveHandler = new PeriodicEventHandler(
-            this.exerciseService.saveUnsavedExercises.bind(
-                this.exerciseService
-            ),
+            this.saveTick.bind(this),
             this.saveTickInterval
         );
         this.saveHandler.start();
@@ -51,7 +53,7 @@ export class FuesimServer {
         this.saveHandler.pause();
         // Save all remaining instances, if it's still possible
         if (this.databaseService.isInitialized) {
-            await this.exerciseService.saveUnsavedExercises();
+            await this.saveTick();
         }
     }
 }

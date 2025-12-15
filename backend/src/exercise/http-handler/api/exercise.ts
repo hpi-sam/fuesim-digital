@@ -4,13 +4,13 @@ import type {
     StateExport,
 } from 'digital-fuesim-manv-shared';
 import { isEmpty } from 'lodash-es';
-import { ExerciseFactory } from 'exercise/exercise-factory.js';
-import type { ExerciseService } from 'database/services/exercise-service.js';
-import { UnknownExerciseError } from 'database/services/exercise-service.js';
-import { importExercise } from 'utils/import-exercise.js';
 import { UserReadableIdGenerator } from '../../../utils/user-readable-id-generator.js';
-import { ExerciseWrapper } from '../../exercise-wrapper.js';
+import { ActiveExercise } from '../../exercise-wrapper.js';
 import type { HttpResponse } from '../utils.js';
+import { importExercise } from '../../../utils/import-exercise.js';
+import { UnknownExerciseError } from './../../../database/services/exercise-service.js';
+import type { ExerciseService } from './../../../database/services/exercise-service.js';
+import { ExerciseFactory } from './../../../exercise/exercise-factory.js';
 
 export async function postExercise(
     exerciseService: ExerciseService,
@@ -25,11 +25,11 @@ export async function postExercise(
                   participantId,
                   trainerId,
               });
-        if (!(newExerciseOrError instanceof ExerciseWrapper)) {
+        if (!(newExerciseOrError instanceof ActiveExercise)) {
             return newExerciseOrError;
         }
 
-        exerciseService.loadExercise(newExerciseOrError, {
+        await exerciseService.loadExercise(newExerciseOrError, {
             participantId,
             trainerId,
         });

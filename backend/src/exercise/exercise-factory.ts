@@ -1,8 +1,4 @@
 import type {
-    actionWrapperTable,
-    exerciseWrapperTable,
-} from 'database/schema.js';
-import type {
     StateExport,
     ExerciseIds,
     ExerciseAction,
@@ -17,18 +13,19 @@ import {
     migrateStateExport,
     validateExerciseExport,
 } from 'digital-fuesim-manv-shared';
-import { pushAll } from 'utils/array.js';
-import { Config } from 'config.js';
 import type { InferSelectModel } from 'drizzle-orm';
-import { RestoreError } from 'utils/restore-error.js';
-import { ValidationErrorWrapper } from 'utils/validation-error-wrapper.js';
-import { ExerciseWrapper } from './exercise-wrapper.js';
-import { ActionWrapper } from './action-wrapper.js';
+import { Config } from '../config.js';
+import type { exerciseTable, actionTable } from '../database/schema.js';
+import { pushAll } from '../utils/array.js';
+import { RestoreError } from '../utils/restore-error.js';
+import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
 import type { HttpResponse } from './http-handler/utils.js';
+import { ActionWrapper } from './action-wrapper.js';
+import { ActiveExercise } from './exercise-wrapper.js';
 
 export class ExerciseFactory {
     public static fromBlank(exerciseIds: ExerciseIds) {
-        return ExerciseWrapper.create(
+        return ActiveExercise.create(
             exerciseIds.participantId,
             exerciseIds.trainerId,
             ExerciseState.create(exerciseIds.participantId)
@@ -41,7 +38,7 @@ export class ExerciseFactory {
     public static fromFile(
         file: StateExport,
         exerciseIds: ExerciseIds
-    ): ExerciseWrapper | HttpResponse<ExerciseIds> {
+    ): ActiveExercise | HttpResponse<ExerciseIds> {
         const migratedImportObject = migrateStateExport(file);
         const validationErrors = validateExerciseExport(migratedImportObject);
         if (validationErrors.length > 0) {
@@ -57,7 +54,7 @@ export class ExerciseFactory {
             newInitialState.participantId = exerciseIds.participantId;
             newCurrentState.participantId = exerciseIds.participantId;
 
-            const exercise = new ExerciseWrapper(
+            const exercise = new ActiveExercise(
                 exerciseIds.participantId,
                 exerciseIds.trainerId,
                 [],
@@ -102,13 +99,12 @@ export class ExerciseFactory {
     }
 
     public static fromDatabase(
-        dbEntry: InferSelectModel<typeof exerciseWrapperTable> & {
-            actions?: InferSelectModel<typeof actionWrapperTable>[];
-        },
+        dbEntry: InferSelectModel<typeof exerciseTable>,
+        actions: InferSelectModel<typeof actionTable>[],
         exerciseIds?: ExerciseIds
-    ): ExerciseWrapper {
+    ): ActiveExercise {
         const actionsInWrapper: ActionWrapper[] = [];
-        const exercise = new ExerciseWrapper(
+        const exercise = new ActiveExercise(
             exerciseIds?.participantId ?? dbEntry.participantId,
             exerciseIds?.trainerId ?? dbEntry.trainerId,
             actionsInWrapper,
@@ -116,10 +112,12 @@ export class ExerciseFactory {
             dbEntry.initialStateString,
             dbEntry.currentStateString
         );
-        if (dbEntry.actions) {
+        exercise.setExerciseId(dbEntry.id);
+        // TODO : @Quixelation --> why are we doing this? --> the thingies are already committed in the database...
+        /* if (actions) {
             pushAll(
                 actionsInWrapper,
-                dbEntry.actions.map(
+                actions.map(
                     (action) =>
                         new ActionWrapper(
                             action.actionString,
@@ -130,23 +128,23 @@ export class ExerciseFactory {
                         )
                 )
             );
-        }
+        }*/
         exercise.setTickCounter(dbEntry.tickCounter);
         exercise.markAsSaved();
         return exercise;
     }
 
     public static restore(
-        exerciseWrapper: ExerciseWrapper,
+        activeExercise: ActiveExercise,
         keepActions: boolean
     ): void {
-        const exercise = exerciseWrapper.getExercise();
+        const exercise = activeExercise.getExercise();
 
         // Check State Version
         if (exercise.stateVersion !== ExerciseState.currentStateVersion) {
             throw new RestoreError(
                 `The exercise was created with an incompatible version of the state (got version ${exercise.stateVersion}, required version ${ExerciseState.currentStateVersion})`,
-                exercise.id!
+                activeExercise.exerciseId
             );
         }
 
@@ -156,7 +154,7 @@ export class ExerciseFactory {
             throw new ValidationErrorWrapper(errors);
         }
 
-        this.restoreState(exerciseWrapper, keepActions);
+        this.restoreState(activeExercise, keepActions);
     }
 
     /**
@@ -165,13 +163,13 @@ export class ExerciseFactory {
      * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
      */
     private static restoreState(
-        exerciseWrapper: ExerciseWrapper,
+        activeExercise: ActiveExercise,
         keepActions: boolean
     ) {
-        const exercise = exerciseWrapper.getExercise();
+        const exercise = activeExercise.getExercise();
         let currentState = cloneDeepMutable(exercise.initialStateString);
 
-        exerciseWrapper.temporaryActionHistory.forEach((actionWrapper) => {
+        activeExercise.temporaryActionHistory.forEach((actionWrapper) => {
             this.validateAction(actionWrapper.getAction().actionString);
             try {
                 currentState = applyAction(
@@ -184,7 +182,7 @@ export class ExerciseFactory {
                         `A reducer error occurred while restoring (Action ${
                             actionWrapper.getAction().index
                         }: \`${JSON.stringify(actionWrapper.getAction().actionString)}\`)`,
-                        exercise.id ?? 'unknown id',
+                        activeExercise.exerciseId,
                         e
                     );
                 }
@@ -192,19 +190,19 @@ export class ExerciseFactory {
             }
         });
         exercise.currentStateString = currentState;
-        exerciseWrapper.incrementIdGenerator.setCurrent(
-            exerciseWrapper.temporaryActionHistory.length
+        activeExercise.incrementIdGenerator.setCurrent(
+            activeExercise.temporaryActionHistory.length
         );
         if (Config.useDb && !keepActions) {
             // Remove all actions to not save them again in the database
-            exerciseWrapper.temporaryActionHistory.splice(
+            activeExercise.temporaryActionHistory.splice(
                 0,
-                exerciseWrapper.temporaryActionHistory.length
+                activeExercise.temporaryActionHistory.length
             );
         }
         // Pause exercise
         if (exercise.currentStateString.currentStatus === 'running')
-            exerciseWrapper.reduce(
+            activeExercise.reduce(
                 {
                     type: '[Exercise] Pause',
                 },
@@ -217,7 +215,7 @@ export class ExerciseFactory {
                 type: '[Client] Remove client',
                 clientId: client.id,
             };
-            exerciseWrapper.reduce(
+            activeExercise.reduce(
                 removeClientAction,
                 // Exercise emitter Id is always null
                 null

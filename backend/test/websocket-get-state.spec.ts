@@ -1,4 +1,4 @@
-import { createTestEnvironment } from './utils';
+import { createTestEnvironment } from './utils.js';
 
 describe('get state', () => {
     const environment = createTestEnvironment();

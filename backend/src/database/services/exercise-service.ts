@@ -1,17 +1,17 @@
-import type { ExerciseWrapper } from 'exercise/exercise-wrapper.js';
-import { migrateInDatabase } from 'database/migrate-in-database.js';
 import type {
     ExerciseIds,
     ExerciseTimeline,
     Role,
 } from 'digital-fuesim-manv-shared';
-import { ActionWrapper } from 'exercise/action-wrapper.js';
-import { pushAll, removeAll } from 'utils/array.js';
-import { UserReadableIdGenerator } from 'utils/user-readable-id-generator.js';
-import type { ExerciseRepository } from 'database/repositories/exercise-repository.js';
-import type { ActionRepository } from 'database/repositories/action-repository.js';
-import { ExerciseFactory } from 'exercise/exercise-factory.js';
-import type { ClientWrapper } from 'exercise/client-wrapper.js';
+import { ActionWrapper } from '../../exercise/action-wrapper.js';
+import type { ClientWrapper } from '../../exercise/client-wrapper.js';
+import { ExerciseFactory } from '../../exercise/exercise-factory.js';
+import type { ActiveExercise } from '../../exercise/exercise-wrapper.js';
+import { removeAll, pushAll } from '../../utils/array.js';
+import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
+import { migrateInDatabase } from '../migrate-in-database.js';
+import type { ActionRepository } from '../repositories/action-repository.js';
+import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 
 export class ExerciseService {
     public constructor(
@@ -19,7 +19,7 @@ export class ExerciseService {
         private readonly actionRepository: ActionRepository
     ) {}
 
-    private readonly exerciseMap = new Map<string, ExerciseWrapper>();
+    private readonly exerciseMap = new Map<string, ActiveExercise>();
 
     public hasExerciseId(exerciseId: string) {
         return this.exerciseMap.has(exerciseId);
@@ -29,13 +29,24 @@ export class ExerciseService {
         return this.exerciseMap.get(exerciseId);
     }
 
+    public getAllExercises() {
+        return new Set(this.exerciseMap.values());
+    }
+
     public async loadExercise(
-        exerciseWrapper: ExerciseWrapper,
+        activeExercise: ActiveExercise,
         exerciseIds: ExerciseIds
     ) {
-        this.exerciseMap.set(exerciseIds.participantId, exerciseWrapper);
-        this.exerciseMap.set(exerciseIds.trainerId, exerciseWrapper);
+        this.exerciseMap.set(exerciseIds.participantId, activeExercise);
+        this.exerciseMap.set(exerciseIds.trainerId, activeExercise);
         UserReadableIdGenerator.lock(Object.values(exerciseIds));
+        const result =
+            await this.exerciseRepository.createExerciseIfNotExists(
+                activeExercise
+            );
+        if (result.length === 1 && result[0]?.id) {
+            activeExercise.setExerciseId(result[0].id);
+        }
     }
 
     public leaveExercise(exercisePublicId: string, client: ClientWrapper) {
@@ -45,7 +56,7 @@ export class ExerciseService {
     /**
      * Restore all Exercises from Database; called on startup
      */
-    public async restoreAllExercises(): Promise<ExerciseWrapper[]> {
+    public async restoreAllExercises(): Promise<ActiveExercise[]> {
         return this.exerciseRepository.transaction(
             async (exerciseRepoTransaction) => {
                 const outdatedExercises =
@@ -66,8 +77,14 @@ export class ExerciseService {
                 const exercises = await Promise.all(
                     (await exerciseRepoTransaction.getAllExercises()).map(
                         async (exerciseEntity) => {
-                            const exercise =
-                                ExerciseFactory.fromDatabase(exerciseEntity);
+                            const actions = await this.actionRepository
+                                .withConnection(exerciseRepoTransaction)
+                                .getActionsForExerciseId(exerciseEntity.id);
+
+                            const exercise = ExerciseFactory.fromDatabase(
+                                exerciseEntity,
+                                actions
+                            );
                             removeAll(exercise.temporaryActionHistory);
 
                             // Load all actions
@@ -117,45 +134,46 @@ export class ExerciseService {
     }
 
     public async deleteExercise(publicId: string) {
-        const exerciseWrapper = this.getExerciseById(publicId);
-        if (!exerciseWrapper) {
-            console.warn(
-                `Tried to delete non-existing exercise with id ${publicId}`
-            );
+        const activeExercise = this.getExerciseById(publicId);
+        if (!activeExercise) {
             throw new UnknownExerciseError(publicId);
         }
 
-        exerciseWrapper.destroy();
+        activeExercise.destroy();
 
-        const exercise = exerciseWrapper.getExercise();
+        const exercise = activeExercise.getExercise();
         this.exerciseMap.delete(exercise.participantId);
         this.exerciseMap.delete(exercise.trainerId);
-        await this.exerciseRepository.deleteExerciseById(exercise.id ?? '');
-        exerciseWrapper.markAsSaved();
+        if (activeExercise.exerciseId) {
+            // only delete if exercise has been saved before in database
+            await this.exerciseRepository.deleteExerciseByUUID(
+                activeExercise.exerciseId
+            );
+        }
+        activeExercise.markAsSaved();
     }
 
     public async saveUnsavedExercises() {
         return this.exerciseRepository.transaction(async (repoTransaction) => {
             await Promise.all(
-                [...this.exerciseMap.entries()]
-                    .filter((f) => f[0].length === 8 && f[1].changedSinceSave)
-                    .map((m) => m[1])
-                    .map((exerciseWrapper) => async () => {
+                [...this.getAllExercises()]
+                    .filter((f) => f.changedSinceSave)
+                    .map(async (activeExercise) => {
                         await repoTransaction.transaction(
                             async (exerciseTransaction) => {
-                                exerciseWrapper.markAsAboutToBeSaved();
+                                activeExercise.markAsAboutToBeSaved();
 
                                 await exerciseTransaction.saveExerciseState(
-                                    exerciseWrapper.getExercise()
+                                    activeExercise.getExercise()
                                 );
 
                                 await this.actionRepository
                                     .withConnection(exerciseTransaction)
                                     .saveActions(
-                                        exerciseWrapper.getSaveableActions()
+                                        activeExercise.getSaveableActions()
                                     );
 
-                                exerciseWrapper.markAsSaved();
+                                activeExercise.markAsSaved();
                             }
                         );
                     })
@@ -164,8 +182,8 @@ export class ExerciseService {
     }
 
     public async getTimeline(exerciseId: string): Promise<ExerciseTimeline> {
-        const exerciseWrapper = this.getExerciseById(exerciseId);
-        if (exerciseWrapper === undefined)
+        const activeExercise = this.getExerciseById(exerciseId);
+        if (activeExercise === undefined)
             throw new UnknownExerciseError(exerciseId);
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
@@ -175,7 +193,7 @@ export class ExerciseService {
                 emitterId: action.emitterId,
                 time: action.index,
             })),
-            ...exerciseWrapper.temporaryActionHistory.map((actionWrapper) => ({
+            ...activeExercise.temporaryActionHistory.map((actionWrapper) => ({
                 action: actionWrapper.getAction().actionString,
                 emitterId: actionWrapper.getAction().emitterId,
                 time: actionWrapper.getAction().index,
@@ -185,7 +203,7 @@ export class ExerciseService {
             .sort((a, b) => a.time - b.time);
 
         return {
-            initialState: exerciseWrapper.getExercise().initialStateString,
+            initialState: activeExercise.getExercise().initialStateString,
             actionsWrappers: completeHistory,
         };
     }
@@ -199,6 +217,13 @@ export class ExerciseService {
             default:
                 throw new RangeError(`Incorrect id: ${id}`);
         }
+    }
+
+    /**
+     * THIS SHOULD ONLY BE USED FOR TESTING PURPOSES
+     */
+    public TESTING_getExerciseMap() {
+        return this.exerciseMap;
     }
 }
 

@@ -1,8 +1,8 @@
 import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
 import { Client, ClientRole } from 'digital-fuesim-manv-shared';
-import type { ExerciseService } from 'database/services/exercise-service.js';
 import type { ExerciseSocket } from '../exercise-server.js';
-import type { ExerciseWrapper } from './exercise-wrapper.js';
+import type { ExerciseService } from '../database/services/exercise-service.js';
+import type { ActiveExercise } from './exercise-wrapper.js';
 
 export class ClientWrapper {
     public constructor(
@@ -10,7 +10,7 @@ export class ClientWrapper {
         private readonly exerciseService: ExerciseService
     ) {}
 
-    private chosenExercise?: ExerciseWrapper;
+    private chosenExercise?: ActiveExercise;
 
     private relatedExerciseClient?: Client;
 
@@ -60,7 +60,7 @@ export class ClientWrapper {
         );
     }
 
-    public get exercise(): ExerciseWrapper | undefined {
+    public get exercise(): ActiveExercise | undefined {
         return this.chosenExercise;
     }
 

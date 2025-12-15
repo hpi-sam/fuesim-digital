@@ -1,6 +1,6 @@
 import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
 import type { ActionEntry } from '../database/schema.js';
-import type { ExerciseWrapper } from './exercise-wrapper.js';
+import type { ActiveExercise } from './exercise-wrapper.js';
 
 export class ActionWrapper {
     private readonly action: Omit<ActionEntry, 'id'> &
@@ -20,7 +20,7 @@ export class ActionWrapper {
     public constructor(
         action: ExerciseAction,
         emitterId: UUID | null,
-        public readonly exercise: ExerciseWrapper,
+        public readonly exercise: ActiveExercise,
         index?: number,
         id?: UUID
     ) {
@@ -29,7 +29,7 @@ export class ActionWrapper {
             emitterId,
             index: index ?? exercise.incrementIdGenerator.next(),
             id: id ?? undefined,
-            exerciseId: exercise.getExercise().id!,
+            exerciseId: exercise.exerciseId,
         };
     }
 }

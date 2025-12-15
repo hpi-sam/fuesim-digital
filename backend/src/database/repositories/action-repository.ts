@@ -1,33 +1,34 @@
-import { upsertHelper } from 'database/services/database-service.js';
-import { actionWrapperTable } from 'database/schema.js';
 import type { InferInsertModel } from 'drizzle-orm';
 import { eq, asc, and, inArray } from 'drizzle-orm';
 import type { ExerciseAction } from 'digital-fuesim-manv-shared';
-import type { ActionWrapper } from 'exercise/action-wrapper.js';
+import { actionTable } from '../schema.js';
+import type { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ActionRepository extends BaseRepository {
     public async getActionsForExerciseId(exerciseId: string) {
         return this.databaseConnection
             .select()
-            .from(actionWrapperTable)
-            .where(eq(actionWrapperTable.exerciseId, exerciseId))
-            .orderBy(asc(actionWrapperTable.index));
+            .from(actionTable)
+            .where(eq(actionTable.exerciseId, exerciseId))
+            .orderBy(asc(actionTable.index));
     }
 
     public async deleteAllForExercise(exerciseId: string) {
         await this.databaseConnection
-            .delete(actionWrapperTable)
-            .where(eq(actionWrapperTable.exerciseId, exerciseId));
+            .delete(actionTable)
+            .where(eq(actionTable.exerciseId, exerciseId));
     }
 
     // TODO: @Quixelation --> sollte hier der Wrapper übergeben werden, oder wie bei Exercises nur das Object?
     public async saveActions(actions: ActionWrapper[]) {
-        const actionsPatch: InferInsertModel<typeof actionWrapperTable>[] =
+        if (actions.length === 0) return;
+
+        const actionsPatch: InferInsertModel<typeof actionTable>[] =
             actions.map((actionWrapper) => {
                 const { actionString, emitterId, exerciseId, index, id } =
                     actionWrapper.getAction();
-                const actionPatch: typeof actionWrapperTable.$inferInsert = {
+                const actionPatch: typeof actionTable.$inferInsert = {
                     actionString,
                     emitterId,
                     exerciseId,
@@ -38,24 +39,35 @@ export class ActionRepository extends BaseRepository {
                 }
                 return actionPatch;
             });
-        const results = await this.databaseConnection
-            .insert(actionWrapperTable)
-            .values(actionsPatch)
-            .onConflictDoUpdate({
-                target: actionWrapperTable.id,
-                set: upsertHelper(actionWrapperTable),
-            })
-            .returning();
 
-        if (results.length !== actionsPatch.length) {
-            console.error('Not all actions were saved');
-        }
-        for (const [i, result] of results.entries()) {
-            if (actionsPatch[i]?.id !== undefined) {
-                actionsPatch[i].id = result.id;
+        return this.databaseConnection.transaction(async (tx) => {
+            const results = [];
+            for (const action of actionsPatch) {
+                const result = await tx
+                    .insert(actionTable)
+                    .values(action)
+                    .onConflictDoUpdate({
+                        target: actionTable.id,
+                        set: {
+                            id: action.id,
+                            actionString: action.actionString,
+                            emitterId: action.emitterId,
+                            exerciseId: action.exerciseId,
+                            index: action.index,
+                        },
+                    })
+                    .returning();
+
+                if (result.length !== 1 || result[0] === undefined) {
+                    throw new Error('Could not upsert action');
+                }
+                if (action.id !== undefined) {
+                    action.id = result[0].id;
+                }
+                results.push(result);
             }
-        }
-        return results;
+            return results;
+        });
     }
 
     public async updateActionIndex(
@@ -65,15 +77,15 @@ export class ActionRepository extends BaseRepository {
         actionString: ExerciseAction
     ) {
         return this.databaseConnection
-            .update(actionWrapperTable)
+            .update(actionTable)
             .set({
                 index: newIndex,
                 actionString,
             })
             .where(
                 and(
-                    eq(actionWrapperTable.exerciseId, exerciseId),
-                    eq(actionWrapperTable.index, previousIndex)
+                    eq(actionTable.exerciseId, exerciseId),
+                    eq(actionTable.index, previousIndex)
                 )
             );
     }
@@ -83,11 +95,11 @@ export class ActionRepository extends BaseRepository {
         indicesToRemove: number[]
     ) {
         return this.databaseConnection
-            .delete(actionWrapperTable)
+            .delete(actionTable)
             .where(
                 and(
-                    eq(actionWrapperTable.exerciseId, exerciseId),
-                    inArray(actionWrapperTable.index, indicesToRemove)
+                    eq(actionTable.exerciseId, exerciseId),
+                    inArray(actionTable.index, indicesToRemove)
                 )
             );
     }

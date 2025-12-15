@@ -1,15 +1,16 @@
-import { exerciseWrapperTable } from 'database/schema.js';
 import { ExerciseState } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { eq, lt } from 'drizzle-orm';
+import { exerciseTable } from '../schema.js';
+import type { ActiveExercise } from '../../exercise/exercise-wrapper.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
     public getExerciseByUUID(id: string) {
         return this.databaseConnection
             .select()
-            .from(exerciseWrapperTable)
-            .where(eq(exerciseWrapperTable.id, id));
+            .from(exerciseTable)
+            .where(eq(exerciseTable.id, id));
     }
 
     /**
@@ -18,8 +19,8 @@ export class ExerciseRepository extends BaseRepository {
     public getExerciseByTrainerId(id: string) {
         return this.databaseConnection
             .select()
-            .from(exerciseWrapperTable)
-            .where(eq(exerciseWrapperTable.trainerId, id));
+            .from(exerciseTable)
+            .where(eq(exerciseTable.trainerId, id));
     }
 
     /**
@@ -28,18 +29,18 @@ export class ExerciseRepository extends BaseRepository {
     public getExerciseByParticipantId(id: string) {
         return this.databaseConnection
             .select()
-            .from(exerciseWrapperTable)
-            .where(eq(exerciseWrapperTable.participantId, id));
+            .from(exerciseTable)
+            .where(eq(exerciseTable.participantId, id));
     }
 
     public getAllExercises() {
-        return this.databaseConnection.select().from(exerciseWrapperTable);
+        return this.databaseConnection.select().from(exerciseTable);
     }
 
-    public deleteExerciseById(id: string) {
+    public deleteExerciseByUUID(uuid: string) {
         return this.databaseConnection
-            .delete(exerciseWrapperTable)
-            .where(eq(exerciseWrapperTable.id, id));
+            .delete(exerciseTable)
+            .where(eq(exerciseTable.id, uuid));
     }
 
     /**
@@ -48,30 +49,43 @@ export class ExerciseRepository extends BaseRepository {
     public async getOutdatedExercises() {
         return this.databaseConnection
             .select()
-            .from(exerciseWrapperTable)
+            .from(exerciseTable)
             .where(
                 lt(
-                    exerciseWrapperTable.stateVersion,
+                    exerciseTable.stateVersion,
                     ExerciseState.currentStateVersion
                 )
             );
     }
 
     public async saveExerciseState(
-        exercisePatch: InferInsertModel<typeof exerciseWrapperTable>
+        exercisePatch: InferInsertModel<typeof exerciseTable>
     ) {
         const result = await this.databaseConnection
-            .insert(exerciseWrapperTable)
+            .insert(exerciseTable)
             .values(exercisePatch)
             .onConflictDoUpdate({
-                target: exerciseWrapperTable.id,
+                target: exerciseTable.id,
                 set: exercisePatch,
             })
             .returning();
-        if (result.length > 0 && result[0]?.id !== undefined) {
-            // TODO: @Quixelation --> test if this saves the id
-            exercisePatch.id = result[0].id;
-        }
         return result;
+    }
+
+    public async createExerciseIfNotExists(activeExercise: ActiveExercise) {
+        const exercise = activeExercise.getExercise();
+        return this.databaseConnection
+            .insert(exerciseTable)
+            .values({
+                id: activeExercise.exerciseId,
+                currentStateString: exercise.currentStateString,
+                initialStateString: exercise.initialStateString,
+                tickCounter: exercise.tickCounter,
+                stateVersion: exercise.stateVersion,
+                trainerId: exercise.trainerId,
+                participantId: exercise.participantId,
+            })
+            .onConflictDoNothing()
+            .returning();
     }
 }

@@ -15,6 +15,9 @@ import {
 import { Config } from '../src/config.js';
 import type { HttpMethod } from '../src/exercise/http-handler/secure-http.js';
 import { FuesimServer } from '../src/fuesim-server.js';
+import { ExerciseService } from '../src/database/services/exercise-service.js';
+import { ExerciseRepository } from '../src/database/repositories/exercise-repository.js';
+import { ActionRepository } from '../src/database/repositories/action-repository.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 export interface ExerciseCreationResponse {
@@ -114,8 +117,12 @@ export class WebsocketClient {
 class TestEnvironment {
     public server!: FuesimServer;
     private _databaseService!: DatabaseService;
+    private _exerciseService!: ExerciseService;
     public get databaseService(): DatabaseService {
         return this._databaseService;
+    }
+    public get exerciseService(): ExerciseService {
+        return this._exerciseService;
     }
 
     public httpRequest(method: HttpMethod, url: string): request.Test {
@@ -141,9 +148,13 @@ class TestEnvironment {
         }
     }
 
-    public init(databaseService: DatabaseService) {
+    public init(
+        databaseService: DatabaseService,
+        exerciseService: ExerciseService
+    ) {
         this._databaseService = databaseService;
-        this.server = new FuesimServer(this.databaseService);
+        this._exerciseService = exerciseService;
+        this.server = new FuesimServer(this.databaseService, exerciseService);
     }
 }
 
@@ -151,11 +162,24 @@ export const createTestEnvironment = (): TestEnvironment => {
     Config.initialize(true);
     const environment = new TestEnvironment();
     let databaseService: DatabaseService;
+    let exerciseService: ExerciseService;
+    let exerciseRepository: ExerciseRepository;
+    let actionRepository: ActionRepository;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
         databaseService = await setupDatabase();
-        environment.init(databaseService);
+        exerciseRepository = new ExerciseRepository(
+            databaseService.databaseConnection
+        );
+        actionRepository = new ActionRepository(
+            databaseService.databaseConnection
+        );
+        exerciseService = new ExerciseService(
+            exerciseRepository,
+            actionRepository
+        );
+        environment.init(databaseService, exerciseService);
     });
     afterEach(async () => {
         // Prevent the dataSource from being closed too soon.
@@ -170,35 +194,31 @@ export const createTestEnvironment = (): TestEnvironment => {
 
 async function setupDatabase(): Promise<DatabaseService> {
     if (!Config.useDb) {
-        const memoryConnection =
-            await DatabaseService.createNewDatabaseConnection('testing');
-        return new DatabaseService(memoryConnection);
+        return DatabaseService.createNewDatabaseConnection('testing');
     }
 
-    const connection =
+    const baselineDataSource =
         await DatabaseService.createNewDatabaseConnection('baseline');
-    const baselineDataSource = new DatabaseService(connection);
+
     // Re-create the test database
-    await baselineDataSource.execute(
+    await baselineDataSource.databaseConnection.execute(
         `DROP DATABASE IF EXISTS "${testingDatabaseName}"`
     );
-    await baselineDataSource.execute(
+    await baselineDataSource.databaseConnection.execute(
         `CREATE DATABASE "${testingDatabaseName}"`
     );
     await baselineDataSource.destroy();
 
-    const testDatabaseConnection =
-        await DatabaseService.createNewDatabaseConnection('testing');
-
     // Ensure required Postgres extensions are available in the test DB
     // (e.g. uuid_generate_v4() comes from the "uuid-ossp" extension)
-    const testDatabaseService = new DatabaseService(testDatabaseConnection);
-    await testDatabaseService.execute(
+    const testDatabaseService =
+        await DatabaseService.createNewDatabaseConnection('testing');
+    await testDatabaseService.databaseConnection.execute(
         `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
     );
 
     // Apply the migrations on the newly created database
-    await DatabaseService.migrate(testDatabaseConnection);
+    await DatabaseService.migrate(testDatabaseService.databaseConnection);
 
     return testDatabaseService;
 }

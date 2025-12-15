@@ -20,7 +20,7 @@ export class BaseEntity {
     };
 }
 
-export const exerciseWrapperTable = pgTable('exercise_wrapper_entity', {
+export const exerciseTable = pgTable('exercise_entity', {
     ...BaseEntity.table,
     tickCounter: integer().default(0).notNull(),
     initialStateString: json().$type<ExerciseState>().notNull(),
@@ -29,10 +29,10 @@ export const exerciseWrapperTable = pgTable('exercise_wrapper_entity', {
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
 });
-export type ExerciseEntry = InferSelectModel<typeof exerciseWrapperTable>;
+export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 
-export const actionWrapperTable = pgTable(
-    'action_wrapper_entity',
+export const actionTable = pgTable(
+    'action_entity',
     {
         id: uuid()
             .default(sql`uuid_generate_v4()`)
@@ -47,28 +47,22 @@ export const actionWrapperTable = pgTable(
     (table) => [
         foreignKey({
             columns: [table.exerciseId],
-            foreignColumns: [exerciseWrapperTable.id],
+            foreignColumns: [exerciseTable.id],
             name: 'FK_180a58767f06b503216ba2b0982',
         })
             .onUpdate('cascade')
             .onDelete('cascade'),
     ]
 );
-export type ActionEntry = InferSelectModel<typeof actionWrapperTable>;
+export type ActionEntry = InferSelectModel<typeof actionTable>;
 
-export const actionWrapperEntityRelations = relations(
-    actionWrapperTable,
-    ({ one }) => ({
-        exerciseWrapperEntity: one(exerciseWrapperTable, {
-            fields: [actionWrapperTable.exerciseId],
-            references: [exerciseWrapperTable.id],
-        }),
-    })
-);
+export const actionEntityRelations = relations(actionTable, ({ one }) => ({
+    exerciseWrapperEntity: one(exerciseTable, {
+        fields: [actionTable.exerciseId],
+        references: [exerciseTable.id],
+    }),
+}));
 
-export const exerciseWrapperEntityRelations = relations(
-    exerciseWrapperTable,
-    ({ many }) => ({
-        actionWrapperEntities: many(actionWrapperTable),
-    })
-);
+export const exerciseEntityRelations = relations(exerciseTable, ({ many }) => ({
+    actionWrapperEntities: many(actionTable),
+}));

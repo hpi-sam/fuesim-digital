@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { jest } from '@jest/globals';
 import { generateDummyPatient, sleep } from 'digital-fuesim-manv-shared';
-import { ExerciseWrapper } from '../src/exercise/exercise-wrapper';
-import { createExercise, createTestEnvironment } from './utils';
+import { ActiveExercise } from '../src/exercise/exercise-wrapper.js';
+import { createExercise, createTestEnvironment } from './utils.js';
 
 describe('join exercise', () => {
     const environment = createTestEnvironment();
@@ -184,7 +184,7 @@ describe('join exercise', () => {
     it('stops an exercise after the last client has left', async () => {
         const exerciseIds = await createExercise(environment);
 
-        const pauseSpy = jest.spyOn(ExerciseWrapper.prototype, 'pause');
+        const pauseSpy = jest.spyOn(ActiveExercise.prototype, 'pause');
         await environment.withWebsocket(async (socket) => {
             const joinResponse = await socket.emit(
                 'joinExercise',

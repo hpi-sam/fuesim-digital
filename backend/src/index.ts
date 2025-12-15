@@ -1,13 +1,13 @@
 import * as util from 'node:util';
 import { ReducerError } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'database/services/exercise-service.js';
-import { ExerciseRepository } from 'database/repositories/exercise-repository.js';
-import { ActionRepository } from 'database/repositories/action-repository.js';
 import { DatabaseService } from './database/services/database-service.js';
 import { ValidationErrorWrapper } from './utils/validation-error-wrapper.js';
 import { RestoreError } from './utils/restore-error.js';
 import { Config } from './config.js';
 import { FuesimServer } from './fuesim-server.js';
+import { ActionRepository } from './database/repositories/action-repository.js';
+import { ExerciseRepository } from './database/repositories/exercise-repository.js';
+import { ExerciseService } from './database/services/exercise-service.js';
 
 async function main() {
     Config.initialize();

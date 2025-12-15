@@ -16,7 +16,7 @@
             <i class="bi bi-save"></i>
         </button>
     } @else {
-        {{ value() }}
+        <div class="flex-grow-1">{{ value() }}</div>
         <button class="btn btn-sm" (click)="edit = true">
             <i class="bi bi-pencil"></i>
         </button>

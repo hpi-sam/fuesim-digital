@@ -1,11 +1,17 @@
 <nav class="navbar bg-body-tertiary mb-4">
     <div class="container container-fluid">
         <a routerLink="/" class="navbar-brand">Digitale FüSim MANV</a>
-        <ul ngbNav [activeId]="route.fragment | async" class="navbar-nav">
-            <li ngbNavItem class="nav-item">
+        <ul
+            ngbNav
+            [activeId]="route.url | async"
+            class="navbar-nav d-flex flex-row"
+        >
+            <li ngbNavItem="exercises" class="nav-item mx-2">
                 <a ngbNavLink class="nav-link" routerLink="/exercises/">
                     Meine Übungen
                 </a>
+            </li>
+            <li ngbNavItem="exercise_templates" class="nav-item mx-2">
                 <a
                     ngbNavLink
                     class="nav-link"

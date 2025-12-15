@@ -58,9 +58,10 @@ import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.
 import { UserAccountNavbarItemComponent } from './components/user-account-navbar-item/user-account-navbar-item.component';
 import { HeaderComponent } from './components/header/header.component';
 import { TimesPipe } from './pipes/times.pipe';
-import { ExerciseTemplateCardComponent } from './components/exercise-card/exercise-template-card.component';
-import { ExerciseCardComponent } from './components/exercise-template-card/exercise-card.component';
+import { ExerciseTemplateCardComponent } from './components/exercise-template-card/exercise-template-card.component';
+import { ExerciseCardComponent } from './components/exercise-card/exercise-card.component';
 import { InlineTextEditorComponent } from './components/inline-text-editor/inline-text-editor.component';
+import { CopyButtonComponent } from './components/copy-button/copy-button.component';
 
 @NgModule({
     declarations: [
@@ -114,6 +115,7 @@ import { InlineTextEditorComponent } from './components/inline-text-editor/inlin
         ExerciseCardComponent,
         ExerciseTemplateCardComponent,
         InlineTextEditorComponent,
+        CopyButtonComponent,
     ],
     imports: [
         CommonModule,
@@ -173,6 +175,7 @@ import { InlineTextEditorComponent } from './components/inline-text-editor/inlin
         ExerciseCardComponent,
         ExerciseTemplateCardComponent,
         InlineTextEditorComponent,
+        CopyButtonComponent,
     ],
     providers: [HotkeysService],
 })

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
-    ExerciseKeys,
+    ExerciseAccessIds,
     ExerciseTimeline,
     StateExport,
 } from 'digital-fuesim-manv-shared';
@@ -26,13 +26,16 @@ export class ApiService {
 
     public async createExercise() {
         return lastValueFrom(
-            this.httpClient.post<ExerciseKeys>(`${httpOrigin}/api/exercise`, {})
+            this.httpClient.post<ExerciseAccessIds>(
+                `${httpOrigin}/api/exercise`,
+                {}
+            )
         );
     }
 
     public async importExercise(exportedState: StateExport) {
         return lastValueFrom(
-            this.httpClient.post<ExerciseKeys>(
+            this.httpClient.post<ExerciseAccessIds>(
                 `${httpOrigin}/api/exercise`,
                 exportedState
             )

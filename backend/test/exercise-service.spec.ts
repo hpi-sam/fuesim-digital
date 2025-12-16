@@ -16,7 +16,7 @@ describe('Exercise-Service', () => {
     it('does not throw away actions while saving', async () => {
         const exercideIds = await createExercise(environment);
         const exercise = environment.exerciseService.getExerciseByKey(
-            exercideIds.trainerKey
+            exercideIds.trainerId
         )!;
         const markAsAboutToBeSaved =
             exercise.markAsAboutToBeSaved.bind(exercise);

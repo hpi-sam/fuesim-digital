@@ -21,12 +21,12 @@ export class ActionRepository extends BaseRepository {
     }
 
     // TODO: @Quixelation --> sollte hier der Wrapper übergeben werden, oder wie bei Exercises nur das Object?
-    public async saveActions(actions: ActionWrapper[]) {
+    public async saveActions(actions: ActionWrapper[], exerciseId: string) {
         if (actions.length === 0) return;
 
         const actionsPatch: InferInsertModel<typeof actionTable>[] =
             actions.map((actionWrapper) => {
-                const { actionString, emitterId, exerciseId, index, id } =
+                const { actionString, emitterId, index, id } =
                     actionWrapper.getAction();
                 const actionPatch: typeof actionTable.$inferInsert = {
                     actionString,

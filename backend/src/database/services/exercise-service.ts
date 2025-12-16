@@ -37,9 +37,6 @@ export class ExerciseService {
         activeExercise: ActiveExercise,
         exerciseKeys: ExerciseKeys
     ) {
-        this.exerciseMap.set(exerciseKeys.participantKey, activeExercise);
-        this.exerciseMap.set(exerciseKeys.trainerKey, activeExercise);
-        UserReadableIdGenerator.lock(Object.values(exerciseKeys));
         const result =
             await this.exerciseRepository.createExerciseIfNotExists(
                 activeExercise
@@ -47,6 +44,9 @@ export class ExerciseService {
         if (result.length === 1 && result[0]?.id) {
             activeExercise.setExerciseId(result[0].id);
         }
+        this.exerciseMap.set(exerciseKeys.participantKey, activeExercise);
+        this.exerciseMap.set(exerciseKeys.trainerKey, activeExercise);
+        UserReadableIdGenerator.lock(Object.values(exerciseKeys));
     }
 
     public leaveExercise(exerciseKey: string, client: ClientWrapper) {
@@ -164,13 +164,15 @@ export class ExerciseService {
                                 activeExercise.markAsAboutToBeSaved();
 
                                 await exerciseTransaction.saveExerciseState(
+                                    activeExercise.exerciseId,
                                     activeExercise.getExercise()
                                 );
 
                                 await this.actionRepository
                                     .withConnection(exerciseTransaction)
                                     .saveActions(
-                                        activeExercise.getSaveableActions()
+                                        activeExercise.getSaveableActions(),
+                                        activeExercise.exerciseId
                                     );
 
                                 activeExercise.markAsSaved();

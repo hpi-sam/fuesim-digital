@@ -3,7 +3,7 @@ import type { ActionEntry } from '../database/schema.js';
 import type { ActiveExercise } from './exercise-wrapper.js';
 
 export class ActionWrapper {
-    private readonly action: Omit<ActionEntry, 'id'> &
+    private readonly action: Omit<ActionEntry, 'exerciseId' | 'id'> &
         Partial<Pick<ActionEntry, 'id'>>;
 
     public getAction() {
@@ -29,7 +29,6 @@ export class ActionWrapper {
             emitterId,
             index: index ?? exercise.incrementIdGenerator.next(),
             id: id ?? undefined,
-            exerciseId: exercise.exerciseId,
         };
     }
 }

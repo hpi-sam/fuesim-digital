@@ -59,14 +59,20 @@ export class ExerciseRepository extends BaseRepository {
     }
 
     public async saveExerciseState(
+        exerciseId: string,
         exercisePatch: InferInsertModel<typeof exerciseTable>
     ) {
+        const exercisePatchWithId = {
+            id: exerciseId,
+            ...exercisePatch,
+        };
+
         const result = await this.databaseConnection
             .insert(exerciseTable)
-            .values(exercisePatch)
+            .values(exercisePatchWithId)
             .onConflictDoUpdate({
                 target: exerciseTable.id,
-                set: exercisePatch,
+                set: exercisePatchWithId,
             })
             .returning();
         return result;

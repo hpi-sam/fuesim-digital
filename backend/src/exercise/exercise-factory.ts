@@ -47,8 +47,9 @@ export class ExerciseFactory {
 
         try {
             const newInitialState =
-                file.history?.initialState ?? file.currentState;
-            const newCurrentState = file.currentState;
+                migratedImportObject.history?.initialState ??
+                migratedImportObject.currentState;
+            const newCurrentState = migratedImportObject.currentState;
 
             // Set new participant id
             newInitialState.participantId = exerciseKeys.participantKey;
@@ -63,7 +64,7 @@ export class ExerciseFactory {
                 newCurrentState
             );
             const actions: ActionWrapper[] = (
-                file.history?.actionHistory ?? []
+                migratedImportObject.history?.actionHistory ?? []
             ).map(
                 (action) =>
                     new ActionWrapper(

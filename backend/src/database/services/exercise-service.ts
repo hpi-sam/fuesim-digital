@@ -1,5 +1,5 @@
 import type {
-    ExerciseIds,
+    ExerciseKeys,
     ExerciseTimeline,
     Role,
 } from 'digital-fuesim-manv-shared';
@@ -21,12 +21,12 @@ export class ExerciseService {
 
     private readonly exerciseMap = new Map<string, ActiveExercise>();
 
-    public hasExerciseId(exerciseId: string) {
+    public hasExerciseKey(exerciseId: string) {
         return this.exerciseMap.has(exerciseId);
     }
 
-    public getExerciseById(exerciseId: string) {
-        return this.exerciseMap.get(exerciseId);
+    public getExerciseByKey(roleKey: string) {
+        return this.exerciseMap.get(roleKey);
     }
 
     public getAllExercises() {
@@ -35,11 +35,11 @@ export class ExerciseService {
 
     public async loadExercise(
         activeExercise: ActiveExercise,
-        exerciseIds: ExerciseIds
+        exerciseKeys: ExerciseKeys
     ) {
-        this.exerciseMap.set(exerciseIds.participantId, activeExercise);
-        this.exerciseMap.set(exerciseIds.trainerId, activeExercise);
-        UserReadableIdGenerator.lock(Object.values(exerciseIds));
+        this.exerciseMap.set(exerciseKeys.participantKey, activeExercise);
+        this.exerciseMap.set(exerciseKeys.trainerKey, activeExercise);
+        UserReadableIdGenerator.lock(Object.values(exerciseKeys));
         const result =
             await this.exerciseRepository.createExerciseIfNotExists(
                 activeExercise
@@ -49,8 +49,8 @@ export class ExerciseService {
         }
     }
 
-    public leaveExercise(exercisePublicId: string, client: ClientWrapper) {
-        this.getExerciseById(exercisePublicId)?.removeClient(client);
+    public leaveExercise(exerciseKey: string, client: ClientWrapper) {
+        this.getExerciseByKey(exerciseKey)?.removeClient(client);
     }
 
     /**
@@ -133,10 +133,10 @@ export class ExerciseService {
         );
     }
 
-    public async deleteExercise(publicId: string) {
-        const activeExercise = this.getExerciseById(publicId);
+    public async deleteExercise(exerciseKey: string) {
+        const activeExercise = this.getExerciseByKey(exerciseKey);
         if (!activeExercise) {
-            throw new UnknownExerciseError(publicId);
+            throw new UnknownExerciseError(exerciseKey);
         }
 
         activeExercise.destroy();
@@ -146,7 +146,7 @@ export class ExerciseService {
         this.exerciseMap.delete(exercise.trainerId);
         if (activeExercise.exerciseId) {
             // only delete if exercise has been saved before in database
-            await this.exerciseRepository.deleteExerciseByUUID(
+            await this.exerciseRepository.deleteExerciseById(
                 activeExercise.exerciseId
             );
         }
@@ -181,13 +181,13 @@ export class ExerciseService {
         });
     }
 
-    public async getTimeline(exerciseId: string): Promise<ExerciseTimeline> {
-        const activeExercise = this.getExerciseById(exerciseId);
+    public async getTimeline(exerciseKey: string): Promise<ExerciseTimeline> {
+        const activeExercise = this.getExerciseByKey(exerciseKey);
         if (activeExercise === undefined)
-            throw new UnknownExerciseError(exerciseId);
+            throw new UnknownExerciseError(exerciseKey);
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
-                await this.actionRepository.getActionsForExerciseId(exerciseId)
+                await this.actionRepository.getActionsForExerciseId(exerciseKey)
             ).map((action) => ({
                 action: action.actionString,
                 emitterId: action.emitterId,

@@ -1,6 +1,6 @@
 import type {
     ClientToServerEvents,
-    ExerciseIds,
+    ExerciseKeys,
     MergeIntersection,
     ServerToClientEvents,
 } from 'digital-fuesim-manv-shared';
@@ -21,8 +21,8 @@ import { ActionRepository } from '../src/database/repositories/action-repository
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 export interface ExerciseCreationResponse {
-    readonly participantId: string;
-    readonly trainerId: string;
+    readonly participantKey: string;
+    readonly trainerKey: string;
 }
 
 // Some helper types
@@ -225,7 +225,7 @@ async function setupDatabase(): Promise<DatabaseService> {
 
 export async function createExercise(
     environment: TestEnvironment
-): Promise<ExerciseIds> {
+): Promise<ExerciseKeys> {
     const response = await environment
         .httpRequest('post', '/api/exercise')
         .expect(201);

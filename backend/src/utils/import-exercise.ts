@@ -1,4 +1,4 @@
-import type { ExerciseIds, StateExport } from 'digital-fuesim-manv-shared';
+import type { ExerciseKeys, StateExport } from 'digital-fuesim-manv-shared';
 import { ReducerError } from 'digital-fuesim-manv-shared';
 import type { ActiveExercise } from '../exercise/exercise-wrapper.js';
 import type { HttpResponse } from '../exercise/http-handler/utils.js';
@@ -7,8 +7,8 @@ import { ValidationErrorWrapper } from './validation-error-wrapper.js';
 
 export function importExercise(
     importObject: StateExport,
-    ids: ExerciseIds
-): ActiveExercise | HttpResponse<ExerciseIds> {
+    ids: ExerciseKeys
+): ActiveExercise | HttpResponse<ExerciseKeys> {
     try {
         return ExerciseFactory.fromFile(importObject, ids);
     } catch (err) {

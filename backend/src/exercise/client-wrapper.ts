@@ -23,7 +23,7 @@ export class ClientWrapper {
         exerciseId: string,
         clientName: string
     ): UUID | undefined {
-        const exercise = this.exerciseService.getExerciseById(exerciseId);
+        const exercise = this.exerciseService.getExerciseByKey(exerciseId);
         if (!exercise) {
             return undefined;
         }

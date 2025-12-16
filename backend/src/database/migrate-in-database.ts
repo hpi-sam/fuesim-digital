@@ -14,7 +14,7 @@ export async function migrateInDatabase(
     exerciseRepository: ExerciseRepository,
     actionRepository: ActionRepository
 ): Promise<void> {
-    const exercises = await exerciseRepository.getExerciseByUUID(exerciseId);
+    const exercises = await exerciseRepository.getExerciseById(exerciseId);
     if (exercises.length === 0 && exercises[0] === undefined) {
         throw new RestoreError(
             'Cannot find exercise to convert in database',

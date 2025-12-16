@@ -1,6 +1,6 @@
 import type {
     StateExport,
-    ExerciseIds,
+    ExerciseKeys,
     ExerciseAction,
 } from 'digital-fuesim-manv-shared';
 import {
@@ -24,11 +24,11 @@ import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './exercise-wrapper.js';
 
 export class ExerciseFactory {
-    public static fromBlank(exerciseIds: ExerciseIds) {
+    public static fromBlank(exerciseKeys: ExerciseKeys) {
         return ActiveExercise.create(
-            exerciseIds.participantId,
-            exerciseIds.trainerId,
-            ExerciseState.create(exerciseIds.participantId)
+            exerciseKeys.participantKey,
+            exerciseKeys.trainerKey,
+            ExerciseState.create(exerciseKeys.participantKey)
         );
     }
 
@@ -37,8 +37,8 @@ export class ExerciseFactory {
      */
     public static fromFile(
         file: StateExport,
-        exerciseIds: ExerciseIds
-    ): ActiveExercise | HttpResponse<ExerciseIds> {
+        exerciseKeys: ExerciseKeys
+    ): ActiveExercise | HttpResponse<ExerciseKeys> {
         const migratedImportObject = migrateStateExport(file);
         const validationErrors = validateExerciseExport(migratedImportObject);
         if (validationErrors.length > 0) {
@@ -51,12 +51,12 @@ export class ExerciseFactory {
             const newCurrentState = file.currentState;
 
             // Set new participant id
-            newInitialState.participantId = exerciseIds.participantId;
-            newCurrentState.participantId = exerciseIds.participantId;
+            newInitialState.participantId = exerciseKeys.participantKey;
+            newCurrentState.participantId = exerciseKeys.participantKey;
 
             const exercise = new ActiveExercise(
-                exerciseIds.participantId,
-                exerciseIds.trainerId,
+                exerciseKeys.participantKey,
+                exerciseKeys.trainerKey,
                 [],
                 ExerciseState.currentStateVersion,
                 newInitialState,
@@ -101,12 +101,12 @@ export class ExerciseFactory {
     public static fromDatabase(
         dbEntry: InferSelectModel<typeof exerciseTable>,
         actions: InferSelectModel<typeof actionTable>[],
-        exerciseIds?: ExerciseIds
+        exerciseKeys?: ExerciseKeys
     ): ActiveExercise {
         const actionsInWrapper: ActionWrapper[] = [];
         const exercise = new ActiveExercise(
-            exerciseIds?.participantId ?? dbEntry.participantId,
-            exerciseIds?.trainerId ?? dbEntry.trainerId,
+            exerciseKeys?.participantKey ?? dbEntry.participantId,
+            exerciseKeys?.trainerKey ?? dbEntry.trainerId,
             actionsInWrapper,
             dbEntry.stateVersion,
             dbEntry.initialStateString,

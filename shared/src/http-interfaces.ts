@@ -1,4 +1,4 @@
-export interface ExerciseIds {
-    readonly participantId: string;
-    readonly trainerId: string;
+export interface ExerciseKeys {
+    readonly participantKey: string;
+    readonly trainerKey: string;
 }

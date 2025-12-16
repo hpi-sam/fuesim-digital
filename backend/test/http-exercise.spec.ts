@@ -17,8 +17,8 @@ describe('exercise', () => {
 
             const exerciseCreationResponse =
                 response.body as ExerciseCreationResponse;
-            expect(exerciseCreationResponse.participantId).toBeDefined();
-            expect(exerciseCreationResponse.trainerId).toBeDefined();
+            expect(exerciseCreationResponse.participantKey).toBeDefined();
+            expect(exerciseCreationResponse.trainerKey).toBeDefined();
         });
 
         it('fails when no ids are left', async () => {
@@ -31,17 +31,17 @@ describe('exercise', () => {
 
     describe('GET /api/exercise/:exerciseId', () => {
         it('succeeds returning true for participant id', async () => {
-            const participantId = (await createExercise(environment))
-                .participantId;
+            const participantKey = (await createExercise(environment))
+                .participantKey;
             await environment
-                .httpRequest('get', `/api/exercise/${participantId}`)
+                .httpRequest('get', `/api/exercise/${participantKey}`)
                 .expect(200);
         });
 
         it('succeeds returning true for trainer id', async () => {
-            const trainerId = (await createExercise(environment)).trainerId;
+            const trainerKey = (await createExercise(environment)).trainerKey;
             await environment
-                .httpRequest('get', `/api/exercise/${trainerId}`)
+                .httpRequest('get', `/api/exercise/${trainerKey}`)
                 .expect(200);
         });
 
@@ -54,7 +54,7 @@ describe('exercise', () => {
 
     describe('DELETE /api/exercise/:exerciseId', () => {
         it('succeeds deleting an exercise', async () => {
-            const exerciseId = (await createExercise(environment)).trainerId;
+            const exerciseId = (await createExercise(environment)).trainerKey;
             await environment
                 .httpRequest('delete', `/api/exercise/${exerciseId}`)
                 .expect(204);
@@ -78,14 +78,14 @@ describe('exercise', () => {
 
         it('fails deleting an exercise by its participant id', async () => {
             const exerciseId = (await createExercise(environment))
-                .participantId;
+                .participantKey;
             await environment
                 .httpRequest('delete', `/api/exercise/${exerciseId}`)
                 .expect(403);
         });
 
         it('disconnects clients of the removed exercise', async () => {
-            const exerciseId = (await createExercise(environment)).trainerId;
+            const exerciseId = (await createExercise(environment)).trainerKey;
             await environment.withWebsocket(async (socket) => {
                 const joinExercise = await socket.emit(
                     'joinExercise',

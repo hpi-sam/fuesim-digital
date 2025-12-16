@@ -6,7 +6,7 @@ import type { ActiveExercise } from '../../exercise/exercise-wrapper.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
-    public getExerciseByUUID(id: string) {
+    public getExerciseById(id: string) {
         return this.databaseConnection
             .select()
             .from(exerciseTable)
@@ -16,28 +16,28 @@ export class ExerciseRepository extends BaseRepository {
     /**
      * Loads the exercise with the corresponding trainer id
      */
-    public getExerciseByTrainerId(id: string) {
+    public getExerciseByTrainerKey(trainerKey: string) {
         return this.databaseConnection
             .select()
             .from(exerciseTable)
-            .where(eq(exerciseTable.trainerId, id));
+            .where(eq(exerciseTable.trainerId, trainerKey));
     }
 
     /**
      * Loads the exercise with the corresponding participant id
      */
-    public getExerciseByParticipantId(id: string) {
+    public getExerciseByParticipantKey(participantKey: string) {
         return this.databaseConnection
             .select()
             .from(exerciseTable)
-            .where(eq(exerciseTable.participantId, id));
+            .where(eq(exerciseTable.participantId, participantKey));
     }
 
     public getAllExercises() {
         return this.databaseConnection.select().from(exerciseTable);
     }
 
-    public deleteExerciseByUUID(uuid: string) {
+    public deleteExerciseById(uuid: string) {
         return this.databaseConnection
             .delete(exerciseTable)
             .where(eq(exerciseTable.id, uuid));

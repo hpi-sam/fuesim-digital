@@ -30,9 +30,9 @@ export class LandingPageComponent {
         this.apiService
             .createExercise()
             .then((ids) => {
-                this.trainerId = ids.trainerId;
+                this.trainerId = ids.trainerKey;
                 this.exerciseId = this.trainerId;
-                this.participantId = ids.participantId;
+                this.participantId = ids.participantKey;
                 this.exerciseHasBeenCreated = true;
 
                 this.messageService.postMessage(
@@ -70,9 +70,9 @@ export class LandingPageComponent {
                 case 'complete': {
                     const ids =
                         await this.apiService.importExercise(importPlain);
-                    this.trainerId = ids.trainerId;
+                    this.trainerId = ids.trainerKey;
                     this.exerciseId = this.trainerId;
-                    this.participantId = ids.participantId;
+                    this.participantId = ids.participantKey;
                     this.exerciseHasBeenCreated = true;
 
                     this.messageService.postMessage(

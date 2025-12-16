@@ -1,5 +1,5 @@
 import type {
-    ExerciseIds,
+    ExerciseKeys,
     ExerciseTimeline,
     StateExport,
 } from 'digital-fuesim-manv-shared';
@@ -15,30 +15,30 @@ import { ExerciseFactory } from './../../../exercise/exercise-factory.js';
 export async function postExercise(
     exerciseService: ExerciseService,
     importObject: StateExport
-): Promise<HttpResponse<ExerciseIds>> {
+): Promise<HttpResponse<ExerciseKeys>> {
     try {
-        const participantId = UserReadableIdGenerator.generateId();
-        const trainerId = UserReadableIdGenerator.generateId(8);
+        const participantKey = UserReadableIdGenerator.generateId();
+        const trainerKey = UserReadableIdGenerator.generateId(8);
         const newExerciseOrError = isEmpty(importObject)
-            ? ExerciseFactory.fromBlank({ participantId, trainerId })
+            ? ExerciseFactory.fromBlank({ participantKey, trainerKey })
             : importExercise(importObject, {
-                  participantId,
-                  trainerId,
+                  participantKey,
+                  trainerKey,
               });
         if (!(newExerciseOrError instanceof ActiveExercise)) {
             return newExerciseOrError;
         }
 
         await exerciseService.loadExercise(newExerciseOrError, {
-            participantId,
-            trainerId,
+            participantKey,
+            trainerKey,
         });
 
         return {
             statusCode: 201,
             body: {
-                participantId,
-                trainerId,
+                participantKey,
+                trainerKey,
             },
         };
     } catch (error: unknown) {
@@ -58,7 +58,7 @@ export function getExercise(
     exerciseId: string,
     exerciseService: ExerciseService
 ): HttpResponse {
-    const exerciseExists = exerciseService.hasExerciseId(exerciseId);
+    const exerciseExists = exerciseService.hasExerciseKey(exerciseId);
     return {
         statusCode: exerciseExists ? 200 : 404,
         body: undefined,

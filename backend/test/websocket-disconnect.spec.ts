@@ -5,7 +5,7 @@ describe('disconnect socket', () => {
     const environment = createTestEnvironment();
 
     it('removes client from state on disconnect', async () => {
-        const exerciseId = (await createExercise(environment)).participantId;
+        const exerciseId = (await createExercise(environment)).participantKey;
 
         const outerName = 'Name';
         const innerName = 'My Name';

@@ -15,8 +15,8 @@ describe('Exercise-Service', () => {
     // In a naive implementation it can happen that such actions get removed from memory without being saved to the database.
     it('does not throw away actions while saving', async () => {
         const exercideIds = await createExercise(environment);
-        const exercise = environment.exerciseService.getExerciseById(
-            exercideIds.trainerId
+        const exercise = environment.exerciseService.getExerciseByKey(
+            exercideIds.trainerKey
         )!;
         const markAsAboutToBeSaved =
             exercise.markAsAboutToBeSaved.bind(exercise);

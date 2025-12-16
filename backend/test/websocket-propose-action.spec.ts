@@ -16,12 +16,12 @@ describe('propose action', () => {
     });
 
     it('fails proposing a syntactically invalid action', async () => {
-        const exerciseIds = await createExercise(environment);
+        const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (socket) => {
             const join = await socket.emit(
                 'joinExercise',
-                exerciseIds.trainerId,
+                exerciseKeys.trainerKey,
                 'Name'
             );
 
@@ -37,12 +37,12 @@ describe('propose action', () => {
     });
 
     it('fails proposing a semantically invalid action', async () => {
-        const exerciseIds = await createExercise(environment);
+        const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (socket) => {
             const join = await socket.emit(
                 'joinExercise',
-                exerciseIds.trainerId,
+                exerciseKeys.trainerKey,
                 'Name'
             );
 
@@ -58,12 +58,12 @@ describe('propose action', () => {
     });
 
     it('succeeds proposing a valid action with sufficient rights', async () => {
-        const exerciseIds = await createExercise(environment);
+        const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (socket) => {
             const join = await socket.emit(
                 'joinExercise',
-                exerciseIds.trainerId,
+                exerciseKeys.trainerKey,
                 'Name'
             );
 
@@ -79,12 +79,12 @@ describe('propose action', () => {
     });
 
     it('fails proposing a valid action with unsufficient rights', async () => {
-        const exerciseIds = await createExercise(environment);
+        const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (socket) => {
             const join = await socket.emit(
                 'joinExercise',
-                exerciseIds.participantId,
+                exerciseKeys.participantKey,
                 'Name'
             );
 

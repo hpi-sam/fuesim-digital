@@ -54,7 +54,7 @@ export const registerProposeActionHandler = (
             }
 
             const exerciseClient =
-                exerciseWrapper.getStateSnapshot().clients[
+                activeExercise.getStateSnapshot().clients[
                     clientWrapper.client.id
                 ];
             if (!exerciseClient) {

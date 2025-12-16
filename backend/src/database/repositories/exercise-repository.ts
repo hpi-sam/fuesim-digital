@@ -2,7 +2,7 @@ import { ExerciseState } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { eq, lt } from 'drizzle-orm';
 import { exerciseTable } from '../schema.js';
-import type { ActiveExercise } from '../../exercise/exercise-wrapper.js';
+import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {

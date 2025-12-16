@@ -5,7 +5,7 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import { isEmpty } from 'lodash-es';
 import { UserReadableIdGenerator } from '../../../utils/user-readable-id-generator.js';
-import { ActiveExercise } from '../../exercise-wrapper.js';
+import { ActiveExercise } from '../../active-exercise.js';
 import type { HttpResponse } from '../utils.js';
 import { importExercise } from '../../../utils/import-exercise.js';
 import { UnknownExerciseError } from './../../../database/services/exercise-service.js';

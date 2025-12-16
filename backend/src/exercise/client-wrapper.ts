@@ -2,7 +2,7 @@ import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
 import { Client, ClientRole } from 'digital-fuesim-manv-shared';
 import type { ExerciseSocket } from '../exercise-server.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
-import type { ActiveExercise } from './exercise-wrapper.js';
+import type { ActiveExercise } from './active-exercise.js';
 
 export class ClientWrapper {
     public constructor(

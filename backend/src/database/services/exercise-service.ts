@@ -6,7 +6,7 @@ import type {
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import type { ClientWrapper } from '../../exercise/client-wrapper.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
-import type { ActiveExercise } from '../../exercise/exercise-wrapper.js';
+import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { removeAll, pushAll } from '../../utils/array.js';
 import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
 import { migrateInDatabase } from '../migrate-in-database.js';

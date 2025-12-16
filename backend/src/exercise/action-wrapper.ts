@@ -1,6 +1,6 @@
 import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
 import type { ActionEntry } from '../database/schema.js';
-import type { ActiveExercise } from './exercise-wrapper.js';
+import type { ActiveExercise } from './active-exercise.js';
 
 export class ActionWrapper {
     private readonly action: Omit<ActionEntry, 'exerciseId' | 'id'> &

@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 import { sleep } from 'digital-fuesim-manv-shared';
 import { createTestEnvironment } from '../../test/utils.js';
 import { clientMap } from './client-map.js';
-import { ActiveExercise } from './exercise-wrapper.js';
+import { ActiveExercise } from './active-exercise.js';
 
 describe('Exercise Wrapper', () => {
     const environment = createTestEnvironment();

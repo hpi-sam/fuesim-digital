@@ -21,7 +21,7 @@ import { RestoreError } from '../utils/restore-error.js';
 import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
 import type { HttpResponse } from './http-handler/utils.js';
 import { ActionWrapper } from './action-wrapper.js';
-import { ActiveExercise } from './exercise-wrapper.js';
+import { ActiveExercise } from './active-exercise.js';
 
 export class ExerciseFactory {
     public static fromBlank(exerciseKeys: ExerciseKeys) {

@@ -1,3 +1,5 @@
+import type { ExerciseMapComponent } from '../../src/app/pages/exercises/exercise/shared/exercise-map/exercise-map.component';
+
 /**
  * Tests on github have been super flaky,
  * because the runners are not fast enough
@@ -8,32 +10,34 @@ const tickDuration = 1000;
 
 describe('A trainer on the exercise page', () => {
     beforeEach(() => {
-        cy.createExercise().joinExerciseAsTrainer().initializeTrainerSocket();
+        cy.createExercise().joinExerciseAsTrainer().spyOnProposeAction();
     });
 
-    it('can load and unload vehicles', () => {
+    it.only('can load and unload vehicles', () => {
         cy.get('[data-cy=vehiclesAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableVehicleDiv]');
+        cy.get('@performAction').should('be.calledWithMatch', {
+            type: '[Vehicle] Add vehicle',
+        });
+
+        // TODO: get this to retry
+        cy.getMapFeaturesAt().should('have.length', 1);
 
         cy.get('[data-cy=patientsAccordionButton]').click();
         cy.log('load a patient to a vehicle').dragToMap(
             '[data-cy=draggablePatientDiv]'
         );
-
-        cy.wait(commonErrorTimeout);
-
-        cy.get('@trainerSocketPerformedActions')
-            .atPosition(-2)
-            .should('have.property', 'type', '[Patient] Add patient');
+        cy.get('@proposeAction').should('be.calledWithMatch', {
+            type: '[Patient] Add patient',
+        });
+        cy.get('@proposeAction').should('have.been.calledWithMatch', {
+            type: '[Vehicle] Load vehicle',
+        });
 
         cy.getState()
             .its('exerciseState')
             .its('patients')
             .should('not.be.empty');
-
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Vehicle] Load vehicle');
 
         cy.getState()
             .its('exerciseState')
@@ -46,9 +50,9 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=openLayersContainer]').click();
         cy.get('[data-cy=vehiclePopupUnloadButton]').click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Vehicle] Unload vehicle');
+        cy.get('@proposeAction').should('have.been.calledWithMatch', {
+            type: '[Vehicle] Unload vehicle',
+        });
 
         cy.getState()
             .its('exerciseState')

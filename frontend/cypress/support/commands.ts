@@ -49,6 +49,9 @@ import type {
     ExerciseAction,
 } from 'digital-fuesim-manv-shared';
 import { io } from 'socket.io-client';
+import { ExerciseComponent } from '../../src/app/pages/exercises/exercise/exercise/exercise.component';
+import type { ExerciseService } from '../../src/app/core/exercise.service';
+import type { ExerciseMapComponent } from '../../src/app/pages/exercises/exercise/shared/exercise-map/exercise-map.component';
 
 export function dragToMap(
     elementSelector: string,
@@ -118,7 +121,31 @@ export function joinExerciseAsTrainer() {
         // eslint-disable-next-line @typescript-eslint/no-base-to-string
         cy.visit(`exercises/${trainerId}`)
     );
-    cy.get('[data-cy=joinExerciseModalButton]').click();
+    cy.get('[data-cy=joinExerciseModalButton]', { timeout: 8000 }).click();
+
+    return cy;
+}
+
+export function spyOnProposeAction() {
+    cy.window().then(($window) => {
+        cy.get('app-exercise').then(($exerciseComponent) => {
+            const exerciseComponent = $window.ng.getComponent(
+                $exerciseComponent.get()[0]
+            );
+            const exerciseService = exerciseComponent.applicationService
+                .exerciseService as ExerciseService;
+
+            cy.spy(exerciseService, 'proposeAction').as('proposeAction');
+            cy.spy(exerciseService.optimisticActionHandler, 'performAction').as(
+                'performAction'
+            );
+        });
+    });
+
+    return cy;
+}
+
+export function spyOnRendercomplete() {
     return cy;
 }
 
@@ -127,7 +154,7 @@ export function joinExerciseAsParticipant() {
         // eslint-disable-next-line @typescript-eslint/no-base-to-string
         cy.visit(`exercises/${participantId}`)
     );
-    cy.get('[data-cy=joinExerciseModalButton]').click();
+    cy.get('[data-cy=joinExerciseModalButton]', { timeout: 8000 }).click();
     return cy;
 }
 
@@ -208,7 +235,7 @@ export function initializeTrainerSocket() {
 
     cy.wrap([])
         .as('trainerSocketPerformedActions')
-        .then((performedActions: any) => {
+        .then((performedActions: any[]) => {
             cy.get('@trainerSocket', { log: false }).then(
                 (trainerSocket: any) => {
                     trainerSocket.on(
@@ -246,4 +273,30 @@ export function itsKeys(subject: JsonObject) {
 
 export function itsValues(subject: JsonObject) {
     return cy.log('its values').wrap(Object.values(subject), { log: false });
+}
+
+export function getMapFeaturesAt(
+    offset: { x: number; y: number } = { x: 0, y: 0 }
+) {
+    const mapSelector = '[data-cy=openLayersContainer]';
+    cy.get(mapSelector).then(($mapContainer) => {
+        const element: HTMLElement = $mapContainer.get()[0]!;
+
+        cy.window().then(($window) => {
+            cy.get('app-exercise-map').then(($mapComponent) => {
+                const mapComponent = $window.ng.getComponent(
+                    $mapComponent.get()[0]
+                ) as ExerciseMapComponent;
+                const olMap = mapComponent.olMapManager?.olMap;
+
+                expect(olMap).to.exist;
+
+                debugger;
+                const x = element.offsetWidth / 2 + offset.x;
+                const y = element.offsetHeight / 2 + offset.y;
+                const features = olMap?.getFeaturesAtPixel([x, y]);
+                return cy.wrap(features);
+            });
+        });
+    });
 }

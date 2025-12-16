@@ -159,25 +159,21 @@ export class ExerciseService {
                 [...this.getAllExercises()]
                     .filter((f) => f.changedSinceSave)
                     .map(async (activeExercise) => {
-                        await repoTransaction.transaction(
-                            async (exerciseTransaction) => {
-                                activeExercise.markAsAboutToBeSaved();
+                        activeExercise.markAsAboutToBeSaved();
 
-                                await exerciseTransaction.saveExerciseState(
-                                    activeExercise.exerciseId,
-                                    activeExercise.getExercise()
-                                );
-
-                                await this.actionRepository
-                                    .withConnection(exerciseTransaction)
-                                    .saveActions(
-                                        activeExercise.getSaveableActions(),
-                                        activeExercise.exerciseId
-                                    );
-
-                                activeExercise.markAsSaved();
-                            }
+                        await repoTransaction.saveExerciseState(
+                            activeExercise.exerciseId,
+                            activeExercise.getExercise()
                         );
+
+                        await this.actionRepository
+                            .withConnection(repoTransaction)
+                            .saveActions(
+                                activeExercise.getSaveableActions(),
+                                activeExercise.exerciseId
+                            );
+
+                        activeExercise.markAsSaved();
                     })
             );
         });

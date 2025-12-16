@@ -19,7 +19,6 @@ import type { exerciseTable, actionTable } from '../database/schema.js';
 import { pushAll } from '../utils/array.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
-import type { HttpResponse } from './http-handler/utils.js';
 import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './active-exercise.js';
 
@@ -38,65 +37,52 @@ export class ExerciseFactory {
     public static fromFile(
         file: StateExport,
         exerciseKeys: ExerciseKeys
-    ): ActiveExercise | HttpResponse<ExerciseKeys> {
+    ): ActiveExercise {
         const migratedImportObject = migrateStateExport(file);
         const validationErrors = validateExerciseExport(migratedImportObject);
         if (validationErrors.length > 0) {
             throw new ValidationErrorWrapper(validationErrors);
         }
 
-        try {
-            const newInitialState =
-                migratedImportObject.history?.initialState ??
-                migratedImportObject.currentState;
-            const newCurrentState = migratedImportObject.currentState;
+        const newInitialState =
+            migratedImportObject.history?.initialState ??
+            migratedImportObject.currentState;
+        const newCurrentState = migratedImportObject.currentState;
 
-            // Set new participant id
-            newInitialState.participantId = exerciseKeys.participantKey;
-            newCurrentState.participantId = exerciseKeys.participantKey;
+        // Set new participant id
+        newInitialState.participantId = exerciseKeys.participantKey;
+        newCurrentState.participantId = exerciseKeys.participantKey;
 
-            const exercise = new ActiveExercise(
-                exerciseKeys.participantKey,
-                exerciseKeys.trainerKey,
-                [],
-                ExerciseState.currentStateVersion,
-                newInitialState,
-                newCurrentState
-            );
-            const actions: ActionWrapper[] = (
-                migratedImportObject.history?.actionHistory ?? []
-            ).map(
+        const exercise = new ActiveExercise(
+            exerciseKeys.participantKey,
+            exerciseKeys.trainerKey,
+            [],
+            ExerciseState.currentStateVersion,
+            newInitialState,
+            newCurrentState
+        );
+        const actions: ActionWrapper[] = (
+            migratedImportObject.history?.actionHistory ?? []
+        ).map(
+            (action) =>
+                new ActionWrapper(
+                    action,
+                    exercise.emitterId, // this is always null
+                    exercise
+                )
+        );
+        pushAll(exercise.temporaryActionHistory, actions);
+
+        exercise.setTickCounter(
+            actions.filter(
                 (action) =>
-                    new ActionWrapper(
-                        action,
-                        exercise.emitterId, // this is always null
-                        exercise
-                    )
-            );
-            pushAll(exercise.temporaryActionHistory, actions);
+                    action.getAction().actionString.type === '[Exercise] Tick'
+            ).length
+        );
 
-            exercise.setTickCounter(
-                actions.filter(
-                    (action) =>
-                        action.getAction().actionString.type ===
-                        '[Exercise] Tick'
-                ).length
-            );
-
-            // The actions haven't been saved in the database yet -> keep them
-            this.restore(exercise, true);
-            return exercise;
-        } catch (e: unknown) {
-            if (e instanceof ReducerError) {
-                return {
-                    statusCode: 400,
-                    body: {
-                        message: `Error importing exercise: ${e.message}`,
-                    },
-                };
-            }
-            throw e;
-        }
+        // The actions haven't been saved in the database yet -> keep them
+        this.restore(exercise, true);
+        return exercise;
     }
 
     public static fromDatabase(

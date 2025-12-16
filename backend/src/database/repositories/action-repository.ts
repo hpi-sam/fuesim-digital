@@ -43,29 +43,35 @@ export class ActionRepository extends BaseRepository {
         return this.databaseConnection.transaction(async (tx) => {
             const results = [];
             for (const action of actionsPatch) {
-                const result = await tx
-                    .insert(actionTable)
-                    .values(action)
-                    .onConflictDoUpdate({
-                        target: actionTable.id,
-                        set: {
-                            id: action.id,
-                            actionString: action.actionString,
-                            emitterId: action.emitterId,
-                            exerciseId: action.exerciseId,
-                            index: action.index,
-                        },
-                    })
-                    .returning();
+                results.push(
+                    tx
+                        .insert(actionTable)
+                        .values(action)
+                        .onConflictDoUpdate({
+                            target: actionTable.id,
+                            set: {
+                                id: action.id,
+                                actionString: action.actionString,
+                                emitterId: action.emitterId,
+                                exerciseId: action.exerciseId,
+                                index: action.index,
+                            },
+                        })
+                        .returning()
+                );
+            }
 
+            const dbResults = await Promise.all(results);
+
+            for (const [i, result] of dbResults.entries()) {
                 if (result.length !== 1 || result[0] === undefined) {
                     throw new Error('Could not upsert action');
                 }
-                if (action.id !== undefined) {
-                    action.id = result[0].id;
+                if (actionsPatch[i]?.id !== undefined) {
+                    actionsPatch[i].id = result[0].id;
                 }
-                results.push(result);
             }
+
             return results;
         });
     }

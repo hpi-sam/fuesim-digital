@@ -109,7 +109,6 @@ export type DatabaseTransaction = Parameters<
     Parameters<DatabaseConnection['transaction']>[0]
 >[0];
 
-
 /**
  * TODO: @Quixelation --> this is faulty and also not needed anymore
  *

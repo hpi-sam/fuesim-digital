@@ -12,6 +12,8 @@
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/.vscode" />
       <excludeFolder url="file://$MODULE_DIR$/backend/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/shared/coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/coverage" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

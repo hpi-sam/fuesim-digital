@@ -13,24 +13,35 @@ describe('A trainer on the exercise page', () => {
         cy.createExercise().joinExerciseAsTrainer().spyOnProposeAction();
     });
 
-    it.only('can load and unload vehicles', () => {
+    it('can load and unload vehicles', () => {
         cy.get('[data-cy=vehiclesAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableVehicleDiv]');
         cy.get('@performAction').should('be.calledWithMatch', {
             type: '[Vehicle] Add vehicle',
         });
 
-        // TODO: get this to retry
-        cy.getMapFeaturesAt().should('have.length', 1);
+        cy.log('wait until vehicle is drawn on map');
+        const exerciseMap = cy.$$('app-exercise-map').get()[0]!;
+        cy.window()
+            .its('ng')
+            .invoke('getComponent', exerciseMap)
+            .its('olMapManager')
+            .its('olMap')
+            .should('exist')
+            .invoke('getFeaturesAtPixel', [
+                exerciseMap.offsetWidth / 2,
+                exerciseMap.offsetHeight / 2,
+            ])
+            .should('have.length', 1);
 
         cy.get('[data-cy=patientsAccordionButton]').click();
         cy.log('load a patient to a vehicle').dragToMap(
             '[data-cy=draggablePatientDiv]'
         );
-        cy.get('@proposeAction').should('be.calledWithMatch', {
+        cy.get('@performAction').should('be.calledWithMatch', {
             type: '[Patient] Add patient',
         });
-        cy.get('@proposeAction').should('have.been.calledWithMatch', {
+        cy.get('@performAction').should('have.been.calledWithMatch', {
             type: '[Vehicle] Load vehicle',
         });
 
@@ -50,7 +61,7 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=openLayersContainer]').click();
         cy.get('[data-cy=vehiclePopupUnloadButton]').click();
 
-        cy.get('@proposeAction').should('have.been.calledWithMatch', {
+        cy.get('@performAction').should('have.been.calledWithMatch', {
             type: '[Vehicle] Unload vehicle',
         });
 

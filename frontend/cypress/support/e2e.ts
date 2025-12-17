@@ -17,7 +17,6 @@
 // When a command from ./commands is ready to use, import with `import './commands'` syntax
 
 import type { JsonObject } from 'digital-fuesim-manv-shared';
-import type { FeatureLike } from 'ol/Feature';
 import {
     dragToMap,
     store,
@@ -34,8 +33,6 @@ import {
     initializeTrainerSocket,
     atKey,
     spyOnProposeAction,
-    spyOnRendercomplete,
-    getMapFeaturesAt,
 } from './commands';
 
 declare global {
@@ -58,10 +55,6 @@ declare global {
             initializeParticipantSocket(): Chainable;
             initializeTrainerSocket(): Chainable;
             spyOnProposeAction(): Chainable;
-            getMapFeaturesAt(offset?: {
-                x: number;
-                y: number;
-            }): Chainable<FeatureLike[] | undefined>;
             atKey(key: string): Chainable;
         }
     }
@@ -84,8 +77,6 @@ Cypress.Commands.addAll<keyof Cypress.Chainable, JsonObject>(
         atKey,
     }
 );
-
-Cypress.Commands.add('getMapFeaturesAt', getMapFeaturesAt);
 
 Cypress.Commands.addAll({
     dragToMap,

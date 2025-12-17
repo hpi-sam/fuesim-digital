@@ -5,7 +5,4 @@ export const mapCoordinatesSchema = z.strictObject({
     y: z.number(),
 });
 
-export interface MapCoordinates {
-    x: number;
-    y: number;
-}
+export type MapCoordinates = z.infer<typeof mapCoordinatesSchema>;

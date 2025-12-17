@@ -4,6 +4,6 @@ export const waitForTransferOccupationSchema = z.strictObject({
     type: z.literal('waitForTransferOccupation'),
 });
 
-export interface WaitForTransferOccupation {
-    type: 'waitForTransferOccupation';
-}
+export type WaitForTransferOccupation = z.infer<
+    typeof waitForTransferOccupationSchema
+>;

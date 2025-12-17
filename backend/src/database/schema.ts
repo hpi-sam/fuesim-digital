@@ -12,7 +12,6 @@ import {
     varchar,
     timestamp,
     text,
-    varchar,
 } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 

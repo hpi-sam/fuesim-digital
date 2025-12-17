@@ -9,6 +9,7 @@ import type {
     ParticipantKey,
     TrainerKey,
 } from '../../exercise/exercise-keys.js';
+import { onlySingle } from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {

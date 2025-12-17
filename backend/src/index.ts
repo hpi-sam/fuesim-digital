@@ -64,6 +64,17 @@ async function main() {
         throw e;
     }
 
+    let authService: AuthService;
+    try {
+        authService = await new AuthService(
+            userRepository,
+            sessionRepository
+        ).initialize();
+    } catch (e: unknown) {
+        console.error('Error initializing AuthService:');
+        throw e;
+    }
+
     if (Config.useDb) {
         try {
             console.log('Loading exercises from database…');

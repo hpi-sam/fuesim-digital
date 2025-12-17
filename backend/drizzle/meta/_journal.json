@@ -36,27 +36,6 @@
             "when": 1769525695314,
             "tag": "0004_oidc",
             "breakpoints": true
-        },
-        {
-            "idx": 5,
-            "version": "7",
-            "when": 1768399467635,
-            "tag": "0005_exercise_template",
-            "breakpoints": true
-        },
-        {
-            "idx": 6,
-            "version": "7",
-            "when": 1768574948036,
-            "tag": "0006_created_at",
-            "breakpoints": true
-        },
-        {
-            "idx": 7,
-            "version": "7",
-            "when": 1768597588538,
-            "tag": "0007_base_template",
-            "breakpoints": true
         }
     ]
 }

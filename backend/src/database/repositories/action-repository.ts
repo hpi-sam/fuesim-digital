@@ -20,59 +20,56 @@ export class ActionRepository extends BaseRepository {
             .where(eq(actionTable.exerciseId, exerciseId));
     }
 
-    // TODO: @Quixelation --> sollte hier der Wrapper übergeben werden, oder wie bei Exercises nur das Object?
     public async saveActions(actions: ActionWrapper[], exerciseId: string) {
         if (actions.length === 0) return;
 
         const actionsPatch: InferInsertModel<typeof actionTable>[] =
             actions.map((actionWrapper) => {
-                const { actionString, emitterId, index, id } =
-                    actionWrapper.getAction();
+                const action = actionWrapper.getAction();
                 const actionPatch: typeof actionTable.$inferInsert = {
-                    actionString,
-                    emitterId,
+                    actionString: action.actionString,
+                    emitterId: action.emitterId,
                     exerciseId,
-                    index,
+                    index: action.index,
                 };
-                if (id !== undefined) {
-                    actionPatch.id = id;
+                if (action.id !== undefined) {
+                    actionPatch.id = action.id;
                 }
                 return actionPatch;
             });
 
         return this.databaseConnection.transaction(async (tx) => {
-            const results = [];
-            for (const action of actionsPatch) {
-                results.push(
-                    tx
-                        .insert(actionTable)
-                        .values(action)
-                        .onConflictDoUpdate({
-                            target: actionTable.id,
-                            set: {
-                                id: action.id,
-                                actionString: action.actionString,
-                                emitterId: action.emitterId,
-                                exerciseId: action.exerciseId,
-                                index: action.index,
-                            },
-                        })
-                        .returning()
-                );
-            }
+            const actionPromises = actionsPatch.map(async (action) => {
+                const dbInsertResult = await tx
+                    .insert(actionTable)
+                    .values(action)
+                    .onConflictDoUpdate({
+                        target: actionTable.id,
+                        set: {
+                            id: action.id,
+                            actionString: action.actionString,
+                            emitterId: action.emitterId,
+                            exerciseId: action.exerciseId,
+                            index: action.index,
+                        },
+                    })
+                    .returning();
 
-            const dbResults = await Promise.all(results);
-
-            for (const [i, result] of dbResults.entries()) {
-                if (result.length !== 1 || result[0] === undefined) {
+                if (
+                    dbInsertResult.length !== 1 ||
+                    dbInsertResult[0] === undefined
+                ) {
                     throw new Error('Could not upsert action');
                 }
-                if (actionsPatch[i]?.id !== undefined) {
-                    actionsPatch[i].id = result[0].id;
-                }
-            }
 
-            return results;
+                action.id ??= dbInsertResult[0].id;
+
+                return dbInsertResult;
+            });
+
+            const awaitedResults = await Promise.all(actionPromises);
+
+            return awaitedResults;
         });
     }
 

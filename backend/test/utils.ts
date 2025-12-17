@@ -115,11 +115,21 @@ class TestEnvironment {
     public server!: FuesimServer;
     private _databaseService!: DatabaseService;
     private _exerciseService!: ExerciseService;
+    private _exerciseRepository!: ExerciseRepository;
+    private _actionRepository!: ActionRepository;
     public get databaseService(): DatabaseService {
         return this._databaseService;
     }
     public get exerciseService(): ExerciseService {
         return this._exerciseService;
+    }
+
+    public get exerciseRepository(): ExerciseRepository {
+        return this._exerciseRepository;
+    }
+
+    public get actionRepository(): ActionRepository {
+        return this._actionRepository;
     }
 
     public httpRequest(method: HttpMethod, url: string): request.Test {
@@ -147,10 +157,14 @@ class TestEnvironment {
 
     public init(
         databaseService: DatabaseService,
-        exerciseService: ExerciseService
+        exerciseService: ExerciseService,
+        exerciseRepository: ExerciseRepository,
+        actionRepository: ActionRepository
     ) {
         this._databaseService = databaseService;
         this._exerciseService = exerciseService;
+        this._exerciseRepository = exerciseRepository;
+        this._actionRepository = actionRepository;
         this.server = new FuesimServer(this.databaseService, exerciseService);
     }
 }
@@ -176,7 +190,12 @@ export const createTestEnvironment = (): TestEnvironment => {
             exerciseRepository,
             actionRepository
         );
-        environment.init(databaseService, exerciseService);
+        environment.init(
+            databaseService,
+            exerciseService,
+            exerciseRepository,
+            actionRepository
+        );
     });
     afterEach(async () => {
         // Prevent the dataSource from being closed too soon.

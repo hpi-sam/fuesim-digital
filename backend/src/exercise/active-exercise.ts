@@ -288,8 +288,6 @@ export class ActiveExercise {
         action: ExerciseAction,
         emitterId: UUID | null
     ): void {
-        // TODO: @Quixelation --> maybe not do this sync, but keep the old patterns of having a js object and updating the database every 10s
-
         this.exercise.currentStateString = newExerciseState;
         this.temporaryActionHistory.push(
             new ActionWrapper(action, emitterId, this)

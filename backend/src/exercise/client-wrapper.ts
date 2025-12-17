@@ -53,7 +53,7 @@ export class ClientWrapper {
             // The client has not joined an exercise. Do nothing.
             return;
         }
-        // TODO: @Quixelation --> this is ugly now --> (use Wrapper instead of Id?)
+
         this.exerciseService.leaveExercise(
             this.chosenExercise.getExercise().participantId,
             this

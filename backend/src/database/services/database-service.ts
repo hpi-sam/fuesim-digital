@@ -6,7 +6,6 @@ import { migrate as migratePostgres } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
 import { PGlite } from '@electric-sql/pglite';
 import { uuid_ossp } from '@electric-sql/pglite/contrib/uuid_ossp';
-import { getTableColumns } from 'drizzle-orm';
 import * as schema from '../schema.js';
 import { Config } from '../../config.js';
 
@@ -27,9 +26,6 @@ export class DatabaseService {
         return this._initialized;
     }
 
-    /**
-     * DO NOT USE WITHOUT `DatabaseService` AS A WRAPPER
-     */
     public static async createNewDatabaseConnection(
         mode: DatabaseConnectionMode = 'default'
     ): Promise<DatabaseService> {
@@ -108,19 +104,3 @@ export type DatabaseTable = AnyPgTable;
 export type DatabaseTransaction = Parameters<
     Parameters<DatabaseConnection['transaction']>[0]
 >[0];
-
-/**
- * TODO: @Quixelation --> this is faulty and also not needed anymore
- *
- * REMOVE THIS
- *
- * @deprecated
- */
-export function upsertHelper(table: DatabaseTable) {
-    return Object.fromEntries(
-        Object.entries(getTableColumns(table)).map(([key, value]) => [
-            key,
-            `EXCLUDED.${value.name}`,
-        ])
-    );
-}

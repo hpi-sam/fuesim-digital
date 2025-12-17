@@ -160,7 +160,6 @@ export class ExerciseService {
                     .filter((f) => f.changedSinceSave)
                     .map(async (activeExercise) => {
                         activeExercise.markAsAboutToBeSaved();
-
                         await repoTransaction.saveExerciseState(
                             activeExercise.exerciseId,
                             activeExercise.getExercise()
@@ -197,7 +196,7 @@ export class ExerciseService {
                 time: actionWrapper.getAction().index,
             })),
         ]
-            // TODO: Is this necessary? (@Quixelation :--> old comment from prev)
+            // TODO: Is this necessary?
             .sort((a, b) => a.time - b.time);
 
         return {

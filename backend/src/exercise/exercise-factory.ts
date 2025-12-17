@@ -100,22 +100,19 @@ export class ExerciseFactory {
             dbEntry.currentStateString
         );
         exercise.setExerciseId(dbEntry.id);
-        // TODO : @Quixelation --> why are we doing this? --> the thingies are already committed in the database...
-        /* if (actions) {
-            pushAll(
-                actionsInWrapper,
-                actions.map(
-                    (action) =>
-                        new ActionWrapper(
-                            action.actionString,
-                            action.emitterId,
-                            exercise,
-                            action.index,
-                            action.id
-                        )
-                )
-            );
-        }*/
+        pushAll(
+            actionsInWrapper,
+            actions.map(
+                (action) =>
+                    new ActionWrapper(
+                        action.actionString,
+                        action.emitterId,
+                        exercise,
+                        action.index,
+                        action.id
+                    )
+            )
+        );
         exercise.setTickCounter(dbEntry.tickCounter);
         exercise.markAsSaved();
         return exercise;

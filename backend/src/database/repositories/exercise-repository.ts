@@ -3,6 +3,7 @@ import type { InferInsertModel } from 'drizzle-orm';
 import { eq, lt } from 'drizzle-orm';
 import { exerciseTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
+import { onlySingle } from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
@@ -98,14 +99,4 @@ export class ExerciseRepository extends BaseRepository {
             .onConflictDoNothing()
             .returning();
     }
-}
-
-function onlySingle<T>(array: T[]): T | null {
-    if (array.length === 0 || array[0] === undefined) {
-        return null;
-    }
-    if (array.length > 1) {
-        throw new Error('Multiple entries found where only one expected');
-    }
-    return array[0];
 }

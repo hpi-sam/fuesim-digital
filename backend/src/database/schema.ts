@@ -9,6 +9,8 @@ import {
     json,
     bigint,
     foreignKey,
+    varchar,
+    timestamp,
 } from 'drizzle-orm/pg-core';
 
 const baseTable = {
@@ -50,6 +52,35 @@ export const actionTable = pgTable(
     ]
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
+
+export const userTable = pgTable('users', {
+    /**
+     * This should always be the sub claim from the OIDC provider
+     */
+    id: varchar().primaryKey().notNull(),
+    username: varchar().notNull(),
+    display_name: varchar().notNull(),
+    updatedAt: timestamp({ mode: 'date', precision: 3 })
+        .notNull()
+        .$defaultFn(() => new Date())
+        .$onUpdateFn(() => new Date()),
+});
+
+export const sessionTable = pgTable('sessions', {
+    id: varchar().primaryKey().notNull(),
+    userId: varchar()
+        .notNull()
+        .references(() => userTable.id, {
+            onDelete: 'cascade',
+            onUpdate: 'cascade',
+        }),
+    createdAt: timestamp({ mode: 'date', precision: 3 })
+        .notNull()
+        .$defaultFn(() => new Date()),
+    expiresAt: timestamp({ mode: 'date', precision: 3 }).notNull(),
+    accessToken: varchar().notNull(),
+});
+export type SessionEntry = InferSelectModel<typeof sessionTable>;
 
 export const actionEntityRelations = relations(actionTable, ({ one }) => ({
     exerciseWrapperEntity: one(exerciseTable, {

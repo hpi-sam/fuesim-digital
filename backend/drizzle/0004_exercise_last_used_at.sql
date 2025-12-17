@@ -1,0 +1,1 @@
+ALTER TABLE "exercise_entity" ADD COLUMN "lastUsedAt" timestamp with time zone DEFAULT now() NOT NULL;

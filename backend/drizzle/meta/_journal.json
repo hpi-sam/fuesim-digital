@@ -29,6 +29,13 @@
             "when": 1765811148683,
             "tag": "0003_table_rename",
             "breakpoints": true
+        },
+        {
+            "idx": 4,
+            "version": "7",
+            "when": 1765967790449,
+            "tag": "0004_exercise_last_used_at",
+            "breakpoints": true
         }
     ]
 }

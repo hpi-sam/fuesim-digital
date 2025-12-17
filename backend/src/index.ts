@@ -8,6 +8,7 @@ import { FuesimServer } from './fuesim-server.js';
 import { ActionRepository } from './database/repositories/action-repository.js';
 import { ExerciseRepository } from './database/repositories/exercise-repository.js';
 import { ExerciseService } from './database/services/exercise-service.js';
+import { ExerciseManagerService } from './database/services/exercise-manager-service.js';
 
 async function main() {
     Config.initialize();
@@ -37,6 +38,9 @@ async function main() {
     const exerciseService = new ExerciseService(
         exerciseRepository,
         actionRepository
+    );
+    const exerciseManagerService = new ExerciseManagerService(
+        exerciseRepository
     );
 
     if (Config.useDb) {
@@ -75,7 +79,7 @@ async function main() {
     }
 
     // eslint-disable-next-line no-new
-    new FuesimServer(databaseService, exerciseService);
+    new FuesimServer(databaseService, exerciseService, exerciseManagerService);
 }
 
 main();

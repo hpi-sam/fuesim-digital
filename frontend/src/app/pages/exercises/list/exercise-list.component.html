@@ -30,7 +30,7 @@
     @if (exercises.hasValue()) {
         <div class="row row-cols-3">
             @for (exercise of exercises.value(); track exercise.trainerId) {
-                <div class="col">
+                <div class="col mb-4">
                     <app-exercise-card [exercise]="exercise" />
                 </div>
             }

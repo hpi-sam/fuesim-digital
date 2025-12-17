@@ -39,6 +39,9 @@ export const exerciseTable = pgTable('exercise_entity', {
     trainerId: char({ length: 8 }).notNull(),
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
+    lastUsedAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
 });
 export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 

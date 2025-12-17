@@ -2,14 +2,10 @@ import type { Server as HttpServer } from 'node:http';
 import cors from 'cors';
 import type { Express } from 'express';
 import express from 'express';
-import {
-    exercisesSchema,
-    exerciseTemplatesSchema,
-} from 'digital-fuesim-manv-shared';
+import { exerciseTemplatesSchema } from 'digital-fuesim-manv-shared';
 import cookieParser from 'cookie-parser';
 import { Config } from '../config.js';
 import type { DatabaseService } from '../database/services/database-service.js';
-import type { AuthService } from '../auth/auth-service.js';
 import { AuthHttpRouter } from '../auth/auth-http-router.js';
 import type { ExerciseService } from './../database/services/exercise-service.js';
 import {
@@ -20,8 +16,9 @@ import {
 } from './http-handler/api/exercise.js';
 import { getHealth } from './http-handler/api/health.js';
 import { secureHttp } from './http-handler/secure-http.js';
+import { getExercises } from './http-handler/api/exercise-manager.js';
 
-export class ExerciseHttpServer {
+export class ApiHttpServer {
     public readonly httpServer: HttpServer;
     /**
      * @param uploadLimit in Megabyte can be set via ENV DFM_UPLOAD_LIMIT
@@ -30,7 +27,8 @@ export class ExerciseHttpServer {
         app: Express,
         databaseService: DatabaseService,
         exerciseService: ExerciseService,
-        authService: AuthService
+        authService: AuthService,
+        exerciseManagerService: ExerciseManagerService
     ) {
         Config.initialize();
 
@@ -83,55 +81,45 @@ export class ExerciseHttpServer {
         );
 
         app.get('/api/exercises/', async (req, res) =>
-            secureHttp(() => {
-                const exercises = [
-                    {
-                        participantId: '123456',
-                        trainerId: '12345678',
-                        lastUsedAt: new Date('2025-12-07T16:42:02.718Z'),
-                    },
-                    {
-                        participantId: '789123',
-                        trainerId: '78912345',
-                        lastUsedAt: new Date('2025-12-03T16:42:02.718Z'),
-                    },
-                ];
-
-                return {
-                    statusCode: 200,
-                    body: exercisesSchema.encode(exercises),
-                };
-            }, res)
+            secureHttp(
+                async () => getExercises(exerciseManagerService),
+                req,
+                res
+            )
         );
 
         app.get('/api/exercise_templates/', async (req, res) =>
-            secureHttp(() => {
-                const exercises = [
-                    {
-                        trainerId: '12345678',
-                        lastExerciseCreatedAt: new Date(
-                            '2025-12-07T16:42:02.718Z'
-                        ),
-                        name: 'MANV 25 mit Verkehrsunfall',
-                        description:
-                            'Diverse eingeklemmte Personen nach einem Busunfall',
-                    },
-                    {
-                        trainerId: '78912345',
-                        lastExerciseCreatedAt: new Date(
-                            '2025-12-03T16:42:02.718Z'
-                        ),
-                        name: 'MANV 50 am Brandenburger Tor',
-                        description:
-                            'Viele leichtverletzte Personen nach einem Gedränge',
-                    },
-                ];
+            secureHttp(
+                () => {
+                    const exercises = [
+                        {
+                            trainerId: '12345678',
+                            lastExerciseCreatedAt: new Date(
+                                '2025-12-07T16:42:02.718Z'
+                            ),
+                            name: 'MANV 25 mit Verkehrsunfall',
+                            description:
+                                'Diverse eingeklemmte Personen nach einem Busunfall',
+                        },
+                        {
+                            trainerId: '78912345',
+                            lastExerciseCreatedAt: new Date(
+                                '2025-12-03T16:42:02.718Z'
+                            ),
+                            name: 'MANV 50 am Brandenburger Tor',
+                            description:
+                                'Viele leichtverletzte Personen nach einem Gedränge',
+                        },
+                    ];
 
-                return {
-                    statusCode: 200,
-                    body: exerciseTemplatesSchema.encode(exercises),
-                };
-            }, res)
+                    return {
+                        statusCode: 200,
+                        body: exerciseTemplatesSchema.encode(exercises),
+                    };
+                },
+                req,
+                res
+            )
         );
 
         app.use('/api/auth', new AuthHttpRouter(authService).router);

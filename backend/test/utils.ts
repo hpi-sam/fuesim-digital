@@ -13,7 +13,7 @@ import {
     testingDatabaseName,
 } from '../src/database/services/database-service.js';
 import { Config } from '../src/config.js';
-import type { HttpMethod } from '../src/exercise/http-handler/secure-http.js';
+import type { HttpMethod } from '../src/http-handler/secure-http.js';
 import { FuesimServer } from '../src/fuesim-server.js';
 import { ExerciseService } from '../src/database/services/exercise-service.js';
 import { ExerciseRepository } from '../src/database/repositories/exercise-repository.js';

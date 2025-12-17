@@ -1,7 +1,7 @@
 import type { ExerciseTimeline, StateExport } from 'digital-fuesim-manv-shared';
 import { isEmpty } from 'lodash-es';
-import { UserReadableIdGenerator } from '../../../utils/user-readable-id-generator.js';
-import { ActiveExercise } from '../../active-exercise.js';
+import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
+import { ActiveExercise } from '../../exercise/active-exercise.js';
 import type { HttpErrorMessage, HttpResponse } from '../utils.js';
 import { importExercise } from '../../../utils/import-exercise.js';
 import { isExerciseKey, isTrainerKey } from '../../exercise-keys.js';

@@ -1,6 +1,6 @@
 import { ExerciseState } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
-import { eq, lt } from 'drizzle-orm';
+import { desc, eq, lt } from 'drizzle-orm';
 import type { ExerciseId } from '../schema.js';
 import { exerciseTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
@@ -46,6 +46,18 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection.select().from(exerciseTable);
     }
 
+    public getAllExercisesOfOwner() {
+        return this.databaseConnection
+            .select({
+                id: exerciseTable.id,
+                participantId: exerciseTable.participantId,
+                trainerId: exerciseTable.trainerId,
+                lastUsedAt: exerciseTable.lastUsedAt,
+            })
+            .from(exerciseTable)
+            .orderBy(desc(exerciseTable.lastUsedAt));
+    }
+
     public deleteExerciseById(exerciseId: ExerciseId) {
         return this.databaseConnection
             .delete(exerciseTable)
@@ -74,6 +86,7 @@ export class ExerciseRepository extends BaseRepository {
         const exercisePatchWithId = {
             id: exerciseId,
             ...exercisePatch,
+            lastUsedAt: new Date(),
         };
 
         const result = await this.databaseConnection

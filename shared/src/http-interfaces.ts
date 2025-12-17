@@ -50,6 +50,7 @@ export type Exercise = z.infer<typeof exerciseSchema>;
 
 export const exercisesSchema = z.array(exerciseSchema);
 export type Exercises = z.infer<typeof exercisesSchema>;
+export type ExercisesInput = z.input<typeof exercisesSchema>;
 
 export const exerciseTemplateSchema = z.object({
     trainerId: z.string(),

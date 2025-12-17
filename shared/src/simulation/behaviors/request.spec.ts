@@ -1,5 +1,8 @@
 import { produce } from 'immer';
 import {
+    newImageProperties,
+    newMapCoordinatesAt,
+    newNoOccupation,
     newSimulatedRegionPositionIn,
     SimulatedRegion,
     SimulatedRegionRequestTargetConfiguration,
@@ -21,7 +24,7 @@ import { RecurringEventActivityState } from '../activities/index.js';
 import { addActivity } from '../activities/utils.js';
 import { SendRequestEvent } from '../events/send-request.js';
 import { ResourcePromise } from '../utils/resource-promise.js';
-import { createVehicle } from '../../models/vehicle.js';
+import { newVehicle } from '../../models/vehicle.js';
 import {
     RequestBehaviorState,
     getResourcesToRequest,
@@ -81,7 +84,7 @@ function setupStateAndInteract(
     ) => void
 ) {
     const simulatedRegion = SimulatedRegion.create(
-        { x: 0, y: 0 },
+        newMapCoordinatesAt(0, 0),
         Size.create(10, 10),
         'test region'
     );
@@ -174,7 +177,7 @@ const updateRequestTarget = (
 ) => {
     const otherSimulatedRegion = cloneDeepMutable(
         SimulatedRegion.create(
-            { x: 0, y: 0 },
+            newMapCoordinatesAt(0, 0),
             Size.create(10, 10),
             'requestable region'
         )
@@ -375,14 +378,15 @@ const sendEvent = {
         simulatedRegion: Mutable<SimulatedRegion>,
         behaviorState: Mutable<RequestBehaviorState>
     ) => {
-        const vehicle = createVehicle(
+        const vehicle = newVehicle(
             'KTW',
             'KTW 1',
+            uuid(),
             {},
             0,
-            { url: '', height: 0, aspectRatio: 0 },
+            newImageProperties('', 0, 0),
             newSimulatedRegionPositionIn(simulatedRegion.id),
-            { type: 'noOccupation' }
+            newNoOccupation()
         );
         draftState.vehicles[vehicle.id] = cloneDeepMutable(vehicle);
 

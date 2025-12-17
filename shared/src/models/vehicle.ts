@@ -20,7 +20,7 @@ export const vehicleSchema = z.strictObject({
     name: z.string(),
     templateId: z.uuidv4(),
     materialIds: uuidSetSchema,
-    patientCapacity: z.int().nonnegative(), // TODO: state migration?
+    patientCapacity: z.int().nonnegative(),
     position: positionSchema,
     image: imagePropertiesSchema,
     personnelIds: uuidSetSchema,
@@ -30,7 +30,7 @@ export const vehicleSchema = z.strictObject({
 
 export type Vehicle = Immutable<z.infer<typeof vehicleSchema>>;
 
-export function createVehicle(
+export function newVehicle(
     vehicleType: string,
     name: string,
     templateId: UUID,

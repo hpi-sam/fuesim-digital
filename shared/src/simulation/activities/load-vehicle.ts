@@ -16,6 +16,7 @@ import {
     createVehicleActionTag,
     getCreate,
     isInSpecificSimulatedRegion,
+    newIntermediateOccupation,
 } from '../../models/index.js';
 import type { UUID, UUIDSet } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
@@ -294,10 +295,13 @@ export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
                     vehicle.id
                 );
 
-                changeOccupation(draftState, vehicle, {
-                    type: 'intermediateOccupation',
-                    unoccupiedUntil: draftState.currentTime + tickInterval,
-                });
+                changeOccupation(
+                    draftState,
+                    vehicle,
+                    newIntermediateOccupation(
+                        draftState.currentTime + tickInterval
+                    )
+                );
 
                 terminate();
             }

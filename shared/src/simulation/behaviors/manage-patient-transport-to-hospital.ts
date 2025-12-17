@@ -8,15 +8,17 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import type {
-    PatientStatus,
-    PatientStatusForTransport,
-} from '../../models/index.js';
 import {
+    newPatientTransferOccupation,
+    PatientStatus,
+    type PatientStatusForTransport,
+    type ResourceDescription,
+    SimulatedRegion,
     currentSimulatedRegionOf,
     getCreate,
     isInSpecificSimulatedRegion,
     patientStatusAllowedValues,
+    addResourceDescription,
 } from '../../models/index.js';
 import type { Mutable, UUID, UUIDSet } from '../../utils/index.js';
 import {
@@ -37,6 +39,7 @@ import {
     PublishRadiogramActivityState,
     RecurringEventActivityState,
     SendRemoteEventActivityState,
+    CountPatientsActivityState,
 } from '../activities/index.js';
 import {
     AskForPatientDataEvent,
@@ -45,10 +48,11 @@ import {
     TryToSendToHospitalEvent,
 } from '../events/index.js';
 import type { TransferCountsRadiogram } from '../../models/radiogram/index.js';
-import { RadiogramUnpublishedStatus } from '../../models/radiogram/index.js';
+import {
+    RadiogramUnpublishedStatus,
+    NewPatientDataRequestedRadiogram,
+} from '../../models/radiogram/index.js';
 import { IsPatientsPerUUID } from '../../utils/validators/is-patients-per-uuid.js';
-import { NewPatientDataRequestedRadiogram } from '../../models/radiogram/new-patient-data-requested-radiogram.js';
-import { CountPatientsActivityState } from '../activities/count-patients.js';
 import type { ExerciseState } from '../../state.js';
 import {
     getActivityById,
@@ -56,9 +60,6 @@ import {
     getElementByPredicate,
 } from '../../store/action-reducers/utils/index.js';
 import { PatientsTransportPromise } from '../utils/patients-transported-promise.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import { addResourceDescription } from '../../models/utils/resource-description.js';
-import type { SimulatedRegion } from '../../models/simulated-region.js';
 import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
 import { logLastPatientTransportedInMultipleSimulatedRegions } from '../../store/action-reducers/utils/log.js';
 import type {
@@ -281,11 +282,9 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                                     targetTransferPoint.id,
                                     simulatedRegion.id,
                                     undefined,
-                                    {
-                                        type: 'patientTransferOccupation',
-                                        transportManagementRegionId:
-                                            simulatedRegion.id,
-                                    }
+                                    newPatientTransferOccupation(
+                                        simulatedRegion.id
+                                    )
                                 )
                             )
                         );

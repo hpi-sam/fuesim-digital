@@ -3,6 +3,7 @@ import {
     getCreate,
     changeOccupation,
     isUnoccupied,
+    newUnloadingOccupation,
 } from '../../models/index.js';
 import type { UUID } from '../../utils/index.js';
 import {
@@ -77,9 +78,11 @@ export const unloadArrivingVehiclesBehavior: SimulationBehavior<UnloadArrivingVe
                         const activityId = nextUUID(draftState);
                         behaviorState.vehicleActivityMap[event.vehicleId] =
                             activityId;
-                        changeOccupation(draftState, vehicle, {
-                            type: 'unloadingOccupation',
-                        });
+                        changeOccupation(
+                            draftState,
+                            vehicle,
+                            newUnloadingOccupation()
+                        );
                         addActivity(
                             simulatedRegion,
                             UnloadVehicleActivityState.create(

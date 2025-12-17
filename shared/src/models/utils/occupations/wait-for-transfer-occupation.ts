@@ -7,3 +7,7 @@ export const waitForTransferOccupationSchema = z.strictObject({
 export type WaitForTransferOccupation = z.infer<
     typeof waitForTransferOccupationSchema
 >;
+
+export const newWaitForTransferOccupation = (): WaitForTransferOccupation => ({
+    type: 'waitForTransferOccupation',
+});

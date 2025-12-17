@@ -1,5 +1,9 @@
 import { IsUUID } from 'class-validator';
-import { changeOccupation, getCreate } from '../../models/index.js';
+import {
+    changeOccupation,
+    getCreate,
+    newIntermediateOccupation,
+} from '../../models/index.js';
 import type { UUID, UUIDSet } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
 import { IsUUIDSet, IsValue } from '../../utils/validators/index.js';
@@ -84,10 +88,11 @@ export const transferPatientToHospitalActivity: SimulationActivity<TransferPatie
                 activityState.transferManagementRegionId
             );
 
-            changeOccupation(draftState, vehicle, {
-                type: 'intermediateOccupation',
-                unoccupiedUntil: draftState.currentTime + tickInterval,
-            });
+            changeOccupation(
+                draftState,
+                vehicle,
+                newIntermediateOccupation(draftState.currentTime + tickInterval)
+            );
 
             sendSimulationEvent(
                 simulatedRegion,

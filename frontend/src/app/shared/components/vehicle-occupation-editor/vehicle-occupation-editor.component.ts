@@ -1,6 +1,10 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input } from '@angular/core';
-import type { UUID, ExerciseOccupation } from 'digital-fuesim-manv-shared';
+import {
+    type UUID,
+    type ExerciseOccupation,
+    newNoOccupation,
+} from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -33,7 +37,7 @@ export class VehicleOccupationEditorComponent implements OnChanges {
         this.exerciseService.proposeAction({
             type: '[Vehicle] Set occupation',
             vehicleId: this.vehicleId,
-            occupation: { type: 'noOccupation' },
+            occupation: newNoOccupation(),
         });
     }
 }

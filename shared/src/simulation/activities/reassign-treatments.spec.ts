@@ -6,6 +6,7 @@ import {
     TransferPoint,
     CanCaterFor,
     Size,
+    newMapCoordinatesAt,
 } from '../../models/index.js';
 import type { PatientStatus } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
@@ -41,7 +42,7 @@ function setupStateAndApplyTreatments(
     ) => void
 ) {
     const simulatedRegion = SimulatedRegion.create(
-        { x: 0, y: 0 },
+        newMapCoordinatesAt(0, 0),
         Size.create(10, 10),
         'test region'
     );

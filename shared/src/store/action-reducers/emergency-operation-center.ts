@@ -10,7 +10,11 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { EocLogEntry, VehicleParameters } from '../../models/index.js';
+import {
+    EocLogEntry,
+    newAlarmGroupStartPoint,
+    VehicleParameters,
+} from '../../models/index.js';
 import type { Mutable, UUID } from '../../utils/index.js';
 import {
     StrictObject,
@@ -189,11 +193,7 @@ function sendAlarmGroupVehicle(
         type: '[Transfer] Add to transfer',
         elementType: vehicleParameters.vehicle.type,
         elementId: vehicleParameters.vehicle.id,
-        startPoint: {
-            type: 'alarmGroupStartPoint',
-            alarmGroupId,
-            duration: time,
-        },
+        startPoint: newAlarmGroupStartPoint(alarmGroupId, time),
         targetTransferPointId,
     });
 }

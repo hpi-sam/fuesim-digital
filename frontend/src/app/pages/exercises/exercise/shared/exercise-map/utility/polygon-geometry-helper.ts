@@ -1,6 +1,6 @@
 import {
     currentCoordinatesOf,
-    type MapCoordinates,
+    newMapCoordinatesAt,
 } from 'digital-fuesim-manv-shared';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
@@ -59,11 +59,8 @@ export class PolygonGeometryHelper
 
     getFeaturePosition = (feature: Feature<Polygon>): Positions<Polygon> =>
         this.getFeatureCoordinates(feature).map((coordinates) =>
-            coordinates.map(
-                (coordinate): MapCoordinates => ({
-                    x: coordinate[0]!,
-                    y: coordinate[1]!,
-                })
+            coordinates.map((coordinate) =>
+                newMapCoordinatesAt(coordinate[0]!, coordinate[1]!)
             )
         );
 }

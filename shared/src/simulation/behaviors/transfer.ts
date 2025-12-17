@@ -16,6 +16,8 @@ import {
     changeOccupation,
     isUnoccupied,
     isUnoccupiedOrIntermediarilyOccupied,
+    newLoadOccupation,
+    newWaitForTransferOccupation,
 } from '../../models/index.js';
 import type { UUID } from '../../utils/index.js';
 import {
@@ -146,10 +148,11 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                                 behaviorState.personnelLoadTime
                             )
                         );
-                        changeOccupation(draftState, vehicleToLoad, {
-                            type: 'loadOccupation',
-                            loadingActivityId: activityId,
-                        });
+                        changeOccupation(
+                            draftState,
+                            vehicleToLoad,
+                            newLoadOccupation(activityId)
+                        );
                     }
                 }
                 break;
@@ -184,10 +187,11 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                             behaviorState.personnelLoadTime
                         )
                     );
-                    changeOccupation(draftState, vehicle, {
-                        type: 'loadOccupation',
-                        loadingActivityId: activityId,
-                    });
+                    changeOccupation(
+                        draftState,
+                        vehicle,
+                        newLoadOccupation(activityId)
+                    );
                 }
                 break;
             case 'transferSpecificVehicleRequestEvent':
@@ -220,10 +224,11 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                             event.successorOccupation
                         )
                     );
-                    changeOccupation(draftState, vehicle, {
-                        type: 'loadOccupation',
-                        loadingActivityId: activityId,
-                    });
+                    changeOccupation(
+                        draftState,
+                        vehicle,
+                        newLoadOccupation(activityId)
+                    );
                 }
                 break;
             case 'transferVehiclesRequestEvent':
@@ -301,10 +306,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                                 changeOccupation(
                                     draftState,
                                     loadableVehicles![index]!,
-                                    {
-                                        type: 'loadOccupation',
-                                        loadingActivityId: activityId,
-                                    }
+                                    newLoadOccupation(activityId)
                                 );
                                 sentVehicles[vehicleType]++;
                             }
@@ -395,9 +397,11 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                     if (vehicle === undefined) {
                         break;
                     }
-                    changeOccupation(draftState, vehicle, {
-                        type: 'waitForTransferOccupation',
-                    });
+                    changeOccupation(
+                        draftState,
+                        vehicle,
+                        newWaitForTransferOccupation()
+                    );
 
                     behaviorState.startTransferEventQueue.push(event);
                 }

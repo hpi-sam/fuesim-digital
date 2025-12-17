@@ -5,6 +5,7 @@ import { cloneDeepMutable } from '../../../utils/index.js';
 import type { Vehicle } from '../../vehicle.js';
 import { createOccupationTag } from '../tag-helpers.js';
 import type { ExerciseOccupation } from './exercise-occupation.js';
+import { newNoOccupation } from './no-occupation.js';
 
 export function isUnoccupied(
     draftState: Mutable<ExerciseState>,
@@ -14,7 +15,7 @@ export function isUnoccupied(
         vehicle.occupation.type === 'intermediateOccupation' &&
         vehicle.occupation.unoccupiedUntil < draftState.currentTime
     ) {
-        changeOccupation(draftState, vehicle, { type: 'noOccupation' });
+        changeOccupation(draftState, vehicle, newNoOccupation());
     }
 
     return vehicle.occupation.type === 'noOccupation';

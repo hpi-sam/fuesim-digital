@@ -25,3 +25,13 @@ export const imagePropertiesSchema = z.strictObject({
 });
 
 export type ImageProperties = z.infer<typeof imagePropertiesSchema>;
+
+export const newImageProperties = (
+    url: string,
+    height: number,
+    aspectRatio: number
+): ImageProperties => ({
+    url,
+    height,
+    aspectRatio,
+});

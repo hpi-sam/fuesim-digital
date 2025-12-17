@@ -6,6 +6,7 @@ import type {
     MapCoordinates,
 } from '../models/index.js';
 import {
+    newNoOccupation,
     newVehiclePositionIn,
     newMapPositionAt,
     VehicleParameters,
@@ -64,7 +65,7 @@ export function createVehicleParameters(
         patientIds: {},
         personnelIds: arrayToUUIDSet(personnel.map((p) => p.id)),
         position: newMapPositionAt(vehiclePosition),
-        occupation: { type: 'noOccupation' },
+        occupation: newNoOccupation(),
     };
 
     return VehicleParameters.create(vehicle, materials, personnel);

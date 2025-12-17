@@ -392,7 +392,7 @@ export namespace VehicleActionReducers {
                 for (const patientId of patientIds) {
                     changePositionWithId(
                         patientId,
-                        { type: 'simulatedRegion', simulatedRegionId },
+                        newSimulatedRegionPositionIn(simulatedRegionId),
                         'patient',
                         draftState
                     );

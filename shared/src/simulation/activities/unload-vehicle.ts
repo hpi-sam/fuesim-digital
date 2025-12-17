@@ -3,6 +3,7 @@ import {
     changeOccupation,
     getCreate,
     isInSpecificSimulatedRegion,
+    newNoOccupation,
 } from '../../models/index.js';
 import type { UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
@@ -90,7 +91,7 @@ export const unloadVehicleActivity: SimulationActivity<UnloadVehicleActivityStat
                 activity.vehicleId
             );
             if (vehicle?.occupation.type === 'unloadingOccupation') {
-                changeOccupation(draftState, vehicle, { type: 'noOccupation' });
+                changeOccupation(draftState, vehicle, newNoOccupation());
             }
         },
     };

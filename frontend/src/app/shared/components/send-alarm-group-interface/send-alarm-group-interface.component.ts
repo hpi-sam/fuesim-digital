@@ -3,6 +3,7 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     createVehicleParameters,
+    newMapCoordinatesAt,
     StrictObject,
     TransferPoint,
     uuid,
@@ -242,7 +243,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
         // We have to provide a map position when creating a vehicle
         // It will be overwritten directly after by putting the vehicle into transfer
-        const placeholderPosition = { x: 0, y: 0 };
+        const placeholderPosition = newMapCoordinatesAt(0, 0);
 
         // Create vehicle parameters for the alarm group
         // This has to be done in the frontend to ensure the UUIDs of the vehicles, material, and personnel are consistent across all clients

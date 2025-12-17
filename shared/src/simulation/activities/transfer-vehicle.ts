@@ -4,8 +4,9 @@ import {
     RadiogramUnpublishedStatus,
 } from '../../models/radiogram/index.js';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
-import type { ExerciseOccupation } from '../../models/index.js';
 import {
+    type ExerciseOccupation,
+    newTransferStartPoint,
     exerciseOccupationSchema,
     ResourceDescription,
     changeOccupation,
@@ -13,6 +14,7 @@ import {
     isInSpecificSimulatedRegion,
     isInSpecificVehicle,
     VehicleResource,
+    newNoOccupation,
 } from '../../models/index.js';
 import { TransferActionReducers } from '../../store/action-reducers/transfer.js';
 import {
@@ -133,7 +135,7 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
             changeOccupation(
                 draftState,
                 vehicle,
-                activityState.successorOccupation ?? { type: 'noOccupation' }
+                activityState.successorOccupation ?? newNoOccupation()
             );
 
             switch (activityState.transferDestinationType) {
@@ -180,10 +182,7 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
                         type: '[Transfer] Add to transfer',
                         elementType: 'vehicle',
                         elementId: activityState.vehicleId,
-                        startPoint: {
-                            type: 'transferStartPoint',
-                            transferPointId: ownTransferPoint.id,
-                        },
+                        startPoint: newTransferStartPoint(ownTransferPoint.id),
                         targetTransferPointId:
                             activityState.transferDestinationId,
                     });

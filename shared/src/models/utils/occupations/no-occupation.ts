@@ -5,3 +5,7 @@ export const noOccupationSchema = z.strictObject({
 });
 
 export type NoOccupation = z.infer<typeof noOccupationSchema>;
+
+export const newNoOccupation = (): NoOccupation => ({
+    type: 'noOccupation',
+});

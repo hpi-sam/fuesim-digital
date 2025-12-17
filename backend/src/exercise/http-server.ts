@@ -12,15 +12,19 @@ import {
 } from './http-handler/api/exercise.js';
 import { getHealth } from './http-handler/api/health.js';
 import { secureHttp } from './http-handler/secure-http.js';
+import type { AuthService } from '../auth.js';
+import cookieParser from "cookie-parser";
 
 export class ExerciseHttpServer {
     public readonly httpServer: HttpServer;
     /**
      * @param uploadLimit in Megabyte can be set via ENV DFM_UPLOAD_LIMIT
      */
-    public constructor(app: Express, databaseService: DatabaseService) {
+    public constructor(app: Express, databaseService: DatabaseService, authService: AuthService) {
         // TODO: Temporary allow all
         app.use(cors());
+
+        app.use(cookieParser())
 
         app.use(express.json({ limit: `${Config.uploadLimit}mb` }));
 
@@ -43,6 +47,13 @@ export class ExerciseHttpServer {
                 res
             )
         );
+
+        app.get("/api/auth/oidc-redirect", (req, res) => {
+            authService.handleRedirect(req, res);
+        });
+        app.get("/api/auth/oidc-callback", (req, res) => {
+            authService.handleCallback(req, res);
+        });
 
         this.httpServer = app.listen(Config.httpPort);
     }

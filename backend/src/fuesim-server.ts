@@ -6,6 +6,7 @@ import { ExerciseHttpServer } from './exercise/http-server.js';
 import { Config } from './config.js';
 import type { DatabaseService } from './database/services/database-service.js';
 import type { ExerciseWrapper } from './exercise/exercise-wrapper.js';
+import { AuthService } from 'auth.js';
 
 export class FuesimServer {
     private readonly _httpServer: ExerciseHttpServer;
@@ -67,10 +68,10 @@ export class FuesimServer {
         this.saveTickInterval
     );
 
-    public constructor(private readonly databaseService: DatabaseService) {
+    public constructor(private readonly databaseService: DatabaseService, private readonly authService: AuthService) {
         const app = express();
         this._websocketServer = new ExerciseWebsocketServer(app);
-        this._httpServer = new ExerciseHttpServer(app, databaseService);
+        this._httpServer = new ExerciseHttpServer(app, databaseService, authService);
         if (Config.useDb) {
             this.saveHandler.start();
         }

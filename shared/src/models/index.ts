@@ -24,3 +24,4 @@ export * from './log-entry.js';
 export * from './tag.js';
 export { MaterialTemplate } from './material-template.js';
 export { PersonnelTemplate } from './personnel-template.js';
+export { User } from './user.js';

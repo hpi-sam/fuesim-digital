@@ -25,11 +25,20 @@ export class ExerciseWebsocketServer {
             ...socketIoTransports,
         });
 
+        this.exerciseServer.use((socket, next) => {
+            const token = socket.handshake;
+            //   console.log(token)
+            // ...
+        });
         this.exerciseServer.listen(Config.websocketPort);
 
         this.exerciseServer.on('connection', (socket) => {
+            // console.log(`New websocket connection: ${socket.id}`);
+            // console.log(`with user: ${socket.request.user}`);
+
             this.registerClient(socket);
         });
+
     }
 
     private registerClient(client: ExerciseSocket): void {

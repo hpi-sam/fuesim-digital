@@ -7,6 +7,7 @@ import { Config } from './config.js';
 import { createNewDataSource } from './database/data-source.js';
 import { DatabaseService } from './database/services/database-service.js';
 import { FuesimServer } from './fuesim-server.js';
+import { AuthService } from 'auth.js';
 
 async function main() {
     Config.initialize();
@@ -61,8 +62,12 @@ async function main() {
             throw e;
         }
     }
+
+    const authService = await new AuthService().initialize();
+
+
     // eslint-disable-next-line no-new
-    new FuesimServer(databaseService);
+    new FuesimServer(databaseService, authService);
 }
 
 main();

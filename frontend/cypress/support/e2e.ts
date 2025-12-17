@@ -29,8 +29,6 @@ import {
     atPosition,
     itsKeys,
     itsValues,
-    initializeParticipantSocket,
-    initializeTrainerSocket,
     atKey,
     spyOnProposeAction,
 } from './commands';
@@ -85,7 +83,5 @@ Cypress.Commands.addAll({
     createExercise,
     joinExerciseAsParticipant,
     joinExerciseAsTrainer,
-    initializeParticipantSocket,
-    initializeTrainerSocket,
     spyOnProposeAction,
 });

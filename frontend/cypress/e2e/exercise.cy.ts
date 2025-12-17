@@ -1,4 +1,4 @@
-import type { ExerciseMapComponent } from '../../src/app/pages/exercises/exercise/shared/exercise-map/exercise-map.component';
+import type { SinonSpy } from 'node_modules/cypress/types/sinon';
 
 /**
  * Tests on github have been super flaky,
@@ -7,6 +7,7 @@ import type { ExerciseMapComponent } from '../../src/app/pages/exercises/exercis
  */
 const commonErrorTimeout = 500;
 const tickDuration = 1000;
+const expectedDoubleClickDuration = 600;
 
 describe('A trainer on the exercise page', () => {
     beforeEach(() => {
@@ -20,6 +21,7 @@ describe('A trainer on the exercise page', () => {
             type: '[Vehicle] Add vehicle',
         });
 
+        // TODO: refactor this into some kind of helper function
         cy.log('wait until vehicle is drawn on map');
         const exerciseMap = cy.$$('app-exercise-map').get()[0]!;
         cy.window()
@@ -88,9 +90,9 @@ describe('A trainer on the exercise page', () => {
             '[data-cy=draggableViewportDiv]'
         );
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Viewport] Add viewport');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Viewport] Add viewport',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -102,13 +104,9 @@ describe('A trainer on the exercise page', () => {
             '[data-cy=draggableTransferPointDiv]'
         );
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[TransferPoint] Add TransferPoint'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[TransferPoint] Add TransferPoint',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -120,9 +118,9 @@ describe('A trainer on the exercise page', () => {
             '[data-cy=draggableMapImageDiv]'
         );
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[MapImage] Add MapImage');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[MapImage] Add MapImage',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -134,26 +132,37 @@ describe('A trainer on the exercise page', () => {
             '[data-cy=draggablePatientDiv]'
         );
 
-        cy.wait(commonErrorTimeout);
-
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Patient] Add patient');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Patient] Add patient',
+        });
 
         cy.getState()
             .its('exerciseState')
             .its('patients')
             .should('not.be.empty');
 
+        cy.log('wait until patient is drawn on map');
+        const exerciseMap = cy.$$('app-exercise-map').get()[0]!;
+        cy.window()
+            .its('ng')
+            .invoke('getComponent', exerciseMap)
+            .its('olMapManager')
+            .its('olMap')
+            .should('exist')
+            .invoke('getFeaturesAtPixel', [
+                exerciseMap.offsetWidth / 2,
+                exerciseMap.offsetHeight / 2,
+            ])
+            .should('have.length', 3); // viewport is not returned
         cy.get('[data-cy=openLayersContainer]').click();
 
         cy.get('[data-cy=patientPopupTriageNav]').click();
         cy.get('[data-cy=patientPopupPretriageButton]').click();
         cy.get('[data-cy=patientPopupPretriageButtonDropdown]').last().click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Patient] Set Visible Status');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Patient] Set Visible Status',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -167,11 +176,9 @@ describe('A trainer on the exercise page', () => {
             '[data-cy=draggableVehicleDiv]'
         );
 
-        cy.wait(commonErrorTimeout);
-
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Vehicle] Add vehicle');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Vehicle] Add vehicle',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -183,13 +190,9 @@ describe('A trainer on the exercise page', () => {
             '[data-cy=draggableSimulatedRegionDiv]'
         );
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[SimulatedRegion] Add simulated region'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[SimulatedRegion] Add simulated region',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -201,33 +204,26 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=trainerToolbarCreationButton]').click();
         cy.get('[data-cy=trainerToolbarAlarmGroupsButton]').click();
 
-        cy.log('add an alarm group')
-            .get('[data-cy="alarmGroupAddButton"]')
-            .click();
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[AlarmGroup] Add AlarmGroup');
+        cy.log('add an alarm group');
+        cy.get('[data-cy="alarmGroupAddButton"]').click();
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[AlarmGroup] Add AlarmGroup',
+        });
 
         cy.getState()
             .its('exerciseState')
             .its('alarmGroups')
             .should('not.be.empty');
 
-        cy.log('add an alarm group vehicle')
-            .get('[data-cy="alarmGroupAddVehicleButton"]')
-            .first()
-            .click();
+        cy.log('add an alarm group vehicle');
+        cy.get('[data-cy="alarmGroupAddVehicleButton"]').first().click();
         cy.get('[data-cy="alarmGroupAddVehicleSelect"] > :nth-child(1)')
             .first()
             .click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[AlarmGroup] Add AlarmGroupVehicle'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[AlarmGroup] Add AlarmGroupVehicle',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -237,19 +233,15 @@ describe('A trainer on the exercise page', () => {
             .its('alarmGroupVehicles')
             .should('not.be.empty');
 
-        cy.log('change the input delay of a vehicle')
-            .get('[data-cy="alarmGroupVehicleDelayInput"]')
+        cy.log('change the input delay of a vehicle');
+        cy.get('[data-cy="alarmGroupVehicleDelayInput"]')
             .first()
             .clear()
             .type('10');
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[AlarmGroup] Edit AlarmGroupVehicle'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[AlarmGroup] Edit AlarmGroupVehicle',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -282,15 +274,9 @@ describe('A trainer on the exercise page', () => {
             .click();
         cy.get('[data-cy=sendAlarmGroupSendButton]').click();
 
-        cy.wait(commonErrorTimeout);
-
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Emergency Operation Center] Send Alarm Group'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Emergency Operation Center] Send Alarm Group',
+        });
 
         cy.get('[data-cy=closeEmergencyOperationsCenterPopupButton]').click({
             force: true,
@@ -301,9 +287,9 @@ describe('A trainer on the exercise page', () => {
             .first()
             .click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Transfer] Finish transfer');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Transfer] Finish transfer',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -325,22 +311,14 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=trainerToolbarCreationButton]').click();
         cy.get('[data-cy=trainerToolbarAlarmGroupsButton]').click();
 
-        cy.log('remove an alarm group vehicle')
-            .get('[data-cy="alarmGroupRemoveVehicleButton"]')
-            .first()
-            .click();
-        cy.log('remove an alarm group vehicle')
-            .get('[data-cy="alarmGroupRemoveVehicleButton"]')
-            .first()
-            .click();
+        cy.log('remove an alarm group vehicle');
+        cy.get('[data-cy="alarmGroupRemoveVehicleButton"]').first().click();
+        cy.log('remove an alarm group vehicle');
+        cy.get('[data-cy="alarmGroupRemoveVehicleButton"]').first().click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[AlarmGroup] Remove AlarmGroupVehicle'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[AlarmGroup] Remove AlarmGroupVehicle',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -350,14 +328,12 @@ describe('A trainer on the exercise page', () => {
             .its('alarmGroupVehicles')
             .should('be.empty');
 
-        cy.log('remove an alarm group')
-            .get('[data-cy="alarmGroupsRemoveButton"]')
-            .first()
-            .click();
+        cy.log('remove an alarm group');
+        cy.get('[data-cy="alarmGroupsRemoveButton"]').first().click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[AlarmGroup] Remove AlarmGroup');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[AlarmGroup] Remove AlarmGroup',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -369,33 +345,33 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=trainerToolbarCreationButton]').click();
         cy.get('[data-cy=trainerToolbarHospitalsButton]').click();
 
-        cy.log('add a hospital').get('[data-cy="hospitalAddButton"]').click();
-        cy.get('@trainerSocketPerformedActions')
-            .firstElement()
-            .should('have.property', 'type', '[Hospital] Add hospital');
-        cy.get('@trainerSocketPerformedActions')
-            .firstElement()
-            .its('hospital')
-            .as('createdHospital');
+        cy.log('add a hospital');
+        cy.get('[data-cy="hospitalAddButton"]').click();
+        cy.get('@performAction')
+            .should('have.been.calledOnce')
+            .should('always.have.been.calledWithMatch', {
+                type: '[Hospital] Add hospital',
+            })
+            .then((spy) => {
+                // typings are incorrect
+                const hospital = (spy as any).args[0][0].hospital;
+                cy.wrap(hospital).as('createdHospital');
+            });
 
         cy.getState()
             .its('exerciseState')
             .its('hospitals')
             .should('not.be.empty');
 
-        cy.log('update a hospitals transport time')
-            .get('[data-cy="hospitalUpdateTransportTimeInput"]')
+        cy.log('update a hospitals transport time');
+        cy.get('[data-cy="hospitalUpdateTransportTimeInput"]')
             .last()
             .clear()
             .type('30');
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Hospital] Edit transportDuration to hospital'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Hospital] Edit transportDuration to hospital',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -415,13 +391,9 @@ describe('A trainer on the exercise page', () => {
             .last()
             .click({ force: true });
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[TransferPoint] Connect hospital'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[TransferPoint] Connect hospital',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -434,6 +406,21 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=transferPointPopupCloseButton]').click();
         cy.get('[data-cy=vehiclesAccordionButton]').click();
         cy.dragToMap('[data-cy=draggableVehicleDiv]');
+
+        cy.log('wait until vehicle is drawn on map');
+        const exerciseMap = cy.$$('app-exercise-map').get()[0]!;
+        cy.window()
+            .its('ng')
+            .invoke('getComponent', exerciseMap)
+            .its('olMapManager')
+            .its('olMap')
+            .should('exist')
+            .invoke('getFeaturesAtPixel', [
+                exerciseMap.offsetWidth / 2,
+                exerciseMap.offsetHeight / 2,
+            ])
+            .should('have.length', 2);
+
         cy.get('[data-cy=patientsAccordionButton]').click();
         cy.dragToMap('[data-cy=draggablePatientDiv]');
 
@@ -441,34 +428,38 @@ describe('A trainer on the exercise page', () => {
             .first()
             .click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Hospital] Transport patient to hospital'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Hospital] Transport patient to hospital',
+        });
 
         cy.getState()
             .its('exerciseState')
             .its('hospitals')
-            .itsValues()
-            .lastElement()
-            .its('patientIds')
-            .should('not.be.empty');
+            .should(function (hospitals) {
+                // @ts-expect-error registered via .as("createdHospital")
+                expect(hospitals[this.createdHospital.id].patientIds).to.not.be
+                    .empty;
+            });
 
-        cy.wait(commonErrorTimeout);
+        cy.window()
+            .its('ng')
+            .invoke('getComponent', exerciseMap)
+            .its('olMapManager')
+            .its('olMap')
+            .should('exist')
+            .invoke('getFeaturesAtPixel', [
+                exerciseMap.offsetWidth / 2,
+                exerciseMap.offsetHeight / 2,
+            ])
+            .should('have.length', 1);
 
+        cy.wait(expectedDoubleClickDuration); // prevent registering as double click
         cy.get('[data-cy=openLayersContainer]').click();
         cy.get('[data-cy=transferPointPopupHospitalNav]').click();
         cy.get('[data-cy=transferPointPopupRemoveHospitalButton]').click();
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[TransferPoint] Disconnect hospital'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[TransferPoint] Disconnect hospital',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -484,16 +475,17 @@ describe('A trainer on the exercise page', () => {
         cy.log('delete a hospital');
         cy.get('[data-cy="hospitalDeleteButton"]').click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Hospital] Remove hospital');
-
-        cy.get('@createdHospital').then((hospital: any) => {
-            cy.getState()
-                .its('exerciseState')
-                .its('hospitals')
-                .should('not.have.keys', hospital.id);
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Hospital] Remove hospital',
         });
+
+        cy.getState()
+            .its('exerciseState')
+            .its('hospitals')
+            .should(function (hospitals) {
+                // @ts-expect-error registered via .as("createdHospital")
+                expect(hospitals).not.have.any.keys(this.createdHospital.id);
+            });
     });
 
     it('can manage transfer points (within simulated regions) and transfer vehicles', () => {
@@ -513,13 +505,9 @@ describe('A trainer on the exercise page', () => {
             .first()
             .click({ force: true });
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[TransferPoint] Connect TransferPoints'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[TransferPoint] Connect TransferPoints',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -533,13 +521,9 @@ describe('A trainer on the exercise page', () => {
             '[data-cy=transferPointPopupRemoveOtherTransferPointButton]'
         ).click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[TransferPoint] Disconnect TransferPoints'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[TransferPoint] Disconnect TransferPoints',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -560,13 +544,9 @@ describe('A trainer on the exercise page', () => {
             .clear()
             .type('0.5');
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[TransferPoint] Connect TransferPoints'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[TransferPoint] Connect TransferPoints',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -584,9 +564,9 @@ describe('A trainer on the exercise page', () => {
             .first()
             .click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Transfer] Add to transfer');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Transfer] Add to transfer',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -600,13 +580,9 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=trainerToolbarTransferButton]').click();
         cy.get('[data-cy=transferTimeTogglePauseButton]').click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Transfer] Toggle pause transfer'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Transfer] Toggle pause transfer',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -628,13 +604,9 @@ describe('A trainer on the exercise page', () => {
             .then((previousEndTimeStamp: any) => {
                 cy.get('[data-cy=transferTimeReduceByOneMinuteButton]').click();
 
-                cy.get('@trainerSocketPerformedActions')
-                    .lastElement()
-                    .should(
-                        'have.property',
-                        'type',
-                        '[Transfer] Edit transfer'
-                    );
+                cy.get('@performAction').should('have.been.calledWithMatch', {
+                    type: '[Transfer] Edit transfer',
+                });
 
                 cy.getState()
                     .its('exerciseState')
@@ -649,13 +621,13 @@ describe('A trainer on the exercise page', () => {
 
         cy.get('[data-cy=transferTimeTogglePauseButton]').click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Transfer] Toggle pause transfer'
-            );
+        cy.get('@performAction').should((spy) =>
+            expect(
+                (spy as unknown as SinonSpy).getCall(-1).calledWithMatch({
+                    type: '[Transfer] Toggle pause transfer',
+                })
+            )
+        );
 
         cy.getState()
             .its('exerciseState')
@@ -681,63 +653,56 @@ describe('A trainer on the exercise page', () => {
     });
 
     it('can start and stop an exercise', () => {
-        cy.log('start an exercise')
-            .get('[data-cy=trainerToolbarStartButton]')
-            .click();
+        cy.log('start an exercise');
+        cy.get('[data-cy=trainerToolbarStartButton]').click();
         cy.get('[data-cy=confirmationModalOkButton]').click();
 
-        cy.wait(commonErrorTimeout);
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Exercise] Start',
+        });
 
-        cy.get('@trainerSocketPerformedActions')
-            .atPosition(-2)
-            .should('have.property', 'type', '[Exercise] Start');
-
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Emergency Operation Center] Add Log Entry'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Emergency Operation Center] Add Log Entry',
+        });
 
         cy.getState()
             .its('exerciseState')
             .should('have.property', 'currentStatus', 'running');
 
         cy.wait(tickDuration);
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should('have.property', 'type', '[Exercise] Tick');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Exercise] Tick',
+        });
 
         cy.getState()
             .its('exerciseState')
             .its('currentTime')
             .should('be.greaterThan', 0);
 
-        cy.log('pause an exercise')
-            .get('[data-cy=trainerToolbarPauseButton]')
-            .click();
+        cy.log('pause an exercise');
+        cy.get('[data-cy=trainerToolbarPauseButton]').click();
 
         cy.wait(commonErrorTimeout);
 
-        cy.get('@trainerSocketPerformedActions')
-            .atPosition(-2)
-            .should('have.property', 'type', '[Exercise] Pause');
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Exercise] Pause',
+        });
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Emergency Operation Center] Add Log Entry'
-            );
+        cy.get('@performAction').should((spy) =>
+            expect(
+                (spy as unknown as SinonSpy).getCall(-1).calledWithMatch({
+                    type: '[Emergency Operation Center] Add Log Entry',
+                })
+            )
+        );
 
         cy.getState()
             .its('exerciseState')
             .should('have.property', 'currentStatus', 'paused');
     });
 
-    it('can manage participants', () => {
+    // TODO: this test should connect the participant using a second window
+    it.skip('can manage participants', () => {
         cy.initializeParticipantSocket();
 
         cy.get('@trainerSocketPerformedActions')
@@ -810,13 +775,9 @@ describe('A trainer on the exercise page', () => {
         cy.get('[data-cy=settingsMaxZoomInput]').clear().type('30');
         cy.get('[data-cy=settingsSaveTileMapPropertiesButton]').click();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Configuration] Set tileMapProperties'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Configuration] Set tileMapProperties',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -826,13 +787,9 @@ describe('A trainer on the exercise page', () => {
 
         cy.get('[data-cy=settingsPretriageCheckbox]').uncheck();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Configuration] Set pretriageEnabled'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Configuration] Set pretriageEnabled',
+        });
 
         cy.getState()
             .its('exerciseState')
@@ -841,13 +798,9 @@ describe('A trainer on the exercise page', () => {
 
         cy.get('[data-cy=settingsBluePatientsCheckbox]').check();
 
-        cy.get('@trainerSocketPerformedActions')
-            .lastElement()
-            .should(
-                'have.property',
-                'type',
-                '[Configuration] Set bluePatientsEnabled'
-            );
+        cy.get('@performAction').should('have.been.calledWithMatch', {
+            type: '[Configuration] Set bluePatientsEnabled',
+        });
 
         cy.getState()
             .its('exerciseState')

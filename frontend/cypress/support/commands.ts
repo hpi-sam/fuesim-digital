@@ -127,6 +127,7 @@ export function joinExerciseAsTrainer() {
 export function spyOnProposeAction() {
     cy.window().then(($window) => {
         cy.get('app-exercise').then(($exerciseComponent) => {
+            // @ts-expect-error ng is defined on the window
             const exerciseComponent = $window.ng.getComponent(
                 $exerciseComponent.get()[0]
             );
@@ -134,6 +135,7 @@ export function spyOnProposeAction() {
                 .exerciseService as ExerciseService;
 
             cy.spy(exerciseService, 'proposeAction').as('proposeAction');
+            // @ts-expect-error we depend on the private optimisticActionHandler to register server applied events
             cy.spy(exerciseService.optimisticActionHandler, 'performAction').as(
                 'performAction'
             );

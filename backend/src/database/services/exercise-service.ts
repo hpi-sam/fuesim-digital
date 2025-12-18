@@ -1,8 +1,4 @@
-import type {
-    ExerciseKeys,
-    ExerciseTimeline,
-    Role,
-} from 'digital-fuesim-manv-shared';
+import type { ExerciseTimeline, Role } from 'digital-fuesim-manv-shared';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import type { ClientWrapper } from '../../exercise/client-wrapper.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
@@ -33,9 +29,7 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
-    public async loadExercise(
-        activeExercise: ActiveExercise,
-    ) {
+    public async loadExercise(activeExercise: ActiveExercise) {
         const result =
             await this.exerciseRepository.createExerciseIfNotExists(
                 activeExercise
@@ -47,7 +41,10 @@ export class ExerciseService {
         const exercise = activeExercise.getExercise();
         this.exerciseMap.set(exercise.participantId, activeExercise);
         this.exerciseMap.set(exercise.trainerId, activeExercise);
-        UserReadableIdGenerator.lock([exercise.participantId, exercise.trainerId]);
+        UserReadableIdGenerator.lock([
+            exercise.participantId,
+            exercise.trainerId,
+        ]);
     }
 
     public leaveExercise(exerciseKey: string, client: ClientWrapper) {
@@ -168,10 +165,7 @@ export class ExerciseService {
 
                         await this.actionRepository
                             .withConnection(repoTransaction)
-                            .saveActions(
-                                activeExercise.getSaveableActions(),
-                                activeExercise.exerciseId
-                            );
+                            .saveActions(activeExercise.getSaveableActions());
 
                         activeExercise.markAsSaved();
                     })

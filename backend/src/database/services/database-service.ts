@@ -26,7 +26,9 @@ export class DatabaseService {
         return this._initialized;
     }
 
-    private static async createPostgresConnection(mode: DatabaseConnectionMode): Promise<ReturnType<typeof postgresDrizzle>> {
+    private static async createPostgresConnection(
+        mode: DatabaseConnectionMode
+    ): Promise<ReturnType<typeof postgresDrizzle>> {
         const defaultDatabaseName = `${Config.dbName}`;
         testingDatabaseName = `${Config.dbName}_TESTING`;
         const connection = postgresDrizzle({
@@ -36,10 +38,10 @@ export class DatabaseService {
                 database:
                     mode === 'baseline'
                         ? // This database probably always exists
-                        'postgres'
+                          'postgres'
                         : mode === 'default'
-                            ? defaultDatabaseName
-                            : testingDatabaseName,
+                          ? defaultDatabaseName
+                          : testingDatabaseName,
                 user: Config.dbUser,
                 password: Config.dbPassword,
                 ssl: false,
@@ -51,7 +53,9 @@ export class DatabaseService {
         return connection;
     }
 
-    private static async createPgliteConnection(): Promise<ReturnType<typeof pgliteDrizzle>> {
+    private static async createPgliteConnection(): Promise<
+        ReturnType<typeof pgliteDrizzle>
+    > {
         const connection = pgliteDrizzle({
             client: new PGlite({
                 extensions: { uuid_ossp },
@@ -72,13 +76,12 @@ export class DatabaseService {
         let connection: DatabaseConnection;
 
         if (Config.useDb) {
-            connection = await this.createPostgresConnection(mode)
+            connection = await this.createPostgresConnection(mode);
         } else {
             connection = await this.createPgliteConnection();
         }
 
         return new DatabaseService(connection);
-
     }
 
     public static async testConnection(connection: DatabaseConnection) {

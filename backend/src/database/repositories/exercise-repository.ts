@@ -100,7 +100,6 @@ export class ExerciseRepository extends BaseRepository {
     }
 }
 
-
 function onlySingle<T>(array: T[]): T | null {
     if (array.length === 0 || array[0] === undefined) {
         return null;

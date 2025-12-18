@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { SetPretriageEnabledAction } from '../../../../shared/dist/store/action-reducers/configuration.js';
-import { createExercise, createTestEnvironment } from '../../../test/utils.js';
+import { createTestEnvironment } from '../../../test/utils.js';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
 import { actionTable } from '../schema.js';
@@ -15,7 +15,6 @@ describe('ActionRepository', () => {
     });
 
     it('should save and retrieve actions correctly', async () => {
-
         // We want to create an exercise like this manually
         // to simulate creating an exercise and adding actions
         // before the exercise actually has an id assigned
@@ -23,7 +22,10 @@ describe('ActionRepository', () => {
         //
         // This is to test, wether action before exercise id assignment
         // are saved and retrieved correctly with this exerciseId.
-        const activeExercise = ExerciseFactory.fromBlank({ participantKey: "123456", trainerKey: "12345678" });
+        const activeExercise = ExerciseFactory.fromBlank({
+            participantKey: '123456',
+            trainerKey: '12345678',
+        });
 
         const actions = [
             new ActionWrapper(
@@ -46,32 +48,27 @@ describe('ActionRepository', () => {
             ),
         ];
 
-
         // Save exercise in database and therefore assign id, after actions are created
         expect(activeExercise.exerciseId).toBeUndefined();
         await environment.exerciseService.loadExercise(activeExercise);
         expect(activeExercise.exerciseId).toBeDefined();
 
-        await environment.actionRepository.saveActions(
-            actions
-        );
+        await environment.actionRepository.saveActions(actions);
 
         // TEMPLATES TO COMPARE AGAINST
-        const expectedActions =
-            actions.map(actionWrapper => ({
-                actionString: actionWrapper.getAction().actionString,
-                emitterId: actionWrapper.getAction().emitterId,
-                exerciseId: activeExercise.exerciseId,
-                index: actionWrapper.getAction().index,
-            }))
+        const expectedActions = actions.map((actionWrapper) => ({
+            actionString: actionWrapper.getAction().actionString,
+            emitterId: actionWrapper.getAction().emitterId,
+            exerciseId: activeExercise.exerciseId,
+            index: actionWrapper.getAction().index,
+        }));
         expectedActions.sort((a, b) => a.index - b.index);
 
-
-        const removeId = <T>(element: T): Omit<T, "id"> => {
-            //@ts-expect-error: id not on unknown type
-            delete element["id"];
+        const removeId = <T>(element: T): Omit<T, 'id'> => {
+            // @ts-expect-error: id not on unknown type
+            delete element.id;
             return element;
-        }
+        };
 
         // MANUAL CHECK
         const exerciseActions =
@@ -79,7 +76,7 @@ describe('ActionRepository', () => {
                 .select()
                 .from(actionTable)
                 .where(eq(actionTable.exerciseId, activeExercise.exerciseId));
-        exerciseActions.sort((a, b) => a.index - b.index)
+        exerciseActions.sort((a, b) => a.index - b.index);
 
         expect(exerciseActions[0]!.id).toBeDefined();
         expect(exerciseActions[1]!.id).toBeDefined();

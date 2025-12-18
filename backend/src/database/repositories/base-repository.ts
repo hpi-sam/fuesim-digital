@@ -2,7 +2,7 @@ import type { Constructor } from 'digital-fuesim-manv-shared';
 import type {
     DatabaseConnection,
     DatabaseTransaction,
-} from './../../database/services/database-service.js';
+} from '../services/database-service.js';
 
 export abstract class BaseRepository {
     public constructor(

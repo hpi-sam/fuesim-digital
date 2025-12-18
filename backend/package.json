@@ -20,7 +20,7 @@
         "migration:generate": "npx drizzle-kit generate",
         "migration:run": "npx drizzle-kit migrate",
         "migration:check": "npx drizzle-kit check",
-        "db:studo": "npx drizzle-kit studio",
+        "db:studio": "npx drizzle-kit studio",
         "db:purge": "node --loader ts-node/esm src/database/scripts/purge.ts"
     },
     "private": true,

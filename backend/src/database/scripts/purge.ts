@@ -8,7 +8,7 @@ await databaseService.databaseConnection.transaction(async (manager) => {
         DatabaseService.isInMemoryConnection(databaseService.databaseConnection)
     ) {
         console.warn(
-            'PURGING IN-MEMORY DATABASE! --> Set DFM_USE_DB=true to purge Postgres Database.'
+            'PURGING IN-MEMORY DATABASE! Set DFM_USE_DB=true to purge PostgreSQL database.'
         );
     }
     const deleteResult = await databaseService.databaseConnection

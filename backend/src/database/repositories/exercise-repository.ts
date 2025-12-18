@@ -14,7 +14,7 @@ export class ExerciseRepository extends BaseRepository {
     }
 
     /**
-     * Loads the exercise with the corresponding trainer id
+     * Loads the exercise with the corresponding trainer key
      */
     public getExerciseByTrainerKey(trainerKey: string) {
         return this.databaseConnection
@@ -24,7 +24,7 @@ export class ExerciseRepository extends BaseRepository {
     }
 
     /**
-     * Loads the exercise with the corresponding participant id
+     * Loads the exercise with the corresponding participant key
      */
     public getExerciseByParticipantKey(participantKey: string) {
         return this.databaseConnection

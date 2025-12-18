@@ -11,17 +11,15 @@ import {
     foreignKey,
 } from 'drizzle-orm/pg-core';
 
-export class BaseEntity {
-    public static table = {
-        id: uuid()
-            .default(sql`uuid_generate_v4()`)
-            .primaryKey()
-            .notNull(),
-    };
-}
+const baseTable = {
+    id: uuid()
+        .default(sql`uuid_generate_v4()`)
+        .primaryKey()
+        .notNull(),
+};
 
 export const exerciseTable = pgTable('exercise_entity', {
-    ...BaseEntity.table,
+    ...baseTable,
     tickCounter: integer().default(0).notNull(),
     initialStateString: json().$type<ExerciseState>().notNull(),
     participantId: char({ length: 6 }).notNull(),
@@ -34,10 +32,7 @@ export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 export const actionTable = pgTable(
     'action_entity',
     {
-        id: uuid()
-            .default(sql`uuid_generate_v4()`)
-            .primaryKey()
-            .notNull(),
+        ...baseTable,
         emitterId: uuid(),
         // You can use { mode: "bigint" } if numbers are exceeding js number limitations
         index: bigint({ mode: 'number' }).notNull(),

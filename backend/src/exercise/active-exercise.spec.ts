@@ -4,10 +4,10 @@ import { createTestEnvironment } from '../../test/utils.js';
 import { clientMap } from './client-map.js';
 import { ActiveExercise } from './active-exercise.js';
 
-describe('Exercise Wrapper', () => {
+describe('Active Exercise', () => {
     const environment = createTestEnvironment();
     it('fails getting a role for the wrong id', () => {
-        const exercise = ActiveExercise.create('123456', '12345678');
+        const exercise = new ActiveExercise('123456', '12345678');
 
         expect(() => exercise.getRoleFromUsedId('wrong id')).toThrow(
             RangeError
@@ -15,7 +15,7 @@ describe('Exercise Wrapper', () => {
     });
 
     it('does nothing adding a client that is not set up', async () => {
-        const exercise = ActiveExercise.create('123456', '12345678');
+        const exercise = new ActiveExercise('123456', '12345678');
         // Use a websocket in order to have a ClientWrapper set up
         await environment.withWebsocket(async () => {
             // Sleep a bit to allow the socket to connect.
@@ -34,7 +34,7 @@ describe('Exercise Wrapper', () => {
     });
 
     it('does nothing removing a client that is not joined', async () => {
-        const exercise = ActiveExercise.create('123456', '12345678');
+        const exercise = new ActiveExercise('123456', '12345678');
         // Use a websocket in order to have a ClientWrapper set up
         await environment.withWebsocket(async () => {
             // Sleep a bit to allow the socket to connect.
@@ -56,7 +56,7 @@ describe('Exercise Wrapper', () => {
     describe('Started Exercise', () => {
         let exercise: ActiveExercise | undefined;
         beforeEach(() => {
-            exercise = ActiveExercise.create('123456', '12345678');
+            exercise = new ActiveExercise('123456', '12345678');
             exercise.start();
         });
         afterEach(() => {
@@ -82,7 +82,7 @@ describe('Exercise Wrapper', () => {
 
     describe('Reactions to Actions', () => {
         it('calls start when matching action is sent', () => {
-            const exercise = ActiveExercise.create('123456', '12345678');
+            const exercise = new ActiveExercise('123456', '12345678');
 
             const startMock = jest.spyOn(ActiveExercise.prototype, 'start');
             startMock.mockImplementation(() => ({}));
@@ -95,7 +95,7 @@ describe('Exercise Wrapper', () => {
         });
 
         it('calls pause when matching action is sent', () => {
-            const exercise = ActiveExercise.create('123456', '12345678');
+            const exercise = new ActiveExercise('123456', '12345678');
 
             const pause = jest.spyOn(ActiveExercise.prototype, 'pause');
             pause.mockImplementation(() => ({}));

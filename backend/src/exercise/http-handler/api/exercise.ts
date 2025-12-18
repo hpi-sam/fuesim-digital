@@ -29,10 +29,7 @@ export async function postExercise(
             return newExerciseOrError;
         }
 
-        await exerciseService.loadExercise(newExerciseOrError, {
-            participantKey,
-            trainerKey,
-        });
+        await exerciseService.loadExercise(newExerciseOrError);
 
         return {
             statusCode: 201,

@@ -135,39 +135,19 @@ export class ActiveExercise {
 
     public readonly incrementIdGenerator = new IncrementIdGenerator();
 
-    public static create(
-        participantId: string,
-        trainerId: string,
-        initialState: ExerciseState = ExerciseState.create(participantId)
-    ): ActiveExercise {
-        const exercise = new ActiveExercise(
-            participantId,
-            trainerId,
-            [],
-            ExerciseState.currentStateVersion,
-            initialState
-        );
-
-        return exercise;
-    }
-
-    /**
-     * Be very careful when using this. - Use {@link create} instead for most use cases.
-     * This constructor does not guarantee a valid entity.
-     */
     public constructor(
-        participantId: string,
-        trainerId: string,
-        public readonly temporaryActionHistory: ActionWrapper[],
-        stateVersion: number,
-        initialState = ExerciseState.create(participantId),
+        participantKey: string,
+        trainerKey: string,
+        public readonly temporaryActionHistory: ActionWrapper[] = [],
+        stateVersion: number = ExerciseState.currentStateVersion,
+        initialState = ExerciseState.create(participantKey),
         currentState: ExerciseState = initialState
     ) {
         this.exercise = {
             currentStateString: currentState,
             initialStateString: initialState,
-            participantId,
-            trainerId,
+            participantId: participantKey,
+            trainerId: trainerKey,
             stateVersion,
             tickCounter: 0,
         };

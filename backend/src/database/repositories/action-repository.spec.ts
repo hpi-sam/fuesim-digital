@@ -4,6 +4,7 @@ import { createExercise, createTestEnvironment } from '../../../test/utils.js';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
 import { actionTable } from '../schema.js';
+import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 
 describe('ActionRepository', () => {
     const environment = createTestEnvironment();
@@ -14,11 +15,15 @@ describe('ActionRepository', () => {
     });
 
     it('should save and retrieve actions correctly', async () => {
-        const exerciseKeys = await createExercise(environment);
-        const exercise = environment.exerciseService.getExerciseByKey(
-            exerciseKeys.trainerId
-        )!;
-        expect(exercise).toBeDefined();
+
+        // We want to create an exercise like this manually
+        // to simulate creating an exercise and adding actions
+        // before the exercise actually has an id assigned
+        // by the database.
+        //
+        // This is to test, wether action before exercise id assignment
+        // are saved and retrieved correctly with this exerciseId.
+        const activeExercise = ExerciseFactory.fromBlank({ participantKey: "123456", trainerKey: "12345678" });
 
         const actions = [
             new ActionWrapper(
@@ -27,7 +32,7 @@ describe('ActionRepository', () => {
                     pretriageEnabled: true,
                 } satisfies SetPretriageEnabledAction,
                 null,
-                exercise,
+                activeExercise,
                 1
             ),
             new ActionWrapper(
@@ -36,44 +41,69 @@ describe('ActionRepository', () => {
                     pretriageEnabled: false,
                 } satisfies SetPretriageEnabledAction,
                 null,
-                exercise,
+                activeExercise,
                 2
             ),
         ];
 
+
+        // Save exercise in database and therefore assign id, after actions are created
+        expect(activeExercise.exerciseId).toBeUndefined();
+        await environment.exerciseService.loadExercise(activeExercise);
+        expect(activeExercise.exerciseId).toBeDefined();
+
         await environment.actionRepository.saveActions(
-            actions,
-            exercise.exerciseId
+            actions
         );
 
-        // MANUAL CHECK
+        // TEMPLATES TO COMPARE AGAINST
+        const expectedActions =
+            actions.map(actionWrapper => ({
+                actionString: actionWrapper.getAction().actionString,
+                emitterId: actionWrapper.getAction().emitterId,
+                exerciseId: activeExercise.exerciseId,
+                index: actionWrapper.getAction().index,
+            }))
+        expectedActions.sort((a, b) => a.index - b.index);
 
+
+        const removeId = <T>(element: T): Omit<T, "id"> => {
+            //@ts-expect-error: id not on unknown type
+            delete element["id"];
+            return element;
+        }
+
+        // MANUAL CHECK
         const exerciseActions =
             await environment.databaseService.databaseConnection
                 .select()
                 .from(actionTable)
-                .where(eq(actionTable.exerciseId, exercise.exerciseId));
+                .where(eq(actionTable.exerciseId, activeExercise.exerciseId));
+        exerciseActions.sort((a, b) => a.index - b.index)
 
-        expect(exerciseActions.length).toBe(2);
-        exerciseActions.sort((a, b) => a.index - b.index);
-        expect(exerciseActions[0]!.actionString).toEqual(
-            actions[0]!.getAction().actionString
-        );
-        expect(exerciseActions[1]!.actionString).toEqual(
-            actions[1]!.getAction().actionString
-        );
+        expect(exerciseActions[0]!.id).toBeDefined();
+        expect(exerciseActions[1]!.id).toBeDefined();
 
-        // Service check
+        const exerciseActionsNoId = exerciseActions.map(removeId);
+
+        expect(exerciseActionsNoId.length).toBe(2);
+        expect(exerciseActionsNoId[0]!).toEqual(expectedActions[0]!);
+        expect(exerciseActionsNoId[1]!).toEqual(expectedActions[1]!);
+
+        // REPOSITORY METHOD CHECK
         const exerciseActions2 =
             await environment.actionRepository.getActionsForExerciseId(
-                exercise.exerciseId
+                activeExercise.exerciseId
             );
-        expect(exerciseActions2.length).toBe(2);
-        expect(exerciseActions2[0]!.actionString).toEqual(
-            actions[0]!.getAction().actionString
-        );
-        expect(exerciseActions2[1]!.actionString).toEqual(
-            actions[1]!.getAction().actionString
-        );
+        exerciseActions2.sort((a, b) => a.index - b.index);
+
+        expect(exerciseActions2[0]!.id).toBeDefined();
+        expect(exerciseActions2[1]!.id).toBeDefined();
+
+        const exerciseActions2NoId = exerciseActions.map(removeId);
+
+        expect(exerciseActions2NoId.length).toBe(2);
+        expect(exerciseActions2NoId[0]!).toEqual(expectedActions[0]!);
+        expect(exerciseActions2NoId[1]!).toEqual(expectedActions[1]!);
     });
 });

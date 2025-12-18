@@ -35,7 +35,6 @@ export class ExerciseService {
 
     public async loadExercise(
         activeExercise: ActiveExercise,
-        exerciseKeys: ExerciseKeys
     ) {
         const result =
             await this.exerciseRepository.createExerciseIfNotExists(
@@ -44,9 +43,11 @@ export class ExerciseService {
         if (result.length === 1 && result[0]?.id) {
             activeExercise.setExerciseId(result[0].id);
         }
-        this.exerciseMap.set(exerciseKeys.participantKey, activeExercise);
-        this.exerciseMap.set(exerciseKeys.trainerKey, activeExercise);
-        UserReadableIdGenerator.lock(Object.values(exerciseKeys));
+
+        const exercise = activeExercise.getExercise();
+        this.exerciseMap.set(exercise.participantId, activeExercise);
+        this.exerciseMap.set(exercise.trainerId, activeExercise);
+        UserReadableIdGenerator.lock([exercise.participantId, exercise.trainerId]);
     }
 
     public leaveExercise(exerciseKey: string, client: ClientWrapper) {

@@ -20,7 +20,7 @@ export class ActionRepository extends BaseRepository {
             .where(eq(actionTable.exerciseId, exerciseId));
     }
 
-    public async saveActions(actions: ActionWrapper[], exerciseId: string) {
+    public async saveActions(actions: ActionWrapper[]) {
         if (actions.length === 0) return;
 
         const actionsPatch: InferInsertModel<typeof actionTable>[] =
@@ -29,7 +29,7 @@ export class ActionRepository extends BaseRepository {
                 const actionPatch: typeof actionTable.$inferInsert = {
                     actionString: action.actionString,
                     emitterId: action.emitterId,
-                    exerciseId,
+                    exerciseId: actionWrapper.exercise.exerciseId,
                     index: action.index,
                 };
                 if (action.id !== undefined) {

@@ -24,10 +24,9 @@ import { ActiveExercise } from './active-exercise.js';
 
 export class ExerciseFactory {
     public static fromBlank(exerciseKeys: ExerciseKeys) {
-        return ActiveExercise.create(
+        return new ActiveExercise(
             exerciseKeys.participantKey,
-            exerciseKeys.trainerKey,
-            ExerciseState.create(exerciseKeys.participantKey)
+            exerciseKeys.trainerKey
         );
     }
 

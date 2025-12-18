@@ -26,47 +26,59 @@ export class DatabaseService {
         return this._initialized;
     }
 
+    private static async createPostgresConnection(mode: DatabaseConnectionMode): Promise<ReturnType<typeof postgresDrizzle>> {
+        const defaultDatabaseName = `${Config.dbName}`;
+        testingDatabaseName = `${Config.dbName}_TESTING`;
+        const connection = postgresDrizzle({
+            connection: {
+                host: Config.dbHost,
+                port: Config.dbPort,
+                database:
+                    mode === 'baseline'
+                        ? // This database probably always exists
+                        'postgres'
+                        : mode === 'default'
+                            ? defaultDatabaseName
+                            : testingDatabaseName,
+                user: Config.dbUser,
+                password: Config.dbPassword,
+                ssl: false,
+            },
+            logger: Config.dbLogging,
+            schema,
+        });
+        await this.testConnection(connection);
+        return connection;
+    }
+
+    private static async createPgliteConnection(): Promise<ReturnType<typeof pgliteDrizzle>> {
+        const connection = pgliteDrizzle({
+            client: new PGlite({
+                extensions: { uuid_ossp },
+            }),
+            schema,
+            logger: Config.dbLogging,
+        });
+        await this.testConnection(connection);
+        await connection.execute(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+        await this.migrate(connection);
+        return connection;
+    }
+
     public static async createNewDatabaseConnection(
         mode: DatabaseConnectionMode = 'default'
     ): Promise<DatabaseService> {
         Config.initialize();
+        let connection: DatabaseConnection;
+
         if (Config.useDb) {
-            const defaultDatabaseName = `${Config.dbName}`;
-            testingDatabaseName = `${Config.dbName}_TESTING`;
-            const connection = postgresDrizzle({
-                connection: {
-                    host: Config.dbHost,
-                    port: Config.dbPort,
-                    database:
-                        mode === 'baseline'
-                            ? // This database probably always exists
-                              'postgres'
-                            : mode === 'default'
-                              ? defaultDatabaseName
-                              : testingDatabaseName,
-                    user: Config.dbUser,
-                    password: Config.dbPassword,
-                    ssl: false,
-                },
-                logger: Config.dbLogging,
-                schema,
-            });
-            await this.testConnection(connection);
-            return new DatabaseService(connection);
+            connection = await this.createPostgresConnection(mode)
+        } else {
+            connection = await this.createPgliteConnection();
         }
 
-        const pgLite = new PGlite({
-            extensions: { uuid_ossp },
-        });
-        const db = pgliteDrizzle({
-            client: pgLite,
-            schema,
-            logger: Config.dbLogging,
-        });
-        await this.testConnection(db);
-        await db.execute(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
-        await this.migrate(db);
-        return new DatabaseService(db);
+        return new DatabaseService(connection);
+
     }
 
     public static async testConnection(connection: DatabaseConnection) {

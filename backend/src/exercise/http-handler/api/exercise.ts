@@ -1,46 +1,41 @@
-import type {
-    ExerciseIds,
-    ExerciseTimeline,
-    StateExport,
-} from 'digital-fuesim-manv-shared';
-import { ExerciseState } from 'digital-fuesim-manv-shared';
+import type { ExerciseTimeline, StateExport } from 'digital-fuesim-manv-shared';
 import { isEmpty } from 'lodash-es';
-import { importExercise } from '../../../utils/import-exercise.js';
-import type { DatabaseService } from '../../../database/services/database-service.js';
 import { UserReadableIdGenerator } from '../../../utils/user-readable-id-generator.js';
-import { exerciseMap } from '../../exercise-map.js';
-import { ExerciseWrapper } from '../../exercise-wrapper.js';
-import type { HttpResponse } from '../utils.js';
+import { ActiveExercise } from '../../active-exercise.js';
+import type { HttpErrorMessage, HttpResponse } from '../utils.js';
+import { importExercise } from '../../../utils/import-exercise.js';
+import { UnknownExerciseError } from './../../../database/services/exercise-service.js';
+import type { ExerciseService } from './../../../database/services/exercise-service.js';
+import { ExerciseFactory } from './../../../exercise/exercise-factory.js';
 
 export async function postExercise(
-    databaseService: DatabaseService,
+    exerciseService: ExerciseService,
     importObject: StateExport
-): Promise<HttpResponse<ExerciseIds>> {
+): Promise<
+    HttpResponse<
+        HttpErrorMessage | { participantId: string; trainerId: string }
+    >
+> {
     try {
-        const participantId = UserReadableIdGenerator.generateId();
-        const trainerId = UserReadableIdGenerator.generateId(8);
+        const participantKey = UserReadableIdGenerator.generateId();
+        const trainerKey = UserReadableIdGenerator.generateId(8);
         const newExerciseOrError = isEmpty(importObject)
-            ? ExerciseWrapper.create(
-                  participantId,
-                  trainerId,
-                  databaseService,
-                  ExerciseState.create(participantId)
-              )
-            : await importExercise(
-                  importObject,
-                  { participantId, trainerId },
-                  databaseService
-              );
-        if (!(newExerciseOrError instanceof ExerciseWrapper)) {
+            ? ExerciseFactory.fromBlank({ participantKey, trainerKey })
+            : importExercise(importObject, {
+                  participantKey,
+                  trainerKey,
+              });
+        if (!(newExerciseOrError instanceof ActiveExercise)) {
             return newExerciseOrError;
         }
-        exerciseMap.set(participantId, newExerciseOrError);
-        exerciseMap.set(trainerId, newExerciseOrError);
+
+        await exerciseService.loadExercise(newExerciseOrError);
+
         return {
             statusCode: 201,
             body: {
-                participantId,
-                trainerId,
+                participantId: participantKey,
+                trainerId: trainerKey,
             },
         };
     } catch (error: unknown) {
@@ -56,8 +51,11 @@ export async function postExercise(
     }
 }
 
-export function getExercise(exerciseId: string): HttpResponse {
-    const exerciseExists = exerciseMap.has(exerciseId);
+export function getExercise(
+    exerciseId: string,
+    exerciseService: ExerciseService
+): HttpResponse {
+    const exerciseExists = exerciseService.hasExerciseKey(exerciseId);
     return {
         statusCode: exerciseExists ? 200 : 404,
         body: undefined,
@@ -65,18 +63,10 @@ export function getExercise(exerciseId: string): HttpResponse {
 }
 
 export async function deleteExercise(
-    exerciseId: string
+    exerciseId: string,
+    exerciseService: ExerciseService
 ): Promise<HttpResponse> {
-    const exerciseWrapper = exerciseMap.get(exerciseId);
-    if (exerciseWrapper === undefined) {
-        return {
-            statusCode: 404,
-            body: {
-                message: `Exercise with id '${exerciseId}' was not found`,
-            },
-        };
-    }
-    if (exerciseWrapper.getRoleFromUsedId(exerciseId) !== 'trainer') {
+    if (exerciseService.getRoleFromId(exerciseId) !== 'trainer') {
         return {
             statusCode: 403,
             body: {
@@ -85,27 +75,45 @@ export async function deleteExercise(
             },
         };
     }
-    await exerciseWrapper.deleteExercise();
-    return {
-        statusCode: 204,
-        body: undefined,
-    };
+    try {
+        await exerciseService.deleteExercise(exerciseId);
+        return {
+            statusCode: 204,
+            body: undefined,
+        };
+    } catch (err) {
+        if (err instanceof UnknownExerciseError) {
+            return {
+                statusCode: 404,
+                body: {
+                    message: `Exercise with id '${exerciseId}' was not found`,
+                },
+            };
+        }
+
+        throw err;
+    }
 }
 
 export async function getExerciseHistory(
-    exerciseId: string
+    exerciseId: string,
+    exerciseService: ExerciseService
 ): Promise<HttpResponse<ExerciseTimeline>> {
-    const exerciseWrapper = exerciseMap.get(exerciseId);
-    if (exerciseWrapper === undefined) {
+    try {
+        const timeline = await exerciseService.getTimeline(exerciseId);
         return {
-            statusCode: 404,
-            body: {
-                message: `Exercise with id '${exerciseId}' was not found`,
-            },
+            statusCode: 200,
+            body: timeline,
         };
+    } catch (err) {
+        if (err instanceof UnknownExerciseError) {
+            return {
+                statusCode: 404,
+                body: {
+                    message: `Exercise with id '${exerciseId}' was not found`,
+                },
+            };
+        }
+        throw err;
     }
-    return {
-        statusCode: 200,
-        body: await exerciseWrapper.getTimeLine(),
-    };
 }

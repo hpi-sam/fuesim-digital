@@ -104,6 +104,8 @@ COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/shared/package.js
 
 # copy backend
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/dist $PRODUCTION_PATH/backend/dist
+COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/drizzle $PRODUCTION_PATH/backend/drizzle
+COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/drizzle.config.ts $PRODUCTION_PATH/backend/drizzle.config.ts
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/node_modules $PRODUCTION_PATH/backend/node_modules
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/package.json $PRODUCTION_PATH/backend
 

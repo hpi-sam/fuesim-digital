@@ -26,4 +26,16 @@ export class ClientRole {
     }
 
     static readonly create = getCreate(this);
+
+    public static getSpecificRoleDisplayName(
+        specificRole: SpecificRole
+    ): string {
+        return (
+            {
+                eoc: 'Leitstelle',
+                mapOperator: 'Kartenansicht',
+                trainer: 'Trainer',
+            } satisfies { [key in SpecificRole]: string }
+        )[specificRole];
+    }
 }

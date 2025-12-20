@@ -32,7 +32,7 @@ export const addPatientIdentifiers37: Migration = {
         typedState.configuration.patientIdentifierPrefix ??= '';
 
         Object.values(typedState.patients)
-            .sort((a, b) => a.id.localeCompare(b.id))
+            .sort((a, b) => stringCompare(a.id, b.id))
             .forEach((patient) => {
                 typedState.patientCounter!++;
                 const paddedCounter = String(
@@ -48,3 +48,13 @@ export const addPatientIdentifiers37: Migration = {
         );
     },
 };
+
+/**
+ * At the time of writing, this is identical to `shared/src/utils/string-compare.ts`.
+ * However, we want migrations to be stable and thus avoid dependencies outside the `src/state-migrations` tree.
+ */
+function stringCompare(a: string, b: string) {
+    if (a < b) return -1;
+    else if (a > b) return 1;
+    return 0;
+}

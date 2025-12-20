@@ -4,7 +4,10 @@ import { map } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { selectEocLogEntries } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors';
+import {
+    selectCurrentMainRole,
+    selectOwnClient,
+} from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 
 @Component({
@@ -21,6 +24,10 @@ export class EocLogInterfaceComponent {
 
     public newLogEntry = '';
 
+    public sendingPrivateLog = true;
+    public readonly clientIsTrainer =
+        selectStateSnapshot(selectCurrentMainRole, this.store) === 'trainer';
+
     constructor(
         private readonly exerciseService: ExerciseService,
         private readonly store: Store<AppState>
@@ -31,9 +38,12 @@ export class EocLogInterfaceComponent {
             type: '[Emergency Operation Center] Add Log Entry',
             message: this.newLogEntry,
             name: selectStateSnapshot(selectOwnClient, this.store)!.name,
+            isPrivate: this.clientIsTrainer ? this.sendingPrivateLog : false,
         });
         if (response.success) {
             this.newLogEntry = '';
         }
+
+        this.sendingPrivateLog = true;
     }
 }

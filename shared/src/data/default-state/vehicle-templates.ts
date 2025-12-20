@@ -1,5 +1,7 @@
 import { VehicleTemplate } from '../../models/index.js';
 import type { ImageProperties } from '../../models/utils/index.js';
+import { defaultMaterialTemplates } from './material-templates.js';
+import { defaultPersonnelTemplates } from './personnel-templates.js';
 
 const rtwImage: ImageProperties = {
     url: '/assets/rtw-vehicle.png',
@@ -48,8 +50,8 @@ const rtwVehicleTemplate = VehicleTemplate.create(
     `RTW ???`,
     rtwImage,
     1,
-    ['notSan', 'rettSan'],
-    ['standard']
+    [defaultPersonnelTemplates.notSan.id, defaultPersonnelTemplates.rettSan.id],
+    [defaultMaterialTemplates.standard.id]
 );
 
 const nawVehicleTemplate = VehicleTemplate.create(
@@ -57,8 +59,12 @@ const nawVehicleTemplate = VehicleTemplate.create(
     `NAW ???`,
     nawImage,
     1,
-    ['notarzt', 'notSan', 'rettSan'],
-    ['standard']
+    [
+        defaultPersonnelTemplates.notarzt.id,
+        defaultPersonnelTemplates.notSan.id,
+        defaultPersonnelTemplates.rettSan.id,
+    ],
+    [defaultMaterialTemplates.standard.id]
 );
 
 const ktwVehicleTemplate = VehicleTemplate.create(
@@ -66,8 +72,8 @@ const ktwVehicleTemplate = VehicleTemplate.create(
     `KTW ???`,
     ktwImage,
     1,
-    ['san', 'rettSan'],
-    ['standard']
+    [defaultPersonnelTemplates.san.id, defaultPersonnelTemplates.rettSan.id],
+    [defaultMaterialTemplates.standard.id]
 );
 
 const carryingUnitVehicleTemplate = VehicleTemplate.create(
@@ -84,8 +90,8 @@ const ktwKatSchutzVehicleTemplate = VehicleTemplate.create(
     `KTW (KatSchutz) ???`,
     ktwImage,
     2,
-    ['san', 'rettSan'],
-    ['standard']
+    [defaultPersonnelTemplates.san.id, defaultPersonnelTemplates.rettSan.id],
+    [defaultMaterialTemplates.standard.id]
 );
 
 const gwSanVehicleTemplate = VehicleTemplate.create(
@@ -93,8 +99,20 @@ const gwSanVehicleTemplate = VehicleTemplate.create(
     `GW-San ???`,
     gwSanImage,
     0,
-    ['gf', 'rettSan', 'rettSan', 'san', 'san', 'notarzt'],
-    ['big', 'big', 'big', 'big']
+    [
+        defaultPersonnelTemplates.gf.id,
+        defaultPersonnelTemplates.rettSan.id,
+        defaultPersonnelTemplates.rettSan.id,
+        defaultPersonnelTemplates.san.id,
+        defaultPersonnelTemplates.san.id,
+        defaultPersonnelTemplates.notarzt.id,
+    ],
+    [
+        defaultMaterialTemplates.big.id,
+        defaultMaterialTemplates.big.id,
+        defaultMaterialTemplates.big.id,
+        defaultMaterialTemplates.big.id,
+    ]
 );
 
 const nefVehicleTemplate = VehicleTemplate.create(
@@ -102,8 +120,8 @@ const nefVehicleTemplate = VehicleTemplate.create(
     `NEF ???`,
     nefImage,
     0,
-    ['notarzt', 'notSan'],
-    ['standard']
+    [defaultPersonnelTemplates.notarzt.id, defaultPersonnelTemplates.notSan.id],
+    [defaultMaterialTemplates.standard.id]
 );
 
 const rthVehicleTemplate = VehicleTemplate.create(
@@ -111,8 +129,8 @@ const rthVehicleTemplate = VehicleTemplate.create(
     `RTH ???`,
     rthImage,
     1,
-    ['notarzt', 'notSan'],
-    ['standard']
+    [defaultPersonnelTemplates.notarzt.id, defaultPersonnelTemplates.notSan.id],
+    [defaultMaterialTemplates.standard.id]
 );
 
 export const defaultVehicleTemplates: readonly VehicleTemplate[] = [
@@ -125,3 +143,7 @@ export const defaultVehicleTemplates: readonly VehicleTemplate[] = [
     rthVehicleTemplate,
     nawVehicleTemplate,
 ];
+
+export const defaultVehicleTemplatesById = Object.fromEntries(
+    defaultVehicleTemplates.map((template) => [template.id, template])
+);

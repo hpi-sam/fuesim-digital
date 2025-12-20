@@ -4,7 +4,7 @@ import {
     SimulatedRegion,
     TransferPoint,
 } from '../../models/index.js';
-import type { PatientStatus, PersonnelType } from '../../models/utils/index.js';
+import type { PatientStatus } from '../../models/utils/index.js';
 import {
     CanCaterFor,
     MapCoordinates,
@@ -114,7 +114,7 @@ describe('reassign treatment', () => {
                     );
                 });
                 expect(newState).toStrictEqual(shouldState);
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
             });
 
             it('goes to noTreatment when there is no personnel', () => {
@@ -142,7 +142,7 @@ describe('reassign treatment', () => {
                     );
                 });
                 expect(newState).toStrictEqual(shouldState);
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
             });
 
             it('goes to noTreatment when there is no leading personnel', () => {
@@ -180,7 +180,7 @@ describe('reassign treatment', () => {
                     );
                 });
                 expect(newState).toStrictEqual(shouldState);
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
             });
 
             it('does nothing when there is only the leading personnel', () => {
@@ -218,7 +218,7 @@ describe('reassign treatment', () => {
                         }
                     );
                 expect(newState).toStrictEqual(beforeState);
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
             });
         }
     );
@@ -335,7 +335,7 @@ describe('reassign treatment', () => {
                     }
                 );
             expect(newState).toStrictEqual(beforeState);
-            expect(terminate).not.toBeCalled();
+            expect(terminate).not.toHaveBeenCalled();
             expect(newActivityState.countingStartedAt).toBe(time);
         });
 
@@ -394,7 +394,7 @@ describe('reassign treatment', () => {
                     }
                 );
             expect(newState).toStrictEqual(beforeState);
-            expect(terminate).not.toBeCalled();
+            expect(terminate).not.toHaveBeenCalled();
             expect(newActivityState.countingStartedAt).toBe(startTime);
         });
 
@@ -452,7 +452,7 @@ describe('reassign treatment', () => {
                     }
                 );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
             expect(newActivityState.countingStartedAt).toBe(startTime);
 
             const event = simulatedRegion?.inEvents.find(
@@ -512,7 +512,7 @@ describe('reassign treatment', () => {
                     }
                 );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
 
             assertCatering(beforeState, newState, [
                 {
@@ -582,7 +582,7 @@ describe('reassign treatment', () => {
                     }
                 );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
 
             assertCatering(beforeState, newState, [
                 {
@@ -620,7 +620,7 @@ describe('reassign treatment', () => {
             );
 
             expect(simulatedRegion?.inEvents).toBeEmpty();
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
         });
 
         it('sends an event when all patients are triaged', () => {
@@ -671,7 +671,9 @@ describe('reassign treatment', () => {
                 }
             );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
+
+            console.log(simulatedRegion?.inEvents);
 
             const event = simulatedRegion?.inEvents.find(
                 (element) => element.type === 'treatmentProgressChangedEvent'
@@ -759,7 +761,7 @@ describe('reassign treatment', () => {
                     }
                 );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
 
             assertCatering(beforeState, newState, [
                 {
@@ -830,7 +832,7 @@ describe('reassign treatment', () => {
                     }
                 );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
 
             assertCatering(beforeState, newState, [
                 {
@@ -908,7 +910,7 @@ describe('reassign treatment', () => {
                         }
                     );
 
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
 
                 assertCatering(beforeState, newState, [
                     {
@@ -959,7 +961,7 @@ describe('reassign treatment', () => {
                 }
             );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
             expect(
                 Object.keys(
                     newState.personnel[catererId]?.assignedPatientIds ?? {}
@@ -1006,7 +1008,7 @@ describe('reassign treatment', () => {
                 }
             );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
             expect(
                 Object.keys(
                     newState.personnel[catererId]?.assignedPatientIds ?? {}
@@ -1063,7 +1065,7 @@ describe('reassign treatment', () => {
                         }
                     );
 
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
                 assertCatering(beforeState, newState, []);
             }
         );
@@ -1126,7 +1128,7 @@ describe('reassign treatment', () => {
                         }
                     );
 
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
                 assertCatering(beforeState, newState, [
                     {
                         catererId,
@@ -1193,7 +1195,7 @@ describe('reassign treatment', () => {
                     }
                 );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
             assertCatering(beforeState, newState, [
                 {
                     catererId: generalCatererId,
@@ -1256,7 +1258,7 @@ describe('reassign treatment', () => {
                     }
                 );
 
-            expect(terminate).toBeCalled();
+            expect(terminate).toHaveBeenCalled();
             assertCatering(beforeState, newState, [
                 {
                     catererId,
@@ -1336,7 +1338,7 @@ describe('reassign treatment', () => {
                         }
                     );
 
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
                 assertCatering(beforeState, newState, [
                     {
                         catererId,
@@ -1357,7 +1359,7 @@ describe('reassign treatment', () => {
                 readonly count: number;
             }[],
             personnel: readonly {
-                readonly type: PersonnelType;
+                readonly type: keyof typeof defaultPersonnelTemplates;
                 readonly count: number;
             }[]
         ) {
@@ -1450,7 +1452,7 @@ describe('reassign treatment', () => {
                         }
                     );
 
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
                 expect(
                     simulatedRegion?.inEvents.filter(
                         (element) =>
@@ -1528,7 +1530,7 @@ describe('reassign treatment', () => {
                         }
                     );
 
-                expect(terminate).toBeCalled();
+                expect(terminate).toHaveBeenCalled();
 
                 const event = simulatedRegion?.inEvents.find(
                     (element) =>

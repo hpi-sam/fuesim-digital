@@ -128,6 +128,7 @@ describe('transfer to hospital behavior', () => {
                             Vehicle.create(
                                 'RTW',
                                 'RTW',
+                                uuid(),
                                 {},
                                 0,
                                 ImageProperties.create('', 0, 0),
@@ -161,6 +162,7 @@ describe('transfer to hospital behavior', () => {
             const vehicle = Vehicle.create(
                 'RTW',
                 'RTW',
+                uuid(),
                 {},
                 10,
                 ImageProperties.create('', 0, 0),

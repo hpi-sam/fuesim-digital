@@ -1,5 +1,6 @@
 import {
     IsArray,
+    IsBoolean,
     IsInt,
     IsOptional,
     IsString,
@@ -37,6 +38,8 @@ export class AddLogEntryAction implements Action {
     @IsString()
     @MaxLength(65535)
     public readonly message!: string;
+    @IsBoolean()
+    public readonly isPrivate: boolean = false;
 }
 
 export class SendAlarmGroupAction implements Action {
@@ -70,16 +73,22 @@ export class SendAlarmGroupAction implements Action {
 export namespace EmergencyOperationCenterActionReducers {
     export const addLogEntry: ActionReducer<AddLogEntryAction> = {
         action: AddLogEntryAction,
-        reducer: (draftState, { name, message }) => {
+        reducer: (draftState, { name, message, isPrivate }) => {
             const logEntry = EocLogEntry.create(
                 draftState.currentTime,
                 message,
-                name
+                name,
+                isPrivate
             );
             draftState.eocLog.push(cloneDeepMutable(logEntry));
             return draftState;
         },
-        rights: 'trainer',
+        rights: (client, action) => {
+            if (action.isPrivate && client.role.mainRole === 'participant') {
+                return false;
+            }
+            return 'eoc';
+        },
     };
     export const sendAlarmGroup: ActionReducer<SendAlarmGroupAction> = {
         action: SendAlarmGroupAction,
@@ -157,6 +166,7 @@ export namespace EmergencyOperationCenterActionReducers {
                 type: '[Emergency Operation Center] Add Log Entry',
                 message: logEntry,
                 name: clientName,
+                isPrivate: false,
             });
 
             logAlarmGroupSent(draftState, alarmGroupId);
@@ -164,7 +174,7 @@ export namespace EmergencyOperationCenterActionReducers {
 
             return draftState;
         },
-        rights: 'trainer',
+        rights: 'eoc',
     };
 }
 

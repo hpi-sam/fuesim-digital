@@ -1,80 +1,45 @@
 import express from 'express';
 import { PeriodicEventHandler } from './exercise/periodic-events/periodic-event-handler.js';
-import { exerciseMap } from './exercise/exercise-map.js';
 import { ExerciseWebsocketServer } from './exercise/websocket.js';
 import { ExerciseHttpServer } from './exercise/http-server.js';
-import { Config } from './config.js';
 import type { DatabaseService } from './database/services/database-service.js';
-import type { ExerciseWrapper } from './exercise/exercise-wrapper.js';
 import { AuthService } from 'auth.js';
+import type { ExerciseService } from './database/services/exercise-service.js';
 
 export class FuesimServer {
     private readonly _httpServer: ExerciseHttpServer;
     private readonly _websocketServer: ExerciseWebsocketServer;
 
-    private readonly saveTick = async () => {
-        const exercisesToSave: ExerciseWrapper[] = [];
-        exerciseMap.forEach((exercise, key) => {
-            // Only use exercises referenced by their trainer id (8 characters) to not choose the same exercise twice
-            if (key.length !== 8) {
-                return;
-            }
-            if (exercise.changedSinceSave) {
-                exercisesToSave.push(exercise);
-            }
-        });
-        if (exercisesToSave.length === 0) {
-            return;
-        }
-        await this.databaseService.transaction(async (manager) => {
-            const exerciseEntities = await Promise.all(
-                exercisesToSave.map(async (exercise) => {
-                    exercise.markAsAboutToBeSaved();
-                    return exercise.asEntity(false, manager);
-                })
-            );
-            const actionEntities = exerciseEntities.flatMap(
-                (exercise) => exercise.actions ?? []
-            );
-            // First save the exercises...
-            await manager.save(exerciseEntities);
-            // ...and then the actions
-            await manager.save(actionEntities);
-            // Re-map database id to instance
-            exercisesToSave.forEach((exercise) => {
-                exercise.id ??= exerciseEntities.find(
-                    (entity) => entity.trainerId === exercise.trainerId
-                )?.id;
-            });
-            exercisesToSave
-                .flatMap((exercise) => exercise.temporaryActionHistory)
-                .forEach((action) => {
-                    action.id ??= actionEntities.find(
-                        (entity) =>
-                            entity.index === action.index &&
-                            entity.exercise.id === action.exercise.id
-                    )?.id;
-                });
-            exercisesToSave.forEach((exercise) => {
-                exercise.markAsSaved();
-            });
-        });
-    };
-
     private readonly saveTickInterval = 10_000;
 
-    private readonly saveHandler = new PeriodicEventHandler(
-        this.saveTick,
-        this.saveTickInterval
-    );
+    private readonly saveHandler: PeriodicEventHandler;
 
-    public constructor(private readonly databaseService: DatabaseService, private readonly authService: AuthService) {
+    public async saveTick() {
+        await this.exerciseService.saveUnsavedExercises();
+    }
+
+    public constructor(
+        private readonly databaseService: DatabaseService,
+        private readonly exerciseService: ExerciseService,
+        private readonly authService: AuthService
+    ) {
         const app = express();
-        this._websocketServer = new ExerciseWebsocketServer(app);
-        this._httpServer = new ExerciseHttpServer(app, databaseService, authService);
-        if (Config.useDb) {
-            this.saveHandler.start();
-        }
+        this._websocketServer = new ExerciseWebsocketServer(
+            app,
+            exerciseService
+        );
+        this._httpServer = new ExerciseHttpServer(
+            app,
+            databaseService,
+            exerciseService,
+            authService
+        );
+
+        this.saveHandler = new PeriodicEventHandler(
+            this.saveTick.bind(this),
+            this.saveTickInterval
+        );
+        this.saveHandler.start();
     }
 
     public get websocketServer(): ExerciseWebsocketServer {

@@ -34,8 +34,8 @@ export const registerProposeActionHandler = (
                 return;
             }
             // 2. Get matching exercise wrapper & client wrapper
-            const exerciseWrapper = clientWrapper.exercise;
-            if (!exerciseWrapper) {
+            const activeExercise = clientWrapper.exercise;
+            if (!activeExercise) {
                 callback({
                     success: false,
                     message: 'No exercise selected',
@@ -43,6 +43,7 @@ export const registerProposeActionHandler = (
                 });
                 return;
             }
+
             if (!clientWrapper.client) {
                 callback({
                     success: false,
@@ -51,12 +52,26 @@ export const registerProposeActionHandler = (
                 });
                 return;
             }
+
+            const exerciseClient =
+                activeExercise.getStateSnapshot().clients[
+                    clientWrapper.client.id
+                ];
+            if (!exerciseClient) {
+                callback({
+                    success: false,
+                    message: 'Client not part of the exercise',
+                    expected: false,
+                });
+                return;
+            }
+
             // 3. validate user permissions
             if (
                 !validatePermissions(
-                    clientWrapper.client,
+                    exerciseClient,
                     action,
-                    exerciseWrapper.getStateSnapshot()
+                    activeExercise.getStateSnapshot()
                 )
             ) {
                 callback({
@@ -68,7 +83,7 @@ export const registerProposeActionHandler = (
             }
             // 4. apply & broadcast action (+ save to timeline)
             try {
-                exerciseWrapper.applyAction(action, clientWrapper.client.id);
+                activeExercise.applyAction(action, clientWrapper.client.id);
             } catch (error: any) {
                 if (error instanceof ReducerError) {
                     if (error instanceof ExpectedReducerError) {

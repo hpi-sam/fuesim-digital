@@ -21,8 +21,8 @@ export class CreateVehicleTemplateModalComponent {
             name: null,
             patientCapacity: 1,
             type: null,
-            materialTypes: [],
-            personnelTypes: [],
+            materialTemplates: [],
+            personnelTemplates: [],
         };
 
     constructor(
@@ -37,8 +37,8 @@ export class CreateVehicleTemplateModalComponent {
         aspectRatio,
         patientCapacity,
         type,
-        materialTypes,
-        personnelTypes,
+        materialTemplateIds,
+        personnelTemplateIds,
     }: ChangedVehicleTemplateValues) {
         this.exerciseService
             .proposeAction({
@@ -52,9 +52,9 @@ export class CreateVehicleTemplateModalComponent {
                         aspectRatio,
                     },
                     name,
-                    materials: materialTypes,
+                    materialTemplateIds,
+                    personnelTemplateIds,
                     patientCapacity,
-                    personnel: personnelTypes,
                     vehicleType: type,
                 },
             })

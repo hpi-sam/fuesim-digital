@@ -4,9 +4,17 @@
 
 <table *ngIf="radiogram$ | async as radiogram" class="table table-sm">
     <tbody>
-        <tr *ngFor="let personnelCategory of personnelCategories">
-            <td>{{ personnelCategory | personnelName }}</td>
-            <td>{{ radiogram.personnelCount[personnelCategory] }}</td>
-        </tr>
+        <ng-container
+            *ngFor="
+                let personnelTemplate of personnelTemplates$ | async | values
+            "
+        >
+            <tr *ngIf="radiogram.personnelCount[personnelTemplate.id]">
+                <td>{{ personnelTemplate.name }}</td>
+                <td>
+                    {{ radiogram.personnelCount[personnelTemplate.id] }}
+                </td>
+            </tr>
+        </ng-container>
     </tbody>
 </table>

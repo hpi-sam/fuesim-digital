@@ -1,13 +1,12 @@
 import { CanCaterFor } from '../../models/utils/index.js';
 import { MaterialTemplate } from '../../models/material-template.js';
-import type { MaterialType } from '../../models/utils/material-type.js';
 import {
     defaultOverrideTreatmentRange,
     defaultTreatmentRange,
 } from './default-treatment-range.js';
 
 const standardMaterialTemplate = MaterialTemplate.create(
-    'standard',
+    'Standardmaterial',
     {
         url: '/assets/material.svg',
         height: 35,
@@ -19,7 +18,7 @@ const standardMaterialTemplate = MaterialTemplate.create(
 );
 
 const bigMaterialTemplate = MaterialTemplate.create(
-    'big',
+    'Erweitertes Material',
     {
         url: '/assets/big-material.svg',
         height: 35,
@@ -30,9 +29,14 @@ const bigMaterialTemplate = MaterialTemplate.create(
     10
 );
 
-export const defaultMaterialTemplates: {
-    [key in MaterialType]: MaterialTemplate;
-} = {
+export const defaultMaterialTemplates = {
     standard: standardMaterialTemplate,
     big: bigMaterialTemplate,
-};
+} as const;
+
+export const defaultMaterialTemplatesById = Object.fromEntries(
+    Object.values(defaultMaterialTemplates).map((template) => [
+        template.id,
+        template,
+    ])
+);

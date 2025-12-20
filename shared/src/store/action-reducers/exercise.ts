@@ -6,15 +6,15 @@ import {
     IsInt,
     IsPositive,
 } from 'class-validator';
-import type { Personnel, PersonnelType, Vehicle } from '../../models/index.js';
+import {
+    Personnel,
+    Vehicle,
+    createPersonnelTypeTag,
+    Patient,
+    ResourceDescription,
+} from '../../models/index.js';
 import { PartialExport } from '../../export-import/file-format/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import {
-    createPersonnelTypeTag,
-    personnelTypeAllowedValues,
-    personnelTypeNames,
-    Patient,
-} from '../../models/index.js';
 import {
     getStatus,
     isNotInTransfer,
@@ -181,13 +181,12 @@ export namespace ExerciseActionReducers {
         reducer: (draftState, { mode, partialExport }) => {
             const mutablePartialExport = cloneDeepMutable(partialExport);
             if (mutablePartialExport.mapImageTemplates !== undefined) {
-                if (mode === 'append') {
-                    draftState.mapImageTemplates.push(
-                        ...mutablePartialExport.mapImageTemplates
-                    );
-                } else {
-                    draftState.mapImageTemplates =
-                        mutablePartialExport.mapImageTemplates;
+                if (mode !== 'append') {
+                    draftState.mapImageTemplates = {};
+                }
+                for (const mapImageTemplate of mutablePartialExport.mapImageTemplates) {
+                    draftState.mapImageTemplates[mapImageTemplate.id] =
+                        mapImageTemplate;
                 }
             }
             if (mutablePartialExport.patientCategories !== undefined) {
@@ -201,19 +200,18 @@ export namespace ExerciseActionReducers {
                 }
             }
             if (mutablePartialExport.vehicleTemplates !== undefined) {
-                if (mode === 'append') {
-                    draftState.vehicleTemplates.push(
-                        ...mutablePartialExport.vehicleTemplates
-                    );
-                } else {
+                if (mode !== 'append') {
                     // Remove all vehicles from all alarm groups as all existing vehicle templates are being removed
                     for (const alarmGroup of Object.values(
                         draftState.alarmGroups
                     )) {
                         alarmGroup.alarmGroupVehicles = {};
                     }
-                    draftState.vehicleTemplates =
-                        mutablePartialExport.vehicleTemplates;
+                    draftState.vehicleTemplates = {};
+                }
+                for (const vehicleTemplate of mutablePartialExport.vehicleTemplates) {
+                    draftState.vehicleTemplates[vehicleTemplate.id] =
+                        vehicleTemplate;
                 }
             }
             return draftState;
@@ -287,7 +285,7 @@ export function preparePartialExportForImport(
 }
 
 export interface TreatmentAssignment {
-    [patientId: UUID]: { [personnelType in PersonnelType]: number };
+    [patientId: UUID]: ResourceDescription;
 }
 
 function calculateTreatmentAssignment(
@@ -297,9 +295,10 @@ function calculateTreatmentAssignment(
         Object.keys(draftState.patients).map((patientId) => [
             patientId,
             StrictObject.fromEntries(
-                StrictObject.keys(personnelTypeAllowedValues).map(
-                    (personnelType) => [personnelType, 0]
-                )
+                Object.values(draftState.personnelTemplates).map((template) => [
+                    template.id,
+                    0,
+                ])
             ),
         ])
     ) as TreatmentAssignment;
@@ -311,7 +310,7 @@ function calculateTreatmentAssignment(
         StrictObject.keys(personnel.assignedPatientIds)
             .filter((patientId) => treatmentAssignment[patientId])
             .forEach((patientId) => {
-                treatmentAssignment[patientId]![personnel.personnelType] +=
+                treatmentAssignment[patientId]![personnel.templateId]! +=
                     1 / assignedPatientCount;
             });
     });
@@ -324,14 +323,13 @@ function evaluateTreatmentReassignment(
     newTreatmentAssignment: TreatmentAssignment
 ) {
     if (!draftState.previousTreatmentAssignment) return;
-
     Object.keys(newTreatmentAssignment)
         .filter((patientId) =>
-            StrictObject.keys(personnelTypeAllowedValues).some(
-                (personnelType) =>
-                    newTreatmentAssignment[patientId]![personnelType] !==
+            Object.values(draftState.personnelTemplates).some(
+                (personnelTemplate) =>
+                    newTreatmentAssignment[patientId]![personnelTemplate.id] !==
                     draftState.previousTreatmentAssignment![patientId]?.[
-                        personnelType
+                        personnelTemplate.id
                     ]
             )
         )
@@ -340,16 +338,21 @@ function evaluateTreatmentReassignment(
                 draftState,
                 StrictObject.entries(newTreatmentAssignment[patientId]!)
                     .filter(([, count]) => count > 0)
-                    .map(([personnelType]) =>
-                        createPersonnelTypeTag(draftState, personnelType)
+                    .map(([personnelTemplateId]) =>
+                        createPersonnelTypeTag(
+                            draftState,
+                            draftState.personnelTemplates[personnelTemplateId]!
+                        )
                     ),
                 `Diese Einsatzkräfte wurden dem Patienten neu zugeteilt: ${
                     StrictObject.entries(newTreatmentAssignment[patientId]!)
                         .filter(([, count]) => count > 0)
                         .map(
-                            ([personnelType, count]) =>
+                            ([personnelTemplateId, count]) =>
                                 `${+count.toFixed(2)} ${
-                                    personnelTypeNames[personnelType]
+                                    draftState.personnelTemplates[
+                                        personnelTemplateId
+                                    ]!.name
                                 }`
                         )
                         .join(', ') || 'Keine Einsatzkräfte'

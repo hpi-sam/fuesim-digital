@@ -9,8 +9,8 @@ import {
     Min,
     ValidateNested,
 } from 'class-validator';
-import { defaultMaterialTemplates } from './data/default-state/material-templates.js';
-import { defaultPersonnelTemplates } from './data/default-state/personnel-templates.js';
+import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
+import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
 import {
     AlarmGroup,
     Client,
@@ -30,17 +30,16 @@ import {
     Viewport,
 } from './models/index.js';
 import { ExerciseConfiguration } from './models/exercise-configuration.js';
-import type { MaterialTemplate } from './models/material-template.js';
-import type { PersonnelTemplate } from './models/personnel-template.js';
+import { MaterialTemplate } from './models/material-template.js';
+import { PersonnelTemplate } from './models/personnel-template.js';
 import type { ExerciseRadiogram } from './models/radiogram/exercise-radiogram.js';
 import { getRadiogramConstructor } from './models/radiogram/exercise-radiogram.js';
-import type { PersonnelType, ExerciseStatus } from './models/utils/index.js';
+import type { ExerciseStatus } from './models/utils/index.js';
 import {
     exerciseStatusAllowedValues,
     getCreate,
     SpatialTree,
 } from './models/utils/index.js';
-import type { MaterialType } from './models/utils/material-type.js';
 import {
     RandomState,
     seededRandomState,
@@ -58,8 +57,8 @@ import {
     catchAllHospitalId,
 } from './data/default-state/catch-all-hospital.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
-import { defaultVehicleTemplates } from './data/default-state/vehicle-templates.js';
-import { defaultMapImagesTemplates } from './data/default-state/map-images-templates.js';
+import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
+import { defaultMapImagesTemplatesById } from './data/default-state/map-images-templates.js';
 import type { LogEntry } from './models/log-entry.js';
 import type { TreatmentAssignment } from './store/action-reducers/exercise.js';
 
@@ -122,22 +121,24 @@ export class ExerciseState {
     @ValidateNested()
     @Type(() => PatientCategory)
     public readonly patientCategories = defaultPatientCategories;
-    @IsArray()
-    @ValidateNested()
-    @Type(() => VehicleTemplate)
-    public readonly vehicleTemplates = defaultVehicleTemplates;
-    @IsObject()
+
+    @IsIdMap(VehicleTemplate)
+    public readonly vehicleTemplates: {
+        readonly [key: UUID]: VehicleTemplate;
+    } = defaultVehicleTemplatesById;
+    @IsIdMap(MaterialTemplate)
     public readonly materialTemplates: {
-        [Key in MaterialType]: MaterialTemplate;
-    } = defaultMaterialTemplates;
-    @IsObject()
+        readonly [key: UUID]: MaterialTemplate;
+    } = defaultMaterialTemplatesById;
+    @IsIdMap(PersonnelTemplate)
     public readonly personnelTemplates: {
-        [Key in PersonnelType]: PersonnelTemplate;
-    } = defaultPersonnelTemplates;
-    @IsArray()
-    @ValidateNested()
-    @Type(() => MapImageTemplate)
-    public readonly mapImageTemplates = defaultMapImagesTemplates;
+        readonly [key: UUID]: PersonnelTemplate;
+    } = defaultPersonnelTemplatesById;
+    @IsIdMap(MapImageTemplate)
+    public readonly mapImageTemplates: {
+        readonly [key: UUID]: MapImageTemplate;
+    } = defaultMapImagesTemplatesById;
+
     @IsArray()
     @ValidateNested()
     @Type(() => EocLogEntry)
@@ -188,5 +189,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 42;
+    static readonly currentStateVersion = 44;
 }

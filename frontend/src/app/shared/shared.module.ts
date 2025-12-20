@@ -32,7 +32,6 @@ import { PatientStatusBadgeComponent } from './components/patient-status-badge/p
 import { OrderByPipe } from './pipes/order-by.pipe';
 import { FileInputDirective } from './directives/file-input.directive';
 import { JoinIdDirective } from './validation/join-id-validator.directive';
-import { PersonnelNamePipe } from './pipes/personnel-name.pipe';
 import { CaterCapacityCountPipe } from './pipes/cater-capacity-count.pipe';
 import { FooterComponent } from './components/footer/footer.component';
 import { PatientHealthPointDisplayComponent } from './components/patient-health-point-display/patient-health-point-display.component';
@@ -56,6 +55,7 @@ import { PatientStatusDropdownComponent } from './components/patient-status-drop
 import { SendAlarmGroupInterfaceComponent } from './components/send-alarm-group-interface/send-alarm-group-interface.component';
 import { OccupationNamePipe } from './pipes/occupation-name.pipe';
 import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
+import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.pipe';
 
 @NgModule({
     declarations: [
@@ -80,7 +80,6 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
         IntegerValidatorDirective,
         PatientStatusDataFieldComponent,
         PatientStatusBadgeComponent,
-        PersonnelNamePipe,
         CaterCapacityCountPipe,
         FileInputDirective,
         FooterComponent,
@@ -104,6 +103,7 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
         SendAlarmGroupInterfaceComponent,
         OccupationNamePipe,
         OccupationShortNamePipe,
+        SpecificRoleDisplayNamePipe,
     ],
     imports: [
         CommonModule,
@@ -117,6 +117,7 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
         QrCodeComponent,
     ],
     exports: [
+        SpecificRoleDisplayNamePipe,
         AutofocusDirective,
         AppSaveOnTypingDirective,
         DisplayValidationComponent,
@@ -134,7 +135,6 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
         ValuesPipe,
         KeysPipe,
         OrderByPipe,
-        PersonnelNamePipe,
         CaterCapacityCountPipe,
         ViewportNameComponent,
         IntegerValidatorDirective,

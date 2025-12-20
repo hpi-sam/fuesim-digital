@@ -8,15 +8,8 @@ import {
 } from 'class-validator';
 import type { UUID } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../utils/validators/index.js';
-import type { PersonnelType } from './utils/index.js';
-import {
-    ImageProperties,
-    personnelTypeAllowedValues,
-    getCreate,
-} from './utils/index.js';
-import type { MaterialType } from './utils/material-type.js';
-import { materialTypeAllowedValues } from './utils/material-type.js';
+import { IsValue } from '../utils/validators/index.js';
+import { ImageProperties, getCreate } from './utils/index.js';
 
 export class VehicleTemplate {
     @IsUUID(4, uuidValidationOptions)
@@ -39,16 +32,12 @@ export class VehicleTemplate {
     public readonly patientCapacity: number;
 
     @IsArray()
-    @IsLiteralUnion(personnelTypeAllowedValues, {
-        each: true,
-    })
-    public readonly personnel: readonly PersonnelType[];
+    @IsUUID(4, { each: true })
+    public readonly personnelTemplateIds: readonly UUID[];
 
     @IsArray()
-    @IsLiteralUnion(materialTypeAllowedValues, {
-        each: true,
-    })
-    public readonly materials: readonly MaterialType[];
+    @IsUUID(4, { each: true })
+    public readonly materialTemplateIds: readonly UUID[];
 
     /**
      * @deprecated Use {@link create} instead
@@ -58,15 +47,15 @@ export class VehicleTemplate {
         name: string,
         image: ImageProperties,
         patientCapacity: number,
-        personnel: readonly PersonnelType[],
-        materials: readonly MaterialType[]
+        personnelTemplateIds: readonly UUID[],
+        materialTemplateIds: readonly UUID[]
     ) {
         this.vehicleType = vehicleType;
         this.name = name;
         this.image = image;
         this.patientCapacity = patientCapacity;
-        this.personnel = personnel;
-        this.materials = materials;
+        this.personnelTemplateIds = personnelTemplateIds;
+        this.materialTemplateIds = materialTemplateIds;
     }
 
     static readonly create = getCreate(this);

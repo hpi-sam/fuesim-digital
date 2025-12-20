@@ -1,6 +1,6 @@
 import type {
     ClientToServerEvents,
-    ExerciseIds,
+    ExerciseAccessIds,
     MergeIntersection,
     ServerToClientEvents,
 } from 'digital-fuesim-manv-shared';
@@ -8,21 +8,19 @@ import { sleep, socketIoTransports } from 'digital-fuesim-manv-shared';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import request from 'supertest';
-import type { DataSource } from 'typeorm';
-import { DatabaseService } from '../src/database/services/database-service.js';
 import {
-    createNewDataSource,
+    DatabaseService,
     testingDatabaseName,
-} from '../src/database/data-source.js';
+} from '../src/database/services/database-service.js';
 import { Config } from '../src/config.js';
 import type { HttpMethod } from '../src/exercise/http-handler/secure-http.js';
 import { FuesimServer } from '../src/fuesim-server.js';
+import { ExerciseService } from '../src/database/services/exercise-service.js';
+import { ExerciseRepository } from '../src/database/repositories/exercise-repository.js';
+import { ActionRepository } from '../src/database/repositories/action-repository.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
-export interface ExerciseCreationResponse {
-    readonly participantId: string;
-    readonly trainerId: string;
-}
+export type ExerciseCreationResponse = ExerciseAccessIds;
 
 // Some helper types
 /**
@@ -116,8 +114,22 @@ export class WebsocketClient {
 class TestEnvironment {
     public server!: FuesimServer;
     private _databaseService!: DatabaseService;
+    private _exerciseService!: ExerciseService;
+    private _exerciseRepository!: ExerciseRepository;
+    private _actionRepository!: ActionRepository;
     public get databaseService(): DatabaseService {
         return this._databaseService;
+    }
+    public get exerciseService(): ExerciseService {
+        return this._exerciseService;
+    }
+
+    public get exerciseRepository(): ExerciseRepository {
+        return this._exerciseRepository;
+    }
+
+    public get actionRepository(): ActionRepository {
+        return this._actionRepository;
     }
 
     public httpRequest(method: HttpMethod, url: string): request.Test {
@@ -143,60 +155,93 @@ class TestEnvironment {
         }
     }
 
-    public init(databaseService: DatabaseService) {
+    public init(
+        databaseService: DatabaseService,
+        exerciseService: ExerciseService,
+        exerciseRepository: ExerciseRepository,
+        actionRepository: ActionRepository
+    ) {
         this._databaseService = databaseService;
-        this.server = new FuesimServer(this.databaseService);
+        this._exerciseService = exerciseService;
+        this._exerciseRepository = exerciseRepository;
+        this._actionRepository = actionRepository;
+        this.server = new FuesimServer(this.databaseService, exerciseService);
     }
 }
 
 export const createTestEnvironment = (): TestEnvironment => {
     Config.initialize(true);
     const environment = new TestEnvironment();
-    let dataSource: DataSource;
+    let databaseService: DatabaseService;
+    let exerciseService: ExerciseService;
+    let exerciseRepository: ExerciseRepository;
+    let actionRepository: ActionRepository;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
-        dataSource = await setupDatabase();
-        const databaseService = new DatabaseService(dataSource);
-        environment.init(databaseService);
+        databaseService = await setupDatabase();
+        exerciseRepository = new ExerciseRepository(
+            databaseService.databaseConnection
+        );
+        actionRepository = new ActionRepository(
+            databaseService.databaseConnection
+        );
+        exerciseService = new ExerciseService(
+            exerciseRepository,
+            actionRepository
+        );
+        environment.init(
+            databaseService,
+            exerciseService,
+            exerciseRepository,
+            actionRepository
+        );
     });
     afterEach(async () => {
         // Prevent the dataSource from being closed too soon.
         await sleep(200);
         await environment.server.destroy();
-        if (dataSource.isInitialized) {
-            await dataSource.destroy();
-        }
+
+        await databaseService.destroy();
     });
 
     return environment;
 };
 
-async function setupDatabase() {
+async function setupDatabase(): Promise<DatabaseService> {
     if (!Config.useDb) {
-        return createNewDataSource('testing');
+        return DatabaseService.createNewDatabaseConnection('testing');
     }
+
     const baselineDataSource =
-        await createNewDataSource('baseline').initialize();
+        await DatabaseService.createNewDatabaseConnection('baseline');
+
     // Re-create the test database
-    await baselineDataSource.query(
+    await baselineDataSource.databaseConnection.execute(
         `DROP DATABASE IF EXISTS "${testingDatabaseName}"`
     );
-    await baselineDataSource.query(`CREATE DATABASE "${testingDatabaseName}"`);
+    await baselineDataSource.databaseConnection.execute(
+        `CREATE DATABASE "${testingDatabaseName}"`
+    );
     await baselineDataSource.destroy();
 
-    const testDataSource = createNewDataSource('testing');
-    await testDataSource.initialize();
+    // Ensure required Postgres extensions are available in the test DB
+    // (e.g. uuid_generate_v4() comes from the "uuid-ossp" extension)
+    const testDatabaseService =
+        await DatabaseService.createNewDatabaseConnection('testing');
+    await testDatabaseService.databaseConnection.execute(
+        `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
+    );
 
     // Apply the migrations on the newly created database
-    await testDataSource.runMigrations({ transaction: 'all' });
+    await DatabaseService.migrate(testDatabaseService.databaseConnection);
 
-    return testDataSource;
+    return testDatabaseService;
 }
 
 export async function createExercise(
     environment: TestEnvironment
-): Promise<ExerciseIds> {
+): Promise<ExerciseAccessIds> {
     const response = await environment
         .httpRequest('post', '/api/exercise')
         .expect(201);

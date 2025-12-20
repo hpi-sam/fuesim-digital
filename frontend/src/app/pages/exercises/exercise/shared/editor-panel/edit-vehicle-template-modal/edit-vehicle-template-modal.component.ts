@@ -6,11 +6,17 @@ import type {
     UUID,
     Mutable,
     VehicleTemplate,
+    MaterialTemplate,
+    PersonnelTemplate,
 } from 'digital-fuesim-manv-shared';
 import { cloneDeepMutable } from 'digital-fuesim-manv-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
-import { createSelectVehicleTemplate } from 'src/app/state/application/selectors/exercise.selectors';
+import {
+    createSelectVehicleTemplate,
+    selectMaterialTemplates,
+    selectPersonnelTemplates,
+} from 'src/app/state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
 import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehicle-template-form.component';
@@ -26,7 +32,8 @@ export class EditVehicleTemplateModalComponent implements OnInit {
     public vehicleTemplateId!: UUID;
 
     public vehicleTemplate?: Mutable<VehicleTemplate>;
-
+    public materialTemplates?: Mutable<MaterialTemplate[]> = [];
+    public personnelTemplates?: Mutable<PersonnelTemplate[]> = [];
     constructor(
         private readonly exerciseService: ExerciseService,
         private readonly store: Store<AppState>,
@@ -41,6 +48,26 @@ export class EditVehicleTemplateModalComponent implements OnInit {
                 this.store
             )
         );
+
+        const materialTemplates = selectStateSnapshot(
+            selectMaterialTemplates,
+            this.store
+        );
+        this.materialTemplates = cloneDeepMutable(
+            this.vehicleTemplate.materialTemplateIds.map(
+                (templateId) => materialTemplates[templateId]
+            )
+        ).filter((template) => template !== undefined);
+
+        const personnelTemplates = selectStateSnapshot(
+            selectPersonnelTemplates,
+            this.store
+        );
+        this.personnelTemplates = cloneDeepMutable(
+            this.vehicleTemplate.personnelTemplateIds.map(
+                (templateId) => personnelTemplates[templateId]
+            )
+        ).filter((template) => template !== undefined);
     }
 
     public async deleteVehicleTemplate(): Promise<void> {
@@ -70,8 +97,8 @@ export class EditVehicleTemplateModalComponent implements OnInit {
         aspectRatio,
         patientCapacity,
         type,
-        materialTypes,
-        personnelTypes,
+        materialTemplateIds,
+        personnelTemplateIds,
     }: ChangedVehicleTemplateValues): void {
         if (!this.vehicleTemplate) {
             console.error("VehicleTemplate wasn't initialized yet");
@@ -87,9 +114,9 @@ export class EditVehicleTemplateModalComponent implements OnInit {
                     height,
                     aspectRatio,
                 },
-                materials: materialTypes,
+                materialTemplateIds,
+                personnelTemplateIds,
                 patientCapacity,
-                personnelTypes,
                 vehicleType: type,
             })
             .then((response) => {

@@ -7,7 +7,7 @@ import {
     tryToCaterFor,
 } from '../../store/action-reducers/utils/calculate-treatments.js';
 import type { Immutable, Mutable } from '../../utils/immutability.js';
-import type { UUID } from '../../utils/index.js';
+import { stringCompare, type UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/uuid.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { TreatmentProgress } from '../utils/treatment.js';
@@ -35,7 +35,6 @@ import {
 import { logTreatmentStatusChangedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
 import { getCreate } from '../../models/utils/get-create.js';
 import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
-import type { PersonnelType } from '../../models/utils/personnel-type.js';
 import { PersonnelResource } from '../../models/utils/rescue-resource.js';
 import type { PatientStatus } from '../../models/utils/patient-status.js';
 import type {
@@ -88,7 +87,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                 .filter((patient) =>
                     isInSpecificSimulatedRegion(patient, simulatedRegion.id)
                 )
-                .sort((a, b) => a.id.localeCompare(b.id));
+                .sort((a, b) => stringCompare(a.id, b.id));
             let personnel = Object.values(draftState.personnel).filter((pers) =>
                 isInSpecificSimulatedRegion(pers, simulatedRegion.id)
             );
@@ -141,9 +140,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
             }
 
             let allowTerminate = true;
-            let missingPersonnel:
-                | ResourceDescription<PersonnelType>
-                | undefined;
+            let missingPersonnel: ResourceDescription | undefined;
 
             switch (progress) {
                 case 'noTreatment': {
@@ -274,20 +271,20 @@ interface CateringPersonnel {
 }
 
 type PatientToPersonnelDict = {
-    [patientId in UUID]: { [personnelType in PersonnelType]?: UUID[] };
+    [patientId in UUID]: { [personnelType in string]?: UUID[] };
 };
 
 type PersonnelToPatientCategoryDict = {
     [personnelId in UUID]: {
-        [personnelType in PersonnelType]?: {
+        [personnelType in string]?: {
             [sk in TreatablePatientStatus]?: number;
         };
     };
 };
 
 interface PersonnelSubstitution {
-    from: ResourceDescription<PersonnelType>;
-    to: Mutable<PersonnelType>;
+    from: ResourceDescription;
+    to: string;
 }
 
 function createCateringMaterials(
@@ -299,13 +296,17 @@ function createCateringMaterials(
     }));
 }
 
-const personnelPriorities: { [Key in PersonnelType]: number } = {
+const personnelPriorities: { [key in string]: number } = {
     gf: 0,
     san: 1,
     rettSan: 2,
     notSan: 3,
     notarzt: 4,
 };
+
+const emptyPersonnelCounts = Object.fromEntries(
+    Object.keys(personnelPriorities).map((personnelType) => [personnelType, 0])
+);
 
 // Estimation for required personnel based on the 7/2/1 rule.
 const estimatedSkDistribution = { green: 7 / 10, yellow: 2 / 10, red: 1 / 10 };
@@ -322,37 +323,37 @@ const capacities = Object.fromEntries(
             },
         ]
     )
-) as { [key in PersonnelType]: ResourceDescription<TreatablePatientStatus> };
-capacities.notarzt = {
+) as { [key in string]: ResourceDescription<TreatablePatientStatus> };
+capacities['notarzt'] = {
     green: defaultPersonnelTemplates.notarzt.canCaterFor.green,
     red: defaultPersonnelTemplates.notarzt.canCaterFor.red,
     yellow: defaultPersonnelTemplates.notarzt.canCaterFor.yellow,
 };
 
 const minimumRequiredPersonnel: {
-    [SK in TreatablePatientStatus]: Immutable<
-        ResourceDescription<PersonnelType>
-    >;
+    [SK in TreatablePatientStatus]: Immutable<ResourceDescription>;
 } = {
     red: {
         gf: 0,
         san: 0,
         rettSan: 1,
         notSan: 1,
-        notarzt: 1 / capacities.notarzt.red,
+        notarzt: 1 / capacities['notarzt'].red,
     },
     yellow: {
         gf: 0,
         san: 0,
         rettSan: 1,
         notSan: 0,
-        notarzt: 1 / (capacities.notarzt.yellow + capacities.notarzt.red),
+        notarzt: 1 / (capacities['notarzt'].yellow + capacities['notarzt'].red),
     },
     green: {
         gf: 0,
         san:
             1 /
-            (capacities.san.green + capacities.san.yellow + capacities.san.red),
+            ((capacities['san']?.green ?? 0) +
+                (capacities['san']?.yellow ?? 0) +
+                (capacities['san']?.red ?? 0)),
         rettSan: 0,
         notSan: 0,
         notarzt: 0,
@@ -360,7 +361,7 @@ const minimumRequiredPersonnel: {
 };
 
 const requiresExclusivity: {
-    [SK in TreatablePatientStatus]?: { [Per in PersonnelType]?: boolean };
+    [SK in TreatablePatientStatus]?: { [Per in string]?: boolean };
 } = {
     red: { rettSan: true, notSan: true },
     yellow: { rettSan: true },
@@ -380,7 +381,7 @@ function createCateringPersonnel(
 ): CateringPersonnel[] {
     return personnel.map((pers) => ({
         personnel: pers,
-        priority: personnelPriorities[pers.personnelType],
+        priority: personnelPriorities[pers.personnelType] ?? -1,
         catersFor: {
             red: 0,
             yellow: 0,
@@ -427,12 +428,12 @@ function triage(
     patients: Mutable<Patient>[],
     personnel: Mutable<Personnel>[],
     materials: Mutable<Material>[]
-): [boolean, ResourceDescription<PersonnelType>] {
+): [boolean, ResourceDescription] {
     const patientsToTreat: Mutable<Patient>[] = [];
     const cateringPersonnel = createCateringPersonnel(personnel).sort(
         (a, b) => a.priority - b.priority
     );
-    const emptyPersonnelCount = PersonnelResource.create().personnelCounts;
+    const emptyPersonnelCount = { ...emptyPersonnelCounts };
     const triagePersonnelSubstitution: PersonnelSubstitution[] = [];
 
     patients.forEach((patient) => {
@@ -504,7 +505,7 @@ function treat(
     patients: Mutable<Patient>[],
     personnel: Mutable<Personnel>[],
     materials: Mutable<Material>[]
-): [boolean, ResourceDescription<PersonnelType>] {
+): [boolean, ResourceDescription] {
     return assignTreatments(
         draftState,
         patients,
@@ -603,9 +604,9 @@ function allPatientsTriaged(patients: Patient[]): boolean {
  */
 function findAssignablePersonnel(
     groupedPersonnel: {
-        [Key in PersonnelType]?: CateringPersonnel[];
+        [Key in string]?: CateringPersonnel[];
     },
-    minType: PersonnelType,
+    minType: string,
     patientStatus: TreatablePatientStatus,
     maxPatients: number,
     mixWithHigherStatus = true
@@ -666,7 +667,7 @@ function assignTreatments(
     patients: Mutable<Patient>[],
     cateringPersonnel: CateringPersonnel[],
     materials: Mutable<Material>[]
-): [boolean, ResourceDescription<PersonnelType>] {
+): [boolean, ResourceDescription] {
     const groupedPatients = groupBy(patients, (patient) =>
         Patient.getVisibleStatus(
             patient,
@@ -708,7 +709,7 @@ function assignTreatments(
     // A notarzt may be used to replace a lower tier personnel if there is not enough
     // In this case, we consider the notarzt to be more occupied that by it's normal work so we don't want to use them here
     const remainingNotarzts =
-        groupedPersonnel.notarzt?.filter((notarzt) =>
+        groupedPersonnel['notarzt']?.filter((notarzt) =>
             hasNoTreatments(notarzt)
         ) ?? [];
 
@@ -774,9 +775,9 @@ function assignTreatments(
 function tryAssignPersonnel(
     patient: Mutable<Patient>,
     patientStatus: TreatablePatientStatus,
-    minType: PersonnelType,
+    minType: string,
     context: {
-        groupedPersonnel: { [K in PersonnelType]?: CateringPersonnel[] };
+        groupedPersonnel: { [K in string]?: CateringPersonnel[] };
         personnelTreatments: PersonnelToPatientCategoryDict;
         patientTreatments: PatientToPersonnelDict;
         draftState: Mutable<ExerciseState>;
@@ -815,7 +816,7 @@ function recordPatientTreatedByPersonnel(
     patientId: UUID,
     patientStatus: TreatablePatientStatus,
     personnelId: UUID,
-    minType: PersonnelType,
+    minType: string,
     context: {
         personnelTreatments: PersonnelToPatientCategoryDict;
         patientTreatments: PatientToPersonnelDict;
@@ -841,14 +842,14 @@ function recordPatientTreatedByPersonnel(
 function estimateRequiredPersonnel(
     patientCount: number,
     personnel: Personnel[]
-): ResourceDescription<PersonnelType> {
+): ResourceDescription {
     const groupedPersonnel = groupBy(personnel, (p) => p.personnelType);
-    const havePersonnel = Object.fromEntries(
+    const havePersonnel: ResourceDescription = Object.fromEntries(
         StrictObject.keys(personnelPriorities).map((pt) => [
             pt,
             groupedPersonnel[pt]?.length ?? 0,
         ])
-    ) as ResourceDescription<PersonnelType>;
+    );
     const wantPersonnel = requiredPersonnelForPatients(
         scaleResourceDescription(estimatedSkDistribution, patientCount)
     );
@@ -862,7 +863,7 @@ function estimateRequiredPersonnel(
 
 function requiredPersonnelForPatients(
     patientCounts: ResourceDescription<TreatablePatientStatus>
-): ResourceDescription<PersonnelType> {
+): ResourceDescription {
     const requiredByType = Object.fromEntries(
         StrictObject.entries(patientCounts).map(
             ([patientType, patientCount]) => [
@@ -882,9 +883,9 @@ function requiredPersonnelForPatients(
         // Green should not be mixed. Therefore we ceil them before merging.
         ceilResourceDescription(requiredByType['green']!)
     );
-    result.notarzt = Math.max(
-        requiredByType['red']!.notarzt,
-        requiredByType['yellow']!.notarzt
+    result['notarzt'] = Math.max(
+        requiredByType['red']!['notarzt'] ?? 0,
+        requiredByType['yellow']!['notarzt'] ?? 0
     );
     return result;
 }
@@ -906,8 +907,7 @@ function calculateMissingPersonnel(
         (['red', 'yellow', 'green'] as const).map((patientStatus) => {
             const patients = groupedPatients[patientStatus] ?? [];
 
-            let statusMissingPersonnel =
-                PersonnelResource.create().personnelCounts;
+            let statusMissingPersonnel = { ...emptyPersonnelCounts };
             patients.forEach((patient) => {
                 const patientMissingPersonnel = cloneDeepMutable(
                     minimumRequiredPersonnel[patientStatus]
@@ -920,6 +920,7 @@ function calculateMissingPersonnel(
                         )
                         .forEach((p) => {
                             if (p) {
+                                patientMissingPersonnel[personnelType] ??= 0;
                                 patientMissingPersonnel[personnelType] -=
                                     1 /
                                     (requiresExclusivity[patientStatus]?.[
@@ -937,7 +938,7 @@ function calculateMissingPersonnel(
             });
             return [patientStatus, statusMissingPersonnel] as const;
         })
-    ) as { [K in TreatablePatientStatus]: ResourceDescription<PersonnelType> };
+    ) as { [K in TreatablePatientStatus]: ResourceDescription };
 
     const totalMissingPersonnel = addResourceDescription(
         addResourceDescription(
@@ -947,9 +948,9 @@ function calculateMissingPersonnel(
         ceilResourceDescription(patientStatusMissingPersonnel.green)
     );
 
-    totalMissingPersonnel.notarzt = Math.max(
-        patientStatusMissingPersonnel.red.notarzt,
-        patientStatusMissingPersonnel.yellow.notarzt
+    totalMissingPersonnel['notarzt'] = Math.max(
+        patientStatusMissingPersonnel.red['notarzt'] ?? 0,
+        patientStatusMissingPersonnel.yellow['notarzt'] ?? 0
     );
 
     const secured = StrictObject.values(totalMissingPersonnel).every(
@@ -971,10 +972,10 @@ function calculateMissingPersonnel(
 }
 
 function calculateSubstitutedMissingPersonnel(
-    missingPersonnel: ResourceDescription<PersonnelType>,
+    missingPersonnel: ResourceDescription,
     cateringDict: { [k: string]: CateringPersonnel },
     personnelTreatments: PersonnelToPatientCategoryDict
-): ResourceDescription<PersonnelType> {
+): ResourceDescription {
     const substitutions = StrictObject.entries(personnelTreatments)
         .map(
             ([persId, roles]) =>
@@ -994,14 +995,14 @@ function calculateSubstitutedMissingPersonnel(
                               .map(
                                   (patientType) =>
                                       (role[patientType] ?? 0) /
-                                      capacities[personnelType][patientType]
+                                      capacities[personnelType]![patientType]
                               )
                               .reduce((a, b) => Math.max(a, b), 0)
                         : 0;
 
                     return [personnelType, requiredPersonnelCount];
                 })
-            ) as ResourceDescription<PersonnelType>;
+            ) as ResourceDescription;
             return { from, to: realPersonnelType };
         });
 
@@ -1009,18 +1010,18 @@ function calculateSubstitutedMissingPersonnel(
 }
 
 function applySubstitutions(
-    missing: ResourceDescription<PersonnelType>,
+    missing: ResourceDescription,
     substitutions: PersonnelSubstitution[]
 ) {
     let stillMissing = { ...missing };
     reversedPersonnelTypePriorityList.forEach((personnelType) => {
-        while (stillMissing[personnelType] > 0) {
+        while ((stillMissing[personnelType] ?? 0) > 0) {
             const substitutionIndex = substitutions.findIndex(
                 (s) => s.to === personnelType
             );
             if (substitutionIndex === -1) break;
             const substitution = substitutions.splice(substitutionIndex, 1)[0]!;
-            stillMissing[substitution.to] -= 1;
+            stillMissing[substitution.to]! -= 1;
 
             stillMissing = addResourceDescription(
                 stillMissing,

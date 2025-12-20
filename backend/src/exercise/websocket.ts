@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import { socketIoTransports } from 'digital-fuesim-manv-shared';
 import { Config } from '../config.js';
 import type { ExerciseSocket, ExerciseServer } from '../exercise-server.js';
+import type { ExerciseService } from './../database/services/exercise-service.js';
 import { clientMap } from './client-map.js';
 import { ClientWrapper } from './client-wrapper.js';
 import {
@@ -14,7 +15,10 @@ import {
 
 export class ExerciseWebsocketServer {
     public readonly exerciseServer: ExerciseServer;
-    public constructor(app: core.Express) {
+    public constructor(
+        app: core.Express,
+        private readonly exerciseService: ExerciseService
+    ) {
         const server = createServer(app);
 
         this.exerciseServer = new Server(server, {
@@ -43,7 +47,7 @@ export class ExerciseWebsocketServer {
 
     private registerClient(client: ExerciseSocket): void {
         // Add client
-        clientMap.set(client, new ClientWrapper(client));
+        clientMap.set(client, new ClientWrapper(client, this.exerciseService));
 
         // register handlers
         registerGetStateHandler(this.exerciseServer, client);

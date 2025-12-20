@@ -8,14 +8,12 @@ import {
 import type { UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
-import { IsPersonnelCount } from '../../utils/validators/is-personnel-count.js';
 import { IsRadiogramStatus } from '../../utils/validators/is-radiogram-status.js';
-import type { PersonnelType } from '../utils/index.js';
 import { getCreate } from '../utils/get-create.js';
+import type { ResourceDescription } from '../utils/index.js';
+import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
 import type { Radiogram } from './radiogram.js';
 import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
-
-export type PersonnelCount = { [key in PersonnelType]: number };
 
 export class PersonnelCountRadiogram implements Radiogram {
     @IsUUID(4, uuidValidationOptions)
@@ -42,8 +40,8 @@ export class PersonnelCountRadiogram implements Radiogram {
     @ValidateIf((_, value) => value !== null)
     public readonly informationRequestKey: string | null;
 
-    @IsPersonnelCount()
-    readonly personnelCount: PersonnelCount;
+    @IsResourceDescription()
+    readonly personnelCount: ResourceDescription;
 
     /**
      * @deprecated Use {@link create} instead
@@ -58,13 +56,7 @@ export class PersonnelCountRadiogram implements Radiogram {
         this.simulatedRegionId = simulatedRegionId;
         this.informationRequestKey = key;
         this.status = status;
-        this.personnelCount = {
-            gf: 0,
-            notarzt: 0,
-            notSan: 0,
-            rettSan: 0,
-            san: 0,
-        };
+        this.personnelCount = {};
     }
 
     static readonly create = getCreate(this);

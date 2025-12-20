@@ -1,11 +1,7 @@
 import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type {
-    PatientStatus,
-    PersonnelType,
-    UUID,
-} from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
 import { Patient } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
@@ -33,7 +29,12 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
     @Input() cateringsActive!: boolean;
 
     public caterings$!: Observable<
-        { personnelType: PersonnelType; assignedPatientCount: number }[]
+        {
+            personnelType: string;
+            typeName: string;
+            typeAbbreviation: string;
+            assignedPatientCount: number;
+        }[]
     >;
     public visibleStatus$?: Observable<PatientStatus>;
     public patient$!: Observable<Patient>;
@@ -58,6 +59,8 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
                             .filter((person) => person !== undefined)
                             .map((person) => ({
                                 personnelType: person.personnelType,
+                                typeName: person.typeName,
+                                typeAbbreviation: person.typeAbbreviation,
                                 assignedPatientCount: Object.values(
                                     person.assignedPatientIds
                                 ).length,

@@ -410,10 +410,9 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                     const numberOfPatients = Object.entries(
                         event.vehiclesSent.vehicleCounts
                     ).reduce((sum, [type, count]) => {
-                        const vehicleTemplate =
-                            draftState.vehicleTemplates.find(
-                                (template) => template.vehicleType === type
-                            );
+                        const vehicleTemplate = Object.values(
+                            draftState.vehicleTemplates
+                        ).find((template) => template.vehicleType === type);
 
                         return (
                             sum +

@@ -8,17 +8,7 @@
     ></button>
 </div>
 <div class="modal-body" style="min-height: 60vh">
-    <div class="card">
-        <h5 class="card-header">Alarmieren</h5>
-        <div class="card-body">
-            <app-send-alarm-group-interface />
-        </div>
-    </div>
+    <app-send-alarm-groups-card [useComplexLayout]="true" />
     <br />
-    <div class="card">
-        <h5 class="card-header">Einsatztagebuch</h5>
-        <div class="card-body">
-            <app-eoc-log-interface />
-        </div>
-    </div>
+    <app-eoc-log-interface />
 </div>

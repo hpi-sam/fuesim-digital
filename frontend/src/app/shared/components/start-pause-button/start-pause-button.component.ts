@@ -61,6 +61,7 @@ export class StartPauseButtonComponent {
             type: '[Emergency Operation Center] Add Log Entry',
             name: selectStateSnapshot(selectOwnClient, this.store)!.name,
             message,
+            isPrivate: true,
         });
     }
 

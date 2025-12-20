@@ -1,4 +1,7 @@
-import type { Response as ExpressResponse } from 'express';
+import type {
+    Response as ExpressResponse,
+    Request as ExpressRequest,
+} from 'express';
 import type { HttpResponse } from './utils.js';
 
 export type HttpMethod =
@@ -12,6 +15,7 @@ export type HttpMethod =
 
 export async function secureHttp<Result extends object | undefined>(
     operation: () => HttpResponse<Result> | Promise<HttpResponse<Result>>,
+    req: ExpressRequest,
     res: ExpressResponse
 ): Promise<void> {
     try {
@@ -21,7 +25,7 @@ export async function secureHttp<Result extends object | undefined>(
     } catch (error: unknown) {
         // Try sending 500 response
         try {
-            const message = `An error occurred on http request: ${error}`;
+            const message = `An error occurred on http request ${req.path}: ${error}`;
             console.warn(
                 message,
                 error instanceof Error && error.stack

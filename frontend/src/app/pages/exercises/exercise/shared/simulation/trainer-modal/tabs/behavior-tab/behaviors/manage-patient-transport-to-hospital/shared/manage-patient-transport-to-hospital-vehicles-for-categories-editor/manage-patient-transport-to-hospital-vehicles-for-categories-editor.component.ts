@@ -57,7 +57,7 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
             .select(selectVehicleTemplates)
             .pipe(
                 map((vehicleTemplates) =>
-                    vehicleTemplates.map(
+                    Object.values(vehicleTemplates).map(
                         (vehicleTemplate) => vehicleTemplate.vehicleType
                     )
                 )

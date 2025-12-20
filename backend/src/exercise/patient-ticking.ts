@@ -2,7 +2,6 @@ import type {
     ExerciseState,
     HealthPoints,
     PatientUpdate,
-    PersonnelType,
 } from 'digital-fuesim-manv-shared';
 import {
     getElement,
@@ -13,7 +12,7 @@ import {
 /**
  * The count of assigned personnel and material that cater for a {@link Patient}.
  */
-type Catering = { [key in PersonnelType | 'material']: number };
+type Catering = { [key in string]: number } & { material: number };
 
 /**
  * Apply the patient tick to the {@link state}
@@ -73,12 +72,15 @@ function getDedicatedResources(
     };
 
     // Get the number of every personnel
-    Object.keys(patient.assignedPersonnelIds).forEach(
-        (personnelId) =>
-            cateringTypes[
-                getElement(state, 'personnel', personnelId).personnelType
-            ]++
-    );
+    Object.keys(patient.assignedPersonnelIds).forEach((personnelId) => {
+        const personnelType = getElement(
+            state,
+            'personnel',
+            personnelId
+        ).personnelType;
+        if (!cateringTypes[personnelType]) return;
+        cateringTypes[personnelType]++;
+    });
 
     return cateringTypes;
 }
@@ -98,9 +100,9 @@ function getNextPatientHealthPoints(
     patientTickInterval: number
 ): HealthPoints {
     let material = treatedBy.material;
-    const notarzt = treatedBy.notarzt;
-    const notSan = treatedBy.notSan;
-    const rettSan = treatedBy.rettSan;
+    const notarzt = treatedBy['notarzt'] ?? 0;
+    const notSan = treatedBy['notSan'] ?? 0;
+    const rettSan = treatedBy['rettSan'] ?? 0;
     // TODO: Sans should be able to treat patients too.
     const functionParameters =
         patient.healthStates[patient.currentHealthStateId]!.functionParameters;

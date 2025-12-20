@@ -33,8 +33,6 @@ import { TrainerMapEditorComponent } from './shared/trainer-map-editor/trainer-m
 import { TrainerToolbarComponent } from './shared/trainer-toolbar/trainer-toolbar.component';
 import { TransferOverviewModule } from './shared/transfer-overview/transfer-overview.module';
 import { CoordinatePickerModule } from './shared/coordinate-picker/coordinate-picker.module';
-import { PersonnelTemplateDisplayComponent } from './shared/editor-panel/personnel-template-display/personnel-template-display.component';
-import { MaterialTemplateDisplayComponent } from './shared/editor-panel/material-template-display/material-template-display.component';
 import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/map-editor-card.component';
 
 @NgModule({
@@ -52,8 +50,6 @@ import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/ma
         EditVehicleTemplateModalComponent,
         ImageTemplateFormComponent,
         VehicleTemplateFormComponent,
-        PersonnelTemplateDisplayComponent,
-        MaterialTemplateDisplayComponent,
         PartialExportModalComponent,
         PartialImportModalComponent,
     ],

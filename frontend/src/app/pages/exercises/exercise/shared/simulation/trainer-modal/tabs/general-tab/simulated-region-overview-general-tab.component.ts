@@ -6,7 +6,6 @@ import type {
     Patient,
     PatientStatus,
     Personnel,
-    PersonnelType,
     Vehicle,
 } from 'digital-fuesim-manv-shared';
 import { SimulatedRegion } from 'digital-fuesim-manv-shared';
@@ -21,19 +20,12 @@ import {
     selectVehicleTemplates,
     selectVehicles,
     createSelectByPredicate,
+    selectPersonnelTemplates,
+    selectMaterialTemplates,
 } from 'src/app/state/application/selectors/exercise.selectors';
 
 const patientCategories = ['red', 'yellow', 'green', 'black'] as const;
 export type PatientCategory = (typeof patientCategories)[number];
-
-const personnelCategories = [
-    'notarzt',
-    'notSan',
-    'rettSan',
-    'san',
-    'gf',
-] as const;
-export type PersonnelCategory = (typeof personnelCategories)[number];
 
 @Component({
     selector: 'app-simulated-region-overview-general-tab',
@@ -47,9 +39,14 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
     public readonly vehicleTemplates$ = this.store.select(
         selectVehicleTemplates
     );
+    public readonly personnelTemplates$ = this.store.select(
+        selectPersonnelTemplates
+    );
+    public readonly materialTemplates$ = this.store.select(
+        selectMaterialTemplates
+    );
 
     public readonly patientCategories = patientCategories;
-    public readonly personnelCategories = personnelCategories;
 
     patients: {
         [Key in `${PatientCategory | 'all'}$`]?: Observable<Patient[]>;
@@ -57,15 +54,14 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
     vehicles$?: Observable<{ [Key in string]?: Vehicle[] }>;
 
-    personnel: {
-        [Key in `${PersonnelCategory | 'all'}$`]?: Observable<Personnel[]>;
-    } = {};
+    personnel$?: Observable<{ [Key in string]?: Personnel[] }>;
 
-    material$?: Observable<Material[]>;
+    materials$?: Observable<{ [Key in string]?: Material[] }>;
 
     public patientsCollapsed = true;
     public vehiclesCollapsed = true;
     public personnelCollapsed = true;
+    public materialsCollapsed = true;
 
     constructor(
         private readonly exerciseService: ExerciseService,
@@ -77,11 +73,6 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
             selectPatients,
             this.simulatedRegion.id
         );
-        const containedPersonnelSelector =
-            createSelectElementsInSimulatedRegion(
-                selectPersonnel,
-                this.simulatedRegion.id
-            );
 
         this.patients.all$ = this.store.select(containedPatientsSelector);
         patientCategories.forEach((category) => {
@@ -106,14 +97,10 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
                     categorizedVehicles['all'] = [];
 
-                    vehicleTemplates.forEach((template) => {
-                        categorizedVehicles[template.vehicleType] ??= [];
-                    });
-
                     vehicles.forEach((vehicle) => {
-                        categorizedVehicles[vehicle.vehicleType] ??= [];
+                        categorizedVehicles[vehicle.templateId] ??= [];
 
-                        categorizedVehicles[vehicle.vehicleType]!.push(vehicle);
+                        categorizedVehicles[vehicle.templateId]!.push(vehicle);
 
                         categorizedVehicles['all']!.push(vehicle);
                     });
@@ -123,20 +110,59 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
             )
         );
 
-        this.personnel.all$ = this.store.select(containedPersonnelSelector);
-        personnelCategories.forEach((category) => {
-            this.personnel[`${category}$`] = this.store.select(
-                createSelectByPredicate(
-                    containedPersonnelSelector,
-                    this.createPersonnelTypePredicate(category)
-                )
-            );
-        });
+        this.personnel$ = this.store.select(
+            createSelector(
+                createSelectElementsInSimulatedRegion(
+                    selectPersonnel,
+                    this.simulatedRegion.id
+                ),
+                (personnel) => {
+                    const categorizedPersonnel: {
+                        [Key in string]?: Personnel[];
+                    } = {};
 
-        this.material$ = this.store.select(
-            createSelectElementsInSimulatedRegion(
-                selectMaterials,
-                this.simulatedRegion.id
+                    categorizedPersonnel['all'] = [];
+
+                    personnel.forEach((singlePersonnel) => {
+                        categorizedPersonnel[singlePersonnel.templateId] ??= [];
+
+                        categorizedPersonnel[singlePersonnel.templateId]!.push(
+                            singlePersonnel
+                        );
+
+                        categorizedPersonnel['all']!.push(singlePersonnel);
+                    });
+
+                    return categorizedPersonnel;
+                }
+            )
+        );
+
+        this.materials$ = this.store.select(
+            createSelector(
+                createSelectElementsInSimulatedRegion(
+                    selectMaterials,
+                    this.simulatedRegion.id
+                ),
+                (materials) => {
+                    const categorizedMaterials: {
+                        [Key in string]?: Material[];
+                    } = {};
+
+                    categorizedMaterials['all'] = [];
+
+                    materials.forEach((material) => {
+                        categorizedMaterials[material.templateId] ??= [];
+
+                        categorizedMaterials[material.templateId]!.push(
+                            material
+                        );
+
+                        categorizedMaterials['all']!.push(material);
+                    });
+
+                    return categorizedMaterials;
+                }
             )
         );
     }
@@ -145,12 +171,6 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
         status: PatientStatus
     ): (patient: Patient) => boolean {
         return (patient) => patient.realStatus === status;
-    }
-
-    createPersonnelTypePredicate(
-        type: PersonnelType
-    ): (personnel: Personnel) => boolean {
-        return (patient) => patient.personnelType === type;
     }
 
     public async renameSimulatedRegion(newName: string) {

@@ -45,7 +45,6 @@ export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
 export const selectRadiograms = selectPropertyFactory('radiograms');
-// Array properties
 export const selectVehicleTemplates = selectPropertyFactory('vehicleTemplates');
 export const selectPersonnelTemplates =
     selectPropertyFactory('personnelTemplates');
@@ -53,6 +52,7 @@ export const selectMaterialTemplates =
     selectPropertyFactory('materialTemplates');
 export const selectMapImagesTemplates =
     selectPropertyFactory('mapImageTemplates');
+// Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');
 // Misc properties
@@ -95,36 +95,24 @@ export const createSelectSimulatedRegion = createSelectElementFromMapFactory(
 );
 export const createSelectClient =
     createSelectElementFromMapFactory(selectClients);
-export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
-    return createSelector(
-        selectRadiograms,
-        (radiograms) => radiograms[id] as R
-    );
-}
+export const createSelectVehicleTemplate = createSelectElementFromMapFactory(
+    selectVehicleTemplates
+);
 export const createSelectMaterialTemplate = createSelectElementFromMapFactory(
     selectMaterialTemplates
 );
 export const createSelectPersonnelTemplate = createSelectElementFromMapFactory(
     selectPersonnelTemplates
 );
-
-function createSelectElementFromArrayFactory<Element extends { id: UUID }>(
-    elementsSelector: (state: AppState) => readonly Element[]
-) {
-    return (id: UUID) =>
-        createSelector(
-            elementsSelector,
-            (elements) => elements.find((element) => element.id === id)!
-        );
-}
-
-// Element from Array
-export const createSelectMapImageTemplate = createSelectElementFromArrayFactory(
+export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
     selectMapImagesTemplates
 );
-export const createSelectVehicleTemplate = createSelectElementFromArrayFactory(
-    selectVehicleTemplates
-);
+export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
+    return createSelector(
+        selectRadiograms,
+        (radiograms) => radiograms[id] as R
+    );
+}
 
 // Misc selectors
 

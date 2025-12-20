@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import { createExercise, createTestEnvironment } from './utils';
+import { createTestEnvironment, createExercise } from './utils.js';
 
 describe('disconnect socket', () => {
     const environment = createTestEnvironment();

@@ -10,17 +10,11 @@ import {
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import type { UUID, UUIDSet } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
-import {
-    IsLiteralUnion,
-    IsUUIDSet,
-    IsValue,
-} from '../utils/validators/index.js';
+import { IsUUIDSet, IsValue } from '../utils/validators/index.js';
 import { IsPosition } from '../utils/validators/is-position.js';
 import type { PersonnelTemplate } from './personnel-template.js';
-import type { PersonnelType } from './utils/index.js';
 import { CanCaterFor, ImageProperties, getCreate } from './utils/index.js';
 import type { Position } from './utils/position/position.js';
-import { personnelTypeAllowedValues } from './utils/personnel-type.js';
 
 export class Personnel {
     @IsUUID(4, uuidValidationOptions)
@@ -32,8 +26,20 @@ export class Personnel {
     @IsUUID(4, uuidValidationOptions)
     public readonly vehicleId: UUID;
 
-    @IsLiteralUnion(personnelTypeAllowedValues)
-    public readonly personnelType: PersonnelType;
+    /**
+     * @deprecated This will be refactored into a capability-based system. Please already consider using {@link templateId} if you only need an opaque identifier of the type and you don't assert any properties of the personnel.
+     */
+    @IsString()
+    public readonly personnelType: string;
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly templateId: UUID;
+
+    @IsString()
+    public readonly typeName: string;
+
+    @IsString()
+    public readonly typeAbbreviation: string = '';
 
     @IsString()
     public readonly vehicleName: string;
@@ -82,7 +88,10 @@ export class Personnel {
     constructor(
         vehicleId: UUID,
         vehicleName: string,
-        personnelType: PersonnelType,
+        personnelType: string,
+        templateId: UUID,
+        typeName: string,
+        typeAbbreviation: string,
         assignedPatientIds: UUIDSet,
         image: ImageProperties,
         canCaterFor: CanCaterFor,
@@ -93,6 +102,9 @@ export class Personnel {
         this.vehicleId = vehicleId;
         this.vehicleName = vehicleName;
         this.personnelType = personnelType;
+        this.templateId = templateId;
+        this.typeName = typeName;
+        this.typeAbbreviation = typeAbbreviation;
         this.assignedPatientIds = assignedPatientIds;
         this.image = image;
         this.canCaterFor = canCaterFor;
@@ -113,6 +125,9 @@ export class Personnel {
             vehicleId,
             vehicleName,
             personnelTemplate.personnelType,
+            personnelTemplate.id,
+            personnelTemplate.name,
+            personnelTemplate.abbreviation,
             {},
             personnelTemplate.image,
             personnelTemplate.canCaterFor,

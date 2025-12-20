@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     createVehicleParameters,
@@ -42,6 +42,15 @@ let firstVehiclesCount = 0;
     standalone: false,
 })
 export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
+    @Input()
+    useHotkeys = true;
+
+    @Input()
+    useAlarmGroupButtons = false;
+
+    @Input()
+    useFirstVehicles = true;
+
     private readonly destroy$ = new Subject<void>();
 
     @ViewChild('selectAlarmGroupPopover')
@@ -146,7 +155,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     public get canSubmit() {
         return (
-            !(this.firstVehiclesInput?.invalid ?? true) &&
+            !(this.firstVehiclesInput?.invalid ?? false) &&
             selectedAlarmGroup !== null &&
             selectedTarget !== null &&
             (firstVehiclesCount === 0 || selectedFirstVehiclesTarget !== null)
@@ -177,10 +186,12 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
-        this.hotkeyLayer.addHotkey(this.selectAlarmGroupHotkey);
-        this.hotkeyLayer.addHotkey(this.selectTargetHotkey);
-        this.hotkeyLayer.addHotkey(this.selectFirstVehiclesTargetHotkey);
-        this.hotkeyLayer.addHotkey(this.submitHotkey);
+        if (this.useHotkeys) {
+            this.hotkeyLayer.addHotkey(this.selectAlarmGroupHotkey);
+            this.hotkeyLayer.addHotkey(this.selectTargetHotkey);
+            this.hotkeyLayer.addHotkey(this.selectFirstVehiclesTargetHotkey);
+            this.hotkeyLayer.addHotkey(this.submitHotkey);
+        }
     }
 
     ngOnDestroy() {
@@ -216,9 +227,6 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
             selectVehicleTemplates,
             this.store
         );
-        const vehicleTemplatesById = Object.fromEntries(
-            vehicleTemplates.map((template) => [template.id, template])
-        );
 
         const materialTemplates = selectStateSnapshot(
             selectMaterialTemplates,
@@ -244,7 +252,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
                 createVehicleParameters(
                     uuid(),
                     {
-                        ...vehicleTemplatesById[
+                        ...vehicleTemplates[
                             alarmGroupVehicle.vehicleTemplateId
                         ]!,
                         name: alarmGroupVehicle.name,

@@ -44,7 +44,7 @@ if ${DFM_ENABLE_SSL}; then
 fi
 
 if ${DFM_USE_DB}; then
-    NODE_ENV=migration node --experimental-specifier-resolution=node ./node_modules/typeorm/cli -d dist/src/database/migration-datasource.js migration:run
+    NODE_ENV=migration npm run migration:run
 fi
 
 NODE_ENV=production node --experimental-specifier-resolution=node dist/src/index.js

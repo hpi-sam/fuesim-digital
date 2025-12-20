@@ -2,16 +2,12 @@ import { jest } from '@jest/globals';
 import { sleep } from 'digital-fuesim-manv-shared';
 import { createTestEnvironment } from '../../test/utils.js';
 import { clientMap } from './client-map.js';
-import { ExerciseWrapper } from './exercise-wrapper.js';
+import { ActiveExercise } from './active-exercise.js';
 
-describe('Exercise Wrapper', () => {
+describe('Active Exercise', () => {
     const environment = createTestEnvironment();
     it('fails getting a role for the wrong id', () => {
-        const exercise = ExerciseWrapper.create(
-            '123456',
-            '12345678',
-            environment.databaseService
-        );
+        const exercise = new ActiveExercise('123456', '12345678');
 
         expect(() => exercise.getRoleFromUsedId('wrong id')).toThrow(
             RangeError
@@ -19,11 +15,7 @@ describe('Exercise Wrapper', () => {
     });
 
     it('does nothing adding a client that is not set up', async () => {
-        const exercise = ExerciseWrapper.create(
-            '123456',
-            '12345678',
-            environment.databaseService
-        );
+        const exercise = new ActiveExercise('123456', '12345678');
         // Use a websocket in order to have a ClientWrapper set up
         await environment.withWebsocket(async () => {
             // Sleep a bit to allow the socket to connect.
@@ -32,7 +24,7 @@ describe('Exercise Wrapper', () => {
             expect(client).toBeDefined();
 
             const applySpy = jest.spyOn(
-                ExerciseWrapper.prototype,
+                ActiveExercise.prototype,
                 'applyAction'
             );
             exercise.addClient(client!);
@@ -42,11 +34,7 @@ describe('Exercise Wrapper', () => {
     });
 
     it('does nothing removing a client that is not joined', async () => {
-        const exercise = ExerciseWrapper.create(
-            '123456',
-            '12345678',
-            environment.databaseService
-        );
+        const exercise = new ActiveExercise('123456', '12345678');
         // Use a websocket in order to have a ClientWrapper set up
         await environment.withWebsocket(async () => {
             // Sleep a bit to allow the socket to connect.
@@ -55,7 +43,7 @@ describe('Exercise Wrapper', () => {
             expect(client).toBeDefined();
 
             const applySpy = jest.spyOn(
-                ExerciseWrapper.prototype,
+                ActiveExercise.prototype,
                 'applyAction'
             );
             applySpy.mockClear();
@@ -66,13 +54,9 @@ describe('Exercise Wrapper', () => {
     });
 
     describe('Started Exercise', () => {
-        let exercise: ExerciseWrapper | undefined;
+        let exercise: ActiveExercise | undefined;
         beforeEach(() => {
-            exercise = ExerciseWrapper.create(
-                '123456',
-                '12345678',
-                environment.databaseService
-            );
+            exercise = new ActiveExercise('123456', '12345678');
             exercise.start();
         });
         afterEach(() => {
@@ -81,7 +65,7 @@ describe('Exercise Wrapper', () => {
         });
         it('emits tick event in tick (repeated)', async () => {
             const applySpy = jest.spyOn(
-                ExerciseWrapper.prototype,
+                ActiveExercise.prototype,
                 'applyAction'
             );
             const tickInterval = (exercise as any).tickInterval;
@@ -98,13 +82,9 @@ describe('Exercise Wrapper', () => {
 
     describe('Reactions to Actions', () => {
         it('calls start when matching action is sent', () => {
-            const exercise = ExerciseWrapper.create(
-                '123456',
-                '12345678',
-                environment.databaseService
-            );
+            const exercise = new ActiveExercise('123456', '12345678');
 
-            const startMock = jest.spyOn(ExerciseWrapper.prototype, 'start');
+            const startMock = jest.spyOn(ActiveExercise.prototype, 'start');
             startMock.mockImplementation(() => ({}));
 
             exercise.applyAction(
@@ -115,13 +95,9 @@ describe('Exercise Wrapper', () => {
         });
 
         it('calls pause when matching action is sent', () => {
-            const exercise = ExerciseWrapper.create(
-                '123456',
-                '12345678',
-                environment.databaseService
-            );
+            const exercise = new ActiveExercise('123456', '12345678');
 
-            const pause = jest.spyOn(ExerciseWrapper.prototype, 'pause');
+            const pause = jest.spyOn(ActiveExercise.prototype, 'pause');
             pause.mockImplementation(() => ({}));
 
             // We have to start the exercise before it can be paused

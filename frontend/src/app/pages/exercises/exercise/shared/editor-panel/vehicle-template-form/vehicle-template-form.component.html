@@ -96,39 +96,34 @@
                                 | values
                         "
                         ngbDropdownItem
-                        (click)="addMaterial(materialTemplate.materialType)"
+                        (click)="addMaterial(materialTemplate)"
                         type="button"
                         class="btn"
                     >
                         <i class="bi bi-plus"></i>
-                        {{ materialTypeNames[materialTemplate.materialType] }}
+                        {{ materialTemplate.name }}
                     </button>
                 </div>
             </div></label
         >
         <div
-            *ngIf="values.materialTypes.length > 0; else noMaterialTemplates"
+            *ngIf="
+                values.materialTemplates.length > 0;
+                else noMaterialTemplates
+            "
             class="d-flex flex-wrap"
         >
             <app-map-editor-card
                 *ngFor="
-                    let materialTypes of values.materialTypes;
+                    let materialTemplate of values.materialTemplates;
                     let index = index
                 "
+                [imageUrl]="materialTemplate.image.url"
+                [title]="materialTemplate.name"
                 style="width: 8rem"
-            >
-                <app-material-template-display
-                    [materialTemplateType]="materialTypes"
-                >
-                </app-material-template-display>
-                <button
-                    (click)="removeMaterial(index)"
-                    class="btn btn-sm btn-outline-danger position-absolute"
-                    style="top: 0; right: 0"
-                >
-                    <i class="bi bi-trash"></i>
-                </button>
-            </app-map-editor-card>
+                [enableDeleteButton]="true"
+                (elementDelete)="removeMaterial(index)"
+            ></app-map-editor-card>
         </div>
         <ng-template #noMaterialTemplates>
             <div class="text-muted mt-3 mb-3">Keine Materialien zugewiesen</div>
@@ -153,41 +148,34 @@
                                 | values
                         "
                         ngbDropdownItem
-                        (click)="addPersonnel(personnelTemplate.personnelType)"
+                        (click)="addPersonnel(personnelTemplate)"
                         type="button"
                         class="btn"
                     >
                         <i class="bi bi-plus"></i>
-                        {{
-                            personnelTypeNames[personnelTemplate.personnelType]
-                        }}
+                        {{ personnelTemplate.name }}
                     </button>
                 </div>
             </div></label
         >
         <div
-            *ngIf="values.personnelTypes.length > 0; else noPersonnelTemplates"
+            *ngIf="
+                values.personnelTemplates.length > 0;
+                else noPersonnelTemplates
+            "
             class="d-flex flex-wrap"
         >
             <app-map-editor-card
                 *ngFor="
-                    let personnelType of values.personnelTypes;
+                    let personnelTemplate of values.personnelTemplates;
                     let index = index
                 "
+                [imageUrl]="personnelTemplate.image.url"
+                [title]="personnelTemplate.name"
                 style="width: 8rem"
-            >
-                <app-personnel-template-display
-                    [personnelTemplateType]="personnelType"
-                >
-                </app-personnel-template-display>
-                <button
-                    (click)="removePersonnel(index)"
-                    class="btn btn-outline-danger btn-sm position-absolute"
-                    style="top: 0; right: 0"
-                >
-                    <i class="bi bi-trash"></i>
-                </button>
-            </app-map-editor-card>
+                [enableDeleteButton]="true"
+                (elementDelete)="removePersonnel(index)"
+            ></app-map-editor-card>
         </div>
         <ng-template #noPersonnelTemplates>
             <div class="text-muted mt-3 mb-3">Kein Personal zugewiesen</div>

@@ -1,21 +1,21 @@
 import assert from 'node:assert';
 import { jest } from '@jest/globals';
 import { generateDummyPatient, sleep } from 'digital-fuesim-manv-shared';
-import { ExerciseWrapper } from '../src/exercise/exercise-wrapper';
-import { createExercise, createTestEnvironment } from './utils';
+import { ActiveExercise } from '../src/exercise/active-exercise.js';
+import { createExercise, createTestEnvironment } from './utils.js';
 
 describe('join exercise', () => {
     const environment = createTestEnvironment();
 
     it('adds the joining client to the state', async () => {
-        const exerciseId = (await createExercise(environment)).trainerId;
+        const exerciseKey = (await createExercise(environment)).trainerId;
 
         await environment.withWebsocket(async (clientSocket) => {
             const clientName = 'someRandomName';
 
             const joinExercise = await clientSocket.emit(
                 'joinExercise',
-                exerciseId,
+                exerciseKey,
                 clientName
             );
 
@@ -49,15 +49,15 @@ describe('join exercise', () => {
     });
 
     it('ignores clients joining other exercises', async () => {
-        const firstExerciseId = (await createExercise(environment)).trainerId;
-        const secondExerciseId = (await createExercise(environment)).trainerId;
+        const firstExerciseKey = (await createExercise(environment)).trainerId;
+        const secondExerciseKey = (await createExercise(environment)).trainerId;
 
         await environment.withWebsocket(async (firstClientSocket) => {
             const firstClientName = 'someRandomName';
 
             await firstClientSocket.emit(
                 'joinExercise',
-                firstExerciseId,
+                firstExerciseKey,
                 firstClientName
             );
 
@@ -66,7 +66,7 @@ describe('join exercise', () => {
 
                 await secondClientSocket.emit(
                     'joinExercise',
-                    secondExerciseId,
+                    secondExerciseKey,
                     secondClientName
                 );
 
@@ -83,7 +83,7 @@ describe('join exercise', () => {
     });
 
     it('sends a message to existing clients when another client is joining the exercises', async () => {
-        const exerciseId = (await createExercise(environment)).trainerId;
+        const exerciseKey = (await createExercise(environment)).trainerId;
 
         await environment.withWebsocket(async (firstClientSocket) => {
             const firstClientName = 'someRandomName';
@@ -92,7 +92,7 @@ describe('join exercise', () => {
 
             await firstClientSocket.emit(
                 'joinExercise',
-                exerciseId,
+                exerciseKey,
                 firstClientName
             );
 
@@ -101,7 +101,7 @@ describe('join exercise', () => {
 
                 await secondClientSocket.emit(
                     'joinExercise',
-                    exerciseId,
+                    exerciseKey,
                     secondClientName
                 );
 
@@ -113,12 +113,12 @@ describe('join exercise', () => {
     });
 
     it('treats participant exercise the same as the trainer exercise', async () => {
-        const exerciseIds = await createExercise(environment);
+        const exerciseKeys = await createExercise(environment);
 
         await environment.withWebsocket(async (trainerSocket) => {
             const joinTrainer = await trainerSocket.emit(
                 'joinExercise',
-                exerciseIds.trainerId,
+                exerciseKeys.trainerId,
                 'trainer'
             );
 
@@ -127,7 +127,7 @@ describe('join exercise', () => {
             await environment.withWebsocket(async (participantSocket) => {
                 const joinParticipant = await participantSocket.emit(
                     'joinExercise',
-                    exerciseIds.participantId,
+                    exerciseKeys.participantId,
                     'participant'
                 );
 
@@ -182,13 +182,13 @@ describe('join exercise', () => {
     });
 
     it('stops an exercise after the last client has left', async () => {
-        const exerciseIds = await createExercise(environment);
+        const exerciseKeys = await createExercise(environment);
 
-        const pauseSpy = jest.spyOn(ExerciseWrapper.prototype, 'pause');
+        const pauseSpy = jest.spyOn(ActiveExercise.prototype, 'pause');
         await environment.withWebsocket(async (socket) => {
             const joinResponse = await socket.emit(
                 'joinExercise',
-                exerciseIds.trainerId,
+                exerciseKeys.trainerId,
                 'Test'
             );
             expect(joinResponse.success).toBe(true);

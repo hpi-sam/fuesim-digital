@@ -1,14 +1,13 @@
-import { exerciseMap } from '../src/exercise/exercise-map';
-import { UserReadableIdGenerator } from '../src/utils/user-readable-id-generator';
-import type { ExerciseCreationResponse } from './utils';
-import { createExercise, createTestEnvironment } from './utils';
+import { UserReadableIdGenerator } from '../src/utils/user-readable-id-generator.js';
+import type { ExerciseCreationResponse } from './utils.js';
+import { createExercise, createTestEnvironment } from './utils.js';
 
 describe('exercise', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
         UserReadableIdGenerator.freeAll();
-        exerciseMap.clear();
+        environment.exerciseService.TESTING_getExerciseMap().clear();
     });
     describe('POST /api/exercise', () => {
         it('returns an exercise id', async () => {
@@ -32,17 +31,17 @@ describe('exercise', () => {
 
     describe('GET /api/exercise/:exerciseId', () => {
         it('succeeds returning true for participant id', async () => {
-            const participantId = (await createExercise(environment))
+            const participantKey = (await createExercise(environment))
                 .participantId;
             await environment
-                .httpRequest('get', `/api/exercise/${participantId}`)
+                .httpRequest('get', `/api/exercise/${participantKey}`)
                 .expect(200);
         });
 
         it('succeeds returning true for trainer id', async () => {
-            const trainerId = (await createExercise(environment)).trainerId;
+            const trainerKey = (await createExercise(environment)).trainerId;
             await environment
-                .httpRequest('get', `/api/exercise/${trainerId}`)
+                .httpRequest('get', `/api/exercise/${trainerKey}`)
                 .expect(200);
         });
 
@@ -60,12 +59,20 @@ describe('exercise', () => {
                 .httpRequest('delete', `/api/exercise/${exerciseId}`)
                 .expect(204);
 
-            expect(exerciseMap.size).toBe(0);
+            expect(
+                environment.exerciseService.TESTING_getExerciseMap().size
+            ).toBe(0);
+        });
+
+        it('fails deleting an arbitrary exercise id string', async () => {
+            await environment
+                .httpRequest('delete', '/api/exercise/anyNumber')
+                .expect(500);
         });
 
         it('fails deleting a not existing exercise', async () => {
             await environment
-                .httpRequest('delete', '/api/exercise/anyNumber')
+                .httpRequest('delete', '/api/exercise/12345678')
                 .expect(404);
         });
 

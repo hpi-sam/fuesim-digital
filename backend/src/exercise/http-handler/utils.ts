@@ -3,6 +3,6 @@ export interface HttpResponse<T extends object | undefined = undefined> {
     body: HttpErrorMessage | T;
 }
 
-interface HttpErrorMessage {
+export interface HttpErrorMessage {
     message: string;
 }

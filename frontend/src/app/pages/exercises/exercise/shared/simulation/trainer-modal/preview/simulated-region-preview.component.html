@@ -37,7 +37,7 @@
                         *ngFor="let patient of patients"
                         dataCy="patientWithVisibleStatusDiv"
                         [imageUrl]="patient.image.url"
-                        [darkBackground]="selectedId == patient.id"
+                        [darkBackground]="selectedId === patient.id"
                         [title]="patient.identifier"
                         (elementMousedown)="
                             selectedId = patient.id;
@@ -64,7 +64,7 @@
                         *ngFor="let personnel of personnel"
                         dataCy="personnelDiv"
                         [imageUrl]="personnel.image.url"
-                        [darkBackground]="selectedId == personnel.id"
+                        [darkBackground]="selectedId === personnel.id"
                         [title]="personnel.vehicleName"
                         (elementMousedown)="
                             selectedId = personnel.id;
@@ -91,7 +91,7 @@
                         *ngFor="let material of material"
                         dataCy="personnelDiv"
                         [imageUrl]="material.image.url"
-                        [darkBackground]="selectedId == material.id"
+                        [darkBackground]="selectedId === material.id"
                         [title]="material.vehicleName"
                         (elementMousedown)="
                             selectingMaterial(material.id);
@@ -128,7 +128,7 @@
                         "
                         dataCy="vehicleDiv"
                         [imageUrl]="vehicle.image.url"
-                        [darkBackground]="selectedId == vehicle.id"
+                        [darkBackground]="selectedId === vehicle.id"
                         [title]="vehicle.name"
                         (elementMousedown)="
                             selectVehicle(vehicle.id);
@@ -154,7 +154,7 @@
                 style="min-width: 25em; max-width: 25em"
             >
                 <!-- patient details -->
-                <ng-container *ngIf="selectionCategory == 'patient'">
+                <ng-container *ngIf="selectionCategory === 'patient'">
                     <app-patients-details
                         class="overflow-auto w-100 d-inline-block flex-grow-1"
                         *ngIf="selectedId"
@@ -169,7 +169,7 @@
                 <!-- personnel details -->
                 <ng-container
                     *ngIf="
-                        selectionCategory == 'personnel' &&
+                        selectionCategory === 'personnel' &&
                         (selectedPersonnel$ | async) as personnel
                     "
                 >
@@ -268,7 +268,7 @@
                         class="col h-100"
                         style="max-width: 80%"
                         *ngIf="
-                            selectionCategory == 'material' &&
+                            selectionCategory === 'material' &&
                             (selectedMaterial$ | async) as material
                         "
                     >
@@ -328,7 +328,7 @@
                     class="col h-100"
                     style="max-width: 80%"
                     *ngIf="
-                        selectionCategory == 'vehicle' &&
+                        selectionCategory === 'vehicle' &&
                         (vehicleSelection$ | async) as selection
                     "
                 >

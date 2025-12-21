@@ -17,7 +17,6 @@ import type {
     Vehicle,
     VehicleTemplate,
 } from 'digital-fuesim-manv-shared';
-import { PatientWithVisibleStatus } from '../patients-table/simulated-region-overview-patients-table.component';
 import {
     createSelectElementsInSimulatedRegion,
     createSelectMaterial,
@@ -30,9 +29,10 @@ import {
     selectVehicles,
     selectVehicleTemplates,
 } from 'src/app/state/application/selectors/exercise.selectors';
-import { comparePatientsByVisibleStatus } from '../tabs/compare-patients';
-import { groupBy } from 'lodash';
+import { groupBy } from 'lodash-es';
 import { ExerciseService } from 'src/app/core/exercise.service';
+import { comparePatientsByVisibleStatus } from '../tabs/compare-patients';
+import { PatientWithVisibleStatus } from '../patients-table/simulated-region-overview-patients-table.component';
 import { StartTransferService } from '../start-transfer.service';
 const selectionCategories = [
     'patient',
@@ -41,14 +41,6 @@ const selectionCategories = [
     'material',
 ] as const;
 export type selectionCategory = (typeof selectionCategories)[number];
-
-const personnelCategories = [
-    'notarzt',
-    'notSan',
-    'rettSan',
-    'san',
-    'gf',
-] as const;
 @Component({
     selector: 'app-simulated-region-preview',
     templateUrl: './simulated-region-preview.component.html',

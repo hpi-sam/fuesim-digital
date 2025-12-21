@@ -14,6 +14,7 @@ import {
 import { TransferPointOverviewModule } from '../transfer-point-overview/transfer-point-overview.module';
 import { SimulatedRegionOverviewGeneralComponent } from './trainer-modal/overview/simulated-region-overview.component';
 import { SimulatedRegionPreviewComponent } from './trainer-modal/preview/simulated-region-preview.component';
+import { SimulatedRegionPreviewCardComponent } from './trainer-modal/preview-card/simulated-region-preview-card.component';
 import { SimulatedRegionOverviewBehaviorTabComponent } from './trainer-modal/tabs/behavior-tab/simulated-region-overview-behavior-tab.component';
 import { SimulatedRegionOverviewGeneralTabComponent } from './trainer-modal/tabs/general-tab/simulated-region-overview-general-tab.component';
 import { SimulatedRegionOverviewBehaviorTreatPatientsComponent } from './trainer-modal/tabs/behavior-tab/behaviors/treat-patients/simulated-region-overview-behavior-treat-patients.component';
@@ -93,6 +94,7 @@ import { SignallerModalTransportRequestTargetEditorComponent } from './signaller
         SimulatedRegionOverviewBehaviorTabComponent,
         SimulatedRegionOverviewGeneralTabComponent,
         SimulatedRegionPreviewComponent,
+        SimulatedRegionPreviewCardComponent,
         SimulatedRegionOverviewBehaviorTreatPatientsComponent,
         SimulatedRegionOverviewBehaviorAssignLeaderComponent,
         SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent,

@@ -157,8 +157,14 @@ export class SimulatedRegionPreviewComponent implements OnInit {
                 return Object.entries(groupedVehicles)
                     .sort(
                         ([keyA], [keyB]) =>
-                            this.indexOfTemplate(vehicleTemplates, keyA) -
-                            this.indexOfTemplate(vehicleTemplates, keyB)
+                            this.indexOfTemplate(
+                                Object.values(vehicleTemplates),
+                                keyA
+                            ) -
+                            this.indexOfTemplate(
+                                Object.values(vehicleTemplates),
+                                keyB
+                            )
                     )
                     .map(([key, values]) => ({
                         vehicleType: key,

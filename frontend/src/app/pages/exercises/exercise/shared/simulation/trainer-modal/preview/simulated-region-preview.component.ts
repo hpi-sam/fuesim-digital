@@ -40,7 +40,7 @@ const selectionCategories = [
     'vehicle',
     'material',
 ] as const;
-export type selectionCategory = (typeof selectionCategories)[number];
+export type SelectionCategory = (typeof selectionCategories)[number];
 @Component({
     selector: 'app-simulated-region-preview',
     templateUrl: './simulated-region-preview.component.html',
@@ -54,7 +54,8 @@ export class SimulatedRegionPreviewComponent implements OnInit {
     selectedVehicleId$ = new Subject<UUID | null>();
     selectedVehiclePersonnel$!: Observable<Personnel[]>;
 
-    selectionCategory?: selectionCategory;
+    public readonly selectionCatertories = selectionCategories;
+    selectionCategory?: SelectionCategory;
 
     simulatetRegion$!: Observable<SimulatedRegion>;
 

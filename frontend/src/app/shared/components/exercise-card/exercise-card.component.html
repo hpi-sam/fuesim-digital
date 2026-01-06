@@ -2,12 +2,12 @@
     <div class="card">
         <div class="card-body">
             <h2 class="card-title h4 d-flex">
-                #{{ exercise.trainerId }}
-                <app-copy-button [value]="trainerUrl()" />
+                #{{ exercise.participantId }}
+                <app-copy-button [value]="participantUrl()" />
             </h2>
             <p class="card-text">
-                Teilnehmer-ID: {{ exercise.participantId }}
-                <app-copy-button [value]="participantUrl()" />
+                Trainer-ID: {{ exercise.trainerId }}
+                <app-copy-button [value]="trainerUrl()" />
             </p>
         </div>
         <ul class="list-group list-group-flush">

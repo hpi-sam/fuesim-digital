@@ -20,7 +20,6 @@ import { AutofocusDirective } from './directives/autofocus.directive';
 import { LetDirective } from './directives/let.directive';
 import { FormatDurationPipe } from './pipes/format-duration.pipe';
 import { KeysPipe } from './pipes/keys.pipe';
-import { AppTrackByPropertyPipe } from './pipes/track-by-property/app-track-by-property.pipe';
 import { ValuesPipe } from './pipes/values.pipe';
 import { DisplayValidationComponent } from './validation/display-validation/display-validation.component';
 import { ExactMatchValidatorDirective } from './validation/exact-match-validator.directive';
@@ -64,7 +63,6 @@ import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.
         DisplayValidationComponent,
         ExactMatchValidatorDirective,
         JoinIdDirective,
-        AppTrackByPropertyPipe,
         ExerciseExistsValidatorDirective,
         ImageExistsValidatorDirective,
         TransferPointNameComponent,
@@ -123,7 +121,6 @@ import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.
         DisplayValidationComponent,
         ExactMatchValidatorDirective,
         JoinIdDirective,
-        AppTrackByPropertyPipe,
         ExerciseExistsValidatorDirective,
         ImageExistsValidatorDirective,
         TransferPointNameComponent,

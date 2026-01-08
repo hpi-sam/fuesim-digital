@@ -1,4 +1,4 @@
-<ng-container *ngIf="behaviorState$ | async as behaviorState">
+@if (behaviorState$ | async; as behaviorState) {
     <div class="d-flex row mb-1">
         <span class="col-sm">Intervall der Fahrzeuganfragen</span>
         <div class="input-group input-group-sm col-sm" style="max-width: 250px">
@@ -52,4 +52,4 @@
             <span class="input-group-text">Min</span>
         </div>
     </div>
-</ng-container>
+}

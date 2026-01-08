@@ -2,19 +2,24 @@
     <h4 class="modal-title">Bild bearbeiten</h4>
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
-<div *ngIf="mapImageTemplate" class="modal-body">
-    <app-image-template-form
-        [initialValues]="{
-            url: mapImageTemplate.image.url,
-            height: mapImageTemplate.image.height,
-            name: mapImageTemplate.name,
-        }"
-        (submitImageTemplate)="editMapImageTemplate($event)"
-        [btnText]="'Speichern'"
-    ></app-image-template-form>
+@if (mapImageTemplate) {
+    <div class="modal-body">
+        <app-image-template-form
+            [initialValues]="{
+                url: mapImageTemplate.image.url,
+                height: mapImageTemplate.image.height,
+                name: mapImageTemplate.name,
+            }"
+            (submitImageTemplate)="editMapImageTemplate($event)"
+            [btnText]="'Speichern'"
+        ></app-image-template-form>
 
-    <button class="btn btn-danger float-end" (click)="deleteMapImageTemplate()">
-        <i class="bi bi-trash-fill"></i>
-        Löschen
-    </button>
-</div>
+        <button
+            class="btn btn-danger float-end"
+            (click)="deleteMapImageTemplate()"
+        >
+            <i class="bi bi-trash-fill"></i>
+            Löschen
+        </button>
+    </div>
+}

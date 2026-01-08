@@ -1,150 +1,165 @@
-<ng-container *ngIf="behaviorState$ | async as behaviorState">
-    <ng-container *ngIf="patientStatusOptions$ | async as patientStatusOptions">
-        <ng-container
-            *ngIf="managedSimulatedRegions$ | async as managedSimulatedRegions"
-        >
-            <table class="table" *ngIf="managedSimulatedRegions.length > 0">
-                <thead>
-                    <tr>
-                        <th scope="col">Name</th>
-                        <th
-                            scope="col"
-                            *ngFor="let patientStatus of patientStatusOptions"
-                        >
-                            <app-patient-status-badge
-                                [status]="patientStatus"
-                            />
-                        </th>
-                        <th scope="col">Aktionen</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        *ngFor="
-                            let managedSimulatedRegion of managedSimulatedRegions
-                        "
-                    >
-                        <th scope="row">{{ managedSimulatedRegion.name }}</th>
-                        <td
-                            *ngFor="let patientStatus of patientStatusOptions"
-                            class="text-center p-0"
-                        >
-                            <span
-                                *ngIf="
-                                    selectedSimulatedRegionId !==
-                                        managedSimulatedRegion.id;
-                                    else editPatientCount
-                                "
-                            >
-                                {{
-                                    behaviorState.patientsExpectedInRegions[
-                                        managedSimulatedRegion.id
-                                    ]?.[patientStatus] ?? 0
-                                }}
-                            </span>
-                            <ng-template #editPatientCount>
-                                <input
-                                    type="number"
-                                    class="form-control"
-                                    min="0"
-                                    [ngModel]="
-                                        behaviorState.patientsExpectedInRegions[
+@if (behaviorState$ | async; as behaviorState) {
+    @if (patientStatusOptions$ | async; as patientStatusOptions) {
+        @if (managedSimulatedRegions$ | async; as managedSimulatedRegions) {
+            @if (managedSimulatedRegions.length > 0) {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            @for (
+                                patientStatus of patientStatusOptions;
+                                track patientStatus
+                            ) {
+                                <th scope="col">
+                                    <app-patient-status-badge
+                                        [status]="patientStatus"
+                                    />
+                                </th>
+                            }
+                            <th scope="col">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (
+                            managedSimulatedRegion of managedSimulatedRegions;
+                            track managedSimulatedRegion
+                        ) {
+                            <tr>
+                                <th scope="row">
+                                    {{ managedSimulatedRegion.name }}
+                                </th>
+                                @for (
+                                    patientStatus of patientStatusOptions;
+                                    track patientStatus
+                                ) {
+                                    <td class="text-center p-0">
+                                        @if (
+                                            selectedSimulatedRegionId !==
                                             managedSimulatedRegion.id
-                                        ]?.[patientStatus] ?? 0
-                                    "
-                                    (appSaveOnTyping)="
-                                        updatePatientsExpectedInRegion(
-                                            managedSimulatedRegion.id,
-                                            $event,
-                                            patientStatus
-                                        )
-                                    "
-                                    class="form-control form-control-sm d-inline-block no-validation"
-                                    style="max-width: 75px"
-                                />
-                            </ng-template>
-                        </td>
-                        <td>
-                            <button
-                                class="btn btn-outline-secondary me-1"
-                                type="button"
-                                (click)="
-                                    selectRegion(managedSimulatedRegion.id)
-                                "
-                                *ngIf="
-                                    selectedSimulatedRegionId !==
-                                        managedSimulatedRegion.id;
-                                    else checkButton
-                                "
-                            >
-                                <span class="bi-pencil"></span>
-                            </button>
-                            <ng-template #checkButton>
-                                <button
-                                    class="btn btn-outline-success me-1"
-                                    type="button"
-                                    (click)="unselectRegion()"
-                                >
-                                    <span class="bi-check"></span>
-                                </button>
-                            </ng-template>
-                            <button
-                                class="btn btn-outline-danger"
-                                type="button"
-                                (click)="
-                                    removeSimulatedRegionToManage(
+                                        ) {
+                                            <span>
+                                                {{
+                                                    behaviorState
+                                                        .patientsExpectedInRegions[
+                                                        managedSimulatedRegion
+                                                            .id
+                                                    ]?.[patientStatus] ?? 0
+                                                }}
+                                            </span>
+                                        } @else {
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                min="0"
+                                                [ngModel]="
+                                                    behaviorState
+                                                        .patientsExpectedInRegions[
+                                                        managedSimulatedRegion
+                                                            .id
+                                                    ]?.[patientStatus] ?? 0
+                                                "
+                                                (appSaveOnTyping)="
+                                                    updatePatientsExpectedInRegion(
+                                                        managedSimulatedRegion.id,
+                                                        $event,
+                                                        patientStatus
+                                                    )
+                                                "
+                                                class="form-control form-control-sm d-inline-block no-validation"
+                                                style="max-width: 75px"
+                                            />
+                                        }
+                                    </td>
+                                }
+                                <td>
+                                    @if (
+                                        selectedSimulatedRegionId !==
                                         managedSimulatedRegion.id
-                                    )
-                                "
-                            >
-                                <span class="bi-trash"></span>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </ng-container>
+                                    ) {
+                                        <button
+                                            class="btn btn-outline-secondary me-1"
+                                            type="button"
+                                            (click)="
+                                                selectRegion(
+                                                    managedSimulatedRegion.id
+                                                )
+                                            "
+                                        >
+                                            <span class="bi-pencil"></span>
+                                        </button>
+                                    } @else {
+                                        <button
+                                            class="btn btn-outline-success me-1"
+                                            type="button"
+                                            (click)="unselectRegion()"
+                                        >
+                                            <span class="bi-check"></span>
+                                        </button>
+                                    }
 
-        <div
-            *ngIf="
-                possibleNewSimulatedRegionsToManage$
-                    | async as possibleNewSimulatedRegionsToManage
-            "
-            ngbDropdown
-            placement="bottom-start"
-            autoClose="outside"
-            class="d-inline-block overflow-visible text-center mb-3"
-        >
-            <button
-                ngbDropdownToggle
-                type="button"
-                class="btn btn-outline-primary"
-                [disabled]="possibleNewSimulatedRegionsToManage.length === 0"
-            >
-                <span class="bi-plus me-1"></span>
-                Weiteren simulierten Bereich hinzufügen
-            </button>
+                                    <button
+                                        class="btn btn-outline-danger"
+                                        type="button"
+                                        (click)="
+                                            removeSimulatedRegionToManage(
+                                                managedSimulatedRegion.id
+                                            )
+                                        "
+                                    >
+                                        <span class="bi-trash"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+
+        @if (
+            possibleNewSimulatedRegionsToManage$ | async;
+            as possibleNewSimulatedRegionsToManage
+        ) {
             <div
-                *ngIf="possibleNewSimulatedRegionsToManage.length > 0"
-                ngbDropdownMenu
+                ngbDropdown
+                placement="bottom-start"
+                autoClose="outside"
+                class="d-inline-block overflow-visible text-center mb-3"
             >
                 <button
-                    *ngFor="
-                        let possibleNewSimulatedRegionsToManage of possibleNewSimulatedRegionsToManage
-                    "
-                    ngbDropdownItem
-                    class="dropdown-item"
+                    ngbDropdownToggle
                     type="button"
-                    (click)="
-                        addSimulatedRegionToManage(
-                            possibleNewSimulatedRegionsToManage.id
-                        )
+                    class="btn btn-outline-primary"
+                    [disabled]="
+                        possibleNewSimulatedRegionsToManage.length === 0
                     "
                 >
                     <span class="bi-plus me-1"></span>
-                    {{ possibleNewSimulatedRegionsToManage.name }}
+                    Weiteren simulierten Bereich hinzufügen
                 </button>
+                @if (possibleNewSimulatedRegionsToManage.length > 0) {
+                    <div ngbDropdownMenu>
+                        @for (
+                            possibleNewSimulatedRegionsToManage of possibleNewSimulatedRegionsToManage;
+                            track possibleNewSimulatedRegionsToManage
+                        ) {
+                            <button
+                                ngbDropdownItem
+                                class="dropdown-item"
+                                type="button"
+                                (click)="
+                                    addSimulatedRegionToManage(
+                                        possibleNewSimulatedRegionsToManage.id
+                                    )
+                                "
+                            >
+                                <span class="bi-plus me-1"></span>
+                                {{ possibleNewSimulatedRegionsToManage.name }}
+                            </button>
+                        }
+                    </div>
+                }
             </div>
-        </div>
-    </ng-container>
-</ng-container>
+        }
+    }
+}

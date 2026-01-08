@@ -10,20 +10,21 @@
         />
     </div>
     <div class="col overflow-hidden d-flex flex-column" style="max-width: 65%">
-        <app-patients-details
-            class="overflow-auto w-100 d-inline-block flex-grow-1"
-            *ngIf="selectedPatientId; else noSelectedPatient"
-            [patientId]="selectedPatientId"
-        />
-        <app-simulated-region-overview-patient-interaction-bar
-            class="w-100 d-inline-block"
-            *ngIf="selectedPatientId"
-            [patientId]="selectedPatientId"
-        />
-        <ng-template #noSelectedPatient>
+        @if (selectedPatientId) {
+            <app-patients-details
+                class="overflow-auto w-100 d-inline-block flex-grow-1"
+                [patientId]="selectedPatientId"
+            />
+        } @else {
             <p class="text-muted">
                 Bitte wählen Sie einen Patienten links aus der Liste.
             </p>
-        </ng-template>
+        }
+        @if (selectedPatientId) {
+            <app-simulated-region-overview-patient-interaction-bar
+                class="w-100 d-inline-block"
+                [patientId]="selectedPatientId"
+            />
+        }
     </div>
 </div>

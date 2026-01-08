@@ -1,4 +1,4 @@
-<ng-container *ngIf="transferPoint$ | async as transferPoint">
+@if (transferPoint$ | async; as transferPoint) {
     <h5 class="popover-header">
         {{ transferPoint.externalName }}
         <button
@@ -95,4 +95,4 @@
             style="min-height: 0"
         ></div>
     </div>
-</ng-container>
+}

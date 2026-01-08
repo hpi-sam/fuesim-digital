@@ -1,4 +1,4 @@
-<ng-container *ngIf="patient$ | async as patient">
+@if (patient$ | async; as patient) {
     <div
         [ngClass]="{ 'border border-4 rounded': patient.hasTransportPriority }"
         style="border-color: red !important"
@@ -21,4 +21,4 @@
             <app-patients-details [patientId]="patientId" />
         </div>
     </div>
-</ng-container>
+}

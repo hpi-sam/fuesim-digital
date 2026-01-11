@@ -1,13 +1,20 @@
-import type { Vehicle, VehicleTemplate } from '../models/index.js';
-import { VehicleParameters, Material, Personnel } from '../models/index.js';
-import type { MaterialTemplate } from '../models/material-template.js';
-import type { PersonnelTemplate } from '../models/personnel-template.js';
-import type { MapCoordinates } from '../models/utils/index.js';
-import { MapPosition } from '../models/utils/position/map-position.js';
-import { VehiclePosition } from '../models/utils/position/vehicle-position.js';
+import type {
+    Vehicle,
+    VehicleTemplate,
+    MaterialTemplate,
+    PersonnelTemplate,
+    MapCoordinates,
+} from '../models/index.js';
+import {
+    newNoOccupation,
+    newVehiclePositionIn,
+    newMapPositionAt,
+    VehicleParameters,
+    Material,
+    Personnel,
+} from '../models/index.js';
 
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
-import { NoOccupation } from '../models/utils/occupations/no-occupation.js';
 import type { UUID } from '../utils/index.js';
 
 /**
@@ -29,7 +36,7 @@ export function createVehicleParameters(
                 materialTemplate,
                 vehicleId,
                 vehicleTemplate.name,
-                VehiclePosition.create(vehicleId)
+                newVehiclePositionIn(vehicleId)
             );
         })
         .filter((val) => val !== null);
@@ -41,7 +48,7 @@ export function createVehicleParameters(
                 personnelTemplate,
                 vehicleId,
                 vehicleTemplate.name,
-                VehiclePosition.create(vehicleId)
+                newVehiclePositionIn(vehicleId)
             );
         })
         .filter((val) => val !== null);
@@ -57,8 +64,8 @@ export function createVehicleParameters(
         image: vehicleTemplate.image,
         patientIds: {},
         personnelIds: arrayToUUIDSet(personnel.map((p) => p.id)),
-        position: MapPosition.create(vehiclePosition),
-        occupation: NoOccupation.create(),
+        position: newMapPositionAt(vehiclePosition),
+        occupation: newNoOccupation(),
     };
 
     return VehicleParameters.create(vehicle, materials, personnel);

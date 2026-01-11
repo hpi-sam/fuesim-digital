@@ -1,18 +1,20 @@
 import type { SimulatedRegion, Vehicle } from '../../models/index.js';
-import { createVehicleActionTag } from '../../models/utils/tag-helpers.js';
 import {
+    newSimulatedRegionPositionIn,
+    createVehicleActionTag,
     isInSpecificSimulatedRegion,
     isInSpecificVehicle,
-    SimulatedRegionPosition,
-} from '../../models/utils/index.js';
+} from '../../models/index.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
 import { getElement } from '../../store/action-reducers/utils/index.js';
 import { logVehicle } from '../../store/action-reducers/utils/log.js';
 import type { Mutable } from '../../utils/index.js';
-import { NewPatientEvent } from '../events/index.js';
-import { MaterialAvailableEvent } from '../events/material-available.js';
-import { PersonnelAvailableEvent } from '../events/personnel-available.js';
+import {
+    NewPatientEvent,
+    MaterialAvailableEvent,
+    PersonnelAvailableEvent,
+} from '../events/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
 
 export function unloadVehicle(
@@ -46,7 +48,7 @@ export function unloadVehicle(
             if (isInSpecificVehicle(element, vehicle.id)) {
                 changePositionWithId(
                     elementId,
-                    SimulatedRegionPosition.create(simulatedRegion.id),
+                    newSimulatedRegionPositionIn(simulatedRegion.id),
                     elementType,
                     draftState
                 );

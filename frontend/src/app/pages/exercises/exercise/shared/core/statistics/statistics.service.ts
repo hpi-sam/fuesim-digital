@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
-    isNotInVehicle,
     currentCoordinatesOf,
     isOnMap,
     loopTroughTime,
     uuid,
     Viewport,
-    isNotInTransfer,
     isInSpecificSimulatedRegion,
     cloneDeepMutable,
+    isInVehicle,
+    isInTransfer,
 } from 'digital-fuesim-manv-shared';
 import type {
     Personnel,
@@ -182,8 +182,7 @@ export class StatisticsService {
             personnel: countBy(
                 personnel.filter(
                     (_personnel) =>
-                        isNotInVehicle(_personnel) &&
-                        isNotInTransfer(_personnel)
+                        !isInVehicle(_personnel) && !isInTransfer(_personnel)
                 ),
                 (_personnel) => _personnel.templateId
             ),

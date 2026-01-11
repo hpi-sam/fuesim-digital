@@ -1,9 +1,9 @@
 import { IsUUID } from 'class-validator';
 import {
-    IntermediateOccupation,
     changeOccupation,
     getCreate,
-} from '../../models/utils/index.js';
+    newIntermediateOccupation,
+} from '../../models/index.js';
 import type { UUID, UUIDSet } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
 import { IsUUIDSet, IsValue } from '../../utils/validators/index.js';
@@ -12,7 +12,7 @@ import {
     PatientTransferToHospitalSuccessfulEvent,
     TransferPatientsInSpecificVehicleRequestEvent,
 } from '../events/index.js';
-import { catchAllHospitalId } from '../../data/default-state/catch-all-hospital.js';
+import { catchAllHospitalId } from '../../data/index.js';
 import {
     getElement,
     tryGetElement,
@@ -91,9 +91,7 @@ export const transferPatientToHospitalActivity: SimulationActivity<TransferPatie
             changeOccupation(
                 draftState,
                 vehicle,
-                IntermediateOccupation.create(
-                    draftState.currentTime + tickInterval
-                )
+                newIntermediateOccupation(draftState.currentTime + tickInterval)
             );
 
             sendSimulationEvent(

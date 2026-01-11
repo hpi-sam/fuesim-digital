@@ -1,20 +1,13 @@
-import { IsNumber } from 'class-validator';
-import { getCreate } from '../get-create.js';
+import * as z from 'zod';
 
-export class MapCoordinates {
-    @IsNumber()
-    public readonly x: number;
+export const mapCoordinatesSchema = z.strictObject({
+    x: z.number(),
+    y: z.number(),
+});
 
-    @IsNumber()
-    public readonly y: number;
+export type MapCoordinates = z.infer<typeof mapCoordinatesSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
-
-    static readonly create = getCreate(this);
-}
+export const newMapCoordinatesAt = (x: number, y: number): MapCoordinates => ({
+    x,
+    y,
+});

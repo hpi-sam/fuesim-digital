@@ -16,9 +16,7 @@ import type { MapPosition } from './map-position.js';
 import type { Position } from './position.js';
 import {
     coordinatesOfPosition,
-    isPositionNotOnMap,
     isPositionOnMap,
-    isNotOnMap,
     isOnMap,
 } from './position-helpers.js';
 
@@ -92,9 +90,9 @@ function updateSpatialElementTree(
             element.id,
             coordinatesOfPosition(to)
         );
-    } else if (isOnMap(element) && isPositionNotOnMap(to)) {
+    } else if (isOnMap(element) && !isPositionOnMap(to)) {
         removeElementPosition(state, type, element.id);
-    } else if (isNotOnMap(element) && isPositionOnMap(to)) {
+    } else if (!isOnMap(element) && isPositionOnMap(to)) {
         updateElementPosition(
             state,
             type,

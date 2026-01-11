@@ -1,9 +1,14 @@
 import { Type } from 'class-transformer';
 import { ArrayNotEmpty, IsArray, ValidateNested } from 'class-validator';
 import { IsValue } from '../utils/validators/index.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
 import { PatientTemplate } from './patient-template.js';
-import { getCreate, ImageProperties } from './utils/index.js';
-import { PatientStatusCode } from './utils/patient-status-code.js';
+import type { ImageProperties } from './utils/index.js';
+import {
+    getCreate,
+    imagePropertiesSchema,
+    PatientStatusCode,
+} from './utils/index.js';
 
 export class PatientCategory {
     @IsValue('patientCategory' as const)
@@ -13,8 +18,7 @@ export class PatientCategory {
     @Type(() => PatientStatusCode)
     public readonly name: PatientStatusCode;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
     @IsArray()

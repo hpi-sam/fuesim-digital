@@ -6,18 +6,19 @@ import {
     IsInt,
     IsArray,
 } from 'class-validator';
-import { VehicleTemplate } from '../../models/index.js';
-import { ImageProperties } from '../../models/utils/index.js';
+import { VehicleTemplate, imagePropertiesSchema } from '../../models/index.js';
+import type { ImageProperties } from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
+import type { Mutable, UUID } from '../../utils/index.js';
+import type { Action, ActionReducer } from '../action-reducer.js';
+import { ReducerError } from '../reducer-error.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
     uuidArrayValidationOptions,
     uuidValidationOptions,
     cloneDeepMutable,
 } from '../../utils/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
-import { IsValue } from '../../utils/validators/is-value.js';
 
 export class AddVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Add vehicleTemplate')
@@ -44,8 +45,7 @@ export class EditVehicleTemplateAction implements Action {
     @IsInt()
     public readonly patientCapacity!: number;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image!: ImageProperties;
 
     @IsUUID(4, uuidArrayValidationOptions)

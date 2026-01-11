@@ -1,20 +1,18 @@
 import { produce } from 'immer';
 import {
-    Personnel,
     SimulatedRegion,
+    newSimulatedRegionPositionIn,
+    Personnel,
     TransferPoint,
-} from '../../models/index.js';
-import type { PatientStatus } from '../../models/utils/index.js';
-import {
     CanCaterFor,
-    MapCoordinates,
-    SimulatedRegionPosition,
     Size,
-} from '../../models/utils/index.js';
+    newMapCoordinatesAt,
+} from '../../models/index.js';
+import type { PatientStatus } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
 import type { Mutable, UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuid } from '../../utils/index.js';
-import { AssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
+import { AssignLeaderBehaviorState } from '../behaviors/index.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
 import { addPersonnel } from '../../../tests/utils/personnel.spec.js';
 import { defaultPersonnelTemplates } from '../../data/default-state/personnel-templates.js';
@@ -44,12 +42,12 @@ function setupStateAndApplyTreatments(
     ) => void
 ) {
     const simulatedRegion = SimulatedRegion.create(
-        MapCoordinates.create(0, 0),
+        newMapCoordinatesAt(0, 0),
         Size.create(10, 10),
         'test region'
     );
     const transferPoint = TransferPoint.create(
-        SimulatedRegionPosition.create(simulatedRegion.id),
+        newSimulatedRegionPositionIn(simulatedRegion.id),
         {},
         {},
         '',
@@ -131,7 +129,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 'white',
                                 'red',
-                                SimulatedRegionPosition.create(id)
+                                newSimulatedRegionPositionIn(id)
                             );
                         }
                     );
@@ -159,7 +157,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 'white',
                                 'red',
-                                SimulatedRegionPosition.create(id)
+                                newSimulatedRegionPositionIn(id)
                             );
 
                             addPersonnel(
@@ -168,7 +166,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(id)
+                                    newSimulatedRegionPositionIn(id)
                                 )
                             );
                         }
@@ -199,9 +197,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 'white',
                                 'red',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             );
 
                             addPersonnel(draftState, {
@@ -209,7 +205,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         simulatedRegion.id
                                     )
                                 ),
@@ -238,19 +234,19 @@ describe('reassign treatment', () => {
                             draftState,
                             'black',
                             'black',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
                         addPatient(
                             draftState,
                             'black',
                             'black',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
                         addPatient(
                             draftState,
                             'black',
                             'black',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
@@ -258,9 +254,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
@@ -271,9 +265,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         ).id;
                     }
@@ -304,7 +296,7 @@ describe('reassign treatment', () => {
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
@@ -312,9 +304,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
@@ -325,9 +315,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         );
 
@@ -362,7 +350,7 @@ describe('reassign treatment', () => {
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
@@ -370,9 +358,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
@@ -383,9 +369,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         );
 
@@ -421,7 +405,7 @@ describe('reassign treatment', () => {
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
@@ -429,7 +413,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -442,7 +426,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             )
@@ -483,7 +467,7 @@ describe('reassign treatment', () => {
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         ).id;
 
                         addPersonnel(draftState, {
@@ -491,9 +475,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
@@ -504,9 +486,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         ).id;
                     }
@@ -541,19 +521,19 @@ describe('reassign treatment', () => {
                             draftState,
                             'red',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
                         whitePatientId = addPatient(
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         ).id;
                         addPatient(
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
@@ -561,9 +541,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
@@ -574,9 +552,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         ).id;
                     }
@@ -604,7 +580,7 @@ describe('reassign treatment', () => {
                         draftState,
                         'white',
                         'red',
-                        SimulatedRegionPosition.create(_simulatedRegion.id)
+                        newSimulatedRegionPositionIn(_simulatedRegion.id)
                     );
 
                     addPersonnel(draftState, {
@@ -612,7 +588,7 @@ describe('reassign treatment', () => {
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         id: leaderId,
                     });
@@ -634,19 +610,19 @@ describe('reassign treatment', () => {
                         draftState,
                         'red',
                         'red',
-                        SimulatedRegionPosition.create(_simulatedRegion.id)
+                        newSimulatedRegionPositionIn(_simulatedRegion.id)
                     );
                     addPatient(
                         draftState,
                         'yellow',
                         'yellow',
-                        SimulatedRegionPosition.create(_simulatedRegion.id)
+                        newSimulatedRegionPositionIn(_simulatedRegion.id)
                     );
                     addPatient(
                         draftState,
                         'green',
                         'green',
-                        SimulatedRegionPosition.create(_simulatedRegion.id)
+                        newSimulatedRegionPositionIn(_simulatedRegion.id)
                     );
 
                     addPersonnel(draftState, {
@@ -654,7 +630,7 @@ describe('reassign treatment', () => {
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         id: leaderId,
                     });
@@ -665,7 +641,7 @@ describe('reassign treatment', () => {
                             defaultPersonnelTemplates.rettSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         )
                     );
                 }
@@ -701,7 +677,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 'red',
                                 'red',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id
@@ -710,14 +686,14 @@ describe('reassign treatment', () => {
                             draftState,
                             'yellow',
                             'yellow',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
                         redPatientIds.push(
                             addPatient(
                                 draftState,
                                 'red',
                                 'red',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id
@@ -728,7 +704,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -741,7 +717,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             )
@@ -752,7 +728,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -791,19 +767,19 @@ describe('reassign treatment', () => {
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
                         yellowPatientId = addPatient(
                             draftState,
                             'yellow',
                             'yellow',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ).id;
                         addPatient(
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
@@ -811,7 +787,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -823,7 +799,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -863,7 +839,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 'green',
                                 'green',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             );
@@ -871,7 +847,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 higherStatus,
                                 higherStatus,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id;
@@ -879,7 +855,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 'green',
                                 'green',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             );
@@ -889,7 +865,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -902,7 +878,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 )
@@ -935,7 +911,7 @@ describe('reassign treatment', () => {
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
                     }
 
@@ -944,7 +920,7 @@ describe('reassign treatment', () => {
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         id: leaderId,
                     });
@@ -954,7 +930,7 @@ describe('reassign treatment', () => {
                             defaultPersonnelTemplates.san,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         canCaterFor: CanCaterFor.create(0, 0, 10, 'and'),
                     }).id;
@@ -982,7 +958,7 @@ describe('reassign treatment', () => {
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
                     }
 
@@ -991,7 +967,7 @@ describe('reassign treatment', () => {
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         id: leaderId,
                     });
@@ -1001,7 +977,7 @@ describe('reassign treatment', () => {
                             defaultPersonnelTemplates.san,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         canCaterFor: CanCaterFor.create(0, 0, 1, 'and'),
                     }).id;
@@ -1034,7 +1010,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 status,
                                 status,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             );
@@ -1044,7 +1020,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1056,7 +1032,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1097,7 +1073,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 patientStatus,
                                 patientStatus,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id;
@@ -1107,7 +1083,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1119,7 +1095,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates[higherPersonnel],
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1154,7 +1130,7 @@ describe('reassign treatment', () => {
                             draftState,
                             'red',
                             'red',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ).id;
 
                         addPersonnel(draftState, {
@@ -1162,7 +1138,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -1174,7 +1150,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -1186,7 +1162,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notarzt,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -1224,7 +1200,7 @@ describe('reassign treatment', () => {
                             draftState,
                             'red',
                             'red',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ).id;
 
                         addPersonnel(draftState, {
@@ -1232,7 +1208,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -1244,7 +1220,7 @@ describe('reassign treatment', () => {
                                 defaultPersonnelTemplates.san,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -1253,7 +1229,7 @@ describe('reassign treatment', () => {
 
                         catererId = addMaterial(
                             draftState,
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ).id;
                     }
                 );
@@ -1292,7 +1268,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 higherStatus,
                                 higherStatus,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id;
@@ -1300,7 +1276,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 lowerStatus,
                                 lowerStatus,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             );
@@ -1310,7 +1286,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1322,7 +1298,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.san,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1331,7 +1307,7 @@ describe('reassign treatment', () => {
 
                             catererId = addMaterial(
                                 draftState,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id;
@@ -1369,7 +1345,7 @@ describe('reassign treatment', () => {
                         draftState,
                         state,
                         state,
-                        SimulatedRegionPosition.create(simulatedRegion.id)
+                        newSimulatedRegionPositionIn(simulatedRegion.id)
                     );
                 }
             });
@@ -1382,7 +1358,7 @@ describe('reassign treatment', () => {
                             defaultPersonnelTemplates[type],
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         )
                     );
                 }
@@ -1436,7 +1412,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1514,7 +1490,7 @@ describe('reassign treatment', () => {
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),

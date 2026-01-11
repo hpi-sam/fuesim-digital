@@ -7,20 +7,25 @@ import {
     uuidValidationOptions,
 } from '../utils/index.js';
 import { IsIdMap, IsValue } from '../utils/validators/index.js';
-import type { PatientStatusCode, HealthPoints } from './utils/index.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
+import type {
+    PatientStatusCode,
+    HealthPoints,
+    ImageProperties,
+    Position,
+} from './utils/index.js';
 import {
     BiometricInformation,
     getCreate,
     getStatus,
     IsValidHealthPoint,
+    imagePropertiesSchema,
 } from './utils/index.js';
-import { ImageProperties } from './utils/image-properties.js';
 import { PersonalInformation } from './utils/personal-information.js';
 import { Patient } from './patient.js';
 import type { FunctionParameters } from './patient-health-state.js';
 import { PretriageInformation } from './utils/pretriage-information.js';
 import { PatientHealthState } from './patient-health-state.js';
-import type { Position } from './utils/position/position.js';
 
 export class PatientTemplate {
     @IsUUID(4, uuidValidationOptions)
@@ -37,8 +42,7 @@ export class PatientTemplate {
     @Type(() => PretriageInformation)
     public readonly pretriageInformation: PretriageInformation;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
     @IsIdMap(PatientHealthState)

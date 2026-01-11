@@ -1,7 +1,10 @@
 import type { Store } from '@ngrx/store';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { UUID, Element } from 'digital-fuesim-manv-shared';
-import { TransferPoint, TransferStartPoint } from 'digital-fuesim-manv-shared';
+import {
+    TransferPoint,
+    newTransferStartPoint,
+} from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
 import type { TranslateEvent } from 'ol/interaction/Translate';
@@ -141,7 +144,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
                                 type: '[Transfer] Add to transfer',
                                 elementType: droppedElement.type,
                                 elementId: droppedElement.id,
-                                startPoint: TransferStartPoint.create(
+                                startPoint: newTransferStartPoint(
                                     droppedOnTransferPoint.id
                                 ),
                                 targetTransferPointId: targetId,

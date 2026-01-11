@@ -1,95 +1,101 @@
-<div
-    *ngIf="transferPoint$ | async as transferPoint"
-    class="container d-flex flex-column h-100"
->
-    <p
-        *ngIf="(transferPoint.reachableTransferPoints | values).length === 0"
-        class="text-muted font-bold"
-    >
-        Es sind noch keine Transferpunkte verbunden.
-    </p>
-    <div class="mb-3 overflow-auto flex-grow-1 flex-shrink-1">
-        <ul class="list-group">
-            <li
-                *ngFor="
-                    let reachableTransferPoint of reachableTransferPoints$
-                        | async;
-                    index as index;
-                    trackBy: 'id'
-                        | appTrackByProperty: (reachableTransferPoints$ | async)
+@if (transferPoint$ | async; as transferPoint) {
+    <div class="container d-flex flex-column h-100">
+        @if ((transferPoint.reachableTransferPoints | values).length === 0) {
+            <p class="text-muted font-bold">
+                Es sind noch keine Transferpunkte verbunden.
+            </p>
+        }
+        <div class="mb-3 overflow-auto flex-grow-1 flex-shrink-1">
+            <ul class="list-group">
+                @for (
+                    reachableTransferPoint of reachableTransferPoints$ | async;
+                    track reachableTransferPoint.id;
+                    let index = $index
+                ) {
+                    <li
+                        class="list-group-item d-flex align-items-center flex-nowrap p-0"
+                    >
+                        <div
+                            class="flex-grow-1 ps-2 pe-2 text-truncate"
+                            style="max-width: 300px"
+                        >
+                            <app-transfer-point-name
+                                [transferPointId]="reachableTransferPoint.id"
+                            ></app-transfer-point-name>
+                        </div>
+                        <input
+                            required
+                            [min]="0"
+                            [max]="24 * 60"
+                            [ngModel]="
+                                reachableTransferPoint.duration / 1000 / 60
+                            "
+                            (appSaveOnTyping)="
+                                connectTransferPoint(
+                                    reachableTransferPoint.id,
+                                    $event * 1000 * 60
+                                )
+                            "
+                            [tabIndex]="index * 2 + 1"
+                            style="width: 125px"
+                            class="form-control form-control-sm"
+                            type="number"
+                            step="0.1"
+                            placeholder="Dauer"
+                            data-cy="transferPointPopupDurationInput"
+                        />
+                        <span class="ps-2 pe-2" title="Minuten">min</span>
+                        <button
+                            class="btn btn-link text-danger text-decoration-none"
+                            title="Verbindung löschen"
+                            [tabIndex]="index * 2 + 2"
+                            (click)="
+                                disconnectTransferPoint(
+                                    reachableTransferPoint.id
+                                )
+                            "
+                            data-cy="transferPointPopupRemoveOtherTransferPointButton"
+                        >
+                            <i class="bi-trash"></i>
+                        </button>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="d-inline-block">
+            <button
+                type="button"
+                class="btn btn-outline-primary"
+                [ngbPopover]="selectTargetTemplate"
+                autoClose="outside"
+                #selectTargetPopover="ngbPopover"
+                [disabled]="
+                    ((transferPointsToBeAdded$ | async)?.length ?? 0) === 0
                 "
-                class="list-group-item d-flex align-items-center flex-nowrap p-0"
+                [tabIndex]="
+                    (transferPoint.reachableTransferPoints | values).length *
+                        2 +
+                    1
+                "
+                data-cy="transferPointPopupAddOtherTransferPointButton"
             >
-                <div
-                    class="flex-grow-1 ps-2 pe-2 text-truncate"
-                    style="max-width: 300px"
-                >
-                    <app-transfer-point-name
-                        [transferPointId]="reachableTransferPoint.id"
-                    ></app-transfer-point-name>
-                </div>
-                <input
-                    required
-                    [min]="0"
-                    [max]="24 * 60"
-                    [ngModel]="reachableTransferPoint.duration / 1000 / 60"
-                    (appSaveOnTyping)="
-                        connectTransferPoint(
-                            reachableTransferPoint.id,
-                            $event * 1000 * 60
-                        )
+                <span class="bi-plus me-1"></span>
+                Hinzufügen
+            </button>
+            <ng-template #selectTargetTemplate>
+                <app-searchable-dropdown
+                    [options]="(transferPointsToBeAdded$ | async)!"
+                    (selected)="
+                        connectTransferPoint($event.key);
+                        selectTargetPopover.close()
                     "
-                    [tabIndex]="index * 2 + 1"
-                    style="width: 125px"
-                    class="form-control form-control-sm"
-                    type="number"
-                    step="0.1"
-                    placeholder="Dauer"
-                    data-cy="transferPointPopupDurationInput"
                 />
-                <span class="ps-2 pe-2" title="Minuten">min</span>
-                <button
-                    class="btn btn-link text-danger text-decoration-none"
-                    title="Verbindung löschen"
-                    [tabIndex]="index * 2 + 2"
-                    (click)="disconnectTransferPoint(reachableTransferPoint.id)"
-                    data-cy="transferPointPopupRemoveOtherTransferPointButton"
-                >
-                    <i class="bi-trash"></i>
-                </button>
-            </li>
-        </ul>
+            </ng-template>
+            @if (((transferPointsToBeAdded$ | async)?.length ?? 0) === 0) {
+                <span class="text-muted ms-2">
+                    Alle verfügbaren Ziele sind bereits verbunden.
+                </span>
+            }
+        </div>
     </div>
-    <div class="d-inline-block">
-        <button
-            type="button"
-            class="btn btn-outline-primary"
-            [ngbPopover]="selectTargetTemplate"
-            autoClose="outside"
-            #selectTargetPopover="ngbPopover"
-            [disabled]="((transferPointsToBeAdded$ | async)?.length ?? 0) === 0"
-            [tabIndex]="
-                (transferPoint.reachableTransferPoints | values).length * 2 + 1
-            "
-            data-cy="transferPointPopupAddOtherTransferPointButton"
-        >
-            <span class="bi-plus me-1"></span>
-            Hinzufügen
-        </button>
-        <ng-template #selectTargetTemplate>
-            <app-searchable-dropdown
-                [options]="(transferPointsToBeAdded$ | async)!"
-                (selected)="
-                    connectTransferPoint($event.key);
-                    selectTargetPopover.close()
-                "
-            />
-        </ng-template>
-        <span
-            *ngIf="((transferPointsToBeAdded$ | async)?.length ?? 0) === 0"
-            class="text-muted ms-2"
-        >
-            Alle verfügbaren Ziele sind bereits verbunden.
-        </span>
-    </div>
-</div>
+}

@@ -23,10 +23,12 @@
     >
         Überschreiben
     </button>
-    <div *ngIf="importingPartialExport">
-        <span class="spinner-border spinner-border-sm"></span>
-        Import läuft
-    </div>
+    @if (importingPartialExport) {
+        <div>
+            <span class="spinner-border spinner-border-sm"></span>
+            Import läuft
+        </div>
+    }
 </div>
 <div class="modal-footer">
     <button

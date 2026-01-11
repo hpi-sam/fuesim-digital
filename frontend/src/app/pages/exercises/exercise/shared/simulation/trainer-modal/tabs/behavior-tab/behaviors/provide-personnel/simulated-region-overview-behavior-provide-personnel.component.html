@@ -4,79 +4,86 @@
     Fahrzeug aus dieser Liste genommen, welches das nötige Personal enthält.
 </p>
 <p>Sie können die Elemente in die gewünschte Reihenfolge ziehen.</p>
-<div
-    ngbDropdown
-    *ngIf="vehicleTemplatesToAdd$ | async as vehicleTemplates"
-    placement="bottom-start"
-    autoClose="outside"
-    class="d-inline-block overflow-visible text-center mb-3"
->
-    <button
-        ngbDropdownToggle
-        type="button"
-        class="btn btn-outline-primary"
-        [disabled]="vehicleTemplates.length === 0"
+@if (vehicleTemplatesToAdd$ | async; as vehicleTemplates) {
+    <div
+        ngbDropdown
+        placement="bottom-start"
+        autoClose="outside"
+        class="d-inline-block overflow-visible text-center mb-3"
     >
-        <span class="bi-plus me-1"></span>
-        Anderes Fahrzeug anfordern
-    </button>
-    <div *ngIf="vehicleTemplates.length" ngbDropdownMenu>
         <button
-            *ngFor="let template of vehicleTemplates"
-            ngbDropdownItem
-            (click)="vehiclePriorityAdd(template.id)"
-            class="dropdown-item"
+            ngbDropdownToggle
+            type="button"
+            class="btn btn-outline-primary"
+            [disabled]="vehicleTemplates.length === 0"
         >
             <span class="bi-plus me-1"></span>
-            {{ template.vehicleType }}
+            Anderes Fahrzeug anfordern
         </button>
+        @if (vehicleTemplates.length) {
+            <div ngbDropdownMenu>
+                @for (template of vehicleTemplates; track template.id) {
+                    <button
+                        ngbDropdownItem
+                        (click)="vehiclePriorityAdd(template.id)"
+                        class="dropdown-item"
+                    >
+                        <span class="bi-plus me-1"></span>
+                        {{ template.vehicleType }}
+                    </button>
+                }
+            </div>
+        }
     </div>
-</div>
-<ng-container *ngIf="vehicleTemplatesCurrent$ | async as vehicleTemplates">
-    <div
-        cdkDropList
-        *ngIf="vehicleTemplates.length; else noTemplatesPrioritized"
-        (cdkDropListDropped)="vehiclePriorityReorder($event)"
-        class="align-items-center drag-list"
-    >
+}
+@if (vehicleTemplatesCurrent$ | async; as vehicleTemplates) {
+    @if (vehicleTemplates.length) {
         <div
-            *ngFor="
-                let template of vehicleTemplates;
-                trackBy: 'id' | appTrackByProperty: vehicleTemplates
-            "
-            type="button"
-            cdkDrag
-            [cdkDragData]="template.id"
-            class="drag-list-item card text-center m-1 w-100 container"
+            cdkDropList
+            (cdkDropListDropped)="vehiclePriorityReorder($event)"
+            class="align-items-center drag-list"
         >
-            <div class="card-body">
-                <div class="row align-items-center" style="max-height: 8em">
-                    <div class="col">
-                        <div class="preview-image-container p-0">
-                            <img
-                                [src]="template.image.url"
-                                class="img-fluid rounded-start"
-                            />
+            @for (template of vehicleTemplates; track template.id) {
+                <div
+                    type="button"
+                    cdkDrag
+                    [cdkDragData]="template.id"
+                    class="drag-list-item card text-center m-1 w-100 container"
+                >
+                    <div class="card-body">
+                        <div
+                            class="row align-items-center"
+                            style="max-height: 8em"
+                        >
+                            <div class="col">
+                                <div class="preview-image-container p-0">
+                                    <img
+                                        [src]="template.image.url"
+                                        class="img-fluid rounded-start"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col">
+                                <p class="fw-bold">
+                                    {{ template.vehicleType }}
+                                </p>
+                                <button
+                                    type="button"
+                                    class="btn btn-small btn-outline-danger"
+                                    (click)="vehiclePriorityRemove(template.id)"
+                                >
+                                    Nicht anfordern
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="col">
-                        <p class="fw-bold">{{ template.vehicleType }}</p>
-                        <button
-                            type="button"
-                            class="btn btn-small btn-outline-danger"
-                            (click)="vehiclePriorityRemove(template.id)"
-                        >
-                            Nicht anfordern
-                        </button>
-                    </div>
                 </div>
-            </div>
+            }
         </div>
-    </div></ng-container
->
-<ng-template #noTemplatesPrioritized>
-    <p class="text-muted">
-        Keine Priorität eingerichtet. Bei Personalmangel werden keine Fahrzeuge
-        angefordert.
-    </p>
-</ng-template>
+    } @else {
+        <p class="text-muted">
+            Keine Priorität eingerichtet. Bei Personalmangel werden keine
+            Fahrzeuge angefordert.
+        </p>
+    }
+}

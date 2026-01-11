@@ -1,23 +1,19 @@
 <h5>Bereits bekannte Standorte</h5>
 
-<ul
-    *ngIf="
-        ((connectedTransferPointNames$ | async)?.length ?? 0) !== 0;
-        else noConnectedTransferPoints
-    "
->
-    <li
-        *ngFor="
-            let connectedTransferPointName of connectedTransferPointNames$
-                | async
-        "
-    >
-        {{ connectedTransferPointName }}
-    </li>
-</ul>
-<ng-template #noConnectedTransferPoints>
+@if (((connectedTransferPointNames$ | async)?.length ?? 0) !== 0) {
+    <ul>
+        @for (
+            connectedTransferPointName of connectedTransferPointNames$ | async;
+            track connectedTransferPointName
+        ) {
+            <li>
+                {{ connectedTransferPointName }}
+            </li>
+        }
+    </ul>
+} @else {
     <p class="text-muted">Aktuell sind keine Standorte bekannt.</p>
-</ng-template>
+}
 
 <form (ngSubmit)="addConnection()" class="mt-3">
     <button
@@ -46,13 +42,15 @@
         <i class="bi bi-caret-down-fill flex-shrink-1 ms-1"></i>
     </button>
     <ng-template #selectTransferPointTemplate>
-        <app-searchable-dropdown
-            *ngIf="((transferPointsToBeAdded$ | async)?.length ?? 0) !== 0"
-            [options]="(transferPointsToBeAdded$ | async)!"
-            (selected)="
-                selectTransferPoint($event); selectTransferPointPopover.close()
-            "
-        />
+        @if (((transferPointsToBeAdded$ | async)?.length ?? 0) !== 0) {
+            <app-searchable-dropdown
+                [options]="(transferPointsToBeAdded$ | async)!"
+                (selected)="
+                    selectTransferPoint($event);
+                    selectTransferPointPopover.close()
+                "
+            />
+        }
     </ng-template>
     <button
         [disabled]="selectedTransferPoint === null || loading"
@@ -60,14 +58,14 @@
         [tabIndex]="selectedTransferPoint !== null ? 2 : -1"
     >
         Standort bekannt machen
-        <span
-            *ngIf="loading; else hotkey"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-        ></span>
-        <ng-template #hotkey>
+        @if (loading) {
+            <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+            ></span>
+        } @else {
             <app-hotkey-indicator [hotkey]="submitHotkey" class="ms-1" />
-        </ng-template>
+        }
     </button>
 </form>

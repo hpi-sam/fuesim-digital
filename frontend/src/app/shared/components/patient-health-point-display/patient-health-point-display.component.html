@@ -1,19 +1,21 @@
-<span
-    *ngIf="
-        (currentRole$ | async) === 'participant'
-            ? (status$ | async)?.visible
-            : (status$ | async)?.real as displayedStatus
-    "
-    [ngStyle]="{ 'background-color': displayedStatus }"
-    [class.text-dark]="
-        displayedStatus === 'yellow' || displayedStatus === 'white'
-    "
-    class="badge rounded-pill font-monospace"
->
-    {{
-        (currentRole$ | async) !== 'participant'
-            ? (((status$ | async)?.health ?? 0) / healthPointsDefaults.max
-              | percent)
-            : statusNames[displayedStatus]
-    }}
-</span>
+@if (
+    (currentRole$ | async) === 'participant'
+        ? (status$ | async)?.visible
+        : (status$ | async)?.real;
+    as displayedStatus
+) {
+    <span
+        [ngStyle]="{ 'background-color': displayedStatus }"
+        [class.text-dark]="
+            displayedStatus === 'yellow' || displayedStatus === 'white'
+        "
+        class="badge rounded-pill font-monospace"
+    >
+        {{
+            (currentRole$ | async) !== 'participant'
+                ? (((status$ | async)?.health ?? 0) / healthPointsDefaults.max
+                  | percent)
+                : statusNames[displayedStatus]
+        }}
+    </span>
+}

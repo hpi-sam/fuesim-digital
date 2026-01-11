@@ -1,63 +1,62 @@
 <form (ngSubmit)="startTransfer()" class="container">
     <h5>Anzahl zu sendender Fahrzeuge</h5>
 
-    <div
-        *ngFor="
-            let vehicleTemplate of vehicleTemplates$ | async | values;
-            first as first;
-            index as index;
-            trackBy: 'id' | appTrackByProperty
-        "
-        class="row"
-        [class.mt-2]="!first"
-    >
-        <ng-container
-            *appLet="
-                (availableVehicles$ | async)?.[vehicleTemplate.vehicleType] ??
-                0 as availableVehicles
-            "
-        >
-            <label class="col text-nowrap"
-                >{{ vehicleTemplate.name }}<br /><span class="text-muted">
-                    ({{ availableVehicles }} verfügbar)</span
-                ></label
-            >
-            <input
-                [ngModel]="vehicleAmounts[vehicleTemplate.vehicleType] ?? 0"
-                (ngModelChange)="
-                    vehicleAmounts[vehicleTemplate.vehicleType] = $event
+    @for (
+        vehicleTemplate of vehicleTemplates$ | async | values;
+        track vehicleTemplate.id;
+        let first = $first;
+        let index = $index
+    ) {
+        <div class="row" [class.mt-2]="!first">
+            <ng-container
+                *appLet="
+                    (availableVehicles$ | async)?.[
+                        vehicleTemplate.vehicleType
+                    ] ?? 0 as availableVehicles
                 "
-                [name]="vehicleTemplate.vehicleType + 'Count'"
-                [tabIndex]="index + 1"
-                #amountInput="ngModel"
-                required
-                appIntegerValidator
-                type="number"
-                min="0"
-                [max]="availableVehicles"
-                step="1"
-                class="form-control col ms-2"
-                style="width: 1px"
-            />
-            <div class="btn-group col-auto ms-2" role="group">
-                <button
-                    type="button"
-                    class="btn btn-outline-success"
-                    (click)="increaseAmount(vehicleTemplate.vehicleType)"
+            >
+                <label class="col text-nowrap"
+                    >{{ vehicleTemplate.name }}<br /><span class="text-muted">
+                        ({{ availableVehicles }} verfügbar)</span
+                    ></label
                 >
-                    +
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-outline-danger"
-                    (click)="decreaseAmount(vehicleTemplate.vehicleType)"
-                >
-                    -
-                </button>
-            </div>
-            <app-display-validation [ngModelInput]="amountInput" />
-        </ng-container>
-    </div>
+                <input
+                    [ngModel]="vehicleAmounts[vehicleTemplate.vehicleType] ?? 0"
+                    (ngModelChange)="
+                        vehicleAmounts[vehicleTemplate.vehicleType] = $event
+                    "
+                    [name]="vehicleTemplate.vehicleType + 'Count'"
+                    [tabIndex]="index + 1"
+                    #amountInput="ngModel"
+                    required
+                    appIntegerValidator
+                    type="number"
+                    min="0"
+                    [max]="availableVehicles"
+                    step="1"
+                    class="form-control col ms-2"
+                    style="width: 1px"
+                />
+                <div class="btn-group col-auto ms-2" role="group">
+                    <button
+                        type="button"
+                        class="btn btn-outline-success"
+                        (click)="increaseAmount(vehicleTemplate.vehicleType)"
+                    >
+                        +
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        (click)="decreaseAmount(vehicleTemplate.vehicleType)"
+                    >
+                        -
+                    </button>
+                </div>
+                <app-display-validation [ngModelInput]="amountInput" />
+            </ng-container>
+        </div>
+    }
     <div class="mt-2 d-flex flex-row align-items-center">
         <label class="flex-shrink-1 text-nowrap">nach</label>
         <button
@@ -88,11 +87,14 @@
             <i class="bi bi-caret-down-fill flex-shrink-1 ms-1"></i>
         </button>
         <ng-template #selectTargetTemplate>
-            <app-searchable-dropdown
-                *ngIf="((availableTargets$ | async)?.length ?? 0) !== 0"
-                [options]="(availableTargets$ | async)!"
-                (selected)="selectTarget($event); selectTargetPopover.close()"
-            />
+            @if (((availableTargets$ | async)?.length ?? 0) !== 0) {
+                <app-searchable-dropdown
+                    [options]="(availableTargets$ | async)!"
+                    (selected)="
+                        selectTarget($event); selectTargetPopover.close()
+                    "
+                />
+            }
         </ng-template>
     </div>
     <button
@@ -105,14 +107,14 @@
         "
     >
         Sende Fahrzeuge
-        <span
-            *ngIf="loading; else hotkey"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-        ></span>
-        <ng-template #hotkey>
+        @if (loading) {
+            <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+            ></span>
+        } @else {
             <app-hotkey-indicator [hotkey]="submitHotkey" class="ms-1" />
-        </ng-template>
+        }
     </button>
 </form>

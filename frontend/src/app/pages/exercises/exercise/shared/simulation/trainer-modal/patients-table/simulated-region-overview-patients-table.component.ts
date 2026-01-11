@@ -16,7 +16,7 @@ export type Scope = 'simulatedRegion' | 'vehicle';
 })
 export class SimulatedRegionOverviewPatientsTableComponent {
     @Input()
-    patients!: PatientWithVisibleStatus[];
+    patients: PatientWithVisibleStatus[] = [];
 
     @Input()
     selectedPatientId?: UUID;

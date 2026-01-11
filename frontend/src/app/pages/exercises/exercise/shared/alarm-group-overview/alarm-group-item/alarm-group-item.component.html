@@ -20,17 +20,19 @@
             Fahrzeug hinzufügen
         </button>
         <div ngbDropdownMenu data-cy="alarmGroupAddVehicleSelect">
-            <button
-                *ngFor="
-                    let vehicleTemplate of vehicleTemplates$ | async | values
-                "
-                ngbDropdownItem
-                (click)="createAlarmGroupVehicle(vehicleTemplate.id)"
-                type="button"
-                class="btn"
-            >
-                <i class="bi bi-plus"></i> {{ vehicleTemplate.vehicleType }}
-            </button>
+            @for (
+                vehicleTemplate of vehicleTemplates$ | async | values;
+                track vehicleTemplate.id
+            ) {
+                <button
+                    ngbDropdownItem
+                    (click)="createAlarmGroupVehicle(vehicleTemplate.id)"
+                    type="button"
+                    class="btn"
+                >
+                    <i class="bi bi-plus"></i> {{ vehicleTemplate.vehicleType }}
+                </button>
+            }
         </div>
     </div>
 
@@ -43,77 +45,72 @@
     </button>
 </h2>
 
-<div
-    *ngIf="
-        (alarmGroup.alarmGroupVehicles | values).length > 0;
-        else noAlarmGroupVehicles
-    "
-    class="d-flex flex-wrap"
->
-    <div
-        *ngFor="
-            let alarmGroupVehicle of alarmGroup.alarmGroupVehicles | values;
-            trackBy: 'id'
-                | appTrackByProperty: (alarmGroup.alarmGroupVehicles | values)
-        "
-        class="card text-center m-1"
-        style="width: 10rem; text-overflow: ellipsis; height: auto"
-    >
-        <div>
+@if ((alarmGroup.alarmGroupVehicles | values).length > 0) {
+    <div class="d-flex flex-wrap">
+        @for (
+            alarmGroupVehicle of alarmGroup.alarmGroupVehicles | values;
+            track alarmGroupVehicle.id
+        ) {
             <div
-                title="Zeit bis zur Ankunft"
-                class="input-group input-group-sm float-start"
-                style="width: 100px"
+                class="card text-center m-1"
+                style="width: 10rem; text-overflow: ellipsis; height: auto"
             >
-                <!-- The input is in minutes -->
+                <div>
+                    <div
+                        title="Zeit bis zur Ankunft"
+                        class="input-group input-group-sm float-start"
+                        style="width: 100px"
+                    >
+                        <!-- The input is in minutes -->
+                        <input
+                            #timeInput="ngModel"
+                            [ngModel]="alarmGroupVehicle.time / 60 / 1000"
+                            (appSaveOnTyping)="
+                                editAlarmGroupVehicle(
+                                    alarmGroupVehicle.id,
+                                    $event * 60 * 1000,
+                                    alarmGroupVehicle.name
+                                )
+                            "
+                            min="0"
+                            required
+                            step="1"
+                            type="number"
+                            class="form-control form-control-sm d-inline-block no-validation"
+                            data-cy="alarmGroupVehicleDelayInput"
+                        />
+                        <span class="input-group-text">Min</span>
+                    </div>
+                    <button
+                        (click)="removeVehicleTemplate(alarmGroupVehicle.id)"
+                        class="btn btn-sm btn-outline-danger float-end"
+                        data-cy="alarmGroupRemoveVehicleButton"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+                <app-vehicle-template-display
+                    [vehicleTemplateId]="alarmGroupVehicle.vehicleTemplateId"
+                >
+                </app-vehicle-template-display>
                 <input
-                    #timeInput="ngModel"
-                    [ngModel]="alarmGroupVehicle.time / 60 / 1000"
+                    #nameInput="ngModel"
+                    [ngModel]="alarmGroupVehicle.name"
                     (appSaveOnTyping)="
                         editAlarmGroupVehicle(
                             alarmGroupVehicle.id,
-                            $event * 60 * 1000,
-                            alarmGroupVehicle.name
+                            alarmGroupVehicle.time,
+                            $event
                         )
                     "
-                    min="0"
                     required
-                    step="1"
-                    type="number"
-                    class="form-control form-control-sm d-inline-block no-validation"
-                    data-cy="alarmGroupVehicleDelayInput"
+                    placeholder="Name"
+                    type="text"
+                    class="form-control form-control-sm d-inline-block fw-bold"
                 />
-                <span class="input-group-text">Min</span>
             </div>
-            <button
-                (click)="removeVehicleTemplate(alarmGroupVehicle.id)"
-                class="btn btn-sm btn-outline-danger float-end"
-                data-cy="alarmGroupRemoveVehicleButton"
-            >
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
-        <app-vehicle-template-display
-            [vehicleTemplateId]="alarmGroupVehicle.vehicleTemplateId"
-        >
-        </app-vehicle-template-display>
-        <input
-            #nameInput="ngModel"
-            [ngModel]="alarmGroupVehicle.name"
-            (appSaveOnTyping)="
-                editAlarmGroupVehicle(
-                    alarmGroupVehicle.id,
-                    alarmGroupVehicle.time,
-                    $event
-                )
-            "
-            required
-            placeholder="Name"
-            type="text"
-            class="form-control form-control-sm d-inline-block fw-bold"
-        />
+        }
     </div>
-</div>
-<ng-template #noAlarmGroupVehicles>
+} @else {
     <div class="text-muted mt-3 mb-3">Keine Fahrzeuge zugewiesen</div>
-</ng-template>
+}

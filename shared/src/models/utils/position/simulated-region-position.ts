@@ -1,39 +1,21 @@
-import { IsUUID } from 'class-validator';
+import * as z from 'zod';
 import type { UUID } from '../../../utils/index.js';
-import { uuidValidationOptions } from '../../../utils/index.js';
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../get-create.js';
-import {
-    // import needed to display @link Links in Comments
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isInSimulatedRegion,
-    // import needed to display @link Links in Comments
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isNotInSimulatedRegion,
-    // import needed to display @link Links in Comments
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    currentSimulatedRegionIdOf,
-} from './position-helpers.js';
 
-export class SimulatedRegionPosition {
+export const simulatedRegionPositionSchema = z.strictObject({
+    type: z.literal('simulatedRegion'),
     /**
-     * @deprecated Use {@link isInSimulatedRegion } or {@link isNotInSimulatedRegion} instead
+     * @deprecated Use {@link isInSimulatedRegion } instead
      */
-    @IsValue('simulatedRegion')
-    public readonly type = 'simulatedRegion';
+    simulatedRegionId: z.uuidv4(),
+});
 
-    /**
-     * @deprecated Use {@link currentSimulatedRegionIdOf } instead
-     */
-    @IsUUID(4, uuidValidationOptions)
-    public readonly simulatedRegionId: UUID;
+export type SimulatedRegionPosition = z.infer<
+    typeof simulatedRegionPositionSchema
+>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(simulatedRegionId: UUID) {
-        this.simulatedRegionId = simulatedRegionId;
-    }
-
-    static readonly create = getCreate(this);
-}
+export const newSimulatedRegionPositionIn = (
+    simulatedRegionId: UUID
+): SimulatedRegionPosition => ({
+    type: 'simulatedRegion',
+    simulatedRegionId,
+});

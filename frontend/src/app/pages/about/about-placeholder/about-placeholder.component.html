@@ -7,11 +7,9 @@
         <a routerLink="/">Zur Startseite</a>
     </p>
 
-    <div
-        *ngIf="content$ | async; else placeholder"
-        [innerHTML]="content$ | async"
-    ></div>
-    <ng-template #placeholder>
+    @if (content$ | async) {
+        <div [innerHTML]="content$ | async"></div>
+    } @else {
         <p>
             Sie können den Inhalt der Seite unter
             <code>frontend/src/assets/about/{{ contentFile }}</code> bearbeiten.
@@ -21,7 +19,7 @@
             <code>docker-compose.yml</code> Beispiel-Datei eine Anleitung, wie
             Sie Inhalte für diese Seite bereitstellen können.
         </p>
-    </ng-template>
+    }
 
     <div class="my-4 p-2 bg-light rounded-3">
         <app-footer />

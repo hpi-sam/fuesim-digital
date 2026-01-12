@@ -1,15 +1,10 @@
-import { Type } from 'class-transformer';
-import {
-    IsUUID,
-    IsString,
-    ValidateNested,
-    IsNumber,
-    IsArray,
-} from 'class-validator';
+import { IsUUID, IsString, IsNumber, IsArray } from 'class-validator';
 import type { UUID } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
 import { IsValue } from '../utils/validators/index.js';
-import { ImageProperties, getCreate } from './utils/index.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
+import { imagePropertiesSchema, getCreate } from './utils/index.js';
+import type { ImageProperties } from './utils/index.js';
 
 export class VehicleTemplate {
     @IsUUID(4, uuidValidationOptions)
@@ -24,8 +19,7 @@ export class VehicleTemplate {
     @IsString()
     public readonly name: string;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
     @IsNumber()

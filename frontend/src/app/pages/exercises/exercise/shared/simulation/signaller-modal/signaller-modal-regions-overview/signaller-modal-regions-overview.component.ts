@@ -1,6 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { UUID } from 'digital-fuesim-manv-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import {
@@ -18,10 +19,12 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
     regions$!: Observable<
         (
             | {
+                  id: UUID;
                   name: string;
                   hasLeader: false;
               }
             | {
+                  id: UUID;
                   name: string;
                   hasLeader: true;
                   leaderName: string;
@@ -45,6 +48,7 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
 
                     if (!assignLeaderBehavior?.leaderId) {
                         return {
+                            id: simulatedRegion.id,
                             name: simulatedRegion.name,
                             hasLeader: false as const,
                         };
@@ -54,6 +58,7 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
 
                     if (!leader) {
                         return {
+                            id: simulatedRegion.id,
                             name: simulatedRegion.name,
                             hasLeader: false as const,
                         };

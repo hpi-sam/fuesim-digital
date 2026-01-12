@@ -18,23 +18,27 @@ import {
     IsUUIDSet,
     IsValue,
 } from '../utils/validators/index.js';
-import { IsPosition } from '../utils/validators/is-position.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
 import { PatientHealthState } from './patient-health-state.js';
-import type { Position } from './utils/position/position.js';
+import type {
+    Position,
+    PatientStatus,
+    ImageProperties,
+    HealthPoints,
+} from './utils/index.js';
 import { PersonalInformation } from './utils/personal-information.js';
 import { PretriageInformation } from './utils/pretriage-information.js';
-import { BiometricInformation } from './utils/biometric-information.js';
-import { PatientStatusCode } from './utils/patient-status-code.js';
-import type { PatientStatus } from './utils/patient-status.js';
-import { patientStatusAllowedValues } from './utils/patient-status.js';
-import { ImageProperties } from './utils/image-properties.js';
-import type { HealthPoints } from './utils/health-points.js';
-import { healthPointsDefaults } from './utils/health-points.js';
-import { getCreate } from './utils/get-create.js';
 import {
+    BiometricInformation,
+    PatientStatusCode,
+    patientStatusAllowedValues,
+    healthPointsDefaults,
+    getCreate,
     isInSimulatedRegion,
     isOnMap,
-} from './utils/position/position-helpers.js';
+    imagePropertiesSchema,
+    IsPosition,
+} from './utils/index.js';
 
 export class Patient {
     @IsUUID(4, uuidValidationOptions)
@@ -77,15 +81,13 @@ export class Patient {
     @IsLiteralUnion(patientStatusAllowedValues)
     public readonly realStatus: PatientStatus;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
     /**
      * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
      */
     @IsPosition()
-    @ValidateNested()
     public readonly position: Position;
 
     /**

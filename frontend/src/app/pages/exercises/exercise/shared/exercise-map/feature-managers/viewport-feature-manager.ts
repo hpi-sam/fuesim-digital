@@ -1,6 +1,10 @@
 import type { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
-import { MapCoordinates, Size, Viewport } from 'digital-fuesim-manv-shared';
+import {
+    newMapCoordinatesAt,
+    Size,
+    Viewport,
+} from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type { Coordinate } from 'ol/coordinate';
 import type { Polygon } from 'ol/geom';
@@ -114,7 +118,7 @@ export class ViewportFeatureManager
                     {
                         type: '[Viewport] Resize viewport',
                         viewportId: element.id,
-                        targetPosition: MapCoordinates.create(
+                        targetPosition: newMapCoordinatesAt(
                             topLeftCoordinate[0]!,
                             topLeftCoordinate[1]!
                         ),

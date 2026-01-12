@@ -30,20 +30,24 @@
     <ul
         class="flex-grow-1 flex-shrink-1 list-group list-group-horizontal overflow-auto"
     >
-        <button
-            *ngFor="
-                let simulatedRegion of simulatedRegionNames$ | async;
-                trackBy: 'key' | appTrackByProperty
-            "
-            [id]="'signaller-modal-simulated-region-tab-' + simulatedRegion.key"
-            class="list-group-item list-group-item-action w-auto text-nowrap"
-            [class.active]="
-                simulatedRegion.key ===
-                (selectRegionService.selectedSimulatedRegion$ | async)
-            "
-            (click)="selectRegion(simulatedRegion)"
-        >
-            {{ simulatedRegion.name }}
-        </button>
+        @for (
+            simulatedRegion of simulatedRegionNames$ | async;
+            track simulatedRegion.key
+        ) {
+            <button
+                [id]="
+                    'signaller-modal-simulated-region-tab-' +
+                    simulatedRegion.key
+                "
+                class="list-group-item list-group-item-action w-auto text-nowrap"
+                [class.active]="
+                    simulatedRegion.key ===
+                    (selectRegionService.selectedSimulatedRegion$ | async)
+                "
+                (click)="selectRegion(simulatedRegion)"
+            >
+                {{ simulatedRegion.name }}
+            </button>
+        }
     </ul>
 </div>

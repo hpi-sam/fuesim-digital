@@ -7,17 +7,17 @@ import {
     Min,
 } from 'class-validator';
 import { difference } from 'lodash-es';
-import { Type } from 'class-transformer';
-import type { ExerciseOccupation } from '../../models/utils/index.js';
 import {
-    SimulatedRegionPosition,
-    VehiclePosition,
+    type ExerciseOccupation,
+    newSimulatedRegionPositionIn,
+    newVehiclePositionIn,
+    exerciseOccupationSchema,
     changeOccupation,
     createVehicleActionTag,
     getCreate,
     isInSpecificSimulatedRegion,
-    occupationTypeOptions,
-} from '../../models/utils/index.js';
+    newIntermediateOccupation,
+} from '../../models/index.js';
 import type { UUID, UUIDSet } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import {
@@ -40,9 +40,9 @@ import {
     StartTransferEvent,
 } from '../events/index.js';
 import { completelyLoadVehicle } from '../../store/action-reducers/utils/completely-load-vehicle.js';
-import { IntermediateOccupation } from '../../models/utils/occupations/intermediate-occupation.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
 import { logVehicle } from '../../store/action-reducers/utils/log.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type {
     SimulationActivity,
     SimulationActivityState,
@@ -91,8 +91,7 @@ export class LoadVehicleActivityState implements SimulationActivityState {
     @Min(0)
     public readonly startTime: number = 0;
 
-    @IsOptional()
-    @Type(...occupationTypeOptions)
+    @IsZodSchema(exerciseOccupationSchema.optional())
     readonly successorOccupation?: ExerciseOccupation;
 
     /**
@@ -229,7 +228,7 @@ export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
                 patientsToUnload.forEach((patientId) => {
                     changePositionWithId(
                         patientId,
-                        SimulatedRegionPosition.create(simulatedRegion.id),
+                        newSimulatedRegionPositionIn(simulatedRegion.id),
                         'patient',
                         draftState
                     );
@@ -248,7 +247,7 @@ export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
                 patientsToLoad.forEach((patientId) => {
                     changePositionWithId(
                         patientId,
-                        VehiclePosition.create(vehicle.id),
+                        newVehiclePositionIn(vehicle.id),
                         'patient',
                         draftState
                     );
@@ -299,7 +298,7 @@ export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
                 changeOccupation(
                     draftState,
                     vehicle,
-                    IntermediateOccupation.create(
+                    newIntermediateOccupation(
                         draftState.currentTime + tickInterval
                     )
                 );

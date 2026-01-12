@@ -11,10 +11,15 @@ import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import type { UUID, UUIDSet } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
 import { IsUUIDSet, IsValue } from '../utils/validators/index.js';
-import { IsPosition } from '../utils/validators/is-position.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
 import type { PersonnelTemplate } from './personnel-template.js';
-import { CanCaterFor, ImageProperties, getCreate } from './utils/index.js';
-import type { Position } from './utils/position/position.js';
+import {
+    imagePropertiesSchema,
+    getCreate,
+    CanCaterFor,
+    IsPosition,
+} from './utils/index.js';
+import type { ImageProperties, Position } from './utils/index.js';
 
 export class Personnel {
     @IsUUID(4, uuidValidationOptions)
@@ -71,15 +76,13 @@ export class Personnel {
     @Max(maxTreatmentRange)
     public readonly treatmentRange: number;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
     /**
      * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
      */
     @IsPosition()
-    @ValidateNested()
     public readonly position: Position;
 
     /**

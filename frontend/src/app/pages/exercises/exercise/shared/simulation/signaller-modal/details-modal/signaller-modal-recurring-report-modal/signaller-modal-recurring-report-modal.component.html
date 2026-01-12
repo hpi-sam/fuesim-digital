@@ -1,4 +1,4 @@
-<ng-container *ngIf="reportBehaviorId; else noReports">
+@if (reportBehaviorId) {
     <h5>{{ humanReadableReportType }}</h5>
 
     <form (ngSubmit)="submit()">
@@ -35,22 +35,21 @@
             [disabled]="loading"
         >
             Speichern
-            <span
-                *ngIf="loading; else hotkey"
-                class="spinner-border spinner-border-sm"
-                role="status"
-                aria-hidden="true"
-            ></span>
-            <ng-template #hotkey>
+            @if (loading) {
+                <span
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                ></span>
+            } @else {
                 <app-hotkey-indicator keys="Enter" />
-            </ng-template>
+            }
         </button>
     </form>
-</ng-container>
-<ng-template #noReports>
+} @else {
     <div class="modal-body">
         <span class="text-danger">
             Der gewünschte simulierte Bereich kann keine Berichte erstellen.
         </span>
     </div>
-</ng-template>
+}

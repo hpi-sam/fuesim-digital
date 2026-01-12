@@ -1,87 +1,88 @@
-<ng-container *ngIf="behaviorState$ | async as behaviorState">
-    <ng-container
-        *ngIf="
-            possibleNewVehicleTypesForTransport$
-                | async as possibleNewVehicleTypesForTransport
-        "
-    >
-        <div
-            *ngFor="let patientStatus of patientStatusForTransport"
-            class="mb-3"
-        >
-            <h5><app-patient-status-badge [status]="patientStatus" /></h5>
+@if (behaviorState$ | async; as behaviorState) {
+    @if (
+        possibleNewVehicleTypesForTransport$ | async;
+        as possibleNewVehicleTypesForTransport
+    ) {
+        @for (patientStatus of patientStatusForTransport; track patientStatus) {
+            <div class="mb-3">
+                <h5><app-patient-status-badge [status]="patientStatus" /></h5>
 
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="mb-1">
-                    <span
-                        *ngFor="
-                            let vehicle of behaviorState.vehiclesForPatients[
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="mb-1">
+                        @for (
+                            vehicle of behaviorState.vehiclesForPatients[
                                 patientStatus
-                            ]
-                        "
-                        class="badge rounded-pill text-bg-info me-1 text-center"
-                    >
-                        {{ vehicle }}
-                        <span
-                            class="bi-x"
-                            role="button"
-                            (click)="
-                                removeVehicleTypeForPatientTransport(
-                                    vehicle,
-                                    patientStatus
-                                )
-                            "
-                        ></span>
-                    </span>
-                </div>
+                            ];
+                            track vehicle
+                        ) {
+                            <span
+                                class="badge rounded-pill text-bg-info me-1 text-center"
+                            >
+                                {{ vehicle }}
+                                <span
+                                    class="bi-x"
+                                    role="button"
+                                    (click)="
+                                        removeVehicleTypeForPatientTransport(
+                                            vehicle,
+                                            patientStatus
+                                        )
+                                    "
+                                ></span>
+                            </span>
+                        }
+                    </div>
 
-                <div
-                    ngbDropdown
-                    placement="bottom-start"
-                    autoClose="outside"
-                    class="d-inline overflow-visible text-center"
-                >
-                    <button
-                        ngbDropdownToggle
-                        type="button"
-                        class="btn btn-outline-primary"
-                        [disabled]="
-                            possibleNewVehicleTypesForTransport[patientStatus]
-                                .length === 0
-                        "
-                    >
-                        <span class="bi-plus me-1"></span>
-                        Weiteres Fahrzeug hinzufügen
-                    </button>
                     <div
-                        *ngIf="
-                            possibleNewVehicleTypesForTransport[patientStatus]
-                                .length > 0
-                        "
-                        ngbDropdownMenu
+                        ngbDropdown
+                        placement="bottom-start"
+                        autoClose="outside"
+                        class="d-inline overflow-visible text-center"
                     >
                         <button
-                            *ngFor="
-                                let possibleNewVehicle of possibleNewVehicleTypesForTransport[
-                                    patientStatus
-                                ]
-                            "
-                            ngbDropdownItem
-                            class="dropdown-item"
+                            ngbDropdownToggle
                             type="button"
-                            (click)="
-                                addVehicleTypeForPatientTransport(
-                                    possibleNewVehicle,
+                            class="btn btn-outline-primary"
+                            [disabled]="
+                                possibleNewVehicleTypesForTransport[
                                     patientStatus
-                                )
+                                ].length === 0
                             "
                         >
                             <span class="bi-plus me-1"></span>
-                            {{ possibleNewVehicle }}
+                            Weiteres Fahrzeug hinzufügen
                         </button>
+                        @if (
+                            possibleNewVehicleTypesForTransport[patientStatus]
+                                .length > 0
+                        ) {
+                            <div ngbDropdownMenu>
+                                @for (
+                                    possibleNewVehicle of possibleNewVehicleTypesForTransport[
+                                        patientStatus
+                                    ];
+                                    track possibleNewVehicle
+                                ) {
+                                    <button
+                                        ngbDropdownItem
+                                        class="dropdown-item"
+                                        type="button"
+                                        (click)="
+                                            addVehicleTypeForPatientTransport(
+                                                possibleNewVehicle,
+                                                patientStatus
+                                            )
+                                        "
+                                    >
+                                        <span class="bi-plus me-1"></span>
+                                        {{ possibleNewVehicle }}
+                                    </button>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
-        </div>
-    </ng-container>
-</ng-container>
+        }
+    }
+}

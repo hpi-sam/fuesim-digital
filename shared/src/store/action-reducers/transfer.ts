@@ -1,18 +1,17 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsUUID, ValidateNested } from 'class-validator';
-import type { StartPoint, MapPosition } from '../../models/utils/index.js';
+import { IsInt, IsOptional, IsUUID } from 'class-validator';
 import {
+    type StartPoint,
+    type MapPosition,
+    newTransferPositionFor,
+    startPointSchema,
     isPositionOnMap,
     isInTransfer,
-    isNotInTransfer,
     currentTransferOf,
-    TransferPosition,
-    startPointTypeOptions,
     isPositionInSimulatedRegion,
     simulatedRegionIdOfPosition,
     createVehicleActionTag,
     createTransferPointTag,
-} from '../../models/utils/index.js';
+} from '../../models/index.js';
 import {
     changePosition,
     offsetMapPositionBy,
@@ -25,11 +24,14 @@ import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import { TransferPoint } from '../../models/transfer-point.js';
-import { PersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
-import { VehicleArrivedEvent } from '../../simulation/events/vehicle-arrived.js';
-import { imageSizeToPosition } from '../../state-helpers/image-size-to-position.js';
+import { TransferPoint } from '../../models/index.js';
+import {
+    PersonnelAvailableEvent,
+    VehicleArrivedEvent,
+} from '../../simulation/index.js';
+import { imageSizeToPosition } from '../../state-helpers/index.js';
 import type { Vehicle } from '../../models/vehicle.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { getElement } from './utils/index.js';
 import {
     logElementAddedToTransfer,
@@ -55,7 +57,7 @@ export function letElementArrive(
 ) {
     const element = getElement(draftState, elementType, elementId);
     // check that element is in transfer, this should be always the case where this function is used
-    if (isNotInTransfer(element)) {
+    if (!isInTransfer(element)) {
         throw getNotInTransferError(element.id);
     }
     const targetTransferPoint = getElement(
@@ -115,8 +117,7 @@ export class AddToTransferAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly elementId!: UUID;
 
-    @ValidateNested()
-    @Type(() => Object, startPointTypeOptions)
+    @IsZodSchema(startPointSchema)
     public readonly startPoint!: StartPoint;
 
     @IsUUID(4, uuidValidationOptions)
@@ -214,7 +215,7 @@ export namespace TransferActionReducers {
             // Set the element to transfer
             changePosition(
                 element,
-                TransferPosition.create({
+                newTransferPositionFor({
                     startPoint: cloneDeepMutable(startPoint),
                     targetTransferPointId,
                     endTimeStamp: draftState.currentTime + duration,
@@ -249,7 +250,7 @@ export namespace TransferActionReducers {
             { elementType, elementId, targetTransferPointId, timeToAdd }
         ) => {
             const element = getElement(draftState, elementType, elementId);
-            if (isNotInTransfer(element)) {
+            if (!isInTransfer(element)) {
                 throw getNotInTransferError(element.id);
             }
             const newTransfer = cloneDeepMutable(currentTransferOf(element));
@@ -278,7 +279,7 @@ export namespace TransferActionReducers {
             );
             changePosition(
                 element,
-                TransferPosition.create(newTransfer),
+                newTransferPositionFor(newTransfer),
                 draftState
             );
             return draftState;
@@ -295,7 +296,7 @@ export namespace TransferActionReducers {
             // check if transferPoint exists
             getElement(draftState, 'transferPoint', targetTransferPointId);
             const element = getElement(draftState, elementType, elementId);
-            if (isNotInTransfer(element)) {
+            if (!isInTransfer(element)) {
                 throw getNotInTransferError(element.id);
             }
             logTransferFinished(
@@ -315,7 +316,7 @@ export namespace TransferActionReducers {
             action: TogglePauseTransferAction,
             reducer: (draftState, { elementType, elementId }) => {
                 const element = getElement(draftState, elementType, elementId);
-                if (isNotInTransfer(element)) {
+                if (!isInTransfer(element)) {
                     throw getNotInTransferError(element.id);
                 }
                 const newTransfer = cloneDeepMutable(
@@ -331,7 +332,7 @@ export namespace TransferActionReducers {
                 );
                 changePosition(
                     element,
-                    TransferPosition.create(newTransfer),
+                    newTransferPositionFor(newTransfer),
                     draftState
                 );
                 return draftState;

@@ -1,5 +1,4 @@
-import type { UUID } from './index.js';
+import * as z from 'zod';
 
-export type UUIDSet = {
-    readonly [key in UUID]: true;
-};
+export const uuidSetSchema = z.record(z.uuidv4(), z.literal(true));
+export type UUIDSet = z.infer<typeof uuidSetSchema>;

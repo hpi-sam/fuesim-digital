@@ -1,4 +1,5 @@
 import { Type } from 'class-transformer';
+import * as z from 'zod';
 import {
     Equals,
     IsArray,
@@ -28,18 +29,16 @@ import {
     Vehicle,
     VehicleTemplate,
     Viewport,
-} from './models/index.js';
-import { ExerciseConfiguration } from './models/exercise-configuration.js';
-import { MaterialTemplate } from './models/material-template.js';
-import { PersonnelTemplate } from './models/personnel-template.js';
-import type { ExerciseRadiogram } from './models/radiogram/exercise-radiogram.js';
-import { getRadiogramConstructor } from './models/radiogram/exercise-radiogram.js';
-import type { ExerciseStatus } from './models/utils/index.js';
-import {
+    ExerciseConfiguration,
     exerciseStatusAllowedValues,
     getCreate,
     SpatialTree,
-} from './models/utils/index.js';
+    MaterialTemplate,
+    PersonnelTemplate,
+} from './models/index.js';
+import type { ExerciseStatus, LogEntry } from './models/index.js';
+import type { ExerciseRadiogram } from './models/radiogram/index.js';
+import { getRadiogramConstructor } from './models/radiogram/index.js';
 import {
     RandomState,
     seededRandomState,
@@ -55,12 +54,13 @@ import {
 import {
     createCatchAllHospital,
     catchAllHospitalId,
-} from './data/default-state/catch-all-hospital.js';
-import { defaultPatientCategories } from './data/default-state/patient-templates.js';
+    defaultPatientCategories,
+    defaultMapImagesTemplatesById,
+} from './data/index.js';
+import { IsZodSchema } from './utils/validators/is-zod-object.js';
+import { vehicleSchema } from './models/vehicle.js';
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
-import { defaultMapImagesTemplatesById } from './data/default-state/map-images-templates.js';
-import type { LogEntry } from './models/log-entry.js';
-import type { TreatmentAssignment } from './store/action-reducers/exercise.js';
+import type { TreatmentAssignment } from './store/index.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -88,8 +88,10 @@ export class ExerciseState {
     public readonly simulatedRegions: {
         readonly [key: UUID]: SimulatedRegion;
     } = {};
-    @IsIdMap(Vehicle)
+
+    @IsZodSchema(z.record(z.uuidv4(), vehicleSchema))
     public readonly vehicles: { readonly [key: UUID]: Vehicle } = {};
+
     @IsIdMap(Personnel)
     public readonly personnel: { readonly [key: UUID]: Personnel } = {};
     @IsIdMap(Patient)

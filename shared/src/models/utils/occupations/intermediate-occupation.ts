@@ -1,22 +1,17 @@
-import { IsInt, Min } from 'class-validator';
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../get-create.js';
-import type { Occupation } from './occupation.js';
+import * as z from 'zod';
 
-export class IntermediateOccupation implements Occupation {
-    @IsValue('intermediateOccupation')
-    readonly type = 'intermediateOccupation';
+export const intermediateOccupationSchema = z.strictObject({
+    type: z.literal('intermediateOccupation'),
+    unoccupiedUntil: z.int().nonnegative(),
+});
 
-    @IsInt()
-    @Min(0)
-    readonly unoccupiedUntil: number;
+export type IntermediateOccupation = z.infer<
+    typeof intermediateOccupationSchema
+>;
 
-    /**
-     * @deprecated Use static `create` method instead.
-     */
-    constructor(unoccupiedUntil: number) {
-        this.unoccupiedUntil = unoccupiedUntil;
-    }
-
-    static readonly create = getCreate(this);
-}
+export const newIntermediateOccupation = (
+    unoccupiedUntil: number
+): IntermediateOccupation => ({
+    type: 'intermediateOccupation',
+    unoccupiedUntil,
+});

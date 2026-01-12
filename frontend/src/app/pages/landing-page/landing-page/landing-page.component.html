@@ -58,10 +58,9 @@
             >
                 <i class="bi-cloud-upload me-2"> </i>
                 Übung importieren
-                <span
-                    *ngIf="importingExercise"
-                    class="spinner-border spinner-border-sm"
-                ></span>
+                @if (importingExercise) {
+                    <span class="spinner-border spinner-border-sm"></span>
+                }
                 <input
                     (appFileInput)="importExerciseState($event)"
                     type="file"
@@ -72,17 +71,19 @@
             </label>
         </div>
 
-        <p *ngIf="exerciseHasBeenCreated" class="mb-0">
-            Sie haben eine Übung mit der Übungsleitungs-ID
-            <span class="font-monospace fw-bolder user-select-all">{{
-                trainerId
-            }}</span>
-            und der Teilnehmer-ID
-            <span class="font-monospace fw-bolder user-select-all">{{
-                participantId
-            }}</span>
-            erstellt.
-        </p>
+        @if (exerciseHasBeenCreated) {
+            <p class="mb-0">
+                Sie haben eine Übung mit der Übungsleitungs-ID
+                <span class="font-monospace fw-bolder user-select-all">{{
+                    trainerId
+                }}</span>
+                und der Teilnehmer-ID
+                <span class="font-monospace fw-bolder user-select-all">{{
+                    participantId
+                }}</span>
+                erstellt.
+            </p>
+        }
     </div>
 
     <div class="mb-4 rounded-3">

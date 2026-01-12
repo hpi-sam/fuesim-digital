@@ -1,172 +1,180 @@
-<div
-    *ngIf="exerciseStateMode$ | async as mode"
-    class="p-2 d-flex flex-column"
-    style="height: 100vh"
->
-    <div class="px-2">
-        <h2>
-            Übung:
-            <span class="font-monospace fw-bold user-select-all">{{
-                participantId$ | async
-            }}</span>
-            <ng-container *ngIf="mode === 'exercise'">
-                <app-exercise-state-badge
-                    class="ms-3"
-                ></app-exercise-state-badge>
-                <button
-                    *ngIf="participantId$ | async"
-                    (click)="shareExercise('participantId')"
-                    class="btn btn-light ms-3"
-                    ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen von Ihnen bestätigt werden."
-                >
-                    Teilnehmerlink teilen
-                </button>
-                <button
-                    *ngIf="
-                        (ownClient$ | async)?.role?.mainRole !== 'participant'
-                    "
-                    (click)="shareExercise('trainerId')"
-                    class="btn btn-outline-warning ms-3"
-                    ngbTooltip="Über diesen Link können weitere Personen diese Übung verwalten. Teilen Sie diesen Link nicht mit Teilnehmenden!"
-                >
-                    Übungsleiterlink teilen
-                </button>
-            </ng-container>
-            <button
-                *ngIf="mode === 'timeTravel'"
-                class="btn btn-outline-primary ms-3"
-                (click)="leaveTimeTravel()"
-            >
-                <i class="bi-box-arrow-left"></i>
-                Übung wieder beitreten
-            </button>
-            <div class="d-inline-block float-end">
-                <div ngbDropdown class="d-inline-block">
-                    <button
-                        type="button"
-                        class="btn btn-outline-primary"
-                        ngbDropdownToggle
-                    >
-                        <i class="bi-cloud-download me-2"> </i>
-                        Exportieren
-                    </button>
-                    <!-- "position: absolute" is only set with a delay by "ngbDropdownMenu", therefore the map canvas has the wrong height when it is initialized -->
-                    <div ngbDropdownMenu class="position-absolute">
+@if (exerciseStateMode$ | async; as mode) {
+    <div class="p-2 d-flex flex-column" style="height: 100vh">
+        <div class="px-2">
+            <h2>
+                Übung:
+                <span class="font-monospace fw-bold user-select-all">{{
+                    participantId$ | async
+                }}</span>
+                @if (mode === 'exercise') {
+                    <app-exercise-state-badge
+                        class="ms-3"
+                    ></app-exercise-state-badge>
+                    @if (participantId$ | async) {
                         <button
-                            ngbDropdownItem
-                            (click)="exportExerciseWithHistory()"
+                            (click)="shareExercise('participantId')"
+                            class="btn btn-light ms-3"
+                            ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen von Ihnen bestätigt werden."
                         >
-                            <i class="bi-clock-history me-2"> </i>
-                            Kompletten Verlauf
+                            Teilnehmerlink teilen
                         </button>
-                        <button ngbDropdownItem (click)="exportExerciseState()">
-                            <i class="bi-cloud-download me-2"> </i>
-                            Aktuellen Zustand
-                            <span
-                                *ngIf="
-                                    timeConstraints$ | async as timeConstraints
-                                "
-                                class="text-muted"
-                            >
-                                um
-                                {{ timeConstraints.current | formatDuration }}
-                            </span>
+                    }
+                    @if (
+                        (ownClient$ | async)?.role?.mainRole !== 'participant'
+                    ) {
+                        <button
+                            (click)="shareExercise('trainerId')"
+                            class="btn btn-outline-warning ms-3"
+                            ngbTooltip="Über diesen Link können weitere Personen diese Übung verwalten. Teilen Sie diesen Link nicht mit Teilnehmenden!"
+                        >
+                            Übungsleiterlink teilen
                         </button>
-                        <button ngbDropdownItem (click)="partialExport()">
-                            <i class="bi-card-list me-2"> </i>
-                            Vorlagen exportieren
-                        </button>
-                    </div>
-                </div>
-                <div class="btn-group ms-3" role="group">
-                    <a
-                        class="btn btn-outline-secondary"
-                        href="/about/privacy"
-                        target="_blank"
-                    >
-                        Datenschutz
-                    </a>
-                    <a
-                        class="btn btn-outline-secondary"
-                        href="/about/imprint"
-                        target="_blank"
-                    >
-                        Impressum
-                    </a>
-                </div>
-                <div ngbDropdown class="d-inline-block ms-3">
+                    }
+                }
+                @if (mode === 'timeTravel') {
                     <button
-                        type="button"
-                        class="btn btn-outline-secondary"
-                        ngbDropdownToggle
+                        class="btn btn-outline-primary ms-3"
+                        (click)="leaveTimeTravel()"
                     >
-                        Infos
+                        <i class="bi-box-arrow-left"></i>
+                        Übung wieder beitreten
                     </button>
-                    <!-- "position: absolute" is only set with a delay by "ngbDropdownMenu", therefore the map canvas has the wrong height when it is initialized -->
-                    <div ngbDropdownMenu class="position-absolute">
-                        <a
-                            ngbDropdownItem
-                            class="btn btn-outline-secondary"
-                            href="/about/terms"
-                            target="_blank"
+                }
+                <div class="d-inline-block float-end">
+                    <div ngbDropdown class="d-inline-block">
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary"
+                            ngbDropdownToggle
                         >
-                            Nutzungsbedingungen
-                        </a>
-                        <a
-                            ngbDropdownItem
-                            class="btn btn-outline-secondary"
-                            href="/about/license"
-                            target="_blank"
-                        >
-                            Lizenz
-                        </a>
-                        <a
-                            ngbDropdownItem
-                            class="btn btn-outline-secondary"
-                            href="mailto:kontakt@manv-simulation.de?subject=Anfrage zur Digitalen FüSim MANV Version {{
-                                version
-                            }}"
-                        >
-                            Kontakt & Feedback
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </h2>
-    </div>
-
-    <div class="flex-fill">
-        <app-time-travel *ngIf="mode === 'timeTravel'"></app-time-travel>
-        <ng-container *ngIf="mode === 'exercise'">
-            <ng-container *ngIf="ownClient$ | async as ownClient">
-                <ng-container
-                    *ngIf="!ownClient.isInWaitingRoom; else waitingRoomTemplate"
-                    [ngSwitch]="ownClient.role.specificRole"
-                >
-                    <app-exercise-map
-                        *ngSwitchCase="'mapOperator'"
-                        class="h-100 rounded overflow-hidden"
-                    ></app-exercise-map>
-                    <app-trainer-map-editor
-                        *ngSwitchCase="'trainer'"
-                    ></app-trainer-map-editor>
-                    <app-emergency-operations-center-full
-                        *ngSwitchCase="'eoc'"
-                    ></app-emergency-operations-center-full>
-                </ng-container>
-                <ng-template #waitingRoomTemplate>
-                    <div class="container">
-                        <br />
-                        <div class="p-5 bg-light rounded-3">
-                            <p class="lead mb-0">
-                                Sie sind im Warteraum. Bitte warten Sie, bis ein
-                                Übungsleiter Sie zuweist.
-                            </p>
-                            <!-- TODO: Add a nice waiting animation to fill the space -->
+                            <i class="bi-cloud-download me-2"> </i>
+                            Exportieren
+                        </button>
+                        <!-- "position: absolute" is only set with a delay by "ngbDropdownMenu", therefore the map canvas has the wrong height when it is initialized -->
+                        <div ngbDropdownMenu class="position-absolute">
+                            <button
+                                ngbDropdownItem
+                                (click)="exportExerciseWithHistory()"
+                            >
+                                <i class="bi-clock-history me-2"> </i>
+                                Kompletten Verlauf
+                            </button>
+                            <button
+                                ngbDropdownItem
+                                (click)="exportExerciseState()"
+                            >
+                                <i class="bi-cloud-download me-2"> </i>
+                                Aktuellen Zustand
+                                @if (
+                                    timeConstraints$ | async;
+                                    as timeConstraints
+                                ) {
+                                    <span class="text-muted">
+                                        um
+                                        {{
+                                            timeConstraints.current
+                                                | formatDuration
+                                        }}
+                                    </span>
+                                }
+                            </button>
+                            <button ngbDropdownItem (click)="partialExport()">
+                                <i class="bi-card-list me-2"> </i>
+                                Vorlagen exportieren
+                            </button>
                         </div>
                     </div>
-                </ng-template>
-            </ng-container>
-        </ng-container>
+                    <div class="btn-group ms-3" role="group">
+                        <a
+                            class="btn btn-outline-secondary"
+                            href="/about/privacy"
+                            target="_blank"
+                        >
+                            Datenschutz
+                        </a>
+                        <a
+                            class="btn btn-outline-secondary"
+                            href="/about/imprint"
+                            target="_blank"
+                        >
+                            Impressum
+                        </a>
+                    </div>
+                    <div ngbDropdown class="d-inline-block ms-3">
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            ngbDropdownToggle
+                        >
+                            Infos
+                        </button>
+                        <!-- "position: absolute" is only set with a delay by "ngbDropdownMenu", therefore the map canvas has the wrong height when it is initialized -->
+                        <div ngbDropdownMenu class="position-absolute">
+                            <a
+                                ngbDropdownItem
+                                class="btn btn-outline-secondary"
+                                href="/about/terms"
+                                target="_blank"
+                            >
+                                Nutzungsbedingungen
+                            </a>
+                            <a
+                                ngbDropdownItem
+                                class="btn btn-outline-secondary"
+                                href="/about/license"
+                                target="_blank"
+                            >
+                                Lizenz
+                            </a>
+                            <a
+                                ngbDropdownItem
+                                class="btn btn-outline-secondary"
+                                href="mailto:kontakt@manv-simulation.de?subject=Anfrage zur Digitalen FüSim MANV Version {{
+                                    version
+                                }}"
+                            >
+                                Kontakt & Feedback
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </h2>
+        </div>
+
+        <div class="flex-fill">
+            @if (mode === 'timeTravel') {
+                <app-time-travel></app-time-travel>
+            }
+            @if (mode === 'exercise') {
+                @if (ownClient$ | async; as ownClient) {
+                    @if (!ownClient.isInWaitingRoom) {
+                        @switch (ownClient.role.specificRole) {
+                            @case ('mapOperator') {
+                                <app-exercise-map
+                                    class="h-100 rounded overflow-hidden"
+                                ></app-exercise-map>
+                            }
+                            @case ('trainer') {
+                                <app-trainer-map-editor></app-trainer-map-editor>
+                            }
+                            @case ('eoc') {
+                                <app-emergency-operations-center-full></app-emergency-operations-center-full>
+                            }
+                        }
+                    } @else {
+                        <div class="container">
+                            <br />
+                            <div class="p-5 bg-light rounded-3">
+                                <p class="lead mb-0">
+                                    Sie sind im Warteraum. Bitte warten Sie, bis
+                                    ein Übungsleiter Sie zuweist.
+                                </p>
+                                <!-- TODO: Add a nice waiting animation to fill the space -->
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
     </div>
-</div>
+}

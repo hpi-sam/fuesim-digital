@@ -8,8 +8,12 @@ import {
     IsUUID,
     ValidateNested,
 } from 'class-validator';
-import { MapImage } from '../../models/index.js';
-import { MapPosition, MapCoordinates } from '../../models/utils/index.js';
+import {
+    MapImage,
+    type MapCoordinates,
+    mapCoordinatesSchema,
+    newMapPositionAt,
+} from '../../models/index.js';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
 import type { Mutable, UUID } from '../../utils/index.js';
@@ -20,7 +24,8 @@ import {
 } from '../../utils/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
-import { getElement } from './utils/get-element.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { getElement } from './utils/index.js';
 
 export class AddMapImageAction implements Action {
     @IsValue('[MapImage] Add MapImage' as const)
@@ -38,8 +43,7 @@ export class MoveMapImageAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly mapImageId!: UUID;
 
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -136,7 +140,7 @@ export namespace MapImagesActionReducers {
             const mapImage = getElement(draftState, 'mapImage', mapImageId);
             changePosition(
                 mapImage,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 draftState
             );
             return draftState;

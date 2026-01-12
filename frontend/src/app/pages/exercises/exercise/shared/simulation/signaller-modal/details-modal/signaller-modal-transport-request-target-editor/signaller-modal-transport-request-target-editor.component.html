@@ -25,11 +25,12 @@
         <i class="bi bi-caret-down-fill flex-shrink-1 ms-1"></i>
     </button>
     <ng-template #selectTargetTemplate>
-        <app-searchable-dropdown
-            *ngIf="((availableTargets$ | async)?.length ?? 0) !== 0"
-            [options]="(availableTargets$ | async)!"
-            (selected)="selectTarget($event); selectTargetPopover.close()"
-        />
+        @if (((availableTargets$ | async)?.length ?? 0) !== 0) {
+            <app-searchable-dropdown
+                [options]="(availableTargets$ | async)!"
+                (selected)="selectTarget($event); selectTargetPopover.close()"
+            />
+        }
     </ng-template>
     <button
         [disabled]="selectedTarget === null || loading"
@@ -37,14 +38,14 @@
         [tabIndex]="selectedTarget !== null ? 2 : -1"
     >
         Anfrageziel ändern
-        <span
-            *ngIf="loading; else hotkey"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-        ></span>
-        <ng-template #hotkey>
+        @if (loading) {
+            <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+            ></span>
+        } @else {
             <app-hotkey-indicator [hotkey]="submitHotkey" class="ms-1" />
-        </ng-template>
+        }
     </button>
 </form>

@@ -1,22 +1,23 @@
-<ng-container *ngIf="behaviorState$ | async as behaviorState">
+@if (behaviorState$ | async; as behaviorState) {
     <div class="d-flex justify-content-between align-items-center">
         <div class="mb-1">
             Die Transportorganisation ist aktuell
-            <span *ngIf="behaviorState.transportStarted; else transportStopped">
-                gestartet.
-            </span>
-            <ng-template #transportStopped>gestoppt.</ng-template>
+            @if (behaviorState.transportStarted) {
+                <span> gestartet. </span>
+            } @else {
+                gestoppt.
+            }
         </div>
 
-        <button
-            class="btn btn-outline-primary"
-            type="button"
-            (click)="startTransport()"
-            *ngIf="!behaviorState.transportStarted; else transportStoppedButton"
-        >
-            Transport starten
-        </button>
-        <ng-template #transportStoppedButton>
+        @if (!behaviorState.transportStarted) {
+            <button
+                class="btn btn-outline-primary"
+                type="button"
+                (click)="startTransport()"
+            >
+                Transport starten
+            </button>
+        } @else {
             <button
                 class="btn btn-outline-primary"
                 type="button"
@@ -24,6 +25,6 @@
             >
                 Transport stoppen
             </button>
-        </ng-template>
+        }
     </div>
-</ng-container>
+}

@@ -1,9 +1,10 @@
-import { Type } from 'class-transformer';
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 import type { UUID } from '../utils/index.js';
 import { uuid, uuidValidationOptions } from '../utils/index.js';
 import { IsValue } from '../utils/validators/index.js';
-import { getCreate, ImageProperties } from './utils/index.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
+import type { ImageProperties } from './utils/index.js';
+import { getCreate, imagePropertiesSchema } from './utils/index.js';
 
 export class MapImageTemplate {
     @IsUUID(4, uuidValidationOptions)
@@ -15,8 +16,7 @@ export class MapImageTemplate {
     @IsString()
     public readonly name: string;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
     /**

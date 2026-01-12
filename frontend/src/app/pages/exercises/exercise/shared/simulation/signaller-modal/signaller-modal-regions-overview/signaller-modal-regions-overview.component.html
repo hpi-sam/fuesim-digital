@@ -1,9 +1,11 @@
 <h3>Übersicht</h3>
 
-<p *ngIf="((regions$ | async)?.length ?? 0) === 0" class="text-muted">
-    Aktuell gibt es noch keine simulierten Bereiche in dieser Übung. Bitte
-    warten Sie, bis die Übungsleitung die Übung fertig konfiguriert hat.
-</p>
+@if (((regions$ | async)?.length ?? 0) === 0) {
+    <p class="text-muted">
+        Aktuell gibt es noch keine simulierten Bereiche in dieser Übung. Bitte
+        warten Sie, bis die Übungsleitung die Übung fertig konfiguriert hat.
+    </p>
+}
 
 <table class="table table-striped">
     <thead>
@@ -14,24 +16,20 @@
         </tr>
     </thead>
     <tbody>
-        <tr
-            *ngFor="
-                let region of regions$ | async;
-                trackBy: 'id' | appTrackByProperty
-            "
-        >
-            <td>{{ region.name }}</td>
-            <ng-container *ngIf="region.hasLeader; else noLeader">
-                <td>{{ region.leaderName }}</td>
-                <td>{{ region.leaderVehicleName }}</td>
-            </ng-container>
-            <ng-template #noLeader>
-                <td colspan="2">
-                    <em class="text-muted"
-                        >Keine Führungskraft in diesem Bereich</em
-                    >
-                </td>
-            </ng-template>
-        </tr>
+        @for (region of regions$ | async; track region.id) {
+            <tr>
+                <td>{{ region.name }}</td>
+                @if (region.hasLeader) {
+                    <td>{{ region.leaderName }}</td>
+                    <td>{{ region.leaderVehicleName }}</td>
+                } @else {
+                    <td colspan="2">
+                        <em class="text-muted"
+                            >Keine Führungskraft in diesem Bereich</em
+                        >
+                    </td>
+                }
+            </tr>
+        }
     </tbody>
 </table>

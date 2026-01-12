@@ -1,19 +1,18 @@
 import { produce } from 'immer';
 import type { Patient } from '../../models/index.js';
 import {
-    ImageProperties,
-    IntermediateOccupation,
-    LoadOccupation,
-    MapCoordinates,
-    NoOccupation,
-    PatientTransferOccupation,
+    newPatientTransferOccupation,
+    newImageProperties,
+    newWaitForTransferOccupation,
+    newUnloadingOccupation,
+    newLoadOccupation,
+    newIntermediateOccupation,
+    newNoOccupation,
+    newMapCoordinatesAt,
     SimulatedRegion,
-    SimulatedRegionPosition,
+    newSimulatedRegionPositionIn,
     Size,
     TransferPoint,
-    UnloadingOccupation,
-    Vehicle,
-    WaitForTransferOccupation,
 } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
 import type { Mutable, UUIDSet } from '../../utils/index.js';
@@ -26,6 +25,7 @@ import type {
     DelayEventActivityState,
     TransferPatientToHospitalActivityState,
 } from '../activities/index.js';
+import { newVehicle } from '../../models/vehicle.js';
 import { TransferToHospitalBehaviorState } from './transfer-to-hospital.js';
 
 const emptyState = ExerciseState.create('123456');
@@ -39,12 +39,12 @@ function setupStateAndInteract(
     ) => void
 ) {
     const simulatedRegion = SimulatedRegion.create(
-        MapCoordinates.create(0, 0),
+        newMapCoordinatesAt(0, 0),
         Size.create(10, 10),
         'test region'
     );
     const transferPoint = TransferPoint.create(
-        SimulatedRegionPosition.create(simulatedRegion.id),
+        newSimulatedRegionPositionIn(simulatedRegion.id),
         {},
         {},
         '',
@@ -108,37 +108,32 @@ function removeEvents(state: ExerciseState) {
 describe('transfer to hospital behavior', () => {
     describe('on arriving vehicle', () => {
         describe.each([
-            ['no', NoOccupation.create()],
+            ['no', newNoOccupation()],
             [
                 'valid intermediate',
-                IntermediateOccupation.create(currentTime + 1_000),
+                newIntermediateOccupation(currentTime + 1_000),
             ],
             [
                 'expired intermediate',
-                IntermediateOccupation.create(currentTime - 1_000),
+                newIntermediateOccupation(currentTime - 1_000),
             ],
-            ['load', LoadOccupation.create(uuid())],
-            ['unload', UnloadingOccupation.create()],
-            ['wait for transfer', WaitForTransferOccupation.create()],
+            ['load', newLoadOccupation(uuid())],
+            ['unload', newUnloadingOccupation()],
+            ['wait for transfer', newWaitForTransferOccupation()],
         ] as const)('with %s occupation', (_, occupation) => {
             it('does nothing', () => {
                 const { beforeState, afterState } = setupStateAndInteract(
                     (state, simulatedRegion) => {
-                        const vehicle = cloneDeepMutable(
-                            Vehicle.create(
-                                'RTW',
-                                'RTW',
-                                uuid(),
-                                {},
-                                0,
-                                ImageProperties.create('', 0, 0),
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                ),
-                                occupation
-                            )
+                        const vehicle = newVehicle(
+                            'RTW',
+                            'RTW',
+                            uuid(),
+                            {},
+                            0,
+                            newImageProperties('', 0, 0),
+                            newSimulatedRegionPositionIn(simulatedRegion.id),
+                            occupation
                         );
-
                         state.vehicles[vehicle.id] = vehicle;
 
                         simulatedRegion.inEvents.push(
@@ -159,15 +154,15 @@ describe('transfer to hospital behavior', () => {
         });
 
         describe('with patient transfer occupation', () => {
-            const vehicle = Vehicle.create(
+            const vehicle = newVehicle(
                 'RTW',
                 'RTW',
                 uuid(),
                 {},
                 10,
-                ImageProperties.create('', 0, 0),
-                SimulatedRegionPosition.create(uuid()),
-                PatientTransferOccupation.create(uuid())
+                newImageProperties('', 0, 0),
+                newSimulatedRegionPositionIn(uuid()),
+                newPatientTransferOccupation(uuid())
             );
 
             it('does nothing if there are no patients', () => {
@@ -203,9 +198,7 @@ describe('transfer to hospital behavior', () => {
                                 state,
                                 'red',
                                 'red',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             );
                         }
 
@@ -243,9 +236,7 @@ describe('transfer to hospital behavior', () => {
                                 state,
                                 'red',
                                 'red',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             );
                         }
 
@@ -281,19 +272,19 @@ describe('transfer to hospital behavior', () => {
                         state,
                         'red',
                         'red',
-                        SimulatedRegionPosition.create(simulatedRegion.id)
+                        newSimulatedRegionPositionIn(simulatedRegion.id)
                     );
                     addPatient(
                         state,
                         'yellow',
                         'yellow',
-                        SimulatedRegionPosition.create(simulatedRegion.id)
+                        newSimulatedRegionPositionIn(simulatedRegion.id)
                     );
                     addPatient(
                         state,
                         'green',
                         'green',
-                        SimulatedRegionPosition.create(simulatedRegion.id)
+                        newSimulatedRegionPositionIn(simulatedRegion.id)
                     );
 
                     simulatedRegion.inEvents.push(
@@ -348,7 +339,7 @@ describe('transfer to hospital behavior', () => {
                             state,
                             'red',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id),
+                            newSimulatedRegionPositionIn(simulatedRegion.id),
                             uuids[i]
                         );
                     }
@@ -399,9 +390,7 @@ describe('transfer to hospital behavior', () => {
                                 state,
                                 'red',
                                 'red',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         );
                     }
@@ -411,7 +400,7 @@ describe('transfer to hospital behavior', () => {
                             state,
                             'yellow',
                             'yellow',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
                     }
 
@@ -489,7 +478,7 @@ describe('transfer to hospital behavior', () => {
                         state,
                         'red',
                         'red',
-                        SimulatedRegionPosition.create(simulatedRegion.id),
+                        newSimulatedRegionPositionIn(simulatedRegion.id),
                         selectedUUID
                     );
 
@@ -526,14 +515,14 @@ describe('transfer to hospital behavior', () => {
                         state,
                         'red',
                         'red',
-                        SimulatedRegionPosition.create(simulatedRegion.id),
+                        newSimulatedRegionPositionIn(simulatedRegion.id),
                         selectedUUID
                     );
                     addPatient(
                         state,
                         'red',
                         'red',
-                        SimulatedRegionPosition.create(simulatedRegion.id)
+                        newSimulatedRegionPositionIn(simulatedRegion.id)
                     );
 
                     behaviorState.patientIdsSelectedForTransfer[selectedUUID] =
@@ -559,7 +548,7 @@ describe('transfer to hospital behavior', () => {
                             state,
                             'red',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id),
+                            newSimulatedRegionPositionIn(simulatedRegion.id),
                             selectedUUID
                         );
 

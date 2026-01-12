@@ -11,13 +11,16 @@
 <div class="modal-body">
     <ng-container [ngTemplateOutlet]="body" />
 </div>
-<div *ngIf="hotkeysEnabled" class="modal-footer text-muted">
-    <small>
-        <app-hotkey-indicator keys="Leertaste" />: Aktuelles Steuerelement
-        an-/ausschalten
-        <br />
-        <app-hotkey-indicator keys="Tab" />: Nächstes Steuerelement auswählen
-        <br />
-        <app-hotkey-indicator keys="Esc" />: Schließen
-    </small>
-</div>
+@if (hotkeysEnabled) {
+    <div class="modal-footer text-muted">
+        <small>
+            <app-hotkey-indicator keys="Leertaste" />: Aktuelles Steuerelement
+            an-/ausschalten
+            <br />
+            <app-hotkey-indicator keys="Tab" />: Nächstes Steuerelement
+            auswählen
+            <br />
+            <app-hotkey-indicator keys="Esc" />: Schließen
+        </small>
+    </div>
+}

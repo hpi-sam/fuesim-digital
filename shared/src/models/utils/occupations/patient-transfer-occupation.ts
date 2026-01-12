@@ -1,20 +1,18 @@
-import { IsUUID } from 'class-validator';
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../get-create.js';
+import * as z from 'zod';
 import type { UUID } from '../../../utils/index.js';
-import { uuidValidationOptions } from '../../../utils/index.js';
-import type { Occupation } from './occupation.js';
 
-export class PatientTransferOccupation implements Occupation {
-    @IsValue('patientTransferOccupation')
-    readonly type = 'patientTransferOccupation';
+export const patientTransferOccupation = z.strictObject({
+    type: z.literal('patientTransferOccupation'),
+    transportManagementRegionId: z.uuidv4(),
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly transportManagementRegionId: UUID;
+export type PatientTransferOccupation = z.infer<
+    typeof patientTransferOccupation
+>;
 
-    constructor(transportManagementRegionId: UUID) {
-        this.transportManagementRegionId = transportManagementRegionId;
-    }
-
-    static readonly create = getCreate(this);
-}
+export const newPatientTransferOccupation = (
+    transportManagementRegionId: UUID
+): PatientTransferOccupation => ({
+    type: 'patientTransferOccupation',
+    transportManagementRegionId,
+});

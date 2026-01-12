@@ -8,15 +8,16 @@
         <i class="bi-box-arrow-left"></i>
         Alle aussteigen
     </button>
-    <button
-        *ngIf="(currentRole$ | async) === 'trainer'"
-        (click)="loadVehicle()"
-        [disabled]="!(vehicleLoadState$ | async)?.loadable"
-        class="btn btn-outline-primary"
-    >
-        <i class="bi-box-arrow-in-right"></i>
-        Alle einsteigen
-    </button>
+    @if ((currentRole$ | async) === 'trainer') {
+        <button
+            (click)="loadVehicle()"
+            [disabled]="!(vehicleLoadState$ | async)?.loadable"
+            class="btn btn-outline-primary"
+        >
+            <i class="bi-box-arrow-in-right"></i>
+            Alle einsteigen
+        </button>
+    }
 </div>
 
 <p>Personal, das sich gerade im Transfer befindet, kann nicht einsteigen.</p>

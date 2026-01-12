@@ -1,11 +1,10 @@
 import {
+    newMapPositionAt,
     FunctionParameters,
     Patient,
     PatientHealthState,
+    PatientStatusCode,
 } from '../../models/index.js';
-import { MapCoordinates } from '../../models/utils/position/map-coordinates.js';
-import { MapPosition } from '../../models/utils/position/map-position.js';
-import { PatientStatusCode } from '../../models/utils/patient-status-code.js';
 import { defaultPatientCategories } from '../default-state/patient-templates.js';
 
 export function generateDummyPatient(): Patient {
@@ -30,6 +29,6 @@ export function generateDummyPatient(): Patient {
         template.image,
         template.health,
         '',
-        MapPosition.create(MapCoordinates.create(0, 0))
+        newMapPositionAt({ x: 0, y: 0 })
     );
 }

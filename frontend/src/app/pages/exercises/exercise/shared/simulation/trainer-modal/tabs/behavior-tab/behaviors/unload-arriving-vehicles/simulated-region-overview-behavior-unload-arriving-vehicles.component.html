@@ -25,30 +25,33 @@
     </div>
 
     <h6>Gerade aussteigend</h6>
-    <table
-        class="table table-striped"
-        *ngIf="(vehiclesStatus$ | async)?.length; else noUnloadVehicles"
-    >
-        <thead>
-            <tr>
-                <th scope="col" class="text-center">Name</th>
-                <th scope="col" class="text-center">Verbleibende Zeit</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let vehicleStatus of vehiclesStatus$ | async">
-                <td class="align-middle text-center">
-                    {{ vehicleStatus.vehicleName }}
-                </td>
-                <td class="align-middle text-center">
-                    {{ vehicleStatus.timeLeft | formatDuration }}
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <ng-template #noUnloadVehicles>
+    @if ((vehiclesStatus$ | async)?.length) {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center">Name</th>
+                    <th scope="col" class="text-center">Verbleibende Zeit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (
+                    vehicleStatus of vehiclesStatus$ | async;
+                    track vehicleStatus
+                ) {
+                    <tr>
+                        <td class="align-middle text-center">
+                            {{ vehicleStatus.vehicleName }}
+                        </td>
+                        <td class="align-middle text-center">
+                            {{ vehicleStatus.timeLeft | formatDuration }}
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    } @else {
         <span class="text-muted">
             Im Moment steigt niemand aus eintreffenden Fahrzeugen aus
         </span>
-    </ng-template>
+    }
 </div>

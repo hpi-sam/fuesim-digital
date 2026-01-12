@@ -6,23 +6,24 @@ import {
     IsUUID,
     ValidateNested,
 } from 'class-validator';
-import { TransferPoint } from '../../models/index.js';
 import {
+    mapCoordinatesSchema,
+    newMapPositionAt,
+    TransferPoint,
     currentTransferOf,
     isInTransfer,
-    MapCoordinates,
-    MapPosition,
+    type MapCoordinates,
     nestedCoordinatesOf,
-} from '../../models/utils/index.js';
+} from '../../models/index.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
 import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { letElementArrive } from './transfer.js';
-import { calculateDistance } from './utils/calculate-distance.js';
-import { getElement } from './utils/get-element.js';
+import { calculateDistance, getElement } from './utils/index.js';
 import {
     logTransferPointConnection,
     logTransferPointConnectionRemoved,
@@ -45,8 +46,7 @@ export class MoveTransferPointAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly transferPointId!: UUID;
 
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -136,7 +136,7 @@ export namespace TransferPointActionReducers {
         reducer: (draftState, { transferPointId, targetPosition }) => {
             changePositionWithId(
                 transferPointId,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 'transferPoint',
                 draftState
             );

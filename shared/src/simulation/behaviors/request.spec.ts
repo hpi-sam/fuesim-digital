@@ -1,13 +1,13 @@
 import { produce } from 'immer';
 import {
-    ImageProperties,
-    MapCoordinates,
+    newImageProperties,
+    newMapCoordinatesAt,
+    newNoOccupation,
+    newSimulatedRegionPositionIn,
     SimulatedRegion,
-    SimulatedRegionPosition,
     SimulatedRegionRequestTargetConfiguration,
     Size,
     TransferPoint,
-    Vehicle,
     VehicleResource,
 } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
@@ -16,16 +16,15 @@ import {
     VehicleArrivedEvent,
     VehiclesSentEvent,
 } from '../events/index.js';
-import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import type { Mutable } from '../../utils/immutability.js';
+import { cloneDeepMutable, StrictObject, uuid } from '../../utils/index.js';
+import type { Mutable } from '../../utils/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { handleSimulationEvents } from '../utils/simulation.js';
-import { StrictObject, uuid } from '../../utils/index.js';
 import { RecurringEventActivityState } from '../activities/index.js';
 import { addActivity } from '../activities/utils.js';
 import { SendRequestEvent } from '../events/send-request.js';
 import { ResourcePromise } from '../utils/resource-promise.js';
-import { NoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { newVehicle } from '../../models/vehicle.js';
 import {
     RequestBehaviorState,
     getResourcesToRequest,
@@ -85,12 +84,12 @@ function setupStateAndInteract(
     ) => void
 ) {
     const simulatedRegion = SimulatedRegion.create(
-        MapCoordinates.create(0, 0),
+        newMapCoordinatesAt(0, 0),
         Size.create(10, 10),
         'test region'
     );
     const transferPoint = TransferPoint.create(
-        SimulatedRegionPosition.create(simulatedRegion.id),
+        newSimulatedRegionPositionIn(simulatedRegion.id),
         {},
         {},
         '',
@@ -178,13 +177,13 @@ const updateRequestTarget = (
 ) => {
     const otherSimulatedRegion = cloneDeepMutable(
         SimulatedRegion.create(
-            MapCoordinates.create(0, 0),
+            newMapCoordinatesAt(0, 0),
             Size.create(10, 10),
             'requestable region'
         )
     );
     const transferPoint = TransferPoint.create(
-        SimulatedRegionPosition.create(otherSimulatedRegion.id),
+        newSimulatedRegionPositionIn(otherSimulatedRegion.id),
         {},
         {},
         '',
@@ -379,14 +378,15 @@ const sendEvent = {
         simulatedRegion: Mutable<SimulatedRegion>,
         behaviorState: Mutable<RequestBehaviorState>
     ) => {
-        const vehicle = Vehicle.create(
+        const vehicle = newVehicle(
             'KTW',
             'KTW 1',
+            uuid(),
             {},
             0,
-            ImageProperties.create('', 0, 0),
-            SimulatedRegionPosition.create(simulatedRegion.id),
-            NoOccupation.create()
+            newImageProperties('', 0, 0),
+            newSimulatedRegionPositionIn(simulatedRegion.id),
+            newNoOccupation()
         );
         draftState.vehicles[vehicle.id] = cloneDeepMutable(vehicle);
 

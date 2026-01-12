@@ -12,7 +12,7 @@ export { PatientTemplate } from './patient-template.js';
 export { ClientRole } from './client-role.js';
 export { Personnel } from './personnel.js';
 export { TransferPoint } from './transfer-point.js';
-export { Vehicle } from './vehicle.js';
+export type { Vehicle } from './vehicle.js';
 export { VehicleTemplate } from './vehicle-template.js';
 export { Viewport } from './viewport.js';
 export { PatientCategory } from './patient-category.js';

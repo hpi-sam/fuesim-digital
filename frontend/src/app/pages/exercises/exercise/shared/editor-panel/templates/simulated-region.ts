@@ -9,7 +9,6 @@ import {
     ManagePatientTransportToHospitalBehaviorState,
     TransferBehaviorState,
     cloneDeepMutable,
-    MapPosition,
     SimulatedRegion,
     uuid,
     AnswerRequestsBehaviorState,
@@ -20,6 +19,7 @@ import {
     RequestBehaviorState,
     TreatPatientsBehaviorState,
     UnloadArrivingVehiclesBehaviorState,
+    newMapPositionAt,
     StrictObject,
 } from 'digital-fuesim-manv-shared';
 
@@ -35,7 +35,7 @@ const size = {
     height,
     width,
 };
-const position: MapPosition = MapPosition.create({ x: 0, y: 0 });
+const position = newMapPositionAt({ x: 0, y: 0 });
 
 const stereotypes: SimulatedRegion[] = [
     {

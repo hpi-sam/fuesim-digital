@@ -1,80 +1,57 @@
-import { Type } from 'class-transformer';
-import { IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
+import type { Immutable } from 'immer';
+import * as z from 'zod';
 import type { UUID, UUIDSet } from '../utils/index.js';
-import { uuid, uuidValidationOptions } from '../utils/index.js';
-import { IsUUIDSet, IsValue } from '../utils/validators/index.js';
-import { IsPosition } from '../utils/validators/is-position.js';
-import { getCreate } from './utils/index.js';
-import { ImageProperties } from './utils/image-properties.js';
-import type { Position } from './utils/position/position.js';
-import type { ExerciseOccupation } from './utils/occupations/exercise-occupation.js';
-import { occupationTypeOptions } from './utils/occupations/exercise-occupation.js';
+import { uuid, uuidSetSchema } from '../utils/index.js';
+import {
+    exerciseOccupationSchema,
+    imagePropertiesSchema,
+    positionSchema,
+} from './utils/index.js';
+import type {
+    Position,
+    ImageProperties,
+    ExerciseOccupation,
+} from './utils/index.js';
 
-export class Vehicle {
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export const vehicleSchema = z.strictObject({
+    id: z.uuidv4(),
+    type: z.literal('vehicle'),
+    vehicleType: z.string(),
+    name: z.string(),
+    templateId: z.uuidv4(),
+    materialIds: uuidSetSchema,
+    patientCapacity: z.int().nonnegative(),
+    position: positionSchema,
+    image: imagePropertiesSchema,
+    personnelIds: uuidSetSchema,
+    patientIds: uuidSetSchema,
+    occupation: exerciseOccupationSchema,
+});
 
-    @IsValue('vehicle' as const)
-    public readonly type = 'vehicle';
+export type Vehicle = Immutable<z.infer<typeof vehicleSchema>>;
 
-    @IsString()
-    public readonly vehicleType: string;
-
-    @IsString()
-    public readonly name: string;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly templateId: UUID;
-
-    @IsUUIDSet()
-    public readonly materialIds: UUIDSet = {};
-
-    @IsNumber()
-    public readonly patientCapacity: number;
-
-    /**
-     * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
-     */
-    @IsPosition()
-    @ValidateNested()
-    public readonly position: Position;
-
-    @ValidateNested()
-    @Type(() => ImageProperties)
-    public readonly image: ImageProperties;
-
-    @IsUUIDSet()
-    public readonly personnelIds: UUIDSet = {};
-
-    @IsUUIDSet()
-    public readonly patientIds: UUIDSet = {};
-
-    @Type(...occupationTypeOptions)
-    @ValidateNested()
-    public readonly occupation: ExerciseOccupation;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        vehicleType: string,
-        name: string,
-        templateId: UUID,
-        materialIds: UUIDSet,
-        patientCapacity: number,
-        image: ImageProperties,
-        position: Position,
-        occupation: ExerciseOccupation
-    ) {
-        this.vehicleType = vehicleType;
-        this.name = name;
-        this.templateId = templateId;
-        this.materialIds = materialIds;
-        this.patientCapacity = patientCapacity;
-        this.image = image;
-        this.position = position;
-        this.occupation = occupation;
-    }
-
-    static readonly create = getCreate(this);
+export function newVehicle(
+    vehicleType: string,
+    name: string,
+    templateId: UUID,
+    materialIds: UUIDSet,
+    patientCapacity: number,
+    image: ImageProperties,
+    position: Position,
+    occupation: ExerciseOccupation
+): Vehicle {
+    return {
+        id: uuid(),
+        type: 'vehicle',
+        vehicleType,
+        name,
+        templateId,
+        materialIds,
+        patientCapacity,
+        position,
+        image,
+        personnelIds: {},
+        patientIds: {},
+        occupation,
+    };
 }

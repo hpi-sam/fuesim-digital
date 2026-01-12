@@ -16,8 +16,8 @@ import {
     PatientTemplate,
     TransferPoint,
     Viewport,
-    SimulatedRegionPosition,
-    MapPosition,
+    newMapPositionAt,
+    newSimulatedRegionPositionIn,
 } from 'digital-fuesim-manv-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -199,7 +199,7 @@ export class DragElementService {
                             )
                         ]!,
                         this.transferringTemplate.template.name,
-                        MapPosition.create(position)
+                        newMapPositionAt(position)
                     );
                     this.exerciseService.proposeAction(
                         {
@@ -258,7 +258,7 @@ export class DragElementService {
             case 'transferPoint':
                 {
                     const transferPoint = TransferPoint.create(
-                        MapPosition.create(position),
+                        newMapPositionAt(position),
                         {},
                         {},
                         '???',
@@ -284,12 +284,12 @@ export class DragElementService {
                         this.transferringTemplate.template.stereotype,
                         exerciseState
                     );
-                    simulatedRegion.position = MapPosition.create({
+                    simulatedRegion.position = newMapPositionAt({
                         x: position.x - simulatedRegion.size.width / 2,
                         y: position.y + simulatedRegion.size.height / 2,
                     });
                     const transferPoint = TransferPoint.create(
-                        SimulatedRegionPosition.create(simulatedRegion.id),
+                        newSimulatedRegionPositionIn(simulatedRegion.id),
                         {},
                         {},
                         '',

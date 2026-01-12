@@ -1,14 +1,15 @@
 import { Type } from 'class-transformer';
 import { IsString, IsUUID, ValidateNested } from 'class-validator';
-import { SimulatedRegion } from '../../models/simulated-region.js';
-import { TransferPoint } from '../../models/transfer-point.js';
 import {
+    SimulatedRegion,
+    TransferPoint,
     isInSpecificSimulatedRegion,
-    MapCoordinates,
-    MapPosition,
-    SimulatedRegionPosition,
+    type MapCoordinates,
+    mapCoordinatesSchema,
+    newMapPositionAt,
+    newSimulatedRegionPositionIn,
     Size,
-} from '../../models/utils/index.js';
+} from '../../models/index.js';
 import {
     changePosition,
     changePositionWithId,
@@ -28,9 +29,10 @@ import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { TransferPointActionReducers } from './transfer-point.js';
 import { isCompletelyLoaded } from './utils/completely-load-vehicle.js';
-import { getElement, getElementByPredicate } from './utils/get-element.js';
+import { getElement, getElementByPredicate } from './utils/index.js';
 import {
     logBehaviorAdded,
     logBehaviorRemoved,
@@ -61,8 +63,7 @@ export class MoveSimulatedRegionAction implements Action {
     public readonly type = '[SimulatedRegion] Move simulated region';
     @IsUUID(4, uuidValidationOptions)
     public readonly simulatedRegionId!: UUID;
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -71,8 +72,8 @@ export class ResizeSimulatedRegionAction implements Action {
     public readonly type = '[SimulatedRegion] Resize simulated region';
     @IsUUID(4, uuidValidationOptions)
     public readonly simulatedRegionId!: UUID;
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
     @ValidateNested()
     @Type(() => Size)
@@ -185,7 +186,7 @@ export namespace SimulatedRegionActionReducers {
             reducer: (draftState, { simulatedRegionId, targetPosition }) => {
                 changePositionWithId(
                     simulatedRegionId,
-                    MapPosition.create(targetPosition),
+                    newMapPositionAt(targetPosition),
                     'simulatedRegion',
                     draftState
                 );
@@ -208,7 +209,7 @@ export namespace SimulatedRegionActionReducers {
                 );
                 changePosition(
                     simulatedRegion,
-                    MapPosition.create(targetPosition),
+                    newMapPositionAt(targetPosition),
                     draftState
                 );
                 simulatedRegion.size = cloneDeepMutable(newSize);
@@ -287,7 +288,7 @@ export namespace SimulatedRegionActionReducers {
 
                 changePosition(
                     element,
-                    SimulatedRegionPosition.create(simulatedRegionId),
+                    newSimulatedRegionPositionIn(simulatedRegionId),
                     draftState
                 );
 

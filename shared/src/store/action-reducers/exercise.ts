@@ -7,20 +7,18 @@ import {
     IsPositive,
 } from 'class-validator';
 import {
+    newTransferPositionFor,
     Personnel,
     Vehicle,
     createPersonnelTypeTag,
     Patient,
+    getStatus,
+    currentTransferOf,
+    isInTransfer,
     ResourceDescription,
 } from '../../models/index.js';
 import { PartialExport } from '../../export-import/file-format/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import {
-    getStatus,
-    isNotInTransfer,
-    currentTransferOf,
-    TransferPosition,
-} from '../../models/utils/index.js';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import { simulateAllRegions } from '../../simulation/utils/simulation.js';
 import type { ExerciseState } from '../../state.js';
@@ -33,7 +31,7 @@ import { ReducerError } from '../reducer-error.js';
 import type { TransferableElementType } from './transfer.js';
 import { letElementArrive } from './transfer.js';
 import { updateTreatments } from './utils/calculate-treatments.js';
-import { PatientUpdate } from './utils/patient-updates.js';
+import { PatientUpdate } from './utils/index.js';
 import {
     logPatientVisibleStatusChanged,
     logActive,
@@ -232,7 +230,7 @@ function refreshTransfer(
 ): void {
     const elements = draftState[elementTypePluralMap[type]];
     Object.values(elements).forEach((element: Mutable<Personnel | Vehicle>) => {
-        if (isNotInTransfer(element)) {
+        if (!isInTransfer(element)) {
             return;
         }
         if (currentTransferOf(element).isPaused) {
@@ -240,7 +238,7 @@ function refreshTransfer(
             newTransfer.endTimeStamp += tickInterval;
             changePosition(
                 element,
-                TransferPosition.create(newTransfer),
+                newTransferPositionFor(newTransfer),
                 draftState
             );
             return;

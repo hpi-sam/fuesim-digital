@@ -2,18 +2,18 @@ import { groupBy } from 'lodash-es';
 import type {
     MapCoordinates,
     PatientStatus,
-} from '../../../models/utils/index.js';
+    Personnel,
+} from '../../../models/index.js';
 import {
+    isOnMap,
     currentCoordinatesOf,
-    isNotOnMap,
     isInSimulatedRegion,
-} from '../../../models/utils/position/position-helpers.js';
-import { SpatialTree } from '../../../models/utils/spatial-tree.js';
+    SpatialTree,
+} from '../../../models/index.js';
 import type { ExerciseState } from '../../../state.js';
 import { maxTreatmentRange } from '../../../state-helpers/max-treatment-range.js';
 import type { Mutable, UUID } from '../../../utils/index.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
-import type { Personnel } from '../../../models/personnel.js';
 import type { Material } from '../../../models/material.js';
 import { Patient } from '../../../models/patient.js';
 import { getElement } from './get-element.js';
@@ -181,7 +181,7 @@ export function updateTreatments(
         return;
     }
 
-    if (isNotOnMap(element)) {
+    if (!isOnMap(element)) {
         removeTreatmentsOfElement(state, element);
         return;
     }
@@ -236,7 +236,7 @@ function updateCatering(
             cateringElement.canCaterFor.yellow === 0 &&
             cateringElement.canCaterFor.green === 0) ||
         // The element is no longer in a position to treat a patient on the map
-        isNotOnMap(cateringElement)
+        !isOnMap(cateringElement)
     ) {
         return;
     }

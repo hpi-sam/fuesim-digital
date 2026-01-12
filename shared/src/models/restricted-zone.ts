@@ -30,6 +30,7 @@ export class RestrictedZone {
 
     @IsValue('restrictedZone' as const)
     public readonly type = 'restrictedZone';
+
     /**
      * top-left position
      *

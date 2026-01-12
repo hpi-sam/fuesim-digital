@@ -194,7 +194,7 @@ export namespace RestrictedZoneActionReducers {
                 delete draftState.restrictedZones[restrictedZoneId];
                 return draftState;
             },
-            rights: 'participant',
+            rights: 'trainer',
         };
 
     export const renameRestrictedZone: ActionReducer<RenameRestrictedZoneAction> =

@@ -238,7 +238,7 @@ export class RestrictedZoneFeatureManager
                 currentCoordinatesOf(droppedOnRestrictedZone)
             );
 
-            // place the vehicle on the right hand side of the simulated region
+            // place the vehicle on the right hand side of the restricted zone
             coordinates.y -= 0.5 * droppedOnRestrictedZone.size.height;
             coordinates.x +=
                 10 + Math.max(droppedOnRestrictedZone.size.width, 0);

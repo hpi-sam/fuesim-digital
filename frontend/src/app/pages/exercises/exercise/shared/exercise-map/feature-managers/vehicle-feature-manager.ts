@@ -5,6 +5,7 @@ import type {
     Vehicle,
     // eslint-disable-next-line @typescript-eslint/no-shadow
     Element,
+    PatientStatus,
 } from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
@@ -221,7 +222,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             const getStatus = (p: any) =>
                 config.pretriageEnabled ? p.pretriageStatus : p.realStatus;
 
-            let sk: 'black' | 'blue' | 'green' | 'red' | 'yellow' | undefined;
+            let sk: Exclude<PatientStatus, 'white'> | undefined;
             if (patients.some((p) => p && getStatus(p) === 'red')) sk = 'red';
             else if (patients.some((p) => p && getStatus(p) === 'yellow'))
                 sk = 'yellow';

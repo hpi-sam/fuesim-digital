@@ -6,6 +6,7 @@ import { migrate as migratePostgres } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
 import { PGlite } from '@electric-sql/pglite';
 import { uuid_ossp } from '@electric-sql/pglite/contrib/uuid_ossp';
+import { getTableColumns, sql } from 'drizzle-orm';
 import * as schema from '../schema.js';
 import { Config } from '../../config.js';
 
@@ -109,6 +110,15 @@ export class DatabaseService {
             await client.close();
         }
         this._initialized = false;
+    }
+
+    static upsertHelper(table: DatabaseTable) {
+        return Object.fromEntries(
+            Object.entries(getTableColumns(table)).map(([key, value]) => [
+                key,
+                sql.raw(`EXCLUDED."${value.name}"`),
+            ])
+        );
     }
 }
 

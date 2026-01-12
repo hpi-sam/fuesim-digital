@@ -133,17 +133,20 @@ const rthVehicleTemplate = VehicleTemplate.create(
     [defaultMaterialTemplates.standard.id]
 );
 
-export const defaultVehicleTemplates: readonly VehicleTemplate[] = [
-    rtwVehicleTemplate,
-    ktwVehicleTemplate,
-    ktwKatSchutzVehicleTemplate,
-    nefVehicleTemplate,
-    gwSanVehicleTemplate,
-    carryingUnitVehicleTemplate,
-    rthVehicleTemplate,
-    nawVehicleTemplate,
-];
+export const defaultVehicleTemplates = {
+    rtw: rtwVehicleTemplate,
+    ktw: ktwVehicleTemplate,
+    ktwKatSchutz: ktwKatSchutzVehicleTemplate,
+    nef: nefVehicleTemplate,
+    gwSan: gwSanVehicleTemplate,
+    carryingUnit: carryingUnitVehicleTemplate,
+    rth: rthVehicleTemplate,
+    naw: nawVehicleTemplate,
+} as const;
 
 export const defaultVehicleTemplatesById = Object.fromEntries(
-    defaultVehicleTemplates.map((template) => [template.id, template])
+    Object.values(defaultVehicleTemplates).map((template) => [
+        template.id,
+        template,
+    ])
 );

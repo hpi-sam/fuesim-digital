@@ -1,12 +1,11 @@
-import { IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsNumber, IsString, IsUUID } from 'class-validator';
 import { Action, ActionReducer } from '../action-reducer.js';
 import { IsValue } from '../../utils/validators/index.js';
 import {
     coordinatesOfPosition,
-    RestrictedZone,
+    type RestrictedZone,
     type MapCoordinates,
-    Size,
+    type Size,
     type VehicleRestrictionType,
     newMapPositionAt,
     mapCoordinatesSchema,
@@ -20,13 +19,17 @@ import {
 import { ExerciseState } from '../../state.js';
 import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { sizeSchema } from '../../models/utils/size.js';
+import {
+    isInRestrictedZone,
+    restrictedZoneSchema,
+} from '../../models/restricted-zone.js';
 import { getElement } from './utils/index.js';
 
 export class AddRestrictedZoneAction implements Action {
     @IsValue('[RestrictedZone] Add restricted zone' as const)
     public readonly type = '[RestrictedZone] Add restricted zone';
-    @ValidateNested()
-    @Type(() => RestrictedZone)
+    @IsZodSchema(restrictedZoneSchema)
     public readonly restrictedZone!: RestrictedZone;
 }
 
@@ -64,8 +67,7 @@ export class ResizeRestrictedZoneAction implements Action {
     public readonly restrictedZoneId!: UUID;
     @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
-    @ValidateNested()
-    @Type(() => Size)
+    @IsZodSchema(sizeSchema)
     public readonly newSize!: Size;
 }
 
@@ -109,7 +111,7 @@ function recheckVehiclesInZone(
     restrictedZone.vehicleIds
         .filter((vehicleId) => {
             const vehicle = getElement(draftState, 'vehicle', vehicleId);
-            return !RestrictedZone.isInRestrictedZone(
+            return !isInRestrictedZone(
                 restrictedZone,
                 coordinatesOfPosition(vehicle.position)
             );
@@ -120,7 +122,7 @@ function recheckVehiclesInZone(
         });
     return restrictedZone.vehicleIds.filter((vehicleId) => {
         const vehicle = getElement(draftState, 'vehicle', vehicleId);
-        return RestrictedZone.isInRestrictedZone(
+        return isInRestrictedZone(
             restrictedZone,
             coordinatesOfPosition(vehicle.position)
         );

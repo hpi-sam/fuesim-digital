@@ -2,7 +2,7 @@ import type { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import {
     newMapCoordinatesAt,
-    Size,
+    newSize,
     Viewport,
 } from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
@@ -122,7 +122,7 @@ export class ViewportFeatureManager
                             topLeftCoordinate[0]!,
                             topLeftCoordinate[1]!
                         ),
-                        newSize: Size.create(
+                        newSize: newSize(
                             currentElement.size.width * scale.x,
                             currentElement.size.height * scale.y
                         ),

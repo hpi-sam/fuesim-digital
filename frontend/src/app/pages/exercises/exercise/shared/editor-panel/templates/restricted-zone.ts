@@ -2,11 +2,13 @@ import type {
     ExerciseState,
     ImageProperties,
     MapPosition,
+    RestrictedZone,
 } from 'digital-fuesim-manv-shared';
 import {
     cloneDeepMutable,
+    defaultVehicleTemplates,
     newMapPositionAt,
-    RestrictedZone,
+    restrictedZoneImage,
     uuid,
 } from 'digital-fuesim-manv-shared';
 import { toUtf8Base64 } from './utils/base64';
@@ -16,8 +18,8 @@ export interface RestrictedZoneDragTemplate {
     stereotype: RestrictedZone;
 }
 
-const height = RestrictedZone.image.height / 23.5;
-const width = height * RestrictedZone.image.aspectRatio;
+const height = restrictedZoneImage.height / 23.5;
+const width = height * restrictedZoneImage.aspectRatio;
 const size = {
     height,
     width,
@@ -43,7 +45,9 @@ const stereotypes: RestrictedZone[] = [
         color: '#00ff00',
         capacity: 3,
         vehicleIds: [],
-        vehicleRestrictions: { Tragetrupp: 'ignore' },
+        vehicleRestrictions: {
+            [defaultVehicleTemplates.carryingUnit.id]: 'ignore',
+        },
         position,
         size,
     },
@@ -66,14 +70,14 @@ const stereotypes: RestrictedZone[] = [
         capacity: 1,
         vehicleIds: [],
         vehicleRestrictions: {
-            RTH: 'restrict',
-            RTW: 'prohibit',
-            NAW: 'prohibit',
-            NEF: 'prohibit',
-            KTW: 'prohibit',
-            'KTW (KatSchutz)': 'prohibit',
-            'GW-San': 'prohibit',
-            Tragetrupp: 'prohibit',
+            [defaultVehicleTemplates.rth.id]: 'restrict',
+            [defaultVehicleTemplates.rtw.id]: 'prohibit',
+            [defaultVehicleTemplates.naw.id]: 'prohibit',
+            [defaultVehicleTemplates.nef.id]: 'prohibit',
+            [defaultVehicleTemplates.ktw.id]: 'prohibit',
+            [defaultVehicleTemplates.ktwKatSchutz.id]: 'prohibit',
+            [defaultVehicleTemplates.gwSan.id]: 'prohibit',
+            [defaultVehicleTemplates.carryingUnit.id]: 'prohibit',
         },
         position,
         size: { width: 50, height: 50 },
@@ -113,7 +117,7 @@ function coloredImageUrl(color: string, name: string): ImageProperties {
     const url = `data:image/svg+xml;base64,${toUtf8Base64(content)}`;
 
     return {
-        ...RestrictedZone.image,
+        ...restrictedZoneImage,
         url,
     };
 }

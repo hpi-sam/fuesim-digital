@@ -5,7 +5,7 @@ import type {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     Element,
 } from 'digital-fuesim-manv-shared';
-import { Size, newMapCoordinatesAt } from 'digital-fuesim-manv-shared';
+import { newMapCoordinatesAt, newSize } from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type { Polygon } from 'ol/geom';
 import type { TranslateEvent } from 'ol/interaction/Translate';
@@ -118,7 +118,7 @@ export class SimulatedRegionFeatureManager
                             topLeftCoordinate[0]!,
                             topLeftCoordinate[1]!
                         ),
-                        newSize: Size.create(
+                        newSize: newSize(
                             currentElement.size.width * scale.x,
                             currentElement.size.height * scale.y
                         ),

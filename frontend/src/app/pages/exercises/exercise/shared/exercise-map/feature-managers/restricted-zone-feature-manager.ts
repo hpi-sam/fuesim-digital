@@ -10,7 +10,7 @@ import {
     currentCoordinatesOf,
     isOnMap,
     newMapCoordinatesAt,
-    Size,
+    newSize,
 } from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type { Polygon } from 'ol/geom';
@@ -126,7 +126,7 @@ export class RestrictedZoneFeatureManager
                             topLeftCoordinate[0]!,
                             topLeftCoordinate[1]!
                         ),
-                        newSize: Size.create(
+                        newSize: newSize(
                             currentElement.size.width * scale.x,
                             currentElement.size.height * scale.y
                         ),

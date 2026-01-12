@@ -17,7 +17,6 @@ import {
     VehicleParameters,
     mapCoordinatesSchema,
     newVehiclePositionIn,
-    RestrictedZone,
     newSimulatedRegionPositionIn,
 } from '../../models/index.js';
 import {
@@ -45,6 +44,7 @@ import {
     VehicleRemovedEvent,
 } from '../../simulation/index.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { isInRestrictedZone } from '../../models/restricted-zone.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
 import { getElement } from './utils/index.js';
@@ -372,12 +372,7 @@ export namespace VehicleActionReducers {
                     'restrictedZone',
                     vehicle.restrictedZoneId
                 );
-                if (
-                    !RestrictedZone.isInRestrictedZone(
-                        restrictedZone,
-                        targetPosition
-                    )
-                ) {
+                if (!isInRestrictedZone(restrictedZone, targetPosition)) {
                     removeVehicleFromCurrentRestrictedZone(
                         draftState,
                         vehicleId

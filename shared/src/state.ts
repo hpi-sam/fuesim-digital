@@ -62,6 +62,7 @@ import { IsZodSchema } from './utils/validators/is-zod-object.js';
 import { vehicleSchema } from './models/vehicle.js';
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import type { TreatmentAssignment } from './store/index.js';
+import { restrictedZoneSchema } from './models/restricted-zone.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -99,7 +100,7 @@ export class ExerciseState {
     public readonly patients: { readonly [key: UUID]: Patient } = {};
     @IsIdMap(Material)
     public readonly materials: { readonly [key: UUID]: Material } = {};
-    @IsIdMap(RestrictedZone)
+    @IsZodSchema(z.record(z.uuidv4(), restrictedZoneSchema))
     public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
         {};
     @IsIdMap(MapImage)

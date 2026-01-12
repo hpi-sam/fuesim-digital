@@ -11,7 +11,7 @@ export * from './position/simulated-region-position.js';
 export * from './position/map-coordinates.js';
 export * from './position/position-helpers.js';
 export * from './patient-status.js';
-export { Size } from './size.js';
+export * from './size.js';
 export type { Role } from './role.js';
 export { CanCaterFor } from './cater-for.js';
 export * from './exercise-status.js';

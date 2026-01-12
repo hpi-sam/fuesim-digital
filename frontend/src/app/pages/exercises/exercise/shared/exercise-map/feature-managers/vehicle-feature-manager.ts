@@ -31,6 +31,52 @@ import type { PopupService } from '../utility/popup.service';
 import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
+type PossibleVehicleStatus = Exclude<PatientStatus, 'white'>;
+
+interface StatusbarColor {
+    backgroundColor: string;
+    backgroundStroke: string;
+    color: string;
+}
+
+const statusPriorities = [
+    'red',
+    'yellow',
+    'green',
+    'blue',
+    'black',
+] as const satisfies PossibleVehicleStatus[];
+
+const patientStatusToStatusbarColors = {
+    red: {
+        backgroundColor: 'rgba(220, 53, 69, 0.85)',
+        backgroundStroke: 'rgb(220, 53, 69)',
+        color: 'white',
+    },
+    yellow: {
+        backgroundColor: 'rgba(255, 193, 7, 0.85)',
+        backgroundStroke: 'rgb(255, 193, 7)',
+        color: 'black',
+    },
+    green: {
+        backgroundColor: 'rgba(40, 167, 69, 0.85)',
+        backgroundStroke: 'rgb(40, 167, 69)',
+        color: 'white',
+    },
+    black: {
+        backgroundColor: 'rgba(15, 15, 15, 0.85)',
+        backgroundStroke: 'rgb(15, 15, 15)',
+        color: 'white',
+    },
+    blue: {
+        backgroundColor: 'rgba(0, 123, 255, 0.85)',
+        backgroundStroke: 'rgb(0, 123, 255)',
+        color: 'white',
+    },
+} as const satisfies {
+    [key in PossibleVehicleStatus]: StatusbarColor;
+};
+
 export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
     public register(
         destroy$: Subject<void>,
@@ -209,9 +255,11 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
         const filled = Object.keys(vehicle.patientIds).length;
         const text = `${filled}/${vehicle.patientCapacity}`;
 
-        let backgroundColor = 'rgba(255, 255, 255, 0.85)';
-        let backgroundStroke = 'rgb(255, 255, 255)';
-        let color = 'black';
+        let statusbarColor: StatusbarColor = {
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backgroundStroke: 'rgb(255, 255, 255)',
+            color: 'black',
+        };
 
         if (config.vehicleStatusInSkColor && filled > 0) {
             const state = selectStateSnapshot(selectExerciseState, this.store);
@@ -222,38 +270,12 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             const getStatus = (p: any) =>
                 config.pretriageEnabled ? p.pretriageStatus : p.realStatus;
 
-            let sk: Exclude<PatientStatus, 'white'> | undefined;
-            if (patients.some((p) => p && getStatus(p) === 'red')) sk = 'red';
-            else if (patients.some((p) => p && getStatus(p) === 'yellow'))
-                sk = 'yellow';
-            else if (patients.some((p) => p && getStatus(p) === 'green'))
-                sk = 'green';
-            else if (patients.some((p) => p && getStatus(p) === 'blue'))
-                sk = 'blue';
-            else if (patients.some((p) => p && getStatus(p) === 'black'))
-                sk = 'black';
-
-            if (sk === 'red') {
-                backgroundColor = 'rgba(220, 53, 69, 0.85)';
-                backgroundStroke = 'rgb(220, 53, 69)';
-                color = 'white';
-            } else if (sk === 'yellow') {
-                backgroundColor = 'rgba(255, 193, 7, 0.85)';
-                backgroundStroke = 'rgb(255, 193, 7)';
-                color = 'black';
-            } else if (sk === 'green') {
-                backgroundColor = 'rgba(40, 167, 69, 0.85)';
-                backgroundStroke = 'rgb(40, 167, 69)';
-                color = 'white';
-            } else if (sk === 'black') {
-                backgroundColor = 'rgba(15, 15, 15, 0.85)';
-                backgroundStroke = 'rgb(15, 15, 15)';
-                color = 'white';
-            } else if (sk === 'blue') {
-                backgroundColor = 'rgba(0, 123, 255, 0.85)';
-                backgroundStroke = 'rgb(0, 123, 255)';
-                color = 'white';
-            }
+            const vehicleStatusColor = statusPriorities.find((s) =>
+                patients.some((p) => p && getStatus(p) === s)
+            );
+            if (vehicleStatusColor)
+                statusbarColor =
+                    patientStatusToStatusbarColors[vehicleStatusColor];
         }
 
         const resolution = this.olMap.getView().getResolution() ?? 1;
@@ -264,10 +286,12 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             text: new OlText({
                 text,
                 font: `${fontPx}px sans-serif`,
-                fill: new Fill({ color }),
-                backgroundFill: new Fill({ color: backgroundColor }),
+                fill: new Fill({ color: statusbarColor.color }),
+                backgroundFill: new Fill({
+                    color: statusbarColor.backgroundColor,
+                }),
                 backgroundStroke: new Stroke({
-                    color: backgroundStroke,
+                    color: statusbarColor.backgroundStroke,
                     width: 0.5 * scale,
                 }),
                 offsetY: -6 * scale,

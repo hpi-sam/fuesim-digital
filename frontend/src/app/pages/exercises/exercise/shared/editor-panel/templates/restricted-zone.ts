@@ -9,6 +9,7 @@ import {
     RestrictedZone,
     uuid,
 } from 'digital-fuesim-manv-shared';
+import { toUtf8Base64 } from './utils/base64';
 
 export interface RestrictedZoneDragTemplate {
     image: ImageProperties;
@@ -109,10 +110,7 @@ function coloredImageUrl(color: string, name: string): ImageProperties {
       </text>
     </svg>
     `;
-    const encoder = new TextEncoder();
-    const data = encoder.encode(content);
-    const base64 = btoa(String.fromCharCode(...data));
-    const url = `data:image/svg+xml;base64,${base64}`;
+    const url = `data:image/svg+xml;base64,${toUtf8Base64(content)}`;
 
     return {
         ...RestrictedZone.image,

@@ -22,6 +22,7 @@ import {
     newMapPositionAt,
     StrictObject,
 } from 'digital-fuesim-manv-shared';
+import { toUtf8Base64 } from './utils/base64';
 
 export interface SimulatedRegionDragTemplate {
     editorName: string;
@@ -122,7 +123,7 @@ function coloredImageUrl(borderColor: string): ImageProperties {
          y="0.036193207" />
     </svg>
     `;
-    const url = `data:image/svg+xml;base64,${window.btoa(content)}`;
+    const url = `data:image/svg+xml;base64,${toUtf8Base64(content)}`;
     return {
         ...SimulatedRegion.image,
         url,

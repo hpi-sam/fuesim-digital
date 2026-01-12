@@ -294,7 +294,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
                     color: statusbarColor.backgroundStroke,
                     width: 0.5 * scale,
                 }),
-                offsetY: -6 * scale,
+                offsetY: -5 * scale,
                 padding: [0.3 * scale, 2 * scale, 0 * scale, 2 * scale],
                 textAlign: 'center',
                 textBaseline: 'middle',

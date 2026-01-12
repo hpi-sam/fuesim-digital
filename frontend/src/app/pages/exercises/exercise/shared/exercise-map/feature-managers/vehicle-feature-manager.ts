@@ -261,7 +261,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             color: 'black',
         };
 
-        if (config.vehicleStatusInSkColor && filled > 0) {
+        if (config.vehicleStatusInPatientStatusColor && filled > 0) {
             const state = selectStateSnapshot(selectExerciseState, this.store);
             const patients = Object.keys(vehicle.patientIds)
                 .map((id) => state.patients[id])

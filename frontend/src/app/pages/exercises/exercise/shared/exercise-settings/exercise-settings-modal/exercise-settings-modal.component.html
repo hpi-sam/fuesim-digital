@@ -144,7 +144,9 @@
                     <div class="form-switch">
                         <input
                             [ngModel]="configuration.vehicleStatusHighlight"
-                            (ngModelChange)="vehicleStatusHighlightFlag($event)"
+                            (ngModelChange)="
+                                setVehicleStatusHighlightFlag($event)
+                            "
                             class="form-check-input"
                             type="checkbox"
                             data-cy="settingsVehicleStatusHighlightCheckbox"
@@ -156,8 +158,12 @@
                     Statusanzeige in zugehörige SK-Farbe einfärben?
                     <div class="form-switch">
                         <input
-                            [ngModel]="configuration.vehicleStatusInSkColor"
-                            (ngModelChange)="vehicleStatusInSkColorFlag($event)"
+                            [ngModel]="
+                                configuration.vehicleStatusInPatientStatusColor
+                            "
+                            (ngModelChange)="
+                                setVehicleStatusInPatientStatusColorFlag($event)
+                            "
                             class="form-check-input"
                             type="checkbox"
                             data-cy="settingsvehicleStatusInSkColorCheckbox"

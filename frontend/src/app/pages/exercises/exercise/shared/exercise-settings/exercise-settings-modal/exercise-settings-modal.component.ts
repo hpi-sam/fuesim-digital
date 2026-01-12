@@ -60,17 +60,22 @@ export class ExerciseSettingsModalComponent {
         });
     }
 
-    public vehicleStatusHighlightFlag(vehicleStatusHighlightEnabled: boolean) {
+    public setVehicleStatusHighlightFlag(
+        vehicleStatusHighlightEnabled: boolean
+    ) {
         this.exerciseService.proposeAction({
             type: '[Configuration] Set vehicleStatusHighlightEnabled',
             vehicleStatusHighlightEnabled,
         });
     }
 
-    public vehicleStatusInSkColorFlag(vehicleStatusInSkColorEnabled: boolean) {
+    public setVehicleStatusInPatientStatusColorFlag(
+        vehicleStatusInPatientStatusColorEnabled: boolean
+    ) {
         this.exerciseService.proposeAction({
-            type: '[Configuration] Set SetVehicleStatusInSkColorEnabled',
-            vehicleStatusInSkColorEnabled,
+            type: '[Configuration] Set VehicleStatusInPatientStatusColorEnabled',
+            vehicleStatusInPatientStatusColor:
+                vehicleStatusInPatientStatusColorEnabled,
         });
     }
 

@@ -46,13 +46,15 @@ export class SetVehicleStatusHighlightEnabled implements Action {
     public readonly vehicleStatusHighlightEnabled!: boolean;
 }
 
-export class SetVehicleStatusInSkColorEnabled implements Action {
-    @IsValue('[Configuration] Set SetVehicleStatusInSkColorEnabled' as const)
+export class SetVehicleStatusInPatientStatusColorEnabled implements Action {
+    @IsValue(
+        '[Configuration] Set VehicleStatusInPatientStatusColorEnabled' as const
+    )
     public readonly type =
-        '[Configuration] Set SetVehicleStatusInSkColorEnabled';
+        '[Configuration] Set VehicleStatusInPatientStatusColorEnabled';
 
     @IsBoolean()
-    public readonly vehicleStatusInSkColorEnabled!: boolean;
+    public readonly vehicleStatusInPatientStatusColor!: boolean;
 }
 
 export namespace ConfigurationActionReducers {
@@ -109,12 +111,12 @@ export namespace ConfigurationActionReducers {
             rights: 'trainer',
         };
 
-    export const setVehicleStatusInSkColor: ActionReducer<SetVehicleStatusInSkColorEnabled> =
+    export const setVehicleStatusInSkColor: ActionReducer<SetVehicleStatusInPatientStatusColorEnabled> =
         {
-            action: SetVehicleStatusInSkColorEnabled,
-            reducer(draftState, { vehicleStatusInSkColorEnabled }) {
-                draftState.configuration.vehicleStatusInSkColor =
-                    vehicleStatusInSkColorEnabled;
+            action: SetVehicleStatusInPatientStatusColorEnabled,
+            reducer(draftState, { vehicleStatusInPatientStatusColor }) {
+                draftState.configuration.vehicleStatusInPatientStatusColor =
+                    vehicleStatusInPatientStatusColor;
                 return draftState;
             },
             rights: 'trainer',

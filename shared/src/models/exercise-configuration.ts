@@ -19,7 +19,7 @@ export class ExerciseConfiguration {
     @IsBoolean()
     public readonly vehicleStatusHighlight: boolean = false;
     @IsBoolean()
-    public readonly vehicleStatusInSkColor: boolean = false;
+    public readonly vehicleStatusInPatientStatusColor: boolean = false;
 
     @ValidateNested()
     @Type(() => TileMapProperties)

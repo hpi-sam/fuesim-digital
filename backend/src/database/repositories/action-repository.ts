@@ -1,13 +1,9 @@
-import type { InferInsertModel } from 'drizzle-orm';
-import { eq, asc, and, inArray, sql } from 'drizzle-orm';
+import { eq, asc, and, inArray } from 'drizzle-orm';
 import type { ExerciseAction } from 'digital-fuesim-manv-shared';
 import { actionTable } from '../schema.js';
 import type { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { BaseRepository } from './base-repository.js';
-import {
-    DatabaseService,
-    upsertHelper,
-} from './../services/database-service.js';
+import { DatabaseService } from './../services/database-service.js';
 
 export class ActionRepository extends BaseRepository {
     public async getActionsForExerciseId(exerciseId: string) {
@@ -63,12 +59,10 @@ export class ActionRepository extends BaseRepository {
                 throw new Error('Could not find matching action after upsert');
             }
 
-            if (matchingAction) {
-                // Update the action ID in the ActionWrapper
-                // to prevent this action being re-inserted
-                // incase it is still in termporaryActionHistory next time
-                matchingAction.getAction().id = element.id;
-            }
+            // Update the action ID in the ActionWrapper
+            // to prevent this action being re-inserted
+            // incase it is still in termporaryActionHistory next time
+            matchingAction.getAction().id = element.id;
         }
     }
 

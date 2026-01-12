@@ -112,7 +112,7 @@ export class DatabaseService {
         this._initialized = false;
     }
 
-    static upsertHelper(table: DatabaseTable) {
+    public static upsertHelper(table: DatabaseTable) {
         return Object.fromEntries(
             Object.entries(getTableColumns(table)).map(([key, value]) => [
                 key,

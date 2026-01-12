@@ -6,6 +6,7 @@ import {
     StateExport,
     cloneDeepMutable,
     StateHistoryCompound,
+    exportPatientsToCSV,
 } from 'digital-fuesim-manv-shared';
 import { Subject } from 'rxjs';
 import { ApiService } from 'src/app/core/api.service';
@@ -114,6 +115,16 @@ export class ExerciseComponent implements OnDestroy {
 
     public partialExport() {
         openPartialExportModal(this.modalService);
+    }
+
+    public csvExport() {
+        const currentState = selectStateSnapshot(
+            selectExerciseState,
+            this.store
+        );
+        const csvContent = exportPatientsToCSV(currentState);
+        const blob = new Blob([csvContent]);
+        saveBlob(blob, `patienten-${currentState.participantId}.csv`);
     }
 
     public exportExerciseState() {

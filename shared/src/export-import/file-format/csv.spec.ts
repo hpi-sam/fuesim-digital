@@ -1,0 +1,131 @@
+import { produce } from 'immer';
+import { ExerciseState } from '../../state.js';
+import { type Mutable } from '../../utils/index.js';
+import { addPatient } from '../../../tests/utils/patients.spec.js';
+import { preparePatientsForCSVExport } from './csv.js';
+
+const emptyState = ExerciseState.create('123456');
+
+function setupState(
+    mutateBeforeState: (state: Mutable<ExerciseState>) => void
+) {
+    return produce(emptyState, (draftState) => {
+        mutateBeforeState(draftState);
+    });
+}
+
+describe('csv export', () => {
+    describe.each([
+        [
+            'red patient',
+            [
+                (draftState: Mutable<ExerciseState>) => {
+                    const patient = addPatient(draftState, 'red', 'red');
+                    patient.biometricInformation.sex = 'female';
+                },
+                {
+                    status: '1',
+                    sex: 'W',
+                    remarks: '',
+                    hasTransportPriority: '0',
+                },
+            ],
+        ],
+        [
+            'yellow patient',
+            [
+                (draftState: Mutable<ExerciseState>) => {
+                    const patient = addPatient(draftState, 'yellow', 'yellow');
+                    patient.biometricInformation.sex = 'male';
+                    patient.remarks = 'unique_remarks';
+                },
+                {
+                    status: '2',
+                    sex: 'M',
+                    remarks: 'unique_remarks',
+                },
+            ],
+        ],
+        [
+            'green patient',
+            [
+                (draftState: Mutable<ExerciseState>) => {
+                    const patient = addPatient(draftState, 'green', 'green');
+                    patient.biometricInformation.sex = 'diverse';
+                    patient.hasTransportPriority = true;
+                },
+                {
+                    status: '3',
+                    sex: '',
+                    hasTransportPriority: '1',
+                },
+            ],
+        ],
+        [
+            'blue patient',
+            [
+                (draftState: Mutable<ExerciseState>) => {
+                    const patient = addPatient(draftState, 'blue', 'blue');
+                    patient.biometricInformation.sex = 'female';
+                },
+                {
+                    status: '1',
+                },
+            ],
+        ],
+        [
+            'black patient',
+            [
+                (draftState: Mutable<ExerciseState>) => {
+                    const patient = addPatient(draftState, 'black', 'black');
+                    patient.biometricInformation.sex = 'female';
+                },
+                {
+                    status: '1',
+                },
+            ],
+        ],
+        [
+            'white patient',
+            [
+                (draftState: Mutable<ExerciseState>) => {
+                    const patient = addPatient(draftState, 'white', 'red');
+                    patient.biometricInformation.sex = 'female';
+                },
+                {
+                    status: '1',
+                },
+            ],
+        ],
+        [
+            'red triaged, but real yellow',
+            [
+                (draftState: Mutable<ExerciseState>) => {
+                    const patient = addPatient(draftState, 'red', 'yellow');
+                    patient.biometricInformation.sex = 'female';
+                },
+                {
+                    status: '1',
+                },
+            ],
+        ],
+    ] as const)('export %s', (_, [mutateState, expectedState]) => {
+        it('correct data', () => {
+            const state = setupState(mutateState);
+            const patient = Object.values(state.patients)[0]!;
+            const patients = preparePatientsForCSVExport(state);
+            expect(patients).toHaveLength(1);
+            const exportedPatient = patients[0]!;
+            expect(exportedPatient.id).toBe(patient.identifier);
+            expect(exportedPatient.age).toBe(patient.biometricInformation.age);
+            expect(exportedPatient.pzc).toBe('');
+            expect(exportedPatient.ventilated).toBe('');
+            expect(exportedPatient.doctorEscort).toBe('');
+
+            for (const key of Object.keys(expectedState)) {
+                // @ts-expect-error: string
+                expect(exportedPatient[key]).toBe(expectedState[key]);
+            }
+        });
+    });
+});

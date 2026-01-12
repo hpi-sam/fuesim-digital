@@ -153,10 +153,6 @@ export class RestrictedZoneFeatureManager
                 this.geometryHelper.getElementCoordinates(newElement)
             );
         }
-        // If the style has updated, we need to redraw the feature
-        if (changedProperties.has('color')) {
-            elementFeature.changed();
-        }
         elementFeature.changed();
     }
 

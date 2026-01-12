@@ -1,7 +1,6 @@
 import fs from 'node:fs';
-import { UserReadableIdGenerator } from 'utils/user-readable-id-generator';
-import { exerciseMap } from 'exercise/exercise-map';
-import { createTestEnvironment } from './utils';
+import { UserReadableIdGenerator } from '../src/utils/user-readable-id-generator.js';
+import { createTestEnvironment } from './utils.js';
 
 const basePath = '../test-scenarios/migration-test-scenarios';
 
@@ -10,7 +9,7 @@ describe('migration', () => {
 
     beforeEach(async () => {
         UserReadableIdGenerator.freeAll();
-        exerciseMap.clear();
+        environment.exerciseService.TESTING_getExerciseMap().clear();
     });
 
     fs.readdirSync(basePath).forEach((stateDir) => {

@@ -34,8 +34,8 @@ export const registerProposeActionHandler = (
                 return;
             }
             // 2. Get matching exercise wrapper & client wrapper
-            const exerciseWrapper = clientWrapper.exercise;
-            if (!exerciseWrapper) {
+            const activeExercise = clientWrapper.exercise;
+            if (!activeExercise) {
                 callback({
                     success: false,
                     message: 'No exercise selected',
@@ -54,7 +54,7 @@ export const registerProposeActionHandler = (
             }
 
             const exerciseClient =
-                exerciseWrapper.getStateSnapshot().clients[
+                activeExercise.getStateSnapshot().clients[
                     clientWrapper.client.id
                 ];
             if (!exerciseClient) {
@@ -71,7 +71,7 @@ export const registerProposeActionHandler = (
                 !validatePermissions(
                     exerciseClient,
                     action,
-                    exerciseWrapper.getStateSnapshot()
+                    activeExercise.getStateSnapshot()
                 )
             ) {
                 callback({
@@ -83,7 +83,7 @@ export const registerProposeActionHandler = (
             }
             // 4. apply & broadcast action (+ save to timeline)
             try {
-                exerciseWrapper.applyAction(action, clientWrapper.client.id);
+                activeExercise.applyAction(action, clientWrapper.client.id);
             } catch (error: any) {
                 if (error instanceof ReducerError) {
                     if (error instanceof ExpectedReducerError) {

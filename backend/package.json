@@ -17,16 +17,10 @@
         "test:ci-no-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci --testPathIgnorePatterns ./test/http-migration.spec.ts",
         "test:ci-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci ./test/http-migration.spec.ts",
         "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --verbose --watch",
-        "typeorm:cli": "NODE_ENV=migration node --loader ts-node/esm ./node_modules/typeorm/cli -d src/database/migration-datasource.ts",
-        "typeorm:cli:prod": "NODE_ENV=migration node ./node_modules/typeorm/cli -d dist/src/database/migration-datasource.js",
-        "typeorm:cli:windows": "set NODE_ENV=migration&& node --loader ts-node/esm ./node_modules/typeorm/cli -d src/database/migration-datasource.ts",
-        "migration:generate": "genmigration() { npm run typeorm:cli migration:generate \"./src/database/migrations/$1\"; }; genmigration",
-        "migration:generate:windows": ".\\src\\database\\migrations\\generate-migration.bat",
-        "migration:run": "npm run typeorm:cli migration:run",
-        "migration:run:prod": "npm run typeorm:cli:prod migration:run",
-        "migration:run:windows": "npm run typeorm:cli:windows migration:run",
-        "migration:revert": "npm run typeorm:cli migration:revert",
-        "migration:revert:windows": "npm run typeorm:cli:windows migration:revert",
+        "migration:generate": "npx drizzle-kit generate",
+        "migration:run": "npx drizzle-kit migrate",
+        "migration:check": "npx drizzle-kit check",
+        "db:studio": "npx drizzle-kit studio",
         "db:purge": "node --loader ts-node/esm src/database/scripts/purge.ts"
     },
     "private": true,
@@ -35,18 +29,20 @@
         "npm": ">=11"
     },
     "dependencies": {
+        "@electric-sql/pglite": "^0.3.14",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.1",
         "cors": "^2.8.5",
         "digital-fuesim-manv-shared": "file:../shared",
         "dotenv": "^16.4.7",
+        "drizzle-kit": "^0.31.7",
+        "drizzle-orm": "^0.44.7",
         "envalid": "^8.0.0",
         "express": "^5.1.0",
         "lodash-es": "4.17.21",
         "pg": "^8.14.1",
         "socket.io": "^4.8.1",
         "supertest": "^7.1.0",
-        "typeorm": "^0.3.26",
         "zod": "^4.1.12"
     },
     "devDependencies": {
@@ -56,7 +52,8 @@
         "@types/express": "^5.0.1",
         "@types/jest": "^30.0.0",
         "@types/lodash-es": "^4.17.6",
-        "@types/node": "^22",
+        "@types/node": "^22.19.1",
+        "@types/pg": "^8.15.6",
         "@types/supertest": "^6.0.3",
         "eslint": "^9.36.0",
         "eslint-config-prettier": "^10.1.1",
@@ -73,6 +70,9 @@
     "overrides": {
         "@istanbuljs/load-nyc-config": {
             "js-yaml": "^4.1.1"
+        },
+        "@esbuild-kit/core-utils": {
+            "esbuild": "0.27.0"
         }
     }
 }

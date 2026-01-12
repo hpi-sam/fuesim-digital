@@ -4,6 +4,7 @@ import type { Express } from 'express';
 import express from 'express';
 import { Config } from '../config.js';
 import type { DatabaseService } from '../database/services/database-service.js';
+import type { ExerciseService } from './../database/services/exercise-service.js';
 import {
     deleteExercise,
     getExercise,
@@ -18,7 +19,11 @@ export class ExerciseHttpServer {
     /**
      * @param uploadLimit in Megabyte can be set via ENV DFM_UPLOAD_LIMIT
      */
-    public constructor(app: Express, databaseService: DatabaseService) {
+    public constructor(
+        app: Express,
+        databaseService: DatabaseService,
+        exerciseService: ExerciseService
+    ) {
         // TODO: Temporary allow all
         app.use(cors());
 
@@ -27,19 +32,36 @@ export class ExerciseHttpServer {
         // This endpoint is used to determine whether the API itself is running.
         // It should be independent from any other services that may or may not be running.
         // This is used for the Cypress CI.
-        app.get('/api/health', async (_req, res) => secureHttp(getHealth, res));
+        app.get('/api/health', async (_req, res) =>
+            secureHttp(getHealth, _req, res)
+        );
         app.post('/api/exercise', async (req, res) =>
-            secureHttp(async () => postExercise(databaseService, req.body), res)
+            secureHttp(
+                async () => postExercise(exerciseService, req.body),
+                req,
+                res
+            )
         );
         app.get('/api/exercise/:exerciseId', async (req, res) =>
-            secureHttp(() => getExercise(req.params.exerciseId), res)
+            secureHttp(
+                () => getExercise(req.params.exerciseId, exerciseService),
+                req,
+                res
+            )
         );
         app.delete('/api/exercise/:exerciseId', async (req, res) =>
-            secureHttp(async () => deleteExercise(req.params.exerciseId), res)
+            secureHttp(
+                async () =>
+                    deleteExercise(req.params.exerciseId, exerciseService),
+                req,
+                res
+            )
         );
         app.get('/api/exercise/:exerciseId/history', async (req, res) =>
             secureHttp(
-                async () => getExerciseHistory(req.params.exerciseId),
+                async () =>
+                    getExerciseHistory(req.params.exerciseId, exerciseService),
+                req,
                 res
             )
         );

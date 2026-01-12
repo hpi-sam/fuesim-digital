@@ -1,0 +1,1 @@
+ALTER TABLE "exercise_wrapper_entity" ALTER COLUMN "stateVersion" DROP DEFAULT;

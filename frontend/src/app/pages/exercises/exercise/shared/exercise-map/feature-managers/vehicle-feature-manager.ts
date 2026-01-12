@@ -104,7 +104,6 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
                 this.imageStyleHelper.getStyle(feature as Feature, resolution),
             ];
 
-            // Statusbar-Styles hinzufügen (ohne Zeitangabe)
             const statusBarStyle = this.statusBarStyleHelper(
                 feature as Feature
             );
@@ -190,9 +189,8 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
     }
 
     /**
-     * Erzeugt die Statusbar-Styles für ein Fahrzeug-Feature.
-     * Zeigt Belegung (filled/capacity) und färbt optional nach kritischster Patienten-SK.
-     * Keine Zeitangabe.
+     * Creates statusbar styles for a vehicle feature.
+     * The statusbar shows the number of occupied/all patient seats and is, optionally, colored by the patient's status color.
      */
     private readonly statusBarStyleHelper = (
         feature: Feature<any>
@@ -210,7 +208,6 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
         const filled = Object.keys(vehicle.patientIds).length;
         const text = `${filled}/${vehicle.patientCapacity}`;
 
-        // Farben bestimmen (optional nach kritischster SK)
         let backgroundColor = 'rgba(255, 255, 255, 0.85)';
         let backgroundStroke = 'rgb(255, 255, 255)';
         let color = 'black';
@@ -221,7 +218,6 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
                 .map((id) => state.patients[id])
                 .filter(Boolean);
 
-            // Sichtbarer Status je Konfiguration
             const getStatus = (p: any) =>
                 config.pretriageEnabled ? p.pretriageStatus : p.realStatus;
 
@@ -259,7 +255,6 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             }
         }
 
-        // Text-Style über dem Fahrzeug rendern
         const resolution = this.olMap.getView().getResolution() ?? 1;
         const scale = 1 / resolution;
         const fontPx = 2 * scale;

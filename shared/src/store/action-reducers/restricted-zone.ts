@@ -147,7 +147,7 @@ export namespace RestrictedZoneActionReducers {
             });
 
             const newRestrictedZone = cloneDeepMutable(restrictedZone);
-            // Template-Restrictions haben Vorrang vor den automatisch initialisierten
+            // Restrictions of the template override default restrictions
             newRestrictedZone.vehicleRestrictions = {
                 ...vehicleRestrictions,
                 ...newRestrictedZone.vehicleRestrictions,

@@ -57,7 +57,6 @@ export class RestrictedZonePopupComponent implements OnInit {
             createSelectRestrictedZone(this.restrictedZoneId)
         );
 
-        // Alle verfügbaren Fahrzeugtypen sammeln
         this.availableVehicleTypes$ = combineLatest([
             this.store.select(selectVehicleTemplates),
             this.store.select(selectVehicles),
@@ -65,14 +64,12 @@ export class RestrictedZonePopupComponent implements OnInit {
             map(([vehicleTemplates, vehiclesObject]) => {
                 const vehicleTypes = new Set<string>();
 
-                // Fahrzeugtypen aus Templates hinzufügen
                 Object.values(vehicleTemplates).forEach(
                     (template: VehicleTemplate) => {
                         vehicleTypes.add(template.vehicleType);
                     }
                 );
 
-                // Fahrzeugtypen aus aktiven Fahrzeugen hinzufügen
                 Object.values(vehiclesObject).forEach((vehicle: Vehicle) => {
                     vehicleTypes.add(vehicle.vehicleType);
                 });

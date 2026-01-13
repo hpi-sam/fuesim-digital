@@ -1,12 +1,15 @@
 import * as z from 'zod';
 import type { Immutable } from 'immer';
 import { type UUID, uuid } from '../utils/index.js';
+import type { ExerciseState } from '../state.js';
 import type { ImageProperties, MapCoordinates, Size } from './utils/index.js';
 import {
     lowerRightCornerOf,
     upperLeftCornerOf,
     newMapPositionAt,
     positionSchema,
+    isOnMap,
+    currentCoordinatesOf,
 } from './utils/index.js';
 import { sizeSchema } from './utils/size.js';
 
@@ -35,7 +38,6 @@ export const restrictedZoneSchema = z.strictObject({
     name: z.string(),
     capacity: z.int().nonnegative(),
     color: z.string(),
-    vehicleIds: z.uuidv4().array(),
     vehicleRestrictions: vehicleRestrictionsSchema,
 });
 
@@ -65,7 +67,6 @@ export function newRestrictedZone(
         name,
         capacity,
         color,
-        vehicleIds: [],
         vehicleRestrictions: vehicleRestrictions ?? {},
     };
 }
@@ -93,38 +94,65 @@ export function isInRestrictedZone(
 /**
  * Get the restriction status of a vehicle type in a specific restricted zone
  * @param restrictedZone The restricted zone to get the restriction status of
- * @param vehicleType The UUID of the vehicle type to get the restriction status of
+ * @param vehicleTemplateId The UUID of the vehicle template to get the restriction status of
  * @returns The {@link VehicleRestrictionType} of the vehicle type in the restricted zone
  */
-export function getVehicleRestriction(
+export function getVehicleTemplateRestriction(
     restrictedZone: RestrictedZone,
-    vehicleType: UUID
+    vehicleTemplateId: UUID
 ): VehicleRestrictionType {
-    return restrictedZone.vehicleRestrictions[vehicleType] ?? 'ignore';
+    return restrictedZone.vehicleRestrictions[vehicleTemplateId] ?? 'restrict';
 }
 
 /**
  * Checks whether the given vehicle type is prohibited in a specific restricted zone
  * @param restrictedZone The restricted zone to check against
- * @param vehicleType The UUID of the vehicle type to check
+ * @param vehicleTemplateId The UUID of the vehicle template to check
  * @returns `true`, if the vehicle type is prohibited in the zone, `false` otherwise
  */
-export function isVehicleProhibited(
+export function isVehicleTemplateProhibited(
     restrictedZone: RestrictedZone,
-    vehicleType: UUID
+    vehicleTemplateId: UUID
 ): boolean {
-    return getVehicleRestriction(restrictedZone, vehicleType) === 'prohibit';
+    return (
+        getVehicleTemplateRestriction(restrictedZone, vehicleTemplateId) ===
+        'prohibit'
+    );
 }
 
 /**
  * Checks whether the given vehicle type is restricted (limited capacity) in a specific restricted zone
  * @param restrictedZone The restricted zone to check against
- * @param vehicleType The UUID of the vehicle type to check
+ * @param vehicleTemplateId The UUID of the vehicle template to check
  * @returns `true`, if the vehicle type is restricted in the zone, `false` otherwise
  */
-export function isVehicleRestricted(
+export function isVehicleTemplateRestricted(
     restrictedZone: RestrictedZone,
-    vehicleType: string
+    vehicleTemplateId: UUID
 ): boolean {
-    return getVehicleRestriction(restrictedZone, vehicleType) === 'restrict';
+    return (
+        getVehicleTemplateRestriction(restrictedZone, vehicleTemplateId) ===
+        'restrict'
+    );
+}
+
+/**
+ * Counts how many restricted vehicles are in the given zone
+ * @param state The state to count in. Used to get a list of vehicles.
+ * @param restrictedZone The restricted zone to count the vehicles in.
+ * @param vehicleIdToIgnore The ID of a vehicle that should be ignored while counting (optional).
+ * @returns The number of vehicles, whose template is restricted, in the zone.
+ */
+export function countRestrictedVehiclesInRestrictedZone(
+    state: ExerciseState,
+    restrictedZone: RestrictedZone,
+    vehicleIdToIgnore?: UUID
+) {
+    return Object.values(state.vehicles).filter(
+        (v) =>
+            v.id !== vehicleIdToIgnore &&
+            isOnMap(v) &&
+            isInRestrictedZone(restrictedZone, currentCoordinatesOf(v)) &&
+            isVehicleTemplateRestricted(restrictedZone, v.templateId)
+    ).length;
 }

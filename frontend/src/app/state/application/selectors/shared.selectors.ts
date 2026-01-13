@@ -22,7 +22,7 @@ import type { AppState } from '../../app.state';
 import { selectOwnClientId } from './application.selectors';
 import {
     selectClients,
-    selectRestrictedZone,
+    selectRestrictedZones,
     selectMapImages,
     selectMaterials,
     selectPatients,
@@ -120,7 +120,7 @@ export const selectVisibleTransferPoints =
 export const selectVisibleSimulatedRegions =
     selectVisibleElementsFactory<SimulatedRegion>(selectSimulatedRegions);
 export const selectVisibleRestrictedZone =
-    selectVisibleElementsFactory<RestrictedZone>(selectRestrictedZone);
+    selectVisibleElementsFactory<RestrictedZone>(selectRestrictedZones);
 
 export const selectVisibleCateringLines = createSelector(
     selectRestrictedViewport,

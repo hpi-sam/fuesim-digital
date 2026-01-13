@@ -77,7 +77,10 @@
                 >
                 <ng-template ngbNavContent>
                     <div class="form-group pb-3">
-                        @if (availableVehicleTypes$ | async; as vehicleTypes) {
+                        @if (
+                            availableVehicleTemplates$ | async;
+                            as vehicleTemplates
+                        ) {
                             <div
                                 class="table-responsive"
                                 style="max-height: 250px; overflow-y: auto"
@@ -95,13 +98,14 @@
                                     </thead>
                                     <tbody>
                                         @for (
-                                            vehicleType of vehicleTypes;
-                                            track vehicleType
+                                            vehicleTemplate of vehicleTemplates
+                                                | keyvalue;
+                                            track vehicleTemplate.key
                                         ) {
                                             <tr>
                                                 <td class="align-middle">
                                                     <strong>{{
-                                                        vehicleType
+                                                        vehicleTemplate.value
                                                     }}</strong>
                                                 </td>
                                                 <td class="text-center">
@@ -114,22 +118,23 @@
                                                             class="btn-check"
                                                             [name]="
                                                                 'restriction-' +
-                                                                vehicleType
+                                                                vehicleTemplate.key
                                                             "
                                                             [id]="
                                                                 'ignore-' +
-                                                                vehicleType
+                                                                vehicleTemplate.key
                                                             "
                                                             value="ignore"
                                                             [checked]="
                                                                 restrictedZone
                                                                     .vehicleRestrictions[
-                                                                    vehicleType
+                                                                    vehicleTemplate
+                                                                        .key
                                                                 ] === 'ignore'
                                                             "
                                                             (change)="
                                                                 setVehicleRestriction(
-                                                                    vehicleType,
+                                                                    vehicleTemplate.key,
                                                                     'ignore'
                                                                 )
                                                             "
@@ -138,7 +143,7 @@
                                                             class="btn btn-outline-success"
                                                             [for]="
                                                                 'ignore-' +
-                                                                vehicleType
+                                                                vehicleTemplate.key
                                                             "
                                                             title="Ignorieren"
                                                         >
@@ -152,22 +157,25 @@
                                                             class="btn-check"
                                                             [name]="
                                                                 'restriction-' +
-                                                                vehicleType
+                                                                vehicleTemplate.key
                                                             "
                                                             [id]="
                                                                 'restrict-' +
-                                                                vehicleType
+                                                                vehicleTemplate.key
                                                             "
                                                             value="restrict"
                                                             [checked]="
-                                                                restrictedZone
+                                                                (restrictedZone
                                                                     .vehicleRestrictions[
-                                                                    vehicleType
-                                                                ] === 'restrict'
+                                                                    vehicleTemplate
+                                                                        .key
+                                                                ] ||
+                                                                    'restrict') ===
+                                                                'restrict'
                                                             "
                                                             (change)="
                                                                 setVehicleRestriction(
-                                                                    vehicleType,
+                                                                    vehicleTemplate.key,
                                                                     'restrict'
                                                                 )
                                                             "
@@ -176,7 +184,7 @@
                                                             class="btn btn-outline-warning"
                                                             [for]="
                                                                 'restrict-' +
-                                                                vehicleType
+                                                                vehicleTemplate.key
                                                             "
                                                             title="Einschränken"
                                                         >
@@ -190,24 +198,23 @@
                                                             class="btn-check"
                                                             [name]="
                                                                 'restriction-' +
-                                                                vehicleType
+                                                                vehicleTemplate.key
                                                             "
                                                             [id]="
                                                                 'prohibit-' +
-                                                                vehicleType
+                                                                vehicleTemplate.key
                                                             "
                                                             value="prohibit"
                                                             [checked]="
-                                                                (restrictedZone
+                                                                restrictedZone
                                                                     .vehicleRestrictions[
-                                                                    vehicleType
-                                                                ] ||
-                                                                    'prohibit') ===
-                                                                'prohibit'
+                                                                    vehicleTemplate
+                                                                        .key
+                                                                ] === 'prohibit'
                                                             "
                                                             (change)="
                                                                 setVehicleRestriction(
-                                                                    vehicleType,
+                                                                    vehicleTemplate.key,
                                                                     'prohibit'
                                                                 )
                                                             "
@@ -216,7 +223,7 @@
                                                             class="btn btn-outline-danger"
                                                             [for]="
                                                                 'prohibit-' +
-                                                                vehicleType
+                                                                vehicleTemplate.key
                                                             "
                                                             title="Verbieten"
                                                         >

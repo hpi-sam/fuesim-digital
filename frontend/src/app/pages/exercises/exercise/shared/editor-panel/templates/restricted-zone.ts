@@ -1,13 +1,12 @@
 import type {
     ExerciseState,
     ImageProperties,
-    MapPosition,
     RestrictedZone,
 } from 'digital-fuesim-manv-shared';
 import {
     cloneDeepMutable,
     defaultVehicleTemplates,
-    newMapPositionAt,
+    newNoPosition,
     restrictedZoneImage,
     uuid,
 } from 'digital-fuesim-manv-shared';
@@ -24,7 +23,7 @@ const size = {
     height,
     width,
 };
-const position: MapPosition = newMapPositionAt({ x: 0, y: 0 });
+const position = newNoPosition();
 
 const stereotypes: RestrictedZone[] = [
     {
@@ -33,7 +32,6 @@ const stereotypes: RestrictedZone[] = [
         name: 'Eingeschränkte Zone ???',
         color: '#ff4444',
         capacity: 5,
-        vehicleIds: [],
         vehicleRestrictions: {},
         position,
         size,
@@ -44,7 +42,6 @@ const stereotypes: RestrictedZone[] = [
         name: 'Ladezone ???',
         color: '#00ff00',
         capacity: 3,
-        vehicleIds: [],
         vehicleRestrictions: {
             [defaultVehicleTemplates.carryingUnit.id]: 'ignore',
         },
@@ -57,7 +54,6 @@ const stereotypes: RestrictedZone[] = [
         name: 'Pufferzone ???',
         color: '#ffff00',
         capacity: 5,
-        vehicleIds: [],
         vehicleRestrictions: {},
         position,
         size,
@@ -68,7 +64,6 @@ const stereotypes: RestrictedZone[] = [
         name: 'RTH-Landeplatz ???',
         color: '#ff8800',
         capacity: 1,
-        vehicleIds: [],
         vehicleRestrictions: {
             [defaultVehicleTemplates.rth.id]: 'restrict',
             [defaultVehicleTemplates.rtw.id]: 'prohibit',

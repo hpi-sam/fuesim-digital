@@ -19,8 +19,8 @@ import {
     RequestBehaviorState,
     TreatPatientsBehaviorState,
     UnloadArrivingVehiclesBehaviorState,
-    newMapPositionAt,
     StrictObject,
+    newNoPosition,
 } from 'digital-fuesim-manv-shared';
 import { toUtf8Base64 } from './utils/base64';
 
@@ -36,7 +36,7 @@ const size = {
     height,
     width,
 };
-const position = newMapPositionAt({ x: 0, y: 0 });
+const position = newNoPosition();
 
 const stereotypes: SimulatedRegion[] = [
     {

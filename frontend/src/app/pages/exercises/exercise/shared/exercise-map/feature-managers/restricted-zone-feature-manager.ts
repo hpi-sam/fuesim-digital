@@ -1,13 +1,9 @@
-import type { Store } from '@ngrx/store';
-import type {
-    UUID,
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    Element,
-    RestrictedZone,
-} from 'digital-fuesim-manv-shared';
+import { createSelector, type Store } from '@ngrx/store';
+import type { UUID, RestrictedZone } from 'digital-fuesim-manv-shared';
 import {
-    cloneDeepMutable,
+    countRestrictedVehiclesInRestrictedZone,
     currentCoordinatesOf,
+    isInRestrictedZone,
     isOnMap,
     newMapCoordinatesAt,
     newSize,
@@ -17,7 +13,7 @@ import type { Polygon } from 'ol/geom';
 import type OlMap from 'ol/Map';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
-import type { Subject } from 'rxjs';
+import { pairwise, startWith, takeUntil, type Subject } from 'rxjs';
 import type { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import {
@@ -25,9 +21,14 @@ import {
     selectVisibleRestrictedZone,
 } from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import type { TranslateEvent } from 'ol/interaction/Translate';
 import { Fill } from 'ol/style';
 import { asArray } from 'ol/color';
+import { isEmpty } from 'lodash-es';
+import {
+    selectExerciseState,
+    selectRestrictedZones,
+    selectVehicles,
+} from 'src/app/state/application/selectors/exercise.selectors';
 import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -51,6 +52,60 @@ export class RestrictedZoneFeatureManager
             destroy$,
             mapInteractionsManager
         );
+
+        // Register change handlers to update number of vehicles if a vehicle has been moved
+        this.store
+            .select(
+                createSelector(
+                    selectRestrictedZones,
+                    selectVehicles,
+                    (restrictedZones, vehicles) =>
+                        Object.fromEntries(
+                            Object.values(restrictedZones).map((rz) => [
+                                rz.id,
+                                {
+                                    restrictedZone: rz,
+                                    vehicleCount: Object.values(
+                                        vehicles
+                                    ).filter(
+                                        (v) =>
+                                            isOnMap(v) &&
+                                            isInRestrictedZone(
+                                                rz,
+                                                currentCoordinatesOf(v)
+                                            )
+                                    ),
+                                },
+                            ])
+                        )
+                )
+            )
+            .pipe(
+                startWith(
+                    {} as {
+                        [key: string]: {
+                            restrictedZone: RestrictedZone;
+                            vehicleCount: number;
+                        };
+                    }
+                ),
+                pairwise(),
+                takeUntil(destroy$)
+            )
+            .subscribe(([oldZones, newZones]) =>
+                Object.entries(newZones).forEach(([zoneId, vehicleCount]) => {
+                    if (
+                        !isEmpty(oldZones) &&
+                        (!(zoneId in oldZones) ||
+                            oldZones[zoneId]!.vehicleCount !== vehicleCount)
+                    )
+                        this.onElementChanged(
+                            oldZones[zoneId]!.restrictedZone,
+                            newZones[zoneId]!.restrictedZone
+                        );
+                })
+            );
+
         mapInteractionsManager.addTrainerInteraction(
             new ResizeRectangleInteraction(this.layer.getSource()!)
         );
@@ -106,8 +161,12 @@ export class RestrictedZoneFeatureManager
             const extent = (feature as Feature<Polygon>)
                 .getGeometry()!
                 .getExtent() as [number, number, number, number];
+            const vehicleCount = countRestrictedVehiclesInRestrictedZone(
+                selectStateSnapshot(selectExerciseState, this.store),
+                restrictedZone
+            );
             return {
-                name: `${restrictedZone.name} (${restrictedZone.vehicleIds.length}/${restrictedZone.capacity})`,
+                name: `${restrictedZone.name} (${vehicleCount}/${restrictedZone.capacity})`,
                 offsetY: (extent[3] - extent[1]) / 2,
             };
         },
@@ -194,68 +253,6 @@ export class RestrictedZoneFeatureManager
                 this.olMap.getView().getCenter()!
             ),
         });
-    }
-
-    public override onFeatureDrop(
-        droppedElement: Element | undefined,
-        droppedOnFeature: Feature<any>,
-        dropEvent?: TranslateEvent
-    ) {
-        const droppedOnRestrictedZone = this.getElementFromFeature(
-            droppedOnFeature
-        ) as RestrictedZone | undefined;
-        if (!droppedElement || !droppedOnRestrictedZone) {
-            console.error('Could not find element for the features');
-            return false;
-        }
-        if (droppedElement.type === 'vehicle' && isOnMap(droppedElement)) {
-            if (
-                droppedElement.restrictedZoneId === droppedOnRestrictedZone.id
-            ) {
-                // The vehicle is already assigned to the restricted zone
-                return true;
-            }
-            if (
-                droppedOnRestrictedZone.vehicleRestrictions[
-                    droppedElement.vehicleType
-                ] === 'ignore'
-            ) {
-                return true;
-            }
-            if (
-                droppedOnRestrictedZone.vehicleRestrictions[
-                    droppedElement.vehicleType
-                ] === 'restrict'
-            ) {
-                if (
-                    droppedOnRestrictedZone.vehicleIds.length <
-                    droppedOnRestrictedZone.capacity
-                ) {
-                    this.exerciseService.proposeAction({
-                        type: '[Vehicle] Assign restricted zone to vehicle',
-                        vehicleId: droppedElement.id,
-                        restrictedZoneId: droppedOnRestrictedZone.id,
-                    });
-                    return true;
-                }
-            }
-            const coordinates = cloneDeepMutable(
-                currentCoordinatesOf(droppedOnRestrictedZone)
-            );
-
-            // place the vehicle on the right hand side of the restricted zone
-            coordinates.y -= 0.5 * droppedOnRestrictedZone.size.height;
-            coordinates.x +=
-                10 + Math.max(droppedOnRestrictedZone.size.width, 0);
-
-            this.exerciseService.proposeAction({
-                type: '[Vehicle] Move vehicle',
-                vehicleId: droppedElement.id,
-                targetPosition: coordinates,
-            });
-            return false;
-        }
-        return false;
     }
 
     public override isFeatureTranslatable(feature: Feature<Polygon>): boolean {

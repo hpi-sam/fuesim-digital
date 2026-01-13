@@ -2,7 +2,6 @@ import { IsNumber, IsString, IsUUID } from 'class-validator';
 import { Action, ActionReducer } from '../action-reducer.js';
 import { IsValue } from '../../utils/validators/index.js';
 import {
-    coordinatesOfPosition,
     type RestrictedZone,
     type MapCoordinates,
     type Size,
@@ -10,20 +9,16 @@ import {
     newMapPositionAt,
     mapCoordinatesSchema,
 } from '../../models/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import { ExerciseState } from '../../state.js';
 import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { sizeSchema } from '../../models/utils/size.js';
-import {
-    isInRestrictedZone,
-    restrictedZoneSchema,
-} from '../../models/restricted-zone.js';
+import { restrictedZoneSchema } from '../../models/restricted-zone.js';
 import { getElement } from './utils/index.js';
 
 export class AddRestrictedZoneAction implements Action {
@@ -95,7 +90,7 @@ export class SetVehicleRestrictionAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly restrictedZoneId!: UUID;
     @IsString()
-    public readonly vehicleType!: string;
+    public readonly vehicleTemplateId!: string;
     @IsLiteralUnion({
         ignore: true,
         restrict: true,
@@ -104,48 +99,23 @@ export class SetVehicleRestrictionAction implements Action {
     public readonly restriction!: VehicleRestrictionType;
 }
 
-function recheckVehiclesInZone(
-    draftState: Mutable<ExerciseState>,
-    restrictedZone: RestrictedZone
-) {
-    restrictedZone.vehicleIds
-        .filter((vehicleId) => {
-            const vehicle = getElement(draftState, 'vehicle', vehicleId);
-            return !isInRestrictedZone(
-                restrictedZone,
-                coordinatesOfPosition(vehicle.position)
-            );
-        })
-        .forEach((vehicleId) => {
-            const vehicle = getElement(draftState, 'vehicle', vehicleId);
-            vehicle.restrictedZoneId = undefined;
-        });
-    return restrictedZone.vehicleIds.filter((vehicleId) => {
-        const vehicle = getElement(draftState, 'vehicle', vehicleId);
-        return isInRestrictedZone(
-            restrictedZone,
-            coordinatesOfPosition(vehicle.position)
-        );
-    });
-}
-
 export namespace RestrictedZoneActionReducers {
     export const addRestrictedZone: ActionReducer<AddRestrictedZoneAction> = {
         action: AddRestrictedZoneAction,
         reducer: (draftState, { restrictedZone }) => {
             // Initialize vehicle restrictions with 'restrict' for all vehicle types
             const vehicleRestrictions: {
-                [vehicleType: string]: VehicleRestrictionType;
+                [vehicleTemplateId: UUID]: VehicleRestrictionType;
             } = {};
 
             // Get all vehicle types from vehicle templates
             Object.values(draftState.vehicleTemplates).forEach((template) => {
-                vehicleRestrictions[template.vehicleType] = 'restrict';
+                vehicleRestrictions[template.id] = 'restrict';
             });
 
             // Get all vehicle types from existing vehicles
             Object.values(draftState.vehicles).forEach((vehicle) => {
-                vehicleRestrictions[vehicle.vehicleType] = 'restrict';
+                vehicleRestrictions[vehicle.templateId] = 'restrict';
             });
 
             const newRestrictedZone = cloneDeepMutable(restrictedZone);
@@ -170,15 +140,6 @@ export namespace RestrictedZoneActionReducers {
                 'restrictedZone',
                 draftState
             );
-            const restrictedZone = getElement(
-                draftState,
-                'restrictedZone',
-                restrictedZoneId
-            );
-            restrictedZone.vehicleIds = recheckVehiclesInZone(
-                draftState,
-                restrictedZone
-            );
             return draftState;
         },
         rights: 'trainer',
@@ -188,11 +149,6 @@ export namespace RestrictedZoneActionReducers {
         {
             action: RemoveRestrictedZoneAction,
             reducer: (draftState, { restrictedZoneId }) => {
-                Object.values(draftState.vehicles).forEach((vehicle) => {
-                    if (vehicle.restrictedZoneId === restrictedZoneId) {
-                        vehicle.restrictedZoneId = undefined;
-                    }
-                });
                 delete draftState.restrictedZones[restrictedZoneId];
                 return draftState;
             },
@@ -232,10 +188,6 @@ export namespace RestrictedZoneActionReducers {
                     draftState
                 );
                 restrictedZone.size = cloneDeepMutable(newSize);
-                restrictedZone.vehicleIds = recheckVehiclesInZone(
-                    draftState,
-                    restrictedZone
-                );
                 return draftState;
             },
             rights: 'trainer',
@@ -276,7 +228,7 @@ export namespace RestrictedZoneActionReducers {
             action: SetVehicleRestrictionAction,
             reducer: (
                 draftState,
-                { restrictedZoneId, vehicleType, restriction }
+                { restrictedZoneId, vehicleTemplateId, restriction }
             ) => {
                 const restrictedZone = getElement(
                     draftState,
@@ -285,7 +237,7 @@ export namespace RestrictedZoneActionReducers {
                 );
                 restrictedZone.vehicleRestrictions = {
                     ...restrictedZone.vehicleRestrictions,
-                    [vehicleType]: restriction,
+                    [vehicleTemplateId]: restriction,
                 };
                 return draftState;
             },

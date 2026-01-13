@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map, Observable, combineLatest } from 'rxjs';
-import type {
-    RestrictedZone,
-    UUID,
-    VehicleTemplate,
-    Vehicle,
-    VehicleRestrictionType,
+import {
+    type RestrictedZone,
+    type UUID,
+    type VehicleTemplate,
+    type Vehicle,
+    type VehicleRestrictionType,
+    sortObject,
+    stringCompare,
 } from 'digital-fuesim-manv-shared';
 import type { AppState } from 'src/app/state/app.state';
 import {
@@ -37,7 +39,7 @@ export class RestrictedZonePopupComponent implements OnInit {
 
     public restrictedZone$?: Observable<RestrictedZone>;
     public readonly currentRole$ = this.store.select(selectCurrentMainRole);
-    public availableVehicleTypes$?: Observable<string[]>;
+    public availableVehicleTemplates$?: Observable<{ [key: UUID]: string }>;
 
     public get activeNavId() {
         return activeNavId;
@@ -57,24 +59,30 @@ export class RestrictedZonePopupComponent implements OnInit {
             createSelectRestrictedZone(this.restrictedZoneId)
         );
 
-        this.availableVehicleTypes$ = combineLatest([
+        this.availableVehicleTemplates$ = combineLatest([
             this.store.select(selectVehicleTemplates),
             this.store.select(selectVehicles),
         ]).pipe(
             map(([vehicleTemplates, vehiclesObject]) => {
-                const vehicleTypes = new Set<string>();
+                const availableTemplates: { [key: UUID]: string } = {};
 
                 Object.values(vehicleTemplates).forEach(
                     (template: VehicleTemplate) => {
-                        vehicleTypes.add(template.vehicleType);
+                        availableTemplates[template.id] = template.vehicleType;
                     }
                 );
 
                 Object.values(vehiclesObject).forEach((vehicle: Vehicle) => {
-                    vehicleTypes.add(vehicle.vehicleType);
+                    if (!(vehicle.templateId in availableTemplates))
+                        availableTemplates[vehicle.templateId] =
+                            vehicle.vehicleType;
                 });
 
-                return [...vehicleTypes].sort();
+                return sortObject(
+                    availableTemplates,
+                    ([keyA, valueA], [keyB, valueB]) =>
+                        stringCompare(keyA as string, keyB as string)
+                );
             })
         );
     }
@@ -103,11 +111,14 @@ export class RestrictedZonePopupComponent implements OnInit {
         });
     }
 
-    public setVehicleRestriction(vehicleType: string, restriction: string) {
+    public setVehicleRestriction(
+        vehicleTemplateId: string,
+        restriction: string
+    ) {
         this.exerciseService.proposeAction({
             type: '[RestrictedZone] Set vehicle restriction',
             restrictedZoneId: this.restrictedZoneId,
-            vehicleType,
+            vehicleTemplateId,
             restriction: restriction as VehicleRestrictionType,
         });
     }

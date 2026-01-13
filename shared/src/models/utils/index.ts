@@ -2,6 +2,7 @@ export * from './position/position.js';
 export type * from './position/position.js';
 export type { WithPosition } from './position/with-position.js';
 export * from './position/map-position.js';
+export * from './position/no-position.js';
 export type * from './position/vehicle-position.js';
 export * from './position/vehicle-position.js';
 export type * from './position/transfer-position.js';

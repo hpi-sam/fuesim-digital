@@ -305,7 +305,7 @@ export class OlMapManager {
             this.olMap
         );
 
-        const restrictedZoneFeatureMananger = new RestrictedZoneFeatureManager(
+        const restrictedZoneFeatureManager = new RestrictedZoneFeatureManager(
             this.olMap,
             this.exerciseService,
             this.store,
@@ -336,7 +336,7 @@ export class OlMapManager {
 
         this.featureManagers = [
             deleteFeatureManager,
-            restrictedZoneFeatureMananger,
+            restrictedZoneFeatureManager,
             transferLinesFeatureManager,
             simulatedRegionFeatureManager,
             mapImageFeatureManager,
@@ -387,7 +387,7 @@ export class OlMapManager {
         );
         this.featureNameFeatureManagerDictionary.set(
             'restrictedZone',
-            restrictedZoneFeatureMananger
+            restrictedZoneFeatureManager
         );
         this.featureNameFeatureManagerDictionary.set(
             'delete',

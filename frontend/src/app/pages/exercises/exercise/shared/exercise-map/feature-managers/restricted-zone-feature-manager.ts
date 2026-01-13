@@ -27,6 +27,7 @@ import {
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import { Fill } from 'ol/style';
+import { asArray } from 'ol/color';
 import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -41,8 +42,6 @@ export class RestrictedZoneFeatureManager
     extends MoveableFeatureManager<RestrictedZone, Polygon>
     implements FeatureManager<Polygon>
 {
-    private readonly fill = new Fill({ color: '#ffffff00' });
-
     public register(
         destroy$: Subject<void>,
         mapInteractionsManager: OlMapInteractionsManager
@@ -84,8 +83,14 @@ export class RestrictedZoneFeatureManager
         const restrictedZone = this.getElementFromFeature(
             feature
         ) as RestrictedZone;
+
+        // OpenLayers caches the results, so we must not modify them directly
+        // → Array destructuring to create a copy
+        const fill = [...asArray(restrictedZone.color)];
+        fill[3] = 0.2;
+
         return new Style({
-            fill: this.fill,
+            fill: new Fill({ color: fill }),
             stroke: new Stroke({
                 color: restrictedZone.color,
                 width: 2,

@@ -38,6 +38,8 @@ export class RestrictedZonePopupComponent implements OnInit {
     public restrictedZoneId!: UUID;
 
     public restrictedZone$?: Observable<RestrictedZone>;
+    public ignoredVehicleTypes$?: Observable<string[]>;
+    public prohibitedVehicleTypes$?: Observable<string[]>;
     public readonly currentRole$ = this.store.select(selectCurrentMainRole);
     public availableVehicleTemplates$?: Observable<{ [key: UUID]: string }>;
 
@@ -84,6 +86,34 @@ export class RestrictedZonePopupComponent implements OnInit {
                         stringCompare(keyA as string, keyB as string)
                 );
             })
+        );
+
+        this.ignoredVehicleTypes$ = combineLatest([
+            this.restrictedZone$,
+            this.availableVehicleTemplates$,
+        ]).pipe(
+            map(([restrictedZone, vehicleTemplates]) =>
+                Object.entries(restrictedZone.vehicleRestrictions)
+                    .filter(([_, restriction]) => restriction === 'ignore')
+                    .map(
+                        ([templateId, _]) =>
+                            vehicleTemplates[templateId] ?? 'unbekannter Typ'
+                    )
+            )
+        );
+
+        this.prohibitedVehicleTypes$ = combineLatest([
+            this.restrictedZone$,
+            this.availableVehicleTemplates$,
+        ]).pipe(
+            map(([restrictedZone, vehicleTemplates]) =>
+                Object.entries(restrictedZone.vehicleRestrictions)
+                    .filter(([_, restriction]) => restriction === 'prohibit')
+                    .map(
+                        ([templateId, _]) =>
+                            vehicleTemplates[templateId] ?? 'unbekannter Typ'
+                    )
+            )
         );
     }
 

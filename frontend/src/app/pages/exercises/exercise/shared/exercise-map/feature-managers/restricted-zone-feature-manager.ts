@@ -225,11 +225,6 @@ export class RestrictedZoneFeatureManager
         feature: Feature<any>
     ): void {
         super.onFeatureClicked(event, feature);
-        if (
-            selectStateSnapshot(selectCurrentMainRole, this.store) !== 'trainer'
-        ) {
-            return;
-        }
         const zoom = this.olMap.getView().getZoom()!;
         const margin = 10 / zoom;
 

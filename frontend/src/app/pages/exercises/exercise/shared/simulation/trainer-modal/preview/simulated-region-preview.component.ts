@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { createSelector, Store } from '@ngrx/store';
 import {
@@ -48,16 +48,15 @@ export type SelectionCategory = (typeof selectionCategories)[number];
     standalone: false,
 })
 export class SimulatedRegionPreviewComponent implements OnInit {
-    @Input() simulatedRegionId!: UUID;
-    @Input() selectedId?: UUID;
+    simulatedRegionId = '' as UUID;
+    selectedId = '' as UUID;
 
     selectedVehicleId$ = new Subject<UUID | null>();
     selectedVehiclePersonnel$!: Observable<Personnel[]>;
 
-    public readonly selectionCatertories = selectionCategories;
     selectionCategory?: SelectionCategory;
 
-    simulatetRegion$!: Observable<SimulatedRegion>;
+    simulatedRegion$!: Observable<SimulatedRegion>;
 
     patients$!: Observable<PatientWithVisibleStatus[]>;
 
@@ -84,7 +83,6 @@ export class SimulatedRegionPreviewComponent implements OnInit {
 
     detailsIsCollapsed = true;
     collapseIsLocked = false;
-    detailsWidth = 1;
 
     constructor(
         private readonly store: Store<AppState>,
@@ -94,10 +92,9 @@ export class SimulatedRegionPreviewComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.simulatetRegion$ = this.store.select(
+        this.simulatedRegion$ = this.store.select(
             createSelectSimulatedRegion(this.simulatedRegionId)
         );
-
         this.patients$ = this.store.select(
             createSelector(
                 createSelectElementsInSimulatedRegion(
@@ -259,16 +256,34 @@ export class SimulatedRegionPreviewComponent implements OnInit {
         });
     }
 
-    selectingPersonnel(personnelId: UUID) {
-        this.selectedPersonnel$ = this.store.select(
-            createSelectPersonnel(personnelId)
-        );
-    }
-
-    selectingMaterial(materialId: UUID) {
-        this.selectedMaterial$ = this.store.select(
-            createSelectMaterial(materialId)
-        );
+    onCardClick(
+        id: UUID,
+        type: SelectionCategory,
+        collapse: boolean,
+        collapseLocked: boolean
+    ) {
+        this.selectedId = id;
+        this.selectionCategory = type;
+        this.detailsIsCollapsed = collapse;
+        this.collapseIsLocked = collapseLocked;
+        // do selection
+        switch (type) {
+            case 'material':
+                this.selectedMaterial$ = this.store.select(
+                    createSelectMaterial(id)
+                );
+                break;
+            case 'personnel':
+                this.selectedPersonnel$ = this.store.select(
+                    createSelectPersonnel(id)
+                );
+                break;
+            case 'vehicle':
+                this.selectedVehicleId$.next(id);
+                break;
+            case 'patient':
+                break;
+        }
     }
 
     moveVehicleToMap(vehicleId: UUID) {

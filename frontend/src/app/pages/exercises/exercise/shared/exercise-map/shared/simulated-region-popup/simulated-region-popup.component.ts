@@ -8,7 +8,7 @@ import type { AppState } from 'src/app/state/app.state';
 import { createSelectSimulatedRegion } from 'src/app/state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { openSimulationTrainerModal } from '../../../simulation/trainer-modal/open-simulation-trainer-modal';
-import { openPreview } from '../../../simulation/trainer-modal/open-preview';
+import { openPreviewModal } from '../../../simulation/trainer-modal/open-preview-modal';
 import { PopupService } from '../../utility/popup.service';
 
 @Component({
@@ -39,8 +39,8 @@ export class SimulatedRegionPopupComponent implements OnInit {
         openSimulationTrainerModal(this.modalService, this.simulatedRegionId);
     }
 
-    openPreview() {
-        openPreview(this.modalService, this.simulatedRegionId);
+    openPreviewModal() {
+        openPreviewModal(this.modalService, this.simulatedRegionId);
     }
 
     public closePopup() {

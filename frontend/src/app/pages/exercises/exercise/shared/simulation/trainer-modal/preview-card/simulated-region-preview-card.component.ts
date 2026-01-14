@@ -1,4 +1,4 @@
-import { Component, Input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { AppState } from 'src/app/state/app.state';
 
@@ -13,8 +13,8 @@ export class SimulatedRegionPreviewCardComponent {
 
     readonly elementMousedown = output<MouseEvent>();
 
-    @Input() dataCy = '';
-    @Input() title!: string;
-    @Input() imageUrl!: string;
-    @Input() darkBackground = false;
+    dataCy = input<string>('');
+    title = input.required<string>();
+    imageUrl = input.required<string>();
+    darkBackground = input(false);
 }

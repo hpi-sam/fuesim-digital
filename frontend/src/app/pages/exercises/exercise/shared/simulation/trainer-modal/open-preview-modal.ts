@@ -2,7 +2,7 @@ import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { SimulatedRegionPreviewComponent } from './preview/simulated-region-preview.component';
 
-export function openPreview(
+export function openPreviewModal(
     ngbModalService: NgbModal,
     simulatedRegionId?: UUID
 ) {

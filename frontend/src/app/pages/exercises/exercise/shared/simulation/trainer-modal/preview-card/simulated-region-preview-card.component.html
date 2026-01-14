@@ -1,18 +1,18 @@
 <div
     class="card text-center me-1 mb-1"
     (mousedown)="elementMousedown.emit($event)"
-    [attr.data-cy]="dataCy"
+    [attr.data-cy]="dataCy()"
 >
     <ng-content>
         <div
             class="preview-image-container"
-            [class.bg-secondary]="darkBackground"
+            [class.bg-secondary]="darkBackground()"
         >
-            <img [src]="imageUrl" class="card-img-top" />
+            <img [src]="imageUrl()" class="card-img-top" />
         </div>
         <div class="card-body px-1 pb-0 pt-2">
             <h6 class="text-truncate" placement="bottom">
-                {{ title }}
+                {{ title() }}
             </h6>
         </div>
     </ng-content>

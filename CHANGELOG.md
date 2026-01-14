@@ -7,10 +7,6 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
-### Fixed
-
-- Exporting the history of an exercise no longer fails silently.
-
 ## [0.10.0] - 2025-12-08
 
 ### Added

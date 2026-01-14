@@ -105,4 +105,21 @@ describe('exercise', () => {
             });
         });
     });
-});
+
+    describe("GET /api/exercise/:exerciseId/history", () => {
+        it("returns history for existing exercise", async ()=> {
+            const exerciseId = (await createExercise(environment)).trainerId;
+            await environment
+                .httpRequest('get', `/api/exercise/${exerciseId}/history`)
+                .expect(200);
+        })
+
+        it("fails with 404 for non-existing exercise", async ()=> {
+            const exerciseId = 'non-existing-id';
+            await environment
+                .httpRequest('get', `/api/exercise/${exerciseId}/history`)
+                .expect(404);
+        })
+
+    });
+})

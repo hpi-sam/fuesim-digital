@@ -22,7 +22,7 @@ export class ApiService {
         private readonly store: Store<AppState>,
         private readonly messageService: MessageService,
         private readonly httpClient: HttpClient
-    ) {}
+    ) { }
 
     public async createExercise() {
         return lastValueFrom(
@@ -48,7 +48,13 @@ export class ApiService {
             this.httpClient.get<ExerciseTimeline>(
                 `${httpOrigin}/api/exercise/${exerciseId}/history`
             )
-        ).then((value) => freeze(value, true));
+        ).then((value) => freeze(value, true)).catch((error) => {
+            this.messageService.postError({
+                title: 'Fehler beim Laden der Übungshistorie',
+                body: "Der Server konnte keine Übungshistorie bereitstellen.",
+            });
+            throw error;
+        });
     }
 
     public async deleteExercise(trainerId: string) {

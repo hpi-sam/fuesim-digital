@@ -35,8 +35,14 @@ export class ExerciseService {
             await this.exerciseRepository.createExerciseIfNotExists(
                 activeExercise
             );
-        if (result.length === 1 && result[0]?.id) {
-            activeExercise.setExerciseId(result[0].id);
+        if (result) {
+            activeExercise.setExerciseId(result.id);
+        }
+        const exerciseEntity = await this.exerciseRepository.getExerciseById(
+            activeExercise.exerciseId
+        );
+        if (exerciseEntity) {
+            activeExercise.setTemplate(exerciseEntity.exercise_template);
         }
 
         this.exerciseMap.set(activeExercise.participantKey, activeExercise);
@@ -77,11 +83,16 @@ export class ExerciseService {
                         async (exerciseEntity) => {
                             const actions = await this.actionRepository
                                 .withConnection(exerciseRepoTransaction)
-                                .getActionsForExerciseId(exerciseEntity.id);
+                                .getActionsForExerciseId(
+                                    exerciseEntity.exercise_entity.id
+                                );
 
                             const exercise = ExerciseFactory.fromDatabase(
-                                exerciseEntity,
+                                exerciseEntity.exercise_entity,
                                 actions
+                            );
+                            exercise.setTemplate(
+                                exerciseEntity.exercise_template
                             );
                             removeAll(exercise.temporaryActionHistory);
 
@@ -92,7 +103,7 @@ export class ExerciseService {
                                     await this.actionRepository
                                         .withConnection(exerciseRepoTransaction)
                                         .getActionsForExerciseId(
-                                            exerciseEntity.id
+                                            exerciseEntity.exercise_entity.id
                                         )
                                 ).map(
                                     (actionEntity) =>

@@ -2,14 +2,17 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
+    exerciseExistsSchema,
     exercisesSchema,
+    ExerciseTemplateCreateData,
+    exerciseTemplateSchema,
     exerciseTemplatesSchema,
     type ExerciseAccessIds,
     type ExerciseTimeline,
     type StateExport,
 } from 'digital-fuesim-manv-shared';
 import { freeze } from 'immer';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, map } from 'rxjs';
 import type { AppState } from '../state/app.state';
 import { selectExerciseId } from '../state/application/selectors/application.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
@@ -76,20 +79,18 @@ export class ApiService {
      */
     public async exerciseExists(exerciseId: string) {
         return lastValueFrom(
-            this.httpClient.get<null>(
-                `${httpOrigin}/api/exercise/${exerciseId}`
-            )
-        )
-            .then(() => true)
-            .catch((error) => {
-                if (error.status !== 404) {
-                    this.messageService.postError({
-                        title: 'Interner Fehler',
-                        error,
-                    });
-                }
-                return false;
-            });
+            this.httpClient
+                .get(`${httpOrigin}/api/exercise/${exerciseId}`)
+                .pipe(map((v) => exerciseExistsSchema.parse(v)))
+        ).catch((error) => {
+            if (error.status !== 404) {
+                this.messageService.postError({
+                    title: 'Interner Fehler',
+                    error,
+                });
+            }
+            return null;
+        });
     }
 
     public getExercisesResource() {
@@ -101,5 +102,13 @@ export class ApiService {
         return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
             parse: exerciseTemplatesSchema.parse,
         });
+    }
+
+    public async createExerciseTemplate(data: ExerciseTemplateCreateData) {
+        return lastValueFrom(
+            this.httpClient
+                .post(`${httpOrigin}/api/exercise_template`, data)
+                .pipe(map((v) => exerciseTemplateSchema.parse(v)))
+        );
     }
 }

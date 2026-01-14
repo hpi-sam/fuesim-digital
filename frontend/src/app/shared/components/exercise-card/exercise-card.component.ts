@@ -1,7 +1,5 @@
 import { Component, computed, input } from '@angular/core';
 import type { Exercise } from 'digital-fuesim-manv-shared';
-import { selectStateSnapshot } from '../../../state/get-state-snapshot';
-import { selectExerciseId } from '../../../state/application/selectors/application.selectors';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';

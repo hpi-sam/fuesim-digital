@@ -1,5 +1,6 @@
 import { Component, input } from '@angular/core';
 import type { ExerciseTemplate } from 'digital-fuesim-manv-shared';
+import { ApplicationService } from '../../../core/application.service';
 
 @Component({
     selector: 'app-exercise-template-card',
@@ -9,4 +10,12 @@ import type { ExerciseTemplate } from 'digital-fuesim-manv-shared';
 })
 export class ExerciseTemplateCardComponent {
     exerciseTemplate = input<ExerciseTemplate>();
+
+    constructor(private readonly applicationService: ApplicationService) {}
+
+    joinExercise() {
+        const exerciseTemplate = this.exerciseTemplate();
+        if (!exerciseTemplate) return;
+        this.applicationService.joinExercise(exerciseTemplate.trainerId, '');
+    }
 }

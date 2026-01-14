@@ -84,8 +84,8 @@ describe('ActionRepository', () => {
         const exerciseActionsNoId = exerciseActions.map(removeId);
 
         expect(exerciseActionsNoId.length).toBe(2);
-        expect(exerciseActionsNoId[0]!).toEqual(expectedActions[0]!);
-        expect(exerciseActionsNoId[1]!).toEqual(expectedActions[1]!);
+        expect(exerciseActionsNoId[0]).toEqual(expectedActions[0]!);
+        expect(exerciseActionsNoId[1]).toEqual(expectedActions[1]!);
 
         // REPOSITORY METHOD CHECK
         const exerciseActions2 =
@@ -100,7 +100,7 @@ describe('ActionRepository', () => {
         const exerciseActions2NoId = exerciseActions.map(removeId);
 
         expect(exerciseActions2NoId.length).toBe(2);
-        expect(exerciseActions2NoId[0]!).toEqual(expectedActions[0]!);
-        expect(exerciseActions2NoId[1]!).toEqual(expectedActions[1]!);
+        expect(exerciseActions2NoId[0]).toEqual(expectedActions[0]!);
+        expect(exerciseActions2NoId[1]).toEqual(expectedActions[1]!);
     });
 });

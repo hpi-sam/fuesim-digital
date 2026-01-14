@@ -1,5 +1,4 @@
 import { Component, input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-inline-text-editor',

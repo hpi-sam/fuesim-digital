@@ -5,7 +5,6 @@ import { AboutModule } from './pages/about/about.module';
 import { Error404Component } from './pages/error-404/error-404.component';
 import { HealthPageComponent } from './pages/health/health-page/health-page.component';
 import { LandingPageComponent } from './pages/landing-page/landing-page/landing-page.component';
-import { ExerciseTemplateListComponent } from './pages/exercises/template-list/exercise-template-list.component';
 
 const routes: Routes = [
     {
@@ -23,10 +22,6 @@ const routes: Routes = [
             import('./pages/exercises/exercises.module').then(
                 (m) => m.ExercisesModule
             ),
-    },
-    {
-        path: 'exercise_templates',
-        component: ExerciseTemplateListComponent,
     },
     {
         path: 'health',

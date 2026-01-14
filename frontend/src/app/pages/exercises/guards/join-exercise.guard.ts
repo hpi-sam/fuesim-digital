@@ -12,6 +12,7 @@ import type { AppState } from 'src/app/state/app.state';
 import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { tryToJoinExercise } from '../shared/join-exercise-modal/try-to-join-exercise';
+import { ApplicationService } from '../../../core/application.service';
 
 @Injectable({
     providedIn: 'root',
@@ -22,7 +23,8 @@ export class JoinExerciseGuard {
         private readonly router: Router,
         private readonly apiService: ApiService,
         private readonly store: Store<AppState>,
-        private readonly messageService: MessageService
+        private readonly messageService: MessageService,
+        private readonly applicationService: ApplicationService
     ) {}
 
     async canActivate(
@@ -46,11 +48,21 @@ export class JoinExerciseGuard {
             this.router.navigate(['/']);
             return false;
         }
+        console.log(exerciseExists);
 
-        const successfullyJoined = await tryToJoinExercise(
-            this.ngbModalService,
-            route.params['exerciseId']
-        );
+        let successfullyJoined = false;
+        if (exerciseExists.isTemplate) {
+            successfullyJoined = await this.applicationService.joinExercise(
+                route.params['exerciseId'],
+                ''
+            );
+        } else {
+            successfullyJoined = await tryToJoinExercise(
+                this.ngbModalService,
+                route.params['exerciseId']
+            );
+        }
+
         if (!successfullyJoined) {
             this.router.navigate(['/']);
         }

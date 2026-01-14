@@ -11,6 +11,8 @@ import {
     foreignKey,
     varchar,
     timestamp,
+    text,
+    varchar,
 } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
@@ -31,6 +33,19 @@ const baseTable = <T>() => ({
         .notNull(),
 });
 
+export const exerciseTemplateTable = pgTable('exercise_template', {
+    ...baseTable,
+    lastExerciseCreatedAt: timestamp({
+        withTimezone: true,
+        mode: 'date',
+    }),
+    name: varchar().notNull(),
+    description: text().notNull().default(''),
+});
+export type ExerciseTemplateEntry = InferSelectModel<
+    typeof exerciseTemplateTable
+>;
+
 export const exerciseTable = pgTable('exercise_entity', {
     ...baseTable<ExerciseId>(),
     tickCounter: integer().default(0).notNull(),
@@ -42,6 +57,10 @@ export const exerciseTable = pgTable('exercise_entity', {
     lastUsedAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
         .defaultNow(),
+    // by setting a templateId this exercise will be an exercise template
+    templateId: uuid().references(() => exerciseTemplateTable.id, {
+        onDelete: 'cascade',
+    }),
 });
 export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 

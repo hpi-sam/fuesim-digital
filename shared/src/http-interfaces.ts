@@ -52,14 +52,30 @@ export const exercisesSchema = z.array(exerciseSchema);
 export type Exercises = z.infer<typeof exercisesSchema>;
 export type ExercisesInput = z.input<typeof exercisesSchema>;
 
+export const exerciseExistsSchema = z.object({
+    isTemplate: z.boolean(),
+});
+
+export type ExerciseExistsInput = z.input<typeof exerciseExistsSchema>;
+
 export const exerciseTemplateSchema = z.object({
+    id: z.uuid(),
     trainerId: z.string(),
-    lastExerciseCreatedAt: stringToDate,
+    lastExerciseCreatedAt: z.nullable(stringToDate),
     name: z.string(),
     description: z.string(),
 });
+export const exerciseTemplateCreateSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+});
+export type ExerciseTemplateCreateData = z.infer<
+    typeof exerciseTemplateCreateSchema
+>;
 export type ExerciseTemplate = z.infer<typeof exerciseTemplateSchema>;
+export type ExerciseTemplateInput = z.input<typeof exerciseTemplateSchema>;
 
 export const exerciseTemplatesSchema = z.array(exerciseTemplateSchema);
 
 export type ExerciseTemplates = z.infer<typeof exerciseTemplatesSchema>;
+export type ExerciseTemplatesInput = z.input<typeof exerciseTemplatesSchema>;

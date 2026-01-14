@@ -2,7 +2,6 @@ import type { Server as HttpServer } from 'node:http';
 import cors from 'cors';
 import type { Express } from 'express';
 import express from 'express';
-import { exerciseTemplatesSchema } from 'digital-fuesim-manv-shared';
 import cookieParser from 'cookie-parser';
 import { Config } from '../config.js';
 import type { DatabaseService } from '../database/services/database-service.js';
@@ -16,7 +15,12 @@ import {
 } from './http-handler/api/exercise.js';
 import { getHealth } from './http-handler/api/health.js';
 import { secureHttp } from './http-handler/secure-http.js';
-import { getExercises } from './http-handler/api/exercise-manager.js';
+import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
+import {
+    getExercises,
+    getExerciseTemplates,
+    postExerciseTemplate,
+} from './http-handler/api/exercise-manager.js';
 
 export class ApiHttpServer {
     public readonly httpServer: HttpServer;
@@ -90,33 +94,19 @@ export class ApiHttpServer {
 
         app.get('/api/exercise_templates/', async (req, res) =>
             secureHttp(
-                () => {
-                    const exercises = [
-                        {
-                            trainerId: '12345678',
-                            lastExerciseCreatedAt: new Date(
-                                '2025-12-07T16:42:02.718Z'
-                            ),
-                            name: 'MANV 25 mit Verkehrsunfall',
-                            description:
-                                'Diverse eingeklemmte Personen nach einem Busunfall',
-                        },
-                        {
-                            trainerId: '78912345',
-                            lastExerciseCreatedAt: new Date(
-                                '2025-12-03T16:42:02.718Z'
-                            ),
-                            name: 'MANV 50 am Brandenburger Tor',
-                            description:
-                                'Viele leichtverletzte Personen nach einem Gedränge',
-                        },
-                    ];
-
-                    return {
-                        statusCode: 200,
-                        body: exerciseTemplatesSchema.encode(exercises),
-                    };
-                },
+                async () => getExerciseTemplates(exerciseManagerService),
+                req,
+                res
+            )
+        );
+        app.post('/api/exercise_template/', async (req, res) =>
+            secureHttp(
+                async () =>
+                    postExerciseTemplate(
+                        exerciseManagerService,
+                        exerciseService,
+                        req.body
+                    ),
                 req,
                 res
             )

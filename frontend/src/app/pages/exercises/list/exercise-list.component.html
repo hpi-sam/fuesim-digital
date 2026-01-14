@@ -2,7 +2,9 @@
 <div class="container">
     <h1>
         Meine Übungen
-        <button class="btn btn-primary float-end">Neue Übung erstellen</button>
+        <button class="btn btn-primary float-end" (click)="createExercise()">
+            Neue Übung erstellen
+        </button>
     </h1>
     @if (exercises.isLoading()) {
         <div class="row row-cols-3">

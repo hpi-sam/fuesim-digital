@@ -1,6 +1,6 @@
 import type { ExerciseAction, Role, UUID } from 'digital-fuesim-manv-shared';
 import { ExerciseState, reduceExerciseState } from 'digital-fuesim-manv-shared';
-import type { ExerciseEntry, ExerciseId } from '../database/schema.js';
+import type { ExerciseEntry, ExerciseTemplateEntry, ExerciseId } from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
 import type { ClientWrapper } from './client-wrapper.js';
@@ -32,6 +32,17 @@ export class ActiveExercise {
             throw new Error('Exercise ID has already been set.');
         }
         this._exerciseId = value;
+    }
+
+    private _template: ExerciseTemplateEntry | null = null;
+
+    public get template() {
+        return this._template;
+    }
+
+    public setTemplate(template: ExerciseTemplateEntry | null) {
+        // the strictness is only valid, if the id is immediately set
+        this._template = template;
     }
 
     public getExercise() {

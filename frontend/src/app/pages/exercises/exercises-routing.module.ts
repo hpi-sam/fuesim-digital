@@ -5,11 +5,16 @@ import { ExerciseComponent } from './exercise/exercise/exercise.component';
 import { JoinExerciseGuard } from './guards/join-exercise.guard';
 import { LeaveExerciseGuard } from './guards/leave-exercise.guard';
 import { ExerciseListComponent } from './list/exercise-list.component';
+import { ExerciseTemplateListComponent } from './template-list/exercise-template-list.component';
 
 const routes: Routes = [
     {
         path: '',
         component: ExerciseListComponent,
+    },
+    {
+        path: 'templates',
+        component: ExerciseTemplateListComponent,
     },
     {
         path: ':exerciseId',

@@ -1,6 +1,11 @@
-import type { ExerciseTimeline, StateExport } from 'digital-fuesim-manv-shared';
+import {
+    type ExerciseExistsInput,
+    exerciseExistsSchema,
+    type ExerciseAccessIds,
+    type ExerciseTimeline,
+    type StateExport,
+} from 'digital-fuesim-manv-shared';
 import { isEmpty } from 'lodash-es';
-import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
 import type { HttpErrorMessage, HttpResponse } from '../utils.js';
 import { importExercise } from '../../../utils/import-exercise.js';
@@ -12,20 +17,11 @@ import { ExerciseFactory } from './../../../exercise/exercise-factory.js';
 export async function postExercise(
     exerciseService: ExerciseService,
     importObject: StateExport
-): Promise<
-    HttpResponse<
-        HttpErrorMessage | { participantId: string; trainerId: string }
-    >
-> {
+): Promise<HttpResponse<ExerciseAccessIds | HttpErrorMessage>> {
     try {
-        const participantKey = UserReadableIdGenerator.generateId();
-        const trainerKey = UserReadableIdGenerator.generateId(8);
         const newExerciseOrError = isEmpty(importObject)
-            ? ExerciseFactory.fromBlank({ participantKey, trainerKey })
-            : importExercise(importObject, {
-                  participantKey,
-                  trainerKey,
-              });
+            ? ExerciseFactory.fromBlank()
+            : importExercise(importObject);
         if (!(newExerciseOrError instanceof ActiveExercise)) {
             return newExerciseOrError;
         }
@@ -35,8 +31,8 @@ export async function postExercise(
         return {
             statusCode: 201,
             body: {
-                participantId: participantKey,
-                trainerId: trainerKey,
+                participantId: newExerciseOrError.getExercise().participantId,
+                trainerId: newExerciseOrError.getExercise().trainerId,
             },
         };
     } catch (error: unknown) {
@@ -55,7 +51,7 @@ export async function postExercise(
 export function getExercise(
     exerciseKey: string,
     exerciseService: ExerciseService
-): HttpResponse {
+): HttpResponse<ExerciseExistsInput | HttpErrorMessage | undefined> {
     if (!isExerciseKey(exerciseKey)) {
         return {
             statusCode: 400,
@@ -65,10 +61,12 @@ export function getExercise(
         };
     }
 
-    const exerciseExists = exerciseService.hasExerciseKey(exerciseKey);
+    const exercise = exerciseService.getExerciseByKey(exerciseId);
     return {
-        statusCode: exerciseExists ? 200 : 404,
-        body: undefined,
+        statusCode: exercise ? 200 : 404,
+        body: exercise
+            ? exerciseExistsSchema.parse({ isTemplate: !!exercise.template })
+            : undefined,
     };
 }
 

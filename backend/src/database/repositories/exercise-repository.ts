@@ -1,8 +1,9 @@
+import type { ExerciseTemplateCreateData } from 'digital-fuesim-manv-shared';
 import { ExerciseState } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
-import { desc, eq, lt } from 'drizzle-orm';
+import { isNull, desc, eq, lt } from 'drizzle-orm';
 import type { ExerciseId } from '../schema.js';
-import { exerciseTable } from '../schema.js';
+import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import type {
     ParticipantKey,
@@ -11,11 +12,17 @@ import type {
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
-    public getExerciseById(id: ExerciseId) {
-        return this.databaseConnection
-            .select()
-            .from(exerciseTable)
-            .where(eq(exerciseTable.id, id));
+    public async getExerciseById(id: ExerciseId) {
+        return onlySingle(
+            await this.databaseConnection
+                .select()
+                .from(exerciseTable)
+                .leftJoin(
+                    exerciseTemplateTable,
+                    eq(exerciseTemplateTable.id, exerciseTable.templateId)
+                )
+                .where(eq(exerciseTable.id, id))
+        );
     }
 
     /**
@@ -25,6 +32,10 @@ export class ExerciseRepository extends BaseRepository {
         const dbResult = await this.databaseConnection
             .select()
             .from(exerciseTable)
+            .leftJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, exerciseTable.templateId)
+            )
             .where(eq(exerciseTable.trainerId, trainerKey));
 
         return this.onlySingle(dbResult);
@@ -43,7 +54,13 @@ export class ExerciseRepository extends BaseRepository {
     }
 
     public getAllExercises() {
-        return this.databaseConnection.select().from(exerciseTable);
+        return this.databaseConnection
+            .select()
+            .from(exerciseTable)
+            .leftJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, exerciseTable.templateId)
+            );
     }
 
     public getAllExercisesOfOwner() {
@@ -55,7 +72,35 @@ export class ExerciseRepository extends BaseRepository {
                 lastUsedAt: exerciseTable.lastUsedAt,
             })
             .from(exerciseTable)
+            .where(isNull(exerciseTable.templateId))
             .orderBy(desc(exerciseTable.lastUsedAt));
+    }
+
+    public getAllExerciseTemplatesOfOwner() {
+        return this.databaseConnection
+            .select({
+                id: exerciseTemplateTable.id,
+                trainerId: exerciseTable.trainerId,
+                lastExerciseCreatedAt:
+                    exerciseTemplateTable.lastExerciseCreatedAt,
+                name: exerciseTemplateTable.name,
+                description: exerciseTemplateTable.description,
+            })
+            .from(exerciseTemplateTable)
+            .innerJoin(
+                exerciseTable,
+                eq(exerciseTemplateTable.id, exerciseTable.templateId)
+            )
+            .orderBy(desc(exerciseTemplateTable.lastExerciseCreatedAt));
+    }
+
+    public async createExerciseTemplate(data: ExerciseTemplateCreateData) {
+        return onlySingle(
+            await this.databaseConnection
+                .insert(exerciseTemplateTable)
+                .values(data)
+                .returning()
+        );
     }
 
     public deleteExerciseById(exerciseId: ExerciseId) {
@@ -89,31 +134,38 @@ export class ExerciseRepository extends BaseRepository {
             lastUsedAt: new Date(),
         };
 
-        const result = await this.databaseConnection
-            .insert(exerciseTable)
-            .values(exercisePatchWithId)
-            .onConflictDoUpdate({
-                target: exerciseTable.id,
-                set: exercisePatchWithId,
-            })
-            .returning();
-        return result;
+        return onlySingle(
+            await this.databaseConnection
+                .insert(exerciseTable)
+                .values(exercisePatchWithId)
+                .onConflictDoUpdate({
+                    target: exerciseTable.id,
+                    set: exercisePatchWithId,
+                })
+                .returning()
+        );
     }
 
-    public async createExerciseIfNotExists(activeExercise: ActiveExercise) {
+    public async createExerciseIfNotExists(
+        activeExercise: ActiveExercise,
+        templateId: string | null = null
+    ) {
         const exercise = activeExercise.getExercise();
-        return this.databaseConnection
-            .insert(exerciseTable)
-            .values({
-                id: activeExercise.exerciseId,
-                currentStateString: exercise.currentStateString,
-                initialStateString: exercise.initialStateString,
-                tickCounter: exercise.tickCounter,
-                stateVersion: exercise.stateVersion,
-                trainerId: exercise.trainerId,
-                participantId: exercise.participantId,
-            })
-            .onConflictDoNothing()
-            .returning();
+        return onlySingle(
+            await this.databaseConnection
+                .insert(exerciseTable)
+                .values({
+                    id: activeExercise.exerciseId,
+                    currentStateString: exercise.currentStateString,
+                    initialStateString: exercise.initialStateString,
+                    tickCounter: exercise.tickCounter,
+                    stateVersion: exercise.stateVersion,
+                    trainerId: exercise.trainerId,
+                    participantId: exercise.participantId,
+                    templateId,
+                })
+                .onConflictDoNothing()
+                .returning()
+        );
     }
 }

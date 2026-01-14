@@ -8,12 +8,14 @@ import { ExerciseModule } from './exercise/exercise.module';
 import { JoinExerciseModalComponent } from './shared/join-exercise-modal/join-exercise-modal.component';
 import { ExerciseListComponent } from './list/exercise-list.component';
 import { ExerciseTemplateListComponent } from './template-list/exercise-template-list.component';
+import { CreateExerciseTemplateModalComponent } from './shared/create-exercise-template-modal/create-exercise-template-modal.component';
 
 @NgModule({
     declarations: [
         JoinExerciseModalComponent,
         ExerciseListComponent,
         ExerciseTemplateListComponent,
+        CreateExerciseTemplateModalComponent,
     ],
     imports: [
         CommonModule,

@@ -1,5 +1,4 @@
 import { Component, input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { MessageService } from '../../../core/messages/message.service';
 
 @Component({

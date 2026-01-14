@@ -19,19 +19,28 @@ import type { exerciseTable, actionTable } from '../database/schema.js';
 import { pushAll } from '../utils/array.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
+import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './active-exercise.js';
 import { isParticipantKey, isTrainerKey } from './exercise-keys.js';
 
 export class ExerciseFactory {
-    public static fromBlank(exerciseKeys: ExerciseKeys) {
+    public static createKeys(): ExerciseKeys {
+        const participantKey = UserReadableIdGenerator.generateId();
+        const trainerKey = UserReadableIdGenerator.generateId(8);
+        return { participantKey, trainerKey };
+    }
+
+    public static fromBlank(exerciseKeys?: ExerciseKeys) {
+        // eslint-disable-next-line no-param-reassign
+        exerciseKeys ??= this.createKeys();
+
         if (
             !isParticipantKey(exerciseKeys.participantKey) ||
             !isTrainerKey(exerciseKeys.trainerKey)
         ) {
             throw new Error('Invalid exercise keys provided');
         }
-
         return new ActiveExercise(
             exerciseKeys.participantKey,
             exerciseKeys.trainerKey
@@ -43,8 +52,11 @@ export class ExerciseFactory {
      */
     public static fromFile(
         file: StateExport,
-        exerciseKeys: ExerciseKeys
+        exerciseKeys?: ExerciseKeys
     ): ActiveExercise {
+        // eslint-disable-next-line no-param-reassign
+        exerciseKeys ??= this.createKeys();
+
         if (
             !isParticipantKey(exerciseKeys.participantKey) ||
             !isTrainerKey(exerciseKeys.trainerKey)

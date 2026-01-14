@@ -4,7 +4,7 @@
             #inlineInput="ngModel"
             class="form-control form-control-sm"
             rows="3"
-            [ngModel]="value()"
+            [(ngModel)]="newValue"
             name="inline"
             autofocus
         ></textarea>
@@ -23,7 +23,7 @@
                 –
             }
         </div>
-        <button class="btn btn-sm" (click)="edit = true">
+        <button class="btn btn-sm" (click)="startEdit()">
             <i class="bi bi-pencil"></i>
         </button>
     }

@@ -19,6 +19,7 @@ import type { ExerciseManagerService } from './database/services/exercise-manage
 import {
     getExercises,
     getExerciseTemplates,
+    patchExerciseTemplate,
     postExerciseTemplate,
 } from './http-handler/api/exercise-manager.js';
 
@@ -105,6 +106,18 @@ export class ApiHttpServer {
                     postExerciseTemplate(
                         exerciseManagerService,
                         exerciseService,
+                        req.body
+                    ),
+                req,
+                res
+            )
+        );
+        app.patch('/api/exercise_template/:id', async (req, res) =>
+            secureHttp(
+                async () =>
+                    patchExerciseTemplate(
+                        exerciseManagerService,
+                        req.params.id,
                         req.body
                     ),
                 req,

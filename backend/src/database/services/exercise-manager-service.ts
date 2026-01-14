@@ -36,4 +36,22 @@ export class ExerciseManagerService {
             trainerId: newExercise.getExercise().trainerId,
         };
     }
+
+    public async patchExerciseTemplate(
+        id: string,
+        data: ExerciseTemplateCreateData
+    ) {
+        const exerciseTemplate =
+            await this.exerciseRepository.getExerciseTemplateById(id);
+        if (!exerciseTemplate) {
+            throw Error('Exercise template does not exist');
+        }
+        return {
+            ...(await this.exerciseRepository.patchExerciseTemplate(
+                exerciseTemplate.exercise_template.id,
+                data
+            )),
+            trainerId: exerciseTemplate.exercise_entity.trainerId,
+        };
+    }
 }

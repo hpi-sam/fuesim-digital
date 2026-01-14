@@ -5,6 +5,12 @@
                 <app-inline-text-editor
                     class="flex-grow-1"
                     [value]="exerciseTemplate.name"
+                    (update)="
+                        patchExerciseTemplate({
+                            name: $event,
+                            description: exerciseTemplate.description,
+                        })
+                    "
                 />
             </h2>
         </div>
@@ -24,6 +30,12 @@
                 <app-inline-text-editor
                     class="flex-grow-1"
                     [value]="exerciseTemplate.description"
+                    (update)="
+                        patchExerciseTemplate({
+                            name: exerciseTemplate.name,
+                            description: $event,
+                        })
+                    "
                 />
             </li>
         </ul>

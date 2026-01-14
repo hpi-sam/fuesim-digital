@@ -7,6 +7,7 @@ import {
     ExerciseTemplateCreateData,
     exerciseTemplateSchema,
     exerciseTemplatesSchema,
+    UUID,
     type ExerciseAccessIds,
     type ExerciseTimeline,
     type StateExport,
@@ -108,6 +109,17 @@ export class ApiService {
         return lastValueFrom(
             this.httpClient
                 .post(`${httpOrigin}/api/exercise_template`, data)
+                .pipe(map((v) => exerciseTemplateSchema.parse(v)))
+        );
+    }
+
+    public async patchExerciseTemplate(
+        id: UUID,
+        data: ExerciseTemplateCreateData
+    ) {
+        return lastValueFrom(
+            this.httpClient
+                .patch(`${httpOrigin}/api/exercise_template/${id}`, data)
                 .pipe(map((v) => exerciseTemplateSchema.parse(v)))
         );
     }

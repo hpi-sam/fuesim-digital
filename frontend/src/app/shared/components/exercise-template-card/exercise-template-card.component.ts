@@ -1,6 +1,10 @@
 import { Component, input } from '@angular/core';
-import type { ExerciseTemplate } from 'digital-fuesim-manv-shared';
+import type {
+    ExerciseTemplate,
+    ExerciseTemplateCreateData,
+} from 'digital-fuesim-manv-shared';
 import { ApplicationService } from '../../../core/application.service';
+import { ApiService } from '../../../core/api.service';
 
 @Component({
     selector: 'app-exercise-template-card',
@@ -11,11 +15,11 @@ import { ApplicationService } from '../../../core/application.service';
 export class ExerciseTemplateCardComponent {
     exerciseTemplate = input<ExerciseTemplate>();
 
-    constructor(private readonly applicationService: ApplicationService) {}
+    constructor(private readonly apiService: ApiService) {}
 
-    joinExercise() {
+    patchExerciseTemplate(data: ExerciseTemplateCreateData) {
         const exerciseTemplate = this.exerciseTemplate();
         if (!exerciseTemplate) return;
-        this.applicationService.joinExercise(exerciseTemplate.trainerId, '');
+        this.apiService.patchExerciseTemplate(exerciseTemplate.id, data);
     }
 }

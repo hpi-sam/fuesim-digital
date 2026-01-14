@@ -94,11 +94,37 @@ export class ExerciseRepository extends BaseRepository {
             .orderBy(desc(exerciseTemplateTable.lastExerciseCreatedAt));
     }
 
+    public async getExerciseTemplateById(id: string) {
+        return onlySingle(
+            await this.databaseConnection
+                .select()
+                .from(exerciseTemplateTable)
+                .innerJoin(
+                    exerciseTable,
+                    eq(exerciseTemplateTable.id, exerciseTable.templateId)
+                )
+                .where(eq(exerciseTemplateTable.id, id))
+        );
+    }
+
     public async createExerciseTemplate(data: ExerciseTemplateCreateData) {
         return onlySingle(
             await this.databaseConnection
                 .insert(exerciseTemplateTable)
                 .values(data)
+                .returning()
+        );
+    }
+
+    public async patchExerciseTemplate(
+        id: string,
+        data: ExerciseTemplateCreateData
+    ) {
+        return onlySingle(
+            await this.databaseConnection
+                .update(exerciseTemplateTable)
+                .set(data)
+                .where(eq(exerciseTemplateTable.id, id))
                 .returning()
         );
     }

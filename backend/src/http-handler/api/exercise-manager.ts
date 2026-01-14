@@ -51,3 +51,21 @@ export async function postExerciseTemplate(
         body: exerciseTemplateSchema.encode(exerciseTemplate),
     };
 }
+
+export async function patchExerciseTemplate(
+    exerciseManagerService: ExerciseManagerService,
+    id: string,
+    data: object
+): Promise<HttpResponse<ExerciseTemplateInput | HttpErrorMessage>> {
+    const parsedData = exerciseTemplateCreateSchema.parse(data);
+
+    const exerciseTemplate = await exerciseManagerService.patchExerciseTemplate(
+        id,
+        parsedData
+    );
+
+    return {
+        statusCode: 201,
+        body: exerciseTemplateSchema.encode(exerciseTemplate),
+    };
+}

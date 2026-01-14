@@ -18,7 +18,7 @@ import type { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import {
     selectCurrentMainRole,
-    selectVisibleRestrictedZone,
+    selectVisibleRestrictedZones,
 } from 'src/app/state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { Fill } from 'ol/style';
@@ -48,7 +48,7 @@ export class RestrictedZoneFeatureManager
         mapInteractionsManager: OlMapInteractionsManager
     ): void {
         super.registerFeatureElementManager(
-            this.store.select(selectVisibleRestrictedZone),
+            this.store.select(selectVisibleRestrictedZones),
             destroy$,
             mapInteractionsManager
         );

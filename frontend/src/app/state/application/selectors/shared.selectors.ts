@@ -119,7 +119,7 @@ export const selectVisibleTransferPoints =
     selectVisibleElementsFactory<TransferPoint>(selectTransferPoints);
 export const selectVisibleSimulatedRegions =
     selectVisibleElementsFactory<SimulatedRegion>(selectSimulatedRegions);
-export const selectVisibleRestrictedZone =
+export const selectVisibleRestrictedZones =
     selectVisibleElementsFactory<RestrictedZone>(selectRestrictedZones);
 
 export const selectVisibleCateringLines = createSelector(

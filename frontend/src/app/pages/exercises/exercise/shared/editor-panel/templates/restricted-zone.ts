@@ -15,6 +15,7 @@ import { toUtf8Base64 } from './utils/base64';
 export interface RestrictedZoneDragTemplate {
     image: ImageProperties;
     stereotype: RestrictedZone;
+    editorName: string;
 }
 
 const height = restrictedZoneImage.height / 23.5;
@@ -121,6 +122,9 @@ export const restrictedZoneDragTemplates: RestrictedZoneDragTemplate[] =
     stereotypes.map((stereotype) => ({
         stereotype,
         image: coloredImageUrl(stereotype.color, stereotype.name),
+        editorName: stereotype.name.endsWith(' ???')
+            ? stereotype.name.slice(0, -4)
+            : stereotype.name,
     }));
 
 export function reconstituteRestrictedZoneTemplate(

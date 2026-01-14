@@ -6,7 +6,7 @@ import {
     type UUID,
     type VehicleTemplate,
     type Vehicle,
-    type VehicleRestrictionType,
+    type VehicleRestriction,
     sortObject,
     stringCompare,
 } from 'digital-fuesim-manv-shared';
@@ -119,7 +119,7 @@ export class RestrictedZonePopupComponent implements OnInit {
             type: '[RestrictedZone] Set vehicle restriction',
             restrictedZoneId: this.restrictedZoneId,
             vehicleTemplateId,
-            restriction: restriction as VehicleRestrictionType,
+            restriction: restriction as VehicleRestriction,
         });
     }
 

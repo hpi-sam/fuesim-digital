@@ -5,7 +5,7 @@ import {
     type RestrictedZone,
     type MapCoordinates,
     type Size,
-    type VehicleRestrictionType,
+    type VehicleRestriction,
     newMapPositionAt,
     mapCoordinatesSchema,
 } from '../../models/index.js';
@@ -18,7 +18,10 @@ import {
 import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { sizeSchema } from '../../models/utils/size.js';
-import { restrictedZoneSchema } from '../../models/restricted-zone.js';
+import {
+    restrictedZoneSchema,
+    vehicleRestrictionAllowedValues,
+} from '../../models/restricted-zone.js';
 import { getElement } from './utils/index.js';
 
 export class AddRestrictedZoneAction implements Action {
@@ -91,12 +94,8 @@ export class SetVehicleRestrictionAction implements Action {
     public readonly restrictedZoneId!: UUID;
     @IsString()
     public readonly vehicleTemplateId!: string;
-    @IsLiteralUnion({
-        ignore: true,
-        restrict: true,
-        prohibit: true,
-    })
-    public readonly restriction!: VehicleRestrictionType;
+    @IsLiteralUnion(vehicleRestrictionAllowedValues)
+    public readonly restriction!: VehicleRestriction;
 }
 
 export namespace RestrictedZoneActionReducers {
@@ -105,7 +104,7 @@ export namespace RestrictedZoneActionReducers {
         reducer: (draftState, { restrictedZone }) => {
             // Initialize vehicle restrictions with 'restrict' for all vehicle types
             const vehicleRestrictions: {
-                [vehicleTemplateId: UUID]: VehicleRestrictionType;
+                [vehicleTemplateId: UUID]: VehicleRestriction;
             } = {};
 
             // Get all vehicle types from vehicle templates

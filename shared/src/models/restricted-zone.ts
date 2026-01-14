@@ -2,6 +2,7 @@ import * as z from 'zod';
 import type { Immutable } from 'immer';
 import { type UUID, uuid } from '../utils/index.js';
 import type { ExerciseState } from '../state.js';
+import type { AllowedValues } from '../utils/validators/is-literal-union.js';
 import type { ImageProperties, MapCoordinates, Size } from './utils/index.js';
 import {
     lowerRightCornerOf,
@@ -13,19 +14,24 @@ import {
 } from './utils/index.js';
 import { sizeSchema } from './utils/size.js';
 
-export const vehicleRestrictionTypeSchema = z.literal([
+export const vehicleRestrictionSchema = z.literal([
     'ignore',
     'prohibit',
     'restrict',
 ]);
 
-export type VehicleRestrictionType = z.infer<
-    typeof vehicleRestrictionTypeSchema
->;
+export type VehicleRestriction = z.infer<typeof vehicleRestrictionSchema>;
+
+export const vehicleRestrictionAllowedValues: AllowedValues<VehicleRestriction> =
+    {
+        ignore: true,
+        prohibit: true,
+        restrict: true,
+    };
 
 export const vehicleRestrictionsSchema = z.record(
     z.uuidv4(),
-    vehicleRestrictionTypeSchema
+    vehicleRestrictionSchema
 );
 
 export type VehicleRestrictions = z.infer<typeof vehicleRestrictionsSchema>;
@@ -56,7 +62,7 @@ export function newRestrictedZone(
     capacity: number,
     color: string,
     vehicleRestrictions?: {
-        readonly [vehicleType: string]: VehicleRestrictionType;
+        readonly [vehicleType: string]: VehicleRestriction;
     }
 ): RestrictedZone {
     return {
@@ -95,12 +101,12 @@ export function isInRestrictedZone(
  * Get the restriction status of a vehicle type in a specific restricted zone
  * @param restrictedZone The restricted zone to get the restriction status of
  * @param vehicleTemplateId The UUID of the vehicle template to get the restriction status of
- * @returns The {@link VehicleRestrictionType} of the vehicle type in the restricted zone
+ * @returns The {@link VehicleRestriction} of the vehicle type in the restricted zone
  */
 export function getVehicleTemplateRestriction(
     restrictedZone: RestrictedZone,
     vehicleTemplateId: UUID
-): VehicleRestrictionType {
+): VehicleRestriction {
     return restrictedZone.vehicleRestrictions[vehicleTemplateId] ?? 'restrict';
 }
 

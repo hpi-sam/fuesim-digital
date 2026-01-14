@@ -80,8 +80,7 @@ export class SignallerModalTransportRequestTargetEditorComponent
         ]).pipe(
             map(([targetId, simulatedRegions]) =>
                 targetId
-                    ? (simulatedRegions[targetId]?.name ??
-                      'unbekannter Einsatzabschnitt')
+                    ? (simulatedRegions[targetId]?.name ?? 'unbekanntes Ziel')
                     : 'nicht festgelegt'
             )
         );

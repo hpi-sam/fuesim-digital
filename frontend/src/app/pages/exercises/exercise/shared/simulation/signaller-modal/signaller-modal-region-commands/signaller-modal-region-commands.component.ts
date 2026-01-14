@@ -47,8 +47,7 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
         {
             key: 'editTransferConnections',
             name: 'Standort eines Bereichs',
-            details:
-                '(macht den Standort eines anderen Einsatzabschnitts bekannt)',
+            details: '(macht den Standort eines anderen Bereichs bekannt)',
             keywords: [
                 'bereich',
                 'bereiche',

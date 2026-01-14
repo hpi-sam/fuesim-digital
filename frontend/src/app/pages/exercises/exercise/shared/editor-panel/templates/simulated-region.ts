@@ -93,7 +93,7 @@ const stereotypes: SimulatedRegion[] = [
     {
         type: 'simulatedRegion',
         id: '',
-        name: 'Einsatzabschnitt ???',
+        name: 'Generische Simulation ???',
         borderColor: '#cccc00',
         activities: {},
         behaviors: [

@@ -191,7 +191,7 @@ export class SignallerModalProvideVehiclesEditorComponent
                 } else {
                     this.messageService.postError({
                         title: 'Fehler beim Erteilen des Befehls',
-                        body: 'Der Fahrzeug-Befehl ist nicht bei der simulierten Abschnittsleitung angekommen',
+                        body: 'Der Fahrzeug-Befehl ist nicht bei der Leitung des simulierten Bereichs angekommen',
                     });
                 }
 

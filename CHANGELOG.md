@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Fixed
+
+- Viewports are now consistently called "Ansicht" in the frontend and some other incorrect usages of "Einsatzabschnitt" have been corrected.
+
 ## [0.10.0] - 2025-12-08
 
 ### Added

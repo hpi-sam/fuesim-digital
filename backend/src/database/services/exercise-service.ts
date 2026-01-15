@@ -179,7 +179,9 @@ export class ExerciseService {
             throw new UnknownExerciseError(exerciseKey);
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
-                await this.actionRepository.getActionsForExerciseId(exerciseKey)
+                await this.actionRepository.getActionsForExerciseId(
+                    activeExercise.exerciseId
+                )
             ).map((action) => ({
                 action: action.actionString,
                 emitterId: action.emitterId,

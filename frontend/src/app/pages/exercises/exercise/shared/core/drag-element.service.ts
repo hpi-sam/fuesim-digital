@@ -225,7 +225,7 @@ export class DragElementService {
                             height,
                             width,
                         },
-                        'Einsatzabschnitt'
+                        'Ansicht ???'
                     );
                     this.exerciseService.proposeAction(
                         {

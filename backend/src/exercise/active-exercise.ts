@@ -1,6 +1,6 @@
 import type { ExerciseAction, Role, UUID } from 'digital-fuesim-manv-shared';
 import { ExerciseState, reduceExerciseState } from 'digital-fuesim-manv-shared';
-import type { ExerciseEntry } from '../database/schema.js';
+import type { ExerciseEntry, ExerciseId } from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
 import type { ClientWrapper } from './client-wrapper.js';
@@ -14,13 +14,13 @@ export class ActiveExercise {
     // the ExerciseService when creating/loading
     // the exercise or the ExerciseFactory when
     // restoring an exercise
-    private _exerciseId!: string;
+    private _exerciseId!: ExerciseId;
 
-    public get exerciseId(): string {
+    public get exerciseId(): ExerciseId {
         return this._exerciseId;
     }
 
-    public setExerciseId(value: string) {
+    public setExerciseId(value: ExerciseId) {
         // the strictness is only valid, if the id is immediately set
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (this._exerciseId !== undefined) {

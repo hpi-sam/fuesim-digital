@@ -42,25 +42,25 @@ export class ExerciseHttpServer {
                 res
             )
         );
-        app.get('/api/exercise/:exerciseId', async (req, res) =>
+        app.get('/api/exercise/:exerciseKey', async (req, res) =>
             secureHttp(
-                () => getExercise(req.params.exerciseId, exerciseService),
+                () => getExercise(req.params.exerciseKey, exerciseService),
                 req,
                 res
             )
         );
-        app.delete('/api/exercise/:exerciseId', async (req, res) =>
+        app.delete('/api/exercise/:exerciseKey', async (req, res) =>
             secureHttp(
                 async () =>
-                    deleteExercise(req.params.exerciseId, exerciseService),
+                    deleteExercise(req.params.exerciseKey, exerciseService),
                 req,
                 res
             )
         );
-        app.get('/api/exercise/:exerciseId/history', async (req, res) =>
+        app.get('/api/exercise/:exerciseKey/history', async (req, res) =>
             secureHttp(
                 async () =>
-                    getExerciseHistory(req.params.exerciseId, exerciseService),
+                    getExerciseHistory(req.params.exerciseKey, exerciseService),
                 req,
                 res
             )

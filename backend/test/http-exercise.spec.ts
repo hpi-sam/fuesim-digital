@@ -29,7 +29,7 @@ describe('exercise', () => {
         });
     });
 
-    describe('GET /api/exercise/:exerciseId', () => {
+    describe('GET /api/exercise/:exerciseKey', () => {
         it('succeeds returning true for participant id', async () => {
             const participantKey = (await createExercise(environment))
                 .participantId;
@@ -52,7 +52,7 @@ describe('exercise', () => {
         });
     });
 
-    describe('DELETE /api/exercise/:exerciseId', () => {
+    describe('DELETE /api/exercise/:exerciseKey', () => {
         it('succeeds deleting an exercise', async () => {
             const exerciseId = (await createExercise(environment)).trainerId;
             await environment
@@ -106,7 +106,7 @@ describe('exercise', () => {
         });
     });
 
-    describe('GET /api/exercise/:exerciseId/history', () => {
+    describe('GET /api/exercise/:exerciseKey/history', () => {
         it('returns history for existing exercise', async () => {
             const exerciseId = (await createExercise(environment)).trainerId;
             await environment

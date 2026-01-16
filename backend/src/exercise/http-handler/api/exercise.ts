@@ -52,10 +52,10 @@ export async function postExercise(
 }
 
 export function getExercise(
-    exerciseId: string,
+    exerciseKey: string,
     exerciseService: ExerciseService
 ): HttpResponse {
-    const exerciseExists = exerciseService.hasExerciseKey(exerciseId);
+    const exerciseExists = exerciseService.hasExerciseKey(exerciseKey);
     return {
         statusCode: exerciseExists ? 200 : 404,
         body: undefined,
@@ -63,10 +63,10 @@ export function getExercise(
 }
 
 export async function deleteExercise(
-    exerciseId: string,
+    exerciseKey: string,
     exerciseService: ExerciseService
 ): Promise<HttpResponse> {
-    if (exerciseService.getRoleFromId(exerciseId) !== 'trainer') {
+    if (exerciseService.getRoleFromKey(exerciseKey) !== 'trainer') {
         return {
             statusCode: 403,
             body: {
@@ -76,7 +76,7 @@ export async function deleteExercise(
         };
     }
     try {
-        await exerciseService.deleteExercise(exerciseId);
+        await exerciseService.deleteExercise(exerciseKey);
         return {
             statusCode: 204,
             body: undefined,
@@ -86,7 +86,7 @@ export async function deleteExercise(
             return {
                 statusCode: 404,
                 body: {
-                    message: `Exercise with id '${exerciseId}' was not found`,
+                    message: `Exercise with id '${exerciseKey}' was not found`,
                 },
             };
         }
@@ -96,11 +96,11 @@ export async function deleteExercise(
 }
 
 export async function getExerciseHistory(
-    exerciseId: string,
+    exerciseKey: string,
     exerciseService: ExerciseService
 ): Promise<HttpResponse<ExerciseTimeline>> {
     try {
-        const timeline = await exerciseService.getTimeline(exerciseId);
+        const timeline = await exerciseService.getTimeline(exerciseKey);
         return {
             statusCode: 200,
             body: timeline,
@@ -110,7 +110,7 @@ export async function getExerciseHistory(
             return {
                 statusCode: 404,
                 body: {
-                    message: `Exercise with id '${exerciseId}' was not found`,
+                    message: `Exercise with id '${exerciseKey}' was not found`,
                 },
             };
         }

@@ -17,8 +17,8 @@ export class ExerciseService {
 
     private readonly exerciseMap = new Map<string, ActiveExercise>();
 
-    public hasExerciseKey(exerciseId: string) {
-        return this.exerciseMap.has(exerciseId);
+    public hasExerciseKey(exerciseKey: string) {
+        return this.exerciseMap.has(exerciseKey);
     }
 
     public getExerciseByKey(roleKey: string) {
@@ -202,7 +202,7 @@ export class ExerciseService {
         };
     }
 
-    public getRoleFromId(id: string): Role {
+    public getRoleFromKey(id: string): Role {
         switch (id.length) {
             case 6:
                 return 'participant';

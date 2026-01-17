@@ -21,6 +21,7 @@ import {
     getExerciseTemplates,
     patchExerciseTemplate,
     postExerciseTemplate,
+    postNewExerciseFromTemplate,
 } from './http-handler/api/exercise-manager.js';
 
 export class ApiHttpServer {
@@ -107,6 +108,18 @@ export class ApiHttpServer {
                         exerciseManagerService,
                         exerciseService,
                         req.body
+                    ),
+                req,
+                res
+            )
+        );
+        app.post('/api/exercise_template/:id/new', async (req, res) =>
+            secureHttp(
+                async () =>
+                    postNewExerciseFromTemplate(
+                        exerciseManagerService,
+                        exerciseService,
+                        req.params.id
                     ),
                 req,
                 res

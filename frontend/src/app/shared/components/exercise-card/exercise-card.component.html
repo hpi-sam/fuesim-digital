@@ -11,6 +11,19 @@
             </p>
         </div>
         <ul class="list-group list-group-flush">
+            @if (exercise.baseTemplate) {
+                <li class="list-group-item">
+                    <i class="bi bi-rocket me-2"></i>
+                    basiert auf
+                    <a [routerLink]="`/exercises/templates/`">{{
+                        exercise.baseTemplate.name
+                    }}</a>
+                </li>
+            }
+            <li class="list-group-item">
+                <i class="bi bi-plus-circle me-2"></i>
+                erstellt am {{ exercise.createdAt | date: 'medium' }}
+            </li>
             <li class="list-group-item">
                 <i class="bi bi-clock me-2"></i>
                 zuletzt benutzt am {{ exercise.lastUsedAt | date: 'medium' }}

@@ -69,9 +69,18 @@ export class ExerciseRepository extends BaseRepository {
                 id: exerciseTable.id,
                 participantId: exerciseTable.participantId,
                 trainerId: exerciseTable.trainerId,
+                createdAt: exerciseTable.createdAt,
                 lastUsedAt: exerciseTable.lastUsedAt,
+                baseTemplate: {
+                    id: exerciseTemplateTable.id,
+                    name: exerciseTemplateTable.name,
+                },
             })
             .from(exerciseTable)
+            .leftJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, exerciseTable.baseTemplateId)
+            )
             .where(isNull(exerciseTable.templateId))
             .orderBy(desc(exerciseTable.lastUsedAt));
     }
@@ -81,6 +90,7 @@ export class ExerciseRepository extends BaseRepository {
             .select({
                 id: exerciseTemplateTable.id,
                 trainerId: exerciseTable.trainerId,
+                createdAt: exerciseTemplateTable.createdAt,
                 lastExerciseCreatedAt:
                     exerciseTemplateTable.lastExerciseCreatedAt,
                 name: exerciseTemplateTable.name,
@@ -174,7 +184,7 @@ export class ExerciseRepository extends BaseRepository {
 
     public async createExerciseIfNotExists(
         activeExercise: ActiveExercise,
-        templateId: string | null = null
+        data?: Partial<InferInsertModel<typeof exerciseTable>>
     ) {
         const exercise = activeExercise.getExercise();
         return onlySingle(
@@ -188,7 +198,7 @@ export class ExerciseRepository extends BaseRepository {
                     stateVersion: exercise.stateVersion,
                     trainerId: exercise.trainerId,
                     participantId: exercise.participantId,
-                    templateId,
+                    ...(data ?? {}),
                 })
                 .onConflictDoNothing()
                 .returning()

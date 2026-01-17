@@ -15,7 +15,11 @@ import {
 } from 'digital-fuesim-manv-shared';
 import type { InferSelectModel } from 'drizzle-orm';
 import { Config } from '../config.js';
-import type { exerciseTable, actionTable } from '../database/schema.js';
+import type {
+    exerciseTable,
+    actionTable,
+    exerciseTemplateTable,
+} from '../database/schema.js';
 import { pushAll } from '../utils/array.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
@@ -150,6 +154,44 @@ export class ExerciseFactory {
         exercise.setTickCounter(dbEntry.tickCounter);
         exercise.markAsSaved();
         return exercise;
+    }
+
+    public static fromExerciseTemplate(
+        exerciseTemplate: InferSelectModel<typeof exerciseTemplateTable>,
+        exercise: InferSelectModel<typeof exerciseTable>,
+        actions: InferSelectModel<typeof actionTable>[]
+    ): ActiveExercise {
+        const exerciseKeys = this.createKeys();
+        const actionsInWrapper: ActionWrapper[] = [];
+        const newExercise = new ActiveExercise(
+            exerciseKeys.participantKey,
+            exerciseKeys.trainerKey,
+            actionsInWrapper,
+            exercise.stateVersion,
+            {
+                ...exercise.initialStateString,
+                participantId: exerciseKeys.participantKey,
+            },
+            {
+                ...exercise.currentStateString,
+                participantId: exerciseKeys.participantKey,
+            }
+        );
+        pushAll(
+            actionsInWrapper,
+            actions.map(
+                (action) =>
+                    new ActionWrapper(
+                        action.actionString,
+                        action.emitterId,
+                        newExercise,
+                        action.index,
+                        action.id
+                    )
+            )
+        );
+        newExercise.setTickCounter(exercise.tickCounter);
+        return newExercise;
     }
 
     public static restore(

@@ -49,7 +49,8 @@ async function main() {
         actionRepository
     );
     const exerciseManagerService = new ExerciseManagerService(
-        exerciseRepository
+        exerciseRepository,
+        actionRepository
     );
 
     let authService: AuthService;

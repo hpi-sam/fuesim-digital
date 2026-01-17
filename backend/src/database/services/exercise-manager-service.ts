@@ -1,11 +1,13 @@
 import type { ExerciseTemplateCreateData } from 'digital-fuesim-manv-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
+import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseService } from './exercise-service.js';
 
 export class ExerciseManagerService {
     public constructor(
-        private readonly exerciseRepository: ExerciseRepository
+        private readonly exerciseRepository: ExerciseRepository,
+        private readonly actionRepository: ActionRepository
     ) {}
 
     public async getAllExercisesOfOwner() {
@@ -26,10 +28,9 @@ export class ExerciseManagerService {
             throw Error('Exercise template not created');
         }
         const newExercise = ExerciseFactory.fromBlank();
-        await this.exerciseRepository.createExerciseIfNotExists(
-            newExercise,
-            exerciseTemplate.id
-        );
+        await this.exerciseRepository.createExerciseIfNotExists(newExercise, {
+            templateId: exerciseTemplate.id,
+        });
         await exerciseService.loadExercise(newExercise);
         return {
             ...exerciseTemplate,
@@ -53,5 +54,30 @@ export class ExerciseManagerService {
             )),
             trainerId: exerciseTemplate.exercise_entity.trainerId,
         };
+    }
+
+    public async createExerciseFromTemplate(
+        id: string,
+        exerciseService: ExerciseService
+    ) {
+        const exerciseTemplate =
+            await this.exerciseRepository.getExerciseTemplateById(id);
+        if (!exerciseTemplate) {
+            throw Error('Exercise template does not exist');
+        }
+        const actions = await this.actionRepository.getActionsForExerciseId(
+            exerciseTemplate.exercise_entity.id
+        );
+
+        const newExercise = ExerciseFactory.fromExerciseTemplate(
+            exerciseTemplate.exercise_template,
+            exerciseTemplate.exercise_entity,
+            actions
+        );
+        await this.exerciseRepository.createExerciseIfNotExists(newExercise, {
+            baseTemplateId: exerciseTemplate.exercise_template.id,
+        });
+        await exerciseService.loadExercise(newExercise);
+        return newExercise;
     }
 }

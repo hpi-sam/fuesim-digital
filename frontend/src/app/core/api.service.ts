@@ -123,4 +123,13 @@ export class ApiService {
                 .pipe(map((v) => exerciseTemplateSchema.parse(v)))
         );
     }
+
+    public async createExerciseFromTemplate(id: UUID) {
+        return lastValueFrom(
+            this.httpClient.post<ExerciseAccessIds>(
+                `${httpOrigin}/api/exercise_template/${id}/new`,
+                {}
+            )
+        );
+    }
 }

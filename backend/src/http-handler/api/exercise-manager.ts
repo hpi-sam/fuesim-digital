@@ -2,6 +2,7 @@ import type {
     ExercisesInput,
     ExerciseTemplatesInput,
     ExerciseTemplateInput,
+    ExerciseAccessIds,
 } from 'digital-fuesim-manv-shared';
 import {
     exercisesSchema,
@@ -67,5 +68,24 @@ export async function patchExerciseTemplate(
     return {
         statusCode: 201,
         body: exerciseTemplateSchema.encode(exerciseTemplate),
+    };
+}
+
+export async function postNewExerciseFromTemplate(
+    exerciseManagerService: ExerciseManagerService,
+    exerciseService: ExerciseService,
+    id: string
+): Promise<HttpResponse<ExerciseAccessIds | HttpErrorMessage>> {
+    const newExercise = await exerciseManagerService.createExerciseFromTemplate(
+        id,
+        exerciseService
+    );
+
+    return {
+        statusCode: 201,
+        body: {
+            participantId: newExercise.getExercise().participantId,
+            trainerId: newExercise.getExercise().trainerId,
+        },
     };
 }

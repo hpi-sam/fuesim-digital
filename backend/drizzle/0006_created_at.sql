@@ -1,0 +1,2 @@
+ALTER TABLE "exercise_entity" ADD COLUMN "createdAt" timestamp with time zone DEFAULT now() NOT NULL;--> statement-breakpoint
+ALTER TABLE "exercise_template" ADD COLUMN "createdAt" timestamp with time zone DEFAULT now() NOT NULL;

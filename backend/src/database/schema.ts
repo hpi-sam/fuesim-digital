@@ -35,6 +35,9 @@ const baseTable = <T>() => ({
 
 export const exerciseTemplateTable = pgTable('exercise_template', {
     ...baseTable,
+    createdAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
     lastExerciseCreatedAt: timestamp({
         withTimezone: true,
         mode: 'date',
@@ -54,12 +57,18 @@ export const exerciseTable = pgTable('exercise_entity', {
     trainerId: char({ length: 8 }).notNull(),
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
+    createdAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
     lastUsedAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
         .defaultNow(),
     // by setting a templateId this exercise will be an exercise template
     templateId: uuid().references(() => exerciseTemplateTable.id, {
         onDelete: 'cascade',
+    }),
+    baseTemplateId: uuid().references(() => exerciseTemplateTable.id, {
+        onDelete: 'set null',
     }),
 });
 export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;

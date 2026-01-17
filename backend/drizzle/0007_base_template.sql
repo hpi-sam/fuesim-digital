@@ -1,0 +1,2 @@
+ALTER TABLE "exercise_entity" ADD COLUMN "baseTemplateId" uuid;--> statement-breakpoint
+ALTER TABLE "exercise_entity" ADD CONSTRAINT "exercise_entity_baseTemplateId_exercise_template_id_fk" FOREIGN KEY ("baseTemplateId") REFERENCES "public"."exercise_template"("id") ON DELETE set null ON UPDATE no action;

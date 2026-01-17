@@ -44,7 +44,9 @@ const stringToDate = z.codec(
 export const exerciseSchema = z.object({
     participantId: z.string(),
     trainerId: z.string(),
+    createdAt: stringToDate,
     lastUsedAt: stringToDate,
+    baseTemplate: z.nullable(z.object({ id: z.uuid(), name: z.string() })),
 });
 export type Exercise = z.infer<typeof exerciseSchema>;
 
@@ -61,6 +63,7 @@ export type ExerciseExistsInput = z.input<typeof exerciseExistsSchema>;
 export const exerciseTemplateSchema = z.object({
     id: z.uuid(),
     trainerId: z.string(),
+    createdAt: stringToDate,
     lastExerciseCreatedAt: z.nullable(stringToDate),
     name: z.string(),
     description: z.string(),

@@ -4,6 +4,7 @@ import { UserReadableIdGenerator } from '../../../utils/user-readable-id-generat
 import { ActiveExercise } from '../../active-exercise.js';
 import type { HttpErrorMessage, HttpResponse } from '../utils.js';
 import { importExercise } from '../../../utils/import-exercise.js';
+import { isExerciseKey, isTrainerKey } from '../../exercise-keys.js';
 import { UnknownExerciseError } from './../../../database/services/exercise-service.js';
 import type { ExerciseService } from './../../../database/services/exercise-service.js';
 import { ExerciseFactory } from './../../../exercise/exercise-factory.js';
@@ -55,6 +56,15 @@ export function getExercise(
     exerciseKey: string,
     exerciseService: ExerciseService
 ): HttpResponse {
+    if (!isExerciseKey(exerciseKey)) {
+        return {
+            statusCode: 400,
+            body: {
+                message: `The provided exercise key '${exerciseKey}' is invalid.`,
+            },
+        };
+    }
+
     const exerciseExists = exerciseService.hasExerciseKey(exerciseKey);
     return {
         statusCode: exerciseExists ? 200 : 404,
@@ -66,7 +76,7 @@ export async function deleteExercise(
     exerciseKey: string,
     exerciseService: ExerciseService
 ): Promise<HttpResponse> {
-    if (exerciseService.getRoleFromKey(exerciseKey) !== 'trainer') {
+    if (!isTrainerKey(exerciseKey)) {
         return {
             statusCode: 403,
             body: {
@@ -99,6 +109,15 @@ export async function getExerciseHistory(
     exerciseKey: string,
     exerciseService: ExerciseService
 ): Promise<HttpResponse<ExerciseTimeline>> {
+    if (!isExerciseKey(exerciseKey)) {
+        return {
+            statusCode: 400,
+            body: {
+                message: `The provided exercise key '${exerciseKey}' is invalid.`,
+            },
+        };
+    }
+
     try {
         const timeline = await exerciseService.getTimeline(exerciseKey);
         return {

@@ -2,6 +2,7 @@ import type { UUID } from 'digital-fuesim-manv-shared';
 import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
+import { isExerciseKey } from '../exercise-keys.js';
 import { secureOn } from './secure-on.js';
 
 export const registerJoinExerciseHandler = (
@@ -11,7 +12,7 @@ export const registerJoinExerciseHandler = (
     secureOn(
         client,
         'joinExercise',
-        (exerciseId: string, clientName: string, callback): void => {
+        (exerciseKey: string, clientName: string, callback): void => {
             // When this listener is registered the socket is in the map.
             const clientWrapper = clientMap.get(client)!;
             if (clientWrapper.exercise) {
@@ -24,9 +25,12 @@ export const registerJoinExerciseHandler = (
             }
             let clientId: UUID | undefined;
             try {
+                if (!isExerciseKey(exerciseKey)) {
+                    throw new ValidationErrorWrapper(['Invalid exercise key']);
+                }
                 clientId = clientMap
                     .get(client)
-                    ?.joinExercise(exerciseId, clientName);
+                    ?.joinExercise(exerciseKey, clientName);
             } catch (e: unknown) {
                 if (e instanceof ValidationErrorWrapper) {
                     callback({

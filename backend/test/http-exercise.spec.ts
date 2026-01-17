@@ -45,9 +45,17 @@ describe('exercise', () => {
                 .expect(200);
         });
 
+        it('succeeds returning 400 for abitrary id string', async () => {
+            await environment
+                .httpRequest('get', `/api/exercise/anyString`)
+                .expect(400);
+        });
         it('succeeds returning false for not existing id', async () => {
             await environment
-                .httpRequest('get', `/api/exercise/trainerId`)
+                .httpRequest(
+                    'get',
+                    `/api/exercise/${UserReadableIdGenerator.generateId()}`
+                )
                 .expect(404);
         });
     });
@@ -67,7 +75,7 @@ describe('exercise', () => {
         it('fails deleting an arbitrary exercise id string', async () => {
             await environment
                 .httpRequest('delete', '/api/exercise/anyNumber')
-                .expect(500);
+                .expect(403);
         });
 
         it('fails deleting a not existing exercise', async () => {
@@ -114,8 +122,15 @@ describe('exercise', () => {
                 .expect(200);
         });
 
-        it('fails with 404 for non-existing exercise', async () => {
+        it('fails with 400 for abitrary exercise id string', async () => {
             const exerciseId = 'non-existing-id';
+            await environment
+                .httpRequest('get', `/api/exercise/${exerciseId}/history`)
+                .expect(400);
+        });
+
+        it('fails with 404 for non-existing exercise', async () => {
+            const exerciseId = UserReadableIdGenerator.generateId();
             await environment
                 .httpRequest('get', `/api/exercise/${exerciseId}/history`)
                 .expect(404);

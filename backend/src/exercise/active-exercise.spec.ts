@@ -3,19 +3,31 @@ import { sleep } from 'digital-fuesim-manv-shared';
 import { createTestEnvironment } from '../../test/utils.js';
 import { clientMap } from './client-map.js';
 import { ActiveExercise } from './active-exercise.js';
+import type {
+    ExerciseKey,
+    ParticipantKey,
+    TrainerKey,
+} from './exercise-keys.js';
 
 describe('Active Exercise', () => {
     const environment = createTestEnvironment();
-    it('fails getting a role for the wrong id', () => {
-        const exercise = new ActiveExercise('123456', '12345678');
 
-        expect(() => exercise.getRoleFromUsedId('wrong id')).toThrow(
-            RangeError
+    it('fails getting a role for the wrong id', () => {
+        const exercise = new ActiveExercise(
+            '123456' as ParticipantKey,
+            '12345678' as TrainerKey
         );
+
+        expect(() =>
+            exercise.getRoleFromUsedKey('wrong key' as ExerciseKey)
+        ).toThrow(RangeError);
     });
 
     it('does nothing adding a client that is not set up', async () => {
-        const exercise = new ActiveExercise('123456', '12345678');
+        const exercise = new ActiveExercise(
+            '123456' as ParticipantKey,
+            '12345678' as TrainerKey
+        );
         // Use a websocket in order to have a ClientWrapper set up
         await environment.withWebsocket(async () => {
             // Sleep a bit to allow the socket to connect.
@@ -34,7 +46,10 @@ describe('Active Exercise', () => {
     });
 
     it('does nothing removing a client that is not joined', async () => {
-        const exercise = new ActiveExercise('123456', '12345678');
+        const exercise = new ActiveExercise(
+            '123456' as ParticipantKey,
+            '12345678' as TrainerKey
+        );
         // Use a websocket in order to have a ClientWrapper set up
         await environment.withWebsocket(async () => {
             // Sleep a bit to allow the socket to connect.
@@ -56,7 +71,10 @@ describe('Active Exercise', () => {
     describe('Started Exercise', () => {
         let exercise: ActiveExercise | undefined;
         beforeEach(() => {
-            exercise = new ActiveExercise('123456', '12345678');
+            exercise = new ActiveExercise(
+                '123456' as ParticipantKey,
+                '12345678' as TrainerKey
+            );
             exercise.start();
         });
         afterEach(() => {
@@ -82,7 +100,10 @@ describe('Active Exercise', () => {
 
     describe('Reactions to Actions', () => {
         it('calls start when matching action is sent', () => {
-            const exercise = new ActiveExercise('123456', '12345678');
+            const exercise = new ActiveExercise(
+                '123456' as ParticipantKey,
+                '12345678' as TrainerKey
+            );
 
             const startMock = jest.spyOn(ActiveExercise.prototype, 'start');
             startMock.mockImplementation(() => ({}));
@@ -95,7 +116,10 @@ describe('Active Exercise', () => {
         });
 
         it('calls pause when matching action is sent', () => {
-            const exercise = new ActiveExercise('123456', '12345678');
+            const exercise = new ActiveExercise(
+                '123456' as ParticipantKey,
+                '12345678' as TrainerKey
+            );
 
             const pause = jest.spyOn(ActiveExercise.prototype, 'pause');
             pause.mockImplementation(() => ({}));

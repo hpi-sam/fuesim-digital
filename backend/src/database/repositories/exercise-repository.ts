@@ -4,6 +4,10 @@ import { eq, lt } from 'drizzle-orm';
 import type { ExerciseId } from '../schema.js';
 import { exerciseTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
+import type {
+    ParticipantKey,
+    TrainerKey,
+} from '../../exercise/exercise-keys.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
@@ -17,7 +21,7 @@ export class ExerciseRepository extends BaseRepository {
     /**
      * Loads the exercise with the corresponding trainer key
      */
-    public async getExerciseByTrainerKey(trainerKey: string) {
+    public async getExerciseByTrainerKey(trainerKey: TrainerKey) {
         const dbResult = await this.databaseConnection
             .select()
             .from(exerciseTable)
@@ -29,7 +33,7 @@ export class ExerciseRepository extends BaseRepository {
     /**
      * Loads the exercise with the corresponding participant key
      */
-    public async getExerciseByParticipantKey(participantKey: string) {
+    public async getExerciseByParticipantKey(participantKey: ParticipantKey) {
         const dbResult = await this.databaseConnection
             .select()
             .from(exerciseTable)

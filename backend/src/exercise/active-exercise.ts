@@ -6,6 +6,11 @@ import { ActionWrapper } from './action-wrapper.js';
 import type { ClientWrapper } from './client-wrapper.js';
 import { patientTick } from './patient-ticking.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
+import type {
+    ExerciseKey,
+    ParticipantKey,
+    TrainerKey,
+} from './exercise-keys.js';
 
 export class ActiveExercise {
     private readonly exercise: Omit<ExerciseEntry, 'id'>;
@@ -31,6 +36,16 @@ export class ActiveExercise {
 
     public getExercise() {
         return this.exercise;
+    }
+
+    public get participantKey(): ParticipantKey {
+        // This should always be valid, since we are creating all active exercises in the exercise factory which ensures valid keys
+        return this.exercise.participantId as ParticipantKey;
+    }
+
+    public get trainerKey(): TrainerKey {
+        // This should always be valid, since we are creating all active exercises in the exercise factory which ensures valid keys
+        return this.exercise.trainerId as TrainerKey;
     }
 
     private _changedSinceSave = true;
@@ -136,8 +151,8 @@ export class ActiveExercise {
     public readonly incrementIdGenerator = new IncrementIdGenerator();
 
     public constructor(
-        participantKey: string,
-        trainerKey: string,
+        participantKey: ParticipantKey,
+        trainerKey: TrainerKey,
         public readonly temporaryActionHistory: ActionWrapper[] = [],
         stateVersion: number = ExerciseState.currentStateVersion,
         initialState = ExerciseState.create(participantKey),
@@ -159,7 +174,7 @@ export class ActiveExercise {
      * @returns The role of the client, determined by the id.
      * @throws {@link RangeError} in case the provided {@link id} is not part of this exercise.
      */
-    public getRoleFromUsedId(id: string): Role {
+    public getRoleFromUsedKey(id: ExerciseKey): Role {
         switch (id) {
             case this.exercise.participantId:
                 return 'participant';

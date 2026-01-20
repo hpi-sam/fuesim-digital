@@ -132,7 +132,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
     ) {
         super(
             olMap,
-            (targetPosition, vehicle) => {
+            async (targetPosition, vehicle) =>
                 exerciseService.proposeAction(
                     {
                         type: '[Vehicle] Move vehicle',
@@ -140,8 +140,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
                         targetPosition,
                     },
                     true
-                );
-            },
+                ),
             new PointGeometryHelper(),
             1000
         );

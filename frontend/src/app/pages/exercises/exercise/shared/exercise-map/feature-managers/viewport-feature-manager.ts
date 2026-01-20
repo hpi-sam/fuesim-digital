@@ -64,7 +64,7 @@ export class ViewportFeatureManager
     ) {
         super(
             olMap,
-            (targetPositions, viewport) => {
+            async (targetPositions, viewport) =>
                 exerciseService.proposeAction(
                     {
                         type: '[Viewport] Move viewport',
@@ -72,8 +72,7 @@ export class ViewportFeatureManager
                         targetPosition: targetPositions[0]![0]!,
                     },
                     true
-                );
-            },
+                ),
             new PolygonGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => [

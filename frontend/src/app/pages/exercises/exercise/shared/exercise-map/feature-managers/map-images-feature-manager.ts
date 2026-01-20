@@ -43,7 +43,7 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
     ) {
         super(
             olMap,
-            (targetPosition, mapImage) => {
+            async (targetPosition, mapImage) =>
                 exerciseService.proposeAction(
                     {
                         type: '[MapImage] Move MapImage',
@@ -51,8 +51,7 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
                         targetPosition,
                     },
                     true
-                );
-            },
+                ),
             new PointGeometryHelper(),
             10_000
         );

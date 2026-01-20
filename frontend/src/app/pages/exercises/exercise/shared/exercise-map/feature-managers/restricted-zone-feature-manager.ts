@@ -119,13 +119,12 @@ export class RestrictedZoneFeatureManager
     ) {
         super(
             olMap,
-            (targetPositions, restrictedZone) => {
+            async (targetPositions, restrictedZone) =>
                 exerciseService.proposeAction({
                     type: '[RestrictedZone] Move restricted zone',
                     restrictedZoneId: restrictedZone.id,
                     targetPosition: targetPositions[0]![0]!,
-                });
-            },
+                }),
             new PolygonGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => [

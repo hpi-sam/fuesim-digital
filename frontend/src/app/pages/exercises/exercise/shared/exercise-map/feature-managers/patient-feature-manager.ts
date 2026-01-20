@@ -96,7 +96,7 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
     ) {
         super(
             olMap,
-            (targetPosition, patient) => {
+            async (targetPosition, patient) =>
                 exerciseService.proposeAction(
                     {
                         type: '[Patient] Move patient',
@@ -104,8 +104,7 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
                         targetPosition,
                     },
                     true
-                );
-            },
+                ),
             new PointGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => {

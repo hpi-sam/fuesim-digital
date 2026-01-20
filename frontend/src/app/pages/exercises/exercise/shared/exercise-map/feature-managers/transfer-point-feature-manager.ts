@@ -38,7 +38,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
     ) {
         super(
             olMap,
-            (targetPosition, transferPoint) => {
+            async (targetPosition, transferPoint) =>
                 exerciseService.proposeAction(
                     {
                         type: '[TransferPoint] Move TransferPoint',
@@ -46,8 +46,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
                         targetPosition,
                     },
                     true
-                );
-            },
+                ),
             new PointGeometryHelper(),
             600
         );

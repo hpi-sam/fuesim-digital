@@ -70,7 +70,7 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
     ) {
         super(
             olMap,
-            (targetPosition, personnel) => {
+            async (targetPosition, personnel) =>
                 exerciseService.proposeAction(
                     {
                         type: '[Personnel] Move personnel',
@@ -78,8 +78,7 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
                         targetPosition,
                     },
                     true
-                );
-            },
+                ),
             new PointGeometryHelper()
         );
 

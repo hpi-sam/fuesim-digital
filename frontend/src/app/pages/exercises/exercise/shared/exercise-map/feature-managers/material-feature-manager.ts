@@ -70,7 +70,7 @@ export class MaterialFeatureManager extends MoveableFeatureManager<Material> {
     ) {
         super(
             olMap,
-            (targetPosition, material) => {
+            async (targetPosition, material) =>
                 exerciseService.proposeAction(
                     {
                         type: '[Material] Move material',
@@ -78,8 +78,7 @@ export class MaterialFeatureManager extends MoveableFeatureManager<Material> {
                         targetPosition,
                     },
                     true
-                );
-            },
+                ),
             new PointGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => {

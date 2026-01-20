@@ -56,7 +56,7 @@ export class SimulatedRegionFeatureManager
     ) {
         super(
             olMap,
-            (targetPositions, simulatedRegion) => {
+            async (targetPositions, simulatedRegion) =>
                 exerciseService.proposeAction(
                     {
                         type: '[SimulatedRegion] Move simulated region',
@@ -64,8 +64,7 @@ export class SimulatedRegionFeatureManager
                         targetPosition: targetPositions[0]![0]!,
                     },
                     true
-                );
-            },
+                ),
             new PolygonGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => [

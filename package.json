@@ -9,7 +9,7 @@
         "cy:ci": "cd frontend && npm run cy:run",
         "cy:install": "cd frontend && npm run cy:install",
         "benchmark": "cd benchmark && npm run benchmark",
-        "install:all": "npm i && concurrently \"cd shared && npm i \" \"cd frontend && npm i \" \"cd backend && npm i \" \"cd benchmark && npm i \"",
+        "install:all": "npm i && (cd shared && npm i) && concurrently \"cd frontend && npm i \" \"cd backend && npm i \" \"cd benchmark && npm i \"",
         "setup": "npm i && cd shared && npm i && npm run build && cd .. && concurrently \"cd frontend && npm i \" \"cd backend && npm i \" \"cd benchmark && npm i \"",
         "setup:package-lock-only": "npm i --package-lock-only && cd shared && npm i --package-lock-only && cd ../frontend && npm i --package-lock-only && cd ../backend && npm i --package-lock-only && cd ../benchmark && npm i --package-lock-only",
         "prune": "npm prune && cd shared && npm prune && cd ../frontend && npm prune && cd ../backend && npm prune",

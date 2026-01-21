@@ -3,7 +3,7 @@ import { exerciseTable } from './../schema.js';
 
 const databaseService = await DatabaseService.createNewDatabaseConnection();
 
-await databaseService.databaseConnection.transaction(async (manager) => {
+databaseService.databaseConnection.transaction(async (manager) => {
     if (
         DatabaseService.isInMemoryConnection(databaseService.databaseConnection)
     ) {
@@ -11,14 +11,14 @@ await databaseService.databaseConnection.transaction(async (manager) => {
             'PURGING IN-MEMORY DATABASE! Set DFM_USE_DB=true to purge PostgreSQL database.'
         );
     }
-    const deleteResult = await databaseService.databaseConnection
-        .delete(exerciseTable)
-        .returning();
+    try {
+        const deleteResult = await manager.delete(exerciseTable).returning();
 
-    console.log(`Successfully deleted ${deleteResult.length} exercises.`);
+        console.log(`Successfully deleted ${deleteResult.length} exercises.`);
 
-    const remaining = await databaseService.databaseConnection
-        .select()
-        .from(exerciseTable);
-    console.log(`${remaining.length} exercises remaining in database.`);
+        const remaining = await manager.select().from(exerciseTable);
+        console.log(`${remaining.length} exercises remaining in database.`);
+    } catch (error) {
+        console.error('Error during purge operation:', error);
+    }
 });

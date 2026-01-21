@@ -16,4 +16,3 @@ users:
         email: 'jane.roe@example.org'
         groups:
             - 'users'
-

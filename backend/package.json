@@ -38,7 +38,7 @@
         "drizzle-kit": "^0.31.7",
         "drizzle-orm": "^0.44.7",
         "envalid": "^8.0.0",
-        "express": "^5.1.0",
+        "express": "^5.2.0",
         "lodash-es": "4.17.21",
         "pg": "^8.14.1",
         "socket.io": "^4.8.1",

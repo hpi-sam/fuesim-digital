@@ -3,8 +3,8 @@ import { PeriodicEventHandler } from './exercise/periodic-events/periodic-event-
 import { ExerciseWebsocketServer } from './exercise/websocket.js';
 import { ExerciseHttpServer } from './exercise/http-server.js';
 import type { DatabaseService } from './database/services/database-service.js';
-import { AuthService } from 'auth.js';
 import type { ExerciseService } from './database/services/exercise-service.js';
+import type { AuthService } from './auth/auth-service.js';
 
 export class FuesimServer {
     private readonly _httpServer: ExerciseHttpServer;

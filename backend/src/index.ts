@@ -5,10 +5,12 @@ import { ValidationErrorWrapper } from './utils/validation-error-wrapper.js';
 import { RestoreError } from './utils/restore-error.js';
 import { Config } from './config.js';
 import { FuesimServer } from './fuesim-server.js';
-import { AuthService } from 'auth.js';
 import { ActionRepository } from './database/repositories/action-repository.js';
 import { ExerciseRepository } from './database/repositories/exercise-repository.js';
 import { ExerciseService } from './database/services/exercise-service.js';
+import { UserRepository } from './database/repositories/user-repository.js';
+import { SessionRepository } from './database/repositories/session-repository.js';
+import { AuthService } from './auth/auth-service.js';
 
 async function main() {
     Config.initialize();
@@ -34,13 +36,28 @@ async function main() {
     const actionRepository = new ActionRepository(
         databaseService.databaseConnection
     );
+    const userRepository = new UserRepository(
+        databaseService.databaseConnection
+    );
+    const sessionRepository = new SessionRepository(
+        databaseService.databaseConnection
+    );
 
     const exerciseService = new ExerciseService(
         exerciseRepository,
         actionRepository
     );
 
-    const authService = await new AuthService().initialize();
+    let authService: AuthService;
+    try {
+        authService = await new AuthService(
+            userRepository,
+            sessionRepository
+        ).initialize();
+    } catch (e: unknown) {
+        console.error('Error initializing AuthService:');
+        throw e;
+    }
 
     if (Config.useDb) {
         try {

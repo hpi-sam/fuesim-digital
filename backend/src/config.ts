@@ -7,7 +7,9 @@ export class Config {
 
     private static _httpPort?: number;
 
-    private static _httpPublicUrl?: string;
+    private static _httpBackendUrl?: string;
+
+    private static _httpFrontendUrl?: string;
 
     private static _uploadLimit?: number;
 
@@ -41,9 +43,14 @@ export class Config {
         return this._httpPort!;
     }
 
-    public static get httpPublicUrl(): string {
+    public static get httpBackendUrl(): string {
         this.throwIfNotInitialized();
-        return this._httpPublicUrl!;
+        return this._httpBackendUrl!;
+    }
+
+    public static get httpFrontendUrl(): string {
+        this.throwIfNotInitialized();
+        return this._httpFrontendUrl!;
     }
 
     public static get uploadLimit(): number {
@@ -124,8 +131,14 @@ export class Config {
             DFM_WEBSOCKET_PORT_TESTING: tcpPortValidator({ default: 13200 }),
             DFM_HTTP_PORT: tcpPortValidator({ default: 3201 }),
             DFM_HTTP_PORT_TESTING: tcpPortValidator({ default: 13201 }),
-            DFM_HTTP_PUBLIC_URL: url({ default: 'http://localhost:3201' }),
-            DFM_HTTP_PUBLIC_URL_TESTING: url({ default: 'http://localhost:13201' }),
+            DFM_HTTP_BACKEND_URL: url({ default: 'http://localhost:3201' }),
+            DFM_HTTP_BACKEND_URL_TESTING: url({
+                default: 'http://localhost:13201',
+            }),
+            DFM_HTTP_FRONTEND_URL: url({ default: 'http://localhost:4200' }),
+            DFM_HTTP_FRONTEND_URL_TESTING: url({
+                default: 'http://localhost:14200',
+            }),
             DFM_UPLOAD_LIMIT: num({ default: 200 }),
             DFM_USE_DB: bool(),
             DFM_USE_DB_TESTING: bool({ default: undefined }),
@@ -187,9 +200,14 @@ export class Config {
         this._httpPort = testing
             ? env.DFM_HTTP_PORT_TESTING
             : env.DFM_HTTP_PORT;
-        this._httpPublicUrl = testing && env.DFM_HTTP_PUBLIC_URL_TESTING
-            ? env.DFM_HTTP_PUBLIC_URL_TESTING
-            : env.DFM_HTTP_PUBLIC_URL;
+        this._httpBackendUrl =
+            testing && env.DFM_HTTP_BACKEND_URL_TESTING
+                ? env.DFM_HTTP_BACKEND_URL_TESTING
+                : env.DFM_HTTP_BACKEND_URL;
+        this._httpFrontendUrl =
+            testing && env.DFM_HTTP_FRONTEND_URL_TESTING
+                ? env.DFM_HTTP_FRONTEND_URL_TESTING
+                : env.DFM_HTTP_FRONTEND_URL;
         this._uploadLimit = env.DFM_UPLOAD_LIMIT;
         this._useDb =
             testing && env.DFM_USE_DB_TESTING
@@ -219,15 +237,18 @@ export class Config {
             testing && env.DFM_DB_PORT_TESTING
                 ? env.DFM_DB_PORT_TESTING
                 : env.DFM_DB_PORT;
-        this._authUrl = testing && env.DFM_AUTH_URL_TESTING
-            ? env.DFM_AUTH_URL_TESTING
-            : env.DFM_AUTH_URL;
-        this._authClientId = testing && env.DFM_AUTH_CLIENT_ID_TESTING
-            ? env.DFM_AUTH_CLIENT_ID_TESTING
-            : env.DFM_AUTH_CLIENT_ID;
-        this._authClientSecret = testing && env.DFM_AUTH_CLIENT_SECRET_TESTING
-            ? env.DFM_AUTH_CLIENT_SECRET_TESTING
-            : env.DFM_AUTH_CLIENT_SECRET;
+        this._authUrl =
+            testing && env.DFM_AUTH_URL_TESTING
+                ? env.DFM_AUTH_URL_TESTING
+                : env.DFM_AUTH_URL;
+        this._authClientId =
+            testing && env.DFM_AUTH_CLIENT_ID_TESTING
+                ? env.DFM_AUTH_CLIENT_ID_TESTING
+                : env.DFM_AUTH_CLIENT_ID;
+        this._authClientSecret =
+            testing && env.DFM_AUTH_CLIENT_SECRET_TESTING
+                ? env.DFM_AUTH_CLIENT_SECRET_TESTING
+                : env.DFM_AUTH_CLIENT_SECRET;
         this.isInitialized = true;
     }
 }

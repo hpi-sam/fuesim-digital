@@ -21,7 +21,7 @@ export class AuthService {
         private readonly messageService: MessageService
     ) {
         this.fetchUserData();
-        this.handleLoginFailureToast();
+        this.handleAuthMessageToast();
     }
 
     private async fetchUserData() {
@@ -43,7 +43,7 @@ export class AuthService {
         this.user$.next(userData ?? { user: null });
     }
 
-    private handleLoginFailureToast() {
+    private handleAuthMessageToast() {
         this.route.queryParams.subscribe((params) => {
             if (params['logoutstatus'] != null) {
                 switch (params['logoutstatus']) {
@@ -72,9 +72,19 @@ export class AuthService {
             }
 
             if (params['loginfailure'] != null) {
-                this.messageService.postError({
+                this.messageService.postMessage({
+                    color: 'danger',
                     title: 'Login fehlgeschlagen',
                     body: params['loginfailure'],
+                });
+            }
+
+
+            if (params['loginsuccess'] != null) {
+                this.messageService.postMessage({
+                    color: "success",
+                    title: 'Login erfolgreich',
+                    body: "Willkommen zurück!",
                 });
             }
 
@@ -82,6 +92,7 @@ export class AuthService {
                 queryParams: {
                     loginfailure: null,
                     logoutstatus: null,
+                    loginsuccess: null,
                 },
                 queryParamsHandling: 'merge',
             });

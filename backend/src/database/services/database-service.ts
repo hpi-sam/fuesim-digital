@@ -112,6 +112,16 @@ export class DatabaseService {
     }
 }
 
+export function onlySingle<T>(array: T[]): T | null {
+    if (array.length === 0 || array[0] === undefined) {
+        return null;
+    }
+    if (array.length > 1) {
+        throw new Error('Multiple entries found where only one expected');
+    }
+    return array[0];
+}
+
 export type DatabaseConnection = Awaited<
     ReturnType<typeof pgliteDrizzle | typeof postgresDrizzle>
 >;

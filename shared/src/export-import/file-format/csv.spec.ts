@@ -2,7 +2,12 @@ import { produce } from 'immer';
 import { ExerciseState } from '../../state.js';
 import { type Mutable } from '../../utils/index.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
-import { preparePatientsForCSVExport } from './csv.js';
+import type { Patient } from '../../models/index.js';
+import {
+    exportPatientsToCSV,
+    patientsCsvExportColumns,
+    preparePatientsForCSVExport,
+} from './csv.js';
 
 const emptyState = ExerciseState.create('123456');
 
@@ -127,5 +132,28 @@ describe('csv export', () => {
                 expect(exportedPatient[key]).toBe(expectedState[key]);
             }
         });
+    });
+    it('correct columns', () => {
+        const state = setupState(() => {
+            // no patients
+        });
+        const csvContent = exportPatientsToCSV(state);
+        expect(csvContent).toBe(patientsCsvExportColumns.join(';'));
+    });
+    it('multiple patients', () => {
+        let patients: Patient[] = [];
+        const state = setupState((draftState: Mutable<ExerciseState>) => {
+            patients = [
+                addPatient(draftState, 'red', 'red'),
+                addPatient(draftState, 'yellow', 'yellow'),
+                addPatient(draftState, 'green', 'green'),
+            ];
+        });
+
+        const exportedPatients = preparePatientsForCSVExport(state);
+        expect(exportedPatients).toHaveLength(patients.length);
+        expect(
+            exportedPatients.map((patient) => patient.id)
+        ).toIncludeAllMembers(patients.map((patient) => patient.identifier));
     });
 });

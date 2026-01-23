@@ -117,7 +117,7 @@ export class ExerciseComponent implements OnDestroy {
         openPartialExportModal(this.modalService);
     }
 
-    public csvExport() {
+    public patientsCsvExport() {
         const currentState = selectStateSnapshot(
             selectExerciseState,
             this.store

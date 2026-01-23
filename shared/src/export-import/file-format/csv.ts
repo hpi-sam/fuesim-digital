@@ -55,17 +55,17 @@ export type CSVExportType = z.infer<typeof csvExportSchema>;
 export type CSVExportInput = z.input<typeof csvExportSchema>;
 const csvExportListSchema = z.array(csvExportSchema);
 
-const csvExportColumns: { [key in keyof CSVExportType]: string } = {
-    id: 'ID',
-    status: 'SK',
-    sex: 'Geschlecht',
-    age: 'Alter',
-    pzc: 'PZC',
-    remarks: 'Bemerkungen',
-    hasTransportPriority: 'Transportpriorität',
-    ventilated: 'Beatmet',
-    doctorEscort: 'Arztbegleitung',
-};
+export const patientsCsvExportColumns = [
+    'ID',
+    'SK',
+    'Geschlecht',
+    'Alter',
+    'PZC',
+    'Bemerkungen',
+    'Transportpriorität',
+    'Beatmet',
+    'Arztbegleitung',
+];
 
 export function preparePatientsForCSVExport(state: ExerciseState) {
     const patients = Object.values(state.patients).map(
@@ -87,11 +87,13 @@ export function preparePatientsForCSVExport(state: ExerciseState) {
     return csvExportListSchema.parse(patients);
 }
 export function exportPatientsToCSV(state: ExerciseState) {
-    const data = preparePatientsForCSVExport(state).map((pat) =>
-        StrictObject.keys(csvExportColumns).map((key) => pat[key])
+    return Papa.unparse(
+        [
+            Object.values(patientsCsvExportColumns),
+            ...preparePatientsForCSVExport(state),
+        ],
+        {
+            delimiter: ';',
+        }
     );
-    console.log(data);
-    return Papa.unparse([Object.values(csvExportColumns), ...data], {
-        delimiter: ';',
-    });
 }

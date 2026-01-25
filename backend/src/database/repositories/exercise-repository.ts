@@ -145,6 +145,13 @@ export class ExerciseRepository extends BaseRepository {
             .where(eq(exerciseTable.id, exerciseId));
     }
 
+    public deleteExerciseTemplateById(id: string) {
+        // due to cascade, the connected exercise should be deleted, too
+        return this.databaseConnection
+            .delete(exerciseTemplateTable)
+            .where(eq(exerciseTemplateTable.id, id));
+    }
+
     /**
      * get exercises with outdated state versions
      */

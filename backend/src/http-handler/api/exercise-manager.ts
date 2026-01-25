@@ -89,3 +89,15 @@ export async function postNewExerciseFromTemplate(
         },
     };
 }
+
+export async function deleteExerciseTemplate(
+    id: string,
+    exerciseManagerService: ExerciseManagerService,
+    exerciseService: ExerciseService
+): Promise<HttpResponse> {
+    await exerciseManagerService.deleteExerciseTemplate(id, exerciseService);
+    return {
+        statusCode: 204,
+        body: undefined,
+    };
+}

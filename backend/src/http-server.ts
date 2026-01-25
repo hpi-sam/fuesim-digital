@@ -17,6 +17,7 @@ import { getHealth } from './http-handler/api/health.js';
 import { secureHttp } from './http-handler/secure-http.js';
 import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
 import {
+    deleteExerciseTemplate,
     getExercises,
     getExerciseTemplates,
     patchExerciseTemplate,
@@ -132,6 +133,18 @@ export class ApiHttpServer {
                         exerciseManagerService,
                         req.params.id,
                         req.body
+                    ),
+                req,
+                res
+            )
+        );
+        app.delete('/api/exercise_template/:id', async (req, res) =>
+            secureHttp(
+                async () =>
+                    deleteExerciseTemplate(
+                        req.params.id,
+                        exerciseManagerService,
+                        exerciseService
                     ),
                 req,
                 res

@@ -30,6 +30,13 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
+    public destroyExercise(exercise: ActiveExercise) {
+        exercise.destroy();
+
+        this.exerciseMap.delete(exercise.getExercise().participantId);
+        this.exerciseMap.delete(exercise.getExercise().trainerId);
+    }
+
     public async loadExercise(activeExercise: ActiveExercise) {
         const result =
             await this.exerciseRepository.createExerciseIfNotExists(
@@ -142,7 +149,7 @@ export class ExerciseService {
             throw new UnknownExerciseError(exerciseKey);
         }
 
-        activeExercise.destroy();
+        this.destroyExercise(activeExercise);
 
         this.exerciseMap.delete(activeExercise.participantKey);
         this.exerciseMap.delete(activeExercise.trainerKey);

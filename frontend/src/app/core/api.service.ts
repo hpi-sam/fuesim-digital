@@ -132,4 +132,13 @@ export class ApiService {
             )
         );
     }
+
+    public async deleteExerciseTemplate(id: string) {
+        return lastValueFrom(
+            this.httpClient.delete<undefined>(
+                `${httpOrigin}/api/exercise_template/${id}`,
+                {}
+            )
+        );
+    }
 }

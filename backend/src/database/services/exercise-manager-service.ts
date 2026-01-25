@@ -80,4 +80,26 @@ export class ExerciseManagerService {
         await exerciseService.loadExercise(newExercise);
         return newExercise;
     }
+
+    public async deleteExerciseTemplate(
+        id: string,
+        exerciseService: ExerciseService
+    ) {
+        const exerciseTemplate =
+            await this.exerciseRepository.getExerciseTemplateById(id);
+        if (!exerciseTemplate) {
+            throw Error('Exercise template does not exist');
+        }
+
+        const activeExercise = exerciseService.getExerciseByKey(
+            exerciseTemplate.exercise_entity.trainerId
+        );
+        if (activeExercise) {
+            exerciseService.destroyExercise(activeExercise);
+        }
+
+        await this.exerciseRepository.deleteExerciseTemplateById(
+            exerciseTemplate.exercise_template.id
+        );
+    }
 }

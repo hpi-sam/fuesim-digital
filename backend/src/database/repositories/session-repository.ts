@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { and, eq, gt } from 'drizzle-orm';
+import { and, eq, gt, lte } from 'drizzle-orm';
 import { sessionTable } from '../schema.js';
 import { onlySingle } from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
@@ -45,5 +45,11 @@ export class SessionRepository extends BaseRepository {
         await this.databaseConnection
             .delete(sessionTable)
             .where(eq(sessionTable.id, sessionId));
+    }
+
+    public async deleteExpiredSessions() {
+        await this.databaseConnection
+            .delete(sessionTable)
+            .where(lte(sessionTable.expiresAt, new Date()));
     }
 }

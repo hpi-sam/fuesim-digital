@@ -1,6 +1,7 @@
 import type { UserRepository } from '../database/repositories/user-repository.js';
 import type { SessionRepository } from '../database/repositories/session-repository.js';
 import type { SessionEntry } from '../database/schema.js';
+import { PeriodicEventHandler } from '../exercise/periodic-events/periodic-event-handler.js';
 import { OidcService } from './oidc-service.js';
 
 export class AuthService {
@@ -8,11 +9,19 @@ export class AuthService {
     public readonly SESSION_DURATION_S = 7 * 24 * 60 * 60; // 7 days
     public readonly SESSION_COOKIE_NAME = 'fuesim_session';
 
+    public readonly SESSION_CLEAR_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+    public readonly sessionClearHandler: PeriodicEventHandler;
+
     public constructor(
         private readonly userRepository: UserRepository,
         private readonly sessionRepository: SessionRepository
     ) {
         this.oidcService = new OidcService(this);
+
+        this.sessionClearHandler = new PeriodicEventHandler(
+            this.clearExpiredSessions.bind(this),
+            this.SESSION_CLEAR_INTERVAL_MS
+        );
     }
 
     public async initialize() {
@@ -78,5 +87,9 @@ export class AuthService {
 
     public async deleteSession(sessionToken: string) {
         await this.sessionRepository.deleteSessionById(sessionToken);
+    }
+
+    public async clearExpiredSessions() {
+        await this.sessionRepository.deleteExpiredSessions();
     }
 }

@@ -82,7 +82,7 @@ export class ExerciseHttpServer {
 
         app.use('/api/auth', new AuthHttpRouter(authService).router);
 
-        this.httpServer = app.listen(Config.httpPort, ()=>{
+        this.httpServer = app.listen(Config.httpPort, () => {
             console.log(`HTTP server listening on port ${Config.httpPort}`);
         });
     }

@@ -1,14 +1,14 @@
 import type { UserRepository } from '../database/repositories/user-repository.js';
 import type { SessionRepository } from '../database/repositories/session-repository.js';
+import type { SessionEntry } from '../database/schema.js';
 import { OidcService } from './oidc-service.js';
-import { SessionEntry } from '../database/schema.js';
 
 export class AuthService {
     public readonly oidcService;
-    private readonly SESSION_DURATION_S = 7 * 24 * 60 * 60; // 7 days
+    public readonly SESSION_DURATION_S = 7 * 24 * 60 * 60; // 7 days
     public readonly SESSION_COOKIE_NAME = 'fuesim_session';
 
-    constructor(
+    public constructor(
         private readonly userRepository: UserRepository,
         private readonly sessionRepository: SessionRepository
     ) {
@@ -24,28 +24,23 @@ export class AuthService {
         user: OidcService.UserInfo;
         accessToken: string;
     }): Promise<string> {
-        return this.userRepository.transaction(
-            async (userRepoTrans) => {
-                await userRepoTrans.upsertUser({
-                    id: data.user.id,
-                    display_name: data.user.display_name,
-                    username: data.user.username,
-                });
+        return this.userRepository.transaction(async (userRepoTrans) => {
+            await userRepoTrans.upsertUser({
+                id: data.user.id,
+                display_name: data.user.display_name,
+                username: data.user.username,
+            });
 
-                const sessionRepoTrans =
-                    this.sessionRepository.withConnection(
-                        userRepoTrans
-                    );
-                const sessionToken =
-                    await sessionRepoTrans.createSession({
-                        validityDurationSeconds: this.SESSION_DURATION_S,
-                        accessToken: data.accessToken,
-                        userId: data.user.id,
-                    });
+            const sessionRepoTrans =
+                this.sessionRepository.withConnection(userRepoTrans);
+            const sessionToken = await sessionRepoTrans.createSession({
+                validityDurationSeconds: this.SESSION_DURATION_S,
+                accessToken: data.accessToken,
+                userId: data.user.id,
+            });
 
-                return sessionToken;
-            }
-        );
+            return sessionToken;
+        });
     }
 
     public async refreshSession(sessionToken: string) {
@@ -68,7 +63,7 @@ export class AuthService {
      */
     public async getDataFromSessionToken(
         sessionToken: string
-    ): Promise<{ user: OidcService.UserInfo, session: SessionEntry } | null> {
+    ): Promise<{ user: OidcService.UserInfo; session: SessionEntry } | null> {
         const session =
             await this.sessionRepository.getValidSessionByToken(sessionToken);
         if (!session) {

@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { and, eq, gt, InferInsertModel } from 'drizzle-orm';
+import { and, eq, gt } from 'drizzle-orm';
 import { sessionTable } from '../schema.js';
 import { onlySingle } from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
@@ -18,7 +18,9 @@ export class SessionRepository extends BaseRepository {
                 id: sessionToken,
                 userId: data.userId,
                 accessToken: data.accessToken,
-                expiresAt: new Date(Date.now() + data.validityDurationSeconds * 1000),
+                expiresAt: new Date(
+                    Date.now() + data.validityDurationSeconds * 1000
+                ),
             })
             .returning();
         return sessionToken;

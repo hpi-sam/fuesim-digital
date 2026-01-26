@@ -55,11 +55,11 @@ import { SendAlarmGroupInterfaceComponent } from './components/send-alarm-group-
 import { OccupationNamePipe } from './pipes/occupation-name.pipe';
 import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
 import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.pipe';
-import { UserAccountNavbarItem } from './components/user-account-navbar-item/user-account-navbar-item';
+import { UserAccountNavbarItemComponent } from './components/user-account-navbar-item/user-account-navbar-item.component';
 
 @NgModule({
     declarations: [
-        UserAccountNavbarItem,
+        UserAccountNavbarItemComponent,
         AutofocusDirective,
         AppSaveOnTypingDirective,
         DisplayValidationComponent,
@@ -117,7 +117,7 @@ import { UserAccountNavbarItem } from './components/user-account-navbar-item/use
         QrCodeComponent,
     ],
     exports: [
-        UserAccountNavbarItem,
+        UserAccountNavbarItemComponent,
         SpecificRoleDisplayNamePipe,
         AutofocusDirective,
         AppSaveOnTypingDirective,

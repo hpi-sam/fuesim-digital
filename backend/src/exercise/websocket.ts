@@ -34,7 +34,6 @@ export class ExerciseWebsocketServer {
         this.exerciseServer.on('connection', (socket) => {
             this.registerClient(socket);
         });
-
     }
 
     private registerClient(client: ExerciseSocket): void {

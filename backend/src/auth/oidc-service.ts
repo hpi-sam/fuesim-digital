@@ -1,5 +1,8 @@
 import * as oidc from 'openid-client';
-import type { Request, Response } from 'express';
+import type {
+    Request as ExpressRequest,
+    Response as ExpressResponse,
+} from 'express';
 import { Config } from 'config.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';
 import type { AuthService } from './auth-service.js';
@@ -17,7 +20,7 @@ export class OidcService {
     private _publicUrl: string = Config.httpBackendUrl;
     private static readonly redirectPath = '/api/auth/oidc-callback';
 
-    constructor(private readonly authService: AuthService) { }
+    public constructor(private readonly authService: AuthService) {}
 
     public get config(): oidc.Configuration {
         if (this._config === null) {
@@ -38,14 +41,14 @@ export class OidcService {
                     execute:
                         process.env['NODE_ENV'] === 'development'
                             ? [
-                                /**
-                                 * Marked as deprecated only to make it stand out as something you shouldn't
-                                 * have the need to use, possibly only for local development and testing
-                                 * against non-TLS secured environments.
-                                 * https://github.com/panva/openid-client/blob/01f5fe37cbe78c8c2624f0e568fc3a7d4d2386eb/docs/functions/allowInsecureRequests.md
-                                 */
-                                oidc.allowInsecureRequests,
-                            ]
+                                  /**
+                                   * Marked as deprecated only to make it stand out as something you shouldn't
+                                   * have the need to use, possibly only for local development and testing
+                                   * against non-TLS secured environments.
+                                   * https://github.com/panva/openid-client/blob/01f5fe37cbe78c8c2624f0e568fc3a7d4d2386eb/docs/functions/allowInsecureRequests.md
+                                   */
+                                  oidc.allowInsecureRequests,
+                              ]
                             : undefined,
                 }
             );
@@ -65,7 +68,9 @@ export class OidcService {
         const codeVerifier = oidc.randomPKCECodeVerifier();
         const codeChallenge =
             await oidc.calculatePKCECodeChallenge(codeVerifier);
-        const state = oidc.randomState().substring(0, 43).padEnd(43, '=') + (opts?.returnTo ?? "");
+        const state =
+            oidc.randomState().slice(0, 43).padEnd(43, '=') +
+            (opts?.returnTo ?? '');
 
         const parameters: { [key: string]: string } = {
             redirect_uri: this._publicUrl + OidcService.redirectPath,
@@ -80,15 +85,14 @@ export class OidcService {
             { name: 'state', value: state },
         ];
 
-
         return {
             url: oidc.buildAuthorizationUrl(this.config, parameters),
             cookies,
         };
     }
-    public async handleRedirect(req: Request, res: Response) {
-        const returnToPath = req.query["returnto"] as string | undefined;
-        const authUrl = await this.getAuthUrl({returnTo: returnToPath});
+    public async handleRedirect(req: ExpressRequest, res: ExpressResponse) {
+        const returnToPath = req.query['returnto'] as string | undefined;
+        const authUrl = await this.getAuthUrl({ returnTo: returnToPath });
 
         for (const cookie of authUrl.cookies) {
             res.cookie(cookie.name, cookie.value, {
@@ -101,11 +105,7 @@ export class OidcService {
         res.redirect(authUrl.url.toString());
     }
 
-    public async handleRegistrationRedirect(req: Request, res: Response) {
-
-    }
-
-    public async handleCallback(req: Request, res: Response) {
+    public async handleCallback(req: ExpressRequest, res: ExpressResponse) {
         const state = req.cookies['state'];
         const codeVerifier = req.cookies['code-verifier'];
 
@@ -129,7 +129,6 @@ export class OidcService {
         res.clearCookie('code-verifier');
         res.clearCookie('state');
 
-
         const userInfo = await this.fetchUserInfo(tokens.access_token);
 
         const sessionToken = await this.authService.createNewSession({
@@ -137,13 +136,12 @@ export class OidcService {
             accessToken: tokens.access_token,
         });
 
-        const returnTo = state.length > 43 ? state.substring(43) : undefined;
+        const returnTo = state.length > 43 ? state.slice(43) : undefined;
 
         res.cookie(this.authService.SESSION_COOKIE_NAME, sessionToken, {
             httpOnly: true,
         }).redirect(toFrontend(returnTo, { loginsuccess: true }));
     }
-
 
     public async fetchUserInfo(
         accessToken: string
@@ -170,7 +168,9 @@ export class OidcService {
             return null;
         }
         return oidc.buildEndSessionUrl(this.config, {
-            post_logout_redirect_uri: toFrontend(undefined, { logoutstatus: 'loggedout' }),
+            post_logout_redirect_uri: toFrontend(undefined, {
+                logoutstatus: 'loggedout',
+            }),
         });
     }
 }

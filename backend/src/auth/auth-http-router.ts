@@ -13,7 +13,7 @@ export class AuthHttpRouter extends HttpRouter {
         this.router.get('/oidc-redirect', (req, res) => {
             try {
                 this.authService.oidcService.handleRedirect(req, res);
-            } catch (err) {
+            } catch {
                 res.redirect(
                     toFrontend(undefined, {
                         loginfailure: 'Anmeldung fehlgeschlagen',
@@ -25,7 +25,7 @@ export class AuthHttpRouter extends HttpRouter {
         this.router.get('/oidc-callback', async (req, res) => {
             try {
                 await this.authService.oidcService.handleCallback(req, res);
-            } catch (err) {
+            } catch {
                 res.redirect(
                     toFrontend(undefined, {
                         loginfailure: 'Anmeldung fehlgeschlagen',
@@ -75,7 +75,7 @@ export class AuthHttpRouter extends HttpRouter {
             )
         );
 
-        this.router.post('/refresh', async (req, res) => {
+        this.router.post('/refresh-session', async (req, res) => {
             const sessionToken =
                 req.cookies[this.authService.SESSION_COOKIE_NAME];
             if (!sessionToken) {
@@ -97,7 +97,7 @@ export class AuthHttpRouter extends HttpRouter {
                 );
 
                 res.status(200).json({ message: 'Session refreshed' });
-            } catch (error) {
+            } catch {
                 res.status(400).json({ error: 'Failed to refresh session' });
             }
         });

@@ -9,7 +9,7 @@ export function toFrontend(path: string = '', data?: AuthQueryParams): string {
     if (data?.loginfailure) {
         url.searchParams.append('loginfailure', data.loginfailure);
     }
-    if(data?.loginsuccess) {
+    if (data?.loginsuccess) {
         url.searchParams.append('loginsuccess', 'true');
     }
     return url.toString();

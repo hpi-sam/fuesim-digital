@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { UserDataResponse } from 'digital-fuesim-manv-shared';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Route, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 
@@ -10,7 +10,9 @@ import { MessageService } from './messages/message.service';
     providedIn: 'root',
 })
 export class AuthService {
-    private readonly user$ = new BehaviorSubject<UserDataResponse>({ user: undefined });
+    private readonly user$ = new BehaviorSubject<UserDataResponse>({
+        user: undefined,
+    });
 
     public readonly userData$ = this.user$.asObservable();
 
@@ -22,6 +24,32 @@ export class AuthService {
     ) {
         this.fetchUserData();
         this.handleAuthMessageToast();
+    }
+
+    private async refreshSessionHandler() {
+        const userData = await lastValueFrom(this.userData$);
+        if (!userData.user) return;
+        setInterval(
+            () => {
+                lastValueFrom(
+                    this.httpClient.get(
+                        `${httpOrigin}/api/auth/refresh-session`,
+                        { withCredentials: true }
+                    )
+                )
+                    .then((result) => {
+                        // Session refreshed
+                    })
+                    .catch((err) => {
+                        this.messageService.postMessage({
+                            title: 'Sitzung abgelaufen',
+                            color: 'warning',
+                            body: 'Ihre Sitzung konnte nicht verlängert werden. Bitte melden Sie sich erneut an.',
+                        });
+                    });
+            },
+            15 * 60 * 1000
+        ); // every 15 minutes
     }
 
     private async fetchUserData() {
@@ -41,37 +69,36 @@ export class AuthService {
         }
 
         this.user$.next(userData ?? { user: null });
+        this.refreshSessionHandler();
     }
 
     private handleAuthMessageToast() {
         this.route.queryParams.subscribe((params) => {
-            if (params['logoutstatus'] != null) {
-                switch (params['logoutstatus']) {
-                    case 'loggedout':
-                        this.messageService.postMessage({
-                            title: 'Erfolgreich abgemeldet',
-                            color: 'info',
-                            body: 'Sie wurden erfolgreich abgemeldet.',
-                        });
-                        break;
-                    case 'nosessionfound':
-                        this.messageService.postMessage({
-                            title: 'Abmeldung fehlgeschlagen',
-                            color: 'warning',
-                            body: 'Es wurde keine aktive Sitzung gefunden.',
-                        });
-                        break;
-                    case 'sessionexpired':
-                        this.messageService.postMessage({
-                            title: 'Sitzung abgelaufen',
-                            color: 'warning',
-                            body: 'Ihre Sitzung ist abgelaufen.',
-                        });
-                        break;
-                }
+            switch (params['logoutstatus']) {
+                case 'loggedout':
+                    this.messageService.postMessage({
+                        title: 'Erfolgreich abgemeldet',
+                        color: 'info',
+                        body: 'Sie wurden erfolgreich abgemeldet.',
+                    });
+                    break;
+                case 'nosessionfound':
+                    this.messageService.postMessage({
+                        title: 'Abmeldung fehlgeschlagen',
+                        color: 'warning',
+                        body: 'Es wurde keine aktive Sitzung gefunden.',
+                    });
+                    break;
+                case 'sessionexpired':
+                    this.messageService.postMessage({
+                        title: 'Sitzung abgelaufen',
+                        color: 'warning',
+                        body: 'Ihre Sitzung ist abgelaufen.',
+                    });
+                    break;
             }
 
-            if (params['loginfailure'] != null) {
+            if (params['loginfailure'] !== undefined) {
                 this.messageService.postMessage({
                     color: 'danger',
                     title: 'Login fehlgeschlagen',
@@ -79,12 +106,11 @@ export class AuthService {
                 });
             }
 
-
-            if (params['loginsuccess'] != null) {
+            if (params['loginsuccess'] !== undefined) {
                 this.messageService.postMessage({
-                    color: "success",
+                    color: 'success',
                     title: 'Login erfolgreich',
-                    body: "Willkommen zurück!",
+                    body: 'Willkommen zurück!',
                 });
             }
 

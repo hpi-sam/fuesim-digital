@@ -95,7 +95,7 @@ async function main() {
     }
 
     // eslint-disable-next-line no-new
-    new FuesimServer(databaseService, exerciseService);
+    new FuesimServer(databaseService, exerciseService, authService);
 }
 
 main();

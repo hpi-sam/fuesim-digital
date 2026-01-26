@@ -1,4 +1,3 @@
-version: '3'
 services:
     digital-fuesim-manv:
         depends_on:
@@ -34,9 +33,19 @@ services:
             - POSTGRES_USER=${DFM_DB_USER}
             - POSTGRES_PASSWORD=${DFM_DB_PASSWORD}
             - POSTGRES_DB=${DFM_DB_NAME}
+    # THIS IS ONLY FOR DEVELOPMENT - for production, please use a proper configured OIDC provider
+    authelia:
+        image: docker.io/authelia/authelia:latest
+        restart: unless-stopped
+        ports:
+            - 127.0.0.1:9091:9091
+        volumes:
+            - ./docker/authelia-config:/config:ro
+            - authelia-secrets:/secrets
 
 volumes:
     # database is in this volume
     dfm_db:
     # needed to keep persistency, right now SSL
     dfm-data:
+    authelia-secrets:

@@ -24,6 +24,8 @@ import {
     postExerciseTemplate,
     postNewExerciseFromTemplate,
 } from './http-handler/api/exercise-manager.js';
+import { AuthHttpRouter } from './auth/auth-http-router.js';
+import type { AuthService } from './auth/auth-service.js';
 
 export class ApiHttpServer {
     public readonly httpServer: HttpServer;

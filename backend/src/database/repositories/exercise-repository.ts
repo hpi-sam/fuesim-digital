@@ -46,10 +46,10 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection.select().from(exerciseTable);
     }
 
-    public deleteExerciseById(id: ExerciseId) {
+    public deleteExerciseById(exerciseId: ExerciseId) {
         return this.databaseConnection
             .delete(exerciseTable)
-            .where(eq(exerciseTable.id, uuid));
+            .where(eq(exerciseTable.id, exerciseId));
     }
 
     /**

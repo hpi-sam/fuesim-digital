@@ -1,4 +1,5 @@
 import type { ExerciseTemplateCreateData } from 'digital-fuesim-manv-shared';
+import { NotFoundError } from 'digital-fuesim-manv-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
@@ -25,7 +26,7 @@ export class ExerciseManagerService {
         const exerciseTemplate =
             await this.exerciseRepository.createExerciseTemplate(data);
         if (!exerciseTemplate) {
-            throw Error('Exercise template not created');
+            throw new NotFoundError();
         }
         const newExercise = ExerciseFactory.fromBlank();
         await this.exerciseRepository.createExerciseIfNotExists(newExercise, {
@@ -45,7 +46,7 @@ export class ExerciseManagerService {
         const exerciseTemplate =
             await this.exerciseRepository.getExerciseTemplateById(id);
         if (!exerciseTemplate) {
-            throw Error('Exercise template does not exist');
+            throw new NotFoundError();
         }
         return {
             ...(await this.exerciseRepository.patchExerciseTemplate(
@@ -63,7 +64,7 @@ export class ExerciseManagerService {
         const exerciseTemplate =
             await this.exerciseRepository.getExerciseTemplateById(id);
         if (!exerciseTemplate) {
-            throw Error('Exercise template does not exist');
+            throw new NotFoundError();
         }
         const actions = await this.actionRepository.getActionsForExerciseId(
             exerciseTemplate.exercise_entity.id
@@ -88,7 +89,7 @@ export class ExerciseManagerService {
         const exerciseTemplate =
             await this.exerciseRepository.getExerciseTemplateById(id);
         if (!exerciseTemplate) {
-            throw Error('Exercise template does not exist');
+            throw new NotFoundError();
         }
 
         const activeExercise = exerciseService.getExerciseByKey(

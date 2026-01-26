@@ -9,8 +9,17 @@ import { AuthHttpRouter } from '../auth/auth-http-router.js';
 import type { ExerciseService } from './../database/services/exercise-service.js';
 import { HealthHttpRouter } from './health-router.js';
 import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
-import type { AuthService } from './auth/auth-service.js';
+import type { AuthService, SessionInformation } from './auth/auth-service.js';
 import { ApplicationRouter } from './application-routers/application-router.js';
+import { errorHandler } from './utils/http-error-handler.js';
+
+declare global {
+    namespace Express {
+        interface Request {
+            session?: SessionInformation | null;
+        }
+    }
+}
 
 export class ApiHttpServer {
     public readonly httpServer: HttpServer;
@@ -47,6 +56,8 @@ export class ApiHttpServer {
         );
 
         app.use('/api/auth', new AuthHttpRouter(authService).router);
+
+        app.use(errorHandler);
 
         this.httpServer = app.listen(Config.httpPort, () => {
             console.log(`HTTP server listening on port ${Config.httpPort}`);

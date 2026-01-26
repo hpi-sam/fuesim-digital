@@ -1,4 +1,8 @@
-import type { ExerciseTimeline, Role } from 'digital-fuesim-manv-shared';
+import {
+    NotFoundError,
+    type ExerciseTimeline,
+    type Role,
+} from 'digital-fuesim-manv-shared';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import type { ClientWrapper } from '../../exercise/client-wrapper.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
@@ -146,7 +150,7 @@ export class ExerciseService {
     public async deleteExercise(exerciseKey: ExerciseKey) {
         const activeExercise = this.getExerciseByKey(exerciseKey);
         if (!activeExercise) {
-            throw new UnknownExerciseError(exerciseKey);
+            throw new NotFoundError();
         }
 
         this.destroyExercise(activeExercise);
@@ -188,8 +192,7 @@ export class ExerciseService {
         exerciseKey: ExerciseKey
     ): Promise<ExerciseTimeline> {
         const activeExercise = this.getExerciseByKey(exerciseKey);
-        if (activeExercise === undefined)
-            throw new UnknownExerciseError(exerciseKey);
+        if (activeExercise === undefined) throw new NotFoundError();
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
                 await this.actionRepository.getActionsForExerciseId(
@@ -231,13 +234,5 @@ export class ExerciseService {
      */
     public TESTING_getExerciseMap() {
         return this.exerciseMap;
-    }
-}
-
-export class UnknownExerciseError extends Error {
-    public constructor(exerciseId: string) {
-        super(
-            `Exercise with id ${exerciseId} was requested but not found on server`
-        );
     }
 }

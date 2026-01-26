@@ -1,5 +1,20 @@
 import { z } from 'zod';
 
+export class ApiError extends Error {
+    public statusCode = 400;
+}
+export class NotFoundError extends ApiError {
+    public override statusCode = 404;
+    public constructor() {
+        super(`Object does not exist`);
+    }
+}
+export class PermissionDeniedError extends ApiError {
+    public override statusCode = 403;
+    public constructor() {
+        super('You have no permission for this operation.');
+    }
+}
 export interface ExerciseKeys {
     readonly participantKey: string;
     readonly trainerKey: string;

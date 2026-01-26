@@ -1,5 +1,3 @@
-import type { UserDataResponse } from 'digital-fuesim-manv-shared';
-import { secureHttp } from '../utils/secure-http.js';
 import { HttpRouter } from '../http-router.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';
 import type { AuthService } from './auth-service.js';
@@ -25,9 +23,9 @@ export class AuthHttpRouter extends HttpRouter {
             }
         });
 
-        this.router.get('/oidc-redirect', (req, res) => {
+        this.router.get('/oidc-redirect', async (req, res) => {
             try {
-                this.authService.oidcService.handleLoginRedirect(req, res);
+                await this.authService.oidcService.handleLoginRedirect(req, res);
             } catch {
                 res.redirect(
                     toFrontend(undefined, {
@@ -49,68 +47,38 @@ export class AuthHttpRouter extends HttpRouter {
             }
         });
 
-        this.router.get('/user-data', async (req, res) =>
-            secureHttp<UserDataResponse>(
-                async () => {
-                    const sessionToken =
-                        req.cookies[this.authService.SESSION_COOKIE_NAME];
-                    const sessionTokenData = sessionToken
-                        ? await this.authService.getDataFromSessionToken(
-                              sessionToken
-                          )
-                        : null;
+        this.router.get('/user-data', async (req, res) => {
+            const sessionToken =
+                req.cookies[this.authService.SESSION_COOKIE_NAME];
+            const sessionTokenData = sessionToken
+                ? await this.authService.getDataFromSessionToken(
+                    sessionToken
+                )
+                : null;
 
-                    const sessionIsExpired = sessionToken && !sessionTokenData;
+            const sessionIsExpired = sessionToken && !sessionTokenData;
 
-                    return {
-                        statusCode: 200,
-                        body: userDataResponseSchema.encode({
-                            user: sessionTokenData?.user ?? null,
-                            expired: sessionIsExpired,
-                            userRegistrationsEnabled:
-                                this.authService.oidcService
-                                    .userRegistrationEnabled,
-                            userSelfServiceEnabled:
-                                this.authService.oidcService
-                                    .userSelfServiceEnabled,
-                        }),
-                        cookies: sessionIsExpired
-                            ? [
-                                  {
-                                      name: this.authService
-                                          .SESSION_COOKIE_NAME,
-                                      value: null,
-                                  },
-                              ]
-                            : [],
-                    };
-                },
-                req,
-                res
-            )
-        );
-
-        this.router.get('/self-service', async (req, res) => {
-            try {
-                await this.authService.oidcService.handleSelfServiceRedirect(
-                    req,
-                    res
-                );
-            } catch {
-                res.redirect(
-                    toFrontend(undefined, {
-                        loginFailure:
-                            'Benutzer-Selbstverwaltung fehlgeschlagen',
-                    })
-                );
+            if (sessionIsExpired) {
+                res.clearCookie(this.authService.SESSION_COOKIE_NAME);
             }
+
+            res.send(userDataResponseSchema.encode({
+                user: sessionTokenData?.user ?? null,
+                expired: sessionIsExpired,
+                userRegistrationsEnabled:
+                this.authService.oidcService
+                    .userRegistrationEnabled,
+                userSelfServiceEnabled:
+                this.authService.oidcService
+                    .userSelfServiceEnabled,
+            }));
         });
 
         this.router.post('/refresh-session', async (req, res) => {
             const sessionToken =
                 req.cookies[this.authService.SESSION_COOKIE_NAME];
             if (!sessionToken) {
-                res.status(400).json({ error: 'No session token provided' });
+                res.status(400).send({ error: 'No session token provided' });
                 return;
             }
 
@@ -127,9 +95,9 @@ export class AuthHttpRouter extends HttpRouter {
                     }
                 );
 
-                res.status(200).json({ message: 'Session refreshed' });
+                res.status(200).send({ message: 'Session refreshed' });
             } catch {
-                res.status(400).json({ error: 'Failed to refresh session' });
+                res.status(400).send({ error: 'Failed to refresh session' });
             }
         });
 

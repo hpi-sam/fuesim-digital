@@ -3,7 +3,6 @@ import * as z from 'zod';
 import type { ExerciseState } from '../../state.js';
 import type { PatientStatus } from '../../models/index.js';
 import type { Sex } from '../../models/utils/sex.js';
-import { StrictObject } from '../../utils/index.js';
 
 const statusCodeToExportMap: { [key in PatientStatus]: string } = {
     red: '1',

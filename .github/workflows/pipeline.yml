@@ -146,7 +146,6 @@ jobs:
                     --tmpfs /var/lib/postgresql/data
             authelia:
                 image: docker.io/authelia/authelia:latest
-                restart: unless-stopped
                 ports:
                     - 9091/tcp
                 volumes:

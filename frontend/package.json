@@ -57,7 +57,7 @@
     },
     "devDependencies": {
         "@angular/build": "^19.2.19",
-        "@angular/cli": "~19.2.10",
+        "@angular/cli": "~21.1.1",
         "@angular/compiler-cli": "~19.2.18",
         "@angular/localize": "~19.2.18",
         "@eslint/compat": "^1.4.0",

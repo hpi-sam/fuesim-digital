@@ -148,10 +148,9 @@ jobs:
                 image: docker.io/authelia/authelia:latest
                 restart: unless-stopped
                 ports:
-                    - 127.0.0.1:9091:9091
+                    - 9091/tcp
                 volumes:
-                    - ./docker/authelia-config:/config:ro
-                    - authelia-secrets:/secrets
+                    - ${{ github.workspace }}/docker/authelia-config:/config:ro
 
         steps:
             - uses: actions/checkout@v3
@@ -168,6 +167,7 @@ jobs:
                   | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
                   | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
                   | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/" > ./.env
+                  | sed -e "s/^DFM_AUTH_URL=.*$/DFM_AUTH_URL=http://127.0.0.1:${{ job.services.postgres.ports['9091'] }}/"
             - name: Run migrations
               run: cd backend && npm run migration:run && cd ..
             - name: Run Backend Tests

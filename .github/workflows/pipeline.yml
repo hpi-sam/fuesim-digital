@@ -149,12 +149,13 @@ jobs:
                 ports:
                     - 9091/tcp
                 volumes:
-                    - ${{ github.action_path }}/docker/authelia-config:/config
+                    - authelia-config:/config
 
         steps:
             - uses: actions/checkout@v3
             - name: Copy config files to authelia
               run: |
+                  echo ${{ github.action_path }}
                   docker cp ${{ github.action_path }}/docker/authelia-config/. authelia:/config
             - name: Restart authelia to pick up new config
               run: |

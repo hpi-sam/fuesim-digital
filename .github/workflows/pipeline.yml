@@ -149,7 +149,7 @@ jobs:
                 ports:
                     - 9091/tcp
                 volumes:
-                    - ${{ github.workspace }}/docker/authelia-config:/config:ro
+                    - ${{ github.action_path }}/docker/authelia-config:/config:ro
 
         steps:
             - uses: actions/checkout@v3

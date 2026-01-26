@@ -148,7 +148,8 @@ jobs:
                 image: docker.io/authelia/authelia:latest
                 ports:
                     - 9091/tcp
-                    #- ${{ github.action_path }}/docker/authelia-config:/config
+                volumes:
+                    - ${{ github.action_path }}/docker/authelia-config:/config
 
         steps:
             - uses: actions/checkout@v3

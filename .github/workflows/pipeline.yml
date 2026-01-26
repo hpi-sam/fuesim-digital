@@ -148,11 +148,16 @@ jobs:
                 image: docker.io/authelia/authelia:latest
                 ports:
                     - 9091/tcp
-                volumes:
-                    - ${{ github.action_path }}/docker/authelia-config:/config
+                    #- ${{ github.action_path }}/docker/authelia-config:/config
 
         steps:
             - uses: actions/checkout@v3
+            - name: Copy config files to authelia
+              run: |
+                  docker cp ${{ github.action_path }}/docker/authelia-config/. authelia:/config
+            - name: Restart authelia to pick up new config
+              run: |
+                  docker restart authelia
             - uses: actions/setup-node@v3
               with:
                   node-version: '22'

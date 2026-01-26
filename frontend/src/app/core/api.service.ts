@@ -95,20 +95,34 @@ export class ApiService {
     }
 
     public getExercisesResource() {
-        return httpResource(() => `${httpOrigin}/api/exercises/`, {
-            parse: exercisesSchema.parse,
-        });
+        return httpResource(
+            () => ({
+                url: `${httpOrigin}/api/exercises/`,
+                withCredentials: true,
+            }),
+            {
+                parse: exercisesSchema.parse,
+            }
+        );
     }
     public getExerciseTemplatesResource() {
-        return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
-            parse: exerciseTemplatesSchema.parse,
-        });
+        return httpResource(
+            () => ({
+                url: `${httpOrigin}/api/exercise_templates/`,
+                withCredentials: true,
+            }),
+            {
+                parse: exerciseTemplatesSchema.parse,
+            }
+        );
     }
 
     public async createExerciseTemplate(data: ExerciseTemplateCreateData) {
         return lastValueFrom(
             this.httpClient
-                .post(`${httpOrigin}/api/exercise_template`, data)
+                .post(`${httpOrigin}/api/exercise_template`, data, {
+                    withCredentials: true,
+                })
                 .pipe(map((v) => exerciseTemplateSchema.parse(v)))
         );
     }
@@ -119,7 +133,9 @@ export class ApiService {
     ) {
         return lastValueFrom(
             this.httpClient
-                .patch(`${httpOrigin}/api/exercise_template/${id}`, data)
+                .patch(`${httpOrigin}/api/exercise_template/${id}`, data, {
+                    withCredentials: true,
+                })
                 .pipe(map((v) => exerciseTemplateSchema.parse(v)))
         );
     }
@@ -128,7 +144,8 @@ export class ApiService {
         return lastValueFrom(
             this.httpClient.post<ExerciseAccessIds>(
                 `${httpOrigin}/api/exercise_template/${id}/new`,
-                {}
+                {},
+                { withCredentials: true }
             )
         );
     }
@@ -137,7 +154,7 @@ export class ApiService {
         return lastValueFrom(
             this.httpClient.delete<undefined>(
                 `${httpOrigin}/api/exercise_template/${id}`,
-                {}
+                { withCredentials: true }
             )
         );
     }

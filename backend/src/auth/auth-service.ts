@@ -4,6 +4,10 @@ import type { SessionEntry } from '../database/schema.js';
 import { PeriodicEventHandler } from '../exercise/periodic-events/periodic-event-handler.js';
 import { OidcService } from './oidc-service.js';
 
+export interface SessionInformation {
+    user: OidcService.UserInfo;
+    session: SessionEntry;
+}
 export class AuthService {
     public readonly oidcService;
     public readonly SESSION_DURATION_S = 7 * 24 * 60 * 60; // 7 days
@@ -74,7 +78,7 @@ export class AuthService {
      */
     public async getDataFromSessionToken(
         sessionToken: string
-    ): Promise<{ user: OidcService.UserInfo; session: SessionEntry } | null> {
+    ): Promise<SessionInformation | null> {
         const session =
             await this.sessionRepository.getValidSessionByToken(sessionToken);
         if (!session) {

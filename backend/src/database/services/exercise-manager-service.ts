@@ -1,5 +1,8 @@
 import type { ExerciseTemplateCreateData } from 'digital-fuesim-manv-shared';
-import { NotFoundError } from 'digital-fuesim-manv-shared';
+import {
+    NotFoundError,
+    PermissionDeniedError,
+} from 'digital-fuesim-manv-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
@@ -11,20 +14,24 @@ export class ExerciseManagerService {
         private readonly actionRepository: ActionRepository
     ) {}
 
-    public async getAllExercisesOfOwner() {
-        return this.exerciseRepository.getAllExercisesOfOwner();
+    public async getAllExercisesOfOwner(userId: string) {
+        return this.exerciseRepository.getAllExercisesOfOwner(userId);
     }
 
-    public async getAllExerciseTemplatesOfOwner() {
-        return this.exerciseRepository.getAllExerciseTemplatesOfOwner();
+    public async getAllExerciseTemplatesOfOwner(userId: string) {
+        return this.exerciseRepository.getAllExerciseTemplatesOfOwner(userId);
     }
 
     public async createExerciseTemplate(
         data: ExerciseTemplateCreateData,
+        userId: string,
         exerciseService: ExerciseService
     ) {
         const exerciseTemplate =
-            await this.exerciseRepository.createExerciseTemplate(data);
+            await this.exerciseRepository.createExerciseTemplate({
+                ...data,
+                user: userId,
+            });
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
@@ -41,12 +48,16 @@ export class ExerciseManagerService {
 
     public async patchExerciseTemplate(
         id: string,
+        userId: string,
         data: ExerciseTemplateCreateData
     ) {
         const exerciseTemplate =
             await this.exerciseRepository.getExerciseTemplateById(id);
         if (!exerciseTemplate) {
             throw new NotFoundError();
+        }
+        if (exerciseTemplate.exercise_template.user !== userId) {
+            throw new PermissionDeniedError();
         }
         return {
             ...(await this.exerciseRepository.patchExerciseTemplate(
@@ -59,12 +70,16 @@ export class ExerciseManagerService {
 
     public async createExerciseFromTemplate(
         id: string,
+        userId: string,
         exerciseService: ExerciseService
     ) {
         const exerciseTemplate =
             await this.exerciseRepository.getExerciseTemplateById(id);
         if (!exerciseTemplate) {
             throw new NotFoundError();
+        }
+        if (exerciseTemplate.exercise_template.user !== userId) {
+            throw new PermissionDeniedError();
         }
         const actions = await this.actionRepository.getActionsForExerciseId(
             exerciseTemplate.exercise_entity.id
@@ -77,6 +92,7 @@ export class ExerciseManagerService {
         );
         await this.exerciseRepository.createExerciseIfNotExists(newExercise, {
             baseTemplateId: exerciseTemplate.exercise_template.id,
+            user: userId,
         });
         await exerciseService.loadExercise(newExercise);
         return newExercise;
@@ -84,6 +100,7 @@ export class ExerciseManagerService {
 
     public async deleteExerciseTemplate(
         id: string,
+        userId: string,
         exerciseService: ExerciseService
     ) {
         const exerciseTemplate =
@@ -91,7 +108,9 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-
+        if (exerciseTemplate.exercise_template.user !== userId) {
+            throw new PermissionDeniedError();
+        }
         const activeExercise = exerciseService.getExerciseByKey(
             exerciseTemplate.exercise_entity.trainerId
         );

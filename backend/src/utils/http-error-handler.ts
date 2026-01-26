@@ -1,5 +1,5 @@
-import type { ErrorRequestHandler } from 'express';
-import { ApiError } from 'digital-fuesim-manv-shared';
+import type { ErrorRequestHandler, RequestHandler } from 'express';
+import { ApiError, PermissionDeniedError } from 'digital-fuesim-manv-shared';
 
 export type HttpMethod =
     | 'delete'
@@ -9,6 +9,13 @@ export type HttpMethod =
     | 'patch'
     | 'post'
     | 'put';
+
+export const isAuthenticatedMiddleware: RequestHandler = (req, res, next) => {
+    if (!req.session) {
+        throw new PermissionDeniedError();
+    }
+    next();
+};
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     try {

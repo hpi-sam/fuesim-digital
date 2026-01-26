@@ -12,9 +12,24 @@ export class ApplicationRouter extends HttpRouter {
         private readonly exerciseManagerService: ExerciseManagerService
     ) {
         super();
+
+        this.router.use(async (req, res, next) => {
+            const sessionToken = req.cookies[authService.SESSION_COOKIE_NAME];
+            if (sessionToken) {
+                // eslint-disable-next-line require-atomic-updates
+                req.session =
+                    await authService.getDataFromSessionToken(sessionToken);
+            } else {
+                req.session = null;
+            }
+
+            next();
+        });
+
         this.router.use(
             new ExerciseHttpRouter(authService, exerciseService).router
         );
+
         this.router.use(
             new ExerciseManagerHttpRouter(
                 authService,

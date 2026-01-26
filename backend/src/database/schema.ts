@@ -1,5 +1,5 @@
 import type { ExerciseAction, ExerciseState } from 'digital-fuesim-manv-shared';
-import type { InferSelectModel } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
 import {
     char,
@@ -32,8 +32,40 @@ const baseTable = <T>() => ({
         .notNull(),
 });
 
+export const userTable = pgTable('users', {
+    /**
+     * This should always be the sub claim from the OIDC provider
+     */
+    id: varchar().primaryKey().notNull(),
+    username: varchar().notNull(),
+    display_name: varchar().notNull(),
+    updatedAt: timestamp({ mode: 'date', precision: 3 })
+        .notNull()
+        .$defaultFn(() => new Date())
+        .$onUpdateFn(() => new Date()),
+});
+
+export const sessionTable = pgTable('sessions', {
+    id: varchar().primaryKey().notNull(),
+    userId: varchar()
+        .notNull()
+        .references(() => userTable.id, {
+            onDelete: 'cascade',
+            onUpdate: 'cascade',
+        }),
+    createdAt: timestamp({ mode: 'date', precision: 3 })
+        .notNull()
+        .$defaultFn(() => new Date()),
+    expiresAt: timestamp({ mode: 'date', precision: 3 }).notNull(),
+    accessToken: varchar().notNull(),
+});
+export type SessionEntry = InferSelectModel<typeof sessionTable>;
+
 export const exerciseTemplateTable = pgTable('exercise_template', {
     ...baseTable,
+    user: varchar()
+        .references(() => userTable.id, { onDelete: 'cascade' })
+        .notNull(),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
         .defaultNow(),
@@ -47,6 +79,9 @@ export const exerciseTemplateTable = pgTable('exercise_template', {
 export type ExerciseTemplateEntry = InferSelectModel<
     typeof exerciseTemplateTable
 >;
+export type ExerciseTemplateInsert = InferInsertModel<
+    typeof exerciseTemplateTable
+>;
 
 export const exerciseTable = pgTable('exercise_entity', {
     ...baseTable<ExerciseId>(),
@@ -56,6 +91,7 @@ export const exerciseTable = pgTable('exercise_entity', {
     trainerId: char({ length: 8 }).notNull(),
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
+    user: varchar().references(() => userTable.id, { onDelete: 'cascade' }),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
         .defaultNow(),
@@ -93,33 +129,6 @@ export const actionTable = pgTable(
     ]
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
-
-export const userTable = pgTable('users', {
-    /**
-     * This should always be the sub claim from the OIDC provider
-     */
-    id: varchar().primaryKey().notNull(),
-    username: varchar().notNull(),
-    displayName: varchar().notNull(),
-    updatedAt: timestamp({ mode: 'date', precision: 3 })
-        .notNull()
-        .defaultNow()
-        .$onUpdateFn(() => new Date()),
-});
-
-export const sessionTable = pgTable('sessions', {
-    id: varchar().primaryKey().notNull(),
-    userId: varchar()
-        .notNull()
-        .references(() => userTable.id, {
-            onDelete: 'cascade',
-            onUpdate: 'cascade',
-        }),
-    createdAt: timestamp({ mode: 'date', precision: 3 }).notNull().defaultNow(),
-    expiresAt: timestamp({ mode: 'date', precision: 3 }).notNull(),
-    accessToken: varchar().notNull(),
-});
-export type SessionEntry = InferSelectModel<typeof sessionTable>;
 
 export const actionEntityRelations = relations(actionTable, ({ one }) => ({
     exerciseWrapperEntity: one(exerciseTable, {

@@ -1,8 +1,7 @@
-import type { ExerciseTemplateCreateData } from 'digital-fuesim-manv-shared';
 import { ExerciseState } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
-import { isNull, desc, eq, lt } from 'drizzle-orm';
-import type { ExerciseId } from '../schema.js';
+import { and, isNull, desc, eq, lt } from 'drizzle-orm';
+import type { ExerciseId, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import type {
@@ -64,7 +63,7 @@ export class ExerciseRepository extends BaseRepository {
             );
     }
 
-    public getAllExercisesOfOwner() {
+    public getAllExercisesOfOwner(userId: string) {
         return this.databaseConnection
             .select({
                 id: exerciseTable.id,
@@ -82,11 +81,16 @@ export class ExerciseRepository extends BaseRepository {
                 exerciseTemplateTable,
                 eq(exerciseTemplateTable.id, exerciseTable.baseTemplateId)
             )
-            .where(isNull(exerciseTable.templateId))
+            .where(
+                and(
+                    isNull(exerciseTable.templateId),
+                    eq(exerciseTable.user, userId)
+                )
+            )
             .orderBy(desc(exerciseTable.lastUsedAt));
     }
 
-    public getAllExerciseTemplatesOfOwner() {
+    public getAllExerciseTemplatesOfOwner(userId: string) {
         return this.databaseConnection
             .select({
                 id: exerciseTemplateTable.id,
@@ -102,6 +106,7 @@ export class ExerciseRepository extends BaseRepository {
                 exerciseTable,
                 eq(exerciseTemplateTable.id, exerciseTable.templateId)
             )
+            .where(eq(exerciseTemplateTable.user, userId))
             .orderBy(desc(exerciseTemplateTable.lastExerciseCreatedAt));
     }
 
@@ -118,7 +123,7 @@ export class ExerciseRepository extends BaseRepository {
         );
     }
 
-    public async createExerciseTemplate(data: ExerciseTemplateCreateData) {
+    public async createExerciseTemplate(data: ExerciseTemplateInsert) {
         return onlySingle(
             await this.databaseConnection
                 .insert(exerciseTemplateTable)
@@ -129,7 +134,7 @@ export class ExerciseRepository extends BaseRepository {
 
     public async patchExerciseTemplate(
         id: string,
-        data: ExerciseTemplateCreateData
+        data: ExerciseTemplateInsert
     ) {
         return onlySingle(
             await this.databaseConnection

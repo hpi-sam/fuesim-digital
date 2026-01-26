@@ -197,14 +197,14 @@ export class ExerciseService {
         };
     }
 
-    public getRoleFromKey(key: string): Role {
-        switch (key.length) {
+    public getRoleFromKey(exerciseKey: string): Role {
+        switch (exerciseKey.length) {
             case 6:
                 return 'participant';
             case 8:
                 return 'trainer';
             default:
-                throw new RangeError(`Incorrect id: ${key}`);
+                throw new RangeError(`Incorrect id: ${exerciseKey}`);
         }
     }
 

@@ -12,7 +12,7 @@ import type {
 describe('Active Exercise', () => {
     const environment = createTestEnvironment();
 
-    it('fails getting a role for the wrong id', () => {
+    it('fails getting a role for the wrong key', () => {
         const exercise = new ActiveExercise(
             '123456' as ParticipantKey,
             '12345678' as TrainerKey

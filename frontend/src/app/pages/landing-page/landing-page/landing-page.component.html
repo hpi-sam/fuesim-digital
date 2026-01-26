@@ -1,5 +1,7 @@
 <app-header />
 
+@let userData = (userData$ | async)?.user;
+
 <div class="container">
     <div class="row mb-4 d-flex">
         <div class="col">
@@ -49,13 +51,29 @@
         <div class="col">
             <div class="p-4 bg-light rounded-3 h-100">
                 <h2>Neue Übung erstellen</h2>
-                <div class="mb-3">
-                    <p class="lead">
-                        Melden Sie sich an, um Übungen bequem zu erstellen und
-                        zu verwalten:
-                    </p>
-                    <button class="btn btn-primary btn-lg">Anmelden</button>
-                </div>
+                @if (userData) {
+                    <div class="mb-3">
+                        <p class="lead">
+                            Nutzen Sie den Übungsmanager, um wiederverwendbare
+                            Übungsvorlagen zu erstellen:
+                        </p>
+                        <a
+                            class="btn btn-primary btn-lg"
+                            routerLink="/exercises/templates/"
+                            >Übungsvorlagen verwalten</a
+                        >
+                    </div>
+                } @else {
+                    <div class="mb-3">
+                        <p class="lead">
+                            Melden Sie sich an, um Übungen bequem zu erstellen
+                            und zu verwalten:
+                        </p>
+                        <a class="btn btn-primary btn-lg" [href]="loginUrl"
+                            >Anmelden</a
+                        >
+                    </div>
+                }
                 <div class="mb-3">
                     <p class="lead">
                         Oder erstellen Sie direkt eine Übung, um sofort

@@ -153,13 +153,11 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - name: Copy config files to authelia
+            - name: Start Authelia OIDC Provider
               run: |
-                  echo ${{ github.action_path }}
-                  docker cp ${{ github.action_path }}/docker/authelia-config/. authelia:/config
-            - name: Restart authelia to pick up new config
-              run: |
-                  docker restart authelia
+                  export AUTHELIA_CONTAINER_ID=$(docker run -p 9091/tcp -v ${{ github.action_path }}/docker/authelia-config:/config:ro -v authelia-secrets:/secrets -d docker.io/authelia/authelia:latest)
+                  export AUTHELIA_CONTAINER_PORT=$(sudo docker port $AUTHELIA_CONTAINER_ID | grep -e ":[0-9]*" -o -m1 | cut -c 2-)
+                  echo "Authelia container started with ID $AUTHELIA_CONTAINER_ID on port $AUTHELIA_CONTAINER_PORT"
             - uses: actions/setup-node@v3
               with:
                   node-version: '22'
@@ -173,7 +171,7 @@ jobs:
                   | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
                   | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
                   | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/" > ./.env
-                  | sed -e "s/^DFM_AUTH_URL=.*$/DFM_AUTH_URL=http://127.0.0.1:${{ job.services.postgres.ports['9091'] }}/"
+                  | sed -e "s/^DFM_AUTH_URL=.*$/DFM_AUTH_URL=http://127.0.0.1:$AUTHELIA_CONTAINER_PORT/"
             - name: Run migrations
               run: cd backend && npm run migration:run && cd ..
             - name: Run Backend Tests

@@ -1,6 +1,5 @@
 import type { UserDataResponse } from 'digital-fuesim-manv-shared';
-import { userDataResponseSchema } from 'digital-fuesim-manv-shared';
-import { secureHttp } from '../exercise/http-handler/secure-http.js';
+import { secureHttp } from '../utils/secure-http.js';
 import { HttpRouter } from '../http-router.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';
 import type { AuthService } from './auth-service.js';

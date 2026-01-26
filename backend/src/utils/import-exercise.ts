@@ -1,6 +1,6 @@
 import type { StateExport } from 'digital-fuesim-manv-shared';
 import { ReducerError } from 'digital-fuesim-manv-shared';
-import type { HttpErrorMessage, HttpResponse } from 'http-handler/utils.js';
+import type { HttpErrorMessage, HttpResponse } from 'utils/http.js';
 import type { ActiveExercise } from '../exercise/active-exercise.js';
 import { ExerciseFactory } from '../exercise/exercise-factory.js';
 import { ValidationErrorWrapper } from './validation-error-wrapper.js';

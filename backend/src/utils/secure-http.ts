@@ -2,7 +2,7 @@ import type {
     Response as ExpressResponse,
     Request as ExpressRequest,
 } from 'express';
-import type { HttpResponse } from './utils.js';
+import type { HttpResponse } from './http.js';
 
 export type HttpMethod =
     | 'delete'

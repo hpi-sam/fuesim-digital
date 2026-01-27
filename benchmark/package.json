@@ -10,9 +10,17 @@
         "benchmark": "(pwd && npm run benchmark:linux-macos) || npm run benchmark:windows"
     },
     "private": true,
-    "engines": {
-        "node": ">=22",
-        "npm": ">=11"
+    "devEngines": {
+        "runtime": {
+            "name": "node",
+            "version": "~24.13.0",
+            "onFail": "error"
+        },
+        "packageManager": {
+            "name": "npm",
+            "version": "~11.6.2",
+            "onFail": "error"
+        }
     },
     "dependencies": {
         "digital-fuesim-manv-shared": "file:../shared",

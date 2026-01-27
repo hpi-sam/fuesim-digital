@@ -12,6 +12,7 @@ on:
         types: [opened, synchronize, reopened, ready_for_review]
 
 env:
+    NODE_VERSION: '24.13.0'
     POSTGRES_USER: dfm
     POSTGRES_PASSWORD: notASecurePassword_forPipelineOnly
     POSTGRES_DB: dfm_db
@@ -27,9 +28,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               id: cache-build
               uses: ./.github/actions/cache-build
@@ -47,9 +48,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Build frontend
@@ -63,9 +64,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Build backend
@@ -79,9 +80,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Run ESLint
@@ -100,9 +101,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Audit root
@@ -147,9 +148,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Create .env
@@ -207,9 +208,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Create .env
@@ -259,9 +260,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Cache Cypress binary

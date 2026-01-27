@@ -35,8 +35,10 @@ This project is currently developed as a [bachelor project](https://hpi.de/en/st
 
 ## Installation
 
-1. Install [NodeJs](https://nodejs.org/) (at least version 22.x) (if you need different node versions on your machine we recommend [nvm](https://github.com/nvm-sh/nvm) or [nvm for windows](https://github.com/coreybutler/nvm-windows))
-2. [npm](https://www.npmjs.com/) should already come with NodeJs - if not install it
+1. Install [NodeJs](https://nodejs.org/)  
+   Please use the version specified at `devEngines.runtime.version` in `./package.json`. If you need different node versions on your machine we recommend [nvm](https://github.com/nvm-sh/nvm) or [nvm for windows](https://github.com/coreybutler/nvm-windows)
+2. [npm](https://www.npmjs.com/) should already come with NodeJs.  
+   The npm version specified by `devEngines.packageManager.version` matches the npm version that is bundled with the correct NodeJs version. Please do not update npm on your own.
 3. Clone the repo by running `git clone https://github.com/hpi-sam/digital-fuesim-manv`. To be able to run migration tests, you also have to clone the submodules: use `git clone --recurse-submodules https://github.com/hpi-sam/digital-fuesim-manv` or run `git submodule update --init --recursive` if you have cloned the repo already.
 4. Run `npm run setup` from the root folder
 5. Copy the [`.env.example`](./.env.example) file to `./.env` and adjust the settings as you need them. Note that some of the variables are explained under the next point.

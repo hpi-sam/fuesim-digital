@@ -33,9 +33,17 @@
         "licensing:all": "npm-run-all -s -n -c licensing:third-party-licenses licensing:source-code-zip-file"
     },
     "private": true,
-    "engines": {
-        "node": ">=22",
-        "npm": ">=11"
+    "devEngines": {
+        "runtime": {
+            "name": "node",
+            "version": "~24.13.0",
+            "onFail": "error"
+        },
+        "packageManager": {
+            "name": "npm",
+            "version": "~11.6.2",
+            "onFail": "error"
+        }
     },
     "devDependencies": {
         "@weichwarenprojekt/license-reporter": "^1.0.0",

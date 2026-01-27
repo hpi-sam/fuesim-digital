@@ -21,7 +21,7 @@
         "migration:run": "npx drizzle-kit migrate",
         "migration:check": "npx drizzle-kit check",
         "db:studio": "npx drizzle-kit studio",
-        "db:purge": "node --loader ts-node/esm src/database/scripts/purge.ts"
+        "db:purge": "tsx src/database/scripts/purge.ts"
     },
     "private": true,
     "engines": {
@@ -38,7 +38,7 @@
         "drizzle-kit": "^0.31.7",
         "drizzle-orm": "^0.44.7",
         "envalid": "^8.0.0",
-        "express": "^5.1.0",
+        "express": "^5.2.0",
         "lodash-es": "4.17.21",
         "pg": "^8.14.1",
         "socket.io": "^4.8.1",
@@ -62,7 +62,6 @@
         "jest": "^30.2.0",
         "socket.io-client": "^4.5.4",
         "ts-jest": "^29.4.5",
-        "ts-node": "^10.9.2",
         "tsx": "^4.19.3",
         "typescript": "~5.8.2",
         "typescript-eslint": "^8.45.0"

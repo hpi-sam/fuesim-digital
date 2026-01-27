@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Added
+
+- Provide CSV export for patients to import them into IVENA MANV.
+
 ### Fixed
 
 - Viewports are now consistently called "Ansicht" in the frontend and some other incorrect usages of "Einsatzabschnitt" have been corrected.

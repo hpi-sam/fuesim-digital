@@ -54,7 +54,7 @@
         "class-validator": "^0.14.1",
         "digital-fuesim-manv-shared": "file:../shared",
         "immer": "^10.1.1",
-        "lodash-es": "4.17.21",
+        "lodash-es": "^4.17.23",
         "ng-qrcode": "^19.0.1",
         "ol": "^10.6.1",
         "papaparse": "^5.5.3",

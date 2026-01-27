@@ -23,8 +23,10 @@ export class ExerciseHttpRouter extends HttpRouter {
             const exercise = isEmpty(req.body)
                 ? ExerciseFactory.fromBlank()
                 : importExercise(req.body);
-
-            await this.exerciseService.loadExercise(exercise);
+            const optionalData = req.session
+                ? { user: req.session.user.id }
+                : undefined;
+            await this.exerciseService.createExercise(exercise, optionalData);
             res.status(201).send({
                 participantId: exercise.getExercise().participantId,
                 trainerId: exercise.getExercise().trainerId,

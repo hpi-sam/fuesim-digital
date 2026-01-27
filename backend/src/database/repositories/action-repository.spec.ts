@@ -50,7 +50,7 @@ describe('ActionRepository', () => {
 
         // Save exercise in database and therefore assign id, after actions are created
         expect(activeExercise.exerciseId).toBeUndefined();
-        await environment.exerciseService.loadExercise(activeExercise);
+        await environment.exerciseService.createExercise(activeExercise);
         expect(activeExercise.exerciseId).toBeDefined();
 
         await environment.actionRepository.saveActions(actions);

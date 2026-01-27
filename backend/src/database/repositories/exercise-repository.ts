@@ -107,7 +107,10 @@ export class ExerciseRepository extends BaseRepository {
                 eq(exerciseTemplateTable.id, exerciseTable.templateId)
             )
             .where(eq(exerciseTemplateTable.user, userId))
-            .orderBy(desc(exerciseTemplateTable.lastExerciseCreatedAt));
+            .orderBy(
+                desc(exerciseTemplateTable.lastExerciseCreatedAt),
+                desc(exerciseTemplateTable.createdAt)
+            );
     }
 
     public async getExerciseTemplateById(id: string) {
@@ -134,7 +137,7 @@ export class ExerciseRepository extends BaseRepository {
 
     public async patchExerciseTemplate(
         id: string,
-        data: ExerciseTemplateInsert
+        data: Partial<ExerciseTemplateInsert>
     ) {
         return onlySingle(
             await this.databaseConnection
@@ -195,15 +198,16 @@ export class ExerciseRepository extends BaseRepository {
         );
     }
 
-    public async createExerciseIfNotExists(
+    public async createExercise(
         activeExercise: ActiveExercise,
-        data?: Partial<InferInsertModel<typeof exerciseTable>>
+        optionalData?: Partial<InferInsertModel<typeof exerciseTable>>
     ) {
         const exercise = activeExercise.getExercise();
         return onlySingle(
             await this.databaseConnection
                 .insert(exerciseTable)
                 .values({
+                    ...(optionalData ?? {}),
                     id: activeExercise.exerciseId,
                     currentStateString: exercise.currentStateString,
                     initialStateString: exercise.initialStateString,
@@ -211,9 +215,7 @@ export class ExerciseRepository extends BaseRepository {
                     stateVersion: exercise.stateVersion,
                     trainerId: exercise.trainerId,
                     participantId: exercise.participantId,
-                    ...(data ?? {}),
                 })
-                .onConflictDoNothing()
                 .returning()
         );
     }

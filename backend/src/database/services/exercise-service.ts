@@ -3,6 +3,7 @@ import {
     type ExerciseTimeline,
     type Role,
 } from 'digital-fuesim-manv-shared';
+import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import type { ClientWrapper } from '../../exercise/client-wrapper.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
@@ -12,6 +13,7 @@ import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
+import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
 import type { ExerciseKey } from '../../exercise/exercise-keys.js';
 
 export class ExerciseService {
@@ -41,20 +43,25 @@ export class ExerciseService {
         this.exerciseMap.delete(exercise.getExercise().trainerId);
     }
 
-    public async loadExercise(activeExercise: ActiveExercise) {
-        const result =
-            await this.exerciseRepository.createExerciseIfNotExists(
-                activeExercise
-            );
-        if (result) {
-            activeExercise.setExerciseId(result.id);
-        }
-        const exerciseEntity = await this.exerciseRepository.getExerciseById(
-            activeExercise.exerciseId
+    public async createTemplate(
+        templateExercise: ActiveExercise,
+        exerciseTemplate: ExerciseTemplateEntry
+    ) {
+        templateExercise.setTemplate(exerciseTemplate);
+        await this.createExercise(templateExercise, {
+            templateId: exerciseTemplate.id,
+        });
+    }
+
+    public async createExercise(
+        activeExercise: ActiveExercise,
+        optionalData?: Partial<InferInsertModel<typeof exerciseTable>>
+    ) {
+        const result = await this.exerciseRepository.createExercise(
+            activeExercise,
+            optionalData
         );
-        if (exerciseEntity) {
-            activeExercise.setTemplate(exerciseEntity.exercise_template);
-        }
+        activeExercise.setExerciseId(result!.id);
 
         this.exerciseMap.set(activeExercise.participantKey, activeExercise);
         this.exerciseMap.set(activeExercise.trainerKey, activeExercise);

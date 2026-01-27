@@ -36,10 +36,7 @@ export class ExerciseManagerService {
             throw new NotFoundError();
         }
         const newExercise = ExerciseFactory.fromBlank();
-        await this.exerciseRepository.createExerciseIfNotExists(newExercise, {
-            templateId: exerciseTemplate.id,
-        });
-        await exerciseService.loadExercise(newExercise);
+        await exerciseService.createTemplate(newExercise, exerciseTemplate);
         return {
             ...exerciseTemplate,
             trainerId: newExercise.getExercise().trainerId,
@@ -73,6 +70,8 @@ export class ExerciseManagerService {
         userId: string,
         exerciseService: ExerciseService
     ) {
+        await exerciseService.saveUnsavedExercises();
+
         const exerciseTemplate =
             await this.exerciseRepository.getExerciseTemplateById(id);
         if (!exerciseTemplate) {
@@ -90,11 +89,14 @@ export class ExerciseManagerService {
             exerciseTemplate.exercise_entity,
             actions
         );
-        await this.exerciseRepository.createExerciseIfNotExists(newExercise, {
+        await exerciseService.createExercise(newExercise, {
             baseTemplateId: exerciseTemplate.exercise_template.id,
             user: userId,
         });
-        await exerciseService.loadExercise(newExercise);
+        await this.exerciseRepository.patchExerciseTemplate(
+            exerciseTemplate.exercise_template.id,
+            { lastExerciseCreatedAt: new Date() }
+        );
         return newExercise;
     }
 

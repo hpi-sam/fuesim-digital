@@ -47,4 +47,4 @@ if ${DFM_USE_DB}; then
     NODE_ENV=migration npm run migration:run
 fi
 
-NODE_ENV=production node --experimental-specifier-resolution=node dist/src/index.js
+NODE_ENV=production node dist/src/index.js

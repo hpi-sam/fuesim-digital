@@ -2,7 +2,7 @@
 ARG PRODUCTION_PATH="/usr/local/app"
 
 # Use official node image as the base image
-FROM node:22-bullseye-slim AS builder
+FROM node:24.13.0-trixie-slim AS builder
 
 # Disable interactive frontend to prevent install dialogues
 ARG DEBIAN_FRONTEND=noninteractive
@@ -31,7 +31,7 @@ RUN npm run deployment
 ####  prod container ####
 
 # Use official node image as the base image, important to be on debian based for apt-get
-FROM node:22-bullseye-slim
+FROM node:24.13.0-trixie-slim
 
 # needed to use PRODUCTION_PATH before the first FROM
 ARG PRODUCTION_PATH

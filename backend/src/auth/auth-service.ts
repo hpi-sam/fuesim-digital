@@ -36,7 +36,7 @@ export class AuthService {
         return this.userRepository.transaction(async (userRepoTrans) => {
             await userRepoTrans.upsertUser({
                 id: data.user.id,
-                display_name: data.user.display_name,
+                displayName: data.user.displayName,
                 username: data.user.username,
             });
 

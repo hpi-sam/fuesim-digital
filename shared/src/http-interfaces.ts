@@ -12,7 +12,7 @@ export interface UserDataResponse {
     user: /* logged in */
     | {
               readonly id: string;
-              readonly display_name: string;
+              readonly displayName: string;
               readonly username: string;
           }
         /* not logged in */

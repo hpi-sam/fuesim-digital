@@ -10,7 +10,7 @@ import type { AuthService } from './auth-service.js';
 export namespace OidcService {
     export interface UserInfo {
         id: string;
-        display_name: string;
+        displayName: string;
         username: string;
     }
 }
@@ -158,7 +158,7 @@ export class OidcService {
 
         return {
             id: userInfo.sub,
-            display_name: displayName ?? 'NONAME',
+            displayName: displayName ?? 'NONAME',
             username: username ?? 'NOUSERNAME',
         };
     }

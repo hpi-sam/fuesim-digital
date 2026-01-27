@@ -150,7 +150,7 @@ jobs:
             - name: Start Authelia OIDC Provider
               run: |
                   export AUTHELIA_CONTAINER_ID=$(docker run -p 9091/tcp -v ${{ github.action_path }}/docker/authelia-config:/config:ro -v authelia-secrets:/secrets -d docker.io/authelia/authelia:latest)
-                  export AUTHELIA_CONTAINER_PORT=$(sudo docker port $AUTHELIA_CONTAINER_ID | grep -e ":[0-9]*" -o -m1 | cut -c 2-)
+                  export AUTHELIA_CONTAINER_PORT=$(docker port $AUTHELIA_CONTAINER_ID | grep -e ":[0-9]*" -o -m1 | cut -c 2-)
                   echo "Authelia container started with ID $AUTHELIA_CONTAINER_ID on port $AUTHELIA_CONTAINER_PORT"
             - uses: actions/setup-node@v3
               with:

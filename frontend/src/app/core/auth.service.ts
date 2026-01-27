@@ -10,6 +10,8 @@ import { MessageService } from './messages/message.service';
     providedIn: 'root',
 })
 export class AuthService {
+    private readonly SESSION_REFRESH_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
+
     private readonly user$ = new BehaviorSubject<UserDataResponse>({
         user: undefined,
     });
@@ -48,8 +50,8 @@ export class AuthService {
                         });
                     });
             },
-            15 * 60 * 1000
-        ); // every 15 minutes
+            this.SESSION_REFRESH_INTERVAL_MS
+        );
     }
 
     private async fetchUserData() {

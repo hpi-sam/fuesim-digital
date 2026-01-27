@@ -59,11 +59,11 @@ export const userTable = pgTable('users', {
      */
     id: varchar().primaryKey().notNull(),
     username: varchar().notNull(),
-    display_name: varchar().notNull(),
+    displayName: varchar().notNull(),
     updatedAt: timestamp({ mode: 'date', precision: 3 })
         .notNull()
-        .$defaultFn(() => new Date())
-        .$onUpdateFn(() => new Date()),
+        .defaultNow()
+    .$onUpdateFn(() => new Date()),
 });
 
 export const sessionTable = pgTable('sessions', {
@@ -76,7 +76,7 @@ export const sessionTable = pgTable('sessions', {
         }),
     createdAt: timestamp({ mode: 'date', precision: 3 })
         .notNull()
-        .$defaultFn(() => new Date()),
+        .defaultNow(),
     expiresAt: timestamp({ mode: 'date', precision: 3 }).notNull(),
     accessToken: varchar().notNull(),
 });

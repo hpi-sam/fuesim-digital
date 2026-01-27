@@ -20,6 +20,7 @@ export class AuthService {
         user: undefined,
     });
 
+    public userData: UserDataResponse = { user: null };
     public readonly userData$ = this.user$.asObservable();
 
     constructor(
@@ -72,7 +73,8 @@ export class AuthService {
             });
         }
 
-        this.user$.next(userData ?? { user: null });
+        this.userData = userData ?? { user: null };
+        this.user$.next(this.userData);
         this.refreshSessionHandler();
     }
 

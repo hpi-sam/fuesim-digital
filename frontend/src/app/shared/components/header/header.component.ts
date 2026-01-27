@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../../core/auth.service';
 
 @Component({
     selector: 'app-header',
@@ -8,5 +9,8 @@ import { ActivatedRoute } from '@angular/router';
     standalone: false,
 })
 export class HeaderComponent {
-    constructor(public route: ActivatedRoute) {}
+    constructor(
+        public route: ActivatedRoute,
+        public readonly auth: AuthService
+    ) {}
 }

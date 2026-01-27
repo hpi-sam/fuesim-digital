@@ -40,13 +40,15 @@ paths:
                                 $ref: '#/components/schemas/ErrorResponse'
     /api/exercise/{exerciseId}:
         parameters:
-            - $ref: '#/components/parameters/ExerciseId'
+            - $ref: '#/components/parameters/ExerciseKey'
         get:
-            summary: Check whether an exercise id exists
+            summary: Check whether an exercise key exists
             operationId: getExercise
             responses:
                 200:
                     description: Exercise exists
+                400:
+                    description: Invalid exercise key supplied
                 404:
                     description: Exercise does not exist
         delete:
@@ -69,13 +71,15 @@ paths:
                                 $ref: '#/components/schemas/ErrorResponse'
     /api/exercise/{exerciseId}/history:
         parameters:
-            - $ref: '#/components/parameters/ExerciseId'
+            - $ref: '#/components/parameters/ExerciseKey'
         get:
             summary: Get the history of the exercise
             operationId: getExerciseHistory
             responses:
                 200:
                     description: Exercise history in the payload (TODO:)
+                400:
+                    description: Invalid exercise key supplied
                 404:
                     description: Exercise does not exist
 components:
@@ -86,15 +90,16 @@ components:
                 status:
                     type: string
                     description: Current status of the server
+        # the frontend still expects participantId and trainerId (whereas the backend uses -key)
         ExerciseIdResponse:
             type: object
             properties:
                 participantId:
                     type: string
-                    description: Participant id of the exercise
+                    description: Participant key of the exercise
                 trainerId:
                     type: string
-                    description: Trainer id of the exercise
+                    description: Trainer key of the exercise
         ErrorResponse:
             type: object
             properties:
@@ -102,10 +107,10 @@ components:
                     type: string
                     description: Error message
     parameters:
-        ExerciseId:
-            name: exerciseId
+        ExerciseKey:
+            name: exerciseKey
             in: path
-            description: The exercise id
+            description: The exercise key
             required: true
             schema:
                 type: string

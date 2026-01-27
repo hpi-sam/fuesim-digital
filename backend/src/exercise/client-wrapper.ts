@@ -3,6 +3,7 @@ import { Client, ClientRole } from 'digital-fuesim-manv-shared';
 import type { ExerciseSocket } from '../exercise-server.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import type { ActiveExercise } from './active-exercise.js';
+import type { ExerciseKey } from './exercise-keys.js';
 
 export class ClientWrapper {
     public constructor(
@@ -20,10 +21,10 @@ export class ClientWrapper {
      * @returns The joined client's id, or undefined when the exercise doesn't exists.
      */
     public joinExercise(
-        exerciseId: string,
+        exerciseKey: ExerciseKey,
         clientName: string
     ): UUID | undefined {
-        const exercise = this.exerciseService.getExerciseByKey(exerciseId);
+        const exercise = this.exerciseService.getExerciseByKey(exerciseKey);
         if (!exercise) {
             return undefined;
         }
@@ -31,7 +32,7 @@ export class ClientWrapper {
         // Although getRoleFromUsedId may throw an error, this should never happen here
         // as the provided id is guaranteed to be one of the ids of the exercise as the exercise
         // was fetched with this exact id from the exercise map.
-        const role = this.chosenExercise.getRoleFromUsedId(exerciseId);
+        const role = this.chosenExercise.getRoleFromUsedKey(exerciseKey);
         this.relatedExerciseClient = Client.create(
             clientName,
             ClientRole.create(
@@ -55,7 +56,7 @@ export class ClientWrapper {
         }
 
         this.exerciseService.leaveExercise(
-            this.chosenExercise.getExercise().participantId,
+            this.chosenExercise.participantKey,
             this
         );
     }

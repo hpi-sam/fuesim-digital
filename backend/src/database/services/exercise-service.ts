@@ -8,6 +8,7 @@ import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
+import type { ExerciseKey } from '../../exercise/exercise-keys.js';
 
 export class ExerciseService {
     public constructor(
@@ -15,14 +16,14 @@ export class ExerciseService {
         private readonly actionRepository: ActionRepository
     ) {}
 
-    private readonly exerciseMap = new Map<string, ActiveExercise>();
+    private readonly exerciseMap = new Map<ExerciseKey, ActiveExercise>();
 
-    public hasExerciseKey(exerciseId: string) {
-        return this.exerciseMap.has(exerciseId);
+    public hasExerciseKey(exerciseKey: ExerciseKey) {
+        return this.exerciseMap.has(exerciseKey);
     }
 
-    public getExerciseByKey(roleKey: string) {
-        return this.exerciseMap.get(roleKey);
+    public getExerciseByKey(exerciseKey: ExerciseKey) {
+        return this.exerciseMap.get(exerciseKey);
     }
 
     public getAllExercises() {
@@ -38,16 +39,15 @@ export class ExerciseService {
             activeExercise.setExerciseId(result[0].id);
         }
 
-        const exercise = activeExercise.getExercise();
-        this.exerciseMap.set(exercise.participantId, activeExercise);
-        this.exerciseMap.set(exercise.trainerId, activeExercise);
+        this.exerciseMap.set(activeExercise.participantKey, activeExercise);
+        this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
         UserReadableIdGenerator.lock([
-            exercise.participantId,
-            exercise.trainerId,
+            activeExercise.participantKey,
+            activeExercise.trainerKey,
         ]);
     }
 
-    public leaveExercise(exerciseKey: string, client: ClientWrapper) {
+    public leaveExercise(exerciseKey: ExerciseKey, client: ClientWrapper) {
         this.getExerciseByKey(exerciseKey)?.removeClient(client);
     }
 
@@ -116,14 +116,8 @@ export class ExerciseService {
                     )
                 );
                 exercises.forEach((exercise) => {
-                    this.exerciseMap.set(
-                        exercise.getExercise().participantId,
-                        exercise
-                    );
-                    this.exerciseMap.set(
-                        exercise.getExercise().trainerId,
-                        exercise
-                    );
+                    this.exerciseMap.set(exercise.participantKey, exercise);
+                    this.exerciseMap.set(exercise.trainerKey, exercise);
                 });
                 UserReadableIdGenerator.lock([...this.exerciseMap.keys()]);
                 return exercises;
@@ -131,7 +125,7 @@ export class ExerciseService {
         );
     }
 
-    public async deleteExercise(exerciseKey: string) {
+    public async deleteExercise(exerciseKey: ExerciseKey) {
         const activeExercise = this.getExerciseByKey(exerciseKey);
         if (!activeExercise) {
             throw new UnknownExerciseError(exerciseKey);
@@ -139,9 +133,8 @@ export class ExerciseService {
 
         activeExercise.destroy();
 
-        const exercise = activeExercise.getExercise();
-        this.exerciseMap.delete(exercise.participantId);
-        this.exerciseMap.delete(exercise.trainerId);
+        this.exerciseMap.delete(activeExercise.participantKey);
+        this.exerciseMap.delete(activeExercise.trainerKey);
         if (activeExercise.exerciseId) {
             // only delete if exercise has been saved before in database
             await this.exerciseRepository.deleteExerciseById(
@@ -173,7 +166,9 @@ export class ExerciseService {
         });
     }
 
-    public async getTimeline(exerciseKey: string): Promise<ExerciseTimeline> {
+    public async getTimeline(
+        exerciseKey: ExerciseKey
+    ): Promise<ExerciseTimeline> {
         const activeExercise = this.getExerciseByKey(exerciseKey);
         if (activeExercise === undefined)
             throw new UnknownExerciseError(exerciseKey);
@@ -202,14 +197,14 @@ export class ExerciseService {
         };
     }
 
-    public getRoleFromId(id: string): Role {
-        switch (id.length) {
+    public getRoleFromKey(exerciseKey: string): Role {
+        switch (exerciseKey.length) {
             case 6:
                 return 'participant';
             case 8:
                 return 'trainer';
             default:
-                throw new RangeError(`Incorrect id: ${id}`);
+                throw new RangeError(`Incorrect id: ${exerciseKey}`);
         }
     }
 

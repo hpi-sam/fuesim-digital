@@ -63,7 +63,7 @@ export const userTable = pgTable('users', {
     updatedAt: timestamp({ mode: 'date', precision: 3 })
         .notNull()
         .defaultNow()
-    .$onUpdateFn(() => new Date()),
+        .$onUpdateFn(() => new Date()),
 });
 
 export const sessionTable = pgTable('sessions', {
@@ -74,9 +74,7 @@ export const sessionTable = pgTable('sessions', {
             onDelete: 'cascade',
             onUpdate: 'cascade',
         }),
-    createdAt: timestamp({ mode: 'date', precision: 3 })
-        .notNull()
-        .defaultNow(),
+    createdAt: timestamp({ mode: 'date', precision: 3 }).notNull().defaultNow(),
     expiresAt: timestamp({ mode: 'date', precision: 3 }).notNull(),
     accessToken: varchar().notNull(),
 });

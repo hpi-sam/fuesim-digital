@@ -31,27 +31,23 @@ export class AuthService {
     private async refreshSessionHandler() {
         const userData = await lastValueFrom(this.userData$);
         if (!userData.user) return;
-        setInterval(
-            () => {
-                lastValueFrom(
-                    this.httpClient.get(
-                        `${httpOrigin}/api/auth/refresh-session`,
-                        { withCredentials: true }
-                    )
-                )
-                    .then((result) => {
-                        // Session refreshed
-                    })
-                    .catch((err) => {
-                        this.messageService.postMessage({
-                            title: 'Sitzung abgelaufen',
-                            color: 'warning',
-                            body: 'Ihre Sitzung konnte nicht verlängert werden. Bitte melden Sie sich erneut an.',
-                        });
+        setInterval(() => {
+            lastValueFrom(
+                this.httpClient.get(`${httpOrigin}/api/auth/refresh-session`, {
+                    withCredentials: true,
+                })
+            )
+                .then((result) => {
+                    // Session refreshed
+                })
+                .catch((err) => {
+                    this.messageService.postMessage({
+                        title: 'Sitzung abgelaufen',
+                        color: 'warning',
+                        body: 'Ihre Sitzung konnte nicht verlängert werden. Bitte melden Sie sich erneut an.',
                     });
-            },
-            this.SESSION_REFRESH_INTERVAL_MS
-        );
+                });
+        }, this.SESSION_REFRESH_INTERVAL_MS);
     }
 
     private async fetchUserData() {

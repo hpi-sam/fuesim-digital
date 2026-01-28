@@ -16,3 +16,4 @@ runs:
           run: |
               docker ps -a
               docker logs ${{ env.AUTHELIA_CONTAINER_ID }}
+          shell: bash

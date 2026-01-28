@@ -4,6 +4,7 @@ import { UserReadableIdGenerator } from '../../../utils/user-readable-id-generat
 import { ActiveExercise } from '../../active-exercise.js';
 import type { HttpErrorMessage, HttpResponse } from '../utils.js';
 import { importExercise } from '../../../utils/import-exercise.js';
+import { isExerciseKey, isTrainerKey } from '../../exercise-keys.js';
 import { UnknownExerciseError } from './../../../database/services/exercise-service.js';
 import type { ExerciseService } from './../../../database/services/exercise-service.js';
 import { ExerciseFactory } from './../../../exercise/exercise-factory.js';
@@ -52,10 +53,19 @@ export async function postExercise(
 }
 
 export function getExercise(
-    exerciseId: string,
+    exerciseKey: string,
     exerciseService: ExerciseService
 ): HttpResponse {
-    const exerciseExists = exerciseService.hasExerciseKey(exerciseId);
+    if (!isExerciseKey(exerciseKey)) {
+        return {
+            statusCode: 400,
+            body: {
+                message: `The provided exercise key '${exerciseKey}' is invalid.`,
+            },
+        };
+    }
+
+    const exerciseExists = exerciseService.hasExerciseKey(exerciseKey);
     return {
         statusCode: exerciseExists ? 200 : 404,
         body: undefined,
@@ -63,10 +73,10 @@ export function getExercise(
 }
 
 export async function deleteExercise(
-    exerciseId: string,
+    exerciseKey: string,
     exerciseService: ExerciseService
 ): Promise<HttpResponse> {
-    if (exerciseService.getRoleFromId(exerciseId) !== 'trainer') {
+    if (!isTrainerKey(exerciseKey)) {
         return {
             statusCode: 403,
             body: {
@@ -76,7 +86,7 @@ export async function deleteExercise(
         };
     }
     try {
-        await exerciseService.deleteExercise(exerciseId);
+        await exerciseService.deleteExercise(exerciseKey);
         return {
             statusCode: 204,
             body: undefined,
@@ -86,7 +96,7 @@ export async function deleteExercise(
             return {
                 statusCode: 404,
                 body: {
-                    message: `Exercise with id '${exerciseId}' was not found`,
+                    message: `Exercise with id '${exerciseKey}' was not found`,
                 },
             };
         }
@@ -96,11 +106,20 @@ export async function deleteExercise(
 }
 
 export async function getExerciseHistory(
-    exerciseId: string,
+    exerciseKey: string,
     exerciseService: ExerciseService
 ): Promise<HttpResponse<ExerciseTimeline>> {
+    if (!isExerciseKey(exerciseKey)) {
+        return {
+            statusCode: 400,
+            body: {
+                message: `The provided exercise key '${exerciseKey}' is invalid.`,
+            },
+        };
+    }
+
     try {
-        const timeline = await exerciseService.getTimeline(exerciseId);
+        const timeline = await exerciseService.getTimeline(exerciseKey);
         return {
             statusCode: 200,
             body: timeline,
@@ -110,7 +129,7 @@ export async function getExerciseHistory(
             return {
                 statusCode: 404,
                 body: {
-                    message: `Exercise with id '${exerciseId}' was not found`,
+                    message: `Exercise with id '${exerciseKey}' was not found`,
                 },
             };
         }

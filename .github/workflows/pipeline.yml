@@ -12,6 +12,7 @@ on:
         types: [opened, synchronize, reopened, ready_for_review]
 
 env:
+    NODE_VERSION: '24.13.0'
     POSTGRES_USER: dfm
     POSTGRES_PASSWORD: notASecurePassword_forPipelineOnly
     POSTGRES_DB: dfm_db
@@ -27,9 +28,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               id: cache-build
               uses: ./.github/actions/cache-build
@@ -47,9 +48,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Build frontend
@@ -63,9 +64,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Build backend
@@ -79,9 +80,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Run ESLint
@@ -100,9 +101,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Audit root
@@ -152,9 +153,9 @@ jobs:
                   export AUTHELIA_CONTAINER_ID=$(docker run -p 9091/tcp -v ${{ github.action_path }}/docker/authelia-config:/config:ro -v authelia-secrets:/secrets -d docker.io/authelia/authelia:latest)
                   export AUTHELIA_CONTAINER_PORT=$(docker port $AUTHELIA_CONTAINER_ID 9091/tcp | grep 0.0.0.0 | cut -c 9-)
                   echo "Authelia container started with ID $AUTHELIA_CONTAINER_ID on port $AUTHELIA_CONTAINER_PORT"
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Create .env
@@ -214,9 +215,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Create .env
@@ -266,9 +267,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
+            - uses: actions/setup-node@v6
               with:
-                  node-version: '22'
+                  node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
             - name: Cache Cypress binary

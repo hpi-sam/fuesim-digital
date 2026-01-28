@@ -1,12 +1,12 @@
 import { eq, asc, and, inArray } from 'drizzle-orm';
 import type { ExerciseAction } from 'digital-fuesim-manv-shared';
-import { actionTable } from '../schema.js';
+import { actionTable, type ExerciseId } from '../schema.js';
 import type { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { BaseRepository } from './base-repository.js';
 import { DatabaseService } from './../services/database-service.js';
 
 export class ActionRepository extends BaseRepository {
-    public async getActionsForExerciseId(exerciseId: string) {
+    public async getActionsForExerciseId(exerciseId: ExerciseId) {
         return this.databaseConnection
             .select()
             .from(actionTable)
@@ -14,7 +14,7 @@ export class ActionRepository extends BaseRepository {
             .orderBy(asc(actionTable.index));
     }
 
-    public async deleteAllForExercise(exerciseId: string) {
+    public async deleteAllForExercise(exerciseId: ExerciseId) {
         await this.databaseConnection
             .delete(actionTable)
             .where(eq(actionTable.exerciseId, exerciseId));
@@ -67,7 +67,7 @@ export class ActionRepository extends BaseRepository {
     }
 
     public async updateActionIndex(
-        exerciseId: string,
+        exerciseId: ExerciseId,
         previousIndex: number,
         newIndex: number,
         actionString: ExerciseAction
@@ -87,7 +87,7 @@ export class ActionRepository extends BaseRepository {
     }
 
     public async deleteActionIndices(
-        exerciseId: string,
+        exerciseId: ExerciseId,
         indicesToRemove: number[]
     ) {
         return this.databaseConnection

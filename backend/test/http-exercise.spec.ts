@@ -10,7 +10,7 @@ describe('exercise', () => {
         environment.exerciseService.TESTING_getExerciseMap().clear();
     });
     describe('POST /api/exercise', () => {
-        it('returns an exercise id', async () => {
+        it('returns an exercise key', async () => {
             const response = await environment
                 .httpRequest('post', '/api/exercise')
                 .expect(201);
@@ -21,7 +21,7 @@ describe('exercise', () => {
             expect(exerciseCreationResponse.trainerId).toBeDefined();
         });
 
-        it('fails when no ids are left', async () => {
+        it('fails when no keys are left', async () => {
             for (let i = 0; i < 10_000; i++) {
                 UserReadableIdGenerator.generateId();
             }
@@ -29,8 +29,8 @@ describe('exercise', () => {
         });
     });
 
-    describe('GET /api/exercise/:exerciseId', () => {
-        it('succeeds returning true for participant id', async () => {
+    describe('GET /api/exercise/:exerciseKey', () => {
+        it('succeeds with 200 with a valid participant key', async () => {
             const participantKey = (await createExercise(environment))
                 .participantId;
             await environment
@@ -38,25 +38,38 @@ describe('exercise', () => {
                 .expect(200);
         });
 
-        it('succeeds returning true for trainer id', async () => {
+        it('succeeds returning true for trainer key', async () => {
             const trainerKey = (await createExercise(environment)).trainerId;
             await environment
                 .httpRequest('get', `/api/exercise/${trainerKey}`)
                 .expect(200);
         });
 
-        it('succeeds returning false for not existing id', async () => {
+        it('fails with 400 for arbitrary keys', async () => {
+            await Promise.all(
+                ['12345', '1234567', '123456789'].map((invalidKey) =>
+                    environment
+                        .httpRequest('get', `/api/exercise/${invalidKey}`)
+                        .expect(400)
+                )
+            );
+        });
+
+        it('fails with 404 for non-existing key', async () => {
             await environment
-                .httpRequest('get', `/api/exercise/trainerId`)
+                .httpRequest(
+                    'get',
+                    `/api/exercise/${UserReadableIdGenerator.generateId()}`
+                )
                 .expect(404);
         });
     });
 
-    describe('DELETE /api/exercise/:exerciseId', () => {
+    describe('DELETE /api/exercise/:exerciseKey', () => {
         it('succeeds deleting an exercise', async () => {
-            const exerciseId = (await createExercise(environment)).trainerId;
+            const exerciseKey = (await createExercise(environment)).trainerId;
             await environment
-                .httpRequest('delete', `/api/exercise/${exerciseId}`)
+                .httpRequest('delete', `/api/exercise/${exerciseKey}`)
                 .expect(204);
 
             expect(
@@ -64,10 +77,10 @@ describe('exercise', () => {
             ).toBe(0);
         });
 
-        it('fails deleting an arbitrary exercise id string', async () => {
+        it('fails deleting an arbitrary exercise key string', async () => {
             await environment
                 .httpRequest('delete', '/api/exercise/anyNumber')
-                .expect(500);
+                .expect(403);
         });
 
         it('fails deleting a not existing exercise', async () => {
@@ -76,20 +89,20 @@ describe('exercise', () => {
                 .expect(404);
         });
 
-        it('fails deleting an exercise by its participant id', async () => {
-            const exerciseId = (await createExercise(environment))
+        it('fails deleting an exercise by its participant key', async () => {
+            const exerciseKey = (await createExercise(environment))
                 .participantId;
             await environment
-                .httpRequest('delete', `/api/exercise/${exerciseId}`)
+                .httpRequest('delete', `/api/exercise/${exerciseKey}`)
                 .expect(403);
         });
 
         it('disconnects clients of the removed exercise', async () => {
-            const exerciseId = (await createExercise(environment)).trainerId;
+            const exerciseKey = (await createExercise(environment)).trainerId;
             await environment.withWebsocket(async (socket) => {
                 const joinExercise = await socket.emit(
                     'joinExercise',
-                    exerciseId,
+                    exerciseKey,
                     ''
                 );
 
@@ -98,7 +111,7 @@ describe('exercise', () => {
                 socket.spyOn('disconnect');
 
                 await environment
-                    .httpRequest('delete', `/api/exercise/${exerciseId}`)
+                    .httpRequest('delete', `/api/exercise/${exerciseKey}`)
                     .expect(204);
 
                 expect(socket.getTimesCalled('disconnect')).toBe(1);
@@ -106,18 +119,25 @@ describe('exercise', () => {
         });
     });
 
-    describe('GET /api/exercise/:exerciseId/history', () => {
+    describe('GET /api/exercise/:exerciseKey/history', () => {
         it('returns history for existing exercise', async () => {
-            const exerciseId = (await createExercise(environment)).trainerId;
+            const exerciseKey = (await createExercise(environment)).trainerId;
             await environment
-                .httpRequest('get', `/api/exercise/${exerciseId}/history`)
+                .httpRequest('get', `/api/exercise/${exerciseKey}/history`)
                 .expect(200);
         });
 
-        it('fails with 404 for non-existing exercise', async () => {
-            const exerciseId = 'non-existing-id';
+        it('fails with 400 for abitrary exercise key string', async () => {
+            const exerciseKey = 'non-existing-key';
             await environment
-                .httpRequest('get', `/api/exercise/${exerciseId}/history`)
+                .httpRequest('get', `/api/exercise/${exerciseKey}/history`)
+                .expect(400);
+        });
+
+        it('fails with 404 for non-existing exercise', async () => {
+            const exerciseKey = UserReadableIdGenerator.generateId();
+            await environment
+                .httpRequest('get', `/api/exercise/${exerciseKey}/history`)
                 .expect(404);
         });
     });

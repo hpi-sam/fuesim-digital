@@ -9,3 +9,4 @@ runs:
               export AUTHELIA_CONTAINER_PORT=$(docker port $AUTHELIA_CONTAINER_ID 9091/tcp | grep 0.0.0.0 | cut -c 9-)
               echo "Authelia container started with ID $AUTHELIA_CONTAINER_ID on port $AUTHELIA_CONTAINER_PORT"
               echo "AUTHELIA_CONTAINER_PORT=$AUTHELIA_CONTAINER_PORT" >> "$GITHUB_ENV"
+          shell: bash

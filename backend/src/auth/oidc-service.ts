@@ -153,7 +153,7 @@ export class OidcService {
     }
 
     public async handleCallback(req: ExpressRequest, res: ExpressResponse) {
-        const state = req.cookies.state;
+        const state = req.cookies['state'];
         const codeVerifier = req.cookies['code-verifier'];
 
         if (state === undefined || codeVerifier === undefined) {

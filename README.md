@@ -45,7 +45,7 @@ This project is currently developed as a [bachelor project](https://hpi.de/en/st
 6. Choose whether you want to use a database:
    You can (optionally) use a database for the persistence of exercise data. Look at the [relevant section](./backend/README.md#database) in the backend README for further information.
    Note that to not use the database you have to edit an environment variable, see the [relevant section](./backend/README.md#without-a-database).
-7. Connect an OpenID-Connect provider for authentication in the `.env` file. 
+7. Connect an OpenID-Connect provider for authentication in the `.env` file.
 8. (Optional) We have a list of recommended [vscode](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
 9. (Optional) We have prepared default settings, tasks and debug configurations for VS Code. You can find them in `.vscode/*.example`. Crete a copy of those files removing the `.example` and adjust them to your needs. The files without `.example`-Extensions are untracked so your adjustments won't be committed automatically.
 

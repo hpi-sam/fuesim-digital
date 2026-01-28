@@ -9,10 +9,21 @@
 }
 @if ((exerciseStatus$ | async) !== 'running') {
     <button
+        [disabled]="
+            !!exerciseService.additionalExerciseMeta()?.exerciseTemplate
+        "
         (click)="startExercise()"
         class="btn btn-primary ms-3"
         data-cy="trainerToolbarStartButton"
     >
         Start
     </button>
+    @if (exerciseService.additionalExerciseMeta()?.exerciseTemplate) {
+        <span
+            class="text-warning ms-2"
+            ngbTooltip="Dies ist eine Übungsvorlage. Erstellen Sie eine Übung aus dieser Vorlage, um sie zu starten."
+        >
+            <i class="bi bi-exclamation-triangle"></i>
+        </span>
+    }
 }

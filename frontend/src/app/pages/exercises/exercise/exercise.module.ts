@@ -8,6 +8,7 @@ import {
     NgbAccordionModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { RouterLink } from '@angular/router';
 import { ExerciseComponent } from './exercise/exercise.component';
 import { AlarmGroupOverviewModule } from './shared/alarm-group-overview/alarm-group-overview.module';
 import { ClientOverviewModule } from './shared/client-overview/client-overview.module';
@@ -66,6 +67,7 @@ import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/ma
         CoordinatePickerModule,
         NgbTooltipModule,
         NgbAccordionModule,
+        RouterLink,
     ],
     providers: [provideHttpClient(withInterceptors([]))],
 })

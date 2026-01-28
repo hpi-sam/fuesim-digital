@@ -40,6 +40,9 @@
     <div ngbDropdown placement="top-start" class="d-inline-block">
         <button
             type="button"
+            [disabled]="
+                !!exerciseService.additionalExerciseMeta()?.exerciseTemplate
+            "
             class="btn btn-outline-primary ms-3"
             ngbDropdownToggle
             data-cy="trainerToolbarExecutionButton"
@@ -90,6 +93,9 @@
 
     <div ngbDropdown placement="top-start" class="d-inline-block">
         <button
+            [disabled]="
+                !!exerciseService.additionalExerciseMeta()?.exerciseTemplate
+            "
             type="button"
             class="btn btn-outline-primary ms-3"
             ngbDropdownToggle
@@ -118,7 +124,13 @@
     </div>
 
     <app-start-pause-button />
-    <button (click)="deleteExercise()" class="btn btn-danger ms-3 float-end">
-        Übung löschen
-    </button>
+
+    @if (!exerciseService.additionalExerciseMeta()?.exerciseTemplate) {
+        <button
+            (click)="deleteExercise()"
+            class="btn btn-danger ms-3 float-end"
+        >
+            Übung löschen
+        </button>
+    }
 </div>

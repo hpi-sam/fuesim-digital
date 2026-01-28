@@ -32,7 +32,7 @@ export class TrainerToolbarComponent {
 
     constructor(
         private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
+        public readonly exerciseService: ExerciseService,
         private readonly apiService: ApiService,
         public readonly applicationService: ApplicationService,
         private readonly modalService: NgbModal,

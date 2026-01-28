@@ -97,3 +97,12 @@ export const exerciseTemplatesSchema = z.array(exerciseTemplateSchema);
 
 export type ExerciseTemplates = z.infer<typeof exerciseTemplatesSchema>;
 export type ExerciseTemplatesInput = z.input<typeof exerciseTemplatesSchema>;
+
+export const joinExercisePayloadSchema = z.object({
+    clientId: z.string(),
+    exerciseTemplate: z.nullable(exerciseTemplateSchema),
+});
+export type JoinExercisePayload = z.infer<typeof joinExercisePayloadSchema>;
+export type JoinExercisePayloadInput = z.input<
+    typeof joinExercisePayloadSchema
+>;

@@ -1,4 +1,7 @@
-import type { UUID } from 'digital-fuesim-manv-shared';
+import {
+    joinExercisePayloadSchema,
+    type UUID,
+} from 'digital-fuesim-manv-shared';
 import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
@@ -28,9 +31,7 @@ export const registerJoinExerciseHandler = (
                 if (!isExerciseKey(exerciseKey)) {
                     throw new ValidationErrorWrapper(['Invalid exercise key']);
                 }
-                clientId = clientMap
-                    .get(client)
-                    ?.joinExercise(exerciseKey, clientName);
+                clientId = clientWrapper.joinExercise(exerciseKey, clientName);
             } catch (e: unknown) {
                 if (e instanceof ValidationErrorWrapper) {
                     callback({
@@ -52,7 +53,15 @@ export const registerJoinExerciseHandler = (
             }
             callback({
                 success: true,
-                payload: clientId,
+                payload: joinExercisePayloadSchema.encode({
+                    clientId,
+                    exerciseTemplate: clientWrapper.exercise!.template
+                        ? {
+                              ...clientWrapper.exercise!.template,
+                              trainerId: clientWrapper.exercise!.exerciseId,
+                          }
+                        : null,
+                }),
             });
         }
     );

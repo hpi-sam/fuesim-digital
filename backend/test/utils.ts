@@ -212,7 +212,10 @@ export const createTestEnvironment = (): TestEnvironment => {
         sessionRepository = new SessionRepository(
             databaseService.databaseConnection
         );
-        authService = new AuthService(userRepository, sessionRepository);
+        authService = await new AuthService(
+            userRepository,
+            sessionRepository
+        ).initialize();
         environment.init(
             databaseService,
             exerciseService,

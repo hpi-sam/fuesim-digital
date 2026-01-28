@@ -3,8 +3,8 @@ import type {
     Request as ExpressRequest,
     Response as ExpressResponse,
 } from 'express';
-import { Config } from 'config.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';
+import { Config } from '../config.js';
 import type { AuthService } from './auth-service.js';
 
 export namespace OidcService {
@@ -153,7 +153,7 @@ export class OidcService {
     }
 
     public async handleCallback(req: ExpressRequest, res: ExpressResponse) {
-        const state = req.cookies['state'];
+        const state = req.cookies.state;
         const codeVerifier = req.cookies['code-verifier'];
 
         if (state === undefined || codeVerifier === undefined) {

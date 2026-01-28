@@ -270,11 +270,15 @@ jobs:
             - uses: actions/checkout@v3
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
+            - name: DEBUG
+              run: docker ps -a
             - uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
             - name: Cache node modules and shared/dist
               uses: ./.github/actions/cache-build
+            - name: DEBUG
+              run: docker ps -a
             - name: Cache Cypress binary
               uses: actions/cache@v3
               id: cache-cypress
@@ -284,6 +288,8 @@ jobs:
             - name: Install Cypress
               if: steps.cache-cypress.outputs.cache-hit != 'true'
               run: npm run cy:install
+            - name: DEBUG
+              run: docker ps -a
             - name: Create .env
               run: >
                   cat ./.env.example
@@ -296,6 +302,8 @@ jobs:
                   > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run && cd ..
+            - name: DEBUG
+              run: docker ps -a
             - name: Run Cypress
               uses: cypress-io/github-action@v5
               with:

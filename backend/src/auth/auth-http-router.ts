@@ -1,4 +1,8 @@
-import type { UserDataResponse } from 'digital-fuesim-manv-shared';
+import type {
+    UserDataResponse} from 'digital-fuesim-manv-shared';
+import {
+    userDataResponseSchema,
+} from 'digital-fuesim-manv-shared';
 import { secureHttp } from '../exercise/http-handler/secure-http.js';
 import { HttpRouter } from '../http-router.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';
@@ -10,9 +14,24 @@ export class AuthHttpRouter extends HttpRouter {
     }
 
     protected initializeRoutes() {
+        this.router.get('/register', (req, res) => {
+            try {
+                this.authService.oidcService.handleRegistrationRedirect(
+                    req,
+                    res
+                );
+            } catch {
+                res.redirect(
+                    toFrontend(undefined, {
+                        loginfailure: 'Anmeldung fehlgeschlagen',
+                    })
+                );
+            }
+        });
+
         this.router.get('/oidc-redirect', (req, res) => {
             try {
-                this.authService.oidcService.handleRedirect(req, res);
+                this.authService.oidcService.handleLoginRedirect(req, res);
             } catch {
                 res.redirect(
                     toFrontend(undefined, {
@@ -39,41 +58,57 @@ export class AuthHttpRouter extends HttpRouter {
                 async () => {
                     const sessionToken =
                         req.cookies[this.authService.SESSION_COOKIE_NAME];
-                    if (!sessionToken) {
-                        return {
-                            statusCode: 200,
-                            body: { user: null },
-                        };
-                    }
-                    const sessionTokenData =
-                        await this.authService.getDataFromSessionToken(
-                            sessionToken
-                        );
+                    const sessionTokenData = sessionToken
+                        ? await this.authService.getDataFromSessionToken(
+                              sessionToken
+                          )
+                        : null;
 
-                    if (!sessionTokenData) {
-                        return {
-                            statusCode: 200,
-                            body: { user: null, expired: true },
-                            cookies: [
-                                {
-                                    name: this.authService.SESSION_COOKIE_NAME,
-                                    value: null,
-                                },
-                            ],
-                        };
-                    }
-
-                    const { user } = sessionTokenData;
+                    const sessionIsExpired = sessionToken && !sessionTokenData;
 
                     return {
                         statusCode: 200,
-                        body: { user },
+                        body: userDataResponseSchema.encode({
+                            user: sessionTokenData?.user ?? null,
+                            expired: sessionIsExpired,
+                            userRegistrationsEnabled:
+                                this.authService.oidcService
+                                    .userRegistrationEnabled,
+                            userSelfServiceEnabled:
+                                this.authService.oidcService
+                                    .userSelfServiceEnabled,
+                        }),
+                        cookies: sessionIsExpired
+                            ? [
+                                  {
+                                      name: this.authService
+                                          .SESSION_COOKIE_NAME,
+                                      value: null,
+                                  },
+                              ]
+                            : [],
                     };
                 },
                 req,
                 res
             )
         );
+
+        this.router.get('/self-service', async (req, res) => {
+            try {
+                await this.authService.oidcService.handleSelfServiceRedirect(
+                    req,
+                    res
+                );
+            } catch {
+                res.redirect(
+                    toFrontend(undefined, {
+                        loginfailure:
+                            'Benutzer-Selbstverwaltung fehlgeschlagen',
+                    })
+                );
+            }
+        });
 
         this.router.post('/refresh-session', async (req, res) => {
             const sessionToken =

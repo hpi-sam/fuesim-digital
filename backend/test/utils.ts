@@ -18,6 +18,9 @@ import { FuesimServer } from '../src/fuesim-server.js';
 import { ExerciseService } from '../src/database/services/exercise-service.js';
 import { ExerciseRepository } from '../src/database/repositories/exercise-repository.js';
 import { ActionRepository } from '../src/database/repositories/action-repository.js';
+import { AuthService } from '../src/auth/auth-service.js';
+import { UserRepository } from '../src/database/repositories/user-repository.js';
+import { SessionRepository } from '../src/database/repositories/session-repository.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 export type ExerciseCreationResponse = ExerciseAccessIds;
@@ -117,11 +120,17 @@ class TestEnvironment {
     private _exerciseService!: ExerciseService;
     private _exerciseRepository!: ExerciseRepository;
     private _actionRepository!: ActionRepository;
+    private _authService!: AuthService;
+
     public get databaseService(): DatabaseService {
         return this._databaseService;
     }
     public get exerciseService(): ExerciseService {
         return this._exerciseService;
+    }
+
+    public get authService(): AuthService {
+        return this._authService;
     }
 
     public get exerciseRepository(): ExerciseRepository {
@@ -159,13 +168,19 @@ class TestEnvironment {
         databaseService: DatabaseService,
         exerciseService: ExerciseService,
         exerciseRepository: ExerciseRepository,
-        actionRepository: ActionRepository
+        actionRepository: ActionRepository,
+        authService: AuthService
     ) {
         this._databaseService = databaseService;
         this._exerciseService = exerciseService;
+        this._authService = authService;
         this._exerciseRepository = exerciseRepository;
         this._actionRepository = actionRepository;
-        this.server = new FuesimServer(this.databaseService, exerciseService);
+        this.server = new FuesimServer(
+            this.databaseService,
+            exerciseService,
+            authService
+        );
     }
 }
 
@@ -174,8 +189,11 @@ export const createTestEnvironment = (): TestEnvironment => {
     const environment = new TestEnvironment();
     let databaseService: DatabaseService;
     let exerciseService: ExerciseService;
+    let authService: AuthService;
     let exerciseRepository: ExerciseRepository;
     let actionRepository: ActionRepository;
+    let userRepository: UserRepository;
+    let sessionRepository: SessionRepository;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
@@ -190,11 +208,17 @@ export const createTestEnvironment = (): TestEnvironment => {
             exerciseRepository,
             actionRepository
         );
+        userRepository = new UserRepository(databaseService.databaseConnection);
+        sessionRepository = new SessionRepository(
+            databaseService.databaseConnection
+        );
+        authService = new AuthService(userRepository, sessionRepository);
         environment.init(
             databaseService,
             exerciseService,
             exerciseRepository,
-            actionRepository
+            actionRepository,
+            authService
         );
     });
     afterEach(async () => {

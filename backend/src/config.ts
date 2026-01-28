@@ -33,6 +33,10 @@ export class Config {
 
     private static _authClientSecret?: string;
 
+    private static _authUserRegistrationAdapter?: string;
+
+    private static _authSelfServiceUrl?: string;
+
     public static get websocketPort(): number {
         this.throwIfNotInitialized();
         return this._websocketPort!;
@@ -108,6 +112,16 @@ export class Config {
         return this._authClientSecret!;
     }
 
+    public static get authUserRegistrationAdapter(): string {
+        this.throwIfNotInitialized();
+        return this._authUserRegistrationAdapter!;
+    }
+
+    public static get authSelfServiceUrl(): string {
+        this.throwIfNotInitialized();
+        return this._authSelfServiceUrl!;
+    }
+
     private static createTCPPortValidator() {
         return makeValidator((x) => {
             const int = Number.parseInt(x);
@@ -175,6 +189,16 @@ export class Config {
             DFM_AUTH_CLIENT_ID_TESTING: str({ default: 'dfm-backend' }),
             DFM_AUTH_CLIENT_SECRET: str({ default: '' }),
             DFM_AUTH_CLIENT_SECRET_TESTING: str({ default: '' }),
+            DFM_AUTH_USER_REGISTRATION_ADAPTER: str({
+                default: '',
+                choices: ['', 'keycloak'],
+            }),
+            DFM_AUTH_USER_REGISTRATION_ADAPTER_TESTING: str({
+                default: '',
+                choices: ['', 'keycloak'],
+            }),
+            DFM_AUTH_SELF_SERVICE_URL: url({ default: '' }),
+            DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
         });
     }
 
@@ -249,6 +273,14 @@ export class Config {
             testing && env.DFM_AUTH_CLIENT_SECRET_TESTING
                 ? env.DFM_AUTH_CLIENT_SECRET_TESTING
                 : env.DFM_AUTH_CLIENT_SECRET;
+        this._authUserRegistrationAdapter =
+            testing && env.DFM_AUTH_USER_REGISTRATION_ADAPTER_TESTING
+                ? env.DFM_AUTH_USER_REGISTRATION_ADAPTER_TESTING
+                : env.DFM_AUTH_USER_REGISTRATION_ADAPTER;
+        this._authSelfServiceUrl =
+            testing && env.DFM_AUTH_SELF_SERVICE_URL_TESTING
+                ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
+                : env.DFM_AUTH_SELF_SERVICE_URL;
         this.isInitialized = true;
     }
 }

@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
-import { UserDataResponse } from 'digital-fuesim-manv-shared';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import {
+    UserDataResponse,
+    userDataResponseSchema,
+} from 'digital-fuesim-manv-shared';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 
@@ -10,7 +13,7 @@ import { MessageService } from './messages/message.service';
     providedIn: 'root',
 })
 export class AuthService {
-    private readonly SESSION_REFRESH_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
+    public readonly SESSION_REFRESH_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
 
     private readonly user$ = new BehaviorSubject<UserDataResponse>({
         user: undefined,
@@ -57,6 +60,8 @@ export class AuthService {
                 { withCredentials: true }
             )
         ).catch(() => null);
+
+        userDataResponseSchema.parse(userData);
 
         if (userData?.expired === true) {
             this.messageService.postMessage({
@@ -129,5 +134,13 @@ export class AuthService {
 
     public get logoutUrl() {
         return `${httpOrigin}/api/auth/logout`;
+    }
+
+    public get userSelfServiceUrl() {
+        return `${httpOrigin}/api/auth/self-service`;
+    }
+
+    public get userRegistrationsUrl() {
+        return `${httpOrigin}/api/auth/register`;
     }
 }

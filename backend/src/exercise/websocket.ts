@@ -19,12 +19,13 @@ export class ExerciseWebsocketServer {
         app: core.Express,
         private readonly exerciseService: ExerciseService
     ) {
+        Config.initialize();
+
         const server = createServer(app);
 
         this.exerciseServer = new Server(server, {
-            // TODO: this is only a temporary solution to make this work
             cors: {
-                origin: '*',
+                origin: [Config.httpFrontendUrl],
             },
             ...socketIoTransports,
         });

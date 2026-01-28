@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export interface ExerciseKeys {
     readonly participantKey: string;
     readonly trainerKey: string;
@@ -8,19 +10,21 @@ export interface ExerciseAccessIds {
     readonly trainerId: string;
 }
 
-export interface UserDataResponse {
-    user: /* logged in */
-    | {
-              readonly id: string;
-              readonly displayName: string;
-              readonly username: string;
-          }
-        /* not logged in */
-        | null
-        /* no data yet */
-        | undefined;
-    expired?: boolean;
-}
+export const userDataResponseSchema = z.object({
+    user: z
+        .object({
+            id: z.string(),
+            displayName: z.string(),
+            username: z.string(),
+        })
+        .nullable()
+        .optional(),
+    expired: z.boolean().optional(),
+    userRegistrationsEnabled: z.boolean().optional(),
+    userSelfServiceEnabled: z.boolean().optional(),
+});
+
+export type UserDataResponse = z.infer<typeof userDataResponseSchema>;
 
 export interface AuthQueryParams {
     logoutstatus?: 'loggedout' | 'nosessionfound' | 'sessionexpired';

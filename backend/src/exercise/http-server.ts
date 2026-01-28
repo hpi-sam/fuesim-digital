@@ -28,13 +28,11 @@ export class ExerciseHttpServer {
         exerciseService: ExerciseService,
         authService: AuthService
     ) {
-        // TODO: Temporary allow all
-        // @Quixelation --> We need to restrict this in the future, especially when we have auth in place
+        Config.initialize();
+
         app.use(
             cors({
-                origin(requestOrigin, callback) {
-                    callback(null, true);
-                },
+                origin: [Config.httpFrontendUrl],
                 credentials: true,
             })
         );

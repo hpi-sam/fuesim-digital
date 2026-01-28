@@ -13,6 +13,8 @@ export class UserAccountNavbarItemComponent {
     public userData$?: Observable<UserDataResponse> = this.auth.userData$;
     public loginUrl = this.auth.loginUrl;
     public logoutUrl = this.auth.logoutUrl;
+    public userSelfServiceUrl = this.auth.userSelfServiceUrl;
+    public userRegistrationsUrl = this.auth.userRegistrationsUrl;
 
     constructor(private readonly auth: AuthService) {}
 }

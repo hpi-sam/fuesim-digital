@@ -60,7 +60,10 @@ export class OidcService {
         }
     }
 
-    public async getAuthUrl(opts?: { returnTo?: string }): Promise<{
+    public async getAuthUrl(opts?: {
+        returnTo?: string;
+        urlTransformer: (url: URL) => URL;
+    }): Promise<{
         url: URL;
         cookies: { name: string; value: string }[];
     }> {
@@ -85,14 +88,58 @@ export class OidcService {
             { name: 'state', value: state },
         ];
 
+        let authUrl = oidc.buildAuthorizationUrl(this.config, parameters);
+        if (opts?.urlTransformer) {
+            authUrl = opts.urlTransformer(authUrl);
+        }
+
         return {
-            url: oidc.buildAuthorizationUrl(this.config, parameters),
+            url: authUrl,
             cookies,
         };
     }
-    public async handleRedirect(req: ExpressRequest, res: ExpressResponse) {
+
+    public get userSelfServiceEnabled(): boolean {
+        return Config.authSelfServiceUrl !== '';
+    }
+
+    public get userRegistrationEnabled(): boolean {
+        return Config.authUserRegistrationAdapter !== '';
+    }
+
+    public async handleRegistrationRedirect(
+        req: ExpressRequest,
+        res: ExpressResponse
+    ) {
+        switch (Config.authUserRegistrationAdapter) {
+            case 'keycloak':
+                this.handleLoginRedirect(req, res, (url) => {
+                    url.pathname = url.pathname.replace(
+                        'openid-connect/auth',
+                        'openid-connect/registrations'
+                    );
+                    return url;
+                });
+                break;
+            default:
+                res.redirect(
+                    toFrontend(undefined, {
+                        loginfailure: 'Registrierung nicht verfügbar',
+                    })
+                );
+        }
+    }
+
+    public async handleLoginRedirect(
+        req: ExpressRequest,
+        res: ExpressResponse,
+        urlTransformer: (url: URL) => URL = (url) => url
+    ) {
         const returnToPath = req.query['returnto'] as string | undefined;
-        const authUrl = await this.getAuthUrl({ returnTo: returnToPath });
+        const authUrl = await this.getAuthUrl({
+            returnTo: returnToPath,
+            urlTransformer,
+        });
 
         for (const cookie of authUrl.cookies) {
             res.cookie(cookie.name, cookie.value, {
@@ -141,6 +188,24 @@ export class OidcService {
         res.cookie(this.authService.SESSION_COOKIE_NAME, sessionToken, {
             httpOnly: true,
         }).redirect(toFrontend(returnTo, { loginsuccess: true }));
+    }
+
+    public async handleSelfServiceRedirect(
+        req: ExpressRequest,
+        res: ExpressResponse
+    ) {
+        if (!this.userSelfServiceEnabled) {
+            res.redirect(
+                toFrontend(undefined, {
+                    loginfailure: 'Benutzer-Selbstverwaltung nicht verfügbar',
+                })
+            );
+            return;
+        }
+
+        const selfServiceUrl = new URL(Config.authSelfServiceUrl);
+
+        res.redirect(selfServiceUrl.toString());
     }
 
     public async fetchUserInfo(

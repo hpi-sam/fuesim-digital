@@ -6,16 +6,9 @@ runs:
         - uses: actions/checkout@v3
         - name: Start Authelia OIDC Docker container
           run: |
-              echo $(echo ${{ github.action_path }})
-              echo $(echo ${GITHUB_WORKSPACE})
               export AUTHELIA_CONTAINER_ID=$(docker run -p 9091/tcp -v ${GITHUB_WORKSPACE}/docker/authelia-config:/config -v authelia-secrets:/secrets -d docker.io/authelia/authelia:latest)
               export AUTHELIA_CONTAINER_PORT=$(docker port $AUTHELIA_CONTAINER_ID 9091/tcp | grep 0.0.0.0 | cut -c 9-)
               echo "Authelia container started with ID $AUTHELIA_CONTAINER_ID on port $AUTHELIA_CONTAINER_PORT"
               echo "AUTHELIA_CONTAINER_ID=$AUTHELIA_CONTAINER_ID" >> "$GITHUB_ENV"
               echo "AUTHELIA_CONTAINER_PORT=$AUTHELIA_CONTAINER_PORT" >> "$GITHUB_ENV"
-          shell: bash
-        - name: DEBUG
-          run: |
-              docker ps -a
-              docker logs ${{ env.AUTHELIA_CONTAINER_ID }}
           shell: bash

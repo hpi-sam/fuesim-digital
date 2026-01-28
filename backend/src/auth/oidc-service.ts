@@ -29,29 +29,31 @@ export class OidcService {
         return this._config;
     }
 
-    public async initialize() {
+    public async initialize(opts?: { skipOidcDiscovery?: boolean }) {
         try {
             Config.initialize();
-            this._config = await oidc.discovery(
-                new URL(Config.authUrl),
-                Config.authClientId,
-                Config.authClientSecret,
-                undefined,
-                {
-                    execute:
-                        process.env['NODE_ENV'] === 'development'
-                            ? [
-                                  /**
-                                   * Marked as deprecated only to make it stand out as something you shouldn't
-                                   * have the need to use, possibly only for local development and testing
-                                   * against non-TLS secured environments.
-                                   * https://github.com/panva/openid-client/blob/01f5fe37cbe78c8c2624f0e568fc3a7d4d2386eb/docs/functions/allowInsecureRequests.md
-                                   */
-                                  oidc.allowInsecureRequests,
-                              ]
-                            : undefined,
-                }
-            );
+            if (!(opts?.skipOidcDiscovery ?? false)) {
+                this._config = await oidc.discovery(
+                    new URL(Config.authUrl),
+                    Config.authClientId,
+                    Config.authClientSecret,
+                    undefined,
+                    {
+                        execute:
+                            process.env['NODE_ENV'] === 'development'
+                                ? [
+                                      /**
+                                       * Marked as deprecated only to make it stand out as something you shouldn't
+                                       * have the need to use, possibly only for local development and testing
+                                       * against non-TLS secured environments.
+                                       * https://github.com/panva/openid-client/blob/01f5fe37cbe78c8c2624f0e568fc3a7d4d2386eb/docs/functions/allowInsecureRequests.md
+                                       */
+                                      oidc.allowInsecureRequests,
+                                  ]
+                                : undefined,
+                    }
+                );
+            }
             this._publicUrl = Config.httpBackendUrl;
             return this;
         } catch (err) {

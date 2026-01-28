@@ -24,8 +24,10 @@ export class AuthService {
         );
     }
 
-    public async initialize() {
-        await this.oidcService.initialize();
+    public async initialize(opts?: { skipOidcDiscovery?: boolean }) {
+        await this.oidcService.initialize({
+            skipOidcDiscovery: opts?.skipOidcDiscovery,
+        });
         return this;
     }
 

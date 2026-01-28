@@ -215,7 +215,7 @@ export const createTestEnvironment = (): TestEnvironment => {
         authService = await new AuthService(
             userRepository,
             sessionRepository
-        ).initialize();
+        ).initialize({ skipOidcDiscovery: true });
         environment.init(
             databaseService,
             exerciseService,

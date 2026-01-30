@@ -9,6 +9,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { RouterLink } from '@angular/router';
+import { withCredentialsInterceptor } from '../../../shared/functions/http';
 import { ExerciseComponent } from './exercise/exercise.component';
 import { AlarmGroupOverviewModule } from './shared/alarm-group-overview/alarm-group-overview.module';
 import { ClientOverviewModule } from './shared/client-overview/client-overview.module';
@@ -69,6 +70,8 @@ import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/ma
         NgbAccordionModule,
         RouterLink,
     ],
-    providers: [provideHttpClient(withInterceptors([]))],
+    providers: [
+        provideHttpClient(withInterceptors([withCredentialsInterceptor])),
+    ],
 })
 export class ExerciseModule {}

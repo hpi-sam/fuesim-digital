@@ -67,10 +67,7 @@ export class ApiService {
 
     public async deleteExercise(trainerId: string) {
         return lastValueFrom(
-            this.httpClient.delete<undefined>(
-                `${httpOrigin}/api/exercise/${trainerId}`,
-                {}
-            )
+            this.httpClient.delete(`${httpOrigin}/api/exercise/${trainerId}`)
         );
     }
 
@@ -95,34 +92,20 @@ export class ApiService {
     }
 
     public getExercisesResource() {
-        return httpResource(
-            () => ({
-                url: `${httpOrigin}/api/exercises/`,
-                withCredentials: true,
-            }),
-            {
-                parse: exercisesSchema.parse,
-            }
-        );
+        return httpResource(() => `${httpOrigin}/api/exercises/`, {
+            parse: exercisesSchema.parse,
+        });
     }
     public getExerciseTemplatesResource() {
-        return httpResource(
-            () => ({
-                url: `${httpOrigin}/api/exercise_templates/`,
-                withCredentials: true,
-            }),
-            {
-                parse: exerciseTemplatesSchema.parse,
-            }
-        );
+        return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
+            parse: exerciseTemplatesSchema.parse,
+        });
     }
 
     public async createExerciseTemplate(data: ExerciseTemplateCreateData) {
         return lastValueFrom(
             this.httpClient
-                .post(`${httpOrigin}/api/exercise_template`, data, {
-                    withCredentials: true,
-                })
+                .post(`${httpOrigin}/api/exercise_template`, data)
                 .pipe(map((v) => exerciseTemplateSchema.parse(v)))
         );
     }
@@ -133,9 +116,7 @@ export class ApiService {
     ) {
         return lastValueFrom(
             this.httpClient
-                .patch(`${httpOrigin}/api/exercise_template/${id}`, data, {
-                    withCredentials: true,
-                })
+                .patch(`${httpOrigin}/api/exercise_template/${id}`, data)
                 .pipe(map((v) => exerciseTemplateSchema.parse(v)))
         );
     }
@@ -144,18 +125,14 @@ export class ApiService {
         return lastValueFrom(
             this.httpClient.post<ExerciseAccessIds>(
                 `${httpOrigin}/api/exercise_template/${id}/new`,
-                {},
-                { withCredentials: true }
+                {}
             )
         );
     }
 
     public async deleteExerciseTemplate(id: string) {
         return lastValueFrom(
-            this.httpClient.delete<undefined>(
-                `${httpOrigin}/api/exercise_template/${id}`,
-                { withCredentials: true }
-            )
+            this.httpClient.delete(`${httpOrigin}/api/exercise_template/${id}`)
         );
     }
 }

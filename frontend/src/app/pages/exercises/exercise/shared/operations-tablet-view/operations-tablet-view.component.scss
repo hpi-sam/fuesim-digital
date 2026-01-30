@@ -1,0 +1,25 @@
+.ovtRoot {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.ovtContent {
+    margin: {
+        left: -0.5rem;
+        right: -0.5rem;
+        bottom: -0.5rem;
+    }
+    height: 100%;
+
+    ::ng-deep {
+        // Overwrite default bootstrap
+        .tab-content {
+            height: 100%;
+
+            .tab-pane {
+                height: 100% !important;
+            }
+        }
+    }
+}

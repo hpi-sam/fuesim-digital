@@ -1,0 +1,12 @@
+$vehicleTagHeight: 60px;
+$vehicleTagWidth: 150px;
+$vehicleTagBorderRadius: 8px;
+
+.otvVehicleTag {
+    height: $vehicleTagHeight;
+    width: $vehicleTagWidth;
+    border: 3px solid #000000;
+    background-color: #ffffff;
+    border-radius: $vehicleTagBorderRadius;
+    position: relative;
+}

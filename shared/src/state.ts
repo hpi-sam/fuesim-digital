@@ -61,6 +61,10 @@ import { IsZodSchema } from './utils/validators/is-zod-object.js';
 import { vehicleSchema } from './models/vehicle.js';
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import type { TreatmentAssignment } from './store/index.js';
+import {
+    operationalSectionSchema,
+    OperationalSection,
+} from './models/operational-section.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -119,6 +123,10 @@ export class ExerciseState {
     @ValidateNested()
     public readonly radiograms: { readonly [key: UUID]: ExerciseRadiogram } =
         {};
+    @IsZodSchema(z.record(z.uuidv4(), operationalSectionSchema))
+    public readonly operationalSections: {
+        readonly [key: UUID]: OperationalSection;
+    } = {};
     @IsArray()
     @ValidateNested()
     @Type(() => PatientCategory)
@@ -191,5 +199,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 44;
+    static readonly currentStateVersion = 45;
 }

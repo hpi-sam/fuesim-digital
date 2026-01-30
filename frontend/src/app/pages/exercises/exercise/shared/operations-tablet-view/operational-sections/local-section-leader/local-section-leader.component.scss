@@ -1,0 +1,24 @@
+@use './../vehicle-tag/vehicle-tag.component' as vehicleTag;
+@use './../operational-section-container/operational-section-container.component'
+    as container;
+
+.localSectionLeaderContainer {
+    background-color: #ffffff;
+    padding: container.$outerBoxPadding;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    border-radius: container.$border-radius;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.label {
+    writing-mode: sideways-lr;
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: container.$outerBoxPadding;
+}

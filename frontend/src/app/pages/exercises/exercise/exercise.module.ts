@@ -34,6 +34,7 @@ import { TrainerToolbarComponent } from './shared/trainer-toolbar/trainer-toolba
 import { TransferOverviewModule } from './shared/transfer-overview/transfer-overview.module';
 import { CoordinatePickerModule } from './shared/coordinate-picker/coordinate-picker.module';
 import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/map-editor-card.component';
+import { OperationsTabletViewModule } from './shared/operations-tablet-view/operations-tablet-view.module';
 
 @NgModule({
     declarations: [
@@ -69,6 +70,7 @@ import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/ma
         CoordinatePickerModule,
         NgbTooltipModule,
         NgbAccordionModule,
+        OperationsTabletViewModule,
     ],
     providers: [provideHttpClient(withInterceptorsFromDi())],
 })

@@ -1,0 +1,23 @@
+    <div
+        class="bg-white d-flex flex-column p-3 border border-secondary-subtle h-100"
+    >
+        <span class="h5 fw-bold">Einsatzmittel</span>
+        <span class="bg-body-secondary px-2 py-1 rounded-top-1 mt-2 fw-bold">
+            Vor Ort
+        </span>
+        @for (
+            vehicleAtLocation of vehiclesAtLocation$ | async;
+            track vehicleAtLocation.id
+        ) {
+        <app-operations-vehicle-item [vehicle]="vehicleAtLocation"></app-operations-vehicle-item>
+        }
+        <span class="bg-body-secondary px-2 py-1 rounded-top-1 mt-4 border fw-bold">
+            Alarmiert
+        </span>
+        @for (
+            vehicleInTransfer of vehiclesInTransfer$ | async;
+            track vehicleInTransfer.id
+        ) {
+        <app-operations-vehicle-item [vehicle]="vehicleInTransfer"></app-operations-vehicle-item>
+            }
+    </div>

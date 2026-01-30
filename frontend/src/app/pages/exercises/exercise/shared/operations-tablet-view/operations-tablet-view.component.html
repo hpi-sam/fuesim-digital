@@ -1,0 +1,29 @@
+<div class="ovtRoot">
+    <nav ngbNav [animation]="false" #nav="ngbNav" class="nav-tabs">
+        <ng-container ngbNavItem>
+            <button ngbNavLink>EInsatzdetails</button>
+            <ng-template ngbNavContent>
+                <app-operation-details-tab></app-operation-details-tab>
+            </ng-template>
+        </ng-container>
+        <ng-container ngbNavItem>
+            <button ngbNavLink>Einsatzabschnitte</button>
+            <ng-template ngbNavContent>
+                <app-operational-sections-tab></app-operational-sections-tab>
+            </ng-template>
+        </ng-container>
+        <div style="margin-left: auto">
+            <button class="btn btn-sm btn-outline-dark" title="Vollbildmodus">
+                <span style="padding-right: 8px">Vollbild</span>
+                <i
+                    [class.bi-fullscreen]="!fullscreenEnabled"
+                    [class.bi-fullscreen-exit]="fullscreenEnabled"
+                ></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="ovtContent flex-grow-1">
+        <div [ngbNavOutlet]="nav"></div>
+    </div>
+</div>

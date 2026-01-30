@@ -37,6 +37,8 @@ export class Config {
 
     private static _authSelfServiceUrl?: string;
 
+    private static _devNoWaitingRoom?: boolean;
+
     public static get websocketPort(): number {
         this.throwIfNotInitialized();
         return this._websocketPort!;
@@ -122,6 +124,11 @@ export class Config {
         return this._authSelfServiceUrl!;
     }
 
+    public static get devNoWaitingRoom(): boolean {
+        this.throwIfNotInitialized();
+        return this._devNoWaitingRoom!;
+    }
+
     private static createTCPPortValidator() {
         return makeValidator((x) => {
             const int = Number.parseInt(x);
@@ -199,6 +206,7 @@ export class Config {
             }),
             DFM_AUTH_SELF_SERVICE_URL: url({ default: '' }),
             DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
+            DFM_DEV_NO_WAITING_ROOM: bool({ default: false }),
         });
     }
 
@@ -281,6 +289,11 @@ export class Config {
             testing && env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 : env.DFM_AUTH_SELF_SERVICE_URL;
+        this._devNoWaitingRoom = env.DFM_DEV_NO_WAITING_ROOM;
         this.isInitialized = true;
     }
+}
+
+export function isDevelopment() {
+    return process.env['NODE_ENV'] !== 'production';
 }

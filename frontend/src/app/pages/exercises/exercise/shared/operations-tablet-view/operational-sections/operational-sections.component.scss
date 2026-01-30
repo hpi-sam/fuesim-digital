@@ -1,0 +1,23 @@
+@use './operational-section-container/operational-section-container.component'
+    as container;
+
+.otvOperationalSectionsTabRoot {
+    background-color: #333333;
+}
+
+.otvOperationalSectionsTab {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    width: 100%;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.border-dashed {
+    border-style: dashed;
+}
+
+.addNewOperationalSectionButton {
+    width: container.$containerWidth;
+}

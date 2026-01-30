@@ -4,6 +4,7 @@ import type { ExerciseSocket } from '../exercise-server.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import type { ActiveExercise } from './active-exercise.js';
 import type { ExerciseKey } from './exercise-keys.js';
+import { Config, isDevelopment } from '../config.js';
 
 export class ClientWrapper {
     public constructor(
@@ -39,7 +40,9 @@ export class ClientWrapper {
                 role,
                 role === 'trainer' ? 'trainer' : 'mapOperator'
             ),
-            role !== 'trainer',
+            Config.devNoWaitingRoom && isDevelopment()
+                ? false
+                : role !== 'trainer',
             undefined
         );
         this.chosenExercise.addClient(this);

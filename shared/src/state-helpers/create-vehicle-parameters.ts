@@ -66,6 +66,7 @@ export function createVehicleParameters(
         personnelIds: arrayToUUIDSet(personnel.map((p) => p.id)),
         position: newMapPositionAt(vehiclePosition),
         occupation: newNoOccupation(),
+        operationalSectionId: null,
     };
 
     return VehicleParameters.create(vehicle, materials, personnel);

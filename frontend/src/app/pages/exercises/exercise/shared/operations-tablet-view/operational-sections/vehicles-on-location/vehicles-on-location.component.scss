@@ -1,0 +1,31 @@
+@use './../vehicle-tag/vehicle-tag.component' as vehicleTag;
+@use './../operational-section-container/operational-section-container.component'
+    as container;
+
+$height: (2 * vehicleTag.$vehicleTagHeight) + container.$vehicleTagGap +
+    (2 * container.$innerBoxPadding);
+
+.onLocationVehiclesSection {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.onLocationVehiclesSection > .label {
+    writing-mode: sideways-lr;
+    background-color: #e0e0e0;
+    padding: 12px 4px;
+    text-align: center;
+}
+
+.onLocationVehiclesContainer {
+    height: $height;
+    padding: container.$innerBoxPadding;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 100%;
+    align-content: flex-start;
+    gap: container.$vehicleTagGap;
+}

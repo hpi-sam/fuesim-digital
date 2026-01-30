@@ -17,6 +17,7 @@ import { SimulatedRegionActionReducers } from './simulated-region.js';
 import { SimulationActionReducers } from './simulation.js';
 import { RadiogramActionReducers } from './radiogram.js';
 import { VehicleTemplateActionReducers } from './vehicle-templates.js';
+import { OperationalSectionActionReducers } from './operational-section.js';
 
 /**
  * All action reducers of the exercise must be registered here
@@ -41,6 +42,7 @@ const actionReducers = {
     ...SimulationActionReducers,
     ...RadiogramActionReducers,
     ...VehicleTemplateActionReducers,
+    ...OperationalSectionActionReducers,
 };
 
 type ExerciseActionReducer =

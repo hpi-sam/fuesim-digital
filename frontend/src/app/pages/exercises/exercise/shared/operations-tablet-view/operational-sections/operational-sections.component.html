@@ -1,0 +1,20 @@
+<div
+    cdkDropListGroup
+    class="d-flex flex-column h-100 otvOperationalSectionsTabRoot"
+>
+    <div class="otvOperationalSectionsTab flex-grow-1">
+        <app-local-section-leader></app-local-section-leader>
+        @for (section of operationalSections$ | async; track section.id) {
+            <app-operational-section-container
+                [operationalSection]="section"
+            ></app-operational-section-container>
+        }
+        <button
+            (click)="addOperationalSection()"
+            class="btn btn-outline-light border-dashed addNewOperationalSectionButton"
+        >
+            Einsatzabschnitt hinzufügen
+        </button>
+    </div>
+    <app-vehicles-on-location></app-vehicles-on-location>
+</div>

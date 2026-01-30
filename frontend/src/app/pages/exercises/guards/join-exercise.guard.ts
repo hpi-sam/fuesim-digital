@@ -12,6 +12,7 @@ import type { AppState } from 'src/app/state/app.state';
 import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { tryToJoinExercise } from '../shared/join-exercise-modal/try-to-join-exercise';
+import { ApplicationService } from '../../../core/application.service';
 
 @Injectable({
     providedIn: 'root',
@@ -22,22 +23,22 @@ export class JoinExerciseGuard {
         private readonly router: Router,
         private readonly apiService: ApiService,
         private readonly store: Store<AppState>,
-        private readonly messageService: MessageService
+        private readonly messageService: MessageService,
+        private readonly applicationService: ApplicationService
     ) {}
 
     async canActivate(
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ) {
+        const exerciseId = route.params['exerciseId'];
         if (
             selectStateSnapshot(selectExerciseStateMode, this.store) ===
             'exercise'
         ) {
             return true;
         }
-        const exerciseExists = await this.apiService.exerciseExists(
-            route.params['exerciseId']
-        );
+        const exerciseExists = await this.apiService.exerciseExists(exerciseId);
         if (!exerciseExists) {
             this.messageService.postMessage({
                 title: 'Diese Übung existiert nicht',
@@ -46,11 +47,22 @@ export class JoinExerciseGuard {
             this.router.navigate(['/']);
             return false;
         }
+        console.log(route.queryParams);
 
-        const successfullyJoined = await tryToJoinExercise(
-            this.ngbModalService,
-            route.params['exerciseId']
-        );
+        let successfullyJoined = false;
+
+        if (route.queryParams['autojoin']) {
+            successfullyJoined = await this.applicationService.joinExercise(
+                exerciseId,
+                route.queryParams['autojoin'] || 'Gast'
+            );
+        } else {
+            successfullyJoined = await tryToJoinExercise(
+                this.ngbModalService,
+                exerciseId
+            );
+        }
+
         if (!successfullyJoined) {
             this.router.navigate(['/']);
         }

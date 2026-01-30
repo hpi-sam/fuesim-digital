@@ -1,0 +1,48 @@
+@let availableAGs = availableAlarmGroups$ | async;
+@let availableTPs = availableTransferPoints$ | async;
+@let position = vehicle.position;
+
+<div class="border px-2 py-1 d-flex flex-column gap-1">
+    <span class="h5 m-0">
+        {{ vehicle.name }}
+    </span>
+    @if (position.type === 'transfer') {
+        <div class="d-flex flex-row" style="opacity: 0.8">
+            <div>
+                @if (
+                    position.transfer.startPoint.type === 'alarmGroupStartPoint'
+                ) {
+                    <span class="bg-info-subtle px-1 rounded-1"
+                        ><small>{{
+                            availableAGs?.[
+                                position.transfer.startPoint.alarmGroupId
+                            ]?.name ?? 'Alarmgruppe'
+                        }}</small></span
+                    >
+                }
+
+                @if (
+                    position.transfer.startPoint.type === 'transferStartPoint'
+                ) {
+                    <span class="bg-secondary-subtle px-1 rounded-1"
+                        ><small>{{
+                            availableTPs?.[
+                                position.transfer.startPoint.transferPointId
+                            ]?.externalName ?? 'Transferpunkt'
+                        }}</small></span
+                    >
+                }
+            </div>
+            <i class="bi-arrow-right-short"></i>
+            <div>
+                <span class="bg-secondary-subtle px-1 rounded-1"
+                    ><small>{{
+                        availableTPs?.[position.transfer.targetTransferPointId]
+                            ?.externalName ?? 'Transferpunkt'
+                    }}</small></span
+                >
+            </div>
+        </div>
+    }
+    <span> </span>
+</div>

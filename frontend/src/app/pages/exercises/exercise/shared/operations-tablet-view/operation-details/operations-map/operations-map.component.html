@@ -1,0 +1,13 @@
+<div
+    class="bg-white d-flex flex-column flex-grow-1 border border-secondary-subtle h-100"
+>
+    <div class="flex-grow-1" #mapContainer></div>
+    <div class="d-flex flex-row gap-1">
+        <button class="btn btn-sm btn-success rounded-0 px-3">3D</button>
+        @for (viewport of availableViewports$ | async; track viewport.id) {
+            <button class="btn btn-sm btn-light rounded-0 px-3">
+                {{ viewport.name }}
+            </button>
+        }
+    </div>
+</div>

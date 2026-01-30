@@ -26,6 +26,7 @@ export const vehicleSchema = z.strictObject({
     personnelIds: uuidSetSchema,
     patientIds: uuidSetSchema,
     occupation: exerciseOccupationSchema,
+    operationalSectionId: z.string().nullable().default(null),
 });
 
 export type Vehicle = Immutable<z.infer<typeof vehicleSchema>>;
@@ -53,5 +54,6 @@ export function newVehicle(
         personnelIds: {},
         patientIds: {},
         occupation,
+        operationalSectionId: null,
     };
 }

@@ -54,15 +54,7 @@ export class ApiService {
             this.httpClient.get<ExerciseTimeline>(
                 `${httpOrigin}/api/exercise/${exerciseId}/history`
             )
-        )
-            .then((value) => freeze(value, true))
-            .catch((error) => {
-                this.messageService.postError({
-                    title: 'Fehler beim Laden der Übungshistorie',
-                    body: 'Der Server konnte keine Übungshistorie bereitstellen.',
-                });
-                throw error;
-            });
+        ).then((value) => freeze(value, true));
     }
 
     public async deleteExercise(trainerId: string) {
@@ -80,15 +72,7 @@ export class ApiService {
             this.httpClient
                 .get(`${httpOrigin}/api/exercise/${exerciseId}`)
                 .pipe(map((v) => exerciseExistsSchema.parse(v)))
-        ).catch((error) => {
-            if (error.status !== 404) {
-                this.messageService.postError({
-                    title: 'Interner Fehler',
-                    error,
-                });
-            }
-            return null;
-        });
+        );
     }
 
     public getExercisesResource() {

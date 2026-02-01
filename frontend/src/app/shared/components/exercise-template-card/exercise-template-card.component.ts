@@ -46,13 +46,6 @@ export class ExerciseTemplateCardComponent {
                     'toast'
                 );
                 this.router.navigate(['/exercises', ids.trainerId]);
-            })
-            // TODO use generic error handling
-            .catch((error) => {
-                this.messageService.postError({
-                    title: 'Fehler beim Erstellen der Übung',
-                    error: error.message,
-                });
             });
     }
 
@@ -69,20 +62,14 @@ export class ExerciseTemplateCardComponent {
             return;
         }
         // If we get disconnected by the server during the deletion a disconnect error would be displayed
-        this.apiService.deleteExerciseTemplate(exerciseTemplate.id).then(
-            (response) => {
+        this.apiService
+            .deleteExerciseTemplate(exerciseTemplate.id)
+            .then((response) => {
                 this.messageService.postMessage({
                     title: 'Übungsvorlage erfolgreich gelöscht',
                     color: 'success',
                 });
                 // TODO Refresh list
-            },
-            (error) => {
-                this.messageService.postError({
-                    title: 'Fehler beim Löschen der Übungsvorlage',
-                    error,
-                });
-            }
-        );
+            });
     }
 }

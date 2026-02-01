@@ -36,29 +36,21 @@ export class LandingPageComponent {
     ) {}
 
     public async createExercise() {
-        this.apiService
-            .createExercise()
-            .then((ids) => {
-                this.trainerId = ids.trainerId;
-                this.exerciseId = this.trainerId;
-                this.participantId = ids.participantId;
-                this.exerciseHasBeenCreated = true;
+        this.apiService.createExercise().then((ids) => {
+            this.trainerId = ids.trainerId;
+            this.exerciseId = this.trainerId;
+            this.participantId = ids.participantId;
+            this.exerciseHasBeenCreated = true;
 
-                this.messageService.postMessage(
-                    {
-                        title: 'Übung erstellt',
-                        body: 'Sie können nun der Übung beitreten.',
-                        color: 'success',
-                    },
-                    'toast'
-                );
-            })
-            .catch((error) => {
-                this.messageService.postError({
-                    title: 'Fehler beim Erstellen der Übung',
-                    error: error.message,
-                });
-            });
+            this.messageService.postMessage(
+                {
+                    title: 'Übung erstellt',
+                    body: 'Sie können nun der Übung beitreten.',
+                    color: 'success',
+                },
+                'toast'
+            );
+        });
     }
 
     public importingExercise = false;

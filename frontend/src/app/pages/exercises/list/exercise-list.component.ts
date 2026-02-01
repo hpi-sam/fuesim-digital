@@ -21,26 +21,17 @@ export class ExerciseListComponent {
     }
 
     public async createExercise() {
-        this.apiService
-            .createExercise()
-            .then((ids) => {
-                // TODO use generic success handling
-                this.messageService.postMessage(
-                    {
-                        title: 'Übung erstellt',
-                        body: '',
-                        color: 'success',
-                    },
-                    'toast'
-                );
-                this.exercises.reload();
-            })
-            // TODO use generic error handling
-            .catch((error) => {
-                this.messageService.postError({
-                    title: 'Fehler beim Erstellen der Übung',
-                    error: error.message,
-                });
-            });
+        this.apiService.createExercise().then((ids) => {
+            // TODO use generic success handling
+            this.messageService.postMessage(
+                {
+                    title: 'Übung erstellt',
+                    body: '',
+                    color: 'success',
+                },
+                'toast'
+            );
+            this.exercises.reload();
+        });
     }
 }

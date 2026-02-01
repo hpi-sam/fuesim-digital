@@ -6,13 +6,13 @@ export class ApiError extends Error {
 export class NotFoundError extends ApiError {
     public override statusCode = 404;
     public constructor() {
-        super(`Object does not exist`);
+        super(`Das Objekt existiert nicht.`);
     }
 }
 export class PermissionDeniedError extends ApiError {
     public override statusCode = 403;
     public constructor() {
-        super('You have no permission for this operation.');
+        super('Sie haben keine Berechtigung für diese Operation.');
     }
 }
 export interface ExerciseKeys {

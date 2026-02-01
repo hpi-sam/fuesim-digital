@@ -37,35 +37,31 @@ export class JoinExerciseGuard {
         ) {
             return true;
         }
-        const exerciseExists = await this.apiService.exerciseExists(
-            route.params['exerciseId']
-        );
-        if (!exerciseExists) {
-            this.messageService.postMessage({
-                title: 'Diese Übung existiert nicht',
-                color: 'danger',
-            });
+        try {
+            const exerciseExists = await this.apiService.exerciseExists(
+                route.params['exerciseId']
+            );
+
+            let successfullyJoined = false;
+            if (exerciseExists.isTemplate) {
+                successfullyJoined = await this.applicationService.joinExercise(
+                    route.params['exerciseId'],
+                    ''
+                );
+            } else {
+                successfullyJoined = await tryToJoinExercise(
+                    this.ngbModalService,
+                    route.params['exerciseId']
+                );
+            }
+
+            if (!successfullyJoined) {
+                this.router.navigate(['/']);
+            }
+            return successfullyJoined;
+        } catch {
             this.router.navigate(['/']);
             return false;
         }
-        console.log(exerciseExists);
-
-        let successfullyJoined = false;
-        if (exerciseExists.isTemplate) {
-            successfullyJoined = await this.applicationService.joinExercise(
-                route.params['exerciseId'],
-                ''
-            );
-        } else {
-            successfullyJoined = await tryToJoinExercise(
-                this.ngbModalService,
-                route.params['exerciseId']
-            );
-        }
-
-        if (!successfullyJoined) {
-            this.router.navigate(['/']);
-        }
-        return successfullyJoined;
     }
 }

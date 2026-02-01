@@ -16,7 +16,10 @@ import { SharedModule } from './shared/shared.module';
 import { appReducers } from './state/app.reducer';
 import type { AppState } from './state/app.state';
 import { AboutModule } from './pages/about/about.module';
-import { withCredentialsInterceptor } from './shared/functions/http';
+import {
+    errorHandlingInterceptor,
+    withCredentialsInterceptor,
+} from './shared/functions/http';
 
 @NgModule({
     declarations: [AppComponent, HealthPageComponent],
@@ -35,7 +38,12 @@ import { withCredentialsInterceptor } from './shared/functions/http';
         AboutModule,
     ],
     providers: [
-        provideHttpClient(withInterceptors([withCredentialsInterceptor])),
+        provideHttpClient(
+            withInterceptors([
+                withCredentialsInterceptor,
+                errorHandlingInterceptor,
+            ])
+        ),
     ],
 })
 export class AppModule {}

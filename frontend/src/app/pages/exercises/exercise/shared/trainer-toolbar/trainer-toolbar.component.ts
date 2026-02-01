@@ -92,20 +92,12 @@ export class TrainerToolbarComponent {
         this.applicationService.leaveExercise();
         this.apiService
             .deleteExercise(exerciseId)
-            .then(
-                (response) => {
-                    this.messageService.postMessage({
-                        title: 'Übung erfolgreich gelöscht',
-                        color: 'success',
-                    });
-                },
-                (error) => {
-                    this.messageService.postError({
-                        title: 'Fehler beim Löschen der Übung',
-                        error,
-                    });
-                }
-            )
+            .then((response) => {
+                this.messageService.postMessage({
+                    title: 'Übung erfolgreich gelöscht',
+                    color: 'success',
+                });
+            })
             .finally(() => {
                 this.router.navigate(['/']);
             });

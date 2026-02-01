@@ -22,14 +22,15 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
         if (err instanceof ApiError) {
             res.status(err.statusCode).send({ message: err.message });
         } else {
-            const message = `An error occurred on http request ${req.path}: ${err}`;
             console.warn(
-                message,
+                `An error occurred on http request ${req.path}: ${err}`,
                 err instanceof Error && err.stack
                     ? `at ${err.stack}`
                     : 'no error or no stack'
             );
-            res.status(500).send({ message });
+            res.status(500).send({
+                message: 'Es ist ein interner Serverfehler aufgetreten.',
+            });
         }
     } catch (innerError: unknown) {
         // Nothing works. Log if in production mode, otherwise re-throw inner error

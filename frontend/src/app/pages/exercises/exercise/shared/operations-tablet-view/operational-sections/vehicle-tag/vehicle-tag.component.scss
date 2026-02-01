@@ -3,10 +3,35 @@ $vehicleTagWidth: 150px;
 $vehicleTagBorderRadius: 8px;
 
 .otvVehicleTag {
+    display: block;
     height: $vehicleTagHeight;
     width: $vehicleTagWidth;
+    padding: 4px 8px;
     border: 3px solid #000000;
     background-color: #ffffff;
     border-radius: $vehicleTagBorderRadius;
     position: relative;
+}
+
+::ng-deep {
+    .cdk-drag-preview {
+        border: none;
+        box-sizing: border-box;
+        border-radius: 4px;
+        box-shadow:
+            0 5px 5px -3px rgba(0, 0, 0, 0.2),
+            0 8px 10px 1px rgba(0, 0, 0, 0.14),
+            0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    }
+    .cdk-drag-placeholder {
+        opacity: 0.75;
+        border: dashed 2px #bbbbbb !important;
+        box-sizing: border-box;
+    }
+    .cdk-drag-animating {
+        transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);
+    }
+    .cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+        transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);
+    }
 }

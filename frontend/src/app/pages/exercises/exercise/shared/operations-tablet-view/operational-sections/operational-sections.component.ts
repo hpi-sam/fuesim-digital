@@ -20,7 +20,7 @@ export class OperationalSectionsTabComponent {
 
     public readonly operationalSections$ = this.store
         .select(selectOperationalSections)
-        .pipe(map((sectionsMap) => Object.values(sectionsMap)));
+        .pipe(map((sectionsMap) => Object.values(sectionsMap)),map(s=>{console.log({s}); return s;}));
 
     public addOperationalSection(): void {
         console.log(uuid());

@@ -21,7 +21,7 @@ export class VehiclesOnLocationComponent {
     public readonly vehicles$ = this.store.select(
         createSelector(selectVehicles, (vehicles) => {
             return Object.values(vehicles).filter(
-                (vehicle) => vehicle.operationalSectionId === null
+                (vehicle) => vehicle.operationalAssignment === null
             );
         })
     );
@@ -33,6 +33,7 @@ export class VehiclesOnLocationComponent {
                 type: '[OperationalSection] Move Vehicle To Operational Section',
                 sectionId: null,
                 vehicleId: event.item.data,
+                assignAsSectionLeader: false,
             },
             true
         );

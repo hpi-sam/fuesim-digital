@@ -1,7 +1,10 @@
 <div class="operationalSectionContainer">
     <span class="h3 mt-1 mx-1">{{ operationalSection.title }}</span>
     <div class="ml-auto mr-2">
-        <app-section-leader-slot></app-section-leader-slot>
+        <app-section-leader-slot
+            (vehicleAssigned)="assignVehicle($event, true)"
+            [vehicle]="operationalSectionLeader$ | async"
+        ></app-section-leader-slot>
     </div>
     <div
         class="operationalSectionVehicles"
@@ -10,10 +13,10 @@
         (cdkDropListDropped)="onVehicleDropped($event)"
     >
         @for (
-            vehicle of vehiclesInThisOperationalSection$ | async;
+            vehicle of operationalSectionMembers$ | async;
             track vehicle.id
         ) {
-            <app-vehicle-tag [vehicle]="vehicle"></app-vehicle-tag>
+            <app-vehicle-tag  [vehicle]="vehicle"></app-vehicle-tag>
         }
     </div>
 </div>

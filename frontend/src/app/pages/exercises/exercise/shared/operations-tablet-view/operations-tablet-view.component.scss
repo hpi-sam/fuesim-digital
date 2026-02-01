@@ -2,14 +2,16 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-}
-
-.ovtContent {
+    // This is equivalent to negative p-2 from bootstrap.
+    // This is needed to cancel out the padding from the parent container.
     margin: {
         left: -0.5rem;
         right: -0.5rem;
         bottom: -0.5rem;
     }
+}
+
+.ovtContent {
     height: 100%;
 
     ::ng-deep {
@@ -22,4 +24,8 @@
             }
         }
     }
+}
+
+.nav-tabs.fullscreenEnabled {
+    background-color: #333333;
 }

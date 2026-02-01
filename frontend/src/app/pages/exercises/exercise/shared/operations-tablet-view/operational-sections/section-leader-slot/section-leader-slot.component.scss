@@ -7,10 +7,10 @@
     background-color: container.$innerContainerColor;
     height: vehicleTag.$vehicleTagHeight;
     width: vehicleTag.$vehicleTagWidth;
-    outline: container.$borderSize dashed $color;
-    outline-offset: -(container.$borderSize + 1px);
     border-radius: vehicleTag.$vehicleTagBorderRadius;
     position: relative;
+    outline: container.$borderSize dashed $color;
+    outline-offset: -(container.$borderSize + 1px);
 
     &:empty::after {
         content: 'Abschnittsleitung';

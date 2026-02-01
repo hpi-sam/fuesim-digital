@@ -18,5 +18,4 @@ import { selectVisibleVehicles } from '../../../../../../state/application/selec
     templateUrl: './operation-details.component.html',
     styleUrl: './operation-details.component.scss',
 })
-export class OperationDetailsTabComponent {
-}
+export class OperationDetailsTabComponent {}

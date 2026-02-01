@@ -4,6 +4,7 @@ import type { ExerciseState } from '../state.js';
 import type { Migration } from './migration-functions.js';
 
 export const addOperationsTabletView45: Migration = {
+    //TODO: @Quixelation, this is incomplete, the vehicles are missing their operationalSectionPosition set to null
     action: null,
     state: (state) => {
         const typedState = state as {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { defaultTileMapProperties } from 'digital-fuesim-manv-shared';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -9,6 +9,8 @@ import {
     selectVehiclesInTransfer,
     selectTransferPoints,
     selectAlarmGroups,
+    selectCurrentTime,
+    selectParticipantId,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectVisibleVehicles } from '../../../../../../state/application/selectors/shared.selectors';
 
@@ -18,4 +20,16 @@ import { selectVisibleVehicles } from '../../../../../../state/application/selec
     templateUrl: './operation-details.component.html',
     styleUrl: './operation-details.component.scss',
 })
-export class OperationDetailsTabComponent {}
+export class OperationDetailsTabComponent {
+
+    @Input()
+    public showExerciseDetails: boolean = false;
+
+    public constructor(
+        private readonly store: Store<AppState>
+    ) {}
+
+
+    public readonly participantId$ = this.store.select(selectParticipantId);
+    public readonly currentTime$ = this.store.select(selectCurrentTime)
+}

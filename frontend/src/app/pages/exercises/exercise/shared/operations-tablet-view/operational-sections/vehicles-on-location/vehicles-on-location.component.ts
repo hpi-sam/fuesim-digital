@@ -5,6 +5,7 @@ import { AppState } from '../../../../../../../state/app.state';
 import { selectVehicles } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { map } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { selectVisibleVehicles } from '../../../../../../../state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-vehicles-on-location',
@@ -19,7 +20,7 @@ export class VehiclesOnLocationComponent {
     ) {}
 
     public readonly vehicles$ = this.store.select(
-        createSelector(selectVehicles, (vehicles) => {
+        createSelector(selectVisibleVehicles, (vehicles) => {
             return Object.values(vehicles).filter(
                 (vehicle) => vehicle.operationalAssignment === null
             );

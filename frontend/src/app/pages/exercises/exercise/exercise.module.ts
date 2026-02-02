@@ -23,7 +23,6 @@ import { VehicleTemplateFormComponent } from './shared/editor-panel/vehicle-temp
 import { EmergencyOperationsCenterModule } from './shared/emergency-operations-center/emergency-operations-center.module';
 import { ExerciseMapModule } from './shared/exercise-map/exercise-map.module';
 import { ExerciseSettingsModalComponent } from './shared/exercise-settings/exercise-settings-modal/exercise-settings-modal.component';
-import { ExerciseStateBadgeComponent } from './shared/exercise-state-badge/exercise-state-badge.component';
 import { ExerciseStatisticsModule } from './shared/exercise-statistics/exercise-statistics.module';
 import { HospitalEditorModule } from './shared/hospital-editor/hospital-editor.module';
 import { PartialExportModalComponent } from './shared/partial-export/partial-export-modal/partial-export-modal.component';
@@ -35,6 +34,7 @@ import { TransferOverviewModule } from './shared/transfer-overview/transfer-over
 import { CoordinatePickerModule } from './shared/coordinate-picker/coordinate-picker.module';
 import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/map-editor-card.component';
 import { OperationsTabletViewModule } from './shared/operations-tablet-view/operations-tablet-view.module';
+import { ExerciseStateBadgeModule } from './shared/exercise-state-badge/exercise-state-badge.module';
 
 @NgModule({
     declarations: [
@@ -42,7 +42,6 @@ import { OperationsTabletViewModule } from './shared/operations-tablet-view/oper
         MapEditorCardComponent,
         TrainerMapEditorComponent,
         TrainerToolbarComponent,
-        ExerciseStateBadgeComponent,
         ExerciseSettingsModalComponent,
         TimeTravelComponent,
         CreateImageTemplateModalComponent,
@@ -71,7 +70,8 @@ import { OperationsTabletViewModule } from './shared/operations-tablet-view/oper
         NgbTooltipModule,
         NgbAccordionModule,
         OperationsTabletViewModule,
+        ExerciseStateBadgeModule
     ],
     providers: [provideHttpClient(withInterceptorsFromDi())],
 })
-export class ExerciseModule {}
+export class ExerciseModule { }

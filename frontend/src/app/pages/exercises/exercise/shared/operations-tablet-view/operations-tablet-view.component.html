@@ -9,7 +9,7 @@
         <ng-container ngbNavItem [destroyOnHide]="false">
             <button ngbNavLink>Einsatzdetails</button>
             <ng-template ngbNavContent>
-                <app-operation-details-tab></app-operation-details-tab>
+                <app-operation-details-tab [showExerciseDetails]="fullscreenEnabled"></app-operation-details-tab>
             </ng-template>
         </ng-container>
         <ng-container ngbNavItem>

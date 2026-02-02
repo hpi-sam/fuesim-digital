@@ -26,6 +26,8 @@ import { OperationalSectionsTabComponent } from './operational-sections/operatio
 import { OperationsMapComponent } from './operation-details/operations-map/operations-map.component';
 import { OperationsVehiclesComponent } from './operation-details/operations-vehicles/operations-vehicles.component';
 import { OperationsVehicleItemComponent } from './operation-details/operations-vehicles/operations-vehicle-item/operations-vehicle-item.component';
+import { ExerciseModule } from '../../exercise.module';
+import { ExerciseStateBadgeModule } from '../exercise-state-badge/exercise-state-badge.module';
 
 @NgModule({
     declarations: [
@@ -54,6 +56,7 @@ import { OperationsVehicleItemComponent } from './operation-details/operations-v
         CdkDrag,
         CdkDropList,
         CdkDropListGroup,
+        ExerciseStateBadgeModule,
     ],
     exports: [OperationsTabletViewComponent],
 })

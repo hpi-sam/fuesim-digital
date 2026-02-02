@@ -39,7 +39,6 @@ export class ExerciseCardComponent {
         if (!deletionConfirmed) {
             return;
         }
-        // If we get disconnected by the server during the deletion a disconnect error would be displayed
         this.apiService.deleteExercise(exerciseId).then((response) => {
             this.messageService.postMessage({
                 title: 'Übung erfolgreich gelöscht',

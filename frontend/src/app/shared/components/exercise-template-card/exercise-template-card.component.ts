@@ -62,7 +62,6 @@ export class ExerciseTemplateCardComponent {
         if (!deletionConfirmed) {
             return;
         }
-        // If we get disconnected by the server during the deletion a disconnect error would be displayed
         this.apiService
             .deleteExerciseTemplate(exerciseTemplate.id)
             .then((response) => {

@@ -26,9 +26,8 @@ export function errorHandlingInterceptor(
         catchError((error: unknown) => {
             if (error instanceof HttpErrorResponse) {
                 let message = 'Die Netzwerkanfrage ist fehlgeschlagen.';
-                const typedError = error.error;
-                if (typedError?.message) {
-                    message = typedError.message;
+                if (error.error?.message) {
+                    message = error.error.message;
                 }
                 messageService.postError({
                     title: 'Interner Fehler',

@@ -48,4 +48,14 @@ export abstract class BaseRepository {
         const RepositoryClass = this.constructor as Constructor<typeof this>;
         return new RepositoryClass(newConnection);
     }
+
+    protected onlySingle<T>(array: T[]): T | null {
+        if (array.length === 0 || array[0] === undefined) {
+            return null;
+        }
+        if (array.length > 1) {
+            throw new Error('Multiple entries found where only one expected');
+        }
+        return array[0];
+    }
 }

@@ -10,6 +10,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Added
 
 - Provide CSV export for patients to import them into IVENA MANV.
+- Enable users to login with SSO via an OpenID Connect providers.
 
 ### Fixed
 

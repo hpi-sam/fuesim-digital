@@ -27,7 +27,7 @@ export class ExerciseRepository extends BaseRepository {
             .from(exerciseTable)
             .where(eq(exerciseTable.trainerId, trainerKey));
 
-        return onlySingle(dbResult);
+        return this.onlySingle(dbResult);
     }
 
     /**
@@ -39,7 +39,7 @@ export class ExerciseRepository extends BaseRepository {
             .from(exerciseTable)
             .where(eq(exerciseTable.participantId, participantKey));
 
-        return onlySingle(dbResult);
+        return this.onlySingle(dbResult);
     }
 
     public getAllExercises() {
@@ -103,14 +103,4 @@ export class ExerciseRepository extends BaseRepository {
             .onConflictDoNothing()
             .returning();
     }
-}
-
-function onlySingle<T>(array: T[]): T | null {
-    if (array.length === 0 || array[0] === undefined) {
-        return null;
-    }
-    if (array.length > 1) {
-        throw new Error('Multiple entries found where only one expected');
-    }
-    return array[0];
 }

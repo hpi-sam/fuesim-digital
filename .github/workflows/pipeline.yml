@@ -148,6 +148,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
+            - name: Start Authelia
+              uses: ./.github/actions/start-authelia
             - uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
@@ -160,7 +162,9 @@ jobs:
                   | sed -e "s/^#DFM_DB_PASSWORD=.*$/DFM_DB_PASSWORD=${{ env.POSTGRES_PASSWORD }}/"
                   | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
                   | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
-                  | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/" > ./.env
+                  | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/"
+                  | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
+                  > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run && cd ..
             - name: Run Backend Tests
@@ -208,6 +212,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
+            - name: Start Authelia
+              uses: ./.github/actions/start-authelia
             - uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
@@ -220,7 +226,9 @@ jobs:
                   | sed -e "s/^#DFM_DB_PASSWORD=.*$/DFM_DB_PASSWORD=${{ env.POSTGRES_PASSWORD }}/"
                   | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
                   | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
-                  | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/" > ./.env
+                  | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/"
+                  | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
+                  > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run && cd ..
             - name: Fetch Test Scenarios
@@ -260,6 +268,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
+            - name: Start Authelia
+              uses: ./.github/actions/start-authelia
             - uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
@@ -281,7 +291,9 @@ jobs:
                   | sed -e "s/^#DFM_DB_PASSWORD=.*$/DFM_DB_PASSWORD=${{ env.POSTGRES_PASSWORD }}/"
                   | sed -e "s/^DFM_DB_NAME=.*$/DFM_DB_NAME=${{ env.POSTGRES_DB }}/"
                   | sed -e "s/^DFM_DB_PORT=.*$/DFM_DB_PORT=${{ job.services.postgres.ports['5432'] }}/"
-                  | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/" > ./.env
+                  | sed -e "s/^DFM_DB_HOST=.*$/DFM_DB_HOST=127.0.0.1/"
+                  | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
+                  > ./.env
             - name: Run migrations
               run: cd backend && npm run migration:run && cd ..
             - name: Run Cypress

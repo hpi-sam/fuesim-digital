@@ -21,8 +21,8 @@ jobs:
               run: git checkout -b release/v${{ github.event.inputs.versionName }}
             - name: Initialize git config
               run: |
-                  git config user.name "GitHub Actions"
-                  git config user.email noreply@github.com
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             - name: Cache node modules
               uses: ./.github/actions/cache-build
               with:

@@ -5,7 +5,6 @@ import { ApiHttpServer } from './http-server.js';
 import type { DatabaseService } from './database/services/database-service.js';
 import type { ExerciseService } from './database/services/exercise-service.js';
 import type { AuthService } from './auth/auth-service.js';
-import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
 
 export class FuesimServer {
     private readonly _httpServer: ApiHttpServer;
@@ -35,7 +34,7 @@ export class FuesimServer {
             databaseService,
             exerciseService,
             authService,
-            exerciseManagerService,
+            exerciseManagerService
         );
 
         this.saveHandler = new PeriodicEventHandler(

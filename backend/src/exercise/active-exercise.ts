@@ -1,6 +1,10 @@
 import type { ExerciseAction, Role, UUID } from 'digital-fuesim-manv-shared';
 import { ExerciseState, reduceExerciseState } from 'digital-fuesim-manv-shared';
-import type { ExerciseEntry, ExerciseTemplateEntry, ExerciseId } from '../database/schema.js';
+import type {
+    ExerciseEntry,
+    ExerciseTemplateEntry,
+    ExerciseId,
+} from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
 import type { ClientWrapper } from './client-wrapper.js';

@@ -9,6 +9,7 @@ import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ExerciseFactory } from '../exercise/exercise-factory.js';
 import { HttpRouter } from '../http-router.js';
 import type { AuthService } from '../auth/auth-service.js';
+import { isTrainerKey } from '../exercise/exercise-keys.js';
 
 export class ExerciseHttpRouter extends HttpRouter {
     public constructor(
@@ -28,14 +29,14 @@ export class ExerciseHttpRouter extends HttpRouter {
                 : undefined;
             await this.exerciseService.createExercise(exercise, optionalData);
             res.status(201).send({
-                participantId: exercise.getExercise().participantId,
-                trainerId: exercise.getExercise().trainerId,
+                participantId: exercise.participantKey,
+                trainerId: exercise.trainerKey,
             });
         });
 
-        this.router.get('/api/exercise/:exerciseId', async (req, res) => {
+        this.router.get('/api/exercise/:exerciseKey', async (req, res) => {
             const exercise = this.exerciseService.getExerciseByKey(
-                req.params.exerciseId
+                req.params.exerciseKey
             );
             if (!exercise) throw new NotFoundError();
             res.send(
@@ -45,25 +46,21 @@ export class ExerciseHttpRouter extends HttpRouter {
             );
         });
 
-        this.router.delete('/api/exercise/:exerciseId', async (req, res) => {
-            if (
-                this.exerciseService.getRoleFromId(req.params.exerciseId) !==
-                'trainer'
-            ) {
+        this.router.delete('/api/exercise/:exerciseKey', async (req, res) => {
+            if (!isTrainerKey(req.params.exerciseKey)) {
                 throw new PermissionDeniedError();
             }
-            await this.exerciseService.deleteExercise(req.params.exerciseId);
+            await this.exerciseService.deleteExercise(req.params.exerciseKey);
 
             res.status(204).send();
         });
 
         this.router.get(
-            '/api/exercise/:exerciseId/history',
+            '/api/exercise/:exerciseKey/history',
             async (req, res) => {
                 const timeline = await this.exerciseService.getTimeline(
-                    req.params.exerciseId
+                    req.params.exerciseKey
                 );
-                if (!timeline) throw new NotFoundError();
                 res.send(timeline);
             }
         );

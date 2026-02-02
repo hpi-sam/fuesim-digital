@@ -1,7 +1,6 @@
 import type { InferInsertModel } from 'drizzle-orm';
 import { eq } from 'drizzle-orm';
 import { userTable } from '../schema.js';
-import { onlySingle } from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
 
 export class UserRepository extends BaseRepository {

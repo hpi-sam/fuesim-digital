@@ -1,4 +1,5 @@
 import {
+    ApiError,
     NotFoundError,
     type ExerciseTimeline,
     type Role,
@@ -15,6 +16,7 @@ import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
 import type { ExerciseKey } from '../../exercise/exercise-keys.js';
+import { isExerciseKey } from '../../exercise/exercise-keys.js';
 
 export class ExerciseService {
     public constructor(
@@ -29,6 +31,9 @@ export class ExerciseService {
     }
 
     public getExerciseByKey(exerciseKey: ExerciseKey) {
+        if (!isExerciseKey(exerciseKey)) {
+            throw ApiError();
+        }
         return this.exerciseMap.get(exerciseKey);
     }
 
@@ -39,8 +44,8 @@ export class ExerciseService {
     public destroyExercise(exercise: ActiveExercise) {
         exercise.destroy();
 
-        this.exerciseMap.delete(exercise.getExercise().participantId);
-        this.exerciseMap.delete(exercise.getExercise().trainerId);
+        this.exerciseMap.delete(exercise.participantKey);
+        this.exerciseMap.delete(exercise.trainerKey);
     }
 
     public async createTemplate(

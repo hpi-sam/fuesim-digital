@@ -15,6 +15,7 @@ export class PermissionDeniedError extends ApiError {
         super('Sie haben keine Berechtigung für diese Operation.');
     }
 }
+
 export interface ExerciseKeys {
     readonly participantKey: string;
     readonly trainerKey: string;

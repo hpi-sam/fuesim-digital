@@ -1,3 +1,4 @@
+import { userDataResponseSchema } from 'digital-fuesim-manv-shared';
 import { HttpRouter } from '../http-router.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';
 import type { AuthService } from './auth-service.js';
@@ -25,7 +26,10 @@ export class AuthHttpRouter extends HttpRouter {
 
         this.router.get('/oidc-redirect', async (req, res) => {
             try {
-                await this.authService.oidcService.handleLoginRedirect(req, res);
+                await this.authService.oidcService.handleLoginRedirect(
+                    req,
+                    res
+                );
             } catch {
                 res.redirect(
                     toFrontend(undefined, {
@@ -51,9 +55,7 @@ export class AuthHttpRouter extends HttpRouter {
             const sessionToken =
                 req.cookies[this.authService.SESSION_COOKIE_NAME];
             const sessionTokenData = sessionToken
-                ? await this.authService.getDataFromSessionToken(
-                    sessionToken
-                )
+                ? await this.authService.getDataFromSessionToken(sessionToken)
                 : null;
 
             const sessionIsExpired = sessionToken && !sessionTokenData;
@@ -62,16 +64,16 @@ export class AuthHttpRouter extends HttpRouter {
                 res.clearCookie(this.authService.SESSION_COOKIE_NAME);
             }
 
-            res.send(userDataResponseSchema.encode({
-                user: sessionTokenData?.user ?? null,
-                expired: sessionIsExpired,
-                userRegistrationsEnabled:
-                this.authService.oidcService
-                    .userRegistrationEnabled,
-                userSelfServiceEnabled:
-                this.authService.oidcService
-                    .userSelfServiceEnabled,
-            }));
+            res.send(
+                userDataResponseSchema.encode({
+                    user: sessionTokenData?.user ?? null,
+                    expired: sessionIsExpired,
+                    userRegistrationsEnabled:
+                        this.authService.oidcService.userRegistrationEnabled,
+                    userSelfServiceEnabled:
+                        this.authService.oidcService.userSelfServiceEnabled,
+                })
+            );
         });
 
         this.router.post('/refresh-session', async (req, res) => {

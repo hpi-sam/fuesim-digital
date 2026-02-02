@@ -1,6 +1,6 @@
 import { ExerciseState } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
-import { and, isNull, desc, eq, lt } from 'drizzle-orm';
+import { eq, lt, and, isNull, desc } from 'drizzle-orm';
 import type { ExerciseId, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
@@ -13,7 +13,7 @@ import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
     public async getExerciseById(id: ExerciseId) {
-        return onlySingle(
+        return this.onlySingle(
             await this.databaseConnection
                 .select()
                 .from(exerciseTable)

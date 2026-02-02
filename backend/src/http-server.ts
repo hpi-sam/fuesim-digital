@@ -16,7 +16,7 @@ import { errorHandler } from './utils/http-error-handler.js';
 declare global {
     namespace Express {
         interface Request {
-            session?: SessionInformation | null;
+            session?: SessionInformation;
         }
     }
 }

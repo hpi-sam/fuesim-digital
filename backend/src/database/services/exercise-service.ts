@@ -1,6 +1,7 @@
 import {
     ApiError,
     NotFoundError,
+    PermissionDeniedError,
     type ExerciseTimeline,
     type Role,
 } from 'digital-fuesim-manv-shared';
@@ -16,7 +17,8 @@ import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
 import type { ExerciseKey } from '../../exercise/exercise-keys.js';
-import { isExerciseKey } from '../../exercise/exercise-keys.js';
+import { isTrainerKey, isExerciseKey } from '../../exercise/exercise-keys.js';
+import type { SessionInformation } from '../../auth/auth-service.js';
 
 export class ExerciseService {
     public constructor(
@@ -32,9 +34,36 @@ export class ExerciseService {
 
     public getExerciseByKey(exerciseKey: ExerciseKey) {
         if (!isExerciseKey(exerciseKey)) {
-            throw ApiError();
+            throw new ApiError();
         }
+
         return this.exerciseMap.get(exerciseKey);
+    }
+
+    public async getExerciseByKeyProtected(
+        exerciseKey: ExerciseKey,
+        session?: SessionInformation
+    ) {
+        const exercise = this.getExerciseByKey(exerciseKey);
+        if (!exercise) {
+            throw new NotFoundError();
+        }
+
+        const exerciseEntry = await this.exerciseRepository.getExerciseById(
+            exercise.exerciseId
+        );
+        if (!exerciseEntry) {
+            throw new NotFoundError();
+        }
+
+        if (
+            exerciseEntry.exercise_template &&
+            exerciseEntry.exercise_template.user !== session?.user.id
+        ) {
+            throw new PermissionDeniedError();
+        }
+
+        return exercise;
     }
 
     public getAllExercises() {
@@ -159,10 +188,34 @@ export class ExerciseService {
         );
     }
 
-    public async deleteExercise(exerciseKey: ExerciseKey) {
+    public async deleteExercise(
+        exerciseKey: ExerciseKey,
+        session?: SessionInformation
+    ) {
+        if (!isTrainerKey(exerciseKey)) {
+            throw new PermissionDeniedError();
+        }
+
         const activeExercise = this.getExerciseByKey(exerciseKey);
         if (!activeExercise) {
             throw new NotFoundError();
+        }
+
+        const exerciseEntry = await this.exerciseRepository.getExerciseById(
+            activeExercise.exerciseId
+        );
+        if (!exerciseEntry) {
+            throw new NotFoundError();
+        }
+
+        if (exerciseEntry.exercise_template) {
+            throw new PermissionDeniedError();
+        }
+        if (
+            exerciseEntry.exercise_entity.user &&
+            exerciseEntry.exercise_entity.user !== session?.user.id
+        ) {
+            throw new PermissionDeniedError();
         }
 
         this.destroyExercise(activeExercise);
@@ -201,10 +254,13 @@ export class ExerciseService {
     }
 
     public async getTimeline(
-        exerciseKey: ExerciseKey
+        exerciseKey: ExerciseKey,
+        session?: SessionInformation
     ): Promise<ExerciseTimeline> {
-        const activeExercise = this.getExerciseByKey(exerciseKey);
-        if (activeExercise === undefined) throw new NotFoundError();
+        const activeExercise = await this.getExerciseByKeyProtected(
+            exerciseKey,
+            session
+        );
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
                 await this.actionRepository.getActionsForExerciseId(

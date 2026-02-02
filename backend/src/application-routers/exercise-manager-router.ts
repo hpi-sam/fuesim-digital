@@ -26,7 +26,7 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
             async (req, res) => {
                 const exercises =
                     await this.exerciseManagerService.getAllExercisesOfOwner(
-                        req.session!.user.id
+                        req.session!
                     );
 
                 res.send(exercisesSchema.encode(exercises));
@@ -39,7 +39,7 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
             async (req, res) => {
                 const templates =
                     await this.exerciseManagerService.getAllExerciseTemplatesOfOwner(
-                        req.session!.user.id
+                        req.session!
                     );
                 res.send(exerciseTemplatesSchema.encode(templates));
             }
@@ -53,7 +53,7 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
                 const exerciseTemplate =
                     await this.exerciseManagerService.createExerciseTemplate(
                         parsedData,
-                        req.session!.user.id,
+                        req.session!,
                         this.exerciseService
                     );
 
@@ -68,13 +68,13 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
                 const newExercise =
                     await this.exerciseManagerService.createExerciseFromTemplate(
                         req.params.id,
-                        req.session!.user.id,
+                        req.session!,
                         this.exerciseService
                     );
 
                 res.status(201).send({
-                    participantId: newExercise.getExercise().participantId,
-                    trainerId: newExercise.getExercise().trainerId,
+                    participantId: newExercise.participantKey,
+                    trainerId: newExercise.trainerKey,
                 });
             }
         );
@@ -88,7 +88,7 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
                 const exerciseTemplate =
                     await this.exerciseManagerService.patchExerciseTemplate(
                         req.params.id,
-                        req.session!.user.id,
+                        req.session!,
                         parsedData
                     );
                 res.status(201).send(
@@ -103,7 +103,7 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
             async (req, res) => {
                 await this.exerciseManagerService.deleteExerciseTemplate(
                     req.params.id,
-                    req.session!.user.id,
+                    req.session!,
                     this.exerciseService
                 );
                 res.status(204).send();

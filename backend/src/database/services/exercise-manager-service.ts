@@ -6,6 +6,8 @@ import {
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
+import type { SessionInformation } from '../../auth/auth-service.js';
+import type { TrainerKey } from '../../exercise/exercise-keys.js';
 import type { ExerciseService } from './exercise-service.js';
 
 export class ExerciseManagerService {
@@ -14,23 +16,25 @@ export class ExerciseManagerService {
         private readonly actionRepository: ActionRepository
     ) {}
 
-    public async getAllExercisesOfOwner(userId: string) {
-        return this.exerciseRepository.getAllExercisesOfOwner(userId);
+    public async getAllExercisesOfOwner(session: SessionInformation) {
+        return this.exerciseRepository.getAllExercisesOfOwner(session.user.id);
     }
 
-    public async getAllExerciseTemplatesOfOwner(userId: string) {
-        return this.exerciseRepository.getAllExerciseTemplatesOfOwner(userId);
+    public async getAllExerciseTemplatesOfOwner(session: SessionInformation) {
+        return this.exerciseRepository.getAllExerciseTemplatesOfOwner(
+            session.user.id
+        );
     }
 
     public async createExerciseTemplate(
         data: ExerciseTemplateCreateData,
-        userId: string,
+        session: SessionInformation,
         exerciseService: ExerciseService
     ) {
         const exerciseTemplate =
             await this.exerciseRepository.createExerciseTemplate({
                 ...data,
-                user: userId,
+                user: session.user.id,
             });
         if (!exerciseTemplate) {
             throw new NotFoundError();
@@ -45,7 +49,7 @@ export class ExerciseManagerService {
 
     public async patchExerciseTemplate(
         id: string,
-        userId: string,
+        session: SessionInformation,
         data: ExerciseTemplateCreateData
     ) {
         const exerciseTemplate =
@@ -53,7 +57,7 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.exercise_template.user !== userId) {
+        if (exerciseTemplate.exercise_template.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
         return {
@@ -67,7 +71,7 @@ export class ExerciseManagerService {
 
     public async createExerciseFromTemplate(
         id: string,
-        userId: string,
+        session: SessionInformation,
         exerciseService: ExerciseService
     ) {
         await exerciseService.saveUnsavedExercises();
@@ -77,7 +81,7 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.exercise_template.user !== userId) {
+        if (exerciseTemplate.exercise_template.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
         const actions = await this.actionRepository.getActionsForExerciseId(
@@ -91,7 +95,7 @@ export class ExerciseManagerService {
         );
         await exerciseService.createExercise(newExercise, {
             baseTemplateId: exerciseTemplate.exercise_template.id,
-            user: userId,
+            user: session.user.id,
         });
         await this.exerciseRepository.patchExerciseTemplate(
             exerciseTemplate.exercise_template.id,
@@ -102,7 +106,7 @@ export class ExerciseManagerService {
 
     public async deleteExerciseTemplate(
         id: string,
-        userId: string,
+        session: SessionInformation,
         exerciseService: ExerciseService
     ) {
         const exerciseTemplate =
@@ -110,11 +114,11 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.exercise_template.user !== userId) {
+        if (exerciseTemplate.exercise_template.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
         const activeExercise = exerciseService.getExerciseByKey(
-            exerciseTemplate.exercise_entity.trainerId
+            exerciseTemplate.exercise_entity.trainerId as TrainerKey
         );
         if (activeExercise) {
             exerciseService.destroyExercise(activeExercise);

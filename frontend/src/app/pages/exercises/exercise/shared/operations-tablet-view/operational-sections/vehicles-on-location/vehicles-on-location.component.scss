@@ -1,9 +1,4 @@
-@use './../vehicle-tag/vehicle-tag.component' as vehicleTag;
-@use './../operational-section-container/operational-section-container.component'
-    as container;
-
-$height: (2 * vehicleTag.$vehicleTagHeight) + container.$vehicleTagGap +
-    (2 * container.$innerBoxPadding);
+@use './../_variables.scss' as vars;
 
 .onLocationVehiclesSection {
     display: flex;
@@ -20,12 +15,12 @@ $height: (2 * vehicleTag.$vehicleTagHeight) + container.$vehicleTagGap +
 }
 
 .onLocationVehiclesContainer {
-    height: $height;
-    padding: container.$innerBoxPadding;
+    height: (2 * vars.$vehicleTagHeight) + vars.$vehicleTagGap + (2 * vars.$innerBoxPadding);
+    padding: vars.$innerBoxPadding;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     width: 100%;
     align-content: flex-start;
-    gap: container.$vehicleTagGap;
+    gap: vars.$vehicleTagGap;
 }

@@ -1,0 +1,19 @@
+@use 'bootstrap/scss/bootstrap' as bootstrap;
+
+$vehicleTagHeight: 60px;
+$vehicleTagWidth: 150px;
+
+$borderRadius: bootstrap.$border-radius-sm;
+
+$outerBoxPadding: 8px;
+$innerBoxPadding: 12px;
+
+$vehicleTagGap: 8px;
+$borderSize: 2px;
+
+$innerContainerWidth: 2 * ($vehicleTagWidth + $innerBoxPadding + $borderSize) + $vehicleTagGap;
+$containerWidth: $innerContainerWidth + (2 * $outerBoxPadding);
+
+$innerContainerColor: bootstrap.$gray-100;
+
+

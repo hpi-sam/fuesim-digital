@@ -1,21 +1,21 @@
-$vehicleTagHeight: 60px;
-$vehicleTagWidth: 150px;
-$vehicleTagBorderRadius: 8px;
+@use 'bootstrap/scss/bootstrap';
+@use './../_variables.scss' as vars;
 
-.otvVehicleTag {
+:host {
     display: block;
-    height: $vehicleTagHeight;
-    width: $vehicleTagWidth;
-    padding: 4px 8px;
-    border: 3px solid #000000;
+    height: vars.$vehicleTagHeight;
+    width: vars.$vehicleTagWidth;
+    @extend .px-2;
+    @extend .py-1;
+    border-radius: vars.$borderRadius;
+    border: solid black;
+    @extend .border-3;
     background-color: #ffffff;
-    border-radius: $vehicleTagBorderRadius;
     position: relative;
 }
 
 ::ng-deep {
     .cdk-drag-preview {
-        border: none;
         box-sizing: border-box;
         border-radius: 4px;
         box-shadow:

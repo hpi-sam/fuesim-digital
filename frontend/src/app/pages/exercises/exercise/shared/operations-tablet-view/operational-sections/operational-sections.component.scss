@@ -1,5 +1,4 @@
-@use './operational-section-container/operational-section-container.component'
-    as container;
+@use './_variables.scss' as vars;
 
 .otvOperationalSectionsTabRoot {
     background-color: #333333;
@@ -19,5 +18,5 @@
 }
 
 .addNewOperationalSectionButton {
-    width: container.$containerWidth;
+    width: vars.$containerWidth;
 }

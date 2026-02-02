@@ -1,16 +1,15 @@
-@use './../vehicle-tag/vehicle-tag.component' as vehicleTag;
-@use './../operational-section-container/operational-section-container.component'
-    as container;
+@use 'bootstrap/scss/bootstrap' as bootstrap;
+@use './../_variables.scss' as vars;
 
 .sectionLeaderSlot {
-    $color: #888888;
-    background-color: container.$innerContainerColor;
-    height: vehicleTag.$vehicleTagHeight;
-    width: vehicleTag.$vehicleTagWidth;
-    border-radius: vehicleTag.$vehicleTagBorderRadius;
+    $color: bootstrap.$gray-600;
+    background-color: vars.$innerContainerColor;
+    height: vars.$vehicleTagHeight;
+    width: vars.$vehicleTagWidth;
+    border-radius: vars.$borderRadius;
     position: relative;
-    outline: container.$borderSize dashed $color;
-    outline-offset: -(container.$borderSize + 1px);
+    outline: vars.$borderSize dashed $color;
+    outline-offset: -(vars.$borderSize + 1px);
 
     &:empty::after {
         content: 'Abschnittsleitung';

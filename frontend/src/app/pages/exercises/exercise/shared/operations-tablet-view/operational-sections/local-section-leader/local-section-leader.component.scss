@@ -1,15 +1,13 @@
-@use './../vehicle-tag/vehicle-tag.component' as vehicleTag;
-@use './../operational-section-container/operational-section-container.component'
-    as container;
+@use "./../_variables.scss" as vars;
 
 .localSectionLeaderContainer {
     background-color: #ffffff;
-    padding: container.$outerBoxPadding;
+    padding: vars.$outerBoxPadding;
     height: 100%;
     display: flex;
     flex-direction: column;
 
-    border-radius: container.$border-radius;
+    border-radius: vars.$borderRadius;
 
     display: flex;
     flex-direction: column;
@@ -20,5 +18,5 @@
     writing-mode: sideways-lr;
     font-size: 1.7rem;
     font-weight: bold;
-    margin-bottom: container.$outerBoxPadding;
+    margin-bottom: vars.$outerBoxPadding;
 }

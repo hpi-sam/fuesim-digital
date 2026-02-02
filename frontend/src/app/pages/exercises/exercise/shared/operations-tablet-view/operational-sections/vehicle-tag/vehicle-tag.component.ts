@@ -9,9 +9,6 @@ import { CdkDrag } from '@angular/cdk/drag-drop';
     templateUrl: './vehicle-tag.component.html',
     styleUrl: './vehicle-tag.component.scss',
     hostDirectives: [CdkDrag],
-    host: {
-        class: 'otvVehicleTag'
-    }
 })
 export class VehicleTagComponent implements OnInit {
     private cdkDrag = inject(CdkDrag);

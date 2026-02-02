@@ -22,16 +22,15 @@ export class ExerciseTemplateListComponent {
         this.exerciseTemplates = apiService.getExerciseTemplatesResource();
     }
 
-    createExerciseTemplate() {
+    async createExerciseTemplate() {
         const modalRef = this.ngbModalService.open(
             CreateExerciseTemplateModalComponent
         );
         const componentInstance =
             modalRef.componentInstance as CreateExerciseTemplateModalComponent;
-        firstValueFrom(componentInstance.exerciseTemplateCreated$, {
+        await firstValueFrom(componentInstance.exerciseTemplateCreated$, {
             defaultValue: false,
-        }).then(() => {
-            this.exerciseTemplates.reload();
         });
+        this.exerciseTemplates.reload();
     }
 }

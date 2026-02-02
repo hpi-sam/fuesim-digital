@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import type {
     ExerciseTemplate,
     ExerciseTemplateCreateData,
@@ -16,6 +16,7 @@ import { ConfirmationModalService } from '../../../core/confirmation-modal/confi
 })
 export class ExerciseTemplateCardComponent {
     exerciseTemplate = input<ExerciseTemplate>();
+    readonly updated = output();
 
     constructor(
         private readonly apiService: ApiService,
@@ -24,10 +25,10 @@ export class ExerciseTemplateCardComponent {
         private readonly confirmationModalService: ConfirmationModalService
     ) {}
 
-    patchExerciseTemplate(data: ExerciseTemplateCreateData) {
+    async patchExerciseTemplate(data: ExerciseTemplateCreateData) {
         const exerciseTemplate = this.exerciseTemplate();
         if (!exerciseTemplate) return;
-        this.apiService.patchExerciseTemplate(exerciseTemplate.id, data);
+        await this.apiService.patchExerciseTemplate(exerciseTemplate.id, data);
     }
 
     createExercise() {
@@ -36,15 +37,15 @@ export class ExerciseTemplateCardComponent {
         this.apiService
             .createExerciseFromTemplate(exerciseTemplate.id)
             .then((ids) => {
-                // TODO use generic success handling
                 this.messageService.postMessage(
                     {
-                        title: 'Übung erstellt',
+                        title: 'Übung erfolgreich erstellt',
                         body: '',
                         color: 'success',
                     },
                     'toast'
                 );
+
                 this.router.navigate(['/exercises', ids.trainerId]);
             });
     }
@@ -69,7 +70,7 @@ export class ExerciseTemplateCardComponent {
                     title: 'Übungsvorlage erfolgreich gelöscht',
                     color: 'success',
                 });
-                // TODO Refresh list
+                this.updated.emit();
             });
     }
 }

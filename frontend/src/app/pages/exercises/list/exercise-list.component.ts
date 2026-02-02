@@ -22,10 +22,9 @@ export class ExerciseListComponent {
 
     public async createExercise() {
         this.apiService.createExercise().then((ids) => {
-            // TODO use generic success handling
             this.messageService.postMessage(
                 {
-                    title: 'Übung erstellt',
+                    title: 'Übung erfolgreich erstellt',
                     body: '',
                     color: 'success',
                 },

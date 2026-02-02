@@ -41,6 +41,7 @@
                 <div class="col mb-4">
                     <app-exercise-template-card
                         [exerciseTemplate]="exerciseTemplate"
+                        (updated)="exerciseTemplates.reload()"
                     />
                 </div>
             }

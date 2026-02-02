@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import type { Exercise } from 'digital-fuesim-manv-shared';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ApiService } from '../../../core/api.service';
@@ -18,6 +18,7 @@ export class ExerciseCardComponent {
     trainerUrl = computed(
         () => `${location.origin}/exercises/${this.exercise()?.trainerId}`
     );
+    readonly updated = output();
 
     constructor(
         private readonly apiService: ApiService,
@@ -39,19 +40,12 @@ export class ExerciseCardComponent {
             return;
         }
         // If we get disconnected by the server during the deletion a disconnect error would be displayed
-        this.apiService.deleteExercise(exerciseId).then(
-            (response) => {
-                this.messageService.postMessage({
-                    title: 'Übung erfolgreich gelöscht',
-                    color: 'success',
-                });
-            },
-            (error) => {
-                this.messageService.postError({
-                    title: 'Fehler beim Löschen der Übung',
-                    error,
-                });
-            }
-        );
+        this.apiService.deleteExercise(exerciseId).then((response) => {
+            this.messageService.postMessage({
+                title: 'Übung erfolgreich gelöscht',
+                color: 'success',
+            });
+            this.updated.emit();
+        });
     }
 }

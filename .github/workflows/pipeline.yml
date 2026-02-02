@@ -396,11 +396,9 @@ jobs:
             - uses: ./.github/actions/extract-version
             - name: Extract release notes
               id: extract_release_notes
-              uses: ffurrer2/extract-release-notes@v1
+              uses: ffurrer2/extract-release-notes@v3
             - name: Create release
-              uses: softprops/action-gh-release@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: softprops/action-gh-release@v2
               with:
                   tag_name: v${{ env.VERSION_NAME }}
                   name: v${{ env.VERSION_NAME }}

@@ -4,7 +4,6 @@ import { eq, lt } from 'drizzle-orm';
 import type { ExerciseId } from '../schema.js';
 import { exerciseTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
-import { onlySingle } from '../services/database-service.js';
 import type {
     ParticipantKey,
     TrainerKey,
@@ -28,7 +27,7 @@ export class ExerciseRepository extends BaseRepository {
             .from(exerciseTable)
             .where(eq(exerciseTable.trainerId, trainerKey));
 
-        return onlySingle(dbResult);
+        return this.onlySingle(dbResult);
     }
 
     /**
@@ -40,7 +39,7 @@ export class ExerciseRepository extends BaseRepository {
             .from(exerciseTable)
             .where(eq(exerciseTable.participantId, participantKey));
 
-        return onlySingle(dbResult);
+        return this.onlySingle(dbResult);
     }
 
     public getAllExercises() {

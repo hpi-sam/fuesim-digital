@@ -20,7 +20,7 @@ export class AuthHttpRouter extends HttpRouter {
             } catch {
                 res.redirect(
                     toFrontend(undefined, {
-                        loginfailure: 'Anmeldung fehlgeschlagen',
+                        loginFailure: 'Anmeldung fehlgeschlagen',
                     })
                 );
             }
@@ -32,7 +32,7 @@ export class AuthHttpRouter extends HttpRouter {
             } catch {
                 res.redirect(
                     toFrontend(undefined, {
-                        loginfailure: 'Anmeldung fehlgeschlagen',
+                        loginFailure: 'Anmeldung fehlgeschlagen',
                     })
                 );
             }
@@ -44,7 +44,7 @@ export class AuthHttpRouter extends HttpRouter {
             } catch {
                 res.redirect(
                     toFrontend(undefined, {
-                        loginfailure: 'Anmeldung fehlgeschlagen',
+                        loginFailure: 'Anmeldung fehlgeschlagen',
                     })
                 );
             }
@@ -100,7 +100,7 @@ export class AuthHttpRouter extends HttpRouter {
             } catch {
                 res.redirect(
                     toFrontend(undefined, {
-                        loginfailure:
+                        loginFailure:
                             'Benutzer-Selbstverwaltung fehlgeschlagen',
                     })
                 );
@@ -139,7 +139,7 @@ export class AuthHttpRouter extends HttpRouter {
                 req.cookies[this.authService.SESSION_COOKIE_NAME];
             if (!sessionToken) {
                 res.redirect(
-                    toFrontend(undefined, { logoutstatus: 'nosessionfound' })
+                    toFrontend(undefined, { logoutStatus: 'noSessionFound' })
                 );
                 return;
             }
@@ -152,7 +152,7 @@ export class AuthHttpRouter extends HttpRouter {
                 await this.authService.oidcService.getSingleSignOutUrl();
             if (!logoutUrl) {
                 res.redirect(
-                    toFrontend(undefined, { logoutstatus: 'loggedout' })
+                    toFrontend(undefined, { logoutStatus: 'loggedOut' })
                 );
                 return;
             }

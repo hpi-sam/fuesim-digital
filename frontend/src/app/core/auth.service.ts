@@ -3,6 +3,7 @@ import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+    AuthQueryParams,
     UserDataResponse,
     userDataResponseSchema,
 } from 'digital-fuesim-manv-shared';
@@ -76,23 +77,23 @@ export class AuthService {
     }
 
     private handleAuthMessageToast() {
-        this.route.queryParams.subscribe((params) => {
-            switch (params['logoutstatus']) {
-                case 'loggedout':
+        this.route.queryParams.subscribe((params: AuthQueryParams) => {
+            switch (params['logoutStatus']) {
+                case 'loggedOut':
                     this.messageService.postMessage({
                         title: 'Erfolgreich abgemeldet',
                         color: 'info',
                         body: 'Sie wurden erfolgreich abgemeldet.',
                     });
                     break;
-                case 'nosessionfound':
+                case 'noSessionFound':
                     this.messageService.postMessage({
                         title: 'Abmeldung fehlgeschlagen',
                         color: 'warning',
                         body: 'Es wurde keine aktive Sitzung gefunden.',
                     });
                     break;
-                case 'sessionexpired':
+                case 'sessionExpired':
                     this.messageService.postMessage({
                         title: 'Sitzung abgelaufen',
                         color: 'warning',
@@ -101,15 +102,15 @@ export class AuthService {
                     break;
             }
 
-            if (params['loginfailure'] !== undefined) {
+            if (params['loginFailure'] !== undefined) {
                 this.messageService.postMessage({
                     color: 'danger',
                     title: 'Login fehlgeschlagen',
-                    body: params['loginfailure'],
+                    body: params['loginFailure'],
                 });
             }
 
-            if (params['loginsuccess'] !== undefined) {
+            if (params['loginSuccess'] !== undefined) {
                 this.messageService.postMessage({
                     color: 'success',
                     title: 'Login erfolgreich',
@@ -119,9 +120,9 @@ export class AuthService {
 
             this.router.navigate([], {
                 queryParams: {
-                    loginfailure: null,
-                    logoutstatus: null,
-                    loginsuccess: null,
+                    loginFailure: null,
+                    logoutStatus: null,
+                    loginSuccess: null,
                 },
                 queryParamsHandling: 'merge',
             });

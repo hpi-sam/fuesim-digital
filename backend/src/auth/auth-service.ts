@@ -35,16 +35,16 @@ export class AuthService {
         user: OidcService.UserInfo;
         accessToken: string;
     }): Promise<string> {
-        return this.userRepository.transaction(async (userRepoTrans) => {
-            await userRepoTrans.upsertUser({
+        return this.userRepository.transaction(async (userRepoTransaction) => {
+            await userRepoTransaction.upsertUser({
                 id: data.user.id,
                 displayName: data.user.displayName,
                 username: data.user.username,
             });
 
-            const sessionRepoTrans =
-                this.sessionRepository.withConnection(userRepoTrans);
-            const sessionToken = await sessionRepoTrans.createSession({
+            const sessionRepoTransaction =
+                this.sessionRepository.withConnection(userRepoTransaction);
+            const sessionToken = await sessionRepoTransaction.createSession({
                 validityDurationSeconds: this.SESSION_DURATION_S,
                 accessToken: data.accessToken,
                 userId: data.user.id,

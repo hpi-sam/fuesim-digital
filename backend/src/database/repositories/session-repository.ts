@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 import { and, eq, gt, lte } from 'drizzle-orm';
 import { sessionTable } from '../schema.js';
-import { onlySingle } from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
 
 export class SessionRepository extends BaseRepository {
@@ -38,7 +37,7 @@ export class SessionRepository extends BaseRepository {
             )
             .limit(1);
 
-        return onlySingle(session);
+        return this.onlySingle(session);
     }
 
     public async deleteSessionById(sessionId: string) {

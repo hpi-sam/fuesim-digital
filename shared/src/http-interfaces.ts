@@ -27,7 +27,7 @@ export const userDataResponseSchema = z.object({
 export type UserDataResponse = z.infer<typeof userDataResponseSchema>;
 
 export interface AuthQueryParams {
-    logoutstatus?: 'loggedout' | 'nosessionfound' | 'sessionexpired';
-    loginfailure?: string;
-    loginsuccess?: boolean;
+    logoutStatus?: 'loggedOut' | 'noSessionFound' | 'sessionExpired';
+    loginFailure?: string;
+    loginSuccess?: boolean;
 }

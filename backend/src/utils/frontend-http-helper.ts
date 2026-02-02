@@ -3,14 +3,14 @@ import { Config } from '../config.js';
 
 export function toFrontend(path: string = '', data?: AuthQueryParams): string {
     const url = new URL(Config.httpFrontendUrl + path);
-    if (data?.logoutstatus) {
-        url.searchParams.append('logoutstatus', data.logoutstatus);
+    if (data?.logoutStatus) {
+        url.searchParams.append('logoutStatus', data.logoutStatus);
     }
-    if (data?.loginfailure) {
-        url.searchParams.append('loginfailure', data.loginfailure);
+    if (data?.loginFailure) {
+        url.searchParams.append('loginFailure', data.loginFailure);
     }
-    if (data?.loginsuccess) {
-        url.searchParams.append('loginsuccess', 'true');
+    if (data?.loginSuccess) {
+        url.searchParams.append('loginSuccess', 'true');
     }
     return url.toString();
 }

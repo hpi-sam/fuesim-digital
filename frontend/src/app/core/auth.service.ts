@@ -78,7 +78,7 @@ export class AuthService {
 
     private handleAuthMessageToast() {
         this.route.queryParams.subscribe((params: AuthQueryParams) => {
-            switch (params['logoutStatus']) {
+            switch (params.logoutStatus) {
                 case 'loggedOut':
                     this.messageService.postMessage({
                         title: 'Erfolgreich abgemeldet',
@@ -100,17 +100,19 @@ export class AuthService {
                         body: 'Ihre Sitzung ist abgelaufen.',
                     });
                     break;
+                default:
+                    break;
             }
 
-            if (params['loginFailure'] !== undefined) {
+            if (params.loginFailure !== undefined) {
                 this.messageService.postMessage({
                     color: 'danger',
                     title: 'Login fehlgeschlagen',
-                    body: params['loginFailure'],
+                    body: params.loginFailure,
                 });
             }
 
-            if (params['loginSuccess'] !== undefined) {
+            if (params.loginSuccess !== undefined) {
                 this.messageService.postMessage({
                     color: 'success',
                     title: 'Login erfolgreich',

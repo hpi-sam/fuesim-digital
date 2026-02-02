@@ -9,7 +9,7 @@ export abstract class BaseRepository {
         protected readonly databaseConnection:
             | DatabaseConnection
             | DatabaseTransaction
-    ) { }
+    ) {}
 
     /**
      * Starts a new transaction

@@ -27,7 +27,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
@@ -47,7 +47,7 @@ jobs:
         needs: build-shared
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
@@ -63,7 +63,7 @@ jobs:
         needs: build-shared
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
@@ -79,7 +79,7 @@ jobs:
         needs: build-shared
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
@@ -100,7 +100,7 @@ jobs:
         continue-on-error: true
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - uses: actions/setup-node@v6
               with:
                   node-version: ${{ env.NODE_VERSION }}
@@ -147,7 +147,7 @@ jobs:
                     --tmpfs /var/lib/postgresql/data
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
             - uses: actions/setup-node@v6
@@ -211,7 +211,9 @@ jobs:
                     --tmpfs /var/lib/postgresql/data
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
+              with:
+                  submodules: true
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
             - uses: actions/setup-node@v6
@@ -267,7 +269,7 @@ jobs:
             fail-fast: false
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
             - uses: actions/setup-node@v6
@@ -338,7 +340,7 @@ jobs:
         if: github.ref == 'refs/heads/dev'
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version
@@ -364,7 +366,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - uses: ./.github/actions/extract-version
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Login to docker
@@ -390,7 +392,7 @@ jobs:
         permissions:
             contents: write
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - uses: ./.github/actions/extract-version
             - name: Extract release notes
               id: extract_release_notes

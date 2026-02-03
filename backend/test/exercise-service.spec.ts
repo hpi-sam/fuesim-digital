@@ -17,7 +17,7 @@ describe('Exercise-Service', () => {
         const exercideIds = await createExercise(environment);
         const exercise = environment.exerciseService.getExerciseByKey(
             exercideIds.trainerId
-        )!;
+        );
         const markAsAboutToBeSaved =
             exercise.markAsAboutToBeSaved.bind(exercise);
 

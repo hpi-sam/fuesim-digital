@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { type Vehicle } from '../../../../../../../../../../shared/dist/models/vehicle';
 import { CdkDrag } from '@angular/cdk/drag-drop';
+import { type Vehicle } from 'digital-fuesim-manv-shared';
 
 @Component({
     // We need to do it this way, to avoid cdkDragDrop issues
@@ -11,7 +11,7 @@ import { CdkDrag } from '@angular/cdk/drag-drop';
     hostDirectives: [CdkDrag],
 })
 export class VehicleTagComponent implements OnInit {
-    private cdkDrag = inject(CdkDrag);
+    private readonly cdkDrag = inject(CdkDrag);
 
     @Input()
     public vehicle!: Vehicle;

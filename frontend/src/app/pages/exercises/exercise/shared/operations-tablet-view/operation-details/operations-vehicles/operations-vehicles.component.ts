@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs';
-import { AppState } from '../../../../../../../state/app.state';
-import { selectVehiclesInTransfer } from '../../../../../../../state/application/selectors/exercise.selectors';
-import { selectVisibleVehicles } from '../../../../../../../state/application/selectors/shared.selectors';
+import { AppState } from 'src/app/state/app.state';
+import { selectVehiclesInTransfer } from 'src/app/state/application/selectors/exercise.selectors';
+import { selectVisibleVehicles } from 'src/app/state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-operations-vehicles',

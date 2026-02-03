@@ -179,14 +179,13 @@ export function createSelectReachableHospitals(transferPointId: UUID) {
 export function createSelectVehiclesInOperationalSection(
     operationalSectionId: UUID
 ) {
-    return createSelector(
-        selectVehicles,
-        (vehicles) =>
-            Object.values(vehicles).filter(
-                (vehicle) =>
-                    vehicle.operationalAssignment?.type === "operationalSection" && vehicle.operationalAssignment.sectionId === operationalSectionId
-            )
-    )
+    return createSelector(selectVehicles, (vehicles) =>
+        Object.values(vehicles).filter(
+            (vehicle) =>
+                vehicle.operationalAssignment?.type === 'operationalSection' &&
+                vehicle.operationalAssignment.sectionId === operationalSectionId
+        )
+    );
 }
 
 export const selectVehiclesInTransfer = createSelector(

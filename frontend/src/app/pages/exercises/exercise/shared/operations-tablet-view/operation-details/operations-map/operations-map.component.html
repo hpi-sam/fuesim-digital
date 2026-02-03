@@ -3,12 +3,19 @@
 >
     <div class="flex-grow-1" #mapContainer></div>
     <div class="d-flex flex-row gap-1">
-        <button class="btn btn-sm rounded-0 px-3"
-        [class.btn-success]="is3dBuildingsEnabled"
-        [class.btn-light]="!is3dBuildingsEnabled"
-        (click)="toggle3DBuildings()">3D</button>
+        <button
+            class="btn btn-sm rounded-0 px-3"
+            [class.btn-success]="is3dBuildingsEnabled"
+            [class.btn-light]="!is3dBuildingsEnabled"
+            (click)="toggle3DBuildings()"
+        >
+            3D
+        </button>
         @for (viewport of availableViewports$ | async; track viewport.id) {
-            <button class="btn btn-sm btn-light rounded-0 px-3" (click)="switchViewToViewport(viewport)">
+            <button
+                class="btn btn-sm btn-light rounded-0 px-3"
+                (click)="switchViewToViewport(viewport)"
+            >
                 {{ viewport.name }}
             </button>
         }

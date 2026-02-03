@@ -1,10 +1,17 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { currentCoordinatesOf, defaultTileMapProperties, lowerRightCornerOf, upperLeftCornerOf, Viewport } from 'digital-fuesim-manv-shared';
-import maplibregl, { MercatorCoordinate } from 'maplibre-gl';
-import { AppState } from '../../../../../../../state/app.state';
-import { selectViewports } from '../../../../../../../state/application/selectors/exercise.selectors';
+import {
+    defaultTileMapProperties,
+    lowerRightCornerOf,
+    upperLeftCornerOf,
+    Viewport,
+} from 'digital-fuesim-manv-shared';
+import maplibregl from 'maplibre-gl';
+// eslint-disable-next-line no-restricted-imports
+import 'maplibre-gl/dist/maplibre-gl.css';
 import { map } from 'rxjs';
+import { AppState } from 'src/app/state/app.state';
+import { selectViewports } from 'src/app/state/application/selectors/exercise.selectors';
 import { startingPosition } from '../../../starting-position';
 
 @Component({
@@ -24,8 +31,11 @@ export class OperationsMapComponent implements OnInit {
     public mapContainerRef: ElementRef<HTMLElement> | undefined;
     private map: maplibregl.Map | undefined;
     public is3dBuildingsEnabled = true;
-    private savedViewSettings: {bearing: number, pitch: number} = {bearing: -15, pitch: 37};
-    private readonly MAX_PITCH_3D_BUILDINGS = 60;
+    private readonly savedViewSettings: { bearing: number; pitch: number } = {
+        bearing: -15,
+        pitch: 37,
+    };
+    public readonly MAX_PITCH_3D_BUILDINGS = 60;
 
     public switchViewToViewport(viewport: Viewport) {
         if (!this.map) return;
@@ -35,16 +45,19 @@ export class OperationsMapComponent implements OnInit {
         const ulCorner = upperLeftCornerOf(viewport);
         const lrCorner = lowerRightCornerOf(viewport);
 
-        this.map?.fitBounds([
-            {
-                lat: this.metersToLngLat([ulCorner.x, ulCorner.y])[1],
-                lng: this.metersToLngLat([ulCorner.x, ulCorner.y])[0],
-            },
-            {
-                lat: this.metersToLngLat([lrCorner.x, lrCorner.y])[1],
-                lng: this.metersToLngLat([lrCorner.x, lrCorner.y])[0],
-            }
-        ], {animate: true, padding: 50, duration: 500});
+        this.map.fitBounds(
+            [
+                {
+                    lat: this.metersToLngLat([ulCorner.x, ulCorner.y])[1],
+                    lng: this.metersToLngLat([ulCorner.x, ulCorner.y])[0],
+                },
+                {
+                    lat: this.metersToLngLat([lrCorner.x, lrCorner.y])[1],
+                    lng: this.metersToLngLat([lrCorner.x, lrCorner.y])[0],
+                },
+            ],
+            { animate: true, padding: 50, duration: 500 }
+        );
     }
 
     public toggle3DBuildings() {
@@ -54,16 +67,20 @@ export class OperationsMapComponent implements OnInit {
         const visibility = this.is3dBuildingsEnabled ? 'visible' : 'none';
 
         this.map.setLayoutProperty('3d-buildings', 'visibility', visibility);
-        this.map.setLayoutProperty('building-outline', 'visibility', visibility);
+        this.map.setLayoutProperty(
+            'building-outline',
+            'visibility',
+            visibility
+        );
 
-        if(this.is3dBuildingsEnabled) {
+        if (this.is3dBuildingsEnabled) {
             this.map.setMaxPitch(this.MAX_PITCH_3D_BUILDINGS);
             this.map.setPitch(this.savedViewSettings.pitch);
             this.map.setBearing(this.savedViewSettings.bearing);
             this.map.touchPitch.enable();
-        }else{
-            this.savedViewSettings.bearing = this.map.getBearing()
-            this.savedViewSettings.pitch = this.map.getPitch()
+        } else {
+            this.savedViewSettings.bearing = this.map.getBearing();
+            this.savedViewSettings.pitch = this.map.getPitch();
 
             this.map.setPitch(0);
             this.map.setBearing(0);
@@ -73,10 +90,11 @@ export class OperationsMapComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        console.log('Initializing operations map');
-
+        if (!this.mapContainerRef) {
+            throw new Error('Map container reference is undefined');
+        }
         this.map = new maplibregl.Map({
-            container: this.mapContainerRef?.nativeElement!,
+            container: this.mapContainerRef.nativeElement,
             style: {
                 version: 8,
                 sources: {
@@ -122,7 +140,7 @@ export class OperationsMapComponent implements OnInit {
                             'fill-extrusion-color': 'lightgray',
                             'fill-extrusion-height': ['get', 'render_height'],
                             'fill-extrusion-base': ['get', 'render_min_height'],
-                            'fill-extrusion-vertical-gradient': true, // Adds gradient from bottom to top
+                            'fill-extrusion-vertical-gradient': true,
                         },
                     },
                 ],
@@ -144,20 +162,20 @@ export class OperationsMapComponent implements OnInit {
     // conversion from EPSG:3857 (what OpenLayers uses) to 4326 (MapLibre)
     // https://stackoverflow.com/a/70201137
     metersToLngLat(coords: [number, number]): [number, number] {
-        const e_value = 2.7182818284;
-        const X = 20037508.34;
+        const eValue = 2.7182818284;
+        const x = 20037508.34;
 
         const lat3857 = coords[1];
         const long3857 = coords[0];
 
-        //converting the longitute from epsg 3857 to 4326
-        const long4326 = (long3857 * 180) / X;
+        // converting the longitute from epsg 3857 to 4326
+        const long4326 = (long3857 * 180) / x;
 
-        //converting the latitude from epsg 3857 to 4326 split in multiple lines for readability
-        let lat4326 = lat3857 / (X / 180);
+        // converting the latitude from epsg 3857 to 4326 split in multiple lines for readability
+        let lat4326 = lat3857 / (x / 180);
         const exponent = (Math.PI / 180) * lat4326;
 
-        lat4326 = Math.atan(Math.pow(e_value, exponent));
+        lat4326 = Math.atan(Math.pow(eValue, exponent));
         lat4326 = lat4326 / (Math.PI / 360); // Here is the fixed line
         lat4326 = lat4326 - 90;
 

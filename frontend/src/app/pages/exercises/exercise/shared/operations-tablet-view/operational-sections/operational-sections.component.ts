@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { ExerciseService } from '../../../../../../core/exercise.service';
 import { Store } from '@ngrx/store';
-import { AppState } from '../../../../../../state/app.state';
-import { selectOperationalSections } from '../../../../../../state/application/selectors/exercise.selectors';
 import { map } from 'rxjs';
 import { uuid } from 'digital-fuesim-manv-shared';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import { AppState } from 'src/app/state/app.state';
+import { selectOperationalSections } from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-operational-sections-tab',
@@ -20,7 +20,7 @@ export class OperationalSectionsTabComponent {
 
     public readonly operationalSections$ = this.store
         .select(selectOperationalSections)
-        .pipe(map((sectionsMap) => Object.values(sectionsMap)),map(s=>{console.log({s}); return s;}));
+        .pipe(map((sectionsMap) => Object.values(sectionsMap)));
 
     public addOperationalSection(): void {
         console.log(uuid());

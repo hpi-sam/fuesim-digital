@@ -11,9 +11,8 @@ $innerBoxPadding: 12px;
 $vehicleTagGap: 8px;
 $borderSize: 2px;
 
-$innerContainerWidth: 2 * ($vehicleTagWidth + $innerBoxPadding + $borderSize) + $vehicleTagGap;
+$innerContainerWidth: 2 * ($vehicleTagWidth + $innerBoxPadding + $borderSize) +
+    $vehicleTagGap;
 $containerWidth: $innerContainerWidth + (2 * $outerBoxPadding);
 
 $innerContainerColor: bootstrap.$gray-100;
-
-

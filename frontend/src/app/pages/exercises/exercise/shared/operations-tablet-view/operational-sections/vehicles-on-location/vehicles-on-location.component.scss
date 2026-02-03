@@ -15,7 +15,8 @@
 }
 
 .onLocationVehiclesContainer {
-    height: (2 * vars.$vehicleTagHeight) + vars.$vehicleTagGap + (2 * vars.$innerBoxPadding);
+    height: (2 * vars.$vehicleTagHeight) + vars.$vehicleTagGap +
+        (2 * vars.$innerBoxPadding);
     padding: vars.$innerBoxPadding;
     display: flex;
     flex-wrap: wrap;

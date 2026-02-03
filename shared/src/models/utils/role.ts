@@ -8,8 +8,8 @@ export const roleAllowedValues: AllowedValues<Role> = {
 export type SpecificRole =
     | 'eoc'
     | 'mapOperator'
-    | 'trainer'
-    | 'operationsTablet';
+    | 'operationsTablet'
+    | 'trainer';
 export const specificRoleAllowedValues: AllowedValues<SpecificRole> = {
     mapOperator: true,
     eoc: true,

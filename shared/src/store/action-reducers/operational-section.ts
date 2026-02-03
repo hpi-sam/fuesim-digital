@@ -4,7 +4,6 @@ import { IsValue } from '../../utils/validators/is-value.js';
 import { Action, ActionReducer } from '../action-reducer.js';
 import {
     localOperationsCommandAssignmentSchema,
-    operationalAssignmentSchema,
     operationalSectionAssignmentSchema,
     operationalSectionSchema,
 } from '../../models/operational-section.js';
@@ -66,137 +65,139 @@ export class AssingLocalOperationsCommandAction implements Action {
 
 export namespace OperationalSectionActionReducers {
     export const addOperationalSection: ActionReducer<AddOperationalSectionAction> =
-    {
-        action: AddOperationalSectionAction,
-        reducer: (draftState, { sectionId, title }) => {
-            if (draftState.operationalSections[sectionId]) {
+        {
+            action: AddOperationalSectionAction,
+            reducer: (draftState, { sectionId, title }) => {
+                if (draftState.operationalSections[sectionId]) {
+                    return draftState;
+                }
+
+                const newSection = operationalSectionSchema.parse({
+                    type: 'operationalSection',
+                    id: sectionId,
+                    title,
+                });
+
+                draftState.operationalSections[sectionId] = newSection;
+
                 return draftState;
-            }
-
-            const newSection = operationalSectionSchema.parse({
-                type: 'operationalSection',
-                id: sectionId,
-                title: title,
-            });
-
-            draftState.operationalSections[sectionId] = newSection;
-
-            return draftState;
-        },
-        rights: 'operationsTablet',
-    };
+            },
+            rights: 'operationsTablet',
+        };
 
     export const renameOperationalSection: ActionReducer<RenameOperationalSectionAction> =
-    {
-        action: RenameOperationalSectionAction,
-        reducer: (draftState, { sectionId, newTitle }) => {
-            const section = draftState.operationalSections[sectionId];
-            if (!section) { return draftState; }
-
-            section.title = newTitle;
-
-            return draftState;
-        },
-        rights: 'operationsTablet',
-    };
-
-    export const removeOperationalSection: ActionReducer<RemoveOperationalSectionAction> =
-    {
-        action: RemoveOperationalSectionAction,
-        reducer: (draftState, { sectionId }) => {
-
-            const section = draftState.operationalSections[sectionId];
-            if (!section) { return draftState; }
-
-            delete draftState.operationalSections[sectionId];
-
-            return draftState;
-
-        },
-        rights: 'operationsTablet',
-    };
-
-    export const moveVehicleToOperationalSection: ActionReducer<MoveVehicleToOperationalSectionAction> =
-    {
-        action: MoveVehicleToOperationalSectionAction,
-        reducer: (
-            draftState,
-            { sectionId, vehicleId, assignAsSectionLeader }
-        ) => {
-            if (sectionId) {
+        {
+            action: RenameOperationalSectionAction,
+            reducer: (draftState, { sectionId, newTitle }) => {
                 const section = draftState.operationalSections[sectionId];
                 if (!section) {
                     return draftState;
                 }
-            }
 
-            const vehicle = draftState.vehicles[vehicleId];
-            if (!vehicle) {
+                section.title = newTitle;
+
                 return draftState;
-            }
+            },
+            rights: 'operationsTablet',
+        };
 
-            if (assignAsSectionLeader) {
-                const sectionHasLeader = Object.values(
+    export const removeOperationalSection: ActionReducer<RemoveOperationalSectionAction> =
+        {
+            action: RemoveOperationalSectionAction,
+            reducer: (draftState, { sectionId }) => {
+                const section = draftState.operationalSections[sectionId];
+                if (!section) {
+                    return draftState;
+                }
+
+                delete draftState.operationalSections[sectionId];
+
+                return draftState;
+            },
+            rights: 'operationsTablet',
+        };
+
+    export const moveVehicleToOperationalSection: ActionReducer<MoveVehicleToOperationalSectionAction> =
+        {
+            action: MoveVehicleToOperationalSectionAction,
+            reducer: (
+                draftState,
+                { sectionId, vehicleId, assignAsSectionLeader }
+            ) => {
+                if (sectionId) {
+                    const section = draftState.operationalSections[sectionId];
+                    if (!section) {
+                        return draftState;
+                    }
+                }
+
+                const vehicle = draftState.vehicles[vehicleId];
+                if (!vehicle) {
+                    return draftState;
+                }
+
+                if (assignAsSectionLeader) {
+                    const sectionHasLeader = Object.values(
+                        draftState.vehicles
+                    ).some(
+                        (v) =>
+                            v.operationalAssignment?.type ===
+                                'operationalSection' &&
+                            v.operationalAssignment.role ===
+                                'operationalSectionLeader' &&
+                            v.operationalAssignment.sectionId === sectionId
+                    );
+                    if (sectionHasLeader) {
+                        throw new Error(
+                            `Operational Section with id ${sectionId} already has a leader assigned.`
+                        );
+                    }
+                }
+
+                vehicle.operationalAssignment =
+                    sectionId === null
+                        ? null
+                        : operationalSectionAssignmentSchema.parse({
+                              type: 'operationalSection',
+                              role: assignAsSectionLeader
+                                  ? 'operationalSectionLeader'
+                                  : 'operationalSectionMember',
+                              sectionId,
+                          });
+
+                return draftState;
+            },
+            rights: 'operationsTablet',
+        };
+
+    export const assignLocalOperationsCommand: ActionReducer<AssingLocalOperationsCommandAction> =
+        {
+            action: AssingLocalOperationsCommandAction,
+            reducer: (draftState, { vehicleId }) => {
+                const vehicle = draftState.vehicles[vehicleId];
+
+                if (!vehicle) {
+                    return draftState;
+                }
+
+                const localOperationsCommandAssigned = Object.values(
                     draftState.vehicles
                 ).some(
                     (v) =>
                         v.operationalAssignment?.type ===
-                        'operationalSection' &&
-                        v.operationalAssignment.role ===
-                        'operationalSectionLeader' &&
-                        v.operationalAssignment.sectionId === sectionId
+                        'localOperationsCommand'
                 );
-                if (sectionHasLeader) {
-                    throw new Error(
-                        `Operational Section with id ${sectionId} already has a leader assigned.`
-                    );
+                if (localOperationsCommandAssigned) {
+                    return draftState;
                 }
-            }
 
-            vehicle.operationalAssignment =
-                sectionId == null
-                    ? null
-                    : operationalSectionAssignmentSchema.parse({
-                        type: "operationalSection",
-                        role: assignAsSectionLeader
-                            ? 'operationalSectionLeader'
-                            : 'operationalSectionMember',
-                        sectionId: sectionId,
+                vehicle.operationalAssignment =
+                    localOperationsCommandAssignmentSchema.parse({
+                        type: 'localOperationsCommand',
                     });
 
-            return draftState;
-        },
-        rights: 'operationsTablet',
-    };
-
-    export const assignLocalOperationsCommand: ActionReducer<AssingLocalOperationsCommandAction> =
-    {
-        action: AssingLocalOperationsCommandAction,
-        reducer: (draftState, { vehicleId }) => {
-            const vehicle = draftState.vehicles[vehicleId];
-
-            if (!vehicle) {
                 return draftState;
-            }
-
-            const localOperationsCommandAssigned = Object.values(
-                draftState.vehicles
-            ).some(
-                (v) =>
-                    v.operationalAssignment?.type ===
-                    'localOperationsCommand'
-            );
-            if (localOperationsCommandAssigned) {
-                return draftState;
-            }
-
-            vehicle.operationalAssignment =
-                localOperationsCommandAssignmentSchema.parse({
-                    type: 'localOperationsCommand',
-                });
-
-            return draftState;
-        },
-        rights: 'operationsTablet',
-    };
+            },
+            rights: 'operationsTablet',
+        };
 }

@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
-import { ExerciseService } from '../../../../../../../core/exercise.service';
 import { createSelector, Store } from '@ngrx/store';
-import { AppState } from '../../../../../../../state/app.state';
-import { selectVehicles } from '../../../../../../../state/application/selectors/exercise.selectors';
-import { map } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { selectVisibleVehicles } from '../../../../../../../state/application/selectors/shared.selectors';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import { AppState } from 'src/app/state/app.state';
+import { selectVisibleVehicles } from 'src/app/state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-vehicles-on-location',
@@ -20,11 +18,11 @@ export class VehiclesOnLocationComponent {
     ) {}
 
     public readonly vehicles$ = this.store.select(
-        createSelector(selectVisibleVehicles, (vehicles) => {
-            return Object.values(vehicles).filter(
+        createSelector(selectVisibleVehicles, (vehicles) =>
+            Object.values(vehicles).filter(
                 (vehicle) => vehicle.operationalAssignment === null
-            );
-        })
+            )
+        )
     );
 
     public onVehicleDropped(event: CdkDragDrop<string[]>) {

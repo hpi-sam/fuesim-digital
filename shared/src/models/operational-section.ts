@@ -1,5 +1,4 @@
 import * as z from 'zod';
-import { uuid } from '../utils/uuid.js';
 
 export const operationalSectionSchema = z.object({
     type: z.literal('operationalSection'),

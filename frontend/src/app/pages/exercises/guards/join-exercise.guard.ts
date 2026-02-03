@@ -54,7 +54,7 @@ export class JoinExerciseGuard {
         if (route.queryParams['autojoin']) {
             successfullyJoined = await this.applicationService.joinExercise(
                 exerciseId,
-                route.queryParams['autojoin'] || 'Gast'
+                route.queryParams['autojoin'] ?? 'Gast'
             );
         } else {
             successfullyJoined = await tryToJoinExercise(

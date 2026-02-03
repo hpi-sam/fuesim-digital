@@ -70,8 +70,8 @@ import { ExerciseStateBadgeModule } from './shared/exercise-state-badge/exercise
         NgbTooltipModule,
         NgbAccordionModule,
         OperationsTabletViewModule,
-        ExerciseStateBadgeModule
+        ExerciseStateBadgeModule,
     ],
     providers: [provideHttpClient(withInterceptorsFromDi())],
 })
-export class ExerciseModule { }
+export class ExerciseModule {}

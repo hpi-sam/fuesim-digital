@@ -1,12 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import { AppState } from '../../../../../../../state/app.state';
-import { createSelectVehiclesInOperationalSection, selectVehicles } from '../../../../../../../state/application/selectors/exercise.selectors';
-import { type OperationalSection } from '../../../../../../../../../../shared/dist/models/operational-section';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ExerciseService } from '../../../../../../../core/exercise.service';
-import { first, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Vehicle } from 'digital-fuesim-manv-shared';
+import { AppState } from 'src/app/state/app.state';
+import { createSelectVehiclesInOperationalSection } from 'src/app/state/application/selectors/exercise.selectors';
+import { type OperationalSection } from 'digital-fuesim-manv-shared';
+import { ExerciseService } from 'src/app/core/exercise.service';
 
 @Component({
     selector: 'app-operational-section-container',
@@ -18,36 +18,48 @@ export class OperationalSectionContainerComponent implements OnInit {
     constructor(
         private readonly exerciseService: ExerciseService,
         private readonly store: Store<AppState>
-    ) { }
+    ) {}
 
     @Input()
     public operationalSection!: OperationalSection;
 
     public operationalSectionMembers$?: Observable<Vehicle[]>;
 
-
     public operationalSectionLeader$?: Observable<Vehicle | undefined>;
 
-
     ngOnInit() {
-        this.operationalSectionLeader$ = this.store.select(
-            createSelector(createSelectVehiclesInOperationalSection(this.operationalSection.id), (vehicles) => {
-                return Object.values(vehicles).filter(
-                    (vehicle) =>
-                        vehicle.operationalAssignment?.type === "operationalSection" &&
-                        vehicle.operationalAssignment.role === "operationalSectionLeader"
-                );
-            })
-        ).pipe(map(vehicles => vehicles[0]));
+        this.operationalSectionLeader$ = this.store
+            .select(
+                createSelector(
+                    createSelectVehiclesInOperationalSection(
+                        this.operationalSection.id
+                    ),
+                    (vehicles) =>
+                        Object.values(vehicles).filter(
+                            (vehicle) =>
+                                vehicle.operationalAssignment?.type ===
+                                    'operationalSection' &&
+                                vehicle.operationalAssignment.role ===
+                                    'operationalSectionLeader'
+                        )
+                )
+            )
+            .pipe(map((vehicles) => vehicles[0]));
 
         this.operationalSectionMembers$ = this.store.select(
-            createSelector(createSelectVehiclesInOperationalSection(this.operationalSection.id), (vehicles) => {
-                return Object.values(vehicles).filter(
-                    (vehicle) =>
-                        vehicle.operationalAssignment?.type === "operationalSection" &&
-                        vehicle.operationalAssignment.role === "operationalSectionMember"
-                );
-            })
+            createSelector(
+                createSelectVehiclesInOperationalSection(
+                    this.operationalSection.id
+                ),
+                (vehicles) =>
+                    Object.values(vehicles).filter(
+                        (vehicle) =>
+                            vehicle.operationalAssignment?.type ===
+                                'operationalSection' &&
+                            vehicle.operationalAssignment.role ===
+                                'operationalSectionMember'
+                    )
+            )
         );
     }
 
@@ -62,7 +74,7 @@ export class OperationalSectionContainerComponent implements OnInit {
             {
                 type: '[OperationalSection] Move Vehicle To Operational Section',
                 sectionId: this.operationalSection.id,
-                vehicleId: vehicleId,
+                vehicleId,
                 assignAsSectionLeader: asSectionLeader,
             },
             true
@@ -70,21 +82,17 @@ export class OperationalSectionContainerComponent implements OnInit {
     }
 
     public updateOperationalSectionTitle(newTitle: string) {
-        this.exerciseService.proposeAction(
-            {
-                type: "[OperationalSection] Rename Operational Section",
-                sectionId: this.operationalSection.id,
-                newTitle: newTitle,
-            }
-        )
+        this.exerciseService.proposeAction({
+            type: '[OperationalSection] Rename Operational Section',
+            sectionId: this.operationalSection.id,
+            newTitle,
+        });
     }
 
     public deleteOperationalSection() {
-        this.exerciseService.proposeAction(
-            {
-                type: "[OperationalSection] Remove Operational Section",
-                sectionId: this.operationalSection.id,
-            }
-        )
+        this.exerciseService.proposeAction({
+            type: '[OperationalSection] Remove Operational Section',
+            sectionId: this.operationalSection.id,
+        });
     }
 }

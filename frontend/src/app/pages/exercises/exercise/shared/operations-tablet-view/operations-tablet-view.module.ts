@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OperationsTabletViewComponent } from './operations-tablet-view.component';
 import {
     NgbNavContent,
     NgbNav,
@@ -10,13 +9,17 @@ import {
     NgbNavLinkBase,
     NgbNavOutlet,
 } from '@ng-bootstrap/ng-bootstrap';
-import { OperationalSectionContainerComponent } from './operational-sections/operational-section-container/operational-section-container.component';
 import {
     CdkDrag,
     CdkDropList,
     CdkDropListGroup,
     DragDropModule,
 } from '@angular/cdk/drag-drop';
+import { FormsModule } from '@angular/forms';
+import { ExerciseStateBadgeModule } from '../exercise-state-badge/exercise-state-badge.module';
+import { SharedModule } from '../../../../../shared/shared.module';
+import { OperationsTabletViewComponent } from './operations-tablet-view.component';
+import { OperationalSectionContainerComponent } from './operational-sections/operational-section-container/operational-section-container.component';
 import { VehicleTagComponent } from './operational-sections/vehicle-tag/vehicle-tag.component';
 import { VehiclesOnLocationComponent } from './operational-sections/vehicles-on-location/vehicles-on-location.component';
 import { SectionLeaderSlotComponent } from './operational-sections/section-leader-slot/section-leader-slot.component';
@@ -26,10 +29,6 @@ import { OperationalSectionsTabComponent } from './operational-sections/operatio
 import { OperationsMapComponent } from './operation-details/operations-map/operations-map.component';
 import { OperationsVehiclesComponent } from './operation-details/operations-vehicles/operations-vehicles.component';
 import { OperationsVehicleItemComponent } from './operation-details/operations-vehicles/operations-vehicle-item/operations-vehicle-item.component';
-import { ExerciseModule } from '../../exercise.module';
-import { ExerciseStateBadgeModule } from '../exercise-state-badge/exercise-state-badge.module';
-import { SharedModule } from '../../../../../shared/shared.module';
-import { FormsModule } from '@angular/forms';
 
 @NgModule({
     declarations: [
@@ -60,7 +59,7 @@ import { FormsModule } from '@angular/forms';
         CdkDropListGroup,
         ExerciseStateBadgeModule,
         SharedModule,
-        FormsModule
+        FormsModule,
     ],
     exports: [OperationsTabletViewComponent],
 })

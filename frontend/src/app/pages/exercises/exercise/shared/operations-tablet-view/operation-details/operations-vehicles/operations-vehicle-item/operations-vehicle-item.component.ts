@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle } from 'digital-fuesim-manv-shared';
-import { AppState } from '../../../../../../../../state/app.state';
+import { AppState } from 'src/app/state/app.state';
 import {
     selectTransferPoints,
     selectAlarmGroups,
-} from '../../../../../../../../state/application/selectors/exercise.selectors';
+} from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-operations-vehicle-item',

@@ -40,15 +40,8 @@
         {
             "idx": 5,
             "version": "7",
-            "when": 1769435885770,
+            "when": 1770139425609,
             "tag": "0005_exercise_manager",
-            "breakpoints": true
-        },
-        {
-            "idx": 6,
-            "version": "7",
-            "when": 1769437814150,
-            "tag": "0006_exercise_user",
             "breakpoints": true
         }
     ]

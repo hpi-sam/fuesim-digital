@@ -1,6 +1,6 @@
 {
-    "id": "2bf2bc49-9694-4717-8cb3-f959bfd95ae4",
-    "prevId": "67ac496a-746b-4002-ab75-2e0a197a2267",
+    "id": "0d6d6215-c058-4e1c-a8d7-9c2709bedfd3",
+    "prevId": "03935e4c-1617-428b-b485-67b51790f12f",
     "version": "7",
     "dialect": "postgresql",
     "tables": {
@@ -106,6 +106,12 @@
                     "primaryKey": false,
                     "notNull": true
                 },
+                "user": {
+                    "name": "user",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": false
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "type": "timestamp with time zone",
@@ -135,6 +141,15 @@
             },
             "indexes": {},
             "foreignKeys": {
+                "exercise_entity_user_users_id_fk": {
+                    "name": "exercise_entity_user_users_id_fk",
+                    "tableFrom": "exercise_entity",
+                    "tableTo": "users",
+                    "columnsFrom": ["user"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
                 "exercise_entity_templateId_exercise_template_id_fk": {
                     "name": "exercise_entity_templateId_exercise_template_id_fk",
                     "tableFrom": "exercise_entity",
@@ -171,6 +186,12 @@
                     "notNull": true,
                     "default": "uuid_generate_v4()"
                 },
+                "user": {
+                    "name": "user",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "type": "timestamp with time zone",
@@ -199,7 +220,17 @@
                 }
             },
             "indexes": {},
-            "foreignKeys": {},
+            "foreignKeys": {
+                "exercise_template_user_users_id_fk": {
+                    "name": "exercise_template_user_users_id_fk",
+                    "tableFrom": "exercise_template",
+                    "tableTo": "users",
+                    "columnsFrom": ["user"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
             "compositePrimaryKeys": {},
             "uniqueConstraints": {},
             "policies": {},
@@ -226,7 +257,8 @@
                     "name": "createdAt",
                     "type": "timestamp (3)",
                     "primaryKey": false,
-                    "notNull": true
+                    "notNull": true,
+                    "default": "now()"
                 },
                 "expiresAt": {
                     "name": "expiresAt",
@@ -275,8 +307,8 @@
                     "primaryKey": false,
                     "notNull": true
                 },
-                "display_name": {
-                    "name": "display_name",
+                "displayName": {
+                    "name": "displayName",
                     "type": "varchar",
                     "primaryKey": false,
                     "notNull": true
@@ -285,7 +317,8 @@
                     "name": "updatedAt",
                     "type": "timestamp (3)",
                     "primaryKey": false,
-                    "notNull": true
+                    "notNull": true,
+                    "default": "now()"
                 }
             },
             "indexes": {},

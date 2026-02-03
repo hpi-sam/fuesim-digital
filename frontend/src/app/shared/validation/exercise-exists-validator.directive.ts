@@ -24,19 +24,19 @@ export class ExerciseExistsValidatorDirective implements AsyncValidator {
         // to not become valid without the user typing a new id.
         try {
             await this.apiService.exerciseExists(control.value);
+            return null;
+        } catch {
             return {
-                exerciseExists: {
+                exerciseDoesNotExist: {
                     id: control.value,
                 },
             };
-        } catch {
-            return null;
         }
     }
 }
 
 export interface ExerciseExistsValidatorError {
-    exerciseExists: {
+    exerciseDoesNotExist: {
         id: number;
     };
 }

@@ -11,7 +11,7 @@
     </h1>
     @if (exerciseTemplates.isLoading()) {
         <div class="row row-cols-3">
-            @for (_ of [1,2,3]; track $index) {
+            @for (_ of [1, 2, 3]; track $index) {
                 <div class="col">
                     <div class="card" aria-hidden="true">
                         <div class="card-body">
@@ -46,7 +46,9 @@
                 </div>
             } @empty {
                 <div class="flex-grow-1 bg-light p-4 rounded-3">
-                    <p class="lead">Sie haben noch keine Übungsvorlagen erstellt...</p>
+                    <p class="lead">
+                        Sie haben noch keine Übungsvorlagen erstellt...
+                    </p>
                 </div>
             }
         </div>

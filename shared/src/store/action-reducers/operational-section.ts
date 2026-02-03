@@ -20,7 +20,17 @@ export class AddOperationalSectionAction implements Action {
     public readonly title!: string;
 }
 
-//TODO: @Quixelation Implement the reducer logic
+export class RenameOperationalSectionAction implements Action {
+    @IsValue('[OperationalSection] Rename Operational Section')
+    public readonly type = '[OperationalSection] Rename Operational Section';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly sectionId!: string;
+
+    @IsString()
+    public readonly newTitle!: string;
+}
+
 export class RemoveOperationalSectionAction implements Action {
     @IsValue('[OperationalSection] Remove Operational Section')
     public readonly type = '[OperationalSection] Remove Operational Section';
@@ -59,21 +69,49 @@ export namespace OperationalSectionActionReducers {
     {
         action: AddOperationalSectionAction,
         reducer: (draftState, { sectionId, title }) => {
+            if (draftState.operationalSections[sectionId]) {
+                return draftState;
+            }
+
             const newSection = operationalSectionSchema.parse({
                 type: 'operationalSection',
                 id: sectionId,
                 title: title,
             });
 
-            if (draftState.operationalSections[sectionId]) {
-                throw new Error(
-                    `Operational Section with id ${sectionId} already exists.`
-                );
-            }
-
             draftState.operationalSections[sectionId] = newSection;
 
             return draftState;
+        },
+        rights: 'operationsTablet',
+    };
+
+    export const renameOperationalSection: ActionReducer<RenameOperationalSectionAction> =
+    {
+        action: RenameOperationalSectionAction,
+        reducer: (draftState, { sectionId, newTitle }) => {
+            const section = draftState.operationalSections[sectionId];
+            if (!section) { return draftState; }
+
+            section.title = newTitle;
+
+            return draftState;
+        },
+        rights: 'operationsTablet',
+    };
+
+    export const removeOperationalSection: ActionReducer<RemoveOperationalSectionAction> =
+    {
+        action: RemoveOperationalSectionAction,
+        reducer: (draftState, { sectionId }) => {
+
+            const section = draftState.operationalSections[sectionId];
+            if (!section) { return draftState; }
+
+            delete draftState.operationalSections[sectionId];
+
+            return draftState;
+
         },
         rights: 'operationsTablet',
     };
@@ -88,17 +126,13 @@ export namespace OperationalSectionActionReducers {
             if (sectionId) {
                 const section = draftState.operationalSections[sectionId];
                 if (!section) {
-                    throw new Error(
-                        `Operational Section with id ${sectionId} does not exist.`
-                    );
+                    return draftState;
                 }
             }
 
             const vehicle = draftState.vehicles[vehicleId];
             if (!vehicle) {
-                throw new Error(
-                    `Vehicle with id ${vehicleId} does not exist.`
-                );
+                return draftState;
             }
 
             if (assignAsSectionLeader) {
@@ -142,9 +176,7 @@ export namespace OperationalSectionActionReducers {
             const vehicle = draftState.vehicles[vehicleId];
 
             if (!vehicle) {
-                throw new Error(
-                    `Vehicle with id ${vehicleId} does not exist.`
-                );
+                return draftState;
             }
 
             const localOperationsCommandAssigned = Object.values(
@@ -155,9 +187,7 @@ export namespace OperationalSectionActionReducers {
                     'localOperationsCommand'
             );
             if (localOperationsCommandAssigned) {
-                throw new Error(
-                    'Local Operations Command is already assigned to another vehicle.'
-                );
+                return draftState;
             }
 
             vehicle.operationalAssignment =

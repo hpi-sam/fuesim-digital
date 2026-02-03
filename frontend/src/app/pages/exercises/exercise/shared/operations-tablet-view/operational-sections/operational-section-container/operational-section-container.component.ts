@@ -68,4 +68,23 @@ export class OperationalSectionContainerComponent implements OnInit {
             true
         );
     }
+
+    public updateOperationalSectionTitle(newTitle: string) {
+        this.exerciseService.proposeAction(
+            {
+                type: "[OperationalSection] Rename Operational Section",
+                sectionId: this.operationalSection.id,
+                newTitle: newTitle,
+            }
+        )
+    }
+
+    public deleteOperationalSection() {
+        this.exerciseService.proposeAction(
+            {
+                type: "[OperationalSection] Remove Operational Section",
+                sectionId: this.operationalSection.id,
+            }
+        )
+    }
 }

@@ -28,7 +28,7 @@ export class OperationalSectionsTabComponent {
             this.exerciseService.proposeAction({
                 type: '[OperationalSection] Add Operational Section',
                 sectionId: uuid(),
-                title: '???',
+                title: 'Einsatzabschnitt ???',
             });
         } catch (error) {
             console.error('Failed to add operational section:', error);

@@ -28,6 +28,8 @@ import { OperationsVehiclesComponent } from './operation-details/operations-vehi
 import { OperationsVehicleItemComponent } from './operation-details/operations-vehicles/operations-vehicle-item/operations-vehicle-item.component';
 import { ExerciseModule } from '../../exercise.module';
 import { ExerciseStateBadgeModule } from '../exercise-state-badge/exercise-state-badge.module';
+import { SharedModule } from '../../../../../shared/shared.module';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
     declarations: [
@@ -57,6 +59,8 @@ import { ExerciseStateBadgeModule } from '../exercise-state-badge/exercise-state
         CdkDropList,
         CdkDropListGroup,
         ExerciseStateBadgeModule,
+        SharedModule,
+        FormsModule
     ],
     exports: [OperationsTabletViewComponent],
 })

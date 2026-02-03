@@ -23,9 +23,6 @@ declare global {
 
 export class ApiHttpServer {
     public readonly httpServer: HttpServer;
-    /**
-     * @param uploadLimit in Megabyte can be set via ENV DFM_UPLOAD_LIMIT
-     */
     public constructor(
         app: Express,
         databaseService: DatabaseService,
@@ -64,7 +61,7 @@ export class ApiHttpServer {
         });
     }
 
-    public close(): void {
+    public close() {
         this.httpServer.close();
     }
 }

@@ -157,8 +157,9 @@
                     @if (!ownClient.isInWaitingRoom) {
                         @switch (ownClient.role.specificRole) {
                             @case ('mapOperator') {
-                                <!-- TODO: @Quixelation change this back before PROD -->
-                                <app-operations-tablet-view></app-operations-tablet-view>
+                                <app-exercise-map
+                                    class="h-100 rounded overflow-hidden"
+                                ></app-exercise-map>
                             }
                             @case ('trainer') {
                                 <app-trainer-map-editor></app-trainer-map-editor>

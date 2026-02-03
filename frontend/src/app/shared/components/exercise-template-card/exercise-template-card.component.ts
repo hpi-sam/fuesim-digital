@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import type {
-    ExerciseTemplate,
-    ExerciseTemplateCreateData,
+    GetExerciseTemplateResponseData,
+    PostExerciseTemplateRequestData,
 } from 'digital-fuesim-manv-shared';
 import { Router } from '@angular/router';
 import { ApiService } from '../../../core/api.service';
@@ -15,7 +15,7 @@ import { ConfirmationModalService } from '../../../core/confirmation-modal/confi
     standalone: false,
 })
 export class ExerciseTemplateCardComponent {
-    exerciseTemplate = input<ExerciseTemplate>();
+    exerciseTemplate = input<GetExerciseTemplateResponseData>();
     readonly updated = output();
 
     constructor(
@@ -25,7 +25,7 @@ export class ExerciseTemplateCardComponent {
         private readonly confirmationModalService: ConfirmationModalService
     ) {}
 
-    async patchExerciseTemplate(data: ExerciseTemplateCreateData) {
+    async patchExerciseTemplate(data: PostExerciseTemplateRequestData) {
         const exerciseTemplate = this.exerciseTemplate();
         if (!exerciseTemplate) return;
         await this.apiService.patchExerciseTemplate(exerciseTemplate.id, data);

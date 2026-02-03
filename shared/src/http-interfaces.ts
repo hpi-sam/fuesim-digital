@@ -59,26 +59,36 @@ const stringToDate = z.codec(
     }
 );
 
-export const exerciseSchema = z.object({
+export const getExerciseResponseDataSchema = z.object({
     participantId: participantKeySchema,
     trainerId: trainerKeySchema,
     createdAt: stringToDate,
     lastUsedAt: stringToDate,
-    baseTemplate: z.nullable(z.object({ id: z.uuid(), name: z.string() })),
+    baseTemplate: z.object({ id: z.uuid(), name: z.string() }).nullable(),
 });
-export type Exercise = z.infer<typeof exerciseSchema>;
+export type GetExerciseResponseData = z.infer<
+    typeof getExerciseResponseDataSchema
+>;
 
-export const exercisesSchema = z.array(exerciseSchema);
-export type Exercises = z.infer<typeof exercisesSchema>;
-export type ExercisesInput = z.input<typeof exercisesSchema>;
+export const getExercisesResponseDataSchema = z.array(
+    getExerciseResponseDataSchema
+);
+export type GetExercisesResponseData = z.infer<
+    typeof getExercisesResponseDataSchema
+>;
+export type GetExercisesResponseDataInput = z.input<
+    typeof getExercisesResponseDataSchema
+>;
 
-export const exerciseExistsSchema = z.object({
+export const exerciseExistsResponseDataSchema = z.object({
     isTemplate: z.boolean(),
 });
 
-export type ExerciseExistsInput = z.input<typeof exerciseExistsSchema>;
+export type ExerciseExistsResponseDataInput = z.input<
+    typeof exerciseExistsResponseDataSchema
+>;
 
-export const exerciseTemplateSchema = z.object({
+export const getExerciseTemplateResponseDataSchema = z.object({
     id: z.uuid(),
     trainerId: trainerKeySchema,
     createdAt: stringToDate,
@@ -86,26 +96,38 @@ export const exerciseTemplateSchema = z.object({
     name: z.string(),
     description: z.string(),
 });
-export const exerciseTemplateCreateSchema = z.object({
+export const postExerciseTemplateRequestDataSchema = z.object({
     name: z.string(),
     description: z.string(),
 });
-export type ExerciseTemplateCreateData = z.infer<
-    typeof exerciseTemplateCreateSchema
+export type PostExerciseTemplateRequestData = z.infer<
+    typeof postExerciseTemplateRequestDataSchema
 >;
-export type ExerciseTemplate = z.infer<typeof exerciseTemplateSchema>;
-export type ExerciseTemplateInput = z.input<typeof exerciseTemplateSchema>;
+export type GetExerciseTemplateResponseData = z.infer<
+    typeof getExerciseTemplateResponseDataSchema
+>;
+export type GetExerciseTemplateResponseDataInput = z.input<
+    typeof getExerciseTemplateResponseDataSchema
+>;
 
-export const exerciseTemplatesSchema = z.array(exerciseTemplateSchema);
+export const getExerciseTemplatesResponseDataSchema = z.array(
+    getExerciseTemplateResponseDataSchema
+);
 
-export type ExerciseTemplates = z.infer<typeof exerciseTemplatesSchema>;
-export type ExerciseTemplatesInput = z.input<typeof exerciseTemplatesSchema>;
+export type GetExerciseTemplatesResponseData = z.infer<
+    typeof getExerciseTemplatesResponseDataSchema
+>;
+export type GetExerciseTemplatesResponseDataInput = z.input<
+    typeof getExerciseTemplatesResponseDataSchema
+>;
 
-export const joinExercisePayloadSchema = z.object({
+export const joinExerciseResponseDataSchema = z.object({
     clientId: z.string(),
-    exerciseTemplate: z.nullable(exerciseTemplateSchema),
+    exerciseTemplate: z.nullable(getExerciseTemplateResponseDataSchema),
 });
-export type JoinExercisePayload = z.infer<typeof joinExercisePayloadSchema>;
-export type JoinExercisePayloadInput = z.input<
-    typeof joinExercisePayloadSchema
+export type JoinExerciseResponseData = z.infer<
+    typeof joinExerciseResponseDataSchema
+>;
+export type JoinExerciseResponseDataInput = z.input<
+    typeof joinExerciseResponseDataSchema
 >;

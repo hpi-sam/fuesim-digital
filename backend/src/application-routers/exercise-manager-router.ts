@@ -1,8 +1,8 @@
 import {
-    exercisesSchema,
-    exerciseTemplateCreateSchema,
-    exerciseTemplateSchema,
-    exerciseTemplatesSchema,
+    getExercisesResponseDataSchema,
+    getExerciseTemplateResponseDataSchema,
+    getExerciseTemplatesResponseDataSchema,
+    postExerciseTemplateRequestDataSchema,
 } from 'digital-fuesim-manv-shared';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
@@ -27,7 +27,7 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
                     req.session!
                 );
 
-            res.send(exercisesSchema.encode(exercises));
+            res.send(getExercisesResponseDataSchema.encode(exercises));
         });
 
         this.router.get('/api/exercise_templates/', async (req, res) => {
@@ -35,11 +35,13 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
                 await this.exerciseManagerService.getAllExerciseTemplatesOfOwner(
                     req.session!
                 );
-            res.send(exerciseTemplatesSchema.encode(templates));
+            res.send(getExerciseTemplatesResponseDataSchema.encode(templates));
         });
 
         this.router.post('/api/exercise_template/', async (req, res) => {
-            const parsedData = exerciseTemplateCreateSchema.parse(req.body);
+            const parsedData = postExerciseTemplateRequestDataSchema.parse(
+                req.body
+            );
             const exerciseTemplate =
                 await this.exerciseManagerService.createExerciseTemplate(
                     parsedData,
@@ -47,7 +49,9 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
                     this.exerciseService
                 );
 
-            res.send(exerciseTemplateSchema.encode(exerciseTemplate));
+            res.send(
+                getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
+            );
         });
 
         this.router.post('/api/exercise_template/:id/new', async (req, res) => {
@@ -65,7 +69,9 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
         });
 
         this.router.patch('/api/exercise_template/:id', async (req, res) => {
-            const parsedData = exerciseTemplateCreateSchema.parse(req.body);
+            const parsedData = postExerciseTemplateRequestDataSchema.parse(
+                req.body
+            );
 
             const exerciseTemplate =
                 await this.exerciseManagerService.patchExerciseTemplate(
@@ -74,7 +80,7 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
                     parsedData
                 );
             res.status(201).send(
-                exerciseTemplateSchema.encode(exerciseTemplate)
+                getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
             );
         });
 

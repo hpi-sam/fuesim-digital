@@ -1,4 +1,3 @@
-import type { ExerciseTemplateCreateData } from 'digital-fuesim-manv-shared';
 import {
     NotFoundError,
     PermissionDeniedError,
@@ -7,6 +6,7 @@ import type { ExerciseRepository } from '../repositories/exercise-repository.js'
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
+import type { ExerciseTemplateInsert } from '../schema.js';
 import type { ExerciseService } from './exercise-service.js';
 
 export class ExerciseManagerService {
@@ -26,7 +26,7 @@ export class ExerciseManagerService {
     }
 
     public async createExerciseTemplate(
-        data: ExerciseTemplateCreateData,
+        data: Omit<ExerciseTemplateInsert, 'user'>,
         session: SessionInformation,
         exerciseService: ExerciseService
     ) {
@@ -49,7 +49,7 @@ export class ExerciseManagerService {
     public async patchExerciseTemplate(
         id: string,
         session: SessionInformation,
-        data: ExerciseTemplateCreateData
+        data: Partial<ExerciseTemplateInsert>
     ) {
         const exerciseTemplate =
             await this.exerciseRepository.getExerciseTemplateById(id);

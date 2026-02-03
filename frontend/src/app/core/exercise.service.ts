@@ -4,12 +4,12 @@ import type {
     ClientToServerEvents,
     ExerciseAction,
     ExerciseState,
-    JoinExercisePayload,
+    JoinExerciseResponseData,
     ServerToClientEvents,
     SocketResponse,
 } from 'digital-fuesim-manv-shared';
 import {
-    joinExercisePayloadSchema,
+    joinExerciseResponseDataSchema,
     socketIoTransports,
 } from 'digital-fuesim-manv-shared';
 import { freeze } from 'immer';
@@ -70,7 +70,9 @@ export class ExerciseService {
         SocketResponse
     >;
 
-    public additionalExerciseMeta = signal<JoinExercisePayload | null>(null);
+    public additionalExerciseMeta = signal<JoinExerciseResponseData | null>(
+        null
+    );
 
     constructor(
         private readonly store: Store<AppState>,
@@ -130,7 +132,7 @@ export class ExerciseService {
             });
             return false;
         }
-        const joinResponsePayload = joinExercisePayloadSchema.parse(
+        const joinResponsePayload = joinExerciseResponseDataSchema.parse(
             joinResponse.payload
         );
         this.additionalExerciseMeta.set(joinResponsePayload);

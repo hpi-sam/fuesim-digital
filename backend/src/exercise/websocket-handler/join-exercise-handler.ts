@@ -1,5 +1,5 @@
 import {
-    joinExercisePayloadSchema,
+    joinExerciseResponseDataSchema,
     type UUID,
 } from 'digital-fuesim-manv-shared';
 import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
@@ -53,7 +53,7 @@ export const registerJoinExerciseHandler = (
             }
             callback({
                 success: true,
-                payload: joinExercisePayloadSchema.encode({
+                payload: joinExerciseResponseDataSchema.encode({
                     clientId,
                     exerciseTemplate: clientWrapper.exercise!.template
                         ? {

@@ -2,11 +2,11 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
-    exerciseExistsSchema,
-    exercisesSchema,
-    ExerciseTemplateCreateData,
-    exerciseTemplateSchema,
-    exerciseTemplatesSchema,
+    exerciseExistsResponseDataSchema,
+    getExercisesResponseDataSchema,
+    getExerciseTemplateResponseDataSchema,
+    getExerciseTemplatesResponseDataSchema,
+    PostExerciseTemplateRequestData,
     UUID,
     type ExerciseAccessIds,
     type ExerciseTimeline,
@@ -71,37 +71,41 @@ export class ApiService {
         return lastValueFrom(
             this.httpClient
                 .get(`${httpOrigin}/api/exercise/${exerciseId}`)
-                .pipe(map((v) => exerciseExistsSchema.parse(v)))
+                .pipe(map((v) => exerciseExistsResponseDataSchema.parse(v)))
         );
     }
 
     public getExercisesResource() {
         return httpResource(() => `${httpOrigin}/api/exercises/`, {
-            parse: exercisesSchema.parse,
+            parse: getExercisesResponseDataSchema.parse,
         });
     }
     public getExerciseTemplatesResource() {
         return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
-            parse: exerciseTemplatesSchema.parse,
+            parse: getExerciseTemplatesResponseDataSchema.parse,
         });
     }
 
-    public async createExerciseTemplate(data: ExerciseTemplateCreateData) {
+    public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
             this.httpClient
                 .post(`${httpOrigin}/api/exercise_template`, data)
-                .pipe(map((v) => exerciseTemplateSchema.parse(v)))
+                .pipe(
+                    map((v) => getExerciseTemplateResponseDataSchema.parse(v))
+                )
         );
     }
 
     public async patchExerciseTemplate(
         id: UUID,
-        data: ExerciseTemplateCreateData
+        data: PostExerciseTemplateRequestData
     ) {
         return lastValueFrom(
             this.httpClient
                 .patch(`${httpOrigin}/api/exercise_template/${id}`, data)
-                .pipe(map((v) => exerciseTemplateSchema.parse(v)))
+                .pipe(
+                    map((v) => getExerciseTemplateResponseDataSchema.parse(v))
+                )
         );
     }
 

@@ -1,4 +1,7 @@
-import { ApiError, exerciseExistsSchema } from 'digital-fuesim-manv-shared';
+import {
+    ApiError,
+    exerciseExistsResponseDataSchema,
+} from 'digital-fuesim-manv-shared';
 import { isEmpty } from 'lodash-es';
 import { importExercise } from '../utils/import-exercise.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
@@ -40,7 +43,7 @@ export class ExerciseHttpRouter extends HttpRouter {
                     req.session
                 );
             res.send(
-                exerciseExistsSchema.parse({
+                exerciseExistsResponseDataSchema.parse({
                     isTemplate: !!exercise.template,
                 })
             );

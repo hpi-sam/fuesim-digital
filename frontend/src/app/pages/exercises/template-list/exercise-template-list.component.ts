@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import type { ExerciseTemplates } from 'digital-fuesim-manv-shared';
+import type { GetExerciseTemplatesResponseData } from 'digital-fuesim-manv-shared';
 import { ApiService } from 'src/app/core/api.service';
 import { HttpResourceRef } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -13,7 +13,9 @@ import { CreateExerciseTemplateModalComponent } from '../shared/create-exercise-
     standalone: false,
 })
 export class ExerciseTemplateListComponent {
-    exerciseTemplates: HttpResourceRef<ExerciseTemplates | undefined>;
+    exerciseTemplates: HttpResourceRef<
+        GetExerciseTemplatesResponseData | undefined
+    >;
 
     constructor(
         private readonly apiService: ApiService,

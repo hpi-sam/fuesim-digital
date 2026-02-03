@@ -28,7 +28,8 @@ export class FuesimServer {
         const app = express();
         this._websocketServer = new ExerciseWebsocketServer(
             app,
-            exerciseService
+            exerciseService,
+            authService
         );
         this._httpServer = new ApiHttpServer(
             app,

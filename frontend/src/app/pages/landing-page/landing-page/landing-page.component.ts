@@ -37,14 +37,11 @@ export class LandingPageComponent {
             this.participantId = ids.participantId;
             this.exerciseHasBeenCreated = true;
 
-            this.messageService.postMessage(
-                {
-                    title: 'Übung erstellt',
-                    body: 'Sie können nun der Übung beitreten.',
-                    color: 'success',
-                },
-                'toast'
-            );
+            this.messageService.postMessage({
+                title: 'Übung erstellt',
+                body: 'Sie können nun der Übung beitreten.',
+                color: 'success',
+            });
         });
     }
 
@@ -71,14 +68,11 @@ export class LandingPageComponent {
                     this.participantId = ids.participantId;
                     this.exerciseHasBeenCreated = true;
 
-                    this.messageService.postMessage(
-                        {
-                            color: 'success',
-                            title: 'Übung importiert',
-                            body: 'Sie können nun der Übung beitreten',
-                        },
-                        'toast'
-                    );
+                    this.messageService.postMessage({
+                        color: 'success',
+                        title: 'Übung importiert',
+                        body: 'Sie können nun der Übung beitreten',
+                    });
                     break;
                 }
                 case 'partial': {

@@ -59,6 +59,7 @@
     "devDependencies": {
         "@eslint/compat": "^1.4.0",
         "@eslint/js": "^9.36.0",
+        "@types/cookie": "^0.6.0",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",
         "@types/jest": "^30.0.0",

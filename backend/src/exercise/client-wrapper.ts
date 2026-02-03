@@ -6,12 +6,14 @@ import type {
 import { Client, ClientRole } from 'digital-fuesim-manv-shared';
 import type { ExerciseSocket } from '../exercise-server.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
+import type { SessionInformation } from '../auth/auth-service.js';
 import type { ActiveExercise } from './active-exercise.js';
 
 export class ClientWrapper {
     public constructor(
         private readonly socket: ExerciseSocket,
-        private readonly exerciseService: ExerciseService
+        private readonly exerciseService: ExerciseService,
+        public readonly session?: SessionInformation
     ) {}
 
     private chosenExercise?: ActiveExercise;
@@ -23,14 +25,11 @@ export class ClientWrapper {
      * @param clientName The public name of the client.
      * @returns The joined client's id, or undefined when the exercise doesn't exists.
      */
-    public joinExercise(
-        exerciseKey: ExerciseKey,
-        clientName: string
-    ): UUID | undefined {
-        const exercise = this.exerciseService.getExerciseByKey(exerciseKey);
-        if (!exercise) {
-            return undefined;
-        }
+    public joinExercise(exerciseKey: ExerciseKey, clientName: string): UUID {
+        const exercise = this.exerciseService.getExerciseByKey(
+            exerciseKey,
+            this.session
+        );
         this.chosenExercise = exercise;
         // Although getRoleFromUsedId may throw an error, this should never happen here
         // as the provided id is guaranteed to be one of the ids of the exercise as the exercise

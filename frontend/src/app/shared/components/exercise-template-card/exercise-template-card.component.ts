@@ -37,14 +37,11 @@ export class ExerciseTemplateCardComponent {
         this.apiService
             .createExerciseFromTemplate(exerciseTemplate.id)
             .then((ids) => {
-                this.messageService.postMessage(
-                    {
-                        title: 'Übung erfolgreich erstellt',
-                        body: '',
-                        color: 'success',
-                    },
-                    'toast'
-                );
+                this.messageService.postMessage({
+                    title: 'Übung erfolgreich erstellt',
+                    body: '',
+                    color: 'success',
+                });
 
                 this.router.navigate(['/exercises', ids.trainerId]);
             });

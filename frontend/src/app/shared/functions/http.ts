@@ -30,7 +30,7 @@ export function errorHandlingInterceptor(
                     message = error.error.message;
                 }
                 messageService.postError({
-                    title: 'Interner Fehler',
+                    title: 'Serverfehler',
                     body: message,
                     error,
                 });

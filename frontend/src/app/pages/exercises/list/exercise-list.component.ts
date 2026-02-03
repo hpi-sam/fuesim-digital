@@ -22,14 +22,11 @@ export class ExerciseListComponent {
 
     public async createExercise() {
         this.apiService.createExercise().then((ids) => {
-            this.messageService.postMessage(
-                {
-                    title: 'Übung erfolgreich erstellt',
-                    body: '',
-                    color: 'success',
-                },
-                'toast'
-            );
+            this.messageService.postMessage({
+                title: 'Übung erfolgreich erstellt',
+                body: '',
+                color: 'success',
+            });
             this.exercises.reload();
         });
     }

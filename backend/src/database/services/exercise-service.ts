@@ -1,8 +1,4 @@
-import type {
-    ExerciseKey,
-    ExerciseTimeline,
-    Role,
-} from 'digital-fuesim-manv-shared';
+import type { ExerciseKey, ExerciseTimeline } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import type { ClientWrapper } from '../../exercise/client-wrapper.js';
@@ -34,37 +30,22 @@ export class ExerciseService {
         return this.exerciseMap.has(exerciseKey);
     }
 
-    public getExerciseByKey(exerciseKey: ExerciseKey) {
+    public getExerciseByKey(
+        exerciseKey: ExerciseKey,
+        session?: SessionInformation
+    ) {
         if (!isExerciseKey(exerciseKey)) {
             throw new ApiError();
         }
 
-        return this.exerciseMap.get(exerciseKey);
-    }
-
-    public async getExerciseByKeyProtected(
-        exerciseKey: ExerciseKey,
-        session?: SessionInformation
-    ) {
-        const exercise = this.getExerciseByKey(exerciseKey);
+        const exercise = this.exerciseMap.get(exerciseKey);
         if (!exercise) {
             throw new NotFoundError();
         }
 
-        const exerciseEntry = await this.exerciseRepository.getExerciseById(
-            exercise.exerciseId
-        );
-        if (!exerciseEntry) {
-            throw new NotFoundError();
-        }
-
-        if (
-            exerciseEntry.exercise_template &&
-            exerciseEntry.exercise_template.user !== session?.user.id
-        ) {
+        if (exercise.template && exercise.template.user !== session?.user.id) {
             throw new PermissionDeniedError();
         }
-
         return exercise;
     }
 
@@ -108,7 +89,7 @@ export class ExerciseService {
     }
 
     public leaveExercise(exerciseKey: ExerciseKey, client: ClientWrapper) {
-        this.getExerciseByKey(exerciseKey)?.removeClient(client);
+        this.getExerciseByKey(exerciseKey, client.session).removeClient(client);
     }
 
     /**
@@ -198,10 +179,7 @@ export class ExerciseService {
             throw new PermissionDeniedError();
         }
 
-        const activeExercise = this.getExerciseByKey(exerciseKey);
-        if (!activeExercise) {
-            throw new NotFoundError();
-        }
+        const activeExercise = this.getExerciseByKey(exerciseKey, session);
 
         const exerciseEntry = await this.exerciseRepository.getExerciseById(
             activeExercise.exerciseId
@@ -211,7 +189,7 @@ export class ExerciseService {
         }
 
         if (exerciseEntry.exercise_template) {
-            throw new PermissionDeniedError();
+            throw new ApiError();
         }
         if (
             exerciseEntry.exercise_entity.user &&
@@ -259,7 +237,7 @@ export class ExerciseService {
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ): Promise<ExerciseTimeline> {
-        const activeExercise = await this.getExerciseByKeyProtected(
+        const activeExercise = await this.getExerciseByKey(
             exerciseKey,
             session
         );
@@ -286,17 +264,6 @@ export class ExerciseService {
             initialState: activeExercise.getExercise().initialStateString,
             actionsWrappers: completeHistory,
         };
-    }
-
-    public getRoleFromKey(exerciseKey: string): Role {
-        switch (exerciseKey.length) {
-            case 6:
-                return 'participant';
-            case 8:
-                return 'trainer';
-            default:
-                throw new RangeError(`Incorrect id: ${exerciseKey}`);
-        }
     }
 
     /**

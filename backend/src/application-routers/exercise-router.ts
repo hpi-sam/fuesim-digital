@@ -35,11 +35,10 @@ export class ExerciseHttpRouter extends HttpRouter {
             if (!isExerciseKey(req.params.exerciseKey)) {
                 throw new ApiError();
             }
-            const exercise =
-                await this.exerciseService.getExerciseByKeyProtected(
-                    req.params.exerciseKey,
-                    req.session
-                );
+            const exercise = await this.exerciseService.getExerciseByKey(
+                req.params.exerciseKey,
+                req.session
+            );
             res.send(
                 exerciseExistsResponseDataSchema.parse({
                     isTemplate: !!exercise.template,

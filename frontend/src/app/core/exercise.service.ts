@@ -92,7 +92,6 @@ export class ExerciseService {
                     body: 'Laden Sie die Seite neu, um die Verbindung wieder herzustellen.',
                     error: reason,
                 },
-                'alert',
                 null
             );
         });

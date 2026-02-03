@@ -116,11 +116,10 @@ export class ExerciseManagerService {
             throw new PermissionDeniedError();
         }
         const activeExercise = exerciseService.getExerciseByKey(
-            exerciseTemplate.exercise_entity.trainerId
+            exerciseTemplate.exercise_entity.trainerId,
+            session
         );
-        if (activeExercise) {
-            exerciseService.destroyExercise(activeExercise);
-        }
+        exerciseService.destroyExercise(activeExercise);
 
         await this.exerciseRepository.deleteExerciseTemplateById(
             exerciseTemplate.exercise_template.id

@@ -57,7 +57,6 @@ import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
 import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.pipe';
 import { UserAccountNavbarItemComponent } from './components/user-account-navbar-item/user-account-navbar-item.component';
 import { HeaderComponent } from './components/header/header.component';
-import { TimesPipe } from './pipes/times.pipe';
 import { ExerciseTemplateCardComponent } from './components/exercise-template-card/exercise-template-card.component';
 import { ExerciseCardComponent } from './components/exercise-card/exercise-card.component';
 import { InlineTextEditorComponent } from './components/inline-text-editor/inline-text-editor.component';
@@ -111,7 +110,6 @@ import { CopyButtonComponent } from './components/copy-button/copy-button.compon
         OccupationNamePipe,
         OccupationShortNamePipe,
         SpecificRoleDisplayNamePipe,
-        TimesPipe,
         ExerciseCardComponent,
         ExerciseTemplateCardComponent,
         InlineTextEditorComponent,
@@ -171,7 +169,6 @@ import { CopyButtonComponent } from './components/copy-button/copy-button.compon
         SendAlarmGroupInterfaceComponent,
         OccupationNamePipe,
         OccupationShortNamePipe,
-        TimesPipe,
         ExerciseCardComponent,
         ExerciseTemplateCardComponent,
         InlineTextEditorComponent,

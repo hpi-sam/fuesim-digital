@@ -8,7 +8,7 @@
     </h1>
     @if (exercises.isLoading()) {
         <div class="row row-cols-3">
-            @for (time of 3 | times; track $index) {
+            @for (_ of [1,2,3]; track $index) {
                 <div class="col">
                     <div class="card" aria-hidden="true">
                         <div class="card-body">

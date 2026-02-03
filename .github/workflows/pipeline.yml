@@ -145,14 +145,6 @@ jobs:
                     --health-timeout 5s
                     --health-retries 5
                     --tmpfs /var/lib/postgresql/data
-            authelia:
-                image: docker.io/authelia/authelia:latest
-                restart: unless-stopped
-                ports:
-                    - 127.0.0.1:9091:9091
-                volumes:
-                    - ./docker/authelia-config:/config:ro
-                    - authelia-secrets:/secrets
 
         steps:
             - uses: actions/checkout@v3

@@ -1,0 +1,12 @@
+<div>
+    <textarea
+        [ngModel]="remarks$ | async"
+        (appSaveOnTyping)="updateRemarks($event)"
+        [appAutofocus]="true"
+        maxlength="65535"
+        placeholder="Schreiben Sie Informationen"
+        class="form-control form-control-sm no-validation w-100"
+        style="height: 100px; resize: none"
+        data-cy="scoutableTextArea"
+    ></textarea>
+</div>

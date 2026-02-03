@@ -1,9 +1,12 @@
-import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
+import type {
+    ExerciseAction,
+    ExerciseKey,
+    UUID,
+} from 'digital-fuesim-manv-shared';
 import { Client, ClientRole } from 'digital-fuesim-manv-shared';
 import type { ExerciseSocket } from '../exercise-server.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import type { ActiveExercise } from './active-exercise.js';
-import type { ExerciseKey } from './exercise-keys.js';
 
 export class ClientWrapper {
     public constructor(

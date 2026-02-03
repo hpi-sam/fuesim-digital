@@ -20,7 +20,7 @@ export class ApplicationRouter extends HttpRouter {
                 req.session =
                     await authService.getDataFromSessionToken(sessionToken);
             } else {
-                req.session = null;
+                req.session = undefined;
             }
 
             next();

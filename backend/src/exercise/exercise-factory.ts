@@ -2,6 +2,8 @@ import type {
     StateExport,
     ExerciseKeys,
     ExerciseAction,
+    ParticipantKey,
+    TrainerKey,
 } from 'digital-fuesim-manv-shared';
 import {
     ExerciseState,
@@ -30,8 +32,9 @@ import { isParticipantKey, isTrainerKey } from './exercise-keys.js';
 
 export class ExerciseFactory {
     public static createKeys(): ExerciseKeys {
-        const participantKey = UserReadableIdGenerator.generateId();
-        const trainerKey = UserReadableIdGenerator.generateId(8);
+        const participantKey =
+            UserReadableIdGenerator.generateId() as ParticipantKey;
+        const trainerKey = UserReadableIdGenerator.generateId(8) as TrainerKey;
         return { participantKey, trainerKey };
     }
 

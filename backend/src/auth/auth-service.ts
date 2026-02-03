@@ -78,15 +78,15 @@ export class AuthService {
      */
     public async getDataFromSessionToken(
         sessionToken: string
-    ): Promise<SessionInformation | null> {
+    ): Promise<SessionInformation | undefined> {
         const session =
             await this.sessionRepository.getValidSessionByToken(sessionToken);
         if (!session) {
-            return null;
+            return undefined;
         }
         const user = await this.userRepository.getUserById(session.userId);
         if (!user) {
-            return null;
+            return undefined;
         }
         return { user, session };
     }

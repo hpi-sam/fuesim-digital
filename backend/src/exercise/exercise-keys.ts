@@ -1,18 +1,12 @@
-import { z } from 'zod';
-
-const participantKeySchema = z
-    .string()
-    .regex(/^\d{6}$/u)
-    .brand<'ParticipantKey'>();
-const trainerKeySchema = z
-    .string()
-    .regex(/^\d{8}$/u)
-    .brand<'TrainerKey'>();
-
-export type ParticipantKey = z.infer<typeof participantKeySchema>;
-export type TrainerKey = z.infer<typeof trainerKeySchema>;
-// z.union doesn't work well with branded types
-export type ExerciseKey = ParticipantKey | TrainerKey;
+import type {
+    ExerciseKey,
+    ParticipantKey,
+    TrainerKey,
+} from 'digital-fuesim-manv-shared';
+import {
+    participantKeySchema,
+    trainerKeySchema,
+} from 'digital-fuesim-manv-shared';
 
 export function isParticipantKey(key: string): key is ParticipantKey {
     return participantKeySchema.safeParse(key).success;

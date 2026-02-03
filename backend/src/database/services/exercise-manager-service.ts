@@ -7,7 +7,6 @@ import type { ExerciseRepository } from '../repositories/exercise-repository.js'
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import type { TrainerKey } from '../../exercise/exercise-keys.js';
 import type { ExerciseService } from './exercise-service.js';
 
 export class ExerciseManagerService {
@@ -43,7 +42,7 @@ export class ExerciseManagerService {
         await exerciseService.createTemplate(newExercise, exerciseTemplate);
         return {
             ...exerciseTemplate,
-            trainerId: newExercise.getExercise().trainerId,
+            trainerId: newExercise.trainerKey,
         };
     }
 
@@ -60,11 +59,13 @@ export class ExerciseManagerService {
         if (exerciseTemplate.exercise_template.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
+        await this.exerciseRepository.patchExerciseTemplate(
+            exerciseTemplate.exercise_template.id,
+            data
+        );
         return {
-            ...(await this.exerciseRepository.patchExerciseTemplate(
-                exerciseTemplate.exercise_template.id,
-                data
-            )),
+            ...exerciseTemplate.exercise_template,
+            ...data,
             trainerId: exerciseTemplate.exercise_entity.trainerId,
         };
     }
@@ -118,7 +119,7 @@ export class ExerciseManagerService {
             throw new PermissionDeniedError();
         }
         const activeExercise = exerciseService.getExerciseByKey(
-            exerciseTemplate.exercise_entity.trainerId as TrainerKey
+            exerciseTemplate.exercise_entity.trainerId
         );
         if (activeExercise) {
             exerciseService.destroyExercise(activeExercise);

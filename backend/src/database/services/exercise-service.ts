@@ -1,9 +1,12 @@
+import type {
+    ExerciseKey,
+    ExerciseTimeline,
+    Role,
+} from 'digital-fuesim-manv-shared';
 import {
     ApiError,
     NotFoundError,
     PermissionDeniedError,
-    type ExerciseTimeline,
-    type Role,
 } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
@@ -16,7 +19,6 @@ import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
-import type { ExerciseKey } from '../../exercise/exercise-keys.js';
 import { isTrainerKey, isExerciseKey } from '../../exercise/exercise-keys.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 

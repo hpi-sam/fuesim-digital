@@ -1,4 +1,9 @@
-import type { ExerciseAction, ExerciseState } from 'digital-fuesim-manv-shared';
+import type {
+    ExerciseAction,
+    ExerciseState,
+    ParticipantKey,
+    TrainerKey,
+} from 'digital-fuesim-manv-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
 import {
@@ -60,7 +65,7 @@ export const sessionTable = pgTable('sessions', {
 export type SessionEntry = InferSelectModel<typeof sessionTable>;
 
 export const exerciseTemplateTable = pgTable('exercise_template', {
-    ...baseTable,
+    ...baseTable<string>(),
     user: varchar()
         .references(() => userTable.id, { onDelete: 'cascade' })
         .notNull(),
@@ -85,8 +90,8 @@ export const exerciseTable = pgTable('exercise_entity', {
     ...baseTable<ExerciseId>(),
     tickCounter: integer().default(0).notNull(),
     initialStateString: json().$type<ExerciseState>().notNull(),
-    participantId: char({ length: 6 }).notNull(),
-    trainerId: char({ length: 8 }).notNull(),
+    participantId: char({ length: 6 }).$type<ParticipantKey>().notNull(),
+    trainerId: char({ length: 8 }).$type<TrainerKey>().notNull(),
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
     user: varchar().references(() => userTable.id, { onDelete: 'cascade' }),
@@ -105,6 +110,7 @@ export const exerciseTable = pgTable('exercise_entity', {
     }),
 });
 export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
+export type ExerciseInsert = InferInsertModel<typeof exerciseTable>;
 
 export const actionTable = pgTable(
     'action_entity',

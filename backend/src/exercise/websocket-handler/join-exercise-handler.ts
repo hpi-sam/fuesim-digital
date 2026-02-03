@@ -58,7 +58,7 @@ export const registerJoinExerciseHandler = (
                     exerciseTemplate: clientWrapper.exercise!.template
                         ? {
                               ...clientWrapper.exercise!.template,
-                              trainerId: clientWrapper.exercise!.exerciseId,
+                              trainerId: clientWrapper.exercise!.trainerKey,
                           }
                         : null,
                 }),

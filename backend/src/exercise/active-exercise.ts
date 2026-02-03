@@ -1,23 +1,25 @@
-import type { ExerciseAction, Role, UUID } from 'digital-fuesim-manv-shared';
+import type {
+    ExerciseAction,
+    Role,
+    UUID,
+    ExerciseKey,
+    ParticipantKey,
+    TrainerKey,
+} from 'digital-fuesim-manv-shared';
 import { ExerciseState, reduceExerciseState } from 'digital-fuesim-manv-shared';
 import type {
-    ExerciseEntry,
     ExerciseTemplateEntry,
     ExerciseId,
+    ExerciseInsert,
 } from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
 import type { ClientWrapper } from './client-wrapper.js';
 import { patientTick } from './patient-ticking.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
-import type {
-    ExerciseKey,
-    ParticipantKey,
-    TrainerKey,
-} from './exercise-keys.js';
 
 export class ActiveExercise {
-    private readonly exercise: Omit<ExerciseEntry, 'id'>;
+    private readonly exercise: Omit<ExerciseInsert, 'id'>;
 
     // We need to make sure this is set by
     // the ExerciseService when creating/loading
@@ -55,12 +57,12 @@ export class ActiveExercise {
 
     public get participantKey(): ParticipantKey {
         // This should always be valid, since we are creating all active exercises in the exercise factory which ensures valid keys
-        return this.exercise.participantId as ParticipantKey;
+        return this.exercise.participantId;
     }
 
     public get trainerKey(): TrainerKey {
         // This should always be valid, since we are creating all active exercises in the exercise factory which ensures valid keys
-        return this.exercise.trainerId as TrainerKey;
+        return this.exercise.trainerId;
     }
 
     private _changedSinceSave = true;

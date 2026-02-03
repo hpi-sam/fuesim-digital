@@ -1,13 +1,10 @@
+import type { ParticipantKey, TrainerKey } from 'digital-fuesim-manv-shared';
 import { ExerciseState } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { eq, lt, and, isNull, desc } from 'drizzle-orm';
 import type { ExerciseId, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
-import type {
-    ParticipantKey,
-    TrainerKey,
-} from '../../exercise/exercise-keys.js';
 import { onlySingle } from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
 

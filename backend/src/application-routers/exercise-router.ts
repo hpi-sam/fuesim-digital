@@ -1,10 +1,11 @@
-import { exerciseExistsSchema } from 'digital-fuesim-manv-shared';
+import { ApiError, exerciseExistsSchema } from 'digital-fuesim-manv-shared';
 import { isEmpty } from 'lodash-es';
 import { importExercise } from '../utils/import-exercise.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ExerciseFactory } from '../exercise/exercise-factory.js';
 import { HttpRouter } from '../http-router.js';
 import type { AuthService } from '../auth/auth-service.js';
+import { isExerciseKey } from '../exercise/exercise-keys.js';
 
 export class ExerciseHttpRouter extends HttpRouter {
     public constructor(
@@ -30,6 +31,9 @@ export class ExerciseHttpRouter extends HttpRouter {
         });
 
         this.router.get('/api/exercise/:exerciseKey', async (req, res) => {
+            if (!isExerciseKey(req.params.exerciseKey)) {
+                throw new ApiError();
+            }
             const exercise =
                 await this.exerciseService.getExerciseByKeyProtected(
                     req.params.exerciseKey,
@@ -43,17 +47,22 @@ export class ExerciseHttpRouter extends HttpRouter {
         });
 
         this.router.delete('/api/exercise/:exerciseKey', async (req, res) => {
+            if (!isExerciseKey(req.params.exerciseKey)) {
+                throw new ApiError();
+            }
             await this.exerciseService.deleteExercise(
                 req.params.exerciseKey,
                 req.session
             );
-
             res.status(204).send();
         });
 
         this.router.get(
             '/api/exercise/:exerciseKey/history',
             async (req, res) => {
+                if (!isExerciseKey(req.params.exerciseKey)) {
+                    throw new ApiError();
+                }
                 const timeline = await this.exerciseService.getTimeline(
                     req.params.exerciseKey
                 );

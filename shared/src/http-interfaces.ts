@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import type { ParticipantKey, TrainerKey } from './exercise-keys.js';
+import { participantKeySchema, trainerKeySchema } from './exercise-keys.js';
 
 export class ApiError extends Error {
     public statusCode = 400;
@@ -17,8 +19,8 @@ export class PermissionDeniedError extends ApiError {
 }
 
 export interface ExerciseKeys {
-    readonly participantKey: string;
-    readonly trainerKey: string;
+    readonly participantKey: ParticipantKey;
+    readonly trainerKey: TrainerKey;
 }
 
 export interface ExerciseAccessIds {
@@ -58,8 +60,8 @@ const stringToDate = z.codec(
 );
 
 export const exerciseSchema = z.object({
-    participantId: z.string(),
-    trainerId: z.string(),
+    participantId: participantKeySchema,
+    trainerId: trainerKeySchema,
     createdAt: stringToDate,
     lastUsedAt: stringToDate,
     baseTemplate: z.nullable(z.object({ id: z.uuid(), name: z.string() })),
@@ -78,7 +80,7 @@ export type ExerciseExistsInput = z.input<typeof exerciseExistsSchema>;
 
 export const exerciseTemplateSchema = z.object({
     id: z.uuid(),
-    trainerId: z.string(),
+    trainerId: trainerKeySchema,
     createdAt: stringToDate,
     lastExerciseCreatedAt: z.nullable(stringToDate),
     name: z.string(),

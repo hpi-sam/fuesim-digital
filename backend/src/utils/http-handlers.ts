@@ -1,5 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
-import { ApiError, PermissionDeniedError } from 'digital-fuesim-manv-shared';
+import { PermissionDeniedError, ApiError } from './http.js';
 
 export type HttpMethod =
     | 'delete'

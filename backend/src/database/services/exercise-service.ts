@@ -3,11 +3,6 @@ import type {
     ExerciseTimeline,
     Role,
 } from 'digital-fuesim-manv-shared';
-import {
-    ApiError,
-    NotFoundError,
-    PermissionDeniedError,
-} from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import type { ClientWrapper } from '../../exercise/client-wrapper.js';
@@ -21,6 +16,11 @@ import type { ExerciseRepository } from '../repositories/exercise-repository.js'
 import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
 import { isTrainerKey, isExerciseKey } from '../../exercise/exercise-keys.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
+import {
+    ApiError,
+    NotFoundError,
+    PermissionDeniedError,
+} from '../../utils/http.js';
 
 export class ExerciseService {
     public constructor(

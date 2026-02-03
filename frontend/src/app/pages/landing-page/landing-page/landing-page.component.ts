@@ -1,13 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import type {
-    ExportImportFile,
-    UserDataResponse,
-} from 'digital-fuesim-manv-shared';
+import type { ExportImportFile } from 'digital-fuesim-manv-shared';
 import { escapeRegExp } from 'lodash-es';
 import { ApiService } from 'src/app/core/api.service';
 import { MessageService } from 'src/app/core/messages/message.service';
-import type { Observable } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 
 @Component({
@@ -17,7 +13,6 @@ import { AuthService } from '../../../core/auth.service';
     standalone: false,
 })
 export class LandingPageComponent {
-    public userData$?: Observable<UserDataResponse> = this.auth.userData$;
     public loginUrl = this.auth.loginUrl;
 
     public exerciseId = '';
@@ -32,7 +27,7 @@ export class LandingPageComponent {
         private readonly apiService: ApiService,
         private readonly router: Router,
         private readonly messageService: MessageService,
-        private readonly auth: AuthService
+        readonly auth: AuthService
     ) {}
 
     public async createExercise() {

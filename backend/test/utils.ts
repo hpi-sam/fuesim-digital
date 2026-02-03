@@ -13,7 +13,7 @@ import {
     testingDatabaseName,
 } from '../src/database/services/database-service.js';
 import { Config } from '../src/config.js';
-import type { HttpMethod } from '../src/utils/http-error-handler.js';
+import type { HttpMethod } from '../src/utils/http-handlers.js';
 import { FuesimServer } from '../src/fuesim-server.js';
 import { ExerciseService } from '../src/database/services/exercise-service.js';
 import { ExerciseRepository } from '../src/database/repositories/exercise-repository.js';
@@ -21,6 +21,7 @@ import { ActionRepository } from '../src/database/repositories/action-repository
 import { AuthService } from '../src/auth/auth-service.js';
 import { UserRepository } from '../src/database/repositories/user-repository.js';
 import { SessionRepository } from '../src/database/repositories/session-repository.js';
+import { ExerciseManagerService } from '../src/database/services/exercise-manager-service.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 export type ExerciseCreationResponse = ExerciseAccessIds;
@@ -121,6 +122,7 @@ class TestEnvironment {
     private _exerciseRepository!: ExerciseRepository;
     private _actionRepository!: ActionRepository;
     private _authService!: AuthService;
+    private _exerciseManagerService!: ExerciseManagerService;
 
     public get databaseService(): DatabaseService {
         return this._databaseService;
@@ -131,6 +133,10 @@ class TestEnvironment {
 
     public get authService(): AuthService {
         return this._authService;
+    }
+
+    public get exerciseManagerService() {
+        return this._exerciseManagerService;
     }
 
     public get exerciseRepository(): ExerciseRepository {
@@ -169,17 +175,20 @@ class TestEnvironment {
         exerciseService: ExerciseService,
         exerciseRepository: ExerciseRepository,
         actionRepository: ActionRepository,
-        authService: AuthService
+        authService: AuthService,
+        exerciseManagerService: ExerciseManagerService
     ) {
         this._databaseService = databaseService;
         this._exerciseService = exerciseService;
         this._authService = authService;
+        this._exerciseManagerService = exerciseManagerService;
         this._exerciseRepository = exerciseRepository;
         this._actionRepository = actionRepository;
         this.server = new FuesimServer(
             this.databaseService,
             exerciseService,
-            authService
+            authService,
+            exerciseManagerService
         );
     }
 }
@@ -190,6 +199,7 @@ export const createTestEnvironment = (): TestEnvironment => {
     let databaseService: DatabaseService;
     let exerciseService: ExerciseService;
     let authService: AuthService;
+    let exerciseManagerService: ExerciseManagerService;
     let exerciseRepository: ExerciseRepository;
     let actionRepository: ActionRepository;
     let userRepository: UserRepository;
@@ -216,12 +226,17 @@ export const createTestEnvironment = (): TestEnvironment => {
             userRepository,
             sessionRepository
         ).initialize({ skipOidcDiscovery: true });
+        exerciseManagerService = new ExerciseManagerService(
+            exerciseRepository,
+            actionRepository
+        );
         environment.init(
             databaseService,
             exerciseService,
             exerciseRepository,
             actionRepository,
-            authService
+            authService,
+            exerciseManagerService
         );
     });
     afterEach(async () => {

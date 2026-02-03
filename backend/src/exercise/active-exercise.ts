@@ -47,7 +47,6 @@ export class ActiveExercise {
     }
 
     public setTemplate(template: ExerciseTemplateEntry | null) {
-        // the strictness is only valid, if the id is immediately set
         this._template = template;
     }
 

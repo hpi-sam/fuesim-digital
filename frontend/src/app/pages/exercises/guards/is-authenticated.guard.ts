@@ -15,7 +15,6 @@ export class IsAuthenticatedGuard {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ) {
-        const user = this.auth.userData.user;
-        return user !== null && user !== undefined;
+        return !!this.auth.authData().user;
     }
 }

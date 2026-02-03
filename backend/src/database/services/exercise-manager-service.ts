@@ -1,12 +1,9 @@
-import {
-    NotFoundError,
-    PermissionDeniedError,
-} from 'digital-fuesim-manv-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ExerciseTemplateInsert } from '../schema.js';
+import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
 import type { ExerciseService } from './exercise-service.js';
 
 export class ExerciseManagerService {
@@ -46,7 +43,7 @@ export class ExerciseManagerService {
         };
     }
 
-    public async patchExerciseTemplate(
+    public async updateExerciseTemplate(
         id: string,
         session: SessionInformation,
         data: Partial<ExerciseTemplateInsert>
@@ -59,7 +56,7 @@ export class ExerciseManagerService {
         if (exerciseTemplate.exercise_template.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
-        await this.exerciseRepository.patchExerciseTemplate(
+        await this.exerciseRepository.updateExerciseTemplate(
             exerciseTemplate.exercise_template.id,
             data
         );
@@ -98,7 +95,7 @@ export class ExerciseManagerService {
             baseTemplateId: exerciseTemplate.exercise_template.id,
             user: session.user.id,
         });
-        await this.exerciseRepository.patchExerciseTemplate(
+        await this.exerciseRepository.updateExerciseTemplate(
             exerciseTemplate.exercise_template.id,
             { lastExerciseCreatedAt: new Date() }
         );

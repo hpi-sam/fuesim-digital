@@ -5,7 +5,6 @@ import { eq, lt, and, isNull, desc } from 'drizzle-orm';
 import type { ExerciseId, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
-import { onlySingle } from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
@@ -111,7 +110,7 @@ export class ExerciseRepository extends BaseRepository {
     }
 
     public async getExerciseTemplateById(id: string) {
-        return onlySingle(
+        return this.onlySingle(
             await this.databaseConnection
                 .select()
                 .from(exerciseTemplateTable)
@@ -124,7 +123,7 @@ export class ExerciseRepository extends BaseRepository {
     }
 
     public async createExerciseTemplate(data: ExerciseTemplateInsert) {
-        return onlySingle(
+        return this.onlySingle(
             await this.databaseConnection
                 .insert(exerciseTemplateTable)
                 .values(data)
@@ -132,11 +131,11 @@ export class ExerciseRepository extends BaseRepository {
         );
     }
 
-    public async patchExerciseTemplate(
+    public async updateExerciseTemplate(
         id: string,
         data: Partial<ExerciseTemplateInsert>
     ) {
-        return onlySingle(
+        return this.onlySingle(
             await this.databaseConnection
                 .update(exerciseTemplateTable)
                 .set(data)
@@ -183,7 +182,7 @@ export class ExerciseRepository extends BaseRepository {
             lastUsedAt: new Date(),
         };
 
-        return onlySingle(
+        return this.onlySingle(
             await this.databaseConnection
                 .insert(exerciseTable)
                 .values(exercisePatchWithId)
@@ -200,7 +199,7 @@ export class ExerciseRepository extends BaseRepository {
         optionalData?: Partial<InferInsertModel<typeof exerciseTable>>
     ) {
         const exercise = activeExercise.getExercise();
-        return onlySingle(
+        return this.onlySingle(
             await this.databaseConnection
                 .insert(exerciseTable)
                 .values({

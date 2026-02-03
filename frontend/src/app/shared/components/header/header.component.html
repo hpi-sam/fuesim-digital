@@ -1,5 +1,3 @@
-@let userData = (auth.userData$ | async)?.user;
-
 <nav class="navbar bg-body-tertiary mb-4">
     <div class="container container-fluid">
         <a routerLink="/" class="navbar-brand">Digitale FüSim MANV</a>
@@ -8,7 +6,7 @@
             [activeId]="route.url | async"
             class="navbar-nav d-flex flex-row"
         >
-            @if (userData) {
+            @if (auth.authData().user) {
                 <li ngbNavItem="exercises" class="nav-item mx-2">
                     <a ngbNavLink class="nav-link" routerLink="/exercises/">
                         Meine Übungen

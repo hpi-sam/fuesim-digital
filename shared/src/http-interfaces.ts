@@ -2,22 +2,6 @@ import { z } from 'zod';
 import type { ParticipantKey, TrainerKey } from './exercise-keys.js';
 import { participantKeySchema, trainerKeySchema } from './exercise-keys.js';
 
-export class ApiError extends Error {
-    public statusCode = 400;
-}
-export class NotFoundError extends ApiError {
-    public override statusCode = 404;
-    public constructor() {
-        super(`Das Objekt existiert nicht.`);
-    }
-}
-export class PermissionDeniedError extends ApiError {
-    public override statusCode = 403;
-    public constructor() {
-        super('Sie haben keine Berechtigung für diese Operation.');
-    }
-}
-
 export interface ExerciseKeys {
     readonly participantKey: ParticipantKey;
     readonly trainerKey: TrainerKey;

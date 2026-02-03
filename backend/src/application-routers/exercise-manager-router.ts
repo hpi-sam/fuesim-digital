@@ -8,7 +8,7 @@ import type { ExerciseManagerService } from '../database/services/exercise-manag
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { HttpRouter } from '../http-router.js';
 import type { AuthService } from '../auth/auth-service.js';
-import { isAuthenticatedMiddleware } from '../utils/http-error-handler.js';
+import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 
 export class ExerciseManagerHttpRouter extends HttpRouter {
     public constructor(
@@ -20,15 +20,20 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
     }
 
     protected initializeRoutes() {
-        this.router.use(isAuthenticatedMiddleware);
-        this.router.get('/api/exercises/', async (req, res) => {
-            const exercises =
-                await this.exerciseManagerService.getAllExercisesOfOwner(
-                    req.session!
-                );
+        this.router.get(
+            '/api/exercises/',
+            isAuthenticatedMiddleware,
+            async (req, res) => {
+                const exercises =
+                    await this.exerciseManagerService.getAllExercisesOfOwner(
+                        req.session!
+                    );
 
-            res.send(getExercisesResponseDataSchema.encode(exercises));
-        });
+                res.send(getExercisesResponseDataSchema.encode(exercises));
+            }
+        );
+
+        this.router.use('/api/exercise_templates/', isAuthenticatedMiddleware);
 
         this.router.get('/api/exercise_templates/', async (req, res) => {
             const templates =
@@ -38,7 +43,7 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
             res.send(getExerciseTemplatesResponseDataSchema.encode(templates));
         });
 
-        this.router.post('/api/exercise_template/', async (req, res) => {
+        this.router.post('/api/exercise_templates/', async (req, res) => {
             const parsedData = postExerciseTemplateRequestDataSchema.parse(
                 req.body
             );
@@ -54,27 +59,30 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
             );
         });
 
-        this.router.post('/api/exercise_template/:id/new', async (req, res) => {
-            const newExercise =
-                await this.exerciseManagerService.createExerciseFromTemplate(
-                    req.params.id,
-                    req.session!,
-                    this.exerciseService
-                );
+        this.router.post(
+            '/api/exercise_templates/:id/new',
+            async (req, res) => {
+                const newExercise =
+                    await this.exerciseManagerService.createExerciseFromTemplate(
+                        req.params.id,
+                        req.session!,
+                        this.exerciseService
+                    );
 
-            res.status(201).send({
-                participantId: newExercise.participantKey,
-                trainerId: newExercise.trainerKey,
-            });
-        });
+                res.status(201).send({
+                    participantId: newExercise.participantKey,
+                    trainerId: newExercise.trainerKey,
+                });
+            }
+        );
 
-        this.router.patch('/api/exercise_template/:id', async (req, res) => {
+        this.router.patch('/api/exercise_templates/:id', async (req, res) => {
             const parsedData = postExerciseTemplateRequestDataSchema.parse(
                 req.body
             );
 
             const exerciseTemplate =
-                await this.exerciseManagerService.patchExerciseTemplate(
+                await this.exerciseManagerService.updateExerciseTemplate(
                     req.params.id,
                     req.session!,
                     parsedData
@@ -84,7 +92,7 @@ export class ExerciseManagerHttpRouter extends HttpRouter {
             );
         });
 
-        this.router.delete('/api/exercise_template/:id', async (req, res) => {
+        this.router.delete('/api/exercise_templates/:id', async (req, res) => {
             await this.exerciseManagerService.deleteExerciseTemplate(
                 req.params.id,
                 req.session!,

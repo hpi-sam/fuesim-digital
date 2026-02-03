@@ -29,15 +29,12 @@ Both servers currently use CORS allow all origins as a temporary solution.
 
 ### `ExerciseHttpServer`
 
-The webserver is responsible for all HTTP-API-Requests. This currently includes only creating and deleting an exercise.
-The webserver sets up all available routes in its constructor. The methods doing the actual work for the routes are called there.
-The communication between those is done using the `HttpResponse` type from [`src/exercise/http-handler/http.ts`](src/exercise/http-handler/utils.ts) which includes a [response status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) and a body that can also be used as an error message.
-These worker methods are located in [`src/exercise/http-handler/api`](src/exercise/http-handler/api) and structured in files, where for each major route (e.g. `exercise` or `blobs`) there is a file with multiple methods, one for each allowed HTTP method.
+The webserver is responsible for all HTTP API requests.
+The webserver sets up all available routes in its routers. The methods doing the actual work for the routes are called there.
+These routers are located in [`src/application-routers`](src/application-routers) and structured in files.
 All routes served by this server should be prefixed by `/api/`.
 
 It listens on port `3201` by default (`13201` during tests).
-
-The OpenAPI definition of this API can be found at [`../docs/swagger.yml`](../docs/swagger.yml).
 
 ### `ExerciseWebsocketServer`
 

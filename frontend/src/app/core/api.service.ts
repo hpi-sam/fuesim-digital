@@ -89,7 +89,7 @@ export class ApiService {
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
             this.httpClient
-                .post(`${httpOrigin}/api/exercise_template`, data)
+                .post(`${httpOrigin}/api/exercise_templates`, data)
                 .pipe(
                     map((v) => getExerciseTemplateResponseDataSchema.parse(v))
                 )
@@ -102,7 +102,7 @@ export class ApiService {
     ) {
         return lastValueFrom(
             this.httpClient
-                .patch(`${httpOrigin}/api/exercise_template/${id}`, data)
+                .patch(`${httpOrigin}/api/exercise_templates/${id}`, data)
                 .pipe(
                     map((v) => getExerciseTemplateResponseDataSchema.parse(v))
                 )
@@ -112,7 +112,7 @@ export class ApiService {
     public async createExerciseFromTemplate(id: UUID) {
         return lastValueFrom(
             this.httpClient.post<ExerciseAccessIds>(
-                `${httpOrigin}/api/exercise_template/${id}/new`,
+                `${httpOrigin}/api/exercise_templates/${id}/new`,
                 {}
             )
         );
@@ -120,7 +120,7 @@ export class ApiService {
 
     public async deleteExerciseTemplate(id: string) {
         return lastValueFrom(
-            this.httpClient.delete(`${httpOrigin}/api/exercise_template/${id}`)
+            this.httpClient.delete(`${httpOrigin}/api/exercise_templates/${id}`)
         );
     }
 }

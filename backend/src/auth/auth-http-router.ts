@@ -1,131 +1,113 @@
 import { userDataResponseSchema } from 'digital-fuesim-manv-shared';
-import { HttpRouter } from '../http-router.js';
+import { Router } from 'express';
 import { toFrontend } from '../utils/frontend-http-helper.js';
 import type { AuthService } from './auth-service.js';
 
-export class AuthHttpRouter extends HttpRouter {
-    public constructor(private readonly authService: AuthService) {
-        super();
-    }
+export const createAuthRouter = (authService: AuthService) => {
+    const router = Router();
 
-    protected initializeRoutes() {
-        this.router.get('/register', (req, res) => {
-            try {
-                this.authService.oidcService.handleRegistrationRedirect(
-                    req,
-                    res
-                );
-            } catch {
-                res.redirect(
-                    toFrontend(undefined, {
-                        loginFailure: 'Anmeldung fehlgeschlagen',
-                    })
-                );
-            }
-        });
-
-        this.router.get('/oidc-redirect', async (req, res) => {
-            try {
-                await this.authService.oidcService.handleLoginRedirect(
-                    req,
-                    res
-                );
-            } catch {
-                res.redirect(
-                    toFrontend(undefined, {
-                        loginFailure: 'Anmeldung fehlgeschlagen',
-                    })
-                );
-            }
-        });
-
-        this.router.get('/oidc-callback', async (req, res) => {
-            try {
-                await this.authService.oidcService.handleCallback(req, res);
-            } catch {
-                res.redirect(
-                    toFrontend(undefined, {
-                        loginFailure: 'Anmeldung fehlgeschlagen',
-                    })
-                );
-            }
-        });
-
-        this.router.get('/user-data', async (req, res) => {
-            const sessionToken =
-                req.cookies[this.authService.SESSION_COOKIE_NAME];
-            const sessionTokenData = sessionToken
-                ? await this.authService.getDataFromSessionToken(sessionToken)
-                : null;
-
-            const sessionIsExpired = sessionToken && !sessionTokenData;
-
-            if (sessionIsExpired) {
-                res.clearCookie(this.authService.SESSION_COOKIE_NAME);
-            }
-
-            res.send(
-                userDataResponseSchema.encode({
-                    user: sessionTokenData?.user ?? null,
-                    expired: sessionIsExpired,
-                    userRegistrationsEnabled:
-                        this.authService.oidcService.userRegistrationEnabled,
-                    userSelfServiceEnabled:
-                        this.authService.oidcService.userSelfServiceEnabled,
+    router.get('/register', (req, res) => {
+        try {
+            authService.oidcService.handleRegistrationRedirect(req, res);
+        } catch {
+            res.redirect(
+                toFrontend(undefined, {
+                    loginFailure: 'Anmeldung fehlgeschlagen',
                 })
             );
-        });
+        }
+    });
 
-        this.router.post('/refresh-session', async (req, res) => {
-            const sessionToken =
-                req.cookies[this.authService.SESSION_COOKIE_NAME];
-            if (!sessionToken) {
-                res.status(400).send({ error: 'No session token provided' });
-                return;
-            }
+    router.get('/oidc-redirect', async (req, res) => {
+        try {
+            await authService.oidcService.handleLoginRedirect(req, res);
+        } catch {
+            res.redirect(
+                toFrontend(undefined, {
+                    loginFailure: 'Anmeldung fehlgeschlagen',
+                })
+            );
+        }
+    });
 
-            try {
-                const newSessionToken =
-                    await this.authService.refreshSession(sessionToken);
+    router.get('/oidc-callback', async (req, res) => {
+        try {
+            await authService.oidcService.handleCallback(req, res);
+        } catch {
+            res.redirect(
+                toFrontend(undefined, {
+                    loginFailure: 'Anmeldung fehlgeschlagen',
+                })
+            );
+        }
+    });
 
-                res.cookie(
-                    this.authService.SESSION_COOKIE_NAME,
-                    newSessionToken,
-                    {
-                        httpOnly: true,
-                        sameSite: 'lax',
-                    }
-                );
+    router.get('/user-data', async (req, res) => {
+        const sessionToken = req.cookies[authService.SESSION_COOKIE_NAME];
+        const sessionTokenData = sessionToken
+            ? await authService.getDataFromSessionToken(sessionToken)
+            : null;
 
-                res.status(200).send({ message: 'Session refreshed' });
-            } catch {
-                res.status(400).send({ error: 'Failed to refresh session' });
-            }
-        });
+        const sessionIsExpired = sessionToken && !sessionTokenData;
 
-        this.router.get('/logout', async (req, res) => {
-            const sessionToken =
-                req.cookies[this.authService.SESSION_COOKIE_NAME];
-            if (!sessionToken) {
-                res.redirect(
-                    toFrontend(undefined, { logoutStatus: 'noSessionFound' })
-                );
-                return;
-            }
+        if (sessionIsExpired) {
+            res.clearCookie(authService.SESSION_COOKIE_NAME);
+        }
 
-            await this.authService.deleteSession(sessionToken);
+        res.send(
+            userDataResponseSchema.encode({
+                user: sessionTokenData?.user ?? null,
+                expired: sessionIsExpired,
+                userRegistrationsEnabled:
+                    authService.oidcService.userRegistrationEnabled,
+                userSelfServiceEnabled:
+                    authService.oidcService.userSelfServiceEnabled,
+            })
+        );
+    });
 
-            res.clearCookie(this.authService.SESSION_COOKIE_NAME);
+    router.post('/refresh-session', async (req, res) => {
+        const sessionToken = req.cookies[authService.SESSION_COOKIE_NAME];
+        if (!sessionToken) {
+            res.status(400).send({ error: 'No session token provided' });
+            return;
+        }
 
-            const logoutUrl =
-                await this.authService.oidcService.getSingleSignOutUrl();
-            if (!logoutUrl) {
-                res.redirect(
-                    toFrontend(undefined, { logoutStatus: 'loggedOut' })
-                );
-                return;
-            }
-            res.redirect(logoutUrl.toString());
-        });
-    }
-}
+        try {
+            const newSessionToken =
+                await authService.refreshSession(sessionToken);
+
+            res.cookie(authService.SESSION_COOKIE_NAME, newSessionToken, {
+                httpOnly: true,
+                sameSite: 'lax',
+            });
+
+            res.status(200).send({ message: 'Session refreshed' });
+        } catch {
+            res.status(400).send({ error: 'Failed to refresh session' });
+        }
+    });
+
+    router.get('/logout', async (req, res) => {
+        const sessionToken = req.cookies[authService.SESSION_COOKIE_NAME];
+        if (!sessionToken) {
+            res.redirect(
+                toFrontend(undefined, { logoutStatus: 'noSessionFound' })
+            );
+            return;
+        }
+
+        await authService.deleteSession(sessionToken);
+
+        res.clearCookie(authService.SESSION_COOKIE_NAME);
+
+        const logoutUrl = await authService.oidcService.getSingleSignOutUrl();
+        if (!logoutUrl) {
+            res.redirect(toFrontend(undefined, { logoutStatus: 'loggedOut' }));
+            return;
+        }
+        res.redirect(logoutUrl.toString());
+    });
+
+    return router;
+};

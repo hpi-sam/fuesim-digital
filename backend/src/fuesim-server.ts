@@ -33,7 +33,6 @@ export class FuesimServer {
         );
         this._httpServer = new ApiHttpServer(
             app,
-            databaseService,
             exerciseService,
             authService,
             exerciseManagerService

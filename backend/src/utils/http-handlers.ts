@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
+import type { AuthService } from '../auth/auth-service.js';
 import { PermissionDeniedError, ApiError } from './http.js';
 
 export type HttpMethod =
@@ -9,6 +10,21 @@ export type HttpMethod =
     | 'patch'
     | 'post'
     | 'put';
+
+export const createSessionMiddleware =
+    (authService: AuthService): RequestHandler =>
+    async (req, res, next) => {
+        const sessionToken = req.cookies[authService.SESSION_COOKIE_NAME];
+        if (sessionToken) {
+            // eslint-disable-next-line require-atomic-updates
+            req.session =
+                await authService.getDataFromSessionToken(sessionToken);
+        } else {
+            req.session = undefined;
+        }
+
+        next();
+    };
 
 export const isAuthenticatedMiddleware: RequestHandler = (req, res, next) => {
     if (!req.session) {

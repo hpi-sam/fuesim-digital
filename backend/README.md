@@ -23,15 +23,14 @@ When starting, the `index.ts` is executed. It establishes a database connection 
 
 ### `FuesimServer`
 
-The `FuesimServer` is a class responsible for starting and stopping both the webserver (`ExerciseHttpServer`) and the websocket server (`ExerciseWebsocketServer`) parts of the backend.
+The `FuesimServer` is a class responsible for starting and stopping both the webserver (`ApiHttpServer`) and the websocket server (`ExerciseWebsocketServer`) parts of the backend.
 Both servers use `express` as the underlying architecture.
-Both servers currently use CORS allow all origins as a temporary solution.
 
-### `ExerciseHttpServer`
+### `ApiHttpServer`
 
 The webserver is responsible for all HTTP API requests.
 The webserver sets up all available routes in its routers. The methods doing the actual work for the routes are called there.
-These routers are located in [`src/application-routers`](src/application-routers) and structured in files.
+These routers are located in [`src/routers`](src/routers) and structured in files.
 All routes served by this server should be prefixed by `/api/`.
 
 It listens on port `3201` by default (`13201` during tests).
@@ -57,7 +56,7 @@ Its main purpose is the `reduce` method, allowing an `ExerciseAction` to be appl
 
 ### Database
 
-We are using [PostgreSQL 14](https://www.postgresql.org/) for persistance with [Drizzle](https://orm.drizzle.team) as an in-between layer for interaction with the database.
+We are using [PostgreSQL 14](https://www.postgresql.org/) for persistence with [Drizzle](https://orm.drizzle.team) as an in-between layer for interaction with the database.
 
 The credentials and other parameters of the database must match the [`.env` file in the root directory](../.env).
 

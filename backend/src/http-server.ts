@@ -3,7 +3,8 @@ import cors from 'cors';
 import type { Express } from 'express';
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { createExerciseRouter } from 'routers/exercise-router.js';
+import { createExerciseRouter } from './routers/exercise-router.js';
+import { createAuthRouter } from './routers/auth-http-router.js';
 import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
 import type { AuthService, SessionInformation } from './auth/auth-service.js';
 import {
@@ -11,7 +12,6 @@ import {
     errorHandler,
 } from './utils/http-handlers.js';
 import type { ExerciseService } from './database/services/exercise-service.js';
-import { createAuthRouter } from './auth/auth-http-router.js';
 import { Config } from './config.js';
 import { createExerciseManagerRouter } from './routers/exercise-manager-router.js';
 import { healthRouter } from './routers/health-router.js';

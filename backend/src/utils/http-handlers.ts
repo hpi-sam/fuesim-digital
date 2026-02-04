@@ -33,7 +33,7 @@ export const isAuthenticatedMiddleware: RequestHandler = (req, res, next) => {
     next();
 };
 
-export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     try {
         if (err instanceof ApiError) {
             res.status(err.statusCode).send({ message: err.message });

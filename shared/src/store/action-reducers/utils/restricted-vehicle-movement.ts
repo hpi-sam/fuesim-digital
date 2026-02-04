@@ -96,6 +96,6 @@ export function checkRestrictedVehicleMovementOrThrow(
         )
     )
         throw new ReducerError(
-            'A restricted zone forbids placing this vehicle here.'
+            'Eine eingeschränkte Zone verbietet es, das Fahrzeug an diese Stelle zu bewegen.'
         );
 }

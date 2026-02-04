@@ -1,4 +1,3 @@
-import type { ParticipantKey, TrainerKey } from 'digital-fuesim-manv-shared';
 import { ExerciseState } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { sql, eq, lt, and, isNull, desc } from 'drizzle-orm';

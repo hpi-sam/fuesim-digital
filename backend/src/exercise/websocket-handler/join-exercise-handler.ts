@@ -2,7 +2,6 @@ import {
     joinExerciseResponseDataSchema,
     type UUID,
 } from 'digital-fuesim-manv-shared';
-import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
 import { isExerciseKey } from '../exercise-keys.js';

@@ -25,31 +25,31 @@ export const createExerciseManagerRouter = (
         res.send(getExercisesResponseDataSchema.encode(exercises));
     });
 
-    router.use('/exercise_templates/', isAuthenticatedMiddleware);
-
-    router.get('/exercise_templates/', async (req, res) => {
-        const templates =
-            await exerciseManagerService.getAllExerciseTemplatesOfOwner(
-                req.session!
+    router
+        .route('/exercise_templates/')
+        .all(isAuthenticatedMiddleware)
+        .get(async (req, res) => {
+            const templates =
+                await exerciseManagerService.getAllExerciseTemplatesOfOwner(
+                    req.session!
+                );
+            res.send(getExerciseTemplatesResponseDataSchema.encode(templates));
+        })
+        .post(async (req, res) => {
+            const parsedData = postExerciseTemplateRequestDataSchema.parse(
+                req.body
             );
-        res.send(getExerciseTemplatesResponseDataSchema.encode(templates));
-    });
+            const exerciseTemplate =
+                await exerciseManagerService.createExerciseTemplate(
+                    parsedData,
+                    req.session!,
+                    exerciseService
+                );
 
-    router.post('/exercise_templates/', async (req, res) => {
-        const parsedData = postExerciseTemplateRequestDataSchema.parse(
-            req.body
-        );
-        const exerciseTemplate =
-            await exerciseManagerService.createExerciseTemplate(
-                parsedData,
-                req.session!,
-                exerciseService
+            res.send(
+                getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
             );
-
-        res.send(
-            getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
-        );
-    });
+        });
 
     router.post('/exercise_templates/:id/new', async (req, res) => {
         const templateId = exerciseTemplateIdSchema.safeParse(

@@ -3,7 +3,11 @@ import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ExerciseTemplateInsert } from '../schema.js';
-import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
+import {
+    ApiError,
+    NotFoundError,
+    PermissionDeniedError,
+} from '../../utils/http.js';
 import type { ExerciseService } from './exercise-service.js';
 
 export class ExerciseManagerService {
@@ -33,7 +37,7 @@ export class ExerciseManagerService {
                 user: session.user.id,
             });
         if (!exerciseTemplate) {
-            throw new NotFoundError();
+            throw new ApiError();
         }
         const newExercise = ExerciseFactory.fromBlank();
         await exerciseService.createTemplate(newExercise, exerciseTemplate);
@@ -56,13 +60,16 @@ export class ExerciseManagerService {
         if (exerciseTemplate.exercise_template.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
-        await this.exerciseRepository.updateExerciseTemplate(
-            exerciseTemplate.exercise_template.id,
-            data
-        );
+        const updatedTemplate =
+            await this.exerciseRepository.updateExerciseTemplate(
+                exerciseTemplate.exercise_template.id,
+                data
+            );
+        if (!updatedTemplate) {
+            throw new ApiError();
+        }
         return {
-            ...exerciseTemplate.exercise_template,
-            ...data,
+            ...updatedTemplate,
             trainerId: exerciseTemplate.exercise_entity.trainerId,
         };
     }
@@ -119,7 +126,7 @@ export class ExerciseManagerService {
             exerciseTemplate.exercise_entity.trainerId,
             session
         );
-        exerciseService.destroyExercise(activeExercise);
+        exerciseService.unloadExercise(activeExercise);
 
         await this.exerciseRepository.deleteExerciseTemplateById(
             exerciseTemplate.exercise_template.id

@@ -53,8 +53,11 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
-    public destroyExercise(exercise: ActiveExercise) {
-        exercise.destroy();
+    /**
+     * Removes `exercise` from the set of active exercises
+     */
+    public unloadExercise(exercise: ActiveExercise) {
+        exercise.unload();
 
         this.exerciseMap.delete(exercise.participantKey);
         this.exerciseMap.delete(exercise.trainerKey);
@@ -171,6 +174,13 @@ export class ExerciseService {
         );
     }
 
+    /**
+     * Deletes an exercise from the database and unloads it from the server
+     * @param exerciseKey the trainerKey of the deleting trainer
+     *                    (participants are not authorized)
+     * @param session optionally, the session of a logged-in user. User-owned
+     *                exercises can only be deleted by themselves
+     */
     public async deleteExercise(
         exerciseKey: ExerciseKey,
         session?: SessionInformation
@@ -198,17 +208,11 @@ export class ExerciseService {
             throw new PermissionDeniedError();
         }
 
-        this.destroyExercise(activeExercise);
+        this.unloadExercise(activeExercise);
 
-        this.exerciseMap.delete(activeExercise.participantKey);
-        this.exerciseMap.delete(activeExercise.trainerKey);
-        if (activeExercise.exerciseId) {
-            // only delete if exercise has been saved before in database
-            await this.exerciseRepository.deleteExerciseById(
-                activeExercise.exerciseId
-            );
-        }
-        activeExercise.markAsSaved();
+        await this.exerciseRepository.deleteExerciseById(
+            activeExercise.exerciseId
+        );
     }
 
     public async saveUnsavedExercises() {

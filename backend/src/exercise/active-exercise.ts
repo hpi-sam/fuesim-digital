@@ -306,7 +306,7 @@ export class ActiveExercise {
         this.markAsModified();
     }
 
-    public destroy() {
+    public unload() {
         this.clients.forEach((client) => client.disconnect());
         // Pause the exercise to stop the tick
         this.pause();

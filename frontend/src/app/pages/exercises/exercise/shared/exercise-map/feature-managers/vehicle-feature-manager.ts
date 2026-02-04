@@ -1,4 +1,4 @@
-import type { Store } from '@ngrx/store';
+import { createSelector, type Store } from '@ngrx/store';
 import { normalZoom } from 'digital-fuesim-manv-shared';
 import type {
     UUID,
@@ -11,7 +11,7 @@ import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type OlMap from 'ol/Map';
-import type { Subject } from 'rxjs';
+import { pairwise, startWith, takeUntil, type Subject } from 'rxjs';
 import type { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { selectVisibleVehicles } from 'src/app/state/application/selectors/shared.selectors';
@@ -20,6 +20,7 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import {
     selectConfiguration,
     selectExerciseState,
+    selectVehicles,
 } from 'src/app/state/application/selectors/exercise.selectors';
 import { VehiclePopupComponent } from '../shared/vehicle-popup/vehicle-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -87,6 +88,46 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             destroy$,
             mapInteractionsManager
         );
+
+        // Register change handlers to show/hide vehicle status indicators if configuration was changed
+        this.store
+            .select(
+                createSelector(
+                    selectConfiguration,
+                    selectVehicles,
+                    (configuration, vehicles) => ({
+                        vehicleStatusHighlight:
+                            configuration.vehicleStatusHighlight,
+                        vehicleStatusInPatientStatusColor:
+                            configuration.vehicleStatusInPatientStatusColor,
+                        vehicles,
+                    })
+                )
+            )
+            .pipe(
+                startWith({
+                    vehicleStatusHighlight: false,
+                    vehicleStatusInPatientStatusColor: false,
+                    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+                    vehicles: {} as { [key: UUID]: Vehicle },
+                }),
+                pairwise(),
+                takeUntil(destroy$)
+            )
+            .subscribe(([oldData, newData]) => {
+                if (
+                    oldData.vehicleStatusHighlight !==
+                        newData.vehicleStatusHighlight ||
+                    oldData.vehicleStatusInPatientStatusColor !==
+                        newData.vehicleStatusInPatientStatusColor
+                ) {
+                    Object.values(newData.vehicles).forEach((newVehicle) => {
+                        const oldVehicle = oldData.vehicles[newVehicle.id];
+                        if (oldVehicle)
+                            this.onElementChanged(oldVehicle, newVehicle);
+                    });
+                }
+            });
     }
     private readonly imageStyleHelper = new ImageStyleHelper(
         (feature) => (this.getElementFromFeature(feature) as Vehicle).image

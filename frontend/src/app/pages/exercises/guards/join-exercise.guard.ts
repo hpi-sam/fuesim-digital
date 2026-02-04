@@ -50,7 +50,6 @@ export class JoinExerciseGuard {
 
         let successfullyJoined = false;
 
-
         if (route.queryParams['autojoin']) {
             successfullyJoined = await this.applicationService.joinExercise(
                 exerciseId,

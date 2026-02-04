@@ -8,8 +8,8 @@ export interface ExerciseKeys {
 }
 
 export interface ExerciseAccessIds {
-    readonly participantId: string;
-    readonly trainerId: string;
+    readonly participantId: ParticipantKey;
+    readonly trainerId: TrainerKey;
 }
 
 export const userDataResponseSchema = z.object({

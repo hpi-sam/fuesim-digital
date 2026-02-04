@@ -13,6 +13,7 @@ export const createExerciseRouter = (
     exerciseService: ExerciseService
 ): Router => {
     const router = Router();
+
     router.post('/exercise', async (req, res) => {
         const exercise = isEmpty(req.body)
             ? ExerciseFactory.fromBlank()
@@ -27,31 +28,32 @@ export const createExerciseRouter = (
         });
     });
 
-    router.get('/exercise/:exerciseKey', async (req, res) => {
-        if (!isExerciseKey(req.params.exerciseKey)) {
-            throw new ApiError();
-        }
-        const exercise = exerciseService.getExerciseByKey(
-            req.params.exerciseKey,
-            req.session
-        );
-        res.send(
-            exerciseExistsResponseDataSchema.parse({
-                isTemplate: !!exercise.template,
-            })
-        );
-    });
-
-    router.delete('/exercise/:exerciseKey', async (req, res) => {
-        if (!isExerciseKey(req.params.exerciseKey)) {
-            throw new ApiError();
-        }
-        await exerciseService.deleteExercise(
-            req.params.exerciseKey,
-            req.session
-        );
-        res.status(204).send();
-    });
+    router
+        .route('/exercise/:exerciseKey')
+        .get(async (req, res) => {
+            if (!isExerciseKey(req.params.exerciseKey)) {
+                throw new ApiError();
+            }
+            const exercise = exerciseService.getExerciseByKey(
+                req.params.exerciseKey,
+                req.session
+            );
+            res.send(
+                exerciseExistsResponseDataSchema.parse({
+                    isTemplate: !!exercise.template,
+                })
+            );
+        })
+        .delete(async (req, res) => {
+            if (!isExerciseKey(req.params.exerciseKey)) {
+                throw new ApiError();
+            }
+            await exerciseService.deleteExercise(
+                req.params.exerciseKey,
+                req.session
+            );
+            res.status(204).send();
+        });
 
     router.get('/exercise/:exerciseKey/history', async (req, res) => {
         if (!isExerciseKey(req.params.exerciseKey)) {

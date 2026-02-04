@@ -107,8 +107,8 @@
                             <ng-template>
                                 <div class="cards">
                                     @for (
-                                        simulatedRegionTemplate of simulatedRegionTemplates;
-                                        track simulatedRegionTemplate
+                                        simulatedRegionDragTemplate of simulatedRegionDragTemplates;
+                                        track simulatedRegionDragTemplate
                                     ) {
                                         <app-map-editor-card
                                             (elementMousedown)="
@@ -117,18 +117,18 @@
                                                     {
                                                         type: 'simulatedRegion',
                                                         template:
-                                                            simulatedRegionTemplate,
+                                                            simulatedRegionDragTemplate,
                                                     }
                                                 )
                                             "
                                             dataCy="draggableSimulatedRegionDiv"
                                             [imageUrl]="
-                                                simulatedRegionTemplate.image
-                                                    .url
+                                                simulatedRegionDragTemplate
+                                                    .image.url
                                             "
                                             [darkBackground]="true"
                                             [title]="
-                                                simulatedRegionTemplate.editorName
+                                                simulatedRegionDragTemplate.editorName
                                             "
                                         >
                                         </app-map-editor-card>
@@ -152,8 +152,8 @@
                             <ng-template>
                                 <div class="cards">
                                     @for (
-                                        restrictedZoneTemplate of restrictedZoneTemplates;
-                                        track restrictedZoneTemplate
+                                        restrictedZoneDragTemplate of restrictedZoneDragTemplates;
+                                        track restrictedZoneDragTemplate
                                     ) {
                                         <app-map-editor-card
                                             (elementMousedown)="
@@ -162,17 +162,18 @@
                                                     {
                                                         type: 'restrictedZone',
                                                         template:
-                                                            restrictedZoneTemplate,
+                                                            restrictedZoneDragTemplate,
                                                     }
                                                 )
                                             "
                                             dataCy="draggablerestrictedZoneDiv"
                                             [imageUrl]="
-                                                restrictedZoneTemplate.image.url
+                                                restrictedZoneDragTemplate.image
+                                                    .url
                                             "
                                             [darkBackground]="true"
                                             [title]="
-                                                restrictedZoneTemplate.editorName
+                                                restrictedZoneDragTemplate.editorName
                                             "
                                         />
                                     }

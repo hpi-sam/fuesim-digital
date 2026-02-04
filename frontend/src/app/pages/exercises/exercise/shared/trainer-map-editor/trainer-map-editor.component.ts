@@ -118,9 +118,9 @@ export class TrainerMapEditorComponent implements OnInit {
         private readonly exerciseService: ExerciseService
     ) {}
 
-    public readonly simulatedRegionTemplates = simulatedRegionDragTemplates;
+    public readonly simulatedRegionDragTemplates = simulatedRegionDragTemplates;
 
-    public readonly restrictedZoneTemplates = restrictedZoneDragTemplates;
+    public readonly restrictedZoneDragTemplates = restrictedZoneDragTemplates;
 
     public readonly viewportTemplate = {
         image: Viewport.image,

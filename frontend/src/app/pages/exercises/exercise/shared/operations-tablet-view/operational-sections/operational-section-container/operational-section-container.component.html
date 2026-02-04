@@ -23,7 +23,7 @@
     <div class="ml-auto mr-2">
         <app-section-leader-slot
             (vehicleAssigned)="assignVehicle($event, true)"
-            [vehicle]="operationalSectionLeader$ | async"
+            [vehicle]="(operationalSectionLeader$ | async) ?? null"
         ></app-section-leader-slot>
     </div>
     <div

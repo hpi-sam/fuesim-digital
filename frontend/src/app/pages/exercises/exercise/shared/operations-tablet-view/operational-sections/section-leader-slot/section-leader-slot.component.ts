@@ -13,7 +13,7 @@ export class SectionLeaderSlotComponent {
     constructor(private readonly messageService: MessageService) {}
 
     @Input()
-    public vehicle?: Vehicle | null = null;
+    public vehicle: Vehicle | null = null;
 
     /**
      * Emits the ID of the vehicle that was assigned to this slot

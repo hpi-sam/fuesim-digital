@@ -105,10 +105,19 @@ export namespace OperationalSectionActionReducers {
         {
             action: RemoveOperationalSectionAction,
             reducer: (draftState, { sectionId }) => {
-                const section = draftState.operationalSections[sectionId];
-                if (!section) {
-                    return draftState;
-                }
+                Object.keys(draftState.vehicles).forEach((vehicleId) => {
+                    const vehicle = draftState.vehicles[vehicleId];
+                    if (!vehicle) return;
+
+                    if (
+                        vehicle.operationalAssignment?.type ===
+                            'operationalSection' &&
+                        vehicle.operationalAssignment.sectionId === sectionId
+                    ) {
+                        draftState.vehicles[vehicleId]!.operationalAssignment =
+                            null;
+                    }
+                });
 
                 delete draftState.operationalSections[sectionId];
 

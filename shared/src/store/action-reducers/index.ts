@@ -8,5 +8,6 @@ export * from './viewport.js';
 export * from './map-images.js';
 export * from './action-reducers.js';
 export * from './vehicle-templates.js';
+export * from './operational-section.js';
 
 // Don't forget to register the actionReducer in `action-reducers.ts`

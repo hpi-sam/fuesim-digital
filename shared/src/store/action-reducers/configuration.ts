@@ -48,10 +48,10 @@ export class SetVehicleStatusHighlightEnabled implements Action {
 
 export class SetVehicleStatusInPatientStatusColorEnabled implements Action {
     @IsValue(
-        '[Configuration] Set VehicleStatusInPatientStatusColorEnabled' as const
+        '[Configuration] Set vehicleStatusInPatientStatusColorEnabled' as const
     )
     public readonly type =
-        '[Configuration] Set VehicleStatusInPatientStatusColorEnabled';
+        '[Configuration] Set vehicleStatusInPatientStatusColorEnabled';
 
     @IsBoolean()
     public readonly vehicleStatusInPatientStatusColor!: boolean;

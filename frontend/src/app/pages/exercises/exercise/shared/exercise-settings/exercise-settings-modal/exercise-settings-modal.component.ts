@@ -73,7 +73,7 @@ export class ExerciseSettingsModalComponent {
         vehicleStatusInPatientStatusColorEnabled: boolean
     ) {
         this.exerciseService.proposeAction({
-            type: '[Configuration] Set VehicleStatusInPatientStatusColorEnabled',
+            type: '[Configuration] Set vehicleStatusInPatientStatusColorEnabled',
             vehicleStatusInPatientStatusColor:
                 vehicleStatusInPatientStatusColorEnabled,
         });

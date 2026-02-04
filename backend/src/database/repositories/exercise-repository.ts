@@ -21,34 +21,6 @@ export class ExerciseRepository extends BaseRepository {
         );
     }
 
-    /**
-     * Loads the exercise with the corresponding trainer key
-     */
-    public async getExerciseByTrainerKey(trainerKey: TrainerKey) {
-        const dbResult = await this.databaseConnection
-            .select()
-            .from(exerciseTable)
-            .leftJoin(
-                exerciseTemplateTable,
-                eq(exerciseTemplateTable.id, exerciseTable.templateId)
-            )
-            .where(eq(exerciseTable.trainerId, trainerKey));
-
-        return this.onlySingle(dbResult);
-    }
-
-    /**
-     * Loads the exercise with the corresponding participant key
-     */
-    public async getExerciseByParticipantKey(participantKey: ParticipantKey) {
-        const dbResult = await this.databaseConnection
-            .select()
-            .from(exerciseTable)
-            .where(eq(exerciseTable.participantId, participantKey));
-
-        return this.onlySingle(dbResult);
-    }
-
     public getAllExercises() {
         return this.databaseConnection
             .select()

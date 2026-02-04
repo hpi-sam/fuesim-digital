@@ -6,6 +6,7 @@ import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js'
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
 import { isExerciseKey } from '../exercise-keys.js';
+import { NotFoundError } from '../../utils/http.js';
 import { secureOn } from './secure-on.js';
 
 export const registerJoinExerciseHandler = (
@@ -41,15 +42,15 @@ export const registerJoinExerciseHandler = (
                     });
                     return;
                 }
+                if (e instanceof NotFoundError) {
+                    callback({
+                        success: false,
+                        message: 'The exercise does not exist',
+                        expected: false,
+                    });
+                    return;
+                }
                 throw e;
-            }
-            if (!clientId) {
-                callback({
-                    success: false,
-                    message: 'The exercise does not exist',
-                    expected: false,
-                });
-                return;
             }
             callback({
                 success: true,

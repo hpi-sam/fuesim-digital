@@ -21,16 +21,15 @@ export class ClientWrapper {
     private relatedExerciseClient?: Client;
 
     /**
-     * @param exerciseId The exercise id to be used for the client.
+     * @param exerciseKey The exercise key to be used for the client.
      * @param clientName The public name of the client.
      * @returns The joined client's id, or undefined when the exercise doesn't exists.
      */
     public joinExercise(exerciseKey: ExerciseKey, clientName: string): UUID {
-        const exercise = this.exerciseService.getExerciseByKey(
+        this.chosenExercise = this.exerciseService.getExerciseByKey(
             exerciseKey,
             this.session
         );
-        this.chosenExercise = exercise;
         // Although getRoleFromUsedId may throw an error, this should never happen here
         // as the provided id is guaranteed to be one of the ids of the exercise as the exercise
         // was fetched with this exact id from the exercise map.

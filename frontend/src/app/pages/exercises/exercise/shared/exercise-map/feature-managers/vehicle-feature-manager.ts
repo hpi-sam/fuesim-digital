@@ -251,8 +251,8 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             return undefined;
         }
 
-        const filled = Object.keys(vehicle.patientIds).length;
-        const text = `${filled}/${vehicle.patientCapacity}`;
+        const patientCount = Object.keys(vehicle.patientIds).length;
+        const text = `${patientCount}/${vehicle.patientCapacity}`;
 
         let statusbarColor: StatusbarColor = {
             backgroundColor: 'rgba(255, 255, 255, 0.85)',
@@ -260,7 +260,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
             color: 'black',
         };
 
-        if (config.vehicleStatusInPatientStatusColor && filled > 0) {
+        if (config.vehicleStatusInPatientStatusColor && patientCount > 0) {
             const state = selectStateSnapshot(selectExerciseState, this.store);
             const patients = Object.keys(vehicle.patientIds)
                 .map((id) => state.patients[id])

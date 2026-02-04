@@ -241,10 +241,7 @@ export class ExerciseService {
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ): Promise<ExerciseTimeline> {
-        const activeExercise = await this.getExerciseByKey(
-            exerciseKey,
-            session
-        );
+        const activeExercise = this.getExerciseByKey(exerciseKey, session);
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
                 await this.actionRepository.getActionsForExerciseId(

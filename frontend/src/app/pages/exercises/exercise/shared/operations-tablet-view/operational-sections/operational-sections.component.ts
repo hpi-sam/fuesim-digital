@@ -23,7 +23,6 @@ export class OperationalSectionsTabComponent {
         .pipe(map((sectionsMap) => Object.values(sectionsMap)));
 
     public addOperationalSection(): void {
-        console.log(uuid());
         try {
             this.exerciseService.proposeAction({
                 type: '[OperationalSection] Add Operational Section',

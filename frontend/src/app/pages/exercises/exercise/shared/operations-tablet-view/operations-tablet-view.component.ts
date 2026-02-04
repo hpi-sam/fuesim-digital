@@ -19,7 +19,6 @@ export class OperationsTabletViewComponent implements AfterViewInit, OnDestroy {
     public fullscreenEnabled = false;
 
     public fullscreenEventListener() {
-        console.log('Fullscreen event triggered');
         this.fullscreenEnabled = document.fullscreenElement !== null;
     }
 

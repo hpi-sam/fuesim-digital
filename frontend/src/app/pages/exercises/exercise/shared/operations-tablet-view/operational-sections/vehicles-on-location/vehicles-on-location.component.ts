@@ -26,7 +26,6 @@ export class VehiclesOnLocationComponent {
     );
 
     public onVehicleDropped(event: CdkDragDrop<string[]>) {
-        console.log(event);
         this.exerciseService.proposeAction(
             {
                 type: '[OperationalSection] Move Vehicle To Operational Section',

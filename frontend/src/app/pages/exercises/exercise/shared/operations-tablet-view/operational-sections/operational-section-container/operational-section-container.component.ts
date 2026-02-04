@@ -64,12 +64,10 @@ export class OperationalSectionContainerComponent implements OnInit {
     }
 
     public onVehicleDropped(event: CdkDragDrop<string[]>) {
-        console.log(event);
         this.assignVehicle(event.item.data, false);
     }
 
     public assignVehicle(vehicleId: string, asSectionLeader: boolean) {
-        console.log(vehicleId);
         this.exerciseService.proposeAction(
             {
                 type: '[OperationalSection] Move Vehicle To Operational Section',

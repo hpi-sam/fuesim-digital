@@ -1,4 +1,10 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     defaultTileMapProperties,
@@ -9,9 +15,12 @@ import {
 import maplibregl from 'maplibre-gl';
 // eslint-disable-next-line no-restricted-imports
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { map } from 'rxjs';
+import { map, first, Subject, takeUntil } from 'rxjs';
 import { AppState } from 'src/app/state/app.state';
-import { selectViewports } from 'src/app/state/application/selectors/exercise.selectors';
+import {
+    selectTileMapProperties,
+    selectViewports,
+} from 'src/app/state/application/selectors/exercise.selectors';
 import { startingPosition } from '../../../starting-position';
 
 @Component({
@@ -20,12 +29,27 @@ import { startingPosition } from '../../../starting-position';
     templateUrl: './operations-map.component.html',
     styleUrl: './operations-map.component.scss',
 })
-export class OperationsMapComponent implements OnInit {
+export class OperationsMapComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
+
     constructor(private readonly store: Store<AppState>) {}
 
     public availableViewports$ = this.store
         .select(selectViewports)
         .pipe(map((viewports) => Object.values(viewports)));
+
+    private readonly tileMapPropertiesSubscription = this.store
+        .select(selectTileMapProperties)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((tileMapProperties) => {
+            const source = this.map?.getSource(
+                'raster-tiles'
+            ) as maplibregl.RasterTileSource | null;
+            if (!source) return;
+
+            source.setTiles([tileMapProperties.tileUrl]);
+            this.map?.triggerRepaint();
+        });
 
     @ViewChild('mapContainer', { static: true })
     public mapContainerRef: ElementRef<HTMLElement> | undefined;
@@ -39,8 +63,6 @@ export class OperationsMapComponent implements OnInit {
 
     public switchViewToViewport(viewport: Viewport) {
         if (!this.map) return;
-
-        console.log('Switching view to viewport', viewport);
 
         const ulCorner = upperLeftCornerOf(viewport);
         const lrCorner = lowerRightCornerOf(viewport);
@@ -89,18 +111,27 @@ export class OperationsMapComponent implements OnInit {
         }
     }
 
-    ngOnInit(): void {
+    async ngOnInit() {
         if (!this.mapContainerRef) {
             throw new Error('Map container reference is undefined');
         }
+        this.store
+            .select(selectTileMapProperties)
+            .pipe(first(), takeUntil(this.destroy$))
+            .subscribe((tileMapProperties) => {
+                this.initMap(tileMapProperties.tileUrl);
+            });
+    }
+
+    private initMap(defaultTileUrl: string = defaultTileMapProperties.tileUrl) {
         this.map = new maplibregl.Map({
-            container: this.mapContainerRef.nativeElement,
+            container: this.mapContainerRef!.nativeElement,
             style: {
                 version: 8,
                 sources: {
                     'raster-tiles': {
                         type: 'raster',
-                        tiles: [defaultTileMapProperties.tileUrl],
+                        tiles: [defaultTileUrl],
                         tileSize: 256,
                         minzoom: 0,
                         maxzoom: 19,
@@ -180,5 +211,11 @@ export class OperationsMapComponent implements OnInit {
         lat4326 = lat4326 - 90;
 
         return [long4326, lat4326];
+    }
+
+    ngOnDestroy(): void {
+        this.tileMapPropertiesSubscription.unsubscribe();
+        this.map?.remove();
+        this.destroy$.next();
     }
 }

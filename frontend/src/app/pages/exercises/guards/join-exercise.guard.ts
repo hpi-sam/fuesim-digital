@@ -47,9 +47,9 @@ export class JoinExerciseGuard {
             this.router.navigate(['/']);
             return false;
         }
-        console.log(route.queryParams);
 
         let successfullyJoined = false;
+
 
         if (route.queryParams['autojoin']) {
             successfullyJoined = await this.applicationService.joinExercise(

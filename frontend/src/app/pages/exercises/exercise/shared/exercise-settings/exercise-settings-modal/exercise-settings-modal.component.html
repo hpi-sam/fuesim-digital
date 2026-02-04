@@ -137,10 +137,18 @@
     <br />
     @if (configuration$ | async; as configuration) {
         <div class="card">
-            <div class="card-header">Statusanzeige</div>
+            <div class="card-header">Statusanzeige für Fahrzeuge</div>
             <div class="card-body">
+                <p class="small">
+                    Die Statusanzeige zeigt über jedem Fahrzeug an, wie viele
+                    Patienten sich aktuell im Fahrzeug befinden und wie viele
+                    Plätze das Fahrzeug insgesamt bietet. Sie kann optional in
+                    der Farbe der Sichtungskategorie des Patienten angezeigt
+                    werden, bei mehreren Patienten wird die Kategorie mit der
+                    höchsten Priorität gewählt.
+                </p>
                 <div class="form-group mb-3">
-                    Statusanzeige für Einsatzfahrzeuge aktivieren?
+                    Statusanzeige für Fahrzeuge aktivieren?
                     <div class="form-switch">
                         <input
                             [ngModel]="configuration.vehicleStatusHighlight"

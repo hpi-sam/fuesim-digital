@@ -11,6 +11,9 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Provide CSV export for patients to import them into IVENA MANV.
 - Enable users to login with SSO via an OpenID Connect providers.
+- Add a new role "Einsatztablet" ("operations tablet") that simulates the view of a tablet device used by operation commanders on site
+    - Add overview map with 3d view and on-location-vehicles as well as in-transfer-vehicles list
+    - Add view to manage on-location vehicles in operational sections
 
 ### Fixed
 

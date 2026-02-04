@@ -28,20 +28,17 @@ export const registerJoinExerciseHandler = (
                 return;
             }
             let clientId: UUID | undefined;
+            if (!isExerciseKey(exerciseKey)) {
+                callback({
+                    success: false,
+                    message: `Invalid payload: Invalid exercise key`,
+                    expected: false,
+                });
+                return;
+            }
             try {
-                if (!isExerciseKey(exerciseKey)) {
-                    throw new ValidationErrorWrapper(['Invalid exercise key']);
-                }
                 clientId = clientWrapper.joinExercise(exerciseKey, clientName);
             } catch (e: unknown) {
-                if (e instanceof ValidationErrorWrapper) {
-                    callback({
-                        success: false,
-                        message: `Invalid payload: ${e.errors}`,
-                        expected: false,
-                    });
-                    return;
-                }
                 if (e instanceof NotFoundError) {
                     callback({
                         success: false,

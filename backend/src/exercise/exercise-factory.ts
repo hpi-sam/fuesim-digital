@@ -14,6 +14,8 @@ import {
     validateExerciseAction,
     migrateStateExport,
     validateExerciseExport,
+    isParticipantKey,
+    isTrainerKey,
 } from 'digital-fuesim-manv-shared';
 import type { InferSelectModel } from 'drizzle-orm';
 import { Config } from '../config.js';
@@ -28,7 +30,6 @@ import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
 import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './active-exercise.js';
-import { isParticipantKey, isTrainerKey } from './exercise-keys.js';
 
 export class ExerciseFactory {
     public static createKeys(): ExerciseKeys {

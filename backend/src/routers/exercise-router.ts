@@ -1,10 +1,12 @@
-import { exerciseExistsResponseDataSchema } from 'digital-fuesim-manv-shared';
+import {
+    exerciseExistsResponseDataSchema,
+    isExerciseKey,
+} from 'digital-fuesim-manv-shared';
 import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
 import { importExercise } from '../utils/import-exercise.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ExerciseFactory } from '../exercise/exercise-factory.js';
-import { isExerciseKey } from '../exercise/exercise-keys.js';
 import { ApiError } from '../utils/http.js';
 
 export const createExerciseRouter = (

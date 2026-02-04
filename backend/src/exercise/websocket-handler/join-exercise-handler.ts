@@ -1,10 +1,10 @@
 import {
+    isExerciseKey,
     joinExerciseResponseDataSchema,
     type UUID,
 } from 'digital-fuesim-manv-shared';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
-import { isExerciseKey } from '../exercise-keys.js';
 import { NotFoundError } from '../../utils/http.js';
 import { secureOn } from './secure-on.js';
 

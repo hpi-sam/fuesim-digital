@@ -1,4 +1,9 @@
-import type { ExerciseKey, ExerciseTimeline } from 'digital-fuesim-manv-shared';
+import {
+    isExerciseKey,
+    isTrainerKey,
+    type ExerciseKey,
+    type ExerciseTimeline,
+} from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import type { ClientWrapper } from '../../exercise/client-wrapper.js';
@@ -10,7 +15,6 @@ import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
-import { isTrainerKey, isExerciseKey } from '../../exercise/exercise-keys.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
     ApiError,

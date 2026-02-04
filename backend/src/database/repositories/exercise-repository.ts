@@ -1,7 +1,7 @@
 import type { ParticipantKey, TrainerKey } from 'digital-fuesim-manv-shared';
 import { ExerciseState } from 'digital-fuesim-manv-shared';
 import type { InferInsertModel } from 'drizzle-orm';
-import { eq, lt, and, isNull, desc } from 'drizzle-orm';
+import { sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import type { ExerciseId, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
@@ -104,8 +104,9 @@ export class ExerciseRepository extends BaseRepository {
             )
             .where(eq(exerciseTemplateTable.user, userId))
             .orderBy(
-                desc(exerciseTemplateTable.lastExerciseCreatedAt),
-                desc(exerciseTemplateTable.createdAt)
+                desc(
+                    sql<Date>`COALESCE("exercise_template"."lastExerciseCreatedAt", "exercise_template"."createdAt")`
+                )
             );
     }
 

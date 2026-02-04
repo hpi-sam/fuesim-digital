@@ -8,6 +8,8 @@ import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
+import { exerciseTemplateIdSchema } from '../database/schema.js';
+import { ApiError } from '../utils/http.js';
 
 export const createExerciseManagerRouter = (
     exerciseManagerService: ExerciseManagerService,
@@ -50,9 +52,13 @@ export const createExerciseManagerRouter = (
     });
 
     router.post('/exercise_templates/:id/new', async (req, res) => {
+        const templateId = exerciseTemplateIdSchema.safeParse(
+            req.params.id
+        ).data;
+        if (!templateId) throw new ApiError();
         const newExercise =
             await exerciseManagerService.createExerciseFromTemplate(
-                req.params.id,
+                templateId,
                 req.session!,
                 exerciseService
             );
@@ -64,13 +70,18 @@ export const createExerciseManagerRouter = (
     });
 
     router.patch('/exercise_templates/:id', async (req, res) => {
+        const templateId = exerciseTemplateIdSchema.safeParse(
+            req.params.id
+        ).data;
+        if (!templateId) throw new ApiError();
+
         const parsedData = postExerciseTemplateRequestDataSchema.parse(
             req.body
         );
 
         const exerciseTemplate =
             await exerciseManagerService.updateExerciseTemplate(
-                req.params.id,
+                templateId,
                 req.session!,
                 parsedData
             );
@@ -80,8 +91,13 @@ export const createExerciseManagerRouter = (
     });
 
     router.delete('/exercise_templates/:id', async (req, res) => {
+        const templateId = exerciseTemplateIdSchema.safeParse(
+            req.params.id
+        ).data;
+        if (!templateId) throw new ApiError();
+
         await exerciseManagerService.deleteExerciseTemplate(
-            req.params.id,
+            templateId,
             req.session!,
             exerciseService
         );

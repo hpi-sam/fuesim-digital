@@ -2,7 +2,7 @@ import type { ExerciseRepository } from '../repositories/exercise-repository.js'
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import type { ExerciseTemplateInsert } from '../schema.js';
+import type { ExerciseTemplateId, ExerciseTemplateInsert } from '../schema.js';
 import {
     ApiError,
     NotFoundError,
@@ -48,7 +48,7 @@ export class ExerciseManagerService {
     }
 
     public async updateExerciseTemplate(
-        id: string,
+        id: ExerciseTemplateId,
         session: SessionInformation,
         data: Partial<ExerciseTemplateInsert>
     ) {
@@ -75,14 +75,14 @@ export class ExerciseManagerService {
     }
 
     public async createExerciseFromTemplate(
-        id: string,
+        templateId: ExerciseTemplateId,
         session: SessionInformation,
         exerciseService: ExerciseService
     ) {
         await exerciseService.saveUnsavedExercises();
 
         const exerciseTemplate =
-            await this.exerciseRepository.getExerciseTemplateById(id);
+            await this.exerciseRepository.getExerciseTemplateById(templateId);
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
@@ -110,7 +110,7 @@ export class ExerciseManagerService {
     }
 
     public async deleteExerciseTemplate(
-        id: string,
+        id: ExerciseTemplateId,
         session: SessionInformation,
         exerciseService: ExerciseService
     ) {

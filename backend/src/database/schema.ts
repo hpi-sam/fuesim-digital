@@ -22,10 +22,15 @@ import { z } from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const exerciseIdSchema = z.uuidv4().brand<'ExerciseId'>();
+
+export const exerciseTemplateIdSchema = z
+    .uuidv4()
+    .brand<'ExerciseTemplateId'>();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const actionIdSchema = z.uuidv4().brand<'ActionId'>();
 
 export type ExerciseId = z.infer<typeof exerciseIdSchema>;
+export type ExerciseTemplateId = z.infer<typeof exerciseTemplateIdSchema>;
 export type ActionId = z.infer<typeof actionIdSchema>;
 
 const typedUUID = <T>() => uuid().$type<T>();
@@ -65,7 +70,7 @@ export const sessionTable = pgTable('sessions', {
 export type SessionEntry = InferSelectModel<typeof sessionTable>;
 
 export const exerciseTemplateTable = pgTable('exercise_template', {
-    ...baseTable<string>(),
+    ...baseTable<ExerciseTemplateId>(),
     user: varchar()
         .references(() => userTable.id, { onDelete: 'cascade' })
         .notNull(),

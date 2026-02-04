@@ -2,8 +2,11 @@ import type { Server as HttpServer } from 'node:http';
 import cors from 'cors';
 import type { Express } from 'express';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { Config } from '../config.js';
 import type { DatabaseService } from '../database/services/database-service.js';
+import type { AuthService } from '../auth/auth-service.js';
+import { AuthHttpRouter } from '../auth/auth-http-router.js';
 import type { ExerciseService } from './../database/services/exercise-service.js';
 import {
     deleteExercise,
@@ -22,10 +25,19 @@ export class ExerciseHttpServer {
     public constructor(
         app: Express,
         databaseService: DatabaseService,
-        exerciseService: ExerciseService
+        exerciseService: ExerciseService,
+        authService: AuthService
     ) {
-        // TODO: Temporary allow all
-        app.use(cors());
+        Config.initialize();
+
+        app.use(
+            cors({
+                origin: [Config.httpFrontendUrl],
+                credentials: true,
+            })
+        );
+
+        app.use(cookieParser());
 
         app.use(express.json({ limit: `${Config.uploadLimit}mb` }));
 
@@ -42,31 +54,35 @@ export class ExerciseHttpServer {
                 res
             )
         );
-        app.get('/api/exercise/:exerciseId', async (req, res) =>
+        app.get('/api/exercise/:exerciseKey', async (req, res) =>
             secureHttp(
-                () => getExercise(req.params.exerciseId, exerciseService),
+                () => getExercise(req.params.exerciseKey, exerciseService),
                 req,
                 res
             )
         );
-        app.delete('/api/exercise/:exerciseId', async (req, res) =>
+        app.delete('/api/exercise/:exerciseKey', async (req, res) =>
             secureHttp(
                 async () =>
-                    deleteExercise(req.params.exerciseId, exerciseService),
+                    deleteExercise(req.params.exerciseKey, exerciseService),
                 req,
                 res
             )
         );
-        app.get('/api/exercise/:exerciseId/history', async (req, res) =>
+        app.get('/api/exercise/:exerciseKey/history', async (req, res) =>
             secureHttp(
                 async () =>
-                    getExerciseHistory(req.params.exerciseId, exerciseService),
+                    getExerciseHistory(req.params.exerciseKey, exerciseService),
                 req,
                 res
             )
         );
 
-        this.httpServer = app.listen(Config.httpPort);
+        app.use('/api/auth', new AuthHttpRouter(authService).router);
+
+        this.httpServer = app.listen(Config.httpPort, () => {
+            console.log(`HTTP server listening on port ${Config.httpPort}`);
+        });
     }
 
     public close(): void {

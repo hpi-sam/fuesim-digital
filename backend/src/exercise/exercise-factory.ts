@@ -21,9 +21,17 @@ import { RestoreError } from '../utils/restore-error.js';
 import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
 import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './active-exercise.js';
+import { isParticipantKey, isTrainerKey } from './exercise-keys.js';
 
 export class ExerciseFactory {
     public static fromBlank(exerciseKeys: ExerciseKeys) {
+        if (
+            !isParticipantKey(exerciseKeys.participantKey) ||
+            !isTrainerKey(exerciseKeys.trainerKey)
+        ) {
+            throw new Error('Invalid exercise keys provided');
+        }
+
         return new ActiveExercise(
             exerciseKeys.participantKey,
             exerciseKeys.trainerKey
@@ -37,6 +45,13 @@ export class ExerciseFactory {
         file: StateExport,
         exerciseKeys: ExerciseKeys
     ): ActiveExercise {
+        if (
+            !isParticipantKey(exerciseKeys.participantKey) ||
+            !isTrainerKey(exerciseKeys.trainerKey)
+        ) {
+            throw new Error('Invalid exercise keys provided');
+        }
+
         const migratedImportObject = migrateStateExport(file);
         const validationErrors = validateExerciseExport(migratedImportObject);
         if (validationErrors.length > 0) {
@@ -89,10 +104,18 @@ export class ExerciseFactory {
         actions: InferSelectModel<typeof actionTable>[],
         exerciseKeys?: ExerciseKeys
     ): ActiveExercise {
+        const participantKey =
+            exerciseKeys?.participantKey ?? dbEntry.participantId;
+        const trainerKey = exerciseKeys?.trainerKey ?? dbEntry.trainerId;
+
+        if (!isParticipantKey(participantKey) || !isTrainerKey(trainerKey)) {
+            throw new Error('Invalid exercise keys provided');
+        }
+
         const actionsInWrapper: ActionWrapper[] = [];
         const exercise = new ActiveExercise(
-            exerciseKeys?.participantKey ?? dbEntry.participantId,
-            exerciseKeys?.trainerKey ?? dbEntry.trainerId,
+            participantKey,
+            trainerKey,
             actionsInWrapper,
             dbEntry.stateVersion,
             dbEntry.initialStateString,

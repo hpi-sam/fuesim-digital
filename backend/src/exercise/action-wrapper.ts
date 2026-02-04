@@ -1,5 +1,5 @@
 import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
-import type { ActionEntry } from '../database/schema.js';
+import type { ActionEntry, ActionId } from '../database/schema.js';
 import type { ActiveExercise } from './active-exercise.js';
 
 export class ActionWrapper {
@@ -22,7 +22,7 @@ export class ActionWrapper {
         emitterId: UUID | null,
         public readonly exercise: ActiveExercise,
         index?: number,
-        id?: UUID
+        id?: ActionId
     ) {
         this.action = {
             actionString: action,

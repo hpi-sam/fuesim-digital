@@ -21,6 +21,19 @@ export async function secureHttp<Result extends object | undefined>(
     try {
         const response = await operation();
         res.statusCode = response.statusCode;
+        if (response.cookies) {
+            for (const cookie of response.cookies) {
+                if (cookie.value === null) {
+                    res.clearCookie(cookie.name, cookie.options ?? {});
+                } else {
+                    res.cookie(cookie.name, cookie.value, cookie.options ?? {});
+                }
+            }
+        }
+        if (response.redirect) {
+            res.redirect(response.redirect);
+            return;
+        }
         res.send(response.body);
     } catch (error: unknown) {
         // Try sending 500 response

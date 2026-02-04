@@ -9,17 +9,30 @@ import {
     json,
     bigint,
     foreignKey,
+    varchar,
+    timestamp,
 } from 'drizzle-orm/pg-core';
+import { z } from 'zod';
 
-const baseTable = {
-    id: uuid()
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const exerciseIdSchema = z.uuidv4().brand<'ExerciseId'>();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const actionIdSchema = z.uuidv4().brand<'ActionId'>();
+
+export type ExerciseId = z.infer<typeof exerciseIdSchema>;
+export type ActionId = z.infer<typeof actionIdSchema>;
+
+const typedUUID = <T>() => uuid().$type<T>();
+
+const baseTable = <T>() => ({
+    id: typedUUID<T>()
         .default(sql`uuid_generate_v4()`)
         .primaryKey()
         .notNull(),
-};
+});
 
 export const exerciseTable = pgTable('exercise_entity', {
-    ...baseTable,
+    ...baseTable<ExerciseId>(),
     tickCounter: integer().default(0).notNull(),
     initialStateString: json().$type<ExerciseState>().notNull(),
     participantId: char({ length: 6 }).notNull(),
@@ -32,12 +45,12 @@ export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 export const actionTable = pgTable(
     'action_entity',
     {
-        ...baseTable,
+        ...baseTable<ActionId>(),
         emitterId: uuid(),
         // You can use { mode: "bigint" } if numbers are exceeding js number limitations
         index: bigint({ mode: 'number' }).notNull(),
         actionString: json().$type<ExerciseAction>().notNull(),
-        exerciseId: uuid().notNull(),
+        exerciseId: typedUUID<ExerciseId>().notNull(),
     },
     (table) => [
         foreignKey({
@@ -50,6 +63,33 @@ export const actionTable = pgTable(
     ]
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
+
+export const userTable = pgTable('users', {
+    /**
+     * This should always be the sub claim from the OIDC provider
+     */
+    id: varchar().primaryKey().notNull(),
+    username: varchar().notNull(),
+    displayName: varchar().notNull(),
+    updatedAt: timestamp({ mode: 'date', precision: 3 })
+        .notNull()
+        .defaultNow()
+        .$onUpdateFn(() => new Date()),
+});
+
+export const sessionTable = pgTable('sessions', {
+    id: varchar().primaryKey().notNull(),
+    userId: varchar()
+        .notNull()
+        .references(() => userTable.id, {
+            onDelete: 'cascade',
+            onUpdate: 'cascade',
+        }),
+    createdAt: timestamp({ mode: 'date', precision: 3 }).notNull().defaultNow(),
+    expiresAt: timestamp({ mode: 'date', precision: 3 }).notNull(),
+    accessToken: varchar().notNull(),
+});
+export type SessionEntry = InferSelectModel<typeof sessionTable>;
 
 export const actionEntityRelations = relations(actionTable, ({ one }) => ({
     exerciseWrapperEntity: one(exerciseTable, {

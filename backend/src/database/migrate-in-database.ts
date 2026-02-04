@@ -2,15 +2,15 @@ import type {
     ExerciseAction,
     ExerciseState,
     Mutable,
-    UUID,
 } from 'digital-fuesim-manv-shared';
 import { applyMigrations } from 'digital-fuesim-manv-shared';
 import { RestoreError } from '../utils/restore-error.js';
 import type { ExerciseRepository } from './repositories/exercise-repository.js';
 import type { ActionRepository } from './repositories/action-repository.js';
+import type { ExerciseId } from './schema.js';
 
 export async function migrateInDatabase(
-    exerciseId: UUID,
+    exerciseId: ExerciseId,
     exerciseRepository: ExerciseRepository,
     actionRepository: ActionRepository
 ): Promise<void> {

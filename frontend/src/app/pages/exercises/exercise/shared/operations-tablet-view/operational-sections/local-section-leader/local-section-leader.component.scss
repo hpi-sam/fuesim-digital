@@ -1,9 +1,7 @@
 @use './../_variables.scss' as vars;
 
 .localSectionLeaderContainer {
-    background-color: #ffffff;
     padding: vars.$outerBoxPadding;
-    height: 100%;
     display: flex;
     flex-direction: column;
 

@@ -60,6 +60,25 @@ export class ExerciseSettingsModalComponent {
         });
     }
 
+    public setVehicleStatusHighlightFlag(
+        vehicleStatusHighlightEnabled: boolean
+    ) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set vehicleStatusHighlightEnabled',
+            vehicleStatusHighlightEnabled,
+        });
+    }
+
+    public setVehicleStatusInPatientStatusColorFlag(
+        vehicleStatusInPatientStatusColorEnabled: boolean
+    ) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set vehicleStatusInPatientStatusColorEnabled',
+            vehicleStatusInPatientStatusColor:
+                vehicleStatusInPatientStatusColorEnabled,
+        });
+    }
+
     public close() {
         this.activeModal.close();
     }

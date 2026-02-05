@@ -45,6 +45,7 @@ export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
 export const selectRadiograms = selectPropertyFactory('radiograms');
+export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
 export const selectVehicleTemplates = selectPropertyFactory('vehicleTemplates');
 export const selectPersonnelTemplates =
     selectPropertyFactory('personnelTemplates');
@@ -90,6 +91,9 @@ export const createSelectHospital =
     createSelectElementFromMapFactory(selectHospitals);
 export const createSelectViewport =
     createSelectElementFromMapFactory(selectViewports);
+export const createSelectRestrictedZone = createSelectElementFromMapFactory(
+    selectRestrictedZones
+);
 export const createSelectSimulatedRegion = createSelectElementFromMapFactory(
     selectSimulatedRegions
 );

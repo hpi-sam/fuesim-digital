@@ -4,9 +4,9 @@ import {
     newMapCoordinatesAt,
     newNoOccupation,
     newSimulatedRegionPositionIn,
+    newSize,
     SimulatedRegion,
     SimulatedRegionRequestTargetConfiguration,
-    Size,
     TransferPoint,
     VehicleResource,
 } from '../../models/index.js';
@@ -85,7 +85,7 @@ function setupStateAndInteract(
 ) {
     const simulatedRegion = SimulatedRegion.create(
         newMapCoordinatesAt(0, 0),
-        Size.create(10, 10),
+        newSize(10, 10),
         'test region'
     );
     const transferPoint = TransferPoint.create(
@@ -178,7 +178,7 @@ const updateRequestTarget = (
     const otherSimulatedRegion = cloneDeepMutable(
         SimulatedRegion.create(
             newMapCoordinatesAt(0, 0),
-            Size.create(10, 10),
+            newSize(10, 10),
             'requestable region'
         )
     );

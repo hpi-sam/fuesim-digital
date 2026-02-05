@@ -41,7 +41,7 @@ export abstract class MoveableFeatureManager<
         private readonly proposeMovementAction: (
             newPosition: Positions<FeatureType>,
             element: ManagedElement
-        ) => void,
+        ) => Promise<{ success: boolean }>,
         protected readonly geometryHelper: GeometryHelper<
             FeatureType,
             ManagedElement
@@ -68,8 +68,20 @@ export abstract class MoveableFeatureManager<
         this.layer.getSource()!.addFeature(elementFeature);
         TranslateInteraction.onTranslateEnd<FeatureType>(
             elementFeature,
-            (newPosition) => {
-                this.proposeMovementAction(newPosition, element);
+            async (newPosition) => {
+                if (
+                    !(await this.proposeMovementAction(newPosition, element))
+                        .success
+                ) {
+                    // Roll back movement if it wasn't successful
+                    this.movementAnimator.animateFeatureMovement(
+                        elementFeature,
+                        this.geometryHelper.getElementCoordinates(
+                            this.getElementFromFeature(elementFeature)
+                        )
+                    );
+                    elementFeature.changed();
+                }
             },
             this.geometryHelper.getFeaturePosition
         );

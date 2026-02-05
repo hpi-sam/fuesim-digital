@@ -23,6 +23,7 @@ import { MaterialPopupComponent } from './shared/material-popup/material-popup.c
 import { CaterCapacityComponent } from './shared/cater-capacity/cater-capacity.component';
 import { SimulatedRegionPopupComponent } from './shared/simulated-region-popup/simulated-region-popup.component';
 import { PatientNameComponent } from './shared/patient-name/patient-name.component';
+import { RestrictedZonePopupComponent } from './shared/restricted-zone-popup/restricted-zone-popup.component';
 
 @NgModule({
     declarations: [
@@ -38,6 +39,7 @@ import { PatientNameComponent } from './shared/patient-name/patient-name.compone
         CaterCapacityComponent,
         SimulatedRegionPopupComponent,
         PatientNameComponent,
+        RestrictedZonePopupComponent,
     ],
     exports: [ExerciseMapComponent],
     imports: [

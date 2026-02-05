@@ -16,6 +16,8 @@ import {
     type MapCoordinates,
     VehicleParameters,
     mapCoordinatesSchema,
+    newVehiclePositionIn,
+    newSimulatedRegionPositionIn,
 } from '../../models/index.js';
 import {
     changePosition,
@@ -42,15 +44,13 @@ import {
     VehicleRemovedEvent,
 } from '../../simulation/index.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import {
-    newVehiclePositionIn,
-    newSimulatedRegionPositionIn,
-} from '../../models/index.js';
+import { newNoPosition } from '../../models/utils/position/no-position.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
 import { getElement } from './utils/index.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
 import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
+import { checkRestrictedVehicleMovementOrThrow } from './utils/restricted-vehicle-movement.js';
 
 /**
  * Performs all necessary actions to remove a vehicle from the state.
@@ -242,6 +242,14 @@ export namespace VehicleActionReducers {
                     'Vehicle personnel ids do not match personnel ids'
                 );
             }
+
+            checkRestrictedVehicleMovementOrThrow(
+                draftState,
+                vehicle,
+                newNoPosition(),
+                vehicle.position
+            );
+
             draftState.vehicles[vehicle.id] = cloneDeepMutable(vehicle);
             for (const material of cloneDeepMutable(materials)) {
                 changePosition(

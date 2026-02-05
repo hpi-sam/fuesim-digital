@@ -1,0 +1,382 @@
+@if (restrictedZone$ | async; as restrictedZone) {
+    <h5 class="popover-header">
+        {{ restrictedZone.name }}
+        <button
+            (click)="closePopup()"
+            type="button"
+            class="btn-close float-end"
+        ></button>
+    </h5>
+    <div
+        class="popover-body d-flex flex-column"
+        [style.width]="(currentRole$ | async) === 'trainer' ? '500px' : '400px'"
+        [style.height]="
+            (currentRole$ | async) === 'trainer' ? '400px' : '300px'
+        "
+    >
+        @switch (currentRole$ | async) {
+            @case ('trainer') {
+                <nav
+                    #nav="ngbNav"
+                    ngbNav
+                    [(activeId)]="activeNavId"
+                    class="nav-tabs"
+                >
+                    <ng-container ngbNavItem="settings">
+                        <a ngbNavLink data-cy="restrictedZonePopupSettingsNav"
+                            >Einstellungen</a
+                        >
+                        <ng-template ngbNavContent>
+                            <div class="form-group pb-1">
+                                <label class="form-label">Name</label>
+                                <input
+                                    #nameInput="ngModel"
+                                    [ngModel]="restrictedZone.name"
+                                    (appSaveOnTyping)="
+                                        renameRestrictedZone($event)
+                                    "
+                                    required
+                                    type="text"
+                                    class="form-control"
+                                />
+                                <app-display-validation
+                                    [ngModelInput]="nameInput"
+                                ></app-display-validation>
+                            </div>
+                            <div class="form-check form-switch pb-3">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    [ngModel]="restrictedZone.nameVisible"
+                                    (ngModelChange)="setNameVisible($event)"
+                                />
+                                <label class="form-check-label">
+                                    Name für Teilnehmende sichtbar
+                                </label>
+                            </div>
+                            <div class="form-group pb-1">
+                                <label class="form-label">Kapazität</label>
+                                <input
+                                    #numberInput="ngModel"
+                                    [ngModel]="restrictedZone.capacity"
+                                    (appSaveOnTyping)="
+                                        setRestrictedZoneCapacity($event)
+                                    "
+                                    required
+                                    type="number"
+                                    class="form-control"
+                                />
+                                <app-display-validation
+                                    [ngModelInput]="numberInput"
+                                ></app-display-validation>
+                            </div>
+                            <div class="form-check form-switch pb-3">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    [ngModel]="restrictedZone.capacityVisible"
+                                    (ngModelChange)="setCapacityVisible($event)"
+                                />
+                                <label class="form-check-label">
+                                    Kapazität für Teilnehmende sichtbar
+                                </label>
+                            </div>
+                            <div class="form-group pb-3">
+                                <label class="form-label">Farbe</label>
+                                <input
+                                    #colorInput="ngModel"
+                                    [ngModel]="restrictedZone.color"
+                                    (appSaveOnTyping)="
+                                        setRestrictedZoneColor($event)
+                                    "
+                                    required
+                                    type="color"
+                                    class="form-control form-control-color"
+                                />
+                                <app-display-validation
+                                    [ngModelInput]="colorInput"
+                                ></app-display-validation>
+                            </div>
+                        </ng-template>
+                    </ng-container>
+                    <ng-container ngbNavItem="vehicleRestrictions">
+                        <a
+                            ngbNavLink
+                            data-cy="restrictedZonePopupVehicleRestrictionsNav"
+                            >Fahrzeugbeschränkungen</a
+                        >
+                        <ng-template ngbNavContent>
+                            <div class="form-group pb-3">
+                                @if (
+                                    availableVehicleTemplates$ | async;
+                                    as vehicleTemplates
+                                ) {
+                                    <div
+                                        class="table-responsive"
+                                        style="
+                                            max-height: 250px;
+                                            overflow-y: auto;
+                                        "
+                                    >
+                                        <table
+                                            class="table table-sm table-hover"
+                                        >
+                                            <thead
+                                                class="table-light sticky-top"
+                                            >
+                                                <tr>
+                                                    <th
+                                                        scope="col"
+                                                        style="width: 40%"
+                                                    >
+                                                        Fahrzeugtyp
+                                                    </th>
+                                                    <th
+                                                        scope="col"
+                                                        class="text-center"
+                                                    >
+                                                        Status
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (
+                                                    vehicleTemplate of vehicleTemplates
+                                                        | keyvalue;
+                                                    track vehicleTemplate.key
+                                                ) {
+                                                    <tr>
+                                                        <td
+                                                            class="align-middle"
+                                                        >
+                                                            <strong>{{
+                                                                vehicleTemplate.value
+                                                            }}</strong>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div
+                                                                class="btn-group btn-group-sm"
+                                                                role="group"
+                                                            >
+                                                                <input
+                                                                    type="radio"
+                                                                    class="btn-check"
+                                                                    [name]="
+                                                                        'restriction-' +
+                                                                        vehicleTemplate.key
+                                                                    "
+                                                                    [id]="
+                                                                        'ignore-' +
+                                                                        vehicleTemplate.key
+                                                                    "
+                                                                    value="ignore"
+                                                                    [checked]="
+                                                                        restrictedZone
+                                                                            .vehicleRestrictions[
+                                                                            vehicleTemplate
+                                                                                .key
+                                                                        ] ===
+                                                                        'ignore'
+                                                                    "
+                                                                    (change)="
+                                                                        setVehicleRestriction(
+                                                                            vehicleTemplate.key,
+                                                                            'ignore'
+                                                                        )
+                                                                    "
+                                                                />
+                                                                <label
+                                                                    class="btn btn-outline-success"
+                                                                    [for]="
+                                                                        'ignore-' +
+                                                                        vehicleTemplate.key
+                                                                    "
+                                                                    title="Ignorieren"
+                                                                >
+                                                                    <i
+                                                                        class="bi bi-check-circle"
+                                                                    ></i>
+                                                                </label>
+
+                                                                <input
+                                                                    type="radio"
+                                                                    class="btn-check"
+                                                                    [name]="
+                                                                        'restriction-' +
+                                                                        vehicleTemplate.key
+                                                                    "
+                                                                    [id]="
+                                                                        'restrict-' +
+                                                                        vehicleTemplate.key
+                                                                    "
+                                                                    value="restrict"
+                                                                    [checked]="
+                                                                        (restrictedZone
+                                                                            .vehicleRestrictions[
+                                                                            vehicleTemplate
+                                                                                .key
+                                                                        ] ||
+                                                                            'restrict') ===
+                                                                        'restrict'
+                                                                    "
+                                                                    (change)="
+                                                                        setVehicleRestriction(
+                                                                            vehicleTemplate.key,
+                                                                            'restrict'
+                                                                        )
+                                                                    "
+                                                                />
+                                                                <label
+                                                                    class="btn btn-outline-warning"
+                                                                    [for]="
+                                                                        'restrict-' +
+                                                                        vehicleTemplate.key
+                                                                    "
+                                                                    title="Einschränken"
+                                                                >
+                                                                    <i
+                                                                        class="bi bi-exclamation-triangle"
+                                                                    ></i>
+                                                                </label>
+
+                                                                <input
+                                                                    type="radio"
+                                                                    class="btn-check"
+                                                                    [name]="
+                                                                        'restriction-' +
+                                                                        vehicleTemplate.key
+                                                                    "
+                                                                    [id]="
+                                                                        'prohibit-' +
+                                                                        vehicleTemplate.key
+                                                                    "
+                                                                    value="prohibit"
+                                                                    [checked]="
+                                                                        restrictedZone
+                                                                            .vehicleRestrictions[
+                                                                            vehicleTemplate
+                                                                                .key
+                                                                        ] ===
+                                                                        'prohibit'
+                                                                    "
+                                                                    (change)="
+                                                                        setVehicleRestriction(
+                                                                            vehicleTemplate.key,
+                                                                            'prohibit'
+                                                                        )
+                                                                    "
+                                                                />
+                                                                <label
+                                                                    class="btn btn-outline-danger"
+                                                                    [for]="
+                                                                        'prohibit-' +
+                                                                        vehicleTemplate.key
+                                                                    "
+                                                                    title="Verbieten"
+                                                                >
+                                                                    <i
+                                                                        class="bi bi-x-circle"
+                                                                    ></i>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+
+                                <div class="mt-3 p-2 bg-light rounded">
+                                    <div
+                                        class="d-flex justify-content-center align-items-center gap-4"
+                                    >
+                                        <div class="d-flex align-items-center">
+                                            <span
+                                                class="btn btn-outline-success btn-sm me-2"
+                                                style="pointer-events: none"
+                                            >
+                                                <i
+                                                    class="bi bi-check-circle"
+                                                ></i>
+                                            </span>
+                                            <small class="text-muted"
+                                                >Ignorieren</small
+                                            >
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span
+                                                class="btn btn-outline-warning btn-sm me-2"
+                                                style="pointer-events: none"
+                                            >
+                                                <i
+                                                    class="bi bi-exclamation-triangle"
+                                                ></i>
+                                            </span>
+                                            <small class="text-muted"
+                                                >Einschränken</small
+                                            >
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span
+                                                class="btn btn-outline-danger btn-sm me-2"
+                                                style="pointer-events: none"
+                                            >
+                                                <i class="bi bi-x-circle"></i>
+                                            </span>
+                                            <small class="text-muted"
+                                                >Verbieten</small
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </ng-container>
+                </nav>
+                <div
+                    [ngbNavOutlet]="nav"
+                    class="mt-2 flex-grow-1 flex-shrink-1 restricted-zone-overview-nav-outlet"
+                    style="min-height: 0"
+                ></div>
+            }
+            @case ('participant') {
+                <div class="overflow-y-auto">
+                    <p>
+                        In diesem Bereich dürfen
+                        <strong>
+                            höchstens
+                            {{ restrictedZone.capacity }} Fahrzeuge
+                        </strong>
+                        platziert werden.
+                    </p>
+
+                    <strong>Ausgenommen</strong> von dieser Beschränkung sind
+                    <ul>
+                        @for (
+                            ignoredType of ignoredVehicleTypes$ | async;
+                            track ignoredType
+                        ) {
+                            <li>{{ ignoredType }}</li>
+                        } @empty {
+                            <li>keine Fahrzeuge</li>
+                        }
+                    </ul>
+
+                    Grundsätzlich <strong>verboten</strong> in diesem Bereich
+                    sind
+                    <ul>
+                        @for (
+                            prohibitedType of prohibitedVehicleTypes$ | async;
+                            track prohibitedType
+                        ) {
+                            <li>{{ prohibitedType }}</li>
+                        } @empty {
+                            <li>keine Fahrzeuge</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+    </div>
+}

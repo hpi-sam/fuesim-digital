@@ -16,6 +16,11 @@ export class ExerciseConfiguration {
     @IsString()
     public readonly patientIdentifierPrefix: string = '';
 
+    @IsBoolean()
+    public readonly vehicleStatusHighlight: boolean = false;
+    @IsBoolean()
+    public readonly vehicleStatusInPatientStatusColor: boolean = false;
+
     @ValidateNested()
     @Type(() => TileMapProperties)
     public readonly tileMapProperties: TileMapProperties =

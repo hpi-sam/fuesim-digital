@@ -2,7 +2,7 @@ import type { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import {
     newMapCoordinatesAt,
-    Size,
+    newSize,
     Viewport,
 } from 'digital-fuesim-manv-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
@@ -64,7 +64,7 @@ export class ViewportFeatureManager
     ) {
         super(
             olMap,
-            (targetPositions, viewport) => {
+            async (targetPositions, viewport) =>
                 exerciseService.proposeAction(
                     {
                         type: '[Viewport] Move viewport',
@@ -72,8 +72,7 @@ export class ViewportFeatureManager
                         targetPosition: targetPositions[0]![0]!,
                     },
                     true
-                );
-            },
+                ),
             new PolygonGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => [
@@ -122,7 +121,7 @@ export class ViewportFeatureManager
                             topLeftCoordinate[0]!,
                             topLeftCoordinate[1]!
                         ),
-                        newSize: Size.create(
+                        newSize: newSize(
                             currentElement.size.width * scale.x,
                             currentElement.size.height * scale.y
                         ),

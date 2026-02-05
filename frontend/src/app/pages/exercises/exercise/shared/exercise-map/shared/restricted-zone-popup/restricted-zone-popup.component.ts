@@ -1,0 +1,175 @@
+import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { map, Observable, combineLatest } from 'rxjs';
+import {
+    type RestrictedZone,
+    type UUID,
+    type VehicleTemplate,
+    type Vehicle,
+    type VehicleRestriction,
+    sortObject,
+    stringCompare,
+} from 'digital-fuesim-manv-shared';
+import type { AppState } from 'src/app/state/app.state';
+import {
+    createSelectRestrictedZone,
+    selectVehicleTemplates,
+    selectVehicles,
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import { PopupService } from '../../utility/popup.service';
+
+type NavIds = 'settings' | 'vehicleRestrictions';
+
+/**
+ * We want to remember the last selected nav item, so the user doesn't have to manually select it again.
+ */
+let activeNavId: NavIds = 'settings';
+
+@Component({
+    selector: 'app-restricted-zone-popup',
+    templateUrl: './restricted-zone-popup.component.html',
+    styleUrls: ['./restricted-zone-popup.component.scss'],
+    standalone: false,
+})
+export class RestrictedZonePopupComponent implements OnInit {
+    // These properties are only set after OnInit
+    public restrictedZoneId!: UUID;
+
+    public restrictedZone$?: Observable<RestrictedZone>;
+    public ignoredVehicleTypes$?: Observable<string[]>;
+    public prohibitedVehicleTypes$?: Observable<string[]>;
+    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
+    public availableVehicleTemplates$?: Observable<{ [key: UUID]: string }>;
+
+    public get activeNavId() {
+        return activeNavId;
+    }
+    public set activeNavId(value: NavIds) {
+        activeNavId = value;
+    }
+
+    constructor(
+        private readonly store: Store<AppState>,
+        private readonly exerciseService: ExerciseService,
+        private readonly popupService: PopupService
+    ) {}
+
+    ngOnInit() {
+        this.restrictedZone$ = this.store.select(
+            createSelectRestrictedZone(this.restrictedZoneId)
+        );
+
+        this.availableVehicleTemplates$ = combineLatest([
+            this.store.select(selectVehicleTemplates),
+            this.store.select(selectVehicles),
+        ]).pipe(
+            map(([vehicleTemplates, vehiclesObject]) => {
+                const availableTemplates: { [key: UUID]: string } = {};
+
+                Object.values(vehicleTemplates).forEach(
+                    (template: VehicleTemplate) => {
+                        availableTemplates[template.id] = template.vehicleType;
+                    }
+                );
+
+                Object.values(vehiclesObject).forEach((vehicle: Vehicle) => {
+                    if (!(vehicle.templateId in availableTemplates))
+                        availableTemplates[vehicle.templateId] =
+                            vehicle.vehicleType;
+                });
+
+                return sortObject(
+                    availableTemplates,
+                    ([keyA, valueA], [keyB, valueB]) =>
+                        stringCompare(keyA as string, keyB as string)
+                );
+            })
+        );
+
+        this.ignoredVehicleTypes$ = combineLatest([
+            this.restrictedZone$,
+            this.availableVehicleTemplates$,
+        ]).pipe(
+            map(([restrictedZone, vehicleTemplates]) =>
+                Object.entries(restrictedZone.vehicleRestrictions)
+                    .filter(([_, restriction]) => restriction === 'ignore')
+                    .map(
+                        ([templateId, _]) =>
+                            vehicleTemplates[templateId] ?? 'unbekannter Typ'
+                    )
+            )
+        );
+
+        this.prohibitedVehicleTypes$ = combineLatest([
+            this.restrictedZone$,
+            this.availableVehicleTemplates$,
+        ]).pipe(
+            map(([restrictedZone, vehicleTemplates]) =>
+                Object.entries(restrictedZone.vehicleRestrictions)
+                    .filter(([_, restriction]) => restriction === 'prohibit')
+                    .map(
+                        ([templateId, _]) =>
+                            vehicleTemplates[templateId] ?? 'unbekannter Typ'
+                    )
+            )
+        );
+    }
+
+    public renameRestrictedZone(newName: string) {
+        this.exerciseService.proposeAction({
+            type: '[RestrictedZone] Rename restricted zone',
+            restrictedZoneId: this.restrictedZoneId,
+            newName,
+        });
+    }
+
+    public setRestrictedZoneCapacity(newCapacity: number) {
+        this.exerciseService.proposeAction({
+            type: '[RestrictedZone] Set capacity',
+            restrictedZoneId: this.restrictedZoneId,
+            newCapacity,
+        });
+    }
+
+    public setRestrictedZoneColor(newColor: string) {
+        this.exerciseService.proposeAction({
+            type: '[RestrictedZone] Set color',
+            restrictedZoneId: this.restrictedZoneId,
+            newColor,
+        });
+    }
+
+    public setVehicleRestriction(
+        vehicleTemplateId: string,
+        restriction: string
+    ) {
+        this.exerciseService.proposeAction({
+            type: '[RestrictedZone] Set vehicle restriction',
+            restrictedZoneId: this.restrictedZoneId,
+            vehicleTemplateId,
+            restriction: restriction as VehicleRestriction,
+        });
+    }
+
+    public setNameVisible(newNameVisible: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[RestrictedZone] Set nameVisible',
+            restrictedZoneId: this.restrictedZoneId,
+            newNameVisible,
+        });
+    }
+
+    public setCapacityVisible(newCapacityVisible: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[RestrictedZone] Set capacityVisible',
+            restrictedZoneId: this.restrictedZoneId,
+            newCapacityVisible,
+        });
+    }
+
+    public closePopup() {
+        this.popupService.closePopup();
+    }
+}

@@ -11,8 +11,8 @@ import {
     newMapCoordinatesAt,
     SimulatedRegion,
     newSimulatedRegionPositionIn,
-    Size,
     TransferPoint,
+    newSize,
 } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
 import type { Mutable, UUIDSet } from '../../utils/index.js';
@@ -40,7 +40,7 @@ function setupStateAndInteract(
 ) {
     const simulatedRegion = SimulatedRegion.create(
         newMapCoordinatesAt(0, 0),
-        Size.create(10, 10),
+        newSize(10, 10),
         'test region'
     );
     const transferPoint = TransferPoint.create(

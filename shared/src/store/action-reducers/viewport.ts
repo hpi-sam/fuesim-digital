@@ -1,11 +1,11 @@
 import { Type } from 'class-transformer';
 import { IsString, IsUUID, ValidateNested } from 'class-validator';
-import type { MapCoordinates } from '../../models/index.js';
+import type { MapCoordinates, Size } from '../../models/index.js';
 import {
     newMapPositionAt,
     Viewport,
-    Size,
     mapCoordinatesSchema,
+    sizeSchema,
 } from '../../models/index.js';
 import {
     changePosition,
@@ -49,8 +49,7 @@ export class ResizeViewportAction implements Action {
     public readonly viewportId!: UUID;
     @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
-    @ValidateNested()
-    @Type(() => Size)
+    @IsZodSchema(sizeSchema)
     public readonly newSize!: Size;
 }
 

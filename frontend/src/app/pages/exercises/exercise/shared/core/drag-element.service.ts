@@ -34,6 +34,8 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region';
 import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region';
 import type { FeatureManager } from '../exercise-map/utility/feature-manager';
+import type { RestrictedZoneDragTemplate } from '../editor-panel/templates/restricted-zone';
+import { reconstituteRestrictedZoneTemplate } from '../editor-panel/templates/restricted-zone';
 
 @Injectable({
     providedIn: 'root',
@@ -306,6 +308,26 @@ export class DragElementService {
                     createdElement = simulatedRegion;
                 }
                 break;
+            case 'restrictedZone':
+                {
+                    const restrictedZone = reconstituteRestrictedZoneTemplate(
+                        this.transferringTemplate.template.stereotype,
+                        selectStateSnapshot(selectExerciseState, this.store)
+                    );
+                    restrictedZone.position = newMapPositionAt({
+                        x: position.x - restrictedZone.size.width / 2,
+                        y: position.y + restrictedZone.size.height / 2,
+                    });
+                    this.exerciseService.proposeAction(
+                        {
+                            type: '[RestrictedZone] Add restricted zone',
+                            restrictedZone,
+                        },
+                        true
+                    );
+                    createdElement = restrictedZone;
+                }
+                break;
 
             default:
                 break;
@@ -365,6 +387,10 @@ type TransferTemplate =
     | {
           type: 'patient';
           template: PatientCategory;
+      }
+    | {
+          type: 'restrictedZone';
+          template: RestrictedZoneDragTemplate;
       }
     | {
           type: 'simulatedRegion';

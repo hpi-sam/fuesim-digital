@@ -27,7 +27,7 @@
                             >Einstellungen</a
                         >
                         <ng-template ngbNavContent>
-                            <div class="form-group pb-3">
+                            <div class="form-group pb-1">
                                 <label class="form-label">Name</label>
                                 <input
                                     #nameInput="ngModel"
@@ -43,7 +43,18 @@
                                     [ngModelInput]="nameInput"
                                 ></app-display-validation>
                             </div>
-                            <div class="form-group pb-3">
+                            <div class="form-check form-switch pb-3">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    [ngModel]="restrictedZone.nameVisible"
+                                    (ngModelChange)="setNameVisible($event)"
+                                />
+                                <label class="form-check-label">
+                                    Name für Teilnehmende sichtbar
+                                </label>
+                            </div>
+                            <div class="form-group pb-1">
                                 <label class="form-label">Kapazität</label>
                                 <input
                                     #numberInput="ngModel"
@@ -58,6 +69,17 @@
                                 <app-display-validation
                                     [ngModelInput]="numberInput"
                                 ></app-display-validation>
+                            </div>
+                            <div class="form-check form-switch pb-3">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    [ngModel]="restrictedZone.capacityVisible"
+                                    (ngModelChange)="setCapacityVisible($event)"
+                                />
+                                <label class="form-check-label">
+                                    Kapazität für Teilnehmende sichtbar
+                                </label>
                             </div>
                             <div class="form-group pb-3">
                                 <label class="form-label">Farbe</label>

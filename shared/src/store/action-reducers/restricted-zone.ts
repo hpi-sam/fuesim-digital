@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsNumber, IsString, IsUUID } from 'class-validator';
 import { Action, ActionReducer } from '../action-reducer.js';
 import { IsValue } from '../../utils/validators/index.js';
 import {
@@ -85,6 +85,24 @@ export class SetRestrictedZoneColorAction implements Action {
     public readonly restrictedZoneId!: UUID;
     @IsString()
     public readonly newColor!: string;
+}
+
+export class SetRestrictedZoneNameVisibleAction implements Action {
+    @IsValue('[RestrictedZone] Set nameVisible' as const)
+    public readonly type = '[RestrictedZone] Set nameVisible';
+    @IsUUID(4, uuidValidationOptions)
+    public readonly restrictedZoneId!: UUID;
+    @IsBoolean()
+    public readonly newNameVisible!: boolean;
+}
+
+export class SetRestrictedZoneCapacityVisibleAction implements Action {
+    @IsValue('[RestrictedZone] Set capacityVisible' as const)
+    public readonly type = '[RestrictedZone] Set capacityVisible';
+    @IsUUID(4, uuidValidationOptions)
+    public readonly restrictedZoneId!: UUID;
+    @IsBoolean()
+    public readonly newCapacityVisible!: boolean;
 }
 
 export class SetVehicleRestrictionAction implements Action {
@@ -217,6 +235,36 @@ export namespace RestrictedZoneActionReducers {
                     restrictedZoneId
                 );
                 restrictedZone.color = newColor;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setRestrictedZoneNameVisible: ActionReducer<SetRestrictedZoneNameVisibleAction> =
+        {
+            action: SetRestrictedZoneNameVisibleAction,
+            reducer: (draftState, { restrictedZoneId, newNameVisible }) => {
+                const restrictedZone = getElement(
+                    draftState,
+                    'restrictedZone',
+                    restrictedZoneId
+                );
+                restrictedZone.nameVisible = newNameVisible;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setRestrictedZoneCapacityVisible: ActionReducer<SetRestrictedZoneCapacityVisibleAction> =
+        {
+            action: SetRestrictedZoneCapacityVisibleAction,
+            reducer: (draftState, { restrictedZoneId, newCapacityVisible }) => {
+                const restrictedZone = getElement(
+                    draftState,
+                    'restrictedZone',
+                    restrictedZoneId
+                );
+                restrictedZone.capacityVisible = newCapacityVisible;
                 return draftState;
             },
             rights: 'trainer',

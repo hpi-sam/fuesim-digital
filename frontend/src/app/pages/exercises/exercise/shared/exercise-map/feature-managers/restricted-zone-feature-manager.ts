@@ -164,8 +164,25 @@ export class RestrictedZoneFeatureManager
                 selectStateSnapshot(selectExerciseState, this.store),
                 restrictedZone
             );
+
+            if (
+                selectStateSnapshot(selectCurrentMainRole, this.store) ===
+                'trainer'
+            )
+                return {
+                    name: `${restrictedZone.name} (${vehicleCount}/${restrictedZone.capacity})`,
+                    offsetY: (extent[3] - extent[1]) / 2,
+                };
+
+            const nameSegments = [];
+            if (restrictedZone.nameVisible)
+                nameSegments.push(restrictedZone.name);
+            if (restrictedZone.capacityVisible)
+                nameSegments.push(
+                    `(${vehicleCount}/${restrictedZone.capacity})`
+                );
             return {
-                name: `${restrictedZone.name} (${vehicleCount}/${restrictedZone.capacity})`,
+                name: nameSegments.join(' '),
                 offsetY: (extent[3] - extent[1]) / 2,
             };
         },

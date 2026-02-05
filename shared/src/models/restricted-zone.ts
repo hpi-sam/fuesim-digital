@@ -44,6 +44,8 @@ export const restrictedZoneSchema = z.strictObject({
     name: z.string(),
     capacity: z.int().nonnegative(),
     color: z.string(),
+    nameVisible: z.boolean(),
+    capacityVisible: z.boolean(),
     vehicleRestrictions: vehicleRestrictionsSchema,
 });
 
@@ -61,6 +63,8 @@ export function newRestrictedZone(
     name: string,
     capacity: number,
     color: string,
+    nameVisible: boolean,
+    capacityVisible: boolean,
     vehicleRestrictions?: {
         readonly [vehicleType: string]: VehicleRestriction;
     }
@@ -73,6 +77,8 @@ export function newRestrictedZone(
         name,
         capacity,
         color,
+        nameVisible,
+        capacityVisible,
         vehicleRestrictions: vehicleRestrictions ?? {},
     };
 }

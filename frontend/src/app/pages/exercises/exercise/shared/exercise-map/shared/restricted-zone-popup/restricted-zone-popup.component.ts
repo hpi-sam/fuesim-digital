@@ -153,6 +153,22 @@ export class RestrictedZonePopupComponent implements OnInit {
         });
     }
 
+    public setNameVisible(newNameVisible: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[RestrictedZone] Set nameVisible',
+            restrictedZoneId: this.restrictedZoneId,
+            newNameVisible,
+        });
+    }
+
+    public setCapacityVisible(newCapacityVisible: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[RestrictedZone] Set capacityVisible',
+            restrictedZoneId: this.restrictedZoneId,
+            newCapacityVisible,
+        });
+    }
+
     public closePopup() {
         this.popupService.closePopup();
     }

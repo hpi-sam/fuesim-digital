@@ -36,6 +36,8 @@ const stereotypes: RestrictedZone[] = [
         vehicleRestrictions: {},
         position,
         size,
+        nameVisible: true,
+        capacityVisible: true,
     },
     {
         type: 'restrictedZone',
@@ -48,6 +50,8 @@ const stereotypes: RestrictedZone[] = [
         },
         position,
         size,
+        nameVisible: true,
+        capacityVisible: true,
     },
     {
         type: 'restrictedZone',
@@ -58,6 +62,8 @@ const stereotypes: RestrictedZone[] = [
         vehicleRestrictions: {},
         position,
         size,
+        nameVisible: true,
+        capacityVisible: true,
     },
     {
         type: 'restrictedZone',
@@ -77,6 +83,8 @@ const stereotypes: RestrictedZone[] = [
         },
         position,
         size: { width: 50, height: 50 },
+        nameVisible: true,
+        capacityVisible: true,
     },
 ];
 

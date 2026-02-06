@@ -18,7 +18,7 @@ export class StartPauseButtonComponent {
 
     constructor(
         private readonly store: Store<AppState>,
-        public readonly exerciseService: ExerciseService,
+        private readonly exerciseService: ExerciseService,
         private readonly confirmationModalService: ConfirmationModalService
     ) {}
 

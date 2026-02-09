@@ -21,7 +21,7 @@ export class ExerciseListComponent {
     }
 
     public async createExercise() {
-        this.apiService.createExercise().then((ids) => {
+        this.apiService.createExercise().then((_ids) => {
             this.messageService.postMessage({
                 title: 'Übung erfolgreich erstellt',
                 body: '',

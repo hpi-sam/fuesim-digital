@@ -16,6 +16,11 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Add exercise manager to allow logged-in users to manage their own exercises and exercise templates.
 - Alarm groups can now be limited to a maximum number of activations. When the limit is reached, the alarm group cannot be sent anymore.
 
+### Changed
+
+- Improve hints for exercise settings.
+- Add hints for transfer point settings.
+
 ### Fixed
 
 - Viewports are now consistently called "Ansicht" in the frontend and some other incorrect usages of "Einsatzabschnitt" have been corrected.

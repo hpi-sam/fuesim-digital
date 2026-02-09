@@ -1,18 +1,37 @@
 import type { Migration } from './migration-functions.js';
 
+function migrateAlarmGroup(alarmGroup: {
+    sent: boolean | undefined;
+    triggerLimit: number | null | undefined;
+    triggerCount: number | undefined;
+}) {
+    if (alarmGroup.triggerLimit === undefined) {
+        alarmGroup.triggerLimit = null;
+    }
+
+    alarmGroup.triggerCount ??= 0;
+
+    if (alarmGroup.sent === true && alarmGroup.triggerCount === 0) {
+        alarmGroup.triggerCount = 1;
+    }
+
+    delete alarmGroup.sent;
+}
+
 export const limitedAlarmgroups46: Migration = {
     action: (_intermediaryState, action) => {
-        if (
-            (action as { type: string }).type ===
-            '[Emergency Operation Center] Add Log Entry'
-        ) {
-            const typedAction = action as {
-                isPrivate?: boolean;
-            };
-            // We assume that the log entries were written by a
-            // leader for notes on the running exercise and
-            // therefore set them to private
-            typedAction.isPrivate ??= true;
+        switch ((action as { type: string }).type) {
+            case '[AlarmGroup] Add AlarmGroup': {
+                const typedAction = action as {
+                    alarmGroup: {
+                        triggerLimit: number | null | undefined;
+                        triggerCount: number | undefined;
+                        sent: boolean | undefined;
+                    };
+                };
+
+                migrateAlarmGroup(typedAction.alarmGroup);
+            }
         }
         return true;
     },
@@ -23,16 +42,13 @@ export const limitedAlarmgroups46: Migration = {
                 [alarmGroupId: string]: {
                     triggerLimit: number | null | undefined;
                     triggerCount: number | undefined;
+                    sent: boolean | undefined;
                 };
             };
         };
 
         Object.values(typedState.alarmGroups).forEach((alarmGroup) => {
-            if (alarmGroup.triggerLimit === undefined) {
-                alarmGroup.triggerLimit = null;
-            }
-
-            alarmGroup.triggerCount ??= 0;
+            migrateAlarmGroup(alarmGroup);
         });
     },
 };

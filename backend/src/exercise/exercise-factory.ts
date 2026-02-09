@@ -39,9 +39,8 @@ export class ExerciseFactory {
         return { participantKey, trainerKey };
     }
 
-    public static fromBlank(exerciseKeys?: ExerciseKeys) {
-        // eslint-disable-next-line no-param-reassign
-        exerciseKeys ??= this.createKeys();
+    public static fromBlank() {
+        const exerciseKeys = this.createKeys();
 
         if (
             !isParticipantKey(exerciseKeys.participantKey) ||
@@ -58,12 +57,8 @@ export class ExerciseFactory {
     /**
      * @param file A **valid** import file
      */
-    public static fromFile(
-        file: StateExport,
-        exerciseKeys?: ExerciseKeys
-    ): ActiveExercise {
-        // eslint-disable-next-line no-param-reassign
-        exerciseKeys ??= this.createKeys();
+    public static fromFile(file: StateExport): ActiveExercise {
+        const exerciseKeys = this.createKeys();
 
         if (
             !isParticipantKey(exerciseKeys.participantKey) ||
@@ -121,21 +116,12 @@ export class ExerciseFactory {
 
     public static fromDatabase(
         dbEntry: InferSelectModel<typeof exerciseTable>,
-        actions: InferSelectModel<typeof actionTable>[],
-        exerciseKeys?: ExerciseKeys
+        actions: InferSelectModel<typeof actionTable>[]
     ): ActiveExercise {
-        const participantKey =
-            exerciseKeys?.participantKey ?? dbEntry.participantId;
-        const trainerKey = exerciseKeys?.trainerKey ?? dbEntry.trainerId;
-
-        if (!isParticipantKey(participantKey) || !isTrainerKey(trainerKey)) {
-            throw new Error('Invalid exercise keys provided');
-        }
-
         const actionsInWrapper: ActionWrapper[] = [];
         const exercise = new ActiveExercise(
-            participantKey,
-            trainerKey,
+            dbEntry.participantId,
+            dbEntry.trainerId,
             actionsInWrapper,
             dbEntry.stateVersion,
             dbEntry.initialStateString,

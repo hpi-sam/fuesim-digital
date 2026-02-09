@@ -1,5 +1,4 @@
 import { eq } from 'drizzle-orm';
-import type { ExerciseKeys } from 'digital-fuesim-manv-shared';
 import type { SetPretriageEnabledAction } from '../../../../shared/dist/store/action-reducers/configuration.js';
 import { createTestEnvironment } from '../../../test/utils.js';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
@@ -23,10 +22,7 @@ describe('ActionRepository', () => {
         //
         // This is to test, wether action before exercise id assignment
         // are saved and retrieved correctly with this exerciseId.
-        const activeExercise = ExerciseFactory.fromBlank({
-            participantKey: '123456',
-            trainerKey: '12345678',
-        } as ExerciseKeys);
+        const activeExercise = ExerciseFactory.fromBlank();
 
         const actions = [
             new ActionWrapper(

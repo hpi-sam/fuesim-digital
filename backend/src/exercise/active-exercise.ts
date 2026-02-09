@@ -40,15 +40,7 @@ export class ActiveExercise {
         this._exerciseId = value;
     }
 
-    private _template: ExerciseTemplateEntry | null = null;
-
-    public get template() {
-        return this._template;
-    }
-
-    public setTemplate(template: ExerciseTemplateEntry | null) {
-        this._template = template;
-    }
+    public template: ExerciseTemplateEntry | null = null;
 
     public getExercise() {
         return this.exercise;

@@ -71,7 +71,7 @@ export class ExerciseService {
         templateExercise: ActiveExercise,
         exerciseTemplate: ExerciseTemplateEntry
     ) {
-        templateExercise.setTemplate(exerciseTemplate);
+        templateExercise.template = exerciseTemplate;
         await this.createExercise(templateExercise, {
             templateId: exerciseTemplate.id,
         });
@@ -133,9 +133,8 @@ export class ExerciseService {
                                 exerciseEntity.exercise_entity,
                                 actions
                             );
-                            exercise.setTemplate(
-                                exerciseEntity.exercise_template
-                            );
+                            exercise.template =
+                                exerciseEntity.exercise_template;
                             removeAll(exercise.temporaryActionHistory);
 
                             // Load all actions

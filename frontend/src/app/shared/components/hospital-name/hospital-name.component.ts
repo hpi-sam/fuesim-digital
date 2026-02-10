@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Hospital, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -13,11 +13,11 @@ import { createSelectHospital } from 'src/app/state/application/selectors/exerci
     standalone: false,
 })
 export class HospitalNameComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() hospitalId!: UUID;
 
     public hospital$?: Observable<Hospital>;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnChanges() {
         this.hospital$ = this.store.select(

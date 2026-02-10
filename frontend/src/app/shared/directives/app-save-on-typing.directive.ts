@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Directive, EventEmitter, Output } from '@angular/core';
+import { Directive, EventEmitter, Output, inject } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { Subject, debounceTime, filter, takeUntil, tap } from 'rxjs';
 import { isBeingTestedByCypress } from '../functions/cypress';
@@ -34,7 +34,9 @@ export class AppSaveOnTypingDirective implements OnDestroy {
     private lastInputValueWasValid = false;
     private lastSubmittedValue?: any;
 
-    constructor(ngModel: NgModel) {
+    constructor() {
+        const ngModel = inject(NgModel);
+
         ngModel.update
             .pipe(
                 tap((value) => {

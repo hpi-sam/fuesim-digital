@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import type { GetExercisesResponseData } from 'digital-fuesim-manv-shared';
 import { ApiService } from 'src/app/core/api.service';
 import { HttpResourceRef } from '@angular/common/http';
@@ -11,12 +11,14 @@ import { MessageService } from '../../../core/messages/message.service';
     standalone: false,
 })
 export class ExerciseListComponent {
+    private readonly apiService = inject(ApiService);
+    private readonly messageService = inject(MessageService);
+
     exercises: HttpResourceRef<GetExercisesResponseData | undefined>;
 
-    constructor(
-        private readonly apiService: ApiService,
-        private readonly messageService: MessageService
-    ) {
+    constructor() {
+        const apiService = this.apiService;
+
         this.exercises = apiService.getExercisesResource();
     }
 

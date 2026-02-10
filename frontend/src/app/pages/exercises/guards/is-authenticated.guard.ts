@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type {
     ActivatedRouteSnapshot,
     RouterStateSnapshot,
@@ -9,7 +9,7 @@ import { AuthService } from '../../../core/auth.service';
     providedIn: 'root',
 })
 export class IsAuthenticatedGuard {
-    constructor(private readonly auth: AuthService) {}
+    private readonly auth = inject(AuthService);
 
     async canActivate(
         route: ActivatedRouteSnapshot,

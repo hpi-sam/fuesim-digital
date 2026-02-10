@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 
@@ -10,6 +10,8 @@ import { Subject } from 'rxjs';
     standalone: false,
 })
 export class ConfirmationModalComponent implements OnDestroy {
+    readonly activeModal = inject(NgbActiveModal);
+
     public title = '';
     public description = '';
     /**
@@ -23,8 +25,6 @@ export class ConfirmationModalComponent implements OnDestroy {
      * null - the modal has been closed (cross/click on background/Esc)
      */
     public confirmation$ = new Subject<boolean | null>();
-
-    constructor(public readonly activeModal: NgbActiveModal) {}
 
     public confirmationStringValue = '';
 

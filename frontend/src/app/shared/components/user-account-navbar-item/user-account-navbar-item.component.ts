@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../../../core/auth.service';
 
 @Component({
@@ -8,10 +8,10 @@ import { AuthService } from '../../../core/auth.service';
     standalone: false,
 })
 export class UserAccountNavbarItemComponent {
+    readonly auth = inject(AuthService);
+
     public loginUrl = this.auth.loginUrl;
     public logoutUrl = this.auth.logoutUrl;
     public userSelfServiceUrl = this.auth.userSelfServiceUrl;
     public userRegistrationsUrl = this.auth.userRegistrationsUrl;
-
-    constructor(readonly auth: AuthService) {}
 }

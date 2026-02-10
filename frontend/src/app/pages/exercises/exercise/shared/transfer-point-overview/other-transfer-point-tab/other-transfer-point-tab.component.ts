@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, inject } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
@@ -21,6 +21,9 @@ import {
     standalone: false,
 })
 export class OtherTransferPointTabComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     @Input() public transferPointId!: UUID;
 
     @ViewChild(NgbPopover) popover!: NgbPopover;
@@ -35,11 +38,6 @@ export class OtherTransferPointTabComponent implements OnInit {
      * All transferPoints that are neither connected to this one nor this one itself
      */
     public transferPointsToBeAdded$!: Observable<SearchableDropdownOption[]>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     ngOnInit() {
         this.transferPoint$ = this.store.select(

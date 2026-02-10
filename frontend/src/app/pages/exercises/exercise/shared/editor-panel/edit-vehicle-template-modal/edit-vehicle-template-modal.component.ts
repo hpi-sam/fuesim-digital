@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
@@ -28,18 +28,19 @@ import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehi
     standalone: false,
 })
 export class EditVehicleTemplateModalComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
+
     // This is set after the modal creation and therefore accessible in ngOnInit
     public vehicleTemplateId!: UUID;
 
     public vehicleTemplate?: Mutable<VehicleTemplate>;
     public materialTemplates?: Mutable<MaterialTemplate[]> = [];
     public personnelTemplates?: Mutable<PersonnelTemplate[]> = [];
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly activeModal: NgbActiveModal,
-        private readonly confirmationModalService: ConfirmationModalService
-    ) {}
 
     ngOnInit(): void {
         this.vehicleTemplate = cloneDeepMutable(

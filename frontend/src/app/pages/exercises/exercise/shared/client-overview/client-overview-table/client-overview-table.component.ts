@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { SpecificRole } from 'digital-fuesim-manv-shared';
@@ -16,13 +16,11 @@ import {
     standalone: false,
 })
 export class ClientOverviewTableComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     public readonly clients$ = this.store.select(selectClients);
     public readonly viewports$ = this.store.select(selectViewports);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public async restrictToViewport(
         clientId: UUID,

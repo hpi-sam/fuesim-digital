@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Material } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -14,14 +14,12 @@ import { PopupService } from '../../utility/popup.service';
     standalone: false,
 })
 export class MaterialPopupComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly popupService = inject(PopupService);
+
     public materialId!: UUID;
 
     public material$?: Observable<Material>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly popupService: PopupService
-    ) {}
 
     ngOnInit(): void {
         this.material$ = this.store.select(

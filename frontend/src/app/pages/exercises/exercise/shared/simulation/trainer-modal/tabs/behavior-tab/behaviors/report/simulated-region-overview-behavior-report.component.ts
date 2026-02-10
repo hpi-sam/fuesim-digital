@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     RecurringEventActivityState,
@@ -28,6 +28,9 @@ import {
     standalone: false,
 })
 export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() simulatedRegionId!: UUID;
     @Input() reportBehaviorId!: UUID;
 
@@ -46,11 +49,6 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
     createReportCollapsed = true;
     repeatingReport = false;
     selectedInformation: ReportableInformation | 'noSelect' = 'noSelect';
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
 
     ngOnInit(): void {
         this.reportBehaviorState$ = this.store.select(

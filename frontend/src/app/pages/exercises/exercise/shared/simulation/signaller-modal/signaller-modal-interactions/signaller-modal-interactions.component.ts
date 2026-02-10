@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
@@ -86,6 +86,10 @@ export function setLoadingState(
 export class SignallerModalInteractionsComponent
     implements OnInit, OnChanges, OnDestroy
 {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly hotkeysService = inject(HotkeysService);
+
     @Input()
     simulatedRegionId?: UUID;
     @Input()
@@ -162,11 +166,7 @@ export class SignallerModalInteractionsComponent
     private readonly changeOrDestroy$ = new Subject<void>();
     private readonly destroy$ = new Subject<void>();
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly hotkeysService: HotkeysService
-    ) {
+    constructor() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
     }
 

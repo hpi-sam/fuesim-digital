@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, inject } from '@angular/core';
 import { MessageService } from '../../../core/messages/message.service';
 
 @Component({
@@ -8,9 +8,9 @@ import { MessageService } from '../../../core/messages/message.service';
     standalone: false,
 })
 export class CopyButtonComponent {
-    value = input<string>('');
+    private readonly messageService = inject(MessageService);
 
-    constructor(private readonly messageService: MessageService) {}
+    value = input<string>('');
 
     copy() {
         navigator.clipboard.writeText(this.value());

@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     createVehicleParameters,
@@ -42,6 +42,11 @@ let firstVehiclesCount = 0;
     standalone: false,
 })
 export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
+    private readonly hotkeysService = inject(HotkeysService);
+
     @Input()
     useHotkeys = true;
 
@@ -162,12 +167,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
         );
     }
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService,
-        private readonly hotkeysService: HotkeysService
-    ) {
+    constructor() {
         // reset chosen targetTransferPoint if it gets deleted
         this.transferPoints$
             .pipe(takeUntil(this.destroy$))

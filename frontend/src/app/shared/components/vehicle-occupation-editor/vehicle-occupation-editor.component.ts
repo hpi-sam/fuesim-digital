@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import {
     type UUID,
     type ExerciseOccupation,
@@ -19,13 +19,11 @@ import { createSelectVehicle } from 'src/app/state/application/selectors/exercis
     standalone: false,
 })
 export class VehicleOccupationEditorComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     @Input() vehicleId!: UUID;
     occupation$!: Observable<ExerciseOccupation>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     ngOnChanges() {
         this.occupation$ = this.store

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { AlarmGroup } from 'digital-fuesim-manv-shared';
@@ -16,13 +16,11 @@ import {
     standalone: false,
 })
 export class AlarmGroupOverviewModalComponent {
-    public exerciseId!: string;
+    activeModal = inject(NgbActiveModal);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
 
-    constructor(
-        public activeModal: NgbActiveModal,
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
+    public exerciseId!: string;
 
     public readonly alarmGroups$ = this.store.select(selectAlarmGroups);
 

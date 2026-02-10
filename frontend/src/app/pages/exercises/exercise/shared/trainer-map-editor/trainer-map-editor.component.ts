@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
@@ -50,6 +50,13 @@ type FilterCategory =
  * A wrapper around the map that provides trainers with more options and tools.
  */
 export class TrainerMapEditorComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly dragElementService = inject(DragElementService);
+    readonly transferLinesService = inject(TransferLinesService);
+    private readonly ngbModalService = inject(NgbModal);
+    private readonly messageService = inject(MessageService);
+    private readonly exerciseService = inject(ExerciseService);
+
     public selectedCategories$: BehaviorSubject<{
         [key in FilterCategory]: boolean;
     }> = new BehaviorSubject<{ [key in FilterCategory]: boolean }>({
@@ -108,15 +115,6 @@ export class TrainerMapEditorComponent implements OnInit {
     public changeDisplayTransferLines(newValue: boolean) {
         this.transferLinesService.displayTransferLines = newValue;
     }
-
-    constructor(
-        private readonly store: Store<AppState>,
-        public readonly dragElementService: DragElementService,
-        public readonly transferLinesService: TransferLinesService,
-        private readonly ngbModalService: NgbModal,
-        private readonly messageService: MessageService,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public readonly simulatedRegionDragTemplates = simulatedRegionDragTemplates;
 

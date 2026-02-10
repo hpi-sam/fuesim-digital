@@ -4,7 +4,7 @@ import type {
     OnInit,
     SimpleChanges,
 } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
@@ -51,6 +51,11 @@ const unavailableClient = Client.create(
     standalone: false,
 })
 export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly hotkeyService = inject(HotkeysService);
+    private readonly selectRegionService = inject(SelectSignallerRegionService);
+
     @Input() radiogramId!: UUID;
     @Input() shownInSignallerModal = false;
     @Input() first!: boolean;
@@ -82,12 +87,7 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
         }
     });
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly hotkeyService: HotkeysService,
-        private readonly selectRegionService: SelectSignallerRegionService
-    ) {
+    constructor() {
         this.hotkeyLayer = this.hotkeyService.createLayer(false, false);
         this.hotkeyLayer.addHotkey(this.acceptHotkey);
         this.hotkeyLayer.addHotkey(this.returnHotkey);

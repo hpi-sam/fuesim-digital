@@ -1,4 +1,4 @@
-import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { Component, TemplateRef, ViewChild, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
@@ -10,6 +10,8 @@ import { SignallerModalDetailsService } from '../details-modal/signaller-modal-d
     standalone: false,
 })
 export class SignallerModalEocComponent {
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+
     @ViewChild('alarmGroupsSentDisplay')
     alarmGroupsSentDisplay!: TemplateRef<any>;
     @ViewChild('arrivingVehiclesDisplay')
@@ -91,8 +93,6 @@ export class SignallerModalEocComponent {
             loading$: new BehaviorSubject<boolean>(false),
         },
     ];
-
-    constructor(private readonly detailsModal: SignallerModalDetailsService) {}
 
     requestAlarmGroupsSent() {
         this.detailsModal.open(

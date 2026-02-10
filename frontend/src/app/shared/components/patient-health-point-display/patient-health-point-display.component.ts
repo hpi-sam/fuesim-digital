@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
 import {
@@ -22,6 +22,8 @@ import { selectCurrentMainRole } from 'src/app/state/application/selectors/share
     standalone: false,
 })
 export class PatientHealthPointDisplayComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() patientId!: UUID;
 
     status$!: Observable<{
@@ -33,8 +35,6 @@ export class PatientHealthPointDisplayComponent implements OnInit {
     public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
     public readonly healthPointsDefaults = healthPointsDefaults;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnInit(): void {
         this.status$ = this.store.select(

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { AppState } from 'src/app/state/app.state';
 import { selectAlarmGroups } from 'src/app/state/application/selectors/exercise.selectors';
@@ -16,7 +16,9 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 export class SignallerModalEocInformationAlarmGroupsSentComponent {
     alarmGroupsSent: string[];
 
-    constructor(store: Store<AppState>) {
+    constructor() {
+        const store = inject<Store<AppState>>(Store);
+
         this.alarmGroupsSent = Object.values(
             selectStateSnapshot(selectAlarmGroups, store)
         )

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { StrictObject, uuid } from 'digital-fuesim-manv-shared';
 import {
@@ -156,10 +156,10 @@ export class HotkeyLayer {
     providedIn: 'root',
 })
 export class HotkeysService {
+    private readonly ngNeatHotkeysService = inject(NgNeatHotkeysService);
+
     private readonly layers: HotkeyLayer[] = [];
     private registeredHotkeys: { [key: string]: boolean } = {};
-
-    constructor(private readonly ngNeatHotkeysService: NgNeatHotkeysService) {}
 
     /**
      * Creates a new layer and registers it at this service.

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type {
     ActivatedRouteSnapshot,
     RouterStateSnapshot,
@@ -18,14 +18,12 @@ import { ApplicationService } from '../../../core/application.service';
     providedIn: 'root',
 })
 export class JoinExerciseGuard {
-    constructor(
-        private readonly ngbModalService: NgbModal,
-        private readonly router: Router,
-        private readonly apiService: ApiService,
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService,
-        private readonly applicationService: ApplicationService
-    ) {}
+    private readonly ngbModalService = inject(NgbModal);
+    private readonly router = inject(Router);
+    private readonly apiService = inject(ApiService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
+    private readonly applicationService = inject(ApplicationService);
 
     async canActivate(
         route: ActivatedRouteSnapshot,

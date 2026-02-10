@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
@@ -36,6 +36,13 @@ import { ExerciseService } from '../../../../core/exercise.service';
     standalone: false,
 })
 export class ExerciseComponent implements OnDestroy {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly apiService = inject(ApiService);
+    private readonly applicationService = inject(ApplicationService);
+    readonly exerciseService = inject(ExerciseService);
+    private readonly messageService = inject(MessageService);
+    private readonly modalService = inject(NgbModal);
+
     private readonly destroy = new Subject<void>();
 
     public readonly exerciseStateMode$ = this.store.select(
@@ -46,15 +53,6 @@ export class ExerciseComponent implements OnDestroy {
     public readonly ownClient$ = this.store.select(selectOwnClient);
 
     readonly version: string = Package.version;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly apiService: ApiService,
-        private readonly applicationService: ApplicationService,
-        public readonly exerciseService: ExerciseService,
-        private readonly messageService: MessageService,
-        private readonly modalService: NgbModal
-    ) {}
 
     public shareExercise(type: 'participantId' | 'trainerId') {
         const id = selectStateSnapshot(

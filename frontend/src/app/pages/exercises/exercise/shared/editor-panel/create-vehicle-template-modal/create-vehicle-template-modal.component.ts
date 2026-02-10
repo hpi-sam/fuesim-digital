@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { uuid } from 'digital-fuesim-manv-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
@@ -14,6 +14,9 @@ import type {
     standalone: false,
 })
 export class CreateVehicleTemplateModalComponent {
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly exerciseService = inject(ExerciseService);
+
     public readonly editableVehicleTemplateValues: EditableVehicleTemplateValues =
         {
             url: null,
@@ -24,11 +27,6 @@ export class CreateVehicleTemplateModalComponent {
             materialTemplates: [],
             personnelTemplates: [],
         };
-
-    constructor(
-        private readonly activeModal: NgbActiveModal,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public createVehicleTemplate({
         url,

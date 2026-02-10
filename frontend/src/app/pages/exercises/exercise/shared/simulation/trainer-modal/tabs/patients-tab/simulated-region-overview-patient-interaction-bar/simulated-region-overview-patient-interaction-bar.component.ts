@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import type { Mutable, UUIDSet, UUID } from 'digital-fuesim-manv-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import { SelectPatientService } from '../../../select-patient.service';
@@ -14,13 +14,11 @@ import { StartTransferService } from '../../../start-transfer.service';
     standalone: false,
 })
 export class SimulatedRegionOverviewPatientInteractionBarComponent {
-    @Input() patientId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    readonly selectPatientService = inject(SelectPatientService);
+    readonly startTransferService = inject(StartTransferService);
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        readonly selectPatientService: SelectPatientService,
-        readonly startTransferService: StartTransferService
-    ) {}
+    @Input() patientId!: UUID;
 
     public removeSelectedPatientFromSimulatedRegion() {
         this.exerciseService.proposeAction({

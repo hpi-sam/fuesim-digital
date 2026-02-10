@@ -1,14 +1,14 @@
 import type { TemplateRef } from '@angular/core';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SignallerModalDetailsModalComponent } from './signaller-modal-details-modal/signaller-modal-details-modal.component';
 
 @Injectable()
 export class SignallerModalDetailsService {
-    private readonly modals: NgbModalRef[] = [];
+    private readonly ngbModalService = inject(NgbModal);
 
-    constructor(private readonly ngbModalService: NgbModal) {}
+    private readonly modals: NgbModalRef[] = [];
 
     public open(title: string, body: TemplateRef<any>, hotkeysEnabled = true) {
         const modal = this.ngbModalService.open(

@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
 import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
 import {
     Hotkey,
@@ -15,6 +15,8 @@ import {
 export class SignallerModalNoLeaderOverlayComponent
     implements OnInit, OnDestroy
 {
+    private readonly hotkeysService = inject(HotkeysService);
+
     @Output() readonly accept = new EventEmitter<void>();
 
     private hotkeyLayer!: HotkeyLayer;
@@ -22,8 +24,6 @@ export class SignallerModalNoLeaderOverlayComponent
     acceptHotkey = new Hotkey('Enter', false, () => {
         this.accept.emit();
     });
-
-    constructor(private readonly hotkeysService: HotkeysService) {}
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();

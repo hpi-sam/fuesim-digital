@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,18 +14,18 @@ import { MessageService } from './messages/message.service';
     providedIn: 'root',
 })
 export class AuthService {
+    private readonly httpClient = inject(HttpClient);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly messageService = inject(MessageService);
+
     public readonly SESSION_REFRESH_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
 
     readonly authData = signal<UserDataResponse>({
         user: undefined,
     });
 
-    constructor(
-        private readonly httpClient: HttpClient,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly messageService: MessageService
-    ) {
+    constructor() {
         this.fetchUserData();
         this.handleAuthMessageToast();
     }

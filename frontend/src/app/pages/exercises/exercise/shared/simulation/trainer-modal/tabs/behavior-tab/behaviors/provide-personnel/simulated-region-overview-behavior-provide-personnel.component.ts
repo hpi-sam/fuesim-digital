@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ProvidePersonnelBehaviorState,
@@ -28,6 +28,9 @@ import type { CdkDragDrop } from '@angular/cdk/drag-drop';
 export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
     implements OnInit, OnDestroy
 {
+    private readonly exerciseService = inject(ExerciseService);
+    readonly store = inject<Store<AppState>>(Store);
+
     @Input() simulatedRegionId!: UUID;
     @Input() behaviorId!: UUID;
 
@@ -37,11 +40,6 @@ export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
     private ownPriorities!: readonly UUID[];
 
     private readonly destroy$ = new Subject<void>();
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        public readonly store: Store<AppState>
-    ) {}
 
     ngOnInit(): void {
         const behaviorState$ = this.store.select(

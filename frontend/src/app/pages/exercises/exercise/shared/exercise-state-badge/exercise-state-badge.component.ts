@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { AppState } from 'src/app/state/app.state';
 import {
@@ -13,8 +13,8 @@ import {
     standalone: false,
 })
 export class ExerciseStateBadgeComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+
     public readonly exerciseStatus$ = this.store.select(selectExerciseStatus);
     public readonly currentTime$ = this.store.select(selectCurrentTime);
-
-    constructor(private readonly store: Store<AppState>) {}
 }

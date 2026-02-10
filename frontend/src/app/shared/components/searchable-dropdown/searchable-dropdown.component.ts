@@ -6,6 +6,7 @@ import {
     Input,
     Output,
     ViewChild,
+    inject,
 } from '@angular/core';
 import type { HotkeyLayer } from '../../services/hotkeys.service';
 import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
@@ -26,6 +27,8 @@ export interface SearchableDropdownOption {
 export class SearchableDropdownComponent
     implements OnInit, AfterViewInit, OnDestroy
 {
+    private readonly hotkeysService = inject(HotkeysService);
+
     @Input()
     public options: SearchableDropdownOption[] = [];
 
@@ -55,8 +58,6 @@ export class SearchableDropdownComponent
 
     @ViewChild('searchInput')
     private readonly searchInput!: ElementRef;
-
-    constructor(private readonly hotkeysService: HotkeysService) {}
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer(true);

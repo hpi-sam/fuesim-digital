@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from 'src/app/core/exercise.service';
@@ -14,13 +14,13 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
     standalone: false,
 })
 export class StartPauseButtonComponent {
-    public exerciseStatus$ = this.store.select(selectExerciseStatus);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly confirmationModalService: ConfirmationModalService
-    ) {}
+    public exerciseStatus$ = this.store.select(selectExerciseStatus);
 
     public async pauseExercise() {
         const response = await this.exerciseService.proposeAction({

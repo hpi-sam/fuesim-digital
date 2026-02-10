@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import type { MemoizedSelector } from '@ngrx/store';
 import { Store, createSelector } from '@ngrx/store';
 import type {
@@ -51,6 +51,9 @@ let globalLastTransferCollapsed = true;
 export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
     implements OnInit, OnDestroy
 {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     @Input() simulatedRegionId!: UUID;
     @Input() transferBehaviorId!: UUID;
     @Input() initialTransferOptions?: TransferOptions;
@@ -130,10 +133,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
         globalLastTransferCollapsed = value;
     }
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {
+    constructor() {
         this._informationCollapsed = globalLastInformationCollapsed;
         this._settingsCollapsed = globalLastSettingsCollapsed;
         this._transferCollapsed = globalLastTransferCollapsed;

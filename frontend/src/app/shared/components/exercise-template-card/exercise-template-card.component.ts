@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import type {
     GetExerciseTemplateResponseData,
     PostExerciseTemplateRequestData,
@@ -15,15 +15,15 @@ import { ConfirmationModalService } from '../../../core/confirmation-modal/confi
     standalone: false,
 })
 export class ExerciseTemplateCardComponent {
+    private readonly apiService = inject(ApiService);
+    private readonly messageService = inject(MessageService);
+    private readonly router = inject(Router);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
+
     exerciseTemplate = input<GetExerciseTemplateResponseData>();
     readonly updated = output();
-
-    constructor(
-        private readonly apiService: ApiService,
-        private readonly messageService: MessageService,
-        private readonly router: Router,
-        private readonly confirmationModalService: ConfirmationModalService
-    ) {}
 
     async patchExerciseTemplate(data: PostExerciseTemplateRequestData) {
         const exerciseTemplate = this.exerciseTemplate();

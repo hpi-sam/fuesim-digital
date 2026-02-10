@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { httpOrigin, websocketOrigin } from './core/api-origins';
 import { setupCypressTestingValues } from './shared/functions/cypress';
@@ -11,7 +11,9 @@ import type { AppState } from './state/app.state';
     standalone: false,
 })
 export class AppComponent {
-    constructor(private readonly store: Store<AppState>) {
+    private readonly store = inject<Store<AppState>>(Store);
+
+    constructor() {
         setupCypressTestingValues({
             store: this.store,
             backendBaseUrl: httpOrigin,

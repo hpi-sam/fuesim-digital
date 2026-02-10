@@ -4,6 +4,7 @@ import {
     ElementRef,
     ViewChild,
     ViewContainerRef,
+    inject,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
@@ -28,6 +29,13 @@ import { PopupService } from './utility/popup.service';
     standalone: false,
 })
 export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    readonly dragElementService = inject(DragElementService);
+    readonly transferLinesService = inject(TransferLinesService);
+    private readonly popupService = inject(PopupService);
+    private readonly modalService = inject(NgbModal);
+
     @ViewChild('openLayersContainer')
     openLayersContainer!: ElementRef<HTMLDivElement>;
     @ViewChild('popoverContainer')
@@ -42,15 +50,6 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
         selectRestrictedViewport
     );
     public readonly currentRole$ = this.store.select(selectCurrentMainRole);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        public readonly dragElementService: DragElementService,
-        public readonly transferLinesService: TransferLinesService,
-        private readonly popupService: PopupService,
-        private readonly modalService: NgbModal
-    ) {}
 
     ngAfterViewInit(): void {
         this.popupManager = new PopupManager(

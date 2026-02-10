@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { UUID } from 'digital-fuesim-manv-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
@@ -16,6 +16,8 @@ import {
     standalone: false,
 })
 export class SignallerModalRegionsOverviewComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+
     regions$!: Observable<
         (
             | {
@@ -32,8 +34,6 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
               }
         )[]
     >;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnInit() {
         const simulatedRegions$ = this.store.select(selectSimulatedRegions);

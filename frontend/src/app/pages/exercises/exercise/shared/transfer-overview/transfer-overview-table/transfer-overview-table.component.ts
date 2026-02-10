@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { currentTransferOf } from 'digital-fuesim-manv-shared';
 import type { AppState } from 'src/app/state/app.state';
@@ -15,6 +15,8 @@ import {
     standalone: false,
 })
 export class TransferOverviewTableComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+
     public readonly vehiclesInTransfer$ = this.store.select(
         selectVehiclesInTransfer
     );
@@ -25,6 +27,4 @@ export class TransferOverviewTableComponent {
     public currentTransferOf = currentTransferOf;
 
     public readonly exerciseStatus$ = this.store.select(selectExerciseStatus);
-
-    constructor(private readonly store: Store<AppState>) {}
 }

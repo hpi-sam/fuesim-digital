@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -15,16 +15,14 @@ import { PopupService } from '../../utility/popup.service';
     standalone: false,
 })
 export class VehiclePopupComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly popupService = inject(PopupService);
+
     // These properties are only set after OnInit
     public vehicleId!: UUID;
 
     public vehicle$?: Observable<Vehicle>;
     public readonly currentRole$ = this.store.select(selectCurrentMainRole);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly popupService: PopupService
-    ) {}
 
     ngOnInit() {
         this.vehicle$ = this.store.select(createSelectVehicle(this.vehicleId));

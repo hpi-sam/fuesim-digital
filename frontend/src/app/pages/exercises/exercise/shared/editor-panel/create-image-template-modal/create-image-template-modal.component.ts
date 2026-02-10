@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { uuid } from 'digital-fuesim-manv-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
@@ -14,16 +14,14 @@ import type {
     standalone: false,
 })
 export class CreateImageTemplateModalComponent {
+    readonly activeModal = inject(NgbActiveModal);
+    private readonly exerciseService = inject(ExerciseService);
+
     public readonly editableImageTemplateValues: EditableImageTemplateValues = {
         url: null,
         height: 100,
         name: null,
     };
-
-    constructor(
-        public readonly activeModal: NgbActiveModal,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public createImageTemplate({
         url,

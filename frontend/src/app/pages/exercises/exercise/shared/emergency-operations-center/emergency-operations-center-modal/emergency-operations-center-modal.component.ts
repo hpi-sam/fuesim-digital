@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -8,7 +8,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
     standalone: false,
 })
 export class EmergencyOperationsCenterModalComponent {
-    constructor(public activeModal: NgbActiveModal) {}
+    activeModal = inject(NgbActiveModal);
 
     public close() {
         this.activeModal.close();

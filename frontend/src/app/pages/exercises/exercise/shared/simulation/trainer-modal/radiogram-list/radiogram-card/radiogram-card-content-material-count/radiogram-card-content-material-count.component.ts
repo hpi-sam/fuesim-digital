@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { MaterialCountRadiogram, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -14,11 +14,11 @@ import { createSelectRadiogram } from 'src/app/state/application/selectors/exerc
     standalone: false,
 })
 export class RadiogramCardContentMaterialCountComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() radiogramId!: UUID;
 
     capacity$!: Observable<{ green: number; yellow: number; red: number }>;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnInit(): void {
         this.capacity$ = this.store

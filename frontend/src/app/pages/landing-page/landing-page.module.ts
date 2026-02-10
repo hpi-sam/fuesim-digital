@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 
 import { FormsModule } from '@angular/forms';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { RouterLink } from '@angular/router';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 
 @NgModule({
     declarations: [LandingPageComponent],
-    imports: [CommonModule, FormsModule, SharedModule],
+    imports: [CommonModule, FormsModule, SharedModule, RouterLink],
     exports: [LandingPageComponent],
 })
 export class LandingPageModule {}

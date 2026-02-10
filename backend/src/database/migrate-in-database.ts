@@ -14,15 +14,15 @@ export async function migrateInDatabase(
     exerciseRepository: ExerciseRepository,
     actionRepository: ActionRepository
 ): Promise<void> {
-    const exercises = await exerciseRepository.getExerciseById(exerciseId);
-    if (exercises.length === 0 && exercises[0] === undefined) {
+    const exercise = (await exerciseRepository.getExerciseById(exerciseId))
+        ?.exercise_entity;
+    if (!exercise) {
         throw new RestoreError(
             'Cannot find exercise to convert in database',
             exerciseId
         );
     }
 
-    const exercise = exercises[0]!;
     const loadedInitialState = exercise.initialStateString;
     const loadedCurrentState = exercise.currentStateString;
     const loadedActions = (

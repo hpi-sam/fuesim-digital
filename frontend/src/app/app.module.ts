@@ -2,10 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import {
-    provideHttpClient,
-    withInterceptorsFromDi,
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule } from '@ngrx/store';
 import { AppRoutingModule } from './app-routing.module';
@@ -19,6 +16,10 @@ import { SharedModule } from './shared/shared.module';
 import { appReducers } from './state/app.reducer';
 import type { AppState } from './state/app.state';
 import { AboutModule } from './pages/about/about.module';
+import {
+    errorHandlingInterceptor,
+    withCredentialsInterceptor,
+} from './shared/functions/http';
 
 @NgModule({
     declarations: [AppComponent, HealthPageComponent],
@@ -36,6 +37,13 @@ import { AboutModule } from './pages/about/about.module';
         MessagesModule,
         AboutModule,
     ],
-    providers: [provideHttpClient(withInterceptorsFromDi())],
+    providers: [
+        provideHttpClient(
+            withInterceptors([
+                withCredentialsInterceptor,
+                errorHandlingInterceptor,
+            ])
+        ),
+    ],
 })
 export class AppModule {}

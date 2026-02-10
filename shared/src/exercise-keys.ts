@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-const participantKeySchema = z
+export const participantKeySchema = z
     .string()
     .regex(/^\d{6}$/u)
     .brand<'ParticipantKey'>();
-const trainerKeySchema = z
+export const trainerKeySchema = z
     .string()
     .regex(/^\d{8}$/u)
     .brand<'TrainerKey'>();

@@ -10,7 +10,7 @@
     <div>{{ description }}</div>
     @if (confirmationString) {
         <div class="mt-3">
-            Wiederholen Sie den folgenden Bestätigungskey:
+            Wiederholen Sie bitte den folgenden Bestätigungstext:
             <div class="text-center font-monospace mb-3 fw-bolder fs-5">
                 {{ confirmationString }}
             </div>
@@ -20,7 +20,7 @@
                 [appAutofocus]="true"
                 [appExactMatchValidator]="confirmationString"
                 class="form-control"
-                placeholder="Bestätigungskey hier eingeben..."
+                placeholder="Bestätigungstext hier eingeben"
                 type="text"
             />
             <app-display-validation
@@ -39,7 +39,7 @@
         (click)="confirmation$.next(true); activeModal.close()"
         data-cy="confirmationModalOkButton"
     >
-        Ok
+        OK
     </button>
     <button
         type="button"

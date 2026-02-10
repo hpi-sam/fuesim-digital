@@ -1,8 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-    provideHttpClient,
-    withInterceptorsFromDi,
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
@@ -11,6 +8,11 @@ import {
     NgbAccordionModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { RouterLink } from '@angular/router';
+import {
+    errorHandlingInterceptor,
+    withCredentialsInterceptor,
+} from '../../../shared/functions/http';
 import { ExerciseComponent } from './exercise/exercise.component';
 import { AlarmGroupOverviewModule } from './shared/alarm-group-overview/alarm-group-overview.module';
 import { ClientOverviewModule } from './shared/client-overview/client-overview.module';
@@ -69,7 +71,15 @@ import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/ma
         CoordinatePickerModule,
         NgbTooltipModule,
         NgbAccordionModule,
+        RouterLink,
     ],
-    providers: [provideHttpClient(withInterceptorsFromDi())],
+    providers: [
+        provideHttpClient(
+            withInterceptors([
+                withCredentialsInterceptor,
+                errorHandlingInterceptor,
+            ])
+        ),
+    ],
 })
 export class ExerciseModule {}

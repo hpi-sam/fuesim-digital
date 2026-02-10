@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, lastValueFrom } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -16,11 +16,9 @@ import { MessageService } from './messages/message.service';
 export class AuthService {
     public readonly SESSION_REFRESH_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
 
-    private readonly user$ = new BehaviorSubject<UserDataResponse>({
+    readonly authData = signal<UserDataResponse>({
         user: undefined,
     });
-
-    public readonly userData$ = this.user$.asObservable();
 
     constructor(
         private readonly httpClient: HttpClient,
@@ -33,8 +31,8 @@ export class AuthService {
     }
 
     private async refreshSessionHandler() {
-        const userData = await lastValueFrom(this.userData$);
-        if (!userData.user) return;
+        const authData = this.authData();
+        if (!authData.user) return;
         setInterval(() => {
             lastValueFrom(
                 this.httpClient.get(`${httpOrigin}/api/auth/refresh-session`, {
@@ -72,7 +70,7 @@ export class AuthService {
             });
         }
 
-        this.user$.next(userData ?? { user: null });
+        this.authData.set(userData ?? { user: null });
         this.refreshSessionHandler();
     }
 

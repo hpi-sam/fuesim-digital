@@ -36,7 +36,17 @@ services:
         volumes:
             - ./docker/authelia-config:/config:ro,z
             - authelia-secrets:/secrets
-
+    garage:
+        image: dxflrs/garage:v2.2.0
+        restart: unless-stopped
+        volumes:
+            - ./docker/garage.toml:/etc/garage.toml:ro
+            - garage-meta:/var/lib/garage/meta
+            - garage-data:/var/lib/garage/data
+        ports:
+            - "9092:3900"
 volumes:
     db:
     authelia-secrets:
+    garage-meta:
+    garage-data:

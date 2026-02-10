@@ -41,6 +41,7 @@ import { OrganisationRepository } from '../database/repositories/organisation-re
 import { CollectionRepository } from '../database/repositories/collection-repository.js';
 import { CollectionService } from '../database/services/collection-service.js';
 import { UserDataService } from '../database/services/userdata-service.js';
+import { S3Service } from '../s3/s3-service.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -214,6 +215,7 @@ export function createTestEnvironment(): TestEnvironment {
     Config.initialize(true);
     const environment = new TestEnvironment();
     let databaseService: DatabaseService;
+    let s3Service: S3Service;
     let exerciseService: ExerciseService;
     let authService: AuthService;
     let exerciseManagerService: ExerciseManagerService;
@@ -233,6 +235,7 @@ export function createTestEnvironment(): TestEnvironment {
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
         databaseService = await setupDatabase();
+        s3Service = await S3Service.createNewConnection();
         exerciseRepository = new ExerciseRepository(
             databaseService.databaseConnection
         );
@@ -315,6 +318,7 @@ export function createTestEnvironment(): TestEnvironment {
             organisationService,
             collectionService,
             userDataService,
+            s3Service,
         };
         environment.init(repositories, services);
     });

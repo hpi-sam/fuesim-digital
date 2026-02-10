@@ -12,6 +12,7 @@ import { UserRepository } from './database/repositories/user-repository.js';
 import { SessionRepository } from './database/repositories/session-repository.js';
 import { AuthService } from './auth/auth-service.js';
 import { ExerciseManagerService } from './database/services/exercise-manager-service.js';
+import { S3Service } from './s3/s3-service.js';
 
 async function main() {
     Config.initialize();
@@ -30,6 +31,8 @@ async function main() {
         throw e;
     }
     console.log('Successfully connected to the database.');
+
+    const s3Service = await S3Service.createNewConnection();
 
     const exerciseRepository = new ExerciseRepository(
         databaseService.databaseConnection
@@ -102,6 +105,7 @@ async function main() {
     // eslint-disable-next-line no-new
     new FuesimServer(
         databaseService,
+        s3Service,
         exerciseService,
         authService,
         exerciseManagerService

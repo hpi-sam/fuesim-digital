@@ -37,6 +37,11 @@ export class Config {
 
     private static _authSelfServiceUrl?: string;
 
+    private static _s3Endpoint?: string;
+    private static _s3Bucket?: string;
+    private static _s3AccessKeyId?: string;
+    private static _s3SecretAccessKey?: string;
+
     public static get websocketPort(): number {
         this.throwIfNotInitialized();
         return this._websocketPort!;
@@ -122,6 +127,26 @@ export class Config {
         return this._authSelfServiceUrl!;
     }
 
+    public static get s3Endpoint(): string {
+        this.throwIfNotInitialized();
+        return this._s3Endpoint!;
+    }
+
+    public static get s3Bucket(): string {
+        this.throwIfNotInitialized();
+        return this._s3Bucket!;
+    }
+
+    public static get s3AccessKeyId(): string {
+        this.throwIfNotInitialized();
+        return this._s3AccessKeyId!;
+    }
+
+    public static get s3SecretAccessKey(): string {
+        this.throwIfNotInitialized();
+        return this._s3SecretAccessKey!;
+    }
+
     private static createTCPPortValidator() {
         return makeValidator((x) => {
             const int = Number.parseInt(x);
@@ -199,6 +224,10 @@ export class Config {
             }),
             DFM_AUTH_SELF_SERVICE_URL: url({ default: '' }),
             DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
+            DFM_S3_ENDPOINT: str({ default: 'http://localhost:9092' }),
+            DFM_S3_BUCKET: str({ default: 'fuesim-digital' }),
+            DFM_S3_ACCESS_KEY_ID: str({ default: 'fuesim-digital-key' }),
+            DFM_S3_SECRET_ACCESS_KEY: str({ default: '' }),
         });
     }
 
@@ -281,6 +310,11 @@ export class Config {
             testing && env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 : env.DFM_AUTH_SELF_SERVICE_URL;
+        this._s3Endpoint = env.DFM_S3_ENDPOINT;
+        this._s3Bucket = env.DFM_S3_BUCKET;
+        this._s3AccessKeyId = env.DFM_S3_ACCESS_KEY_ID;
+        this._s3SecretAccessKey = env.DFM_S3_ACCESS_KEY_ID;
+
         this.isInitialized = true;
     }
 }

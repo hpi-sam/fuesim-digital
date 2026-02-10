@@ -6,6 +6,7 @@ import type { DatabaseService } from './database/services/database-service.js';
 import type { ExerciseService } from './database/services/exercise-service.js';
 import type { AuthService } from './auth/auth-service.js';
 import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
+import type { S3Service } from './s3/s3-service.js';
 
 export class FuesimServer {
     private readonly _httpServer: ApiHttpServer;
@@ -21,6 +22,7 @@ export class FuesimServer {
 
     public constructor(
         private readonly databaseService: DatabaseService,
+        private readonly s3Service: S3Service,
         private readonly exerciseService: ExerciseService,
         private readonly authService: AuthService,
         private readonly exerciseManagerService: ExerciseManagerService

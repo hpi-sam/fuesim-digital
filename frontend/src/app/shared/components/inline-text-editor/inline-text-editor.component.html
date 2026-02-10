@@ -1,5 +1,5 @@
-<form class="d-flex flex-grow-1" (submit)="save()">
-    @if (edit) {
+@if (edit) {
+    <form class="d-flex flex-grow-1" (submit)="save()">
         <textarea
             #inlineInput="ngModel"
             class="form-control form-control-sm"
@@ -15,7 +15,9 @@
         <button class="btn btn-primary ms-2" type="submit">
             <i class="bi bi-save"></i>
         </button>
-    } @else {
+    </form>
+} @else {
+    <div class="d-flex">
         <div class="flex-grow-1">
             @if (value()) {
                 {{ value() }}
@@ -26,5 +28,5 @@
         <button class="btn btn-sm" (click)="startEdit()">
             <i class="bi bi-pencil"></i>
         </button>
-    }
-</form>
+    </div>
+}

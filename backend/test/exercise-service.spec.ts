@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { uuid } from 'digital-fuesim-manv-shared';
-import { createExercise, createTestEnvironment } from '../test/utils.js';
 import { ActiveExercise } from '../src/exercise/active-exercise.js';
+import { createExercise, createTestEnvironment } from './utils.js';
 
 describe('Exercise-Service', () => {
     const environment = createTestEnvironment();
@@ -17,7 +17,7 @@ describe('Exercise-Service', () => {
         const exercideIds = await createExercise(environment);
         const exercise = environment.exerciseService.getExerciseByKey(
             exercideIds.trainerId
-        )!;
+        );
         const markAsAboutToBeSaved =
             exercise.markAsAboutToBeSaved.bind(exercise);
 

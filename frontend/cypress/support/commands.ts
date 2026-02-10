@@ -44,9 +44,9 @@
 
 import type {
     JsonObject,
-    UUID,
     SocketResponse,
     ExerciseAction,
+    JoinExerciseResponseDataInput,
 } from 'digital-fuesim-manv-shared';
 import { io } from 'socket.io-client';
 
@@ -144,18 +144,22 @@ export function initializeParticipantSocket() {
         cy.get('@participantSocket', { log: false }).then(
             (participantSocket: any) => {
                 cy.wrap(
-                    new Promise<SocketResponse<UUID>>((resolve) => {
-                        participantSocket.emit(
-                            'joinExercise',
-                            participantId,
-                            '',
-                            (response: SocketResponse<UUID>) =>
-                                resolve(response)
-                        );
-                    }),
+                    new Promise<SocketResponse<JoinExerciseResponseDataInput>>(
+                        (resolve) => {
+                            participantSocket.emit(
+                                'joinExercise',
+                                participantId,
+                                '',
+                                (
+                                    response: SocketResponse<JoinExerciseResponseDataInput>
+                                ) => resolve(response)
+                            );
+                        }
+                    ),
                     { log: false }
                 )
                     .its('payload')
+                    .its('clientId')
                     .as('participantSocketUUID');
             }
         );
@@ -191,17 +195,22 @@ export function initializeTrainerSocket() {
     cy.get('@trainerId', { log: false }).then((trainerId: any) => {
         cy.get('@trainerSocket', { log: false }).then((trainerSocket: any) => {
             cy.wrap(
-                new Promise<SocketResponse<UUID>>((resolve) => {
-                    trainerSocket.emit(
-                        'joinExercise',
-                        trainerId,
-                        '',
-                        (response: SocketResponse<UUID>) => resolve(response)
-                    );
-                }),
+                new Promise<SocketResponse<JoinExerciseResponseDataInput>>(
+                    (resolve) => {
+                        trainerSocket.emit(
+                            'joinExercise',
+                            trainerId,
+                            '',
+                            (
+                                response: SocketResponse<JoinExerciseResponseDataInput>
+                            ) => resolve(response)
+                        );
+                    }
+                ),
                 { log: false }
             )
                 .its('payload')
+                .its('clientId')
                 .as('trainerSocketUUID');
         });
     });

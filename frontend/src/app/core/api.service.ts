@@ -1,13 +1,19 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, httpResource } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type {
-    ExerciseAccessIds,
-    ExerciseTimeline,
-    StateExport,
+import {
+    exerciseExistsResponseDataSchema,
+    getExercisesResponseDataSchema,
+    getExerciseTemplateResponseDataSchema,
+    getExerciseTemplatesResponseDataSchema,
+    PostExerciseTemplateRequestData,
+    UUID,
+    type ExerciseAccessIds,
+    type ExerciseTimeline,
+    type StateExport,
 } from 'digital-fuesim-manv-shared';
 import { freeze } from 'immer';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, map } from 'rxjs';
 import type { AppState } from '../state/app.state';
 import { selectExerciseId } from '../state/application/selectors/application.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
@@ -48,23 +54,12 @@ export class ApiService {
             this.httpClient.get<ExerciseTimeline>(
                 `${httpOrigin}/api/exercise/${exerciseId}/history`
             )
-        )
-            .then((value) => freeze(value, true))
-            .catch((error) => {
-                this.messageService.postError({
-                    title: 'Fehler beim Laden der Übungshistorie',
-                    body: 'Der Server konnte keine Übungshistorie bereitstellen.',
-                });
-                throw error;
-            });
+        ).then((value) => freeze(value, true));
     }
 
     public async deleteExercise(trainerId: string) {
         return lastValueFrom(
-            this.httpClient.delete<undefined>(
-                `${httpOrigin}/api/exercise/${trainerId}`,
-                {}
-            )
+            this.httpClient.delete(`${httpOrigin}/api/exercise/${trainerId}`)
         );
     }
 
@@ -74,19 +69,58 @@ export class ApiService {
      */
     public async exerciseExists(exerciseId: string) {
         return lastValueFrom(
-            this.httpClient.get<null>(
-                `${httpOrigin}/api/exercise/${exerciseId}`
+            this.httpClient
+                .get(`${httpOrigin}/api/exercise/${exerciseId}`)
+                .pipe(map((v) => exerciseExistsResponseDataSchema.parse(v)))
+        );
+    }
+
+    public getExercisesResource() {
+        return httpResource(() => `${httpOrigin}/api/exercises/`, {
+            parse: getExercisesResponseDataSchema.parse,
+        });
+    }
+    public getExerciseTemplatesResource() {
+        return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
+            parse: getExerciseTemplatesResponseDataSchema.parse,
+        });
+    }
+
+    public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
+        return lastValueFrom(
+            this.httpClient
+                .post(`${httpOrigin}/api/exercise_templates`, data)
+                .pipe(
+                    map((v) => getExerciseTemplateResponseDataSchema.parse(v))
+                )
+        );
+    }
+
+    public async patchExerciseTemplate(
+        id: UUID,
+        data: PostExerciseTemplateRequestData
+    ) {
+        return lastValueFrom(
+            this.httpClient
+                .patch(`${httpOrigin}/api/exercise_templates/${id}`, data)
+                .pipe(
+                    map((v) => getExerciseTemplateResponseDataSchema.parse(v))
+                )
+        );
+    }
+
+    public async createExerciseFromTemplate(id: UUID) {
+        return lastValueFrom(
+            this.httpClient.post<ExerciseAccessIds>(
+                `${httpOrigin}/api/exercise_templates/${id}/new`,
+                {}
             )
-        )
-            .then(() => true)
-            .catch((error) => {
-                if (error.status !== 404) {
-                    this.messageService.postError({
-                        title: 'Interner Fehler',
-                        error,
-                    });
-                }
-                return false;
-            });
+        );
+    }
+
+    public async deleteExerciseTemplate(id: string) {
+        return lastValueFrom(
+            this.httpClient.delete(`${httpOrigin}/api/exercise_templates/${id}`)
+        );
     }
 }

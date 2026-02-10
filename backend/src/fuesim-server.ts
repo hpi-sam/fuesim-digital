@@ -1,13 +1,14 @@
 import express from 'express';
 import { PeriodicEventHandler } from './exercise/periodic-events/periodic-event-handler.js';
 import { ExerciseWebsocketServer } from './exercise/websocket.js';
-import { ExerciseHttpServer } from './exercise/http-server.js';
+import { ApiHttpServer } from './http-server.js';
 import type { DatabaseService } from './database/services/database-service.js';
 import type { ExerciseService } from './database/services/exercise-service.js';
 import type { AuthService } from './auth/auth-service.js';
+import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
 
 export class FuesimServer {
-    private readonly _httpServer: ExerciseHttpServer;
+    private readonly _httpServer: ApiHttpServer;
     private readonly _websocketServer: ExerciseWebsocketServer;
 
     private readonly saveTickInterval = 10_000;
@@ -21,18 +22,20 @@ export class FuesimServer {
     public constructor(
         private readonly databaseService: DatabaseService,
         private readonly exerciseService: ExerciseService,
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly exerciseManagerService: ExerciseManagerService
     ) {
         const app = express();
         this._websocketServer = new ExerciseWebsocketServer(
             app,
-            exerciseService
-        );
-        this._httpServer = new ExerciseHttpServer(
-            app,
-            databaseService,
             exerciseService,
             authService
+        );
+        this._httpServer = new ApiHttpServer(
+            app,
+            exerciseService,
+            authService,
+            exerciseManagerService
         );
 
         this.saveHandler = new PeriodicEventHandler(
@@ -46,7 +49,7 @@ export class FuesimServer {
         return this._websocketServer;
     }
 
-    public get httpServer(): ExerciseHttpServer {
+    public get httpServer(): ApiHttpServer {
         return this._httpServer;
     }
 

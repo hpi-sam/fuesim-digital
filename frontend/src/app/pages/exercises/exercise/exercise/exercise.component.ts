@@ -27,6 +27,7 @@ import { selectOwnClient } from 'src/app/state/application/selectors/shared.sele
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import Package from 'package.json';
 import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal';
+import { ExerciseService } from '../../../../core/exercise.service';
 
 @Component({
     selector: 'app-exercise',
@@ -50,6 +51,7 @@ export class ExerciseComponent implements OnDestroy {
         private readonly store: Store<AppState>,
         private readonly apiService: ApiService,
         private readonly applicationService: ApplicationService,
+        public readonly exerciseService: ExerciseService,
         private readonly messageService: MessageService,
         private readonly modalService: NgbModal
     ) {}

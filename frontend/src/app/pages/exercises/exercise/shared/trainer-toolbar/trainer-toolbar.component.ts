@@ -32,7 +32,7 @@ export class TrainerToolbarComponent {
 
     constructor(
         private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
+        public readonly exerciseService: ExerciseService,
         private readonly apiService: ApiService,
         public readonly applicationService: ApplicationService,
         private readonly modalService: NgbModal,
@@ -92,20 +92,12 @@ export class TrainerToolbarComponent {
         this.applicationService.leaveExercise();
         this.apiService
             .deleteExercise(exerciseId)
-            .then(
-                (response) => {
-                    this.messageService.postMessage({
-                        title: 'Übung erfolgreich gelöscht',
-                        color: 'success',
-                    });
-                },
-                (error) => {
-                    this.messageService.postError({
-                        title: 'Fehler beim Löschen der Übung',
-                        error,
-                    });
-                }
-            )
+            .then((response) => {
+                this.messageService.postMessage({
+                    title: 'Übung erfolgreich gelöscht',
+                    color: 'success',
+                });
+            })
             .finally(() => {
                 this.router.navigate(['/']);
             });

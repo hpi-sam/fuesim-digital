@@ -4,6 +4,7 @@ import type { ExportImportFile } from 'digital-fuesim-manv-shared';
 import { escapeRegExp } from 'lodash-es';
 import { ApiService } from 'src/app/core/api.service';
 import { MessageService } from 'src/app/core/messages/message.service';
+import { AuthService } from '../../../core/auth.service';
 
 @Component({
     selector: 'app-landing-page',
@@ -12,6 +13,8 @@ import { MessageService } from 'src/app/core/messages/message.service';
     standalone: false,
 })
 export class LandingPageComponent {
+    public loginUrl = this.auth.loginUrl;
+
     public exerciseId = '';
 
     public exerciseHasBeenCreated = false;
@@ -23,33 +26,23 @@ export class LandingPageComponent {
     constructor(
         private readonly apiService: ApiService,
         private readonly router: Router,
-        private readonly messageService: MessageService
+        private readonly messageService: MessageService,
+        readonly auth: AuthService
     ) {}
 
     public async createExercise() {
-        this.apiService
-            .createExercise()
-            .then((ids) => {
-                this.trainerId = ids.trainerId;
-                this.exerciseId = this.trainerId;
-                this.participantId = ids.participantId;
-                this.exerciseHasBeenCreated = true;
+        this.apiService.createExercise().then((ids) => {
+            this.trainerId = ids.trainerId;
+            this.exerciseId = this.trainerId;
+            this.participantId = ids.participantId;
+            this.exerciseHasBeenCreated = true;
 
-                this.messageService.postMessage(
-                    {
-                        title: 'Übung erstellt',
-                        body: 'Sie können nun der Übung beitreten.',
-                        color: 'success',
-                    },
-                    'toast'
-                );
-            })
-            .catch((error) => {
-                this.messageService.postError({
-                    title: 'Fehler beim Erstellen der Übung',
-                    error: error.message,
-                });
+            this.messageService.postMessage({
+                title: 'Übung erstellt',
+                body: 'Sie können nun der Übung beitreten.',
+                color: 'success',
             });
+        });
     }
 
     public importingExercise = false;
@@ -75,14 +68,11 @@ export class LandingPageComponent {
                     this.participantId = ids.participantId;
                     this.exerciseHasBeenCreated = true;
 
-                    this.messageService.postMessage(
-                        {
-                            color: 'success',
-                            title: 'Übung importiert',
-                            body: 'Sie können nun der Übung beitreten',
-                        },
-                        'toast'
-                    );
+                    this.messageService.postMessage({
+                        color: 'success',
+                        title: 'Übung importiert',
+                        body: 'Sie können nun der Übung beitreten',
+                    });
                     break;
                 }
                 case 'partial': {

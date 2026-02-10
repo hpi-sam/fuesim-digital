@@ -5,15 +5,8 @@ function migrateAlarmGroup(alarmGroup: {
     triggerLimit: number | null | undefined;
     triggerCount: number | undefined;
 }) {
-    if (alarmGroup.triggerLimit === undefined) {
-        alarmGroup.triggerLimit = null;
-    }
-
-    alarmGroup.triggerCount ??= 0;
-
-    if (alarmGroup.sent === true && alarmGroup.triggerCount === 0) {
-        alarmGroup.triggerCount = 1;
-    }
+    alarmGroup.triggerLimit = null;
+    alarmGroup.triggerCount = alarmGroup.sent ? 1 : 0;
 
     delete alarmGroup.sent;
 }

@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { AlarmGroup, AlarmGroupVehicle } from 'digital-fuesim-manv-shared';
@@ -16,7 +16,7 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
     styleUrls: ['./alarm-group-item.component.scss'],
     standalone: false,
 })
-export class AlarmGroupItemComponent {
+export class AlarmGroupItemComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 

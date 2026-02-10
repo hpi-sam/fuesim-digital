@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
 
@@ -9,8 +9,6 @@ import { AuthService } from '../../../core/auth.service';
     standalone: false,
 })
 export class HeaderComponent {
-    constructor(
-        public route: ActivatedRoute,
-        public readonly auth: AuthService
-    ) {}
+    route = inject(ActivatedRoute);
+    readonly auth = inject(AuthService);
 }

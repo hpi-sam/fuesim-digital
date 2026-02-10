@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     Material,
@@ -34,6 +34,9 @@ export type PatientCategory = (typeof patientCategories)[number];
     standalone: false,
 })
 export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() simulatedRegion!: SimulatedRegion;
 
     public readonly vehicleTemplates$ = this.store.select(
@@ -62,11 +65,6 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
     public vehiclesCollapsed = true;
     public personnelCollapsed = true;
     public materialsCollapsed = true;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
 
     ngOnInit(): void {
         const containedPatientsSelector = createSelectElementsInSimulatedRegion(

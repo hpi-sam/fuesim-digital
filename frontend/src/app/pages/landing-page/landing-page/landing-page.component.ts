@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import type { ExportImportFile } from 'digital-fuesim-manv-shared';
 import { escapeRegExp } from 'lodash-es';
@@ -13,6 +13,11 @@ import { AuthService } from '../../../core/auth.service';
     standalone: false,
 })
 export class LandingPageComponent {
+    private readonly apiService = inject(ApiService);
+    private readonly router = inject(Router);
+    private readonly messageService = inject(MessageService);
+    readonly auth = inject(AuthService);
+
     public loginUrl = this.auth.loginUrl;
 
     public exerciseId = '';
@@ -22,13 +27,6 @@ export class LandingPageComponent {
     public trainerId = '';
 
     public participantId = '';
-
-    constructor(
-        private readonly apiService: ApiService,
-        private readonly router: Router,
-        private readonly messageService: MessageService,
-        readonly auth: AuthService
-    ) {}
 
     public async createExercise() {
         this.apiService.createExercise().then((ids) => {

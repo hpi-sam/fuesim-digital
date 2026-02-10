@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
@@ -28,18 +28,18 @@ import { openSimulationSignallerModal } from '../simulation/signaller-modal/open
     standalone: false,
 })
 export class TrainerToolbarComponent {
-    public exerciseStatus$ = this.store.select(selectExerciseStatus);
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly exerciseService = inject(ExerciseService);
+    private readonly apiService = inject(ApiService);
+    readonly applicationService = inject(ApplicationService);
+    private readonly modalService = inject(NgbModal);
+    private readonly router = inject(Router);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
+    private readonly messageService = inject(MessageService);
 
-    constructor(
-        private readonly store: Store<AppState>,
-        public readonly exerciseService: ExerciseService,
-        private readonly apiService: ApiService,
-        public readonly applicationService: ApplicationService,
-        private readonly modalService: NgbModal,
-        private readonly router: Router,
-        private readonly confirmationModalService: ConfirmationModalService,
-        private readonly messageService: MessageService
-    ) {}
+    public exerciseStatus$ = this.store.select(selectExerciseStatus);
 
     public openClientOverview() {
         openClientOverviewModal(this.modalService);

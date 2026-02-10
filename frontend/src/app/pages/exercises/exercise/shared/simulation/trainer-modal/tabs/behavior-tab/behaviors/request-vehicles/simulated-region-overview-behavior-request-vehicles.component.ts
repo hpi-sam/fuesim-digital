@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     RecurringEventActivityState,
@@ -33,6 +33,9 @@ type RequestTargetOption = UUID | 'trainees';
     standalone: false,
 })
 export class RequestVehiclesComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     @Input() simulatedRegionId!: UUID;
     @Input() requestBehaviorId!: UUID;
 
@@ -45,11 +48,6 @@ export class RequestVehiclesComponent implements OnChanges {
     nextTimeoutIn$!: Observable<number | undefined>;
 
     selectedRequestTarget$!: Observable<RequestTargetOption>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     ngOnChanges(): void {
         this.requestTargetOptions$ = this.store

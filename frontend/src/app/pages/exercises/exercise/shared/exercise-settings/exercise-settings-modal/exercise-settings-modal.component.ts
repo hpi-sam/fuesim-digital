@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { cloneDeepMutable } from 'digital-fuesim-manv-shared';
@@ -17,6 +17,10 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
     standalone: false,
 })
 export class ExerciseSettingsModalComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly activeModal = inject(NgbActiveModal);
+    private readonly exerciseService = inject(ExerciseService);
+
     public tileMapProperties = cloneDeepMutable(
         selectStateSnapshot(selectTileMapProperties, this.store)
     );
@@ -25,12 +29,6 @@ export class ExerciseSettingsModalComponent {
         /^(?=.*\{x\})(?=.*\{-?y\})(?=.*\{z\}).*$/u;
 
     public configuration$ = this.store.select(selectConfiguration);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        public readonly activeModal: NgbActiveModal,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public updateTileMapProperties() {
         this.exerciseService.proposeAction({

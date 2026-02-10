@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferPoint, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -13,11 +13,11 @@ import { createSelectTransferPoint } from 'src/app/state/application/selectors/e
     standalone: false,
 })
 export class TransferPointNameComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() transferPointId!: UUID;
 
     public transferPoint$?: Observable<TransferPoint>;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnChanges() {
         this.transferPoint$ = this.store.select(

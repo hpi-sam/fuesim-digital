@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Personnel } from 'digital-fuesim-manv-shared';
 import { AssignLeaderBehaviorState } from 'digital-fuesim-manv-shared';
@@ -19,12 +19,12 @@ import { createSelectPersonnel } from 'src/app/state/application/selectors/exerc
 export class SimulatedRegionOverviewBehaviorAssignLeaderComponent
     implements OnChanges
 {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input()
     assignLeaderBehaviorState!: AssignLeaderBehaviorState;
 
     currentLeader?: Observable<Personnel>;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnChanges(): void {
         if (this.assignLeaderBehaviorState.leaderId) {

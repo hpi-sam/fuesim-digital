@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, TemplateRef } from '@angular/core';
+import { Component, Input, TemplateRef, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
 import {
@@ -14,17 +14,15 @@ import {
     standalone: false,
 })
 export class SignallerModalDetailsModalComponent implements OnInit, OnDestroy {
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly hotkeysService = inject(HotkeysService);
+
     @Input() title = '';
     @Input() body!: TemplateRef<any>;
     @Input() hotkeysEnabled = true;
 
     private hotkeyLayer?: HotkeyLayer;
     private readonly closeHotkey = new Hotkey('Esc', false, () => this.close());
-
-    constructor(
-        private readonly activeModal: NgbActiveModal,
-        private readonly hotkeysService: HotkeysService
-    ) {}
 
     ngOnInit() {
         if (this.hotkeysEnabled) {

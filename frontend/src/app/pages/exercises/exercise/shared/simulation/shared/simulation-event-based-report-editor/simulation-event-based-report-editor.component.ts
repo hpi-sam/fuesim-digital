@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ReportBehaviorState,
@@ -81,6 +81,10 @@ interface EventBasedReport {
 export class SimulationEventBasedReportEditorComponent
     implements OnChanges, OnDestroy, OnInit
 {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly hotkeysService = inject(HotkeysService);
+
     @Input() simulatedRegionId!: UUID;
     @Input() reportBehaviorId!: UUID;
     @Input() useHotkeys = false;
@@ -98,12 +102,6 @@ export class SimulationEventBasedReportEditorComponent
     >;
 
     private readonly destroy$ = new Subject<void>();
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly hotkeysService: HotkeysService
-    ) {}
 
     ngOnInit(): void {
         this.canReport$ = this.simulatedRegionId$.pipe(

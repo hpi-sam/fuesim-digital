@@ -1,4 +1,4 @@
-import { Directive } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 import type { AbstractControl, AsyncValidator } from '@angular/forms';
 import { NG_ASYNC_VALIDATORS } from '@angular/forms';
 import { ApiService } from 'src/app/core/api.service';
@@ -15,7 +15,7 @@ import { ApiService } from 'src/app/core/api.service';
     standalone: false,
 })
 export class ExerciseExistsValidatorDirective implements AsyncValidator {
-    constructor(private readonly apiService: ApiService) {}
+    private readonly apiService = inject(ApiService);
 
     async validate(
         control: AbstractControl

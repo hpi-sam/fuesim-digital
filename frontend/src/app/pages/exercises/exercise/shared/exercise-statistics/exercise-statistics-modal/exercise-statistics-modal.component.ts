@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { PatientStatus, UUID, LogEntry } from 'digital-fuesim-manv-shared';
@@ -26,15 +26,15 @@ import { StackedBarChart } from '../stacked-bar-chart/time-line-area-chart';
     standalone: false,
 })
 export class ExerciseStatisticsModalComponent implements OnInit {
+    activeModal = inject(NgbActiveModal);
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly statisticsService = inject(StatisticsService);
+    readonly areaStatisticsService = inject(AreaStatisticsService);
+
     public viewportIds$!: Observable<UUID[]>;
     public simulatedRegionIds$!: Observable<UUID[]>;
 
-    constructor(
-        public activeModal: NgbActiveModal,
-        private readonly store: Store<AppState>,
-        public readonly statisticsService: StatisticsService,
-        public readonly areaStatisticsService: AreaStatisticsService
-    ) {
+    constructor() {
         this.statisticsService.updateStatistics();
     }
     ngOnInit(): void {

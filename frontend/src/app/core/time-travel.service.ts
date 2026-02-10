@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ExerciseTimeline } from 'digital-fuesim-manv-shared';
 import { freeze } from 'immer';
@@ -30,15 +30,13 @@ import { TimeJumpHelper } from './time-jump-helper';
     providedIn: 'root',
 })
 export class TimeTravelService {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly httpClient = inject(HttpClient);
+    private readonly messageService = inject(MessageService);
+
     private timeJumpHelper?: TimeJumpHelper;
 
     private activatingTimeTravel = false;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly httpClient: HttpClient,
-        private readonly messageService: MessageService
-    ) {}
 
     /**
      * Use the function in ApplicationService instead

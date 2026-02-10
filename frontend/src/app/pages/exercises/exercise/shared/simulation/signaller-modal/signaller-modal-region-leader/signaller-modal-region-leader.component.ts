@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy } from '@angular/core';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Personnel, UUID } from 'digital-fuesim-manv-shared';
 import {
@@ -25,13 +25,13 @@ import {
 export class SignallerModalRegionLeaderComponent
     implements OnChanges, OnDestroy
 {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() simulatedRegionId!: UUID;
     @Output() readonly hasLeader = new EventEmitter<boolean>();
 
     leader$!: Observable<Personnel | null>;
     private readonly changeOrDestroy$ = new Subject<void>();
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnChanges() {
         this.changeOrDestroy$.next();

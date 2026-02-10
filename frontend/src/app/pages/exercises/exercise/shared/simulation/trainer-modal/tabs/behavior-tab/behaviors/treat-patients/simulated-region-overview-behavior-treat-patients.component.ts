@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UUID,
@@ -36,6 +36,10 @@ let globalLastInformationCollapsed = true;
 export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
     implements OnInit
 {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly selectPatientService = inject(SelectPatientService);
+
     @Input() simulatedRegionId!: UUID;
     @Input() treatPatientsBehaviorId!: UUID;
 
@@ -59,12 +63,6 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
         this._informationCollapsed = value;
         globalLastInformationCollapsed = value;
     }
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        readonly selectPatientService: SelectPatientService
-    ) {}
 
     ngOnInit(): void {
         this.settingsCollapsed = globalLastSettingsCollapsed;

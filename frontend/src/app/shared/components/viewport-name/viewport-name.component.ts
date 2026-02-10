@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Viewport, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -13,8 +13,9 @@ import { createSelectViewport } from 'src/app/state/application/selectors/exerci
     standalone: false,
 })
 export class ViewportNameComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() viewportId!: UUID;
-    constructor(private readonly store: Store<AppState>) {}
 
     public viewport$?: Observable<Viewport>;
 

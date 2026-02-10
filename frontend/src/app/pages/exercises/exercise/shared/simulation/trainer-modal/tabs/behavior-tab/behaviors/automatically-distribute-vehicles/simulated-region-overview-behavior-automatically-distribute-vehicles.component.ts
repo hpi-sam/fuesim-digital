@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UUID,
@@ -31,6 +31,9 @@ import {
 export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent
     implements OnInit
 {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() simulatedRegionId!: UUID;
     @Input() automaticallyDistributeVehiclesBehaviorId!: UUID;
 
@@ -50,11 +53,6 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
         TransferPoint.getFullName(transferPoint);
 
     public readonly infinity = Number.MAX_VALUE;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
 
     ngOnInit(): void {
         const automaticallyDistributeVehiclesBehaviorStateSelector =

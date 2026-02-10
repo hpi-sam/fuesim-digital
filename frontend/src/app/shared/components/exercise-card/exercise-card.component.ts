@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, inject } from '@angular/core';
 import type { GetExerciseResponseData } from 'digital-fuesim-manv-shared';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ApiService } from '../../../core/api.service';
@@ -11,6 +11,12 @@ import { MessageService } from '../../../core/messages/message.service';
     standalone: false,
 })
 export class ExerciseCardComponent {
+    private readonly apiService = inject(ApiService);
+    private readonly messageService = inject(MessageService);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
+
     exercise = input<GetExerciseResponseData>();
     participantUrl = computed(
         () => `${location.origin}/exercises/${this.exercise()?.participantId}`
@@ -19,13 +25,6 @@ export class ExerciseCardComponent {
         () => `${location.origin}/exercises/${this.exercise()?.trainerId}`
     );
     readonly updated = output();
-
-    constructor(
-        private readonly apiService: ApiService,
-        private readonly messageService: MessageService,
-
-        private readonly confirmationModalService: ConfirmationModalService
-    ) {}
 
     async deleteExercise() {
         const exerciseId = this.exercise()?.trainerId; // TODO exercise ID

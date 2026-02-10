@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { HotkeysService } from 'src/app/shared/services/hotkeys.service';
 import {
@@ -14,18 +14,16 @@ import {
     standalone: false,
 })
 export class SignallerModalComponent {
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly hotkeys = inject(HotkeysService);
+    readonly selectRegionService = inject(SelectSignallerRegionService);
+
     public get eocId() {
         return eocId;
     }
     public get overviewId() {
         return overviewId;
     }
-
-    constructor(
-        private readonly activeModal: NgbActiveModal,
-        private readonly hotkeys: HotkeysService,
-        public readonly selectRegionService: SelectSignallerRegionService
-    ) {}
 
     public close() {
         this.activeModal.close();

@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Viewport } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -16,17 +16,15 @@ import { PopupService } from '../../utility/popup.service';
     standalone: false,
 })
 export class ViewportPopupComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly popupService = inject(PopupService);
+
     // These properties are only set after OnInit
     public viewportId!: UUID;
 
     public viewport$?: Observable<Viewport>;
     public readonly currentRole$ = this.store.select(selectCurrentMainRole);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly popupService: PopupService
-    ) {}
 
     ngOnInit() {
         this.viewport$ = this.store.select(

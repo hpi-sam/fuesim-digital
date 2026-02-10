@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
 import { Patient } from 'digital-fuesim-manv-shared';
@@ -25,6 +25,8 @@ import {
 export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
     implements OnInit, OnDestroy
 {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() patientId!: UUID;
     @Input() cateringsActive!: boolean;
 
@@ -39,8 +41,6 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
     public visibleStatus$?: Observable<PatientStatus>;
     public patient$!: Observable<Patient>;
     public destroy$ = new Subject<void>();
-
-    constructor(private readonly store: Store<AppState>) {}
     ngOnDestroy(): void {
         this.destroy$.next();
     }

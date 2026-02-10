@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UnloadArrivingVehiclesBehaviorState,
@@ -30,6 +30,9 @@ import {
 export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent
     implements OnInit
 {
+    private readonly exerciseService = inject(ExerciseService);
+    readonly store = inject<Store<AppState>>(Store);
+
     @Input()
     simulatedRegionId!: UUID;
 
@@ -38,11 +41,6 @@ export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent
 
     unloadDuration$?: Observable<number>;
     vehiclesStatus$?: Observable<VehicleUnloadStatus[]>;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        public readonly store: Store<AppState>
-    ) {}
 
     ngOnInit(): void {
         const selectBehavior =

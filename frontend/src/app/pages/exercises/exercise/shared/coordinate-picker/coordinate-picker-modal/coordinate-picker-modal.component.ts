@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { toLonLat } from 'ol/proj';
 import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
@@ -11,13 +11,13 @@ import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
     standalone: false,
 })
 export class CoordinatePickerModalComponent implements OnInit {
+    activeModal = inject(NgbActiveModal);
+
     @Input()
     public olMapManager!: OlMapManager;
 
     public latitude = '';
     public longitude = '';
-
-    constructor(public activeModal: NgbActiveModal) {}
 
     ngOnInit() {
         const center = this.olMapManager.getCoordinates();

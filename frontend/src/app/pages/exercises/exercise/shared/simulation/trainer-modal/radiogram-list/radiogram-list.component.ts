@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ExerciseRadiogram, UUID } from 'digital-fuesim-manv-shared';
 import {
@@ -27,16 +27,14 @@ import { RadiogramListService } from './radiogram-list.service';
     standalone: false,
 })
 export class RadiogramListComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly radiogramListService = inject(RadiogramListService);
+
     @Input() shownInSignallerModal = false;
 
     ownClientId!: UUID;
     publishedRadiograms$!: Observable<ExerciseRadiogram[]>;
     visibleRadiograms$!: Observable<ExerciseRadiogram[]>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        public readonly radiogramListService: RadiogramListService
-    ) {}
 
     ngOnInit(): void {
         this.ownClientId = selectStateSnapshot(selectOwnClientId, this.store)!;

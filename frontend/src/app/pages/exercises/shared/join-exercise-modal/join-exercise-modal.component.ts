@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { ApplicationService } from 'src/app/core/application.service';
@@ -11,6 +11,9 @@ import { ApplicationService } from 'src/app/core/application.service';
     standalone: false,
 })
 export class JoinExerciseModalComponent implements OnDestroy {
+    private readonly applicationService = inject(ApplicationService);
+    private readonly activeModal = inject(NgbActiveModal);
+
     public exerciseId!: string;
     public clientName = '';
     /**
@@ -18,11 +21,6 @@ export class JoinExerciseModalComponent implements OnDestroy {
      * If it completes without emitting a value or emits false, the exercise couldn't be joined.
      */
     public exerciseJoined$ = new Subject<boolean>();
-
-    constructor(
-        private readonly applicationService: ApplicationService,
-        private readonly activeModal: NgbActiveModal
-    ) {}
 
     public async joinExercise() {
         const successfullyJoined = await this.applicationService.joinExercise(

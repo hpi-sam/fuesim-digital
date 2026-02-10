@@ -4,6 +4,7 @@ import {
     Input,
     OnChanges,
     OnDestroy,
+    inject,
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import type { Hotkey, HotkeyState } from '../../services/hotkeys.service';
@@ -15,14 +16,14 @@ import type { Hotkey, HotkeyState } from '../../services/hotkeys.service';
     standalone: false,
 })
 export class HotkeyIndicatorComponent implements OnChanges, OnDestroy {
+    private readonly changeDetectorRef = inject(ChangeDetectorRef);
+
     @Input() hotkey: Hotkey | null = null;
     @Input() keys: string | null = null;
 
     public state: HotkeyState = 'overridden';
 
     private readonly updateOrDestroy$ = new Subject<void>();
-
-    constructor(private readonly changeDetectorRef: ChangeDetectorRef) {}
 
     ngOnChanges(): void {
         this.updateOrDestroy$.next();

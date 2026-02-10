@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import type { GetExerciseTemplatesResponseData } from 'digital-fuesim-manv-shared';
 import { ApiService } from 'src/app/core/api.service';
 import { HttpResourceRef } from '@angular/common/http';
@@ -13,14 +13,16 @@ import { CreateExerciseTemplateModalComponent } from '../shared/create-exercise-
     standalone: false,
 })
 export class ExerciseTemplateListComponent {
+    private readonly apiService = inject(ApiService);
+    private readonly ngbModalService = inject(NgbModal);
+
     exerciseTemplates: HttpResourceRef<
         GetExerciseTemplatesResponseData | undefined
     >;
 
-    constructor(
-        private readonly apiService: ApiService,
-        private readonly ngbModalService: NgbModal
-    ) {
+    constructor() {
+        const apiService = this.apiService;
+
         this.exerciseTemplates = apiService.getExerciseTemplatesResource();
     }
 

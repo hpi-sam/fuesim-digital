@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferCountsRadiogram, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -13,6 +13,8 @@ import { createSelectRadiogram } from 'src/app/state/application/selectors/exerc
     standalone: false,
 })
 export class RadiogramCardContentTransferCountsComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+
     /**
      * Categories that should always be listed in the table.
      */
@@ -35,8 +37,6 @@ export class RadiogramCardContentTransferCountsComponent implements OnInit {
     @Input() radiogramId!: UUID;
 
     radiogram$!: Observable<TransferCountsRadiogram>;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnInit(): void {
         this.radiogram$ = this.store.select(

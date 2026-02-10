@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, ReportableInformation } from 'digital-fuesim-manv-shared';
 import { reportableInformationTypeToGermanNameDictionary } from 'digital-fuesim-manv-shared';
@@ -22,6 +22,11 @@ const defaultInterval = 15 * 60 * 1000; // 15 minutes
     standalone: false,
 })
 export class SignallerModalRecurringReportModalComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+    private readonly messageService = inject(MessageService);
+
     @Input()
     simulatedRegionId!: UUID;
 
@@ -40,13 +45,6 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
     public reportIntervalMilliseconds = defaultInterval;
 
     public loading = false;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly detailsModal: SignallerModalDetailsService,
-        private readonly messageService: MessageService
-    ) {}
 
     ngOnInit() {
         const reportBehavior = selectStateSnapshot(

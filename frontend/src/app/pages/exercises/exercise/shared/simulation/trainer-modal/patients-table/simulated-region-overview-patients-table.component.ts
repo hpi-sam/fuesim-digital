@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import type { UUID, Patient, PatientStatus } from 'digital-fuesim-manv-shared';
 import { SelectPatientService } from '../select-patient.service';
 
@@ -15,6 +15,8 @@ export type Scope = 'simulatedRegion' | 'vehicle';
     standalone: false,
 })
 export class SimulatedRegionOverviewPatientsTableComponent {
+    readonly selectPatientService = inject(SelectPatientService);
+
     @Input()
     patients: PatientWithVisibleStatus[] = [];
 
@@ -28,6 +30,4 @@ export class SimulatedRegionOverviewPatientsTableComponent {
         simulatedRegion: 'im simulierten Bereich',
         vehicle: 'im Fahrzeug',
     } as const;
-
-    constructor(public readonly selectPatientService: SelectPatientService) {}
 }

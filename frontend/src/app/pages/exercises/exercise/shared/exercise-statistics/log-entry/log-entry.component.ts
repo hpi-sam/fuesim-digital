@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { LogEntry } from 'digital-fuesim-manv-shared';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
 
@@ -9,11 +9,11 @@ import { StatisticsTimeSelectionService } from '../statistics-time-selection.ser
     standalone: false,
 })
 export class LogEntryComponent {
-    @Input() logEntry!: LogEntry;
+    private readonly statisticsTimeSelectionService = inject(
+        StatisticsTimeSelectionService
+    );
 
-    constructor(
-        private readonly statisticsTimeSelectionService: StatisticsTimeSelectionService
-    ) {}
+    @Input() logEntry!: LogEntry;
 
     selectTime() {
         this.statisticsTimeSelectionService.selectTime(

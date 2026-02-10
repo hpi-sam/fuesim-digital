@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseRequestTargetConfiguration,
@@ -35,6 +35,12 @@ import { SignallerModalDetailsService } from '../signaller-modal-details.service
 export class SignallerModalRequestDestinationEditorComponent
     implements OnInit, OnChanges, OnDestroy
 {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+    private readonly hotkeysService = inject(HotkeysService);
+    private readonly messageService = inject(MessageService);
+
     public readonly TRAINEES_ID = 'trainees';
     public readonly TRAINEES_NAME = 'Die übende Einsatzleitung';
 
@@ -48,14 +54,6 @@ export class SignallerModalRequestDestinationEditorComponent
     currentTargetName$!: Observable<string>;
     selectedTarget: SearchableDropdownOption | null = null;
     loading = false;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly detailsModal: SignallerModalDetailsService,
-        private readonly hotkeysService: HotkeysService,
-        private readonly messageService: MessageService
-    ) {}
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();

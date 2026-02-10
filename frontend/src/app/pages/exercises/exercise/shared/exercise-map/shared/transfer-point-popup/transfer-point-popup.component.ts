@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { ViewEncapsulation, Component } from '@angular/core';
+import { ViewEncapsulation, Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, TransferPoint } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -23,6 +23,10 @@ let activeNavId: NavIds = 'names';
     standalone: false,
 })
 export class TransferPointPopupComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly popupService = inject(PopupService);
+
     // These properties are only set after OnInit
     public transferPointId!: UUID;
 
@@ -36,12 +40,6 @@ export class TransferPointPopupComponent implements OnInit {
     public set activeNavId(value: NavIds) {
         activeNavId = value;
     }
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly popupService: PopupService
-    ) {}
 
     ngOnInit() {
         this.transferPoint$ = this.store.select(

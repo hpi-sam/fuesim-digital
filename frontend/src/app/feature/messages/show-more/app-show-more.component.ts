@@ -7,6 +7,7 @@ import {
     ElementRef,
     Input,
     ViewChild,
+    inject,
 } from '@angular/core';
 import type { HeightChangeObservationStrategies } from './height-change-observation-strategies';
 
@@ -44,6 +45,9 @@ import type { HeightChangeObservationStrategies } from './height-change-observat
 export class AppShowMoreComponent
     implements OnChanges, AfterViewInit, OnDestroy
 {
+    private readonly animationBuilder = inject(AnimationBuilder);
+    private readonly changeDetectorRef = inject(ChangeDetectorRef);
+
     /**
      * The maximum height that is shown by default without having to click on the "Show more"-button
      * You can use any valid css value like '100px', '100em', '10vh'
@@ -64,11 +68,6 @@ export class AppShowMoreComponent
     @ViewChild('wrapper') wrapper?: ElementRef<HTMLDivElement>;
     @ViewChild('contentWrapper') contentWrapper?: ElementRef<HTMLDivElement>;
     private player?: AnimationPlayer;
-
-    constructor(
-        private readonly animationBuilder: AnimationBuilder,
-        private readonly changeDetectorRef: ChangeDetectorRef
-    ) {}
 
     public fitsIn = true;
     public showingMore = false;

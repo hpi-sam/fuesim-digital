@@ -1,4 +1,4 @@
-import { Component, model, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 
 @Component({
     selector: 'app-inline-text-editor',
@@ -7,6 +7,7 @@ import { Component, model, output } from '@angular/core';
     standalone: false,
 })
 export class InlineTextEditorComponent {
+    required = input<boolean>(false);
     value = model<string>('');
     newValue = '';
     readonly update = output<string>();

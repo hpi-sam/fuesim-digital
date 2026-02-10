@@ -4,6 +4,7 @@
             <h2 class="card-title h4 d-flex">
                 <app-inline-text-editor
                     class="flex-grow-1"
+                    [required]="true"
                     [value]="exerciseTemplate.name"
                     (update)="
                         patchExerciseTemplate({

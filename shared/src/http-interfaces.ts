@@ -81,8 +81,8 @@ export const getExerciseTemplateResponseDataSchema = z.object({
     description: z.string(),
 });
 export const postExerciseTemplateRequestDataSchema = z.object({
-    name: z.string(),
-    description: z.string(),
+    name: z.string().trim().nonempty(),
+    description: z.string().trim(),
 });
 export type PostExerciseTemplateRequestData = z.infer<
     typeof postExerciseTemplateRequestDataSchema

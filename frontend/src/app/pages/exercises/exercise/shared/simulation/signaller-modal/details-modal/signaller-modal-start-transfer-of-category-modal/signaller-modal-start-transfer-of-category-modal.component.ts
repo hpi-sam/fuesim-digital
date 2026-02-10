@@ -5,7 +5,7 @@ import type {
     ExerciseAction,
     PatientStatusForTransport,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';

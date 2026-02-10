@@ -5,8 +5,8 @@ import type {
     ExerciseKey,
     ParticipantKey,
     TrainerKey,
-} from 'digital-fuesim-manv-shared';
-import { ExerciseState, reduceExerciseState } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { ExerciseState, reduceExerciseState } from 'fuesim-digital-shared';
 import type {
     ExerciseTemplateEntry,
     ExerciseId,

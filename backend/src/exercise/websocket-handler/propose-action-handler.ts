@@ -1,10 +1,10 @@
-import type { ExerciseAction } from 'digital-fuesim-manv-shared';
+import type { ExerciseAction } from 'fuesim-digital-shared';
 import {
     ReducerError,
     ExpectedReducerError,
     validateExerciseAction,
     validatePermissions,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
 import { secureOn } from './secure-on.js';

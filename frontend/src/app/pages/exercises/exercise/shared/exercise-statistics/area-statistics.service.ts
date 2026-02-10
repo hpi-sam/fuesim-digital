@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import type { AreaStatistics } from '../core/statistics/area-statistics';

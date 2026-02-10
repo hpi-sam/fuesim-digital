@@ -1,4 +1,4 @@
-import type { ExerciseAction, UUID } from 'digital-fuesim-manv-shared';
+import type { ExerciseAction, UUID } from 'fuesim-digital-shared';
 import type { ActionEntry, ActionId } from '../database/schema.js';
 import type { ActiveExercise } from './active-exercise.js';
 

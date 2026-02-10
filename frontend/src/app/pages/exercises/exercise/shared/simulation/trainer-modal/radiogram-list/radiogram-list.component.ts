@@ -1,7 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ExerciseRadiogram, UUID } from 'digital-fuesim-manv-shared';
+import type { ExerciseRadiogram, UUID } from 'fuesim-digital-shared';
 import {
     currentParticipantIdOf,
     isAccepted,
@@ -11,7 +11,7 @@ import {
     StrictObject,
     isUnread,
     isInterfaceSignallerKey,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ExerciseTimeline } from 'digital-fuesim-manv-shared';
+import type { ExerciseTimeline } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom } from 'rxjs';
 import type { AppState } from '../state/app.state';

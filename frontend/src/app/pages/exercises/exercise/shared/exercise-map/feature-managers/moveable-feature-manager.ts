@@ -5,7 +5,7 @@ import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Observable, Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
-import type { Element, UUID } from 'digital-fuesim-manv-shared';
+import type { Element, UUID } from 'fuesim-digital-shared';
 import type { FeatureLike } from 'ol/Feature';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';

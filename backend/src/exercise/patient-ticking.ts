@@ -2,12 +2,12 @@ import type {
     ExerciseState,
     HealthPoints,
     PatientUpdate,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     getElement,
     healthPointsDefaults,
     Patient,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 
 /**
  * The count of assigned personnel and material that cater for a {@link Patient}.

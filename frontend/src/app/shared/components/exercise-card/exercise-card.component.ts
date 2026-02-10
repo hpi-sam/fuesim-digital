@@ -1,5 +1,5 @@
 import { Component, computed, input, output, inject } from '@angular/core';
-import type { GetExerciseResponseData } from 'digital-fuesim-manv-shared';
+import type { GetExerciseResponseData } from 'fuesim-digital-shared';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';

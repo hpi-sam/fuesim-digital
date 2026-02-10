@@ -1,6 +1,6 @@
 import type { Store } from '@ngrx/store';
-import type { Material, UUID } from 'digital-fuesim-manv-shared';
-import { normalZoom } from 'digital-fuesim-manv-shared';
+import type { Material, UUID } from 'fuesim-digital-shared';
+import { normalZoom } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';

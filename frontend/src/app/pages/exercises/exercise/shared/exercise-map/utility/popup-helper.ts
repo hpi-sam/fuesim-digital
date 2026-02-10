@@ -1,5 +1,5 @@
 import type { Type } from '@angular/core';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type { Point } from 'ol/geom';
 import type Layer from 'ol/layer/Layer';

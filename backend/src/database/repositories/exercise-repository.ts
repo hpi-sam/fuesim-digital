@@ -1,4 +1,4 @@
-import { ExerciseState } from 'digital-fuesim-manv-shared';
+import { ExerciseState } from 'fuesim-digital-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import type {

@@ -1,6 +1,6 @@
 # Line-endings behavior
 * text=auto
-# docker-entrypoint.sh needs LF (see https://github.com/hpi-sam/digital-fuesim-manv/issues/479)
+# docker-entrypoint.sh needs LF (see https://github.com/hpi-sam/fuesim-digital/issues/479)
 docker/docker-entrypoint.sh eol=lf
 # with this export-ignore the zip file won't include itself when using git archive
-frontend/src/assets/source-code/digital-fuesim-manv.zip export-ignore
+frontend/src/assets/source-code/fuesim-digital.zip export-ignore

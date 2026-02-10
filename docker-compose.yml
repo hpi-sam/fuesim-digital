@@ -1,5 +1,5 @@
 services:
-    digital-fuesim-manv:
+    app:
         depends_on:
             - db
         image: digitalfuesimmanv/dfm
@@ -8,7 +8,7 @@ services:
         #    context: .
         #    dockerfile: docker/Dockerfile
         restart: unless-stopped
-        container_name: digital-fuesim-manv
+        container_name: fuesim-digital
         ports:
             - 80:80
         # uncomment port 443 if HTTPS is used
@@ -16,16 +16,15 @@ services:
         env_file:
             - .env
         volumes:
-            - dfm-data:/${DFM_PERSISTENT_DATA_PATH}
+            - data:/${DFM_PERSISTENT_DATA_PATH}
             # To overwrite the contents of the about pages, mount a directory into the container
             # The directory can contain terms.html, license.html, privacy.html and imprint.html
             # Example
-            # - ./about:/usr/local/app/frontend/dist/digital-fuesim-manv/assets/about
+            # - ./about:/usr/local/app/frontend/dist/fuesim-digital/assets/about
     db:
         image: postgres:14
-        container_name: dfm_postgres
         volumes:
-            - dfm_db:/var/lib/postgresql/data
+            - db:/var/lib/postgresql/data
         # Use this to expose the database to your host machine
         #ports:
         #    - 127.0.0.1:${DFM_DB_PORT}:5432
@@ -45,7 +44,7 @@ services:
 
 volumes:
     # database is in this volume
-    dfm_db:
+    db:
     # needed to keep persistency, right now SSL
-    dfm-data:
+    data:
     authelia-secrets:

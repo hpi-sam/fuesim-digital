@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import type { PartialExport } from 'digital-fuesim-manv-shared';
-import { preparePartialExportForImport } from 'digital-fuesim-manv-shared';
+import type { PartialExport } from 'fuesim-digital-shared';
+import { preparePartialExportForImport } from 'fuesim-digital-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import { MessageService } from 'src/app/core/messages/message.service';
 

@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import type * as core from 'express-serve-static-core';
 import { Server } from 'socket.io';
-import { socketIoTransports } from 'digital-fuesim-manv-shared';
+import { socketIoTransports } from 'fuesim-digital-shared';
 import cookie from 'cookie';
 import { Config } from '../config.js';
 import type { ExerciseSocket, ExerciseServer } from '../exercise-server.js';

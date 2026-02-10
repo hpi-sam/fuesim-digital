@@ -10,7 +10,7 @@ import {
     cloneDeepMutable,
     isInVehicle,
     isInTransfer,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type {
     Personnel,
     Client,
@@ -20,7 +20,7 @@ import type {
     WithPosition,
     UUID,
     LogEntry,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { countBy } from 'lodash-es';
 import { ReplaySubject } from 'rxjs';
 import { ApiService } from 'src/app/core/api.service';

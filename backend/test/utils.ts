@@ -3,8 +3,8 @@ import type {
     ExerciseAccessIds,
     MergeIntersection,
     ServerToClientEvents,
-} from 'digital-fuesim-manv-shared';
-import { sleep, socketIoTransports } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { sleep, socketIoTransports } from 'fuesim-digital-shared';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import request from 'supertest';

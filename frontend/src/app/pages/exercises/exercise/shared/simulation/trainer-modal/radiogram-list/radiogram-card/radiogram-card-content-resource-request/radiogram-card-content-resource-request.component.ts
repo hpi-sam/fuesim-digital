@@ -1,11 +1,8 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type {
-    ResourceRequestRadiogram,
-    UUID,
-} from 'digital-fuesim-manv-shared';
-import { isAccepted, isDone } from 'digital-fuesim-manv-shared';
+import type { ResourceRequestRadiogram, UUID } from 'fuesim-digital-shared';
+import { isAccepted, isDone } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import {

@@ -7,8 +7,8 @@ import {
     inject,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ReportableInformation, UUID } from 'digital-fuesim-manv-shared';
-import { makeInterfaceSignallerKey } from 'digital-fuesim-manv-shared';
+import type { ReportableInformation, UUID } from 'fuesim-digital-shared';
+import { makeInterfaceSignallerKey } from 'fuesim-digital-shared';
 import { type Observable, BehaviorSubject, map } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';

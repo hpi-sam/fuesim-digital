@@ -1,4 +1,4 @@
-import { uuid } from 'digital-fuesim-manv-shared';
+import { uuid } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import { CustomTimer } from './custom-timer';
 

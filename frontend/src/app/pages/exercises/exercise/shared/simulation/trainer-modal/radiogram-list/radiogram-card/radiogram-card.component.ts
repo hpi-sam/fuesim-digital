@@ -10,7 +10,7 @@ import type {
     ExerciseRadiogram,
     SimulatedRegion,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     Client,
     ClientRole,
@@ -18,7 +18,7 @@ import {
     isAccepted,
     isDone,
     isUnread,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';

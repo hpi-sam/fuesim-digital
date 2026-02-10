@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { BehaviourCode } from 'digital-fuesim-manv-shared';
+import type { BehaviourCode } from 'fuesim-digital-shared';
 
 const behaviorIconMap: { [Key in BehaviourCode]: string } = {
     A: 'bi-arrow-right-square-fill',

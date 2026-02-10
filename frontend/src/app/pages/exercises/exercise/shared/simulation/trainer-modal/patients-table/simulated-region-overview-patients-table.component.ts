@@ -1,5 +1,5 @@
 import { Component, Input, inject } from '@angular/core';
-import type { UUID, Patient, PatientStatus } from 'digital-fuesim-manv-shared';
+import type { UUID, Patient, PatientStatus } from 'fuesim-digital-shared';
 import { SelectPatientService } from '../select-patient.service';
 
 export type PatientWithVisibleStatus = Patient & {

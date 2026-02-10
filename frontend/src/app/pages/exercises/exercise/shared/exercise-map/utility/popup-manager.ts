@@ -4,7 +4,7 @@ import { Overlay } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import { Subject, takeUntil } from 'rxjs';
 import type OlMap from 'ol/Map';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import { isEqual } from 'lodash-es';
 import type { Positioning } from '../../utils/types/positioning';
 import type { FeatureManager } from './feature-manager';

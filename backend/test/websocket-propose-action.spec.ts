@@ -1,4 +1,4 @@
-import { generateDummyPatient, uuid } from 'digital-fuesim-manv-shared';
+import { generateDummyPatient, uuid } from 'fuesim-digital-shared';
 import { createExercise, createTestEnvironment } from './utils.js';
 
 describe('propose action', () => {

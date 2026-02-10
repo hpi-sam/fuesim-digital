@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { ExerciseRadiogram } from 'digital-fuesim-manv-shared';
+import type { ExerciseRadiogram } from 'fuesim-digital-shared';
 
 const map: { [Key in ExerciseRadiogram['type']]: string } = {
     materialCountRadiogram: 'Anzahl an Material',

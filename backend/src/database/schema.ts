@@ -3,7 +3,7 @@ import type {
     ExerciseState,
     ParticipantKey,
     TrainerKey,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
 import {

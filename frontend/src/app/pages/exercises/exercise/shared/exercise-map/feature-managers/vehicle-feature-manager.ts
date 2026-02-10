@@ -1,12 +1,12 @@
 import { createSelector, type Store } from '@ngrx/store';
-import { normalZoom } from 'digital-fuesim-manv-shared';
+import { normalZoom } from 'fuesim-digital-shared';
 import type {
     UUID,
     Vehicle,
     // eslint-disable-next-line @typescript-eslint/no-shadow
     Element,
     PatientStatus,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
 import type { TranslateEvent } from 'ol/interaction/Translate';

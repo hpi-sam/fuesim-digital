@@ -1,7 +1,7 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Vehicle, UUID } from 'digital-fuesim-manv-shared';
+import type { Vehicle, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectVehicle } from 'src/app/state/application/selectors/exercise.selectors';

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import type { PatientStatus } from 'digital-fuesim-manv-shared';
+import type { PatientStatus } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-patient-status-dropdown',

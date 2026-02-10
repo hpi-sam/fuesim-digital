@@ -1,4 +1,4 @@
-import type { Immutable, JsonObject } from 'digital-fuesim-manv-shared';
+import type { Immutable, JsonObject } from 'fuesim-digital-shared';
 import { isEqual } from 'lodash-es';
 
 /**

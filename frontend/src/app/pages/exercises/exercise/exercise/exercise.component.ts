@@ -7,7 +7,7 @@ import {
     cloneDeepMutable,
     StateHistoryCompound,
     exportPatientsToCSV,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import { ApiService } from 'src/app/core/api.service';
 import { ApplicationService } from 'src/app/core/application.service';

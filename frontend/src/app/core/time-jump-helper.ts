@@ -1,8 +1,5 @@
-import type {
-    ExerciseState,
-    ExerciseTimeline,
-} from 'digital-fuesim-manv-shared';
-import { jumpToTime } from 'digital-fuesim-manv-shared';
+import type { ExerciseState, ExerciseTimeline } from 'fuesim-digital-shared';
+import { jumpToTime } from 'fuesim-digital-shared';
 import { environment } from 'src/environments/environment';
 import { TimeLineCache } from './time-line-cache';
 

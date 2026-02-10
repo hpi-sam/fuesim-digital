@@ -11,7 +11,7 @@ import {
     type ExerciseAccessIds,
     type ExerciseTimeline,
     type StateExport,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
 import type { AppState } from '../state/app.state';

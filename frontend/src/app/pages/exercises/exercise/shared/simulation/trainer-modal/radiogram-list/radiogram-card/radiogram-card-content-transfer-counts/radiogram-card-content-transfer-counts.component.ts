@@ -1,7 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { TransferCountsRadiogram, UUID } from 'digital-fuesim-manv-shared';
+import type { TransferCountsRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectRadiogram } from 'src/app/state/application/selectors/exercise.selectors';

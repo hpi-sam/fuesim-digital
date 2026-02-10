@@ -1,5 +1,5 @@
 {
-    "name": "digital-fuesim-manv-backend",
+    "name": "fuesim-digital-backend",
     "version": "0.10.0",
     "type": "module",
     "scripts": {
@@ -43,7 +43,7 @@
         "class-validator": "^0.14.1",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
-        "digital-fuesim-manv-shared": "file:../shared",
+        "fuesim-digital-shared": "file:../shared",
         "dotenv": "^16.4.7",
         "drizzle-kit": "^0.31.7",
         "drizzle-orm": "^0.44.7",

@@ -1,5 +1,5 @@
     # Frontend
-    root /usr/local/app/frontend/dist/digital-fuesim-manv;
+    root /usr/local/app/frontend/dist/fuesim-digital;
     error_page 404 /index.html;
     error_page 403 /index.html;
 

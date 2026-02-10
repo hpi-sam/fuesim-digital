@@ -4,11 +4,11 @@ import { createSelector, Store } from '@ngrx/store';
 import type {
     UUID,
     AutomaticallyDistributeVehiclesBehaviorState,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     isInSpecificSimulatedRegion,
     TransferPoint,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';

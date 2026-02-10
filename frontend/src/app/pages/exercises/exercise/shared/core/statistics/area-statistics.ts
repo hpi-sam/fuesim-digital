@@ -1,4 +1,4 @@
-import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 
 /**
  * The statistics for an area in the exercise (e.g. a viewport or the whole exercise).

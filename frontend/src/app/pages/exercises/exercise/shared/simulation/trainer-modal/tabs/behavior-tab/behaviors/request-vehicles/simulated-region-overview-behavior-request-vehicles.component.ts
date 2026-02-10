@@ -5,11 +5,11 @@ import type {
     RecurringEventActivityState,
     RequestBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     SimulatedRegionRequestTargetConfiguration,
     TraineesRequestTargetConfiguration,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';

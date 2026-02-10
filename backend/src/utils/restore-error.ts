@@ -1,4 +1,4 @@
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 
 export class RestoreError extends Error {
     public constructor(

@@ -3,7 +3,7 @@ import type {
     ExerciseState,
     ImageProperties,
     Mutable,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     TransferToHospitalBehaviorState,
     ManagePatientTransportToHospitalBehaviorState,
@@ -21,7 +21,7 @@ import {
     UnloadArrivingVehiclesBehaviorState,
     StrictObject,
     newNoPosition,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { toUtf8Base64 } from './utils/base64';
 
 export interface SimulatedRegionDragTemplate {

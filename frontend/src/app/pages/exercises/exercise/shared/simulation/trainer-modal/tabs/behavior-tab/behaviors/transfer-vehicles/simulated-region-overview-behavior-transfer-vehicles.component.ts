@@ -10,13 +10,13 @@ import type {
     UUIDSet,
     Vehicle,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     cloneDeepMutable,
     isInSpecificVehicle,
     isInSpecificSimulatedRegion,
     Patient,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';

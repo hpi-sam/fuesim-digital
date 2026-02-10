@@ -1,5 +1,5 @@
-import type { StateExport } from 'digital-fuesim-manv-shared';
-import { ReducerError } from 'digital-fuesim-manv-shared';
+import type { StateExport } from 'fuesim-digital-shared';
+import { ReducerError } from 'fuesim-digital-shared';
 import type { ActiveExercise } from '../exercise/active-exercise.js';
 import { ExerciseFactory } from '../exercise/exercise-factory.js';
 import { ValidationErrorWrapper } from './validation-error-wrapper.js';

@@ -1,8 +1,5 @@
 import type { Store } from '@ngrx/store';
-import {
-    upperLeftCornerOf,
-    lowerRightCornerOf,
-} from 'digital-fuesim-manv-shared';
+import { upperLeftCornerOf, lowerRightCornerOf } from 'fuesim-digital-shared';
 import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';

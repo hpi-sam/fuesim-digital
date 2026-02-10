@@ -4,8 +4,8 @@ import type {
     SimulatedRegion,
     // eslint-disable-next-line @typescript-eslint/no-shadow
     Element,
-} from 'digital-fuesim-manv-shared';
-import { newMapCoordinatesAt, newSize } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { newMapCoordinatesAt, newSize } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type { Polygon } from 'ol/geom';
 import type { TranslateEvent } from 'ol/interaction/Translate';

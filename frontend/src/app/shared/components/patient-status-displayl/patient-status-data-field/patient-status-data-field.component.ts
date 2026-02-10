@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PatientStatusDataField } from 'digital-fuesim-manv-shared';
+import { PatientStatusDataField } from 'fuesim-digital-shared';
 import { rgbColorPalette } from 'src/app/shared/functions/colors';
 
 @Component({

@@ -1,4 +1,4 @@
-import type { Immutable, JsonObject } from 'digital-fuesim-manv-shared';
+import type { Immutable, JsonObject } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type { Geometry, Point } from 'ol/geom';
 import VectorLayer from 'ol/layer/Vector';

@@ -41,4 +41,4 @@ We are using [`class-validator`](https://github.com/typestack/class-validator) f
 The conversion to instance objects is done with [class-transformer](https://github.com/typestack/class-transformer).
 It is desirable to narrow down the types of the validation as much as possible, within reason.
 Note that we are currently not able to validate any kind of plain objects (e.g. `{ [key: string]: SomeModel }`) and union types (e.g. `'and' | 'or'`).
-This is tracked in [#116](https://github.com/hpi-sam/digital-fuesim-manv/issues/116).
+This is tracked in [#116](https://github.com/hpi-sam/fuesim-digital/issues/116).

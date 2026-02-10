@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { Immutable } from 'digital-fuesim-manv-shared';
+import type { Immutable } from 'fuesim-digital-shared';
 
 @Pipe({
     name: 'orderBy',

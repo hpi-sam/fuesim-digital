@@ -9,8 +9,8 @@ import {
 import type {
     ExerciseSimulationBehaviorType,
     UUID,
-} from 'digital-fuesim-manv-shared';
-import { isInSpecificSimulatedRegion } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { isInSpecificSimulatedRegion } from 'fuesim-digital-shared';
 import { Store, createSelector } from '@ngrx/store';
 import type { AppState } from 'src/app/state/app.state';
 import { map, type Observable } from 'rxjs';

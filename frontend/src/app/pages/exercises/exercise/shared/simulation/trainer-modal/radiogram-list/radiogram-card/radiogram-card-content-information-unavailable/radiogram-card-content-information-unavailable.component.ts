@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import type { ExerciseRadiogram } from 'digital-fuesim-manv-shared';
+import type { ExerciseRadiogram } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-radiogram-card-content-information-unavailable',

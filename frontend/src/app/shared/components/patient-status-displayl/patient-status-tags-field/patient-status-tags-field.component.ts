@@ -1,6 +1,6 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input } from '@angular/core';
-import type { Tags } from 'digital-fuesim-manv-shared';
+import type { Tags } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-patient-status-tags-field',

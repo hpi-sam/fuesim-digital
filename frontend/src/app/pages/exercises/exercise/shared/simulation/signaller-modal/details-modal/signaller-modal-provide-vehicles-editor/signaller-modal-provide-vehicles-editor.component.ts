@@ -1,12 +1,12 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { Component, Input, ViewChild, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ResourceDescription, UUID } from 'digital-fuesim-manv-shared';
+import type { ResourceDescription, UUID } from 'fuesim-digital-shared';
 import {
     TransferPoint,
     isInSpecificSimulatedRegion,
     isUnoccupiedImmutable,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
 import {

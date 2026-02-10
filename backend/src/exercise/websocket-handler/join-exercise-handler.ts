@@ -2,7 +2,7 @@ import {
     isExerciseKey,
     joinExerciseResponseDataSchema,
     type UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
 import { NotFoundError } from '../../utils/http.js';

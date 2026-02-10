@@ -5,7 +5,7 @@ import type {
     MaterialTemplate,
     PersonnelTemplate,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { cloneDeep } from 'lodash-es';
 import { MessageService } from 'src/app/core/messages/message.service';
 import { getImageAspectRatio } from 'src/app/shared/functions/get-image-aspect-ratio';

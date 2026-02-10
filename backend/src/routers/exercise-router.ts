@@ -1,7 +1,7 @@
 import {
     exerciseExistsResponseDataSchema,
     isExerciseKey,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
 import { importExercise } from '../utils/import-exercise.js';

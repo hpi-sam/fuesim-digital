@@ -1,10 +1,6 @@
 import type { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import {
-    newMapCoordinatesAt,
-    newSize,
-    Viewport,
-} from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
+import { newMapCoordinatesAt, newSize, Viewport } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type { Coordinate } from 'ol/coordinate';
 import type { Polygon } from 'ol/geom';

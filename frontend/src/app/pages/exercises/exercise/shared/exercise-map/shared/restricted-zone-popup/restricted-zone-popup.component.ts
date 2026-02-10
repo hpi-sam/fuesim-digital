@@ -9,7 +9,7 @@ import {
     type VehicleRestriction,
     sortObject,
     stringCompare,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { AppState } from 'src/app/state/app.state';
 import {
     createSelectRestrictedZone,

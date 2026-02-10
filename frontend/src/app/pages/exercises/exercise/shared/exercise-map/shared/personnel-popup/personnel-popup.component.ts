@@ -1,7 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID, Personnel } from 'digital-fuesim-manv-shared';
+import type { UUID, Personnel } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectPersonnel } from 'src/app/state/application/selectors/exercise.selectors';

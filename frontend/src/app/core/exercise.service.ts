@@ -7,11 +7,11 @@ import type {
     JoinExerciseResponseData,
     ServerToClientEvents,
     SocketResponse,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     joinExerciseResponseDataSchema,
     socketIoTransports,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import {
     debounceTime,

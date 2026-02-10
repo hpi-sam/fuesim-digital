@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import { ClientRole, type SpecificRole } from 'digital-fuesim-manv-shared';
+import { ClientRole, type SpecificRole } from 'fuesim-digital-shared';
 
 @Pipe({
     name: 'specificRoleDisplayName',

@@ -4,7 +4,7 @@ import {
     type UUID,
     type ExerciseOccupation,
     newNoOccupation,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { Store } from '@ngrx/store';

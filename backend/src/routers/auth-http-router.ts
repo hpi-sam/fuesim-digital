@@ -1,4 +1,4 @@
-import { userDataResponseSchema } from 'digital-fuesim-manv-shared';
+import { userDataResponseSchema } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { AuthService } from 'auth/auth-service.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';

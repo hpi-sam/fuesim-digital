@@ -1,5 +1,10 @@
-import type { ExerciseAction, ExerciseState } from 'digital-fuesim-manv-shared';
-import type { InferSelectModel } from 'drizzle-orm';
+import type {
+    ExerciseAction,
+    ExerciseState,
+    ParticipantKey,
+    TrainerKey,
+} from 'digital-fuesim-manv-shared';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
 import {
     char,
@@ -11,15 +16,21 @@ import {
     foreignKey,
     varchar,
     timestamp,
+    text,
 } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const exerciseIdSchema = z.uuidv4().brand<'ExerciseId'>();
+
+export const exerciseTemplateIdSchema = z
+    .uuidv4()
+    .brand<'ExerciseTemplateId'>();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const actionIdSchema = z.uuidv4().brand<'ActionId'>();
 
 export type ExerciseId = z.infer<typeof exerciseIdSchema>;
+export type ExerciseTemplateId = z.infer<typeof exerciseTemplateIdSchema>;
 export type ActionId = z.infer<typeof actionIdSchema>;
 
 const typedUUID = <T>() => uuid().$type<T>();
@@ -30,39 +41,6 @@ const baseTable = <T>() => ({
         .primaryKey()
         .notNull(),
 });
-
-export const exerciseTable = pgTable('exercise_entity', {
-    ...baseTable<ExerciseId>(),
-    tickCounter: integer().default(0).notNull(),
-    initialStateString: json().$type<ExerciseState>().notNull(),
-    participantId: char({ length: 6 }).notNull(),
-    trainerId: char({ length: 8 }).notNull(),
-    currentStateString: json().$type<ExerciseState>().notNull(),
-    stateVersion: integer().notNull(),
-});
-export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
-
-export const actionTable = pgTable(
-    'action_entity',
-    {
-        ...baseTable<ActionId>(),
-        emitterId: uuid(),
-        // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-        index: bigint({ mode: 'number' }).notNull(),
-        actionString: json().$type<ExerciseAction>().notNull(),
-        exerciseId: typedUUID<ExerciseId>().notNull(),
-    },
-    (table) => [
-        foreignKey({
-            columns: [table.exerciseId],
-            foreignColumns: [exerciseTable.id],
-            name: 'FK_180a58767f06b503216ba2b0982',
-        })
-            .onUpdate('cascade')
-            .onDelete('cascade'),
-    ]
-);
-export type ActionEntry = InferSelectModel<typeof actionTable>;
 
 export const userTable = pgTable('users', {
     /**
@@ -90,6 +68,76 @@ export const sessionTable = pgTable('sessions', {
     accessToken: varchar().notNull(),
 });
 export type SessionEntry = InferSelectModel<typeof sessionTable>;
+
+export const exerciseTemplateTable = pgTable('exercise_template', {
+    ...baseTable<ExerciseTemplateId>(),
+    user: varchar()
+        .references(() => userTable.id, { onDelete: 'cascade' })
+        .notNull(),
+    createdAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
+    lastExerciseCreatedAt: timestamp({
+        withTimezone: true,
+        mode: 'date',
+    }),
+    name: varchar().notNull(),
+    description: text().notNull().default(''),
+});
+export type ExerciseTemplateEntry = InferSelectModel<
+    typeof exerciseTemplateTable
+>;
+export type ExerciseTemplateInsert = InferInsertModel<
+    typeof exerciseTemplateTable
+>;
+
+export const exerciseTable = pgTable('exercise_entity', {
+    ...baseTable<ExerciseId>(),
+    tickCounter: integer().default(0).notNull(),
+    initialStateString: json().$type<ExerciseState>().notNull(),
+    participantId: char({ length: 6 }).$type<ParticipantKey>().notNull(),
+    trainerId: char({ length: 8 }).$type<TrainerKey>().notNull(),
+    currentStateString: json().$type<ExerciseState>().notNull(),
+    stateVersion: integer().notNull(),
+    user: varchar().references(() => userTable.id, { onDelete: 'cascade' }),
+    createdAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
+    lastUsedAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
+    // by setting a templateId this exercise will be an exercise template
+    templateId: uuid().references(() => exerciseTemplateTable.id, {
+        onDelete: 'cascade',
+    }),
+    baseTemplateId: uuid().references(() => exerciseTemplateTable.id, {
+        onDelete: 'set null',
+    }),
+});
+export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
+export type ExerciseInsert = InferInsertModel<typeof exerciseTable>;
+
+export const actionTable = pgTable(
+    'action_entity',
+    {
+        ...baseTable<ActionId>(),
+        emitterId: uuid(),
+        // You can use { mode: "bigint" } if numbers are exceeding js number limitations
+        index: bigint({ mode: 'number' }).notNull(),
+        actionString: json().$type<ExerciseAction>().notNull(),
+        exerciseId: typedUUID<ExerciseId>().notNull(),
+    },
+    (table) => [
+        foreignKey({
+            columns: [table.exerciseId],
+            foreignColumns: [exerciseTable.id],
+            name: 'FK_180a58767f06b503216ba2b0982',
+        })
+            .onUpdate('cascade')
+            .onDelete('cascade'),
+    ]
+);
+export type ActionEntry = InferSelectModel<typeof actionTable>;
 
 export const actionEntityRelations = relations(actionTable, ({ one }) => ({
     exerciseWrapperEntity: one(exerciseTable, {

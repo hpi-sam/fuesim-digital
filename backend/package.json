@@ -54,11 +54,12 @@
         "pg": "^8.14.1",
         "socket.io": "^4.8.1",
         "supertest": "^7.1.0",
-        "zod": "^4.1.12"
+        "zod": "^4.1.13"
     },
     "devDependencies": {
         "@eslint/compat": "^1.4.0",
         "@eslint/js": "^9.36.0",
+        "@types/cookie": "^0.6.0",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",
         "@types/jest": "^30.0.0",

@@ -56,6 +56,11 @@ import { OccupationNamePipe } from './pipes/occupation-name.pipe';
 import { OccupationShortNamePipe } from './pipes/occupation-short-name.pipe';
 import { SpecificRoleDisplayNamePipe } from './pipes/specific-role-display-name.pipe';
 import { UserAccountNavbarItemComponent } from './components/user-account-navbar-item/user-account-navbar-item.component';
+import { HeaderComponent } from './components/header/header.component';
+import { ExerciseTemplateCardComponent } from './components/exercise-template-card/exercise-template-card.component';
+import { ExerciseCardComponent } from './components/exercise-card/exercise-card.component';
+import { InlineTextEditorComponent } from './components/inline-text-editor/inline-text-editor.component';
+import { CopyButtonComponent } from './components/copy-button/copy-button.component';
 
 @NgModule({
     declarations: [
@@ -83,6 +88,7 @@ import { UserAccountNavbarItemComponent } from './components/user-account-navbar
         CaterCapacityCountPipe,
         FileInputDirective,
         FooterComponent,
+        HeaderComponent,
         PatientHealthPointDisplayComponent,
         PatientsDetailsComponent,
         PatientStatusColorPipe,
@@ -104,6 +110,10 @@ import { UserAccountNavbarItemComponent } from './components/user-account-navbar
         OccupationNamePipe,
         OccupationShortNamePipe,
         SpecificRoleDisplayNamePipe,
+        ExerciseCardComponent,
+        ExerciseTemplateCardComponent,
+        InlineTextEditorComponent,
+        CopyButtonComponent,
     ],
     imports: [
         CommonModule,
@@ -141,6 +151,7 @@ import { UserAccountNavbarItemComponent } from './components/user-account-navbar
         PatientStatusBadgeComponent,
         FileInputDirective,
         FooterComponent,
+        HeaderComponent,
         PatientHealthPointDisplayComponent,
         PatientsDetailsComponent,
         PatientStatusColorPipe,
@@ -158,6 +169,10 @@ import { UserAccountNavbarItemComponent } from './components/user-account-navbar
         SendAlarmGroupInterfaceComponent,
         OccupationNamePipe,
         OccupationShortNamePipe,
+        ExerciseCardComponent,
+        ExerciseTemplateCardComponent,
+        InlineTextEditorComponent,
+        CopyButtonComponent,
     ],
     providers: [HotkeysService],
 })

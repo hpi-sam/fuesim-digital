@@ -1,13 +1,13 @@
 import { jest } from '@jest/globals';
-import { sleep } from 'digital-fuesim-manv-shared';
-import { createTestEnvironment } from '../../test/utils.js';
-import { clientMap } from './client-map.js';
-import { ActiveExercise } from './active-exercise.js';
 import type {
     ExerciseKey,
     ParticipantKey,
     TrainerKey,
-} from './exercise-keys.js';
+} from 'digital-fuesim-manv-shared';
+import { sleep } from 'digital-fuesim-manv-shared';
+import { createTestEnvironment } from '../../test/utils.js';
+import { clientMap } from './client-map.js';
+import { ActiveExercise } from './active-exercise.js';
 
 describe('Active Exercise', () => {
     const environment = createTestEnvironment();

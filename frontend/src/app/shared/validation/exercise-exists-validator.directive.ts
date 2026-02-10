@@ -22,20 +22,21 @@ export class ExerciseExistsValidatorDirective implements AsyncValidator {
     ): Promise<ExerciseExistsValidatorError | null> {
         // Because the ids are randomly generated, we can expect the exerciseId
         // to not become valid without the user typing a new id.
-        return this.apiService.exerciseExists(control.value).then((exists) =>
-            exists
-                ? null
-                : {
-                      exerciseExists: {
-                          id: control.value,
-                      },
-                  }
-        );
+        try {
+            await this.apiService.exerciseExists(control.value);
+            return null;
+        } catch {
+            return {
+                exerciseDoesNotExist: {
+                    id: control.value,
+                },
+            };
+        }
     }
 }
 
 export interface ExerciseExistsValidatorError {
-    exerciseExists: {
+    exerciseDoesNotExist: {
         id: number;
     };
 }

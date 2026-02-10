@@ -22,10 +22,6 @@ export interface MessageConfig {
             | 'warning';
     };
     /**
-     * A json-value that should be logged (e.g. for errors)
-     */
-    logValue?: unknown;
-    /**
      * The styling of the message
      */
     color: 'danger' | 'info' | 'success' | 'warning';

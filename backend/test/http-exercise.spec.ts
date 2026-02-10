@@ -25,7 +25,7 @@ describe('exercise', () => {
             for (let i = 0; i < 10_000; i++) {
                 UserReadableIdGenerator.generateId();
             }
-            await environment.httpRequest('post', '/api/exercise').expect(503);
+            await environment.httpRequest('post', '/api/exercise').expect(500);
         });
     });
 
@@ -80,7 +80,7 @@ describe('exercise', () => {
         it('fails deleting an arbitrary exercise key string', async () => {
             await environment
                 .httpRequest('delete', '/api/exercise/anyNumber')
-                .expect(403);
+                .expect(400);
         });
 
         it('fails deleting a not existing exercise', async () => {

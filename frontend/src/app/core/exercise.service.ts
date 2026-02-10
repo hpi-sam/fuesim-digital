@@ -1,14 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ClientToServerEvents,
     ExerciseAction,
     ExerciseState,
+    JoinExerciseResponseData,
     ServerToClientEvents,
     SocketResponse,
-    UUID,
 } from 'digital-fuesim-manv-shared';
-import { socketIoTransports } from 'digital-fuesim-manv-shared';
+import {
+    joinExerciseResponseDataSchema,
+    socketIoTransports,
+} from 'digital-fuesim-manv-shared';
 import { freeze } from 'immer';
 import {
     debounceTime,
@@ -67,6 +70,10 @@ export class ExerciseService {
         SocketResponse
     >;
 
+    public additionalExerciseMeta = signal<JoinExerciseResponseData | null>(
+        null
+    );
+
     constructor(
         private readonly store: Store<AppState>,
         private readonly messageService: MessageService
@@ -85,7 +92,6 @@ export class ExerciseService {
                     body: 'Laden Sie die Seite neu, um die Verbindung wieder herzustellen.',
                     error: reason,
                 },
-                'alert',
                 null
             );
         });
@@ -108,7 +114,7 @@ export class ExerciseService {
                 error,
             });
         });
-        const joinResponse = await new Promise<SocketResponse<UUID>>(
+        const joinResponse = await new Promise<SocketResponse<object>>(
             (resolve) => {
                 this.socket.emit(
                     'joinExercise',
@@ -125,6 +131,11 @@ export class ExerciseService {
             });
             return false;
         }
+        const joinResponsePayload = joinExerciseResponseDataSchema.parse(
+            joinResponse.payload
+        );
+        this.additionalExerciseMeta.set(joinResponsePayload);
+
         const getStateResponse = await new Promise<
             SocketResponse<ExerciseState>
         >((resolve) => {
@@ -140,7 +151,7 @@ export class ExerciseService {
         }
         this.store.dispatch(
             createJoinExerciseAction(
-                joinResponse.payload,
+                joinResponsePayload.clientId,
                 getStateResponse.payload,
                 exerciseId,
                 clientName

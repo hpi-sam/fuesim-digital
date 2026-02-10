@@ -1,8 +1,11 @@
-import type { UUID } from 'digital-fuesim-manv-shared';
-import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
+import {
+    isExerciseKey,
+    joinExerciseResponseDataSchema,
+    type UUID,
+} from 'digital-fuesim-manv-shared';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
-import { isExerciseKey } from '../exercise-keys.js';
+import { NotFoundError } from '../../utils/http.js';
 import { secureOn } from './secure-on.js';
 
 export const registerJoinExerciseHandler = (
@@ -24,35 +27,38 @@ export const registerJoinExerciseHandler = (
                 return;
             }
             let clientId: UUID | undefined;
+            if (!isExerciseKey(exerciseKey)) {
+                callback({
+                    success: false,
+                    message: `Invalid payload: Invalid exercise key`,
+                    expected: false,
+                });
+                return;
+            }
             try {
-                if (!isExerciseKey(exerciseKey)) {
-                    throw new ValidationErrorWrapper(['Invalid exercise key']);
-                }
-                clientId = clientMap
-                    .get(client)
-                    ?.joinExercise(exerciseKey, clientName);
+                clientId = clientWrapper.joinExercise(exerciseKey, clientName);
             } catch (e: unknown) {
-                if (e instanceof ValidationErrorWrapper) {
+                if (e instanceof NotFoundError) {
                     callback({
                         success: false,
-                        message: `Invalid payload: ${e.errors}`,
+                        message: 'The exercise does not exist',
                         expected: false,
                     });
                     return;
                 }
                 throw e;
             }
-            if (!clientId) {
-                callback({
-                    success: false,
-                    message: 'The exercise does not exist',
-                    expected: false,
-                });
-                return;
-            }
             callback({
                 success: true,
-                payload: clientId,
+                payload: joinExerciseResponseDataSchema.encode({
+                    clientId,
+                    exerciseTemplate: clientWrapper.exercise!.template
+                        ? {
+                              ...clientWrapper.exercise!.template,
+                              trainerId: clientWrapper.exercise!.trainerKey,
+                          }
+                        : null,
+                }),
             });
         }
     );

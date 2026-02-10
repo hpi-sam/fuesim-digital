@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -44,13 +44,11 @@ import { reconstituteRestrictedZoneTemplate } from '../editor-panel/templates/re
  * This service handles the adding of elements via drag and drop from the trainer map editor to the map
  */
 export class DragElementService {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     private olMap?: OlMap;
     layerFeatureManagerDictionary?: Map<VectorLayer, FeatureManager<any>>;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
 
     public registerMap(olMap: OlMap) {
         this.olMap = olMap;

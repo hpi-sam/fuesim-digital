@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ChangeZIndexMapImageAction,
@@ -21,6 +21,10 @@ import { PopupService } from '../../utility/popup.service';
     standalone: false,
 })
 export class MapImagePopupComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly popupService = inject(PopupService);
+
     // These properties are only set after OnInit
     public mapImageId!: UUID;
 
@@ -28,12 +32,6 @@ export class MapImagePopupComponent implements OnInit {
     public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
     public url?: string;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly popupService: PopupService
-    ) {}
 
     async ngOnInit() {
         this.mapImage$ = this.store.select(

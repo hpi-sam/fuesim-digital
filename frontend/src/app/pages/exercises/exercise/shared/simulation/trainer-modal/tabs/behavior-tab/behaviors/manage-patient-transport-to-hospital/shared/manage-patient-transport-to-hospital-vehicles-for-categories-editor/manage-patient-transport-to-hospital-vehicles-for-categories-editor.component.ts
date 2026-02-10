@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
@@ -29,6 +29,9 @@ import {
 export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent
     implements OnChanges
 {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     @Input() simulatedRegionId!: UUID;
     @Input() behaviorId!: UUID;
 
@@ -39,11 +42,6 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
     }>;
 
     public patientStatusForTransport = ['red', 'yellow', 'green'] as const;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     ngOnChanges(): void {
         this.behaviorState$ = this.store.select(

@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseAction,
@@ -28,6 +28,12 @@ import { SignallerModalDetailsService } from '../signaller-modal-details.service
 export class SignallerModalStartTransferOfCategoryModalComponent
     implements OnInit, OnDestroy
 {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly hotkeysService = inject(HotkeysService);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+    private readonly messageService = inject(MessageService);
+
     @Input() simulatedRegionId!: UUID;
 
     private hotkeyLayer!: HotkeyLayer;
@@ -44,14 +50,6 @@ export class SignallerModalStartTransferOfCategoryModalComponent
         'yellow',
         'green',
     ] as const satisfies PatientStatusForTransport[];
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly hotkeysService: HotkeysService,
-        private readonly detailsModal: SignallerModalDetailsService,
-        private readonly messageService: MessageService
-    ) {}
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();

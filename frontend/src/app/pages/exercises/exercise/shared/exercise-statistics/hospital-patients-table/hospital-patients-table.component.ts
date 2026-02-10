@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import type { Sort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
 import { statusNames } from 'digital-fuesim-manv-shared';
@@ -17,7 +17,7 @@ import {
     standalone: false,
 })
 export class HospitalPatientsTableComponent {
-    constructor(public readonly store: Store<AppState>) {}
+    readonly store = inject<Store<AppState>>(Store);
 
     public readonly sortEvent$ = new Subject<Sort>();
 

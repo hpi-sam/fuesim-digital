@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type {
     ActivatedRouteSnapshot,
     RouterStateSnapshot,
@@ -14,11 +14,9 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
     providedIn: 'root',
 })
 export class LeaveExerciseGuard {
-    constructor(
-        private readonly applicationService: ApplicationService,
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService
-    ) {}
+    private readonly applicationService = inject(ApplicationService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
 
     canDeactivate(
         component: unknown,

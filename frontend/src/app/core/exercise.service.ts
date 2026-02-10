@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ClientToServerEvents,
@@ -57,6 +57,9 @@ import { OptimisticActionHandler } from './optimistic-action-handler';
     providedIn: 'root',
 })
 export class ExerciseService {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
+
     private readonly socket: Socket<
         ServerToClientEvents,
         ClientToServerEvents
@@ -74,10 +77,7 @@ export class ExerciseService {
         null
     );
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService
-    ) {
+    constructor() {
         this.socket.on('performAction', (action: ExerciseAction) => {
             freeze(action, true);
             this.optimisticActionHandler?.performAction(action);

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
 import { ConfirmationModalComponent } from './confirmation-modal.component';
@@ -7,7 +7,7 @@ import { ConfirmationModalComponent } from './confirmation-modal.component';
     providedIn: 'root',
 })
 export class ConfirmationModalService {
-    constructor(private readonly ngbModalService: NgbModal) {}
+    private readonly ngbModalService = inject(NgbModal);
 
     /**
      * @returns a Promise that resolves to the result of the confirmationModal

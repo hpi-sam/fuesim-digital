@@ -4,7 +4,7 @@ import type {
     SimpleChanges,
     AfterViewInit,
 } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import type { LogEntry, Tag } from 'digital-fuesim-manv-shared';
 import { StrictObject } from 'digital-fuesim-manv-shared';
 import { difference } from 'lodash-es';
@@ -26,6 +26,10 @@ interface Filter {
     standalone: false,
 })
 export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
+    private readonly statisticsTimeSelectionService = inject(
+        StatisticsTimeSelectionService
+    );
+
     @Input() public logEntries!: readonly LogEntry[];
 
     public knownCategories: {
@@ -34,10 +38,6 @@ export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
 
     public filters: Filter[] = [];
     private readonly destroy$ = new Subject<void>();
-
-    constructor(
-        private readonly statisticsTimeSelectionService: StatisticsTimeSelectionService
-    ) {}
 
     public get availableCategories() {
         const knownCategoryNames = Object.keys(this.knownCategories);

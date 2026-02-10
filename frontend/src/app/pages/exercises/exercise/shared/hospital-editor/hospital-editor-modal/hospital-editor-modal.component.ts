@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
@@ -14,14 +14,12 @@ import { selectHospitals } from 'src/app/state/application/selectors/exercise.se
     standalone: false,
 })
 export class HospitalEditorModalComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly activeModal = inject(NgbActiveModal);
+    private readonly exerciseService = inject(ExerciseService);
+
     public hospitals$ = this.store.select(selectHospitals);
     public catchAllHospitalId = catchAllHospitalId;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        public readonly activeModal: NgbActiveModal,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public addHospital() {
         this.exerciseService.proposeAction({

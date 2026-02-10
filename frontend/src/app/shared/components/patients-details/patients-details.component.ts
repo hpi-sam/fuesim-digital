@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
 import { Patient } from 'digital-fuesim-manv-shared';
@@ -20,6 +20,9 @@ import { selectCurrentMainRole } from 'src/app/state/application/selectors/share
     standalone: false,
 })
 export class PatientsDetailsComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     @Input() patientId!: UUID;
 
     readonly currentRole$ = this.store.select(selectCurrentMainRole);
@@ -35,11 +38,6 @@ export class PatientsDetailsComponent implements OnChanges {
                     : ['white', 'black', 'red', 'yellow', 'green']
             )
         );
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     ngOnChanges(): void {
         this.patient$ = this.store.select(createSelectPatient(this.patientId));

@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
@@ -21,16 +21,14 @@ import type { ChangedImageTemplateValues } from '../image-template-form/image-te
     standalone: false,
 })
 export class EditImageTemplateModalComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly activeModal = inject(NgbActiveModal);
+
     // This is set after the modal creation and therefore accessible in ngOnInit
     public mapImageTemplateId!: UUID;
 
     public mapImageTemplate?: Mutable<MapImageTemplate>;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        public readonly activeModal: NgbActiveModal
-    ) {}
 
     ngOnInit(): void {
         this.mapImageTemplate = cloneDeep(

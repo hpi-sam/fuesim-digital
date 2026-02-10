@@ -1,4 +1,10 @@
-import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+import {
+    Directive,
+    Input,
+    TemplateRef,
+    ViewContainerRef,
+    inject,
+} from '@angular/core';
 
 interface LetContext<T> {
     appLet: T;
@@ -22,6 +28,10 @@ interface LetContext<T> {
     standalone: false,
 })
 export class LetDirective<T> {
+    private readonly viewContainer = inject(ViewContainerRef);
+    private readonly templateRef =
+        inject<TemplateRef<LetContext<T>>>(TemplateRef);
+
     @Input()
     set appLet(value: T) {
         this.context.$implicit = this.context.appLet = value;
@@ -39,11 +49,6 @@ export class LetDirective<T> {
         $implicit: null,
     };
     private hasView = false;
-
-    constructor(
-        private readonly viewContainer: ViewContainerRef,
-        private readonly templateRef: TemplateRef<LetContext<T>>
-    ) {}
 
     /**
      * Assert the correct type of the expression bound to the `AppLet` input within the template.

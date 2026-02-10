@@ -1,5 +1,11 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
+import {
+    Component,
+    Input,
+    TemplateRef,
+    ViewChild,
+    inject,
+} from '@angular/core';
 import type {
     ExerciseSimulationBehaviorType,
     UUID,
@@ -22,6 +28,9 @@ import type { InterfaceSignallerInteraction } from '../signaller-modal-interacti
     standalone: false,
 })
 export class SignallerModalRegionCommandsComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+
     @Input()
     simulatedRegionId!: UUID;
 
@@ -179,11 +188,6 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
             errorMessage: 'Dieser Bereich verwaltet keine Transporte',
         },
     ];
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly detailsModal: SignallerModalDetailsService
-    ) {}
 
     ngOnChanges() {
         this.ownTransferPointId$ = this.store.select(

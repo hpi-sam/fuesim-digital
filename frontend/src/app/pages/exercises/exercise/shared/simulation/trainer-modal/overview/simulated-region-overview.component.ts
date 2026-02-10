@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { SimulatedRegion, UUID } from 'digital-fuesim-manv-shared';
 import { isInSpecificSimulatedRegion } from 'digital-fuesim-manv-shared';
@@ -36,6 +36,10 @@ let activeNavId: NavIds = 'general';
 export class SimulatedRegionOverviewGeneralComponent
     implements OnInit, OnDestroy
 {
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly selectPatientService = inject(SelectPatientService);
+    readonly startTransferService = inject(StartTransferService);
+
     @Input() simulatedRegionId!: UUID;
 
     simulatedRegion$!: Observable<SimulatedRegion>;
@@ -54,12 +58,6 @@ export class SimulatedRegionOverviewGeneralComponent
     }
 
     private readonly destroy$ = new Subject<void>();
-
-    constructor(
-        private readonly store: Store<AppState>,
-        readonly selectPatientService: SelectPatientService,
-        readonly startTransferService: StartTransferService
-    ) {}
 
     ngOnInit(): void {
         this.simulatedRegion$ = this.store.select(

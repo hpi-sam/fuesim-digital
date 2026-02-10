@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Transfer } from 'digital-fuesim-manv-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
@@ -12,6 +12,9 @@ import { selectCurrentTime } from 'src/app/state/application/selectors/exercise.
     standalone: false,
 })
 export class TransferTimeInputComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     @Input() elementType!: 'personnel' | 'vehicle';
 
     @Input() elementId!: UUID;
@@ -19,11 +22,6 @@ export class TransferTimeInputComponent {
     @Input() transfer!: Transfer;
 
     public readonly currentTime$ = this.store.select(selectCurrentTime);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public addTransferTime(timeToAdd: number) {
         this.exerciseService.proposeAction({

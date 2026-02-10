@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     currentCoordinatesOf,
@@ -34,10 +34,8 @@ import type { StatisticsEntry } from './statistics-entry';
     providedIn: 'root',
 })
 export class StatisticsService {
-    constructor(
-        private readonly apiService: ApiService,
-        private readonly store: Store<AppState>
-    ) {}
+    private readonly apiService = inject(ApiService);
+    private readonly store = inject<Store<AppState>>(Store);
 
     public updatingStatistics = false;
     // TODO: When changing the exercise, this still emits the statistics of the previous exercise

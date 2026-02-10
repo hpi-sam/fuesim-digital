@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Patient, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -13,11 +13,11 @@ import { createSelectPatient } from 'src/app/state/application/selectors/exercis
     standalone: false,
 })
 export class PatientIdentifierComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() patientId!: UUID;
 
     patient$!: Observable<Patient>;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnInit(): void {
         this.patient$ = this.store.select(createSelectPatient(this.patientId));

@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Role, UUID } from 'digital-fuesim-manv-shared';
 import { isInSpecificVehicle } from 'digital-fuesim-manv-shared';
@@ -22,16 +22,14 @@ import { selectCurrentMainRole } from 'src/app/state/application/selectors/share
     standalone: false,
 })
 export class VehicleLoadUnloadControlsComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     @Input()
     vehicleId!: UUID;
 
     vehicleLoadState$?: Observable<{ loadable: boolean; unloadable: boolean }>;
     currentRole$!: Observable<Role | undefined>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     ngOnChanges(): void {
         const vehicle$ = this.store.select(createSelectVehicle(this.vehicleId));

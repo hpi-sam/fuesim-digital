@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     Personnel,
@@ -35,6 +35,10 @@ import { StartTransferService } from '../../start-transfer.service';
     standalone: false,
 })
 export class SimulatedRegionOverviewVehiclesTabComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    readonly startTransferService = inject(StartTransferService);
+
     @Input()
     simulatedRegion!: SimulatedRegion;
 
@@ -49,12 +53,6 @@ export class SimulatedRegionOverviewVehiclesTabComponent implements OnInit {
     groupedVehicles$!: Observable<
         { vehicleType: string; vehicles: Vehicle[] }[]
     >;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        readonly startTransferService: StartTransferService
-    ) {}
 
     ngOnInit() {
         this.selectedVehicleId$.next(null);

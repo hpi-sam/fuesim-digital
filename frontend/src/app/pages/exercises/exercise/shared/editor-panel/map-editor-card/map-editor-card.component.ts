@@ -1,4 +1,4 @@
-import { Component, Input, output } from '@angular/core';
+import { Component, Input, output, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { AppState } from 'src/app/state/app.state';
 
@@ -9,7 +9,7 @@ import type { AppState } from 'src/app/state/app.state';
     standalone: false,
 })
 export class MapEditorCardComponent {
-    constructor(private readonly store: Store<AppState>) {}
+    private readonly store = inject<Store<AppState>>(Store);
 
     readonly elementMousedown = output<MouseEvent>();
     readonly elementEdit = output();

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map, Observable, combineLatest } from 'rxjs';
 import {
@@ -34,6 +34,10 @@ let activeNavId: NavIds = 'settings';
     standalone: false,
 })
 export class RestrictedZonePopupComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly popupService = inject(PopupService);
+
     // These properties are only set after OnInit
     public restrictedZoneId!: UUID;
 
@@ -49,12 +53,6 @@ export class RestrictedZonePopupComponent implements OnInit {
     public set activeNavId(value: NavIds) {
         activeNavId = value;
     }
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly popupService: PopupService
-    ) {}
 
     ngOnInit() {
         this.restrictedZone$ = this.store.select(

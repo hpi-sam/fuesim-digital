@@ -1,5 +1,5 @@
 import { HttpClient, httpResource } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     exerciseExistsResponseDataSchema,
@@ -24,11 +24,9 @@ import { MessageService } from './messages/message.service';
     providedIn: 'root',
 })
 export class ApiService {
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService,
-        private readonly httpClient: HttpClient
-    ) {}
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
+    private readonly httpClient = inject(HttpClient);
 
     public async createExercise() {
         return lastValueFrom(

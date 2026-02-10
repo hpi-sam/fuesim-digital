@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -14,15 +14,13 @@ import { createSelectVehicle } from 'src/app/state/application/selectors/exercis
     standalone: false,
 })
 export class VehicleNameEditorComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     @Input()
     vehicleId!: UUID;
 
     vehicle$!: Observable<Vehicle>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     ngOnChanges() {
         this.vehicle$ = this.store.select(createSelectVehicle(this.vehicleId));

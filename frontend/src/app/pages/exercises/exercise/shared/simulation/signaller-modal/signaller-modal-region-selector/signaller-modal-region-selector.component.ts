@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
 import {
     Hotkey,
@@ -27,6 +27,10 @@ import {
 export class SignallerModalRegionSelectorComponent
     implements OnInit, OnDestroy
 {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly hotkeys = inject(HotkeysService);
+    readonly selectRegionService = inject(SelectSignallerRegionService);
+
     public simulatedRegionNames$!: Observable<SearchableDropdownOption[]>;
 
     private hotkeyLayer!: HotkeyLayer;
@@ -45,12 +49,6 @@ export class SignallerModalRegionSelectorComponent
     });
 
     private readonly destroy$ = new Subject<void>();
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly hotkeys: HotkeysService,
-        public readonly selectRegionService: SelectSignallerRegionService
-    ) {}
 
     ngOnInit() {
         this.simulatedRegionNames$ = this.store

@@ -1,5 +1,11 @@
 import type { OnChanges, OnInit } from '@angular/core';
-import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
+import {
+    Component,
+    Input,
+    TemplateRef,
+    ViewChild,
+    inject,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ReportableInformation, UUID } from 'digital-fuesim-manv-shared';
 import { makeInterfaceSignallerKey } from 'digital-fuesim-manv-shared';
@@ -24,6 +30,10 @@ import { SignallerModalDetailsService } from '../details-modal/signaller-modal-d
 export class SignallerModalRegionInformationComponent
     implements OnInit, OnChanges
 {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+
     @Input()
     simulatedRegionId!: UUID;
 
@@ -258,12 +268,6 @@ export class SignallerModalRegionInformationComponent
         },
     ];
     reportBehaviorId$!: Observable<UUID | null>;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly detailsModal: SignallerModalDetailsService
-    ) {}
 
     ngOnInit() {
         this.clientId = selectStateSnapshot(selectOwnClientId, this.store)!;

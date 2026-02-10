@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Hospital, TransferPoint, UUID } from 'digital-fuesim-manv-shared';
 import type { Observable } from 'rxjs';
@@ -18,6 +18,9 @@ import {
     standalone: false,
 })
 export class TransferHospitalsTabComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() public transferPointId!: UUID;
 
     public transferPoint$!: Observable<TransferPoint>;
@@ -27,11 +30,6 @@ export class TransferHospitalsTabComponent implements OnInit {
     >;
 
     public hospitalsToBeAdded$!: Observable<{ [key: UUID]: Hospital }>;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
 
     ngOnInit() {
         this.transferPoint$ = this.store.select(

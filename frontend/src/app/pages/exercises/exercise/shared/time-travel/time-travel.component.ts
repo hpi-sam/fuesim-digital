@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { cloneDeepMutable, StateExport } from 'digital-fuesim-manv-shared';
@@ -22,15 +22,13 @@ import { openTransferOverviewModal } from '../transfer-overview/open-transfer-ov
     standalone: false,
 })
 export class TimeTravelComponent implements OnDestroy {
-    public timeConstraints$ = this.store.select(selectTimeConstraints);
+    private readonly modalService = inject(NgbModal);
+    private readonly apiService = inject(ApiService);
+    private readonly timeTravelService = inject(TimeTravelService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
 
-    constructor(
-        private readonly modalService: NgbModal,
-        private readonly apiService: ApiService,
-        private readonly timeTravelService: TimeTravelService,
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService
-    ) {}
+    public timeConstraints$ = this.store.select(selectTimeConstraints);
 
     public openClientOverview() {
         openClientOverviewModal(this.modalService);

@@ -1,5 +1,12 @@
 import type { AfterViewInit, OnChanges, OnDestroy } from '@angular/core';
-import { Component, ElementRef, Input, NgZone, ViewChild } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    Input,
+    NgZone,
+    ViewChild,
+    inject,
+} from '@angular/core';
 import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
 import { Subject, takeUntil } from 'rxjs';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
@@ -15,17 +22,17 @@ import { StackedBarChart } from './time-line-area-chart';
 export class StackedBarChartComponent
     implements AfterViewInit, OnChanges, OnDestroy
 {
+    private readonly ngZone = inject(NgZone);
+    private readonly timeSelectionService = inject(
+        StatisticsTimeSelectionService
+    );
+
     @Input() statistics!: StackedBarChartStatistics;
 
     @ViewChild('chart', { static: true })
     chartCanvas!: ElementRef<HTMLCanvasElement>;
 
     private readonly destroy$ = new Subject<void>();
-
-    constructor(
-        private readonly ngZone: NgZone,
-        private readonly timeSelectionService: StatisticsTimeSelectionService
-    ) {}
 
     private chart?: StackedBarChart;
 

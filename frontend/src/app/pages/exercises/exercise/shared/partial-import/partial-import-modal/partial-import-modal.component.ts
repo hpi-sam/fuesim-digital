@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import type { PartialExport } from 'digital-fuesim-manv-shared';
 import { preparePartialExportForImport } from 'digital-fuesim-manv-shared';
@@ -12,12 +12,11 @@ import { MessageService } from 'src/app/core/messages/message.service';
     standalone: false,
 })
 export class PartialImportModalComponent {
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly messageService = inject(MessageService);
+    private readonly exerciseService = inject(ExerciseService);
+
     public importingPartialExport = false;
-    constructor(
-        private readonly activeModal: NgbActiveModal,
-        private readonly messageService: MessageService,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public partialExport!: PartialExport;
 

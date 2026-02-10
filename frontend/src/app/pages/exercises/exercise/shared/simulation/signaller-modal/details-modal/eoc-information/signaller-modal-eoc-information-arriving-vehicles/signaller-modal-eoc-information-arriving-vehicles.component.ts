@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { currentTransferOf, UUID } from 'digital-fuesim-manv-shared';
 import { groupBy } from 'lodash-es';
@@ -37,7 +37,9 @@ export class SignallerModalEocInformationArrivingVehiclesComponent {
         ).map(([type, vehicles]) => ({ type, count: vehicles.length }));
     }
 
-    constructor(store: Store<AppState>) {
+    constructor() {
+        const store = inject<Store<AppState>>(Store);
+
         const currentTime = selectStateSnapshot(selectCurrentTime, store);
 
         this.arrivingVehicles = selectStateSnapshot(

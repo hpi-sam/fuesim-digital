@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     TreatmentStatusRadiogram,
@@ -16,11 +16,11 @@ import { createSelectRadiogram } from 'src/app/state/application/selectors/exerc
     standalone: false,
 })
 export class RadiogramCardContentTreatmentStatusComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() radiogramId!: UUID;
 
     radiogram$!: Observable<TreatmentStatusRadiogram>;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnInit(): void {
         this.radiogram$ = this.store.select(

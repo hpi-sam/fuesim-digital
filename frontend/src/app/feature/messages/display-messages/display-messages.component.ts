@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MessageService } from 'src/app/core/messages/message.service';
 import { fade } from '../animations/fade';
 
@@ -18,5 +18,5 @@ import { fade } from '../animations/fade';
     standalone: false,
 })
 export class DisplayMessagesComponent {
-    constructor(public readonly messageService: MessageService) {}
+    readonly messageService = inject(MessageService);
 }

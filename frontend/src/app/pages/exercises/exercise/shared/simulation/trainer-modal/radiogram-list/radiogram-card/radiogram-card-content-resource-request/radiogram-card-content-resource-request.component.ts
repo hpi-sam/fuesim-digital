@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     ResourceRequestRadiogram,
@@ -23,6 +23,10 @@ import { createSelectRadiogram } from 'src/app/state/application/selectors/exerc
     standalone: false,
 })
 export class RadigoramCardContentResourceRequestComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly hotkeyService = inject(HotkeysService);
+
     @Input() radiogramId!: UUID;
     @Input() shownInSignallerModal = false;
 
@@ -34,11 +38,7 @@ export class RadigoramCardContentResourceRequestComponent implements OnInit {
     acceptHotkey!: Hotkey;
     denyHotkey!: Hotkey;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly hotkeyService: HotkeysService
-    ) {
+    constructor() {
         this.hotkeyLayer = this.hotkeyService.createLayer(false, false);
     }
 

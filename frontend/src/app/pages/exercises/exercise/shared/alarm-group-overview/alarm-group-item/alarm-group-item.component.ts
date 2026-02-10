@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'digital-fuesim-manv-shared';
 import { AlarmGroup, AlarmGroupVehicle } from 'digital-fuesim-manv-shared';
@@ -16,13 +16,11 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
     styleUrls: ['./alarm-group-item.component.scss'],
     standalone: false,
 })
-export class AlarmGroupItemComponent implements OnInit {
-    @Input() alarmGroup!: AlarmGroup;
+export class AlarmGroupItemComponent {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
+    @Input() alarmGroup!: AlarmGroup;
 
     ngOnInit() {
         this.hasTriggerLimit = this.alarmGroup.triggerLimit !== null;

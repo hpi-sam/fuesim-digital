@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     MaterialTemplate,
@@ -23,6 +23,9 @@ import {
     standalone: false,
 })
 export class VehicleTemplateFormComponent implements OnChanges {
+    private readonly messageService = inject(MessageService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() initialValues!: EditableVehicleTemplateValues;
     @Input() btnText!: string;
 
@@ -36,11 +39,6 @@ export class VehicleTemplateFormComponent implements OnChanges {
 
     public materialTemplates$ = this.store.select(selectMaterialTemplates);
     public personnelTemplates$ = this.store.select(selectPersonnelTemplates);
-
-    constructor(
-        private readonly messageService: MessageService,
-        private readonly store: Store<AppState>
-    ) {}
 
     ngOnChanges(_changes: SimpleChangesGeneric<this>): void {
         this.values = {

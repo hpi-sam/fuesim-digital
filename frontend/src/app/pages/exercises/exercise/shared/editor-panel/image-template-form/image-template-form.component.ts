@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { cloneDeep } from 'lodash-es';
 import { MessageService } from 'src/app/core/messages/message.service';
 import { getImageAspectRatio } from 'src/app/shared/functions/get-image-aspect-ratio';
@@ -12,6 +12,8 @@ import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-g
     standalone: false,
 })
 export class ImageTemplateFormComponent implements OnChanges {
+    private readonly messageService = inject(MessageService);
+
     @Input() initialValues!: EditableImageTemplateValues;
     @Input() btnText!: string;
 
@@ -22,8 +24,6 @@ export class ImageTemplateFormComponent implements OnChanges {
         new EventEmitter<ChangedImageTemplateValues>();
 
     public values?: EditableImageTemplateValues;
-
-    constructor(private readonly messageService: MessageService) {}
 
     ngOnChanges(changes: SimpleChangesGeneric<this>): void {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

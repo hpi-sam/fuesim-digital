@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, inject } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
@@ -37,6 +37,11 @@ import { SignallerModalDetailsService } from '../signaller-modal-details.service
 export class SignallerModalTransportTraysEditorComponent
     implements OnInit, OnChanges, OnDestroy
 {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly hotkeysService = inject(HotkeysService);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+
     @Input() simulatedRegionId!: UUID;
     @Input() transportBehaviorId!: UUID;
 
@@ -61,13 +66,6 @@ export class SignallerModalTransportTraysEditorComponent
     finishHotkey = new Hotkey('Enter', false, () => {
         this.close();
     });
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly hotkeysService: HotkeysService,
-        private readonly detailsModal: SignallerModalDetailsService
-    ) {}
 
     ngOnInit() {
         this.manageTransportBehavior$ = this.inputs$.pipe(

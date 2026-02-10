@@ -1,5 +1,5 @@
 import type { OnChanges, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseSimulationBehaviorState,
@@ -32,6 +32,9 @@ let globalLastBehaviorType: ExerciseSimulationBehaviorType | undefined;
 export class SimulatedRegionOverviewBehaviorTabComponent
     implements OnChanges, OnInit
 {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     @Input() simulatedRegion!: SimulatedRegion;
     @Input() initialTransferOptions?: TransferOptions;
 
@@ -39,11 +42,6 @@ export class SimulatedRegionOverviewBehaviorTabComponent
         ExerciseSimulationBehaviorType[]
     >;
     public selectedBehavior?: ExerciseSimulationBehaviorState;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
 
     async ngOnInit() {
         if (globalLastBehaviorType !== undefined) {

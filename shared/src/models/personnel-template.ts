@@ -1,23 +1,16 @@
-import { Type } from 'class-transformer';
-import {
-    IsNumber,
-    IsString,
-    IsUUID,
-    Max,
-    Min,
-    ValidateNested,
-} from 'class-validator';
+import { IsNumber, IsString, IsUUID, Max, Min } from 'class-validator';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { IsValue } from '../utils/validators/index.js';
 import { IsZodSchema } from '../utils/validators/is-zod-object.js';
 import type { UUID } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
 import {
-    CanCaterFor,
+    type CanCaterFor,
     getCreate,
     imagePropertiesSchema,
     type ImageProperties,
 } from './utils/index.js';
+import { canCaterForSchema } from './utils/cater-for.js';
 
 export class PersonnelTemplate {
     @IsUUID(4, uuidValidationOptions)
@@ -35,8 +28,7 @@ export class PersonnelTemplate {
     @IsString()
     public readonly abbreviation: string = '';
 
-    @ValidateNested()
-    @Type(() => CanCaterFor)
+    @IsZodSchema(canCaterForSchema)
     public readonly canCaterFor: CanCaterFor;
 
     /**

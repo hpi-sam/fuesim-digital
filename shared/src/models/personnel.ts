@@ -1,12 +1,4 @@
-import { Type } from 'class-transformer';
-import {
-    IsUUID,
-    IsString,
-    ValidateNested,
-    IsNumber,
-    Min,
-    Max,
-} from 'class-validator';
+import { IsUUID, IsString, IsNumber, Min, Max } from 'class-validator';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import type { UUID, UUIDSet } from '../utils/index.js';
 import { uuidValidationOptions, uuid } from '../utils/index.js';
@@ -16,10 +8,12 @@ import type { PersonnelTemplate } from './personnel-template.js';
 import {
     imagePropertiesSchema,
     getCreate,
-    CanCaterFor,
     IsPosition,
+    type CanCaterFor,
+    type ImageProperties,
+    type Position,
 } from './utils/index.js';
-import type { ImageProperties, Position } from './utils/index.js';
+import { canCaterForSchema } from './utils/cater-for.js';
 
 export class Personnel {
     @IsUUID(4, uuidValidationOptions)
@@ -52,8 +46,7 @@ export class Personnel {
     @IsUUIDSet()
     public readonly assignedPatientIds: UUIDSet;
 
-    @ValidateNested()
-    @Type(() => CanCaterFor)
+    @IsZodSchema(canCaterForSchema)
     public readonly canCaterFor: CanCaterFor;
 
     /**

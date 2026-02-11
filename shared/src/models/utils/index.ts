@@ -14,7 +14,7 @@ export * from './position/position-helpers.js';
 export * from './patient-status.js';
 export * from './size.js';
 export type { Role } from './role.js';
-export { CanCaterFor } from './cater-for.js';
+export type { CanCaterFor } from './cater-for.js';
 export * from './exercise-status.js';
 export type * from './transfer.js';
 export * from './image-properties.js';

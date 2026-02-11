@@ -10,12 +10,12 @@ import {
     newVehiclePositionIn,
     newMapPositionAt,
     VehicleParameters,
-    Material,
     Personnel,
 } from '../models/index.js';
 
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
 import type { UUID } from '../utils/index.js';
+import { newMaterialFromTemplate } from '../models/material.js';
 
 /**
  * @returns a vehicle with personnel and materials to be added to the map
@@ -32,7 +32,7 @@ export function createVehicleParameters(
         .map((materialTemplateId: UUID) => {
             const materialTemplate = materialTemplates[materialTemplateId];
             if (!materialTemplate) return null;
-            return Material.generateMaterial(
+            return newMaterialFromTemplate(
                 materialTemplate,
                 vehicleId,
                 vehicleTemplate.name,

@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import { ValidateNested, IsArray } from 'class-validator';
-import { Material } from '../material.js';
+import { z } from 'zod';
+import { Material, materialSchema } from '../material.js';
 import { Personnel } from '../personnel.js';
 import { vehicleSchema } from '../vehicle.js';
 import type { Vehicle } from '../vehicle.js';
@@ -11,9 +12,7 @@ export class VehicleParameters {
     @IsZodSchema(vehicleSchema)
     public readonly vehicle!: Vehicle;
 
-    @IsArray()
-    @ValidateNested()
-    @Type(() => Material)
+    @IsZodSchema(z.array(materialSchema))
     public readonly materials!: readonly Material[];
 
     @IsArray()

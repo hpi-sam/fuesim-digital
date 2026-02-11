@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import {
     IsBoolean,
     IsString,
@@ -10,10 +9,11 @@ import type { UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import { IsRadiogramStatus } from '../../utils/validators/is-radiogram-status.js';
-import { getCreate } from '../utils/get-create.js';
-import { CanCaterFor } from '../utils/cater-for.js';
+import { getCreate } from '../utils/index.js';
+import { type CanCaterFor, canCaterForSchema } from '../utils/cater-for.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type { Radiogram } from './radiogram.js';
-import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
+import type { ExerciseRadiogramStatus } from './status/index.js';
 
 export class MaterialCountRadiogram implements Radiogram {
     @IsUUID(4, uuidValidationOptions)
@@ -40,8 +40,7 @@ export class MaterialCountRadiogram implements Radiogram {
     @ValidateIf((_, value) => value !== null)
     public readonly informationRequestKey: string | null;
 
-    @ValidateNested()
-    @Type(() => CanCaterFor)
+    @IsZodSchema(canCaterForSchema)
     readonly materialForPatients: CanCaterFor;
 
     /**

@@ -22,7 +22,7 @@ export class SignallerModalEocInformationAlarmGroupsSentComponent {
         this.alarmGroupsSent = Object.values(
             selectStateSnapshot(selectAlarmGroups, store)
         )
-            .filter((alarmGroup) => alarmGroup.sent)
+            .filter((alarmGroup) => alarmGroup.triggerCount > 0)
             .map((alarmGroup) => alarmGroup.name)
             .sort((a, b) => a.localeCompare(b));
     }

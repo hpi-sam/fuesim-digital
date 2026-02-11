@@ -83,38 +83,29 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     public loading = false;
 
-    public readonly alarmGroups$: Observable<SearchableDropdownOption[]> =
-        this.store.select(selectAlarmGroups).pipe(
-            map((alarmGroups) =>
-                Object.values(alarmGroups)
-                    .map((alarmGroup) => {
-                        const dropdownOption: SearchableDropdownOption & {
-                            sent: boolean;
-                        } = {
-                            key: alarmGroup.id,
-                            name: alarmGroup.name,
-                            sent: alarmGroup.sent,
-                        };
+    public readonly alarmGroups$ = this.store.select(selectAlarmGroups);
 
-                        if (alarmGroup.sent) {
-                            dropdownOption.name += ' (bereits alarmiert)';
-                            dropdownOption.color = '#bbbbbb';
-                        }
+    public readonly alarmGroupsDropdownOptions$: Observable<
+        SearchableDropdownOption[]
+    > = this.store.select(selectAlarmGroups).pipe(
+        map((alarmGroups) =>
+            Object.values(alarmGroups)
+                .map((alarmGroup) => {
+                    const dropdownOption: SearchableDropdownOption = {
+                        key: alarmGroup.id,
+                        name: alarmGroup.name,
+                    };
 
-                        return dropdownOption;
-                    })
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .sort((a, b) => Number(a.sent) - Number(b.sent))
-                    .map((alarmGroup) => {
-                        delete (
-                            alarmGroup as SearchableDropdownOption & {
-                                sent?: boolean;
-                            }
-                        ).sent;
-                        return alarmGroup;
-                    })
-            )
-        );
+                    if (alarmGroup.triggerCount > 0) {
+                        dropdownOption.name += ' (bereits alarmiert)';
+                        dropdownOption.color = '#bbbbbb';
+                    }
+
+                    return dropdownOption;
+                })
+                .sort((a, b) => a.name.localeCompare(b.name))
+        )
+    );
 
     public readonly transferPoints$: Observable<SearchableDropdownOption[]> =
         this.store.select(selectTransferPoints).pipe(
@@ -128,10 +119,12 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
             )
         );
 
-    public get selectedAlarmGroup() {
+    public get selectedAlarmGroupOption() {
         return selectedAlarmGroup;
     }
-    public set selectedAlarmGroup(value: SearchableDropdownOption | null) {
+    public set selectedAlarmGroupOption(
+        value: SearchableDropdownOption | null
+    ) {
         selectedAlarmGroup = value;
     }
 

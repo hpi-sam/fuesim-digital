@@ -14,6 +14,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Restricted Zones can be used to limit the number of vehicles that can be placed in a specific area. The restrictions can be applied per vehicle template.
 - Vehicles on the map have an indicator that shows the number of occupied and total patient slots. This indicator is disabled by default and can be enabled for an exercise. Optionally, the indicator is drawn in the status color of the most urgent patient in the vehicle.
 - Add exercise manager to allow logged-in users to manage their own exercises and exercise templates.
+- Alarm groups can now be limited to a maximum number of activations. When the limit is reached, the alarm group cannot be sent anymore.
 
 ### Fixed
 

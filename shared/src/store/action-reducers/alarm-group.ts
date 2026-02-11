@@ -4,6 +4,7 @@ import {
     IsString,
     IsUUID,
     Min,
+    ValidateIf,
     ValidateNested,
 } from 'class-validator';
 import { AlarmGroup } from '../../models/alarm-group.js';
@@ -34,6 +35,20 @@ export class RenameAlarmGroupAction implements Action {
     @IsString()
     public readonly name!: string;
 }
+
+export class LimitAlarmGroupAction implements Action {
+    @IsValue('[AlarmGroup] Limit AlarmGroup' as const)
+    public readonly type = '[AlarmGroup] Limit AlarmGroup';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly alarmGroupId!: UUID;
+
+    @ValidateIf((_, value) => value !== null)
+    @IsNumber()
+    @Min(0)
+    public readonly triggerLimit!: number | null;
+}
+
 export class RemoveAlarmGroupAction implements Action {
     @IsValue('[AlarmGroup] Remove AlarmGroup' as const)
     public readonly type = '[AlarmGroup] Remove AlarmGroup';
@@ -100,6 +115,20 @@ export namespace AlarmGroupActionReducers {
                 alarmGroupId
             );
             alarmGroup.name = name;
+            return draftState;
+        },
+        rights: 'trainer',
+    };
+
+    export const limitAlarmGroup: ActionReducer<LimitAlarmGroupAction> = {
+        action: LimitAlarmGroupAction,
+        reducer: (draftState, { alarmGroupId, triggerLimit }) => {
+            const alarmGroup = getElement(
+                draftState,
+                'alarmGroup',
+                alarmGroupId
+            );
+            alarmGroup.triggerLimit = triggerLimit ?? null;
             return draftState;
         },
         rights: 'trainer',

@@ -43,6 +43,7 @@ import { replaceClientRoles42 } from './42-replace-clientroles.js';
 import { addEmergencyOperationsCenterViewport43 } from './43-add-eoc-viewport.js';
 import { generalizeMaterialsPersonnel44 } from './44-generalize-materials-personnel.js';
 import { addRestrictedZones45 } from './45-add-restricted-zones.js';
+import { limitedAlarmgroups46 } from './46-limited-alarm-groups.js';
 
 /**
  * Migrate a single action
@@ -114,4 +115,5 @@ export const migrations: {
     43: addEmergencyOperationsCenterViewport43,
     44: generalizeMaterialsPersonnel44,
     45: addRestrictedZones45,
+    46: limitedAlarmgroups46,
 };

@@ -2,9 +2,7 @@ import { produce } from 'immer';
 import {
     SimulatedRegion,
     newSimulatedRegionPositionIn,
-    Personnel,
     TransferPoint,
-    CanCaterFor,
     newMapCoordinatesAt,
     newSize,
 } from '../../models/index.js';
@@ -20,6 +18,8 @@ import { TreatmentProgressChangedEvent } from '../events/index.js';
 import { assertCatering } from '../../../tests/utils/catering.spec.js';
 import { addMaterial } from '../../../tests/utils/materials.spec.js';
 import { sendSimulationEvent } from '../events/utils.js';
+import { newPersonnelFromTemplate } from '../../models/personnel.js';
+import { newCanCaterFor } from '../../models/utils/cater-for.js';
 import {
     reassignTreatmentsActivity,
     ReassignTreatmentsActivityState,
@@ -162,7 +162,7 @@ describe('reassign treatment', () => {
 
                             addPersonnel(
                                 draftState,
-                                Personnel.generatePersonnel(
+                                newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
@@ -201,7 +201,7 @@ describe('reassign treatment', () => {
                             );
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
@@ -250,7 +250,7 @@ describe('reassign treatment', () => {
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -261,7 +261,7 @@ describe('reassign treatment', () => {
 
                         catererId = addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
@@ -300,7 +300,7 @@ describe('reassign treatment', () => {
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -311,7 +311,7 @@ describe('reassign treatment', () => {
 
                         addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
@@ -354,7 +354,7 @@ describe('reassign treatment', () => {
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -365,7 +365,7 @@ describe('reassign treatment', () => {
 
                         addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
@@ -409,7 +409,7 @@ describe('reassign treatment', () => {
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -422,7 +422,7 @@ describe('reassign treatment', () => {
 
                         addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
@@ -471,7 +471,7 @@ describe('reassign treatment', () => {
                         ).id;
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -482,7 +482,7 @@ describe('reassign treatment', () => {
 
                         catererId = addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
@@ -537,7 +537,7 @@ describe('reassign treatment', () => {
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -548,7 +548,7 @@ describe('reassign treatment', () => {
 
                         catererId = addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
@@ -584,7 +584,7 @@ describe('reassign treatment', () => {
                     );
 
                     addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
@@ -626,7 +626,7 @@ describe('reassign treatment', () => {
                     );
 
                     addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
@@ -637,7 +637,7 @@ describe('reassign treatment', () => {
 
                     addPersonnel(
                         draftState,
-                        Personnel.generatePersonnel(
+                        newPersonnelFromTemplate(
                             defaultPersonnelTemplates.rettSan,
                             uuid(),
                             '',
@@ -700,7 +700,7 @@ describe('reassign treatment', () => {
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -713,7 +713,7 @@ describe('reassign treatment', () => {
 
                         notSanId = addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -724,7 +724,7 @@ describe('reassign treatment', () => {
                         ).id;
 
                         rettSanId = addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
@@ -732,7 +732,7 @@ describe('reassign treatment', () => {
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(2, 0, 0, 'and'),
+                            canCaterFor: newCanCaterFor(2, 0, 0, 'and'),
                         }).id;
                     }
                 );
@@ -783,7 +783,7 @@ describe('reassign treatment', () => {
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -795,7 +795,7 @@ describe('reassign treatment', () => {
                         });
 
                         catererId = addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
@@ -803,7 +803,7 @@ describe('reassign treatment', () => {
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(0, 1, 0, 'and'),
+                            canCaterFor: newCanCaterFor(0, 1, 0, 'and'),
                         }).id;
                     }
                 );
@@ -861,7 +861,7 @@ describe('reassign treatment', () => {
                             );
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
@@ -874,7 +874,7 @@ describe('reassign treatment', () => {
 
                             catererId = addPersonnel(
                                 draftState,
-                                Personnel.generatePersonnel(
+                                newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
@@ -916,7 +916,7 @@ describe('reassign treatment', () => {
                     }
 
                     addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
@@ -926,13 +926,13 @@ describe('reassign treatment', () => {
                     });
 
                     catererId = addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.san,
                             uuid(),
                             '',
                             newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
-                        canCaterFor: CanCaterFor.create(0, 0, 10, 'and'),
+                        canCaterFor: newCanCaterFor(0, 0, 10, 'and'),
                     }).id;
                 }
             );
@@ -963,7 +963,7 @@ describe('reassign treatment', () => {
                     }
 
                     addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
@@ -973,13 +973,13 @@ describe('reassign treatment', () => {
                     });
 
                     catererId = addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.san,
                             uuid(),
                             '',
                             newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
-                        canCaterFor: CanCaterFor.create(0, 0, 1, 'and'),
+                        canCaterFor: newCanCaterFor(0, 0, 1, 'and'),
                     }).id;
                 }
             );
@@ -1016,7 +1016,7 @@ describe('reassign treatment', () => {
                             );
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
@@ -1028,7 +1028,7 @@ describe('reassign treatment', () => {
                             });
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
@@ -1036,7 +1036,7 @@ describe('reassign treatment', () => {
                                         _simulatedRegion.id
                                     )
                                 ),
-                                canCaterFor: CanCaterFor.create(0, 0, 0, 'and'),
+                                canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
                             });
                         }
                     );
@@ -1079,7 +1079,7 @@ describe('reassign treatment', () => {
                             ).id;
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
@@ -1091,7 +1091,7 @@ describe('reassign treatment', () => {
                             });
 
                             catererId = addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates[higherPersonnel],
                                     uuid(),
                                     '',
@@ -1099,7 +1099,7 @@ describe('reassign treatment', () => {
                                         _simulatedRegion.id
                                     )
                                 ),
-                                canCaterFor: CanCaterFor.create(1, 0, 0, 'and'),
+                                canCaterFor: newCanCaterFor(1, 0, 0, 'and'),
                             }).id;
                         }
                     );
@@ -1134,7 +1134,7 @@ describe('reassign treatment', () => {
                         ).id;
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -1146,7 +1146,7 @@ describe('reassign treatment', () => {
                         });
 
                         generalCatererId = addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -1154,11 +1154,11 @@ describe('reassign treatment', () => {
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(1, 0, 0, 'and'),
+                            canCaterFor: newCanCaterFor(1, 0, 0, 'and'),
                         }).id;
 
                         notarztId = addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notarzt,
                                 uuid(),
                                 '',
@@ -1166,7 +1166,7 @@ describe('reassign treatment', () => {
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(1, 0, 0, 'and'),
+                            canCaterFor: newCanCaterFor(1, 0, 0, 'and'),
                         }).id;
                     }
                 );
@@ -1204,7 +1204,7 @@ describe('reassign treatment', () => {
                         ).id;
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
@@ -1216,7 +1216,7 @@ describe('reassign treatment', () => {
                         });
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.san,
                                 uuid(),
                                 '',
@@ -1224,7 +1224,7 @@ describe('reassign treatment', () => {
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(0, 0, 0, 'and'),
+                            canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
                         });
 
                         catererId = addMaterial(
@@ -1282,7 +1282,7 @@ describe('reassign treatment', () => {
                             );
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
@@ -1294,7 +1294,7 @@ describe('reassign treatment', () => {
                             });
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.san,
                                     uuid(),
                                     '',
@@ -1302,7 +1302,7 @@ describe('reassign treatment', () => {
                                         _simulatedRegion.id
                                     )
                                 ),
-                                canCaterFor: CanCaterFor.create(0, 0, 0, 'and'),
+                                canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
                             });
 
                             catererId = addMaterial(
@@ -1354,7 +1354,7 @@ describe('reassign treatment', () => {
                 for (let i = 0; i < count; i++) {
                     addPersonnel(
                         draftState,
-                        Personnel.generatePersonnel(
+                        newPersonnelFromTemplate(
                             defaultPersonnelTemplates[type],
                             uuid(),
                             '',
@@ -1408,7 +1408,7 @@ describe('reassign treatment', () => {
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
@@ -1486,7 +1486,7 @@ describe('reassign treatment', () => {
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',

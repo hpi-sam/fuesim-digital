@@ -65,6 +65,9 @@ import type { TreatmentAssignment } from './store/index.js';
 import { restrictedZoneSchema } from './models/restricted-zone.js';
 import { materialSchema } from './models/material.js';
 import { materialTemplateSchema } from './models/material-template.js';
+import { personnelTemplateSchema } from './models/personnel-template.js';
+import { personnelSchema } from './models/personnel.js';
+import { vehicleTemplateSchema } from './models/vehicle-template.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -96,7 +99,7 @@ export class ExerciseState {
     @IsZodSchema(z.record(z.uuidv4(), vehicleSchema))
     public readonly vehicles: { readonly [key: UUID]: Vehicle } = {};
 
-    @IsIdMap(Personnel)
+    @IsZodSchema(z.record(z.uuidv4(), personnelSchema))
     public readonly personnel: { readonly [key: UUID]: Personnel } = {};
     @IsIdMap(Patient)
     public readonly patients: { readonly [key: UUID]: Patient } = {};
@@ -131,7 +134,7 @@ export class ExerciseState {
     @Type(() => PatientCategory)
     public readonly patientCategories = defaultPatientCategories;
 
-    @IsIdMap(VehicleTemplate)
+    @IsZodSchema(z.record(z.uuidv4(), vehicleTemplateSchema))
     public readonly vehicleTemplates: {
         readonly [key: UUID]: VehicleTemplate;
     } = defaultVehicleTemplatesById;
@@ -139,7 +142,7 @@ export class ExerciseState {
     public readonly materialTemplates: {
         readonly [key: UUID]: MaterialTemplate;
     } = defaultMaterialTemplatesById;
-    @IsIdMap(PersonnelTemplate)
+    @IsZodSchema(z.record(z.uuidv4(), personnelTemplateSchema))
     public readonly personnelTemplates: {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;

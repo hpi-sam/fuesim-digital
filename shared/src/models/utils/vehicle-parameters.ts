@@ -1,37 +1,22 @@
-import { Type } from 'class-transformer';
-import { ValidateNested, IsArray } from 'class-validator';
 import { z } from 'zod';
-import { Material, materialSchema } from '../material.js';
-import { Personnel } from '../personnel.js';
-import { vehicleSchema } from '../vehicle.js';
+import type { Personnel } from '../personnel.js';
+import { personnelSchema } from '../personnel.js';
 import type { Vehicle } from '../vehicle.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { getCreate } from './get-create.js';
+import { vehicleSchema } from '../vehicle.js';
+import type { Material } from '../material.js';
+import { materialSchema } from '../material.js';
 
-export class VehicleParameters {
-    @IsZodSchema(vehicleSchema)
-    public readonly vehicle!: Vehicle;
+export const vehicleParametersSchema = z.strictObject({
+    vehicle: vehicleSchema,
+    materials: z.array(materialSchema),
+    personnel: z.array(personnelSchema),
+});
+export type VehicleParameters = z.infer<typeof vehicleParametersSchema>;
 
-    @IsZodSchema(z.array(materialSchema))
-    public readonly materials!: readonly Material[];
-
-    @IsArray()
-    @ValidateNested()
-    @Type(() => Personnel)
-    public readonly personnel!: readonly Personnel[];
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        vehicle: Vehicle,
-        materials: Material[],
-        personnel: Personnel[]
-    ) {
-        this.vehicle = vehicle;
-        this.materials = materials;
-        this.personnel = personnel;
-    }
-
-    static readonly create = getCreate(this);
+export function newVehicleParameters(
+    vehicle: Vehicle,
+    materials: Material[],
+    personnel: Personnel[]
+): VehicleParameters {
+    return { vehicle, materials, personnel };
 }

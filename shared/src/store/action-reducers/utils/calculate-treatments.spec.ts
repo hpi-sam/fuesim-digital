@@ -3,7 +3,6 @@ import type { PatientStatus, Position } from '../../../models/index.js';
 import {
     newVehiclePositionIn,
     newMapPositionAt,
-    Personnel,
 } from '../../../models/index.js';
 import { ExerciseState } from '../../../state.js';
 import type { Mutable } from '../../../utils/index.js';
@@ -14,13 +13,14 @@ import { addPersonnel } from '../../../../tests/utils/personnel.spec.js';
 import { assertCatering } from '../../../../tests/utils/catering.spec.js';
 import { defaultPersonnelTemplates } from '../../../data/default-state/personnel-templates.js';
 import { newCanCaterFor } from '../../../models/utils/cater-for.js';
+import { newPersonnelFromTemplate } from '../../../models/personnel.js';
 import { updateTreatments } from './calculate-treatments.js';
 
 const emptyState = ExerciseState.create('123456');
 
 function createNotSan(position: Position) {
     const template = defaultPersonnelTemplates.notSan;
-    const notSan = Personnel.generatePersonnel(
+    return newPersonnelFromTemplate(
         {
             ...template,
             canCaterFor: {
@@ -34,7 +34,6 @@ function createNotSan(position: Position) {
         'RTW 3/83/1',
         position
     );
-    return notSan;
 }
 
 /**

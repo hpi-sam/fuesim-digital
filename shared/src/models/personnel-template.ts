@@ -1,77 +1,53 @@
-import { IsNumber, IsString, IsUUID, Max, Min } from 'class-validator';
+import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
-import { IsValue } from '../utils/validators/index.js';
-import { IsZodSchema } from '../utils/validators/is-zod-object.js';
-import type { UUID } from '../utils/index.js';
-import { uuidValidationOptions, uuid } from '../utils/index.js';
+import { uuid } from '../utils/index.js';
 import {
     type CanCaterFor,
-    getCreate,
     imagePropertiesSchema,
     type ImageProperties,
 } from './utils/index.js';
 import { canCaterForSchema } from './utils/cater-for.js';
 
-export class PersonnelTemplate {
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
-
-    @IsValue('personnelTemplate' as const)
-    public readonly type = 'personnelTemplate';
-
-    @IsString()
-    public readonly personnelType: string;
-
-    @IsString()
-    public readonly name: string;
-
-    @IsString()
-    public readonly abbreviation: string = '';
-
-    @IsZodSchema(canCaterForSchema)
-    public readonly canCaterFor: CanCaterFor;
-
+export const personnelTemplateSchema = z.strictObject({
+    id: z.uuidv4(),
+    type: z.literal('personnelTemplate'),
+    personnelType: z.string(),
+    name: z.string(),
+    abbreviation: z.string(),
+    canCaterFor: canCaterForSchema,
     /**
      * Patients in this range are preferred over patients farther away (even if they are less injured).
      * Guaranteed to be <= {@link maxTreatmentRange}.
      */
-    @IsNumber()
-    @Min(0)
-    @Max(maxTreatmentRange)
-    public readonly overrideTreatmentRange: number;
-
+    overrideTreatmentRange: z.int().min(0).max(maxTreatmentRange),
     /**
      * Only patients in this range around the personnel's position can be treated.
      * Guaranteed to be <= {@link maxTreatmentRange}.
      */
-    @IsNumber()
-    @Min(0)
-    @Max(maxTreatmentRange)
-    public readonly treatmentRange: number;
+    treatmentRange: z.int().min(0).max(maxTreatmentRange),
+    image: imagePropertiesSchema,
+});
 
-    @IsZodSchema(imagePropertiesSchema)
-    public readonly image: ImageProperties;
+export type PersonnelTemplate = z.infer<typeof personnelTemplateSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        personnelType: string,
-        name: string,
-        image: ImageProperties,
-        canCaterFor: CanCaterFor,
-        overrideTreatmentRange: number,
-        treatmentRange: number,
-        abbreviation: string = ''
-    ) {
-        this.personnelType = personnelType;
-        this.name = name;
-        this.image = image;
-        this.canCaterFor = canCaterFor;
-        this.overrideTreatmentRange = overrideTreatmentRange;
-        this.treatmentRange = treatmentRange;
-        this.abbreviation = abbreviation;
-    }
-
-    static readonly create = getCreate(this);
+export function newPersonnelTemplate(
+    personnelType: string,
+    name: string,
+    abbreviation: string,
+    canCaterFor: CanCaterFor,
+    overrideTreatmentRange: number,
+    treatmentRange: number,
+    image: ImageProperties
+): PersonnelTemplate {
+    return {
+        id: uuid(),
+        type: 'personnelTemplate',
+        personnelType,
+        name,
+        abbreviation,
+        canCaterFor,
+        overrideTreatmentRange,
+        treatmentRange,
+        image,
+    };
 }

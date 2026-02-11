@@ -1,5 +1,4 @@
-import { Type } from 'class-transformer';
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 import {
     newMapPositionAt,
     type ExerciseOccupation,
@@ -14,10 +13,11 @@ import {
     isInVehicle,
     isOnMap,
     type MapCoordinates,
-    VehicleParameters,
+    type VehicleParameters,
     mapCoordinatesSchema,
     newVehiclePositionIn,
     newSimulatedRegionPositionIn,
+    vehicleParametersSchema,
 } from '../../models/index.js';
 import {
     changePosition,
@@ -121,8 +121,7 @@ export class AddVehicleAction implements Action {
     @IsValue('[Vehicle] Add vehicle' as const)
     public readonly type = '[Vehicle] Add vehicle';
 
-    @ValidateNested()
-    @Type(() => VehicleParameters)
+    @IsZodSchema(vehicleParametersSchema)
     public readonly vehicleParameters!: VehicleParameters;
 }
 

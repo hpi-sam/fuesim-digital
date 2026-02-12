@@ -46,16 +46,16 @@ jobs:
               run: npm audit
             - name: Audit shared
               if: always()
-              run: cd shared; npm audit; cd ..
+              run: cd shared && npm audit
             - name: Audit frontend
               if: always()
-              run: cd frontend; npm audit; cd ..
+              run: cd frontend && npm audit
             - name: Audit backend
               if: always()
-              run: cd backend; npm audit; cd ..
+              run: cd backend && npm audit
             - name: Audit benchmark
               if: always()
-              run: cd benchmark; npm audit; cd ..
+              run: cd benchmark && npm audit
 
     build-shared:
         timeout-minutes: 5
@@ -69,7 +69,7 @@ jobs:
               with:
                   install-command: cd shared && npm ci
             - name: Build shared
-              run: cd shared && npm run build && cd ..
+              run: cd shared && npm run build
             - name: Upload shared dist
               uses: actions/upload-artifact@v6
               with:
@@ -89,7 +89,7 @@ jobs:
                   install-command: (cd shared && npm ci) && (cd frontend && npm ci)
                   download-shared: true
             - name: Build frontend
-              run: cd frontend && npm run build && cd ..
+              run: cd frontend && npm run build
 
     build-backend:
         timeout-minutes: 5
@@ -104,7 +104,7 @@ jobs:
                   install-command: (cd shared && npm ci) && (cd backend && npm ci)
                   download-shared: true
             - name: Build backend
-              run: cd backend && npm run build && cd ..
+              run: cd backend && npm run build
 
     lint:
         timeout-minutes: 5
@@ -165,15 +165,15 @@ jobs:
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
                   > ./.env
             - name: Run migrations
-              run: cd backend && npm run migration:run && cd ..
+              run: cd backend && npm run migration:run
             - name: Run Backend Tests
-              run: cd backend && npm run test:ci-no-migration; cd ..
+              run: cd backend && npm run test:ci-no-migration
               if: always()
             - name: Run Frontend Tests
-              run: cd frontend && npm run test:ci; cd ..
+              run: cd frontend && npm run test:ci
               if: always()
             - name: Run Shared Tests
-              run: cd shared && npm run test:ci; cd ..
+              run: cd shared && npm run test:ci
               if: always()
             - name: Merge coverage
               run: npm run merge-coverage
@@ -230,9 +230,9 @@ jobs:
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
                   > ./.env
             - name: Run migrations
-              run: cd backend && npm run migration:run && cd ..
+              run: cd backend && npm run migration:run
             - name: Run Migration Tests
-              run: cd backend && npm run test:ci-migration; cd ..
+              run: cd backend && npm run test:ci-migration
 
     cypress:
         timeout-minutes: 20
@@ -291,7 +291,7 @@ jobs:
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
                   > ./.env
             - name: Run migrations
-              run: cd backend && npm run migration:run && cd ..
+              run: cd backend && npm run migration:run
             - name: Run Cypress
               uses: cypress-io/github-action@v5
               with:

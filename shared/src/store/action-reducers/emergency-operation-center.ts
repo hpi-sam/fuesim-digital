@@ -1,5 +1,4 @@
 import {
-    IsArray,
     IsBoolean,
     IsInt,
     IsOptional,
@@ -7,13 +6,13 @@ import {
     IsUUID,
     MaxLength,
     Min,
-    ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { z } from 'zod';
 import {
     EocLogEntry,
     newAlarmGroupStartPoint,
     VehicleParameters,
+    vehicleParametersSchema,
 } from '../../models/index.js';
 import type { Mutable, UUID } from '../../utils/index.js';
 import {
@@ -24,6 +23,7 @@ import {
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { getElement } from './utils/index.js';
 import { VehicleActionReducers } from './vehicle.js';
 import { TransferActionReducers } from './transfer.js';
@@ -53,9 +53,7 @@ export class SendAlarmGroupAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly alarmGroupId!: UUID;
 
-    @IsArray()
-    @ValidateNested()
-    @Type(() => VehicleParameters)
+    @IsZodSchema(z.array(vehicleParametersSchema))
     public readonly sortedVehicleParameters!: readonly VehicleParameters[];
 
     @IsUUID(4, uuidValidationOptions)

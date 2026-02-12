@@ -63,6 +63,11 @@ import { vehicleSchema } from './models/vehicle.js';
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import type { TreatmentAssignment } from './store/index.js';
 import { restrictedZoneSchema } from './models/restricted-zone.js';
+import { materialSchema } from './models/material.js';
+import { materialTemplateSchema } from './models/material-template.js';
+import { personnelTemplateSchema } from './models/personnel-template.js';
+import { personnelSchema } from './models/personnel.js';
+import { vehicleTemplateSchema } from './models/vehicle-template.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -94,11 +99,11 @@ export class ExerciseState {
     @IsZodSchema(z.record(z.uuidv4(), vehicleSchema))
     public readonly vehicles: { readonly [key: UUID]: Vehicle } = {};
 
-    @IsIdMap(Personnel)
+    @IsZodSchema(z.record(z.uuidv4(), personnelSchema))
     public readonly personnel: { readonly [key: UUID]: Personnel } = {};
     @IsIdMap(Patient)
     public readonly patients: { readonly [key: UUID]: Patient } = {};
-    @IsIdMap(Material)
+    @IsZodSchema(z.record(z.uuidv4(), materialSchema))
     public readonly materials: { readonly [key: UUID]: Material } = {};
     @IsZodSchema(z.record(z.uuidv4(), restrictedZoneSchema))
     public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
@@ -129,15 +134,15 @@ export class ExerciseState {
     @Type(() => PatientCategory)
     public readonly patientCategories = defaultPatientCategories;
 
-    @IsIdMap(VehicleTemplate)
+    @IsZodSchema(z.record(z.uuidv4(), vehicleTemplateSchema))
     public readonly vehicleTemplates: {
         readonly [key: UUID]: VehicleTemplate;
     } = defaultVehicleTemplatesById;
-    @IsIdMap(MaterialTemplate)
+    @IsZodSchema(z.record(z.uuidv4(), materialTemplateSchema))
     public readonly materialTemplates: {
         readonly [key: UUID]: MaterialTemplate;
     } = defaultMaterialTemplatesById;
-    @IsIdMap(PersonnelTemplate)
+    @IsZodSchema(z.record(z.uuidv4(), personnelTemplateSchema))
     public readonly personnelTemplates: {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;

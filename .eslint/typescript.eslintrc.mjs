@@ -394,6 +394,7 @@ export default {
             'warn',
             {
                 args: 'none',
+                enableAutofixRemoval: { imports: true },
             },
         ],
         '@typescript-eslint/no-use-before-define': 'off',

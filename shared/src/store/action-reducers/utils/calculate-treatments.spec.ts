@@ -2,25 +2,25 @@ import { produce } from 'immer';
 import type { PatientStatus, Position } from '../../../models/index.js';
 import {
     newVehiclePositionIn,
-    CanCaterFor,
     newMapPositionAt,
-    Personnel,
 } from '../../../models/index.js';
 import { ExerciseState } from '../../../state.js';
 import type { Mutable } from '../../../utils/index.js';
-import { cloneDeepMutable, uuid } from '../../../utils/index.js';
+import { uuid } from '../../../utils/index.js';
 import { addMaterial } from '../../../../tests/utils/materials.spec.js';
 import { addPatient } from '../../../../tests/utils/patients.spec.js';
 import { addPersonnel } from '../../../../tests/utils/personnel.spec.js';
 import { assertCatering } from '../../../../tests/utils/catering.spec.js';
 import { defaultPersonnelTemplates } from '../../../data/default-state/personnel-templates.js';
+import { newCanCaterFor } from '../../../models/utils/cater-for.js';
+import { newPersonnelFromTemplate } from '../../../models/personnel.js';
 import { updateTreatments } from './calculate-treatments.js';
 
 const emptyState = ExerciseState.create('123456');
 
 function createNotSan(position: Position) {
     const template = defaultPersonnelTemplates.notSan;
-    const notSan = Personnel.generatePersonnel(
+    return newPersonnelFromTemplate(
         {
             ...template,
             canCaterFor: {
@@ -34,7 +34,6 @@ function createNotSan(position: Position) {
         'RTW 3/83/1',
         position
     );
-    return notSan;
 }
 
 /**
@@ -287,9 +286,7 @@ describe('calculate treatment', () => {
                     state,
                     newMapPositionAt({ x: 0, y: 0 })
                 );
-                material.canCaterFor = cloneDeepMutable(
-                    CanCaterFor.create(1, 0, 1, 'and')
-                );
+                material.canCaterFor = newCanCaterFor(1, 0, 1, 'and');
                 ids.material = material.id;
             }
         );

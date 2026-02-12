@@ -1,6 +1,4 @@
-import type { VehicleTemplate } from '../../models/index.js';
-import type { ImageProperties } from '../../models/utils/index.js';
-import { cloneDeepImmutable } from '../../utils/clone-deep.js';
+import type { VehicleTemplate, ImageProperties } from '../../models/index.js';
 import { defaultMaterialTemplates } from './material-templates.js';
 import { defaultPersonnelTemplates } from './personnel-templates.js';
 
@@ -46,7 +44,7 @@ const carryingUnitImage: ImageProperties = {
     aspectRatio: 1,
 };
 
-const rtwVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
+const rtwVehicleTemplate: VehicleTemplate = {
     id: 'f7d8fe70-128d-4cc0-97bd-15e2ccd5d4b9',
     type: 'vehicleTemplate',
     vehicleType: 'RTW',
@@ -58,9 +56,9 @@ const rtwVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
         defaultPersonnelTemplates.rettSan.id,
     ],
     materialTemplateIds: [defaultMaterialTemplates.standard.id],
-});
+};
 
-const nawVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
+const nawVehicleTemplate: VehicleTemplate = {
     id: '8e9f22dc-d9f8-4fd1-a865-c285ce91dde3',
     type: 'vehicleTemplate',
     vehicleType: 'NAW',
@@ -73,9 +71,9 @@ const nawVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
         defaultPersonnelTemplates.rettSan.id,
     ],
     materialTemplateIds: [defaultMaterialTemplates.standard.id],
-});
+};
 
-const ktwVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
+const ktwVehicleTemplate: VehicleTemplate = {
     id: 'b5b241d1-e002-454d-8090-175cb88cdb6e',
     type: 'vehicleTemplate',
     vehicleType: 'KTW',
@@ -87,9 +85,9 @@ const ktwVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
         defaultPersonnelTemplates.rettSan.id,
     ],
     materialTemplateIds: [defaultMaterialTemplates.standard.id],
-});
+};
 
-const carryingUnitVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
+const carryingUnitVehicleTemplate: VehicleTemplate = {
     id: '0dd54aae-79fc-4870-9393-f619571c8ca7',
     type: 'vehicleTemplate',
     vehicleType: 'Tragetrupp',
@@ -98,9 +96,9 @@ const carryingUnitVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
     patientCapacity: 1,
     personnelTemplateIds: [],
     materialTemplateIds: [],
-});
+};
 
-const ktwKatSchutzVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
+const ktwKatSchutzVehicleTemplate: VehicleTemplate = {
     id: '3bb9412a-1412-46b1-9c92-54939156b669',
     type: 'vehicleTemplate',
     vehicleType: 'KTW (KatSchutz)',
@@ -112,9 +110,9 @@ const ktwKatSchutzVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
         defaultPersonnelTemplates.rettSan.id,
     ],
     materialTemplateIds: [defaultMaterialTemplates.standard.id],
-});
+};
 
-const gwSanVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
+const gwSanVehicleTemplate: VehicleTemplate = {
     id: '51018aa6-c38b-4c1a-9bcf-99dd8ebe7e5b',
     type: 'vehicleTemplate',
     vehicleType: 'GW-San',
@@ -135,9 +133,9 @@ const gwSanVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
         defaultMaterialTemplates.big.id,
         defaultMaterialTemplates.big.id,
     ],
-});
+};
 
-const nefVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
+const nefVehicleTemplate: VehicleTemplate = {
     id: 'dcdb5d3e-4654-420d-9847-22bdd97e686c',
     type: 'vehicleTemplate',
     vehicleType: 'NEF',
@@ -149,9 +147,9 @@ const nefVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
         defaultPersonnelTemplates.notSan.id,
     ],
     materialTemplateIds: [defaultMaterialTemplates.standard.id],
-});
+};
 
-const rthVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
+const rthVehicleTemplate: VehicleTemplate = {
     id: '01da16b9-ae27-458f-9f6b-cb8cfed63d83',
     type: 'vehicleTemplate',
     vehicleType: 'RTH',
@@ -163,7 +161,7 @@ const rthVehicleTemplate: VehicleTemplate = cloneDeepImmutable({
         defaultPersonnelTemplates.notSan.id,
     ],
     materialTemplateIds: [defaultMaterialTemplates.standard.id],
-});
+};
 
 export const defaultVehicleTemplates = {
     rtw: rtwVehicleTemplate,

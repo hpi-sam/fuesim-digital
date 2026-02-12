@@ -1,5 +1,5 @@
 import type { PersonnelTemplate } from '../../models/personnel-template.js';
-import { CanCaterFor } from '../../models/utils/cater-for.js';
+import { newCanCaterFor } from '../../models/utils/cater-for.js';
 import { cloneDeepImmutable } from '../../utils/clone-deep.js';
 import {
     defaultOverrideTreatmentRange,
@@ -16,7 +16,7 @@ const sanPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
         height: 80,
         aspectRatio: 1,
     },
-    canCaterFor: CanCaterFor.create(0, 0, 5, 'and'),
+    canCaterFor: newCanCaterFor(0, 0, 5, 'and'),
     overrideTreatmentRange: defaultOverrideTreatmentRange,
     treatmentRange: defaultTreatmentRange,
     abbreviation: 'San',
@@ -32,7 +32,7 @@ const rettSanPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
         height: 80,
         aspectRatio: 1,
     },
-    canCaterFor: CanCaterFor.create(1, 2, 0, 'and'),
+    canCaterFor: newCanCaterFor(1, 2, 0, 'and'),
     overrideTreatmentRange: defaultOverrideTreatmentRange,
     treatmentRange: defaultTreatmentRange,
     abbreviation: 'RS',
@@ -48,7 +48,7 @@ const notSanPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
         height: 80,
         aspectRatio: 1,
     },
-    canCaterFor: CanCaterFor.create(2, 1, 0, 'and'),
+    canCaterFor: newCanCaterFor(2, 1, 0, 'and'),
     overrideTreatmentRange: defaultOverrideTreatmentRange,
     treatmentRange: defaultTreatmentRange,
     abbreviation: 'NFS',
@@ -64,7 +64,7 @@ const notarztPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
         height: 80,
         aspectRatio: 1,
     },
-    canCaterFor: CanCaterFor.create(2, 2, 2, 'and'),
+    canCaterFor: newCanCaterFor(2, 2, 2, 'and'),
     overrideTreatmentRange: defaultOverrideTreatmentRange,
     treatmentRange: 15,
     abbreviation: 'NA',
@@ -80,7 +80,7 @@ const gfPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
         height: 80,
         aspectRatio: 1,
     },
-    canCaterFor: CanCaterFor.create(0, 0, 0, 'and'),
+    canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
     overrideTreatmentRange: 0,
     treatmentRange: 0,
     abbreviation: 'GF',

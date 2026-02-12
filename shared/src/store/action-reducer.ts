@@ -1,15 +1,30 @@
 import type { WritableDraft } from 'immer';
+import type { ZodType } from 'zod';
 import type { Client } from '../models/client.js';
-import type { Role } from '../models/utils/index.js';
+import type { Role } from '../models/index.js';
 import type { SpecificRole } from '../models/utils/role.js';
 import type { ExerciseState } from '../state.js';
 import type { Constructor } from '../utils/index.js';
 
-export interface ActionReducer<A extends Action = Action> {
-    readonly action: Constructor<A>;
-    readonly reducer: ReducerFunction<InstanceType<this['action']>>;
-    readonly rights: ReducerRights<InstanceType<this['action']>>;
+interface BaseActionReducer<A extends Action = Action> {
+    readonly reducer: ReducerFunction<A>;
+    readonly rights: ReducerRights<A>;
 }
+
+interface LegacyActionReducer<A extends Action = Action>
+    extends BaseActionReducer<A> {
+    readonly action: Constructor<A>;
+}
+
+interface SchemaBasedActionReducer<A extends Action = Action>
+    extends BaseActionReducer<A> {
+    readonly type: A['type'];
+    readonly actionSchema: ZodType<A>;
+}
+
+export type ActionReducer<A extends Action = Action> =
+    | LegacyActionReducer<A>
+    | SchemaBasedActionReducer<A>;
 
 /**
  *  An action is an interface for immutable JSON objects used to update the store in the frontend and

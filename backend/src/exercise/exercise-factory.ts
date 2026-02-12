@@ -9,7 +9,6 @@ import type {
 import {
     ExerciseState,
     applyAction,
-    cloneDeepMutable,
     ReducerError,
     validateExerciseState,
     validateExerciseAction,
@@ -18,6 +17,8 @@ import {
     isParticipantKey,
     isTrainerKey,
 } from 'fuesim-digital-shared';
+import { cloneDeep } from 'lodash-es';
+import { produce } from 'immer';
 import { Config } from '../config.js';
 import type {
     ExerciseInsert,
@@ -204,14 +205,16 @@ export class ExerciseFactory {
      */
     private restoreState(activeExercise: ActiveExercise, keepActions: boolean) {
         const exercise = activeExercise.exercise;
-        let currentState = cloneDeepMutable(exercise.initialStateString);
+        let currentState = cloneDeep(exercise.initialStateString);
 
         activeExercise.temporaryActionHistory.forEach((actionWrapper) => {
             this.validateAction(actionWrapper.getAction().actionString);
             try {
-                currentState = applyAction(
-                    currentState,
-                    actionWrapper.getAction().actionString
+                currentState = produce(currentState, (draftState) =>
+                    applyAction(
+                        draftState,
+                        actionWrapper.getAction().actionString
+                    )
                 );
             } catch (e: unknown) {
                 if (e instanceof ReducerError) {

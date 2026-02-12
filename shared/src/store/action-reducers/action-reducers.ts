@@ -1,3 +1,4 @@
+import type { ActionReducer } from '../action-reducer.js';
 import { AlarmGroupActionReducers } from './alarm-group.js';
 import { ClientActionReducers } from './client.js';
 import { ExerciseActionReducers } from './exercise.js';
@@ -43,46 +44,61 @@ const actionReducers = {
     ...RadiogramActionReducers,
     ...VehicleTemplateActionReducers,
     ...RestrictedZoneActionReducers,
-};
+} as const;
 
 type ExerciseActionReducer =
     (typeof actionReducers)[keyof typeof actionReducers];
 
+type ExtractAction<R> = R extends ActionReducer<infer A> ? A : never;
+
+/**
+ * A map that maps from each `Action.type` to the corresponding `ActionReducer`.
+ */
 type ExerciseActionTypeDictionary = {
-    [_ActionReducer in ExerciseActionReducer as InstanceType<
-        _ActionReducer['action']
-    >['type']]: _ActionReducer;
+    [_ActionReducer in ExerciseActionReducer as ExtractAction<_ActionReducer>['type']]: _ActionReducer;
 };
 
 /**
  * This dictionary maps the action type to the ActionReducer.
  */
-let exerciseActionTypeDictionary: ExerciseActionTypeDictionary | undefined;
-
-export function getExerciseActionTypeDictionary(): ExerciseActionTypeDictionary {
-    if (exerciseActionTypeDictionary) {
-        return exerciseActionTypeDictionary;
-    }
-    const dictionary = {} as any;
-    // fill in the dictionary
+const exerciseActionTypeDictionary: ExerciseActionTypeDictionary =
     Object.values(actionReducers)
-        .map(
-            (actionReducer) =>
-                ({
-                    // the generated ts code from class default values adds them only in the constructor: https://github.com/microsoft/TypeScript/issues/15607
-                    // therefore we have to call the constructor (An ActionClass constructor is therefore required to not throw an error when called without arguments)
-                    type: new actionReducer.action().type,
-                    actionClass: actionReducer,
-                }) as const
-        )
-        .forEach(({ type, actionClass }) => {
-            dictionary[type] = actionClass;
-        });
-    exerciseActionTypeDictionary = dictionary as ExerciseActionTypeDictionary;
-    return exerciseActionTypeDictionary;
+        .map((actionReducer) => {
+            if ('type' in actionReducer) {
+                return {
+                    type: actionReducer.type,
+                    reducer: actionReducer,
+                } as const;
+            }
+            return {
+                // the generated ts code from class default values adds them only in the constructor: https://github.com/microsoft/TypeScript/issues/15607
+                // therefore we have to call the constructor (An ActionClass constructor is therefore required to not throw an error when called without arguments)
+                type: new actionReducer.action().type,
+                reducer: actionReducer,
+            } as const;
+        })
+        .reduce(
+            (accumulator: any, value) =>
+                (accumulator[value.type] = value.reducer),
+            {}
+        );
+
+export function isActionType(
+    actionType: string
+): actionType is ExerciseAction['type'] {
+    return actionType in exerciseActionTypeDictionary;
+}
+
+export function lookupReducerFor(
+    actionType: ExerciseAction['type']
+): ActionReducer<ExerciseAction> {
+    // TODO: This is a fishy cast
+    return exerciseActionTypeDictionary[
+        actionType
+    ] as ActionReducer<ExerciseAction>;
 }
 
 /**
  * A Union of all actions of the exercise.
  */
-export type ExerciseAction = InstanceType<ExerciseActionReducer['action']>;
+export type ExerciseAction = ExtractAction<ExerciseActionReducer>;

@@ -27,7 +27,7 @@ runs:
           shell: bash
           run: ${{ inputs.install-command }}
         - name: Download shared dist
-          if: inputs.download-shared == true || inputs.download-shared == 'true'
+          if: inputs.download-shared == 'true'
           uses: actions/download-artifact@v7
           with:
               name: shared-dist

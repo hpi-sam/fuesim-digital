@@ -3,10 +3,8 @@ import { freeze, produce } from 'immer';
 import type { ExerciseState } from '../state.js';
 import {
     type ExerciseAction,
-    getExerciseActionTypeDictionary,
+    lookupReducerFor,
 } from './action-reducers/action-reducers.js';
-
-const exerciseActionTypeDictionary = getExerciseActionTypeDictionary();
 
 /**
  * A pure reducer function that applies the action on the state without mutating it.
@@ -38,11 +36,7 @@ export function applyAction(
 ) {
     // Make sure that the action isn't mutated in the reducer (short circuits if the action is already frozen)
     freeze(action, true);
-    return exerciseActionTypeDictionary[action.type].reducer(
-        draftState,
-        // typescript doesn't narrow action and the reducer to the correct ones based on action.type
-        action as any
-    );
+    return lookupReducerFor(action.type).reducer(draftState, action);
 }
 
 /**

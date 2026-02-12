@@ -67,7 +67,7 @@ jobs:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
               with:
-                  install-command: cd shared && npm ci
+                  install-command: cd shared && npm ci --no-audit
             - name: Build shared
               run: cd shared && npm run build
             - name: Upload shared dist
@@ -86,7 +86,7 @@ jobs:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
               with:
-                  install-command: (cd shared && npm ci) && (cd frontend && npm ci)
+                  install-command: (cd shared && npm ci --no-audit) && (cd frontend && npm ci --no-audit)
                   download-shared: true
             - name: Build frontend
               run: cd frontend && npm run build
@@ -101,7 +101,7 @@ jobs:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
               with:
-                  install-command: (cd shared && npm ci) && (cd backend && npm ci)
+                  install-command: (cd shared && npm ci --no-audit) && (cd backend && npm ci --no-audit)
                   download-shared: true
             - name: Build backend
               run: cd backend && npm run build

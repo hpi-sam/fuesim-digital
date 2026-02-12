@@ -271,15 +271,6 @@ jobs:
                   download-shared: true
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
-            - name: Cache Cypress binary
-              uses: actions/cache@v3
-              id: cache-cypress
-              with:
-                  path: ~/.cache/Cypress
-                  key: cypress-${{ hashFiles('package-lock.json', '**/package-lock.json') }}-${{ runner.os }}
-            - name: Install Cypress
-              if: steps.cache-cypress.outputs.cache-hit != 'true'
-              run: npm run cy:install
             - name: Create .env
               run: >
                   cat ./.env.example
@@ -293,10 +284,12 @@ jobs:
             - name: Run migrations
               run: cd backend && npm run migration:run
             - name: Run Cypress
-              uses: cypress-io/github-action@v5
+              uses: cypress-io/github-action@v7
               with:
                   start: npm --prefix .. -- run start:all
                   working-directory: frontend
+                  install-command: 'npm run cy:install'
+                  package-manager-cache: false # This is handled by actions/setup-node (used internally by our setup-install action)
                   browser: ${{ matrix.browser }}
                   wait-on: 'http://127.0.0.1:4200/, http://127.0.0.1:3201/api/health'
                   wait-on-timeout: 90

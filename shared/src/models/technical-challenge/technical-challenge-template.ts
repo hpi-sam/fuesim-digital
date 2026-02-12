@@ -34,8 +34,11 @@ export function createTechnicalChallengeFromTemplate(
         type: 'technicalChallenge',
         templateId: template.id,
         position: newNoPosition(),
-        taskProgress: {},
+        taskProgress: Object.fromEntries(
+            relevantTasks.map((task) => [task.id, 0])
+        ),
         currentStateId: template.initialStateId,
+        assignedPersonnel: {},
         states,
         relevantTasks,
         transitions,

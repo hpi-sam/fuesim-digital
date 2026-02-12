@@ -17,6 +17,7 @@ import {
     currentTransferOf,
     isInTransfer,
     ResourceDescription,
+    simulateAllTechnicalChallenges,
 } from '../../models/index.js';
 import { PartialExport } from '../../export-import/file-format/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
@@ -183,6 +184,8 @@ export namespace ExerciseActionReducers {
             refreshTransfer(draftState, 'personnel', tickInterval);
 
             simulateAllRegions(draftState, tickInterval);
+
+            simulateAllTechnicalChallenges(draftState, tickInterval);
 
             if (logActive(draftState)) {
                 const newTreatmentAssignment =

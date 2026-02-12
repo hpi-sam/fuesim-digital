@@ -80,3 +80,9 @@ License: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 <https://commons.wikimedia.org/wiki/File:Magnifying-glass.svg#/media/File:Magnifying-glass.svg>
 RRZEicons
 License: [CC-BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/deed.en)
+
+[blue_car_broken.png](blue_car_broken.png),
+[blue_car_broken_burning.png](blue_car_broken_burning.png),
+[blue_car_burnedOut.png](blue_car_burnedOut.png)
+Felix Koch, based on <https://illustoon.com/?dl=9476> and <https://illustoon.com/?id=2723> by [DESIGNALIKE](https://illustoon.com)
+License: CC0 1.0

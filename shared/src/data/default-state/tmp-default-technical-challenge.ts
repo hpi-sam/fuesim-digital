@@ -2,32 +2,51 @@ import type {
     Guard,
     TechnicalChallengeTemplate,
     Transition,
+    UUID,
 } from '../../index.js';
-import { createTechnicalChallengeState } from '../../models/technical-challenge/state-machine.js';
+import { newImageProperties } from '../../index.js';
+import { createTechnicalChallengeState } from '../../models/index.js';
 import type { Task } from '../../models/task.js';
-import { uuid } from '../../utils/index.js';
-import { defaultMapImagesTemplates } from './map-images-templates.js';
 
 // TODO@Felix: remove this file
 
 function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     // --- States ---
-    const initialState = createTechnicalChallengeState('Ausgangslage');
-    const onlyExtinguished = createTechnicalChallengeState('Feuer geloescht');
-    const onlyDead = createTechnicalChallengeState('Patient verstorben');
-    const onlyTreated = createTechnicalChallengeState('Patient gerettet');
-    const onlyBurnedOut = createTechnicalChallengeState('Fahrzeug ausgebrannt');
+    const initialState = createTechnicalChallengeState(
+        'Ausgangslage',
+        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1)
+    );
+    const onlyExtinguished = createTechnicalChallengeState(
+        'Feuer geloescht',
+        newImageProperties('/assets/blue_car_broken.png', 100, 1)
+    );
+    const onlyDead = createTechnicalChallengeState(
+        'Patient verstorben',
+        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1)
+    );
+    const onlyTreated = createTechnicalChallengeState(
+        'Patient gerettet',
+        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1)
+    );
+    const onlyBurnedOut = createTechnicalChallengeState(
+        'Fahrzeug ausgebrannt',
+        newImageProperties('/assets/blue_car_burnedOut.png', 100, 1)
+    );
     const patientDeadButExtinguished = createTechnicalChallengeState(
-        'Patient verstorben, Feuer geloescht'
+        'Patient verstorben, Feuer geloescht',
+        newImageProperties('/assets/blue_car_broken.png', 100, 1)
     );
     const treatedAndExtinguished = createTechnicalChallengeState(
-        'Patient gerettet und Feuer geloescht'
+        'Patient gerettet und Feuer geloescht',
+        newImageProperties('/assets/blue_car_broken.png', 100, 1)
     );
     const burnedOutAndPatientDead = createTechnicalChallengeState(
-        'Fahrzeug ausgebrannt und Patient verstorben'
+        'Fahrzeug ausgebrannt und Patient verstorben',
+        newImageProperties('/assets/blue_car_burnedOut.png', 100, 1)
     );
     const burnedOutButRescued = createTechnicalChallengeState(
-        'Fahrzeug ausgebrannt, Patient gerettet'
+        'Fahrzeug ausgebrannt, Patient gerettet',
+        newImageProperties('/assets/blue_car_burnedOut.png', 100, 1)
     );
 
     const states: State[] = [
@@ -44,54 +63,37 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
 
     // --- Tasks ---
     const extinguishFireTask: Task = {
-        id: uuid(),
+        id: '7eac4a83-99cd-406a-a4a3-d61b4d5b72bd',
         type: 'task',
-        taskName: 'Feuer loeschen',
+        taskName: 'Feuer löschen',
     };
     const rescuePatientTask: Task = {
-        id: uuid(),
+        id: '86fcf9d4-33b3-469e-9b4c-5bf25d88387b',
         type: 'task',
         taskName: 'Patient retten',
     };
-    const patientDeadTask: Task = {
-        id: uuid(),
-        type: 'task',
-        taskName: 'Patient verstorben',
-    };
-    const vehicleBurnedOutTask: Task = {
-        id: uuid(),
-        type: 'task',
-        taskName: 'Fahrzeug ausgebrannt',
-    };
 
-    const relevantTasks: Task[] = [
-        extinguishFireTask,
-        rescuePatientTask,
-        patientDeadTask,
-        vehicleBurnedOutTask,
-    ];
+    const relevantTasks: Task[] = [extinguishFireTask, rescuePatientTask];
 
     // --- Guards ---
     // A guard is fulfilled when the task's progress exceeds minProgress.
     const isFireExtinguished: Guard = {
         type: 'ProgressGuard',
-        minProgress: 100,
+        minProgress: 10000,
         taskId: extinguishFireTask.id,
     };
     const isPatientRescued: Guard = {
         type: 'ProgressGuard',
-        minProgress: 100,
+        minProgress: 10000,
         taskId: rescuePatientTask.id,
     };
     const isPatientDead: Guard = {
-        type: 'ProgressGuard',
-        minProgress: 100,
-        taskId: patientDeadTask.id,
+        type: 'TimerGuard',
+        minTimePassed: 30_000,
     };
     const isVehicleBurnedOut: Guard = {
-        type: 'ProgressGuard',
-        minProgress: 100,
-        taskId: vehicleBurnedOutTask.id,
+        type: 'TimerGuard',
+        minTimePassed: 60_000,
     };
 
     // --- Transitions ---
@@ -132,6 +134,11 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
             to: patientDeadButExtinguished.id,
             guard: isFireExtinguished,
         },
+        {
+            from: onlyDead.id,
+            to: burnedOutAndPatientDead.id,
+            guard: isVehicleBurnedOut,
+        },
 
         // From onlyTreated
         {
@@ -161,7 +168,11 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     return {
         initialStateId: initialState.id,
         id: '9d629cfb-440e-4fe1-9155-ffdb6f97248f',
-        image: defaultMapImagesTemplates.at(1)!.image,
+        image: newImageProperties(
+            '/assets/blue_car_broken_burning.png',
+            100,
+            1
+        ),
         name: 'Brennendes Fahrzeug mit eingeklemmter Person',
         states,
         relevantTasks,
@@ -178,4 +189,9 @@ let _cachedTemplate: TechnicalChallengeTemplate | undefined;
 export function getDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     _cachedTemplate ??= buildDefaultTechnicalChallengeTemplate();
     return _cachedTemplate;
+}
+
+export function getDefaultTasks(): { [key: UUID]: Task } {
+    const tasks = getDefaultTechnicalChallengeTemplate().relevantTasks;
+    return Object.fromEntries(tasks.map((task) => [task.id, task]));
 }

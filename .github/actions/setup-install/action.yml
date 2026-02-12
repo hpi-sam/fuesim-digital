@@ -1,0 +1,30 @@
+name: Setup and Install
+description: Perform setup tasks required by every task in the pipeline, such as setting up node and installing dependencies
+inputs:
+    install-command:
+        description: The command to install node modules. May be left empty if nothing should be installed. Defaults to a full install (npm run install:all-ci)
+        default: npm run install:all-ci
+    download-shared:
+        description: Whether to download and restore shared dist from the artifacts
+        default: 'false'
+
+runs:
+    using: composite
+    steps:
+        - uses: actions/setup-node@v6
+          with:
+              node-version: ${{ env.NODE_VERSION }}
+              cache: npm
+              cache-dependency-path: |
+                  package-lock.json
+                  **/package-lock.json
+        - name: Install dependencies
+          if: inputs.install-command != ''
+          shell: bash
+          run: ${{ inputs.install-command }}
+        - name: Download shared dist
+          if: inputs.download-shared == true || inputs.download-shared == 'true'
+          uses: actions/download-artifact@v7
+          with:
+              name: shared-dist
+              path: shared/dist

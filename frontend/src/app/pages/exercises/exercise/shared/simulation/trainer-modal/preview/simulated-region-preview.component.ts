@@ -1,17 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { createSelector, Store } from '@ngrx/store';
-import {
-    isInSpecificVehicle,
-    Patient,
-    SimulatedRegion,
-} from 'digital-fuesim-manv-shared';
-import { combineLatest, Observable, Subject, map } from 'rxjs';
+import { Patient, SimulatedRegion } from 'digital-fuesim-manv-shared';
+import { combineLatest, Observable, map } from 'rxjs';
 import { AppState } from 'src/app/state/app.state';
 import type {
-    CanCaterFor,
     Material,
-    PatientStatus,
     Personnel,
     UUID,
     Vehicle,
@@ -19,8 +13,6 @@ import type {
 } from 'digital-fuesim-manv-shared';
 import {
     createSelectElementsInSimulatedRegion,
-    createSelectMaterial,
-    createSelectPersonnel,
     createSelectSimulatedRegion,
     selectConfiguration,
     selectMaterials,
@@ -30,17 +22,9 @@ import {
     selectVehicleTemplates,
 } from 'src/app/state/application/selectors/exercise.selectors';
 import { groupBy } from 'lodash-es';
-import { ExerciseService } from 'src/app/core/exercise.service';
 import { comparePatientsByVisibleStatus } from '../tabs/compare-patients';
 import { PatientWithVisibleStatus } from '../patients-table/simulated-region-overview-patients-table.component';
-import { StartTransferService } from '../start-transfer.service';
-const selectionCategories = [
-    'patient',
-    'personnel',
-    'vehicle',
-    'material',
-] as const;
-export type SelectionCategory = (typeof selectionCategories)[number];
+
 @Component({
     selector: 'app-simulated-region-preview',
     templateUrl: './simulated-region-preview.component.html',
@@ -48,48 +32,23 @@ export type SelectionCategory = (typeof selectionCategories)[number];
     standalone: false,
 })
 export class SimulatedRegionPreviewComponent implements OnInit {
-    simulatedRegionId = '' as UUID;
-    selectedId = '' as UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly activeModal = inject(NgbActiveModal);
 
-    selectedVehicleId$ = new Subject<UUID | null>();
-    selectedVehiclePersonnel$!: Observable<Personnel[]>;
-
-    selectionCategory?: SelectionCategory;
+    simulatedRegionId: UUID = '';
+    selected = signal<Material | Patient | Personnel | Vehicle | null>(null);
 
     simulatedRegion$!: Observable<SimulatedRegion>;
 
     patients$!: Observable<PatientWithVisibleStatus[]>;
 
     material$?: Observable<Material[]>;
-    selectedMaterial$?: Observable<Material>;
 
     personnelByCategory$!: Observable<Personnel[]>;
-    selectedPersonnel$!: Observable<Personnel>;
-    caterForStatuses: (PatientStatus & keyof CanCaterFor)[] = [
-        'red',
-        'yellow',
-        'green',
-    ];
-
-    vehicleSelection$!: Observable<{
-        vehicle: Vehicle;
-        personnel: (Personnel & { isInVehicle: boolean })[];
-        patients: PatientWithVisibleStatus[];
-    } | null>;
 
     groupedVehicles$!: Observable<
         { vehicleType: string; vehicles: Vehicle[] }[]
     >;
-
-    detailsIsCollapsed = true;
-    collapseIsLocked = false;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        readonly startTransferService: StartTransferService,
-        public readonly activeModal: NgbActiveModal
-    ) {}
 
     ngOnInit(): void {
         this.simulatedRegion$ = this.store.select(
@@ -128,10 +87,6 @@ export class SimulatedRegionPreviewComponent implements OnInit {
                 this.simulatedRegionId
             )
         );
-
-        const personnel$ = this.store.select(selectPersonnel);
-
-        this.selectedVehicleId$.next(null);
 
         const vehicles$ = this.store.select(
             createSelectElementsInSimulatedRegion(
@@ -173,70 +128,12 @@ export class SimulatedRegionPreviewComponent implements OnInit {
             })
         );
 
-        const patientsUnorderd$ = this.store.select(selectPatients);
-        const configuration$ = this.store.select(selectConfiguration);
-
-        this.vehicleSelection$ = combineLatest([
-            vehicles$,
-            personnel$,
-            patientsUnorderd$,
-            configuration$,
-            this.selectedVehicleId$,
-        ]).pipe(
-            map(
-                ([
-                    vehicles,
-                    personnel,
-                    patients,
-                    configuration,
-                    selectedId,
-                ]) => {
-                    const selectedVehicle = vehicles.find(
-                        (vehicle) => vehicle.id === selectedId
-                    );
-
-                    if (!selectedVehicle) return null;
-
-                    const vehiclePersonnel = Object.keys(
-                        selectedVehicle.personnelIds
-                    )
-                        .map((id) => personnel[id]!)
-                        .map((pers) => ({
-                            ...pers,
-                            isInVehicle: isInSpecificVehicle(pers, selectedId!),
-                        }));
-
-                    const vehiclePatients = Object.keys(
-                        selectedVehicle.patientIds
-                    )
-                        .map((id) => patients[id]!)
-                        .map((patient) => ({
-                            ...patient,
-                            visibleStatus: Patient.getVisibleStatus(
-                                patient,
-                                configuration.pretriageEnabled,
-                                configuration.bluePatientsEnabled
-                            ),
-                        }));
-
-                    return {
-                        vehicle: selectedVehicle,
-                        personnel: vehiclePersonnel,
-                        patients: vehiclePatients,
-                    };
-                }
-            )
-        );
         this.material$ = this.store.select(
             createSelectElementsInSimulatedRegion(
                 selectMaterials,
                 this.simulatedRegionId
             )
         );
-    }
-
-    selectVehicle(vehicleId: UUID) {
-        this.selectedVehicleId$.next(vehicleId);
     }
 
     private indexOfTemplate(
@@ -249,56 +146,13 @@ export class SimulatedRegionPreviewComponent implements OnInit {
         return index === -1 ? vehicleTemplates.length : index;
     }
 
-    removeVehicle(vehicleId: UUID) {
-        this.exerciseService.proposeAction({
-            type: '[Vehicle] Remove vehicle',
-            vehicleId,
-        });
-    }
-
-    onCardClick(
-        id: UUID,
-        type: SelectionCategory,
-        collapse: boolean,
-        collapseLocked: boolean
-    ) {
-        this.selectedId = id;
-        this.selectionCategory = type;
-        this.detailsIsCollapsed = collapse;
-        this.collapseIsLocked = collapseLocked;
-        // do selection
-        switch (type) {
-            case 'material':
-                this.selectedMaterial$ = this.store.select(
-                    createSelectMaterial(id)
-                );
-                break;
-            case 'personnel':
-                this.selectedPersonnel$ = this.store.select(
-                    createSelectPersonnel(id)
-                );
-                break;
-            case 'vehicle':
-                this.selectedVehicleId$.next(id);
-                break;
-            case 'patient':
-                break;
+    selectElement(element: Material | Patient | Personnel | Vehicle) {
+        const currentlySelected = this.selected();
+        if (currentlySelected?.id === element.id) {
+            this.selected.set(null);
+        } else {
+            this.selected.set(element);
         }
-    }
-
-    moveVehicleToMap(vehicleId: UUID) {
-        this.exerciseService.proposeAction({
-            type: '[Vehicle] Remove from simulated region',
-            vehicleId,
-            simulatedRegionId: this.simulatedRegionId,
-        });
-    }
-
-    public initiateVehicleTransfer(vehicle: Vehicle) {
-        this.startTransferService.initiateNewTransferFor({
-            vehicleToTransfer: vehicle,
-            patientsToTransfer: vehicle.patientIds,
-        });
     }
 
     public close() {

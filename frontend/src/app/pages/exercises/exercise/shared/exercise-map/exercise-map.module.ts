@@ -20,7 +20,6 @@ import { VehiclePopupComponent } from './shared/vehicle-popup/vehicle-popup.comp
 import { ViewportPopupComponent } from './shared/viewport-popup/viewport-popup.component';
 import { PersonnelPopupComponent } from './shared/personnel-popup/personnel-popup.component';
 import { MaterialPopupComponent } from './shared/material-popup/material-popup.component';
-import { CaterCapacityComponent } from './shared/cater-capacity/cater-capacity.component';
 import { SimulatedRegionPopupComponent } from './shared/simulated-region-popup/simulated-region-popup.component';
 import { PatientNameComponent } from './shared/patient-name/patient-name.component';
 import { RestrictedZonePopupComponent } from './shared/restricted-zone-popup/restricted-zone-popup.component';
@@ -36,7 +35,6 @@ import { RestrictedZonePopupComponent } from './shared/restricted-zone-popup/res
         ChooseTransferTargetPopupComponent,
         PersonnelPopupComponent,
         MaterialPopupComponent,
-        CaterCapacityComponent,
         SimulatedRegionPopupComponent,
         PatientNameComponent,
         RestrictedZonePopupComponent,

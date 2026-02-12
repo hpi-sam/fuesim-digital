@@ -7,7 +7,7 @@ export function openPreviewModal(
     simulatedRegionId?: UUID
 ) {
     const modalRef = ngbModalService.open(SimulatedRegionPreviewComponent, {
-        size: 'xl',
+        size: 'xxl',
     });
 
     if (simulatedRegionId) {

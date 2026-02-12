@@ -1,6 +1,4 @@
 import { Component, input, output } from '@angular/core';
-import { Store } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
 
 @Component({
     selector: 'app-simulated-region-preview-card',
@@ -9,8 +7,6 @@ import type { AppState } from 'src/app/state/app.state';
     standalone: false,
 })
 export class SimulatedRegionPreviewCardComponent {
-    constructor(private readonly store: Store<AppState>) {}
-
     readonly elementMousedown = output<MouseEvent>();
 
     dataCy = input<string>('');

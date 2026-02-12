@@ -9,20 +9,6 @@
         ></button>
     </h5>
     <div class="popover-body" style="max-width: 350px">
-        Dieses Material
-        @if ((material.canCaterFor | caterCapacityCount) === 0) {
-            <span>
-                kann nicht zur Versorgung von Patienten genutzt werden.</span
-            >
-        } @else {
-            <span>{{
-                material.canCaterFor.logicalOperator === 'or'
-                    ? ' kann nur bei Patienten einer der unten gelisteten Sichtungskategorie gleichzeitig genutzt werden.'
-                    : ' kann bei Patienten verschiedener Sichtungskategorien gleichzeitig genutzt werden. Dabei kann es zur Versorgung von Patienten einer niedriger priorisierten Sichtungskategorie genutzt werden.'
-            }}</span>
-            <app-cater-capacity
-                [canCaterFor]="material.canCaterFor"
-            ></app-cater-capacity>
-        }
+        <app-material-details [materialId]="material.id" />
     </div>
 }

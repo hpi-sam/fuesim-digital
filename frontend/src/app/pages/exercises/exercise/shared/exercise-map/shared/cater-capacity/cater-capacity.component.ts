@@ -1,6 +1,5 @@
 import { Input, Component } from '@angular/core';
-import type { PatientStatus } from 'digital-fuesim-manv-shared';
-import { CanCaterFor } from 'digital-fuesim-manv-shared';
+import type { PatientStatus, CanCaterFor } from 'digital-fuesim-manv-shared';
 
 @Component({
     selector: 'app-cater-capacity',

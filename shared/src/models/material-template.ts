@@ -14,12 +14,12 @@ export const materialTemplateSchema = z.strictObject({
      * Patients in this range are preferred over patients farther away (even if they are less injured).
      * Guaranteed to be <= {@link maxTreatmentRange}.
      */
-    overrideTreatmentRange: z.int().min(0).max(maxTreatmentRange),
+    overrideTreatmentRange: z.number().min(0).max(maxTreatmentRange),
     /**
      * Only patients in this range around the material's position can be treated.
      * Guaranteed to be <= {@link maxTreatmentRange}.
      */
-    treatmentRange: z.int().min(0).max(maxTreatmentRange),
+    treatmentRange: z.number().min(0).max(maxTreatmentRange),
     image: imagePropertiesSchema,
 });
 export type MaterialTemplate = z.infer<typeof materialTemplateSchema>;

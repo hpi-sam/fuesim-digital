@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { imagePropertiesSchema } from './utils/index.js';
 
 export const vehicleTemplateSchema = z.strictObject({
@@ -12,4 +13,4 @@ export const vehicleTemplateSchema = z.strictObject({
     materialTemplateIds: z.array(z.uuidv4()),
 });
 
-export type VehicleTemplate = z.infer<typeof vehicleTemplateSchema>;
+export type VehicleTemplate = Immutable<z.infer<typeof vehicleTemplateSchema>>;

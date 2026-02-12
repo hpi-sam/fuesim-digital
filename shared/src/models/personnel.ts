@@ -30,13 +30,13 @@ export const personnelSchema = z.strictObject({
      * Guaranteed to be <= {@link maxTreatmentRange}.
      * Setting this to `0` means deactivating this range.
      */
-    overrideTreatmentRange: z.int().min(0).max(maxTreatmentRange),
+    overrideTreatmentRange: z.number().min(0).max(maxTreatmentRange),
     /**
      * Only patients in this range around the personnel's position can be treated.
      * Guaranteed to be <= {@link maxTreatmentRange}.
      * Setting this to `0` means deactivating this range.
      */
-    treatmentRange: z.int().min(0).max(maxTreatmentRange),
+    treatmentRange: z.number().min(0).max(maxTreatmentRange),
     image: imagePropertiesSchema,
     position: positionSchema,
 });

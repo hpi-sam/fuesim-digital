@@ -2,14 +2,14 @@ import type {
     ExerciseState,
     ImageProperties,
     RestrictedZone,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     cloneDeepMutable,
     defaultVehicleTemplates,
     newNoPosition,
     restrictedZoneImage,
     uuid,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { toUtf8Base64 } from './utils/base64';
 
 export interface RestrictedZoneDragTemplate {

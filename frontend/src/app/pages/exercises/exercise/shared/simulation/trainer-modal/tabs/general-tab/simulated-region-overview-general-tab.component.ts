@@ -7,8 +7,8 @@ import type {
     PatientStatus,
     Personnel,
     Vehicle,
-} from 'digital-fuesim-manv-shared';
-import { SimulatedRegion } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { SimulatedRegion } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';

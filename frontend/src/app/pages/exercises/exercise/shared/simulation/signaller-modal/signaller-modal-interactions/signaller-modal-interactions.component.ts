@@ -5,14 +5,14 @@ import type {
     ExerciseRadiogram,
     ExerciseSimulationBehaviorType,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     StrictObject,
     getInformationRequestKeyDetails,
     isAccepted,
     isInterfaceSignallerKeyForClient,
     isUnread,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
 import {
     BehaviorSubject,

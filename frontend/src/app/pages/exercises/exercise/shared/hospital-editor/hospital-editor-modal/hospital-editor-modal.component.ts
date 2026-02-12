@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import { Hospital, catchAllHospitalId } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
+import { Hospital, catchAllHospitalId } from 'fuesim-digital-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { selectHospitals } from 'src/app/state/application/selectors/exercise.selectors';

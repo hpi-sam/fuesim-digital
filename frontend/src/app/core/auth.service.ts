@@ -6,7 +6,7 @@ import {
     AuthQueryParams,
     UserDataResponse,
     userDataResponseSchema,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 

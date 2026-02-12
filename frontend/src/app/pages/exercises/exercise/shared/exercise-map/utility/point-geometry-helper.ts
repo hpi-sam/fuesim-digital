@@ -1,8 +1,8 @@
-import type { WithPosition } from 'digital-fuesim-manv-shared';
+import type { WithPosition } from 'fuesim-digital-shared';
 import {
     currentCoordinatesOf,
     newMapCoordinatesAt,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Feature } from 'ol';
 import { Point } from 'ol/geom';
 import type {

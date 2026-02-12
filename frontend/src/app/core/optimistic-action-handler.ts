@@ -2,7 +2,7 @@ import type {
     Immutable,
     JsonObject,
     SocketResponse,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { isEqual } from 'lodash-es';
 
 /**

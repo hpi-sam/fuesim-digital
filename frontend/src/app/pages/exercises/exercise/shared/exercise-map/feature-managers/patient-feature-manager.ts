@@ -1,6 +1,6 @@
 import type { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import { Patient } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
+import { Patient } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
 import { Fill, Stroke } from 'ol/style';

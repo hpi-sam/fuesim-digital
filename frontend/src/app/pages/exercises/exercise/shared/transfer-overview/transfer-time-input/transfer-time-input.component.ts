@@ -1,6 +1,6 @@
 import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID, Transfer } from 'digital-fuesim-manv-shared';
+import type { UUID, Transfer } from 'fuesim-digital-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { selectCurrentTime } from 'src/app/state/application/selectors/exercise.selectors';

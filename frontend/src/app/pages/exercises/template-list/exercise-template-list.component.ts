@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import type { GetExerciseTemplatesResponseData } from 'digital-fuesim-manv-shared';
+import type { GetExerciseTemplatesResponseData } from 'fuesim-digital-shared';
 import { ApiService } from 'src/app/core/api.service';
 import { HttpResourceRef } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';

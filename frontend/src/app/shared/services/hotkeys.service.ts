@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import { StrictObject, uuid } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
+import { StrictObject, uuid } from 'fuesim-digital-shared';
 import {
     BehaviorSubject,
     combineLatest,

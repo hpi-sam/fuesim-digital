@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import type {
     TransferCategoryCompletedRadiogram,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectRadiogram } from 'src/app/state/application/selectors/exercise.selectors';

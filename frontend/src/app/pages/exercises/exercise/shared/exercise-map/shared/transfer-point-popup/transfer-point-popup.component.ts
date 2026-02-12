@@ -1,7 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { ViewEncapsulation, Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID, TransferPoint } from 'digital-fuesim-manv-shared';
+import type { UUID, TransferPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';

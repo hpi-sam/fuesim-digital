@@ -6,12 +6,12 @@ import type {
     UUID,
     Vehicle,
     VehicleTemplate,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     Patient,
     isInSpecificVehicle,
     SimulatedRegion,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject } from 'rxjs';

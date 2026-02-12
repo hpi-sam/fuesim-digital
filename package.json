@@ -1,5 +1,5 @@
 {
-    "name": "digital-fuesim-manv",
+    "name": "fuesim-digital",
     "version": "0.10.0",
     "type": "module",
     "scripts": {
@@ -29,7 +29,7 @@
         "licensing:third-party-licenses:json": "license-reporter --output frontend/src/assets/source-code/THIRD-PARTY-LICENSE-ACKNOWLEDGEMENTS.json --force",
         "licensing:third-party-licenses:html": "node third-party-license-json-to-html.cjs",
         "licensing:third-party-licenses": "npm-run-all -s -n -c licensing:third-party-licenses:json licensing:third-party-licenses:html",
-        "licensing:source-code-zip-file": "git archive --output=./frontend/src/assets/source-code/digital-fuesim-manv.zip --format=zip HEAD",
+        "licensing:source-code-zip-file": "git archive --output=./frontend/src/assets/source-code/fuesim-digital.zip --format=zip HEAD",
         "licensing:all": "npm-run-all -s -n -c licensing:third-party-licenses licensing:source-code-zip-file"
     },
     "private": true,

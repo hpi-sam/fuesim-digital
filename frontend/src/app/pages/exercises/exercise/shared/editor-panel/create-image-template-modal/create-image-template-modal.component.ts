@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { uuid } from 'digital-fuesim-manv-shared';
+import { uuid } from 'fuesim-digital-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type {
     ChangedImageTemplateValues,

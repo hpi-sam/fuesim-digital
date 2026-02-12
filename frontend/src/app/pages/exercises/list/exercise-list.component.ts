@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import type { GetExercisesResponseData } from 'digital-fuesim-manv-shared';
+import type { GetExercisesResponseData } from 'fuesim-digital-shared';
 import { ApiService } from 'src/app/core/api.service';
 import { HttpResourceRef } from '@angular/common/http';
 import { MessageService } from '../../../core/messages/message.service';

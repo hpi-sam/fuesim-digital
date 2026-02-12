@@ -1,9 +1,5 @@
-import type {
-    ExerciseAction,
-    ExerciseKey,
-    UUID,
-} from 'digital-fuesim-manv-shared';
-import { Client, ClientRole } from 'digital-fuesim-manv-shared';
+import type { ExerciseAction, ExerciseKey, UUID } from 'fuesim-digital-shared';
+import { Client, ClientRole } from 'fuesim-digital-shared';
 import type { ExerciseSocket } from '../exercise-server.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import type { SessionInformation } from '../auth/auth-service.js';

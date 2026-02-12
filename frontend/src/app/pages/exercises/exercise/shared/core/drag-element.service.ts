@@ -7,7 +7,7 @@ import type {
     MapImageTemplate,
     PatientCategory,
     VehicleTemplate,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     uuid,
     createVehicleParameters,
@@ -18,7 +18,7 @@ import {
     Viewport,
     newMapPositionAt,
     newSimulatedRegionPositionIn,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';

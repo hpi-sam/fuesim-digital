@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { ExerciseOccupationType } from 'digital-fuesim-manv-shared';
+import type { ExerciseOccupationType } from 'fuesim-digital-shared';
 
 const occupationNamesDictionary: {
     [key in ExerciseOccupationType]: string;

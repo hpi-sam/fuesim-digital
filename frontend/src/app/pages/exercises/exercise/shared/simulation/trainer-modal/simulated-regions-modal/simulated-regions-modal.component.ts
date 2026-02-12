@@ -2,7 +2,7 @@ import type { OnInit } from '@angular/core';
 import { Component, Input, ViewEncapsulation, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';

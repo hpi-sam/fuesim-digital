@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { difference } from 'lodash-es';
 import {
     combineLatest,

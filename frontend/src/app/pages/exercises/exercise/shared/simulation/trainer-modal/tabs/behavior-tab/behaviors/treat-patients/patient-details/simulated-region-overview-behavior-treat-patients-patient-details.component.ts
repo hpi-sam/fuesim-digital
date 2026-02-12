@@ -1,8 +1,8 @@
 import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
-import { Patient } from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'fuesim-digital-shared';
+import { Patient } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';

@@ -1,5 +1,5 @@
 import { createSelector, type Store } from '@ngrx/store';
-import type { UUID, RestrictedZone } from 'digital-fuesim-manv-shared';
+import type { UUID, RestrictedZone } from 'fuesim-digital-shared';
 import {
     countRestrictedVehiclesInRestrictedZone,
     currentCoordinatesOf,
@@ -7,7 +7,7 @@ import {
     isOnMap,
     newMapCoordinatesAt,
     newSize,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type { Polygon } from 'ol/geom';
 import type OlMap from 'ol/Map';

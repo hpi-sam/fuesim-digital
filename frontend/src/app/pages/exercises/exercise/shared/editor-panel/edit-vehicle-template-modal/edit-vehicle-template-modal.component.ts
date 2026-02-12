@@ -8,8 +8,8 @@ import type {
     VehicleTemplate,
     MaterialTemplate,
     PersonnelTemplate,
-} from 'digital-fuesim-manv-shared';
-import { cloneDeepMutable } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { cloneDeepMutable } from 'fuesim-digital-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import {

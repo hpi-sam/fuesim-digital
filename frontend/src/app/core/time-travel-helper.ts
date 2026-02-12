@@ -1,7 +1,4 @@
-import type {
-    ExerciseState,
-    ExerciseTimeline,
-} from 'digital-fuesim-manv-shared';
+import type { ExerciseState, ExerciseTimeline } from 'fuesim-digital-shared';
 import { BehaviorSubject } from 'rxjs';
 import { TimeJumpHelper } from './time-jump-helper';
 

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { assertExhaustiveness } from 'digital-fuesim-manv-shared';
+import { assertExhaustiveness } from 'fuesim-digital-shared';
 import type { AppState } from '../state/app.state';
 import {
     selectExerciseId,

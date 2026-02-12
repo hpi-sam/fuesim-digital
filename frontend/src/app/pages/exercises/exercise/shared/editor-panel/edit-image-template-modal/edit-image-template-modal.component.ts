@@ -2,11 +2,7 @@ import type { OnInit } from '@angular/core';
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import type {
-    MapImageTemplate,
-    Mutable,
-    UUID,
-} from 'digital-fuesim-manv-shared';
+import type { MapImageTemplate, Mutable, UUID } from 'fuesim-digital-shared';
 import { cloneDeep } from 'lodash-es';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';

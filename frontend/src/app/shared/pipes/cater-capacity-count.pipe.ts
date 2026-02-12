@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { CanCaterFor } from 'digital-fuesim-manv-shared';
+import type { CanCaterFor } from 'fuesim-digital-shared';
 
 @Pipe({
     name: 'caterCapacityCount',

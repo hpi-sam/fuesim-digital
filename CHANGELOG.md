@@ -349,19 +349,19 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.10.0...HEAD
-[0.10.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.9.0...v0.10.0
-[0.9.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.1...v0.9.0
-[0.8.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.0...v0.8.1
-[0.8.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.1...v0.8.0
-[0.7.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.0...v0.7.1
-[0.7.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.5.1...v0.6.0
-[0.5.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.5.0...v0.5.1
-[0.5.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.2.1...v0.3.0
-[0.2.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.0.0...v0.1.0
-[0.0.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/37bd43bc1beb4aa9ad597b1ac763dd71b5709737...v0.0.0
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.9.0...v0.10.0
+[0.9.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.8.1...v0.9.0
+[0.8.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.7.1...v0.8.0
+[0.7.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.5.1...v0.6.0
+[0.5.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.0.0...v0.1.0
+[0.0.0]: https://github.com/hpi-sam/fuesim-digital/compare/37bd43bc1beb4aa9ad597b1ac763dd71b5709737...v0.0.0

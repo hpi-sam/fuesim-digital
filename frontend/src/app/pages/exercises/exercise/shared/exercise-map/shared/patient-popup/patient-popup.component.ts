@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Component, OnInit, inject } from '@angular/core';
-import type { Patient, UUID } from 'digital-fuesim-manv-shared';
+import type { Patient, UUID } from 'fuesim-digital-shared';
 import { AppState } from 'src/app/state/app.state';
 import { createSelectPatient } from 'src/app/state/application/selectors/exercise.selectors';
 import { PopupService } from '../../utility/popup.service';

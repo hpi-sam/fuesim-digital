@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { uuid } from 'digital-fuesim-manv-shared';
+import { uuid } from 'fuesim-digital-shared';
 import { ActiveExercise } from '../src/exercise/active-exercise.js';
 import { createExercise, createTestEnvironment } from './utils.js';
 

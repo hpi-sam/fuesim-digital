@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { jest } from '@jest/globals';
-import { generateDummyPatient, sleep } from 'digital-fuesim-manv-shared';
+import { generateDummyPatient, sleep } from 'fuesim-digital-shared';
 import { ActiveExercise } from '../src/exercise/active-exercise.js';
 import { createExercise, createTestEnvironment } from './utils.js';
 

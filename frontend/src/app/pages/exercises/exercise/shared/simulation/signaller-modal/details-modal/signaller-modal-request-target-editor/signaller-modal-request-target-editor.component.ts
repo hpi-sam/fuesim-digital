@@ -5,11 +5,11 @@ import type {
     ExerciseRequestTargetConfiguration,
     RequestBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     SimulatedRegionRequestTargetConfiguration,
     TraineesRequestTargetConfiguration,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';

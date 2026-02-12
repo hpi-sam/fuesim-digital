@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import type {
     MissingTransferConnectionRadiogram,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';

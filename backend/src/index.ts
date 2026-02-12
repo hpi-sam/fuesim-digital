@@ -1,5 +1,5 @@
 import * as util from 'node:util';
-import { ReducerError } from 'digital-fuesim-manv-shared';
+import { ReducerError } from 'fuesim-digital-shared';
 import { DatabaseService } from './database/services/database-service.js';
 import { ValidationErrorWrapper } from './utils/validation-error-wrapper.js';
 import { RestoreError } from './utils/restore-error.js';

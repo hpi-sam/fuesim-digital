@@ -47,7 +47,7 @@ import type {
     SocketResponse,
     ExerciseAction,
     JoinExerciseResponseDataInput,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { io } from 'socket.io-client';
 
 export function dragToMap(

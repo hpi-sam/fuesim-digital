@@ -7,10 +7,10 @@ import {
     PartialExport,
     migratePartialExport,
     validateExerciseExport,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
 import { MessageService } from 'src/app/core/messages/message.service';
-import type { PatientCategory, UUID } from 'digital-fuesim-manv-shared';
+import type { PatientCategory, UUID } from 'fuesim-digital-shared';
 import type { AppState } from 'src/app/state/app.state';
 import {
     selectVehicleTemplates,

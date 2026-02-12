@@ -3,7 +3,7 @@ import {
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     postExerciseTemplateRequestDataSchema,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';

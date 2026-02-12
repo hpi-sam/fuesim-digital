@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { currentTransferOf, UUID } from 'digital-fuesim-manv-shared';
+import { currentTransferOf, UUID } from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
 import type { AppState } from 'src/app/state/app.state';
 import {

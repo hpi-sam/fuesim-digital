@@ -1,8 +1,8 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
-import { Patient } from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'fuesim-digital-shared';
+import { Patient } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';

@@ -9,12 +9,12 @@ import type {
     ExerciseState,
     UUID,
     WithPosition,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     isInSpecificSimulatedRegion,
     isInTransfer,
     nestedCoordinatesOf,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { TransferLine } from 'src/app/shared/types/transfer-line';
 import type { AppState } from '../../app.state';
 

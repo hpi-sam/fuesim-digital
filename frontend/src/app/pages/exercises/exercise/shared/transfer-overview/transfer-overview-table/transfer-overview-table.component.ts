@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { currentTransferOf } from 'digital-fuesim-manv-shared';
+import { currentTransferOf } from 'fuesim-digital-shared';
 import type { AppState } from 'src/app/state/app.state';
 import {
     selectExerciseStatus,

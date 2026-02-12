@@ -5,8 +5,8 @@ import type {
     UnloadArrivingVehiclesBehaviorState,
     UnloadVehicleActivityState,
     UUID,
-} from 'digital-fuesim-manv-shared';
-import { StrictObject } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { StrictObject } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { ExerciseService } from 'src/app/core/exercise.service';

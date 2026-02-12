@@ -5,8 +5,8 @@ import type {
     AfterViewInit,
 } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
-import type { LogEntry, Tag } from 'digital-fuesim-manv-shared';
-import { StrictObject } from 'digital-fuesim-manv-shared';
+import type { LogEntry, Tag } from 'fuesim-digital-shared';
+import { StrictObject } from 'fuesim-digital-shared';
 import { difference } from 'lodash-es';
 import { Subject, takeUntil } from 'rxjs';
 import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';

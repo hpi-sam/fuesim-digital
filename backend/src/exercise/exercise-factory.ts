@@ -4,7 +4,7 @@ import type {
     ExerciseAction,
     ParticipantKey,
     TrainerKey,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     ExerciseState,
     applyAction,
@@ -16,7 +16,7 @@ import {
     validateExerciseExport,
     isParticipantKey,
     isTrainerKey,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { InferSelectModel } from 'drizzle-orm';
 import { Config } from '../config.js';
 import type {

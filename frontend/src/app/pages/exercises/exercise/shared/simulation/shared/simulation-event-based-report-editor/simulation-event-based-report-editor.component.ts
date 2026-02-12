@@ -5,8 +5,8 @@ import type {
     ReportBehaviorState,
     SimulationBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
-import { StrictObject } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { StrictObject } from 'fuesim-digital-shared';
 import {
     map,
     of,

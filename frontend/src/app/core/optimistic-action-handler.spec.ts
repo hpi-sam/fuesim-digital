@@ -1,4 +1,4 @@
-import type { SocketResponse } from 'digital-fuesim-manv-shared';
+import type { SocketResponse } from 'fuesim-digital-shared';
 import { OptimisticActionHandler } from './optimistic-action-handler';
 
 class AddLetterAction {

@@ -1,6 +1,6 @@
-Copyright (c) 2023 See the [README.md](README.md#contributors) for authors/contributors (bottom of the document).
+Copyright (c) 2021-2026 See the [README.md](README.md#contributors) for authors/contributors (bottom of the document).
 
-This software is a digital implementation of the "FüSim MANV"/"FueSim MANV" (Führungssimulation Massenanfall von Verletzen), a German paper-based simulation game for training emergency medical services leadership personnel in managing Mass Casualty Incidents.
+This software is based on the "FüSim MANV" (Führungssimulation Massenanfall von Verletzen), a German paper-based simulation game for training emergency medical services leadership personnel in managing Mass Casualty Incidents.
 
 The software is licensed under the [GNU Affero General Public License](LICENSE.md) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 Exceptions apply to image files in the frontend/src/assets folder (or subfolders), which may be covered by and therefore distributed under different licenses.
@@ -9,12 +9,12 @@ Another exception to the default licence exists for datasets. Datasets are files
 Datasets are not allowed to create any new features or enhance the software in any way, as to create elements that can be part of an export and are importable into this software, with its source code being under the [GNU Affero General Public License](LICENSE.md) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. Especially, you must not use this exception for source code files.
 All exceptions can be part of another license chosen by the author of these images or datasets.
 
-Digital FueSim MANV is free software: you can redistribute it and/or modify
+FüSim Digital is free software: you can redistribute it and/or modify
 it under the terms of the [GNU Affero General Public License](LICENSE.md) as published by
 the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version. Exceptions are mentioned in this file [LICENSE-README.md](LICENSE-README.md).
+(at your option) any later version. Exceptions are mentioned in this file.
 
-Digital FueSim MANV is distributed in the hope that it will be useful,
+FüSim Digital is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.

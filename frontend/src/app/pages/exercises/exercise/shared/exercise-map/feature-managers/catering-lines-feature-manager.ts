@@ -11,7 +11,7 @@ import type { CateringLine } from 'src/app/shared/types/catering-line';
 import type { AppState } from 'src/app/state/app.state';
 import { selectVisibleCateringLines } from 'src/app/state/application/selectors/shared.selectors';
 // eslint-disable-next-line @typescript-eslint/no-shadow
-import type { Element } from 'digital-fuesim-manv-shared';
+import type { Element } from 'fuesim-digital-shared';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { LineStyleHelper } from '../utility/style-helper/line-style-helper';

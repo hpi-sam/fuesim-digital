@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import type { Sort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
-import { statusNames } from 'digital-fuesim-manv-shared';
+import { statusNames } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, startWith, Subject } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';

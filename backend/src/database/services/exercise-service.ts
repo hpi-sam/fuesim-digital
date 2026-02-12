@@ -3,7 +3,7 @@ import {
     isTrainerKey,
     type ExerciseKey,
     type ExerciseTimeline,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import type { ClientWrapper } from '../../exercise/client-wrapper.js';

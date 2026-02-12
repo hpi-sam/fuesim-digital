@@ -3,7 +3,7 @@ import type {
     ExerciseAction,
     ExerciseState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 
 export const createStartTimeTravelAction = createAction(
     '[Application] Start time travel',

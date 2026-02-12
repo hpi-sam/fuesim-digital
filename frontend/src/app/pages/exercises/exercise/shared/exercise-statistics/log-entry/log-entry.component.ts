@@ -1,5 +1,5 @@
 import { Component, Input, inject } from '@angular/core';
-import { LogEntry } from 'digital-fuesim-manv-shared';
+import { LogEntry } from 'fuesim-digital-shared';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
 
 @Component({

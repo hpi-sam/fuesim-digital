@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PatientStatusCode } from 'digital-fuesim-manv-shared';
+import { PatientStatusCode } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-patient-status-display',

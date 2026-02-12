@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { ColorCode } from 'digital-fuesim-manv-shared';
+import type { ColorCode } from 'fuesim-digital-shared';
 
 const colorCodeMap = {
     V: 'black',

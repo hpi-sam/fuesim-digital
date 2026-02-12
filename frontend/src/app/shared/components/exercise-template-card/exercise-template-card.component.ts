@@ -2,7 +2,7 @@ import { Component, input, output, inject } from '@angular/core';
 import type {
     GetExerciseTemplateResponseData,
     PostExerciseTemplateRequestData,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Router } from '@angular/router';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';

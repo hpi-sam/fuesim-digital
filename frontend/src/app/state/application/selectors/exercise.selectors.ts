@@ -40,12 +40,16 @@ export const selectVehicles = selectPropertyFactory('vehicles');
 export const selectPersonnel = selectPropertyFactory('personnel');
 export const selectAlarmGroups = selectPropertyFactory('alarmGroups');
 export const selectMaterials = selectPropertyFactory('materials');
+export const selectTasks = selectPropertyFactory('tasks');
 export const selectTransferPoints = selectPropertyFactory('transferPoints');
 export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
 export const selectRadiograms = selectPropertyFactory('radiograms');
 export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
+export const selectTechnicalChallenges = selectPropertyFactory(
+    'technicalChallenges'
+);
 export const selectVehicleTemplates = selectPropertyFactory('vehicleTemplates');
 export const selectPersonnelTemplates =
     selectPropertyFactory('personnelTemplates');
@@ -83,6 +87,7 @@ export const createSelectPersonnel =
     createSelectElementFromMapFactory(selectPersonnel);
 export const createSelectMaterial =
     createSelectElementFromMapFactory(selectMaterials);
+export const createSelectTask = createSelectElementFromMapFactory(selectTasks);
 export const createSelectPatient =
     createSelectElementFromMapFactory(selectPatients);
 export const createSelectVehicle =
@@ -100,6 +105,9 @@ export const createSelectRestrictedZone = createSelectElementFromMapFactory(
 );
 export const createSelectSimulatedRegion = createSelectElementFromMapFactory(
     selectSimulatedRegions
+);
+export const createSelectTechnicalChallenge = createSelectElementFromMapFactory(
+    selectTechnicalChallenges
 );
 export const createSelectClient =
     createSelectElementFromMapFactory(selectClients);

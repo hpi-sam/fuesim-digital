@@ -56,7 +56,8 @@ import {
     catchAllHospitalId,
     defaultPatientCategories,
     defaultMapImagesTemplatesById,
- defaultVehicleTemplatesById } from './data/index.js';
+    defaultVehicleTemplatesById,
+} from './data/index.js';
 import { IsZodSchema } from './utils/validators/is-zod-object.js';
 import { vehicleSchema } from './models/vehicle.js';
 import type { TreatmentAssignment } from './store/index.js';
@@ -82,6 +83,7 @@ import {
 import { patientSchema } from './models/patient.js';
 import { hospitalPatientSchema } from './models/hospital-patient.js';
 import { patientCategorySchema } from './models/patient-category.js';
+import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -137,7 +139,7 @@ export class ExerciseState {
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
 
     @IsZodSchema(z.record(z.uuidv4(), taskSchema))
-    public tasks: { [key: UUID]: Task } = {};
+    public tasks: { [key: UUID]: Task } = getDefaultTasks();
 
     @IsZodSchema(z.record(z.uuidv4(), technicalChallengeSchema))
     public technicalChallenges: { [key: UUID]: TechnicalChallenge } = {};

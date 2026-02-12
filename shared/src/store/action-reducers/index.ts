@@ -9,5 +9,6 @@ export * from './map-image.js';
 export * from './action-reducers.js';
 export * from './vehicle-templates.js';
 export * from './restricted-zone.js';
+export * from './technical-challenge.js';
 
 // Don't forget to register the actionReducer in `action-reducers.ts`

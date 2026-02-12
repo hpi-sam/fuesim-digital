@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { uuidSchema } from '../../utils/index.js';
 import { positionSchema, imagePropertiesSchema } from '../utils/index.js';
+import { personnelSchema } from '../personnel.js';
+import { taskSchema } from '../task.js';
 import {
     stateMachineSchema,
     technicalChallengeStateIdSchema,
@@ -18,8 +20,9 @@ export const technicalChallengeSchema = z.strictObject({
     templateId: uuidSchema,
     image: imagePropertiesSchema,
     position: positionSchema,
-    taskProgress: z.record(z.uuidv4(), z.number()),
+    taskProgress: z.record(taskSchema.shape.id, z.number()),
     currentStateId: technicalChallengeStateIdSchema,
+    assignedPersonnel: z.record(personnelSchema.shape.id, taskSchema.shape.id),
     ...stateMachineSchema.shape,
 });
 

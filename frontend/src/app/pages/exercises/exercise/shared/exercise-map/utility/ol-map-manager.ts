@@ -25,6 +25,7 @@ import { SimulatedRegionFeatureManager } from '../feature-managers/simulated-reg
 import { TransferLinesFeatureManager } from '../feature-managers/transfer-lines-feature-manager';
 import { TransferPointFeatureManager } from '../feature-managers/transfer-point-feature-manager';
 import { VehicleFeatureManager } from '../feature-managers/vehicle-feature-manager';
+import { TechnicalChallengeFeatureManager } from '../feature-managers/technical-challenge-feature-manager';
 import { ViewportFeatureManager } from '../feature-managers/viewport-feature-manager';
 import { RestrictedZoneFeatureManager } from '../feature-managers/restricted-zone-feature-manager';
 import type { AppState } from '../../../../../../state/app.state';
@@ -355,6 +356,15 @@ export class OlMapManager {
             this.popupService
         );
 
+        const technicalChallengeFeatureManager =
+            new TechnicalChallengeFeatureManager(
+                this.olMap,
+                this,
+                this.exerciseService,
+                this.store,
+                this.popupService
+            );
+
         const viewportFeatureManager = new ViewportFeatureManager(
             this.olMap,
             this.exerciseService,
@@ -382,6 +392,7 @@ export class OlMapManager {
             restrictedZoneFeatureManager,
             transferLinesFeatureManager,
             simulatedRegionFeatureManager,
+            technicalChallengeFeatureManager,
             mapImageFeatureManager,
             transferPointFeatureManager,
             vehicleFeatureManager,
@@ -431,6 +442,10 @@ export class OlMapManager {
         this.featureNameFeatureManagerDictionary.set(
             'restrictedZone',
             restrictedZoneFeatureManager
+        );
+        this.featureNameFeatureManagerDictionary.set(
+            'technicalChallenge',
+            technicalChallengeFeatureManager
         );
         this.featureNameFeatureManagerDictionary.set(
             'delete',

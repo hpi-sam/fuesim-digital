@@ -389,6 +389,45 @@
                         </div>
                     </div>
                 </div>
+                <div ngbAccordionItem="technicalChallenges">
+                    <h5 ngbAccordionHeader>
+                        <button
+                            ngbAccordionButton
+                            data-cy="technicalChallengesAccordianButton"
+                        >
+                            Herausforderungen
+                        </button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="cards">
+                                    @for (
+                                        template of technicalChallengeTemplates$();
+                                        track template.id
+                                    ) {
+                                        <app-map-editor-card
+                                            (elementMousedown)="
+                                                dragElementService.onMouseDown(
+                                                    $event,
+                                                    {
+                                                        type: 'technicalChallenge',
+                                                        template: template,
+                                                    }
+                                                )
+                                            "
+                                            dataCy="draggableMapImageDiv"
+                                            [imageUrl]="template.image.url"
+                                            [title]="template.name"
+                                            [enableEditButton]="true"
+                                        >
+                                        </app-map-editor-card>
+                                    }
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
                 <div ngbAccordionItem="images">
                     <h5 ngbAccordionHeader>
                         <button

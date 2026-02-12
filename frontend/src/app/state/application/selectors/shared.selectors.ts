@@ -11,6 +11,7 @@ import type {
     WithPosition,
     RestrictedZone,
     Viewport,
+    TechnicalChallenge,
 } from 'fuesim-digital-shared';
 import {
     currentCoordinatesOf,
@@ -32,6 +33,7 @@ import {
     selectTransferPoints,
     selectVehicles,
     selectViewports,
+    selectTechnicalChallenges,
 } from './exercise.selectors';
 
 /**
@@ -116,6 +118,8 @@ export const selectVisibleMapImages = selectVisibleElementsFactory<MapImage>(
     // TODO: MapImages could get very big. Therefore its size must be taken into account. The current implementation is a temporary solution.
     (element, viewport) => true
 );
+export const selectVisibleTechnicalChallenges =
+    selectVisibleElementsFactory<TechnicalChallenge>(selectTechnicalChallenges);
 export const selectVisibleTransferPoints =
     selectVisibleElementsFactory<TransferPoint>(selectTransferPoints);
 export const selectVisibleSimulatedRegions =

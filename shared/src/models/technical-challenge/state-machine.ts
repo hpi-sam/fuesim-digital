@@ -1,8 +1,11 @@
 import { z } from 'zod';
 import type { WritableDraft } from 'immer';
+import type { UUID } from '../../utils/index.js';
 import { uuid, uuidSchema } from '../../utils/index.js';
 import type { ExerciseState } from '../../state.js';
 import { taskSchema } from '../task.js';
+import type { ImageProperties } from '../utils/index.js';
+import { imagePropertiesSchema } from '../utils/index.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,
@@ -18,33 +21,48 @@ export type TechnicalChallengeStateId = z.infer<
 export const technicalChallengeStateSchema = z.object({
     id: technicalChallengeStateIdSchema,
     title: z.string(),
+    mapImage: imagePropertiesSchema,
+    possibleTasks: z.record(taskSchema.shape.id, z.number()),
 });
 export type TechnicalChallengeState = z.infer<
     typeof technicalChallengeStateSchema
 >;
 
 export function createTechnicalChallengeState(
-    title: string
+    title: string,
+    mapImage: ImageProperties,
+    possibleTasks: { [key: UUID]: number } = {}
 ): TechnicalChallengeState {
     return {
         id: uuid() as TechnicalChallengeStateId,
         title,
+        mapImage,
+        possibleTasks: {},
     };
 }
 
-export const progressGuardSchema = z.object({
+const progressGuardSchema = z.object({
     type: z.literal('ProgressGuard'),
     minProgress: z.number().optional(),
     maxProgress: z.number().optional(),
     taskId: uuidSchema,
+    name: z.string().optional(),
 });
 export type ProgressGuard = z.infer<typeof progressGuardSchema>;
+
+const timerGuardSchema = z.object({
+    type: z.literal('TimerGuard'),
+    /** Time in exercise time */
+    minTimePassed: z.number().nonnegative(),
+    name: z.string().optional(),
+});
+export type TimerGuard = z.infer<typeof timerGuardSchema>;
 
 const isProgressGuardFulfilled = (
     progressGuard: ProgressGuard,
     technicalChallengeId: TechnicalChallengeId,
     exerciseState: ExerciseState
-) => {
+): boolean => {
     const challenge = exerciseState.technicalChallenges[technicalChallengeId];
     console.assert(
         challenge,
@@ -57,8 +75,13 @@ const isProgressGuardFulfilled = (
     );
 };
 
-export const guardSchema = z.union([progressGuardSchema]);
-export type Guard = ProgressGuard;
+const isTimerGuardFulfilled = (
+    timerGuard: TimerGuard,
+    exerciseState: ExerciseState
+): boolean => exerciseState.currentTime >= timerGuard.minTimePassed;
+
+export const guardSchema = z.union([progressGuardSchema, timerGuardSchema]);
+export type Guard = ProgressGuard | TimerGuard;
 
 export const transitionSchema = z.object({
     to: technicalChallengeStateIdSchema,
@@ -80,8 +103,9 @@ export const isGuardFulfilled = (
                 technicalChallengeId,
                 exerciseState
             );
+        case 'TimerGuard':
+            return isTimerGuardFulfilled(guard, exerciseState);
     }
-    throw TypeError(`Unknown guard type: ${guard.type}`, { cause: guard });
 };
 
 export const stateMachineSchema = z.strictObject({
@@ -90,10 +114,32 @@ export const stateMachineSchema = z.strictObject({
     transitions: z.array(transitionSchema),
 });
 
+const getStateOf = (
+    technicalChallenge: TechnicalChallenge,
+    stateId: TechnicalChallengeStateId
+): TechnicalChallengeState | undefined =>
+    technicalChallenge.states.find((state) => state.id === stateId);
+export const currentStateOf = (
+    technicalChallenge: TechnicalChallenge
+): TechnicalChallengeState =>
+    getStateOf(technicalChallenge, technicalChallenge.currentStateId)!;
+
 export const simulateTechnicalChallenge = (
     technicalChallenge: TechnicalChallenge,
-    exerciseState: WritableDraft<ExerciseState>
+    exerciseState: WritableDraft<ExerciseState>,
+    tickInterval: number
 ) => {
+    const state = currentStateOf(technicalChallenge);
+    for (const taskId of Object.values(technicalChallenge.assignedPersonnel)) {
+        if (state.possibleTasks[taskId]) {
+            technicalChallenge.taskProgress[taskId] ??= 0;
+            technicalChallenge.taskProgress[taskId] +=
+                tickInterval * state.possibleTasks[taskId];
+        }
+
+        // TODO: think about what happens when the tick interval is > 1000
+    }
+
     const fromCurrentState = (t: Transition) =>
         t.from === technicalChallenge.currentStateId;
     const guardFulfilled = (t: Transition) =>
@@ -108,10 +154,11 @@ export const simulateTechnicalChallenge = (
     technicalChallenge.currentStateId = nextTransition.to;
 };
 
-export const tickAllTechnicalChallenges = (
-    draftState: WritableDraft<ExerciseState>
+export const simulateAllTechnicalChallenges = (
+    draftState: WritableDraft<ExerciseState>,
+    tickInterval: number
 ) => {
     Object.values(draftState.technicalChallenges).forEach((challenge) =>
-        simulateTechnicalChallenge(challenge, draftState)
+        simulateTechnicalChallenge(challenge, draftState, tickInterval)
     );
 };

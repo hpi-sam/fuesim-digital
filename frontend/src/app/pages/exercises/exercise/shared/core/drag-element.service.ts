@@ -6,6 +6,8 @@ import type {
     ImageProperties,
     MapImageTemplate,
     PatientCategory,
+    TechnicalChallenge,
+    TechnicalChallengeTemplate,
     VehicleTemplate,
 } from 'fuesim-digital-shared';
 import {
@@ -19,6 +21,8 @@ import {
     defaultViewportSize,
     newTransferPoint,
     newPatientFromTemplate,
+    CreateTechnicalChallengeAction,
+    createTechnicalChallengeFromTemplate,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -315,7 +319,22 @@ export class DragElementService {
                 }
                 break;
 
+            case 'technicalChallenge': {
+                const technicalChallenge: TechnicalChallenge =
+                    createTechnicalChallengeFromTemplate(
+                        this.transferringTemplate.template
+                    );
+                technicalChallenge.position = newMapPositionAt(position);
+                this.exerciseService.proposeAction({
+                    type: '[TechnicalChallenge] Create technical challenge',
+                    technicalChallenge,
+                } satisfies CreateTechnicalChallengeAction);
+                createdElement = technicalChallenge;
+                break;
+            }
             default:
+                // TODO: do template-types exist, where we do not want a mousup
+                //       action?
                 break;
         }
 
@@ -386,6 +405,10 @@ type TransferTemplate =
     | {
           type: 'simulatedRegion';
           template: SimulatedRegionDragTemplate;
+      }
+    | {
+          type: 'technicalChallenge';
+          template: TechnicalChallengeTemplate;
       }
     | {
           type: 'transferPoint';

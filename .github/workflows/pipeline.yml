@@ -29,6 +29,9 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
+              with:
+                  cache-only: true
+                  download-shared: false
 
     audit-dependencies:
         timeout-minutes: 10
@@ -41,6 +44,8 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
+              with:
+                  download-shared: false
             - name: Audit root
               if: always()
               run: npm audit
@@ -68,6 +73,7 @@ jobs:
             - uses: ./.github/actions/setup-install
               with:
                   install-command: cd shared && npm ci --no-audit
+                  download-shared: false
             - name: Build shared
               run: cd shared && npm run build
             - name: Upload shared dist
@@ -87,7 +93,6 @@ jobs:
             - uses: ./.github/actions/setup-install
               with:
                   install-command: (cd shared && npm ci --no-audit) && (cd frontend && npm ci --no-audit)
-                  download-shared: true
             - name: Build frontend
               run: cd frontend && npm run build
 
@@ -102,7 +107,6 @@ jobs:
             - uses: ./.github/actions/setup-install
               with:
                   install-command: (cd shared && npm ci --no-audit) && (cd backend && npm ci --no-audit)
-                  download-shared: true
             - name: Build backend
               run: cd backend && npm run build
 
@@ -115,8 +119,6 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
-              with:
-                  download-shared: true
             - name: Run ESLint
               run: npm run lint
             - name: Run Prettier
@@ -150,8 +152,6 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
-              with:
-                  download-shared: true
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
             - name: Create .env
@@ -214,9 +214,6 @@ jobs:
               with:
                   submodules: true
             - uses: ./.github/actions/setup-install
-              with:
-                  download-shared: true
-                  submodules: true
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
             - name: Create .env
@@ -267,8 +264,6 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-install
-              with:
-                  download-shared: true
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
             - name: Create .env

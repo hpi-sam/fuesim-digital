@@ -1,1 +1,0 @@
-# plcaeholderfile - empty by default gets overwritten via docker-entrypoint.sh - cert locations depend on DFM_PERSISTENT_DATA_PATH

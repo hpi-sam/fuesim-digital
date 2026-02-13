@@ -1,6 +1,7 @@
 services:
     app:
         depends_on:
+            # - authelia # for development setup only
             - db
         image: ghcr.io/hpi-sam/fuesim-digital
         # Use this to build the container for yourself:
@@ -8,19 +9,15 @@ services:
         #    context: .
         #    dockerfile: docker/Dockerfile
         restart: unless-stopped
-        container_name: fuesim-digital
         ports:
             - 80:80
-        # uncomment port 443 if HTTPS is used
-        #    - 443:443
         env_file:
             - .env
-        volumes:
-            - data:/${DFM_PERSISTENT_DATA_PATH}
-            # To overwrite the contents of the about pages, mount a directory into the container
-            # The directory can contain terms.html, license.html, privacy.html and imprint.html
-            # Example
-            # - ./about:/usr/local/app/frontend/dist/fuesim-digital/assets/about
+        # To overwrite the contents of the about pages, mount a directory into the container
+        # The directory can contain terms.html, license.html, privacy.html and imprint.html
+        # Example
+        # - ./about:/usr/local/app/frontend/assets/about
+        # volumes:
     db:
         image: postgres:14
         volumes:
@@ -45,6 +42,4 @@ services:
 volumes:
     # database is in this volume
     db:
-    # needed to keep persistency, right now SSL
-    data:
     authelia-secrets:

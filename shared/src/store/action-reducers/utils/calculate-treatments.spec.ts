@@ -77,7 +77,10 @@ describe('calculate treatment', () => {
     it('does nothing when there is only personnel outside vehicle', () => {
         const { beforeState, newState } = setupStateAndApplyTreatments(
             (state) => {
-                addPersonnel(state, createNotSan(newVehiclePositionIn('')));
+                addPersonnel(
+                    state,
+                    createNotSan(newMapPositionAt({ x: 0, y: 0 }))
+                );
             }
         );
         expect(newState).toStrictEqual(beforeState);
@@ -86,7 +89,7 @@ describe('calculate treatment', () => {
     it('does nothing when there is only material in vehicle', () => {
         const { beforeState, newState } = setupStateAndApplyTreatments(
             (state) => {
-                addMaterial(state, newMapPositionAt({ x: 0, y: 0 }));
+                addMaterial(state, newVehiclePositionIn(''));
             }
         );
         expect(newState).toStrictEqual(beforeState);
@@ -262,7 +265,7 @@ describe('calculate treatment', () => {
         assertCatering(beforeState, newState, []);
     });
 
-    it('treats both patients when there is capacity', () => {
+    it('treats multiple patients when there is capacity', () => {
         const ids = {
             material: '',
             greenPatient: '',

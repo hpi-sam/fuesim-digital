@@ -2,7 +2,7 @@ services:
     app:
         depends_on:
             - db
-        image: digitalfuesimmanv/dfm
+        image: ghcr.io/hpi-sam/fuesim-digital
         # Use this to build the container for yourself:
         #build:
         #    context: .

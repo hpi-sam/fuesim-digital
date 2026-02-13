@@ -16,13 +16,13 @@ jobs:
             commit: ${{ steps.create-commit.outputs.commit }}
         steps:
             - name: Check out code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v6
             - name: Create release branch
               run: git checkout -b release/v${{ github.event.inputs.versionName }}
             - name: Initialize git config
               run: |
-                  git config user.name "GitHub Actions"
-                  git config user.email noreply@github.com
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             - name: Cache node modules
               uses: ./.github/actions/cache-build
               with:
@@ -51,7 +51,7 @@ jobs:
             pull-requests: write
         steps:
             - name: Check out code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v6
               with:
                   ref: release/v${{ github.event.inputs.versionName }}
             - name: Create pull request into main

@@ -1,8 +1,8 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Vehicle, VehicleTemplate } from 'digital-fuesim-manv-shared';
-import { SimulatedRegion } from 'digital-fuesim-manv-shared';
+import type { Vehicle, VehicleTemplate } from 'fuesim-digital-shared';
+import { SimulatedRegion } from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject } from 'rxjs';

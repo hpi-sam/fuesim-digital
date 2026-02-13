@@ -1,6 +1,6 @@
 import { input, OnInit, Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Material, UUID } from 'digital-fuesim-manv-shared';
+import type { Material, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectMaterial } from 'src/app/state/application/selectors/exercise.selectors';

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { createSelector, Store } from '@ngrx/store';
-import { Patient, SimulatedRegion } from 'digital-fuesim-manv-shared';
+import { Patient, SimulatedRegion } from 'fuesim-digital-shared';
 import { combineLatest, Observable, map } from 'rxjs';
 import { AppState } from 'src/app/state/app.state';
 import type {
@@ -10,7 +10,7 @@ import type {
     UUID,
     Vehicle,
     VehicleTemplate,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     createSelectElementsInSimulatedRegion,
     createSelectSimulatedRegion,

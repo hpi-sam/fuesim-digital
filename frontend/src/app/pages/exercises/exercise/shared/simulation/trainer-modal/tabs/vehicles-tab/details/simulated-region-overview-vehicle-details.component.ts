@@ -1,12 +1,12 @@
 import type { OnInit } from '@angular/core';
 import { Component, Input, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Personnel, Vehicle } from 'digital-fuesim-manv-shared';
+import type { Personnel, Vehicle } from 'fuesim-digital-shared';
 import {
     Patient,
     isInSpecificVehicle,
     SimulatedRegion,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';

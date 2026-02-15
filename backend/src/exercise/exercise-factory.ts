@@ -54,6 +54,17 @@ export class ExerciseFactory {
         );
     }
 
+    public static fromBlankTemplate() {
+        const activeExercise = this.fromBlank();
+        const adaptedStateString = {
+            ...activeExercise.getExercise().initialStateString,
+            isTemplate: true,
+        };
+        activeExercise.getExercise().initialStateString = adaptedStateString;
+        activeExercise.getExercise().currentStateString = adaptedStateString;
+        return activeExercise;
+    }
+
     /**
      * @param file A **valid** import file
      */
@@ -161,10 +172,12 @@ export class ExerciseFactory {
             {
                 ...exercise.initialStateString,
                 participantId: exerciseKeys.participantKey,
+                isTemplate: false,
             },
             {
                 ...exercise.currentStateString,
                 participantId: exerciseKeys.participantKey,
+                isTemplate: false,
             }
         );
         pushAll(

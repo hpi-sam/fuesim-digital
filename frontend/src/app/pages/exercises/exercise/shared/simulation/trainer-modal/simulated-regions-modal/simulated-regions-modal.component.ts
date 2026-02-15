@@ -6,7 +6,10 @@ import type { UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import type { AppState } from 'src/app/state/app.state';
-import { selectSimulatedRegions } from 'src/app/state/application/selectors/exercise.selectors';
+import {
+    selectIsTemplate,
+    selectSimulatedRegions,
+} from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-regions-modal',
@@ -20,6 +23,7 @@ export class SimulatedRegionsModalComponent implements OnInit {
     readonly store = inject<Store<AppState>>(Store);
 
     simulatedRegionIds$!: Observable<UUID[]>;
+    isTemplate$ = this.store.select(selectIsTemplate);
 
     @Input()
     currentSimulatedRegionId!: UUID;

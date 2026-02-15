@@ -9,7 +9,10 @@ import { ExerciseService } from 'src/app/core/exercise.service';
 import { MessageService } from 'src/app/core/messages/message.service';
 import type { AppState } from 'src/app/state/app.state';
 import { selectExerciseId } from 'src/app/state/application/selectors/application.selectors';
-import { selectExerciseStatus } from 'src/app/state/application/selectors/exercise.selectors';
+import {
+    selectExerciseStatus,
+    selectIsTemplate,
+} from 'src/app/state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { openAlarmGroupOverviewModal } from '../alarm-group-overview/open-alarm-group-overview-modal';
 import { openClientOverviewModal } from '../client-overview/open-client-overview-modal';
@@ -40,6 +43,7 @@ export class TrainerToolbarComponent {
     private readonly messageService = inject(MessageService);
 
     public exerciseStatus$ = this.store.select(selectExerciseStatus);
+    isTemplate$ = this.store.select(selectIsTemplate);
 
     public openClientOverview() {
         openClientOverviewModal(this.modalService);

@@ -161,5 +161,6 @@ export namespace HospitalActionReducers {
                 return draftState;
             },
             rights: 'participant',
+            forbidInTemplates: true,
         };
 }

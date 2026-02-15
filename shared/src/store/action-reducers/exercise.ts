@@ -97,6 +97,7 @@ export namespace ExerciseActionReducers {
             return draftState;
         },
         rights: 'trainer',
+        forbidInTemplates: true,
     };
 
     export const startExercise: ActionReducer<StartExerciseAction> = {
@@ -109,6 +110,7 @@ export namespace ExerciseActionReducers {
             return draftState;
         },
         rights: 'trainer',
+        forbidInTemplates: true,
     };
 
     export const exerciseTick: ActionReducer<ExerciseTickAction> = {
@@ -172,6 +174,7 @@ export namespace ExerciseActionReducers {
             return draftState;
         },
         rights: 'server',
+        forbidInTemplates: true,
     };
 
     export const templateImport: ActionReducer<ImportTemplatesAction> = {

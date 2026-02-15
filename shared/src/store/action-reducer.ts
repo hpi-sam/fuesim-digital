@@ -8,6 +8,7 @@ export interface ActionReducer<A extends Action = Action> {
     readonly action: Constructor<A>;
     readonly reducer: ReducerFunction<InstanceType<this['action']>>;
     readonly rights: ReducerRights<InstanceType<this['action']>>;
+    readonly forbidInTemplates?: boolean;
 }
 
 /**

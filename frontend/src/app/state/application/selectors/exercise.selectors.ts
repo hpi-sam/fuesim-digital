@@ -62,6 +62,7 @@ export const selectEocLogEntries = selectPropertyFactory('eocLog');
 export const selectExerciseStatus = selectPropertyFactory('currentStatus');
 export const selectParticipantId = selectPropertyFactory('participantId');
 export const selectCurrentTime = selectPropertyFactory('currentTime');
+export const selectIsTemplate = selectPropertyFactory('isTemplate');
 
 // Elements
 

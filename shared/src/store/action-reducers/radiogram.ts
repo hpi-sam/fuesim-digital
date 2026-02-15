@@ -80,6 +80,7 @@ export namespace RadiogramActionReducers {
                 return draftState;
             },
             rights: 'participant',
+            forbidInTemplates: true,
         };
 
     export const returnRadiogramReducer: ActionReducer<ReturnRadiogramAction> =
@@ -90,6 +91,7 @@ export namespace RadiogramActionReducers {
                 return draftState;
             },
             rights: 'participant',
+            forbidInTemplates: true,
         };
 
     export const markDoneReducer: ActionReducer<MarkDoneRadiogramAction> = {
@@ -134,6 +136,7 @@ export namespace RadiogramActionReducers {
             return draftState;
         },
         rights: 'participant',
+        forbidInTemplates: true,
     };
 
     export const acceptResourceRequestRadiogramReducer: ActionReducer<AcceptResourceRequestRadiogramAction> =
@@ -183,6 +186,7 @@ export namespace RadiogramActionReducers {
                 return draftState;
             },
             rights: 'participant',
+            forbidInTemplates: true,
         };
 
     export const denyResourceRequestRadiogramReducer: ActionReducer<DenyResourceRequestRadiogramAction> =
@@ -232,5 +236,6 @@ export namespace RadiogramActionReducers {
                 return draftState;
             },
             rights: 'participant',
+            forbidInTemplates: true,
         };
 }

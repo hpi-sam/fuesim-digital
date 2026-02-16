@@ -2,15 +2,13 @@ import { eq } from 'drizzle-orm';
 import type { SetPretriageEnabledAction } from '../../../../shared/dist/store/action-reducers/configuration.js';
 import { createTestEnvironment } from '../../test/utils.js';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
-import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
 import { actionTable } from '../schema.js';
-import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 
 describe('ActionRepository', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
-        UserReadableIdGenerator.freeAll();
+        await environment.accessKeyService.freeAll();
         environment.exerciseService.TESTING_getExerciseMap().clear();
     });
 
@@ -22,7 +20,8 @@ describe('ActionRepository', () => {
         //
         // This is to test, wether action before exercise id assignment
         // are saved and retrieved correctly with this exerciseId.
-        const activeExercise = ExerciseFactory.fromBlank();
+        const activeExercise =
+            await environment.exerciseService.exerciseFactory.fromBlank();
 
         const actions = [
             new ActionWrapper(

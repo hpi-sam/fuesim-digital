@@ -9,19 +9,28 @@ import type { ClientWrapper } from '../../exercise/client-wrapper.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { removeAll, pushAll } from '../../utils/array.js';
-import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
+import {
+    ApiError,
+    NotFoundError,
+    PermissionDeniedError,
+} from '../../utils/http.js';
+import type { AccessKeyService } from './access-key-service.js';
 
 export class ExerciseService {
+    public readonly exerciseFactory: ExerciseFactory;
+
     public constructor(
         private readonly exerciseRepository: ExerciseRepository,
-        private readonly actionRepository: ActionRepository
-    ) {}
+        private readonly actionRepository: ActionRepository,
+        private readonly accessKeyService: AccessKeyService
+    ) {
+        this.exerciseFactory = new ExerciseFactory(accessKeyService);
+    }
 
     private readonly exerciseMap = new Map<ExerciseKey, ActiveExercise>();
 
@@ -58,6 +67,11 @@ export class ExerciseService {
         this.exerciseMap.delete(exercise.trainerKey);
     }
 
+    public async freeExerciseKeys(exercise: ActiveExercise) {
+        await this.accessKeyService.free(exercise.participantKey);
+        await this.accessKeyService.free(exercise.trainerKey);
+    }
+
     public async createTemplate(
         templateExercise: ActiveExercise,
         exerciseTemplate: ExerciseTemplateEntry
@@ -80,7 +94,7 @@ export class ExerciseService {
 
         this.exerciseMap.set(activeExercise.participantKey, activeExercise);
         this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
-        UserReadableIdGenerator.lock([
+        this.accessKeyService.lock([
             activeExercise.participantKey,
             activeExercise.trainerKey,
         ]);
@@ -120,7 +134,7 @@ export class ExerciseService {
                                     exerciseEntity.exercise_entity.id
                                 );
 
-                            const exercise = ExerciseFactory.fromDatabase(
+                            const exercise = this.exerciseFactory.fromDatabase(
                                 exerciseEntity.exercise_entity,
                                 actions
                             );
@@ -155,14 +169,14 @@ export class ExerciseService {
                 await Promise.all(
                     // The actions have already been saved in the database -> do not keep them
                     exercises.map(async (exercise) =>
-                        ExerciseFactory.restore(exercise, false)
+                        this.exerciseFactory.restore(exercise, false)
                     )
                 );
                 exercises.forEach((exercise) => {
                     this.exerciseMap.set(exercise.participantKey, exercise);
                     this.exerciseMap.set(exercise.trainerKey, exercise);
                 });
-                UserReadableIdGenerator.lock([...this.exerciseMap.keys()]);
+                this.accessKeyService.lock([...this.exerciseMap.keys()]);
                 return exercises;
             }
         );
@@ -207,6 +221,7 @@ export class ExerciseService {
         await this.exerciseRepository.deleteExerciseById(
             activeExercise.exerciseId
         );
+        await this.freeExerciseKeys(activeExercise);
     }
 
     public async saveUnsavedExercises() {

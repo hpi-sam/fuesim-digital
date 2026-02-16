@@ -6,6 +6,7 @@ import type { DatabaseService } from './database/services/database-service.js';
 import type { ExerciseService } from './database/services/exercise-service.js';
 import type { AuthService } from './auth/auth-service.js';
 import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
+import type { AccessKeyService } from './database/services/access-key-service.js';
 
 export class FuesimServer {
     private readonly _httpServer: ApiHttpServer;
@@ -23,7 +24,8 @@ export class FuesimServer {
         private readonly databaseService: DatabaseService,
         private readonly exerciseService: ExerciseService,
         private readonly authService: AuthService,
-        private readonly exerciseManagerService: ExerciseManagerService
+        private readonly exerciseManagerService: ExerciseManagerService,
+        private readonly accessKeyService: AccessKeyService
     ) {
         const app = express();
         this._websocketServer = new ExerciseWebsocketServer(

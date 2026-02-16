@@ -12,6 +12,8 @@ import { UserRepository } from './database/repositories/user-repository.js';
 import { SessionRepository } from './database/repositories/session-repository.js';
 import { AuthService } from './auth/auth-service.js';
 import { ExerciseManagerService } from './database/services/exercise-manager-service.js';
+import { AccessKeyService } from './database/services/access-key-service.js';
+import { AccessKeyRepository } from './database/repositories/access-key-repository.js';
 
 async function main() {
     Config.initialize();
@@ -43,14 +45,20 @@ async function main() {
     const sessionRepository = new SessionRepository(
         databaseService.databaseConnection
     );
+    const accessKeyRepository = new AccessKeyRepository(
+        databaseService.databaseConnection
+    );
 
+    const accessKeyService = new AccessKeyService(accessKeyRepository);
     const exerciseService = new ExerciseService(
         exerciseRepository,
-        actionRepository
+        actionRepository,
+        accessKeyService
     );
     const exerciseManagerService = new ExerciseManagerService(
         exerciseRepository,
-        actionRepository
+        actionRepository,
+        exerciseService
     );
 
     let authService: AuthService;
@@ -104,7 +112,8 @@ async function main() {
         databaseService,
         exerciseService,
         authService,
-        exerciseManagerService
+        exerciseManagerService,
+        accessKeyService
     );
 }
 

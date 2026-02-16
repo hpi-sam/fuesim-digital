@@ -27,6 +27,8 @@ import { UserRepository } from '../database/repositories/user-repository.js';
 import { SessionRepository } from '../database/repositories/session-repository.js';
 import { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import type { OidcService } from '../auth/oidc-service.js';
+import { AccessKeyService } from '../database/services/access-key-service.js';
+import { AccessKeyRepository } from '../database/repositories/access-key-repository.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -126,6 +128,7 @@ export class TestEnvironment {
     private _actionRepository!: ActionRepository;
     private _authService!: AuthService;
     private _exerciseManagerService!: ExerciseManagerService;
+    private _accessKeyService!: AccessKeyService;
 
     public get databaseService(): DatabaseService {
         return this._databaseService;
@@ -148,6 +151,10 @@ export class TestEnvironment {
 
     public get actionRepository(): ActionRepository {
         return this._actionRepository;
+    }
+
+    public get accessKeyService(): AccessKeyService {
+        return this._accessKeyService;
     }
 
     public httpRequest(
@@ -199,7 +206,8 @@ export class TestEnvironment {
         exerciseRepository: ExerciseRepository,
         actionRepository: ActionRepository,
         authService: AuthService,
-        exerciseManagerService: ExerciseManagerService
+        exerciseManagerService: ExerciseManagerService,
+        accessKeyService: AccessKeyService
     ) {
         this._databaseService = databaseService;
         this._exerciseService = exerciseService;
@@ -207,11 +215,13 @@ export class TestEnvironment {
         this._exerciseManagerService = exerciseManagerService;
         this._exerciseRepository = exerciseRepository;
         this._actionRepository = actionRepository;
+        this._accessKeyService = accessKeyService;
         this.server = new FuesimServer(
             this.databaseService,
             exerciseService,
             authService,
-            exerciseManagerService
+            exerciseManagerService,
+            accessKeyService
         );
     }
 }
@@ -223,10 +233,12 @@ export const createTestEnvironment = (): TestEnvironment => {
     let exerciseService: ExerciseService;
     let authService: AuthService;
     let exerciseManagerService: ExerciseManagerService;
+    let accessKeyService: AccessKeyService;
     let exerciseRepository: ExerciseRepository;
     let actionRepository: ActionRepository;
     let userRepository: UserRepository;
     let sessionRepository: SessionRepository;
+    let accessKeyRepository: AccessKeyRepository;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
@@ -237,21 +249,29 @@ export const createTestEnvironment = (): TestEnvironment => {
         actionRepository = new ActionRepository(
             databaseService.databaseConnection
         );
+        accessKeyRepository = new AccessKeyRepository(
+            databaseService.databaseConnection
+        );
+
+        accessKeyService = new AccessKeyService(accessKeyRepository);
         exerciseService = new ExerciseService(
             exerciseRepository,
-            actionRepository
+            actionRepository,
+            accessKeyService
         );
         userRepository = new UserRepository(databaseService.databaseConnection);
         sessionRepository = new SessionRepository(
             databaseService.databaseConnection
         );
+
         authService = await new AuthService(
             userRepository,
             sessionRepository
         ).initialize({ skipOidcDiscovery: true });
         exerciseManagerService = new ExerciseManagerService(
             exerciseRepository,
-            actionRepository
+            actionRepository,
+            exerciseService
         );
         environment.init(
             databaseService,
@@ -259,7 +279,8 @@ export const createTestEnvironment = (): TestEnvironment => {
             exerciseRepository,
             actionRepository,
             authService,
-            exerciseManagerService
+            exerciseManagerService,
+            accessKeyService
         );
     });
     afterEach(async () => {

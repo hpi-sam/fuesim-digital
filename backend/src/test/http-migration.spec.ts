@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
 import { createTestEnvironment } from './utils.js';
 
 const basePath = '../test-scenarios/migration-test-scenarios';
@@ -8,7 +7,7 @@ describe('migration', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
-        UserReadableIdGenerator.freeAll();
+        await environment.accessKeyService.freeAll();
         environment.exerciseService.TESTING_getExerciseMap().clear();
     });
 

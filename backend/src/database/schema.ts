@@ -5,6 +5,7 @@ import type {
     ExerciseState,
     ExerciseTemplateId,
     ParticipantKey,
+    AccessKey,
     TrainerKey,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
@@ -29,6 +30,10 @@ const baseTable = <T>() => ({
         .default(sql`uuid_generate_v4()`)
         .primaryKey()
         .notNull(),
+});
+
+export const accessKeyTable = pgTable('access_key', {
+    key: varchar().$type<AccessKey>().primaryKey().notNull(),
 });
 
 export const userTable = pgTable('users', {

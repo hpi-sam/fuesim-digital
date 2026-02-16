@@ -6,7 +6,6 @@ import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
 import { importExercise } from '../utils/import-exercise.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
-import { ExerciseFactory } from '../exercise/exercise-factory.js';
 import { ApiError } from '../utils/http.js';
 
 export const createExerciseRouter = (
@@ -16,8 +15,8 @@ export const createExerciseRouter = (
 
     router.post('/exercise', async (req, res) => {
         const exercise = isEmpty(req.body)
-            ? ExerciseFactory.fromBlank()
-            : importExercise(req.body);
+            ? await exerciseService.exerciseFactory.fromBlank()
+            : await importExercise(req.body, exerciseService.exerciseFactory);
         const optionalData = req.session
             ? { user: req.session.user.id }
             : undefined;

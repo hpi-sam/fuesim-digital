@@ -1,6 +1,5 @@
 import type { ExerciseTemplateId } from 'fuesim-digital-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ExerciseTemplateInsert } from '../schema.js';
@@ -14,7 +13,8 @@ import type { ExerciseService } from './exercise-service.js';
 export class ExerciseManagerService {
     public constructor(
         private readonly exerciseRepository: ExerciseRepository,
-        private readonly actionRepository: ActionRepository
+        private readonly actionRepository: ActionRepository,
+        private readonly exerciseService: ExerciseService
     ) {}
 
     public async getAllExercisesOfOwner(session: SessionInformation) {
@@ -29,8 +29,7 @@ export class ExerciseManagerService {
 
     public async createExerciseTemplate(
         data: Omit<ExerciseTemplateInsert, 'user'>,
-        session: SessionInformation,
-        exerciseService: ExerciseService
+        session: SessionInformation
     ) {
         const exerciseTemplate =
             await this.exerciseRepository.createExerciseTemplate({
@@ -40,8 +39,12 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new ApiError();
         }
-        const newExercise = ExerciseFactory.fromBlank();
-        await exerciseService.createTemplate(newExercise, exerciseTemplate);
+        const newExercise =
+            await this.exerciseService.exerciseFactory.fromBlank();
+        await this.exerciseService.createTemplate(
+            newExercise,
+            exerciseTemplate
+        );
         return {
             ...exerciseTemplate,
             trainerKey: newExercise.trainerKey,
@@ -77,10 +80,9 @@ export class ExerciseManagerService {
 
     public async createExerciseFromTemplate(
         templateId: ExerciseTemplateId,
-        session: SessionInformation,
-        exerciseService: ExerciseService
+        session: SessionInformation
     ) {
-        await exerciseService.saveUnsavedExercises();
+        await this.exerciseService.saveUnsavedExercises();
 
         const exerciseTemplate =
             await this.exerciseRepository.getExerciseTemplateById(templateId);
@@ -94,12 +96,13 @@ export class ExerciseManagerService {
             exerciseTemplate.exercise_entity.id
         );
 
-        const newExercise = ExerciseFactory.fromExerciseTemplate(
-            exerciseTemplate.exercise_template,
-            exerciseTemplate.exercise_entity,
-            actions
-        );
-        await exerciseService.createExercise(newExercise, {
+        const newExercise =
+            await this.exerciseService.exerciseFactory.fromExerciseTemplate(
+                exerciseTemplate.exercise_template,
+                exerciseTemplate.exercise_entity,
+                actions
+            );
+        await this.exerciseService.createExercise(newExercise, {
             baseTemplateId: exerciseTemplate.exercise_template.id,
             user: session.user.id,
         });
@@ -112,8 +115,7 @@ export class ExerciseManagerService {
 
     public async deleteExerciseTemplate(
         id: ExerciseTemplateId,
-        session: SessionInformation,
-        exerciseService: ExerciseService
+        session: SessionInformation
     ) {
         const exerciseTemplate =
             await this.exerciseRepository.getExerciseTemplateById(id);
@@ -123,14 +125,15 @@ export class ExerciseManagerService {
         if (exerciseTemplate.exercise_template.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
-        const activeExercise = exerciseService.getExerciseByKey(
+        const activeExercise = this.exerciseService.getExerciseByKey(
             exerciseTemplate.exercise_entity.trainerKey,
             session
         );
-        exerciseService.unloadExercise(activeExercise);
+        this.exerciseService.unloadExercise(activeExercise);
 
         await this.exerciseRepository.deleteExerciseTemplateById(
             exerciseTemplate.exercise_template.id
         );
+        await this.exerciseService.freeExerciseKeys(activeExercise);
     }
 }

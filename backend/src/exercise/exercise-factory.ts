@@ -27,21 +27,25 @@ import type {
 import { pushAll } from '../utils/array.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
-import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
+import type { AccessKeyService } from '../database/services/access-key-service.js';
 import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './active-exercise.js';
 
 export class ExerciseFactory {
-    public static createKeys(): ExerciseKeys {
-        const participantKey = UserReadableIdGenerator.generateId(
+    public constructor(private readonly accessKeyService: AccessKeyService) {}
+
+    public async createKeys(): Promise<ExerciseKeys> {
+        const participantKey = (await this.accessKeyService.generateKey(
             6
-        ) as ParticipantKey;
-        const trainerKey = UserReadableIdGenerator.generateId(8) as TrainerKey;
+        )) as ParticipantKey;
+        const trainerKey = (await this.accessKeyService.generateKey(
+            8
+        )) as TrainerKey;
         return { participantKey, trainerKey };
     }
 
-    public static fromBlank() {
-        const exerciseKeys = this.createKeys();
+    public async fromBlank() {
+        const exerciseKeys = await this.createKeys();
 
         if (
             !isParticipantKey(exerciseKeys.participantKey) ||
@@ -58,8 +62,8 @@ export class ExerciseFactory {
     /**
      * @param file A **valid** import file
      */
-    public static fromFile(file: StateExport): ActiveExercise {
-        const exerciseKeys = this.createKeys();
+    public async fromFile(file: StateExport): Promise<ActiveExercise> {
+        const exerciseKeys = await this.createKeys();
 
         if (
             !isParticipantKey(exerciseKeys.participantKey) ||
@@ -115,7 +119,7 @@ export class ExerciseFactory {
         return exercise;
     }
 
-    public static fromDatabase(
+    public fromDatabase(
         dbEntry: InferSelectModel<typeof exerciseTable>,
         actions: InferSelectModel<typeof actionTable>[]
     ): ActiveExercise {
@@ -147,12 +151,12 @@ export class ExerciseFactory {
         return exercise;
     }
 
-    public static fromExerciseTemplate(
+    public async fromExerciseTemplate(
         exerciseTemplate: InferSelectModel<typeof exerciseTemplateTable>,
         exercise: InferSelectModel<typeof exerciseTable>,
         actions: InferSelectModel<typeof actionTable>[]
-    ): ActiveExercise {
-        const exerciseKeys = this.createKeys();
+    ): Promise<ActiveExercise> {
+        const exerciseKeys = await this.createKeys();
         const actionsInWrapper: ActionWrapper[] = [];
         const newExercise = new ActiveExercise(
             exerciseKeys.participantKey,
@@ -185,10 +189,7 @@ export class ExerciseFactory {
         return newExercise;
     }
 
-    public static restore(
-        activeExercise: ActiveExercise,
-        keepActions: boolean
-    ): void {
+    public restore(activeExercise: ActiveExercise, keepActions: boolean): void {
         const exercise = activeExercise.getExercise();
 
         // Check State Version
@@ -213,10 +214,7 @@ export class ExerciseFactory {
      * Recreates the {@link currentState} by applying all actions from {@link temporaryActionHistory} to the {@link initialState}
      * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
      */
-    private static restoreState(
-        activeExercise: ActiveExercise,
-        keepActions: boolean
-    ) {
+    private restoreState(activeExercise: ActiveExercise, keepActions: boolean) {
         const exercise = activeExercise.getExercise();
         let currentState = cloneDeepMutable(exercise.initialStateString);
 
@@ -274,7 +272,7 @@ export class ExerciseFactory {
         });
     }
 
-    private static validateAction(action: ExerciseAction) {
+    private validateAction(action: ExerciseAction) {
         const errors = validateExerciseAction(action);
         if (errors.length > 0) {
             throw new ValidationErrorWrapper(errors);

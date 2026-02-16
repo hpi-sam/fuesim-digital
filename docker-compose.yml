@@ -13,11 +13,11 @@ services:
             - 80:80
         env_file:
             - .env
-        # To overwrite the contents of the about pages, mount a directory into the container
-        # The directory can contain terms.html, license.html, privacy.html and imprint.html
-        # Example
-        # - ./about:/usr/local/app/frontend/assets/about
         # volumes:
+            # To overwrite the contents of the about pages, mount a directory into the container
+            # The directory can contain terms.html, license.html, privacy.html and imprint.html
+            # Example
+            # - ./about:/usr/local/app/frontend/assets/about
     db:
         image: postgres:14
         volumes:

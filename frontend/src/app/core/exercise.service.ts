@@ -23,6 +23,7 @@ import {
 } from 'rxjs';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { handleChanges } from '../shared/functions/handle-changes';
 import type { AppState } from '../state/app.state';
 import {
@@ -45,6 +46,7 @@ import { selectStateSnapshot } from '../state/get-state-snapshot';
 import { websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 import { OptimisticActionHandler } from './optimistic-action-handler';
+import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 
 /**
  * This Service deals with the state synchronization of a live exercise.
@@ -59,6 +61,7 @@ import { OptimisticActionHandler } from './optimistic-action-handler';
 export class ExerciseService {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly messageService = inject(MessageService);
+    private readonly ngbModalService = inject(NgbModal);
 
     private readonly socket: Socket<
         ServerToClientEvents,
@@ -86,14 +89,8 @@ export class ExerciseService {
             if (reason === 'io client disconnect') {
                 return;
             }
-            this.messageService.postError(
-                {
-                    title: 'Die Verbindung zum Server wurde unterbrochen',
-                    body: 'Laden Sie die Seite neu, um die Verbindung wieder herzustellen.',
-                    error: reason,
-                },
-                null
-            );
+            console.error(reason);
+            openConnectionLostModal(this.ngbModalService);
         });
     }
 

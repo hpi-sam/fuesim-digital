@@ -21,6 +21,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Improve hints for exercise settings.
 - Add hints for transfer point settings.
+- Show large, non-dismissable modal if the connection to the server got lost.
 
 ### Fixed
 

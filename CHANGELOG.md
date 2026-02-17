@@ -21,6 +21,12 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Improve hints for exercise settings.
 - Add hints for transfer point settings.
+- The Docker image of the software has been redesigned, including the following breaking changes:
+    - TLS handling has been dropped from the image. Please use a separate reverse proxy for TLS. The variables `DFM_ENABLE_SSL`, `DFM_ENABLE_HSTS`, and `DFM_FORCE_NEW_SSL_CERTS` have no effect and the container only accepts connections on port 80.
+    - With the removal of TLS handling, the application container does not need a volume any longer. The variable `DFM_PERSISTENT_DATA_PATH` has been removed.
+    - The `DFM_UPLOAD_LIMIT` variable now supports custom units. For the previous behavior (megabytes), please append a "m" suffix.
+    - Assets have to be mounted to `/usr/local/app/frontend/assets/about` (dropped `dist/digital-fuesim-manv` from the path).
+    - Several other internal changes to the container, especially the nginx configuration. If you relied on overwriting config files for your setup, please review the code diff.
 - Show large, non-dismissable modal if the connection to the server got lost.
 
 ### Fixed

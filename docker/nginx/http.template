@@ -1,9 +1,0 @@
-server {
-    listen       80 default_server;
-    listen  [::]:80 default_server;
-    include conf.d/server-name;
-    include conf.d/headers;
-    include conf.d/acme-location;
-
-    include conf.d/locations;
-}

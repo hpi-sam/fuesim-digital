@@ -27,6 +27,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
     - The `DFM_UPLOAD_LIMIT` variable now supports custom units. For the previous behavior (megabytes), please append a "m" suffix.
     - Assets have to be mounted to `/usr/local/app/frontend/assets/about` (dropped `dist/digital-fuesim-manv` from the path).
     - Several other internal changes to the container, especially the nginx configuration. If you relied on overwriting config files for your setup, please review the code diff.
+- Show large, non-dismissable modal if the connection to the server got lost.
 
 ### Fixed
 

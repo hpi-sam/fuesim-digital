@@ -25,6 +25,7 @@ import { AuthService } from '../src/auth/auth-service.js';
 import { UserRepository } from '../src/database/repositories/user-repository.js';
 import { SessionRepository } from '../src/database/repositories/session-repository.js';
 import { ExerciseManagerService } from '../src/database/services/exercise-manager-service.js';
+import type { OidcService } from '../src/auth/oidc-service.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -148,8 +149,20 @@ class TestEnvironment {
         return this._actionRepository;
     }
 
-    public httpRequest(method: HttpMethod, url: string): request.Test {
-        return request(this.server.httpServer.httpServer)[method](url);
+    public httpRequest(
+        method: HttpMethod,
+        url: string,
+        session?: string
+    ): request.Test {
+        const req = request(this.server.httpServer.httpServer)[method](url);
+        if (session) {
+            req.set(
+                'Cookie',
+                `${this.authService.SESSION_COOKIE_NAME}=${session}`
+            );
+        }
+
+        return req;
     }
 
     /**
@@ -250,6 +263,23 @@ export const createTestEnvironment = (): TestEnvironment => {
 
     return environment;
 };
+
+export const defaultTestUserSessionData: OidcService.UserInfo = {
+    displayName: 'Test User',
+    id: 'test-user',
+    username: 'testuser',
+};
+export async function createTestUserSession(
+    environment: TestEnvironment,
+    data?: { user?: OidcService.UserInfo; expired?: boolean }
+) {
+    const session = await environment.authService.createNewSession({
+        user: data?.user ?? defaultTestUserSessionData,
+        accessToken: 'abc',
+        validityDurationMs: data?.expired ? 0 : undefined,
+    });
+    return session;
+}
 
 async function setupDatabase(): Promise<DatabaseService> {
     if (!Config.useDb) {

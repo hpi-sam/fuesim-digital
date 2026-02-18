@@ -7,15 +7,14 @@ export const exerciseKeysSchema = z.object({
 });
 export type ExerciseKeys = z.infer<typeof exerciseKeysSchema>;
 
+export const userDataDtoSchema = z.object({
+    id: z.string(),
+    displayName: z.string(),
+    username: z.string(),
+});
+
 export const userDataResponseSchema = z.object({
-    user: z
-        .object({
-            id: z.string(),
-            displayName: z.string(),
-            username: z.string(),
-        })
-        .nullable()
-        .optional(),
+    user: userDataDtoSchema.nullable().optional(),
     expired: z.boolean().optional(),
     userRegistrationsEnabled: z.boolean().optional(),
     userSelfServiceEnabled: z.boolean().optional(),

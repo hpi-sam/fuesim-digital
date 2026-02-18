@@ -7,6 +7,8 @@ import type {
     ParticipantKey,
     AccessKey,
     TrainerKey,
+    GroupParticipantKey,
+    ParallelExerciseId,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
@@ -147,3 +149,26 @@ export const actionEntityRelations = relations(actionTable, ({ one }) => ({
 export const exerciseEntityRelations = relations(exerciseTable, ({ many }) => ({
     actionWrapperEntities: many(actionTable),
 }));
+
+export const parallelExerciseTable = pgTable('parallel_exercise', {
+    ...baseTable<ParallelExerciseId>(),
+    user: varchar()
+        .references(() => userTable.id, { onDelete: 'cascade' })
+        .notNull(),
+    createdAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
+    templateId: uuid()
+        // TODO Cascade dangerous?
+        .references(() => exerciseTemplateTable.id, { onDelete: 'cascade' })
+        .notNull(),
+    participantKey: char({ length: 7 }).$type<GroupParticipantKey>().notNull(),
+    // Participants will join this viewport
+    joinViewportId: uuid().notNull(),
+});
+export type ParallelExerciseEntry = InferSelectModel<
+    typeof parallelExerciseTable
+>;
+export type ParallelExerciseInsert = InferInsertModel<
+    typeof parallelExerciseTable
+>;

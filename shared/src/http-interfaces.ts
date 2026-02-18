@@ -1,6 +1,10 @@
 import { z } from 'zod';
-import { participantKeySchema, trainerKeySchema } from './exercise-keys.js';
 import { exerciseTemplateIdSchema } from './ids.js';
+import {
+    groupParticipantKeySchema,
+    participantKeySchema,
+    trainerKeySchema,
+} from './exercise-keys.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -69,14 +73,17 @@ export type ExerciseExistsResponseDataInput = z.input<
     typeof exerciseExistsResponseDataSchema
 >;
 
-export const getExerciseTemplateResponseDataSchema = z.object({
+export const getExerciseTemplateResponseDataWithoutTrainerKeySchema = z.object({
     id: exerciseTemplateIdSchema,
-    trainerKey: trainerKeySchema,
     createdAt: stringToDate,
     lastExerciseCreatedAt: z.nullable(stringToDate),
     name: z.string(),
     description: z.string(),
 });
+export const getExerciseTemplateResponseDataSchema =
+    getExerciseTemplateResponseDataWithoutTrainerKeySchema.extend({
+        trainerKey: trainerKeySchema,
+    });
 export type GetExerciseTemplateResponseData = z.infer<
     typeof getExerciseTemplateResponseDataSchema
 >;
@@ -118,4 +125,32 @@ export type JoinExerciseResponseData = z.infer<
 >;
 export type JoinExerciseResponseDataInput = z.input<
     typeof joinExerciseResponseDataSchema
+>;
+
+export const getParallelExerciseResponseDataSchema = z.object({
+    id: parallelExerciseIdSchema,
+    participantKey: groupParticipantKeySchema,
+    createdAt: stringToDate,
+    joinViewportId: z.uuidv4(),
+    template: getExerciseTemplateResponseDataWithoutTrainerKeySchema,
+});
+export const getParallelExercisesResponseDataSchema = z.array(
+    getParallelExerciseResponseDataSchema
+);
+export const postParallelExerciseRequestDataSchema = z.object({
+    joinViewportId: z.uuidv4(),
+    templateId: exerciseTemplateIdSchema,
+});
+export type PostParallelExerciseRequestData = z.infer<
+    typeof postParallelExerciseRequestDataSchema
+>;
+
+export const getExerciseTemplateViewportsResponseDataSchema = z.array(
+    z.object({
+        id: z.uuidv4(),
+        name: z.string(),
+    })
+);
+export type GetExerciseTemplateViewportsResponseData = z.infer<
+    typeof getExerciseTemplateViewportsResponseDataSchema
 >;

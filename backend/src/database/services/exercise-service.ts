@@ -12,7 +12,11 @@ import { removeAll, pushAll } from '../../utils/array.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
+import type {
+    ExerciseId,
+    exerciseTable,
+    ExerciseTemplateEntry,
+} from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
     ApiError,
@@ -32,7 +36,10 @@ export class ExerciseService {
         this.exerciseFactory = new ExerciseFactory(accessKeyService);
     }
 
-    private readonly exerciseMap = new Map<ExerciseKey, ActiveExercise>();
+    private readonly exerciseMap = new Map<
+        ExerciseId | ExerciseKey,
+        ActiveExercise
+    >();
 
     public getExerciseByKey(
         exerciseKey: ExerciseKey,
@@ -65,6 +72,7 @@ export class ExerciseService {
 
         this.exerciseMap.delete(exercise.participantKey);
         this.exerciseMap.delete(exercise.trainerKey);
+        this.exerciseMap.delete(exercise.exerciseId);
     }
 
     public async freeExerciseKeys(exercise: ActiveExercise) {
@@ -94,7 +102,8 @@ export class ExerciseService {
 
         this.exerciseMap.set(activeExercise.participantKey, activeExercise);
         this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
-        this.accessKeyService.lock([
+        this.exerciseMap.set(activeExercise.exerciseId, activeExercise);
+        await this.accessKeyService.lock([
             activeExercise.participantKey,
             activeExercise.trainerKey,
         ]);
@@ -125,6 +134,7 @@ export class ExerciseService {
                     })
                 );
 
+                const keys: ExerciseKey[] = [];
                 const exercises = await Promise.all(
                     (await exerciseRepoTransaction.getAllExercises()).map(
                         async (exerciseEntity) => {
@@ -175,8 +185,10 @@ export class ExerciseService {
                 exercises.forEach((exercise) => {
                     this.exerciseMap.set(exercise.participantKey, exercise);
                     this.exerciseMap.set(exercise.trainerKey, exercise);
+                    this.exerciseMap.set(exercise.exerciseId, exercise);
+                    keys.push(exercise.participantKey, exercise.trainerKey);
                 });
-                this.accessKeyService.lock([...this.exerciseMap.keys()]);
+                await this.accessKeyService.lock(keys);
                 return exercises;
             }
         );
@@ -274,6 +286,16 @@ export class ExerciseService {
             initialState: activeExercise.getExercise().initialStateString,
             actionsWrappers: completeHistory,
         };
+    }
+
+    public getExercisesViewportsById(id: ExerciseId) {
+        const activeExercise = this.exerciseMap.get(id);
+        if (!activeExercise) {
+            throw new NotFoundError();
+        }
+        return Object.values(
+            activeExercise.getExercise().currentStateString.viewports
+        );
     }
 
     /**

@@ -136,4 +136,21 @@ export class ExerciseManagerService {
         );
         await this.exerciseService.freeExerciseKeys(activeExercise);
     }
+
+    public async getExerciseTemplateViewportsById(
+        id: ExerciseTemplateId,
+        session: SessionInformation
+    ) {
+        const exerciseTemplate =
+            await this.exerciseRepository.getExerciseTemplateById(id);
+        if (!exerciseTemplate) {
+            throw new NotFoundError();
+        }
+        if (exerciseTemplate.exercise_template.user !== session.user.id) {
+            throw new PermissionDeniedError();
+        }
+        return this.exerciseService.getExercisesViewportsById(
+            exerciseTemplate.exercise_entity.id
+        );
+    }
 }

@@ -2,11 +2,7 @@ import express from 'express';
 import { PeriodicEventHandler } from './exercise/periodic-events/periodic-event-handler.js';
 import { ExerciseWebsocketServer } from './exercise/websocket.js';
 import { ApiHttpServer } from './http-server.js';
-import type { DatabaseService } from './database/services/database-service.js';
-import type { ExerciseService } from './database/services/exercise-service.js';
-import type { AuthService } from './auth/auth-service.js';
-import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
-import type { AccessKeyService } from './database/services/access-key-service.js';
+import type { Services } from './database/services/index.js';
 
 export class FuesimServer {
     private readonly _httpServer: ApiHttpServer;
@@ -17,28 +13,17 @@ export class FuesimServer {
     private readonly saveHandler: PeriodicEventHandler;
 
     public async saveTick() {
-        await this.exerciseService.saveUnsavedExercises();
+        await this.services.exerciseService.saveUnsavedExercises();
     }
 
-    public constructor(
-        private readonly databaseService: DatabaseService,
-        private readonly exerciseService: ExerciseService,
-        private readonly authService: AuthService,
-        private readonly exerciseManagerService: ExerciseManagerService,
-        private readonly accessKeyService: AccessKeyService
-    ) {
+    public constructor(private readonly services: Services) {
         const app = express();
         this._websocketServer = new ExerciseWebsocketServer(
             app,
-            exerciseService,
-            authService
+            services.exerciseService,
+            services.authService
         );
-        this._httpServer = new ApiHttpServer(
-            app,
-            exerciseService,
-            authService,
-            exerciseManagerService
-        );
+        this._httpServer = new ApiHttpServer(app, services);
 
         this.saveHandler = new PeriodicEventHandler(
             this.saveTick.bind(this),
@@ -60,7 +45,7 @@ export class FuesimServer {
         this.websocketServer.close();
         this.saveHandler.pause();
         // Save all remaining instances, if it's still possible
-        if (this.databaseService.isInitialized) {
+        if (this.services.databaseService.isInitialized) {
             await this.saveTick();
         }
     }

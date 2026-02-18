@@ -8,7 +8,10 @@ import {
     getExercisesResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
+    getExerciseTemplateViewportsResponseDataSchema,
+    getParallelExerciseResponseDataSchema,
     PostExerciseTemplateRequestData,
+    PostParallelExerciseRequestData,
     TrainerKey,
     type ExerciseTimeline,
     type StateExport,
@@ -85,6 +88,31 @@ export class ApiService {
         });
     }
 
+    public getParallelExerciseResource(id: UUID) {
+        return httpResource(
+            () => `${httpOrigin}/api/parallel_exercises/${id}`,
+            {
+                parse: getParallelExerciseResponseDataSchema.parse,
+            }
+        );
+    }
+    public getParallelExercisesResource() {
+        return httpResource(() => `${httpOrigin}/api/parallel_exercises/`, {
+            parse: getParallelExercisesResponseDataSchema.parse,
+        });
+    }
+    public async getExerciseTemplateViewportsById(id: ExerciseTemplateId) {
+        return lastValueFrom(
+            this.httpClient
+                .get(`${httpOrigin}/api/exercise_templates/${id}/viewports`)
+                .pipe(
+                    map((v) =>
+                        getExerciseTemplateViewportsResponseDataSchema.parse(v)
+                    )
+                )
+        );
+    }
+
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
             this.httpClient
@@ -124,6 +152,15 @@ export class ApiService {
             this.httpClient.delete(
                 `${httpOrigin}/api/exercise_templates/${templateId}`
             )
+        );
+    }
+    public async createParallelExercise(data: PostParallelExerciseRequestData) {
+        return lastValueFrom(
+            this.httpClient
+                .post(`${httpOrigin}/api/parallel_exercises/`, data)
+                .pipe(
+                    map((v) => getParallelExerciseResponseDataSchema.parse(v))
+                )
         );
     }
 }

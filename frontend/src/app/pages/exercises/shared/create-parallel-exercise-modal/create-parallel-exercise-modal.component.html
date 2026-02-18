@@ -1,0 +1,42 @@
+<div class="modal-header">
+    <h4 class="modal-title">Neue Parallelübung erstellen</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    <form #f="ngForm" (ngSubmit)="create(f)">
+        <div class="form-group mb-2">
+            <label class="form-label">Übungsvorlage</label>
+            <input
+                [value]="exerciseTemplate()?.name"
+                readonly
+                class="form-control"
+                type="text"
+            />
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="form-label">Startansicht</label>
+            <p class="small text-muted mb-1">
+                Dieser Ansicht werden die Teilnehmenden automatisch beitreten.
+            </p>
+            <select
+                [(ngModel)]="model.joinViewportId"
+                name="joinViewport"
+                #joinViewportInput="ngModel"
+                required
+                class="form-control"
+            >
+                @for (viewport of viewports; track viewport.id) {
+                    <option [value]="viewport.id">{{ viewport.name }}</option>
+                }
+            </select>
+            <app-display-validation
+                [ngModelInput]="joinViewportInput"
+            ></app-display-validation>
+        </div>
+
+        <button class="btn btn-primary" [disabled]="!f.form.valid">
+            Parallelübung erstellen
+        </button>
+    </form>
+</div>

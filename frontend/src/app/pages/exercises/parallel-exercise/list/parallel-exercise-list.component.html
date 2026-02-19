@@ -1,0 +1,49 @@
+<app-header />
+<div class="container">
+    <h1>Meine Parallelübungen</h1>
+    @if (parallelExercises.isLoading()) {
+        <div class="row row-cols-3">
+            @for (_ of [1, 2, 3]; track $index) {
+                <div class="col">
+                    <div class="card" aria-hidden="true">
+                        <div class="card-body">
+                            <h2 class="card-title h4 placeholder-glow">
+                                <span class="placeholder col-6"></span>
+                            </h2>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-4"></span>
+                            </p>
+                            <a
+                                class="btn btn-primary disabled placeholder col-6"
+                                aria-disabled="true"
+                            ></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @if (parallelExercises.hasValue()) {
+        <div class="row row-cols-3">
+            @for (
+                parallelExercise of parallelExercises.value();
+                track parallelExercise.id
+            ) {
+                <div class="col mb-4">
+                    <app-parallel-exercise-card
+                        [parallelExercise]="parallelExercise"
+                        (updated)="parallelExercises.reload()"
+                    />
+                </div>
+            } @empty {
+                <div class="col flex-grow-1">
+                    <p class="bg-light p-4 rounded-3 lead mb-0">
+                        Sie haben noch keine Parallelübungen erstellt.
+                    </p>
+                </div>
+            }
+        </div>
+    }
+</div>
+<app-footer />

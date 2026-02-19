@@ -1,0 +1,41 @@
+@if (parallelExercise(); as parallelExercise) {
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title h4 d-flex">
+                {{ parallelExercise.template.name }}
+            </h2>
+            <p class="card-text">
+                Teilnehmer-ID: {{ parallelExercise.participantKey }}
+                <app-copy-button [value]="participantUrl()" />
+            </p>
+        </div>
+        <ul class="list-group list-group-flush">
+            @if (parallelExercise.template) {
+                <li class="list-group-item">
+                    <i class="bi bi-rocket me-2"></i>
+                    basiert auf
+                    <a [routerLink]="`/exercises/templates/`">{{
+                        parallelExercise.template.name
+                    }}</a>
+                </li>
+            }
+            <li class="list-group-item">
+                <i class="bi bi-plus-circle me-2"></i>
+                erstellt am {{ parallelExercise.createdAt | date: 'medium' }}
+            </li>
+        </ul>
+        <div class="card-body d-flex">
+            <a
+                [routerLink]="`/exercises/parallel/${parallelExercise.id}`"
+                class="btn btn-primary me-2"
+            >
+                Öffnen
+            </a>
+            <div class="flex-grow-1"></div>
+            <button class="btn btn-outline-danger" (click)="deleteExercise()">
+                <i class="bi bi-trash me-2"></i>
+                Löschen
+            </button>
+        </div>
+    </div>
+}

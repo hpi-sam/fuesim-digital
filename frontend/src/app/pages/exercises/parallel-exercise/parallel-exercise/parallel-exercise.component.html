@@ -1,0 +1,72 @@
+<app-header />
+<div class="container">
+    @if (parallelExercise.isLoading()) {
+        <div class="row row-cols-3">
+            @for (_ of [1, 2, 3]; track $index) {
+                <div class="col">
+                    <div class="card" aria-hidden="true">
+                        <div class="card-body">
+                            <h2 class="card-title h4 placeholder-glow">
+                                <span class="placeholder col-6"></span>
+                            </h2>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-4"></span>
+                            </p>
+                            <a
+                                class="btn btn-primary disabled placeholder col-6"
+                                aria-disabled="true"
+                            ></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @if (parallelExercise.hasValue()) {
+        @let exercise = parallelExercise.value();
+        <h1 class="mb-4">Parallelübung: {{ exercise.template.name }}</h1>
+        <div class="row mb-4 align-items-stretch">
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-header h4">Steuerung</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-header h4 d-flex align-content-center">
+                        <div>
+                            Teilnehmer-ID:
+                            <span class="font-monospace fw-bold">{{
+                                exercise.participantKey
+                            }}</span>
+                        </div>
+                        <div class="flex-grow-1"></div>
+                        <button
+                            class="btn btn-outline-secondary btn-sm ms-3"
+                            ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen von Ihnen bestätigt werden."
+                        >
+                            Teilnehmerlink teilen
+                        </button>
+                    </div>
+                    <div class="card-body d-flex justify-content-center py-0">
+                        <qr-code
+                            [value]="participantUrl()"
+                            size="350"
+                            errorCorrectionLevel="M"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header h4">Teilnehmende</div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<app-footer />

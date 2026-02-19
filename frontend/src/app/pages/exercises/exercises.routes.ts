@@ -5,6 +5,8 @@ import { LeaveExerciseGuard } from './guards/leave-exercise.guard';
 import { ExerciseListComponent } from './list/exercise-list.component';
 import { ExerciseTemplateListComponent } from './template-list/exercise-template-list.component';
 import { IsAuthenticatedGuard } from './guards/is-authenticated.guard';
+import { ParallelExerciseComponent } from './parallel-exercise/parallel-exercise/parallel-exercise.component';
+import { ParallelExerciseListComponent } from './parallel-exercise/list/parallel-exercise-list.component';
 
 export const routes: Routes = [
     {
@@ -15,6 +17,16 @@ export const routes: Routes = [
     {
         path: 'templates',
         component: ExerciseTemplateListComponent,
+        canActivate: [IsAuthenticatedGuard],
+    },
+    {
+        path: 'parallel',
+        component: ParallelExerciseListComponent,
+        canActivate: [IsAuthenticatedGuard],
+    },
+    {
+        path: 'parallel/:id',
+        component: ParallelExerciseComponent,
         canActivate: [IsAuthenticatedGuard],
     },
     {

@@ -18,11 +18,13 @@ export const createParallelExerciseRouter = (
         .route('/')
         .all(isAuthenticatedMiddleware)
         .get(async (req, res) => {
-            const templates =
+            const parallelExercies =
                 await parallelExerciseService.getParallelExercisesOfOwner(
                     req.session!
                 );
-            res.send(getParallelExercisesResponseDataSchema.encode(templates));
+            res.send(
+                getParallelExercisesResponseDataSchema.encode(parallelExercies)
+            );
         })
         .post(async (req, res) => {
             const parsedData = postParallelExerciseRequestDataSchema.parse(

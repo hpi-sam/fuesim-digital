@@ -5,6 +5,7 @@ import {
     GetExerciseTemplateResponseData,
     GetExerciseTemplateViewportsResponseData,
 } from 'fuesim-digital-shared';
+import { Router } from '@angular/router';
 import { ApiService } from '../../../../core/api.service';
 
 @Component({
@@ -16,6 +17,7 @@ import { ApiService } from '../../../../core/api.service';
 export class CreateParallelExerciseModalComponent {
     private readonly apiService = inject(ApiService);
     private readonly activeModal = inject(NgbActiveModal);
+    private readonly router = inject(Router);
 
     public exerciseTemplate = signal<GetExerciseTemplateResponseData | null>(
         null
@@ -40,12 +42,13 @@ export class CreateParallelExerciseModalComponent {
     public async create(form: NgForm) {
         const exerciseTemplate = this.exerciseTemplate();
         if (!exerciseTemplate) return;
-        await this.apiService.createParallelExercise({
+        const res = await this.apiService.createParallelExercise({
             ...this.model,
             templateId: exerciseTemplate.id,
         });
         this.created.emit(true);
         this.activeModal.close();
+        await this.router.navigate(['/exercises/parallel', res.id]);
     }
 
     public close() {

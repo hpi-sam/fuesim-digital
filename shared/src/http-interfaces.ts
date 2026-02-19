@@ -134,9 +134,16 @@ export const getParallelExerciseResponseDataSchema = z.object({
     joinViewportId: z.uuidv4(),
     template: getExerciseTemplateResponseDataWithoutTrainerKeySchema,
 });
+export type GetParallelExerciseResponseData = z.infer<
+    typeof getParallelExerciseResponseDataSchema
+>;
 export const getParallelExercisesResponseDataSchema = z.array(
     getParallelExerciseResponseDataSchema
 );
+export type GetParallelExercisesResponseData = z.infer<
+    typeof getParallelExercisesResponseDataSchema
+>;
+
 export const postParallelExerciseRequestDataSchema = z.object({
     joinViewportId: z.uuidv4(),
     templateId: exerciseTemplateIdSchema,

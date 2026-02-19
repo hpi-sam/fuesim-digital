@@ -10,6 +10,7 @@ import {
     getExerciseTemplatesResponseDataSchema,
     getExerciseTemplateViewportsResponseDataSchema,
     getParallelExerciseResponseDataSchema,
+    getParallelExercisesResponseDataSchema,
     PostExerciseTemplateRequestData,
     PostParallelExerciseRequestData,
     TrainerKey,
@@ -88,7 +89,7 @@ export class ApiService {
         });
     }
 
-    public getParallelExerciseResource(id: UUID) {
+    public getParallelExerciseResource(id: ParallelExerciseId) {
         return httpResource(
             () => `${httpOrigin}/api/parallel_exercises/${id}`,
             {
@@ -154,6 +155,7 @@ export class ApiService {
             )
         );
     }
+
     public async createParallelExercise(data: PostParallelExerciseRequestData) {
         return lastValueFrom(
             this.httpClient
@@ -161,6 +163,12 @@ export class ApiService {
                 .pipe(
                     map((v) => getParallelExerciseResponseDataSchema.parse(v))
                 )
+        );
+    }
+
+    public async deleteParallelExercise(id: ParallelExerciseId) {
+        return lastValueFrom(
+            this.httpClient.delete(`${httpOrigin}/api/parallel_exercises/${id}`)
         );
     }
 }

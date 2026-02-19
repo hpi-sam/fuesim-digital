@@ -59,9 +59,6 @@ export class ExerciseTemplateCardComponent {
         const componentInstance =
             modalRef.componentInstance as CreateParallelExerciseModalComponent;
         componentInstance.exerciseTemplate.set(this.exerciseTemplate()!);
-        componentInstance.created.subscribe((data) => {
-            // Do something on success
-        });
     }
 
     async deleteExerciseTemplate() {

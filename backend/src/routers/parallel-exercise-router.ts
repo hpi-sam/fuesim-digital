@@ -4,6 +4,8 @@ import {
     getParallelExercisesResponseDataSchema,
     postParallelExerciseRequestDataSchema,
     parallelExerciseIdSchema,
+    groupParticipantKeySchema,
+    postJoinParallelExerciseResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { ApiError } from '../utils/http.js';
@@ -41,8 +43,23 @@ export const createParallelExerciseRouter = (
             );
         });
 
+    router.post('/join/:key', async (req, res) => {
+        const key = groupParticipantKeySchema.safeParse(req.params.key).data;
+        if (!key) throw new ApiError();
+        const exercise =
+            await parallelExerciseService.joinParallelExerciseByParticipantKey(
+                key
+            );
+        res.send(
+            postJoinParallelExerciseResponseDataSchema.encode({
+                participantKey: exercise.participantKey,
+            })
+        );
+    });
+
     router
-        .get('/:id', async (req, res) => {
+        .route('/:id')
+        .get(async (req, res) => {
             const id = parallelExerciseIdSchema.safeParse(req.params.id).data;
             if (!id) throw new ApiError();
 
@@ -55,7 +72,7 @@ export const createParallelExerciseRouter = (
                 getParallelExerciseResponseDataSchema.encode(parallelExercise)
             );
         })
-        .delete('/:id', async (req, res) => {
+        .delete(async (req, res) => {
             const id = parallelExerciseIdSchema.safeParse(req.params.id).data;
             if (!id) throw new ApiError();
 
@@ -65,5 +82,6 @@ export const createParallelExerciseRouter = (
             );
             res.status(204).send();
         });
+
     return router;
 };

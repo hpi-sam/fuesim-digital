@@ -161,3 +161,7 @@ export const getExerciseTemplateViewportsResponseDataSchema = z.array(
 export type GetExerciseTemplateViewportsResponseData = z.infer<
     typeof getExerciseTemplateViewportsResponseDataSchema
 >;
+
+export const postJoinParallelExerciseResponseDataSchema = z.object({
+    participantKey: participantKeySchema,
+});

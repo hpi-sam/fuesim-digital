@@ -71,7 +71,8 @@ async function main() {
     );
     const parallelExerciseService = new ParallelExerciseService(
         repositories.parallelExerciseRepository,
-        accessKeyService
+        accessKeyService,
+        exerciseManagerService
     );
 
     let authService: AuthService;

@@ -12,6 +12,7 @@ import {
     getParallelExerciseResponseDataSchema,
     getParallelExercisesResponseDataSchema,
     PostExerciseTemplateRequestData,
+    postJoinParallelExerciseResponseDataSchema,
     PostParallelExerciseRequestData,
     TrainerKey,
     type ExerciseTimeline,
@@ -169,6 +170,21 @@ export class ApiService {
     public async deleteParallelExercise(id: ParallelExerciseId) {
         return lastValueFrom(
             this.httpClient.delete(`${httpOrigin}/api/parallel_exercises/${id}`)
+        );
+    }
+
+    public async joinParallelExercise(key: string) {
+        return lastValueFrom(
+            this.httpClient
+                .post(
+                    `${httpOrigin}/api/parallel_exercises/join/${key}`,
+                    undefined
+                )
+                .pipe(
+                    map((v) =>
+                        postJoinParallelExerciseResponseDataSchema.parse(v)
+                    )
+                )
         );
     }
 }

@@ -113,6 +113,11 @@ export const exerciseTable = pgTable('exercise_entity', {
         .references(() => exerciseTemplateTable.id, {
             onDelete: 'set null',
         }),
+    parallelExerciseId: uuid()
+        .$type<ParallelExerciseId>()
+        .references(() => parallelExerciseTable.id, {
+            onDelete: 'cascade',
+        }),
 });
 export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 export type ExerciseInsert = InferInsertModel<typeof exerciseTable>;

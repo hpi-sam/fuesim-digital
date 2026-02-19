@@ -7,6 +7,7 @@ import { ExerciseTemplateListComponent } from './template-list/exercise-template
 import { IsAuthenticatedGuard } from './guards/is-authenticated.guard';
 import { ParallelExerciseComponent } from './parallel-exercise/parallel-exercise/parallel-exercise.component';
 import { ParallelExerciseListComponent } from './parallel-exercise/list/parallel-exercise-list.component';
+import { JoinParallelExerciseGuard } from './guards/join-parallel-exercise.guard';
 
 export const routes: Routes = [
     {
@@ -28,6 +29,11 @@ export const routes: Routes = [
         path: 'parallel/:id',
         component: ParallelExerciseComponent,
         canActivate: [IsAuthenticatedGuard],
+    },
+    {
+        path: 'parallel/join/:key',
+        component: ParallelExerciseComponent,
+        canActivate: [JoinParallelExerciseGuard],
     },
     {
         path: ':exerciseId',

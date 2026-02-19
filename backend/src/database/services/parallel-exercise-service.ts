@@ -8,11 +8,13 @@ import {
 } from '../../utils/http.js';
 import type { ParallelExerciseRepository } from '../repositories/parallel-exercise-repository.js';
 import type { AccessKeyService } from './access-key-service.js';
+import type { ExerciseManagerService } from './exercise-manager-service.js';
 
 export class ParallelExerciseService {
     public constructor(
         private readonly parallelExerciseRepository: ParallelExerciseRepository,
-        private readonly accessKeyService: AccessKeyService
+        private readonly accessKeyService: AccessKeyService,
+        private readonly exerciseManagerService: ExerciseManagerService
     ) {}
 
     public async generateParticipantKey() {
@@ -41,6 +43,41 @@ export class ParallelExerciseService {
         }
         return parallelExercise;
     }
+
+    public async getParallelExerciseByParticipantKey(
+        key: GroupParticipantKey,
+        session: SessionInformation
+    ) {
+        const parallelExercise =
+            await this.parallelExerciseRepository.getParallelExerciseByParticipantKey(
+                key
+            );
+        if (!parallelExercise) {
+            throw new NotFoundError();
+        }
+        return parallelExercise;
+    }
+
+    public async joinParallelExerciseByParticipantKey(
+        key: GroupParticipantKey
+    ) {
+        const parallelExercise =
+            await this.parallelExerciseRepository.getParallelExerciseByParticipantKey(
+                key
+            );
+        if (!parallelExercise) {
+            throw new NotFoundError();
+        }
+
+        const exercise =
+            await this.exerciseManagerService.createExerciseFromTemplate(
+                parallelExercise.template.id,
+                undefined,
+                { parallelExerciseId: parallelExercise.id }
+            );
+        return exercise;
+    }
+
     public async createParallelExercise(
         data: Pick<ParallelExerciseInsert, 'joinViewportId' | 'templateId'>,
         session: SessionInformation

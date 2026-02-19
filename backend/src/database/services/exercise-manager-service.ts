@@ -1,8 +1,12 @@
 import type { ExerciseTemplateId } from 'fuesim-digital-shared';
+import type { InferInsertModel } from 'drizzle-orm';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import type { ExerciseTemplateInsert } from '../schema.js';
+import type {
+    exerciseTable,
+    ExerciseTemplateInsert,
+} from '../schema.js';
 import {
     ApiError,
     NotFoundError,
@@ -80,7 +84,13 @@ export class ExerciseManagerService {
 
     public async createExerciseFromTemplate(
         templateId: ExerciseTemplateId,
-        session: SessionInformation
+        session?: SessionInformation,
+        optionalData?: Partial<
+            Omit<
+                InferInsertModel<typeof exerciseTable>,
+                'baseTemplateId' | 'user'
+            >
+        >
     ) {
         await this.exerciseService.saveUnsavedExercises();
 
@@ -89,7 +99,10 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.exercise_template.user !== session.user.id) {
+        if (
+            session &&
+            exerciseTemplate.exercise_template.user !== session.user.id
+        ) {
             throw new PermissionDeniedError();
         }
         const actions = await this.actionRepository.getActionsForExerciseId(
@@ -103,8 +116,9 @@ export class ExerciseManagerService {
                 actions
             );
         await this.exerciseService.createExercise(newExercise, {
+            ...(optionalData ?? {}),
             baseTemplateId: exerciseTemplate.exercise_template.id,
-            user: session.user.id,
+            user: session ? session.user.id : null,
         });
         await this.exerciseRepository.updateExerciseTemplate(
             exerciseTemplate.exercise_template.id,

@@ -50,6 +50,7 @@
                         </button>
                     </div>
                     <div class="card-body d-flex justify-content-center py-0">
+                        {{ participantUrl() }}
                         <qr-code
                             [value]="participantUrl()"
                             size="350"

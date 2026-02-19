@@ -1,4 +1,5 @@
 import { eq, desc, getTableColumns } from 'drizzle-orm';
+import type { GroupParticipantKey } from 'fuesim-digital-shared';
 import type { ParallelExerciseId, ParallelExerciseInsert } from '../schema.js';
 import { parallelExerciseTable, exerciseTemplateTable } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
@@ -10,6 +11,7 @@ export class ParallelExerciseRepository extends BaseRepository {
             template: { ...getTableColumns(exerciseTemplateTable) },
         };
     }
+
     public async getParallelExerciseById(id: ParallelExerciseId) {
         return this.onlySingle(
             await this.databaseConnection
@@ -23,6 +25,22 @@ export class ParallelExerciseRepository extends BaseRepository {
                     )
                 )
                 .where(eq(parallelExerciseTable.id, id))
+        );
+    }
+
+    public async getParallelExerciseByParticipantKey(key: GroupParticipantKey) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .select(this.getColumns())
+                .from(parallelExerciseTable)
+                .innerJoin(
+                    exerciseTemplateTable,
+                    eq(
+                        exerciseTemplateTable.id,
+                        parallelExerciseTable.templateId
+                    )
+                )
+                .where(eq(parallelExerciseTable.participantKey, key))
         );
     }
 

@@ -1,0 +1,2 @@
+ALTER TABLE "exercise_entity" ADD COLUMN "parallelExerciseId" uuid;--> statement-breakpoint
+ALTER TABLE "exercise_entity" ADD CONSTRAINT "exercise_entity_parallelExerciseId_parallel_exercise_id_fk" FOREIGN KEY ("parallelExerciseId") REFERENCES "public"."parallel_exercise"("id") ON DELETE cascade ON UPDATE no action;

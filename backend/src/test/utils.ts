@@ -14,18 +14,18 @@ import request from 'supertest';
 import {
     DatabaseService,
     testingDatabaseName,
-} from '../src/database/services/database-service.js';
-import { Config } from '../src/config.js';
-import type { HttpMethod } from '../src/utils/http-handlers.js';
-import { FuesimServer } from '../src/fuesim-server.js';
-import { ExerciseService } from '../src/database/services/exercise-service.js';
-import { ExerciseRepository } from '../src/database/repositories/exercise-repository.js';
-import { ActionRepository } from '../src/database/repositories/action-repository.js';
-import { AuthService } from '../src/auth/auth-service.js';
-import { UserRepository } from '../src/database/repositories/user-repository.js';
-import { SessionRepository } from '../src/database/repositories/session-repository.js';
-import { ExerciseManagerService } from '../src/database/services/exercise-manager-service.js';
-import type { OidcService } from '../src/auth/oidc-service.js';
+} from '../database/services/database-service.js';
+import { Config } from '../config.js';
+import type { HttpMethod } from '../utils/http-handlers.js';
+import { FuesimServer } from '../fuesim-server.js';
+import { ExerciseService } from '../database/services/exercise-service.js';
+import { ExerciseRepository } from '../database/repositories/exercise-repository.js';
+import { ActionRepository } from '../database/repositories/action-repository.js';
+import { AuthService } from '../auth/auth-service.js';
+import { UserRepository } from '../database/repositories/user-repository.js';
+import { SessionRepository } from '../database/repositories/session-repository.js';
+import { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
+import type { OidcService } from '../auth/oidc-service.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types

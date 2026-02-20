@@ -1,8 +1,8 @@
 import { exerciseKeysSchema } from 'fuesim-digital-shared';
-import { UserReadableIdGenerator } from '../src/utils/user-readable-id-generator.js';
+import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
 import { createExercise, createTestEnvironment } from './utils.js';
 
-describe('exercise', () => {
+describe('exercise router', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {

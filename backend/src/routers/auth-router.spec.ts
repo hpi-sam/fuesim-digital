@@ -3,7 +3,7 @@ import {
     createTestEnvironment,
     createTestUserSession,
     defaultTestUserSessionData,
-} from './utils.js';
+} from '../test/utils.js';
 
 describe('Auth-Service', () => {
     const environment = createTestEnvironment();

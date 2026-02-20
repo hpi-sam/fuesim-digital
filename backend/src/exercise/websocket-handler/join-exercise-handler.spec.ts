@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { jest } from '@jest/globals';
 import { generateDummyPatient, sleep } from 'fuesim-digital-shared';
-import { ActiveExercise } from '../src/exercise/active-exercise.js';
-import { createExercise, createTestEnvironment } from './utils.js';
+import { ActiveExercise } from '../active-exercise.js';
+import { createExercise, createTestEnvironment } from '../../test/utils.js';
 
 describe('join exercise', () => {
     const environment = createTestEnvironment();

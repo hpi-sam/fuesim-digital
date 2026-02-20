@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { SetPretriageEnabledAction } from '../../../../shared/dist/store/action-reducers/configuration.js';
-import { createTestEnvironment } from '../../../test/utils.js';
+import { createTestEnvironment } from '../../test/utils.js';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
 import { actionTable } from '../schema.js';

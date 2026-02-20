@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { uuid } from 'fuesim-digital-shared';
-import { ActiveExercise } from '../src/exercise/active-exercise.js';
-import { createExercise, createTestEnvironment } from './utils.js';
+import { ActiveExercise } from '../../exercise/active-exercise.js';
+import { createExercise, createTestEnvironment } from '../../test/utils.js';
 
 describe('Exercise-Service', () => {
     const environment = createTestEnvironment();
@@ -38,7 +38,8 @@ describe('Exercise-Service', () => {
                     id: uuid(),
                     type: 'alarmGroup',
                     name: 'Alarm Group',
-                    sent: false,
+                    triggerCount: 0,
+                    triggerLimit: null,
                 },
             },
             null

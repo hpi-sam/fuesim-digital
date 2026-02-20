@@ -5,7 +5,7 @@ import type {
     TrainerKey,
 } from 'fuesim-digital-shared';
 import { sleep } from 'fuesim-digital-shared';
-import { createTestEnvironment } from '../../test/utils.js';
+import { createTestEnvironment } from '../test/utils.js';
 import { clientMap } from './client-map.js';
 import { ActiveExercise } from './active-exercise.js';
 

@@ -3,13 +3,13 @@ import {
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     postExerciseTemplateRequestDataSchema,
+    patchExerciseTemplateRequestDataSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { exerciseTemplateIdSchema } from '../database/schema.js';
-import { ApiError } from '../utils/http.js';
 
 export const createExerciseManagerRouter = (
     exerciseManagerService: ExerciseManagerService,
@@ -46,62 +46,58 @@ export const createExerciseManagerRouter = (
                     exerciseService
                 );
 
-            res.send(
+            res.status(201).send(
                 getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
             );
         });
 
-    router.post('/exercise_templates/:id/new', async (req, res) => {
-        const templateId = exerciseTemplateIdSchema.safeParse(
-            req.params.id
-        ).data;
-        if (!templateId) throw new ApiError();
-        const newExercise =
-            await exerciseManagerService.createExerciseFromTemplate(
+    router
+        .route('/exercise_templates/:id/new')
+        .all(isAuthenticatedMiddleware)
+        .post(async (req, res) => {
+            const templateId = exerciseTemplateIdSchema.parse(req.params.id);
+            const newExercise =
+                await exerciseManagerService.createExerciseFromTemplate(
+                    templateId,
+                    req.session!,
+                    exerciseService
+                );
+
+            res.status(201).send({
+                participantKey: newExercise.participantKey,
+                trainerKey: newExercise.trainerKey,
+            });
+        });
+
+    router
+        .route('/exercise_templates/:id')
+        .all(isAuthenticatedMiddleware)
+        .patch(async (req, res) => {
+            const templateId = exerciseTemplateIdSchema.parse(req.params.id);
+
+            const parsedData = patchExerciseTemplateRequestDataSchema.parse(
+                req.body
+            );
+
+            const exerciseTemplate =
+                await exerciseManagerService.updateExerciseTemplate(
+                    templateId,
+                    req.session!,
+                    parsedData
+                );
+            res.send(
+                getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
+            );
+        })
+        .delete(async (req, res) => {
+            const templateId = exerciseTemplateIdSchema.parse(req.params.id);
+
+            await exerciseManagerService.deleteExerciseTemplate(
                 templateId,
                 req.session!,
                 exerciseService
             );
-
-        res.status(201).send({
-            participantKey: newExercise.participantKey,
-            trainerKey: newExercise.trainerKey,
+            res.status(204).send();
         });
-    });
-
-    router.patch('/exercise_templates/:id', async (req, res) => {
-        const templateId = exerciseTemplateIdSchema.safeParse(
-            req.params.id
-        ).data;
-        if (!templateId) throw new ApiError();
-
-        const parsedData = postExerciseTemplateRequestDataSchema.parse(
-            req.body
-        );
-
-        const exerciseTemplate =
-            await exerciseManagerService.updateExerciseTemplate(
-                templateId,
-                req.session!,
-                parsedData
-            );
-        res.status(201).send(
-            getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
-        );
-    });
-
-    router.delete('/exercise_templates/:id', async (req, res) => {
-        const templateId = exerciseTemplateIdSchema.safeParse(
-            req.params.id
-        ).data;
-        if (!templateId) throw new ApiError();
-
-        await exerciseManagerService.deleteExerciseTemplate(
-            templateId,
-            req.session!,
-            exerciseService
-        );
-        res.status(204).send();
-    });
     return router;
 };

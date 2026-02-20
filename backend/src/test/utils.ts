@@ -5,6 +5,7 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     exerciseKeysSchema,
+    getExerciseTemplateResponseDataSchema,
     sleep,
     socketIoTransports,
 } from 'fuesim-digital-shared';
@@ -117,7 +118,7 @@ export class WebsocketClient {
     }
 }
 
-class TestEnvironment {
+export class TestEnvironment {
     public server!: FuesimServer;
     private _databaseService!: DatabaseService;
     private _exerciseService!: ExerciseService;
@@ -269,6 +270,11 @@ export const defaultTestUserSessionData: OidcService.UserInfo = {
     id: 'test-user',
     username: 'testuser',
 };
+export const alternativeTestUserSessionData: OidcService.UserInfo = {
+    displayName: 'Test User 2',
+    id: 'test-user-2',
+    username: 'testuser2',
+};
 export async function createTestUserSession(
     environment: TestEnvironment,
     data?: { user?: OidcService.UserInfo; expired?: boolean }
@@ -312,10 +318,28 @@ async function setupDatabase(): Promise<DatabaseService> {
     return testDatabaseService;
 }
 
-export async function createExercise(environment: TestEnvironment) {
+export async function createExercise(
+    environment: TestEnvironment,
+    session?: string
+) {
     const response = await environment
-        .httpRequest('post', '/api/exercise')
+        .httpRequest('post', '/api/exercise', session)
         .expect(201);
 
     return exerciseKeysSchema.parse(response.body);
+}
+
+export async function createExerciseTemplate(
+    environment: TestEnvironment,
+    session: string
+) {
+    const response = await environment
+        .httpRequest('post', '/api/exercise_templates', session)
+        .send({
+            name: 'Test Template',
+            description: 'Test Template Description',
+        })
+        .expect(201);
+
+    return getExerciseTemplateResponseDataSchema.parse(response.body);
 }

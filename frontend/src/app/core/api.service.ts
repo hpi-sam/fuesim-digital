@@ -13,6 +13,7 @@ import {
     UUID,
     type ExerciseTimeline,
     type StateExport,
+    type PatchExerciseTemplateResponseData,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -95,15 +96,12 @@ export class ApiService {
     }
 
     public async patchExerciseTemplate(
-        templateId: UUID,
-        data: PostExerciseTemplateRequestData
+        id: UUID,
+        data: PatchExerciseTemplateResponseData
     ) {
         return lastValueFrom(
             this.httpClient
-                .patch(
-                    `${httpOrigin}/api/exercise_templates/${templateId}`,
-                    data
-                )
+                .patch(`${httpOrigin}/api/exercise_templates/${id}`, data)
                 .pipe(
                     map((v) => getExerciseTemplateResponseDataSchema.parse(v))
                 )

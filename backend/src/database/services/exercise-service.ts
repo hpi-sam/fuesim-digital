@@ -1,5 +1,5 @@
 import {
-    isExerciseKey,
+    isParticipantKey,
     isTrainerKey,
     type ExerciseKey,
     type ExerciseTimeline,
@@ -16,11 +16,7 @@ import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import {
-    ApiError,
-    NotFoundError,
-    PermissionDeniedError,
-} from '../../utils/http.js';
+import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
 
 export class ExerciseService {
     public constructor(
@@ -30,24 +26,20 @@ export class ExerciseService {
 
     private readonly exerciseMap = new Map<ExerciseKey, ActiveExercise>();
 
-    public hasExerciseKey(exerciseKey: ExerciseKey) {
-        return this.exerciseMap.has(exerciseKey);
-    }
-
     public getExerciseByKey(
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ) {
-        if (!isExerciseKey(exerciseKey)) {
-            throw new ApiError();
-        }
-
         const exercise = this.exerciseMap.get(exerciseKey);
         if (!exercise) {
             throw new NotFoundError();
         }
 
-        if (exercise.template && exercise.template.user !== session?.user.id) {
+        if (
+            exercise.template &&
+            (exercise.template.user !== session?.user.id ||
+                isParticipantKey(exerciseKey))
+        ) {
             throw new PermissionDeniedError();
         }
         return exercise;
@@ -202,7 +194,7 @@ export class ExerciseService {
         }
 
         if (exerciseEntry.exercise_template) {
-            throw new ApiError();
+            throw new PermissionDeniedError();
         }
         if (
             exerciseEntry.exercise_entity.user &&

@@ -1,6 +1,19 @@
-import { exerciseKeysSchema } from 'fuesim-digital-shared';
+import {
+    exerciseKeysSchema,
+    exerciseExistsResponseDataSchema,
+} from 'fuesim-digital-shared';
+import type {
+    GetExerciseTemplateResponseData,
+    ExerciseKeys,
+} from 'fuesim-digital-shared';
 import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
-import { createExercise, createTestEnvironment } from './utils.js';
+import {
+    createExerciseTemplate,
+    createTestUserSession,
+    createExercise,
+    createTestEnvironment,
+    alternativeTestUserSessionData,
+} from '../test/utils.js';
 
 describe('exercise router', () => {
     const environment = createTestEnvironment();
@@ -39,11 +52,15 @@ describe('exercise router', () => {
                 .expect(200);
         });
 
-        it('succeeds returning true for trainer key', async () => {
+        it('succeeds with 200 with a valid trainer key', async () => {
             const trainerKey = (await createExercise(environment)).trainerKey;
-            await environment
+            const response = await environment
                 .httpRequest('get', `/api/exercise/${trainerKey}`)
                 .expect(200);
+            const parsed = exerciseExistsResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed.isTemplate).toBe(false);
         });
 
         it('fails with 400 for arbitrary keys', async () => {
@@ -54,6 +71,124 @@ describe('exercise router', () => {
                         .expect(400)
                 )
             );
+        });
+
+        describe('user-related exercise', () => {
+            let session: string;
+            let exercise: ExerciseKeys;
+            beforeEach(async () => {
+                session = await createTestUserSession(environment);
+                exercise = await createExercise(environment, session);
+            });
+
+            it('succeeds with 200 with a trainer key if not logged in', async () => {
+                await environment
+                    .httpRequest('get', `/api/exercise/${exercise.trainerKey}`)
+                    .expect(200);
+            });
+
+            it('succeeds with 200 with a trainer key if logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.trainerKey}`,
+                        session
+                    )
+                    .expect(200);
+            });
+
+            it('succeeds with 200 with a participant key if not logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.participantKey}`
+                    )
+                    .expect(200);
+            });
+
+            it('succeeds with 200 with a participant key if logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.participantKey}`,
+                        session
+                    )
+                    .expect(200);
+            });
+        });
+
+        describe('exercise template', () => {
+            let session: string;
+            let exerciseTemplate: GetExerciseTemplateResponseData;
+            beforeEach(async () => {
+                session = await createTestUserSession(environment);
+                exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session
+                );
+            });
+
+            it('fails with trainer key if not logged in', async () => {
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exerciseTemplate.trainerKey}`
+                    )
+                    .expect(403);
+            });
+
+            it('succeeds with trainer key if logged in', async () => {
+                const response = await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        session
+                    )
+                    .expect(200);
+
+                const parsed = exerciseExistsResponseDataSchema.parse(
+                    response.body
+                );
+                expect(parsed.isTemplate).toBe(true);
+            });
+
+            it('fails with trainer key if logged in with wrong user', async () => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        session2
+                    )
+                    .expect(403);
+            });
+
+            it('fails with participant key if not logged in', async () => {
+                const exercise = environment.exerciseService
+                    .TESTING_getExerciseMap()
+                    .get(exerciseTemplate.trainerKey)!;
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.participantKey}`
+                    )
+                    .expect(403);
+            });
+
+            it('fails with participant key if logged in', async () => {
+                const exercise = environment.exerciseService
+                    .TESTING_getExerciseMap()
+                    .get(exerciseTemplate.trainerKey)!;
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exercise.participantKey}`,
+                        session
+                    )
+                    .expect(403);
+            });
         });
 
         it('fails with 404 for non-existing key', async () => {
@@ -96,6 +231,88 @@ describe('exercise router', () => {
             await environment
                 .httpRequest('delete', `/api/exercise/${exerciseKey}`)
                 .expect(403);
+        });
+
+        describe('user-related exercise', () => {
+            let session: string;
+            let exercise: ExerciseKeys;
+            beforeEach(async () => {
+                session = await createTestUserSession(environment);
+                exercise = await createExercise(environment, session);
+            });
+
+            it('fails deleting an exercise if not logged-in', async () => {
+                await environment
+                    .httpRequest(
+                        'delete',
+                        `/api/exercise/${exercise.trainerKey}`
+                    )
+                    .expect(403);
+
+                await environment
+                    .httpRequest('get', `/api/exercise/${exercise.trainerKey}`)
+                    .expect(200);
+            });
+
+            it('succeeds deleting an exercise if logged-in', async () => {
+                await environment
+                    .httpRequest(
+                        'delete',
+                        `/api/exercise/${exercise.trainerKey}`,
+                        session
+                    )
+                    .expect(204);
+
+                await environment
+                    .httpRequest('get', `/api/exercise/${exercise.trainerKey}`)
+                    .expect(404);
+            });
+        });
+
+        describe('exercise template', () => {
+            let session: string;
+            let exerciseTemplate: GetExerciseTemplateResponseData;
+            beforeEach(async () => {
+                session = await createTestUserSession(environment);
+                exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session
+                );
+            });
+
+            it('fails deleting an exercise if logged-in', async () => {
+                await environment
+                    .httpRequest(
+                        'delete',
+                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        session
+                    )
+                    .expect(403);
+
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        session
+                    )
+                    .expect(200);
+            });
+            it('fails deleting an exercise if not logged-in', async () => {
+                await environment
+                    .httpRequest(
+                        'delete',
+                        `/api/exercise/${exerciseTemplate.trainerKey}`
+                    )
+                    .expect(403);
+
+                await environment
+                    .httpRequest(
+                        'get',
+                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        session
+                    )
+                    .expect(200);
+            });
         });
 
         it('disconnects clients of the removed exercise', async () => {

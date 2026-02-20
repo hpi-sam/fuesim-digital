@@ -74,6 +74,13 @@ export const getExerciseTemplateResponseDataSchema = z.object({
     name: z.string(),
     description: z.string(),
 });
+export type GetExerciseTemplateResponseData = z.infer<
+    typeof getExerciseTemplateResponseDataSchema
+>;
+export type GetExerciseTemplateResponseDataInput = z.input<
+    typeof getExerciseTemplateResponseDataSchema
+>;
+
 export const postExerciseTemplateRequestDataSchema = z.object({
     name: z.string().trim().nonempty(),
     description: z.string().trim(),
@@ -81,11 +88,11 @@ export const postExerciseTemplateRequestDataSchema = z.object({
 export type PostExerciseTemplateRequestData = z.infer<
     typeof postExerciseTemplateRequestDataSchema
 >;
-export type GetExerciseTemplateResponseData = z.infer<
-    typeof getExerciseTemplateResponseDataSchema
->;
-export type GetExerciseTemplateResponseDataInput = z.input<
-    typeof getExerciseTemplateResponseDataSchema
+
+export const patchExerciseTemplateRequestDataSchema =
+    postExerciseTemplateRequestDataSchema.partial();
+export type PatchExerciseTemplateResponseData = z.infer<
+    typeof patchExerciseTemplateRequestDataSchema
 >;
 
 export const getExerciseTemplatesResponseDataSchema = z.array(

@@ -1,3 +1,19 @@
+import type {
+    Vehicle,
+    VehicleTemplate,
+    MaterialTemplate,
+    PersonnelTemplate,
+    MapCoordinates,
+    VehicleParameters,
+    VersionedElementPartial,
+} from '../models/index.js';
+import {
+    newVehicleParameters,
+    newNoOccupation,
+    newVehiclePositionIn,
+    newMapPositionAt,
+} from '../models/index.js';
+
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
 import { newMaterialFromTemplate } from '../models/material.js';
 import { newPersonnelFromTemplate } from '../models/personnel.js';
@@ -24,8 +40,10 @@ export function createVehicleParameters(
     vehicleTemplate: VehicleTemplate,
     materialTemplates: { readonly [key in UUID]: MaterialTemplate },
     personnelTemplates: { readonly [key in UUID]: PersonnelTemplate },
-    vehiclePosition: MapCoordinates
+    vehiclePosition: MapCoordinates,
+    entityVersion?: VersionedElementPartial
 ): VehicleParameters {
+    console.log(entityVersion);
     const materials = vehicleTemplate.materialTemplateIds
         .map((materialTemplateId: UUID) => {
             const materialTemplate = materialTemplates[materialTemplateId];
@@ -52,6 +70,8 @@ export function createVehicleParameters(
         .filter((val) => val !== null);
 
     const vehicle: Vehicle = {
+        entityId: entityVersion?.entityId,
+        versionId: entityVersion?.versionId,
         id: vehicleId,
         type: 'vehicle',
         templateId: vehicleTemplate.id,

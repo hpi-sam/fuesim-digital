@@ -1,0 +1,35 @@
+@let content = element().content;
+
+@switch (content.type) {
+    @case ('alarmGroup') {
+        <app-generic-element-card
+            [title]="content.name"
+            [subtitle]="
+                (content.alarmGroupVehicles | values).length + ' Fahrzeuge'
+            "
+            [editable]="editable()"
+            (edit)="openEditor()"
+            (delete)="deleteElement()"
+            (duplicate)="duplicateElement()"
+        />
+    }
+    @case ('vehicleTemplate') {
+        <app-generic-element-card
+            [image]="content.image.url"
+            [title]="content.name"
+            [subtitle]="content.vehicleType"
+            [editable]="editable()"
+            (edit)="openEditor()"
+            (delete)="deleteElement()"
+            (duplicate)="duplicateElement()"
+        />
+    }
+
+    @default {
+        <app-generic-element-card
+            [title]="element().title"
+            subtitle="Unbekannter Typ"
+            [editable]="false"
+        />
+    }
+}

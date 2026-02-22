@@ -1,17 +1,23 @@
 import type {
     ActionId,
+    CollectionEntityId,
+    CollectionVersionId,
+    ElementEntityId,
+    ElementVersionId,
     ExerciseAction,
     ExerciseId,
     ExerciseState,
     ExerciseTemplateId,
+    Marketplace,
     ParticipantKey,
     AccessKey,
     TrainerKey,
+    VersionedElementContent,
     GroupParticipantKey,
     ParallelExerciseId,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { relations, sql } from 'drizzle-orm';
+import { and, eq, getTableColumns, max, relations, sql } from 'drizzle-orm';
 import {
     char,
     integer,
@@ -22,25 +28,29 @@ import {
     foreignKey,
     varchar,
     timestamp,
+    unique,
     text,
+    pgView,
+    pgEnum,
+    boolean,
+    check,
 } from 'drizzle-orm/pg-core';
 
-function typedUUID<T>() {
+function typedUUID<T = string>() {
     return uuid().$type<T>();
+}
+function defaultUUID<T = string>() {
+    return typedUUID<T>().default(sql`uuid_generate_v4()`);
+}
+function defaultPrefixedUUID(prefix: string) {
+    return varchar().$defaultFn(() => `${prefix}_${crypto.randomUUID()}`);
 }
 
 function baseTable<T>() {
     return {
-        id: typedUUID<T>()
-            .default(sql`uuid_generate_v4()`)
-            .primaryKey()
-            .notNull(),
+        id: defaultUUID<T>().primaryKey().notNull(),
     };
 }
-
-export const accessKeyTable = pgTable('access_key', {
-    key: varchar().$type<AccessKey>().primaryKey().notNull(),
-});
 
 export const userTable = pgTable('users', {
     /**
@@ -150,6 +160,117 @@ export const actionTable = pgTable(
     ]
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
+
+const stateVersionedEntity = <EntityBrand, VersionBrand>(prefix: string) => ({
+    versionId: defaultPrefixedUUID(prefix + '_version')
+        .unique()
+        .notNull()
+        .primaryKey()
+        .$type<VersionBrand>(),
+    entityId: defaultPrefixedUUID(prefix + '_entity')
+        .notNull()
+        .$type<EntityBrand>(),
+    version: integer().notNull(),
+    stateVersion: integer().notNull(),
+    createdBy: varchar().notNull().default('unknown'), //TODO: @Quixelation - replace with actual user id when creating sets and elements
+    createdAt: timestamp({ withTimezone: true, mode: 'date' })
+        .defaultNow()
+        .notNull(),
+});
+
+export const setVisibilityEnum = pgEnum('exercise_set_visibility', [
+    'private',
+    'public',
+]);
+
+export const collectionTable = pgTable(
+    'exercise_element_sets',
+    {
+        ...stateVersionedEntity<CollectionEntityId, CollectionVersionId>('set'),
+        title: varchar().notNull(),
+        description: varchar().notNull(),
+        visibility: setVisibilityEnum().notNull().default('private'),
+        owner: varchar().notNull(),
+        draftState: boolean().notNull(),
+    },
+    (table) => [
+        unique('unique_set_version').on(table.entityId, table.version),
+        unique('unique_set_id').on(table.entityId, table.versionId),
+    ]
+);
+
+export const elementCollectionMappingTable = pgTable(
+    'exercise_element_to_set_mapping',
+    {
+        setEntityId: varchar().notNull().$type<CollectionEntityId>(),
+        setVersionId: varchar()
+            .notNull()
+            .$type<CollectionVersionId>()
+            .references(() => collectionTable.versionId, {
+                onDelete: 'cascade',
+            }),
+        elementEntityId: varchar().notNull().$type<ElementEntityId>(),
+        elementVersionId: varchar()
+            .notNull()
+            .$type<ElementVersionId>()
+            .references(() => elementTable.versionId, {
+                onDelete: 'cascade',
+            }),
+        isBaseReference: boolean().default(false),
+    },
+    (table) => [
+        unique('unique_element_set_mapping').on(
+            table.setVersionId,
+            table.elementVersionId
+        ),
+        unique('unique_element_set_mapping_2').on(
+            table.setVersionId,
+            table.elementEntityId
+        ),
+    ]
+);
+
+export const collectionDependencyMappingTable = pgTable(
+    'collection_dependency_mapping',
+    {
+        collectionEntityId: varchar().notNull().$type<CollectionEntityId>(),
+        collectionVersionId: varchar()
+            .notNull()
+            .$type<CollectionVersionId>()
+            .references(() => collectionTable.versionId, {
+                onDelete: 'cascade',
+            }),
+        dependentCollectionEntityId: varchar()
+            .notNull()
+            .$type<CollectionEntityId>(),
+        dependentCollectionVersionId: varchar()
+            .notNull()
+            .$type<CollectionVersionId>()
+            .references(() => collectionTable.versionId, {
+                onDelete: 'cascade',
+            }),
+    },
+    (table) => [
+        unique('unique_collection_dependency').on(
+            table.collectionVersionId,
+            table.dependentCollectionVersionId
+        ),
+    ]
+);
+
+export const elementTable = pgTable(
+    'exercise_element_templates',
+    {
+        ...stateVersionedEntity<ElementEntityId, ElementVersionId>('element'),
+        title: varchar().notNull(),
+        description: varchar().notNull(),
+        content: json().$type<VersionedElementContent>().notNull(),
+    },
+    (table) => [
+        unique('unique_template_version').on(table.entityId, table.version),
+        unique('unique_template_id').on(table.entityId, table.versionId),
+    ]
+);
 
 export const actionEntityRelations = relations(actionTable, ({ one }) => ({
     exerciseWrapperEntity: one(exerciseTable, {

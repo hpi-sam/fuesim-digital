@@ -22,6 +22,7 @@ import { RestrictedZoneActionReducers } from './restricted-zone.js';
 import { OperationalSectionActionReducers } from './operational-section.js';
 import { ScoutableActionReducers } from './scoutable.js';
 import { TechnicalChallengeActionReducers } from './technical-challenge.js';
+import { CollectionReducers } from './collections.js';
 
 /**
  * All action reducers of the exercise must be registered here
@@ -47,6 +48,7 @@ const actionReducers = {
     ...RadiogramActionReducers,
     ...VehicleTemplateActionReducers,
     ...RestrictedZoneActionReducers,
+    ...CollectionReducers,
     ...OperationalSectionActionReducers,
     ...ScoutableActionReducers,
     ...TechnicalChallengeActionReducers,

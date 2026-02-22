@@ -337,15 +337,6 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
-                                <div class="mb-2">
-                                    <button
-                                        class="btn btn-sm btn-outline-primary"
-                                        (click)="addVehicleTemplate()"
-                                    >
-                                        <i class="bi bi-plus"></i>
-                                        Hinzufügen
-                                    </button>
-                                </div>
                                 <div class="cards">
                                     @for (
                                         vehicleTemplate of vehicleTemplates$
@@ -367,11 +358,6 @@
                                             dataCy="draggableVehicleDiv"
                                             [imageUrl]="
                                                 vehicleTemplate.image.url
-                                            "
-                                            (elementEdit)="
-                                                editVehicleTemplate(
-                                                    vehicleTemplate.id
-                                                )
                                             "
                                             [enableEditButton]="true"
                                             [title]="

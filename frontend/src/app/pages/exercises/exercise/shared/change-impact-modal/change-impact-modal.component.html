@@ -1,0 +1,63 @@
+<p>change-impact-modal works!</p>
+
+{{ changes | json }}
+
+@for (change of changes; track change.id; let idx = $index) {
+    <p (click)="selectChange(idx)">{{ change.type }}</p>
+}
+
+@if (selectedChangeIndex() !== null) {
+    @let selectedChange = changes[selectedChangeIndex()!]!;
+    @switch (selectedChange.type) {
+        @case ('removed') {
+            <p>Element {{ selectedChange.entity.title }} wurde entfernt.</p>
+            <p>Bitte wählen sie eine geeignete Vorgehensweise aus.</p>
+            <input
+                type="radio"
+                id="keep"
+                name="action"
+                value="keep"
+                (change)="setRemovalActionType('replace')"
+            />
+            <label for="keep">Element ersetzen</label><br />
+
+            <input
+                type="radio"
+                id="remove"
+                name="action"
+                value="remove"
+                (change)="setRemovalActionType('remove')"
+            />
+            <label for="remove">Element entfernen</label><br />
+
+            <input type="checkbox" id="applyForAll" />
+            <label for="applyForAll"
+                >Diese Aktion für alle Objekte dieses Typs anwenden</label
+            >
+
+            @if (changesToApply()[selectedChange.id]; as applyingChanges) {
+                @if (applyingChanges.action === 'replace') {
+                    <p>Das Element wird ersetzt.</p>
+                    @for (
+                        newElement of newCollectionElements;
+                        track newElement.versionId
+                    ) {
+                        <app-map-editor-card
+                            [title]="newElement.content.name"
+                        />
+                    }
+                } @else if (applyingChanges.action === 'remove') {
+                    <p>Das Element wird entfernt.</p>
+                }
+            }
+        }
+
+        @default {
+            <p>
+                Element {{ selectedChange.element.versionId }} wurde
+                {{ selectedChange.type }}.
+            </p>
+            <p>Für diesen Fall gibt es noch keine spezifische Darstellung.</p>
+        }
+    }
+}

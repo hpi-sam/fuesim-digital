@@ -1,0 +1,33 @@
+<div
+    class="d-flex flex-row align-items-center justify-content-between gap-2 mb-3"
+>
+    <h4 class="mb-0">
+        {{ dependency().collection.title }} (Version
+        {{ dependency().collection.version }}, draft:
+        {{ dependency().collection.draftState }})
+    </h4>
+    @if (newerVersionAvailable.isLoading()) {
+        <div class="spinner-grow-sm text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+    @if (
+        newerVersionAvailable.hasValue() &&
+        newerVersionAvailable.value().newerVersionAvailable
+    ) {
+        <button
+            class="btn btn-outline-primary btn-sm"
+            (click)="upgradeVersion()"
+        >
+            Version aktualisieren
+        </button>
+    }
+</div>
+<div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-2">
+    @for (
+        exerciseObject of dependency().elements;
+        track exerciseObject.versionId
+    ) {
+        <app-element-card [element]="exerciseObject" [editable]="false" />
+    }
+</div>

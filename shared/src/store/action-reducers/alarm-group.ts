@@ -12,6 +12,7 @@ import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getElement } from './utils/get-element.js';
+import { isElementVersionId, Marketplace } from '../../index.js';
 
 export class AddAlarmGroupAction implements Action {
     @IsValue('[AlarmGroup] Add AlarmGroup' as const)
@@ -167,6 +168,12 @@ export namespace AlarmGroupActionReducers {
                     'alarmGroup',
                     alarmGroupId
                 );
+
+                if (!isElementVersionId(alarmGroupId)) {
+                    throw new ReducerError(
+                        `Invalid alarmGroupVehicleId ${alarmGroupVehicleId} for AlarmGroup with id ${alarmGroup.id}`
+                    );
+                }
                 const alarmGroupVehicle = getAlarmGroupVehicle(
                     alarmGroup,
                     alarmGroupVehicleId
@@ -187,6 +194,7 @@ export namespace AlarmGroupActionReducers {
                     'alarmGroup',
                     alarmGroupId
                 );
+
                 getAlarmGroupVehicle(alarmGroup, alarmGroupVehicleId);
                 delete alarmGroup.alarmGroupVehicles[alarmGroupVehicleId];
                 return draftState;

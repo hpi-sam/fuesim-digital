@@ -1,0 +1,78 @@
+<div class="modal-header">
+    <h4 class="modal-title">Sammlungs-Element</h4>
+</div>
+<div class="">
+    <div class="d-flex flex-row">
+        @if (data.isEditMode) {
+            <ul class="list-group rounded-0">
+                @if (versionHistory() !== null) {
+                    @for (
+                        version of versionHistory();
+                        track version.versionId
+                    ) {
+                        @let isCurrentVersion =
+                            version.version === data.element.version;
+                        @let isSelectedVersion =
+                            version.version === selectedVersion();
+                        <li
+                            class="list-group-item d-flex flex-column small text-nowrap"
+                            [class.active]="isSelectedVersion"
+                            [class.text-primary]="
+                                isCurrentVersion && !isSelectedVersion
+                            "
+                            [aria-current]="isCurrentVersion ? 'true' : 'false'"
+                            (click)="selectVersion(version.version)"
+                            role="button"
+                        >
+                            <b
+                                >Version {{ version.version }} (<span
+                                    class="font-monospace"
+                                    >{{ version.stateVersion }}</span
+                                >)
+                            </b>
+                            <span>{{ version.createdAt | localeDate }}</span>
+                        </li>
+                    }
+                } @else {
+                    <span>Versionen laden</span>
+                }
+            </ul>
+        }
+        <div class="modal-body">
+            @if (timeTravelMode()) {
+                <div class="alert alert-warning" role="alert">
+                    Sie betrachten eine frühere Version der Fahrzeugvorlage.
+                    <br />
+                    Bitte wechseln Sie zurück zur aktuellen Version, um
+                    Änderungen vorzunehmen.
+                </div>
+            }
+            @switch (data.type) {
+                @case ('vehicleTemplate') {
+                    <app-vehicle-template-form-marketplace
+                        [data]="selectedVersionData()"
+                        (submit)="submit($event)"
+                        [btnText]="
+                            data.isEditMode
+                                ? 'Änderungen speichern'
+                                : 'Fahrzeugvorlage hinzufügen'
+                        "
+                        [disabled]="timeTravelMode()"
+                    ></app-vehicle-template-form-marketplace>
+                }
+                @case ('alarmGroup') {
+                    <app-alarmgroup-element-modal
+                        [data]="selectedVersionData()"
+                        [btnText]="
+                            data.isEditMode
+                                ? 'Änderungen speichern'
+                                : 'Alarmgruppe hinzufügen'
+                        "
+                        (submit)="submit($event)"
+                        [disabled]="timeTravelMode()"
+                    />
+                }
+            }
+        </div>
+    </div>
+</div>

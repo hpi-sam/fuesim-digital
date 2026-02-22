@@ -15,6 +15,7 @@ import { createExerciseManagerRouter } from './routers/exercise-manager-router.j
 import { healthRouter } from './routers/health-router.js';
 import type { Services } from './database/services/index.js';
 import { createParallelExerciseRouter } from './routers/parallel-exercise-router.js';
+import { createCollectionsRouter } from './routers/collections-router.js';
 
 declare global {
     namespace Express {
@@ -57,10 +58,15 @@ export class ApiHttpServer {
 
         app.use('/api/auth', createAuthRouter(services.authService));
 
+        app.use(
+            '/api/collections',
+            createCollectionsRouter(services.collectionService)
+        );
+
         app.use(errorHandler);
 
         this.httpServer = app.listen(Config.httpPort, () => {
-            console.log(`HTTP server listening on port ${Config.httpPort}`);
+            //console.log(`HTTP server listening on port ${Config.httpPort}`);
         });
     }
 

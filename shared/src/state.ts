@@ -87,6 +87,8 @@ import {
 } from './models/technical-challenge/technical-challenge.js';
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
+import { versionedElementPartialSchema } from './models/versioned-elements.js';
+import { VersionedCollectionPartial } from './models/versioned-collections.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -109,6 +111,10 @@ export class ExerciseState {
 
     @IsZodSchema(randomStateSchema)
     public readonly randomState: RandomState = newSeededRandomState();
+    // String, bc versionId is a Prefixed UUID
+    @IsZodSchema(versionedElementPartialSchema.nullable())
+    public readonly selectedCollection: VersionedCollectionPartial | null =
+        null;
 
     @IsZodSchema(z.record(uuidSchema, viewportSchema))
     public readonly viewports: { readonly [key: UUID]: Viewport } = {};

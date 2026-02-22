@@ -34,6 +34,8 @@ import { ParallelExerciseService } from '../database/services/parallel-exercise-
 import { ParallelExerciseRepository } from '../database/repositories/parallel-exercise-repository.js';
 import type { Repositories } from '../database/repositories/index.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
+import { CollectionRepository } from '../database/repositories/collection-repository.js';
+import { CollectionService } from '../database/services/collection-service.js';
 
 // Some helper types
 /**
@@ -148,12 +150,15 @@ export class TestEnvironment {
         return this._services;
     }
 
-    public httpRequest(
+    public httpRequest<TData extends string | object>(
         method: HttpMethod,
         url: string,
-        session?: string
+        session?: string,
+        data?: TData
     ): request.Test {
-        const req = request(this.server.httpServer.httpServer)[method](url);
+        const req = request(this.server.httpServer.httpServer)
+            [method](url)
+            .send(data);
         if (session) {
             req.set(
                 'Cookie',
@@ -210,6 +215,8 @@ export function createTestEnvironment(): TestEnvironment {
     let actionRepository: ActionRepository;
     let userRepository: UserRepository;
     let sessionRepository: SessionRepository;
+    let collectionService: CollectionService;
+    let collectionRepository: CollectionRepository;
     let accessKeyRepository: AccessKeyRepository;
     let parallelExerciseService: ParallelExerciseService;
     let parallelExerciseRepository: ParallelExerciseRepository;
@@ -229,6 +236,10 @@ export function createTestEnvironment(): TestEnvironment {
         parallelExerciseRepository = new ParallelExerciseRepository(
             databaseService.databaseConnection
         );
+        collectionRepository = new CollectionRepository(
+            databaseService.databaseConnection
+        );
+        collectionService = new CollectionService(collectionRepository);
 
         accessKeyService = new AccessKeyService(accessKeyRepository);
         exerciseService = new ExerciseService(
@@ -263,6 +274,7 @@ export function createTestEnvironment(): TestEnvironment {
             parallelExerciseRepository,
             sessionRepository,
             userRepository,
+            collectionRepository,
         };
         const services: Services = {
             authService,
@@ -271,6 +283,7 @@ export function createTestEnvironment(): TestEnvironment {
             parallelExerciseService,
             accessKeyService,
             databaseService,
+            collectionService,
         };
         environment.init(repositories, services);
     });

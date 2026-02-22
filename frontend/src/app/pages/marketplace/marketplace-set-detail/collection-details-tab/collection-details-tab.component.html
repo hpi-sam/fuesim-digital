@@ -1,0 +1,73 @@
+<h4 class="h4 mt-4">Eigenschaften</h4>
+<hr class="my-2" />
+<div class="form-group mb-3">
+    <label class="form-label">Name der Sammlung</label>
+    <input
+        #nameInput="ngModel"
+        [(ngModel)]="collectionTitle"
+        required
+        type="text"
+        class="form-control"
+    />
+    <app-display-validation [ngModelInput]="nameInput"></app-display-validation>
+    <button
+        class="btn btn-primary mt-2"
+        type="button"
+        (click)="updateCollectionTitle()"
+    >
+        Umbenennen
+    </button>
+</div>
+
+<h4 class="h4 mt-5">Gefahrenzone</h4>
+<hr class="my-2" />
+<ul class="list-group">
+    <li
+        class="list-group-item border-danger d-flex flex-row align-items-center justify-content-between gap-2"
+    >
+        <div class="d-flex flex-column">
+            <b> Sammlung veröffentlichen </b>
+            <small class="text-muted">
+                Diese Sammlung wird in der Übersicht für alle Benutzer sichtbar
+                und in Übungsszenarien verwendbar sein. Diese Aktion kann nicht
+                rückgängig gemacht werden.
+            </small>
+        </div>
+        @if (collection().visibility === 'private') {
+            <button
+                class="btn btn-outline-danger text-nowrap"
+                type="button"
+                (click)="makeSetPublic()"
+            >
+                Sammlung veröffentlichen
+            </button>
+        } @else {
+            <span
+                class="badge text-bg-success d-flex flex-row align-items-center gap-1 p-2"
+            >
+                <i class="bi bi-check-circle"></i>
+                <span> Bereits öffentlich </span>
+            </span>
+        }
+    </li>
+    <li
+        class="list-group-item border-danger d-flex flex-row align-items-center justify-content-between gap-2"
+    >
+        <div class="d-flex flex-column">
+            <b> Sammlung löschen </b>
+            <small class="text-muted">
+                Wenn eine Sammlung gelöscht wird, wird diese nicht mehr in der
+                Übersicht angezeigt. Bereits bestehende Übungsszenarien, die
+                Elemente aus dieser Sammlung verwenden, können weiterhin auf
+                diese Elemente zugreifen.
+            </small>
+        </div>
+        <button
+            class="btn btn-outline-danger text-nowrap"
+            type="button"
+            (click)="deleteSet()"
+        >
+            Sammlung löschen
+        </button>
+    </li>
+</ul>

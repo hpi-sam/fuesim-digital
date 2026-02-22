@@ -1,0 +1,185 @@
+<div class="form-group mb-3">
+    <label class="form-label">Standardname von neuen Fahrzeugen:</label>
+    <input
+        #nameInput="ngModel"
+        [(ngModel)]="values().name"
+        [disabled]="disabled()"
+        required
+        type="text"
+        class="form-control"
+        placeholder="Fahrzeugname"
+    />
+    <app-display-validation [ngModelInput]="nameInput"></app-display-validation>
+</div>
+<div class="form-group mb-3">
+    <label class="form-label">Typ:</label>
+    <input
+        #typeInput="ngModel"
+        [(ngModel)]="values().vehicleType"
+        [disabled]="disabled()"
+        required
+        type="text"
+        class="form-control"
+        placeholder="Fahrzeugtyp"
+    />
+    <app-display-validation [ngModelInput]="typeInput"></app-display-validation>
+</div>
+<div class="form-group mb-3">
+    <label class="form-label">Bildadresse:</label>
+    <input
+        #imageUrlInput="ngModel"
+        [(ngModel)]="values().image.url"
+        [appAutofocus]="true"
+        appImageExistsValidator
+        [disabled]="disabled()"
+        required
+        type="url"
+        class="form-control"
+        placeholder="https://example.com/image.png"
+    />
+    <app-display-validation
+        [ngModelInput]="imageUrlInput"
+    ></app-display-validation>
+</div>
+<div class="form-group mb-3">
+    <label class="form-label">Bildhöhe:</label>
+    <input
+        #heightInput="ngModel"
+        [(ngModel)]="values().image.height"
+        [disabled]="disabled()"
+        required
+        min="1"
+        step="1"
+        appIntegerValidator
+        type="number"
+        class="form-control"
+        placeholder="100"
+    />
+    <app-display-validation
+        [ngModelInput]="heightInput"
+    ></app-display-validation>
+</div>
+<div class="form-group mb-3">
+    <label class="form-label">Patientenkapazität:</label>
+    <input
+        #patientCapacityInput="ngModel"
+        [(ngModel)]="values().patientCapacity"
+        [disabled]="disabled()"
+        required
+        min="0"
+        step="1"
+        appIntegerValidator
+        type="number"
+        class="form-control"
+        placeholder="1"
+    />
+    <app-display-validation
+        [ngModelInput]="patientCapacityInput"
+    ></app-display-validation>
+</div>
+<div class="form-group mb-3">
+    <label class="form-label"
+        >Materialien
+
+        @if (!disabled()) {
+            <div ngbDropdown autoClose="outside" class="d-inline-block">
+                <button
+                    ngbDropdownToggle
+                    type="button"
+                    class="btn btn-outline-primary ms-3"
+                >
+                    Material hinzufügen
+                </button>
+                <div ngbDropdownMenu>
+                    @for (
+                        materialTemplate of materialTemplates$ | async | values;
+                        track materialTemplate.id
+                    ) {
+                        <button
+                            ngbDropdownItem
+                            (click)="addMaterial(materialTemplate)"
+                            type="button"
+                            class="btn"
+                        >
+                            <i class="bi bi-plus"></i>
+                            {{ materialTemplate.name }}
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </label>
+    @if (values().materialTemplateIds.length > 0) {
+        <div class="d-flex flex-wrap">
+            @for (
+                materialTemplate of values().materialTemplateIds;
+                track materialTemplate;
+                let index = $index
+            ) {}
+        </div>
+    } @else {
+        <div class="text-muted mt-3 mb-3">Keine Materialien zugewiesen</div>
+    }
+</div>
+<div class="form-group mb-3">
+    <label class="form-label"
+        >Personal
+        @if (!disabled()) {
+            <div ngbDropdown autoClose="outside" class="d-inline-block">
+                <button
+                    ngbDropdownToggle
+                    type="button"
+                    class="btn btn-outline-primary ms-3"
+                >
+                    Personal hinzufügen
+                </button>
+                <div ngbDropdownMenu>
+                    @for (
+                        personnelTemplate of personnelTemplates$
+                            | async
+                            | values;
+                        track personnelTemplate.id
+                    ) {
+                        <button
+                            ngbDropdownItem
+                            (click)="addPersonnel(personnelTemplate)"
+                            type="button"
+                            class="btn"
+                        >
+                            <i class="bi bi-plus"></i>
+                            {{ personnelTemplate.name }}
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </label>
+    @if (values().personnelTemplateIds.length > 0) {
+        <div class="d-flex flex-wrap">
+            @for (
+                personnelTemplate of values().personnelTemplateIds;
+                track personnelTemplate;
+                let index = $index
+            ) {}
+        </div>
+    } @else {
+        <div class="text-muted mt-3 mb-3">Kein Personal zugewiesen</div>
+    }
+</div>
+
+@if (!disabled()) {
+    <!-- If the button is not disabled the vehicleTemplate is correct -->
+    <button
+        (click)="submitData()"
+        [disabled]="
+            nameInput.invalid ||
+            typeInput.invalid ||
+            imageUrlInput.invalid ||
+            heightInput.invalid ||
+            patientCapacityInput.invalid
+        "
+        class="btn btn-primary"
+    >
+        {{ btnText() }}
+    </button>
+}

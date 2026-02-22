@@ -13,6 +13,8 @@ import {
     type UUID,
     type AlarmGroup,
     newAlarmGroupVehicle,
+    Marketplace,
+    ElementVersionId,
 } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
@@ -131,7 +133,7 @@ export class AlarmGroupItemComponent implements OnInit {
         );
     }
 
-    public createAlarmGroupVehicle(vehicleTemplateId: UUID) {
+    public createAlarmGroupVehicle(vehicleTemplateId: ElementVersionId) {
         const vehicleTemplate = selectStateSnapshot(
             createSelectVehicleTemplate(vehicleTemplateId),
             this.store

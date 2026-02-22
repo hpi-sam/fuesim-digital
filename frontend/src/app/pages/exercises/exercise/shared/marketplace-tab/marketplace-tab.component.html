@@ -1,0 +1,64 @@
+<div ngbDropdown placement="top-end" class="d-inline-block">
+    <button type="button" class="btn btn-outline-primary" ngbDropdownToggle>
+        @if (selectedCollection(); as selectedCollection) {
+            {{
+                selectedCollectionData()?.title ?? selectedCollection.versionId
+            }}
+        } @else {
+            Sammlung auswählen
+        }
+    </button>
+    <div ngbDropdownMenu aria-labelledby="dropdownBasic2">
+        @for (
+            availableCollection of availableCollections();
+            track availableCollection.versionId
+        ) {
+            <button
+                ngbDropdownItem
+                (click)="selectCollection(availableCollection)"
+            >
+                {{ availableCollection.title }} (Version
+                {{ availableCollection.version }})
+            </button>
+        }
+    </div>
+    @if (updateAvailable()?.newerVersionAvailable) {
+        <div class="alert alert-primary d-flex flex-column gap-2 mt-2">
+            <small>
+                Es ist eine neue Version der Sammlung verfügbar. Bitte
+                aktualisieren Sie die Sammlung, um die neuesten Elemente zu
+                sehen.
+            </small>
+            <button
+                class="btn btn-primary btn-sm"
+                (click)="upgradeCollectionVersion()"
+            >
+                Aktualisieren
+            </button>
+        </div>
+    }
+
+    @for (element of elementsOfSelectedCollection(); track element.versionId) {
+        @if (element.content.type === 'vehicleTemplate') {
+            <app-map-editor-card
+                (elementMousedown)="
+                    dragElementService.onMouseDown(
+                        $event,
+                        {
+                            type: 'vehicle',
+                            template: element.content,
+                        },
+                        {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                        }
+                    )
+                "
+                [title]="element.content.name"
+                [imageUrl]="element.content.image.url"
+            />
+        } @else {
+            <app-map-editor-card [title]="element.content.name" />
+        }
+    }
+</div>

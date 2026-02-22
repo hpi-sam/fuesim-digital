@@ -9,6 +9,7 @@ import type {
     TechnicalChallenge,
     TechnicalChallengeTemplate,
     VehicleTemplate,
+    VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import {
     uuid,
@@ -77,14 +78,20 @@ export class DragElementService {
     private dragElement?: HTMLImageElement;
     private imageDimensions?: { width: number; height: number };
     private transferringTemplate?: TransferTemplate;
+    private transferingEntityVersion?: VersionedElementPartial;
 
     /**
      * Should be called on the mousedown event of the element to be dragged
      * @param event the mouse event
      * @param transferTemplate the template to be added
      */
-    public onMouseDown(event: MouseEvent, transferTemplate: TransferTemplate) {
+    public onMouseDown(
+        event: MouseEvent,
+        transferTemplate: TransferTemplate,
+        entityVersion?: VersionedElementPartial
+    ) {
         this.transferringTemplate = transferTemplate;
+        this.transferingEntityVersion = entityVersion;
         // Create the drag image
         const imageProperties = transferTemplate.template.image;
         const zoom = this.olMap!.getView().getZoom()!;
@@ -182,7 +189,8 @@ export class DragElementService {
                             selectPersonnelTemplates,
                             this.store
                         ),
-                        position
+                        position,
+                        this.transferingEntityVersion
                     );
                     this.exerciseService.proposeAction(
                         {

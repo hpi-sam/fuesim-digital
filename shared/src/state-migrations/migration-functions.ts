@@ -49,6 +49,7 @@ import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
 import { addScoutables50 } from './50-add-scoutables.js';
 import { addTechnicalChallenges51 } from './51-add-technical-challenges.js';
+import { addCollections48 } from './48-add-collections.js';
 
 /**
  * Migrate a single action

@@ -1,0 +1,42 @@
+<div class="w-100 d-flex flex-row justify-content-end mb-3">
+    <div ngbDropdown>
+        <button
+            type="button"
+            class="btn btn-outline-primary d-flex flex-row align-items-center"
+            ngbDropdownToggle
+        >
+            <i class="bi bi-box-arrow-in-down-right me-2"></i>
+            <span>Weitere Sammlung verwenden</span>
+        </button>
+        <div ngbDropdownMenu>
+            @for (
+                availableCollection of availableCollections();
+                track availableCollection.versionId
+            ) {
+                @if (
+                    availableCollection.entityId !== currentCollectionEntityId
+                ) {
+                    <button
+                        ngbDropdownItem
+                        (click)="
+                            importFromCollection(availableCollection.versionId)
+                        "
+                    >
+                        {{ availableCollection.title }}
+                    </button>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@for (
+    dependency of importedCollections();
+    track dependency.collection.versionId
+) {
+    <app-used-collection-item
+        [dependency]="dependency"
+        [currentCollectionEntityId]="currentCollectionEntityId()"
+    />
+    <hr />
+}

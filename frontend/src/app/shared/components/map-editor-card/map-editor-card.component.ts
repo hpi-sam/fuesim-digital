@@ -1,7 +1,7 @@
 import { Component, output, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
-import type { AppState } from '../../../../../../state/app.state';
+import { AppState } from '../../../state/app.state';
 
 @Component({
     selector: 'app-map-editor-card',

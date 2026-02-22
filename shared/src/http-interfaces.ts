@@ -8,6 +8,19 @@ import {
 import { validationMessages } from './validation-messages.js';
 import { exerciseStatusSchema } from './models/utils/exercise-status.js';
 import { logEntrySchema } from './models/log-entry.js';
+import { vehicleTemplateSchema } from './models/vehicle-template.js';
+import { alarmGroupSchema } from './models/alarm-group.js';
+import { stringToDate } from './models/utils/date.js';
+import {
+    collectionDtoSchema,
+    CollectionEntityId,
+    collectionEntityIdSchema,
+    collectionVersionIdSchema,
+    collectionVisibilitySchema,
+    elementDtoSchema,
+    elementEntityIdSchema,
+    versionedElementContentSchema,
+} from './models/index.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -35,15 +48,6 @@ export interface AuthQueryParams {
     loginFailure?: string;
     loginSuccess?: boolean;
 }
-
-const stringToDate = z.codec(
-    z.iso.datetime({ offset: true }), // input schema: ISO date string
-    z.date(), // output schema: Date object
-    {
-        decode: (isoString) => new Date(isoString), // ISO string → Date
-        encode: (date) => date.toISOString(), // Date → ISO string
-    }
-);
 
 export const getExerciseResponseDataSchema = z.object({
     participantKey: participantKeySchema,
@@ -210,3 +214,251 @@ export const updateParallelExerciseInstancesSchema = z.object({
 export type UpdateParallelExerciseResponseData = z.infer<
     typeof updateParallelExerciseInstancesSchema
 >;
+
+// ###### Exercise Element Set ######
+
+class Route<TRequest = never, TResponse = never> {
+    constructor(opts: { request?: TRequest; response?: TResponse }) {
+        this.requestSchema = opts.request as TRequest;
+        this.responseSchema = opts.response as TResponse;
+    }
+
+    public readonly requestSchema: TRequest;
+    public readonly responseSchema: TResponse;
+    public readonly Request!: TRequest extends z.ZodType
+        ? z.infer<TRequest>
+        : never;
+    public readonly Response!: TResponse extends z.ZodType
+        ? z.infer<TResponse>
+        : never;
+}
+
+export namespace Marketplace {
+    export namespace Element {
+        export const Create = new Route({
+            request: z.object({
+                data: versionedElementContentSchema,
+            }),
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema,
+                result: elementDtoSchema,
+            }),
+        });
+
+        export const Edit = new Route({
+            request: z.object({
+                data: versionedElementContentSchema,
+            }),
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema,
+                result: elementDtoSchema,
+            }),
+        });
+
+        export const Duplicate = new Route({
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema,
+                result: elementDtoSchema,
+            }),
+        });
+
+        export const Delete = new Route({
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema.nullable(),
+                requiresConfirmation: z.array(
+                    z.object({
+                        element: elementDtoSchema,
+                        blocking: z.boolean(),
+                    })
+                ),
+            }),
+        });
+
+        export const GetByEntityId = new Route({
+            response: z.object({
+                result: z.array(elementDtoSchema),
+            }),
+        });
+    }
+
+    export namespace Set {
+        export const Create = new Route({
+            request: z.object({
+                title: z.string().trim().nonempty(),
+            }),
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
+        export const editableCollectionPropertiesSchema = z.object({
+            title: z.string().trim().nonempty().optional(),
+            description: z.string().trim().nonempty().optional(),
+        });
+
+        export type EditableCollectionProperties = z.infer<
+            typeof editableCollectionPropertiesSchema
+        >;
+
+        export const Edit = new Route({
+            request: editableCollectionPropertiesSchema,
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
+        export const LoadMy = new Route({
+            response: z.object({
+                result: z.array(collectionDtoSchema),
+            }),
+        });
+
+        export const GetByEntityId = new Route({
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
+        export const transitiveCollectionSchema = z.object({
+            collection: collectionDtoSchema,
+            elements: z.array(elementDtoSchema),
+        });
+
+        export const GetLatestElementsBySetVersionId = new Route({
+            response: z.object({
+                direct: z.array(elementDtoSchema),
+                transitive: z.array(transitiveCollectionSchema),
+            }),
+        });
+
+        export const GetCollectionVersion = new Route({
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
+        export const ChangeVisibility = new Route({
+            request: z.object({
+                visibility: collectionVisibilitySchema,
+            }),
+            response: z.object({
+                status: z.literal(['success']),
+            }),
+        });
+
+        export const Duplicate = new Route({
+            response: z.object({
+                createdSet: collectionDtoSchema,
+            }),
+        });
+
+        export const Import = new Route({
+            response: z.object({
+                importedSet: transitiveCollectionSchema,
+                newCollectionVersionId: collectionVersionIdSchema,
+            }),
+        });
+
+        export const SaveDraftState = new Route({
+            response: z.object({
+                result: collectionDtoSchema.nullable(),
+                saved: z.boolean().default(true),
+            }),
+        });
+
+        export const GetElementsOfCollectionVersion = new Route({
+            response: z.object({
+                direct: z.array(elementDtoSchema),
+                transitive: z.array(transitiveCollectionSchema),
+            }),
+        });
+
+        class TypedSchema<D, T> {
+            constructor(public readonly schema: T) {}
+
+            public readonly Type!: T extends z.ZodType
+                ? // if D is defined (override type), use D, otherwise infer from T
+                  D extends unknown
+                    ? z.infer<T>
+                    : D
+                : never;
+        }
+
+        export namespace Events {
+            const defineEvent = <TName extends string, TData>(
+                eventName: TName,
+                dataSchema: TData
+            ) => {
+                const schema = z.object({
+                    event: z.literal(eventName),
+                    data: dataSchema,
+                    collectionEntityId: collectionEntityIdSchema,
+                });
+                // We need to type seperately to keep the event-name as a literal type
+                return new TypedSchema<
+                    {
+                        event: TName;
+                        collectionEntityId: CollectionEntityId;
+                        data: z.infer<TData>;
+                    },
+                    typeof schema
+                >(schema);
+            };
+
+            export const DependencyAdd = defineEvent(
+                'dependency:add',
+                collectionVersionIdSchema
+            );
+
+            export const DependencyReplaceData = defineEvent(
+                'dependency:replace-data',
+                z.array(transitiveCollectionSchema)
+            );
+
+            export const InitialData = defineEvent(
+                'initialdata',
+                z.object({
+                    collection: collectionDtoSchema,
+                    elements: z.object({
+                        direct: z.array(elementDtoSchema),
+                        transitive: z.array(transitiveCollectionSchema),
+                    }),
+                })
+            );
+
+            export const ElementCreate = defineEvent(
+                'element:create',
+                elementDtoSchema
+            );
+
+            export const ElementUpdate = defineEvent(
+                'element:update',
+                elementDtoSchema
+            );
+
+            export const ElementDelete = defineEvent(
+                'element:delete',
+                z.object({
+                    entityId: elementEntityIdSchema,
+                })
+            );
+
+            export const CollectionUpdate = defineEvent(
+                'collection:update',
+                collectionDtoSchema
+            );
+
+            export const Event = new TypedSchema(
+                z.union([
+                    CollectionUpdate.schema,
+                    DependencyAdd.schema,
+                    DependencyReplaceData.schema,
+                    ElementCreate.schema,
+                    ElementDelete.schema,
+                    ElementUpdate.schema,
+                    InitialData.schema,
+                ])
+            );
+        }
+    }
+}

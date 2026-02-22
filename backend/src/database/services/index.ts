@@ -1,5 +1,6 @@
 import type { AuthService } from '../../auth/auth-service.js';
 import type { AccessKeyService } from './access-key-service.js';
+import { CollectionService } from './collection-service.js';
 import type { DatabaseService } from './database-service.js';
 import type { ExerciseManagerService } from './exercise-manager-service.js';
 import type { ExerciseService } from './exercise-service.js';
@@ -12,4 +13,5 @@ export interface Services {
     exerciseManagerService: ExerciseManagerService;
     parallelExerciseService: ParallelExerciseService;
     authService: AuthService;
+    collectionService: CollectionService;
 }

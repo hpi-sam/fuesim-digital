@@ -1,0 +1,60 @@
+<app-header />
+
+<div class="d-flex flex-row gap-3 container">
+    <div class="me-3">
+        <div class="d-flex align-items-center justify-content-between">
+            <h4>Meine Sammlungen</h4>
+        </div>
+
+        <button
+            (click)="createNewExercise()"
+            class="btn btn-sm btn-outline-primary d-flex flex-row align-items-center justify-content-center gap-1 mb-3 w-100"
+        >
+            <i class="bi bi-plus"></i>
+            <span>Neue Sammlung</span>
+        </button>
+
+        <ul ngbNav class="flex-column gap-3" #nav="ngbNav">
+            @for (elementSet of elementSets; track elementSet.versionId) {
+                @let currentlySelected =
+                    currentlySelectedSetEntityId() === elementSet.entityId;
+                <li
+                    ngbNavItem
+                    [class.border-primary]="currentlySelected"
+                    [class.border-white]="!currentlySelected"
+                    [class.fw-bold]="currentlySelected"
+                    class="border-3 border-start ps-2 fw-bold"
+                >
+                    <a
+                        [routerLink]="'/marketplace/' + elementSet.entityId"
+                        class="d-flex flex-column align-items-start text-decoration-none"
+                    >
+                        <span>{{ elementSet.title }}</span>
+                        <small
+                            class="d-flex flex-row align-items-center gap-1 text-secondary"
+                            ><span
+                                class="badge"
+                                [class.text-bg-success]="
+                                    elementSet.visibility === 'public'
+                                "
+                                [class.text-bg-secondary]="
+                                    elementSet.visibility === 'private'
+                                "
+                            >
+                                {{
+                                    elementSet.visibility === 'public'
+                                        ? 'Öffentlich'
+                                        : 'Privat'
+                                }}
+                            </span>
+                            &middot; 5 Elemente</small
+                        >
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="flex-grow-1">
+        <router-outlet></router-outlet>
+    </div>
+</div>

@@ -136,7 +136,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
         (feature) => {
             const vehicle = this.getElementFromFeature(feature) as Vehicle;
             return {
-                name: vehicle.name,
+                name: vehicle.versionId ?? vehicle.name,
                 offsetY: vehicle.image.height / 2 / normalZoom,
             };
         },

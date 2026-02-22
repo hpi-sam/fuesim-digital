@@ -1,4 +1,4 @@
-import type { OnDestroy } from '@angular/core';
+import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, computed, inject } from '@angular/core';
 import {
     NgbModal,
@@ -15,7 +15,8 @@ import {
     exportPatientsToCSV,
     currentStateVersion,
 } from 'fuesim-digital-shared';
-import { Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AsyncPipe, Location as NgLocation } from '@angular/common';
 import Package from '../../../../../../package.json';
 import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal';
@@ -33,6 +34,7 @@ import {
 import {
     selectParticipantKey,
     selectExerciseState,
+    selectSelectedCollections,
 } from '../../../../state/application/selectors/exercise.selectors';
 import { selectOwnClient } from '../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
@@ -51,6 +53,9 @@ import {
 } from '../shared/clients-modal/open-clients-modal';
 import { environment } from '../../../../../environments/environment.js';
 import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator-map.component';
+import { openSelectCollectionModal } from '../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';
+import { LoadingModalService } from '../../../../core/loading-modal/loading-modal.service';
+import { openManageExerciseCollectionsModal } from '../shared/manage-exercise-collections/open-manage-exercise-collections-modal';
 
 @Component({
     selector: 'app-exercise',
@@ -75,13 +80,16 @@ import { MapOperatorMapComponent } from '../shared/map-operator-map/map-operator
         MapOperatorMapComponent,
     ],
 })
-export class ExerciseComponent implements OnDestroy {
+export class ExerciseComponent implements OnDestroy, OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly apiService = inject(ApiService);
     private readonly applicationService = inject(ApplicationService);
     readonly exerciseService = inject(ExerciseService);
     private readonly messageService = inject(MessageService);
     private readonly modalService = inject(NgbModal);
+    private readonly loadingModalService = inject(LoadingModalService);
+    private readonly activatedRoute = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     readonly location = inject(NgLocation);
 
     private readonly destroy = new Subject<void>();
@@ -104,6 +112,48 @@ export class ExerciseComponent implements OnDestroy {
     public readonly trainerUrl = computed(
         () => `${location.origin}/exercises/${this.exerciseKey()}`
     );
+
+    public ngOnInit() {
+        const selectedCollections = selectStateSnapshot(
+            selectSelectedCollections,
+            this.store
+        );
+        if (selectedCollections.length === 0) {
+            openSelectCollectionModal(this.modalService, {
+                showDependencyElements: true,
+                allowLeave: false,
+                allowCreate: true,
+                showInfoBanner: true,
+                selectionInfoText:
+                    'Möchten Sie die Elemente aus dieser Sammlung und ggf. enthaltenen Sammlungen zu der Übung hinzufügen?',
+                skipOnNoChoice: true,
+            }).then(async (result) => {
+                if (result === null) return;
+                this.loadingModalService.showLoading({
+                    title: 'Sammlung wird hinzugefügt',
+                    description: 'Ihre Übungselemente werden vorbereitet',
+                });
+                await this.exerciseService.addCollection(result);
+                this.loadingModalService.closeLoading();
+            });
+        }
+        this.activatedRoute.queryParamMap
+            .pipe(takeUntil(this.destroy))
+            .subscribe((params) => {
+                const openCollectionModal = params.get(
+                    'openmanagecollectionmodal'
+                );
+                if (openCollectionModal === 'true') {
+                    openManageExerciseCollectionsModal(this.modalService);
+                    // remove the query param so that the modal doesn't open again on page reload
+                    this.router.navigate([], {
+                        relativeTo: this.activatedRoute,
+                        queryParams: { openmanagecollectionmodal: null },
+                        queryParamsHandling: 'merge',
+                    });
+                }
+            });
+    }
 
     readonly version: string = Package.version;
     readonly docsUrl = environment.docsUrl;

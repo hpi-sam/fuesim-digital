@@ -1,0 +1,16 @@
+@use './../../../../../marketplace/shared/_change-indicator-colors' as
+    changeColors;
+
+.btn-outline-warning {
+    border-color: changeColors.$change-primary !important;
+    color: changeColors.$change-primary !important;
+    &:hover {
+        background-color: changeColors.$change-background !important;
+        border-color: changeColors.$change-primary !important;
+        color: changeColors.$change-primary !important;
+    }
+}
+
+.update-available {
+    color: changeColors.$change-primary !important;
+}

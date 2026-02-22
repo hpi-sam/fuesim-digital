@@ -28,6 +28,14 @@ export const appRoutes: Routes = [
             ),
     },
     {
+        path: 'collections',
+        // eslint-disable-next-line @typescript-eslint/promise-function-async
+        loadChildren: () =>
+            import('./pages/marketplace/marketplace.routes').then(
+                (m) => m.routes
+            ),
+    },
+    {
         path: 'health',
         component: HealthPageComponent,
     },

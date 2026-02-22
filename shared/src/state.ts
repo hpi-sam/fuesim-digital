@@ -1,7 +1,5 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
-import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
 import {
     newSeededRandomState,
     randomStateSchema,
@@ -10,13 +8,9 @@ import { spatialElementTypePluralSchema } from './store/action-reducers/utils/sp
 import { vehicleSchema } from './models/vehicle.js';
 import { restrictedZoneSchema } from './models/restricted-zone.js';
 import { materialSchema } from './models/material.js';
-import { materialTemplateSchema } from './models/material-template.js';
-import { personnelTemplateSchema } from './models/personnel-template.js';
 import { personnelSchema } from './models/personnel.js';
-import { vehicleTemplateSchema } from './models/vehicle-template.js';
 import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
 import { hospitalSchema } from './models/hospital.js';
-import { mapImageTemplateSchema } from './models/map-image-template.js';
 import { mapImageSchema } from './models/map-image.js';
 import { viewportSchema } from './models/viewport.js';
 import { transferPointSchema } from './models/transfer-point.js';
@@ -32,7 +26,6 @@ import { patientSchema } from './models/patient.js';
 import { hospitalPatientSchema } from './models/hospital-patient.js';
 import { patientCategorySchema } from './models/patient-category.js';
 import { uuid, uuidSchema } from './utils/uuid.js';
-import { defaultMapImagesTemplatesById } from './data/default-state/map-images-templates.js';
 import { SpatialTree } from './models/utils/spatial-tree.js';
 import { logEntrySchema } from './models/log-entry.js';
 import {
@@ -51,16 +44,17 @@ import { defaultMeasureTemplateCategories } from './data/default-state/measure-t
 import { technicalChallengeSchema } from './models/technical-challenge/technical-challenge.js';
 import { taskTypeSchema } from './models/task-type.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
-import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
+import { templateSchema } from './models/template.js';
+import { collectionStateReferenceSchema } from './marketplace/models/collection-state-reference.js';
 
 /**
  * **Important**
  *
  * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
  */
-export const currentStateVersion = 58 as const;
+export const currentStateVersion = 59 as const;
 
 export const exerciseStateSchema = z.strictObject({
     id: uuidSchema,
@@ -75,6 +69,8 @@ export const exerciseStateSchema = z.strictObject({
     type: exerciseTypeSchema,
     currentStatus: exerciseStatusSchema,
     randomState: randomStateSchema,
+
+    selectedCollections: z.array(collectionStateReferenceSchema),
 
     viewports: z.record(uuidSchema, viewportSchema),
     autojoinViewportId: uuidSchema.nullable(),
@@ -111,13 +107,11 @@ export const exerciseStateSchema = z.strictObject({
     operationalSections: z.record(uuidSchema, operationalSectionSchema),
 
     patientCategories: z.array(patientCategorySchema),
-    vehicleTemplates: z.record(uuidSchema, vehicleTemplateSchema),
-    materialTemplates: z.record(uuidSchema, materialTemplateSchema),
-    personnelTemplates: z.record(uuidSchema, personnelTemplateSchema),
     measureTemplates: z.record(z.string(), measureTemplateCategorySchema),
-    mapImageTemplates: z.record(uuidSchema, mapImageTemplateSchema),
 
     scoutables: z.record(scoutableSchema.shape.id, scoutableSchema),
+
+    templates: z.record(uuidSchema, templateSchema),
 
     eocLog: z.array(eocLogEntrySchema),
 
@@ -148,6 +142,7 @@ export function newExerciseState(
         type: 'standalone',
         currentStatus: 'notStarted',
         randomState: newSeededRandomState(),
+        selectedCollections: [],
         viewports: {},
         autojoinViewportId: null,
         simulatedRegions: {},
@@ -170,12 +165,9 @@ export function newExerciseState(
         radiograms: {},
         operationalSections: {},
         patientCategories: defaultPatientCategories,
-        vehicleTemplates: defaultVehicleTemplatesById,
-        materialTemplates: defaultMaterialTemplatesById,
-        personnelTemplates: defaultPersonnelTemplatesById,
         measureTemplates: defaultMeasureTemplateCategories,
-        mapImageTemplates: defaultMapImagesTemplatesById,
         scoutables: {},
+        templates: {},
         eocLog: [],
         participantKey,
         spatialTrees: {

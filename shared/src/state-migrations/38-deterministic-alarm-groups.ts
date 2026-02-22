@@ -4,6 +4,7 @@ import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
 import { uuid, type UUID } from '../utils/uuid.js';
 import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { VehicleTemplate } from '../models/vehicle-template.js';
+import { getTemplates } from '../models/template.js';
 import type { Migration } from './migration-functions.js';
 
 interface VehicleParameters {
@@ -232,43 +233,43 @@ export const deterministicAlarmGroups38: Migration = {
 
                 // Build personnel templates and material templates from current state as state version 38
                 const personnelTemplates = Object.fromEntries(
-                    Object.values(intermediaryState.personnelTemplates).map(
-                        (template) => [
+                    Object.values(
+                        getTemplates(intermediaryState, 'personnelTemplate')
+                    ).map((template) => [
+                        template.id,
+                        {
+                            personnelType: template.personnelType,
+                            type: template.type,
+                            canCaterFor: template.canCaterFor,
+                            overrideTreatmentRange:
+                                template.overrideTreatmentRange,
+                            treatmentRange: template.treatmentRange,
+                            image: template.image,
+                        } satisfies PersonnelTemplate,
+                    ])
+                );
+
+                const materialTemplates = Object.fromEntries(
+                    Object.values(
+                        getTemplates(intermediaryState, 'materialTemplate')
+                    ).map((template) => {
+                        const materialType: MaterialType =
+                            template.image.url === '/assets/material.svg'
+                                ? 'standard'
+                                : 'big';
+                        return [
                             template.id,
                             {
-                                personnelType: template.personnelType,
+                                materialType,
                                 type: template.type,
                                 canCaterFor: template.canCaterFor,
                                 overrideTreatmentRange:
                                     template.overrideTreatmentRange,
                                 treatmentRange: template.treatmentRange,
                                 image: template.image,
-                            } satisfies PersonnelTemplate,
-                        ]
-                    )
-                );
-
-                const materialTemplates = Object.fromEntries(
-                    Object.values(intermediaryState.materialTemplates).map(
-                        (template) => {
-                            const materialType: MaterialType =
-                                template.image.url === '/assets/material.svg'
-                                    ? 'standard'
-                                    : 'big';
-                            return [
-                                template.id,
-                                {
-                                    materialType,
-                                    type: template.type,
-                                    canCaterFor: template.canCaterFor,
-                                    overrideTreatmentRange:
-                                        template.overrideTreatmentRange,
-                                    treatmentRange: template.treatmentRange,
-                                    image: template.image,
-                                } satisfies MaterialTemplate,
-                            ];
-                        }
-                    )
+                            } satisfies MaterialTemplate,
+                        ];
+                    })
                 );
 
                 // We're trying to restore the original vehicle IDs that were generated with `nextUUID`.
@@ -297,9 +298,10 @@ export const deterministicAlarmGroups38: Migration = {
                         createVehicleParameters(
                             vehicleIds[alarmGroupVehicle.id]!,
                             {
-                                ...intermediaryState.vehicleTemplates[
-                                    alarmGroupVehicle.vehicleTemplateId
-                                ]!,
+                                ...getTemplates(
+                                    intermediaryState,
+                                    'vehicleTemplate'
+                                )[alarmGroupVehicle.vehicleTemplateId]!,
                                 name: alarmGroupVehicle.name,
                             },
                             materialTemplates,

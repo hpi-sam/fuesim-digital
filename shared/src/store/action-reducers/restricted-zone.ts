@@ -14,6 +14,7 @@ import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { type UUID } from '../../utils/uuid.js';
 import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
+import { getTemplates } from '../../models/template.js';
 import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
 import { getElement } from './utils/get-element.js';
 
@@ -118,9 +119,11 @@ export namespace RestrictedZoneActionReducers {
             } = {};
 
             // Get all vehicle types from vehicle templates
-            Object.values(draftState.vehicleTemplates).forEach((template) => {
-                vehicleRestrictions[template.id] = 'restrict';
-            });
+            Object.values(getTemplates(draftState, 'vehicleTemplate')).forEach(
+                (template) => {
+                    vehicleRestrictions[template.id] = 'restrict';
+                }
+            );
 
             // Get all vehicle types from existing vehicles
             Object.values(draftState.vehicles).forEach((vehicle) => {

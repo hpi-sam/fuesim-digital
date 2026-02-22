@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { uuid, uuidSchema } from '../utils/uuid.js';
+import { versionedElementModelStateExtension } from '../marketplace/models/versioned-element-model.js';
 import { type CanCaterFor, canCaterForSchema } from './utils/cater-for.js';
 import {
     type ImageProperties,
@@ -9,6 +10,7 @@ import {
 } from './utils/image-properties.js';
 
 export const personnelTemplateSchema = z.strictObject({
+    ...versionedElementModelStateExtension,
     id: uuidSchema,
     type: z.literal('personnelTemplate'),
     personnelType: z.string(),

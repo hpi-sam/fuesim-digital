@@ -7,6 +7,7 @@ import type { Observable, Subject } from 'rxjs';
 import type { Element as StateElement, UUID } from 'fuesim-digital-shared';
 import type { FeatureLike } from 'ol/Feature';
 import type Style from 'ol/style/Style';
+import type { Immutable } from 'immer';
 import type { FeatureManager } from '../utility/feature-manager';
 import type {
     GeometryHelper,
@@ -166,7 +167,7 @@ export abstract class MoveableFeatureManager<
      * The standard implementation is to ignore these events.
      */
     public onFeatureDrop(
-        droppedElement: StateElement,
+        droppedElement: Immutable<StateElement>,
         droppedOnFeature: Feature<FeatureType>,
         dropEvent: MouseEvent | TranslateEvent
     ): boolean {

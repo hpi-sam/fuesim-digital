@@ -22,6 +22,8 @@ export class ConfirmationModalService {
         componentInstance.title = options.title;
         componentInstance.description = options.description;
         componentInstance.confirmationString = options.confirmationString;
+        componentInstance.confirmationButtonText =
+            options.confirmationButtonText ?? 'OK';
         return firstValueFrom(componentInstance.confirmation$, {
             defaultValue: false,
         });
@@ -35,4 +37,5 @@ export interface ConfirmationOptions {
      * A string that must be manually entered to confirm the action
      */
     confirmationString?: string;
+    confirmationButtonText?: string;
 }

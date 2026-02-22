@@ -64,3 +64,26 @@ main {
     width: 90%;
     max-width: 90%;
 }
+
+.rounded-none {
+    border-radius: 0 !important;
+}
+
+$primary-muted: color-mix(in srgb, bootstrap.$primary 60%, transparent);
+
+.pulsating {
+    animation: pulsate 1s infinite ease-in-out;
+}
+
+@keyframes pulsate {
+    0% {
+        box-shadow: 0 0 1px 0px var(--pulsating-color, $primary-muted);
+    }
+    50% {
+        box-shadow: 0 0 3px var(--pulsating-strength, 2px)
+            var(--pulsating-color, $primary-muted);
+    }
+    100% {
+        box-shadow: 0 0 1px 0px var(--pulsating-color, $primary-muted);
+    }
+}

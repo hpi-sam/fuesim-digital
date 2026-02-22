@@ -11,32 +11,51 @@
                     <a ngbNavLink class="nav-link" routerLink="/">Start</a>
                 </li>
                 <li ngbNavItem="exercises" class="nav-item mx-2">
-                    <a ngbNavLink class="nav-link" routerLink="/exercises/">
-                        Übungen
-                    </a>
-                </li>
-                <li ngbNavItem="exercise_templates" class="nav-item mx-2">
-                    <a
-                        ngbNavLink
-                        class="nav-link"
-                        routerLink="/exercises/templates"
-                    >
-                        Übungsvorlagen
-                    </a>
-                </li>
-                @if (exerciseConfig()?.parallelExercisesEnabled) {
-                    <li ngbNavItem="parallel" class="nav-item mx-2">
+                    <div ngbDropdown class="openonhover">
                         <a
-                            ngbNavLink
+                            ngbDropdownToggle
                             class="nav-link"
-                            routerLink="/exercises/parallel"
+                            routerLink="/exercises/"
                         >
-                            Parallelübungen
+                            Übungen
                         </a>
-                    </li>
-                }
+                        <div ngbDropdownMenu>
+                            <a ngbDropdownItem routerLink="/exercises">
+                                Einzelübungen
+                            </a>
+
+                            @if (exerciseConfig()?.parallelExercisesEnabled) {
+                                <a
+                                    ngbDropdownItem
+                                    routerLink="/exercises/parallel"
+                                >
+                                    Parallelübungen
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </li>
+                <li ngbNavItem="templates" class="nav-item mx-2">
+                    <div ngbDropdown class="openonhover">
+                        <a ngbDropdownToggle ngbNavLink class="nav-link">
+                            Vorlagen
+                        </a>
+                        <div ngbDropdownMenu>
+                            <a
+                                ngbDropdownItem
+                                routerLink="/exercises/templates"
+                            >
+                                Übungsvorlagen
+                            </a>
+
+                            <a ngbDropdownItem routerLink="/collections">
+                                Übungselemente
+                            </a>
+                        </div>
+                    </div>
+                </li>
                 <li ngbNavItem="organisations" class="nav-item mx-2">
-                    <a ngbNavLink class="nav-link" routerLink="/organisations">
+                    <a ngbNavLink routerLink="/organisations">
                         Organisationen
                     </a>
                 </li>

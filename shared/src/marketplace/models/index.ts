@@ -1,6 +1,7 @@
 export * from './collection-visibility.js';
 export * from './collection.js';
 export * from './versioned-elements.js';
+export * from './versioned-elements-contentless.js';
 export * from './versioned-id-schema.js';
 export * from './versioned-element-model.js';
 export * from './versioned-element-content.js';
@@ -8,3 +9,4 @@ export * from './collection-elements.js';
 export * from './state-versioned-entity.js';
 export * from './collection-relationship.js';
 export * from './collection-element-type.js';
+export * from './collection-state-reference.js';

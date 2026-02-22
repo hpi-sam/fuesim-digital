@@ -3,8 +3,8 @@ import { z } from 'zod';
 /// COLLECTIONS
 export const collectionEntityIdSchema = z
     .string()
-    .regex(/^set_entity_.+$/u)
-    .brand<'SetEntityId'>();
+    .regex(/^collection_entity_.+$/u)
+    .brand<'CollectionEntityId'>();
 export type CollectionEntityId = z.infer<typeof collectionEntityIdSchema>;
 export function isCollectionEntityId(
     value: string | null
@@ -14,8 +14,8 @@ export function isCollectionEntityId(
 
 export const collectionVersionIdSchema = z
     .string()
-    .regex(/^set_version_.+$/u)
-    .brand<'SetVersionId'>();
+    .regex(/^collection_version_.+$/u)
+    .brand<'CollectionVersionId'>();
 export type CollectionVersionId = z.infer<typeof collectionVersionIdSchema>;
 export function isCollectionVersionId(
     value: string
@@ -43,10 +43,7 @@ export function isElementEntityId(
     return elementEntityIdSchema.safeParse(value).success;
 }
 
-export const elementVersionIdSchema = z
-    .string()
-    .regex(/^element_version_.+$/u)
-    .brand<'ElementVersionId'>();
+export const elementVersionIdSchema = z.string().brand<'ElementVersionId'>();
 export type ElementVersionId = z.infer<typeof elementVersionIdSchema>;
 export function isElementVersionId(value: string): value is ElementVersionId {
     return elementVersionIdSchema.safeParse(value).success;

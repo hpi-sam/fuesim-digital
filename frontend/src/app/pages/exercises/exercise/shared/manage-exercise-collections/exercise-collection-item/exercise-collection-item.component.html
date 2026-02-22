@@ -1,0 +1,86 @@
+<div
+    class="my-3 placeholder-glow"
+    [class.update-available]="
+        newerVersionAvailable.hasValue() &&
+        newerVersionAvailable.value().newerVersionAvailable
+    "
+>
+    @if (collectionDataRes.status() === 'error') {
+        <div class="text-danger mt-2 d-flex flex-row align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span>
+                Sammlung konnte nicht geladen werden.
+                {{ collectionDataRes.error() }}
+            </span>
+        </div>
+    } @else {
+        <!-- fyi: resource throws if value is read when error state -->
+        @let collectionData = collectionDataRes.value();
+        <span>
+            <b
+                class="collection-title"
+                [class.placeholder]="collectionDataRes.isLoading()"
+                >{{ collectionData?.title ?? collection().title }}</b
+            >
+            @if (collectionData) {
+                <span class="text-muted small ms-1">
+                    (Version {{ collectionData.version }} &ndash;
+                    {{ collectionData.createdAt | date: 'short' }})
+                </span>
+            }
+        </span>
+        @let noAccess =
+            collectionData === null && collectionDataRes.status() !== 'error';
+        @if (noAccess) {
+            <div class="text-danger small">
+                Sie haben keinen Zugriff auf diese Sammlung: Die Sammlung ist
+                möglicherweise nicht mehr vorhanden oder Sie haben keine
+                Berechtigung, diese anzuzeigen.
+            </div>
+        }
+        <div class="d-flex flex-row gap-2 mt-2">
+            @if (!noAccess) {
+                <a
+                    class="btn btn-primary btn-sm"
+                    (click)="closeActiveModal()"
+                    [routerLink]="'/collections/' + collection().entityId"
+                    [queryParams]="{ from: exerciseKey() }"
+                    [class.disabled]="collectionDataRes.isLoading()"
+                    [class.placeholder]="collectionDataRes.isLoading()"
+                >
+                    Elemente verwalten
+                    <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </a>
+            }
+            @if (
+                newerVersionAvailable.hasValue() &&
+                newerVersionAvailable.value().newerVersionAvailable &&
+                collectionData
+            ) {
+                <button
+                    class="btn btn-outline-warning btn-sm pulsating"
+                    style="
+                        --pulsating-color: #b508ff;
+                        --pulsating-strength: 1px;
+                    "
+                    (click)="
+                        $event.stopPropagation();
+                        upgradeCollectionVersion(collectionData)
+                    "
+                >
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Auf neuere Version aktualisieren
+                </button>
+            }
+            <button
+                class="btn btn-outline-danger btn-sm text-danger"
+                (click)="removeCollection()"
+                [class.disabled]="collectionDataRes.isLoading()"
+                [class.placeholder]="collectionDataRes.isLoading()"
+            >
+                <i class="bi bi-trash me-1"></i>
+                Sammlung entfernen
+            </button>
+        </div>
+    }
+</div>

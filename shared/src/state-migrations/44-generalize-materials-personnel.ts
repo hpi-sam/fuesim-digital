@@ -1,6 +1,6 @@
-import type { WritableDraft } from 'immer';
+import { castDraft, type WritableDraft } from 'immer';
 import type { UUID } from '../utils/uuid.js';
-import type { ExerciseState } from '../state.js';
+import { getTemplates } from '../models/template.js';
 import type { Migration } from './migration-functions.js';
 
 interface ImageProperties {
@@ -166,12 +166,27 @@ function migratePersonnel(personnel: Personnel) {
 export const generalizeMaterialsPersonnel44: Migration = {
     action: (intermediaryState, action) => {
         const actionType = (action as { type: string }).type;
-        const mutableIntermediaryState =
-            intermediaryState as WritableDraft<ExerciseState>;
+        const mutableIntermediaryState = intermediaryState as WritableDraft<{
+            templates: { [Key in UUID]: MapImageTemplate | VehicleTemplate };
+        }>;
 
         const { mapImageTemplateIds, vehicleTemplateIds } = getTemplateIds(
-            Object.values(mutableIntermediaryState.vehicleTemplates),
-            Object.values(mutableIntermediaryState.mapImageTemplates)
+            Object.values(
+                castDraft(
+                    getTemplates(
+                        // @ts-expect-error: this does not include Alarmgroups, which ts expects
+                        mutableIntermediaryState,
+                        'vehicleTemplate'
+                    )
+                )
+            ),
+            Object.values(
+                getTemplates(
+                    // @ts-expect-error: this does not include Alarmgroups, which ts expects
+                    mutableIntermediaryState,
+                    'mapImageTemplate'
+                )
+            )
         );
         if (actionType === '[Vehicle] Add vehicle') {
             const typedAction = action as {

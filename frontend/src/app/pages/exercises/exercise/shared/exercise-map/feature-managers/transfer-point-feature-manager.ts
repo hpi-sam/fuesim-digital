@@ -10,6 +10,7 @@ import type Point from 'ol/geom/Point';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
+import type { Immutable } from 'immer';
 import { ChooseTransferTargetPopupComponent } from '../shared/choose-transfer-target-popup/choose-transfer-target-popup.component';
 import { TransferPointPopupComponent } from '../shared/transfer-point-popup/transfer-point-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -87,7 +88,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
     );
 
     public override onFeatureDrop(
-        droppedElement: Element | undefined,
+        droppedElement: Immutable<Element> | undefined,
         droppedOnFeature: Feature<Point>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

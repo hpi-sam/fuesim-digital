@@ -161,7 +161,9 @@ export class TestEnvironment {
         session?: string,
         data?: TData
     ): request.Test {
-        const req = request(this.server.httpServer.httpServer)[method](url);
+        const req = request(this.server.httpServer.httpServer)
+            [method](url)
+            .send(data);
         if (session) {
             req.set(
                 'Cookie',
@@ -248,6 +250,7 @@ export function createTestEnvironment(): TestEnvironment {
             databaseService.databaseConnection
         );
         collectionService = new CollectionService(
+            exerciseService,
             organisationService,
             collectionRepository
         );

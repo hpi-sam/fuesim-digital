@@ -1,17 +1,12 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import type { ElementEntityId } from './versioned-id-schema.js';
-import {
-    elementEntityIdSchema,
-    elementVersionIdSchema,
-} from './versioned-id-schema.js';
-import type { Element as FuesimElement } from './../../models/element.js';
 import { collectionElementTypeSchema } from './collection-element-type.js';
+import type { Element as FuesimElement } from './../../models/element.js';
+import { contentlessTemplateVersionSchema } from './versioned-elements-contentless.js';
 
 export const versionedElementModelSchema = z.strictObject({
     entity: z.object({
-        entityId: elementEntityIdSchema,
-        versionId: elementVersionIdSchema,
+        ...contentlessTemplateVersionSchema.shape,
         type: collectionElementTypeSchema,
     }),
 });
@@ -21,11 +16,18 @@ export const versionedElementModelStateExtension =
 
 export type VersionedElementModel = z.infer<typeof versionedElementModelSchema>;
 
-export function getEntityIdFromElement(
+export function getEntityFromElement(
     element: FuesimElement | Immutable<FuesimElement>
-): ElementEntityId | undefined {
+): VersionedElementModel['entity'] | undefined {
     if ('entity' in element) {
-        return element.entity?.entityId;
+        const parsed = versionedElementModelStateExtension.entity.safeParse(
+            element.entity
+        );
+        if (!parsed.success || parsed.data === undefined) {
+            return undefined;
+        }
+
+        return parsed.data;
     }
     return undefined;
 }

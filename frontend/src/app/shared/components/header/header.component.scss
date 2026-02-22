@@ -3,3 +3,18 @@
     top: 0;
     z-index: 10;
 }
+
+.dropdown.openonhover:hover > .dropdown-menu {
+    display: block;
+    position: absolute;
+    // this is needed to move the dropdown menu up a bit to remove
+    // a little gap between the toggle and the menu that causes
+    // the menu to close when moving the mouse from the toggle to the menu
+    // too slowly
+    transform: translateY(-2px);
+}
+
+.dropdown.openonhover > .dropdown-toggle:active {
+    /*Without this, clicking will make it sticky*/
+    pointer-events: none;
+}

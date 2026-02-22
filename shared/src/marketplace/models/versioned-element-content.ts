@@ -2,12 +2,22 @@ import { z } from 'zod';
 import type { Immutable, WritableDraft } from 'immer';
 import { alarmGroupSchema } from '../../models/alarm-group.js';
 import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
-import type { VersionedElementModel } from './versioned-element-model.js';
+import { personnelTemplateSchema } from '../../models/personnel-template.js';
+import { materialTemplateSchema } from '../../models/material-template.js';
+import { mapImageTemplateSchema } from '../../models/map-image-template.js';
 import { versionedElementModelSchema } from './versioned-element-model.js';
+export {
+    type VersionedElementModel,
+    versionedElementModelSchema,
+    versionedElementModelStateExtension,
+} from './versioned-element-model.js';
 
 export const versionedElementContentSchema = z.discriminatedUnion('type', [
     vehicleTemplateSchema,
     alarmGroupSchema,
+    personnelTemplateSchema,
+    materialTemplateSchema,
+    mapImageTemplateSchema,
 ]);
 
 export const versionedElementContentAllowedTypes =
@@ -39,11 +49,3 @@ export const definitelyVersionedElementContentSchema = z.union(
 export type DefinitelyVersionedElementContent = Immutable<
     z.infer<typeof definitelyVersionedElementContentSchema>
 >;
-
-export function hasEntityProperties(
-    element: object
-): element is { entity: VersionedElementModel['entity'] } {
-    if (!('entity' in element)) return false;
-    return versionedElementModelSchema.shape.entity.safeParse(element.entity)
-        .success;
-}

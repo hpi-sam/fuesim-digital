@@ -12,6 +12,7 @@ import type {
     UUID,
     OrganisationId,
     GetExerciseTemplateResponseData,
+    VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import {
     joinExerciseResponseDataSchema,
@@ -66,6 +67,7 @@ import { OptimisticActionHandler } from './optimistic-action-handler';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 import { AuthService } from './auth.service.js';
 import { ApiService } from './api.service.js';
+import { CollectionService } from './exercise-element.service';
 
 /**
  * This Service deals with the state synchronization of a live exercise.
@@ -80,6 +82,7 @@ import { ApiService } from './api.service.js';
 export class ExerciseService {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly messageService = inject(MessageService);
+    private readonly collectionService = inject(CollectionService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly authService = inject(AuthService);
     private readonly apiService = inject(ApiService);
@@ -275,6 +278,34 @@ export class ExerciseService {
 
         // TODO: throw if `response.success` is false
         return this.optimisticActionHandler.proposeAction(action, optimistic);
+    }
+
+    public async addCollection(collection: VersionedCollectionPartial) {
+        const collectionData =
+            await this.collectionService.getCollectionVersion(collection);
+        const collectionElements =
+            await this.collectionService.getElementsOfCollectionVersion(
+                collection
+            );
+
+        if (collectionData === null) {
+            this.messageService.postError({
+                title: 'Sammlung konnte nicht hinzugefügt werden',
+                body: 'Die Sammlung konnte nicht geladen werden. Möglicherweise haben Sie keinen Zugriff auf die Sammlung.',
+            });
+            return;
+        }
+
+        await this.proposeAction({
+            type: '[Collection] Add Collection',
+            elements: collectionElements,
+            collection: collectionData,
+        });
+        this.messageService.postMessage({
+            title: 'Sammlung wurde hinzugefügt.',
+            body: 'Sie können die Elemente der Sammlung nun in der Übung verwenden.',
+            color: 'success',
+        });
     }
 
     private readonly stopNotifications$ = new Subject<void>();

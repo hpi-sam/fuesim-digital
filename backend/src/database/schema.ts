@@ -50,8 +50,10 @@ function typedUUID<T = string>() {
 function defaultUUID<T = string>() {
     return typedUUID<T>().$defaultFn(() => fuesimUUID() as T);
 }
-function defaultPrefixedUUID(prefix: string) {
-    return varchar().$defaultFn(() => `${prefix}_${fuesimUUID()}`);
+function defaultPrefixedUUID<T = string>(prefix: string) {
+    return varchar()
+        .$defaultFn(() => `${prefix}_${fuesimUUID()}`)
+        .$type<T>();
 }
 
 function baseTable<T>() {
@@ -275,14 +277,18 @@ export const actionTable = pgTable(
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
 
-function stateVersionedEntity<EntityBrand, VersionBrand>(prefix: string) {
+function stateVersionedEntity<EntityBrand, VersionBrand>(
+    prefix: string,
+    usePrefixForVersionId = true
+) {
     return {
         // VersionId uniquely indentifies an entry in the entire elements/collections table
-        versionId: defaultPrefixedUUID(`${prefix}_version`)
-            .unique()
-            .notNull()
-            .primaryKey()
-            .$type<VersionBrand>(),
+        versionId: usePrefixForVersionId
+            ? defaultPrefixedUUID<VersionBrand>(`${prefix}_version`)
+                  .unique()
+                  .notNull()
+                  .primaryKey()
+            : defaultUUID<VersionBrand>().unique().notNull().primaryKey(),
         // EntityId references a set of multiple versions of an element/collection
         // and is therefore not unique.
         entityId: defaultPrefixedUUID(`${prefix}_entity`)
@@ -349,7 +355,7 @@ export const elementCollectionMappingTable = pgTable(
                 onDelete: 'cascade',
             }),
         elementEntityId: varchar().notNull().$type<ElementEntityId>(),
-        elementVersionId: varchar()
+        elementVersionId: uuid()
             .notNull()
             .$type<ElementVersionId>()
             .references(() => elementTable.versionId, {
@@ -420,7 +426,10 @@ export const collectionDependencyMappingTable = pgTable(
 export const elementTable = pgTable(
     'elements',
     {
-        ...stateVersionedEntity<ElementEntityId, ElementVersionId>('element'),
+        ...stateVersionedEntity<ElementEntityId, ElementVersionId>(
+            'element',
+            false
+        ),
         title: varchar().notNull(),
         description: varchar().notNull(),
         content: json().$type<VersionedElementContent>().notNull(),

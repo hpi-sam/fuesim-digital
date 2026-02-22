@@ -1,0 +1,156 @@
+<div
+    class="card h-100"
+    style="cursor: pointer; background: transparent"
+    [class.border-success]="showIndicator() === 'created'"
+    [class.border-warning]="showIndicator() === 'changed'"
+    [class.ghost]="showIndicator() === 'ghost'"
+    [class.border-2]="showIndicator()"
+>
+    @if (image()) {
+        @let imgHeight = small() ? 80 : 100;
+        <div class="d-flex" [style.height.px]="imgHeight">
+            <img
+                [src]="image()"
+                class="card-img-top p-3 m-auto object-fit-contain"
+                [style.max-height.px]="imgHeight"
+            />
+        </div>
+    }
+    <div
+        class="card-body d-flex flex-column justify-content-between"
+        [class.small]="small()"
+    >
+        <div class="mb-2">
+            <span
+                class="card-title d-block mb-0"
+                [class.h5]="!small()"
+                [class.fw-medium]="small()"
+            >
+                {{ title() }}
+            </span>
+            @if (subtitle(); as subtitle) {
+                <span
+                    class="card-subtitle mb-2 text-body-secondary"
+                    [class.h6]="!small()"
+                    data-cy="elementCardSubtitle"
+                >
+                    {{ subtitle }}
+                </span>
+            }
+        </div>
+        @if (editable()) {
+            @if (showIndicator() === 'ghost') {
+                <button
+                    class="btn btn-outline-secondary btn-sm"
+                    (click)="$event.stopPropagation(); output.restore()"
+                >
+                    Wiederherstellen
+                </button>
+            } @else {
+                <div class="d-flex flex-row flex-wrap gap-2">
+                    <!-- a blank button that allows propagating the click event to the card itself,
+                         so that clicking the edit button opens the edit view -->
+                    <button
+                        class="btn btn-outline-primary btn-sm"
+                        ngbTooltip="Bearbeiten"
+                        placement="top"
+                        data-cy="editElementButton"
+                    >
+                        <i class="bi bi-pencil"></i>
+                    </button>
+
+                    <div ngbDropdown class="d-inline-block">
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary btn-sm"
+                            ngbDropdownToggle
+                            (click)="$event.stopPropagation()"
+                            ngbTooltip="Duplizieren"
+                            placement="top"
+                            data-cy="duplicateElementButton"
+                        >
+                            <i class="bi bi-copy"></i>
+                        </button>
+                        <div ngbDropdownMenu>
+                            <button
+                                ngbDropdownItem
+                                (click)="
+                                    $event.stopPropagation(); output.duplicate()
+                                "
+                                data-cy="duplicateInSameCollectionButton"
+                            >
+                                <i class="bi bi-arrow-right-square me-1"></i>
+                                Diese Sammlung
+                            </button>
+                            <button
+                                ngbDropdownItem
+                                (click)="
+                                    $event.stopPropagation();
+                                    output.duplicateExternal()
+                                "
+                            >
+                                <i class="bi bi-arrow-up-right-circle me-1"></i>
+                                Andere Sammlung
+                            </button>
+                        </div>
+                    </div>
+                    <button
+                        class="btn btn-outline-danger btn-sm"
+                        (click)="$event.stopPropagation(); output.delete()"
+                        ngbTooltip="Löschen"
+                        placement="top"
+                        data-cy="deleteElementButton"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            }
+        } @else {
+            <div
+                class="d-flex flex-row flex-wrap justify-content-stretch gap-1"
+            >
+                <button
+                    class="btn btn-outline-secondary btn-sm flex-grow-1 px-2"
+                    ngbTooltip="Ansehen"
+                    placement="top"
+                    (click)="
+                        $event.stopPropagation(); output.duplicateExternal()
+                    "
+                >
+                    <i class="bi bi-eye"></i>
+                </button>
+                <button
+                    class="btn btn-outline-secondary btn-sm d-flex gap-1 justify-content-center px-3"
+                    ngbTooltip="In andere Sammlung duplizieren"
+                    placement="top"
+                    (click)="
+                        $event.stopPropagation(); output.duplicateExternal()
+                    "
+                >
+                    <i class="bi bi-copy"></i>
+                    <i class="bi bi-arrow-up-right me-1"></i>
+                </button>
+            </div>
+        }
+    </div>
+    @if (showIndicator()) {
+        <div
+            class="w-100 text-center small fw-medium"
+            [class.bg-success]="showIndicator() === 'created'"
+            [class.bg-warning]="showIndicator() === 'changed'"
+            [class.bg-danger-subtle]="showIndicator() === 'ghost'"
+        >
+            @switch (showIndicator()) {
+                @case ('created') {
+                    <span class="text-white">Neu</span>
+                }
+                @case ('changed') {
+                    <span class="text-black">Verändert</span>
+                }
+                @case ('ghost') {
+                    <span class="text-gray">Gelöscht</span>
+                }
+            }
+        </div>
+    }
+</div>

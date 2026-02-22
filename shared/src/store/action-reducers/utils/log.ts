@@ -876,7 +876,7 @@ function createRadiogramDescription(
         case 'personnelCountRadiogram': {
             return `In dieser Region gab es die folgenden Einsatzkräfte: ${generateCountString(
                 radiogram.personnelCount,
-                (id) => state.personnelTemplates[id]?.name ?? ''
+                (id) => state.templates[id]?.name ?? ''
             )}.`;
         }
         case 'resourceRequestRadiogram': {

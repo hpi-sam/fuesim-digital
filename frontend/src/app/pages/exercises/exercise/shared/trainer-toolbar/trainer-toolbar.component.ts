@@ -11,12 +11,10 @@ import {
 import { Store } from '@ngrx/store';
 import type { TrainerKey } from 'fuesim-digital-shared';
 import { exerciseTypeGermanNameDictionary } from 'fuesim-digital-shared';
-import { openAlarmGroupOverviewModal } from '../alarm-group-overview/open-alarm-group-overview-modal';
 import { openClientsModal } from '../clients-modal/open-clients-modal';
 import { openEmergencyOperationsCenterModal } from '../emergency-operations-center/open-emergency-operations-center-modal';
 import { openExerciseSettingsModal } from '../exercise-settings/open-exercise-settings-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
-import { openHospitalEditorModal } from '../hospital-editor/hospital-editor-modal';
 import { openTrainerOperationsTabletModal } from '../operations-tablet-view/trainer-operations-tablet-modal/open-trainer-operations-tablet-modal';
 import { openSimulationTrainerModal } from '../simulation/trainer-modal/open-simulation-trainer-modal';
 import { openSimulationSignallerModal } from '../simulation/signaller-modal/open-simulation-signaller-modal';
@@ -79,14 +77,6 @@ export class TrainerToolbarComponent {
 
     public openTransferOverview() {
         openTransferOverviewModal(this.modalService);
-    }
-
-    public openAlarmGroupOverview() {
-        openAlarmGroupOverviewModal(this.modalService);
-    }
-
-    public openHospitalEditor() {
-        openHospitalEditorModal(this.modalService);
     }
 
     public openMeasuresOverview() {

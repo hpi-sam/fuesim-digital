@@ -1,0 +1,22 @@
+<div class="form-group mb-3">
+    <label class="form-label">Name</label>
+    <input
+        [formField]="mapImageForm.name"
+        type="text"
+        class="form-control"
+        placeholder="z.B. Brennendes Haus"
+    />
+    <app-display-model-validation
+        [field]="mapImageForm.name()"
+    ></app-display-model-validation>
+</div>
+
+<app-image-partial-form [imageForm]="mapImageForm.image" />
+
+<app-marketplace-form-submit-button-bar
+    [form]="mapImageForm"
+    [type]="data().type"
+    [disabled]="disabled()"
+    (submitData)="submitData()"
+    (discardChanges)="discardChanges.emit()"
+/>

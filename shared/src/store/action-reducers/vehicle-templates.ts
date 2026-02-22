@@ -19,6 +19,7 @@ import {
     imagePropertiesSchema,
 } from '../../models/utils/image-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getTemplates } from '../../models/template.js';
 
 export class AddVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Add vehicleTemplate')
@@ -56,6 +57,9 @@ export class EditVehicleTemplateAction implements Action {
     public readonly personnelTemplateIds!: readonly UUID[];
 }
 
+/**
+ * @deprecated This becomes obsolete with the Marketplace
+ */
 export class DeleteVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Delete vehicleTemplate')
     public readonly type = '[VehicleTemplate] Delete vehicleTemplate';
@@ -68,12 +72,14 @@ export namespace VehicleTemplateActionReducers {
     export const addVehicleTemplate: ActionReducer<AddVehicleTemplateAction> = {
         action: AddVehicleTemplateAction,
         reducer: (draftState, { vehicleTemplate }) => {
-            if (draftState.vehicleTemplates[vehicleTemplate.id]) {
+            if (
+                getTemplates(draftState, 'vehicleTemplate')[vehicleTemplate.id]
+            ) {
                 throw new ReducerError(
                     `VehicleTemplate with id ${vehicleTemplate.id} already exists`
                 );
             }
-            draftState.vehicleTemplates[vehicleTemplate.id] =
+            draftState.templates[vehicleTemplate.id] =
                 cloneDeepMutable(vehicleTemplate);
             return draftState;
         },
@@ -95,7 +101,9 @@ export namespace VehicleTemplateActionReducers {
                     personnelTemplateIds,
                 }
             ) => {
-                const vehicleTemplate = getVehicleTemplate(draftState, id);
+                const vehicleTemplate = cloneDeepMutable(
+                    getVehicleTemplate(draftState, id)
+                );
                 vehicleTemplate.image = cloneDeepMutable(image);
                 vehicleTemplate.name = name;
                 vehicleTemplate.patientCapacity = patientCapacity;
@@ -110,12 +118,15 @@ export namespace VehicleTemplateActionReducers {
             rights: 'trainer',
         };
 
+    /**
+     * @deprecated This becomes obsolete with the Marketplace
+     */
     export const deleteVehicleTemplate: ActionReducer<DeleteVehicleTemplateAction> =
         {
             action: DeleteVehicleTemplateAction,
             reducer: (draftState, { id }) => {
                 getVehicleTemplate(draftState, id);
-                delete draftState.vehicleTemplates[id];
+                delete getTemplates(draftState, 'vehicleTemplate')[id];
                 // Delete this template from every alarm group
                 for (const alarmGroup of Object.values(
                     draftState.alarmGroups
@@ -135,8 +146,8 @@ export namespace VehicleTemplateActionReducers {
 function getVehicleTemplate(
     state: WritableDraft<ExerciseState>,
     id: UUID
-): WritableDraft<VehicleTemplate> {
-    const vehicleTemplate = state.vehicleTemplates[id];
+): VehicleTemplate {
+    const vehicleTemplate = getTemplates(state, 'vehicleTemplate')[id];
     if (!vehicleTemplate) {
         throw new ReducerError(`VehicleTemplate with id ${id} does not exist`);
     }

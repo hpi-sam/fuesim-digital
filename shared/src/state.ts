@@ -1,7 +1,5 @@
 import { z } from 'zod';
 import { Equals, IsObject, IsOptional, IsUUID } from 'class-validator';
-import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
-import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
 import {
     newSeededRandomState,
     type RandomState,
@@ -10,35 +8,18 @@ import {
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
 import { IsZodSchema } from './utils/validators/is-zod-object.js';
 import { Vehicle, vehicleSchema } from './models/vehicle.js';
-import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import {
     RestrictedZone,
     restrictedZoneSchema,
 } from './models/restricted-zone.js';
 import { Material, materialSchema } from './models/material.js';
-import {
-    type MaterialTemplate,
-    materialTemplateSchema,
-} from './models/material-template.js';
-import {
-    type PersonnelTemplate,
-    personnelTemplateSchema,
-} from './models/personnel-template.js';
 import { Personnel, personnelSchema } from './models/personnel.js';
-import {
-    type VehicleTemplate,
-    vehicleTemplateSchema,
-} from './models/vehicle-template.js';
 import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
 import {
     operationalSectionSchema,
     OperationalSection,
 } from './models/operational-section.js';
 import { Hospital, hospitalSchema } from './models/hospital.js';
-import {
-    type MapImageTemplate,
-    mapImageTemplateSchema,
-} from './models/map-image-template.js';
 import { type MapImage, mapImageSchema } from './models/map-image.js';
 import { Viewport, viewportSchema } from './models/viewport.js';
 import { TransferPoint, transferPointSchema } from './models/transfer-point.js';
@@ -61,7 +42,6 @@ import {
     createCatchAllHospital,
 } from './data/default-state/catch-all-hospital.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
-import { defaultMapImagesTemplatesById } from './data/default-state/map-images-templates.js';
 import { SpatialTree } from './models/utils/spatial-tree.js';
 import { type LogEntry, logEntrySchema } from './models/log-entry.js';
 import type { TreatmentAssignment } from './store/action-reducers/exercise.js';
@@ -96,6 +76,11 @@ import {
 } from './models/technical-challenge/technical-challenge.js';
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
+import {
+    VersionedCollectionPartial,
+    versionedCollectionPartialSchema,
+} from './marketplace/models/versioned-id-schema.js';
+import { Template, templateSchema } from './models/template.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -118,6 +103,9 @@ export class ExerciseState {
 
     @IsZodSchema(randomStateSchema)
     public readonly randomState: RandomState = newSeededRandomState();
+
+    @IsZodSchema(z.array(versionedCollectionPartialSchema))
+    public readonly selectedCollections: VersionedCollectionPartial[] = [];
 
     @IsZodSchema(z.record(uuidSchema, viewportSchema))
     public readonly viewports: { readonly [key: UUID]: Viewport } = {};
@@ -201,30 +189,10 @@ export class ExerciseState {
     @IsZodSchema(z.array(patientCategorySchema))
     public readonly patientCategories = defaultPatientCategories;
 
-    @IsZodSchema(z.record(uuidSchema, vehicleTemplateSchema))
-    public readonly vehicleTemplates: {
-        readonly [key: UUID]: VehicleTemplate;
-    } = defaultVehicleTemplatesById;
-
-    @IsZodSchema(z.record(uuidSchema, materialTemplateSchema))
-    public readonly materialTemplates: {
-        readonly [key: UUID]: MaterialTemplate;
-    } = defaultMaterialTemplatesById;
-
-    @IsZodSchema(z.record(uuidSchema, personnelTemplateSchema))
-    public readonly personnelTemplates: {
-        readonly [key: UUID]: PersonnelTemplate;
-    } = defaultPersonnelTemplatesById;
-
     @IsZodSchema(z.record(z.string(), measureTemplateCategorySchema))
     public readonly measureTemplates: {
         readonly [key: string]: MeasureTemplateCategory;
     } = defaultMeasureTemplateCategories;
-
-    @IsZodSchema(z.record(uuidSchema, mapImageTemplateSchema))
-    public readonly mapImageTemplates: {
-        readonly [key: UUID]: MapImageTemplate;
-    } = defaultMapImagesTemplatesById;
 
     @IsZodSchema(z.array(eocLogEntrySchema))
     public readonly eocLog: readonly EocLogEntry[] = [];
@@ -265,6 +233,9 @@ export class ExerciseState {
     @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
 
+    @IsZodSchema(z.record(uuidSchema, templateSchema))
+    public readonly templates: { readonly [key: UUID]: Template } = {};
+
     /**
      * @deprecated Use {@link create} instead.
      */
@@ -278,6 +249,10 @@ export class ExerciseState {
      * **Important**
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
+     *
+     * WARNING: Before incresing this number, make sure to check:
+     * - If you made any changes to where/how references are stored in a model, please check
+     *   if collection-service.ts/findEntitiyVersionsInContent() needs to be updated to detect the new references.
      */
-    static readonly currentStateVersion = 57;
+    static readonly currentStateVersion = 58;
 }

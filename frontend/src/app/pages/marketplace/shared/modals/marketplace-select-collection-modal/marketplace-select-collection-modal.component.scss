@@ -1,0 +1,19 @@
+@use 'bootstrap/scss/bootstrap' as bt;
+
+$primary-muted: color-mix(in srgb, bt.$primary 60%, transparent);
+
+.pulsating {
+    animation: pulsate 1s infinite ease-in-out;
+}
+
+@keyframes pulsate {
+    0% {
+        box-shadow: 0 0 1px 0px $primary-muted;
+    }
+    50% {
+        box-shadow: 0 0 3px 2px $primary-muted;
+    }
+    100% {
+        box-shadow: 0 0 1px 0px $primary-muted;
+    }
+}

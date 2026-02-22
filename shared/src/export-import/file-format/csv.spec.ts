@@ -64,10 +64,8 @@ describe('csv export', () => {
                     sex: 'W',
                     remarks: '',
                     hasTransportPriority: '0',
-                    longitude: coordinateStringToNumber.encode(
-                        realPosition[0]!
-                    ),
-                    latitude: coordinateStringToNumber.encode(realPosition[1]!),
+                    longitude: coordinateStringToNumber.encode(realPosition[0]),
+                    latitude: coordinateStringToNumber.encode(realPosition[1]),
                     section: 'Test Viewport',
                 },
             ],
@@ -98,10 +96,8 @@ describe('csv export', () => {
                     status: '2',
                     sex: 'M',
                     remarks: 'unique_remarks',
-                    longitude: coordinateStringToNumber.encode(
-                        realPosition[0]!
-                    ),
-                    latitude: coordinateStringToNumber.encode(realPosition[1]!),
+                    longitude: coordinateStringToNumber.encode(realPosition[0]),
+                    latitude: coordinateStringToNumber.encode(realPosition[1]),
                     section: '',
                 },
             ],

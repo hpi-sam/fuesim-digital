@@ -1,0 +1,70 @@
+<label class="form-label"
+    >Anzahl der Patienten, die behandelt werden können</label
+>
+<div class="row row-cols-4">
+    <div class="form-group mb-3 col">
+        <label class="form-label text-danger">SK I</label>
+        <input
+            [formField]="caterForForm().red"
+            type="number"
+            class="form-control"
+            placeholder="z.B. 3"
+        />
+        <app-display-model-validation
+            [field]="caterForForm().red()"
+        ></app-display-model-validation>
+    </div>
+    <div class="form-group mb-3 col">
+        <label class="form-label text-warning">SK II</label>
+        <input
+            [formField]="caterForForm().yellow"
+            type="number"
+            class="form-control"
+            placeholder="z.B. 3"
+        />
+        <app-display-model-validation
+            [field]="caterForForm().yellow()"
+        ></app-display-model-validation>
+    </div>
+    <div class="form-group mb-3 col">
+        <label class="form-label text-success">SK III</label>
+        <input
+            [formField]="caterForForm().green"
+            type="number"
+            class="form-control"
+            placeholder="z.B. 3"
+        />
+        <app-display-model-validation
+            [field]="caterForForm().green()"
+        ></app-display-model-validation>
+    </div>
+    <div
+        class="input-group mb-3 col align-self-end"
+        style="width: fit-content; height: fit-content"
+    >
+        <input
+            type="radio"
+            class="btn-check"
+            id="caterForOptionAnd"
+            autocomplete="off"
+            value="and"
+            [formField]="caterForForm().logicalOperator"
+        />
+        <label
+            class="btn btn-secondary-outline rounded-start"
+            for="caterForOptionAnd"
+            >UND</label
+        >
+        <input
+            type="radio"
+            class="btn-check"
+            id="caterForOptionOr"
+            autocomplete="off"
+            value="or"
+            [formField]="caterForForm().logicalOperator"
+        />
+        <label class="btn btn-secondary-outline" for="caterForOptionOr"
+            >ODER</label
+        >
+    </div>
+</div>

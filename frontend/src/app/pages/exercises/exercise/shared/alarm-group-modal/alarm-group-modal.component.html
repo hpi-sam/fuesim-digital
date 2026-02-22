@@ -1,0 +1,40 @@
+<div class="modal-header">
+    <h4 class="modal-title">Alarmgruppe auswählen</h4>
+
+    @if (collectionElements.isLoading()) {
+        <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
+    }
+
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    @if (collectionElements.hasValue()) {
+        @for (
+            entry of collectionElements.value();
+            track entry.collection.versionId
+        ) {
+            <h5>{{ entry.collection.title }}</h5>
+
+            <div class="container">
+                <div class="row row-cols-2 row-cols-md-4 row-cols-lg-4 g-2">
+                    @for (
+                        element of entry.elements.direct;
+                        track element.versionId
+                    ) {
+                        @if (element.content.type === 'alarmGroup') {
+                            <app-element-card
+                                [element]="element"
+                                [showIndicator]="undefined"
+                                [small]="true"
+                                mode="static"
+                                (click)="close(element.content)"
+                                [collection]="entry.collection"
+                                [collectionElements]="entry.elements"
+                            />
+                        }
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

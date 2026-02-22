@@ -179,6 +179,7 @@ export namespace AlarmGroupActionReducers {
                     'alarmGroup',
                     alarmGroupId
                 );
+
                 const alarmGroupVehicle = getAlarmGroupVehicle(
                     alarmGroup,
                     alarmGroupVehicleId
@@ -199,6 +200,7 @@ export namespace AlarmGroupActionReducers {
                     'alarmGroup',
                     alarmGroupId
                 );
+
                 getAlarmGroupVehicle(alarmGroup, alarmGroupVehicleId);
                 delete alarmGroup.alarmGroupVehicles[alarmGroupVehicleId];
                 return draftState;

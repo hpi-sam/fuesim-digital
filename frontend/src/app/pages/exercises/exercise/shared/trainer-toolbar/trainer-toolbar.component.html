@@ -20,14 +20,6 @@
             <div ngbDropdownMenu>
                 <button
                     ngbDropdownItem
-                    (click)="openAlarmGroupOverview()"
-                    class="btn btn-outline-primary"
-                    data-cy="trainerToolbarAlarmGroupsButton"
-                >
-                    Erstellen
-                </button>
-                <button
-                    ngbDropdownItem
                     (click)="openEmergencyOperationsCenter()"
                     class="btn btn-primary"
                     data-cy="trainerToolbarControlCenterButton"
@@ -45,13 +37,6 @@
             </div>
         </div>
         <button
-            (click)="openHospitalEditor()"
-            class="btn btn-outline-primary"
-            data-cy="trainerToolbarHospitalsButton"
-        >
-            Krankenhäuser
-        </button>
-        <button
             (click)="openOperationsTabletModal()"
             class="btn btn-outline-primary"
             data-cy="trainerToolbarOperationsTabletButton"
@@ -60,48 +45,19 @@
         </button>
         <button
             (click)="openMeasuresOverview()"
-            class="btn btn-outline-primary ms-3"
+            class="btn btn-outline-primary"
             data-cy="trainerToolbarMeasuresButton"
         >
             Maßnahmen
         </button>
     } @else {
-        <div ngbDropdown placement="top-start" class="d-inline-block">
-            <button
-                type="button"
-                class="btn btn-outline-primary"
-                ngbDropdownToggle
-                data-cy="trainerToolbarCreationButton"
-            >
-                Erstellung
-            </button>
-            <div ngbDropdownMenu>
-                <button
-                    ngbDropdownItem
-                    (click)="openAlarmGroupOverview()"
-                    class="btn btn-primary"
-                    data-cy="trainerToolbarAlarmGroupsButton"
-                >
-                    Alarmierungsgruppen
-                </button>
-                <button
-                    ngbDropdownItem
-                    (click)="openHospitalEditor()"
-                    class="btn btn-primary"
-                    data-cy="trainerToolbarHospitalsButton"
-                >
-                    Krankenhäuser
-                </button>
-                <button
-                    ngbDropdownItem
-                    (click)="openMeasuresOverview()"
-                    class="btn btn-primary"
-                    data-cy="trainerToolbarMeasuresButton"
-                >
-                    Maßnahmen
-                </button>
-            </div>
-        </div>
+        <button
+            (click)="openMeasuresOverview()"
+            class="btn btn-outline-primary"
+            data-cy="trainerToolbarMeasuresButton"
+        >
+            Maßnahmen
+        </button>
 
         <div ngbDropdown placement="top-start" class="d-inline-block">
             <button

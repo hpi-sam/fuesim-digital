@@ -18,6 +18,8 @@ import type { Services } from './database/services/index.js';
 import { ParallelExerciseService } from './database/services/parallel-exercise-service.js';
 import { OrganisationService } from './database/services/organisation-service.js';
 import { OrganisationRepository } from './database/repositories/organisation-repository.js';
+import { CollectionRepository } from './database/repositories/collection-repository.js';
+import { CollectionService } from './database/services/collection-service.js';
 
 async function main() {
     Config.initialize();
@@ -57,6 +59,9 @@ async function main() {
         organisationRepository: new OrganisationRepository(
             databaseService.databaseConnection
         ),
+        collectionRepository: new CollectionRepository(
+            databaseService.databaseConnection
+        ),
     };
 
     const exerciseService = new ExerciseService(
@@ -78,6 +83,12 @@ async function main() {
         repositories.organisationRepository,
         repositories.userRepository
     );
+    const collectionService = new CollectionService(
+        organisationService,
+        repositories.collectionRepository
+    );
+
+    await collectionService.initialize();
 
     let authService: AuthService;
     try {
@@ -98,6 +109,7 @@ async function main() {
         parallelExerciseService,
         databaseService,
         organisationService,
+        collectionService,
     };
 
     if (Config.useDb) {

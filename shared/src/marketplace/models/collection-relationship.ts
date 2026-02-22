@@ -75,10 +75,10 @@ export type CollectionRelationshipDto = z.infer<
 export const collectionRelationshipTypesDisplayNames: {
     [key in (typeof collectionRelationshipTypeAllowedValues)[number]]: string;
 } = {
-    other: 'Sonstige',
-    viewer: 'Betrachter',
-    editor: 'Bearbeiter',
     admin: 'Besitzer',
+    editor: 'Bearbeiter',
+    viewer: 'Betrachter',
+    other: 'Sonstige',
 };
 
 export function checkCollectionRole(currentRole: CollectionRelationshipType) {

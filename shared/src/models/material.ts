@@ -3,15 +3,18 @@ import type { Immutable } from 'immer';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { uuidSetSchema } from '../utils/uuid-set.js';
+import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
+import { hybridIdSchema } from '../utils/hybrid-id.js';
 import type { MaterialTemplate } from './material-template.js';
 import { canCaterForSchema } from './utils/cater-for.js';
 import { imagePropertiesSchema } from './utils/image-properties.js';
 import { type Position, positionSchema } from './utils/position/position.js';
 
 export const materialSchema = z.strictObject({
+    ...versionedElementModelSchema.partial().shape,
     id: uuidSchema,
     type: z.literal('material'),
-    templateId: uuidSchema,
+    templateId: hybridIdSchema,
     typeName: z.string(),
     vehicleId: uuidSchema,
     vehicleName: z.string(),

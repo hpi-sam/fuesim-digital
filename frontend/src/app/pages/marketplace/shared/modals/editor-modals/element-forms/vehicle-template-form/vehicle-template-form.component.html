@@ -1,0 +1,172 @@
+<div class="form-group mb-3">
+    <label class="form-label">Typ:</label>
+    <input
+        [formField]="vehicleForm.vehicleType"
+        type="text"
+        class="form-control"
+        placeholder="Fahrzeugtyp"
+    />
+    <app-display-model-validation
+        [field]="vehicleForm.vehicleType()"
+    ></app-display-model-validation>
+</div>
+<div class="form-group mb-3">
+    <label class="form-label">Standardname von neuen Fahrzeugen:</label>
+    <input
+        [formField]="vehicleForm.name"
+        type="text"
+        class="form-control"
+        placeholder="Fahrzeugname"
+    />
+    <app-display-model-validation
+        [field]="vehicleForm.name()"
+    ></app-display-model-validation>
+</div>
+<app-image-partial-form [imageForm]="vehicleForm.image" />
+<div class="form-group mb-3">
+    <label class="form-label">Patientenkapazität:</label>
+    <input
+        [formField]="vehicleForm.patientCapacity"
+        step="1"
+        appIntegerValidator
+        type="number"
+        class="form-control"
+        placeholder="1"
+    />
+    <app-display-model-validation
+        [field]="vehicleForm.patientCapacity()"
+    ></app-display-model-validation>
+</div>
+<div class="form-group mb-3">
+    <label class="form-label"
+        >Materialien
+
+        @if (!disabled()) {
+            <div ngbDropdown autoClose="outside" class="d-inline-block">
+                <button
+                    ngbDropdownToggle
+                    type="button"
+                    class="btn btn-outline-primary ms-3"
+                >
+                    Material hinzufügen
+                </button>
+                <div ngbDropdownMenu>
+                    @for (
+                        materialTemplate of availableMaterialTemplates();
+                        track materialTemplate.versionId
+                    ) {
+                        <button
+                            ngbDropdownItem
+                            (click)="addMaterial(materialTemplate)"
+                            type="button"
+                            class="btn"
+                        >
+                            <i class="bi bi-plus"></i>
+                            {{ materialTemplate.content.name }}
+                        </button>
+                    } @empty {
+                        <p class="text-muted m-1">
+                            Sie haben noch keine Materialien in der Sammlung
+                        </p>
+                    }
+                </div>
+            </div>
+        }
+    </label>
+    @if (values().materialTemplateIds.length > 0) {
+        <div class="d-flex flex-wrap">
+            @for (
+                materialTemplate of values().materialTemplateIds;
+                track materialTemplate;
+                let index = $index
+            ) {
+                @let material = getMaterialTemplateById(materialTemplate);
+                @if (material === undefined) {
+                    <div class="alert alert-danger" role="alert">
+                        Fehler: Materialvorlage mit ID
+                        {{ materialTemplate }} nicht gefunden.
+                    </div>
+                } @else {
+                    <app-map-editor-card
+                        [title]="material.name"
+                        [imageUrl]="material.image.url"
+                        [enableDeleteButton]="!disabled()"
+                        (elementDelete)="removeMaterial($index)"
+                    />
+                }
+            }
+        </div>
+    } @else {
+        <div class="text-muted mt-3 mb-3">Keine Materialien zugewiesen</div>
+    }
+</div>
+<div class="form-group mb-3">
+    <label class="form-label"
+        >Personal
+        @if (!disabled()) {
+            <div ngbDropdown autoClose="outside" class="d-inline-block">
+                <button
+                    ngbDropdownToggle
+                    type="button"
+                    class="btn btn-outline-primary ms-3"
+                >
+                    Personal hinzufügen
+                </button>
+                <div ngbDropdownMenu>
+                    @for (
+                        personnelTemplate of availablePersonnelTemplates();
+                        track personnelTemplate.versionId
+                    ) {
+                        <button
+                            ngbDropdownItem
+                            (click)="addPersonnel(personnelTemplate)"
+                            type="button"
+                            class="btn"
+                        >
+                            <i class="bi bi-plus"></i>
+                            {{ personnelTemplate.content.name }}
+                        </button>
+                    } @empty {
+                        <p class="text-muted m-1">
+                            Sie haben noch kein Personal in der Sammlung
+                        </p>
+                    }
+                </div>
+            </div>
+        }
+    </label>
+    @if (values().personnelTemplateIds.length > 0) {
+        <div class="d-flex flex-wrap">
+            @for (
+                personnelTemplate of values().personnelTemplateIds;
+                track personnelTemplate;
+                let index = $index
+            ) {
+                @let personnel = getPersonnelTemplateById(personnelTemplate);
+                @if (personnel === undefined) {
+                    <div class="alert alert-danger" role="alert">
+                        Fehler: Personalvorlage mit ID
+                        {{ personnelTemplate }} nicht gefunden.
+                    </div>
+                } @else {
+                    <app-map-editor-card
+                        [title]="personnel.name"
+                        [imageUrl]="personnel.image.url"
+                        [enableDeleteButton]="!disabled()"
+                        (elementDelete)="removePersonnel($index)"
+                    />
+                }
+            }
+        </div>
+    } @else {
+        <div class="text-muted mt-3 mb-3">Kein Personal zugewiesen</div>
+    }
+</div>
+
+<app-marketplace-form-submit-button-bar
+    [form]="vehicleForm"
+    [type]="data().type"
+    [disabled]="disabled()"
+    (submitData)="submitData()"
+    (discardChanges)="discardChanges.emit()"
+/>

@@ -54,6 +54,8 @@ import { getDefaultTasks } from './data/default-state/tmp-default-technical-chal
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
+import { versionedCollectionPartialSchema } from './marketplace/models/versioned-id-schema.js';
+import { templateSchema } from './models/template.js';
 
 /**
  * **Important**
@@ -75,6 +77,8 @@ export const exerciseStateSchema = z.strictObject({
     type: exerciseTypeSchema,
     currentStatus: exerciseStatusSchema,
     randomState: randomStateSchema,
+
+    selectedCollections: z.array(versionedCollectionPartialSchema),
 
     viewports: z.record(uuidSchema, viewportSchema),
     autojoinViewportId: uuidSchema.nullable(),
@@ -111,13 +115,11 @@ export const exerciseStateSchema = z.strictObject({
     operationalSections: z.record(uuidSchema, operationalSectionSchema),
 
     patientCategories: z.array(patientCategorySchema),
-    vehicleTemplates: z.record(uuidSchema, vehicleTemplateSchema),
-    materialTemplates: z.record(uuidSchema, materialTemplateSchema),
-    personnelTemplates: z.record(uuidSchema, personnelTemplateSchema),
     measureTemplates: z.record(z.string(), measureTemplateCategorySchema),
-    mapImageTemplates: z.record(uuidSchema, mapImageTemplateSchema),
 
     scoutables: z.record(scoutableSchema.shape.id, scoutableSchema),
+
+    templates: z.record(uuidSchema, templateSchema),
 
     eocLog: z.array(eocLogEntrySchema),
 
@@ -148,6 +150,7 @@ export function newExerciseState(
         type: 'standalone',
         currentStatus: 'notStarted',
         randomState: newSeededRandomState(),
+        selectedCollections: [],
         viewports: {},
         autojoinViewportId: null,
         simulatedRegions: {},
@@ -170,12 +173,9 @@ export function newExerciseState(
         radiograms: {},
         operationalSections: {},
         patientCategories: defaultPatientCategories,
-        vehicleTemplates: defaultVehicleTemplatesById,
-        materialTemplates: defaultMaterialTemplatesById,
-        personnelTemplates: defaultPersonnelTemplatesById,
         measureTemplates: defaultMeasureTemplateCategories,
-        mapImageTemplates: defaultMapImagesTemplatesById,
         scoutables: {},
+        templates: {},
         eocLog: [],
         participantKey,
         spatialTrees: {

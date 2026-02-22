@@ -1,7 +1,10 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
+import { cloneDeepMutable } from '../utils/clone-deep.js';
 import type {
     ElementVersionId,
+    CollectionVersionId,
     VersionedCollectionPartial,
 } from './models/versioned-id-schema.js';
 import { elementVersionIdSchema } from './models/versioned-id-schema.js';
@@ -55,10 +58,14 @@ export const changeDependenciesSchema = z.record(
 );
 
 export type ChangeDependencies = { [T in ElementVersionId]: TemplateVersion[] };
+import type { CollectionElements } from './models/collection-elements.js';
+import { gatherCollectionElements } from './models/collection-elements.js';
+import type { TemplateVersion } from './models/marketplace-element.js';
+import type { ChangedTemplateVersion } from './collection-element-diff.js';
 
 export function getCollectionElementDiff(
-    currentElements: TemplateVersion[],
-    newElements: TemplateVersion[]
+    currentElements: Immutable<TemplateVersion[]>,
+    newElements: Immutable<TemplateVersion[]>
 ): ChangedTemplateVersion[] {
     const changes: ChangedTemplateVersion[] = [];
 
@@ -95,6 +102,8 @@ export function getCollectionElementDiff(
         currentElementEntityIds.has(element.entityId)
     );
 
+    // TODO: @Quixelation -> we should also do a content diff, to see if the content was actually significantly changed
+    // But this is something for a later point (ba-thesis?)
     overlappingNew
         .map((newElement) => {
             const matchingCurrentElement = currentElements.find(
@@ -165,4 +174,141 @@ export function getCollectionElementsDiff(
             gatherAllReferencedCollectionElements(combinedNextElements)
         ),
     };
+}
+
+export async function dependencyTreeConflictResolution(
+    baseCollection: VersionedCollectionPartial,
+    opts: {
+        // levels of dependencies which are later directly visible to the user
+        // 1 is used for collections in collections
+        // 2 is used for collections in exercises
+        strictLevels: number;
+    },
+    retrievers: {
+        getCollectionDependencies: (
+            collectionVersionId: CollectionVersionId
+        ) => Promise<VersionedCollectionPartial[]>;
+        getCollectionElements: (
+            collectionVersionId: CollectionVersionId
+        ) => Promise<TemplateVersion[]>;
+    }
+) {
+    // -- STRICT LEVEL --
+    const strictLevelCollections: VersionedCollectionPartial[] = [];
+    const looseLevelCollections: VersionedCollectionPartial[] = [];
+    const strictLevelElements: TemplateVersion[] = [];
+
+    const loadDeps = async (
+        collection: VersionedCollectionPartial,
+        currentLevel: number
+    ) => {
+        if (currentLevel > opts.strictLevels) {
+            looseLevelCollections.push(collection);
+            return;
+        }
+
+        const elements = await retrievers.getCollectionElements(
+            collection.versionId
+        );
+        strictLevelElements.push(...elements);
+
+        const deps = await retrievers.getCollectionDependencies(
+            collection.versionId
+        );
+
+        await Promise.all(
+            deps.map(async (dep) => {
+                strictLevelCollections.push(collection);
+                return loadDeps(dep, currentLevel + 1);
+            })
+        );
+    };
+
+    await loadDeps(baseCollection, 1);
+
+    const groupedIds = strictLevelCollections.reduce<{
+        [key: string]: CollectionVersionId[];
+    }>((acc, collection) => {
+        acc[collection.entityId] ??= [];
+        acc[collection.entityId]!.push(collection.versionId);
+        return acc;
+    }, {});
+
+    if (Object.values(groupedIds).some((versions) => versions.length > 1)) {
+        console.warn(
+            'Conflict detected in dependency tree, multiple versions of the same collection found in strict levels',
+            strictLevelCollections
+        );
+    }
+
+    // -- LOOSE LEVEL --
+
+    const looseLevelElements: TemplateVersion[] = [];
+
+    const loadLooseDeps = async (collection: VersionedCollectionPartial) => {
+        const elements = await retrievers.getCollectionElements(
+            collection.versionId
+        );
+        looseLevelElements.push(...elements);
+
+        const deps = await retrievers.getCollectionDependencies(
+            collection.versionId
+        );
+
+        await Promise.all(
+            deps.map(async (dep) =>
+                // We do not check if two versions of the same collection are in the loose level,
+                // since we use mix-n-match resolution for the loose level
+                //
+                // So we only need to check for version conflicts on the elements
+                loadLooseDeps(dep)
+            )
+        );
+    };
+
+    await Promise.all(
+        looseLevelCollections.map(async (collection) =>
+            loadLooseDeps(collection)
+        )
+    );
+
+    return { strictLevelCollections, groupedIds };
+}
+
+export async function getAllCollectionElements(
+    collections: VersionedCollectionPartial[],
+    elementRetriever: (
+        collection: VersionedCollectionPartial
+    ) => Promise<CollectionElements>
+): Promise<CollectionElements> {
+    const elements = await Promise.all(
+        collections.map(async (collection) => elementRetriever(collection))
+    );
+    return cloneDeepMutable(elements).reduce<WritableDraft<CollectionElements>>(
+        (acc, collectionElements) => {
+            acc.direct.push(...collectionElements.direct);
+
+            for (const elementType of ['references', 'imported'] as const) {
+                for (const colElements of collectionElements[elementType]) {
+                    const existingCollection = acc[elementType].find(
+                        (f) =>
+                            f.collection.entityId ===
+                            colElements.collection.entityId
+                    );
+                    if (existingCollection) {
+                        existingCollection.elements.push(
+                            ...colElements.elements
+                        );
+                    } else {
+                        acc[elementType].push({
+                            collection: colElements.collection,
+                            elements: [...colElements.elements],
+                        });
+                    }
+                }
+            }
+            return acc;
+        },
+        { direct: [], imported: [], references: [] }
+    );
 }

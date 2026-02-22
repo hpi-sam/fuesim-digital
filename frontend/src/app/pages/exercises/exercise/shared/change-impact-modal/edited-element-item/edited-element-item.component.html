@@ -1,0 +1,124 @@
+@let applyChange = applyingChange();
+<p>Element {{ change().entity.title }} wurde verändert.</p>
+<p>
+    Bitte wählen sie eine geeignete Vorgehensweise für die folgenden Attribute
+    aus.
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Attribut</th>
+            <th scope="col">Aktueller Wert</th>
+            <th scope="col">Neuer Wert</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">{{ change().editedValue.name }}</th>
+            <td>{{ change().editedValue.model }}</td>
+            <td>{{ change().editedValue.template }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="card mt-2">
+    <div class="card-header">
+        <div class="form-check">
+            <input
+                type="radio"
+                id="remove"
+                name="action"
+                value="remove"
+                class="form-check-input"
+                [checked]="applyChange?.action === 'keep'"
+                (change)="setActionType('keep')"
+            />
+            <label for="remove" class="form-check-label text-danger">
+                Alten Wert beibehalten
+            </label>
+        </div>
+    </div>
+    <div class="card-header">
+        <div class="form-check">
+            <input
+                type="radio"
+                id="replace"
+                name="action"
+                value="replace"
+                [checked]="applyChange?.action === 'replace'"
+                class="form-check-input"
+                (change)="setReplaceWith()"
+            />
+            <label for="replace" class="form-check-label">
+                Eigenen Wert verwenden
+            </label>
+        </div>
+    </div>
+    @if (applyChange?.action === 'replace') {
+        <div class="card-body">
+            <div class="mb-3">
+                <label
+                    for="editedValueChangeImpactReplaceContent"
+                    class="form-label"
+                    >Neuer Wert</label
+                >
+                <input
+                    type="email"
+                    class="form-control"
+                    id="editedValueChangeImpactReplaceContent"
+                    [value]="newValue()"
+                    (input)="setReplaceWith($event.target.value)"
+                />
+            </div>
+        </div>
+    }
+    <div class="card-header">
+        <div class="form-check">
+            <input
+                type="radio"
+                id="keep"
+                name="action"
+                value="keep"
+                [checked]="applyChange?.action === 'update'"
+                class="form-check-input"
+                (change)="setActionType('update')"
+            />
+            <label for="keep" class="form-check-label text-success">
+                Neuen Wert übernehmen
+            </label>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+@let selectedKeep = applyChange && applyChange.action === 'keep';
+@let selectedUpdate =
+    applyChange &&
+    (applyChange.action === 'update' || applyChange.action === 'replace');
+
+<div class="alert alert-info" role="alert">
+    <b class="d-block">Folgende Aktion wird auf das Element angewendet:</b>
+    @if (selectedKeep) {
+        <span
+            >Das Attribut bleibt unverändert:
+            <b class="fw-medium">{{ newValue() }}</b></span
+        >
+    } @else if (selectedUpdate) {
+        <span
+            >Das Attribut wird ersetzt:
+            <b class="fw-medium">{{ newValue() }}</b></span
+        >
+    } @else {
+        <i>Es wurde noch keine Aktion ausgewählt.</i>
+    }
+    @if (selectedKeep || selectedUpdate) {
+        <button
+            class="btn btn-sm btn-outline-primary d-block mt-2"
+            (click)="applyForAll.emit()"
+        >
+            Diese Aktion für alle Objekte dieses Typs anwenden
+        </button>
+    }
+</div>

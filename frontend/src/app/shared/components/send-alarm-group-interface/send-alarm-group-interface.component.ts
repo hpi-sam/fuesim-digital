@@ -212,55 +212,65 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     public async sendAlarmGroup() {
         this.loading.set(true);
+        try {
+            if (!this.canSubmit) {
+                this.messageService.postError({
+                    title: 'Fehler beim Senden der Alarmgruppe',
+                    body: 'Bitte geben Sie alle notwendigen Informationen an!',
+                });
+                this.loading.set(false);
+                return;
+            }
 
-        if (!this.canSubmit) {
-            this.messageService.postError({
-                title: 'Fehler beim Senden der Alarmgruppe',
-                body: 'Bitte geben Sie alle notwendigen Informationen an!',
+            const alarmGroup = selectStateSnapshot(
+                createSelectAlarmGroup(selectedAlarmGroup!.key),
+                this.store
+            );
+
+            const firstVehiclesCountForAction = this.firstVehiclesCount;
+            const firstVehiclesCountReducedBy = Math.min(
+                Object.keys(alarmGroup.alarmGroupVehicles).length,
+                this.firstVehiclesCount
+            );
+            this.firstVehiclesCount -= firstVehiclesCountReducedBy;
+
+            const vehicleParameters = getVehicleParameters(
+                this.store,
+                alarmGroup
+            );
+
+            const request = await this.exerciseService.proposeAction({
+                type: '[Emergency Operation Center] Send Alarm Group',
+                clientName: selectStateSnapshot(selectOwnClient, this.store)!
+                    .name,
+                alarmGroupId: alarmGroup.id,
+                sortedVehicleParameters: vehicleParameters,
+                targetTransferPointId: this.selectedTarget!.key,
+                firstVehiclesCount: firstVehiclesCountForAction,
+                firstVehiclesTargetTransferPointId:
+                    this.selectedFirstVehiclesTarget?.key,
+                eocLogId: uuid(),
             });
+
             this.loading.set(false);
-            return;
-        }
 
-        const alarmGroup = selectStateSnapshot(
-            createSelectAlarmGroup(selectedAlarmGroup!.key),
-            this.store
-        );
-
-        const firstVehiclesCountForAction = this.firstVehiclesCount;
-        const firstVehiclesCountReducedBy = Math.min(
-            Object.keys(alarmGroup.alarmGroupVehicles).length,
-            this.firstVehiclesCount
-        );
-        this.firstVehiclesCount -= firstVehiclesCountReducedBy;
-
-        const vehicleParameters = getVehicleParameters(this.store, alarmGroup);
-
-        const request = await this.exerciseService.proposeAction({
-            type: '[Emergency Operation Center] Send Alarm Group',
-            clientName: selectStateSnapshot(selectOwnClient, this.store)!.name,
-            alarmGroupId: alarmGroup.id,
-            sortedVehicleParameters: vehicleParameters,
-            targetTransferPointId: this.selectedTarget!.key,
-            firstVehiclesCount: firstVehiclesCountForAction,
-            firstVehiclesTargetTransferPointId:
-                this.selectedFirstVehiclesTarget?.key,
-            eocLogId: uuid(),
-        });
-
-        this.loading.set(false);
-
-        if (request.success) {
-            this.messageService.postMessage({
-                title: `Alarmgruppe ${alarmGroup.name} alarmiert!`,
-                color: 'success',
-            });
-        } else {
-            this.firstVehiclesCount += firstVehiclesCountReducedBy;
+            if (request.success) {
+                this.messageService.postMessage({
+                    title: `Alarmgruppe ${alarmGroup.name} alarmiert!`,
+                    color: 'success',
+                });
+            } else {
+                this.firstVehiclesCount += firstVehiclesCountReducedBy;
+                this.firstVehiclesCount += firstVehiclesCountReducedBy;
+                throw new Error("Couldn't send alarm group");
+            }
+        } catch {
             this.messageService.postError({
                 title: 'Fehler beim Senden der Alarmgruppe',
                 body: 'Die Alarmgruppe konnte nicht gesendet werden',
             });
+        } finally {
+            this.loading.set(false);
         }
     }
 }

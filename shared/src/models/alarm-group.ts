@@ -44,7 +44,7 @@ registerDependency('alarmGroup', {
                     return [key, vehicle];
                 })
         );
-        return content;
+        return mutableContent;
     },
 });
 

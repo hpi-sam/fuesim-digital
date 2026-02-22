@@ -3,7 +3,7 @@ import { z } from 'zod';
 /// COLLECTIONS
 export const collectionEntityIdSchema = z
     .string()
-    .regex(/^set_entity_.+$/u)
+    .regex(/^collection_entity_.+$/u)
     .brand<'SetEntityId'>();
 export type CollectionEntityId = z.infer<typeof collectionEntityIdSchema>;
 export function isCollectionEntityId(
@@ -14,7 +14,7 @@ export function isCollectionEntityId(
 
 export const collectionVersionIdSchema = z
     .string()
-    .regex(/^set_version_.+$/u)
+    .regex(/^collection_version_.+$/u)
     .brand<'SetVersionId'>();
 export type CollectionVersionId = z.infer<typeof collectionVersionIdSchema>;
 export function isCollectionVersionId(

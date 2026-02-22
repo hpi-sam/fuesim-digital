@@ -17,6 +17,10 @@ export interface ServerToClientEvents {
     collectionUpdate: (
         data: z.input<typeof Marketplace.Collection.Events.SSEvent.schema>
     ) => void;
+    collectionUpdate: (
+        data: z.input<typeof Marketplace.Collection.Events.SSEvent.schema>
+    ) => void;
+    collectionVersioningEnabled: (data: boolean) => void;
 }
 
 // The last argument is always expected to be the callback function. (To be able to use it in advanced typings)

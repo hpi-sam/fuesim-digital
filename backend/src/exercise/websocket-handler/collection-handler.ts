@@ -3,6 +3,7 @@ import type { Services } from '../../database/services/index.js';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { ClientWrapper, CollectionClientWrapper } from '../client-wrapper.js';
 import { clientMap } from '../client-map.js';
+import { Config } from '../../config.js';
 import { secureOn } from './secure-on.js';
 
 export function registerCollectionHandler(
@@ -35,6 +36,11 @@ export function registerCollectionHandler(
             });
             return;
         }
+
+        socket.emit(
+            'collectionVersioningEnabled',
+            !Config.experimentalDisableVersioning
+        );
 
         callback({
             success: true,

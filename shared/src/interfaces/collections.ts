@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
+import type { ImmutableInfer } from '../utils/infer.js';
+import { marketplaceElementContentSchema } from '../marketplace/elements/marketplace-elements.js';
 import type { CollectionEntityId } from '../marketplace/models/versioned-id-schema.js';
 import {
     collectionEntityIdSchema,
@@ -7,6 +9,7 @@ import {
     elementEntityIdSchema,
     elementVersionIdSchema,
 } from '../marketplace/models/versioned-id-schema.js';
+import { templateVersionSchema } from '../marketplace/models/marketplace-element.js';
 import { collectionRelationshipTypeSchema } from '../marketplace/models/collection-relationship.js';
 import {
     collectionVersionSchema,
@@ -254,6 +257,7 @@ export namespace Marketplace {
                 acceptedElementChanges: z.array(elementVersionIdSchema),
             }),
             response: z.object({
+                importedSet: collectionElementsSingleSchema,
                 newCollectionVersionId: collectionVersionIdSchema,
             }),
         });

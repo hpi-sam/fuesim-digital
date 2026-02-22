@@ -1,0 +1,52 @@
+@switch (data().type) {
+    @case ('vehicleTemplate') {
+        <app-vehicle-template-form-marketplace
+            [data]="data()"
+            (dataSubmit)="dataSubmit.emit($event)"
+            (discardChanges)="discardChanges.emit()"
+            [btnText]="generateButtonText()"
+            [disabled]="disabled()"
+        ></app-vehicle-template-form-marketplace>
+    }
+    @case ('alarmGroup') {
+        <app-alarmgroup-form
+            [data]="data()"
+            [btnText]="generateButtonText()"
+            (dataSubmit)="dataSubmit.emit($event)"
+            (discardChanges)="discardChanges.emit()"
+            [disabled]="disabled()"
+        />
+    }
+    @case ('personnelTemplate') {
+        <app-personnel-template-form
+            [data]="data()"
+            [btnText]="generateButtonText()"
+            (dataSubmit)="dataSubmit.emit($event)"
+            (discardChanges)="discardChanges.emit()"
+            [disabled]="disabled()"
+        />
+    }
+    @case ('materialTemplate') {
+        <app-material-template-form
+            [data]="data()"
+            [btnText]="generateButtonText()"
+            (dataSubmit)="dataSubmit.emit($event)"
+            (discardChanges)="discardChanges.emit()"
+            [disabled]="disabled()"
+        />
+    }
+    @case ('mapImageTemplate') {
+        <app-map-image-template-form
+            [data]="data()"
+            [btnText]="generateButtonText()"
+            (dataSubmit)="dataSubmit.emit($event)"
+            (discardChanges)="discardChanges.emit()"
+            [disabled]="disabled()"
+        />
+    }
+    @default {
+        <div class="alert alert-danger" role="alert">
+            Kein Formular für diesen Elementtyp vorhanden: {{ data().type }}
+        </div>
+    }
+}

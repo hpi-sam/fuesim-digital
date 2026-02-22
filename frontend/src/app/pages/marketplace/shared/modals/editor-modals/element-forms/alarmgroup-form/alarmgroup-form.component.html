@@ -1,0 +1,148 @@
+<div class="form-group mb-3">
+    <label class="form-label">Bezeichnung der Alarmgruppe</label>
+    <input
+        [formField]="agForm.name"
+        type="text"
+        class="form-control"
+        placeholder="z.B. MANV-25"
+    />
+    <app-display-model-validation
+        [field]="agForm.name()"
+    ></app-display-model-validation>
+</div>
+
+<div class="form-group mb-3">
+    <label class="form-label">Anzahl der Auslösungen beschränken auf</label>
+    <input
+        [formField]="agForm.triggerLimit"
+        type="number"
+        class="form-control"
+        placeholder="z.B. 3"
+    />
+    <app-display-model-validation
+        [field]="agForm.triggerLimit()"
+    ></app-display-model-validation>
+</div>
+
+<div class="form-group mb-3">
+    <label class="form-label"
+        >Fahrzeuge
+
+        @if (!disabled()) {
+            <div ngbDropdown autoClose="outside" class="d-inline-block">
+                <button
+                    ngbDropdownToggle
+                    type="button"
+                    class="btn btn-outline-primary ms-3"
+                >
+                    Fahrzeug hinzufügen
+                </button>
+                <div ngbDropdownMenu>
+                    @for (
+                        availableVehicle of availableVehicles();
+                        track availableVehicle.versionId
+                    ) {
+                        <button
+                            ngbDropdownItem
+                            (click)="addVehicle(availableVehicle)"
+                            type="button"
+                            class="btn"
+                        >
+                            <i class="bi bi-plus"></i>
+                            {{ availableVehicle.content.vehicleType }}
+                        </button>
+                    } @empty {
+                        <span class="text-muted p-2 italic"
+                            >Keine Fahrzeuge</span
+                        >
+                    }
+                </div>
+            </div>
+        }
+    </label>
+    @if ((values().alarmGroupVehicles | values).length > 0) {
+        <div class="btn-group ms-3" role="group">
+            <button
+                type="button"
+                [disabled]="disabled()"
+                class="btn btn-outline-secondary"
+                (click)="changeTimeGlobal(-5 * 60 * 1000)"
+            >
+                -5min
+            </button>
+            <button
+                type="button"
+                [disabled]="disabled()"
+                class="btn btn-outline-secondary"
+                (click)="changeTimeGlobal(-1 * 60 * 1000)"
+            >
+                -1min
+            </button>
+            <button
+                type="button"
+                [disabled]="disabled()"
+                class="btn btn-outline-secondary"
+                (click)="changeTimeGlobal(1 * 60 * 1000)"
+            >
+                +1min
+            </button>
+            <button
+                type="button"
+                [disabled]="disabled()"
+                class="btn btn-outline-secondary"
+                (click)="changeTimeGlobal(5 * 60 * 1000)"
+            >
+                +5min
+            </button>
+        </div>
+        <div class="d-flex flex-wrap">
+            @for (
+                vehicleTemplate of values().alarmGroupVehicles | values;
+                track vehicleTemplate.id;
+                let index = $index
+            ) {
+                @let vehicle =
+                    getAvailableVehicleByVersionId(
+                        vehicleTemplate.vehicleTemplateId
+                    );
+                @if (vehicle === undefined) {
+                    <div class="alert alert-danger" role="alert">
+                        Fehler: Fahrzeugvorlage mit ID
+                        {{ vehicleTemplate.vehicleTemplateId }} nicht gefunden.
+                    </div>
+                } @else {
+                    <app-alarm-group-vehicle-item
+                        [alarmGroupVehicle]="vehicleTemplate"
+                        [vehicleTemplate]="vehicle.content"
+                        (editName)="
+                            editAlarmGroupVehicle(
+                                $event.vehicle.id,
+                                $event.vehicle.time,
+                                $event.event
+                            )
+                        "
+                        (editTime)="
+                            editAlarmGroupVehicle(
+                                $event.vehicle.id,
+                                $event.event * 60 * 1000,
+                                $event.vehicle.name
+                            )
+                        "
+                        (remove)="removeVehicle(vehicleTemplate.id)"
+                        [disabled]="disabled()"
+                    />
+                }
+            }
+        </div>
+    } @else {
+        <div class="text-muted mt-3 mb-3">Keine Fahrzeuge zugewiesen</div>
+    }
+</div>
+
+<app-marketplace-form-submit-button-bar
+    [form]="agForm"
+    [type]="data().type"
+    [disabled]="disabled()"
+    (submitData)="submitData()"
+    (discardChanges)="discardChanges.emit()"
+/>

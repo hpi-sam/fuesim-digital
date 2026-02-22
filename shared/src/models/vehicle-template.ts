@@ -15,9 +15,35 @@ export const vehicleTemplateSchema = z.strictObject({
     image: imagePropertiesSchema,
     patientCapacity: z.number(),
     patientLoadMinutes: z.number().nonnegative(),
-    personnelTemplateIds: z.array(uuidSchema),
-    materialTemplateIds: z.array(uuidSchema),
+    personnelTemplateIds: z.array(hybridIdSchema),
+    materialTemplateIds: z.array(hybridIdSchema),
 });
+
+registerEditableValue(
+    {
+        model: 'vehicle',
+        template: 'vehicleTemplate',
+    },
+    [
+        {
+            id: 'name',
+            name: 'Name',
+            asString: ({ template, element }) => ({
+                template: template.name,
+                model: element.name,
+            }),
+            equality: ({ template, element }) => template.name === element.name,
+            keep: ({ oldElement, newElement }) => ({
+                ...newElement,
+                name: oldElement.name,
+            }),
+            replace: ({ newElement, newContent }) => ({
+                ...newElement,
+                name: newContent,
+            }),
+        },
+    ]
+);
 
 registerEditableValue(
     {
@@ -47,8 +73,31 @@ registerEditableValue(
 
 export type VehicleTemplate = Immutable<z.infer<typeof vehicleTemplateSchema>>;
 
-// We dont have any dependencies for the vehicle template YET!
 registerDependency('vehicleTemplate', {
-    detect: (content) => [],
-    replace: (content, replacements) => content,
+    detect: (content) => {
+        const personnelTemplateIds = content.personnelTemplateIds;
+        const materialTemplateIds = content.materialTemplateIds;
+        return [
+            ...personnelTemplateIds,
+            ...materialTemplateIds,
+        ] as ElementVersionId[];
+    },
+    replace: (content, replacements) => {
+        const mutableContent = cloneDeepMutable(content);
+
+        const replaceId = (id: string) => {
+            const replacement = replacements.find((r) => r.old === id);
+            return replacement ? replacement.new : id;
+        };
+
+        mutableContent.personnelTemplateIds =
+            mutableContent.personnelTemplateIds
+                .map(replaceId)
+                .filter((f) => f !== null);
+        mutableContent.materialTemplateIds = mutableContent.materialTemplateIds
+            .map(replaceId)
+            .filter((f) => f !== null);
+
+        return mutableContent;
+    },
 });

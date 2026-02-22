@@ -10,6 +10,9 @@ import type {
     ElementVersionId,
     ExtendedCollectionVersion,
     Marketplace,
+    ParticipantKey,
+    VehicleTemplate,
+    MarketplaceElementContent,
     VersionedElementContent,
     VersionedElementPartial,
     OrganisationId,
@@ -17,15 +20,24 @@ import type {
     OrganisationMembershipRole,
 } from 'fuesim-digital-shared';
 import {
+    applyMigrations,
     checkCollectionOrganisationRole,
     cloneDeepMutable,
+    ExerciseState,
+    gatherCollectionElements,
+    getAllCollectionElements,
     gatherAllDirectCollectionElements,
     getCollectionElementDiff,
+    getDependencyChecker,
     getElementDependencies,
+    isMarketplaceElementContent,
     replaceDependencies,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
+import type { WritableDraft } from 'immer';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
+import { Config } from '../../config.js';
+import type { ExerciseService } from './exercise-service.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { OrganisationService } from './organisation-service.js';
 
@@ -56,6 +68,7 @@ export class CollectionService {
             eventBuffer: EventBuffer
         ) => Promise<T>
     ): Promise<T> {
+        // using cleanup = this.afterCollectionUpdate(collectionEntityId);
         return this.transaction(async (tx) => {
             const eventBuffer = tx.newDeferredEventBuffer();
 
@@ -63,6 +76,7 @@ export class CollectionService {
                 await tx.collectionRepository.getOrCreateDraftStateCollectionVersion(
                     collectionEntityId
                 );
+
             if (createdNewDraftState) {
                 eventBuffer.next({
                     event: 'collection:update',
@@ -123,6 +137,7 @@ export class CollectionService {
     }
 
     public constructor(
+        private readonly exerciseService: ExerciseService,
         private readonly organisationService: OrganisationService,
         private readonly collectionRepository: CollectionRepository,
         private readonly eventSubject = new Subject<
@@ -224,11 +239,11 @@ export class CollectionService {
      */
     public async getUserRoleInCollectionTransitive(
         collectionEntityId: CollectionEntityId,
-        userId: SessionInformation
+        user: SessionInformation
     ): Promise<CollectionRelationshipType | null> {
         const directRole = await this.getUserRoleInCollection(
             collectionEntityId,
-            userId
+            user
         );
         if (directRole !== null) return directRole;
 
@@ -245,7 +260,7 @@ export class CollectionService {
             parentCollections.map(async (parentCollection) => {
                 const parentRole = await this.getUserRoleInCollection(
                     parentCollection,
-                    userId
+                    user
                 );
 
                 return parentRole !== null;
@@ -418,10 +433,17 @@ export class CollectionService {
         );
     }
 
-    public async addCollectionDependency(data: {
-        importTo: CollectionEntityId;
-        importFrom: CollectionVersionId;
-    }) {
+    public async addCollectionDependency(
+        data: {
+            importTo: CollectionEntityId;
+            importFrom: CollectionVersionId;
+        },
+        opts: {
+            throwOnDuplicate: boolean;
+        } = {
+            throwOnDuplicate: true,
+        }
+    ) {
         return this.reduce(
             data.importTo,
             async (tx, draftState, eventBuffer) => {
@@ -433,7 +455,10 @@ export class CollectionService {
 
                 // TODO: Check if dependency can be added!
 
-                if (importFromCollection.draftState) {
+                if (
+                    importFromCollection.draftState &&
+                    !Config.experimentalDisableVersioning
+                ) {
                     throw new Error(
                         `Collection version with id ${data.importFrom} is in draft state and can not be imported`
                     );
@@ -442,25 +467,29 @@ export class CollectionService {
                 const existingDependencies = await tx.getCollectionDependencies(
                     draftState.versionId
                 );
-                const existingCollectionDependency = existingDependencies.find(
+
+                const collectionDependencyExists = existingDependencies.some(
                     (dep) => dep.entityId === importFromCollection.entityId
                 );
-                if (existingCollectionDependency !== undefined) {
-                    throw new Error(
-                        'This collection already depends on a version of the imported collection. Please remove the existing dependency before adding a new one.'
+
+                if (collectionDependencyExists) {
+                    if (opts.throwOnDuplicate) {
+                        throw new Error(
+                            'This collection already depends on a version of the imported collection. Please remove the existing dependency before adding a new one.'
+                        );
+                    }
+                } else {
+                    await tx.collectionRepository.addCollectionVersionDependency(
+                        draftState.versionId,
+                        importFromCollection.versionId
                     );
+
+                    eventBuffer.next({
+                        event: 'dependency:change',
+                        data: importFromCollection.versionId,
+                        collectionEntityId: data.importTo,
+                    });
                 }
-
-                await tx.collectionRepository.addCollectionVersionDependency(
-                    draftState.versionId,
-                    importFromCollection.versionId
-                );
-
-                eventBuffer.next({
-                    event: 'dependency:change',
-                    data: importFromCollection.versionId,
-                    collectionEntityId: data.importTo,
-                });
 
                 const newlyImportedElements = tx.exists(
                     await tx.collectionRepository.getElementsOfCollectionVersion(
@@ -545,9 +574,8 @@ export class CollectionService {
 
                 // Check if the provided acceptedElementDeletions actually account for all depending elements
                 if (
-                    changedDependingElements.some(
-                        (ed) =>
-                            !data.acceptedElementChanges.includes(ed.versionId)
+                    !changedDependingElements.every((ed) =>
+                        data.acceptedElementChanges.includes(ed.versionId)
                     )
                 ) {
                     throw new Error(
@@ -559,6 +587,17 @@ export class CollectionService {
                     dependingElements.map(async (dependingElement) => {
                         const dependencies =
                             await tx.getDependenciesOfElement(dependingElement);
+                        const dependencyCheck = getDependencyChecker(
+                            dependingElement.content.type
+                        );
+                        if (!dependencyCheck) {
+                            if (dependencies.length > 0) {
+                                throw new Error(
+                                    `Element with type ${dependingElement.content.type} has dependencies but no dependency checker is implemented for this type.`
+                                );
+                            }
+                            return;
+                        }
 
                         const newContent = replaceDependencies(
                             dependingElement.content,
@@ -598,6 +637,7 @@ export class CollectionService {
 
                 return {
                     collection: upgradeToCollection,
+                    elements: [], // TODO: ,
                     newCollectionVersion: draftState,
                 };
             }
@@ -890,6 +930,10 @@ export class CollectionService {
             allowDraftState: boolean;
         }
     ): Promise<CollectionElements> {
+        if (Config.experimentalDisableVersioning) {
+            opts.allowDraftState = true;
+        }
+
         const baseCollection = this.exists(
             await this.collectionRepository.getCollectionByVersionId(
                 collectionVersionId
@@ -1119,6 +1163,9 @@ export class CollectionService {
 
             eventBuffer.flush();
 
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            using cleanup = this.afterCollectionUpdate(draftState);
+
             return {
                 newSetVersionId: draftState.versionId,
                 newElement: newElementVersion,
@@ -1161,11 +1208,8 @@ export class CollectionService {
         elementEntityId: ElementEntityId,
         acceptedCascadingDeletions: ElementVersionId[] = []
     ): Promise<typeof Marketplace.Element.Delete.Response> {
-        const collection = this.exists(
-            await this.collectionRepository.getLatestCollectionOfElementEntity(
-                elementEntityId
-            )
-        );
+        return this.transaction(async (tx) => {
+            const eventBuffer = tx.newDeferredEventBuffer();
 
         return this.reduce(
             collection.entityId,
@@ -1183,10 +1227,11 @@ export class CollectionService {
                     );
                 }
 
-                const [elementIsInLatestCollectionVersion] =
-                    await this.isElementInLatestCollectionVersion(
-                        elementEntityId
-                    );
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            using cleanup = this.afterCollectionUpdate(containingSet.entityId);
+
+            const [elementIsInLatestCollectionVersion] =
+                await this.isElementInLatestCollectionVersion(elementEntityId);
 
                 if (!elementIsInLatestCollectionVersion) {
                     throw new Error(
@@ -1194,11 +1239,23 @@ export class CollectionService {
                     );
                 }
 
-                const latestElementVersion = tx.exists(
-                    await tx.collectionRepository.getLatestElementVersion(
-                        elementEntityId
-                    )
+            const [draftState, createdNewDraftState] =
+                await tx.collectionRepository.getOrCreateDraftState(
+                    containingSet.entityId
                 );
+            if (createdNewDraftState) {
+                eventBuffer.next({
+                    event: 'collection:update',
+                    data: draftState,
+                    collectionEntityId: containingSet.entityId,
+                });
+            }
+
+            const latestElementVersion = tx.exists(
+                await tx.collectionRepository.getLatestElementVersion(
+                    elementEntityId
+                )
+            );
 
                 // We want to fail the deletion if the element we want to delete is being referenced by other elements
                 // that have not been picked up by the frontend and as such not been shown to the user
@@ -1253,22 +1310,21 @@ export class CollectionService {
                     );
                 }
 
-                eventBuffer.next({
-                    event: 'element:delete',
-                    data: {
-                        entityId: elementEntityId,
-                    },
-                    collectionEntityId: collection.entityId,
-                });
+            eventBuffer.next({
+                event: 'element:delete',
+                data: {
+                    entityId: elementEntityId,
+                },
+                collectionEntityId: containingSet.entityId,
+            });
 
                 eventBuffer.flush();
 
-                return {
-                    newSetVersionId: draftState.versionId,
-                    requiresConfirmation: [],
-                };
-            }
-        );
+            return {
+                newSetVersionId: draftState.versionId,
+                requiresConfirmation: [],
+            };
+        });
     }
 
     public async restoreDeletedElementVersion(
@@ -1434,7 +1490,8 @@ export class CollectionService {
 
     public async duplicateElementVersion(
         elementVersionId: ElementVersionId,
-        targetCollectionEntity: CollectionEntityId
+        targetCollectionEntity: CollectionEntityId,
+        isExternalCopy: boolean
     ) {
         return this.reduce(
             targetCollectionEntity,
@@ -1445,8 +1502,72 @@ export class CollectionService {
                     )
                 );
 
+                // If we copy this Element into a differnent collection, we want to make sure, that all the dependencies
+                // are also copied over.
+                const dependencyIds = isExternalCopy
+                    ? getElementDependencies(sourceElement.content)
+                    : [];
+
+                const collectionsToImport = await Promise.all(
+                    dependencyIds.map(async (dependencyId) =>
+                        tx.transaction(async (tx2) => {
+                            const element = this.exists(
+                                await tx2.collectionRepository.getElementVersionByVersionId(
+                                    dependencyId
+                                )
+                            );
+
+                            const containingCollection = this.exists(
+                                await tx2.collectionRepository.getLatestCollectionOfElementEntity(
+                                    element.entityId
+                                )
+                            );
+
+                            const collectionIsSelf =
+                                containingCollection.entityId ===
+                                targetCollectionEntity;
+
+                            if (collectionIsSelf) return null;
+
+                            return containingCollection.versionId;
+                        })
+                    )
+                );
+
+                await Promise.all(
+                    // new Set to avoid duplicate imports in case multiple dependencies belong to the same collection
+                    //
+                    // and we most certainly dont need duplicate imports because drizzle and co
+                    // do weird things here that i neither have the time nor the nerve to debug.
+                    // This is also why this is a seperate Promise.all and not directly integrated
+                    // into the Promise.all from collectionsToImport.
+                    //
+                    // We NEED to filter out duplicates.
+                    [
+                        ...new Set(
+                            collectionsToImport.filter(
+                                (c): c is CollectionVersionId => c !== null
+                            )
+                        ),
+                    ].map(async (collectionVersionId) => {
+                        await tx.addCollectionDependency(
+                            {
+                                importTo: targetCollectionEntity,
+                                importFrom: collectionVersionId,
+                            },
+                            { throwOnDuplicate: false }
+                        );
+                    })
+                );
+
                 const content = cloneDeepMutable(sourceElement.content);
-                content.name = `Kopie von ${content.name}`;
+                if (!isExternalCopy) {
+                    if (content.type === 'vehicleTemplate') {
+                        content.vehicleType = `Kopie von ${content.name}`;
+                    } else {
+                        content.name = `Kopie von ${content.name}`;
+                    }
+                }
 
                 const duplicatedElement = this.exists(
                     await tx.collectionRepository.createElementVersion({
@@ -1489,6 +1610,7 @@ export class CollectionService {
             }
 
             const newCollection = await tx.createFirstCollectionVersion(
+                // TODO: Quixelation : also duplicate description (visbility should stay private)
                 `Kopie von ${latestCollectionEntity.title}`,
                 true
             );
@@ -1569,5 +1691,141 @@ export class CollectionService {
         return [...relevantDependencies, ...transitiveRelevantDependencies].map(
             (dep) => dep.element
         );
+    }
+
+    public async upgradeAllElementStateVersionsToLatest(): Promise<number> {
+        return this.collectionRepository.transaction(async (tx) => {
+            const allElements = await tx.UNSAFE_getAllElements();
+
+            const allElementVersions = new Set<number>();
+            allElements.forEach((element) =>
+                allElementVersions.add(element.stateVersion)
+            );
+
+            if (allElementVersions.size === 0) return 0;
+            if (allElementVersions.size > 1) {
+                throw new Error(
+                    `There are multiple stateversions present in the element table. This should not happen and indicates a problem with the migration script.`
+                );
+            }
+            const currentElementVersion = allElementVersions
+                .values()
+                .next().value!;
+            if (ExerciseState.currentStateVersion === currentElementVersion) {
+                return 0;
+            }
+
+            let state = cloneDeepMutable(
+                ExerciseState.create(
+                    '123456' as ParticipantKey
+                ) as WritableDraft<ExerciseState>
+            );
+
+            // TODO: Change this as soon as we have the new state structure with step 2 of marketplace
+            state = Object.assign(state, {
+                templates: allElements.reduce<{
+                    [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
+                }>((acc, element) => {
+                    if (element.content.type !== 'vehicleTemplate') return acc;
+                    acc[element.entityId] = {
+                        ...cloneDeepMutable(element.content),
+                        entity: {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                            type: 'direct',
+                        },
+                    };
+                    return acc;
+                }, {}),
+                alarmGroups: allElements.reduce<{
+                    [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
+                }>((acc, element) => {
+                    if (element.content.type !== 'vehicleTemplate') return acc;
+                    acc[element.entityId] = {
+                        ...cloneDeepMutable(element.content),
+                        entity: {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                            type: 'direct',
+                        },
+                    };
+                    return acc;
+                }, {}),
+            } satisfies { [T in keyof ExerciseState]?: any });
+
+            // Asserted value as we check for set-size of =1 above
+            const migratedState = applyMigrations(currentElementVersion, {
+                currentState: state,
+                history: undefined,
+            });
+
+            const affectedElementCount = await tx.UNSAFE_overwriteElements(
+                migratedState.newVersion,
+                [
+                    ...Object.values(
+                        migratedState.migratedProperties.currentState.templates
+                    ).filter(isMarketplaceElementContent),
+                ]
+            );
+
+            return affectedElementCount;
+        });
+    }
+
+    // TODO: We can remove this as soon as the thesis about the marketplace is done
+    public afterCollectionUpdate(
+        collectionEntityId: CollectionEntityId
+    ): DisposableStack {
+        const ds = new DisposableStack();
+        ds.defer(async () => {
+            // We dont need this if we already have versioning
+            if (!Config.experimentalDisableVersioning) return;
+
+            const collection = await this.getLatestCollectionById(
+                collectionEntityId,
+                {
+                    draftState: true,
+                }
+            );
+            if (collection === null) return;
+
+            const affectedExercises =
+                await this.collectionRepository.getExercisesUsingCollection(
+                    collection.entityId
+                );
+            console.log(affectedExercises);
+            await Promise.all(
+                affectedExercises.rows.map(async (exerciseEntry) => {
+                    const exercise = this.exerciseService.getExerciseById(
+                        exerciseEntry.id
+                    );
+                    exercise.applyAction(
+                        {
+                            type: '[Collection] Upgrade Collection',
+                            // The disabling of versioning causes no changeApplies to be sent.
+                            // THIS causes this feature-flag to be named EXPERIMENTAL!
+                            changeApplies: [],
+                            // we want to keep the same exercise version, since we do NOT work with versioning in this configuration
+                            collectionVersion: {
+                                entityId: collection.entityId,
+                                versionId: collection.versionId,
+                            },
+                            overwriteTemplates: await getAllCollectionElements(
+                                exerciseEntry.currentStateString
+                                    .selectedCollections,
+                                // We allow draftState here only bc we are in a section where Versioning is disabled
+                                async (c) =>
+                                    this.getElementsOfCollectionVersion(
+                                        c.versionId,
+                                        { allowDraftState: true }
+                                    )
+                            ),
+                        },
+                        null
+                    );
+                })
+            );
+        });
+        return ds;
     }
 }

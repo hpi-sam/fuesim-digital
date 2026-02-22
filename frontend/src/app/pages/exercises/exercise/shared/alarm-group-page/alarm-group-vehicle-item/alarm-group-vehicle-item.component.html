@@ -1,0 +1,58 @@
+<div
+    class="card text-center m-1"
+    style="width: 10rem; text-overflow: ellipsis; height: auto"
+>
+    <div>
+        <div
+            title="Zeit bis zur Ankunft"
+            class="input-group input-group-sm float-start"
+            style="width: 100px"
+        >
+            <!-- The input is in minutes -->
+            <input
+                #timeInput="ngModel"
+                [ngModel]="alarmGroupVehicle().time / 60 / 1000"
+                (change)="
+                    editTime.emit({
+                        vehicle: alarmGroupVehicle(),
+                        event: $event.target.value,
+                    })
+                "
+                min="0"
+                required
+                step="1"
+                [disabled]="disabled()"
+                type="number"
+                class="form-control form-control-sm d-inline-block no-validation"
+                data-cy="alarmGroupVehicleDelayInput"
+            />
+            <span class="input-group-text">Min</span>
+        </div>
+        @if (!disabled()) {
+            <button
+                (click)="remove.emit(alarmGroupVehicle())"
+                class="btn btn-sm btn-outline-danger float-end"
+                data-cy="alarmGroupRemoveVehicleButton"
+            >
+                <i class="bi bi-trash"></i>
+            </button>
+        }
+    </div>
+    <app-vehicle-template-display [vehicleTemplate]="vehicleTemplate()">
+    </app-vehicle-template-display>
+    <input
+        #nameInput="ngModel"
+        [ngModel]="alarmGroupVehicle().name"
+        (change)="
+            editName.emit({
+                vehicle: alarmGroupVehicle(),
+                event: $event.target.value,
+            })
+        "
+        required
+        placeholder="Name"
+        [disabled]="disabled()"
+        type="text"
+        class="form-control form-control-sm d-inline-block fw-bold"
+    />
+</div>

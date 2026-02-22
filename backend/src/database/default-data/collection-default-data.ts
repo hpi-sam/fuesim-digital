@@ -1,10 +1,19 @@
+import type {
+    CollectionVersion,
+    ElementVersionId,
+    TemplateVersion,
+} from 'fuesim-digital-shared';
 import type { CollectionVersion, TemplateVersion } from 'fuesim-digital-shared';
 import {
     collectionEntityIdSchema,
     collectionVersionIdSchema,
+    defaultMapImagesTemplates,
+    defaultMaterialTemplates,
+    defaultPersonnelTemplates,
     defaultVehicleTemplatesById,
     elementEntityIdSchema,
     elementVersionIdSchema,
+    replaceDependencies,
 } from 'fuesim-digital-shared';
 import type { Immutable } from 'immer';
 
@@ -28,10 +37,10 @@ function newElementEntityId(uuid: string) {
 // PLEASE CREATE A NEW SET OF DEFAULT ELEMENTS (e.g.  FüSim Digital {YEAR} Übungselemente)
 const fuesimDigital20250629DefaultCollectionData: DefaultCollection = {
     entityId: collectionEntityIdSchema.parse(
-        'set_entity_76dcdff5-9dd5-4430-b7a7-f680479977ae'
+        'collection_entity_76dcdff5-9dd5-4430-b7a7-f680479977ae'
     ),
     versionId: collectionVersionIdSchema.parse(
-        'set_version_7743eb0c-dee1-4d7a-9159-911c7a2e9253'
+        'collection_version_7743eb0c-dee1-4d7a-9159-911c7a2e9253'
     ),
     title: 'FüSim Digital 2025 Übungselemente',
     description: '',
@@ -41,16 +50,60 @@ const fuesimDigital20250629DefaultCollectionData: DefaultCollection = {
     draftState: false,
     version: 1,
     visibility: 'embedded',
-    elements: Object.values(defaultVehicleTemplatesById).map((template) => ({
-        title: template.vehicleType,
-        description: '',
-        content: template,
-        entityId: newElementEntityId(template.id),
-        versionId: newElementVersionId(template.id),
-        createdAt: new Date(2023, 6, 10),
-        editedAt: new Date(2023, 6, 10),
-        version: 1,
-    })),
+    elements: [
+        ...Object.values(defaultVehicleTemplatesById).map((template) => ({
+            title: template.vehicleType,
+            description: '',
+            content: replaceDependencies(template, [
+                ...Object.values(defaultMaterialTemplates).map((t) => ({
+                    old: t.id as ElementVersionId,
+                    new: newElementVersionId(t.id),
+                })),
+                ...Object.values(defaultPersonnelTemplates).map((t) => ({
+                    old: t.id as ElementVersionId,
+                    new: newElementVersionId(t.id),
+                })),
+            ]),
+            entityId: newElementEntityId(template.id),
+            versionId: newElementVersionId(template.id),
+            createdAt: new Date(2023, 6, 10),
+            editedAt: new Date(2023, 6, 10),
+            version: 1,
+        })),
+
+        ...Object.values(defaultMapImagesTemplates).map((template) => ({
+            title: template.name,
+            description: '',
+            content: template,
+            entityId: newElementEntityId(template.id),
+            versionId: newElementVersionId(template.id),
+            createdAt: new Date(2023, 6, 10),
+            editedAt: new Date(2023, 6, 10),
+            version: 1,
+        })),
+
+        ...Object.values(defaultPersonnelTemplates).map((template) => ({
+            title: template.name,
+            description: '',
+            content: template,
+            entityId: newElementEntityId(template.id),
+            versionId: newElementVersionId(template.id),
+            createdAt: new Date(2023, 6, 10),
+            editedAt: new Date(2023, 6, 10),
+            version: 1,
+        })),
+
+        ...Object.values(defaultMaterialTemplates).map((template) => ({
+            title: template.name,
+            description: '',
+            content: template,
+            entityId: newElementEntityId(template.id),
+            versionId: newElementVersionId(template.id),
+            createdAt: new Date(2023, 6, 10),
+            editedAt: new Date(2023, 6, 10),
+            version: 1,
+        })),
+    ],
 };
 
 export const defaultCollectionData: DefaultCollection[] = [

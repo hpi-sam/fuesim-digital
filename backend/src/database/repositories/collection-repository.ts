@@ -1,6 +1,7 @@
 import type {
     CollectionVersion,
     CollectionEntityId,
+    CollectionRelationshipType,
     CollectionVersionId,
     CollectionVisibility,
     TemplateVersion,
@@ -15,6 +16,11 @@ import type {
 } from 'fuesim-digital-shared';
 import { currentStateVersion } from 'fuesim-digital-shared';
 import type { InferInsertModel, SQL } from 'drizzle-orm';
+import {
+    collectionRelationshipTypeAllowedValues,
+    ExerciseState,
+} from 'fuesim-digital-shared';
+import type { InferInsertModel, InferSelectModel, SQL } from 'drizzle-orm';
 import {
     eq,
     desc,
@@ -38,7 +44,14 @@ import {
     organisationTable,
 } from '../schema.js';
 import { defaultCollectionData } from '../default-data/collection-default-data.js';
+import { Config } from '../../config.js';
 import { BaseRepository } from './base-repository.js';
+
+function canEditCollection(collection: CollectionVersion): boolean {
+    if (Config.experimentalDisableVersioning) return true;
+    if (collection.draftState) return true;
+    return false;
+}
 
 export class CollectionRepository extends BaseRepository {
     public readonly INVITE_CODE_VALIDITY_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 DAYS
@@ -157,6 +170,20 @@ export class CollectionRepository extends BaseRepository {
         );
     }
 
+   public async getExercisesUsingCollection(
+           collectionEntitiyId: CollectionEntityId
+       ) {
+           return this.databaseConnection.execute<
+               InferSelectModel<typeof exerciseTable>
+           >(
+               sql`
+                   SELECT ${exerciseTable}.*
+                   FROM ${exerciseTable}, json_array_elements("currentStateString"->'selectedCollections') AS t
+                   WHERE t->>'entityId' = ${collectionEntitiyId}
+               `
+           );
+       }
+
     public async getJoinCode(collectionEntityId: CollectionEntityId) {
         return this.onlySingle(
             await this.databaseConnection
@@ -167,6 +194,8 @@ export class CollectionRepository extends BaseRepository {
                 )
         );
     }
+
+
 
     public async getOrCreateJoinCode(collectionEntityId: CollectionEntityId) {
         const existingCode = await this.getJoinCode(collectionEntityId);
@@ -300,6 +329,10 @@ export class CollectionRepository extends BaseRepository {
     private latestCollectionVersionNumbers(opts: {
         allowDraftState?: boolean;
     }) {
+        if (Config.experimentalDisableVersioning) {
+            opts.allowDraftState = true;
+        }
+
         return this.databaseConnection.$with('latestSetVersionNumbers').as(
             this.databaseConnection
                 .select({
@@ -405,7 +438,8 @@ export class CollectionRepository extends BaseRepository {
     public async getOrCreateDraftStateCollectionVersion(
         collectionEntityId: CollectionEntityId
     ): Promise<[CollectionVersion, boolean]> {
-        const result = this.onlySingle(
+        // check if there exists a collection version in draftstate
+        const draftStateCollectionVersion = this.onlySingle(
             await this.databaseConnection
                 .select()
                 .from(collectionTable)
@@ -417,7 +451,7 @@ export class CollectionRepository extends BaseRepository {
                 )
         );
 
-        if (result === null) {
+        if (draftStateCollectionVersion === null) {
             const latestVersion = this.strict(
                 await this.getLatestCollectionByEntityId(collectionEntityId)
             );
@@ -448,7 +482,7 @@ export class CollectionRepository extends BaseRepository {
             return [newCollection, true];
         }
 
-        return [this.strict(result), false];
+        return [this.strict(draftStateCollectionVersion), false];
     }
 
     public async getCollectionVersionDirectDependencies(
@@ -577,7 +611,7 @@ export class CollectionRepository extends BaseRepository {
         const collection = this.strict(
             await this.getCollectionByVersionId(collectionVersionId)
         );
-        if (!collection.draftState) {
+        if (!canEditCollection(collection)) {
             throw new Error(
                 'Cannot edit collection that is not in draft state'
             );
@@ -599,7 +633,7 @@ export class CollectionRepository extends BaseRepository {
         elementVersionId: ElementVersionId,
         data: VersionedElementContent
     ) {
-        return this.databaseConnection.transaction(async (tx) => {
+        return this.transaction(async (tx) => {
             const isEditable =
                 await this.checkElementVersionEditable(elementVersionId);
             if (!isEditable) {
@@ -608,7 +642,7 @@ export class CollectionRepository extends BaseRepository {
                 );
             }
 
-            const result = await tx
+            const result = await tx.databaseConnection
                 .update(elementTable)
                 .set({
                     content: data,
@@ -844,14 +878,14 @@ export class CollectionRepository extends BaseRepository {
         isBaseReference: boolean = true
     ) {
         // Check if the Set is in draft state, otherwise we cannot add the element to it
-        const set = this.onlySingleStrict(
+        const collection = this.onlySingleStrict(
             await this.databaseConnection
                 .select()
                 .from(collectionTable)
                 .where(eq(collectionTable.versionId, collectionVersionId))
         );
 
-        if (!set.draftState) {
+        if (!canEditCollection(collection)) {
             throw new Error(
                 'Can only add exercise objects to sets in draft state'
             );
@@ -884,7 +918,7 @@ export class CollectionRepository extends BaseRepository {
         return this.databaseConnection
             .insert(elementCollectionMappingTable)
             .values({
-                collectionEntityId: set.entityId,
+                collectionEntityId: collection.entityId,
                 collectionVersionId,
                 elementEntityId: element.entityId,
                 elementVersionId,
@@ -994,7 +1028,7 @@ export class CollectionRepository extends BaseRepository {
                     .where(eq(collectionTable.versionId, target.versionId))
             );
 
-            if (!targetSet.draftState) {
+            if (!canEditCollection(targetSet)) {
                 throw new Error(
                     'Can only copy exercise objects to sets in draft state'
                 );
@@ -1116,7 +1150,7 @@ export class CollectionRepository extends BaseRepository {
                     collectionTable,
                     eq(collectionTable.versionId, latestCollections.versionId)
                 )
-                .innerJoin(
+                .leftJoin(
                     elementCounts,
                     eq(
                         elementCounts.collectionVersionId,
@@ -1143,6 +1177,8 @@ export class CollectionRepository extends BaseRepository {
 
                     return {
                         ...collection,
+                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- it can be null if the collection has no elements (leftJoin)
+                        elementCount: collection.elementCount ?? 0,
                         relationship: relationship!,
                     } satisfies ExtendedCollectionVersion;
                 })
@@ -1193,6 +1229,8 @@ export class CollectionRepository extends BaseRepository {
                     ({
                         ...collection,
                         relationship: 'viewer',
+                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- it can be null if the collection has no elements (leftJoin)
+                        elementCount: collection.elementCount ?? 0,
                     }) satisfies ExtendedCollectionVersion
             );
         });
@@ -1256,6 +1294,7 @@ export class CollectionRepository extends BaseRepository {
         await this.databaseConnection
             .delete(collectionTable)
             .where(eq(collectionTable.entityId, entityId));
+        // TODO: WHAT DO WE DO HERE WHEN WE HAVE NO VERSIONING?
     }
 
     public async getElementVersions(entityId: ElementEntityId) {

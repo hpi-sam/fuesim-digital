@@ -159,7 +159,9 @@ export class TestEnvironment {
         session?: string,
         data?: TData
     ): request.Test {
-        const req = request(this.server.httpServer.httpServer)[method](url);
+        const req = request(this.server.httpServer.httpServer)
+            [method](url)
+            .send(data);
         if (session) {
             req.set(
                 'Cookie',

@@ -4,6 +4,8 @@ import { collectionVersionSchema } from './collection.js';
 import type { TemplateVersion } from './versioned-elements.js';
 import { templateVersionSchema } from './versioned-elements.js';
 import type { CollectionElementType } from './collection-element-type.js';
+import type { TemplateVersion } from './marketplace-element.js';
+import { templateVersionSchema } from './marketplace-element.js';
 
 export const collectionElementsSingleSchema = z.strictObject({
     collection: collectionVersionSchema,

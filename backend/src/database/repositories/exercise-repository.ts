@@ -38,8 +38,8 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select({
                 id: exerciseTable.id,
-                participantId: exerciseTable.participantId,
-                trainerId: exerciseTable.trainerId,
+                participantKey: exerciseTable.participantKey,
+                trainerKey: exerciseTable.trainerKey,
                 createdAt: exerciseTable.createdAt,
                 lastUsedAt: exerciseTable.lastUsedAt,
                 baseTemplate: {
@@ -65,7 +65,7 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select({
                 id: exerciseTemplateTable.id,
-                trainerId: exerciseTable.trainerId,
+                trainerKey: exerciseTable.trainerKey,
                 createdAt: exerciseTemplateTable.createdAt,
                 lastExerciseCreatedAt:
                     exerciseTemplateTable.lastExerciseCreatedAt,
@@ -185,8 +185,8 @@ export class ExerciseRepository extends BaseRepository {
                     initialStateString: exercise.initialStateString,
                     tickCounter: exercise.tickCounter,
                     stateVersion: exercise.stateVersion,
-                    trainerId: exercise.trainerId,
-                    participantId: exercise.participantId,
+                    trainerKey: exercise.trainerKey,
+                    participantKey: exercise.participantKey,
                 })
                 .returning()
         );

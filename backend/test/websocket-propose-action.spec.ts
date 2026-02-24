@@ -21,7 +21,7 @@ describe('propose action', () => {
         await environment.withWebsocket(async (socket) => {
             const join = await socket.emit(
                 'joinExercise',
-                exerciseKeys.trainerId,
+                exerciseKeys.trainerKey,
                 'Name'
             );
 
@@ -42,7 +42,7 @@ describe('propose action', () => {
         await environment.withWebsocket(async (socket) => {
             const join = await socket.emit(
                 'joinExercise',
-                exerciseKeys.trainerId,
+                exerciseKeys.trainerKey,
                 'Name'
             );
 
@@ -63,7 +63,7 @@ describe('propose action', () => {
         await environment.withWebsocket(async (socket) => {
             const join = await socket.emit(
                 'joinExercise',
-                exerciseKeys.trainerId,
+                exerciseKeys.trainerKey,
                 'Name'
             );
 
@@ -84,7 +84,7 @@ describe('propose action', () => {
         await environment.withWebsocket(async (socket) => {
             const join = await socket.emit(
                 'joinExercise',
-                exerciseKeys.participantId,
+                exerciseKeys.participantKey,
                 'Name'
             );
 

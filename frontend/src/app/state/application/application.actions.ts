@@ -1,6 +1,7 @@
 import { createAction } from '@ngrx/store';
 import type {
     ExerciseAction,
+    ExerciseKey,
     ExerciseState,
     UUID,
 } from 'fuesim-digital-shared';
@@ -26,12 +27,12 @@ export const createJoinExerciseAction = createAction(
     (
         ownClientId: UUID,
         exerciseState: ExerciseState,
-        exerciseId: UUID,
+        exerciseKey: ExerciseKey,
         clientName: string
     ) => ({
         ownClientId,
         exerciseState,
-        exerciseId,
+        exerciseKey,
         clientName,
     })
 );

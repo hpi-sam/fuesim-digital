@@ -8,7 +8,7 @@ describe('join exercise', () => {
     const environment = createTestEnvironment();
 
     it('adds the joining client to the state', async () => {
-        const exerciseKey = (await createExercise(environment)).trainerId;
+        const exerciseKey = (await createExercise(environment)).trainerKey;
 
         await environment.withWebsocket(async (clientSocket) => {
             const clientName = 'someRandomName';
@@ -49,8 +49,9 @@ describe('join exercise', () => {
     });
 
     it('ignores clients joining other exercises', async () => {
-        const firstExerciseKey = (await createExercise(environment)).trainerId;
-        const secondExerciseKey = (await createExercise(environment)).trainerId;
+        const firstExerciseKey = (await createExercise(environment)).trainerKey;
+        const secondExerciseKey = (await createExercise(environment))
+            .trainerKey;
 
         await environment.withWebsocket(async (firstClientSocket) => {
             const firstClientName = 'someRandomName';
@@ -83,7 +84,7 @@ describe('join exercise', () => {
     });
 
     it('sends a message to existing clients when another client is joining the exercises', async () => {
-        const exerciseKey = (await createExercise(environment)).trainerId;
+        const exerciseKey = (await createExercise(environment)).trainerKey;
 
         await environment.withWebsocket(async (firstClientSocket) => {
             const firstClientName = 'someRandomName';
@@ -118,7 +119,7 @@ describe('join exercise', () => {
         await environment.withWebsocket(async (trainerSocket) => {
             const joinTrainer = await trainerSocket.emit(
                 'joinExercise',
-                exerciseKeys.trainerId,
+                exerciseKeys.trainerKey,
                 'trainer'
             );
 
@@ -127,7 +128,7 @@ describe('join exercise', () => {
             await environment.withWebsocket(async (participantSocket) => {
                 const joinParticipant = await participantSocket.emit(
                     'joinExercise',
-                    exerciseKeys.participantId,
+                    exerciseKeys.participantKey,
                     'participant'
                 );
 
@@ -188,7 +189,7 @@ describe('join exercise', () => {
         await environment.withWebsocket(async (socket) => {
             const joinResponse = await socket.emit(
                 'joinExercise',
-                exerciseKeys.trainerId,
+                exerciseKeys.trainerKey,
                 'Test'
             );
             expect(joinResponse.success).toBe(true);

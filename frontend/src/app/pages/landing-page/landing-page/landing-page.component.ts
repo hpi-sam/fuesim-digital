@@ -24,15 +24,15 @@ export class LandingPageComponent {
 
     public exerciseHasBeenCreated = false;
 
-    public trainerId = '';
+    public trainerKey = '';
 
-    public participantId = '';
+    public participantKey = '';
 
     public async createExercise() {
-        this.apiService.createExercise().then((ids) => {
-            this.trainerId = ids.trainerId;
-            this.exerciseId = this.trainerId;
-            this.participantId = ids.participantId;
+        this.apiService.createExercise().then((exerciseKeys) => {
+            this.trainerKey = exerciseKeys.trainerKey;
+            this.exerciseId = this.trainerKey;
+            this.participantKey = exerciseKeys.participantKey;
             this.exerciseHasBeenCreated = true;
 
             this.messageService.postMessage({
@@ -59,11 +59,11 @@ export class LandingPageComponent {
             }
             switch (importPlain.type) {
                 case 'complete': {
-                    const ids =
+                    const exerciseKeys =
                         await this.apiService.importExercise(importPlain);
-                    this.trainerId = ids.trainerId;
-                    this.exerciseId = this.trainerId;
-                    this.participantId = ids.participantId;
+                    this.trainerKey = exerciseKeys.trainerKey;
+                    this.exerciseId = this.trainerKey;
+                    this.participantKey = exerciseKeys.participantKey;
                     this.exerciseHasBeenCreated = true;
 
                     this.messageService.postMessage({

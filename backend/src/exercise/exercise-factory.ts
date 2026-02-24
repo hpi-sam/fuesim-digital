@@ -1,9 +1,9 @@
 import type {
     StateExport,
-    ExerciseKeys,
     ExerciseAction,
     ParticipantKey,
     TrainerKey,
+    ExerciseAccessKeys,
 } from 'fuesim-digital-shared';
 import {
     ExerciseState,
@@ -32,9 +32,10 @@ import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './active-exercise.js';
 
 export class ExerciseFactory {
-    public static createKeys(): ExerciseKeys {
-        const participantKey =
-            UserReadableIdGenerator.generateId() as ParticipantKey;
+    public static createKeys(): ExerciseAccessKeys {
+        const participantKey = UserReadableIdGenerator.generateId(
+            6
+        ) as ParticipantKey;
         const trainerKey = UserReadableIdGenerator.generateId(8) as TrainerKey;
         return { participantKey, trainerKey };
     }
@@ -79,8 +80,8 @@ export class ExerciseFactory {
         const newCurrentState = migratedImportObject.currentState;
 
         // Set new participant id
-        newInitialState.participantId = exerciseKeys.participantKey;
-        newCurrentState.participantId = exerciseKeys.participantKey;
+        newInitialState.participantKey = exerciseKeys.participantKey;
+        newCurrentState.participantKey = exerciseKeys.participantKey;
 
         const exercise = new ActiveExercise(
             exerciseKeys.participantKey,
@@ -120,8 +121,8 @@ export class ExerciseFactory {
     ): ActiveExercise {
         const actionsInWrapper: ActionWrapper[] = [];
         const exercise = new ActiveExercise(
-            dbEntry.participantId,
-            dbEntry.trainerId,
+            dbEntry.participantKey,
+            dbEntry.trainerKey,
             actionsInWrapper,
             dbEntry.stateVersion,
             dbEntry.initialStateString,
@@ -160,11 +161,11 @@ export class ExerciseFactory {
             exercise.stateVersion,
             {
                 ...exercise.initialStateString,
-                participantId: exerciseKeys.participantKey,
+                participantKey: exerciseKeys.participantKey,
             },
             {
                 ...exercise.currentStateString,
-                participantId: exerciseKeys.participantKey,
+                participantKey: exerciseKeys.participantKey,
             }
         );
         pushAll(

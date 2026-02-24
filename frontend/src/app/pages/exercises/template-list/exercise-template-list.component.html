@@ -36,7 +36,7 @@
         <div class="row row-cols-3">
             @for (
                 exerciseTemplate of exerciseTemplates.value();
-                track exerciseTemplate.trainerId
+                track exerciseTemplate.trainerKey
             ) {
                 <div class="col mb-4">
                     <app-exercise-template-card

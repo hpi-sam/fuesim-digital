@@ -23,8 +23,8 @@ export const createExerciseRouter = (
             : undefined;
         await exerciseService.createExercise(exercise, optionalData);
         res.status(201).send({
-            participantId: exercise.participantKey,
-            trainerId: exercise.trainerKey,
+            participantKey: exercise.participantKey,
+            trainerKey: exercise.trainerKey,
         });
     });
 

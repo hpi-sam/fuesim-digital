@@ -66,11 +66,11 @@ export const applicationReducer = createReducer(
     ),
     on(
         createJoinExerciseAction,
-        (state, { ownClientId, exerciseId, clientName, exerciseState }) => ({
+        (state, { ownClientId, exerciseKey, clientName, exerciseState }) => ({
             ...state,
             exerciseState,
             exerciseStateMode: 'exercise' as const,
-            exerciseId,
+            exerciseKey,
             ownClientId,
             lastClientName: clientName,
         })

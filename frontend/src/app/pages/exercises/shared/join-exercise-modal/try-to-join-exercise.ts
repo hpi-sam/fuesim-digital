@@ -1,5 +1,6 @@
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
+import type { ExerciseKey } from 'fuesim-digital-shared';
 import { JoinExerciseModalComponent } from './join-exercise-modal.component';
 
 /**
@@ -7,7 +8,7 @@ import { JoinExerciseModalComponent } from './join-exercise-modal.component';
  */
 export async function tryToJoinExercise(
     ngbModalService: NgbModal,
-    exerciseId: string
+    exerciseKey: ExerciseKey
 ): Promise<boolean> {
     const modalRef = ngbModalService.open(JoinExerciseModalComponent, {
         keyboard: false,
@@ -15,7 +16,7 @@ export async function tryToJoinExercise(
     });
     const componentInstance =
         modalRef.componentInstance as JoinExerciseModalComponent;
-    componentInstance.exerciseId = exerciseId;
+    componentInstance.exerciseKey = exerciseKey;
     return firstValueFrom(componentInstance.exerciseJoined$, {
         defaultValue: false,
     });

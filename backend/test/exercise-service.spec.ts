@@ -14,9 +14,9 @@ describe('Exercise-Service', () => {
     // As the saving happens asynchronously, it's possible that an action gets added between collecting the actions to be saved and removing the actions.
     // In a naive implementation it can happen that such actions get removed from memory without being saved to the database.
     it('does not throw away actions while saving', async () => {
-        const exercideIds = await createExercise(environment);
+        const exerciseKeys = await createExercise(environment);
         const exercise = environment.exerciseService.getExerciseByKey(
-            exercideIds.trainerId
+            exerciseKeys.trainerKey
         );
         const markAsAboutToBeSaved =
             exercise.markAsAboutToBeSaved.bind(exercise);

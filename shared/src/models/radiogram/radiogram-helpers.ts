@@ -25,12 +25,7 @@ export function isUnpublished(radiogram: ExerciseRadiogram) {
 }
 
 export function currentParticipantIdOf(radiogram: ExerciseRadiogram) {
-    if (isAccepted(radiogram)) {
-        return participantIdOfRadiogramStatus(radiogram.status);
-    }
-    throw new TypeError(
-        `Expected radiogram status to be accepted. Was of type ${radiogram.status.type}.`
-    );
+    return participantIdOfRadiogramStatus(radiogram.status);
 }
 
 export function publishTimeOf(radiogram: ExerciseRadiogram) {

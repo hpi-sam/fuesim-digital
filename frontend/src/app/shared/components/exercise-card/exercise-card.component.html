@@ -2,11 +2,11 @@
     <div class="card">
         <div class="card-body">
             <h2 class="card-title h4 d-flex">
-                #{{ exercise.participantId }}
+                #{{ exercise.participantKey }}
                 <app-copy-button [value]="participantUrl()" />
             </h2>
             <p class="card-text">
-                Übungsleiter-ID: {{ exercise.trainerId }}
+                Übungsleiter-ID: {{ exercise.trainerKey }}
                 <app-copy-button [value]="trainerUrl()" />
             </p>
         </div>
@@ -31,7 +31,7 @@
         </ul>
         <div class="card-body d-flex">
             <a
-                [routerLink]="`/exercises/${exercise.trainerId}`"
+                [routerLink]="`/exercises/${exercise.trainerKey}`"
                 class="btn btn-primary me-2"
             >
                 Öffnen

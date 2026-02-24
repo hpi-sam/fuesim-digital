@@ -43,7 +43,7 @@ export class ExerciseManagerService {
         await exerciseService.createTemplate(newExercise, exerciseTemplate);
         return {
             ...exerciseTemplate,
-            trainerId: newExercise.trainerKey,
+            trainerKey: newExercise.trainerKey,
         };
     }
 
@@ -70,7 +70,7 @@ export class ExerciseManagerService {
         }
         return {
             ...updatedTemplate,
-            trainerId: exerciseTemplate.exercise_entity.trainerId,
+            trainerKey: exerciseTemplate.exercise_entity.trainerKey,
         };
     }
 
@@ -123,7 +123,7 @@ export class ExerciseManagerService {
             throw new PermissionDeniedError();
         }
         const activeExercise = exerciseService.getExerciseByKey(
-            exerciseTemplate.exercise_entity.trainerId,
+            exerciseTemplate.exercise_entity.trainerKey,
             session
         );
         exerciseService.unloadExercise(activeExercise);

@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { assertExhaustiveness } from 'fuesim-digital-shared';
 import type { AppState } from '../state/app.state';
 import {
-    selectExerciseId,
+    selectExerciseKey,
     selectExerciseStateMode,
     selectLastClientName,
 } from '../state/application/selectors/application.selectors';
@@ -61,7 +61,7 @@ export class ApplicationService {
      */
     public async rejoinExercise() {
         return this.joinExercise(
-            selectStateSnapshot(selectExerciseId, this.store)!,
+            selectStateSnapshot(selectExerciseKey, this.store)!,
             selectStateSnapshot(selectLastClientName, this.store)!
         );
     }

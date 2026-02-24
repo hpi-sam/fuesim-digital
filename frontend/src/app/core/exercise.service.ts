@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import type {
     ClientToServerEvents,
     ExerciseAction,
+    ExerciseKey,
     ExerciseState,
     JoinExerciseResponseData,
     ServerToClientEvents,
@@ -102,7 +103,7 @@ export class ExerciseService {
      * @returns whether the join was successful
      */
     public async joinExercise(
-        exerciseId: string,
+        exerciseKey: ExerciseKey,
         clientName: string
     ): Promise<boolean> {
         this.socket.connect().on('connect_error', (error) => {
@@ -115,7 +116,7 @@ export class ExerciseService {
             (resolve) => {
                 this.socket.emit(
                     'joinExercise',
-                    exerciseId,
+                    exerciseKey,
                     clientName,
                     resolve
                 );
@@ -150,7 +151,7 @@ export class ExerciseService {
             createJoinExerciseAction(
                 joinResponsePayload.clientId,
                 getStateResponse.payload,
-                exerciseId,
+                exerciseKey,
                 clientName
             )
         );

@@ -1,16 +1,11 @@
 import { z } from 'zod';
-import type { ParticipantKey, TrainerKey } from './exercise-keys.js';
 import { participantKeySchema, trainerKeySchema } from './exercise-keys.js';
 
-export interface ExerciseKeys {
-    readonly participantKey: ParticipantKey;
-    readonly trainerKey: TrainerKey;
-}
-
-export interface ExerciseAccessIds {
-    readonly participantId: ParticipantKey;
-    readonly trainerId: TrainerKey;
-}
+export const exerciseKeysSchema = z.object({
+    participantKey: participantKeySchema,
+    trainerKey: trainerKeySchema,
+});
+export type ExerciseAccessKeys = z.infer<typeof exerciseKeysSchema>;
 
 export const userDataResponseSchema = z.object({
     user: z
@@ -44,8 +39,8 @@ const stringToDate = z.codec(
 );
 
 export const getExerciseResponseDataSchema = z.object({
-    participantId: participantKeySchema,
-    trainerId: trainerKeySchema,
+    participantKey: participantKeySchema,
+    trainerKey: trainerKeySchema,
     createdAt: stringToDate,
     lastUsedAt: stringToDate,
     baseTemplate: z.object({ id: z.uuid(), name: z.string() }).nullable(),
@@ -74,7 +69,7 @@ export type ExerciseExistsResponseDataInput = z.input<
 
 export const getExerciseTemplateResponseDataSchema = z.object({
     id: z.uuid(),
-    trainerId: trainerKeySchema,
+    trainerKey: trainerKeySchema,
     createdAt: stringToDate,
     lastExerciseCreatedAt: z.nullable(stringToDate),
     name: z.string(),

@@ -17,10 +17,10 @@ import type { AppState } from 'src/app/state/app.state';
 import {
     selectExerciseStateMode,
     selectTimeConstraints,
-    selectExerciseId,
+    selectExerciseKey,
 } from 'src/app/state/application/selectors/application.selectors';
 import {
-    selectParticipantId,
+    selectParticipantKey,
     selectExerciseState,
 } from 'src/app/state/application/selectors/exercise.selectors';
 import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors';
@@ -48,15 +48,17 @@ export class ExerciseComponent implements OnDestroy {
     public readonly exerciseStateMode$ = this.store.select(
         selectExerciseStateMode
     );
-    public readonly participantId$ = this.store.select(selectParticipantId);
+    public readonly participantKey$ = this.store.select(selectParticipantKey);
     public readonly timeConstraints$ = this.store.select(selectTimeConstraints);
     public readonly ownClient$ = this.store.select(selectOwnClient);
 
     readonly version: string = Package.version;
 
-    public shareExercise(type: 'participantId' | 'trainerId') {
+    public shareExercise(type: 'participantKey' | 'trainerKey') {
         const id = selectStateSnapshot(
-            type === 'participantId' ? selectParticipantId : selectExerciseId,
+            type === 'participantKey'
+                ? selectParticipantKey
+                : selectExerciseKey,
             this.store
         );
         const url = `${location.origin}/exercises/${id}`;
@@ -110,7 +112,7 @@ export class ExerciseComponent implements OnDestroy {
                 )
             ),
         ]);
-        saveBlob(blob, `exercise-state-${currentState.participantId}.json`);
+        saveBlob(blob, `exercise-state-${currentState.participantKey}.json`);
     }
 
     public partialExport() {
@@ -124,7 +126,7 @@ export class ExerciseComponent implements OnDestroy {
         );
         const csvContent = exportPatientsToCSV(currentState);
         const blob = new Blob([csvContent]);
-        saveBlob(blob, `patienten-${currentState.participantId}.csv`);
+        saveBlob(blob, `patienten-${currentState.participantKey}.csv`);
     }
 
     public exportExerciseState() {
@@ -135,7 +137,7 @@ export class ExerciseComponent implements OnDestroy {
         const blob = new Blob([
             JSON.stringify(new StateExport(cloneDeepMutable(currentState))),
         ]);
-        saveBlob(blob, `exercise-state-${currentState.participantId}.json`);
+        saveBlob(blob, `exercise-state-${currentState.participantKey}.json`);
     }
 
     ngOnDestroy(): void {

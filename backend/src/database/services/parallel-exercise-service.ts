@@ -1,4 +1,7 @@
-import type { GroupParticipantKey } from 'fuesim-digital-shared';
+import type {
+    GroupParticipantKey,
+    SetAutojoinViewportAction,
+} from 'fuesim-digital-shared';
 import { parallelExerciseInstanceSummarySchema } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
@@ -85,6 +88,13 @@ export class ParallelExerciseService {
                 undefined,
                 { parallelExerciseId: parallelExercise.id }
             );
+
+        const setAutojoinViewportAction: SetAutojoinViewportAction = {
+            type: '[Exercise] Set autojoin viewport',
+            viewportId: parallelExercise.joinViewportId,
+        };
+        exercise.applyAction(setAutojoinViewportAction, null);
+
         this.newJoin.next({
             parallelExerciseId: parallelExercise.id,
             activeExercise: exercise,

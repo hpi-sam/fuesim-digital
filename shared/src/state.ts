@@ -1,5 +1,11 @@
 import * as z from 'zod';
-import { Equals, IsObject, ValidateNested } from 'class-validator';
+import {
+    Equals,
+    IsObject,
+    IsOptional,
+    IsUUID,
+    ValidateNested,
+} from 'class-validator';
 import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
 import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
 import {
@@ -34,7 +40,12 @@ import {
     randomStateSchema,
 } from './simulation/utils/randomness.js';
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
-import { UUID, uuidSchema, uuid } from './utils/index.js';
+import {
+    UUID,
+    uuidSchema,
+    uuid,
+    uuidValidationOptions,
+} from './utils/index.js';
 import { IsIdMap, IsMultiTypedIdMap } from './utils/validators/index.js';
 import {
     createCatchAllHospital,
@@ -90,6 +101,10 @@ export class ExerciseState {
 
     @IsZodSchema(z.record(uuidSchema, viewportSchema))
     public readonly viewports: { readonly [key: UUID]: Viewport } = {};
+
+    @IsUUID(4, uuidValidationOptions)
+    @IsOptional()
+    public readonly autojoinViewportId: UUID | null = null;
 
     @IsIdMap(SimulatedRegion)
     public readonly simulatedRegions: {

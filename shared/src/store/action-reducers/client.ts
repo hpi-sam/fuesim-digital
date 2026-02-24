@@ -58,7 +58,16 @@ export namespace ClientActionReducers {
     export const addClient: ActionReducer<AddClientAction> = {
         action: AddClientAction,
         reducer: (draftState, { client }) => {
-            draftState.clients[client.id] = cloneDeepMutable(client);
+            const clientMutable = cloneDeepMutable(client);
+            if (
+                draftState.autojoinViewportId &&
+                draftState.autojoinViewportId in draftState.viewports
+            ) {
+                clientMutable.viewRestrictedToViewportId =
+                    draftState.autojoinViewportId;
+                clientMutable.isInWaitingRoom = false;
+            }
+            draftState.clients[client.id] = clientMutable;
             return draftState;
         },
         rights: 'server',

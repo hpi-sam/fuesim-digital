@@ -44,13 +44,13 @@
                         <div class="flex-grow-1"></div>
                         <button
                             class="btn btn-outline-secondary btn-sm ms-3"
-                            ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen von Ihnen bestätigt werden."
+                            ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten."
+                            (click)="shareParticipantLink()"
                         >
                             Teilnehmerlink teilen
                         </button>
                     </div>
                     <div class="card-body d-flex justify-content-center py-0">
-                        {{ participantUrl() }}
                         <qr-code
                             [value]="participantUrl()"
                             size="350"

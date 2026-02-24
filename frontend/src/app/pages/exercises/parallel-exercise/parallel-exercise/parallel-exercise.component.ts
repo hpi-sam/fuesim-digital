@@ -5,6 +5,8 @@ import { GetParallelExerciseResponseData } from 'fuesim-digital-shared';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../../../core/api.service';
 import { ParallelExerciseService } from '../../../../core/parallel-exercise.service';
+import { shareLink } from '../../../../shared/functions/share';
+import { MessageService } from '../../../../core/messages/message.service';
 
 @Component({
     selector: 'app-parallel-exercise',
@@ -17,6 +19,7 @@ export class ParallelExerciseComponent {
     private readonly ngbModalService = inject(NgbModal);
     private readonly route = inject(ActivatedRoute);
     public readonly parallelExerciseService = inject(ParallelExerciseService);
+    private readonly messageService = inject(MessageService);
 
     parallelExercise: HttpResourceRef<
         GetParallelExerciseResponseData | undefined
@@ -25,6 +28,10 @@ export class ParallelExerciseComponent {
         () =>
             `${location.origin}/exercises/parallel/join/${this.parallelExercise.value()?.participantKey}`
     );
+
+    shareParticipantLink() {
+        shareLink(this.participantUrl(), this.messageService);
+    }
 
     constructor() {
         this.parallelExercise = this.apiService.getParallelExerciseResource(

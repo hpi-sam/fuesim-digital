@@ -1,7 +1,15 @@
 import { eq, desc, getTableColumns } from 'drizzle-orm';
 import type { GroupParticipantKey } from 'fuesim-digital-shared';
-import type { ParallelExerciseId, ParallelExerciseInsert } from '../schema.js';
-import { parallelExerciseTable, exerciseTemplateTable } from '../schema.js';
+import type {
+    ParallelExercise,
+    ParallelExerciseId,
+    ParallelExerciseInsert,
+} from '../schema.js';
+import {
+    exerciseTable,
+    parallelExerciseTable,
+    exerciseTemplateTable,
+} from '../schema.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ParallelExerciseRepository extends BaseRepository {
@@ -12,7 +20,9 @@ export class ParallelExerciseRepository extends BaseRepository {
         };
     }
 
-    public async getParallelExerciseById(id: ParallelExerciseId) {
+    public async getParallelExerciseById(
+        id: ParallelExerciseId
+    ): Promise<ParallelExercise | null> {
         return this.onlySingle(
             await this.databaseConnection
                 .select(this.getColumns())
@@ -28,7 +38,9 @@ export class ParallelExerciseRepository extends BaseRepository {
         );
     }
 
-    public async getParallelExerciseByParticipantKey(key: GroupParticipantKey) {
+    public async getParallelExerciseByParticipantKey(
+        key: GroupParticipantKey
+    ): Promise<ParallelExercise | null> {
         return this.onlySingle(
             await this.databaseConnection
                 .select(this.getColumns())
@@ -44,7 +56,9 @@ export class ParallelExerciseRepository extends BaseRepository {
         );
     }
 
-    public getParallelExercisesOfOwner(userId: string) {
+    public async getParallelExercisesOfOwner(
+        userId: string
+    ): Promise<ParallelExercise[]> {
         return this.databaseConnection
             .select(this.getColumns())
             .from(parallelExerciseTable)
@@ -69,5 +83,12 @@ export class ParallelExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .delete(parallelExerciseTable)
             .where(eq(parallelExerciseTable.id, id));
+    }
+
+    public async getParallelExerciseInstancesById(id: ParallelExerciseId) {
+        return this.databaseConnection
+            .select()
+            .from(exerciseTable)
+            .where(eq(exerciseTable.parallelExerciseId, id));
     }
 }

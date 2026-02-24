@@ -65,6 +65,29 @@
             <div class="col">
                 <div class="card">
                     <div class="card-header h4">Teilnehmende</div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Teilnehmer-ID</th>
+                                <th>Teilnehmername</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (
+                                exerciseInstance of parallelExerciseService.exerciseInstances();
+                                track exerciseInstance.participantKey
+                            ) {
+                                <tr>
+                                    <td>
+                                        <code>{{
+                                            exerciseInstance.participantKey
+                                        }}</code>
+                                    </td>
+                                    <td>{{ exerciseInstance.clientName }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -177,3 +177,6 @@ export type ParallelExerciseEntry = InferSelectModel<
 export type ParallelExerciseInsert = InferInsertModel<
     typeof parallelExerciseTable
 >;
+export interface ParallelExercise extends ParallelExerciseEntry {
+    template: ExerciseTemplateEntry;
+}

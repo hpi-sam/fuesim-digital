@@ -165,3 +165,29 @@ export type GetExerciseTemplateViewportsResponseData = z.infer<
 export const postJoinParallelExerciseResponseDataSchema = z.object({
     participantKey: participantKeySchema,
 });
+
+export const parallelExerciseInstanceSummarySchema = z.object({
+    participantKey: participantKeySchema,
+    clientName: z.string(),
+});
+export type ParallelExerciseInstanceSummary = z.infer<
+    typeof parallelExerciseInstanceSummarySchema
+>;
+
+export const parallelExerciseInstancesSchema = z.array(
+    parallelExerciseInstanceSummarySchema
+);
+
+export const joinParallelExerciseResponseDataSchema = z.object({
+    exerciseInstances: parallelExerciseInstancesSchema,
+});
+export type JoinParallelExerciseResponseData = z.infer<
+    typeof joinParallelExerciseResponseDataSchema
+>;
+
+export const updateParallelExerciseInstancesSchema = z.object({
+    exerciseInstances: parallelExerciseInstancesSchema,
+});
+export type UpdateParallelExerciseResponseData = z.infer<
+    typeof updateParallelExerciseInstancesSchema
+>;

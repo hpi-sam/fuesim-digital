@@ -8,18 +8,21 @@ import type {
     ExerciseId,
 } from 'fuesim-digital-shared';
 import { ExerciseState, reduceExerciseState } from 'fuesim-digital-shared';
+import { Subject } from 'rxjs';
 import type {
     ExerciseTemplateEntry,
     ExerciseInsert,
 } from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
-import type { ClientWrapper } from './client-wrapper.js';
+import type { ExerciseClientWrapper } from './client-wrapper.js';
 import { patientTick } from './patient-ticking.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
 
 export class ActiveExercise {
     private readonly exercise: Omit<ExerciseInsert, 'id'>;
+
+    public readonly actionApplied = new Subject<boolean>();
 
     // We need to make sure this is set by
     // the ExerciseService when creating/loading
@@ -154,7 +157,7 @@ export class ActiveExercise {
         this.tickInterval
     );
 
-    private readonly clients = new Set<ClientWrapper>();
+    private readonly clients = new Set<ExerciseClientWrapper>();
 
     public readonly incrementIdGenerator = new IncrementIdGenerator();
 
@@ -204,7 +207,7 @@ export class ActiveExercise {
         this.clients.forEach((client) => client.emitAction(action));
     }
 
-    public addClient(clientWrapper: ClientWrapper) {
+    public addClient(clientWrapper: ExerciseClientWrapper) {
         if (clientWrapper.client === undefined) {
             return;
         }
@@ -218,7 +221,7 @@ export class ActiveExercise {
         this.clients.add(clientWrapper);
     }
 
-    public removeClient(clientWrapper: ClientWrapper) {
+    public removeClient(clientWrapper: ExerciseClientWrapper) {
         if (!this.clients.has(clientWrapper)) {
             // clientWrapper not part of this exercise
             return;
@@ -229,7 +232,6 @@ export class ActiveExercise {
             clientId: client.id,
         };
         this.applyAction(removeClientAction, client.id, () => {
-            clientWrapper.disconnect();
             this.clients.delete(clientWrapper);
         });
         if (
@@ -267,6 +269,7 @@ export class ActiveExercise {
         this.reduce(action, emitterId);
         intermediateAction?.();
         this.emitAction(action);
+        this.actionApplied.next(true);
     }
 
     /**

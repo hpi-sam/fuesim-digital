@@ -18,11 +18,7 @@ export class FuesimServer {
 
     public constructor(private readonly services: Services) {
         const app = express();
-        this._websocketServer = new ExerciseWebsocketServer(
-            app,
-            services.exerciseService,
-            services.authService
-        );
+        this._websocketServer = new ExerciseWebsocketServer(app, this.services);
         this._httpServer = new ApiHttpServer(app, services);
 
         this.saveHandler = new PeriodicEventHandler(

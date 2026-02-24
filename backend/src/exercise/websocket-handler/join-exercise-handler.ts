@@ -8,26 +8,26 @@ import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
 import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
 import type { AuthService } from '../../auth/auth-service.js';
+import { ExerciseClientWrapper } from '../client-wrapper.js';
 import type { ExerciseService } from '../../database/services/exercise-service.js';
-import { ClientWrapper } from '../client-wrapper.js';
 import { secureOn } from './secure-on.js';
 
 export const registerJoinExerciseHandler = (
     io: ExerciseServer,
-    client: ExerciseSocket,
+    socket: ExerciseSocket,
     authService: AuthService,
     exerciseService: ExerciseService
 ) => {
     secureOn(
-        client,
+        socket,
         'joinExercise',
         (exerciseKey: ExerciseKey, clientName: string, callback) => {
-            const clientWrapper = new ClientWrapper(
-                client,
-                exerciseService,
-                authService
+            const clientWrapper = new ExerciseClientWrapper(
+                socket,
+                authService,
+                exerciseService
             );
-            clientMap.set(client, clientWrapper);
+            clientMap.set(socket, clientWrapper);
 
             clientWrapper.getSessionInformation().then(() => {
                 // When this listener is registered the socket is in the map.

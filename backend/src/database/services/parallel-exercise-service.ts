@@ -1,4 +1,6 @@
 import type { GroupParticipantKey } from 'fuesim-digital-shared';
+import { parallelExerciseInstanceSummarySchema } from 'fuesim-digital-shared';
+import { Subject } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ParallelExerciseId, ParallelExerciseInsert } from '../schema.js';
 import {
@@ -7,14 +9,22 @@ import {
     PermissionDeniedError,
 } from '../../utils/http.js';
 import type { ParallelExerciseRepository } from '../repositories/parallel-exercise-repository.js';
+import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import type { AccessKeyService } from './access-key-service.js';
 import type { ExerciseManagerService } from './exercise-manager-service.js';
+import type { ExerciseService } from './exercise-service.js';
 
+export interface ParallelExerciseJoin {
+    parallelExerciseId: ParallelExerciseId;
+    activeExercise: ActiveExercise;
+}
 export class ParallelExerciseService {
+    public newJoin = new Subject<ParallelExerciseJoin>();
     public constructor(
         private readonly parallelExerciseRepository: ParallelExerciseRepository,
         private readonly accessKeyService: AccessKeyService,
-        private readonly exerciseManagerService: ExerciseManagerService
+        private readonly exerciseManagerService: ExerciseManagerService,
+        private readonly exerciseService: ExerciseService
     ) {}
 
     public async generateParticipantKey() {
@@ -75,6 +85,10 @@ export class ParallelExerciseService {
                 undefined,
                 { parallelExerciseId: parallelExercise.id }
             );
+        this.newJoin.next({
+            parallelExerciseId: parallelExercise.id,
+            activeExercise: exercise,
+        });
         return exercise;
     }
 
@@ -113,5 +127,42 @@ export class ParallelExerciseService {
 
         await this.parallelExerciseRepository.deleteParallelExerciseById(id);
         await this.accessKeyService.free(parallelExercise.participantKey);
+    }
+
+    public async getParallelExerciseInstancesById(
+        id: ParallelExerciseId,
+        session: SessionInformation
+    ) {
+        const parallelExercise = await this.getParallelExerciseById(
+            id,
+            session
+        );
+        const exerciseInstances =
+            await this.parallelExerciseRepository.getParallelExerciseInstancesById(
+                parallelExercise.id
+            );
+        const activeExercises = exerciseInstances.map((exerciseEntry) =>
+            this.exerciseService.getExerciseByKey(exerciseEntry.participantKey)
+        );
+        return activeExercises;
+    }
+
+    public async getParallelExerciseInstanceSummariesById(
+        id: ParallelExerciseId,
+        session: SessionInformation
+    ) {
+        const activeExercises = await this.getParallelExerciseInstancesById(
+            id,
+            session
+        );
+        return activeExercises.map((exercise) =>
+            parallelExerciseInstanceSummarySchema.parse({
+                participantKey: exercise.participantKey,
+                clientName:
+                    Object.values(
+                        exercise.getExercise().currentStateString.clients
+                    )[0]?.name ?? '',
+            })
+        );
     }
 }

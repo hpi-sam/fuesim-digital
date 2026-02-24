@@ -5,7 +5,6 @@ import {
 } from 'fuesim-digital-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
-import type { ClientWrapper } from '../../exercise/client-wrapper.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { removeAll, pushAll } from '../../utils/array.js';
@@ -23,6 +22,7 @@ import {
     NotFoundError,
     PermissionDeniedError,
 } from '../../utils/http.js';
+import type { ExerciseClientWrapper } from '../../exercise/client-wrapper.js';
 import type { AccessKeyService } from './access-key-service.js';
 
 export class ExerciseService {
@@ -109,8 +109,13 @@ export class ExerciseService {
         ]);
     }
 
-    public leaveExercise(exerciseKey: ExerciseKey, client: ClientWrapper) {
-        this.getExerciseByKey(exerciseKey, client.session).removeClient(client);
+    public leaveExercise(
+        exerciseKey: ExerciseKey,
+        clientWrapper: ExerciseClientWrapper
+    ) {
+        this.getExerciseByKey(exerciseKey, clientWrapper.session).removeClient(
+            clientWrapper
+        );
     }
 
     /**

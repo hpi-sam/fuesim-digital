@@ -3,7 +3,7 @@ import type { Migration } from './migration-functions.js';
 
 interface VehicleParameters {
     vehicle: {
-        operationalAssignment?: object | null;
+        operationalAssignment?: null;
     };
 }
 
@@ -15,12 +15,8 @@ export const addOperationsTabletView45: Migration = {
                 const typedVehicleAction = action as {
                     vehicleParameters: VehicleParameters;
                 };
-                typedVehicleAction.vehicleParameters.vehicle.operationalAssignment ??=
+                typedVehicleAction.vehicleParameters.vehicle.operationalAssignment =
                     null;
-                console.log(
-                    'Initialized operationalAssignment for new vehicle in migration 45.',
-                    typedVehicleAction
-                );
                 break;
             }
             case '[Emergency Operation Center] Send Alarm Group': {
@@ -29,13 +25,8 @@ export const addOperationsTabletView45: Migration = {
                 };
                 typedVehicleAction.sortedVehicleParameters.forEach(
                     (vehicleParameters) => {
-                        vehicleParameters.vehicle.operationalAssignment ??=
-                            null;
+                        vehicleParameters.vehicle.operationalAssignment = null;
                     }
-                );
-                console.log(
-                    'Initialized operationalAssignment for new vehicles in migration 45.',
-                    typedAction
                 );
                 break;
             }
@@ -49,14 +40,14 @@ export const addOperationsTabletView45: Migration = {
             operationalSections: { [key in UUID]: any } | undefined;
             vehicles: {
                 [key in UUID]: {
-                    operationalAssignment: object | null | undefined;
+                    operationalAssignment: null | undefined;
                 };
             };
         };
 
-        typedState.operationalSections ??= {};
+        typedState.operationalSections = {};
         Object.values(typedState.vehicles).forEach((vehicle) => {
-            vehicle.operationalAssignment ??= null;
+            vehicle.operationalAssignment = null;
         });
     },
 };

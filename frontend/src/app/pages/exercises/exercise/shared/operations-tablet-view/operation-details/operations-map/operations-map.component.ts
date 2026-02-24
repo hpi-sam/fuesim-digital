@@ -10,7 +10,6 @@ import {
     defaultTileMapProperties,
     lowerRightCornerOf,
     upperLeftCornerOf,
-    Viewport,
 } from 'digital-fuesim-manv-shared';
 import maplibregl from 'maplibre-gl';
 // eslint-disable-next-line no-restricted-imports
@@ -18,9 +17,11 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { map, first, Subject, takeUntil } from 'rxjs';
 import { AppState } from 'src/app/state/app.state';
 import {
+    selectSimulatedRegions,
     selectTileMapProperties,
     selectViewports,
 } from 'src/app/state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { startingPosition } from '../../../starting-position';
 
 @Component({
@@ -61,24 +62,41 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
     };
     public readonly MAX_PITCH_3D_BUILDINGS = 60;
 
-    public switchViewToViewport(viewport: Viewport) {
+    public gotoHomeLocation(animate = true) {
         if (!this.map) return;
 
-        const ulCorner = upperLeftCornerOf(viewport);
-        const lrCorner = lowerRightCornerOf(viewport);
+        const elements = [
+            ...Object.values(selectStateSnapshot(selectViewports, this.store)),
+            ...Object.values(
+                selectStateSnapshot(selectSimulatedRegions, this.store)
+            ),
+        ];
+
+        if (elements.length === 0) {
+            this.map.setCenter(
+                this.metersToLngLat([startingPosition.x, startingPosition.y])
+            );
+            return;
+        }
+        const minX = Math.min(
+            ...elements.map((element) => upperLeftCornerOf(element).x)
+        );
+        const minY = Math.min(
+            ...elements.map((element) => lowerRightCornerOf(element).y)
+        );
+        const maxX = Math.max(
+            ...elements.map((element) => lowerRightCornerOf(element).x)
+        );
+        const maxY = Math.max(
+            ...elements.map((element) => upperLeftCornerOf(element).y)
+        );
 
         this.map.fitBounds(
             [
-                {
-                    lat: this.metersToLngLat([ulCorner.x, ulCorner.y])[1],
-                    lng: this.metersToLngLat([ulCorner.x, ulCorner.y])[0],
-                },
-                {
-                    lat: this.metersToLngLat([lrCorner.x, lrCorner.y])[1],
-                    lng: this.metersToLngLat([lrCorner.x, lrCorner.y])[0],
-                },
+                this.metersToLngLat([minX, minY]),
+                this.metersToLngLat([maxX, maxY]),
             ],
-            { animate: true, padding: 50, duration: 500 }
+            { padding: 25, animate }
         );
     }
 
@@ -187,6 +205,7 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
         });
         this.map.on('load', () => {
             this.map?.resize();
+            this.gotoHomeLocation(false);
         });
     }
 

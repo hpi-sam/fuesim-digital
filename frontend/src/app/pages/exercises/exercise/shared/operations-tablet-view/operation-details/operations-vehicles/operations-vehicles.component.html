@@ -6,11 +6,12 @@
         Vor Ort
     </span>
     @for (
-        vehicleAtLocation of vehiclesAtLocation$ | async;
+        vehicleAtLocation of vehiclesOnLocation$ | async;
         track vehicleAtLocation.id
     ) {
         <app-operations-vehicle-item
             [vehicle]="vehicleAtLocation"
+            [showTransfer]="false"
         ></app-operations-vehicle-item>
     }
     <span class="bg-body-secondary px-2 py-1 rounded-top-1 mt-4 border fw-bold">

@@ -23,14 +23,10 @@ export class OperationalSectionsTabComponent {
         .pipe(map((sectionsMap) => Object.values(sectionsMap)));
 
     public addOperationalSection(): void {
-        try {
-            this.exerciseService.proposeAction({
-                type: '[OperationalSection] Add Operational Section',
-                sectionId: uuid(),
-                title: 'Einsatzabschnitt ???',
-            });
-        } catch (error) {
-            console.error('Failed to add operational section:', error);
-        }
+        this.exerciseService.proposeAction({
+            type: '[OperationalSection] Add Operational Section',
+            sectionId: uuid(),
+            title: 'Einsatzabschnitt ???',
+        });
     }
 }

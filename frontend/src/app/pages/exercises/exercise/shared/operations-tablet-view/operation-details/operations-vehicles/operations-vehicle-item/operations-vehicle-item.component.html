@@ -1,12 +1,12 @@
 @let availableAGs = availableAlarmGroups$ | async;
 @let availableTPs = availableTransferPoints$ | async;
-@let position = vehicle.position;
+@let position = vehicle().position;
 
 <div class="border px-2 py-1 d-flex flex-column gap-1">
     <span class="h5 m-0">
-        {{ vehicle.name }}
+        {{ vehicle().name }}
     </span>
-    @if (position.type === 'transfer') {
+    @if (position.type === 'transfer' && showTransfer()) {
         <div class="d-flex flex-row" style="opacity: 0.8">
             <div>
                 @if (

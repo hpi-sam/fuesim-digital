@@ -14,10 +14,7 @@ export const localOperationsCommandAssignmentSchema = z.object({
 
 export const operationalSectionAssignmentSchema = z.object({
     type: z.literal('operationalSection'),
-    role: z.union([
-        z.literal('operationalSectionLeader'),
-        z.literal('operationalSectionMember'),
-    ]),
+    role: z.literal(['operationalSectionLeader', 'operationalSectionMember']),
     sectionId: z.uuidv4(),
 });
 

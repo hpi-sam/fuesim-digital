@@ -11,13 +11,11 @@
         >
             3D
         </button>
-        @for (viewport of availableViewports$ | async; track viewport.id) {
-            <button
-                class="btn btn-sm btn-light rounded-0 px-3"
-                (click)="switchViewToViewport(viewport)"
-            >
-                {{ viewport.name }}
-            </button>
-        }
+        <button
+            class="btn btn-sm btn-light rounded-0 px-3 d-flex flex-row align-items-center gap-1"
+            (click)="gotoHomeLocation()"
+        >
+            <i class="bi bi-house-fill"></i> <span>Zurück zum Einsatzort</span>
+        </button>
     </div>
 </div>

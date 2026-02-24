@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { map } from 'rxjs';
+import { map, zip } from 'rxjs';
 import { AppState } from 'src/app/state/app.state';
 import { selectVehiclesInTransfer } from 'src/app/state/application/selectors/exercise.selectors';
 import { selectVisibleVehicles } from 'src/app/state/application/selectors/shared.selectors';
@@ -14,10 +14,46 @@ import { selectVisibleVehicles } from 'src/app/state/application/selectors/share
 export class OperationsVehiclesComponent {
     constructor(private readonly store: Store<AppState>) {}
 
-    public vehiclesAtLocation$ = this.store
+    private readonly visibleVehicles$ = this.store
         .select(selectVisibleVehicles)
         .pipe(map((vehicles) => Object.values(vehicles)));
+    private readonly vehiclesInBetweenTransferpoints$ = this.store
+        .select(selectVehiclesInTransfer)
+        .pipe(
+            map((vehicles) =>
+                Object.values(vehicles).filter(
+                    (vehicle) =>
+                        vehicle.position.type === 'transfer' &&
+                        vehicle.position.transfer.startPoint.type ===
+                            'transferStartPoint'
+                )
+            )
+        );
+
+    public vehiclesOnLocation$ = zip(
+        this.visibleVehicles$,
+        this.vehiclesInBetweenTransferpoints$
+    ).pipe(
+        map(([visibleVehicles, vehiclesInBetweenTransferpoints]) => {
+            const data = [
+                ...visibleVehicles,
+                ...vehiclesInBetweenTransferpoints,
+            ];
+            data.sort((a, b) => a.name.localeCompare(b.name));
+            return data;
+        })
+    );
+
     public vehiclesInTransfer$ = this.store
         .select(selectVehiclesInTransfer)
-        .pipe(map((vehicles) => Object.values(vehicles)));
+        .pipe(
+            map((vehicles) =>
+                Object.values(vehicles).filter(
+                    (vehicle) =>
+                        vehicle.position.type === 'transfer' &&
+                        vehicle.position.transfer.startPoint.type ===
+                            'alarmGroupStartPoint'
+                )
+            )
+        );
 }

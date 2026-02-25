@@ -1,0 +1,15 @@
+@if (exerciseInstance(); as exerciseInstance) {
+    <td>
+        <code class="me-2">{{ exerciseInstance.participantKey }}</code>
+        <app-copy-button [value]="participantUrl()" />
+    </td>
+    <td>{{ exerciseInstance.clientName }}</td>
+    <td>
+        <a
+            [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"
+            class="btn btn-sm btn-outline-primary float-end"
+        >
+            Öffnen
+        </a>
+    </td>
+}

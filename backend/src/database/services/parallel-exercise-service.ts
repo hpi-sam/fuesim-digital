@@ -168,6 +168,7 @@ export class ParallelExerciseService {
         return activeExercises.map((exercise) =>
             parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,
+                trainerKey: exercise.trainerKey,
                 clientName:
                     Object.values(
                         exercise.getExercise().currentStateString.clients

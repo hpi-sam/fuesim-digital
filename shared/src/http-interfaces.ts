@@ -168,6 +168,7 @@ export const postJoinParallelExerciseResponseDataSchema = z.object({
 
 export const parallelExerciseInstanceSummarySchema = z.object({
     participantKey: participantKeySchema,
+    trainerKey: trainerKeySchema,
     clientName: z.string(),
 });
 export type ParallelExerciseInstanceSummary = z.infer<

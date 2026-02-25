@@ -70,6 +70,7 @@
                             <tr>
                                 <th>Teilnehmer-ID</th>
                                 <th>Teilnehmername</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,14 +78,7 @@
                                 exerciseInstance of parallelExerciseService.exerciseInstances();
                                 track exerciseInstance.participantKey
                             ) {
-                                <tr>
-                                    <td>
-                                        <code>{{
-                                            exerciseInstance.participantKey
-                                        }}</code>
-                                    </td>
-                                    <td>{{ exerciseInstance.clientName }}</td>
-                                </tr>
+                                <tr app-parallel-exercise-instance-row [exerciseInstance]="exerciseInstance"></tr>
                             }
                         </tbody>
                     </table>

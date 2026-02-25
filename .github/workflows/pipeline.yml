@@ -37,6 +37,8 @@ jobs:
         timeout-minutes: 10
         runs-on: ubuntu-latest
 
+        if: startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/head/dev') || github.ref == 'refs/head/main'
+
         needs: cache-dependencies
 
         continue-on-error: true

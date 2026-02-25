@@ -35,6 +35,7 @@ import {
 import {
     selectParticipantKey,
     selectExerciseState,
+    selectExerciseType,
 } from '../../../../state/application/selectors/exercise.selectors';
 import { selectOwnClient } from '../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../state/get-state-snapshot';

@@ -79,6 +79,36 @@ export class ParallelExerciseService {
         return true;
     }
 
+    public async startParallelExercise() {
+        const joinResponse = await new Promise<SocketResponse>((resolve) => {
+            this.socket.emit('startParallelExercise', resolve);
+        });
+
+        if (!joinResponse.success) {
+            this.messageService.postError({
+                title: 'Fehler beim Starten der Parallelübung',
+                error: joinResponse.message,
+            });
+            return false;
+        }
+        return true;
+    }
+
+    public async pauseParallelExercise() {
+        const joinResponse = await new Promise<SocketResponse>((resolve) => {
+            this.socket.emit('pauseParallelExercise', resolve);
+        });
+
+        if (!joinResponse.success) {
+            this.messageService.postError({
+                title: 'Fehler beim Pausieren der Parallelübung',
+                error: joinResponse.message,
+            });
+            return false;
+        }
+        return true;
+    }
+
     public leaveParallelExercise() {
         this.socket.disconnect();
     }

@@ -5,6 +5,7 @@ import {
     participantKeySchema,
     trainerKeySchema,
 } from './exercise-keys.js';
+import { exerciseStatusSchema } from './models/index.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -170,6 +171,8 @@ export const parallelExerciseInstanceSummarySchema = z.object({
     participantKey: participantKeySchema,
     trainerKey: trainerKeySchema,
     clientName: z.string(),
+    currentTime: z.number(),
+    currentStatus: exerciseStatusSchema,
 });
 export type ParallelExerciseInstanceSummary = z.infer<
     typeof parallelExerciseInstanceSummarySchema

@@ -22,18 +22,24 @@ export interface ClientToServerEvents {
             response: SocketResponse<JoinExerciseResponseDataInput>
         ) => void
     ) => void;
-    joinParallelExercise: (
-        id: UUID,
-        callback: (
-            response: SocketResponse<JoinParallelExerciseResponseData>
-        ) => void
-    ) => void;
     proposeAction: (
         action: ExerciseAction,
         callback: (response: SocketResponse) => void
     ) => void;
     getState: (
         callback: (response: SocketResponse<ExerciseState>) => void
+    ) => void;
+    joinParallelExercise: (
+        id: UUID,
+        callback: (
+            response: SocketResponse<JoinParallelExerciseResponseData>
+        ) => void
+    ) => void;
+    startParallelExercise: (
+        callback: (response: SocketResponse) => void
+    ) => void;
+    pauseParallelExercise: (
+        callback: (response: SocketResponse) => void
     ) => void;
 }
 

@@ -165,15 +165,15 @@ export class ParallelExerciseService {
             id,
             session
         );
-        return activeExercises.map((exercise) =>
-            parallelExerciseInstanceSummarySchema.parse({
+        return activeExercises.map((exercise) => {
+            const state = exercise.getExercise().currentStateString;
+            return parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,
                 trainerKey: exercise.trainerKey,
-                clientName:
-                    Object.values(
-                        exercise.getExercise().currentStateString.clients
-                    )[0]?.name ?? '',
-            })
-        );
+                clientName: Object.values(state.clients)[0]?.name ?? '',
+                currentTime: state.currentTime,
+                currentStatus: state.currentStatus,
+            });
+        });
     }
 }

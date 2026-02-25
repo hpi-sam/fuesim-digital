@@ -1,3 +1,11 @@
+import type {
+    ExerciseAction,
+    ExerciseKey,
+    UUID,
+    StartExerciseAction,
+    PauseExerciseAction,
+} from 'fuesim-digital-shared';
+import { Client, ClientRole } from 'fuesim-digital-shared';
 import type { ExerciseAction, ExerciseKey, UUID } from 'fuesim-digital-shared';
 import { Client } from 'fuesim-digital-shared';
 import { filter, type Subscription } from 'rxjs';
@@ -175,6 +183,32 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
             this.chosenExercise!.id,
             this.session
         );
+    }
+
+    public async applyActionToAll(action: ExerciseAction) {
+        if (!this.session) {
+            throw new PermissionDeniedError();
+        }
+        const activeExercises =
+            await this.parallelExerciseService.getParallelExerciseInstancesById(
+                this.chosenExercise!.id,
+                this.session
+            );
+        for (const activeExercise of activeExercises) {
+            activeExercise.applyAction(action, null);
+        }
+    }
+
+    public async start() {
+        await this.applyActionToAll({
+            type: '[Exercise] Start',
+        } satisfies StartExerciseAction);
+    }
+
+    public async pause() {
+        await this.applyActionToAll({
+            type: '[Exercise] Pause',
+        } satisfies PauseExerciseAction);
     }
 
     /**

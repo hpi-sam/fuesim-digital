@@ -25,6 +25,7 @@ import {
     Vehicle,
     VehicleTemplate,
     Viewport,
+    ExerciseConfiguration,
     getCreate,
     SpatialTree,
     MaterialTemplate,
@@ -40,6 +41,9 @@ import {
     randomStateSchema,
 } from './simulation/utils/randomness.js';
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
+import type { UUID } from './utils/index.js';
+import { uuid, uuidValidationOptions } from './utils/index.js';
+import { IsIdMap, IsMultiTypedIdMap } from './utils/validators/index.js';
 import {
     UUID,
     uuidSchema,

@@ -30,6 +30,45 @@
             <div class="col">
                 <div class="card h-100">
                     <div class="card-header h4">Steuerung</div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            @let leadingExercise =
+                                parallelExerciseService.exerciseInstances()[0];
+                            @if (leadingExercise) {
+                                <app-exercise-state-badge-inner
+                                    class="h1"
+                                    [exerciseStatus]="
+                                        leadingExercise.currentStatus
+                                    "
+                                    [currentTime]="leadingExercise.currentTime"
+                                />
+                                <div class="flex-grow-1"></div>
+                                @if (
+                                    leadingExercise.currentStatus !== 'running'
+                                ) {
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary"
+                                        (click)="
+                                            parallelExerciseService.startParallelExercise()
+                                        "
+                                    >
+                                        Start
+                                    </button>
+                                } @else {
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary"
+                                        (click)="
+                                            parallelExerciseService.pauseParallelExercise()
+                                        "
+                                    >
+                                        Pause
+                                    </button>
+                                }
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col">
@@ -78,7 +117,10 @@
                                 exerciseInstance of parallelExerciseService.exerciseInstances();
                                 track exerciseInstance.participantKey
                             ) {
-                                <tr app-parallel-exercise-instance-row [exerciseInstance]="exerciseInstance"></tr>
+                                <tr
+                                    app-parallel-exercise-instance-row
+                                    [exerciseInstance]="exerciseInstance"
+                                ></tr>
                             }
                         </tbody>
                     </table>

@@ -53,3 +53,7 @@
 .accordion-button:focus {
     box-shadow: none;
 }
+
+main {
+    min-height: calc(100vh - 160px);
+}

@@ -61,6 +61,10 @@ import { ExerciseTemplateCardComponent } from './components/exercise-template-ca
 import { ExerciseCardComponent } from './components/exercise-card/exercise-card.component';
 import { InlineTextEditorComponent } from './components/inline-text-editor/inline-text-editor.component';
 import { CopyButtonComponent } from './components/copy-button/copy-button.component';
+import { PersonnelDetailsComponent } from './components/personnel-details/personnel-details.component';
+import { CaterCapacityComponent } from './components/cater-capacity/cater-capacity.component';
+import { PatientHeaderComponent } from './components/patient-header/patient-header.component';
+import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 
 @NgModule({
     declarations: [
@@ -86,11 +90,15 @@ import { CopyButtonComponent } from './components/copy-button/copy-button.compon
         PatientStatusDataFieldComponent,
         PatientStatusBadgeComponent,
         CaterCapacityCountPipe,
+        CaterCapacityComponent,
         FileInputDirective,
         FooterComponent,
         HeaderComponent,
         PatientHealthPointDisplayComponent,
         PatientsDetailsComponent,
+        PersonnelDetailsComponent,
+        MaterialDetailsComponent,
+        PatientHeaderComponent,
         PatientStatusColorPipe,
         PatientStatusTagsFieldComponent,
         PatientBehaviorIconPipe,
@@ -133,6 +141,8 @@ import { CopyButtonComponent } from './components/copy-button/copy-button.compon
         AppSaveOnTypingDirective,
         DisplayValidationComponent,
         ExactMatchValidatorDirective,
+        CaterCapacityComponent,
+        PatientHeaderComponent,
         JoinIdDirective,
         ExerciseExistsValidatorDirective,
         ImageExistsValidatorDirective,
@@ -154,6 +164,8 @@ import { CopyButtonComponent } from './components/copy-button/copy-button.compon
         HeaderComponent,
         PatientHealthPointDisplayComponent,
         PatientsDetailsComponent,
+        PersonnelDetailsComponent,
+        MaterialDetailsComponent,
         PatientStatusColorPipe,
         VehicleNameEditorComponent,
         VehicleLoadUnloadControlsComponent,

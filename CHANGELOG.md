@@ -40,6 +40,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Trainees can mark patients for transport priority. Those patients show a red outline around their popup.
 - Participants can now be assigned to an emergency operations view, allowing them to send alarm groups and write public messages to the emergency operations center log.
 - The emergency operations center log now differentiates between public messages and private messages only visible to trainers.
+- From the simulated region pop-up, a visual overview of all objects inside the region can be opened as a modal.
 
 ### Changed
 

@@ -13,6 +13,8 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { TransferPointOverviewModule } from '../transfer-point-overview/transfer-point-overview.module';
 import { SimulatedRegionOverviewGeneralComponent } from './trainer-modal/overview/simulated-region-overview.component';
+import { SimulatedRegionPreviewComponent } from './trainer-modal/preview/simulated-region-preview.component';
+import { SimulatedRegionPreviewCardComponent } from './trainer-modal/preview-card/simulated-region-preview-card.component';
 import { SimulatedRegionOverviewBehaviorTabComponent } from './trainer-modal/tabs/behavior-tab/simulated-region-overview-behavior-tab.component';
 import { SimulatedRegionOverviewGeneralTabComponent } from './trainer-modal/tabs/general-tab/simulated-region-overview-general-tab.component';
 import { SimulatedRegionOverviewBehaviorTreatPatientsComponent } from './trainer-modal/tabs/behavior-tab/behaviors/treat-patients/simulated-region-overview-behavior-treat-patients.component';
@@ -23,7 +25,7 @@ import { TreatmentProgressToGermanNamePipe } from './trainer-modal/tabs/behavior
 import { SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent } from './trainer-modal/tabs/behavior-tab/behaviors/treat-patients/patient-details/simulated-region-overview-behavior-treat-patients-patient-details.component';
 import { WithDollarPipe } from './trainer-modal/tabs/general-tab/utils/with-dollar';
 import { SimulatedRegionsModalComponent } from './trainer-modal/simulated-regions-modal/simulated-regions-modal.component';
-import { SimulatedRegionOverviewPatientsTabComponent } from './trainer-modal/tabs/patients-tab/simulated-region-overview-patients-tab/simulated-region-overview-patients-tab.component';
+import { SimulatedRegionOverviewPatientsTabComponent } from './trainer-modal/tabs/patients-tab/tab/simulated-region-overview-patients-tab.component';
 import { SelectPatientService } from './trainer-modal/select-patient.service';
 import { RadiogramListComponent } from './trainer-modal/radiogram-list/radiogram-list.component';
 import { RadiogramCardComponent } from './trainer-modal/radiogram-list/radiogram-card/radiogram-card.component';
@@ -44,8 +46,8 @@ import { SimulatedRegionOverviewBehaviorAnswerVehicleRequestsComponent } from '.
 import { RadigoramCardContentResourceRequestComponent } from './trainer-modal/radiogram-list/radiogram-card/radiogram-card-content-resource-request/radiogram-card-content-resource-request.component';
 import { SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent } from './trainer-modal/tabs/behavior-tab/behaviors/automatically-distribute-vehicles/simulated-region-overview-behavior-automatically-distribute-vehicles.component';
 import { RequestVehiclesComponent } from './trainer-modal/tabs/behavior-tab/behaviors/request-vehicles/simulated-region-overview-behavior-request-vehicles.component';
-import { SimulatedRegionOverviewPatientInteractionBarComponent } from './trainer-modal/tabs/patients-tab/simulated-region-overview-patient-interaction-bar/simulated-region-overview-patient-interaction-bar.component';
-import { SimulatedRegionOverviewVehiclesTabComponent } from './trainer-modal/tabs/vehicles-tab/simulated-region-overview-vehicles-tab.component';
+import { SimulatedRegionOverviewPatientInteractionBarComponent } from './trainer-modal/tabs/patients-tab/interaction-bar/simulated-region-overview-patient-interaction-bar.component';
+import { SimulatedRegionOverviewVehiclesTabComponent } from './trainer-modal/tabs/vehicles-tab/tab/simulated-region-overview-vehicles-tab.component';
 import { SimulatedRegionOverviewPatientsTableComponent } from './trainer-modal/patients-table/simulated-region-overview-patients-table.component';
 import { StartTransferService } from './trainer-modal/start-transfer.service';
 import { SimulatedRegionOverviewBehaviorTransferVehiclesComponent } from './trainer-modal/tabs/behavior-tab/behaviors/transfer-vehicles/simulated-region-overview-behavior-transfer-vehicles.component';
@@ -85,12 +87,16 @@ import { SignallerModalEocInformationAlarmGroupsSentComponent } from './signalle
 import { SignallerModalEocInformationArrivingVehiclesComponent } from './signaller-modal/details-modal/eoc-information/signaller-modal-eoc-information-arriving-vehicles/signaller-modal-eoc-information-arriving-vehicles.component';
 import { RadiogramCardContentVehicleOccupationsComponent } from './trainer-modal/radiogram-list/radiogram-card/radiogram-card-content-vehicle-occupations/radiogram-card-content-vehicle-occupations.component';
 import { SignallerModalTransportRequestTargetEditorComponent } from './signaller-modal/details-modal/signaller-modal-transport-request-target-editor/signaller-modal-transport-request-target-editor.component';
+import { SimulatedRegionOverviewVehicleDetailsComponent } from './trainer-modal/tabs/vehicles-tab/details/simulated-region-overview-vehicle-details.component';
+import { SimulatedRegionOverviewPatientDetailsComponent } from './trainer-modal/tabs/patients-tab/details/simulated-region-overview-patient-details.component';
 
 @NgModule({
     declarations: [
         SimulatedRegionOverviewGeneralComponent,
         SimulatedRegionOverviewBehaviorTabComponent,
         SimulatedRegionOverviewGeneralTabComponent,
+        SimulatedRegionPreviewComponent,
+        SimulatedRegionPreviewCardComponent,
         SimulatedRegionOverviewBehaviorTreatPatientsComponent,
         SimulatedRegionOverviewBehaviorAssignLeaderComponent,
         SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent,
@@ -121,6 +127,8 @@ import { SignallerModalTransportRequestTargetEditorComponent } from './signaller
         RequestVehiclesComponent,
         SimulatedRegionOverviewPatientInteractionBarComponent,
         SimulatedRegionOverviewVehiclesTabComponent,
+        SimulatedRegionOverviewVehicleDetailsComponent,
+        SimulatedRegionOverviewPatientDetailsComponent,
         SimulatedRegionOverviewPatientsTableComponent,
         SimulatedRegionOverviewBehaviorTransferVehiclesComponent,
         RadiogramCardContentTransferCountsComponent,

@@ -11,20 +11,13 @@
     </div>
     <div class="col overflow-hidden d-flex flex-column" style="max-width: 65%">
         @if (selectedPatientId) {
-            <app-patients-details
-                class="overflow-auto w-100 d-inline-block flex-grow-1"
+            <app-simulated-region-overview-patient-details
                 [patientId]="selectedPatientId"
             />
         } @else {
             <p class="text-muted">
                 Bitte wählen Sie einen Patienten links aus der Liste.
             </p>
-        }
-        @if (selectedPatientId) {
-            <app-simulated-region-overview-patient-interaction-bar
-                class="w-100 d-inline-block"
-                [patientId]="selectedPatientId"
-            />
         }
     </div>
 </div>

@@ -1,19 +1,22 @@
 import type { OnChanges } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Patient, UUID } from 'fuesim-digital-shared';
+import type { UUID } from 'fuesim-digital-shared';
+import { Patient } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { ExerciseService } from 'src/app/core/exercise.service';
 import type { AppState } from 'src/app/state/app.state';
 import { createSelectPatient } from 'src/app/state/application/selectors/exercise.selectors';
 
 @Component({
-    selector: 'app-patient-identifier',
-    templateUrl: './patient-identifier.component.html',
-    styleUrls: ['./patient-identifier.component.scss'],
+    selector: 'app-patient-header',
+    templateUrl: './patient-header.component.html',
+    styleUrls: ['./patient-header.component.scss'],
     standalone: false,
 })
-export class PatientIdentifierComponent implements OnChanges {
+export class PatientHeaderComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
 
     @Input() patientId!: UUID;
 

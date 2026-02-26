@@ -3,7 +3,7 @@ import type {
     ExerciseAction,
     ParticipantKey,
     TrainerKey,
-    ExerciseAccessKeys,
+    ExerciseKeys,
 } from 'fuesim-digital-shared';
 import {
     ExerciseState,
@@ -32,7 +32,7 @@ import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './active-exercise.js';
 
 export class ExerciseFactory {
-    public static createKeys(): ExerciseAccessKeys {
+    public static createKeys(): ExerciseKeys {
         const participantKey = UserReadableIdGenerator.generateId(
             6
         ) as ParticipantKey;

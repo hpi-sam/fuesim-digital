@@ -1,4 +1,4 @@
-import type { Immutable, JsonObject } from 'fuesim-digital-shared';
+import type { JsonObject } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type { Geometry, Point } from 'ol/geom';
 import VectorLayer from 'ol/layer/Vector';
@@ -6,6 +6,7 @@ import VectorSource from 'ol/source/Vector';
 import type { Observable, Subject } from 'rxjs';
 import { pairwise, startWith, takeUntil } from 'rxjs';
 import { handleChanges } from 'src/app/shared/functions/handle-changes';
+import type { Immutable } from 'immer';
 import { generateChangedProperties } from '../utility/generate-changed-properties';
 
 /**

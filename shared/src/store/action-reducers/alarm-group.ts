@@ -7,9 +7,10 @@ import {
     ValidateIf,
     ValidateNested,
 } from 'class-validator';
+import { WritableDraft } from 'immer';
 import { AlarmGroup } from '../../models/alarm-group.js';
 import { AlarmGroupVehicle } from '../../models/utils/alarm-group-vehicle.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
@@ -201,7 +202,7 @@ export namespace AlarmGroupActionReducers {
 }
 
 function getAlarmGroupVehicle(
-    alarmGroup: Mutable<AlarmGroup>,
+    alarmGroup: WritableDraft<AlarmGroup>,
     alarmGroupVehicleId: UUID
 ) {
     const alarmGroupVehicle =

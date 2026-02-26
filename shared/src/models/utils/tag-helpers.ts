@@ -4,6 +4,7 @@
  * and they should figure out the color and name for the tag by themselves.
  */
 
+import type { WritableDraft } from 'immer';
 import { behaviorTypeToGermanNameDictionary } from '../../simulation/behaviors/utils.js';
 import type { TreatmentProgress } from '../../simulation/utils/treatment.js';
 import { treatmentProgressToGermanNameDictionary } from '../../simulation/utils/treatment.js';
@@ -14,7 +15,6 @@ import {
     getExerciseRadiogramById,
 } from '../../store/action-reducers/utils/get-element.js';
 import type { UUID } from '../../utils/index.js';
-import type { Mutable } from '../../utils/immutability.js';
 import { Patient } from '../patient.js';
 import { radiogramTypeToGermanDictionary } from '../radiogram/exercise-radiogram.js';
 import type { ExerciseRadiogramStatus } from '../radiogram/status/exercise-radiogram-status.js';
@@ -32,7 +32,7 @@ import {
 } from './position/position-helpers.js';
 
 export function createPatientStatusTag(
-    _draftState: Mutable<ExerciseState>,
+    _draftState: WritableDraft<ExerciseState>,
     patientStatus: PatientStatus
 ): Tag {
     return new Tag(
@@ -47,7 +47,7 @@ export function createPatientStatusTag(
 }
 
 export function createPatientTag(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     patientId: UUID
 ): Tag {
     const patient = getElement(draftState, 'patient', patientId);
@@ -55,7 +55,7 @@ export function createPatientTag(
 }
 
 export function createTagsForSinglePatient(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     patientId: UUID
 ): Tag[] {
     const patient = getElement(draftState, 'patient', patientId);
@@ -81,7 +81,7 @@ export function createTagsForSinglePatient(
 }
 
 export function createRadiogramTypeTag(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     radiogramId: UUID
 ): Tag {
     const radiogram = getExerciseRadiogramById(draftState, radiogramId);
@@ -96,7 +96,7 @@ export function createRadiogramTypeTag(
 }
 
 export function createRadiogramActionTag(
-    _draftState: Mutable<ExerciseState>,
+    _draftState: WritableDraft<ExerciseState>,
     radiogramStatus:
         | ExerciseRadiogramStatus['type']
         | 'resourcesPromised'
@@ -120,7 +120,7 @@ export function createRadiogramActionTag(
 }
 
 export function createSimulatedRegionTag(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID
 ): Tag {
     const simulatedRegion = getElement(
@@ -136,7 +136,7 @@ export function createSimulatedRegionTag(
 }
 
 export function createSimulatedRegionTagWithName(
-    _draftState: Mutable<ExerciseState>,
+    _draftState: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
     name: string
 ): Tag {
@@ -150,7 +150,7 @@ export function createSimulatedRegionTagWithName(
 }
 
 export function createTransferPointTag(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     transferPointId: UUID
 ): Tag {
     const transferPoint = getElement(
@@ -168,7 +168,7 @@ export function createTransferPointTag(
 }
 
 export function createTreatmentProgressTag(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     treatmentProgress: TreatmentProgress
 ): Tag {
     return new Tag(
@@ -181,7 +181,7 @@ export function createTreatmentProgressTag(
 }
 
 export function createAlarmGroupTag(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     alarmGroupId: UUID
 ): Tag {
     const alarmGroup = getElement(draftState, 'alarmGroup', alarmGroupId);
@@ -195,7 +195,7 @@ export function createAlarmGroupTag(
 }
 
 export function createVehicleTag(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     vehicleId: UUID
 ): Tag {
     const vehicle = getElement(draftState, 'vehicle', vehicleId);
@@ -203,14 +203,14 @@ export function createVehicleTag(
 }
 
 export function createVehicleTypeTag(
-    _draftState: Mutable<ExerciseState>,
+    _draftState: WritableDraft<ExerciseState>,
     vehicleType: UUID
 ): Tag {
     return new Tag('Fahrzeugtyp', 'grey', 'white', vehicleType, vehicleType);
 }
 
 export function createOccupationTag(
-    _draftState: Mutable<ExerciseState>,
+    _draftState: WritableDraft<ExerciseState>,
     occupation: ExerciseOccupation
 ): Tag {
     return new Tag(
@@ -223,7 +223,7 @@ export function createOccupationTag(
 }
 
 export function createVehicleActionTag(
-    _draftState: Mutable<ExerciseState>,
+    _draftState: WritableDraft<ExerciseState>,
     vehicleAction: 'arrived' | 'departed' | 'loaded' | 'unloaded'
 ): Tag {
     let vehicleActionName;
@@ -251,7 +251,7 @@ export function createVehicleActionTag(
 }
 
 export function createHospitalTag(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     hospitalId: UUID
 ): Tag {
     const hospital = getElement(draftState, 'hospital', hospitalId);
@@ -265,7 +265,7 @@ export function createHospitalTag(
 }
 
 export function createBehaviorTag(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
     behaviorId: UUID
 ): Tag {
@@ -283,7 +283,7 @@ export function createBehaviorTag(
     );
 }
 export function createPersonnelTypeTag(
-    _draftState: Mutable<ExerciseState>,
+    _draftState: WritableDraft<ExerciseState>,
     personnel: Personnel | PersonnelTemplate
 ): Tag {
     return new Tag(

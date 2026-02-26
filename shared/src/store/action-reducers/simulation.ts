@@ -10,6 +10,7 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { WritableDraft } from 'immer';
 import type {
     ExerciseSimulationEvent,
     ReportableInformation,
@@ -32,7 +33,7 @@ import {
 import { StartCollectingInformationEvent } from '../../simulation/events/start-collecting.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import { nextUUID } from '../../simulation/utils/randomness.js';
-import type { Mutable, UUID, UUIDSet } from '../../utils/index.js';
+import type { UUID, UUIDSet } from '../../utils/index.js';
 import {
     uuidValidationOptions,
     cloneDeepMutable,
@@ -687,7 +688,7 @@ export namespace SimulationActionReducers {
                 const behaviorStates = simulatedRegion.behaviors;
                 const treatPatientsBehaviorState = behaviorStates.find(
                     (behaviorState) => behaviorState.id === behaviorStateId
-                ) as Mutable<TreatPatientsBehaviorState>;
+                ) as WritableDraft<TreatPatientsBehaviorState>;
 
                 if (unknown !== undefined) {
                     treatPatientsBehaviorState.intervals.unknown = unknown;
@@ -799,7 +800,9 @@ export namespace SimulationActionReducers {
                 );
                 const behaviorState = simulatedRegion.behaviors.find(
                     (behavior) => behavior.id === behaviorId
-                ) as Mutable<UnloadArrivingVehiclesBehaviorState> | undefined;
+                ) as
+                    | WritableDraft<UnloadArrivingVehiclesBehaviorState>
+                    | undefined;
 
                 if (behaviorState) {
                     behaviorState.unloadDelay = unloadDelay;

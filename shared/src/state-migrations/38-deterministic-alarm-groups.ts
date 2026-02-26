@@ -1,8 +1,9 @@
+import type { WritableDraft } from 'immer';
 import { nextUUID } from '../simulation/utils/randomness.js';
 import type { ExerciseState } from '../state.js';
 import { getElement } from '../store/action-reducers/utils/index.js';
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
-import type { Mutable, UUID } from '../utils/index.js';
+import type { UUID } from '../utils/index.js';
 import { uuid } from '../utils/index.js';
 import type { VehicleTemplate } from '../models/index.js';
 import type { Migration } from './migration-functions.js';
@@ -285,7 +286,9 @@ export const deterministicAlarmGroups38: Migration = {
                 const vehicleIds = Object.fromEntries(
                     alarmGroupVehicles.map((alarmGroupVehicle) => [
                         alarmGroupVehicle.id,
-                        nextUUID(intermediaryState as Mutable<ExerciseState>),
+                        nextUUID(
+                            intermediaryState as WritableDraft<ExerciseState>
+                        ),
                     ])
                 );
 

@@ -1,9 +1,10 @@
 import { Type } from 'class-transformer';
 import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { WritableDraft } from 'immer';
 import { MapImageTemplate, imagePropertiesSchema } from '../../models/index.js';
 import type { ImageProperties } from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
@@ -83,9 +84,9 @@ export namespace MapImageTemplatesActionReducers {
 }
 
 function getMapImageTemplate(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     id: UUID
-): Mutable<MapImageTemplate> {
+): WritableDraft<MapImageTemplate> {
     const mapImageTemplate = state.mapImageTemplates[id];
     if (!mapImageTemplate) {
         throw new ReducerError(`MapImageTemplate with id ${id} does not exist`);

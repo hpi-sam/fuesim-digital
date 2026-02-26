@@ -7,7 +7,8 @@ import {
     Min,
     ValidateNested,
 } from 'class-validator';
-import type { Mutable, UUID } from '../utils/index.js';
+import type { WritableDraft } from 'immer';
+import type { UUID } from '../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../utils/index.js';
 import { IsIdMap, IsLiteralUnion, IsValue } from '../utils/validators/index.js';
 import { IsZodSchema } from '../utils/validators/is-zod-object.js';
@@ -152,7 +153,7 @@ export class HospitalPatient {
      * @returns a Mutable\<HospitalPatient\>
      */
     static createFromPatient(
-        patient: Mutable<Patient>,
+        patient: WritableDraft<Patient>,
         vehicleType: string,
         startTime: number,
         arrivalTime: number

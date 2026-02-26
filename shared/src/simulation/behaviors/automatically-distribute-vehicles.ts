@@ -1,7 +1,8 @@
 import { IsInt, IsOptional, IsUUID, Min } from 'class-validator';
 import { cloneDeep } from 'lodash-es';
+import type { WritableDraft } from 'immer';
 import { getCreate } from '../../models/utils/get-create.js';
-import type { Mutable, UUID, UUIDSet } from '../../utils/index.js';
+import type { UUID, UUIDSet } from '../../utils/index.js';
 import { cloneDeepMutable, uuid } from '../../utils/index.js';
 import {
     IsUUIDSet,
@@ -249,7 +250,7 @@ export const automaticallyDistributeVehiclesBehavior: SimulationBehavior<Automat
     };
 
 function distributionLimitOfVehicleTypeReached(
-    behaviorState: Mutable<AutomaticallyDistributeVehiclesBehaviorState>,
+    behaviorState: WritableDraft<AutomaticallyDistributeVehiclesBehaviorState>,
     vehicleType: string
 ) {
     return (
@@ -259,7 +260,7 @@ function distributionLimitOfVehicleTypeReached(
 }
 
 function numberOfDifferentVehiclesNeeded(
-    behaviorState: Mutable<AutomaticallyDistributeVehiclesBehaviorState>,
+    behaviorState: WritableDraft<AutomaticallyDistributeVehiclesBehaviorState>,
     regionId: string
 ) {
     return Object.values(behaviorState.remainingInNeed).reduce(

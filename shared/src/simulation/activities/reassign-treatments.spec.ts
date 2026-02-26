@@ -1,4 +1,4 @@
-import { produce } from 'immer';
+import { produce, type WritableDraft } from 'immer';
 import {
     SimulatedRegion,
     newSimulatedRegionPositionIn,
@@ -8,7 +8,7 @@ import {
 } from '../../models/index.js';
 import type { PatientStatus } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuid } from '../../utils/index.js';
 import { AssignLeaderBehaviorState } from '../behaviors/index.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
@@ -20,12 +20,13 @@ import { addMaterial } from '../../../tests/utils/materials.spec.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { newPersonnelFromTemplate } from '../../models/personnel.js';
 import { newCanCaterFor } from '../../models/utils/cater-for.js';
+import type { ParticipantKey } from '../../exercise-keys.js';
 import {
     reassignTreatmentsActivity,
     ReassignTreatmentsActivityState,
 } from './reassign-treatments.js';
 
-const emptyState = ExerciseState.create('123456');
+const emptyState = ExerciseState.create('123456' as ParticipantKey);
 
 /**
  * TODO: Update comment and rename function
@@ -37,7 +38,7 @@ function setupStateAndApplyTreatments(
     activityState: ReassignTreatmentsActivityState,
     leaderId?: UUID,
     mutateBeforeState?: (
-        state: Mutable<ExerciseState>,
+        state: WritableDraft<ExerciseState>,
         simulatedRegion: SimulatedRegion
     ) => void
 ) {
@@ -66,7 +67,7 @@ function setupStateAndApplyTreatments(
         if (leaderId) {
             (
                 draftState.simulatedRegions[simulatedRegion.id]
-                    ?.behaviors[0] as Mutable<AssignLeaderBehaviorState>
+                    ?.behaviors[0] as WritableDraft<AssignLeaderBehaviorState>
             ).leaderId = leaderId;
         }
 
@@ -1328,7 +1329,7 @@ describe('reassign treatment', () => {
 
     describe('in triaged state', () => {
         function setupPatientsAndPersonnel(
-            draftState: Mutable<ExerciseState>,
+            draftState: WritableDraft<ExerciseState>,
             simulatedRegion: SimulatedRegion,
             patients: readonly {
                 readonly state: PatientStatus;

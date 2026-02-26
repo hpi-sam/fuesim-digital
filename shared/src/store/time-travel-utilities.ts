@@ -1,6 +1,6 @@
+import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
 import type { ExerciseState } from '../state.js';
-import type { Mutable } from '../utils/index.js';
 import { sleep } from '../utils/index.js';
 import type { ExerciseAction } from './action-reducers/index.js';
 import { applyAction } from './reduce-exercise-state.js';
@@ -11,7 +11,7 @@ import { applyAction } from './reduce-exercise-state.js';
  * This function is asynchronous to not block the main thread. You should therefore always await it, if you want to make use of side-effects from {@link callback}.
  */
 export async function loopTroughTime(
-    currentState: Mutable<ExerciseState>,
+    currentState: WritableDraft<ExerciseState>,
     actions: readonly ExerciseAction[],
     callback: (stateAtTime: ExerciseState) => boolean
 ) {

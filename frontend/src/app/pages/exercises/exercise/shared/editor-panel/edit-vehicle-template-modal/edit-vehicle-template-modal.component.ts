@@ -4,7 +4,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
     UUID,
-    Mutable,
     VehicleTemplate,
     MaterialTemplate,
     PersonnelTemplate,
@@ -19,6 +18,7 @@ import {
 } from 'src/app/state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
+import { WritableDraft } from 'immer';
 import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehicle-template-form.component';
 
 @Component({
@@ -38,9 +38,9 @@ export class EditVehicleTemplateModalComponent implements OnInit {
     // This is set after the modal creation and therefore accessible in ngOnInit
     public vehicleTemplateId!: UUID;
 
-    public vehicleTemplate?: Mutable<VehicleTemplate>;
-    public materialTemplates?: Mutable<MaterialTemplate[]> = [];
-    public personnelTemplates?: Mutable<PersonnelTemplate[]> = [];
+    public vehicleTemplate?: WritableDraft<VehicleTemplate>;
+    public materialTemplates?: WritableDraft<MaterialTemplate[]> = [];
+    public personnelTemplates?: WritableDraft<PersonnelTemplate[]> = [];
 
     ngOnInit(): void {
         this.vehicleTemplate = cloneDeepMutable(

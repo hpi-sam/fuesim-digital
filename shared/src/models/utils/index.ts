@@ -22,7 +22,6 @@ export * from './tile-map-properties.js';
 export * from './biometric-information.js';
 export * from './health-points.js';
 export * from './get-create.js';
-export * from './immutable-date.js';
 export { AlarmGroupVehicle } from './alarm-group-vehicle.js';
 export * from './patient-status-code.js';
 export * from './start-points.js';

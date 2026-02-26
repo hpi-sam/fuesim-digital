@@ -1,3 +1,4 @@
+import type { WritableDraft } from 'immer';
 import type { SimulatedRegion, Vehicle } from '../../models/index.js';
 import {
     newSimulatedRegionPositionIn,
@@ -9,7 +10,6 @@ import { changePositionWithId } from '../../models/utils/position/position-helpe
 import type { ExerciseState } from '../../state.js';
 import { getElement } from '../../store/action-reducers/utils/index.js';
 import { logVehicle } from '../../store/action-reducers/utils/log.js';
-import type { Mutable } from '../../utils/index.js';
 import {
     NewPatientEvent,
     MaterialAvailableEvent,
@@ -18,9 +18,9 @@ import {
 import { sendSimulationEvent } from '../events/utils.js';
 
 export function unloadVehicle(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    vehicle: Mutable<Vehicle>
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    vehicle: WritableDraft<Vehicle>
 ) {
     if (!isInSpecificSimulatedRegion(vehicle, simulatedRegion.id)) {
         console.error(

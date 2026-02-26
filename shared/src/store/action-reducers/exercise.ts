@@ -6,6 +6,7 @@ import {
     IsInt,
     IsPositive,
 } from 'class-validator';
+import { WritableDraft } from 'immer';
 import {
     newTransferPositionFor,
     Personnel,
@@ -22,7 +23,7 @@ import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import { simulateAllRegions } from '../../simulation/utils/simulation.js';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, StrictObject, uuid } from '../../utils/index.js';
 import type { ElementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
@@ -224,31 +225,37 @@ type TransferTypePluralMap = Pick<
 >;
 
 function refreshTransfer(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     type: keyof TransferTypePluralMap,
     tickInterval: number
 ): void {
     const elements = draftState[elementTypePluralMap[type]];
-    Object.values(elements).forEach((element: Mutable<Personnel | Vehicle>) => {
-        if (!isInTransfer(element)) {
-            return;
+    Object.values(elements).forEach(
+        (element: WritableDraft<Personnel | Vehicle>) => {
+            if (!isInTransfer(element)) {
+                return;
+            }
+            if (currentTransferOf(element).isPaused) {
+                const newTransfer = cloneDeepMutable(
+                    currentTransferOf(element)
+                );
+                newTransfer.endTimeStamp += tickInterval;
+                changePosition(
+                    element,
+                    newTransferPositionFor(newTransfer),
+                    draftState
+                );
+                return;
+            }
+            // Not transferred yet
+            if (
+                currentTransferOf(element).endTimeStamp > draftState.currentTime
+            ) {
+                return;
+            }
+            letElementArrive(draftState, type, element.id);
         }
-        if (currentTransferOf(element).isPaused) {
-            const newTransfer = cloneDeepMutable(currentTransferOf(element));
-            newTransfer.endTimeStamp += tickInterval;
-            changePosition(
-                element,
-                newTransferPositionFor(newTransfer),
-                draftState
-            );
-            return;
-        }
-        // Not transferred yet
-        if (currentTransferOf(element).endTimeStamp > draftState.currentTime) {
-            return;
-        }
-        letElementArrive(draftState, type, element.id);
-    });
+    );
 }
 
 /**
@@ -287,7 +294,7 @@ export interface TreatmentAssignment {
 }
 
 function calculateTreatmentAssignment(
-    draftState: Mutable<ExerciseState>
+    draftState: WritableDraft<ExerciseState>
 ): TreatmentAssignment {
     const treatmentAssignment = StrictObject.fromEntries(
         Object.keys(draftState.patients).map((patientId) => [
@@ -317,7 +324,7 @@ function calculateTreatmentAssignment(
 }
 
 function evaluateTreatmentReassignment(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     newTreatmentAssignment: TreatmentAssignment
 ) {
     if (!draftState.previousTreatmentAssignment) return;

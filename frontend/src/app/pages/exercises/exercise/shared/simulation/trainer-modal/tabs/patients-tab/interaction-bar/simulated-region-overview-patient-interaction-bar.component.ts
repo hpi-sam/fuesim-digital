@@ -1,6 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
-import type { Mutable, UUIDSet, UUID } from 'fuesim-digital-shared';
+import type { UUIDSet, UUID } from 'fuesim-digital-shared';
 import { ExerciseService } from 'src/app/core/exercise.service';
+import { WritableDraft } from 'immer';
 import { SelectPatientService } from '../../../select-patient.service';
 import { StartTransferService } from '../../../start-transfer.service';
 
@@ -37,7 +38,7 @@ export class SimulatedRegionOverviewPatientInteractionBarComponent {
     }
 
     public initiatePatientTransfer() {
-        const patientsToTransfer: Mutable<UUIDSet> = {
+        const patientsToTransfer: WritableDraft<UUIDSet> = {
             [this.patientId]: true,
         };
         this.startTransferService.initiateNewTransferFor({

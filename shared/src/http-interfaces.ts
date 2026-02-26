@@ -5,7 +5,7 @@ export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
     trainerKey: trainerKeySchema,
 });
-export type ExerciseAccessKeys = z.infer<typeof exerciseKeysSchema>;
+export type ExerciseKeys = z.infer<typeof exerciseKeysSchema>;
 
 export const userDataResponseSchema = z.object({
     user: z

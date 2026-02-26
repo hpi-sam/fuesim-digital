@@ -5,7 +5,6 @@ import {
     newMapPositionAt,
 } from '../../../models/index.js';
 import { ExerciseState } from '../../../state.js';
-import type { Mutable } from '../../../utils/index.js';
 import { uuid } from '../../../utils/index.js';
 import { addMaterial } from '../../../../tests/utils/materials.spec.js';
 import { addPatient } from '../../../../tests/utils/patients.spec.js';
@@ -14,9 +13,10 @@ import { assertCatering } from '../../../../tests/utils/catering.spec.js';
 import { defaultPersonnelTemplates } from '../../../data/default-state/personnel-templates.js';
 import { newCanCaterFor } from '../../../models/utils/cater-for.js';
 import { newPersonnelFromTemplate } from '../../../models/personnel.js';
+import type { ParticipantKey } from '../../../exercise-keys.js';
 import { updateTreatments } from './calculate-treatments.js';
 
-const emptyState = ExerciseState.create('123456');
+const emptyState = ExerciseState.create('123456' as ParticipantKey);
 
 function createNotSan(position: Position) {
     const template = defaultPersonnelTemplates.notSan;
@@ -42,7 +42,7 @@ function createNotSan(position: Position) {
  * @returns The state before and after calling `calculateTreatments`
  */
 function setupStateAndApplyTreatments(
-    mutateBeforeState?: (state: Mutable<ExerciseState>) => void
+    mutateBeforeState?: (state: WritableDraft<ExerciseState>) => void
 ) {
     const beforeState = produce(emptyState, (draftState) => {
         mutateBeforeState?.(draftState);

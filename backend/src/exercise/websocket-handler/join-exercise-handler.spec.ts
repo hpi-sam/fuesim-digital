@@ -1,8 +1,15 @@
 import assert from 'node:assert';
 import { jest } from '@jest/globals';
+import type { GetExerciseTemplateResponseData } from 'fuesim-digital-shared';
 import { generateDummyPatient, sleep } from 'fuesim-digital-shared';
 import { ActiveExercise } from '../active-exercise.js';
-import { createExercise, createTestEnvironment } from '../../test/utils.js';
+import {
+    alternativeTestUserSessionData,
+    createExercise,
+    createExerciseTemplate,
+    createTestEnvironment,
+    createTestUserSession,
+} from '../../test/utils.js';
 
 describe('join exercise', () => {
     const environment = createTestEnvironment();
@@ -45,6 +52,87 @@ describe('join exercise', () => {
             const join = await socket.emit('joinExercise', id, 'Test Client');
 
             expect(join.success).toBe(false);
+        });
+    });
+
+    describe('exercise template', () => {
+        let exerciseTemplate: GetExerciseTemplateResponseData;
+        let session: string;
+        beforeEach(async () => {
+            session = await createTestUserSession(environment);
+            exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session
+            );
+        });
+        it('fails joining with trainer key if not logged in', async () => {
+            await environment.withWebsocket(async (socket) => {
+                const join = await socket.emit(
+                    'joinExercise',
+                    exerciseTemplate.trainerId,
+                    'Test Client'
+                );
+
+                expect(join.success).toBe(false);
+            });
+        });
+
+        it('succeeds joining with trainer key if logged in', async () => {
+            await environment.withWebsocket(async (socket) => {
+                console.log('I ARRRIVE');
+                const join = await socket.emit(
+                    'joinExercise',
+                    exerciseTemplate.trainerId,
+                    'Test Client'
+                );
+
+                expect(join.success).toBe(true);
+            }, session);
+        });
+
+        it('fails joining with trainer key if logged in with wrong user', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            await environment.withWebsocket(async (socket) => {
+                console.log('I ARRIVE HERE', socket);
+                const join = await socket.emit(
+                    'joinExercise',
+                    exerciseTemplate.trainerId,
+                    'Test Client'
+                );
+
+                expect(join.success).toBe(false);
+            }, session2);
+        });
+
+        it('fails joining with participant key if not logged in', async () => {
+            const exercise = environment.exerciseService
+                .TESTING_getExerciseMap()
+                .get(exerciseTemplate.trainerId)!;
+            await environment.withWebsocket(async (socket) => {
+                const join = await socket.emit(
+                    'joinExercise',
+                    exercise.participantKey,
+                    'Test Client'
+                );
+
+                expect(join.success).toBe(false);
+            });
+        });
+        it('fails joining with participant key if logged in', async () => {
+            const exercise = environment.exerciseService
+                .TESTING_getExerciseMap()
+                .get(exerciseTemplate.trainerId)!;
+            await environment.withWebsocket(async (socket) => {
+                const join = await socket.emit(
+                    'joinExercise',
+                    exercise.participantKey,
+                    'Test Client'
+                );
+
+                expect(join.success).toBe(false);
+            }, session);
         });
     });
 

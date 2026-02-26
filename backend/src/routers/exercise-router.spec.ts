@@ -8,11 +8,11 @@ import type {
 } from 'fuesim-digital-shared';
 import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
 import {
+    alternativeTestUserSessionData,
     createExerciseTemplate,
     createTestUserSession,
     createExercise,
     createTestEnvironment,
-    alternativeTestUserSessionData,
 } from '../test/utils.js';
 
 describe('exercise router', () => {

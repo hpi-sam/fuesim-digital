@@ -171,12 +171,20 @@ export class TestEnvironment {
      * @param closure a function that gets a connected websocket client as its argument and should resolve after all operations are finished
      */
     public async withWebsocket(
-        closure: (websocketClient: WebsocketClient) => Promise<any>
+        closure: (websocketClient: WebsocketClient) => Promise<any>,
+        session?: string
     ): Promise<void> {
         let clientSocket: ExerciseClientSocket | undefined;
         try {
             clientSocket = io(`ws://127.0.0.1:${Config.websocketPort}`, {
                 ...socketIoTransports,
+                ...(session
+                    ? {
+                          extraHeaders: {
+                              Cookie: `${this.authService.SESSION_COOKIE_NAME}=${session}`,
+                          },
+                      }
+                    : {}),
             });
             const websocketClient = new WebsocketClient(clientSocket);
             await closure(websocketClient);

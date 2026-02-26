@@ -8,7 +8,7 @@
         Einstellungen
     </button>
 
-    @if (exerciseService.additionalExerciseMeta()?.exerciseTemplate) {
+    @if (isTemplate$ | async) {
         <button
             (click)="openAlarmGroupOverview()"
             class="btn btn-outline-primary ms-3"
@@ -54,7 +54,7 @@
         </div>
     }
 
-    @if (!exerciseService.additionalExerciseMeta()?.exerciseTemplate) {
+    @if ((isTemplate$ | async) === false) {
         <div ngbDropdown placement="top-start" class="d-inline-block">
             <button
                 type="button"

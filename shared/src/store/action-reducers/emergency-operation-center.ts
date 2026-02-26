@@ -87,6 +87,7 @@ export namespace EmergencyOperationCenterActionReducers {
             }
             return 'eoc';
         },
+        forbidInTemplates: true,
     };
     export const sendAlarmGroup: ActionReducer<SendAlarmGroupAction> = {
         action: SendAlarmGroupAction,
@@ -173,6 +174,7 @@ export namespace EmergencyOperationCenterActionReducers {
             return draftState;
         },
         rights: 'eoc',
+        forbidInTemplates: true,
     };
 }
 

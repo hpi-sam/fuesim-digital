@@ -3,6 +3,7 @@ import * as z from 'zod';
 import {
     Equals,
     IsArray,
+    IsBoolean,
     IsInt,
     IsObject,
     IsString,
@@ -84,6 +85,10 @@ export class ExerciseState {
     public readonly currentTime: number = 0;
     @IsLiteralUnion(exerciseStatusAllowedValues)
     public readonly currentStatus: ExerciseStatus = 'notStarted';
+
+    // If this exercise is a template, this is true. Starting the exercise won't be possible then.
+    @IsBoolean()
+    public readonly isTemplate: boolean = false;
 
     @Type(() => RandomState)
     @ValidateNested()
@@ -201,5 +206,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 46;
+    static readonly currentStateVersion = 47;
 }

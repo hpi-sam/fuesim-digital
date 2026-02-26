@@ -39,7 +39,7 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new ApiError();
         }
-        const newExercise = ExerciseFactory.fromBlank();
+        const newExercise = ExerciseFactory.fromBlankTemplate();
         await exerciseService.createTemplate(newExercise, exerciseTemplate);
         return {
             ...exerciseTemplate,

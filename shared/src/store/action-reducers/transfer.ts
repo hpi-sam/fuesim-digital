@@ -241,6 +241,7 @@ export namespace TransferActionReducers {
             return draftState;
         },
         rights: 'participant',
+        forbidInTemplates: true,
     };
 
     export const editTransfer: ActionReducer<EditTransferAction> = {
@@ -285,6 +286,7 @@ export namespace TransferActionReducers {
             return draftState;
         },
         rights: 'trainer',
+        forbidInTemplates: true,
     };
 
     export const finishTransfer: ActionReducer<FinishTransferAction> = {
@@ -309,6 +311,7 @@ export namespace TransferActionReducers {
             return draftState;
         },
         rights: 'trainer',
+        forbidInTemplates: true,
     };
 
     export const togglePauseTransfer: ActionReducer<TogglePauseTransferAction> =
@@ -338,6 +341,7 @@ export namespace TransferActionReducers {
                 return draftState;
             },
             rights: 'trainer',
+            forbidInTemplates: true,
         };
 }
 

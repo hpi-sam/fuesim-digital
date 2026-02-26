@@ -19,6 +19,11 @@ export function validatePermissions(
     state: ExerciseState
 ) {
     const reducer = exerciseActionTypeDictionary[action.type];
+
+    if (state.isTemplate && reducer.forbidInTemplates) {
+        return false;
+    }
+
     let rights = reducer.rights as ReducerRights<
         InstanceType<typeof reducer.action>
     >;

@@ -170,7 +170,7 @@ export class ParallelExerciseService {
             return parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,
                 trainerKey: exercise.trainerKey,
-                clientName: Object.values(state.clients)[0]?.name ?? '',
+                clientNames: state.clientNames,
                 currentTime: state.currentTime,
                 currentStatus: state.currentStatus,
             });

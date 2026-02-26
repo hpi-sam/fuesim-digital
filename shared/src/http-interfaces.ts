@@ -170,7 +170,7 @@ export const postJoinParallelExerciseResponseDataSchema = z.object({
 export const parallelExerciseInstanceSummarySchema = z.object({
     participantKey: participantKeySchema,
     trainerKey: trainerKeySchema,
-    clientName: z.string(),
+    clientNames: z.array(z.string()),
     currentTime: z.number(),
     currentStatus: exerciseStatusSchema,
 });

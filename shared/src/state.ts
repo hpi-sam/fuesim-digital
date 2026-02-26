@@ -154,6 +154,9 @@ export class ExerciseState {
     @IsZodSchema(z.record(uuidSchema, clientSchema))
     public readonly clients: { readonly [key: UUID]: Client } = {};
 
+    @IsZodSchema(z.array(z.string()))
+    public readonly clientNames: string[] = [];
+
     @IsMultiTypedIdMap(getRadiogramConstructor)
     @ValidateNested()
     public readonly radiograms: { readonly [key: UUID]: ExerciseRadiogram } =

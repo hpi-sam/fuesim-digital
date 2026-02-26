@@ -3,7 +3,7 @@
         <code class="me-2">{{ exerciseInstance.participantKey }}</code>
         <app-copy-button [value]="participantUrl()" />
     </td>
-    <td>{{ exerciseInstance.clientName }}</td>
+    <td>{{ exerciseInstance.clientNames.join(', ') }}</td>
     <td>
         <a
             [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"

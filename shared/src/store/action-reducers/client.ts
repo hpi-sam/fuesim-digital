@@ -59,6 +59,7 @@ export namespace ClientActionReducers {
         action: AddClientAction,
         reducer: (draftState, { client }) => {
             const clientMutable = cloneDeepMutable(client);
+            clientMutable.name = clientMutable.name.trim();
             if (
                 draftState.autojoinViewportId &&
                 draftState.autojoinViewportId in draftState.viewports
@@ -68,6 +69,12 @@ export namespace ClientActionReducers {
                 clientMutable.isInWaitingRoom = false;
             }
             draftState.clients[client.id] = clientMutable;
+            if (
+                clientMutable.name &&
+                !draftState.clientNames.includes(clientMutable.name)
+            ) {
+                draftState.clientNames.push(clientMutable.name);
+            }
             return draftState;
         },
         rights: 'server',

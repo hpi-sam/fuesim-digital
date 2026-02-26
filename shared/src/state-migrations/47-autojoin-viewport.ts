@@ -4,5 +4,6 @@ export const addAutojoinViewport47: Migration = {
     action: null,
     state: (state: any) => {
         state.autojoinViewportId = null;
+        state.clientNames = [];
     },
 };

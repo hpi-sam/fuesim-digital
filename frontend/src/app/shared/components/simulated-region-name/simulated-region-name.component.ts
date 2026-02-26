@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -16,13 +16,13 @@ import { createSelectSimulatedRegion } from '../../../state/application/selector
 export class SimulatedRegionNameComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() simulatedRegionId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
 
     name$!: Observable<string>;
 
     ngOnInit(): void {
         this.name$ = this.store
-            .select(createSelectSimulatedRegion(this.simulatedRegionId))
+            .select(createSelectSimulatedRegion(this.simulatedRegionId()))
             .pipe(map((simulatedRegion) => simulatedRegion.name));
     }
 }

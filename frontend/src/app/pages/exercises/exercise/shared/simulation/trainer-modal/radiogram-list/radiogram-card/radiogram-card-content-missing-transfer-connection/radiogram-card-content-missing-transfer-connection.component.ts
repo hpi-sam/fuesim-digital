@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     MissingTransferConnectionRadiogram,
@@ -27,14 +27,14 @@ export class RadigoramCardContentMissingTransferConnectionComponent
 {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() radiogramId!: UUID;
+    readonly radiogramId = input.required<UUID>();
 
     transferPointName$!: Observable<string>;
 
     ngOnInit(): void {
         const radiogram$ = this.store.select(
             createSelectRadiogram<MissingTransferConnectionRadiogram>(
-                this.radiogramId
+                this.radiogramId()
             )
         );
 

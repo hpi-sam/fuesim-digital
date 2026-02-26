@@ -1,10 +1,10 @@
 import type { OnChanges } from '@angular/core';
 import {
     Component,
-    Input,
     TemplateRef,
-    ViewChild,
     inject,
+    input,
+    viewChild,
 } from '@angular/core';
 import type {
     ExerciseSimulationBehaviorType,
@@ -31,21 +31,26 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly detailsModal = inject(SignallerModalDetailsService);
 
-    @Input()
-    simulatedRegionId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
 
-    @ViewChild('transferConnectionsEditor')
-    transferConnectionsEditor!: TemplateRef<any>;
-    @ViewChild('transferTraysEditor')
-    transferTraysEditor!: TemplateRef<any>;
-    @ViewChild('transportOfCategoryEditor')
-    transportOfCategoryEditor!: TemplateRef<any>;
-    @ViewChild('provideVehiclesEditor')
-    provideVehiclesEditor!: TemplateRef<any>;
-    @ViewChild('requestTargetEditor')
-    requestTargetEditor!: TemplateRef<any>;
-    @ViewChild('transportRequestTargetEditor')
-    transportRequestTargetEditor!: TemplateRef<any>;
+    readonly transferConnectionsEditor = viewChild.required<TemplateRef<any>>(
+        'transferConnectionsEditor'
+    );
+    readonly transferTraysEditor = viewChild.required<TemplateRef<any>>(
+        'transferTraysEditor'
+    );
+    readonly transportOfCategoryEditor = viewChild.required<TemplateRef<any>>(
+        'transportOfCategoryEditor'
+    );
+    readonly provideVehiclesEditor = viewChild.required<TemplateRef<any>>(
+        'provideVehiclesEditor'
+    );
+    readonly requestTargetEditor = viewChild.required<TemplateRef<any>>(
+        'requestTargetEditor'
+    );
+    readonly transportRequestTargetEditor = viewChild.required<
+        TemplateRef<any>
+    >('transportRequestTargetEditor');
 
     ownTransferPointId$!: Observable<UUID>;
     manageTransportBehaviorId$!: Observable<UUID | null>;
@@ -197,7 +202,7 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
                     Object.values(transferPoints).find((transferPoint) =>
                         isInSpecificSimulatedRegion(
                             transferPoint,
-                            this.simulatedRegionId
+                            this.simulatedRegionId()
                         )
                     )!.id
             )
@@ -216,7 +221,7 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
     selectBehaviorId(type: ExerciseSimulationBehaviorType) {
         return this.store
             .select(
-                createSelectBehaviorStatesByType(this.simulatedRegionId, type)
+                createSelectBehaviorStatesByType(this.simulatedRegionId(), type)
             )
             .pipe(map((behaviorStates) => behaviorStates[0]?.id ?? null));
     }
@@ -224,42 +229,42 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
     editTransferConnections() {
         this.detailsModal.open(
             'Transferverbindungen bearbeiten',
-            this.transferConnectionsEditor
+            this.transferConnectionsEditor()
         );
     }
 
     editTransferPatientTrays() {
         this.detailsModal.open(
             'PAs für Abtransport festlegen',
-            this.transferTraysEditor
+            this.transferTraysEditor()
         );
     }
 
     startTransportOfCategory() {
         this.detailsModal.open(
             'Abtransport starten/stoppen/ändern',
-            this.transportOfCategoryEditor
+            this.transportOfCategoryEditor()
         );
     }
 
     provideVehicles() {
         this.detailsModal.open(
             'Fahrzeuge bereitstellen',
-            this.provideVehiclesEditor
+            this.provideVehiclesEditor()
         );
     }
 
     setRequestTarget() {
         this.detailsModal.open(
             'Ziel für Fahrzeuganfragen (PA/B-Raum)',
-            this.requestTargetEditor
+            this.requestTargetEditor()
         );
     }
 
     setTransportRequestTarget() {
         this.detailsModal.open(
             'Ziel für Fahrzeuganfragen (Transport)',
-            this.transportRequestTargetEditor
+            this.transportRequestTargetEditor()
         );
     }
 }

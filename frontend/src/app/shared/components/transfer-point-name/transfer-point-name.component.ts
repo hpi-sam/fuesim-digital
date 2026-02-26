@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -15,13 +15,13 @@ import { createSelectTransferPoint } from '../../../state/application/selectors/
 export class TransferPointNameComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() transferPointId!: UUID;
+    readonly transferPointId = input.required<UUID>();
 
     public transferPoint$?: Observable<TransferPoint>;
 
     ngOnChanges() {
         this.transferPoint$ = this.store.select(
-            createSelectTransferPoint(this.transferPointId)
+            createSelectTransferPoint(this.transferPointId())
         );
     }
 }

@@ -5,14 +5,14 @@
     >
         <app-simulated-region-overview-patients-table
             [patients]="(patients$ | async) ?? []"
-            [selectedPatientId]="selectedPatientId"
+            [selectedPatientId]="selectedPatientId()"
             scope="simulatedRegion"
         />
     </div>
     <div class="col overflow-hidden d-flex flex-column" style="max-width: 65%">
-        @if (selectedPatientId) {
+        @if (selectedPatientId(); as patientId) {
             <app-simulated-region-overview-patient-details
-                [patientId]="selectedPatientId"
+                [patientId]="patientId"
             />
         } @else {
             <p class="text-muted">

@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -15,12 +15,13 @@ import { createSelectVehicle } from '../../../state/application/selectors/exerci
 export class VehicleAvailableSlotsDisplayComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input()
-    vehicleId!: UUID;
+    readonly vehicleId = input.required<UUID>();
 
     vehicle$!: Observable<Vehicle>;
 
     ngOnChanges(): void {
-        this.vehicle$ = this.store.select(createSelectVehicle(this.vehicleId));
+        this.vehicle$ = this.store.select(
+            createSelectVehicle(this.vehicleId())
+        );
     }
 }

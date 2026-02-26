@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Personnel, Vehicle } from 'fuesim-digital-shared';
 import {
@@ -30,10 +30,9 @@ export class SimulatedRegionOverviewVehicleDetailsComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     readonly startTransferService = inject(StartTransferService);
 
-    @Input()
-    simulatedRegion!: SimulatedRegion;
+    readonly simulatedRegion = input.required<SimulatedRegion>();
 
-    vehicle = input<Vehicle>();
+    readonly vehicle = input<Vehicle>();
 
     selection$!: Observable<{
         vehicle: Vehicle;
@@ -92,7 +91,7 @@ export class SimulatedRegionOverviewVehicleDetailsComponent implements OnInit {
         this.exerciseService.proposeAction({
             type: '[Vehicle] Remove from simulated region',
             vehicleId: this.vehicle()!.id,
-            simulatedRegionId: this.simulatedRegion.id,
+            simulatedRegionId: this.simulatedRegion().id,
         });
     }
 

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { PatientStatusCode } from 'fuesim-digital-shared';
 
 @Component({
@@ -8,5 +8,5 @@ import { PatientStatusCode } from 'fuesim-digital-shared';
     standalone: false,
 })
 export class PatientStatusDisplayComponent {
-    @Input() patientStatus!: PatientStatusCode;
+    readonly patientStatus = input.required<PatientStatusCode>();
 }

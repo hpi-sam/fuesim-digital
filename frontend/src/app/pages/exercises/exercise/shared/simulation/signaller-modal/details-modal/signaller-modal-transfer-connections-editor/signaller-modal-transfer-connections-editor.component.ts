@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { TransferPoint } from 'fuesim-digital-shared';
@@ -35,7 +35,7 @@ export class SignallerModalTransferConnectionsEditorComponent
     private readonly hotkeysService = inject(HotkeysService);
     private readonly messageService = inject(MessageService);
 
-    @Input() transferPointId!: UUID;
+    readonly transferPointId = input.required<UUID>();
 
     private hotkeyLayer!: HotkeyLayer;
     submitHotkey = new Hotkey('Enter', false, () => this.addConnection());
@@ -53,7 +53,7 @@ export class SignallerModalTransferConnectionsEditorComponent
 
     ngOnChanges() {
         const transferPoint$ = this.store.select(
-            createSelectTransferPoint(this.transferPointId)
+            createSelectTransferPoint(this.transferPointId())
         );
 
         const transferPoints$ = this.store.select(selectTransferPoints);
@@ -61,11 +61,11 @@ export class SignallerModalTransferConnectionsEditorComponent
         this.transferPointsToBeAdded$ = transferPoints$.pipe(
             map((transferPoints) => {
                 const currentTransferPoint =
-                    transferPoints[this.transferPointId]!;
+                    transferPoints[this.transferPointId()]!;
                 return Object.entries(transferPoints)
                     .filter(
                         ([key]) =>
-                            key !== this.transferPointId &&
+                            key !== this.transferPointId() &&
                             !currentTransferPoint.reachableTransferPoints[key]
                     )
                     .map(([id, transferPoint]) => ({
@@ -105,7 +105,7 @@ export class SignallerModalTransferConnectionsEditorComponent
         this.exerciseService
             .proposeAction({
                 type: '[TransferPoint] Connect TransferPoints',
-                transferPointId1: this.transferPointId,
+                transferPointId1: this.transferPointId(),
                 transferPointId2: this.selectedTransferPoint.key,
             })
             .then((result) => {

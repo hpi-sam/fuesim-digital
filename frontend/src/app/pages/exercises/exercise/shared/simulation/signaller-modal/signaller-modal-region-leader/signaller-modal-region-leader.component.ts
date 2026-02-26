@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy } from '@angular/core';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Personnel, UUID } from 'fuesim-digital-shared';
 import {
@@ -27,8 +27,8 @@ export class SignallerModalRegionLeaderComponent
 {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() simulatedRegionId!: UUID;
-    @Output() readonly hasLeader = new EventEmitter<boolean>();
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly hasLeader = output<boolean>();
 
     leader$!: Observable<Personnel | null>;
     private readonly changeOrDestroy$ = new Subject<void>();
@@ -39,7 +39,7 @@ export class SignallerModalRegionLeaderComponent
         const assignLeaderBehaviorState$ = this.store
             .select(
                 createSelectBehaviorStatesByType(
-                    this.simulatedRegionId,
+                    this.simulatedRegionId(),
                     'assignLeaderBehavior'
                 )
             )

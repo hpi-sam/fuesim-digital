@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Transfer } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
@@ -15,17 +15,17 @@ export class TransferTargetInputComponent {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() elementType!: 'personnel' | 'vehicle';
-    @Input() elementId!: UUID;
-    @Input() transfer!: Transfer;
+    readonly elementType = input.required<'personnel' | 'vehicle'>();
+    readonly elementId = input.required<UUID>();
+    readonly transfer = input.required<Transfer>();
 
     public readonly transferPoints$ = this.store.select(selectTransferPoints);
 
     public setTransferTarget(targetTransferPointId: UUID) {
         this.exerciseService.proposeAction({
             type: '[Transfer] Edit transfer',
-            elementType: this.elementType,
-            elementId: this.elementId,
+            elementType: this.elementType(),
+            elementId: this.elementId(),
             targetTransferPointId,
         });
     }

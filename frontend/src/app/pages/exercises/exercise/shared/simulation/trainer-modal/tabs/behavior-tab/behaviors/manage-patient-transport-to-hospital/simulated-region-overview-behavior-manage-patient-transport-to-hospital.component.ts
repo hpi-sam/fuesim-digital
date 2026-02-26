@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import type { UUID } from 'fuesim-digital-shared';
 
 @Component({
@@ -12,6 +12,6 @@ import type { UUID } from 'fuesim-digital-shared';
     standalone: false,
 })
 export class SimulatedRegionOverviewBehaviorManagePatientTransportToHospitalComponent {
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 }

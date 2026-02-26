@@ -22,7 +22,7 @@ export class ExerciseTemplateCardComponent {
         ConfirmationModalService
     );
 
-    exerciseTemplate = input<GetExerciseTemplateResponseData>();
+    readonly exerciseTemplate = input<GetExerciseTemplateResponseData>();
     readonly updated = output();
 
     async patchExerciseTemplate(data: PatchExerciseTemplateRequestData) {

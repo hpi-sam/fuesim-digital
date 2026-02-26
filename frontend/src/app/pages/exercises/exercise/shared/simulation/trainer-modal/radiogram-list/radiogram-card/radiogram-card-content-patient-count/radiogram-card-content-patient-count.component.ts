@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientCountRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -18,14 +18,14 @@ import {
 export class RadiogramCardContentPatientCountComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() radiogramId!: UUID;
+    readonly radiogramId = input.required<UUID>();
     radiogram$!: Observable<PatientCountRadiogram>;
     bluePatientsEnabled$!: Observable<boolean>;
     totalPatientCount$!: Observable<number>;
 
     ngOnInit(): void {
         const radiogramSelector = createSelectRadiogram<PatientCountRadiogram>(
-            this.radiogramId
+            this.radiogramId()
         );
 
         const totalPatientCountSelector = createSelector(

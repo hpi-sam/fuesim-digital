@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     RecurringEventActivityState,
@@ -36,8 +36,8 @@ export class RequestVehiclesComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() requestBehaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly requestBehaviorId = input.required<UUID>();
 
     requestBehaviorState$!: Observable<RequestBehaviorState>;
 
@@ -59,7 +59,9 @@ export class RequestVehiclesComponent implements OnChanges {
                             id,
                             `[Simuliert] ${simulatedRegion.name}`,
                         ])
-                        .filter(([id, _name]) => id !== this.simulatedRegionId)
+                        .filter(
+                            ([id, _name]) => id !== this.simulatedRegionId()
+                        )
                         .sort(([_id1, name1], [_id2, name2]) =>
                             name1 === name2 ? 0 : name1! < name2! ? -1 : 1
                         );
@@ -70,8 +72,8 @@ export class RequestVehiclesComponent implements OnChanges {
 
         this.requestBehaviorState$ = this.store.select(
             createSelectBehaviorState(
-                this.simulatedRegionId,
-                this.requestBehaviorId
+                this.simulatedRegionId(),
+                this.requestBehaviorId()
             )
         );
 
@@ -89,7 +91,7 @@ export class RequestVehiclesComponent implements OnChanges {
         );
 
         const activities$ = this.store.select(
-            createSelectActivityStates(this.simulatedRegionId)
+            createSelectActivityStates(this.simulatedRegionId())
         );
 
         const currentTime$ = this.store.select(selectCurrentTime);
@@ -120,8 +122,8 @@ export class RequestVehiclesComponent implements OnChanges {
     updateRequestInterval(interval: number) {
         this.exerciseService.proposeAction({
             type: '[RequestBehavior] Update RequestInterval',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.requestBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.requestBehaviorId(),
             requestInterval: interval,
         });
     }
@@ -129,8 +131,8 @@ export class RequestVehiclesComponent implements OnChanges {
     updatePromiseInterval(interval: number) {
         this.exerciseService.proposeAction({
             type: '[RequestBehavior] Update Promise invalidation interval',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.requestBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.requestBehaviorId(),
             promiseInvalidationInterval: interval,
         });
     }
@@ -146,8 +148,8 @@ export class RequestVehiclesComponent implements OnChanges {
         }
         this.exerciseService.proposeAction({
             type: '[RequestBehavior] Update RequestTarget',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.requestBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.requestBehaviorId(),
             requestTarget: requestTargetConfiguration,
         });
     }

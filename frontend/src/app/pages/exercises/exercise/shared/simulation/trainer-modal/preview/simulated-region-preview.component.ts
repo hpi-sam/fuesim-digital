@@ -36,7 +36,9 @@ export class SimulatedRegionPreviewComponent implements OnInit, OnDestroy {
     private readonly activeModal = inject(NgbActiveModal);
 
     simulatedRegionId: UUID = '';
-    selected = signal<Material | Patient | Personnel | Vehicle | null>(null);
+    readonly selected = signal<Material | Patient | Personnel | Vehicle | null>(
+        null
+    );
 
     simulatedRegion$!: Observable<SimulatedRegion>;
 

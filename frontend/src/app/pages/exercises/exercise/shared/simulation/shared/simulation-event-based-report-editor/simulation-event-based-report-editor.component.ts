@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ReportBehaviorState,
@@ -85,9 +85,9 @@ export class SimulationEventBasedReportEditorComponent
     private readonly store = inject<Store<AppState>>(Store);
     private readonly hotkeysService = inject(HotkeysService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() reportBehaviorId!: UUID;
-    @Input() useHotkeys = false;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly reportBehaviorId = input.required<UUID>();
+    readonly useHotkeys = input(false);
 
     private hotkeyLayer: HotkeyLayer | undefined;
 
@@ -151,7 +151,7 @@ export class SimulationEventBasedReportEditorComponent
 
         this.hotkeyLayer = this.hotkeysService.createLayer(
             false,
-            this.useHotkeys
+            this.useHotkeys()
         );
         this.eventBasedReports.forEach((eventBasedReport) => {
             this.hotkeyLayer!.addHotkey(eventBasedReport.hotkey);
@@ -160,16 +160,17 @@ export class SimulationEventBasedReportEditorComponent
 
     ngOnChanges(changes: SimpleChanges): void {
         if ('useHotkeys' in changes && this.hotkeyLayer) {
-            this.hotkeyLayer.enabled = this.useHotkeys;
+            this.hotkeyLayer.enabled = this.useHotkeys();
         }
 
         if ('simulatedRegionId' in changes || 'reportBehaviorId' in changes) {
-            this.simulatedRegionId$.next(this.simulatedRegionId);
+            const simulatedRegionId = this.simulatedRegionId();
+            this.simulatedRegionId$.next(simulatedRegionId);
 
             this.reportBehaviorState$ = this.store.select(
                 createSelectBehaviorState<ReportBehaviorState>(
-                    this.simulatedRegionId,
-                    this.reportBehaviorId
+                    simulatedRegionId,
+                    this.reportBehaviorId()
                 )
             );
         }
@@ -183,8 +184,8 @@ export class SimulationEventBasedReportEditorComponent
     updateEventBasedReport(type: EventId, isEnabled: boolean) {
         this.exerciseService.proposeAction({
             type: eventBasedReportData[type].actionType,
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.reportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.reportBehaviorId(),
             reportChanges: isEnabled,
         });
     }
@@ -192,16 +193,16 @@ export class SimulationEventBasedReportEditorComponent
     toggleEventBasedReport(eventId: EventId) {
         const reportBehavior = selectStateSnapshot<ReportBehaviorState>(
             createSelectBehaviorState(
-                this.simulatedRegionId,
-                this.reportBehaviorId
+                this.simulatedRegionId(),
+                this.reportBehaviorId()
             ),
             this.store
         );
 
         this.exerciseService.proposeAction({
             type: eventBasedReportData[eventId].actionType,
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.reportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.reportBehaviorId(),
             reportChanges:
                 !reportBehavior[eventBasedReportData[eventId].propertyName],
         });

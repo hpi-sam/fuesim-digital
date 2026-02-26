@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseRequestTargetConfiguration,
@@ -44,8 +44,8 @@ export class SignallerModalRequestDestinationEditorComponent
     public readonly TRAINEES_ID = 'trainees';
     public readonly TRAINEES_NAME = 'Die übende Einsatzleitung';
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() requestBehaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly requestBehaviorId = input.required<UUID>();
 
     private hotkeyLayer!: HotkeyLayer;
     submitHotkey = new Hotkey('Enter', false, () => this.updateTarget());
@@ -66,8 +66,8 @@ export class SignallerModalRequestDestinationEditorComponent
         const currentTarget$ = this.store
             .select(
                 createSelectBehaviorState(
-                    this.simulatedRegionId,
-                    this.requestBehaviorId
+                    this.simulatedRegionId(),
+                    this.requestBehaviorId()
                 )
             )
             .pipe(
@@ -93,7 +93,7 @@ export class SignallerModalRequestDestinationEditorComponent
             map((simulatedRegions) =>
                 Object.values(simulatedRegions).filter(
                     (simulatedRegion) =>
-                        simulatedRegion.id !== this.simulatedRegionId
+                        simulatedRegion.id !== this.simulatedRegionId()
                 )
             ),
             map((simulatedRegions) =>
@@ -148,8 +148,8 @@ export class SignallerModalRequestDestinationEditorComponent
         this.exerciseService
             .proposeAction({
                 type: '[RequestBehavior] Update RequestTarget',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.requestBehaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.requestBehaviorId(),
                 requestTarget,
             })
             .then((result) => {

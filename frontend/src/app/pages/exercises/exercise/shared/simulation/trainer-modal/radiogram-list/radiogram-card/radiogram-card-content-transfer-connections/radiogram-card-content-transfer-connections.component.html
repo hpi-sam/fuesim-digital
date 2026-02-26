@@ -1,6 +1,6 @@
 <h5>Transferverbindungen</h5>
 
-<ng-container *appLet="connectedRegions$ | async as connectedRegions">
+@if (connectedRegions$ | async; as connectedRegions) {
     Dieser Bereich hat Transferverbindungen zu
 
     @if (connectedRegions.length > 0) {
@@ -17,4 +17,4 @@
     } @else {
         keinem anderen Bereich.
     }
-</ng-container>
+}

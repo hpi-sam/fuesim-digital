@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import type { UUID } from 'fuesim-digital-shared';
 import { SelectPatientService } from '../../../select-patient.service';
 import { StartTransferService } from '../../../start-transfer.service';
@@ -15,5 +15,5 @@ export class SimulatedRegionOverviewPatientDetailsComponent {
     readonly selectPatientService = inject(SelectPatientService);
     readonly startTransferService = inject(StartTransferService);
 
-    @Input() patientId!: UUID;
+    readonly patientId = input.required<UUID>();
 }

@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ProvidePersonnelBehaviorState,
@@ -31,8 +31,8 @@ export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
     private readonly exerciseService = inject(ExerciseService);
     readonly store = inject<Store<AppState>>(Store);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public vehicleTemplatesToAdd$!: Observable<readonly VehicleTemplate[]>;
     public vehicleTemplatesCurrent$!: Observable<readonly VehicleTemplate[]>;
@@ -44,8 +44,8 @@ export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
     ngOnInit(): void {
         const behaviorState$ = this.store.select(
             createSelectBehaviorState<ProvidePersonnelBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
 
@@ -101,8 +101,8 @@ export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
         this.exerciseService.proposeAction(
             {
                 type: '[ProvidePersonnelBehavior] Update VehiclePriorities',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.behaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.behaviorId(),
                 priorities: newPriorities,
             },
             true

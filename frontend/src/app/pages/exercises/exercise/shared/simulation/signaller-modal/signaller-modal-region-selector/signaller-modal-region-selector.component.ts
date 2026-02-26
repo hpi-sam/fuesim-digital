@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, ViewChild, inject } from '@angular/core';
+import { Component, viewChild, inject } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { map, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -35,13 +35,13 @@ export class SignallerModalRegionSelectorComponent
 
     private hotkeyLayer!: HotkeyLayer;
 
-    @ViewChild(NgbPopover, { static: true }) popover!: NgbPopover;
+    readonly popover = viewChild.required(NgbPopover);
 
     public readonly switchSimulatedRegionHotkey = new Hotkey(
         'F2',
         false,
         () => {
-            this.popover.open();
+            this.popover().open();
         }
     );
     public readonly openOverviewHotkey = new Hotkey('⇧ + F2', false, () => {

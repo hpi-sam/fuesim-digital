@@ -4,7 +4,7 @@
         style="min-height: 0"
     >
         <div class="col-sm overflow-auto mh-100" style="max-width: 30%">
-            @if (simulatedRegion.behaviors.length === 0) {
+            @if (simulatedRegion().behaviors.length === 0) {
                 <p class="text-muted font-bold">
                     Es sind noch keine Verhaltensweisen vorhanden.
                 </p>
@@ -12,7 +12,7 @@
             <div class="mb-3">
                 <div class="list-group">
                     @for (
-                        behavior of simulatedRegion.behaviors;
+                        behavior of simulatedRegion().behaviors;
                         track behavior
                     ) {
                         <button
@@ -39,25 +39,25 @@
                     }
                     @case ('treatPatientsBehavior') {
                         <app-simulated-region-overview-behavior-treat-patients
-                            [simulatedRegionId]="simulatedRegion.id"
+                            [simulatedRegionId]="simulatedRegion().id"
                             [treatPatientsBehaviorId]="selectedBehavior!.id"
                         />
                     }
                     @case ('unloadArrivingVehiclesBehavior') {
                         <app-simulated-region-overview-behavior-unload-arriving-vehicles
-                            [simulatedRegionId]="simulatedRegion.id"
+                            [simulatedRegionId]="simulatedRegion().id"
                             [behaviorId]="selectedBehavior!.id"
                         />
                     }
                     @case ('reportBehavior') {
                         <app-simulated-region-overview-behavior-report
-                            [simulatedRegionId]="simulatedRegion.id"
+                            [simulatedRegionId]="simulatedRegion().id"
                             [reportBehaviorId]="selectedBehavior!.id"
                         />
                     }
                     @case ('automaticallyDistributeVehiclesBehavior') {
                         <app-simulated-region-overview-behavior-automatically-distribute-vehicles
-                            [simulatedRegionId]="simulatedRegion.id"
+                            [simulatedRegionId]="simulatedRegion().id"
                             [automaticallyDistributeVehiclesBehaviorId]="
                                 selectedBehavior!.id
                             "
@@ -65,7 +65,7 @@
                     }
                     @case ('providePersonnelBehavior') {
                         <app-simulated-region-overview-behavior-provide-personnel
-                            [simulatedRegionId]="simulatedRegion.id"
+                            [simulatedRegionId]="simulatedRegion().id"
                             [behaviorId]="selectedBehavior!.id"
                         />
                     }
@@ -74,15 +74,15 @@
                     }
                     @case ('requestBehavior') {
                         <app-simulated-region-overview-behavior-request-vehicles
-                            [simulatedRegionId]="simulatedRegion.id"
+                            [simulatedRegionId]="simulatedRegion().id"
                             [requestBehaviorId]="selectedBehavior!.id"
                         />
                     }
                     @case ('transferBehavior') {
                         <app-simulated-region-overview-behavior-transfer-vehicles
-                            [simulatedRegionId]="simulatedRegion.id"
+                            [simulatedRegionId]="simulatedRegion().id"
                             [transferBehaviorId]="selectedBehavior!.id"
-                            [initialTransferOptions]="initialTransferOptions"
+                            [initialTransferOptions]="initialTransferOptions()"
                         />
                     }
                     @case ('transferToHospitalBehavior') {
@@ -90,7 +90,7 @@
                     }
                     @case ('managePatientTransportToHospitalBehavior') {
                         <app-simulated-region-overview-behavior-manage-patient-transport-to-hospital
-                            [simulatedRegionId]="simulatedRegion.id"
+                            [simulatedRegionId]="simulatedRegion().id"
                             [behaviorId]="selectedBehavior!.id"
                         />
                     }

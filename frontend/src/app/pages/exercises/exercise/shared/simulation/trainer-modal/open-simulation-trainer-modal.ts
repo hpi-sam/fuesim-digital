@@ -13,6 +13,6 @@ export function openSimulationTrainerModal(
     if (simulatedRegionId) {
         (
             modalRef.componentInstance as SimulatedRegionsModalComponent
-        ).currentSimulatedRegionId = simulatedRegionId;
+        ).currentSimulatedRegionId.apply(simulatedRegionId);
     }
 }

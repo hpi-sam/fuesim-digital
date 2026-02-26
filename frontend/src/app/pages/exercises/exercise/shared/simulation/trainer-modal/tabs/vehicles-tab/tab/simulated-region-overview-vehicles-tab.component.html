@@ -42,7 +42,7 @@
     <div class="col h-100" style="max-width: 70%">
         @if (selectedVehicle$ | async; as selectedVehicle) {
             <app-simulated-region-overview-vehicle-details
-                [simulatedRegion]="simulatedRegion"
+                [simulatedRegion]="simulatedRegion()"
                 [vehicle]="selectedVehicle"
             />
         } @else {

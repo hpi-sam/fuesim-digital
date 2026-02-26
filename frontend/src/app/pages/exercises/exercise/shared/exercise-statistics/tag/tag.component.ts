@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { Tag } from 'fuesim-digital-shared';
 
 @Component({
@@ -8,5 +8,5 @@ import { Tag } from 'fuesim-digital-shared';
     standalone: false,
 })
 export class TagComponent {
-    @Input() tag!: Tag;
+    readonly tag = input.required<Tag>();
 }

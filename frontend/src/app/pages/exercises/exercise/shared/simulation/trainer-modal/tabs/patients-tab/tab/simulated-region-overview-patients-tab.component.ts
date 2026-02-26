@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { Patient, SimulatedRegion } from 'fuesim-digital-shared';
@@ -22,8 +22,8 @@ import {
 export class SimulatedRegionOverviewPatientsTabComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() simulatedRegion!: SimulatedRegion;
-    @Input() selectedPatientId?: UUID;
+    readonly simulatedRegion = input.required<SimulatedRegion>();
+    readonly selectedPatientId = input<UUID>();
 
     patients$!: Observable<PatientWithVisibleStatus[]>;
 
@@ -32,7 +32,7 @@ export class SimulatedRegionOverviewPatientsTabComponent implements OnInit {
             createSelector(
                 createSelectElementsInSimulatedRegion(
                     selectPatients,
-                    this.simulatedRegion.id
+                    this.simulatedRegion().id
                 ),
                 selectConfiguration,
                 (patients, configuration) =>

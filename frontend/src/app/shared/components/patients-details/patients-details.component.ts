@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import { Patient } from 'fuesim-digital-shared';
@@ -23,7 +23,7 @@ export class PatientsDetailsComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() patientId!: UUID;
+    readonly patientId = input.required<UUID>();
 
     readonly currentRole$ = this.store.select(selectCurrentMainRole);
     configuration$ = this.store.select(selectConfiguration);
@@ -40,10 +40,12 @@ export class PatientsDetailsComponent implements OnChanges {
         );
 
     ngOnChanges(): void {
-        this.patient$ = this.store.select(createSelectPatient(this.patientId));
+        this.patient$ = this.store.select(
+            createSelectPatient(this.patientId())
+        );
         this.visibleStatus$ = this.store.select(
             createSelector(
-                createSelectPatient(this.patientId),
+                createSelectPatient(this.patientId()),
                 selectConfiguration,
                 (patient, configuration) =>
                     Patient.getVisibleStatus(
@@ -61,7 +63,7 @@ export class PatientsDetailsComponent implements OnChanges {
     setPretriageCategory(patientStatus: PatientStatus) {
         this.exerciseService.proposeAction({
             type: '[Patient] Set Visible Status',
-            patientId: this.patientId,
+            patientId: this.patientId(),
             patientStatus,
         });
     }
@@ -69,7 +71,7 @@ export class PatientsDetailsComponent implements OnChanges {
     setTransportPriority(priority: boolean) {
         this.exerciseService.proposeAction({
             type: '[Patient] Set Transport Priority',
-            patientId: this.patientId,
+            patientId: this.patientId(),
             hasTransportPriority: priority,
         });
     }
@@ -77,7 +79,7 @@ export class PatientsDetailsComponent implements OnChanges {
     updateRemarks(remarks: string) {
         this.exerciseService.proposeAction({
             type: '[Patient] Set Remarks',
-            patientId: this.patientId,
+            patientId: this.patientId(),
             remarks,
         });
     }
@@ -85,7 +87,7 @@ export class PatientsDetailsComponent implements OnChanges {
     updateCustomQRCode(customQRCode: string) {
         this.exerciseService.proposeAction({
             type: '[Patient] Set Custom QR Code',
-            patientId: this.patientId,
+            patientId: this.patientId(),
             customQRCode,
         });
     }

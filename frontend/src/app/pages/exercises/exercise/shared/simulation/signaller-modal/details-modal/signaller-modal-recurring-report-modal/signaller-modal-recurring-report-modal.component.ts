@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, ReportableInformation } from 'fuesim-digital-shared';
 import { reportableInformationTypeToGermanNameDictionary } from 'fuesim-digital-shared';
@@ -27,15 +27,13 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
     private readonly detailsModal = inject(SignallerModalDetailsService);
     private readonly messageService = inject(MessageService);
 
-    @Input()
-    simulatedRegionId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
 
-    @Input()
-    informationType!: ReportableInformation;
+    readonly informationType = input.required<ReportableInformation>();
 
     public get humanReadableReportType() {
         return reportableInformationTypeToGermanNameDictionary[
-            this.informationType
+            this.informationType()
         ];
     }
 
@@ -49,14 +47,14 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
     ngOnInit() {
         const reportBehavior = selectStateSnapshot(
             createSelectBehaviorStatesByType(
-                this.simulatedRegionId,
+                this.simulatedRegionId(),
                 'reportBehavior'
             ),
             this.store
         )[0];
         const recurringActivities = selectStateSnapshot(
             createSelectActivityStatesByType(
-                this.simulatedRegionId,
+                this.simulatedRegionId(),
                 'recurringEventActivity'
             ),
             this.store
@@ -67,7 +65,7 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
             const recurringActivity = recurringActivities.find(
                 (activity) =>
                     activity.id ===
-                    reportBehavior.activityIds[this.informationType]
+                    reportBehavior.activityIds[this.informationType()]
             );
 
             this.reportsEnabled = !!recurringActivity;
@@ -94,27 +92,27 @@ export class SignallerModalRecurringReportModalComponent implements OnInit {
             // Reports are currently not enabled but should be
             actionPromise = this.exerciseService.proposeAction({
                 type: '[ReportBehavior] Create Recurring Report',
-                simulatedRegionId: this.simulatedRegionId,
+                simulatedRegionId: this.simulatedRegionId(),
                 behaviorId: this.reportBehaviorId,
-                informationType: this.informationType,
+                informationType: this.informationType(),
                 interval: this.reportIntervalMilliseconds,
             });
         } else if (this.reportsEnabled && this.recurringActivityId) {
             // Reports are currently enabled and should still be
             actionPromise = this.exerciseService.proposeAction({
                 type: '[ReportBehavior] Update Recurring Report',
-                simulatedRegionId: this.simulatedRegionId,
+                simulatedRegionId: this.simulatedRegionId(),
                 behaviorId: this.reportBehaviorId,
-                informationType: this.informationType,
+                informationType: this.informationType(),
                 interval: this.reportIntervalMilliseconds,
             });
         } else if (!this.reportsEnabled && this.recurringActivityId) {
             // Reports are currently enabled but should not be
             actionPromise = this.exerciseService.proposeAction({
                 type: '[ReportBehavior] Remove Recurring Report',
-                simulatedRegionId: this.simulatedRegionId,
+                simulatedRegionId: this.simulatedRegionId(),
                 behaviorId: this.reportBehaviorId,
-                informationType: this.informationType,
+                informationType: this.informationType(),
             });
         } else {
             // Reports are currently not enabled and should not be

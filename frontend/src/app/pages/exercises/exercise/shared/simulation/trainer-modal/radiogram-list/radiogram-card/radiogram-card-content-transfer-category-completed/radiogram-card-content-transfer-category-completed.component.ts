@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     TransferCategoryCompletedRadiogram,
@@ -23,14 +23,14 @@ export class RadiogramCardContentTransferCategoryCompletedComponent
 {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() radiogramId!: UUID;
+    readonly radiogramId = input.required<UUID>();
 
     radiogram$!: Observable<TransferCategoryCompletedRadiogram>;
 
     ngOnInit(): void {
         this.radiogram$ = this.store.select(
             createSelectRadiogram<TransferCategoryCompletedRadiogram>(
-                this.radiogramId
+                this.radiogramId()
             )
         );
     }

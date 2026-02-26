@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { PatientStatusDataField } from 'fuesim-digital-shared';
 import { rgbColorPalette } from '../../../functions/colors';
 
@@ -9,7 +9,7 @@ import { rgbColorPalette } from '../../../functions/colors';
     standalone: false,
 })
 export class PatientStatusDataFieldComponent {
-    @Input() patientStatusDataField!: PatientStatusDataField;
+    readonly patientStatusDataField = input.required<PatientStatusDataField>();
 
     public get rgbColorPalette() {
         return rgbColorPalette;

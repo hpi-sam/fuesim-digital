@@ -1,5 +1,5 @@
 <div class="col-sm d-inline-flex justify-content-center">
-    <app-patient-identifier [patientId]="patientId" />
+    <app-patient-identifier [patientId]="patientId()" />
 </div>
 <div class="col-sm d-inline-flex justify-content-center">
     <app-patient-status-badge
@@ -11,7 +11,7 @@
         [patientStatus]="(patient$ | async)!.patientStatusCode"
     ></app-patient-status-display>
 </div>
-@if (cateringsActive) {
+@if (cateringsActive()) {
     <div
         class="col-sm d-inline-flex justify-content-start"
         style="flex-wrap: wrap"

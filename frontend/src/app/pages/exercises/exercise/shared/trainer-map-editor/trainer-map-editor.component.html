@@ -194,12 +194,10 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
-                                <ng-container
-                                    *appLet="
-                                        selectedCategories$
-                                            | async as selectedCategories
-                                    "
-                                >
+                                @if (
+                                    selectedCategories$ | async;
+                                    as selectedCategories
+                                ) {
                                     <div
                                         class="btn-group btn-group-sm mb-2"
                                         role="group"
@@ -323,7 +321,7 @@
                                             <hr class="mt-1 mb-2" />
                                         }
                                     }
-                                </ng-container>
+                                }
                             </ng-template>
                         </div>
                     </div>

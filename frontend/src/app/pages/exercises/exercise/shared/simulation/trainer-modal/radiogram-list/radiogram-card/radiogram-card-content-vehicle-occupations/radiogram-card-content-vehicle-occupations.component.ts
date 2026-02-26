@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseOccupationType,
@@ -19,7 +19,7 @@ import { createSelectRadiogram } from '../../../../../../../../../state/applicat
 export class RadiogramCardContentVehicleOccupationsComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() radiogramId!: UUID;
+    readonly radiogramId = input.required<UUID>();
     radiogram$!: Observable<VehicleOccupationsRadiogram>;
 
     public occupationShortNames: {
@@ -35,7 +35,9 @@ export class RadiogramCardContentVehicleOccupationsComponent implements OnInit {
 
     ngOnInit(): void {
         this.radiogram$ = this.store.select(
-            createSelectRadiogram<VehicleOccupationsRadiogram>(this.radiogramId)
+            createSelectRadiogram<VehicleOccupationsRadiogram>(
+                this.radiogramId()
+            )
         );
     }
 }

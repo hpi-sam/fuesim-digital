@@ -24,7 +24,7 @@
             <nav
                 #nav="ngbNav"
                 ngbNav
-                [(activeId)]="currentSimulatedRegionId"
+                [activeId]="currentSimulatedRegionId()"
                 class="nav-tabs"
             >
                 @for (id of simulatedRegionIds$ | async; track id) {

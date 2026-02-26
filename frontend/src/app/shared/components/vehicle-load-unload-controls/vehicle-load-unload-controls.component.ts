@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Role, UUID } from 'fuesim-digital-shared';
 import { isInSpecificVehicle } from 'fuesim-digital-shared';
@@ -25,14 +25,15 @@ export class VehicleLoadUnloadControlsComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input()
-    vehicleId!: UUID;
+    readonly vehicleId = input.required<UUID>();
 
     vehicleLoadState$?: Observable<{ loadable: boolean; unloadable: boolean }>;
     currentRole$!: Observable<Role | undefined>;
 
     ngOnChanges(): void {
-        const vehicle$ = this.store.select(createSelectVehicle(this.vehicleId));
+        const vehicle$ = this.store.select(
+            createSelectVehicle(this.vehicleId())
+        );
 
         this.currentRole$ = this.store.select(selectCurrentMainRole);
 
@@ -87,14 +88,14 @@ export class VehicleLoadUnloadControlsComponent implements OnChanges {
     public unloadVehicle() {
         this.exerciseService.proposeAction({
             type: '[Vehicle] Unload vehicle',
-            vehicleId: this.vehicleId,
+            vehicleId: this.vehicleId(),
         });
     }
 
     public loadVehicle() {
         this.exerciseService.proposeAction({
             type: '[Vehicle] Completely load vehicle',
-            vehicleId: this.vehicleId,
+            vehicleId: this.vehicleId(),
         });
     }
 }

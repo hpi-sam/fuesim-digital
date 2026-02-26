@@ -17,7 +17,6 @@ import { TransferPointNameComponent } from './components/transfer-point-name/tra
 import { ViewportNameComponent } from './components/viewport-name/viewport-name.component';
 import { AppSaveOnTypingDirective } from './directives/app-save-on-typing.directive';
 import { AutofocusDirective } from './directives/autofocus.directive';
-import { LetDirective } from './directives/let.directive';
 import { FormatDurationPipe } from './pipes/format-duration.pipe';
 import { KeysPipe } from './pipes/keys.pipe';
 import { ValuesPipe } from './pipes/values.pipe';
@@ -80,7 +79,6 @@ import { MaterialDetailsComponent } from './components/material-details/material
         PatientStatusDisplayComponent,
         HospitalNameComponent,
         FormatDurationPipe,
-        LetDirective,
         UrlValidatorDirective,
         ValuesPipe,
         KeysPipe,
@@ -150,7 +148,6 @@ import { MaterialDetailsComponent } from './components/material-details/material
         PatientStatusDisplayComponent,
         HospitalNameComponent,
         FormatDurationPipe,
-        LetDirective,
         UrlValidatorDirective,
         ValuesPipe,
         KeysPipe,

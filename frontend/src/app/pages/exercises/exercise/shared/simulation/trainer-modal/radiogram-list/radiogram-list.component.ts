@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ExerciseRadiogram, UUID } from 'fuesim-digital-shared';
 import {
@@ -30,7 +30,7 @@ export class RadiogramListComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     readonly radiogramListService = inject(RadiogramListService);
 
-    @Input() shownInSignallerModal = false;
+    readonly shownInSignallerModal = input(false);
 
     ownClientId!: UUID;
     publishedRadiograms$!: Observable<ExerciseRadiogram[]>;

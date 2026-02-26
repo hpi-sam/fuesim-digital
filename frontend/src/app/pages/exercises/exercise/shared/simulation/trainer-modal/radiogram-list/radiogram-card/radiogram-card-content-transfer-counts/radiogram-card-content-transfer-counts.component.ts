@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferCountsRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -34,13 +34,13 @@ export class RadiogramCardContentTransferCountsComponent implements OnInit {
      */
     readonly showIfTransferredCategories = ['black'] as const;
 
-    @Input() radiogramId!: UUID;
+    readonly radiogramId = input.required<UUID>();
 
     radiogram$!: Observable<TransferCountsRadiogram>;
 
     ngOnInit(): void {
         this.radiogram$ = this.store.select(
-            createSelectRadiogram<TransferCountsRadiogram>(this.radiogramId)
+            createSelectRadiogram<TransferCountsRadiogram>(this.radiogramId())
         );
     }
 }

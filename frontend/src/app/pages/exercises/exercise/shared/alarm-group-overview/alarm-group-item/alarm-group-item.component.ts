@@ -1,4 +1,4 @@
-import { Component, Input, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { AlarmGroup, AlarmGroupVehicle } from 'fuesim-digital-shared';
@@ -20,11 +20,11 @@ export class AlarmGroupItemComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() alarmGroup!: AlarmGroup;
+    readonly alarmGroup = input.required<AlarmGroup>();
 
     ngOnInit() {
-        this.hasTriggerLimit = this.alarmGroup.triggerLimit !== null;
-        this.triggerLimit = this.alarmGroup.triggerLimit ?? 1;
+        this.hasTriggerLimit = this.alarmGroup().triggerLimit !== null;
+        this.triggerLimit = this.alarmGroup().triggerLimit ?? 1;
     }
 
     public readonly vehicleTemplates$ = this.store.select(
@@ -39,7 +39,7 @@ export class AlarmGroupItemComponent implements OnInit {
         this.hasTriggerLimit = value;
         if (!value) {
             this.triggerLimit = null;
-        } else if (this.alarmGroup.triggerLimit === null) {
+        } else if (this.alarmGroup().triggerLimit === null) {
             this.triggerLimit = 1;
         }
 
@@ -52,7 +52,7 @@ export class AlarmGroupItemComponent implements OnInit {
         this.exerciseService.proposeAction(
             {
                 type: '[AlarmGroup] Rename AlarmGroup',
-                alarmGroupId: this.alarmGroup.id,
+                alarmGroupId: this.alarmGroup().id,
                 name,
             },
             true
@@ -62,7 +62,7 @@ export class AlarmGroupItemComponent implements OnInit {
     public limitAlarmGroup(limit: number | null) {
         this.exerciseService.proposeAction({
             type: '[AlarmGroup] Limit AlarmGroup',
-            alarmGroupId: this.alarmGroup.id,
+            alarmGroupId: this.alarmGroup().id,
             triggerLimit: this.hasTriggerLimit ? (limit ?? null) : null,
         });
     }
@@ -70,14 +70,14 @@ export class AlarmGroupItemComponent implements OnInit {
     public removeAlarmGroup() {
         this.exerciseService.proposeAction({
             type: '[AlarmGroup] Remove AlarmGroup',
-            alarmGroupId: this.alarmGroup.id,
+            alarmGroupId: this.alarmGroup().id,
         });
     }
 
     public removeVehicleTemplate(alarmGroupVehicleId: UUID) {
         this.exerciseService.proposeAction({
             type: '[AlarmGroup] Remove AlarmGroupVehicle',
-            alarmGroupId: this.alarmGroup.id,
+            alarmGroupId: this.alarmGroup().id,
             alarmGroupVehicleId,
         });
     }
@@ -96,7 +96,7 @@ export class AlarmGroupItemComponent implements OnInit {
         this.exerciseService.proposeAction(
             {
                 type: '[AlarmGroup] Edit AlarmGroupVehicle',
-                alarmGroupId: this.alarmGroup.id,
+                alarmGroupId: this.alarmGroup().id,
                 alarmGroupVehicleId,
                 time,
                 name,
@@ -112,7 +112,7 @@ export class AlarmGroupItemComponent implements OnInit {
         );
         this.exerciseService.proposeAction({
             type: '[AlarmGroup] Add AlarmGroupVehicle',
-            alarmGroupId: this.alarmGroup.id,
+            alarmGroupId: this.alarmGroup().id,
             alarmGroupVehicle: AlarmGroupVehicle.create(
                 vehicleTemplateId,
                 5 * 60 * 1000,

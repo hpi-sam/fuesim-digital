@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild, ElementRef, inject } from '@angular/core';
+import { Component, ElementRef, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
@@ -90,19 +90,13 @@ export class SignallerModalInteractionsComponent
     private readonly store = inject<Store<AppState>>(Store);
     private readonly hotkeysService = inject(HotkeysService);
 
-    @Input()
-    simulatedRegionId?: UUID;
-    @Input()
-    interactions: InterfaceSignallerInteraction[] = [];
-    @Input()
-    primaryActionLabel = '';
-    @Input()
-    showSecondaryButton = true;
-    @Input()
-    filterHotkeyKeys!: string;
+    readonly simulatedRegionId = input<UUID>();
+    readonly interactions = input<InterfaceSignallerInteraction[]>([]);
+    readonly primaryActionLabel = input('');
+    readonly showSecondaryButton = input(true);
+    readonly filterHotkeyKeys = input.required<string>();
 
-    @ViewChild('filterInput')
-    filterInput!: ElementRef;
+    readonly filterInput = viewChild.required<ElementRef>('filterInput');
 
     private interactionHotkeys: {
         [key: string]: { primary: Hotkey; secondary?: Hotkey };
@@ -123,7 +117,7 @@ export class SignallerModalInteractionsComponent
     get filteredInteractions() {
         const lowerFilterPhrases = this.filter.toLowerCase().split(/\s+/u);
 
-        return this.interactions
+        return this.interactions()
             .map((interaction) => ({
                 ...interaction,
                 hotkeys: this.interactionHotkeys[interaction.key]!,
@@ -144,7 +138,7 @@ export class SignallerModalInteractionsComponent
 
     filterHotkey!: Hotkey;
     readonly exitFilterHotkey = new Hotkey('Esc', false, () => {
-        this.filterInput.nativeElement.blur();
+        this.filterInput().nativeElement.blur();
     });
     readonly upHotkey = new Hotkey('up', false, () =>
         this.decreaseSelectedIndex()
@@ -154,11 +148,11 @@ export class SignallerModalInteractionsComponent
     );
     readonly confirmHotkey = new Hotkey('Enter', false, () => {
         this.selectionPrimaryAction();
-        this.filterInput.nativeElement.blur();
+        this.filterInput().nativeElement.blur();
     });
     readonly confirmSecondaryHotkey = new Hotkey('⇧ + Enter', false, () => {
         this.selectionSecondaryAction();
-        this.filterInput.nativeElement.blur();
+        this.filterInput().nativeElement.blur();
     });
 
     requestedRadiograms$!: Observable<{ [key: string]: ExerciseRadiogram[] }>;
@@ -189,12 +183,13 @@ export class SignallerModalInteractionsComponent
         this.interactionHotkeys = {};
         this.interactionRequestable = {};
 
-        if (this.simulatedRegionId) {
+        const simulatedRegionId = this.simulatedRegionId();
+        if (simulatedRegionId) {
             const behaviors$ = this.store.select(
-                createSelectBehaviorStates(this.simulatedRegionId)
+                createSelectBehaviorStates(simulatedRegionId)
             );
 
-            this.interactions.forEach((interaction) => {
+            this.interactions().forEach((interaction) => {
                 this.interactionRequestable[interaction.key] = behaviors$.pipe(
                     map((behaviors) =>
                         interaction.requiredBehaviors.every(
@@ -208,12 +203,12 @@ export class SignallerModalInteractionsComponent
                 );
             });
         } else {
-            this.interactions.forEach((interaction) => {
+            this.interactions().forEach((interaction) => {
                 this.interactionRequestable[interaction.key] = of(true);
             });
         }
 
-        this.interactions.forEach((interaction) => {
+        this.interactions().forEach((interaction) => {
             const enabled$ = combineLatest([
                 interaction.loading$ ?? of(false),
                 this.interactionRequestable[interaction.key]!,
@@ -247,9 +242,10 @@ export class SignallerModalInteractionsComponent
             this.interactionHotkeys[interaction.key] = hotkeys;
         });
 
-        if (this.filterHotkeyKeys && this.filterHotkeyKeys !== '') {
-            this.filterHotkey = new Hotkey(this.filterHotkeyKeys, false, () => {
-                this.filterInput.nativeElement.focus();
+        const filterHotkeyKeys = this.filterHotkeyKeys();
+        if (filterHotkeyKeys && filterHotkeyKeys !== '') {
+            this.filterHotkey = new Hotkey(filterHotkeyKeys, false, () => {
+                this.filterInput().nativeElement.focus();
             });
             this.hotkeyLayer.addHotkey(this.filterHotkey);
         }
@@ -283,7 +279,7 @@ export class SignallerModalInteractionsComponent
                     });
 
                     setLoadingState(
-                        this.interactions,
+                        this.interactions(),
                         getInformationRequestKeyDetails(
                             radiogram.informationRequestKey!
                         ),
@@ -303,7 +299,7 @@ export class SignallerModalInteractionsComponent
                             radiogram.informationRequestKey,
                             this.clientId
                         ) &&
-                        radiogram.simulatedRegionId === this.simulatedRegionId
+                        radiogram.simulatedRegionId === this.simulatedRegionId()
                 )
             ),
             map((radiograms) =>

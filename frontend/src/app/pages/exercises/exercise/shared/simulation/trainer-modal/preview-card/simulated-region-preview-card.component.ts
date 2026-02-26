@@ -9,8 +9,8 @@ import { Component, input, output } from '@angular/core';
 export class SimulatedRegionPreviewCardComponent {
     readonly elementMousedown = output<MouseEvent>();
 
-    dataCy = input<string>('');
-    title = input.required<string>();
-    imageUrl = input.required<string>();
-    darkBackground = input(false);
+    readonly dataCy = input<string>('');
+    readonly title = input.required<string>();
+    readonly imageUrl = input.required<string>();
+    readonly darkBackground = input(false);
 }

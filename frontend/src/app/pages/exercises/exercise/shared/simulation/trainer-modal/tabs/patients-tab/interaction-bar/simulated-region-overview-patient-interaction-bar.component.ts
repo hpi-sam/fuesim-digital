@@ -1,6 +1,5 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, input, inject } from '@angular/core';
 import type { UUIDSet, UUID } from 'fuesim-digital-shared';
-import { WritableDraft } from 'immer';
 import { SelectPatientService } from '../../../select-patient.service';
 import { StartTransferService } from '../../../start-transfer.service';
 import { ExerciseService } from '../../../../../../../../../core/exercise.service';
@@ -19,12 +18,12 @@ export class SimulatedRegionOverviewPatientInteractionBarComponent {
     readonly selectPatientService = inject(SelectPatientService);
     readonly startTransferService = inject(StartTransferService);
 
-    @Input() patientId!: UUID;
+    readonly patientId = input.required<UUID>();
 
     public removeSelectedPatientFromSimulatedRegion() {
         this.exerciseService.proposeAction({
             type: '[Patient] Remove patient from simulated region',
-            patientId: this.patientId,
+            patientId: this.patientId(),
         });
         this.selectPatientService.selectPatient('');
     }
@@ -32,14 +31,14 @@ export class SimulatedRegionOverviewPatientInteractionBarComponent {
     public deleteSelectedPatient() {
         this.exerciseService.proposeAction({
             type: '[Patient] Remove patient',
-            patientId: this.patientId,
+            patientId: this.patientId(),
         });
         this.selectPatientService.selectPatient('');
     }
 
     public initiatePatientTransfer() {
         const patientsToTransfer: WritableDraft<UUIDSet> = {
-            [this.patientId]: true,
+            [this.patientId()]: true,
         };
         this.startTransferService.initiateNewTransferFor({
             patientsToTransfer,

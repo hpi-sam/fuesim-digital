@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import type { PatientStatus } from 'fuesim-digital-shared';
 
 @Component({
@@ -10,10 +10,10 @@ import type { PatientStatus } from 'fuesim-digital-shared';
 export class PatientStatusDropdownComponent<
     AllowedStatus extends PatientStatus,
 > {
-    @Input() patientStatus!: AllowedStatus;
-    @Input() allowedStatuses!: readonly AllowedStatus[];
-    @Input() placement: 'end' | 'start' = 'start';
-    @Input() tabIndex = -1;
+    readonly patientStatus = input.required<AllowedStatus>();
+    readonly allowedStatuses = input.required<readonly AllowedStatus[]>();
+    readonly placement = input<'end' | 'start'>('start');
+    readonly tabIndex = input(-1);
 
-    @Output() readonly statusChanged = new EventEmitter<AllowedStatus>();
+    readonly statusChanged = output<AllowedStatus>();
 }

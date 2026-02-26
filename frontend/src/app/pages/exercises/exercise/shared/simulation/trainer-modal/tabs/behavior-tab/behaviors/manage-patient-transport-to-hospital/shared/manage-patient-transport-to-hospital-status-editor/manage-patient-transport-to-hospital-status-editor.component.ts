@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
@@ -25,16 +25,16 @@ export class ManagePatientTransportToHospitalStatusEditorComponent
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public behaviorState$!: Observable<ManagePatientTransportToHospitalBehaviorState>;
 
     ngOnChanges(): void {
         this.behaviorState$ = this.store.select(
             createSelectBehaviorState<ManagePatientTransportToHospitalBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
     }
@@ -42,16 +42,16 @@ export class ManagePatientTransportToHospitalStatusEditorComponent
     startTransport() {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Start Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
         });
     }
 
     stopTransport() {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Stop Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
         });
     }
 }

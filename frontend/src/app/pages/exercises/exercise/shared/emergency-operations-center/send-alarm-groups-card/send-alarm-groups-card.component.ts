@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, model } from '@angular/core';
 
 @Component({
     selector: 'app-send-alarm-groups-card',
@@ -7,6 +7,9 @@ import { Component, Input } from '@angular/core';
     standalone: false,
 })
 export class SendAlarmGroupsCardComponent {
-    @Input()
-    public useComplexLayout = false;
+    public readonly useComplexLayout = model(false);
+
+    setComplexLayout(useComplexLayout: boolean) {
+        this.useComplexLayout.set(useComplexLayout);
+    }
 }

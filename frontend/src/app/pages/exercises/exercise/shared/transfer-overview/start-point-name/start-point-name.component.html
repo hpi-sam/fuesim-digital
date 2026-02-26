@@ -1,3 +1,4 @@
+@let startPoint = this.startPoint();
 @if (startPoint.type === 'alarmGroupStartPoint') {
     @if (alarmGroupName$ | async; as alarmGroupName) {
         {{ alarmGroupName }}

@@ -17,11 +17,11 @@ export class ExerciseCardComponent {
         ConfirmationModalService
     );
 
-    exercise = input<GetExerciseResponseData>();
-    participantUrl = computed(
+    readonly exercise = input<GetExerciseResponseData>();
+    readonly participantUrl = computed(
         () => `${location.origin}/exercises/${this.exercise()?.participantKey}`
     );
-    trainerUrl = computed(
+    readonly trainerUrl = computed(
         () => `${location.origin}/exercises/${this.exercise()?.trainerKey}`
     );
     readonly updated = output();

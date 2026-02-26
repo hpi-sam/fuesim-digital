@@ -19,7 +19,7 @@
         <div class="col-sm">
             <label [for]="'eventBasedReportEditor_' + eventBasedReport.eventId">
                 {{ eventBasedReport.description }}
-                @if (useHotkeys) {
+                @if (useHotkeys()) {
                     <app-hotkey-indicator [hotkey]="eventBasedReport.hotkey" />
                 }
             </label>

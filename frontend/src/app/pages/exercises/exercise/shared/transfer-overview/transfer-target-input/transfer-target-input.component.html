@@ -5,7 +5,7 @@
         ngbDropdownToggle
     >
         <app-transfer-point-name
-            [transferPointId]="transfer.targetTransferPointId"
+            [transferPointId]="transfer().targetTransferPointId"
         ></app-transfer-point-name>
     </button>
     <div ngbDropdownMenu>
@@ -15,7 +15,9 @@
         ) {
             <button
                 ngbDropdownItem
-                [disabled]="transferPoint.id === transfer.targetTransferPointId"
+                [disabled]="
+                    transferPoint.id === transfer().targetTransferPointId
+                "
                 (click)="setTransferTarget(transferPoint.id)"
             >
                 <app-transfer-point-name

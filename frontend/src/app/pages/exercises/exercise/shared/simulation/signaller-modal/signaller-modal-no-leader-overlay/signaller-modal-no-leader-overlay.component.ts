@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, output, inject } from '@angular/core';
 import type { HotkeyLayer } from '../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
@@ -17,7 +17,7 @@ export class SignallerModalNoLeaderOverlayComponent
 {
     private readonly hotkeysService = inject(HotkeysService);
 
-    @Output() readonly accept = new EventEmitter<void>();
+    readonly accept = output();
 
     private hotkeyLayer!: HotkeyLayer;
 

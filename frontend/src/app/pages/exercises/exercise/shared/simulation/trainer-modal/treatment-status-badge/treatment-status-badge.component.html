@@ -1,11 +1,11 @@
 <span
     class="badge rounded-pill"
-    [class.text-bg-secondary]="treatmentProgress === 'noTreatment'"
+    [class.text-bg-secondary]="treatmentProgress() === 'noTreatment'"
     [class.text-bg-info]="
-        treatmentProgress === 'unknown' || treatmentProgress === 'counted'
+        treatmentProgress() === 'unknown' || treatmentProgress() === 'counted'
     "
-    [class.text-bg-warning]="treatmentProgress === 'triaged'"
-    [class.text-bg-success]="treatmentProgress === 'secured'"
+    [class.text-bg-warning]="treatmentProgress() === 'triaged'"
+    [class.text-bg-success]="treatmentProgress() === 'secured'"
 >
-    {{ treatmentProgress | treatmentProgressToGermanName }}
+    {{ treatmentProgress() | treatmentProgressToGermanName }}
 </span>

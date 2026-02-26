@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import type { PatientStatus } from 'fuesim-digital-shared';
 import { statusNames } from 'fuesim-digital-shared';
 
@@ -9,7 +9,7 @@ import { statusNames } from 'fuesim-digital-shared';
     standalone: false,
 })
 export class PatientStatusBadgeComponent {
-    @Input() status!: PatientStatus;
+    readonly status = input.required<PatientStatus>();
 
     public readonly statusNames = statusNames;
 }

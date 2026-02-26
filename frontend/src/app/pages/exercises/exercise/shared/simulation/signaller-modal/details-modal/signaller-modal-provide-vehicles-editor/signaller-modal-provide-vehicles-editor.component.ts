@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild, inject } from '@angular/core';
+import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ResourceDescription, UUID } from 'fuesim-digital-shared';
 import {
@@ -43,13 +43,12 @@ export class SignallerModalProvideVehiclesEditorComponent
     private readonly hotkeysService = inject(HotkeysService);
     private readonly messageService = inject(MessageService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() transferBehaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly transferBehaviorId = input.required<UUID>();
 
-    @ViewChild('selectVehiclePopover')
-    selectVehiclePopover!: NgbPopover;
-    @ViewChild('selectTargetPopover')
-    selectTargetPopover!: NgbPopover;
+    readonly selectTargetPopover = viewChild.required<NgbPopover>(
+        'selectTargetPopover'
+    );
 
     public get canSend() {
         return (
@@ -60,7 +59,7 @@ export class SignallerModalProvideVehiclesEditorComponent
 
     private hotkeyLayer!: HotkeyLayer;
     selectTargetHotkey = new Hotkey('Z', false, () =>
-        this.selectTargetPopover.open()
+        this.selectTargetPopover().open()
     );
     submitHotkey = new Hotkey('Enter', false, () => this.startTransfer());
 
@@ -90,7 +89,7 @@ export class SignallerModalProvideVehiclesEditorComponent
                     (vehicle) =>
                         isInSpecificSimulatedRegion(
                             vehicle,
-                            this.simulatedRegionId
+                            this.simulatedRegionId()
                         ) && isUnoccupiedImmutable(vehicle, currentTime)
                 )
             ),
@@ -115,7 +114,7 @@ export class SignallerModalProvideVehiclesEditorComponent
                     (transferPoint) =>
                         !isInSpecificSimulatedRegion(
                             transferPoint,
-                            this.simulatedRegionId
+                            this.simulatedRegionId()
                         )
                 )
             ),
@@ -172,8 +171,8 @@ export class SignallerModalProvideVehiclesEditorComponent
         this.exerciseService
             .proposeAction({
                 type: '[TransferBehavior] Transfer Vehicles',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.transferBehaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.transferBehaviorId(),
                 requestedVehicles: this.vehicleAmounts,
                 destinationType: 'transferPoint',
                 destinationId: this.selectedTarget!.key,

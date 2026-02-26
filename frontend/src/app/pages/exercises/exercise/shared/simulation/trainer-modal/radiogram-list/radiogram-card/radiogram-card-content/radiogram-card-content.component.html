@@ -1,59 +1,59 @@
-@if (radiogram.informationAvailable) {
-    @switch (radiogram.type) {
+@if (radiogram().informationAvailable) {
+    @switch (radiogram().type) {
         @case ('vehicleCountRadiogram') {
             <app-radiogram-card-content-vehicle-count
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('vehicleOccupationsRadiogram') {
             <app-radiogram-card-content-vehicle-occupations
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('patientCountRadiogram') {
             <app-radiogram-card-content-patient-count
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('treatmentStatusRadiogram') {
             <app-radiogram-card-content-treatment-status
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('personnelCountRadiogram') {
             <app-radiogram-card-content-personnel-count
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('materialCountRadiogram') {
             <app-radiogram-card-content-material-count
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('missingTransferConnectionRadiogram') {
             <app-radiogram-card-content-missing-transfer-connection
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('resourceRequestRadiogram') {
             <app-radiogram-card-content-resource-request
-                [radiogramId]="radiogram.id"
-                [shownInSignallerModal]="shownInSignallerModal"
+                [radiogramId]="radiogram().id"
+                [shownInSignallerModal]="shownInSignallerModal()"
             />
         }
         @case ('transferConnectionsRadiogram') {
             <app-radiogram-card-content-transfer-connections
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('transferCountsRadiogram') {
             <app-radiogram-card-content-transfer-counts
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('transferCategoryCompletedRadiogram') {
             <app-radiogram-card-content-transfer-category-completed
-                [radiogramId]="radiogram.id"
+                [radiogramId]="radiogram().id"
             />
         }
         @case ('newPatientDataRequestedRadiogram') {
@@ -67,12 +67,12 @@
             but those comments are not supported in templates (see https://github.com/angular/angular/issues/39397)
             -->
             <app-radiogram-card-content-fallback
-                [radiogramType]="$any(radiogram).type"
+                [radiogramType]="$any(radiogram()).type"
             />
         }
     }
 } @else {
     <app-radiogram-card-content-information-unavailable
-        [radiogramType]="radiogram.type"
+        [radiogramType]="radiogram().type"
     />
 }

@@ -2,6 +2,6 @@
     <div
         [@addProgress]="animationParams$ | async"
         style="width: 0; --bs-bg-opacity: 0.5"
-        [class]="'progress-bar ' + (color ? 'bg-' + color : '')"
+        [class]="'progress-bar ' + (color() ? 'bg-' + color() : '')"
     ></div>
 </div>

@@ -1,7 +1,7 @@
 <span
     class="badge badge-pill m-1"
-    [style.background-color]="tag.backgroundColor"
-    [style.color]="tag.color"
+    [style.background-color]="tag().backgroundColor"
+    [style.color]="tag().color"
 >
-    {{ tag.category }}: {{ tag.name }}
+    {{ tag().category }}: {{ tag().name }}
 </span>

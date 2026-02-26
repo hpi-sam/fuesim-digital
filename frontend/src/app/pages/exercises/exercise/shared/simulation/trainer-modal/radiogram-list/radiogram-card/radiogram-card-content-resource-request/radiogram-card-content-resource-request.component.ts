@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { ResourceRequestRadiogram, UUID } from 'fuesim-digital-shared';
 import { isAccepted, isDone } from 'fuesim-digital-shared';
@@ -24,8 +24,8 @@ export class RadigoramCardContentResourceRequestComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly hotkeyService = inject(HotkeysService);
 
-    @Input() radiogramId!: UUID;
-    @Input() shownInSignallerModal = false;
+    readonly radiogramId = input.required<UUID>();
+    readonly shownInSignallerModal = input(false);
 
     radiogram$!: Observable<ResourceRequestRadiogram>;
     enableActionButtons$!: Observable<boolean>;
@@ -42,20 +42,20 @@ export class RadigoramCardContentResourceRequestComponent implements OnInit {
     acceptRequest() {
         this.exerciseService.proposeAction({
             type: '[Radiogram] Accept resource request',
-            radiogramId: this.radiogramId,
+            radiogramId: this.radiogramId(),
         });
     }
 
     denyRequest() {
         this.exerciseService.proposeAction({
             type: '[Radiogram] Deny resource request',
-            radiogramId: this.radiogramId,
+            radiogramId: this.radiogramId(),
         });
     }
 
     ngOnInit(): void {
         const selectRadiogram = createSelectRadiogram<ResourceRequestRadiogram>(
-            this.radiogramId
+            this.radiogramId()
         );
         this.radiogram$ = this.store.select(selectRadiogram);
         this.enableActionButtons$ = this.store.select(
@@ -85,6 +85,6 @@ export class RadigoramCardContentResourceRequestComponent implements OnInit {
         );
         this.hotkeyLayer.addHotkey(this.acceptHotkey);
         this.hotkeyLayer.addHotkey(this.denyHotkey);
-        this.hotkeyLayer.enabled = this.shownInSignallerModal;
+        this.hotkeyLayer.enabled = this.shownInSignallerModal();
     }
 }

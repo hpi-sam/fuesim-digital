@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -17,19 +17,20 @@ export class VehicleNameEditorComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input()
-    vehicleId!: UUID;
+    readonly vehicleId = input.required<UUID>();
 
     vehicle$!: Observable<Vehicle>;
 
     ngOnChanges() {
-        this.vehicle$ = this.store.select(createSelectVehicle(this.vehicleId));
+        this.vehicle$ = this.store.select(
+            createSelectVehicle(this.vehicleId())
+        );
     }
 
     public renameVehicle(name: string) {
         this.exerciseService.proposeAction({
             type: '[Vehicle] Rename vehicle',
-            vehicleId: this.vehicleId,
+            vehicleId: this.vehicleId(),
             name,
         });
     }

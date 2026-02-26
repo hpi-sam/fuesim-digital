@@ -1,4 +1,4 @@
-import { Component, Input, output, inject } from '@angular/core';
+import { Component, output, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { AppState } from '../../../../../../state/app.state';
 
@@ -15,10 +15,10 @@ export class MapEditorCardComponent {
     readonly elementEdit = output();
     readonly elementDelete = output();
 
-    @Input() dataCy = '';
-    @Input() title!: string;
-    @Input() imageUrl!: string;
-    @Input() darkBackground = false;
-    @Input() enableEditButton = false;
-    @Input() enableDeleteButton = false;
+    readonly dataCy = input('');
+    readonly title = input('');
+    readonly imageUrl = input('');
+    readonly darkBackground = input(false);
+    readonly enableEditButton = input(false);
+    readonly enableDeleteButton = input(false);
 }

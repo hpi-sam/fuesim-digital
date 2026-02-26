@@ -1,5 +1,5 @@
 import type { OnChanges, OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseSimulationBehaviorState,
@@ -35,8 +35,8 @@ export class SimulatedRegionOverviewBehaviorTabComponent
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() simulatedRegion!: SimulatedRegion;
-    @Input() initialTransferOptions?: TransferOptions;
+    readonly simulatedRegion = input.required<SimulatedRegion>();
+    readonly initialTransferOptions = input<TransferOptions>();
 
     public behaviorTypesToBeAdded$!: Observable<
         ExerciseSimulationBehaviorType[]
@@ -45,29 +45,29 @@ export class SimulatedRegionOverviewBehaviorTabComponent
 
     async ngOnInit() {
         if (globalLastBehaviorType !== undefined) {
-            this.selectedBehavior = this.simulatedRegion.behaviors.find(
+            this.selectedBehavior = this.simulatedRegion().behaviors.find(
                 (behavior) => behavior.type === globalLastBehaviorType
             );
         }
-        if (this.initialTransferOptions) {
-            this.selectedBehavior = this.simulatedRegion.behaviors.find(
+        if (this.initialTransferOptions()) {
+            this.selectedBehavior = this.simulatedRegion().behaviors.find(
                 (behavior) => behavior.type === 'transferBehavior'
             );
             if (!this.selectedBehavior) {
                 await this.exerciseService.proposeAction({
                     type: '[SimulatedRegion] Add Behavior',
-                    simulatedRegionId: this.simulatedRegion.id,
+                    simulatedRegionId: this.simulatedRegion().id,
                     behaviorState:
                         simulationBehaviorDictionary.transferBehavior.behaviorState.create(),
                 });
-                this.selectedBehavior = this.simulatedRegion.behaviors.find(
+                this.selectedBehavior = this.simulatedRegion().behaviors.find(
                     (behavior) => behavior.type === 'transferBehavior'
                 );
             }
         }
 
         this.behaviorTypesToBeAdded$ = this.store
-            .select(createSelectBehaviorStates(this.simulatedRegion.id))
+            .select(createSelectBehaviorStates(this.simulatedRegion().id))
             .pipe(
                 map((states) => {
                     const currentTypes = new Set(
@@ -81,12 +81,13 @@ export class SimulatedRegionOverviewBehaviorTabComponent
     }
 
     public ngOnChanges() {
+        const simulatedRegion = this.simulatedRegion();
         if (
             // if the selected behavior has been removed by a different client
             this.selectedBehavior !== undefined &&
-            !this.simulatedRegion.behaviors.includes(this.selectedBehavior)
+            !simulatedRegion.behaviors.includes(this.selectedBehavior)
         ) {
-            this.selectedBehavior = this.simulatedRegion.behaviors.find(
+            this.selectedBehavior = simulatedRegion.behaviors.find(
                 (behavior) => behavior.id === this.selectedBehavior?.id
             );
         }
@@ -110,7 +111,7 @@ export class SimulatedRegionOverviewBehaviorTabComponent
         ].behaviorState.create(...args);
         this.exerciseService.proposeAction({
             type: '[SimulatedRegion] Add Behavior',
-            simulatedRegionId: this.simulatedRegion.id,
+            simulatedRegionId: this.simulatedRegion().id,
             behaviorState,
         });
     }
@@ -118,7 +119,7 @@ export class SimulatedRegionOverviewBehaviorTabComponent
     public removeSelectedBehavior() {
         this.exerciseService.proposeAction({
             type: '[SimulatedRegion] Remove Behavior',
-            simulatedRegionId: this.simulatedRegion.id,
+            simulatedRegionId: this.simulatedRegion().id,
             behaviorId: this.selectedBehavior!.id,
         });
         this.selectedBehavior = undefined;

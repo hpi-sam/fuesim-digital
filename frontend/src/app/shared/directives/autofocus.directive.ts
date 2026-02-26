@@ -1,5 +1,5 @@
 import type { AfterViewInit } from '@angular/core';
-import { Directive, ElementRef, Input, inject } from '@angular/core';
+import { Directive, ElementRef, inject, input } from '@angular/core';
 
 /**
  * This directive focuses the element once after it has been initialized.
@@ -24,10 +24,10 @@ import { Directive, ElementRef, Input, inject } from '@angular/core';
 export class AutofocusDirective implements AfterViewInit {
     private readonly elementRef = inject(ElementRef);
 
-    @Input() public appAutofocus = true;
+    public readonly appAutofocus = input(true);
 
     public ngAfterViewInit() {
-        if (this.appAutofocus) {
+        if (this.appAutofocus()) {
             this.elementRef.nativeElement.focus();
         }
     }

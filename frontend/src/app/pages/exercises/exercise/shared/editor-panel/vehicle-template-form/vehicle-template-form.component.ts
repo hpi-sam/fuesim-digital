@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     MaterialTemplate,
@@ -26,14 +26,13 @@ export class VehicleTemplateFormComponent implements OnChanges {
     private readonly messageService = inject(MessageService);
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() initialValues!: EditableVehicleTemplateValues;
-    @Input() btnText!: string;
+    readonly initialValues = input.required<EditableVehicleTemplateValues>();
+    readonly btnText = input.required<string>();
 
     /**
      * Emits the changed values
      */
-    @Output() readonly submitVehicleTemplate =
-        new EventEmitter<ChangedVehicleTemplateValues>();
+    readonly submitVehicleTemplate = output<ChangedVehicleTemplateValues>();
 
     public values?: EditableVehicleTemplateValues;
 
@@ -42,7 +41,7 @@ export class VehicleTemplateFormComponent implements OnChanges {
 
     ngOnChanges(_changes: SimpleChangesGeneric<this>): void {
         this.values = {
-            ...this.initialValues,
+            ...this.initialValues(),
             ...this.values,
         };
     }

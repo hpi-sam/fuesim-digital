@@ -1,6 +1,6 @@
 <app-header />
 <main class="container">
-    <h1>{{ pageTitle }}</h1>
+    <h1>{{ pageTitle() }}</h1>
 
     <p>
         <a (click)="back($event)" href="#">Zurück zur vorherigen Seite</a>
@@ -11,7 +11,8 @@
     } @else {
         <p>
             Sie können den Inhalt der Seite unter
-            <code>frontend/src/assets/about/{{ contentFile }}</code> bearbeiten.
+            <code>frontend/src/assets/about/{{ contentFile() }}</code>
+            bearbeiten.
         </p>
         <p>
             Falls Sie das Docker-Deployment verwenden, finden Sie in der

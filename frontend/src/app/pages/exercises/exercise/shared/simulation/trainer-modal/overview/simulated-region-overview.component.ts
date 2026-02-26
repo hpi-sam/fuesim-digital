@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewEncapsulation, inject } from '@angular/core';
+import { Component, ViewEncapsulation, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { SimulatedRegion, UUID } from 'fuesim-digital-shared';
 import { isInSpecificSimulatedRegion } from 'fuesim-digital-shared';
@@ -40,7 +40,7 @@ export class SimulatedRegionOverviewGeneralComponent
     readonly selectPatientService = inject(SelectPatientService);
     readonly startTransferService = inject(StartTransferService);
 
-    @Input() simulatedRegionId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
 
     simulatedRegion$!: Observable<SimulatedRegion>;
 
@@ -61,7 +61,7 @@ export class SimulatedRegionOverviewGeneralComponent
 
     ngOnInit(): void {
         this.simulatedRegion$ = this.store.select(
-            createSelectSimulatedRegion(this.simulatedRegionId)
+            createSelectSimulatedRegion(this.simulatedRegionId())
         );
         this.transferPointId$ = this.store.select(
             createSelector(
@@ -70,7 +70,7 @@ export class SimulatedRegionOverviewGeneralComponent
                     Object.values(transferPoints).find((transferPoint) =>
                         isInSpecificSimulatedRegion(
                             transferPoint,
-                            this.simulatedRegionId
+                            this.simulatedRegionId()
                         )
                     )!.id
             )

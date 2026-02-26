@@ -1,4 +1,4 @@
-import type { OnInit } from '@angular/core';
+import type { OnChanges } from '@angular/core';
 import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Patient, UUID } from 'fuesim-digital-shared';
@@ -12,14 +12,14 @@ import { createSelectPatient } from 'src/app/state/application/selectors/exercis
     styleUrls: ['./patient-identifier.component.scss'],
     standalone: false,
 })
-export class PatientIdentifierComponent implements OnInit {
+export class PatientIdentifierComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
 
     @Input() patientId!: UUID;
 
     patient$!: Observable<Patient>;
 
-    ngOnInit(): void {
+    ngOnChanges(): void {
         this.patient$ = this.store.select(createSelectPatient(this.patientId));
     }
 }

@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { createSelector, Store } from '@ngrx/store';
 import { Patient, SimulatedRegion } from 'fuesim-digital-shared';
-import { combineLatest, Observable, map } from 'rxjs';
+import { combineLatest, Observable, map, Subject, takeUntil } from 'rxjs';
 import { AppState } from 'src/app/state/app.state';
 import type {
     Material,
@@ -31,7 +31,7 @@ import { PatientWithVisibleStatus } from '../patients-table/simulated-region-ove
     styleUrls: ['./simulated-region-preview.component.scss'],
     standalone: false,
 })
-export class SimulatedRegionPreviewComponent implements OnInit {
+export class SimulatedRegionPreviewComponent implements OnInit, OnDestroy {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly activeModal = inject(NgbActiveModal);
 
@@ -49,6 +49,7 @@ export class SimulatedRegionPreviewComponent implements OnInit {
     groupedVehicles$!: Observable<
         { vehicleType: string; vehicles: Vehicle[] }[]
     >;
+    private readonly destroy$ = new Subject<void>();
 
     ngOnInit(): void {
         this.simulatedRegion$ = this.store.select(
@@ -134,6 +135,28 @@ export class SimulatedRegionPreviewComponent implements OnInit {
                 this.simulatedRegionId
             )
         );
+
+        combineLatest([
+            this.patients$,
+            vehicles$,
+            this.material$,
+            this.personnelByCategory$,
+        ])
+            .pipe(
+                map(([patients, vehicles, materials, personnel]) => ({
+                    ...patients.map((p) => p.id),
+                    ...vehicles.map((v) => v.id),
+                    ...materials.map((m) => m.id),
+                    ...personnel.map((p) => p.id),
+                })),
+                takeUntil(this.destroy$)
+            )
+            .subscribe((ids) => {
+                const selection = this.selected();
+                if (selection && !ids.includes(selection.id)) {
+                    this.selected.set(null);
+                }
+            });
     }
 
     private indexOfTemplate(
@@ -157,5 +180,8 @@ export class SimulatedRegionPreviewComponent implements OnInit {
 
     public close() {
         this.activeModal.close();
+    }
+    ngOnDestroy(): void {
+        this.destroy$.next();
     }
 }

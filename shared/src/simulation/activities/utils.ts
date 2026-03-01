@@ -1,12 +1,13 @@
+import type { WritableDraft } from 'immer';
 import type { SimulatedRegion } from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable } from '../../utils/index.js';
 import type { ExerciseSimulationActivityState } from './exercise-simulation-activity.js';
 import { simulationActivityDictionary } from './exercise-simulation-activity.js';
 
 export function addActivity(
-    simulatedRegion: Mutable<SimulatedRegion>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
     activityState: ExerciseSimulationActivityState
 ) {
     simulatedRegion.activities[activityState.id] =
@@ -14,8 +15,8 @@ export function addActivity(
 }
 
 export function terminateActivity(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
     activityId: UUID
 ) {
     const activityType = simulatedRegion.activities[activityId]?.type;

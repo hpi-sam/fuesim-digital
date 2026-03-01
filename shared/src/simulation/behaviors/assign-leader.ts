@@ -1,5 +1,6 @@
 import { IsOptional, IsUUID } from 'class-validator';
 import { groupBy } from 'lodash-es';
+import type { WritableDraft } from 'immer';
 import type {
     MaterialCountRadiogram,
     PersonnelCountRadiogram,
@@ -11,7 +12,7 @@ import {
     getElement,
     getElementByPredicate,
 } from '../../store/action-reducers/utils/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import {
     StrictObject,
     uuid,
@@ -141,7 +142,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                         event.generateReportActivityId,
                                         'generateReportActivity'
                                     )
-                                        .radiogram as Mutable<MaterialCountRadiogram>;
+                                        .radiogram as WritableDraft<MaterialCountRadiogram>;
                                     const materials = Object.values(
                                         draftState.materials
                                     ).filter((material) =>
@@ -183,7 +184,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                         event.generateReportActivityId,
                                         'generateReportActivity'
                                     )
-                                        .radiogram as Mutable<PersonnelCountRadiogram>;
+                                        .radiogram as WritableDraft<PersonnelCountRadiogram>;
                                     const personnel = Object.values(
                                         draftState.personnel
                                     ).filter((person) =>
@@ -216,7 +217,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     event.generateReportActivityId,
                                     'generateReportActivity'
                                 )
-                                    .radiogram as Mutable<TransferConnectionsRadiogram>;
+                                    .radiogram as WritableDraft<TransferConnectionsRadiogram>;
 
                                 const ownTransferPoint = getElementByPredicate(
                                     draftState,
@@ -271,7 +272,8 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     simulatedRegion.id,
                                     event.generateReportActivityId,
                                     'generateReportActivity'
-                                ).radiogram as Mutable<VehicleCountRadiogram>;
+                                )
+                                    .radiogram as WritableDraft<VehicleCountRadiogram>;
                                 const vehicles = Object.values(
                                     draftState.vehicles
                                 ).filter((vehicle) =>
@@ -303,7 +305,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     event.generateReportActivityId,
                                     'generateReportActivity'
                                 )
-                                    .radiogram as Mutable<VehicleOccupationsRadiogram>;
+                                    .radiogram as WritableDraft<VehicleOccupationsRadiogram>;
                                 const vehicles = Object.values(
                                     draftState.vehicles
                                 ).filter((vehicle) =>
@@ -340,9 +342,9 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
     };
 
 function selectNewLeader(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<AssignLeaderBehaviorState>,
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<AssignLeaderBehaviorState>,
     changeLeaderIfNoLeaderSelected: boolean
 ) {
     const personnel = Object.values(draftState.personnel).filter(
@@ -367,9 +369,9 @@ function selectNewLeader(
 }
 
 function changeLeader(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<AssignLeaderBehaviorState>,
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<AssignLeaderBehaviorState>,
     newLeaderId: UUID | undefined
 ) {
     addActivity(

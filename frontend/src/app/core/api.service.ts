@@ -3,19 +3,21 @@ import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     exerciseExistsResponseDataSchema,
+    ExerciseKey,
+    exerciseKeysSchema,
     getExercisesResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     PostExerciseTemplateRequestData,
+    TrainerKey,
     UUID,
-    type ExerciseAccessIds,
     type ExerciseTimeline,
     type StateExport,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
 import type { AppState } from '../state/app.state';
-import { selectExerciseId } from '../state/application/selectors/application.selectors';
+import { selectExerciseKey } from '../state/application/selectors/application.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
@@ -30,45 +32,43 @@ export class ApiService {
 
     public async createExercise() {
         return lastValueFrom(
-            this.httpClient.post<ExerciseAccessIds>(
-                `${httpOrigin}/api/exercise`,
-                {}
-            )
+            this.httpClient
+                .post(`${httpOrigin}/api/exercise`, {})
+                .pipe(map((v) => exerciseKeysSchema.parse(v)))
         );
     }
 
     public async importExercise(exportedState: StateExport) {
         return lastValueFrom(
-            this.httpClient.post<ExerciseAccessIds>(
-                `${httpOrigin}/api/exercise`,
-                exportedState
-            )
+            this.httpClient
+                .post(`${httpOrigin}/api/exercise`, exportedState)
+                .pipe(map((v) => exerciseKeysSchema.parse(v)))
         );
     }
 
     public async exerciseHistory() {
-        const exerciseId = selectStateSnapshot(selectExerciseId, this.store);
+        const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store)!;
         return lastValueFrom(
             this.httpClient.get<ExerciseTimeline>(
-                `${httpOrigin}/api/exercise/${exerciseId}/history`
+                `${httpOrigin}/api/exercise/${exerciseKey}/history`
             )
         ).then((value) => freeze(value, true));
     }
 
-    public async deleteExercise(trainerId: string) {
+    public async deleteExercise(trainerKey: TrainerKey) {
         return lastValueFrom(
-            this.httpClient.delete(`${httpOrigin}/api/exercise/${trainerId}`)
+            this.httpClient.delete(`${httpOrigin}/api/exercise/${trainerKey}`)
         );
     }
 
     /**
-     * @param exerciseId the trainerId or participantId of the exercise
-     * @returns wether the exercise exists
+     * @param exerciseKey the trainerKey or participantKey of the exercise
+     * @returns whether the exercise exists
      */
-    public async exerciseExists(exerciseId: string) {
+    public async exerciseExists(exerciseKey: ExerciseKey) {
         return lastValueFrom(
             this.httpClient
-                .get(`${httpOrigin}/api/exercise/${exerciseId}`)
+                .get(`${httpOrigin}/api/exercise/${exerciseKey}`)
                 .pipe(map((v) => exerciseExistsResponseDataSchema.parse(v)))
         );
     }
@@ -95,30 +95,37 @@ export class ApiService {
     }
 
     public async patchExerciseTemplate(
-        id: UUID,
+        templateId: UUID,
         data: PostExerciseTemplateRequestData
     ) {
         return lastValueFrom(
             this.httpClient
-                .patch(`${httpOrigin}/api/exercise_templates/${id}`, data)
+                .patch(
+                    `${httpOrigin}/api/exercise_templates/${templateId}`,
+                    data
+                )
                 .pipe(
                     map((v) => getExerciseTemplateResponseDataSchema.parse(v))
                 )
         );
     }
 
-    public async createExerciseFromTemplate(id: UUID) {
+    public async createExerciseFromTemplate(templateId: UUID) {
         return lastValueFrom(
-            this.httpClient.post<ExerciseAccessIds>(
-                `${httpOrigin}/api/exercise_templates/${id}/new`,
-                {}
-            )
+            this.httpClient
+                .post(
+                    `${httpOrigin}/api/exercise_templates/${templateId}/new`,
+                    {}
+                )
+                .pipe(map((v) => exerciseKeysSchema.parse(v)))
         );
     }
 
-    public async deleteExerciseTemplate(id: string) {
+    public async deleteExerciseTemplate(templateId: UUID) {
         return lastValueFrom(
-            this.httpClient.delete(`${httpOrigin}/api/exercise_templates/${id}`)
+            this.httpClient.delete(
+                `${httpOrigin}/api/exercise_templates/${templateId}`
+            )
         );
     }
 }

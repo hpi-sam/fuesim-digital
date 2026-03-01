@@ -2,7 +2,6 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseState,
     ImageProperties,
-    Mutable,
 } from 'fuesim-digital-shared';
 import {
     TransferToHospitalBehaviorState,
@@ -22,6 +21,7 @@ import {
     StrictObject,
     newNoPosition,
 } from 'fuesim-digital-shared';
+import type { WritableDraft } from 'immer';
 import { toUtf8Base64 } from './utils/base64';
 
 export interface SimulatedRegionDragTemplate {
@@ -140,7 +140,7 @@ export const simulatedRegionDragTemplates: SimulatedRegionDragTemplate[] =
     }));
 
 function reconstituteBehavior(
-    behavior: Mutable<ExerciseSimulationBehaviorState>,
+    behavior: WritableDraft<ExerciseSimulationBehaviorState>,
     state: ExerciseState
 ) {
     behavior.id = uuid();

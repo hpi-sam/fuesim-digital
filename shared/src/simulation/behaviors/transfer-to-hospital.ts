@@ -1,7 +1,8 @@
 import { IsUUID } from 'class-validator';
 import { difference, groupBy } from 'lodash-es';
+import { WritableDraft } from 'immer';
 import { IsValue } from '../../utils/validators/is-value.js';
-import type { Mutable, UUID, UUIDSet } from '../../utils/index.js';
+import type { UUID, UUIDSet } from '../../utils/index.js';
 import {
     StrictObject,
     stringCompare,
@@ -80,7 +81,7 @@ export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBe
                         break;
                     }
 
-                    const patientsToTransfer: Mutable<UUIDSet> = {};
+                    const patientsToTransfer: WritableDraft<UUIDSet> = {};
 
                     const groupedPatients = groupBy(
                         getOwnPatients(draftState, simulatedRegion.id)
@@ -212,7 +213,7 @@ export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBe
                         simulatedRegion.id,
                         event.generateReportActivityId,
                         'generateReportActivity'
-                    ).radiogram as Mutable<TransferCountsRadiogram>;
+                    ).radiogram as WritableDraft<TransferCountsRadiogram>;
 
                     const remainingPatients = Object.fromEntries(
                         Object.entries(
@@ -247,7 +248,7 @@ export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBe
     };
 
 function getOwnPatients(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID
 ) {
     return Object.values(draftState.patients).filter((patient) =>

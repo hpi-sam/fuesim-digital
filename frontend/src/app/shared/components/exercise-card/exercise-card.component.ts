@@ -19,26 +19,26 @@ export class ExerciseCardComponent {
 
     exercise = input<GetExerciseResponseData>();
     participantUrl = computed(
-        () => `${location.origin}/exercises/${this.exercise()?.participantId}`
+        () => `${location.origin}/exercises/${this.exercise()?.participantKey}`
     );
     trainerUrl = computed(
-        () => `${location.origin}/exercises/${this.exercise()?.trainerId}`
+        () => `${location.origin}/exercises/${this.exercise()?.trainerKey}`
     );
     readonly updated = output();
 
     async deleteExercise() {
-        const exerciseId = this.exercise()?.trainerId; // TODO exercise ID
-        if (!exerciseId) return;
+        const trainerKey = this.exercise()?.trainerKey;
+        if (!trainerKey) return;
         const deletionConfirmed = await this.confirmationModalService.confirm({
             title: 'Übung löschen',
             description:
                 'Möchten Sie die Übung wirklich unwiederbringlich löschen?',
-            confirmationString: exerciseId,
+            confirmationString: trainerKey,
         });
         if (!deletionConfirmed) {
             return;
         }
-        this.apiService.deleteExercise(exerciseId).then((response) => {
+        this.apiService.deleteExercise(trainerKey).then((response) => {
             this.messageService.postMessage({
                 title: 'Übung erfolgreich gelöscht',
                 color: 'success',

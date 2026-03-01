@@ -10,7 +10,7 @@ import {
     createStartTimeTravelAction,
 } from '../state/application/application.actions';
 import {
-    selectExerciseId,
+    selectExerciseKey,
     selectTimeConstraints,
 } from '../state/application/selectors/application.selectors';
 import { selectCurrentTime } from '../state/application/selectors/exercise.selectors';
@@ -43,10 +43,10 @@ export class TimeTravelService {
      */
     public async startTimeTravel() {
         this.activatingTimeTravel = true;
-        const exerciseId = selectStateSnapshot(selectExerciseId, this.store);
+        const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store);
         const exerciseTimeLine = await lastValueFrom(
             this.httpClient.get<ExerciseTimeline>(
-                `${httpOrigin}/api/exercise/${exerciseId}/history`
+                `${httpOrigin}/api/exercise/${exerciseKey}/history`
             )
         ).catch((error) => {
             this.stopTimeTravel();

@@ -18,16 +18,16 @@
                     <div>
                         Übung:
                         <span class="font-monospace fw-bold user-select-all">
-                            {{ participantId$ | async }}
+                            {{ participantKey$ | async }}
                         </span>
                     </div>
                     @if (mode === 'exercise') {
                         <app-exercise-state-badge
                             class="ms-3"
                         ></app-exercise-state-badge>
-                        @if (participantId$ | async) {
+                        @if (participantKey$ | async) {
                             <button
-                                (click)="shareExercise('participantId')"
+                                (click)="shareExercise('participantKey')"
                                 class="btn btn-light ms-3"
                                 ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen von Ihnen bestätigt werden."
                             >
@@ -39,7 +39,7 @@
                             'participant'
                         ) {
                             <button
-                                (click)="shareExercise('trainerId')"
+                                (click)="shareExercise('trainerKey')"
                                 class="btn btn-outline-warning ms-3"
                                 ngbTooltip="Über diesen Link können weitere Personen diese Übung verwalten. Teilen Sie diesen Link nicht mit Teilnehmenden!"
                             >

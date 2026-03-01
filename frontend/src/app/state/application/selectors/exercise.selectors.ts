@@ -60,7 +60,7 @@ export const selectPatientCategories =
 export const selectConfiguration = selectPropertyFactory('configuration');
 export const selectEocLogEntries = selectPropertyFactory('eocLog');
 export const selectExerciseStatus = selectPropertyFactory('currentStatus');
-export const selectParticipantId = selectPropertyFactory('participantId');
+export const selectParticipantKey = selectPropertyFactory('participantKey');
 export const selectCurrentTime = selectPropertyFactory('currentTime');
 
 // Elements

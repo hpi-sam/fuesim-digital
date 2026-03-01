@@ -1,4 +1,5 @@
 import { IsString, IsUUID } from 'class-validator';
+import { WritableDraft } from 'immer';
 import {
     newMapPositionAt,
     type ExerciseOccupation,
@@ -25,7 +26,7 @@ import {
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
 import { imageSizeToPosition } from '../../state-helpers/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import {
     cloneDeepMutable,
     StrictObject,
@@ -58,7 +59,7 @@ import { checkRestrictedVehicleMovementOrThrow } from './utils/restricted-vehicl
  * @param vehicleId The ID of the vehicle to be deleted
  */
 export function deleteVehicle(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     vehicleId: UUID
 ) {
     logVehicleRemoved(draftState, vehicleId);

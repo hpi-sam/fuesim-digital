@@ -64,8 +64,8 @@ export const createExerciseManagerRouter = (
             );
 
         res.status(201).send({
-            participantId: newExercise.participantKey,
-            trainerId: newExercise.trainerKey,
+            participantKey: newExercise.participantKey,
+            trainerKey: newExercise.trainerKey,
         });
     });
 

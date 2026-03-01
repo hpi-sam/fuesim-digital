@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsObject, IsOptional, ValidateNested } from 'class-validator';
+import { type WritableDraft } from 'immer';
 import { ExerciseState } from '../../state.js';
-import type { Mutable } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { ExerciseAction } from '../../store/action-reducers/action-reducers.js';
 import { IsExerciseAction } from '../../store/validate-exercise-action.js';
@@ -14,11 +14,11 @@ export class StateHistoryCompound {
 
     @ValidateNested()
     @Type(() => ExerciseState)
-    public initialState: Mutable<ExerciseState>;
+    public initialState: WritableDraft<ExerciseState>;
 
     public constructor(
         actionHistory: ExerciseAction[],
-        initialState: Mutable<ExerciseState>
+        initialState: WritableDraft<ExerciseState>
     ) {
         this.actionHistory = actionHistory;
         this.initialState = initialState;
@@ -50,10 +50,10 @@ export class StateExport extends BaseExportImportFile {
 export class MigratedStateExport extends StateExport {
     @ValidateNested()
     @Type(() => ExerciseState)
-    public override currentState: Mutable<ExerciseState>;
+    public override currentState: WritableDraft<ExerciseState>;
 
     public constructor(
-        currentState: Mutable<ExerciseState>,
+        currentState: WritableDraft<ExerciseState>,
         stateHistory?: StateHistoryCompound
     ) {
         super(currentState, stateHistory);

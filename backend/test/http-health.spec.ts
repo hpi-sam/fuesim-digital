@@ -9,10 +9,10 @@ describe('health', () => {
                 .httpRequest('get', '/api/health')
                 .expect(200);
 
-            const exerciseCreationResponse = response.body as {
+            const healthResponse = response.body as {
                 status: string;
             };
-            expect(exerciseCreationResponse.status).toBeDefined();
+            expect(healthResponse.status).toBeDefined();
         });
     });
 });

@@ -1,4 +1,5 @@
 import {
+    type ExerciseKey,
     isExerciseKey,
     joinExerciseResponseDataSchema,
     type UUID,
@@ -15,7 +16,7 @@ export const registerJoinExerciseHandler = (
     secureOn(
         client,
         'joinExercise',
-        (exerciseKey: string, clientName: string, callback): void => {
+        (exerciseKey: ExerciseKey, clientName: string, callback): void => {
             // When this listener is registered the socket is in the map.
             const clientWrapper = clientMap.get(client)!;
             if (clientWrapper.exercise) {
@@ -55,7 +56,7 @@ export const registerJoinExerciseHandler = (
                     exerciseTemplate: clientWrapper.exercise!.template
                         ? {
                               ...clientWrapper.exercise!.template,
-                              trainerId: clientWrapper.exercise!.trainerKey,
+                              trainerKey: clientWrapper.exercise!.trainerKey,
                           }
                         : null,
                 }),

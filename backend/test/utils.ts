@@ -1,10 +1,13 @@
 import type {
     ClientToServerEvents,
-    ExerciseAccessIds,
     MergeIntersection,
     ServerToClientEvents,
 } from 'fuesim-digital-shared';
-import { sleep, socketIoTransports } from 'fuesim-digital-shared';
+import {
+    exerciseKeysSchema,
+    sleep,
+    socketIoTransports,
+} from 'fuesim-digital-shared';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import request from 'supertest';
@@ -23,8 +26,6 @@ import { UserRepository } from '../src/database/repositories/user-repository.js'
 import { SessionRepository } from '../src/database/repositories/session-repository.js';
 import { ExerciseManagerService } from '../src/database/services/exercise-manager-service.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
-
-export type ExerciseCreationResponse = ExerciseAccessIds;
 
 // Some helper types
 /**
@@ -281,12 +282,10 @@ async function setupDatabase(): Promise<DatabaseService> {
     return testDatabaseService;
 }
 
-export async function createExercise(
-    environment: TestEnvironment
-): Promise<ExerciseAccessIds> {
+export async function createExercise(environment: TestEnvironment) {
     const response = await environment
         .httpRequest('post', '/api/exercise')
         .expect(201);
 
-    return response.body as ExerciseCreationResponse;
+    return exerciseKeysSchema.parse(response.body);
 }

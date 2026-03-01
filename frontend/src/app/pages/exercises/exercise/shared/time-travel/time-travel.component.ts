@@ -114,16 +114,16 @@ export class TimeTravelComponent implements OnDestroy {
             selectExerciseState,
             this.store
         );
-        const { trainerId } = await this.apiService.importExercise(
+        const { trainerKey } = await this.apiService.importExercise(
             new StateExport(cloneDeepMutable(currentExerciseState))
         );
         this.messageService.postMessage({
             color: 'success',
             title: 'Neue Übung erstellt',
-            body: `ÜbungsleiterId: ${trainerId}`,
+            body: `Übungsleiter-ID: ${trainerKey}`,
         });
         window
-            .open(`${location.origin}/exercises/${trainerId}`, '_blank')
+            .open(`${location.origin}/exercises/${trainerKey}`, '_blank')
             ?.focus();
     }
 

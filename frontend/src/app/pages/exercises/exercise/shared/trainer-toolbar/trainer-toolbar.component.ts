@@ -8,9 +8,10 @@ import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confir
 import { ExerciseService } from 'src/app/core/exercise.service';
 import { MessageService } from 'src/app/core/messages/message.service';
 import type { AppState } from 'src/app/state/app.state';
-import { selectExerciseId } from 'src/app/state/application/selectors/application.selectors';
+import { selectExerciseKey } from 'src/app/state/application/selectors/application.selectors';
 import { selectExerciseStatus } from 'src/app/state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import type { TrainerKey } from 'fuesim-digital-shared';
 import { openAlarmGroupOverviewModal } from '../alarm-group-overview/open-alarm-group-overview-modal';
 import { openClientOverviewModal } from '../client-overview/open-client-overview-modal';
 import { openEmergencyOperationsCenterModal } from '../emergency-operations-center/open-emergency-operations-center-modal';
@@ -78,12 +79,12 @@ export class TrainerToolbarComponent {
     }
 
     public async deleteExercise() {
-        const exerciseId = selectStateSnapshot(selectExerciseId, this.store)!;
+        const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store)!;
         const deletionConfirmed = await this.confirmationModalService.confirm({
             title: 'Übung löschen',
             description:
                 'Möchten Sie die Übung wirklich unwiederbringlich löschen?',
-            confirmationString: exerciseId,
+            confirmationString: exerciseKey,
         });
         if (!deletionConfirmed) {
             return;
@@ -91,7 +92,7 @@ export class TrainerToolbarComponent {
         // If we get disconnected by the server during the deletion a disconnect error would be displayed
         this.applicationService.leaveExercise();
         this.apiService
-            .deleteExercise(exerciseId)
+            .deleteExercise(exerciseKey as TrainerKey)
             .then((response) => {
                 this.messageService.postMessage({
                     title: 'Übung erfolgreich gelöscht',

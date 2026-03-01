@@ -1,8 +1,8 @@
-import type { OnDestroy } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { OnDestroy, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { ApplicationService } from 'src/app/core/application.service';
+import type { ExerciseKey } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-join-exercise-modal',
@@ -14,7 +14,7 @@ export class JoinExerciseModalComponent implements OnDestroy {
     private readonly applicationService = inject(ApplicationService);
     private readonly activeModal = inject(NgbActiveModal);
 
-    public exerciseId!: string;
+    public exerciseKey!: ExerciseKey;
     public clientName = '';
     /**
      * Emits true when the exercise was successfully joined.
@@ -24,7 +24,7 @@ export class JoinExerciseModalComponent implements OnDestroy {
 
     public async joinExercise() {
         const successfullyJoined = await this.applicationService.joinExercise(
-            this.exerciseId,
+            this.exerciseKey,
             this.clientName
         );
         this.exerciseJoined$.next(successfullyJoined);

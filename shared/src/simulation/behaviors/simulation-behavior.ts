@@ -1,6 +1,7 @@
+import type { WritableDraft } from 'immer';
 import type { SimulatedRegion } from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import type { Constructor, Mutable, UUID } from '../../utils/index.js';
+import type { Constructor, UUID } from '../../utils/index.js';
 import type { ExerciseSimulationEvent } from '../events/index.js';
 
 export class SimulationBehaviorState {
@@ -16,14 +17,14 @@ export interface SimulationBehavior<
         readonly create: (...args: ConstructorParameters<C>) => S;
     };
     readonly handleEvent: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<S>,
-        event: Mutable<ExerciseSimulationEvent>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<S>,
+        event: WritableDraft<ExerciseSimulationEvent>
     ) => void;
     readonly onRemove?: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<S>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<S>
     ) => void;
 }

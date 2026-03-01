@@ -8,6 +8,7 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import type { WritableDraft } from 'immer';
 import {
     newPatientTransferOccupation,
     PatientStatus,
@@ -20,7 +21,7 @@ import {
     patientStatusAllowedValues,
     addResourceDescription,
 } from '../../models/index.js';
-import type { Mutable, UUID, UUIDSet } from '../../utils/index.js';
+import type { UUID, UUIDSet } from '../../utils/index.js';
 import {
     StrictObject,
     cloneDeepMutable,
@@ -439,7 +440,8 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                                 simulatedRegion.id,
                                 event.generateReportActivityId,
                                 'generateReportActivity'
-                            ).radiogram as Mutable<TransferCountsRadiogram>;
+                            )
+                                .radiogram as WritableDraft<TransferCountsRadiogram>;
 
                             const expectedPatientsPerRegion =
                                 Object.fromEntries(
@@ -492,9 +494,9 @@ const orderedPatientCategories: PatientStatusForTransport[] = [
 ];
 
 export function updateRequestVehiclesDelay(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>,
     newDelay: number
 ) {
     behaviorState.requestVehiclesDelay = newDelay;
@@ -510,9 +512,9 @@ export function updateRequestVehiclesDelay(
 }
 
 export function updateRequestPatientCountsDelay(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>,
     newDelay: number
 ) {
     behaviorState.requestPatientCountsDelay = newDelay;
@@ -528,8 +530,8 @@ export function updateRequestPatientCountsDelay(
 }
 
 function patientsExpectedInRegionsAfterTransports(
-    draftState: Mutable<ExerciseState>,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>
+    draftState: WritableDraft<ExerciseState>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>
 ) {
     behaviorState.patientsExpectedToStillBeTransportedByRegion =
         behaviorState.patientsExpectedToStillBeTransportedByRegion.filter(
@@ -567,7 +569,7 @@ function patientsExpectedInRegionsAfterTransports(
 }
 
 function getNextVehicleForPatientStatus(
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>,
     patientStatus: PatientStatusForTransport
 ) {
     behaviorState.vehiclesForPatients[`${patientStatus}Index`]++;
@@ -584,9 +586,9 @@ function getNextVehicleForPatientStatus(
 }
 
 function addActivities(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>
 ) {
     if (!behaviorState.recurringPatientDataRequestActivityId) {
         behaviorState.recurringPatientDataRequestActivityId =
@@ -617,9 +619,9 @@ function addActivities(
 }
 
 function removeActivities(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>
 ) {
     if (behaviorState.recurringPatientDataRequestActivityId) {
         terminateActivity(

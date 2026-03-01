@@ -36,14 +36,14 @@ export class ExerciseTemplateCardComponent {
         if (!exerciseTemplate) return;
         this.apiService
             .createExerciseFromTemplate(exerciseTemplate.id)
-            .then((ids) => {
+            .then(({ trainerKey }) => {
                 this.messageService.postMessage({
                     title: 'Übung erfolgreich erstellt',
                     body: '',
                     color: 'success',
                 });
 
-                this.router.navigate(['/exercises', ids.trainerId]);
+                this.router.navigate(['/exercises', trainerKey]);
             });
     }
 
@@ -54,7 +54,7 @@ export class ExerciseTemplateCardComponent {
             title: 'Übungsvorlage löschen',
             description:
                 'Möchten Sie die Übungsvorlage wirklich unwiederbringlich löschen?',
-            confirmationString: exerciseTemplate.trainerId,
+            confirmationString: exerciseTemplate.trainerKey,
         });
         if (!deletionConfirmed) {
             return;

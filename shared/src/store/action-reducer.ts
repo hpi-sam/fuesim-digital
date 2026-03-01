@@ -1,8 +1,9 @@
+import type { WritableDraft } from 'immer';
 import type { Client } from '../models/client.js';
 import type { Role } from '../models/utils/index.js';
 import type { SpecificRole } from '../models/utils/role.js';
 import type { ExerciseState } from '../state.js';
-import type { Constructor, Mutable } from '../utils/index.js';
+import type { Constructor } from '../utils/index.js';
 
 export interface ActionReducer<A extends Action = Action> {
     readonly action: Constructor<A>;
@@ -69,9 +70,9 @@ export interface Action {
  */
 type ReducerFunction<A extends Action> = (
     // These functions can only work with a mutable state object, because we expect them to be executed in immers produce context.
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     action: A
-) => Mutable<ExerciseState>;
+) => WritableDraft<ExerciseState>;
 
 export type ReducerRights<A extends Action> =
     | Role

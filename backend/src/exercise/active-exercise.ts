@@ -48,12 +48,12 @@ export class ActiveExercise {
 
     public get participantKey(): ParticipantKey {
         // This should always be valid, since we are creating all active exercises in the exercise factory which ensures valid keys
-        return this.exercise.participantId;
+        return this.exercise.participantKey;
     }
 
     public get trainerKey(): TrainerKey {
         // This should always be valid, since we are creating all active exercises in the exercise factory which ensures valid keys
-        return this.exercise.trainerId;
+        return this.exercise.trainerKey;
     }
 
     private _changedSinceSave = true;
@@ -169,8 +169,8 @@ export class ActiveExercise {
         this.exercise = {
             currentStateString: currentState,
             initialStateString: initialState,
-            participantId: participantKey,
-            trainerId: trainerKey,
+            participantKey,
+            trainerKey,
             stateVersion,
             tickCounter: 0,
         };
@@ -184,13 +184,13 @@ export class ActiveExercise {
      */
     public getRoleFromUsedKey(id: ExerciseKey): Role {
         switch (id) {
-            case this.exercise.participantId:
+            case this.exercise.participantKey:
                 return 'participant';
-            case this.exercise.trainerId:
+            case this.exercise.trainerKey:
                 return 'trainer';
             default:
                 throw new RangeError(
-                    `Incorrect id: ${id} where pid=${this.exercise.participantId} and tid=${this.exercise.trainerId}`
+                    `Incorrect id: ${id} where pid=${this.exercise.participantKey} and tid=${this.exercise.trainerKey}`
                 );
         }
     }

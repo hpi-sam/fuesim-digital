@@ -5,7 +5,6 @@ import {
     IsArray,
     IsInt,
     IsObject,
-    IsString,
     IsUUID,
     Min,
     ValidateNested,
@@ -68,6 +67,7 @@ import { materialTemplateSchema } from './models/material-template.js';
 import { personnelTemplateSchema } from './models/personnel-template.js';
 import { personnelSchema } from './models/personnel.js';
 import { vehicleTemplateSchema } from './models/vehicle-template.js';
+import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -155,10 +155,11 @@ export class ExerciseState {
     @ValidateNested()
     @Type(() => EocLogEntry)
     public readonly eocLog: readonly EocLogEntry[] = [];
-    @IsString()
-    public readonly participantId: string;
 
-    // Mutable<ExerciseState>` could still have immutable objects in spatialTree
+    @IsZodSchema(participantKeySchema)
+    public readonly participantKey: ParticipantKey;
+
+    // WritableDraft<ExerciseState>` could still have immutable objects in spatialTree
     @IsObject()
     public readonly spatialTrees: {
         [type in SpatialElementPlural]: SpatialTree;
@@ -190,8 +191,8 @@ export class ExerciseState {
     /**
      * @deprecated Use {@link create} instead.
      */
-    constructor(participantId: string) {
-        this.participantId = participantId;
+    constructor(participantKey: ParticipantKey) {
+        this.participantKey = participantKey;
     }
 
     static readonly create = getCreate(this);
@@ -201,5 +202,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 46;
+    static readonly currentStateVersion = 47;
 }

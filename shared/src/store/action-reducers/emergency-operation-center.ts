@@ -8,13 +8,14 @@ import {
     Min,
 } from 'class-validator';
 import { z } from 'zod';
+import { WritableDraft } from 'immer';
 import {
     EocLogEntry,
     newAlarmGroupStartPoint,
     VehicleParameters,
     vehicleParametersSchema,
 } from '../../models/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import {
     StrictObject,
     cloneDeepMutable,
@@ -177,7 +178,7 @@ export namespace EmergencyOperationCenterActionReducers {
 }
 
 function sendAlarmGroupVehicle(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     vehicleParameters: VehicleParameters,
     time: number,
     alarmGroupId: UUID,

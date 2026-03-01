@@ -1,3 +1,4 @@
+import type { WritableDraft } from 'immer';
 import { IsValue } from '../../../utils/validators/is-value.js';
 import { cloneDeepMutable } from '../../../utils/clone-deep.js';
 import { getCreate } from '../../../models/utils/get-create.js';
@@ -5,7 +6,6 @@ import { RadiogramUnpublishedStatus } from '../../../models/radiogram/status/rad
 import { publishRadiogram } from '../../../models/radiogram/radiogram-helpers-mutable.js';
 import { nextUUID } from '../../../simulation/utils/randomness.js';
 import { ResourceRequestRadiogram } from '../../radiogram/resource-request-radiogram.js';
-import type { Mutable } from '../../../utils/immutability.js';
 import { isDone, isUnread } from '../../radiogram/radiogram-helpers.js';
 import { StrictObject } from '../../../utils/strict-object.js';
 import { isEmptyResource } from '../rescue-resource.js';
@@ -40,7 +40,7 @@ export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfigura
                     radiogram.type === 'resourceRequestRadiogram' &&
                     isUnread(radiogram) &&
                     radiogram.resourceRequestKey === key
-            ) as Mutable<ResourceRequestRadiogram> | undefined;
+            ) as WritableDraft<ResourceRequestRadiogram> | undefined;
             if (unreadRadiogram) {
                 if (isEmptyResource(requestedResource)) {
                     delete draftState.radiograms[unreadRadiogram.id];

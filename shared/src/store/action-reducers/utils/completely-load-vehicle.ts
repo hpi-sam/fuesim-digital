@@ -1,3 +1,4 @@
+import type { WritableDraft } from 'immer';
 import type { Vehicle } from '../../../models/index.js';
 import {
     currentSimulatedRegionIdOf,
@@ -16,7 +17,6 @@ import {
 } from '../../../simulation/index.js';
 import { sendSimulationEvent } from '../../../simulation/events/utils.js';
 import type { ExerciseState } from '../../../state.js';
-import type { Mutable } from '../../../utils/index.js';
 import { getElement } from './get-element.js';
 
 /**
@@ -27,8 +27,8 @@ import { getElement } from './get-element.js';
  * @returns `true` if everything is in the vehicle, `false` otherwise
  */
 export function isCompletelyLoaded(
-    draftState: Mutable<ExerciseState>,
-    vehicle: Mutable<Vehicle>
+    draftState: WritableDraft<ExerciseState>,
+    vehicle: WritableDraft<Vehicle>
 ) {
     const materialsLoaded = Object.keys(vehicle.materialIds).map((materialId) =>
         isInSpecificVehicle(
@@ -59,8 +59,8 @@ export function isCompletelyLoaded(
  * @param vehicle The vehicle to load
  */
 export function completelyLoadVehicle(
-    draftState: Mutable<ExerciseState>,
-    vehicle: Mutable<Vehicle>
+    draftState: WritableDraft<ExerciseState>,
+    vehicle: WritableDraft<Vehicle>
 ) {
     const inSimulation = isInSimulatedRegion(vehicle);
     const simulatedRegionId = inSimulation

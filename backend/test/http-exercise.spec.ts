@@ -1,5 +1,5 @@
+import { exerciseKeysSchema } from 'fuesim-digital-shared';
 import { UserReadableIdGenerator } from '../src/utils/user-readable-id-generator.js';
-import type { ExerciseCreationResponse } from './utils.js';
 import { createExercise, createTestEnvironment } from './utils.js';
 
 describe('exercise', () => {
@@ -15,10 +15,11 @@ describe('exercise', () => {
                 .httpRequest('post', '/api/exercise')
                 .expect(201);
 
-            const exerciseCreationResponse =
-                response.body as ExerciseCreationResponse;
-            expect(exerciseCreationResponse.participantId).toBeDefined();
-            expect(exerciseCreationResponse.trainerId).toBeDefined();
+            const exerciseCreationResponse = exerciseKeysSchema.parse(
+                response.body
+            );
+            expect(exerciseCreationResponse.participantKey).toBeDefined();
+            expect(exerciseCreationResponse.trainerKey).toBeDefined();
         });
 
         it('fails when no keys are left', async () => {
@@ -32,14 +33,14 @@ describe('exercise', () => {
     describe('GET /api/exercise/:exerciseKey', () => {
         it('succeeds with 200 with a valid participant key', async () => {
             const participantKey = (await createExercise(environment))
-                .participantId;
+                .participantKey;
             await environment
                 .httpRequest('get', `/api/exercise/${participantKey}`)
                 .expect(200);
         });
 
         it('succeeds returning true for trainer key', async () => {
-            const trainerKey = (await createExercise(environment)).trainerId;
+            const trainerKey = (await createExercise(environment)).trainerKey;
             await environment
                 .httpRequest('get', `/api/exercise/${trainerKey}`)
                 .expect(200);
@@ -67,7 +68,7 @@ describe('exercise', () => {
 
     describe('DELETE /api/exercise/:exerciseKey', () => {
         it('succeeds deleting an exercise', async () => {
-            const exerciseKey = (await createExercise(environment)).trainerId;
+            const exerciseKey = (await createExercise(environment)).trainerKey;
             await environment
                 .httpRequest('delete', `/api/exercise/${exerciseKey}`)
                 .expect(204);
@@ -91,14 +92,14 @@ describe('exercise', () => {
 
         it('fails deleting an exercise by its participant key', async () => {
             const exerciseKey = (await createExercise(environment))
-                .participantId;
+                .participantKey;
             await environment
                 .httpRequest('delete', `/api/exercise/${exerciseKey}`)
                 .expect(403);
         });
 
         it('disconnects clients of the removed exercise', async () => {
-            const exerciseKey = (await createExercise(environment)).trainerId;
+            const exerciseKey = (await createExercise(environment)).trainerKey;
             await environment.withWebsocket(async (socket) => {
                 const joinExercise = await socket.emit(
                     'joinExercise',
@@ -121,7 +122,7 @@ describe('exercise', () => {
 
     describe('GET /api/exercise/:exerciseKey/history', () => {
         it('returns history for existing exercise', async () => {
-            const exerciseKey = (await createExercise(environment)).trainerId;
+            const exerciseKey = (await createExercise(environment)).trainerKey;
             await environment
                 .httpRequest('get', `/api/exercise/${exerciseKey}/history`)
                 .expect(200);

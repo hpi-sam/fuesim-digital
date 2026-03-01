@@ -1,8 +1,5 @@
-import type {
-    Immutable,
-    JsonObject,
-    SocketResponse,
-} from 'fuesim-digital-shared';
+import type { JsonObject, SocketResponse } from 'fuesim-digital-shared';
+import type { Immutable } from 'immer';
 import { isEqual } from 'lodash-es';
 
 /**

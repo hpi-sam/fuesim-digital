@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import type {
     ClientToServerEvents,
     ExerciseAction,
+    ExerciseKey,
     ExerciseState,
     JoinExerciseResponseData,
     ServerToClientEvents,
@@ -12,7 +13,7 @@ import {
     joinExerciseResponseDataSchema,
     socketIoTransports,
 } from 'fuesim-digital-shared';
-import { freeze } from 'immer';
+import { freeze, WritableDraft } from 'immer';
 import {
     debounceTime,
     filter,
@@ -102,7 +103,7 @@ export class ExerciseService {
      * @returns whether the join was successful
      */
     public async joinExercise(
-        exerciseId: string,
+        exerciseKey: ExerciseKey,
         clientName: string
     ): Promise<boolean> {
         this.socket.connect().on('connect_error', (error) => {
@@ -115,7 +116,7 @@ export class ExerciseService {
             (resolve) => {
                 this.socket.emit(
                     'joinExercise',
-                    exerciseId,
+                    exerciseKey,
                     clientName,
                     resolve
                 );
@@ -150,7 +151,7 @@ export class ExerciseService {
             createJoinExerciseAction(
                 joinResponsePayload.clientId,
                 getStateResponse.payload,
-                exerciseId,
+                exerciseKey,
                 clientName
             )
         );
@@ -161,14 +162,26 @@ export class ExerciseService {
             SocketResponse
         >(
             (exercise) =>
-                this.store.dispatch(createSetExerciseStateAction(exercise)),
+                this.store.dispatch(
+                    createSetExerciseStateAction(
+                        exercise as WritableDraft<ExerciseState>
+                    )
+                ),
             () => selectStateSnapshot(selectExerciseState, this.store),
             (action) =>
-                this.store.dispatch(createApplyServerActionAction(action)),
+                this.store.dispatch(
+                    createApplyServerActionAction(
+                        action as WritableDraft<ExerciseAction>
+                    )
+                ),
             async (action) => {
                 const response = await new Promise<SocketResponse>(
                     (resolve) => {
-                        this.socket.emit('proposeAction', action, resolve);
+                        this.socket.emit(
+                            'proposeAction',
+                            action as WritableDraft<ExerciseAction>,
+                            resolve
+                        );
                     }
                 );
                 if (!response.success) {

@@ -1,3 +1,4 @@
+import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../../state.js';
 import { getElement } from '../../../store/action-reducers/utils/index.js';
 import {
@@ -9,7 +10,7 @@ import {
     removeElementPosition,
     updateElementPosition,
 } from '../../../store/action-reducers/utils/spatial-elements.js';
-import type { Mutable, UUID } from '../../../utils/index.js';
+import type { UUID } from '../../../utils/index.js';
 import { cloneDeepMutable } from '../../../utils/index.js';
 import { checkRestrictedVehicleMovementOrThrow } from '../../../store/action-reducers/utils/restricted-vehicle-movement.js';
 // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -33,15 +34,15 @@ export function changePositionWithId(
     of: UUID,
     to: Position,
     type: MovableType,
-    inState: Mutable<ExerciseState>
+    inState: WritableDraft<ExerciseState>
 ) {
     changePosition(getElement(inState, type, of), to, inState);
 }
 
 export function changePosition(
-    element: Mutable<MovableElement>,
+    element: WritableDraft<MovableElement>,
     to: Position,
-    state: Mutable<ExerciseState>
+    state: WritableDraft<ExerciseState>
 ) {
     if (
         element.type === 'patient' ||
@@ -68,10 +69,10 @@ export function changePosition(
 }
 
 function updateSpatialElementTree(
-    element: Mutable<MovableElement>,
+    element: WritableDraft<MovableElement>,
     to: Position,
     type: SpatialElementType,
-    state: Mutable<ExerciseState>
+    state: WritableDraft<ExerciseState>
 ) {
     if (isOnMap(element) && isPositionOnMap(to)) {
         updateElementPosition(
@@ -93,7 +94,7 @@ function updateSpatialElementTree(
 }
 
 export function offsetMapPositionBy(
-    position: Mutable<MapPosition>,
+    position: WritableDraft<MapPosition>,
     offset: MapCoordinates
 ) {
     position.coordinates.x += offset.x;

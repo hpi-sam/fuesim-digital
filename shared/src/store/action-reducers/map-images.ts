@@ -8,6 +8,7 @@ import {
     IsUUID,
     ValidateNested,
 } from 'class-validator';
+import { WritableDraft } from 'immer';
 import {
     MapImage,
     type MapCoordinates,
@@ -16,7 +17,7 @@ import {
 } from '../../models/index.js';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import {
     assertExhaustiveness,
     cloneDeepMutable,
@@ -232,7 +233,7 @@ export namespace MapImagesActionReducers {
  * @returns the zIndices of all mapImages except {@link mapImageIdToSkip}
  */
 function getAllZIndices(
-    exerciseState: Mutable<ExerciseState>,
+    exerciseState: WritableDraft<ExerciseState>,
     mapImageIdToSkip?: UUID
 ): number[] {
     return Object.values(exerciseState.mapImages)

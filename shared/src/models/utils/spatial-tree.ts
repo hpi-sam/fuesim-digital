@@ -7,12 +7,8 @@ import RBush from 'rbush';
 // or look out for a newer version here: https://github.com/mourner/rbush-knn#changelog
 // @ts-expect-error doesn't have a type
 import knn from 'rbush-knn';
-import type {
-    Mutable,
-    UUID,
-    JsonObject,
-    Immutable,
-} from '../../utils/index.js';
+import type { Immutable, WritableDraft } from 'immer';
+import type { JsonObject, UUID } from '../../utils/index.js';
 import { getCreate } from './get-create.js';
 import type { MapCoordinates } from './position/map-coordinates.js';
 import type { Size } from './size.js';
@@ -59,7 +55,7 @@ export class SpatialTree {
      * Writes the {@link PointRBush} as an {@link Immutable<JsonObject>} into {@link spatialTree}
      */
     private static savePointRBush(
-        spatialTree: Mutable<SpatialTree>,
+        spatialTree: WritableDraft<SpatialTree>,
         pointRBush: PointRBush
     ) {
         // PointRBush.toJSON() runs in O(1)
@@ -67,7 +63,7 @@ export class SpatialTree {
     }
 
     public static addElement(
-        spatialTree: Mutable<SpatialTree>,
+        spatialTree: WritableDraft<SpatialTree>,
         elementId: UUID,
         position: MapCoordinates
     ) {
@@ -80,9 +76,9 @@ export class SpatialTree {
     }
 
     public static removeElement(
-        spatialTree: Mutable<SpatialTree>,
+        spatialTree: WritableDraft<SpatialTree>,
         elementId: UUID,
-        position: MapCoordinates | Mutable<MapCoordinates>
+        position: MapCoordinates | WritableDraft<MapCoordinates>
     ) {
         const pointRBush = this.getPointRBush(spatialTree);
         pointRBush.remove(
@@ -96,9 +92,9 @@ export class SpatialTree {
     }
 
     public static moveElement(
-        spatialTree: Mutable<SpatialTree>,
+        spatialTree: WritableDraft<SpatialTree>,
         elementId: UUID,
-        startPosition: MapCoordinates | Mutable<MapCoordinates>,
+        startPosition: MapCoordinates | WritableDraft<MapCoordinates>,
         targetPosition: MapCoordinates
     ) {
         // TODO: use the move function from RBush, when available: https://github.com/mourner/rbush/issues/28
@@ -113,7 +109,7 @@ export class SpatialTree {
      * @returns the ids of the elements in the search-circle, sorted by distance to {@link circlePosition}
      */
     public static findAllElementsInCircle(
-        spatialTree: Mutable<SpatialTree>,
+        spatialTree: WritableDraft<SpatialTree>,
         circlePosition: MapCoordinates,
         radius: number
     ): UUID[] {
@@ -140,7 +136,7 @@ export class SpatialTree {
      * @returns all elements in the rectangle in a non-specified order
      */
     public static findAllElementsInRectangle(
-        spatialTree: Mutable<SpatialTree>,
+        spatialTree: WritableDraft<SpatialTree>,
         topLeftPosition: MapCoordinates,
         size: Size
     ) {

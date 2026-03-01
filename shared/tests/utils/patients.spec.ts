@@ -7,16 +7,16 @@ import {
     SpatialTree,
 } from '../../src/models/utils/index.js';
 import type { ExerciseState } from '../../src/state.js';
-import type { Mutable, UUID } from '../../src/utils/index.js';
+import type { UUID } from '../../src/utils/index.js';
 import { cloneDeepMutable } from '../../src/utils/index.js';
 
 export function addPatient(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     pretriageStatus: PatientStatus,
     realStatus: PatientStatus,
     position?: Position,
     uuid?: UUID
-): Mutable<Patient> {
+): WritableDraft<Patient> {
     const patient = cloneDeepMutable(generateDummyPatient());
     patient.pretriageStatus = pretriageStatus;
     if (pretriageStatus !== 'white') {

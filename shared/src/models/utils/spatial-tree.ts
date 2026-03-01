@@ -1,10 +1,5 @@
 import { IsObject } from 'class-validator';
 import RBush from 'rbush';
-// Currently, rbush-knn is included via the github repo
-// when new release is coming out (right now npm package is v3.0.1)
-// rbush-knn could be switched to npm package in package.json and package-lock.json
-// see the following issue: https://github.com/mourner/rbush-knn/issues/21
-// or look out for a newer version here: https://github.com/mourner/rbush-knn#changelog
 // @ts-expect-error doesn't have a type
 import knn from 'rbush-knn';
 import type { Immutable, WritableDraft } from 'immer';

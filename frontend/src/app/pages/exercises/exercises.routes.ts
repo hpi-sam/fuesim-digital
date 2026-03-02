@@ -8,6 +8,7 @@ import { IsAuthenticatedGuard } from './guards/is-authenticated.guard';
 import { ParallelExerciseComponent } from './parallel-exercise/parallel-exercise/parallel-exercise.component';
 import { ParallelExerciseListComponent } from './parallel-exercise/list/parallel-exercise-list.component';
 import { JoinParallelExerciseGuard } from './guards/join-parallel-exercise.guard';
+import { LeaveParallelExerciseGuard } from './guards/leave-parallel-exercise.guard';
 
 export const routes: Routes = [
     {
@@ -34,6 +35,7 @@ export const routes: Routes = [
         path: 'parallel/join/:key',
         component: ParallelExerciseComponent,
         canActivate: [JoinParallelExerciseGuard],
+        canDeactivate: [LeaveParallelExerciseGuard],
     },
     {
         path: ':exerciseId',

@@ -10,6 +10,11 @@ export const registerGetStateHandler = (
     secureOn(client, 'getState', (callback): void => {
         const clientWrapper = clientMap.get(client);
         if (!(clientWrapper instanceof ExerciseClientWrapper)) {
+            callback({
+                success: false,
+                message: 'No exercise selected',
+                expected: false,
+            });
             return;
         }
         if (!clientWrapper.exercise) {

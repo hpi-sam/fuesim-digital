@@ -2,15 +2,17 @@ import type { StateExport } from 'fuesim-digital-shared';
 import { ReducerError } from 'fuesim-digital-shared';
 import type { ActiveExercise } from '../exercise/active-exercise.js';
 import type { ExerciseFactory } from '../exercise/exercise-factory.js';
+import type { ExerciseInsert } from '../database/schema.js';
 import { ValidationErrorWrapper } from './validation-error-wrapper.js';
 import { ApiError } from './http.js';
 
 export async function importExercise(
     importObject: StateExport,
-    exerciseFactory: ExerciseFactory
+    exerciseFactory: ExerciseFactory,
+    optionalData: Partial<ExerciseInsert> = {}
 ): Promise<ActiveExercise> {
     try {
-        return await exerciseFactory.fromFile(importObject);
+        return await exerciseFactory.fromFile(importObject, optionalData);
     } catch (err) {
         if (err instanceof ValidationErrorWrapper) {
             throw new ApiError(

@@ -29,6 +29,10 @@ import { ExerciseManagerService } from '../database/services/exercise-manager-se
 import type { OidcService } from '../auth/oidc-service.js';
 import { AccessKeyService } from '../database/services/access-key-service.js';
 import { AccessKeyRepository } from '../database/repositories/access-key-repository.js';
+import type { Services } from '../database/services/index.js';
+import { ParallelExerciseService } from '../database/services/parallel-exercise-service.js';
+import { ParallelExerciseRepository } from '../database/repositories/parallel-exercise-repository.js';
+import type { Repositories } from '../database/repositories/index.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -122,39 +126,15 @@ export class WebsocketClient {
 
 export class TestEnvironment {
     public server!: FuesimServer;
-    private _databaseService!: DatabaseService;
-    private _exerciseService!: ExerciseService;
-    private _exerciseRepository!: ExerciseRepository;
-    private _actionRepository!: ActionRepository;
-    private _authService!: AuthService;
-    private _exerciseManagerService!: ExerciseManagerService;
-    private _accessKeyService!: AccessKeyService;
+    private _services!: Services;
+    private _repositories!: Repositories;
 
-    public get databaseService(): DatabaseService {
-        return this._databaseService;
-    }
-    public get exerciseService(): ExerciseService {
-        return this._exerciseService;
+    public get repositories(): Repositories {
+        return this._repositories;
     }
 
-    public get authService(): AuthService {
-        return this._authService;
-    }
-
-    public get exerciseManagerService() {
-        return this._exerciseManagerService;
-    }
-
-    public get exerciseRepository(): ExerciseRepository {
-        return this._exerciseRepository;
-    }
-
-    public get actionRepository(): ActionRepository {
-        return this._actionRepository;
-    }
-
-    public get accessKeyService(): AccessKeyService {
-        return this._accessKeyService;
+    public get services(): Services {
+        return this._services;
     }
 
     public httpRequest(
@@ -171,6 +151,12 @@ export class TestEnvironment {
         }
 
         return req;
+    }
+
+    public init(repositories: Repositories, services: Services) {
+        this._repositories = repositories;
+        this._services = services;
+        this.server = new FuesimServer(this.services);
     }
 
     /**
@@ -199,31 +185,6 @@ export class TestEnvironment {
             clientSocket?.close();
         }
     }
-
-    public init(
-        databaseService: DatabaseService,
-        exerciseService: ExerciseService,
-        exerciseRepository: ExerciseRepository,
-        actionRepository: ActionRepository,
-        authService: AuthService,
-        exerciseManagerService: ExerciseManagerService,
-        accessKeyService: AccessKeyService
-    ) {
-        this._databaseService = databaseService;
-        this._exerciseService = exerciseService;
-        this._authService = authService;
-        this._exerciseManagerService = exerciseManagerService;
-        this._exerciseRepository = exerciseRepository;
-        this._actionRepository = actionRepository;
-        this._accessKeyService = accessKeyService;
-        this.server = new FuesimServer(
-            this.databaseService,
-            exerciseService,
-            authService,
-            exerciseManagerService,
-            accessKeyService
-        );
-    }
 }
 
 export const createTestEnvironment = (): TestEnvironment => {
@@ -239,6 +200,8 @@ export const createTestEnvironment = (): TestEnvironment => {
     let userRepository: UserRepository;
     let sessionRepository: SessionRepository;
     let accessKeyRepository: AccessKeyRepository;
+    let parallelExerciseService: ParallelExerciseService;
+    let parallelExerciseRepository: ParallelExerciseRepository;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
@@ -250,6 +213,9 @@ export const createTestEnvironment = (): TestEnvironment => {
             databaseService.databaseConnection
         );
         accessKeyRepository = new AccessKeyRepository(
+            databaseService.databaseConnection
+        );
+        parallelExerciseRepository = new ParallelExerciseRepository(
             databaseService.databaseConnection
         );
 
@@ -273,15 +239,30 @@ export const createTestEnvironment = (): TestEnvironment => {
             actionRepository,
             exerciseService
         );
-        environment.init(
-            databaseService,
-            exerciseService,
+        parallelExerciseService = new ParallelExerciseService(
+            parallelExerciseRepository,
+            accessKeyService,
+            exerciseManagerService,
+            exerciseService
+        );
+
+        const repositories: Repositories = {
             exerciseRepository,
             actionRepository,
+            accessKeyRepository,
+            parallelExerciseRepository,
+            sessionRepository,
+            userRepository,
+        };
+        const services: Services = {
             authService,
             exerciseManagerService,
-            accessKeyService
-        );
+            exerciseService,
+            parallelExerciseService,
+            accessKeyService,
+            databaseService,
+        };
+        environment.init(repositories, services);
     });
     afterEach(async () => {
         // Prevent the dataSource from being closed too soon.

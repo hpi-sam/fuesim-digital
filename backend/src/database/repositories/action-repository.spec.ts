@@ -8,8 +8,8 @@ describe('ActionRepository', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
-        await environment.accessKeyService.freeAll();
-        environment.exerciseService.TESTING_getExerciseMap().clear();
+        await environment.services.accessKeyService.freeAll();
+        environment.services.exerciseService.TESTING_getExerciseMap().clear();
     });
 
     it('should save and retrieve actions correctly', async () => {
@@ -21,7 +21,7 @@ describe('ActionRepository', () => {
         // This is to test, wether action before exercise id assignment
         // are saved and retrieved correctly with this exerciseId.
         const activeExercise =
-            await environment.exerciseService.exerciseFactory.fromBlank();
+            await environment.services.exerciseService.exerciseFactory.fromBlank();
 
         const actions = [
             new ActionWrapper(
@@ -44,18 +44,13 @@ describe('ActionRepository', () => {
             ),
         ];
 
-        // Save exercise in database and therefore assign id, after actions are created
-        expect(activeExercise.exerciseId).toBeUndefined();
-        await environment.exerciseService.createExercise(activeExercise);
-        expect(activeExercise.exerciseId).toBeDefined();
-
-        await environment.actionRepository.saveActions(actions);
+        await environment.repositories.actionRepository.saveActions(actions);
 
         // TEMPLATES TO COMPARE AGAINST
         const expectedActions = actions.map((actionWrapper) => ({
             actionString: actionWrapper.getAction().actionString,
             emitterId: actionWrapper.getAction().emitterId,
-            exerciseId: activeExercise.exerciseId,
+            exerciseId: activeExercise.exercise.id,
             index: actionWrapper.getAction().index,
         }));
         expectedActions.sort((a, b) => a.index - b.index);
@@ -68,10 +63,10 @@ describe('ActionRepository', () => {
 
         // MANUAL CHECK
         const exerciseActions =
-            await environment.databaseService.databaseConnection
+            await environment.services.databaseService.databaseConnection
                 .select()
                 .from(actionTable)
-                .where(eq(actionTable.exerciseId, activeExercise.exerciseId));
+                .where(eq(actionTable.exerciseId, activeExercise.exercise.id));
         exerciseActions.sort((a, b) => a.index - b.index);
 
         expect(exerciseActions[0]!.id).toBeDefined();
@@ -85,8 +80,8 @@ describe('ActionRepository', () => {
 
         // REPOSITORY METHOD CHECK
         const exerciseActions2 =
-            await environment.actionRepository.getActionsForExerciseId(
-                activeExercise.exerciseId
+            await environment.repositories.actionRepository.getActionsForExerciseId(
+                activeExercise.exercise.id
             );
         exerciseActions2.sort((a, b) => a.index - b.index);
 

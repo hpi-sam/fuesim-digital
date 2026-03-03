@@ -1,18 +1,15 @@
 import { jest } from '@jest/globals';
-import type {
-    ExerciseKey,
-    ParticipantKey,
-    TrainerKey,
-} from 'fuesim-digital-shared';
+import type { ExerciseKey } from 'fuesim-digital-shared';
 import { sleep } from 'fuesim-digital-shared';
+import { createTestEnvironment } from '../../test/utils.js';
 import { ActiveExercise } from './active-exercise.js';
 
 describe('Active Exercise', () => {
-    it('fails getting a role for the wrong key', () => {
-        const exercise = new ActiveExercise(
-            '123456' as ParticipantKey,
-            '12345678' as TrainerKey
-        );
+    const environment = createTestEnvironment();
+
+    it('fails getting a role for the wrong key', async () => {
+        const exercise =
+            await environment.services.exerciseService.exerciseFactory.fromBlank();
 
         expect(() =>
             exercise.getRoleFromUsedKey('wrong key' as ExerciseKey)
@@ -21,11 +18,9 @@ describe('Active Exercise', () => {
 
     describe('Started Exercise', () => {
         let exercise: ActiveExercise | undefined;
-        beforeEach(() => {
-            exercise = new ActiveExercise(
-                '123456' as ParticipantKey,
-                '12345678' as TrainerKey
-            );
+        beforeEach(async () => {
+            exercise =
+                await environment.services.exerciseService.exerciseFactory.fromBlank();
             exercise.start();
         });
         afterEach(() => {
@@ -50,11 +45,9 @@ describe('Active Exercise', () => {
     });
 
     describe('Reactions to Actions', () => {
-        it('calls start when matching action is sent', () => {
-            const exercise = new ActiveExercise(
-                '123456' as ParticipantKey,
-                '12345678' as TrainerKey
-            );
+        it('calls start when matching action is sent', async () => {
+            const exercise =
+                await environment.services.exerciseService.exerciseFactory.fromBlank();
 
             const startMock = jest.spyOn(ActiveExercise.prototype, 'start');
             startMock.mockImplementation(() => ({}));
@@ -66,11 +59,9 @@ describe('Active Exercise', () => {
             expect(startMock).toHaveBeenCalledTimes(1);
         });
 
-        it('calls pause when matching action is sent', () => {
-            const exercise = new ActiveExercise(
-                '123456' as ParticipantKey,
-                '12345678' as TrainerKey
-            );
+        it('calls pause when matching action is sent', async () => {
+            const exercise =
+                await environment.services.exerciseService.exerciseFactory.fromBlank();
 
             const pause = jest.spyOn(ActiveExercise.prototype, 'pause');
             pause.mockImplementation(() => ({}));

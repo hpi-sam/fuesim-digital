@@ -5,13 +5,13 @@ import type {
     ExerciseKey,
     ParticipantKey,
     TrainerKey,
-    ExerciseId,
+    ExerciseState,
 } from 'fuesim-digital-shared';
-import { ExerciseState, reduceExerciseState } from 'fuesim-digital-shared';
+import { reduceExerciseState } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type {
+    ExerciseEntry,
     ExerciseTemplateEntry,
-    ExerciseInsert,
 } from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
@@ -20,33 +20,11 @@ import { patientTick } from './patient-ticking.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
 
 export class ActiveExercise {
-    private readonly exercise: Omit<ExerciseInsert, 'id'>;
-
     public readonly actionApplied = new Subject<boolean>();
-
-    // We need to make sure this is set by
-    // the ExerciseService when creating/loading
-    // the exercise or the ExerciseFactory when
-    // restoring an exercise
-    private _exerciseId!: ExerciseId;
-
-    public get exerciseId(): ExerciseId {
-        return this._exerciseId;
-    }
-
-    public setExerciseId(value: ExerciseId) {
-        // the strictness is only valid, if the id is immediately set
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (this._exerciseId !== undefined) {
-            throw new Error('Exercise ID has already been set.');
-        }
-        this._exerciseId = value;
-    }
-
     public template: ExerciseTemplateEntry | null = null;
 
-    public getExercise() {
-        return this.exercise;
+    public get exercise() {
+        return this._exercise;
     }
 
     public get participantKey(): ParticipantKey {
@@ -87,16 +65,11 @@ export class ActiveExercise {
         this._changedSinceSave = true;
     }
 
-    public getSaveableActions() {
+    public getSavableActions() {
         return this.temporaryActionHistory.slice(
             0,
             this.numberOfActionsToBeSaved
         );
-    }
-
-    private tickCounter = 0;
-    public setTickCounter(val: number) {
-        this.tickCounter = val;
     }
 
     /**
@@ -126,11 +99,13 @@ export class ActiveExercise {
                  */
                 // TODO: Refactor this: do this in the reducer instead of sending it in the action
                 refreshTreatments:
-                    this.tickCounter % this.refreshTreatmentInterval === 0,
+                    this.exercise.tickCounter %
+                        this.refreshTreatmentInterval ===
+                    0,
                 tickInterval: this.tickInterval,
             };
             this.applyAction(updateAction, this.emitterId);
-            this.tickCounter++;
+            this.exercise.tickCounter++;
             this.markAsModified();
         } catch (e: unknown) {
             // Something went wrong in tick, probably some corrupted simulation state.
@@ -162,22 +137,9 @@ export class ActiveExercise {
     public readonly incrementIdGenerator = new IncrementIdGenerator();
 
     public constructor(
-        participantKey: ParticipantKey,
-        trainerKey: TrainerKey,
-        public readonly temporaryActionHistory: ActionWrapper[] = [],
-        stateVersion: number = ExerciseState.currentStateVersion,
-        initialState = ExerciseState.create(participantKey),
-        currentState: ExerciseState = initialState
-    ) {
-        this.exercise = {
-            currentStateString: currentState,
-            initialStateString: initialState,
-            participantKey,
-            trainerKey,
-            stateVersion,
-            tickCounter: 0,
-        };
-    }
+        private readonly _exercise: ExerciseEntry,
+        public readonly temporaryActionHistory: ActionWrapper[] = []
+    ) {}
 
     /**
      * Select the role that is applied when using the given id.
@@ -302,7 +264,7 @@ export class ActiveExercise {
     }
 
     public unload() {
-        this.clients.forEach((client) => client.disconnect());
+        this.clients.forEach((clientWrapper) => clientWrapper.disconnect());
         // Pause the exercise to stop the tick
         this.pause();
     }

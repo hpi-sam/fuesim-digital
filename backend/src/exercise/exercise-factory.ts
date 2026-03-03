@@ -17,22 +17,26 @@ import {
     isParticipantKey,
     isTrainerKey,
 } from 'fuesim-digital-shared';
-import type { InferSelectModel } from 'drizzle-orm';
 import { Config } from '../config.js';
 import type {
-    exerciseTable,
-    actionTable,
-    exerciseTemplateTable,
+    ExerciseInsert,
+    ExerciseEntry,
+    ExerciseTemplateEntry,
+    ActionEntry,
 } from '../database/schema.js';
 import { pushAll } from '../utils/array.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
 import type { AccessKeyService } from '../database/services/access-key-service.js';
+import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './active-exercise.js';
 
 export class ExerciseFactory {
-    public constructor(private readonly accessKeyService: AccessKeyService) {}
+    public constructor(
+        private readonly accessKeyService: AccessKeyService,
+        private readonly exerciseService: ExerciseService
+    ) {}
 
     public async createKeys(): Promise<ExerciseKeys> {
         const participantKey = (await this.accessKeyService.generateKey(
@@ -44,25 +48,29 @@ export class ExerciseFactory {
         return { participantKey, trainerKey };
     }
 
-    public async fromBlank() {
+    public async fromBlank(optionalData: Partial<ExerciseInsert> = {}) {
         const exerciseKeys = await this.createKeys();
 
-        if (
-            !isParticipantKey(exerciseKeys.participantKey) ||
-            !isTrainerKey(exerciseKeys.trainerKey)
-        ) {
-            throw new Error('Invalid exercise keys provided');
-        }
-        return new ActiveExercise(
-            exerciseKeys.participantKey,
-            exerciseKeys.trainerKey
-        );
+        const initialState = ExerciseState.create(exerciseKeys.participantKey);
+        const exerciseInsert = {
+            ...optionalData,
+            ...exerciseKeys,
+            initialStateString: initialState,
+            currentStateString: initialState,
+            stateVersion: ExerciseState.currentStateVersion,
+        } satisfies ExerciseInsert;
+        const exerciseEntry =
+            await this.exerciseService.createExercise(exerciseInsert);
+        return new ActiveExercise(exerciseEntry);
     }
 
     /**
      * @param file A **valid** import file
      */
-    public async fromFile(file: StateExport): Promise<ActiveExercise> {
+    public async fromFile(
+        file: StateExport,
+        optionalData: Partial<ExerciseInsert> = {}
+    ): Promise<ActiveExercise> {
         const exerciseKeys = await this.createKeys();
 
         if (
@@ -87,52 +95,45 @@ export class ExerciseFactory {
         newInitialState.participantKey = exerciseKeys.participantKey;
         newCurrentState.participantKey = exerciseKeys.participantKey;
 
-        const exercise = new ActiveExercise(
-            exerciseKeys.participantKey,
-            exerciseKeys.trainerKey,
-            [],
-            ExerciseState.currentStateVersion,
-            newInitialState,
-            newCurrentState
-        );
+        const exerciseEntry = {
+            ...optionalData,
+            ...exerciseKeys,
+            initialStateString: newInitialState,
+            currentStateString: newCurrentState,
+            stateVersion: ExerciseState.currentStateVersion,
+        } satisfies ExerciseInsert;
+        const exercise =
+            await this.exerciseService.createExercise(exerciseEntry);
+        const activeExercise = new ActiveExercise(exercise);
+
         const actions: ActionWrapper[] = (
             migratedImportObject.history?.actionHistory ?? []
         ).map(
             (action) =>
                 new ActionWrapper(
                     action,
-                    exercise.emitterId, // this is always null
-                    exercise
+                    activeExercise.emitterId, // this is always null
+                    activeExercise
                 )
         );
-        pushAll(exercise.temporaryActionHistory, actions);
+        pushAll(activeExercise.temporaryActionHistory, actions);
 
-        exercise.setTickCounter(
-            actions.filter(
-                (action) =>
-                    action.getAction().actionString.type === '[Exercise] Tick'
-            ).length
-        );
+        activeExercise.exercise.tickCounter = actions.filter(
+            (action) =>
+                action.getAction().actionString.type === '[Exercise] Tick'
+        ).length;
 
         // The actions haven't been saved in the database yet -> keep them
-        this.restore(exercise, true);
-        return exercise;
+        this.restore(activeExercise, true);
+        return activeExercise;
     }
 
     public fromDatabase(
-        dbEntry: InferSelectModel<typeof exerciseTable>,
-        actions: InferSelectModel<typeof actionTable>[]
+        exerciseEntry: ExerciseEntry,
+        actions: ActionEntry[]
     ): ActiveExercise {
         const actionsInWrapper: ActionWrapper[] = [];
-        const exercise = new ActiveExercise(
-            dbEntry.participantKey,
-            dbEntry.trainerKey,
-            actionsInWrapper,
-            dbEntry.stateVersion,
-            dbEntry.initialStateString,
-            dbEntry.currentStateString
-        );
-        exercise.setExerciseId(dbEntry.id);
+        const exercise = new ActiveExercise(exerciseEntry, actionsInWrapper);
         pushAll(
             actionsInWrapper,
             actions.map(
@@ -146,32 +147,39 @@ export class ExerciseFactory {
                     )
             )
         );
-        exercise.setTickCounter(dbEntry.tickCounter);
         exercise.markAsSaved();
         return exercise;
     }
 
     public async fromExerciseTemplate(
-        exerciseTemplate: InferSelectModel<typeof exerciseTemplateTable>,
-        exercise: InferSelectModel<typeof exerciseTable>,
-        actions: InferSelectModel<typeof actionTable>[]
+        exerciseTemplate: ExerciseTemplateEntry,
+        exercise: ExerciseEntry,
+        actions: ActionEntry[],
+        optionalData: Partial<ExerciseInsert> = {}
     ): Promise<ActiveExercise> {
         const exerciseKeys = await this.createKeys();
         const actionsInWrapper: ActionWrapper[] = [];
-        const newExercise = new ActiveExercise(
-            exerciseKeys.participantKey,
-            exerciseKeys.trainerKey,
-            actionsInWrapper,
-            exercise.stateVersion,
-            {
+        const newExerciseEntry = {
+            ...optionalData,
+            ...exerciseKeys,
+            stateVersion: exercise.stateVersion,
+            initialStateString: {
                 ...exercise.initialStateString,
                 participantKey: exerciseKeys.participantKey,
             },
-            {
+            currentStateString: {
                 ...exercise.currentStateString,
                 participantKey: exerciseKeys.participantKey,
-            }
+            },
+            baseTemplateId: exerciseTemplate.id,
+        };
+        const newExercise =
+            await this.exerciseService.createExercise(newExerciseEntry);
+        const newActiveExercise = new ActiveExercise(
+            newExercise,
+            actionsInWrapper
         );
+        newActiveExercise.template = exerciseTemplate;
         pushAll(
             actionsInWrapper,
             actions.map(
@@ -179,24 +187,23 @@ export class ExerciseFactory {
                     new ActionWrapper(
                         action.actionString,
                         action.emitterId,
-                        newExercise,
+                        newActiveExercise,
                         action.index,
                         action.id
                     )
             )
         );
-        newExercise.setTickCounter(exercise.tickCounter);
-        return newExercise;
+        return newActiveExercise;
     }
 
     public restore(activeExercise: ActiveExercise, keepActions: boolean): void {
-        const exercise = activeExercise.getExercise();
+        const exercise = activeExercise.exercise;
 
         // Check State Version
         if (exercise.stateVersion !== ExerciseState.currentStateVersion) {
             throw new RestoreError(
                 `The exercise was created with an incompatible version of the state (got version ${exercise.stateVersion}, required version ${ExerciseState.currentStateVersion})`,
-                activeExercise.exerciseId
+                activeExercise.exercise.id
             );
         }
 
@@ -215,7 +222,7 @@ export class ExerciseFactory {
      * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
      */
     private restoreState(activeExercise: ActiveExercise, keepActions: boolean) {
-        const exercise = activeExercise.getExercise();
+        const exercise = activeExercise.exercise;
         let currentState = cloneDeepMutable(exercise.initialStateString);
 
         activeExercise.temporaryActionHistory.forEach((actionWrapper) => {
@@ -231,7 +238,7 @@ export class ExerciseFactory {
                         `A reducer error occurred while restoring (Action ${
                             actionWrapper.getAction().index
                         }: \`${JSON.stringify(actionWrapper.getAction().actionString)}\`)`,
-                        activeExercise.exerciseId,
+                        activeExercise.exercise.id,
                         e
                     );
                 }

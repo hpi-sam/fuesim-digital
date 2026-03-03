@@ -1,10 +1,9 @@
 import type { ExerciseTemplateId } from 'fuesim-digital-shared';
-import type { InferInsertModel } from 'drizzle-orm';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type {
-    exerciseTable,
+    ExerciseInsert,
     ExerciseTemplateInsert,
 } from '../schema.js';
 import {
@@ -44,11 +43,10 @@ export class ExerciseManagerService {
             throw new ApiError();
         }
         const newExercise =
-            await this.exerciseService.exerciseFactory.fromBlank();
-        await this.exerciseService.createTemplate(
-            newExercise,
-            exerciseTemplate
-        );
+            await this.exerciseService.exerciseFactory.fromBlank({
+                templateId: exerciseTemplate.id,
+            });
+        await this.exerciseService.loadExercise(newExercise);
         return {
             ...exerciseTemplate,
             trainerKey: newExercise.trainerKey,
@@ -85,12 +83,7 @@ export class ExerciseManagerService {
     public async createExerciseFromTemplate(
         templateId: ExerciseTemplateId,
         session?: SessionInformation,
-        optionalData?: Partial<
-            Omit<
-                InferInsertModel<typeof exerciseTable>,
-                'baseTemplateId' | 'user'
-            >
-        >
+        optionalData?: Partial<Omit<ExerciseInsert, 'baseTemplateId' | 'user'>>
     ) {
         await this.exerciseService.saveUnsavedExercises();
 
@@ -113,13 +106,9 @@ export class ExerciseManagerService {
             await this.exerciseService.exerciseFactory.fromExerciseTemplate(
                 exerciseTemplate.exercise_template,
                 exerciseTemplate.exercise_entity,
-                actions
+                actions,
+                { ...optionalData, user: session ? session.user.id : null }
             );
-        await this.exerciseService.createExercise(newExercise, {
-            ...(optionalData ?? {}),
-            baseTemplateId: exerciseTemplate.exercise_template.id,
-            user: session ? session.user.id : null,
-        });
         await this.exerciseRepository.updateExerciseTemplate(
             exerciseTemplate.exercise_template.id,
             { lastExerciseCreatedAt: new Date() }

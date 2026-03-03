@@ -43,7 +43,7 @@ export abstract class ClientWrapper {
     }
 
     public disconnect() {
-        /* empty */
+        this.socket.disconnect();
     }
 }
 

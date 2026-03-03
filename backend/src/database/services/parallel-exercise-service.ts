@@ -166,7 +166,7 @@ export class ParallelExerciseService {
             session
         );
         return activeExercises.map((exercise) => {
-            const state = exercise.getExercise().currentStateString;
+            const state = exercise.exercise.currentStateString;
             return parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,
                 trainerKey: exercise.trainerKey,

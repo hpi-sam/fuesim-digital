@@ -7,8 +7,8 @@ describe('migration', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
-        await environment.accessKeyService.freeAll();
-        environment.exerciseService.TESTING_getExerciseMap().clear();
+        await environment.services.accessKeyService.freeAll();
+        environment.services.exerciseService.TESTING_getExerciseMap().clear();
     });
 
     fs.readdirSync(basePath).forEach((stateDir) => {

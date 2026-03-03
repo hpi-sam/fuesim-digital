@@ -20,11 +20,9 @@ export const registerProposeActionHandler = (
         (action: ExerciseAction, callback): void => {
             const clientWrapper = clientMap.get(client);
             if (!(clientWrapper instanceof ExerciseClientWrapper)) {
-                // There is no client. Skip.
-                console.error('Got an action from not matching client');
                 callback({
                     success: false,
-                    message: `Client didn't join an exercise`,
+                    message: 'No exercise selected',
                     expected: false,
                 });
                 return;

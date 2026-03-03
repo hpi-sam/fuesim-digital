@@ -67,7 +67,7 @@ export type GetExercisesResponseDataInput = z.input<
 >;
 
 export const exerciseExistsResponseDataSchema = z.object({
-    isTemplate: z.boolean(),
+    autojoin: z.boolean(),
 });
 
 export type ExerciseExistsResponseDataInput = z.input<

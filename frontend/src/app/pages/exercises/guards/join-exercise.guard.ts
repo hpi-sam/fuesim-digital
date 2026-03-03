@@ -41,7 +41,7 @@ export class JoinExerciseGuard {
             );
 
             let successfullyJoined = false;
-            if (exerciseExists.isTemplate) {
+            if (exerciseExists.autojoin) {
                 successfullyJoined = await this.applicationService.joinExercise(
                     route.params['exerciseId'],
                     ''

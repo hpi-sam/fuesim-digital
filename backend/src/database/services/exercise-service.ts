@@ -3,7 +3,6 @@ import {
     type ExerciseKey,
     type ExerciseTimeline,
 } from 'fuesim-digital-shared';
-import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
@@ -11,11 +10,7 @@ import { removeAll, pushAll } from '../../utils/array.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type {
-    ExerciseId,
-    exerciseTable,
-    ExerciseTemplateEntry,
-} from '../schema.js';
+import type { ExerciseId, ExerciseInsert } from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
     ApiError,
@@ -33,7 +28,7 @@ export class ExerciseService {
         private readonly actionRepository: ActionRepository,
         private readonly accessKeyService: AccessKeyService
     ) {
-        this.exerciseFactory = new ExerciseFactory(accessKeyService);
+        this.exerciseFactory = new ExerciseFactory(accessKeyService, this);
     }
 
     private readonly exerciseMap = new Map<
@@ -64,6 +59,12 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
+    public async loadExercise(activeExercise: ActiveExercise) {
+        this.exerciseMap.set(activeExercise.participantKey, activeExercise);
+        this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
+        this.exerciseMap.set(activeExercise.exercise.id, activeExercise);
+    }
+
     /**
      * Removes `exercise` from the set of active exercises
      */
@@ -72,7 +73,7 @@ export class ExerciseService {
 
         this.exerciseMap.delete(exercise.participantKey);
         this.exerciseMap.delete(exercise.trainerKey);
-        this.exerciseMap.delete(exercise.exerciseId);
+        this.exerciseMap.delete(exercise.exercise.id);
     }
 
     public async freeExerciseKeys(exercise: ActiveExercise) {
@@ -80,33 +81,14 @@ export class ExerciseService {
         await this.accessKeyService.free(exercise.trainerKey);
     }
 
-    public async createTemplate(
-        templateExercise: ActiveExercise,
-        exerciseTemplate: ExerciseTemplateEntry
-    ) {
-        templateExercise.template = exerciseTemplate;
-        await this.createExercise(templateExercise, {
-            templateId: exerciseTemplate.id,
-        });
-    }
-
-    public async createExercise(
-        activeExercise: ActiveExercise,
-        optionalData?: Partial<InferInsertModel<typeof exerciseTable>>
-    ) {
-        const result = await this.exerciseRepository.createExercise(
-            activeExercise,
-            optionalData
-        );
-        activeExercise.setExerciseId(result!.id);
-
-        this.exerciseMap.set(activeExercise.participantKey, activeExercise);
-        this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
-        this.exerciseMap.set(activeExercise.exerciseId, activeExercise);
+    public async createExercise(exercise: ExerciseInsert) {
+        const exerciseEntry =
+            await this.exerciseRepository.createExercise(exercise);
         await this.accessKeyService.lock([
-            activeExercise.participantKey,
-            activeExercise.trainerKey,
+            exercise.participantKey,
+            exercise.trainerKey,
         ]);
+        return exerciseEntry!;
     }
 
     public leaveExercise(
@@ -139,7 +121,6 @@ export class ExerciseService {
                     })
                 );
 
-                const keys: ExerciseKey[] = [];
                 const exercises = await Promise.all(
                     (await exerciseRepoTransaction.getAllExercises()).map(
                         async (exerciseEntity) => {
@@ -190,10 +171,9 @@ export class ExerciseService {
                 exercises.forEach((exercise) => {
                     this.exerciseMap.set(exercise.participantKey, exercise);
                     this.exerciseMap.set(exercise.trainerKey, exercise);
-                    this.exerciseMap.set(exercise.exerciseId, exercise);
-                    keys.push(exercise.participantKey, exercise.trainerKey);
+                    this.exerciseMap.set(exercise.exercise.id, exercise);
+                    this.loadExercise(exercise);
                 });
-                await this.accessKeyService.lock(keys);
                 return exercises;
             }
         );
@@ -217,7 +197,7 @@ export class ExerciseService {
         const activeExercise = this.getExerciseByKey(exerciseKey, session);
 
         const exerciseEntry = await this.exerciseRepository.getExerciseById(
-            activeExercise.exerciseId
+            activeExercise.exercise.id
         );
         if (!exerciseEntry) {
             throw new NotFoundError();
@@ -236,7 +216,7 @@ export class ExerciseService {
         this.unloadExercise(activeExercise);
 
         await this.exerciseRepository.deleteExerciseById(
-            activeExercise.exerciseId
+            activeExercise.exercise.id
         );
         await this.freeExerciseKeys(activeExercise);
     }
@@ -249,13 +229,12 @@ export class ExerciseService {
                     .map(async (activeExercise) => {
                         activeExercise.markAsAboutToBeSaved();
                         await repoTransaction.saveExerciseState(
-                            activeExercise.exerciseId,
-                            activeExercise.getExercise()
+                            activeExercise.exercise
                         );
 
                         await this.actionRepository
                             .withConnection(repoTransaction)
-                            .saveActions(activeExercise.getSaveableActions());
+                            .saveActions(activeExercise.getSavableActions());
 
                         activeExercise.markAsSaved();
                     })
@@ -271,7 +250,7 @@ export class ExerciseService {
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
                 await this.actionRepository.getActionsForExerciseId(
-                    activeExercise.exerciseId
+                    activeExercise.exercise.id
                 )
             ).map((action) => ({
                 action: action.actionString,
@@ -288,7 +267,7 @@ export class ExerciseService {
             .sort((a, b) => a.time - b.time);
 
         return {
-            initialState: activeExercise.getExercise().initialStateString,
+            initialState: activeExercise.exercise.initialStateString,
             actionsWrappers: completeHistory,
         };
     }
@@ -299,7 +278,7 @@ export class ExerciseService {
             throw new NotFoundError();
         }
         return Object.values(
-            activeExercise.getExercise().currentStateString.viewports
+            activeExercise.exercise.currentStateString.viewports
         );
     }
 

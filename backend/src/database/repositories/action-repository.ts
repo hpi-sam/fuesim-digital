@@ -34,7 +34,7 @@ export class ActionRepository extends BaseRepository {
                     .map(({ actionWrapper, action }) => ({
                         actionString: action.actionString,
                         emitterId: action.emitterId,
-                        exerciseId: actionWrapper.exercise.exerciseId,
+                        exerciseId: actionWrapper.exercise.exercise.id,
                         index: action.index,
                         id: action.id,
                     }))

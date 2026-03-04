@@ -10,10 +10,10 @@ import {
     getExerciseTemplatesResponseDataSchema,
     PostExerciseTemplateRequestData,
     TrainerKey,
-    UUID,
     type ExerciseTimeline,
     type StateExport,
     type PatchExerciseTemplateResponseData,
+    ExerciseTemplateId,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -96,7 +96,7 @@ export class ApiService {
     }
 
     public async patchExerciseTemplate(
-        id: UUID,
+        id: ExerciseTemplateId,
         data: PatchExerciseTemplateResponseData
     ) {
         return lastValueFrom(
@@ -108,7 +108,7 @@ export class ApiService {
         );
     }
 
-    public async createExerciseFromTemplate(templateId: UUID) {
+    public async createExerciseFromTemplate(templateId: ExerciseTemplateId) {
         return lastValueFrom(
             this.httpClient
                 .post(
@@ -119,7 +119,7 @@ export class ApiService {
         );
     }
 
-    public async deleteExerciseTemplate(templateId: UUID) {
+    public async deleteExerciseTemplate(templateId: ExerciseTemplateId) {
         return lastValueFrom(
             this.httpClient.delete(
                 `${httpOrigin}/api/exercise_templates/${templateId}`

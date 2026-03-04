@@ -5,11 +5,11 @@ import type {
     ExerciseKey,
     ParticipantKey,
     TrainerKey,
+    ExerciseId,
 } from 'fuesim-digital-shared';
 import { ExerciseState, reduceExerciseState } from 'fuesim-digital-shared';
 import type {
     ExerciseTemplateEntry,
-    ExerciseId,
     ExerciseInsert,
 } from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';

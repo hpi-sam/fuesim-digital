@@ -5,7 +5,6 @@ import {
     createTestEnvironment,
     createTestUserSession,
 } from '../../test/utils.js';
-import type { ExerciseTemplateId } from '../schema.js';
 
 describe('exercise manager service', () => {
     const environment = createTestEnvironment();
@@ -21,10 +20,10 @@ describe('exercise manager service', () => {
             session
         );
         const exercise = environment.exerciseService.getExerciseByKey(
-            exerciseTemplate.trainerId,
+            exerciseTemplate.trainerKey,
             sessionInformation
         );
-        const action = {
+        const action: ExerciseAction = {
             type: '[AlarmGroup] Add AlarmGroup',
             alarmGroup: {
                 alarmGroupVehicles: {},
@@ -34,13 +33,13 @@ describe('exercise manager service', () => {
                 triggerCount: 0,
                 triggerLimit: null,
             },
-        } satisfies ExerciseAction;
+        };
         exercise.applyAction(action, null);
 
         // Copy exercise template
         const newActiveExercise =
             await environment.exerciseManagerService.createExerciseFromTemplate(
-                exerciseTemplate.id as ExerciseTemplateId,
+                exerciseTemplate.id,
                 sessionInformation,
                 environment.exerciseService
             );

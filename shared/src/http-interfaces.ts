@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { participantKeySchema, trainerKeySchema } from './exercise-keys.js';
+import { exerciseTemplateIdSchema } from './ids.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -42,7 +43,9 @@ export const getExerciseResponseDataSchema = z.object({
     trainerKey: trainerKeySchema,
     createdAt: stringToDate,
     lastUsedAt: stringToDate,
-    baseTemplate: z.object({ id: z.uuid(), name: z.string() }).nullable(),
+    baseTemplate: z
+        .object({ id: exerciseTemplateIdSchema, name: z.string() })
+        .nullable(),
 });
 export type GetExerciseResponseData = z.infer<
     typeof getExerciseResponseDataSchema
@@ -67,7 +70,7 @@ export type ExerciseExistsResponseDataInput = z.input<
 >;
 
 export const getExerciseTemplateResponseDataSchema = z.object({
-    id: z.uuid(),
+    id: exerciseTemplateIdSchema,
     trainerKey: trainerKeySchema,
     createdAt: stringToDate,
     lastExerciseCreatedAt: z.nullable(stringToDate),

@@ -15,7 +15,6 @@ import {
     createTestEnvironment,
     createExerciseTemplate,
 } from '../test/utils.js';
-import type { ExerciseTemplateId } from '../database/schema.js';
 
 describe('exercise manager router', () => {
     const environment = createTestEnvironment();
@@ -225,7 +224,7 @@ describe('exercise manager router', () => {
                 .expect(200);
             const exerciseTemplateEntry =
                 (await environment.exerciseRepository.getExerciseTemplateById(
-                    exerciseTemplate.id as ExerciseTemplateId
+                    exerciseTemplate.id
                 ))!;
             expect(exerciseTemplateEntry.exercise_template.name).toBe(
                 newData.name
@@ -247,7 +246,7 @@ describe('exercise manager router', () => {
                 .expect(200);
             const exerciseTemplateEntry =
                 (await environment.exerciseRepository.getExerciseTemplateById(
-                    exerciseTemplate.id as ExerciseTemplateId
+                    exerciseTemplate.id
                 ))!;
             expect(exerciseTemplateEntry.exercise_template.name).toBe(
                 newData.name
@@ -300,7 +299,7 @@ describe('exercise manager router', () => {
 
             const exerciseTemplateEntry =
                 await environment.exerciseRepository.getExerciseTemplateById(
-                    exerciseTemplate.id as ExerciseTemplateId
+                    exerciseTemplate.id
                 );
             expect(exerciseTemplateEntry).toBe(null);
 
@@ -378,7 +377,7 @@ describe('exercise manager router', () => {
             // Ensure that lastExerciseCreatedAt has been updated
             const exerciseTemplateEntry =
                 (await environment.exerciseRepository.getExerciseTemplateById(
-                    exerciseTemplate.id as ExerciseTemplateId
+                    exerciseTemplate.id
                 ))!;
             expect(
                 exerciseTemplateEntry.exercise_template.lastExerciseCreatedAt!.getTime()

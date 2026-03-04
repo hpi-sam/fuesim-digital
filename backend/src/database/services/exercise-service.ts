@@ -1,5 +1,4 @@
 import {
-    isParticipantKey,
     isTrainerKey,
     type ExerciseKey,
     type ExerciseTimeline,
@@ -38,7 +37,7 @@ export class ExerciseService {
         if (
             exercise.template &&
             (exercise.template.user !== session?.user.id ||
-                isParticipantKey(exerciseKey))
+                !isTrainerKey(exerciseKey))
         ) {
             throw new PermissionDeniedError();
         }

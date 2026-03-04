@@ -4,12 +4,12 @@ import {
     getExerciseTemplatesResponseDataSchema,
     postExerciseTemplateRequestDataSchema,
     patchExerciseTemplateRequestDataSchema,
+    exerciseTemplateIdSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
-import { exerciseTemplateIdSchema } from '../database/schema.js';
 
 export const createExerciseManagerRouter = (
     exerciseManagerService: ExerciseManagerService,

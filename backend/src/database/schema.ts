@@ -1,6 +1,9 @@
 import type {
+    ActionId,
     ExerciseAction,
+    ExerciseId,
     ExerciseState,
+    ExerciseTemplateId,
     ParticipantKey,
     TrainerKey,
 } from 'fuesim-digital-shared';
@@ -18,20 +21,6 @@ import {
     timestamp,
     text,
 } from 'drizzle-orm/pg-core';
-import { z } from 'zod';
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const exerciseIdSchema = z.uuidv4().brand<'ExerciseId'>();
-
-export const exerciseTemplateIdSchema = z
-    .uuidv4()
-    .brand<'ExerciseTemplateId'>();
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const actionIdSchema = z.uuidv4().brand<'ActionId'>();
-
-export type ExerciseId = z.infer<typeof exerciseIdSchema>;
-export type ExerciseTemplateId = z.infer<typeof exerciseTemplateIdSchema>;
-export type ActionId = z.infer<typeof actionIdSchema>;
 
 const typedUUID = <T>() => uuid().$type<T>();
 
@@ -107,12 +96,16 @@ export const exerciseTable = pgTable('exercise_entity', {
         .notNull()
         .defaultNow(),
     // by setting a templateId this exercise will be an exercise template
-    templateId: uuid().references(() => exerciseTemplateTable.id, {
-        onDelete: 'cascade',
-    }),
-    baseTemplateId: uuid().references(() => exerciseTemplateTable.id, {
-        onDelete: 'set null',
-    }),
+    templateId: uuid()
+        .$type<ExerciseTemplateId>()
+        .references(() => exerciseTemplateTable.id, {
+            onDelete: 'cascade',
+        }),
+    baseTemplateId: uuid()
+        .$type<ExerciseTemplateId>()
+        .references(() => exerciseTemplateTable.id, {
+            onDelete: 'set null',
+        }),
 });
 export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 export type ExerciseInsert = InferInsertModel<typeof exerciseTable>;

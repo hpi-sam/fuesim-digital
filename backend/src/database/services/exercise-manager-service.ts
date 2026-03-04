@@ -1,8 +1,9 @@
+import type { ExerciseTemplateId } from 'fuesim-digital-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import type { ExerciseTemplateId, ExerciseTemplateInsert } from '../schema.js';
+import type { ExerciseTemplateInsert } from '../schema.js';
 import {
     ApiError,
     NotFoundError,

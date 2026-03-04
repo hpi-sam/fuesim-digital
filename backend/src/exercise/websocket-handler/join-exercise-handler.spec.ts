@@ -1,6 +1,9 @@
 import assert from 'node:assert';
 import { jest } from '@jest/globals';
-import type { GetExerciseTemplateResponseData } from 'fuesim-digital-shared';
+import type {
+    GetExerciseTemplateResponseData,
+    ParticipantKey,
+} from 'fuesim-digital-shared';
 import { generateDummyPatient, sleep } from 'fuesim-digital-shared';
 import { ActiveExercise } from '../active-exercise.js';
 import {
@@ -46,7 +49,7 @@ describe('join exercise', () => {
     });
 
     it('fails joining a non-existing exercise', async () => {
-        const id = '123456';
+        const id = '123456' as ParticipantKey;
 
         await environment.withWebsocket(async (socket) => {
             const join = await socket.emit('joinExercise', id, 'Test Client');
@@ -69,7 +72,7 @@ describe('join exercise', () => {
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',
-                    exerciseTemplate.trainerId,
+                    exerciseTemplate.trainerKey,
                     'Test Client'
                 );
 
@@ -79,10 +82,9 @@ describe('join exercise', () => {
 
         it('succeeds joining with trainer key if logged in', async () => {
             await environment.withWebsocket(async (socket) => {
-                console.log('I ARRRIVE');
                 const join = await socket.emit(
                     'joinExercise',
-                    exerciseTemplate.trainerId,
+                    exerciseTemplate.trainerKey,
                     'Test Client'
                 );
 
@@ -95,10 +97,9 @@ describe('join exercise', () => {
                 user: alternativeTestUserSessionData,
             });
             await environment.withWebsocket(async (socket) => {
-                console.log('I ARRIVE HERE', socket);
                 const join = await socket.emit(
                     'joinExercise',
-                    exerciseTemplate.trainerId,
+                    exerciseTemplate.trainerKey,
                     'Test Client'
                 );
 
@@ -109,7 +110,7 @@ describe('join exercise', () => {
         it('fails joining with participant key if not logged in', async () => {
             const exercise = environment.exerciseService
                 .TESTING_getExerciseMap()
-                .get(exerciseTemplate.trainerId)!;
+                .get(exerciseTemplate.trainerKey)!;
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',
@@ -123,7 +124,7 @@ describe('join exercise', () => {
         it('fails joining with participant key if logged in', async () => {
             const exercise = environment.exerciseService
                 .TESTING_getExerciseMap()
-                .get(exerciseTemplate.trainerId)!;
+                .get(exerciseTemplate.trainerKey)!;
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',

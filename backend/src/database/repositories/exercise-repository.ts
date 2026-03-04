@@ -1,11 +1,8 @@
+import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
 import { ExerciseState } from 'fuesim-digital-shared';
 import type { InferInsertModel } from 'drizzle-orm';
 import { sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
-import type {
-    ExerciseId,
-    ExerciseTemplateId,
-    ExerciseTemplateInsert,
-} from '../schema.js';
+import type { ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { BaseRepository } from './base-repository.js';

@@ -1,10 +1,13 @@
-import type { ExerciseAction, ExerciseState } from 'fuesim-digital-shared';
+import type {
+    ExerciseAction,
+    ExerciseId,
+    ExerciseState,
+} from 'fuesim-digital-shared';
 import { applyMigrations } from 'fuesim-digital-shared';
 import type { WritableDraft } from 'immer';
 import { RestoreError } from '../utils/restore-error.js';
 import type { ExerciseRepository } from './repositories/exercise-repository.js';
 import type { ActionRepository } from './repositories/action-repository.js';
-import type { ExerciseId } from './schema.js';
 
 export async function migrateInDatabase(
     exerciseId: ExerciseId,

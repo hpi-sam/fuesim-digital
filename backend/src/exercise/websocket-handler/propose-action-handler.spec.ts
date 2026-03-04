@@ -1,5 +1,5 @@
 import { generateDummyPatient, uuid } from 'fuesim-digital-shared';
-import { createExercise, createTestEnvironment } from './utils.js';
+import { createExercise, createTestEnvironment } from '../../test/utils.js';
 
 describe('propose action', () => {
     const environment = createTestEnvironment();

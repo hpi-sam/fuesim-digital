@@ -4,7 +4,7 @@ import type { Express } from 'express';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import { createExerciseRouter } from './routers/exercise-router.js';
-import { createAuthRouter } from './routers/auth-http-router.js';
+import { createAuthRouter } from './routers/auth-router.js';
 import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
 import type { AuthService, SessionInformation } from './auth/auth-service.js';
 import {

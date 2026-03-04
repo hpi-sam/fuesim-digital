@@ -9,7 +9,6 @@
                     (update)="
                         patchExerciseTemplate({
                             name: $event,
-                            description: exerciseTemplate.description,
                         })
                     "
                 />
@@ -37,7 +36,6 @@
                     [value]="exerciseTemplate.description"
                     (update)="
                         patchExerciseTemplate({
-                            name: exerciseTemplate.name,
                             description: $event,
                         })
                     "

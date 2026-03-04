@@ -21,6 +21,11 @@ export const registerProposeActionHandler = (
             if (!clientWrapper) {
                 // There is no client. Skip.
                 console.error('Got an action from missing client');
+                callback({
+                    success: false,
+                    message: `Client didn't join an exercise`,
+                    expected: false,
+                });
                 return;
             }
             // 1. validate json

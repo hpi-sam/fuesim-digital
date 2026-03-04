@@ -5,6 +5,7 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     exerciseKeysSchema,
+    getExerciseTemplateResponseDataSchema,
     sleep,
     socketIoTransports,
 } from 'fuesim-digital-shared';
@@ -14,17 +15,18 @@ import request from 'supertest';
 import {
     DatabaseService,
     testingDatabaseName,
-} from '../src/database/services/database-service.js';
-import { Config } from '../src/config.js';
-import type { HttpMethod } from '../src/utils/http-handlers.js';
-import { FuesimServer } from '../src/fuesim-server.js';
-import { ExerciseService } from '../src/database/services/exercise-service.js';
-import { ExerciseRepository } from '../src/database/repositories/exercise-repository.js';
-import { ActionRepository } from '../src/database/repositories/action-repository.js';
-import { AuthService } from '../src/auth/auth-service.js';
-import { UserRepository } from '../src/database/repositories/user-repository.js';
-import { SessionRepository } from '../src/database/repositories/session-repository.js';
-import { ExerciseManagerService } from '../src/database/services/exercise-manager-service.js';
+} from '../database/services/database-service.js';
+import { Config } from '../config.js';
+import type { HttpMethod } from '../utils/http-handlers.js';
+import { FuesimServer } from '../fuesim-server.js';
+import { ExerciseService } from '../database/services/exercise-service.js';
+import { ExerciseRepository } from '../database/repositories/exercise-repository.js';
+import { ActionRepository } from '../database/repositories/action-repository.js';
+import { AuthService } from '../auth/auth-service.js';
+import { UserRepository } from '../database/repositories/user-repository.js';
+import { SessionRepository } from '../database/repositories/session-repository.js';
+import { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
+import type { OidcService } from '../auth/oidc-service.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -116,7 +118,7 @@ export class WebsocketClient {
     }
 }
 
-class TestEnvironment {
+export class TestEnvironment {
     public server!: FuesimServer;
     private _databaseService!: DatabaseService;
     private _exerciseService!: ExerciseService;
@@ -148,8 +150,20 @@ class TestEnvironment {
         return this._actionRepository;
     }
 
-    public httpRequest(method: HttpMethod, url: string): request.Test {
-        return request(this.server.httpServer.httpServer)[method](url);
+    public httpRequest(
+        method: HttpMethod,
+        url: string,
+        session?: string
+    ): request.Test {
+        const req = request(this.server.httpServer.httpServer)[method](url);
+        if (session) {
+            req.set(
+                'Cookie',
+                `${this.authService.SESSION_COOKIE_NAME}=${session}`
+            );
+        }
+
+        return req;
     }
 
     /**
@@ -157,12 +171,20 @@ class TestEnvironment {
      * @param closure a function that gets a connected websocket client as its argument and should resolve after all operations are finished
      */
     public async withWebsocket(
-        closure: (websocketClient: WebsocketClient) => Promise<any>
+        closure: (websocketClient: WebsocketClient) => Promise<any>,
+        session?: string
     ): Promise<void> {
         let clientSocket: ExerciseClientSocket | undefined;
         try {
             clientSocket = io(`ws://127.0.0.1:${Config.websocketPort}`, {
                 ...socketIoTransports,
+                ...(session
+                    ? {
+                          extraHeaders: {
+                              Cookie: `${this.authService.SESSION_COOKIE_NAME}=${session}`,
+                          },
+                      }
+                    : {}),
             });
             const websocketClient = new WebsocketClient(clientSocket);
             await closure(websocketClient);
@@ -251,6 +273,28 @@ export const createTestEnvironment = (): TestEnvironment => {
     return environment;
 };
 
+export const defaultTestUserSessionData: OidcService.UserInfo = {
+    displayName: 'Test User',
+    id: 'test-user',
+    username: 'testuser',
+};
+export const alternativeTestUserSessionData: OidcService.UserInfo = {
+    displayName: 'Test User 2',
+    id: 'test-user-2',
+    username: 'testuser2',
+};
+export async function createTestUserSession(
+    environment: TestEnvironment,
+    data?: { user?: OidcService.UserInfo; expired?: boolean }
+) {
+    const session = await environment.authService.createNewSession({
+        user: data?.user ?? defaultTestUserSessionData,
+        accessToken: 'abc',
+        validityDurationMs: data?.expired ? 0 : undefined,
+    });
+    return session;
+}
+
 async function setupDatabase(): Promise<DatabaseService> {
     if (!Config.useDb) {
         return DatabaseService.createNewDatabaseConnection('testing');
@@ -282,10 +326,28 @@ async function setupDatabase(): Promise<DatabaseService> {
     return testDatabaseService;
 }
 
-export async function createExercise(environment: TestEnvironment) {
+export async function createExercise(
+    environment: TestEnvironment,
+    session?: string
+) {
     const response = await environment
-        .httpRequest('post', '/api/exercise')
+        .httpRequest('post', '/api/exercise', session)
         .expect(201);
 
     return exerciseKeysSchema.parse(response.body);
+}
+
+export async function createExerciseTemplate(
+    environment: TestEnvironment,
+    session: string
+) {
+    const response = await environment
+        .httpRequest('post', '/api/exercise_templates', session)
+        .send({
+            name: 'Test Template',
+            description: 'Test Template Description',
+        })
+        .expect(201);
+
+    return getExerciseTemplateResponseDataSchema.parse(response.body);
 }

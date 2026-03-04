@@ -38,6 +38,7 @@ export class AuthService {
     public async createNewSession(data: {
         user: OidcService.UserInfo;
         accessToken: string;
+        validityDurationMs?: number | null;
     }): Promise<string> {
         return this.userRepository.transaction(async (userRepoTransaction) => {
             await userRepoTransaction.upsertUser({
@@ -49,7 +50,8 @@ export class AuthService {
             const sessionRepoTransaction =
                 this.sessionRepository.withConnection(userRepoTransaction);
             const sessionToken = await sessionRepoTransaction.createSession({
-                validityDurationSeconds: this.SESSION_DURATION_S,
+                validityDurationSeconds:
+                    data.validityDurationMs ?? this.SESSION_DURATION_S,
                 accessToken: data.accessToken,
                 userId: data.user.id,
             });

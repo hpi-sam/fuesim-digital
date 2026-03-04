@@ -1,20 +1,32 @@
 import type { ExerciseAction, ExerciseKey, UUID } from 'fuesim-digital-shared';
 import { Client, ClientRole } from 'fuesim-digital-shared';
+import cookie from 'cookie';
 import type { ExerciseSocket } from '../exercise-server.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
-import type { SessionInformation } from '../auth/auth-service.js';
+import type { AuthService, SessionInformation } from '../auth/auth-service.js';
 import type { ActiveExercise } from './active-exercise.js';
 
 export class ClientWrapper {
+    public session?: SessionInformation;
+
     public constructor(
         private readonly socket: ExerciseSocket,
         private readonly exerciseService: ExerciseService,
-        public readonly session?: SessionInformation
+        private readonly authService: AuthService
     ) {}
 
     private chosenExercise?: ActiveExercise;
 
     private relatedExerciseClient?: Client;
+
+    public async getSessionInformation() {
+        const cookies = cookie.parse(this.socket.request.headers.cookie ?? '');
+        const sessionToken =
+            cookies[this.authService.SESSION_COOKIE_NAME] ?? '';
+
+        this.session =
+            await this.authService.getDataFromSessionToken(sessionToken);
+    }
 
     /**
      * @param exerciseKey The exercise key to be used for the client.

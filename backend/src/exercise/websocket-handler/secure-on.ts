@@ -21,14 +21,9 @@ export function secureOn<
         Ev
     >,
 >(client: ExerciseSocket, event: Ev, listener: Callback) {
-    client.on(event, (async (
-        arg0: any,
-        arg1: any,
-        callback: any,
-        ...args: any[]
-    ) => {
+    client.on(event, ((arg0: any, arg1: any, callback: any, ...args: any[]) => {
         try {
-            await listener(arg0, arg1, callback, ...args);
+            listener(arg0, arg1, callback, ...args);
         } catch (e: unknown) {
             if (isDevelopment()) {
                 throw e;

@@ -2,13 +2,11 @@ import { createServer } from 'node:http';
 import type * as core from 'express-serve-static-core';
 import { Server } from 'socket.io';
 import { socketIoTransports } from 'fuesim-digital-shared';
-import cookie from 'cookie';
 import { Config } from '../config.js';
 import type { ExerciseSocket, ExerciseServer } from '../exercise-server.js';
 import type { AuthService } from '../auth/auth-service.js';
 import type { ExerciseService } from './../database/services/exercise-service.js';
 import { clientMap } from './client-map.js';
-import { ClientWrapper } from './client-wrapper.js';
 import {
     registerGetStateHandler,
     registerJoinExerciseHandler,
@@ -35,38 +33,34 @@ export class ExerciseWebsocketServer {
 
         this.exerciseServer.listen(Config.websocketPort);
 
-        this.exerciseServer.on('connection', async (socket) => {
+        this.exerciseServer.on('connection', (socket) => {
             try {
-                await this.registerClient(socket);
+                this.registerClient(socket);
             } catch (e) {
                 console.error(e);
             }
         });
     }
 
-    private async registerClient(client: ExerciseSocket) {
-        const cookies = cookie.parse(client.request.headers.cookie ?? '');
-        const sessionToken = cookies[this.authService.SESSION_COOKIE_NAME];
-        const session = sessionToken
-            ? await this.authService.getDataFromSessionToken(sessionToken)
-            : undefined;
-
-        // Add client
-        clientMap.set(
-            client,
-            new ClientWrapper(client, this.exerciseService, session)
-        );
-
+    private registerClient(client: ExerciseSocket) {
         // register handlers
+        registerJoinExerciseHandler(
+            this.exerciseServer,
+            client,
+            this.authService,
+            this.exerciseService
+        );
         registerGetStateHandler(this.exerciseServer, client);
         registerProposeActionHandler(this.exerciseServer, client);
-        registerJoinExerciseHandler(this.exerciseServer, client);
 
         // Register disconnect handler
         client.on('disconnect', () => {
             try {
-                clientMap.get(client)!.leaveExercise();
-                clientMap.delete(client);
+                const clientWrapper = clientMap.get(client);
+                if (clientWrapper) {
+                    clientWrapper.leaveExercise();
+                    clientMap.delete(client);
+                }
             } catch (e) {
                 console.error(e);
             }

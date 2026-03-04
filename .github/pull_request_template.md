@@ -1,3 +1,7 @@
+### Summary
+
+_Please provide a short summary of the proposed changes here. Reference the addressed issue or provide a short rational for the changes._
+
 ### PR Checklist
 
 Please make sure to fulfil the following conditions before marking this PR ready for review:

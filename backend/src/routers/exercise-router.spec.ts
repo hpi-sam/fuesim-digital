@@ -254,6 +254,23 @@ describe('exercise router', () => {
                     .expect(200);
             });
 
+            it('fails deleting an exercise if logged-in with wrong user', async () => {
+                session = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+
+                await environment
+                    .httpRequest(
+                        'delete',
+                        `/api/exercise/${exercise.trainerKey}`
+                    )
+                    .expect(403);
+
+                await environment
+                    .httpRequest('get', `/api/exercise/${exercise.trainerKey}`)
+                    .expect(200);
+            });
+
             it('succeeds deleting an exercise if logged-in', async () => {
                 await environment
                     .httpRequest(
@@ -280,7 +297,7 @@ describe('exercise router', () => {
                 );
             });
 
-            it('fails deleting an exercise if logged-in', async () => {
+            it('fails deleting an exercise being a template if logged-in', async () => {
                 await environment
                     .httpRequest(
                         'delete',
@@ -297,7 +314,7 @@ describe('exercise router', () => {
                     )
                     .expect(200);
             });
-            it('fails deleting an exercise if not logged-in', async () => {
+            it('fails deleting an exercise being a template if not logged-in', async () => {
                 await environment
                     .httpRequest(
                         'delete',
@@ -345,7 +362,7 @@ describe('exercise router', () => {
                 .expect(200);
         });
 
-        it('fails with 400 for abitrary exercise key string', async () => {
+        it('fails with 400 for arbitrary exercise key string', async () => {
             const exerciseKey = 'non-existing-key';
             await environment
                 .httpRequest('get', `/api/exercise/${exerciseKey}/history`)

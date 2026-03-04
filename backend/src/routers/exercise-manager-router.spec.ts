@@ -1,8 +1,6 @@
-import type {
-    ExerciseKeys,
-    GetExerciseTemplateResponseData,
-} from 'fuesim-digital-shared';
+import type { GetExerciseTemplateResponseData } from 'fuesim-digital-shared';
 import {
+    exerciseKeysSchema,
     getExercisesResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
@@ -350,7 +348,7 @@ describe('exercise manager router', () => {
                     session
                 )
                 .expect(201);
-            const parsed = response.body as ExerciseKeys;
+            const parsed = exerciseKeysSchema.parse(response.body);
 
             // Ensure different trainer key
             expect(parsed.trainerKey).not.toBe(exerciseTemplate.trainerKey);

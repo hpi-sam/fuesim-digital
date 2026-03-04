@@ -1,7 +1,7 @@
 import { Component, input, output, inject } from '@angular/core';
 import type {
     GetExerciseTemplateResponseData,
-    PatchExerciseTemplateResponseData,
+    PatchExerciseTemplateRequestData,
 } from 'fuesim-digital-shared';
 import { Router } from '@angular/router';
 import { ApiService } from '../../../core/api.service';
@@ -25,7 +25,7 @@ export class ExerciseTemplateCardComponent {
     exerciseTemplate = input<GetExerciseTemplateResponseData>();
     readonly updated = output();
 
-    async patchExerciseTemplate(data: PatchExerciseTemplateResponseData) {
+    async patchExerciseTemplate(data: PatchExerciseTemplateRequestData) {
         const exerciseTemplate = this.exerciseTemplate();
         if (!exerciseTemplate) return;
         await this.apiService.patchExerciseTemplate(exerciseTemplate.id, data);

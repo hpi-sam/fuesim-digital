@@ -8,14 +8,14 @@ export const exerciseKeysSchema = z.object({
 });
 export type ExerciseKeys = z.infer<typeof exerciseKeysSchema>;
 
-export const userDataDtoSchema = z.object({
+export const userDataSchema = z.object({
     id: z.string(),
     displayName: z.string(),
     username: z.string(),
 });
 
 export const userDataResponseSchema = z.object({
-    user: userDataDtoSchema.nullable().optional(),
+    user: userDataSchema.nullable().optional(),
     expired: z.boolean().optional(),
     userRegistrationsEnabled: z.boolean().optional(),
     userSelfServiceEnabled: z.boolean().optional(),
@@ -94,7 +94,7 @@ export type PostExerciseTemplateRequestData = z.infer<
 
 export const patchExerciseTemplateRequestDataSchema =
     postExerciseTemplateRequestDataSchema.partial();
-export type PatchExerciseTemplateResponseData = z.infer<
+export type PatchExerciseTemplateRequestData = z.infer<
     typeof patchExerciseTemplateRequestDataSchema
 >;
 

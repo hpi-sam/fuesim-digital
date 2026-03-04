@@ -12,7 +12,7 @@ import {
     TrainerKey,
     type ExerciseTimeline,
     type StateExport,
-    type PatchExerciseTemplateResponseData,
+    type PatchExerciseTemplateRequestData,
     ExerciseTemplateId,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
@@ -97,7 +97,7 @@ export class ApiService {
 
     public async patchExerciseTemplate(
         id: ExerciseTemplateId,
-        data: PatchExerciseTemplateResponseData
+        data: PatchExerciseTemplateRequestData
     ) {
         return lastValueFrom(
             this.httpClient

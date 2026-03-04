@@ -1,4 +1,4 @@
-import { userDataDtoSchema } from 'fuesim-digital-shared';
+import { userDataSchema } from 'fuesim-digital-shared';
 import {
     createTestEnvironment,
     createTestUserSession,
@@ -20,7 +20,7 @@ describe('Auth-Service', () => {
             expect(response.body).toHaveProperty('expired', false);
             expect(response.body).toHaveProperty('user');
             expect(response.body.user).toEqual(
-                userDataDtoSchema.parse(defaultTestUserSessionData)
+                userDataSchema.parse(defaultTestUserSessionData)
             );
         });
 

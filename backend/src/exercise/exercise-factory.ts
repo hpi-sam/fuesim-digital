@@ -4,6 +4,7 @@ import type {
     ParticipantKey,
     TrainerKey,
     ExerciseKeys,
+    ExerciseType,
 } from 'fuesim-digital-shared';
 import {
     ExerciseState,
@@ -155,6 +156,7 @@ export class ExerciseFactory {
         exerciseTemplate: ExerciseTemplateEntry,
         exercise: ExerciseEntry,
         actions: ActionEntry[],
+        type: ExerciseType = 'standalone',
         optionalData: Partial<ExerciseInsert> = {}
     ): Promise<ActiveExercise> {
         const exerciseKeys = await this.createKeys();
@@ -166,10 +168,12 @@ export class ExerciseFactory {
             initialStateString: {
                 ...exercise.initialStateString,
                 participantKey: exerciseKeys.participantKey,
+                type,
             },
             currentStateString: {
                 ...exercise.currentStateString,
                 participantKey: exerciseKeys.participantKey,
+                type,
             },
             baseTemplateId: exerciseTemplate.id,
         };
@@ -179,7 +183,6 @@ export class ExerciseFactory {
             newExercise,
             actionsInWrapper
         );
-        newActiveExercise.template = exerciseTemplate;
         pushAll(
             actionsInWrapper,
             actions.map(

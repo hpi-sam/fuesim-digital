@@ -89,6 +89,7 @@ export class ParallelExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select()
             .from(exerciseTable)
-            .where(eq(exerciseTable.parallelExerciseId, id));
+            .where(eq(exerciseTable.parallelExerciseId, id))
+            .orderBy(exerciseTable.createdAt);
     }
 }

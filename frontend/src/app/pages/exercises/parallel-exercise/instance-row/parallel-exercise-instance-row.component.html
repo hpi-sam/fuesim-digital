@@ -5,6 +5,11 @@
     </td>
     <td>{{ exerciseInstance.clientNames.join(', ') }}</td>
     <td>
+        @if (exerciseInstance.lastLogEntry) {
+            <app-log-entry [logEntry]="exerciseInstance.lastLogEntry" />
+        }
+    </td>
+    <td>
         <a
             [routerLink]="`/exercises/${exerciseInstance.trainerKey}`"
             class="btn btn-sm btn-outline-primary float-end"

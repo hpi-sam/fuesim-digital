@@ -85,9 +85,11 @@ export class ParallelExerciseService {
         const exercise =
             await this.exerciseManagerService.createExerciseFromTemplate(
                 parallelExercise.template.id,
+                'parallel',
                 undefined,
                 { parallelExerciseId: parallelExercise.id }
             );
+        await this.exerciseService.loadExercise(exercise);
 
         const setAutojoinViewportAction: SetAutojoinViewportAction = {
             type: '[Exercise] Set autojoin viewport',
@@ -173,6 +175,7 @@ export class ParallelExerciseService {
                 clientNames: state.clientNames,
                 currentTime: state.currentTime,
                 currentStatus: state.currentStatus,
+                lastLogEntry: state.lastLogEntry,
             });
         });
     }

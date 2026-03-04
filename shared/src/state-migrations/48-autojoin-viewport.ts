@@ -5,5 +5,6 @@ export const addAutojoinViewport48: Migration = {
     state: (state: any) => {
         state.autojoinViewportId = null;
         state.clientNames = [];
+        state.exerciseType = 'standalone';
     },
 };

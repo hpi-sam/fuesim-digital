@@ -16,7 +16,6 @@ export const registerJoinParallelExerciseHandler = (
     parallelExerciseService: ParallelExerciseService
 ) => {
     secureOn(socket, 'joinParallelExercise', async (id: UUID, callback) => {
-        console.log('join parallel start');
         const clientWrapper = new ParallelExerciseClientWrapper(
             socket,
             authService,
@@ -42,9 +41,7 @@ export const registerJoinParallelExerciseHandler = (
             return;
         }
         try {
-            console.log('Join start');
             await clientWrapper.joinParallelExercise(parsedId.data);
-            console.log('Joined');
         } catch (e: unknown) {
             if (
                 e instanceof NotFoundError ||

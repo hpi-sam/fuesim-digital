@@ -1,3 +1,4 @@
+import type { ExerciseType } from 'fuesim-digital-shared';
 import type { ExerciseTemplateId } from 'fuesim-digital-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
@@ -46,6 +47,7 @@ export class ExerciseManagerService {
             await this.exerciseService.exerciseFactory.fromBlank({
                 templateId: exerciseTemplate.id,
             });
+        newExercise.template = exerciseTemplate;
         await this.exerciseService.loadExercise(newExercise);
         return {
             ...exerciseTemplate,
@@ -82,6 +84,7 @@ export class ExerciseManagerService {
 
     public async createExerciseFromTemplate(
         templateId: ExerciseTemplateId,
+        type: ExerciseType = 'standalone',
         session?: SessionInformation,
         optionalData?: Partial<Omit<ExerciseInsert, 'baseTemplateId' | 'user'>>
     ) {
@@ -107,8 +110,10 @@ export class ExerciseManagerService {
                 exerciseTemplate.exercise_template,
                 exerciseTemplate.exercise_entity,
                 actions,
+                type,
                 { ...optionalData, user: session ? session.user.id : null }
             );
+        await this.exerciseService.loadExercise(newExercise);
         await this.exerciseRepository.updateExerciseTemplate(
             exerciseTemplate.exercise_template.id,
             { lastExerciseCreatedAt: new Date() }

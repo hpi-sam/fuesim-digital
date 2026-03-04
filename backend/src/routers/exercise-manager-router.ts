@@ -57,6 +57,7 @@ export const createExerciseManagerRouter = (
             const newExercise =
                 await exerciseManagerService.createExerciseFromTemplate(
                     templateId,
+                    'standalone',
                     req.session
                 );
 

@@ -14,6 +14,7 @@ import {
     EocLogEntry,
     Hospital,
     HospitalPatient,
+    type LogEntry,
     RestrictedZone,
     MapImage,
     MapImageTemplate,
@@ -31,8 +32,11 @@ import {
     MaterialTemplate,
     PersonnelTemplate,
     exerciseStatusSchema,
+    exerciseTypeSchema,
+    type ExerciseType,
+    type ExerciseStatus,
+    logEntrySchema,
 } from './models/index.js';
-import type { ExerciseStatus, LogEntry } from './models/index.js';
 import type { ExerciseRadiogram } from './models/radiogram/index.js';
 import { getRadiogramConstructor } from './models/radiogram/index.js';
 import {
@@ -96,6 +100,9 @@ export class ExerciseState {
      */
     @IsZodSchema(z.int().nonnegative())
     public readonly currentTime: number = 0;
+
+    @IsZodSchema(exerciseTypeSchema)
+    public readonly type: ExerciseType = 'standalone';
 
     @IsZodSchema(exerciseStatusSchema)
     public readonly currentStatus: ExerciseStatus = 'notStarted';
@@ -212,8 +219,11 @@ export class ExerciseState {
      * This must not be defined on a normal state,
      * unless the statistics are currently being generated.
      */
-    @Equals(undefined)
+    @IsZodSchema(z.undefined())
     public logEntries?: LogEntry[];
+
+    @IsZodSchema(z.optional(logEntrySchema))
+    public lastLogEntry?: LogEntry;
 
     @Equals(undefined)
     public previousTreatmentAssignment?: TreatmentAssignment;

@@ -104,11 +104,11 @@
             <div class="col">
                 <div class="card">
                     <div class="card-header h4">Teilnehmende</div>
-                    <table class="table table-striped">
+                    <table class="table table-striped mb-0">
                         <thead>
                             <tr>
                                 <th>Teilnehmer-ID</th>
-                                <th>Teilnehmername(n)</th>
+                                <th>Name(n)</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -121,6 +121,13 @@
                                     app-parallel-exercise-instance-row
                                     [exerciseInstance]="exerciseInstance"
                                 ></tr>
+                            } @empty {
+                                <tr>
+                                    <td colspan="3" class="text-muted">
+                                        Es sind noch keine Teilnehmenden der
+                                        Übung beigetreten.
+                                    </td>
+                                </tr>
                             }
                         </tbody>
                     </table>

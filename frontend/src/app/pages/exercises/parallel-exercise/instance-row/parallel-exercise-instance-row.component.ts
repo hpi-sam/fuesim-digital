@@ -7,6 +7,7 @@ import { ParallelExerciseService } from '../../../../core/parallel-exercise.serv
 import { MessageService } from '../../../../core/messages/message.service';
 
 @Component({
+    // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'tr[app-parallel-exercise-instance-row]',
     templateUrl: './parallel-exercise-instance-row.component.html',
     styleUrls: ['./parallel-exercise-instance-row.component.scss'],

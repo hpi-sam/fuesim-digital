@@ -1,7 +1,11 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsOptional, ValidateNested } from 'class-validator';
 import { z } from 'zod';
-import { MapImageTemplate, VehicleTemplate } from '../../models/index.js';
+import {
+    MapImageTemplate,
+    mapImageTemplateSchema,
+    VehicleTemplate,
+} from '../../models/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import { PatientCategory } from '../../models/patient-category.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
@@ -21,10 +25,7 @@ export class PartialExport extends BaseExportImportFile {
     @IsZodSchema(z.array(vehicleTemplateSchema).optional())
     public readonly vehicleTemplates?: VehicleTemplate[];
 
-    @IsOptional()
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => MapImageTemplate)
+    @IsZodSchema(z.array(mapImageTemplateSchema).optional())
     public readonly mapImageTemplates?: MapImageTemplate[];
 
     public constructor(

@@ -69,6 +69,8 @@ import { personnelSchema } from './models/personnel.js';
 import { vehicleTemplateSchema } from './models/vehicle-template.js';
 import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
 import { hospitalSchema } from './models/hospital.js';
+import { mapImageTemplateSchema } from './models/map-image-template.js';
+import { mapImageSchema } from './models/map-image.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -109,7 +111,7 @@ export class ExerciseState {
     @IsZodSchema(z.record(z.uuidv4(), restrictedZoneSchema))
     public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
         {};
-    @IsIdMap(MapImage)
+    @IsZodSchema(z.record(z.uuidv4(), mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
     @IsIdMap(TransferPoint)
     public readonly transferPoints: { readonly [key: UUID]: TransferPoint } =
@@ -147,7 +149,7 @@ export class ExerciseState {
     public readonly personnelTemplates: {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;
-    @IsIdMap(MapImageTemplate)
+    @IsZodSchema(z.record(z.uuidv4(), mapImageTemplateSchema))
     public readonly mapImageTemplates: {
         readonly [key: UUID]: MapImageTemplate;
     } = defaultMapImagesTemplatesById;

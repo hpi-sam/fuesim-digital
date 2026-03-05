@@ -11,13 +11,13 @@ import type {
 import {
     uuid,
     createVehicleParameters,
-    MapImage,
     normalZoom,
     PatientTemplate,
     TransferPoint,
     Viewport,
     newMapPositionAt,
     newSimulatedRegionPositionIn,
+    newMapImageFromTemplate,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -241,13 +241,11 @@ export class DragElementService {
             case 'mapImage':
                 {
                     const template = this.transferringTemplate.template;
-                    const mapImage = MapImage.create(
-                        template.id,
-                        position,
-                        template.image,
-                        false,
-                        0
+                    const mapImage = newMapImageFromTemplate(
+                        template,
+                        position
                     );
+
                     this.exerciseService.proposeAction({
                         type: '[MapImage] Add MapImage',
                         mapImage,

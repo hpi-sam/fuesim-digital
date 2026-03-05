@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import {
     IsBoolean,
     IsNumber,
@@ -6,11 +5,10 @@ import {
     IsPositive,
     IsString,
     IsUUID,
-    ValidateNested,
 } from 'class-validator';
 import { WritableDraft } from 'immer';
 import {
-    MapImage,
+    type MapImage,
     type MapCoordinates,
     mapCoordinatesSchema,
     newMapPositionAt,
@@ -26,14 +24,14 @@ import {
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { mapImageSchema } from '../../models/map-image.js';
 import { getElement } from './utils/index.js';
 
 export class AddMapImageAction implements Action {
     @IsValue('[MapImage] Add MapImage' as const)
     public readonly type = '[MapImage] Add MapImage';
 
-    @ValidateNested()
-    @Type(() => MapImage)
+    @IsZodSchema(mapImageSchema)
     public readonly mapImage!: MapImage;
 }
 

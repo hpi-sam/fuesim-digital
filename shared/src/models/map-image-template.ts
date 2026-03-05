@@ -1,31 +1,19 @@
-import { IsString, IsUUID } from 'class-validator';
-import type { UUID } from '../utils/index.js';
-import { uuid, uuidValidationOptions } from '../utils/index.js';
-import { IsValue } from '../utils/validators/index.js';
-import { IsZodSchema } from '../utils/validators/is-zod-object.js';
+import { z } from 'zod';
+import { uuid } from '../utils/index.js';
 import type { ImageProperties } from './utils/index.js';
-import { getCreate, imagePropertiesSchema } from './utils/index.js';
+import { imagePropertiesSchema } from './utils/index.js';
 
-export class MapImageTemplate {
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export const mapImageTemplateSchema = z.strictObject({
+    id: z.uuidv4(),
+    type: z.literal('mapImageTemplate'),
+    name: z.string(),
+    image: imagePropertiesSchema,
+});
+export type MapImageTemplate = z.infer<typeof mapImageTemplateSchema>;
 
-    @IsValue('mapImageTemplate' as const)
-    public readonly type = 'mapImageTemplate';
-
-    @IsString()
-    public readonly name: string;
-
-    @IsZodSchema(imagePropertiesSchema)
-    public readonly image: ImageProperties;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(name: string, image: ImageProperties) {
-        this.name = name;
-        this.image = image;
-    }
-
-    static readonly create = getCreate(this);
+export function newMapImageTemplate(
+    name: string,
+    image: ImageProperties
+): MapImageTemplate {
+    return { id: uuid(), type: 'mapImageTemplate', name, image };
 }

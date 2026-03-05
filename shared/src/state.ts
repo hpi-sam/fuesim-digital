@@ -73,6 +73,7 @@ import { mapImageTemplateSchema } from './models/map-image-template.js';
 import { mapImageSchema } from './models/map-image.js';
 import { viewportSchema } from './models/viewport.js';
 import { transferPointSchema } from './models/transfer-point.js';
+import { alarmGroupSchema } from './models/alarm-group.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -126,7 +127,7 @@ export class ExerciseState {
     public readonly hospitalPatients: {
         readonly [key: UUID]: HospitalPatient;
     } = {};
-    @IsIdMap(AlarmGroup)
+    @IsZodSchema(z.record(z.uuidv4(), alarmGroupSchema))
     public readonly alarmGroups: { readonly [key: UUID]: AlarmGroup } = {};
     @IsIdMap(Client)
     public readonly clients: { readonly [key: UUID]: Client } = {};

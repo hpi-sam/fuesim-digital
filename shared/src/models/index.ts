@@ -1,4 +1,4 @@
-export { AlarmGroup } from './alarm-group.js';
+export * from './alarm-group.js';
 export { Client } from './client.js';
 export { EocLogEntry } from './eoc-log-entry.js';
 export * from './hospital.js';

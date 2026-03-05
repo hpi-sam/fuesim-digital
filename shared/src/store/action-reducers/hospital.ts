@@ -1,12 +1,5 @@
-import { Type } from 'class-transformer';
-import {
-    IsNumber,
-    IsString,
-    IsUUID,
-    Min,
-    ValidateNested,
-} from 'class-validator';
-import { Hospital } from '../../models/hospital.js';
+import { IsNumber, IsString, IsUUID, Min } from 'class-validator';
+import { type Hospital, hospitalSchema } from '../../models/hospital.js';
 import { HospitalPatient } from '../../models/hospital-patient.js';
 import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
@@ -15,6 +8,7 @@ import type { Action, ActionReducer } from '../action-reducer.js';
 import { ExpectedReducerError } from '../reducer-error.js';
 import { catchAllHospitalId } from '../../data/default-state/catch-all-hospital.js';
 import { createHospitalTag } from '../../models/utils/tag-helpers.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { isCompletelyLoaded } from './utils/completely-load-vehicle.js';
 import { getElement } from './utils/get-element.js';
 import { deleteVehicle } from './vehicle.js';
@@ -23,8 +17,7 @@ import { logVehicle } from './utils/log.js';
 export class AddHospitalAction implements Action {
     @IsValue('[Hospital] Add hospital' as const)
     public readonly type = '[Hospital] Add hospital';
-    @ValidateNested()
-    @Type(() => Hospital)
+    @IsZodSchema(hospitalSchema)
     public readonly hospital!: Hospital;
 }
 

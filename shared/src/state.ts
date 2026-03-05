@@ -68,6 +68,7 @@ import { personnelTemplateSchema } from './models/personnel-template.js';
 import { personnelSchema } from './models/personnel.js';
 import { vehicleTemplateSchema } from './models/vehicle-template.js';
 import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
+import { hospitalSchema } from './models/hospital.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -113,7 +114,7 @@ export class ExerciseState {
     @IsIdMap(TransferPoint)
     public readonly transferPoints: { readonly [key: UUID]: TransferPoint } =
         {};
-    @IsIdMap(Hospital)
+    @IsZodSchema(z.record(z.uuidv4(), hospitalSchema))
     public readonly hospitals: { readonly [key: UUID]: Hospital } = {
         [catchAllHospitalId]: createCatchAllHospital(),
     };

@@ -1,6 +1,6 @@
 export * from './alarm-group.js';
 export * from './client.js';
-export { EocLogEntry } from './eoc-log-entry.js';
+export * from './eoc-log-entry.js';
 export * from './hospital.js';
 export { HospitalPatient } from './hospital-patient.js';
 export * from './map-image.js';

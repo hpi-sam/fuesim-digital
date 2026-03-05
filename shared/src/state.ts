@@ -75,6 +75,7 @@ import { viewportSchema } from './models/viewport.js';
 import { transferPointSchema } from './models/transfer-point.js';
 import { alarmGroupSchema } from './models/alarm-group.js';
 import { clientSchema } from './models/client.js';
+import { eocLogEntrySchema } from './models/eoc-log-entry.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -158,9 +159,7 @@ export class ExerciseState {
         readonly [key: UUID]: MapImageTemplate;
     } = defaultMapImagesTemplatesById;
 
-    @IsArray()
-    @ValidateNested()
-    @Type(() => EocLogEntry)
+    @IsZodSchema(z.array(eocLogEntrySchema))
     public readonly eocLog: readonly EocLogEntry[] = [];
 
     @IsZodSchema(participantKeySchema)

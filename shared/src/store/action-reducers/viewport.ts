@@ -1,9 +1,9 @@
-import { Type } from 'class-transformer';
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
-import type { MapCoordinates, Size } from '../../models/index.js';
+import { IsString, IsUUID } from 'class-validator';
 import {
+    type MapCoordinates,
+    type Size,
     newMapPositionAt,
-    Viewport,
+    type Viewport,
     mapCoordinatesSchema,
     sizeSchema,
 } from '../../models/index.js';
@@ -16,13 +16,13 @@ import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { viewportSchema } from '../../models/viewport.js';
 import { getElement } from './utils/index.js';
 
 export class AddViewportAction implements Action {
     @IsValue('[Viewport] Add viewport' as const)
     readonly type = '[Viewport] Add viewport';
-    @ValidateNested()
-    @Type(() => Viewport)
+    @IsZodSchema(viewportSchema)
     public viewport!: Viewport;
 }
 

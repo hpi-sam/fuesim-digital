@@ -1,8 +1,7 @@
 import type { Store } from '@ngrx/store';
-import type { UUID } from 'fuesim-digital-shared';
-import { newMapCoordinatesAt, newSize, Viewport } from 'fuesim-digital-shared';
+import type { UUID, Viewport } from 'fuesim-digital-shared';
+import { newMapCoordinatesAt, newSize } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
-import type { Coordinate } from 'ol/coordinate';
 import type { Polygon } from 'ol/geom';
 import type OlMap from 'ol/Map';
 import Stroke from 'ol/style/Stroke';
@@ -24,16 +23,6 @@ import {
 } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
-
-export function isInViewport(
-    coordinate: Coordinate,
-    viewport: Viewport
-): boolean {
-    return Viewport.isInViewport(viewport, {
-        x: coordinate[0]!,
-        y: coordinate[1]!,
-    });
-}
 
 export class ViewportFeatureManager
     extends MoveableFeatureManager<Viewport, Polygon>

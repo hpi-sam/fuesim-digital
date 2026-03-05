@@ -71,6 +71,7 @@ import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
 import { hospitalSchema } from './models/hospital.js';
 import { mapImageTemplateSchema } from './models/map-image-template.js';
 import { mapImageSchema } from './models/map-image.js';
+import { viewportSchema } from './models/viewport.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -92,7 +93,7 @@ export class ExerciseState {
     @ValidateNested()
     public readonly randomState: RandomState = seededRandomState();
 
-    @IsIdMap(Viewport)
+    @IsZodSchema(z.record(z.uuidv4(), viewportSchema))
     public readonly viewports: { readonly [key: UUID]: Viewport } = {};
     @IsIdMap(SimulatedRegion)
     public readonly simulatedRegions: {

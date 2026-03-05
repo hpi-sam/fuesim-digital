@@ -14,7 +14,7 @@ export type { Personnel } from './personnel.js';
 export { TransferPoint } from './transfer-point.js';
 export * from './vehicle.js';
 export * from './vehicle-template.js';
-export { Viewport } from './viewport.js';
+export * from './viewport.js';
 export { PatientCategory } from './patient-category.js';
 export { SimulatedRegion } from './simulated-region.js';
 export type { Element } from './element.js';

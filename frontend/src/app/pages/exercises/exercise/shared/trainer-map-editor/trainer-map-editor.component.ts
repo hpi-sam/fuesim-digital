@@ -12,11 +12,11 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
-    Viewport,
     TransferPoint,
     PartialExport,
     migratePartialExport,
     validateExerciseExport,
+    viewportImage,
 } from 'fuesim-digital-shared';
 import type { PatientCategory, UUID } from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
@@ -161,7 +161,7 @@ export class TrainerMapEditorComponent implements OnInit {
     public readonly restrictedZoneDragTemplates = restrictedZoneDragTemplates;
 
     public readonly viewportTemplate = {
-        image: Viewport.image,
+        image: viewportImage,
     };
 
     public readonly transferPointTemplate = {

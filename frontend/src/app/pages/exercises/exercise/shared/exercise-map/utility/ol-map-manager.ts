@@ -1,11 +1,17 @@
 import type { Store } from '@ngrx/store';
-import { upperLeftCornerOf, lowerRightCornerOf } from 'fuesim-digital-shared';
+import type { Viewport } from 'fuesim-digital-shared';
+import {
+    upperLeftCornerOf,
+    lowerRightCornerOf,
+    isInViewport,
+} from 'fuesim-digital-shared';
 import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
 import OlMap from 'ol/Map';
 import { Subject, takeUntil } from 'rxjs';
 import { fromLonLat } from 'ol/proj';
+import type { Coordinate } from 'ol/coordinate';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import { startingPosition } from '../../starting-position';
 import { CateringLinesFeatureManager } from '../feature-managers/catering-lines-feature-manager';
@@ -18,10 +24,7 @@ import { SimulatedRegionFeatureManager } from '../feature-managers/simulated-reg
 import { TransferLinesFeatureManager } from '../feature-managers/transfer-lines-feature-manager';
 import { TransferPointFeatureManager } from '../feature-managers/transfer-point-feature-manager';
 import { VehicleFeatureManager } from '../feature-managers/vehicle-feature-manager';
-import {
-    isInViewport,
-    ViewportFeatureManager,
-} from '../feature-managers/viewport-feature-manager';
+import { ViewportFeatureManager } from '../feature-managers/viewport-feature-manager';
 import { RestrictedZoneFeatureManager } from '../feature-managers/restricted-zone-feature-manager';
 import type { AppState } from '../../../../../../state/app.state';
 import {
@@ -129,6 +132,13 @@ export class OlMapManager {
         return this._olMap;
     }
 
+    private isInViewport(coordinate: Coordinate, viewport: Viewport): boolean {
+        return isInViewport(viewport, {
+            x: coordinate[0]!,
+            y: coordinate[1]!,
+        });
+    }
+
     private registerViewportRestriction() {
         this.tryToFitViewForOverview(false);
         this.store
@@ -155,7 +165,7 @@ export class OlMapManager {
                 ];
                 view.fit(targetExtent);
                 const matchingZoom = view.getZoom()!;
-                if (isInViewport(center, viewport)) {
+                if (this.isInViewport(center, viewport)) {
                     // We only want to change the zoom if necessary
                     view.setZoom(previousZoom);
                     view.setCenter(center);

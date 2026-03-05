@@ -14,10 +14,11 @@ import {
     normalZoom,
     PatientTemplate,
     TransferPoint,
-    Viewport,
     newMapPositionAt,
     newSimulatedRegionPositionIn,
     newMapImageFromTemplate,
+    newViewport,
+    defaultViewportSize,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -213,17 +214,10 @@ export class DragElementService {
                 break;
             case 'viewport':
                 {
-                    // This ratio has been determined by trial and error
-                    const height = Viewport.image.height / 23.5;
-                    const width = height * Viewport.image.aspectRatio;
-                    const viewport = Viewport.create(
+                    const viewport = newViewport(
                         {
-                            x: position.x - width / 2,
-                            y: position.y + height / 2,
-                        },
-                        {
-                            height,
-                            width,
+                            x: position.x - defaultViewportSize.width / 2,
+                            y: position.y + defaultViewportSize.height / 2,
                         },
                         'Ansicht ???'
                     );

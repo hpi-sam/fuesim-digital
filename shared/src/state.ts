@@ -29,7 +29,6 @@ import {
     Vehicle,
     VehicleTemplate,
     Viewport,
-    ExerciseConfiguration,
     exerciseStatusAllowedValues,
     getCreate,
     SpatialTree,
@@ -76,6 +75,10 @@ import { transferPointSchema } from './models/transfer-point.js';
 import { alarmGroupSchema } from './models/alarm-group.js';
 import { clientSchema } from './models/client.js';
 import { eocLogEntrySchema } from './models/eoc-log-entry.js';
+import {
+    exerciseConfigurationSchema,
+    newExerciseConfiguration,
+} from './models/exercise-configuration.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -175,9 +178,8 @@ export class ExerciseState {
         personnel: SpatialTree.create(),
     };
 
-    @ValidateNested()
-    @Type(() => ExerciseConfiguration)
-    public readonly configuration = ExerciseConfiguration.create();
+    @IsZodSchema(exerciseConfigurationSchema)
+    public readonly configuration = newExerciseConfiguration();
 
     @IsInt()
     @Min(0)

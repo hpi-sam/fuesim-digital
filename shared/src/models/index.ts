@@ -18,7 +18,7 @@ export * from './viewport.js';
 export { PatientCategory } from './patient-category.js';
 export { SimulatedRegion } from './simulated-region.js';
 export type { Element } from './element.js';
-export { ExerciseConfiguration } from './exercise-configuration.js';
+export * from './exercise-configuration.js';
 export * from './utils/index.js';
 export * from './log-entry.js';
 export * from './tag.js';

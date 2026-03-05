@@ -72,6 +72,7 @@ import { hospitalSchema } from './models/hospital.js';
 import { mapImageTemplateSchema } from './models/map-image-template.js';
 import { mapImageSchema } from './models/map-image.js';
 import { viewportSchema } from './models/viewport.js';
+import { transferPointSchema } from './models/transfer-point.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -114,7 +115,7 @@ export class ExerciseState {
         {};
     @IsZodSchema(z.record(z.uuidv4(), mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
-    @IsIdMap(TransferPoint)
+    @IsZodSchema(z.record(z.uuidv4(), transferPointSchema))
     public readonly transferPoints: { readonly [key: UUID]: TransferPoint } =
         {};
     @IsZodSchema(z.record(z.uuidv4(), hospitalSchema))

@@ -12,9 +12,9 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
-    TransferPoint,
     PartialExport,
     migratePartialExport,
+    transferPointImage,
     validateExerciseExport,
     viewportImage,
 } from 'fuesim-digital-shared';
@@ -165,7 +165,7 @@ export class TrainerMapEditorComponent implements OnInit {
     };
 
     public readonly transferPointTemplate = {
-        image: TransferPoint.image,
+        image: transferPointImage,
     };
 
     public addImageTemplate() {

@@ -6,6 +6,7 @@ import type {
     AutomaticallyDistributeVehiclesBehaviorState,
 } from 'fuesim-digital-shared';
 import {
+    getTransferPointFullName,
     isInSpecificSimulatedRegion,
     TransferPoint,
 } from 'fuesim-digital-shared';
@@ -75,7 +76,7 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
         [k: string]: TransferPoint;
     }>;
     public getTransferPointOrderByValue = (transferPoint: TransferPoint) =>
-        TransferPoint.getFullName(transferPoint);
+        getTransferPointFullName(transferPoint);
 
     public readonly infinity = Number.MAX_VALUE;
 

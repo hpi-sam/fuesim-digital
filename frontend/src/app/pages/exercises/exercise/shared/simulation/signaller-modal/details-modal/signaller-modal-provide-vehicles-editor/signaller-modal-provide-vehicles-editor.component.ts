@@ -3,7 +3,7 @@ import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ResourceDescription, UUID } from 'fuesim-digital-shared';
 import {
-    TransferPoint,
+    getTransferPointFullName,
     isInSpecificSimulatedRegion,
     isUnoccupiedImmutable,
 } from 'fuesim-digital-shared';
@@ -139,7 +139,7 @@ export class SignallerModalProvideVehiclesEditorComponent
             map((transferPoints) =>
                 transferPoints.map((transferPoint) => ({
                     key: transferPoint.id,
-                    name: TransferPoint.getFullName(transferPoint),
+                    name: getTransferPointFullName(transferPoint),
                 }))
             ),
             map((options) => this.sortOptions(options)),

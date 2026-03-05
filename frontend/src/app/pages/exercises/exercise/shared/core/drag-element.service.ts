@@ -13,12 +13,12 @@ import {
     createVehicleParameters,
     normalZoom,
     PatientTemplate,
-    TransferPoint,
     newMapPositionAt,
     newSimulatedRegionPositionIn,
     newMapImageFromTemplate,
     newViewport,
     defaultViewportSize,
+    newTransferPoint,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -249,10 +249,8 @@ export class DragElementService {
                 break;
             case 'transferPoint':
                 {
-                    const transferPoint = TransferPoint.create(
+                    const transferPoint = newTransferPoint(
                         newMapPositionAt(position),
-                        {},
-                        {},
                         '???',
                         '???'
                     );
@@ -280,10 +278,8 @@ export class DragElementService {
                         x: position.x - simulatedRegion.size.width / 2,
                         y: position.y + simulatedRegion.size.height / 2,
                     });
-                    const transferPoint = TransferPoint.create(
+                    const transferPoint = newTransferPoint(
                         newSimulatedRegionPositionIn(simulatedRegion.id),
-                        {},
-                        {},
                         '',
                         `[Simuliert] ${simulatedRegion.name}`
                     );

@@ -2,9 +2,9 @@ import { produce, type WritableDraft } from 'immer';
 import {
     SimulatedRegion,
     newSimulatedRegionPositionIn,
-    TransferPoint,
     newMapCoordinatesAt,
     newSize,
+    newTransferPoint,
 } from '../../models/index.js';
 import type { PatientStatus } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
@@ -47,10 +47,8 @@ function setupStateAndApplyTreatments(
         newSize(10, 10),
         'test region'
     );
-    const transferPoint = TransferPoint.create(
+    const transferPoint = newTransferPoint(
         newSimulatedRegionPositionIn(simulatedRegion.id),
-        {},
-        {},
         '',
         `[Simuliert] test region`
     );

@@ -11,7 +11,7 @@ export * from './patient-health-state.js';
 export { PatientTemplate } from './patient-template.js';
 export { ClientRole } from './client-role.js';
 export type { Personnel } from './personnel.js';
-export { TransferPoint } from './transfer-point.js';
+export * from './transfer-point.js';
 export * from './vehicle.js';
 export * from './vehicle-template.js';
 export * from './viewport.js';

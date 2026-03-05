@@ -13,11 +13,12 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     Client,
-    ClientRole,
     currentParticipantIdOf,
     isAccepted,
     isDone,
     isUnread,
+    newClient,
+    newClientRole,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
@@ -42,9 +43,9 @@ import { RadiogramCardContentComponent } from './radiogram-card-content/radiogra
 
 // Clients that leave are lost from the state but radiograms might point to them.
 // This is a fallback to show something useful in the UI
-const unavailableClient = Client.create(
+const unavailableClient = newClient(
     'Unbekannt',
-    ClientRole.create('participant', 'mapOperator')
+    newClientRole('participant', 'mapOperator')
 );
 
 @Component({

@@ -74,6 +74,7 @@ import { mapImageSchema } from './models/map-image.js';
 import { viewportSchema } from './models/viewport.js';
 import { transferPointSchema } from './models/transfer-point.js';
 import { alarmGroupSchema } from './models/alarm-group.js';
+import { clientSchema } from './models/client.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -129,7 +130,7 @@ export class ExerciseState {
     } = {};
     @IsZodSchema(z.record(z.uuidv4(), alarmGroupSchema))
     public readonly alarmGroups: { readonly [key: UUID]: AlarmGroup } = {};
-    @IsIdMap(Client)
+    @IsZodSchema(z.record(z.uuidv4(), clientSchema))
     public readonly clients: { readonly [key: UUID]: Client } = {};
     @IsMultiTypedIdMap(getRadiogramConstructor)
     @ValidateNested()

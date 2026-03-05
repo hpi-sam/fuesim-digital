@@ -1,5 +1,5 @@
 export * from './alarm-group.js';
-export { Client } from './client.js';
+export * from './client.js';
 export { EocLogEntry } from './eoc-log-entry.js';
 export * from './hospital.js';
 export { HospitalPatient } from './hospital-patient.js';
@@ -9,7 +9,7 @@ export type { Material } from './material.js';
 export { Patient } from './patient.js';
 export * from './patient-health-state.js';
 export { PatientTemplate } from './patient-template.js';
-export { ClientRole } from './client-role.js';
+export * from './client-role.js';
 export type { Personnel } from './personnel.js';
 export * from './transfer-point.js';
 export * from './vehicle.js';

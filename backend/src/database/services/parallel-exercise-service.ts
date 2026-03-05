@@ -1,11 +1,12 @@
 import type {
     GroupParticipantKey,
+    ParallelExerciseId,
     SetAutojoinViewportAction,
 } from 'fuesim-digital-shared';
 import { parallelExerciseInstanceSummarySchema } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import type { ParallelExerciseId, ParallelExerciseInsert } from '../schema.js';
+import type { ParallelExerciseInsert } from '../schema.js';
 import {
     ApiError,
     NotFoundError,

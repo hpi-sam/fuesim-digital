@@ -1,5 +1,5 @@
 import type { AccessKey } from 'fuesim-digital-shared';
-import { createTestEnvironment } from '../../../test/utils.js';
+import { createTestEnvironment } from '../../test/utils.js';
 
 describe('access key service', () => {
     const environment = createTestEnvironment();

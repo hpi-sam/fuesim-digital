@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { exerciseTemplateIdSchema } from './ids.js';
+import { exerciseTemplateIdSchema, parallelExerciseIdSchema } from './ids.js';
 import {
     groupParticipantKeySchema,
     participantKeySchema,

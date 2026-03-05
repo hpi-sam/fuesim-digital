@@ -45,26 +45,13 @@ export class ExerciseWebsocketServer {
 
     private registerClient(client: ExerciseSocket) {
         // register handlers
-        registerJoinExerciseHandler(
-            this.exerciseServer,
-            client,
-            this.services.authService,
-            this.services.exerciseService
-        );
+        registerJoinExerciseHandler(this.exerciseServer, client, this.services);
         registerGetStateHandler(this.exerciseServer, client);
         registerProposeActionHandler(this.exerciseServer, client);
-        registerJoinExerciseHandler(
-            this.exerciseServer,
-            client,
-            this.services.authService,
-            this.services.exerciseService
-        );
         registerJoinParallelExerciseHandler(
             this.exerciseServer,
             client,
-            this.services.authService,
-            this.services.exerciseService,
-            this.services.parallelExerciseService
+            this.services
         );
         registerStartParallelExerciseHandler(this.exerciseServer, client);
         registerPauseParallelExerciseHandler(this.exerciseServer, client);

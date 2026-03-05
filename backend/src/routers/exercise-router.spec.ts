@@ -6,7 +6,6 @@ import type {
     GetExerciseTemplateResponseData,
     ExerciseKeys,
 } from 'fuesim-digital-shared';
-import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
 import {
     alternativeTestUserSessionData,
     createExerciseTemplate,
@@ -19,8 +18,8 @@ describe('exercise router', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
-        UserReadableIdGenerator.freeAll();
-        environment.exerciseService.TESTING_getExerciseMap().clear();
+        await environment.services.accessKeyService.freeAll();
+        environment.services.exerciseService.TESTING_getExerciseMap().clear();
     });
     describe('POST /api/exercise', () => {
         it('returns an exercise key', async () => {
@@ -36,9 +35,7 @@ describe('exercise router', () => {
         });
 
         it('fails when no keys are left', async () => {
-            for (let i = 0; i < 10_000; i++) {
-                UserReadableIdGenerator.generateId();
-            }
+            await environment.services.accessKeyService.generateKeys(6, 10_000);
             await environment.httpRequest('post', '/api/exercise').expect(500);
         });
     });
@@ -60,7 +57,7 @@ describe('exercise router', () => {
             const parsed = exerciseExistsResponseDataSchema.parse(
                 response.body
             );
-            expect(parsed.isTemplate).toBe(false);
+            expect(parsed.autojoin).toBe(false);
         });
 
         it('fails with 400 for arbitrary keys', async () => {
@@ -149,7 +146,7 @@ describe('exercise router', () => {
                 const parsed = exerciseExistsResponseDataSchema.parse(
                     response.body
                 );
-                expect(parsed.isTemplate).toBe(true);
+                expect(parsed.autojoin).toBe(true);
             });
 
             it('fails with trainer key if logged in with wrong user', async () => {
@@ -166,7 +163,7 @@ describe('exercise router', () => {
             });
 
             it('fails with participant key if not logged in', async () => {
-                const exercise = environment.exerciseService
+                const exercise = environment.services.exerciseService
                     .TESTING_getExerciseMap()
                     .get(exerciseTemplate.trainerKey)!;
                 await environment
@@ -178,7 +175,7 @@ describe('exercise router', () => {
             });
 
             it('fails with participant key if logged in', async () => {
-                const exercise = environment.exerciseService
+                const exercise = environment.services.exerciseService
                     .TESTING_getExerciseMap()
                     .get(exerciseTemplate.trainerKey)!;
                 await environment
@@ -195,7 +192,7 @@ describe('exercise router', () => {
             await environment
                 .httpRequest(
                     'get',
-                    `/api/exercise/${UserReadableIdGenerator.generateId()}`
+                    `/api/exercise/${await environment.services.accessKeyService.generateKey()}`
                 )
                 .expect(404);
         });
@@ -209,7 +206,8 @@ describe('exercise router', () => {
                 .expect(204);
 
             expect(
-                environment.exerciseService.TESTING_getExerciseMap().size
+                environment.services.exerciseService.TESTING_getExerciseMap()
+                    .size
             ).toBe(0);
         });
 
@@ -370,7 +368,8 @@ describe('exercise router', () => {
         });
 
         it('fails with 404 for non-existing exercise', async () => {
-            const exerciseKey = UserReadableIdGenerator.generateId();
+            const exerciseKey =
+                await environment.services.accessKeyService.generateKey();
             await environment
                 .httpRequest('get', `/api/exercise/${exerciseKey}/history`)
                 .expect(404);

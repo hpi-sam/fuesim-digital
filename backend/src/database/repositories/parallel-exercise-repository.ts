@@ -1,10 +1,9 @@
 import { eq, desc, getTableColumns } from 'drizzle-orm';
-import type { GroupParticipantKey } from 'fuesim-digital-shared';
 import type {
-    ParallelExercise,
+    GroupParticipantKey,
     ParallelExerciseId,
-    ParallelExerciseInsert,
-} from '../schema.js';
+} from 'fuesim-digital-shared';
+import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
 import {
     exerciseTable,
     parallelExerciseTable,

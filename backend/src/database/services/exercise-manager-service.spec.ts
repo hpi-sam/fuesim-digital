@@ -12,14 +12,16 @@ describe('exercise manager service', () => {
     it('correctly copies data from exercise template to exercise', async () => {
         const session = await createTestUserSession(environment);
         const sessionInformation =
-            (await environment.authService.getDataFromSessionToken(session))!;
+            (await environment.services.authService.getDataFromSessionToken(
+                session
+            ))!;
 
         // Create exercise template and do action
         const exerciseTemplate = await createExerciseTemplate(
             environment,
             session
         );
-        const exercise = environment.exerciseService.getExerciseByKey(
+        const exercise = environment.services.exerciseService.getExerciseByKey(
             exerciseTemplate.trainerKey,
             sessionInformation
         );
@@ -38,18 +40,18 @@ describe('exercise manager service', () => {
 
         // Copy exercise template
         const newActiveExercise =
-            await environment.exerciseManagerService.createExerciseFromTemplate(
+            await environment.services.exerciseManagerService.createExerciseFromTemplate(
                 exerciseTemplate.id,
-                sessionInformation,
-                environment.exerciseService
+                'standalone',
+                sessionInformation
             );
-        expect(environment.exerciseService.TESTING_getExerciseMap().size).toBe(
-            4
-        );
+        expect(
+            environment.services.exerciseService.TESTING_getExerciseMap().size
+        ).toBe(6);
 
         // Check correctness of state
         expect(
-            newActiveExercise.getExercise().currentStateString.alarmGroups[
+            newActiveExercise.exercise.currentStateString.alarmGroups[
                 action.alarmGroup.id
             ]
         ).toMatchObject(action.alarmGroup);

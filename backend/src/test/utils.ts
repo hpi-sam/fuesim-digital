@@ -146,7 +146,7 @@ export class TestEnvironment {
         if (session) {
             req.set(
                 'Cookie',
-                `${this.authService.SESSION_COOKIE_NAME}=${session}`
+                `${this.services.authService.SESSION_COOKIE_NAME}=${session}`
             );
         }
 
@@ -174,7 +174,7 @@ export class TestEnvironment {
                 ...(session
                     ? {
                           extraHeaders: {
-                              Cookie: `${this.authService.SESSION_COOKIE_NAME}=${session}`,
+                              Cookie: `${this.services.authService.SESSION_COOKIE_NAME}=${session}`,
                           },
                       }
                     : {}),
@@ -289,7 +289,7 @@ export async function createTestUserSession(
     environment: TestEnvironment,
     data?: { user?: OidcService.UserInfo; expired?: boolean }
 ) {
-    const session = await environment.authService.createNewSession({
+    const session = await environment.services.authService.createNewSession({
         user: data?.user ?? defaultTestUserSessionData,
         accessToken: 'abc',
         validityDurationMs: data?.expired ? 0 : undefined,

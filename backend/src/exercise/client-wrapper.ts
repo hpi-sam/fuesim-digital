@@ -4,6 +4,7 @@ import type {
     UUID,
     StartExerciseAction,
     PauseExerciseAction,
+    ParallelExerciseId,
 } from 'fuesim-digital-shared';
 import { Client, ClientRole } from 'fuesim-digital-shared';
 import type { ExerciseAction, ExerciseKey, UUID } from 'fuesim-digital-shared';
@@ -12,15 +13,12 @@ import { filter, type Subscription } from 'rxjs';
 import { newClient, newClientRole } from 'fuesim-digital-shared';
 import cookie from 'cookie';
 import type { ExerciseSocket } from '../exercise-server.js';
-import type { ExerciseService } from '../database/services/exercise-service.js';
-import type {
-    ParallelExercise,
-    ParallelExerciseId,
-} from '../database/schema.js';
-import type { ParallelExerciseService } from '../database/services/parallel-exercise-service.js';
+import type { ParallelExercise } from '../database/schema.js';
 import { PermissionDeniedError } from '../utils/http.js';
-import type { AuthService, SessionInformation } from '../auth/auth-service.js';
+import type { SessionInformation } from '../auth/auth-service.js';
+import type { Services } from '../database/services/index.js';
 import type { ActiveExercise } from './active-exercise.js';
+import { clientMap } from './client-map.js';
 
 /**
  * Wraps a {@link ExerciseSocket} for different types of clients.
@@ -28,18 +26,34 @@ import type { ActiveExercise } from './active-exercise.js';
 export abstract class ClientWrapper {
     public session?: SessionInformation;
 
-    protected constructor(
+    public constructor(
         public readonly socket: ExerciseSocket,
-        private readonly authService: AuthService
+        public readonly services: Services
     ) {}
 
+    public static init<T extends typeof ClientWrapper>(
+        wrapperClass: T,
+        socket: ExerciseSocket,
+        services: Services
+    ): InstanceType<T> | undefined {
+        if (clientMap.get(socket)) {
+            // Already registered
+            return;
+        }
+        // @ts-expect-error typing
+        const wrapper = new wrapperClass(socket, services);
+        clientMap.set(socket, wrapper);
+        return wrapper;
+    }
     public async getSessionInformation() {
         const cookies = cookie.parse(this.socket.request.headers.cookie ?? '');
         const sessionToken =
-            cookies[this.authService.SESSION_COOKIE_NAME] ?? '';
+            cookies[this.services.authService.SESSION_COOKIE_NAME] ?? '';
 
         this.session =
-            await this.authService.getDataFromSessionToken(sessionToken);
+            await this.services.authService.getDataFromSessionToken(
+                sessionToken
+            );
     }
 
     public disconnect() {
@@ -48,14 +62,6 @@ export abstract class ClientWrapper {
 }
 
 export class ExerciseClientWrapper extends ClientWrapper {
-    public constructor(
-        public override readonly socket: ExerciseSocket,
-        public override readonly authService: AuthService,
-        private readonly exerciseService: ExerciseService
-    ) {
-        super(socket, authService);
-    }
-
     private chosenExercise?: ActiveExercise;
 
     private relatedExerciseClient?: Client;
@@ -66,7 +72,7 @@ export class ExerciseClientWrapper extends ClientWrapper {
      * @returns The joined client's id, or undefined when the exercise doesn't exist.
      */
     public joinExercise(exerciseKey: ExerciseKey, clientName: string): UUID {
-        this.chosenExercise = this.exerciseService.getExerciseByKey(
+        this.chosenExercise = this.services.exerciseService.getExerciseByKey(
             exerciseKey,
             this.session
         );
@@ -92,7 +98,7 @@ export class ExerciseClientWrapper extends ClientWrapper {
             return;
         }
 
-        this.exerciseService.leaveExercise(
+        this.services.exerciseService.leaveExercise(
             this.chosenExercise.participantKey,
             this
         );
@@ -118,15 +124,6 @@ export class ExerciseClientWrapper extends ClientWrapper {
 }
 
 export class ParallelExerciseClientWrapper extends ClientWrapper {
-    public constructor(
-        public override readonly socket: ExerciseSocket,
-        public override readonly authService: AuthService,
-        private readonly exerciseService: ExerciseService,
-        private readonly parallelExerciseService: ParallelExerciseService
-    ) {
-        super(socket, authService);
-    }
-
     private chosenExercise: ParallelExercise | null = null;
     private readonly subscriptions: Subscription[] = [];
 
@@ -135,19 +132,19 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
             throw new PermissionDeniedError();
         }
         this.chosenExercise =
-            await this.parallelExerciseService.getParallelExerciseById(
+            await this.services.parallelExerciseService.getParallelExerciseById(
                 id,
                 this.session
             );
         const activeExercises =
-            await this.parallelExerciseService.getParallelExerciseInstancesById(
+            await this.services.parallelExerciseService.getParallelExerciseInstancesById(
                 id,
                 this.session
             );
 
         // We watch for new exercise instances to join the parallel exercise
         // to register watchers for them
-        this.parallelExerciseService.newJoin
+        this.services.parallelExerciseService.newJoin
             .pipe(filter((join) => id === join.parallelExerciseId))
             .subscribe((join) => {
                 const sub = join.activeExercise.actionApplied.subscribe(
@@ -179,7 +176,7 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
         if (!this.session) {
             throw new PermissionDeniedError();
         }
-        return this.parallelExerciseService.getParallelExerciseInstanceSummariesById(
+        return this.services.parallelExerciseService.getParallelExerciseInstanceSummariesById(
             this.chosenExercise!.id,
             this.session
         );
@@ -190,7 +187,7 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
             throw new PermissionDeniedError();
         }
         const activeExercises =
-            await this.parallelExerciseService.getParallelExerciseInstancesById(
+            await this.services.parallelExerciseService.getParallelExerciseInstancesById(
                 this.chosenExercise!.id,
                 this.session
             );

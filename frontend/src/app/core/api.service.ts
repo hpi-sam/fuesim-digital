@@ -19,6 +19,7 @@ import {
     type StateExport,
     type PatchExerciseTemplateRequestData,
     ExerciseTemplateId,
+    ParallelExerciseId,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';

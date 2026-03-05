@@ -1,6 +1,6 @@
 ### Summary
 
-_Please provide a short summary of the proposed changes here. Reference the addressed issue or provide a short rational for the changes._
+_Please provide a short summary of the proposed changes here. Reference the addressed issue or provide a short rationale for the changes._
 
 ### PR Checklist
 

@@ -120,6 +120,7 @@ export type GetExerciseTemplatesResponseDataInput = z.input<
 export const joinExerciseResponseDataSchema = z.object({
     clientId: z.string(),
     exerciseTemplate: z.nullable(getExerciseTemplateResponseDataSchema),
+    parallelExerciseId: parallelExerciseIdSchema.nullable(),
 });
 export type JoinExerciseResponseData = z.infer<
     typeof joinExerciseResponseDataSchema

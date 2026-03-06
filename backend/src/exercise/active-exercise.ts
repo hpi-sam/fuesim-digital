@@ -132,7 +132,7 @@ export class ActiveExercise {
         this.tickInterval
     );
 
-    private readonly clients = new Set<ExerciseClientWrapper>();
+    public readonly clients = new Set<ExerciseClientWrapper>();
 
     public readonly incrementIdGenerator = new IncrementIdGenerator();
 

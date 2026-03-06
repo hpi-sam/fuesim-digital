@@ -99,6 +99,15 @@ export class ApiService {
             }
         );
     }
+    public async getParallelExercise(id: ParallelExerciseId) {
+        return lastValueFrom(
+            this.httpClient
+                .get(`${httpOrigin}/api/parallel_exercises/${id}`)
+                .pipe(
+                    map((v) => getParallelExerciseResponseDataSchema.parse(v))
+                )
+        );
+    }
     public getParallelExercisesResource() {
         return httpResource(() => `${httpOrigin}/api/parallel_exercises/`, {
             parse: getParallelExercisesResponseDataSchema.parse,

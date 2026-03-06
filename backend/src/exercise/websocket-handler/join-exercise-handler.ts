@@ -81,6 +81,8 @@ export const registerJoinExerciseHandler = (
                                       clientWrapper.exercise!.trainerKey,
                               }
                             : null,
+                        parallelExerciseId:
+                            clientWrapper.exercise!.exercise.parallelExerciseId,
                     }),
                 });
             });

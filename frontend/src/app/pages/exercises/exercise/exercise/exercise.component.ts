@@ -41,7 +41,6 @@ import { selectOwnClient } from '../../../../state/application/selectors/shared.
 import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
 import {
     ExerciseStateBadgeComponent,
-    ExerciseStateBadgeComponent,
 } from '../shared/exercise-state-badge/exercise-state-badge.component';
 import { TimeTravelComponent } from '../shared/time-travel/time-travel.component';
 import { ExerciseMapComponent } from '../shared/exercise-map/exercise-map.component';
@@ -87,6 +86,7 @@ export class ExerciseComponent implements OnDestroy {
     public readonly participantKey$ = this.store.select(selectParticipantKey);
     public readonly timeConstraints$ = this.store.select(selectTimeConstraints);
     public readonly ownClient$ = this.store.select(selectOwnClient);
+    public readonly exerciseType$ = this.store.select(selectExerciseType);
 
     readonly version: string = Package.version;
 

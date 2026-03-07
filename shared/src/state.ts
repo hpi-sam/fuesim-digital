@@ -2,7 +2,6 @@ import { Type } from 'class-transformer';
 import * as z from 'zod';
 import {
     Equals,
-    IsArray,
     IsInt,
     IsObject,
     IsUUID,
@@ -22,7 +21,6 @@ import {
     MapImageTemplate,
     Material,
     Patient,
-    PatientCategory,
     Personnel,
     SimulatedRegion,
     TransferPoint,
@@ -81,6 +79,7 @@ import {
 } from './models/exercise-configuration.js';
 import { patientSchema } from './models/patient.js';
 import { hospitalPatientSchema } from './models/hospital-patient.js';
+import { patientCategorySchema } from './models/patient-category.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -142,9 +141,7 @@ export class ExerciseState {
     @ValidateNested()
     public readonly radiograms: { readonly [key: UUID]: ExerciseRadiogram } =
         {};
-    @IsArray()
-    @ValidateNested()
-    @Type(() => PatientCategory)
+    @IsZodSchema(z.array(patientCategorySchema))
     public readonly patientCategories = defaultPatientCategories;
 
     @IsZodSchema(z.record(z.uuidv4(), vehicleTemplateSchema))

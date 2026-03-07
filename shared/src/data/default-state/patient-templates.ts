@@ -1,4 +1,5 @@
-import { PatientCategory } from '../../models/patient-category.js';
+import type { PatientCategory } from '../../models/patient-category.js';
+import { newPatientCategory } from '../../models/patient-category.js';
 import {
     newFunctionParameters,
     newPatientHealthState,
@@ -811,7 +812,7 @@ const prioRedUntilPhase2State = newPatientHealthState(
 
 export const defaultPatientCategories: readonly PatientCategory[] = [
     // XAXAXA Patients - Pregnant
-    PatientCategory.create('XAXAXAP', defaultPatientImage, [
+    newPatientCategory('XAXAXAP', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',
@@ -841,7 +842,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // XAXAXD Patients
-    PatientCategory.create('XAXAXD', defaultPatientImage, [
+    newPatientCategory('XAXAXD', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',
@@ -929,7 +930,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // XAXDXA Patients
-    PatientCategory.create('XAXDXA', defaultPatientImage, [
+    newPatientCategory('XAXDXA', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',
@@ -992,7 +993,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // XDXDXA Patients
-    PatientCategory.create('XDXDXA', defaultPatientImage, [
+    newPatientCategory('XDXDXA', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'male',
@@ -1027,7 +1028,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // XAXAYB Patients
-    PatientCategory.create('XAXAYB', defaultPatientImage, [
+    newPatientCategory('XAXAYB', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',
@@ -1064,7 +1065,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // XDZBZC Patients
-    PatientCategory.create('XDZBZC', defaultPatientImage, [
+    newPatientCategory('XDZBZC', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',
@@ -1100,7 +1101,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // YAXAXA Patients
-    PatientCategory.create('YAXAXA', defaultPatientImage, [
+    newPatientCategory('YAXAXA', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'male',
@@ -1133,7 +1134,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // YBXAXA Patients
-    PatientCategory.create('YBXAXA', defaultPatientImage, [
+    newPatientCategory('YBXAXA', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'male',
@@ -1167,7 +1168,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // YBYAYA Patients
-    PatientCategory.create('YBYAYA', defaultPatientImage, [
+    newPatientCategory('YBYAYA', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'male',
@@ -1202,7 +1203,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // YAYBYA Patients
-    PatientCategory.create('YAYBYA', defaultPatientImage, [
+    newPatientCategory('YAYBYA', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'male',
@@ -1232,7 +1233,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // YDYBYB Patients
-    PatientCategory.create('YDYBYB', defaultPatientImage, [
+    newPatientCategory('YDYBYB', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',
@@ -1274,7 +1275,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // YCZCVE Patients
-    PatientCategory.create('YCZCVE', defaultPatientImage, [
+    newPatientCategory('YCZCVE', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',
@@ -1309,7 +1310,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // ZBZAZA Patients - Not Pregnant
-    PatientCategory.create('ZBZAZA', defaultPatientImage, [
+    newPatientCategory('ZBZAZA', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'male',
@@ -1400,7 +1401,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // ZBZAZA Patients - Pregnant
-    PatientCategory.create('ZBZAZAP', defaultPatientImage, [
+    newPatientCategory('ZBZAZAP', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',
@@ -1433,7 +1434,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // ZBZCVE Patients
-    PatientCategory.create('ZBZCVE', defaultPatientImage, [
+    newPatientCategory('ZBZCVE', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',
@@ -1470,7 +1471,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // ZCZCVE Patients
-    PatientCategory.create('ZCZCVE', defaultPatientImage, [
+    newPatientCategory('ZCZCVE', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'male',
@@ -1504,7 +1505,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
     ]),
 
     // ZCVEVE Patients
-    PatientCategory.create('ZCVEVE', defaultPatientImage, [
+    newPatientCategory('ZCVEVE', defaultPatientImage, [
         newPatientTemplate(
             {
                 sex: 'female',

@@ -1,7 +1,11 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { createSelector, Store } from '@ngrx/store';
-import { Patient, SimulatedRegion } from 'fuesim-digital-shared';
+import {
+    getPatientVisibleStatus,
+    Patient,
+    SimulatedRegion,
+} from 'fuesim-digital-shared';
 import { combineLatest, Observable, map, Subject, takeUntil } from 'rxjs';
 import type {
     Material,
@@ -91,7 +95,7 @@ export class SimulatedRegionPreviewComponent implements OnInit, OnDestroy {
                             )
                         )
                         .map((patient) => ({
-                            visibleStatus: Patient.getVisibleStatus(
+                            visibleStatus: getPatientVisibleStatus(
                                 patient,
                                 configuration.pretriageEnabled,
                                 configuration.bluePatientsEnabled

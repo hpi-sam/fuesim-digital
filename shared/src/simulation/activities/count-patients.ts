@@ -5,7 +5,7 @@ import type { UUID } from '../../utils/index.js';
 import { StrictObject, uuidValidationOptions } from '../../utils/index.js';
 import { getCreate } from '../../models/utils/get-create.js';
 import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
-import { Patient } from '../../models/patient.js';
+import { getPatientVisibleStatus } from '../../models/patient.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { PatientsCountedEvent } from '../events/patients-counted.js';
 import type { PatientStatus } from '../../models/utils/patient-status.js';
@@ -50,7 +50,7 @@ export const countPatientsActivity: SimulationActivity<CountPatientsActivityStat
             const patientCount = StrictObject.fromEntries(
                 StrictObject.entries(
                     groupBy(patients, (patient) =>
-                        Patient.getVisibleStatus(
+                        getPatientVisibleStatus(
                             patient,
                             draftState.configuration.pretriageEnabled,
                             draftState.configuration.bluePatientsEnabled
@@ -62,11 +62,9 @@ export const countPatientsActivity: SimulationActivity<CountPatientsActivityStat
                 ])
             );
 
-            StrictObject.keys(patientStatusAllowedValues).forEach(
-                (patientStatus) => {
-                    patientCount[patientStatus] ??= 0;
-                }
-            );
+            patientStatusAllowedValues.forEach((patientStatus) => {
+                patientCount[patientStatus] ??= 0;
+            });
 
             sendSimulationEvent(
                 simulatedRegion,

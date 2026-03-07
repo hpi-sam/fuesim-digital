@@ -9,13 +9,13 @@ import type { UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import { IsRadiogramStatus } from '../../utils/validators/is-radiogram-status.js';
-import { getCreate } from '../utils/get-create.js';
-import type { PatientStatus } from '../utils/patient-status.js';
-import { patientStatusAllowedValues } from '../utils/patient-status.js';
+import { getCreate } from '../utils/index.js';
+import { type PatientStatus, patientStatusSchema } from '../utils/index.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type { Radiogram } from './radiogram.js';
-import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
+import type { ExerciseRadiogramStatus } from './status/index.js';
 import type { Scope as TransferProgressScope } from './utils/transfer-progress-scope.js';
-import { scopeAllowedValues } from './utils/transfer-progress-scope.js';
+import { scopeAllowedValues } from './utils/index.js';
 
 export class TransferCategoryCompletedRadiogram implements Radiogram {
     @IsUUID(4, uuidValidationOptions)
@@ -42,7 +42,7 @@ export class TransferCategoryCompletedRadiogram implements Radiogram {
     @ValidateIf((_, value) => value !== null)
     public readonly informationRequestKey: string | null = null;
 
-    @IsLiteralUnion(patientStatusAllowedValues)
+    @IsZodSchema(patientStatusSchema)
     readonly completedCategory: PatientStatus = 'white';
 
     @IsLiteralUnion(scopeAllowedValues)

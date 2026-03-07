@@ -12,7 +12,6 @@ import {
     Personnel,
     Vehicle,
     createPersonnelTypeTag,
-    Patient,
     getStatus,
     currentTransferOf,
     isInTransfer,
@@ -29,6 +28,7 @@ import type { ElementTypePluralMap } from '../../utils/element-type-plural-map.j
 import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
+import { getPatientVisibleStatus } from '../../models/patient.js';
 import type { TransferableElementType } from './transfer.js';
 import { letElementArrive } from './transfer.js';
 import { updateTreatments } from './utils/calculate-treatments.js';
@@ -122,7 +122,7 @@ export namespace ExerciseActionReducers {
             patientUpdates.forEach((patientUpdate) => {
                 const currentPatient = draftState.patients[patientUpdate.id]!;
 
-                const visibleStatusBefore = Patient.getVisibleStatus(
+                const visibleStatusBefore = getPatientVisibleStatus(
                     currentPatient,
                     draftState.configuration.pretriageEnabled,
                     draftState.configuration.bluePatientsEnabled
@@ -134,7 +134,7 @@ export namespace ExerciseActionReducers {
                 currentPatient.treatmentTime = patientUpdate.treatmentTime;
                 currentPatient.realStatus = getStatus(currentPatient.health);
 
-                const visibleStatusAfter = Patient.getVisibleStatus(
+                const visibleStatusAfter = getPatientVisibleStatus(
                     currentPatient,
                     draftState.configuration.pretriageEnabled,
                     draftState.configuration.bluePatientsEnabled

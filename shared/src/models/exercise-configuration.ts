@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { defaultTileMapProperties } from '../data/index.js';
 import { tileMapPropertiesSchema } from './utils/index.js';
 

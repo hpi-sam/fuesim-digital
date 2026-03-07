@@ -1,24 +1,17 @@
-import { Type } from 'class-transformer';
-import {
-    IsBoolean,
-    IsString,
-    IsUUID,
-    MaxLength,
-    ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsString, IsUUID, MaxLength } from 'class-validator';
 import { WritableDraft } from 'immer';
-import { Patient } from '../../models/patient.js';
+import { type Patient, patientSchema } from '../../models/patient.js';
 import {
     newMapPositionAt,
     type PatientStatus,
     isOnMap,
-    patientStatusAllowedValues,
     type MapCoordinates,
     currentSimulatedRegionIdOf,
     currentCoordinatesOf,
     isInSimulatedRegion,
     currentSimulatedRegionOf,
     mapCoordinatesSchema,
+    patientStatusSchema,
 } from '../../models/index.js';
 import {
     changePosition,
@@ -31,7 +24,7 @@ import {
     StrictObject,
     uuidValidationOptions,
 } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
+import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { PatientRemovedEvent } from '../../simulation/index.js';
@@ -66,8 +59,8 @@ export function deletePatient(
 export class AddPatientAction implements Action {
     @IsValue('[Patient] Add patient' as const)
     public readonly type = '[Patient] Add patient';
-    @ValidateNested()
-    @Type(() => Patient)
+
+    @IsZodSchema(patientSchema)
     public readonly patient!: Patient;
 }
 
@@ -104,7 +97,7 @@ export class SetVisibleStatusAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly patientId!: UUID;
 
-    @IsLiteralUnion(patientStatusAllowedValues)
+    @IsZodSchema(patientStatusSchema)
     public readonly patientStatus!: PatientStatus;
 }
 

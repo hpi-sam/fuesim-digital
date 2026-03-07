@@ -1,8 +1,9 @@
-import type {
-    ExerciseConfiguration,
-    PatientStatus,
+import {
+    type ExerciseConfiguration,
+    type PatientStatus,
+    type Patient,
+    getPatientVisibleStatus,
 } from 'fuesim-digital-shared';
-import { Patient } from 'fuesim-digital-shared';
 
 const patientCategoryOrderDictionary: {
     [Key in PatientStatus]: number;
@@ -27,12 +28,12 @@ export function comparePatientsByVisibleStatus(
     patientB: Patient,
     configuration: ExerciseConfiguration
 ): number {
-    const statusA = Patient.getVisibleStatus(
+    const statusA = getPatientVisibleStatus(
         patientA,
         configuration.pretriageEnabled,
         configuration.bluePatientsEnabled
     );
-    const statusB = Patient.getVisibleStatus(
+    const statusB = getPatientVisibleStatus(
         patientB,
         configuration.pretriageEnabled,
         configuration.bluePatientsEnabled

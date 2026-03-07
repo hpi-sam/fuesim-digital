@@ -12,13 +12,13 @@ import {
     uuid,
     createVehicleParameters,
     normalZoom,
-    PatientTemplate,
     newMapPositionAt,
     newSimulatedRegionPositionIn,
     newMapImageFromTemplate,
     newViewport,
     defaultViewportSize,
     newTransferPoint,
+    newPatientFromTemplate,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -191,7 +191,7 @@ export class DragElementService {
                 break;
             case 'patient':
                 {
-                    const patient = PatientTemplate.generatePatient(
+                    const patient = newPatientFromTemplate(
                         this.transferringTemplate.template.patientTemplates[
                             Math.floor(
                                 Math.random() *

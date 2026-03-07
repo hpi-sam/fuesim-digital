@@ -79,6 +79,8 @@ import {
     exerciseConfigurationSchema,
     newExerciseConfiguration,
 } from './models/exercise-configuration.js';
+import { patientSchema } from './models/patient.js';
+import { hospitalPatientSchema } from './models/hospital-patient.js';
 
 export class ExerciseState {
     @IsUUID(4, uuidValidationOptions)
@@ -112,7 +114,7 @@ export class ExerciseState {
 
     @IsZodSchema(z.record(z.uuidv4(), personnelSchema))
     public readonly personnel: { readonly [key: UUID]: Personnel } = {};
-    @IsIdMap(Patient)
+    @IsZodSchema(z.record(z.uuidv4(), patientSchema))
     public readonly patients: { readonly [key: UUID]: Patient } = {};
     @IsZodSchema(z.record(z.uuidv4(), materialSchema))
     public readonly materials: { readonly [key: UUID]: Material } = {};
@@ -128,7 +130,7 @@ export class ExerciseState {
     public readonly hospitals: { readonly [key: UUID]: Hospital } = {
         [catchAllHospitalId]: createCatchAllHospital(),
     };
-    @IsIdMap(HospitalPatient, (hospitalPatient) => hospitalPatient.patientId)
+    @IsZodSchema(z.record(z.uuidv4(), hospitalPatientSchema))
     public readonly hospitalPatients: {
         readonly [key: UUID]: HospitalPatient;
     } = {};

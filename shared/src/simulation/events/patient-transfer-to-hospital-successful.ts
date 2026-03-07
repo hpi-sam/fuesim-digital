@@ -1,10 +1,13 @@
 import { IsUUID } from 'class-validator';
 import type { UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import type { PatientStatus } from '../../models/utils/patient-status.js';
-import { patientStatusAllowedValues } from '../../models/utils/patient-status.js';
-import { getCreate } from '../../models/utils/get-create.js';
+import { IsValue } from '../../utils/validators/index.js';
+import {
+    type PatientStatus,
+    patientStatusSchema,
+    getCreate,
+} from '../../models/index.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type { SimulationEvent } from './simulation-event.js';
 
 export class PatientTransferToHospitalSuccessfulEvent
@@ -13,7 +16,7 @@ export class PatientTransferToHospitalSuccessfulEvent
     @IsValue('patientTransferToHospitalSuccessfulEvent')
     readonly type = 'patientTransferToHospitalSuccessfulEvent';
 
-    @IsLiteralUnion(patientStatusAllowedValues)
+    @IsZodSchema(patientStatusSchema)
     readonly patientCategory: PatientStatus;
 
     @IsUUID(4, uuidValidationOptions)

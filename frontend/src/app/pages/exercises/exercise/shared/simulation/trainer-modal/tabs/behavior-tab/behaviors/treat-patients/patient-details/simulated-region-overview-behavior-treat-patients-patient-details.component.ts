@@ -2,7 +2,7 @@ import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
-import { Patient } from 'fuesim-digital-shared';
+import { getPatientVisibleStatus, Patient } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { NgbProgressbar } from '@ng-bootstrap/ng-bootstrap/progressbar';
@@ -103,7 +103,7 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
                 patientSelector,
                 selectConfiguration,
                 (patient, configuration) =>
-                    Patient.getVisibleStatus(
+                    getPatientVisibleStatus(
                         patient,
                         configuration.pretriageEnabled,
                         configuration.bluePatientsEnabled

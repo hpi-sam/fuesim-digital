@@ -3,8 +3,8 @@ import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import {
+    getPatientVisibleStatus,
     healthPointsDefaults,
-    Patient,
     statusNames,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -44,7 +44,7 @@ export class PatientHealthPointDisplayComponent implements OnChanges {
                 selectConfiguration,
                 (patient, configuration) => ({
                     real: patient.realStatus,
-                    visible: Patient.getVisibleStatus(
+                    visible: getPatientVisibleStatus(
                         patient,
                         configuration.pretriageEnabled,
                         configuration.bluePatientsEnabled

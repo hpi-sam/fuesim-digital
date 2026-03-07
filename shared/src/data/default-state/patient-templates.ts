@@ -1,9 +1,9 @@
 import { PatientCategory } from '../../models/patient-category.js';
 import {
-    FunctionParameters,
-    PatientHealthState,
+    newFunctionParameters,
+    newPatientHealthState,
 } from '../../models/patient-health-state.js';
-import { PatientTemplate } from '../../models/patient-template.js';
+import { newPatientTemplate } from '../../models/patient-template.js';
 import type { ImageProperties } from '../../models/utils/index.js';
 import { healthPointsDefaults } from '../../models/utils/index.js';
 
@@ -25,13 +25,13 @@ function calculateHealthChange(
 
 const phaseTime = 12 * 60 * 1000;
 
-const noChangesState = PatientHealthState.create(
-    FunctionParameters.create(0, 0, 0, 0),
+const noChangesState = newPatientHealthState(
+    newFunctionParameters(0, 0, 0, 0),
     []
 );
 
-const recoverToGreenState = PatientHealthState.create(
-    FunctionParameters.create(
+const recoverToGreenState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.greenAverage,
@@ -61,8 +61,8 @@ const recoverToGreenState = PatientHealthState.create(
     ]
 );
 
-const yellowFor2PhasesState = PatientHealthState.create(
-    FunctionParameters.create(0, 0, 0, 0),
+const yellowFor2PhasesState = newPatientHealthState(
+    newFunctionParameters(0, 0, 0, 0),
     [
         {
             matchingHealthStateId: recoverToGreenState.id,
@@ -71,8 +71,8 @@ const yellowFor2PhasesState = PatientHealthState.create(
     ]
 );
 
-const greenUntilPhase2State = PatientHealthState.create(
-    FunctionParameters.create(
+const greenUntilPhase2State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.greenMax,
             healthPointsDefaults.yellowAverage,
@@ -90,8 +90,8 @@ const greenUntilPhase2State = PatientHealthState.create(
     ]
 );
 
-const waitForTransportState = PatientHealthState.create(
-    FunctionParameters.create(
+const waitForTransportState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.redAverage,
             healthPointsDefaults.blackMax,
@@ -109,8 +109,8 @@ const waitForTransportState = PatientHealthState.create(
     ]
 );
 
-const greenStartPhase5RADecisionState = PatientHealthState.create(
-    FunctionParameters.create(
+const greenStartPhase5RADecisionState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.redAverage,
             healthPointsDefaults.blackMax,
@@ -140,8 +140,8 @@ const greenStartPhase5RADecisionState = PatientHealthState.create(
     ]
 );
 
-const yellowToRedState = PatientHealthState.create(
-    FunctionParameters.create(
+const yellowToRedState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.redAverage,
@@ -159,8 +159,8 @@ const yellowToRedState = PatientHealthState.create(
     ]
 );
 
-const greenUntilPhase4State = PatientHealthState.create(
-    FunctionParameters.create(
+const greenUntilPhase4State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.greenMax,
             healthPointsDefaults.yellowAverage,
@@ -178,8 +178,8 @@ const greenUntilPhase4State = PatientHealthState.create(
     ]
 );
 
-const yellowToGreenState = PatientHealthState.create(
-    FunctionParameters.create(
+const yellowToGreenState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.greenAverage,
@@ -197,8 +197,8 @@ const yellowToGreenState = PatientHealthState.create(
     ]
 );
 
-const waitForYellowToGreenState = PatientHealthState.create(
-    FunctionParameters.create(0, 0, 0, 0),
+const waitForYellowToGreenState = newPatientHealthState(
+    newFunctionParameters(0, 0, 0, 0),
     [
         {
             matchingHealthStateId: yellowToGreenState.id,
@@ -207,8 +207,8 @@ const waitForYellowToGreenState = PatientHealthState.create(
     ]
 );
 
-const greenUntilPhase7State = PatientHealthState.create(
-    FunctionParameters.create(
+const greenUntilPhase7State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.greenMax,
             healthPointsDefaults.yellowAverage,
@@ -226,8 +226,8 @@ const greenUntilPhase7State = PatientHealthState.create(
     ]
 );
 
-const greenUntilPhase8State = PatientHealthState.create(
-    FunctionParameters.create(
+const greenUntilPhase8State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.greenMax,
             healthPointsDefaults.yellowAverage,
@@ -245,8 +245,8 @@ const greenUntilPhase8State = PatientHealthState.create(
     ]
 );
 
-const greenStartPhase11RADecisionState = PatientHealthState.create(
-    FunctionParameters.create(
+const greenStartPhase11RADecisionState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.blackMax,
@@ -272,8 +272,8 @@ const greenStartPhase11RADecisionState = PatientHealthState.create(
     ]
 );
 
-const greenStartPhase10RADecisionState = PatientHealthState.create(
-    FunctionParameters.create(
+const greenStartPhase10RADecisionState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.redAverage,
@@ -303,8 +303,8 @@ const greenStartPhase10RADecisionState = PatientHealthState.create(
     ]
 );
 
-const greenStartPhase9RSDecisionState = PatientHealthState.create(
-    FunctionParameters.create(
+const greenStartPhase9RSDecisionState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.redAverage,
@@ -339,8 +339,8 @@ const greenStartPhase9RSDecisionState = PatientHealthState.create(
     ]
 );
 
-const greenUntilPhase9State = PatientHealthState.create(
-    FunctionParameters.create(
+const greenUntilPhase9State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.greenMax,
             healthPointsDefaults.yellowAverage,
@@ -358,8 +358,8 @@ const greenUntilPhase9State = PatientHealthState.create(
     ]
 );
 
-const greenUntilPhase10State = PatientHealthState.create(
-    FunctionParameters.create(
+const greenUntilPhase10State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.greenMax,
             healthPointsDefaults.yellowAverage,
@@ -377,8 +377,8 @@ const greenUntilPhase10State = PatientHealthState.create(
     ]
 );
 
-const greenUntilPhase11State = PatientHealthState.create(
-    FunctionParameters.create(
+const greenUntilPhase11State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.greenMax,
             healthPointsDefaults.yellowAverage,
@@ -396,8 +396,8 @@ const greenUntilPhase11State = PatientHealthState.create(
     ]
 );
 
-const greenUntilPhase12State = PatientHealthState.create(
-    FunctionParameters.create(
+const greenUntilPhase12State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.greenMax,
             healthPointsDefaults.yellowAverage,
@@ -415,8 +415,8 @@ const greenUntilPhase12State = PatientHealthState.create(
     ]
 );
 
-const yellowUntilPhase5State = PatientHealthState.create(
-    FunctionParameters.create(
+const yellowUntilPhase5State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.yellowMax,
@@ -434,8 +434,8 @@ const yellowUntilPhase5State = PatientHealthState.create(
     ]
 );
 
-const recoverWithRSState = PatientHealthState.create(
-    FunctionParameters.create(
+const recoverWithRSState = newPatientHealthState(
+    newFunctionParameters(
         0,
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
@@ -461,8 +461,8 @@ const recoverWithRSState = PatientHealthState.create(
     ]
 );
 
-const yellowUntilPhase4State = PatientHealthState.create(
-    FunctionParameters.create(0, 0, 0, 0),
+const yellowUntilPhase4State = newPatientHealthState(
+    newFunctionParameters(0, 0, 0, 0),
     [
         {
             matchingHealthStateId: recoverWithRSState.id,
@@ -471,8 +471,8 @@ const yellowUntilPhase4State = PatientHealthState.create(
     ]
 );
 
-const yellowStartPhase4RSDecisionState = PatientHealthState.create(
-    FunctionParameters.create(
+const yellowStartPhase4RSDecisionState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.redAverage,
@@ -502,8 +502,8 @@ const yellowStartPhase4RSDecisionState = PatientHealthState.create(
     ]
 );
 
-const yellowUntilRedPhase4State = PatientHealthState.create(
-    FunctionParameters.create(0, 0, 0, 0),
+const yellowUntilRedPhase4State = newPatientHealthState(
+    newFunctionParameters(0, 0, 0, 0),
     [
         {
             matchingHealthStateId: yellowStartPhase4RSDecisionState.id,
@@ -512,8 +512,8 @@ const yellowUntilRedPhase4State = PatientHealthState.create(
     ]
 );
 
-const yellowStartPhase9RADecisionState = PatientHealthState.create(
-    FunctionParameters.create(
+const yellowStartPhase9RADecisionState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.blackMax,
@@ -543,8 +543,8 @@ const yellowStartPhase9RADecisionState = PatientHealthState.create(
     ]
 );
 
-const yellowStartPhase8RADecisionState = PatientHealthState.create(
-    FunctionParameters.create(
+const yellowStartPhase8RADecisionState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.redAverage,
@@ -570,8 +570,8 @@ const yellowStartPhase8RADecisionState = PatientHealthState.create(
     ]
 );
 
-const yellowStartPhase7RSDecisionState = PatientHealthState.create(
-    FunctionParameters.create(
+const yellowStartPhase7RSDecisionState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.redAverage,
@@ -601,8 +601,8 @@ const yellowStartPhase7RSDecisionState = PatientHealthState.create(
     ]
 );
 
-const yellowFor3PhasesState = PatientHealthState.create(
-    FunctionParameters.create(0, 0, 0, 0),
+const yellowFor3PhasesState = newPatientHealthState(
+    newFunctionParameters(0, 0, 0, 0),
     [
         {
             matchingHealthStateId: yellowStartPhase7RSDecisionState.id,
@@ -611,8 +611,8 @@ const yellowFor3PhasesState = PatientHealthState.create(
     ]
 );
 
-const redUntilYellowFor2PhasesState = PatientHealthState.create(
-    FunctionParameters.create(
+const redUntilYellowFor2PhasesState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.redAverage,
             healthPointsDefaults.yellowAverage,
@@ -630,8 +630,8 @@ const redUntilYellowFor2PhasesState = PatientHealthState.create(
     ]
 );
 
-const yellowUntilPhase3State = PatientHealthState.create(
-    FunctionParameters.create(
+const yellowUntilPhase3State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.redAverage,
@@ -649,8 +649,8 @@ const yellowUntilPhase3State = PatientHealthState.create(
     ]
 );
 
-const redUntilBlack2PhasesState = PatientHealthState.create(
-    FunctionParameters.create(
+const redUntilBlack2PhasesState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.redAverage,
             healthPointsDefaults.blackMax,
@@ -668,8 +668,8 @@ const redUntilBlack2PhasesState = PatientHealthState.create(
     ]
 );
 
-const yellowUntilPrioRedPhase4State = PatientHealthState.create(
-    FunctionParameters.create(
+const yellowUntilPrioRedPhase4State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.yellowAverage,
             healthPointsDefaults.redAverage,
@@ -687,8 +687,8 @@ const yellowUntilPrioRedPhase4State = PatientHealthState.create(
     ]
 );
 
-const redUntilBlackPhase2State = PatientHealthState.create(
-    FunctionParameters.create(
+const redUntilBlackPhase2State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.redAverage,
             healthPointsDefaults.blackMax,
@@ -718,8 +718,8 @@ const redUntilBlackPhase2State = PatientHealthState.create(
     ]
 );
 
-const redInstantTransportState = PatientHealthState.create(
-    FunctionParameters.create(
+const redInstantTransportState = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.redAverage,
             healthPointsDefaults.blackMax,
@@ -737,8 +737,8 @@ const redInstantTransportState = PatientHealthState.create(
     ]
 );
 
-const redIntoTransportFor2PhasesState = PatientHealthState.create(
-    FunctionParameters.create(0, 0, 0, 0),
+const redIntoTransportFor2PhasesState = newPatientHealthState(
+    newFunctionParameters(0, 0, 0, 0),
     [
         {
             matchingHealthStateId: redInstantTransportState.id,
@@ -747,8 +747,8 @@ const redIntoTransportFor2PhasesState = PatientHealthState.create(
     ]
 );
 
-const redUntilPhase2State = PatientHealthState.create(
-    FunctionParameters.create(
+const redUntilPhase2State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.redAverage,
             healthPointsDefaults.blackMax,
@@ -778,8 +778,8 @@ const redUntilPhase2State = PatientHealthState.create(
     ]
 );
 
-const prioRedUntilPhase2State = PatientHealthState.create(
-    FunctionParameters.create(
+const prioRedUntilPhase2State = newPatientHealthState(
+    newFunctionParameters(
         calculateHealthChange(
             healthPointsDefaults.redAverage,
             healthPointsDefaults.blackMax,
@@ -812,7 +812,7 @@ const prioRedUntilPhase2State = PatientHealthState.create(
 export const defaultPatientCategories: readonly PatientCategory[] = [
     // XAXAXA Patients - Pregnant
     PatientCategory.create('XAXAXAP', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures: 'blaue Augen, rothaarig, 1,69 m',
@@ -842,7 +842,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // XAXAXD Patients
     PatientCategory.create('XAXAXD', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures: 'braune Haare, braune Augen, 1,72 m',
@@ -870,7 +870,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
             healthPointsDefaults.greenMax,
             greenUntilPhase10State.id
         ),
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'male',
                 externalFeatures: '1,89 m, Vollbart, blond, blauäugig',
@@ -898,7 +898,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
             healthPointsDefaults.greenMax,
             greenUntilPhase11State.id
         ),
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures: '1,76m, hellblond, blaue Augen, Brille',
@@ -930,7 +930,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // XAXDXA Patients
     PatientCategory.create('XAXDXA', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures: 'braune Haare, braune Augen, 1,79 m, adipös',
@@ -960,7 +960,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
             healthPointsDefaults.greenMax,
             greenUntilPhase7State.id
         ),
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures: '1,59 m, blaue Augen, graue Haare',
@@ -993,7 +993,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // XDXDXA Patients
     PatientCategory.create('XDXDXA', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'male',
                 externalFeatures:
@@ -1028,7 +1028,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // XAXAYB Patients
     PatientCategory.create('XAXAYB', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures: '1,66 m, blond, blaue Augen',
@@ -1065,7 +1065,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // XDZBZC Patients
     PatientCategory.create('XDZBZC', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures: 'graue Haare, blaue Augen, 1,69 m, Brille',
@@ -1101,7 +1101,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // YAXAXA Patients
     PatientCategory.create('YAXAXA', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'male',
                 externalFeatures:
@@ -1134,7 +1134,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // YBXAXA Patients
     PatientCategory.create('YBXAXA', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'male',
                 externalFeatures: 'blaue Augen, weiße Haare, 174 cm',
@@ -1168,7 +1168,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // YBYAYA Patients
     PatientCategory.create('YBYAYA', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'male',
                 externalFeatures: 'Vollbart, blond, blaue Augen, 1,87 m',
@@ -1203,7 +1203,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // YAYBYA Patients
     PatientCategory.create('YAYBYA', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'male',
                 externalFeatures: 'Glatze, graublaue Augen, Brille, 174 cm',
@@ -1233,7 +1233,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // YDYBYB Patients
     PatientCategory.create('YDYBYB', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures:
@@ -1275,7 +1275,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // YCZCVE Patients
     PatientCategory.create('YCZCVE', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures:
@@ -1310,7 +1310,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // ZBZAZA Patients - Not Pregnant
     PatientCategory.create('ZBZAZA', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'male',
                 externalFeatures: '1,86 m, Glatze, braune Augen, Brille',
@@ -1339,7 +1339,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
             healthPointsDefaults.redAverage,
             redUntilBlackPhase2State.id
         ),
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'male',
                 externalFeatures: '1,84 m, braune Augen, Brille, braune Haare',
@@ -1368,7 +1368,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
             healthPointsDefaults.redAverage,
             redUntilBlackPhase2State.id
         ),
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures:
@@ -1401,7 +1401,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // ZBZAZA Patients - Pregnant
     PatientCategory.create('ZBZAZAP', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures: '1,72 m, braune Augen, blonde Haare',
@@ -1434,7 +1434,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // ZBZCVE Patients
     PatientCategory.create('ZBZCVE', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures:
@@ -1471,7 +1471,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // ZCZCVE Patients
     PatientCategory.create('ZCZCVE', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'male',
                 externalFeatures: '1,78m, Bart, schwarzhaarig, braune Augen',
@@ -1505,7 +1505,7 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
 
     // ZCVEVE Patients
     PatientCategory.create('ZCVEVE', defaultPatientImage, [
-        PatientTemplate.create(
+        newPatientTemplate(
             {
                 sex: 'female',
                 externalFeatures: '1,64 m, blaue Augen, blond',

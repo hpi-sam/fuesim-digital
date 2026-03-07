@@ -1,6 +1,6 @@
 import { IsNumber, IsString, IsUUID, Min } from 'class-validator';
 import { type Hospital, hospitalSchema } from '../../models/hospital.js';
-import { HospitalPatient } from '../../models/hospital-patient.js';
+import { newHospitalPatientFromPatient } from '../../models/hospital-patient.js';
 import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
@@ -142,7 +142,7 @@ export namespace HospitalActionReducers {
                         patientId
                     );
                     draftState.hospitalPatients[patientId] =
-                        HospitalPatient.createFromPatient(
+                        newHospitalPatientFromPatient(
                             patient,
                             vehicle.vehicleType,
                             draftState.currentTime,

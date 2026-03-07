@@ -2,7 +2,10 @@ import type { OnInit } from '@angular/core';
 import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
-import { Patient, SimulatedRegion } from 'fuesim-digital-shared';
+import {
+    getPatientVisibleStatus,
+    SimulatedRegion,
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { comparePatientsByVisibleStatus } from '../../compare-patients';
@@ -52,7 +55,7 @@ export class SimulatedRegionOverviewPatientsTabComponent implements OnInit {
                             )
                         )
                         .map((patient) => ({
-                            visibleStatus: Patient.getVisibleStatus(
+                            visibleStatus: getPatientVisibleStatus(
                                 patient,
                                 configuration.pretriageEnabled,
                                 configuration.bluePatientsEnabled

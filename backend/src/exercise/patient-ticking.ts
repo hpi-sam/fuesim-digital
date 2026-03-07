@@ -2,11 +2,13 @@ import type {
     ExerciseState,
     HealthPoints,
     PatientUpdate,
+    Patient,
 } from 'fuesim-digital-shared';
 import {
+    canBeTreated,
     getElement,
     healthPointsDefaults,
-    Patient,
+    isTreatedByPersonnel,
 } from 'fuesim-digital-shared';
 
 /**
@@ -25,10 +27,10 @@ export function patientTick(
     patientTickInterval: number
 ): PatientUpdate[] {
     return Object.values(state.patients)
-        .filter((patient) => Patient.canBeTreated(patient))
+        .filter(canBeTreated)
         .map((patient) => {
             // update the time a patient is being treated, to check for pretriage later
-            const treatmentTime = Patient.isTreatedByPersonnel(patient)
+            const treatmentTime = isTreatedByPersonnel(patient)
                 ? patient.treatmentTime + patientTickInterval
                 : patient.treatmentTime;
             const nextHealthPoints = getNextPatientHealthPoints(
@@ -158,8 +160,7 @@ function getNextStateId(patient: Patient) {
             (nextConditions.maximumHealth === undefined ||
                 patient.health <= nextConditions.maximumHealth) &&
             (nextConditions.isBeingTreated === undefined ||
-                Patient.isTreatedByPersonnel(patient) ===
-                    nextConditions.isBeingTreated)
+                isTreatedByPersonnel(patient) === nextConditions.isBeingTreated)
         ) {
             return nextConditions.matchingHealthStateId;
         }

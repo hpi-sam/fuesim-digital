@@ -1,30 +1,27 @@
-import { Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, ValidateNested } from 'class-validator';
+import { z } from 'zod';
 import { IsValue } from '../utils/validators/index.js';
 import { IsZodSchema } from '../utils/validators/is-zod-object.js';
-import { PatientTemplate } from './patient-template.js';
-import type { ImageProperties } from './utils/index.js';
+import { PatientTemplate, patientTemplateSchema } from './patient-template.js';
 import {
+    type ImageProperties,
+    patientStatusCodeSchema,
     getCreate,
     imagePropertiesSchema,
-    PatientStatusCode,
+    type PatientStatusCode,
+    newPatientStatusCode,
 } from './utils/index.js';
 
 export class PatientCategory {
     @IsValue('patientCategory' as const)
     public readonly type = 'patientCategory';
 
-    @ValidateNested()
-    @Type(() => PatientStatusCode)
+    @IsZodSchema(patientStatusCodeSchema)
     public readonly name: PatientStatusCode;
 
     @IsZodSchema(imagePropertiesSchema)
     public readonly image: ImageProperties;
 
-    @IsArray()
-    @ArrayNotEmpty()
-    @ValidateNested({ each: true })
-    @Type(() => PatientTemplate)
+    @IsZodSchema(z.array(patientTemplateSchema).nonempty())
     public readonly patientTemplates: readonly PatientTemplate[] = [];
 
     /**
@@ -35,7 +32,7 @@ export class PatientCategory {
         image: ImageProperties,
         patientTemplates: PatientTemplate[]
     ) {
-        this.name = PatientStatusCode.create(name);
+        this.name = newPatientStatusCode(name);
         this.image = image;
         this.patientTemplates = patientTemplates;
     }

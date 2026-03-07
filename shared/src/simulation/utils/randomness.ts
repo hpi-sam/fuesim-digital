@@ -1,30 +1,24 @@
 /* eslint-disable no-bitwise */
-import { IsInt, Min, ValidateIf } from 'class-validator';
 import { sha256 } from '@noble/hashes/sha256';
 import { v4 } from 'uuid';
-import { WritableDraft } from 'immer';
-import { getCreate } from '../../models/utils/get-create.js';
+import type { WritableDraft } from 'immer';
+import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
 import type { UUID } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 
-export class RandomState {
-    @IsValue('randomState' as const)
-    readonly type = 'randomState';
+export const randomStateSchema = z.strictObject({
+    type: z.literal('randomState'),
+    algo: z.literal('sha256-id-ctr'),
+    counter: z.int().nonnegative(),
+});
+export type RandomState = z.infer<typeof randomStateSchema>;
 
-    @IsLiteralUnion({ 'sha256-id-ctr': true })
-    readonly algo = 'sha256-id-ctr';
-
-    @ValidateIf((o) => o.algo === 'sha256-id-ctr')
-    @IsInt()
-    @Min(0)
-    readonly counter: number = 0;
-
-    static readonly create = getCreate(this);
-}
-
-export function seededRandomState() {
-    return RandomState.create();
+export function newSeededRandomState(): RandomState {
+    return {
+        type: 'randomState',
+        algo: 'sha256-id-ctr',
+        counter: 0,
+    };
 }
 
 export function nextBool(

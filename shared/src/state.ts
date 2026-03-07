@@ -1,13 +1,5 @@
-import { Type } from 'class-transformer';
 import * as z from 'zod';
-import {
-    Equals,
-    IsInt,
-    IsObject,
-    IsUUID,
-    Min,
-    ValidateNested,
-} from 'class-validator';
+import { Equals, IsObject, ValidateNested } from 'class-validator';
 import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
 import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
 import {
@@ -27,27 +19,24 @@ import {
     Vehicle,
     VehicleTemplate,
     Viewport,
-    exerciseStatusAllowedValues,
     getCreate,
     SpatialTree,
     MaterialTemplate,
     PersonnelTemplate,
+    exerciseStatusSchema,
 } from './models/index.js';
 import type { ExerciseStatus, LogEntry } from './models/index.js';
 import type { ExerciseRadiogram } from './models/radiogram/index.js';
 import { getRadiogramConstructor } from './models/radiogram/index.js';
 import {
-    RandomState,
-    seededRandomState,
+    newSeededRandomState,
+    type RandomState,
+    randomStateSchema,
 } from './simulation/utils/randomness.js';
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
 import type { UUID } from './utils/index.js';
-import { uuid, uuidValidationOptions } from './utils/index.js';
-import {
-    IsIdMap,
-    IsLiteralUnion,
-    IsMultiTypedIdMap,
-} from './utils/validators/index.js';
+import { uuid } from './utils/index.js';
+import { IsIdMap, IsMultiTypedIdMap } from './utils/validators/index.js';
 import {
     createCatchAllHospital,
     catchAllHospitalId,
@@ -82,7 +71,7 @@ import { hospitalPatientSchema } from './models/hospital-patient.js';
 import { patientCategorySchema } from './models/patient-category.js';
 
 export class ExerciseState {
-    @IsUUID(4, uuidValidationOptions)
+    @IsZodSchema(z.uuidv4())
     public readonly id = uuid();
     /**
      * The number of ms since the start of the exercise.
@@ -91,18 +80,18 @@ export class ExerciseState {
      *
      * It is guaranteed that the `ExerciseTickAction` is the only action that modifies this value.
      */
-    @IsInt()
-    @Min(0)
+    @IsZodSchema(z.int().nonnegative())
     public readonly currentTime: number = 0;
-    @IsLiteralUnion(exerciseStatusAllowedValues)
+
+    @IsZodSchema(exerciseStatusSchema)
     public readonly currentStatus: ExerciseStatus = 'notStarted';
 
-    @Type(() => RandomState)
-    @ValidateNested()
-    public readonly randomState: RandomState = seededRandomState();
+    @IsZodSchema(randomStateSchema)
+    public readonly randomState: RandomState = newSeededRandomState();
 
     @IsZodSchema(z.record(z.uuidv4(), viewportSchema))
     public readonly viewports: { readonly [key: UUID]: Viewport } = {};
+
     @IsIdMap(SimulatedRegion)
     public readonly simulatedRegions: {
         readonly [key: UUID]: SimulatedRegion;
@@ -113,34 +102,45 @@ export class ExerciseState {
 
     @IsZodSchema(z.record(z.uuidv4(), personnelSchema))
     public readonly personnel: { readonly [key: UUID]: Personnel } = {};
+
     @IsZodSchema(z.record(z.uuidv4(), patientSchema))
     public readonly patients: { readonly [key: UUID]: Patient } = {};
+
     @IsZodSchema(z.record(z.uuidv4(), materialSchema))
     public readonly materials: { readonly [key: UUID]: Material } = {};
+
     @IsZodSchema(z.record(z.uuidv4(), restrictedZoneSchema))
     public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
         {};
+
     @IsZodSchema(z.record(z.uuidv4(), mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
+
     @IsZodSchema(z.record(z.uuidv4(), transferPointSchema))
     public readonly transferPoints: { readonly [key: UUID]: TransferPoint } =
         {};
+
     @IsZodSchema(z.record(z.uuidv4(), hospitalSchema))
     public readonly hospitals: { readonly [key: UUID]: Hospital } = {
         [catchAllHospitalId]: createCatchAllHospital(),
     };
+
     @IsZodSchema(z.record(z.uuidv4(), hospitalPatientSchema))
     public readonly hospitalPatients: {
         readonly [key: UUID]: HospitalPatient;
     } = {};
+
     @IsZodSchema(z.record(z.uuidv4(), alarmGroupSchema))
     public readonly alarmGroups: { readonly [key: UUID]: AlarmGroup } = {};
+
     @IsZodSchema(z.record(z.uuidv4(), clientSchema))
     public readonly clients: { readonly [key: UUID]: Client } = {};
+
     @IsMultiTypedIdMap(getRadiogramConstructor)
     @ValidateNested()
     public readonly radiograms: { readonly [key: UUID]: ExerciseRadiogram } =
         {};
+
     @IsZodSchema(z.array(patientCategorySchema))
     public readonly patientCategories = defaultPatientCategories;
 
@@ -148,14 +148,17 @@ export class ExerciseState {
     public readonly vehicleTemplates: {
         readonly [key: UUID]: VehicleTemplate;
     } = defaultVehicleTemplatesById;
+
     @IsZodSchema(z.record(z.uuidv4(), materialTemplateSchema))
     public readonly materialTemplates: {
         readonly [key: UUID]: MaterialTemplate;
     } = defaultMaterialTemplatesById;
+
     @IsZodSchema(z.record(z.uuidv4(), personnelTemplateSchema))
     public readonly personnelTemplates: {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;
+
     @IsZodSchema(z.record(z.uuidv4(), mapImageTemplateSchema))
     public readonly mapImageTemplates: {
         readonly [key: UUID]: MapImageTemplate;
@@ -180,8 +183,7 @@ export class ExerciseState {
     @IsZodSchema(exerciseConfigurationSchema)
     public readonly configuration = newExerciseConfiguration();
 
-    @IsInt()
-    @Min(0)
+    @IsZodSchema(z.int().nonnegative())
     public readonly patientCounter: number = 0;
 
     /**

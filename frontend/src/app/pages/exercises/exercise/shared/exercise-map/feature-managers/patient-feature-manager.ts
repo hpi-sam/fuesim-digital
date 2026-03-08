@@ -5,11 +5,6 @@ import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
 import { Fill, Stroke } from 'ol/style';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectConfiguration } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectVisiblePatients } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { PatientPopupComponent } from '../shared/patient-popup/patient-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
@@ -17,6 +12,11 @@ import { ImagePopupHelper } from '../utility/popup-helper';
 import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import type { PopupService } from '../utility/popup.service';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectConfiguration } from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectVisiblePatients } from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class PatientFeatureManager extends MoveableFeatureManager<Patient> {

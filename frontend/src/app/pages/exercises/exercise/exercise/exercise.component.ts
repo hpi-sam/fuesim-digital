@@ -9,25 +9,25 @@ import {
     exportPatientsToCSV,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
-import { ApiService } from 'src/app/core/api.service';
-import { ApplicationService } from 'src/app/core/application.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { saveBlob } from 'src/app/shared/functions/save-blob';
-import type { AppState } from 'src/app/state/app.state';
+import Package from '../../../../../../package.json';
+import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal';
+import { ExerciseService } from '../../../../core/exercise.service';
+import type { AppState } from '../../../../state/app.state';
+import { ApiService } from '../../../../core/api.service';
+import { ApplicationService } from '../../../../core/application.service';
+import { MessageService } from '../../../../core/messages/message.service';
+import { saveBlob } from '../../../../shared/functions/save-blob';
 import {
     selectExerciseStateMode,
     selectTimeConstraints,
     selectExerciseKey,
-} from 'src/app/state/application/selectors/application.selectors';
+} from '../../../../state/application/selectors/application.selectors';
 import {
     selectParticipantKey,
     selectExerciseState,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import Package from 'package.json';
-import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal';
-import { ExerciseService } from '../../../../core/exercise.service';
+} from '../../../../state/application/selectors/exercise.selectors';
+import { selectOwnClient } from '../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-exercise',

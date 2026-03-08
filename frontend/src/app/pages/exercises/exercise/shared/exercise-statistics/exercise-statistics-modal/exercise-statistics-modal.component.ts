@@ -5,18 +5,18 @@ import { Store } from '@ngrx/store';
 import type { PatientStatus, UUID, LogEntry } from 'fuesim-digital-shared';
 import { statusNames } from 'fuesim-digital-shared';
 import { combineLatest, Observable, map } from 'rxjs';
-import { getRgbaColor } from 'src/app/shared/functions/colors';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectPersonnelTemplates,
-    selectSimulatedRegions,
-    selectVehicleTemplates,
-    selectViewports,
-} from 'src/app/state/application/selectors/exercise.selectors';
 import { StatisticsService } from '../../core/statistics/statistics.service';
 import { AreaStatisticsService } from '../area-statistics.service';
 import type { StackedBarChartStatistics } from '../stacked-bar-chart/stacked-bar-chart.component';
 import { StackedBarChart } from '../stacked-bar-chart/time-line-area-chart';
+import { getRgbaColor } from '../../../../../../shared/functions/colors';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectViewports,
+    selectSimulatedRegions,
+    selectVehicleTemplates,
+    selectPersonnelTemplates,
+} from '../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-exercise-statistics-modal',

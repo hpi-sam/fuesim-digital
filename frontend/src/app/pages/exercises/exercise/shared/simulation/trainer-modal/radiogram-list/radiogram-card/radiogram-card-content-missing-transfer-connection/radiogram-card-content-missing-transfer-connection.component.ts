@@ -7,11 +7,11 @@ import type {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from '../../../../../../../../../state/app.state';
 import {
     createSelectRadiogram,
     selectTransferPoints,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-radiogram-card-content-missing-transfer-connection',

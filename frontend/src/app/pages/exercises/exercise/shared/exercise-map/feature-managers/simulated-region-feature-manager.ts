@@ -14,13 +14,6 @@ import { Fill } from 'ol/style';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectCurrentMainRole,
-    selectVisibleSimulatedRegions,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { SimulatedRegionPopupComponent } from '../shared/simulated-region-popup/simulated-region-popup.component';
 import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
 import type { FeatureManager } from '../utility/feature-manager';
@@ -29,6 +22,13 @@ import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
 import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectVisibleSimulatedRegions,
+    selectCurrentMainRole,
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class SimulatedRegionFeatureManager

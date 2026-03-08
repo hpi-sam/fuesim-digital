@@ -16,18 +16,18 @@ import {
     takeUntil,
     type Observable,
 } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import {
+    createSelectBehaviorStates,
+    createSelectBehaviorState,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
+import type { HotkeyLayer } from '../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    createSelectBehaviorState,
-    createSelectBehaviorStates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+} from '../../../../../../../shared/services/hotkeys.service';
 
 type ReportPropertyName = Exclude<
     keyof ReportBehaviorState,

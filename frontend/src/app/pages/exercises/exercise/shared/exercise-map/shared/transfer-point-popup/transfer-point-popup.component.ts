@@ -3,11 +3,11 @@ import { ViewEncapsulation, Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, TransferPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectTransferPoint } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { PopupService } from '../../utility/popup.service';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import { createSelectTransferPoint } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
 
 type NavIds = 'hospitals' | 'names' | 'transferPoints';
 /**

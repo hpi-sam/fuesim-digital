@@ -1,8 +1,8 @@
 import { Component, inject, Input } from '@angular/core';
-import { ExerciseService } from 'src/app/core/exercise.service';
 import type { UUID } from 'fuesim-digital-shared';
 import { SelectPatientService } from '../../../select-patient.service';
 import { StartTransferService } from '../../../start-transfer.service';
+import { ExerciseService } from '../../../../../../../../../core/exercise.service';
 
 @Component({
     selector: 'app-simulated-region-overview-patient-details',

@@ -19,21 +19,21 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    createSelectActivityStatesByType,
-    createSelectBehaviorState,
-    createSelectElementsInSimulatedRegion,
-    selectConfiguration,
-    selectCurrentTime,
-    selectHospitals,
-    selectPatients,
-    selectTransferPoints,
-    selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
 import { comparePatientsByVisibleStatus } from '../../../compare-patients';
 import type { TransferOptions } from '../../../../start-transfer.service';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
+import {
+    createSelectBehaviorState,
+    selectVehicles,
+    selectHospitals,
+    selectTransferPoints,
+    createSelectActivityStatesByType,
+    selectCurrentTime,
+    createSelectElementsInSimulatedRegion,
+    selectPatients,
+    selectConfiguration,
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
 
 let globalLastInformationCollapsed = true;
 let globalLastSettingsCollapsed = true;

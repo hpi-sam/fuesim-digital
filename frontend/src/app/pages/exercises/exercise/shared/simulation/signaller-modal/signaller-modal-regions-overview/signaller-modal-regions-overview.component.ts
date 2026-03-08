@@ -3,11 +3,11 @@ import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { UUID } from 'fuesim-digital-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from '../../../../../../../state/app.state';
 import {
-    selectPersonnel,
     selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectPersonnel,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-signaller-modal-regions-overview',

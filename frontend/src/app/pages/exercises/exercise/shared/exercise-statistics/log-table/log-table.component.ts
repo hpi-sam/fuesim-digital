@@ -9,8 +9,8 @@ import type { LogEntry, Tag } from 'fuesim-digital-shared';
 import { StrictObject } from 'fuesim-digital-shared';
 import { difference } from 'lodash-es';
 import { Subject, takeUntil } from 'rxjs';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
+import type { SearchableDropdownOption } from '../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 
 type KnownSpecifier = Omit<Tag, 'category'>;
 

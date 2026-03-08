@@ -6,11 +6,11 @@ import {
     NgbNavModule,
     NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { MessagesModule } from 'src/app/feature/messages/messages.module';
-import { SharedModule } from 'src/app/shared/shared.module';
 import { TransferPointOverviewModule } from '../transfer-point-overview/transfer-point-overview.module';
 import { SimulationModalsModule } from '../simulation/simulation-modals.module';
 import { EmergencyOperationsCenterModule } from '../emergency-operations-center/emergency-operations-center.module';
+import { MessagesModule } from '../../../../../feature/messages/messages.module';
+import { SharedModule } from '../../../../../shared/shared.module';
 import { ExerciseMapComponent } from './exercise-map.component';
 import { ChooseTransferTargetPopupComponent } from './shared/choose-transfer-target-popup/choose-transfer-target-popup.component';
 import { MapImagePopupComponent } from './shared/map-image-popup/map-image-popup.component';

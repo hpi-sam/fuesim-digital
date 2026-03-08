@@ -1,7 +1,7 @@
 import { Directive, inject } from '@angular/core';
 import type { AbstractControl, AsyncValidator } from '@angular/forms';
 import { NG_ASYNC_VALIDATORS } from '@angular/forms';
-import { ApiService } from 'src/app/core/api.service';
+import { ApiService } from '../../core/api.service';
 
 @Directive({
     selector: '[appExerciseExistsValidator]',

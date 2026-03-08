@@ -6,14 +6,14 @@ import { SimulatedRegion } from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import { StartTransferService } from '../../../start-transfer.service';
+import { ExerciseService } from '../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../state/app.state';
 import {
     createSelectElementsInSimulatedRegion,
-    selectVehicleTemplates,
     selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { StartTransferService } from '../../../start-transfer.service';
+    selectVehicleTemplates,
+} from '../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-region-overview-vehicles-tab',

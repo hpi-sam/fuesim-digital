@@ -7,25 +7,26 @@ import {
     isInSpecificSimulatedRegion,
     isUnoccupiedImmutable,
 } from 'fuesim-digital-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import { groupBy } from 'lodash-es';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import type { Observable } from 'rxjs';
+import { combineLatest, map, tap } from 'rxjs';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
-import { combineLatest, map, tap, type Observable } from 'rxjs';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
+} from '../../../../../../../../shared/services/hotkeys.service';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import { MessageService } from '../../../../../../../../core/messages/message.service';
+import { SearchableDropdownOption } from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { AppState } from '../../../../../../../../state/app.state';
 import {
-    selectCurrentTime,
-    selectTransferPoints,
     selectVehicleTemplates,
     selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { groupBy } from 'lodash-es';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+    selectCurrentTime,
+    selectTransferPoints,
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-signaller-modal-provide-vehicles-editor',

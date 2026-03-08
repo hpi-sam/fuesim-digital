@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import type { MaterialCountRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectRadiogram } from 'src/app/state/application/selectors/exercise.selectors';
+import type { AppState } from '../../../../../../../../../state/app.state';
+import { createSelectRadiogram } from '../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-radiogram-card-content-material-count',

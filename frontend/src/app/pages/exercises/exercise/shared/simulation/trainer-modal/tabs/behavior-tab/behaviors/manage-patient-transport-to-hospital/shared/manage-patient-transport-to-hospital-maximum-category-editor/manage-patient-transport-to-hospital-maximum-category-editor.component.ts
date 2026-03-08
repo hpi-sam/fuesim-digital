@@ -6,9 +6,9 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectBehaviorState } from 'src/app/state/application/selectors/exercise.selectors';
+import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../../../state/app.state';
+import { createSelectBehaviorState } from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector:

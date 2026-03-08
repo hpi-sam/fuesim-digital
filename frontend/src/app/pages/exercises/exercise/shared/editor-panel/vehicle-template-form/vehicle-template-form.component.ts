@@ -7,14 +7,14 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import { cloneDeep } from 'lodash-es';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { getImageAspectRatio } from 'src/app/shared/functions/get-image-aspect-ratio';
-import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
-import type { AppState } from 'src/app/state/app.state';
+import { MessageService } from '../../../../../../core/messages/message.service';
+import { getImageAspectRatio } from '../../../../../../shared/functions/get-image-aspect-ratio';
+import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
+import type { AppState } from '../../../../../../state/app.state';
 import {
     selectMaterialTemplates,
     selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-vehicle-template-form',

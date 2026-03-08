@@ -7,9 +7,9 @@ import {
     ViewChild,
     inject,
 } from '@angular/core';
-import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
 import { Subject, takeUntil } from 'rxjs';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
+import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
 import type { StackedBarChartDatasets } from './time-line-area-chart';
 import { StackedBarChart } from './time-line-area-chart';
 

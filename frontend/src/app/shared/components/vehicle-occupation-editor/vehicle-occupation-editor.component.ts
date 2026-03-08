@@ -8,9 +8,9 @@ import {
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { Store } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { createSelectVehicle } from 'src/app/state/application/selectors/exercise.selectors';
+import { ExerciseService } from '../../../core/exercise.service';
+import type { AppState } from '../../../state/app.state';
+import { createSelectVehicle } from '../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-vehicle-occupation-editor',

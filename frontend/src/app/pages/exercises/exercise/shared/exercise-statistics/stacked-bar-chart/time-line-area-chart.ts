@@ -10,7 +10,7 @@ import {
     Colors,
 } from 'chart.js';
 import { formatDuration } from 'fuesim-digital-shared';
-import { rgbColorPalette } from 'src/app/shared/functions/colors';
+import { rgbColorPalette } from '../../../../../../shared/functions/colors';
 
 Chart.register(
     CategoryScale,

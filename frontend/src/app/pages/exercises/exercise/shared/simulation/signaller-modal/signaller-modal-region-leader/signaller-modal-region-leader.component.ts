@@ -10,11 +10,11 @@ import {
     Subject,
     distinctUntilChanged,
 } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from '../../../../../../../state/app.state';
 import {
     createSelectBehaviorStatesByType,
     selectPersonnel,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-signaller-modal-region-leader',

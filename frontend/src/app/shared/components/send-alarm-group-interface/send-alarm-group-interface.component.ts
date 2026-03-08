@@ -10,24 +10,24 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, map, takeUntil } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    createSelectAlarmGroup,
-    selectAlarmGroups,
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
-    selectTransferPoints,
-    selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { NgModel } from '@angular/forms';
 import type { HotkeyLayer } from '../../services/hotkeys.service';
 import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
+import { ExerciseService } from '../../../core/exercise.service';
+import { MessageService } from '../../../core/messages/message.service';
+import type { AppState } from '../../../state/app.state';
+import {
+    selectAlarmGroups,
+    selectTransferPoints,
+    createSelectAlarmGroup,
+    selectVehicleTemplates,
+    selectMaterialTemplates,
+    selectPersonnelTemplates,
+} from '../../../state/application/selectors/exercise.selectors';
+import { selectOwnClient } from '../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
+import type { SearchableDropdownOption } from '../searchable-dropdown/searchable-dropdown.component';
 
 // We want to remember this
 let selectedAlarmGroup: SearchableDropdownOption | null = null;

@@ -12,14 +12,14 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import type { TransferOptions } from '../../start-transfer.service';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../state/app.state';
 import {
     createSelectBehaviorStates,
     selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import type { TransferOptions } from '../../start-transfer.service';
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../../state/get-state-snapshot';
 
 let globalLastBehaviorType: ExerciseSimulationBehaviorType | undefined;
 

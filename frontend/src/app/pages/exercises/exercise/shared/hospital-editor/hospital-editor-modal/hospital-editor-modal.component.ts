@@ -3,9 +3,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { Hospital, catchAllHospitalId } from 'fuesim-digital-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectHospitals } from 'src/app/state/application/selectors/exercise.selectors';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectHospitals } from '../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-hospital-editor-modal',

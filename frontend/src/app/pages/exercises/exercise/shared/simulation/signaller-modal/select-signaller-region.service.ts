@@ -3,8 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { ReplaySubject, Subject, takeUntil } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectSimulatedRegion } from 'src/app/state/application/selectors/exercise.selectors';
+import type { AppState } from '../../../../../../state/app.state';
+import { createSelectSimulatedRegion } from '../../../../../../state/application/selectors/exercise.selectors';
 
 export const eocId = 'emergencyOperationsCenter';
 export const overviewId = 'overview';

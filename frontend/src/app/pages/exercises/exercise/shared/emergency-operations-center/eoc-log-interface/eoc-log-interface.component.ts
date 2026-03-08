@@ -1,14 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectEocLogEntries } from 'src/app/state/application/selectors/exercise.selectors';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectEocLogEntries } from '../../../../../../state/application/selectors/exercise.selectors';
 import {
     selectCurrentMainRole,
     selectOwnClient,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-eoc-log-interface',

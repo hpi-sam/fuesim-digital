@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectExerciseStatus } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
+import { ExerciseService } from '../../../core/exercise.service';
+import type { AppState } from '../../../state/app.state';
+import { selectExerciseStatus } from '../../../state/application/selectors/exercise.selectors';
+import { selectOwnClient } from '../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-start-pause-button',

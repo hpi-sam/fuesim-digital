@@ -10,16 +10,16 @@ import { Store } from '@ngrx/store';
 import type { ReportableInformation, UUID } from 'fuesim-digital-shared';
 import { makeInterfaceSignallerKey } from 'fuesim-digital-shared';
 import { type Observable, BehaviorSubject, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { createSelectBehaviorStates } from 'src/app/state/application/selectors/exercise.selectors';
 import {
     setLoadingState,
     type InterfaceSignallerInteraction,
 } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import { selectOwnClientId } from '../../../../../../../state/application/selectors/application.selectors';
+import { createSelectBehaviorStates } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-signaller-modal-region-information',

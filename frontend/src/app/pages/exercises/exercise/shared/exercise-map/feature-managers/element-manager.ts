@@ -5,9 +5,9 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import type { Observable, Subject } from 'rxjs';
 import { pairwise, startWith, takeUntil } from 'rxjs';
-import { handleChanges } from 'src/app/shared/functions/handle-changes';
 import type { Immutable } from 'immer';
 import { generateChangedProperties } from '../utility/generate-changed-properties';
+import { handleChanges } from '../../../../../../shared/functions/handle-changes';
 
 /**
  * Provides an Api to update a feature based on changes to an element (patient, vehicle, etc.).

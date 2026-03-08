@@ -23,19 +23,19 @@ import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Pixel } from 'ol/pixel';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectExerciseState,
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region';
 import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region';
 import type { FeatureManager } from '../exercise-map/utility/feature-manager';
 import type { RestrictedZoneDragTemplate } from '../editor-panel/templates/restricted-zone';
 import { reconstituteRestrictedZoneTemplate } from '../editor-panel/templates/restricted-zone';
+import { ExerciseService } from '../../../../../core/exercise.service';
+import type { AppState } from '../../../../../state/app.state';
+import {
+    selectMaterialTemplates,
+    selectPersonnelTemplates,
+    selectExerciseState,
+} from '../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 
 @Injectable({
     providedIn: 'root',

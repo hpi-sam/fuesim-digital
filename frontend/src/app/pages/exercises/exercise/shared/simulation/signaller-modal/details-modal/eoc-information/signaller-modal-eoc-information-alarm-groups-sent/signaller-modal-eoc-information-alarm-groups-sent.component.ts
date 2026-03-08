@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
-import { selectAlarmGroups } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import type { AppState } from '../../../../../../../../../state/app.state';
+import { selectAlarmGroups } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-signaller-modal-eoc-information-alarm-groups-sent',

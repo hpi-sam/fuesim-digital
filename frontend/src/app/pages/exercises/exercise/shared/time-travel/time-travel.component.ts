@@ -4,16 +4,16 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { cloneDeepMutable, StateExport } from 'fuesim-digital-shared';
 import { throttle } from 'lodash-es';
-import { ApiService } from 'src/app/core/api.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { TimeTravelService } from 'src/app/core/time-travel.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectTimeConstraints } from 'src/app/state/application/selectors/application.selectors';
-import { selectExerciseState } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { openClientOverviewModal } from '../client-overview/open-client-overview-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
 import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
+import { ApiService } from '../../../../../core/api.service';
+import { MessageService } from '../../../../../core/messages/message.service';
+import { TimeTravelService } from '../../../../../core/time-travel.service';
+import type { AppState } from '../../../../../state/app.state';
+import { selectTimeConstraints } from '../../../../../state/application/selectors/application.selectors';
+import { selectExerciseState } from '../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-time-travel',

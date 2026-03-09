@@ -66,6 +66,11 @@
                                         Pause
                                     </button>
                                 }
+                            } @else {
+                                <div class="alert alert-info" role="alert">
+                                    Um die Übung zu starten, warten Sie, bis
+                                    Teilnehmende beigetreten sind.
+                                </div>
                             }
                         </div>
                     </div>
@@ -103,7 +108,16 @@
         <div class="row">
             <div class="col">
                 <div class="card">
-                    <div class="card-header h4">Teilnehmende</div>
+                    <div class="card-header h4">
+                        Teilnehmende
+                        <span class="badge bg-secondary float-end">
+                            <i class="bi bi-people me-1"></i>
+                            {{
+                                parallelExerciseService.exerciseInstances()
+                                    .length
+                            }}
+                        </span>
+                    </div>
                     <table class="table table-striped mb-0">
                         <thead>
                             <tr>

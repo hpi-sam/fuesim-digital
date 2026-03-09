@@ -39,7 +39,15 @@
             } @empty {
                 <div class="col flex-grow-1">
                     <p class="bg-light p-4 rounded-3 lead mb-0">
-                        Sie haben noch keine Parallelübungen erstellt.
+                        Sie haben noch keine Parallelübungen erstellt. Sie
+                        können Übungsvorlagen verwenden, um neue Parallelübungen
+                        zu starten.
+                        <a
+                            class="btn btn-sm btn-outline-primary mt-2"
+                            [routerLink]="`/exercises/templates/`"
+                        >
+                            Zu den Übungsvorlagen
+                        </a>
                     </p>
                 </div>
             }

@@ -1,7 +1,6 @@
 import { count, eq } from 'drizzle-orm';
 import type { AccessKey } from 'fuesim-digital-shared';
 import { accessKeyTable } from '../schema.js';
-import type { DatabaseTransaction } from '../services/database-service.js';
 import { BaseRepository } from './base-repository.js';
 
 export class AccessKeyRepository extends BaseRepository {
@@ -9,10 +8,8 @@ export class AccessKeyRepository extends BaseRepository {
      * Get all allocated keys
      * @param tx optional database transaction
      */
-    public async getAll(tx?: DatabaseTransaction) {
-        const res = await (tx ?? this.databaseConnection)
-            .select()
-            .from(accessKeyTable);
+    public async getAll() {
+        const res = await this.databaseConnection.select().from(accessKeyTable);
         return new Set(res.map((x) => x.key));
     }
 
@@ -60,12 +57,12 @@ export class AccessKeyRepository extends BaseRepository {
      * @param keys to lock
      * @param tx optional database transaction
      */
-    public async lock(keys: AccessKey[], tx?: DatabaseTransaction) {
+    public async lock(keys: AccessKey[]) {
         if (keys.length === 0) {
             // Nothing to lock
             return;
         }
-        return (tx ?? this.databaseConnection)
+        return this.databaseConnection
             .insert(accessKeyTable)
             .values(keys.map((key) => ({ key })))
             .onConflictDoNothing()
@@ -77,10 +74,10 @@ export class AccessKeyRepository extends BaseRepository {
     ) {
         let newKeys: AccessKey[];
         // Do this in a transaction to ensure that the list of existing keys is correct
-        await this.databaseConnection.transaction(async (tx) => {
-            const existingKeys = await this.getAll(tx);
+        await this.transaction(async (tx) => {
+            const existingKeys = await tx.getAll();
             newKeys = generator(existingKeys);
-            await this.lock(newKeys, tx);
+            await tx.lock(newKeys);
         });
         return newKeys!;
     }

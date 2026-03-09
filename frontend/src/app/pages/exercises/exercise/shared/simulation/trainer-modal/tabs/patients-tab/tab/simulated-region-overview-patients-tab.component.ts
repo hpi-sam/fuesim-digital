@@ -4,14 +4,14 @@ import { createSelector, Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { Patient, SimulatedRegion } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    createSelectElementsInSimulatedRegion,
-    selectConfiguration,
-    selectPatients,
-} from 'src/app/state/application/selectors/exercise.selectors';
 import { comparePatientsByVisibleStatus } from '../../compare-patients';
 import type { PatientWithVisibleStatus } from '../../../patients-table/simulated-region-overview-patients-table.component';
+import type { AppState } from '../../../../../../../../../state/app.state';
+import {
+    createSelectElementsInSimulatedRegion,
+    selectPatients,
+    selectConfiguration,
+} from '../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-region-overview-patients-tab',

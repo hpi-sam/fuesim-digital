@@ -1,9 +1,9 @@
 import type { OnChanges } from '@angular/core';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { cloneDeep } from 'lodash-es';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { getImageAspectRatio } from 'src/app/shared/functions/get-image-aspect-ratio';
-import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
+import { MessageService } from '../../../../../../core/messages/message.service';
+import { getImageAspectRatio } from '../../../../../../shared/functions/get-image-aspect-ratio';
+import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
 
 @Component({
     selector: 'app-image-template-form',

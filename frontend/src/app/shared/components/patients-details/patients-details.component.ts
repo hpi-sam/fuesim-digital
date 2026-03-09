@@ -5,13 +5,13 @@ import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import { Patient } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { ExerciseService } from '../../../core/exercise.service';
+import type { AppState } from '../../../state/app.state';
 import {
-    createSelectPatient,
     selectConfiguration,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
+    createSelectPatient,
+} from '../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-patients-details',

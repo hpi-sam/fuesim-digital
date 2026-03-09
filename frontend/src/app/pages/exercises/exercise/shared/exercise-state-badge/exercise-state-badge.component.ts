@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from '../../../../../state/app.state';
 import {
-    selectCurrentTime,
     selectExerciseStatus,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectCurrentTime,
+} from '../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-exercise-state-badge',

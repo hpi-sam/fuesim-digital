@@ -4,9 +4,6 @@ import { normalZoom } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectVisiblePersonnel } from 'src/app/state/application/selectors/shared.selectors';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import { PersonnelPopupComponent } from '../shared/personnel-popup/personnel-popup.component';
@@ -17,6 +14,9 @@ import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';
 import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectVisiblePersonnel } from '../../../../../../state/application/selectors/shared.selectors';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {

@@ -3,8 +3,8 @@ import { Component, Input, inject } from '@angular/core';
 import { Store, createSelector } from '@ngrx/store';
 import type { StartPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectAlarmGroup } from 'src/app/state/application/selectors/exercise.selectors';
+import type { AppState } from '../../../../../../state/app.state';
+import { createSelectAlarmGroup } from '../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-start-point-name',

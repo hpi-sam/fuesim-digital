@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
 import type { GetExerciseTemplatesResponseData } from 'fuesim-digital-shared';
-import { ApiService } from 'src/app/core/api.service';
 import { HttpResourceRef } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
 import { CreateExerciseTemplateModalComponent } from '../shared/create-exercise-template-modal/create-exercise-template-modal.component';
+import { ApiService } from '../../../core/api.service';
 
 @Component({
     selector: 'app-exercise-template-list',

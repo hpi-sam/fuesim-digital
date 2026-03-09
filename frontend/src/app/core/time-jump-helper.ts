@@ -1,6 +1,6 @@
 import type { ExerciseState, ExerciseTimeline } from 'fuesim-digital-shared';
 import { jumpToTime } from 'fuesim-digital-shared';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 import { TimeLineCache } from './time-line-cache';
 
 export class TimeJumpHelper {

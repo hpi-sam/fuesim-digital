@@ -8,18 +8,8 @@ import {
     migratePartialExport,
     validateExerciseExport,
 } from 'fuesim-digital-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { MessageService } from 'src/app/core/messages/message.service';
 import type { PatientCategory, UUID } from 'fuesim-digital-shared';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectVehicleTemplates,
-    selectPatientCategories,
-    selectMapImagesTemplates,
-    selectExerciseState,
-} from 'src/app/state/application/selectors/exercise.selectors';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
@@ -29,6 +19,16 @@ import { openPartialImportOverwriteModal } from '../partial-import/open-partial-
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
 import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
 import { restrictedZoneDragTemplates } from '../editor-panel/templates/restricted-zone';
+import { ExerciseService } from '../../../../../core/exercise.service';
+import { MessageService } from '../../../../../core/messages/message.service';
+import type { AppState } from '../../../../../state/app.state';
+import {
+    selectPatientCategories,
+    selectVehicleTemplates,
+    selectMapImagesTemplates,
+    selectExerciseState,
+} from '../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {

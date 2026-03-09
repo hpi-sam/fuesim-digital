@@ -13,8 +13,8 @@ import type {
 } from 'fuesim-digital-shared';
 import { currentCoordinatesOf, isOnMap, Viewport } from 'fuesim-digital-shared';
 import { pickBy } from 'lodash-es';
-import type { CateringLine } from 'src/app/shared/types/catering-line';
 import type { AppState } from '../../app.state';
+import type { CateringLine } from '../../../shared/types/catering-line';
 import { selectOwnClientId } from './application.selectors';
 import {
     selectClients,

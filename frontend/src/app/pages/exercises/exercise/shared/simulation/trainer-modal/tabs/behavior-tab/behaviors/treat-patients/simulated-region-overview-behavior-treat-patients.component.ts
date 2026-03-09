@@ -9,18 +9,18 @@ import type {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { SelectPatientService } from '../../../../select-patient.service';
+import { comparePatientsByVisibleStatus } from '../../../compare-patients';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
     createSelectElementsInSimulatedRegion,
-    createSelectSimulatedRegion,
-    selectConfiguration,
-    selectCurrentTime,
     selectPatients,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { SelectPatientService } from '../../../../select-patient.service';
-import { comparePatientsByVisibleStatus } from '../../../compare-patients';
+    selectConfiguration,
+    createSelectSimulatedRegion,
+    selectCurrentTime,
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
 
 let globalLastSettingsCollapsed = true;
 let globalLastInformationCollapsed = true;

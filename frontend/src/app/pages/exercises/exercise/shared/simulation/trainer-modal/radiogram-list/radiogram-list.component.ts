@@ -14,10 +14,10 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
-import { selectRadiograms } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import type { AppState } from '../../../../../../../state/app.state';
+import { selectOwnClientId } from '../../../../../../../state/application/selectors/application.selectors';
+import { selectRadiograms } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
 import { RadiogramListService } from './radiogram-list.service';
 
 @Component({

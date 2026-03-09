@@ -9,14 +9,14 @@ import type {
 import { StrictObject } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
-    createSelectActivityStates,
     createSelectBehaviorState,
-    selectCurrentTime,
+    createSelectActivityStates,
     selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectCurrentTime,
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-unload-arriving-vehicles',

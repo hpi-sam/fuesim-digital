@@ -8,13 +8,13 @@ import type {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject, takeUntil } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import type { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
     selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import type { CdkDragDrop } from '@angular/cdk/drag-drop';
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-provide-personnel',

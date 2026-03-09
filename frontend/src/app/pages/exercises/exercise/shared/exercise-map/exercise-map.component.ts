@@ -8,16 +8,16 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectCurrentMainRole,
-    selectRestrictedViewport,
-} from 'src/app/state/application/selectors/shared.selectors';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCoordinatePickerModal } from '../coordinate-picker/open-coordinate-picker-modal';
+import { ExerciseService } from '../../../../../core/exercise.service';
+import type { AppState } from '../../../../../state/app.state';
+import {
+    selectRestrictedViewport,
+    selectCurrentMainRole,
+} from '../../../../../state/application/selectors/shared.selectors';
 import { OlMapManager } from './utility/ol-map-manager';
 import { PopupManager } from './utility/popup-manager';
 import { PopupService } from './utility/popup.service';

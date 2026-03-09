@@ -6,7 +6,7 @@ import {
     NgbNavModule,
     NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { SharedModule } from 'src/app/shared/shared.module';
+import { SharedModule } from '../../../../../shared/shared.module';
 import { ExerciseStatisticsModalComponent } from './exercise-statistics-modal/exercise-statistics-modal.component';
 import { HospitalPatientsTableComponent } from './hospital-patients-table/hospital-patients-table.component';
 import { StackedBarChartComponent } from './stacked-bar-chart/stacked-bar-chart.component';

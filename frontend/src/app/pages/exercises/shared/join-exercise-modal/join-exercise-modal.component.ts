@@ -1,8 +1,8 @@
 import { OnDestroy, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
-import { ApplicationService } from 'src/app/core/application.service';
 import type { ExerciseKey } from 'fuesim-digital-shared';
+import { ApplicationService } from '../../../../core/application.service';
 
 @Component({
     selector: 'app-join-exercise-modal',

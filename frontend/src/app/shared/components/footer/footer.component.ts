@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import Package from 'package.json';
+import Package from '../../../../../package.json';
 
 @Component({
     selector: 'app-footer',

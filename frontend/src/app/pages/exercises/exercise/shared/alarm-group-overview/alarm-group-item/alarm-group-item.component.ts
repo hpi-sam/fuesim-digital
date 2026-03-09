@@ -2,13 +2,13 @@ import { Component, Input, inject, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { AlarmGroup, AlarmGroupVehicle } from 'fuesim-digital-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
 import {
-    createSelectVehicleTemplate,
     selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+    createSelectVehicleTemplate,
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-alarm-group-item',

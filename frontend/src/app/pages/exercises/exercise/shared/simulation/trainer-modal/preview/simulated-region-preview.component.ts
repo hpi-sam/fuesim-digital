@@ -3,7 +3,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { createSelector, Store } from '@ngrx/store';
 import { Patient, SimulatedRegion } from 'fuesim-digital-shared';
 import { combineLatest, Observable, map, Subject, takeUntil } from 'rxjs';
-import { AppState } from 'src/app/state/app.state';
 import type {
     Material,
     Personnel,
@@ -11,19 +10,20 @@ import type {
     Vehicle,
     VehicleTemplate,
 } from 'fuesim-digital-shared';
-import {
-    createSelectElementsInSimulatedRegion,
-    createSelectSimulatedRegion,
-    selectConfiguration,
-    selectMaterials,
-    selectPatients,
-    selectPersonnel,
-    selectVehicles,
-    selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
 import { groupBy } from 'lodash-es';
 import { comparePatientsByVisibleStatus } from '../tabs/compare-patients';
 import { PatientWithVisibleStatus } from '../patients-table/simulated-region-overview-patients-table.component';
+import type { AppState } from '../../../../../../../state/app.state';
+import {
+    createSelectSimulatedRegion,
+    createSelectElementsInSimulatedRegion,
+    selectPatients,
+    selectConfiguration,
+    selectPersonnel,
+    selectVehicles,
+    selectVehicleTemplates,
+    selectMaterials,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-region-preview',

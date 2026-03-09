@@ -7,12 +7,12 @@ import {
     NgbTooltipModule,
     NgbAccordionModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { SharedModule } from 'src/app/shared/shared.module';
 import { RouterLink } from '@angular/router';
 import {
     errorHandlingInterceptor,
     withCredentialsInterceptor,
 } from '../../../shared/functions/http';
+import { SharedModule } from '../../../shared/shared.module';
 import { ExerciseComponent } from './exercise/exercise.component';
 import { AlarmGroupOverviewModule } from './shared/alarm-group-overview/alarm-group-overview.module';
 import { ClientOverviewModule } from './shared/client-overview/client-overview.module';

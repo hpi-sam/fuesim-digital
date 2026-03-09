@@ -10,20 +10,20 @@ import {
     SimulatedRegionRequestTargetConfiguration,
     TraineesRequestTargetConfiguration,
 } from 'fuesim-digital-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
 import { map, tap, type Observable, combineLatest } from 'rxjs';
-import {
-    createSelectBehaviorState,
-    selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import { MessageService } from 'src/app/core/messages/message.service';
+} from '../../../../../../../../shared/services/hotkeys.service';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import { MessageService } from '../../../../../../../../core/messages/message.service';
+import { SearchableDropdownOption } from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { AppState } from '../../../../../../../../state/app.state';
+import {
+    selectSimulatedRegions,
+    createSelectBehaviorState,
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
 import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 
 @Component({

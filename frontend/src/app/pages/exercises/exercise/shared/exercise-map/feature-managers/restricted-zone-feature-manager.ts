@@ -14,21 +14,9 @@ import type OlMap from 'ol/Map';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import { pairwise, startWith, takeUntil, type Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectCurrentMainRole,
-    selectVisibleRestrictedZones,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { Fill } from 'ol/style';
 import { asArray } from 'ol/color';
+import { Fill } from 'ol/style';
 import { isEmpty } from 'lodash-es';
-import {
-    selectExerciseState,
-    selectRestrictedZones,
-    selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
 import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -37,6 +25,18 @@ import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interact
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';
 import { RestrictedZonePopupComponent } from '../shared/restricted-zone-popup/restricted-zone-popup.component';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectRestrictedZones,
+    selectVehicles,
+    selectExerciseState,
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import {
+    selectVisibleRestrictedZones,
+    selectCurrentMainRole,
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class RestrictedZoneFeatureManager

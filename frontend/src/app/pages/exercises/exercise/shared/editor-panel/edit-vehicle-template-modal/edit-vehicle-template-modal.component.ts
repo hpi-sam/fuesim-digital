@@ -9,17 +9,17 @@ import type {
     PersonnelTemplate,
 } from 'fuesim-digital-shared';
 import { cloneDeepMutable } from 'fuesim-digital-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { WritableDraft } from 'immer';
+import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehicle-template-form.component';
+import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
 import {
     createSelectVehicleTemplate,
     selectMaterialTemplates,
     selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
-import { WritableDraft } from 'immer';
-import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehicle-template-form.component';
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-edit-vehicle-template-modal',

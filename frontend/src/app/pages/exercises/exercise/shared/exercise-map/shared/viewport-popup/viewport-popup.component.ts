@@ -3,11 +3,11 @@ import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Viewport } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectViewport } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { PopupService } from '../../utility/popup.service';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import { createSelectViewport } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-viewport-popup',

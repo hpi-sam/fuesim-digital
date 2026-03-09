@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SharedModule } from 'src/app/shared/shared.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import {
     NgbCollapseModule,
@@ -12,6 +11,7 @@ import {
     NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { TransferPointOverviewModule } from '../transfer-point-overview/transfer-point-overview.module';
+import { SharedModule } from '../../../../../shared/shared.module';
 import { SimulatedRegionOverviewGeneralComponent } from './trainer-modal/overview/simulated-region-overview.component';
 import { SimulatedRegionPreviewComponent } from './trainer-modal/preview/simulated-region-preview.component';
 import { SimulatedRegionPreviewCardComponent } from './trainer-modal/preview-card/simulated-region-preview-card.component';

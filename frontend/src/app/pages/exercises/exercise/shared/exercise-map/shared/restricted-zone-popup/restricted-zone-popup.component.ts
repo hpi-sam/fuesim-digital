@@ -10,15 +10,15 @@ import {
     sortObject,
     stringCompare,
 } from 'fuesim-digital-shared';
-import type { AppState } from 'src/app/state/app.state';
+import { PopupService } from '../../utility/popup.service';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../state/app.state';
 import {
     createSelectRestrictedZone,
     selectVehicleTemplates,
     selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { PopupService } from '../../utility/popup.service';
+} from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
 
 type NavIds = 'settings' | 'vehicleRestrictions';
 

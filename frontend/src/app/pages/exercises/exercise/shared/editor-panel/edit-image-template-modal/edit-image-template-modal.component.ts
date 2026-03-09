@@ -4,12 +4,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { MapImageTemplate, UUID } from 'fuesim-digital-shared';
 import { cloneDeep } from 'lodash-es';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectMapImageTemplate } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { WritableDraft } from 'immer';
 import type { ChangedImageTemplateValues } from '../image-template-form/image-template-form.component';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { createSelectMapImageTemplate } from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-edit-image-template-modal',

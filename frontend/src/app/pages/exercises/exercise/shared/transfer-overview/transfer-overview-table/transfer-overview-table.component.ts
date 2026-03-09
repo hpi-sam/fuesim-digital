@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { currentTransferOf } from 'fuesim-digital-shared';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from '../../../../../../state/app.state';
 import {
-    selectExerciseStatus,
-    selectPersonnelInTransfer,
     selectVehiclesInTransfer,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectPersonnelInTransfer,
+    selectExerciseStatus,
+} from '../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-transfer-overview-table',

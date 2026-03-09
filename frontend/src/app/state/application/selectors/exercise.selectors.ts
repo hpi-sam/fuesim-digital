@@ -15,8 +15,8 @@ import {
     isInTransfer,
     nestedCoordinatesOf,
 } from 'fuesim-digital-shared';
-import type { TransferLine } from 'src/app/shared/types/transfer-line';
 import type { AppState } from '../../app.state';
+import type { TransferLine } from '../../../shared/types/transfer-line';
 
 // Properties
 

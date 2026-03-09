@@ -3,11 +3,11 @@ import { Component, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { PersonnelCountRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import type { AppState } from '../../../../../../../../../state/app.state';
 import {
-    createSelectRadiogram,
     selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    createSelectRadiogram,
+} from '../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-radiogram-card-content-personnel-count',

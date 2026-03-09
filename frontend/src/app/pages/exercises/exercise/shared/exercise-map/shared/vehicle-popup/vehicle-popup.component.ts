@@ -3,10 +3,10 @@ import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectVehicle } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import { PopupService } from '../../utility/popup.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import { createSelectVehicle } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-vehicle-popup',

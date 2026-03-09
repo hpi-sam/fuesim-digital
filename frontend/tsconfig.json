@@ -6,7 +6,6 @@
         "module": "preserve",
         "moduleResolution": "bundler",
         "esModuleInterop": true,
-        "baseUrl": "./",
         "outDir": "./dist/out-tsc",
         "lib": ["ES2022", "dom"],
         "useDefineForClassFields": false // TODO: Enabling this requires multiple changes in the code

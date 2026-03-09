@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { HotkeysService } from 'src/app/shared/services/hotkeys.service';
 import {
     eocId,
     overviewId,
     SelectSignallerRegionService,
 } from '../select-signaller-region.service';
+import { HotkeysService } from '../../../../../../../shared/services/hotkeys.service';
 
 @Component({
     selector: 'app-signaller-modal',

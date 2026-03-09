@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { SharedModule } from '../../../../../shared/shared.module';
 import { HospitalEditorModalComponent } from './hospital-editor-modal/hospital-editor-modal.component';
 
 @NgModule({

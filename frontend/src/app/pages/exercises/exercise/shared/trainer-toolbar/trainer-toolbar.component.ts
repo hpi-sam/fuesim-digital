@@ -2,15 +2,6 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { ApiService } from 'src/app/core/api.service';
-import { ApplicationService } from 'src/app/core/application.service';
-import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectExerciseKey } from 'src/app/state/application/selectors/application.selectors';
-import { selectExerciseStatus } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { TrainerKey } from 'fuesim-digital-shared';
 import { openAlarmGroupOverviewModal } from '../alarm-group-overview/open-alarm-group-overview-modal';
 import { openClientOverviewModal } from '../client-overview/open-client-overview-modal';
@@ -21,6 +12,15 @@ import { openHospitalEditorModal } from '../hospital-editor/hospital-editor-moda
 import { openSimulationTrainerModal } from '../simulation/trainer-modal/open-simulation-trainer-modal';
 import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
 import { openSimulationSignallerModal } from '../simulation/signaller-modal/open-simulation-signaller-modal';
+import { ApiService } from '../../../../../core/api.service';
+import { ApplicationService } from '../../../../../core/application.service';
+import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
+import { ExerciseService } from '../../../../../core/exercise.service';
+import { MessageService } from '../../../../../core/messages/message.service';
+import type { AppState } from '../../../../../state/app.state';
+import { selectExerciseKey } from '../../../../../state/application/selectors/application.selectors';
+import { selectExerciseStatus } from '../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-trainer-toolbar',

@@ -9,15 +9,15 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectConfiguration,
-    selectPatients,
-    selectPersonnel,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { ExerciseService } from 'src/app/core/exercise.service';
 import type { PatientWithVisibleStatus } from '../../../patients-table/simulated-region-overview-patients-table.component';
 import { StartTransferService } from '../../../start-transfer.service';
+import { ExerciseService } from '../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../state/app.state';
+import {
+    selectPersonnel,
+    selectPatients,
+    selectConfiguration,
+} from '../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-region-overview-vehicle-details',

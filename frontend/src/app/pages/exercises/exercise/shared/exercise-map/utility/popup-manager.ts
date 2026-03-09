@@ -179,21 +179,33 @@ export class PopupManager {
     }
 }
 
-/**
- * {@link closingUUIDs} is an array containing the UUIDs of elements that when clicked shall close the pop-up
- * {@link markedForParticipantUUIDs} is an array containing the UUIDs of elements that are to be marked while the pop-up is open and in participant mode
- * {@link markedForTrainerUUIDs}  is an array containing the UUIDs of elements that are to be marked while the pop-up is open and in trainer mode
- * {@link changedLayers} is an array of feature types of which the corresponding layers are to be marked as changed upon pop-up opening and closing
- */
 export interface OpenPopupOptions<Component = unknown> {
     elementUUID: UUID | undefined;
     position: number[];
     positioning: Positioning;
+    /**
+     * the angular component to be instantiated
+     */
     component: Type<Component>;
+    /**
+     * an array containing the UUIDs of elements that when clicked shall close the pop-up
+     */
     closingUUIDs: UUID[];
+    /**
+     * an array containing the UUIDs of elements that are to be marked while the pop-up is open and in participant mode
+     */
     markedForParticipantUUIDs: UUID[];
+    /**
+     *  an array containing the UUIDs of elements that are to be marked while the pop-up is open and in trainer mode
+     */
     markedForTrainerUUIDs: UUID[];
+    /**
+     * an array of feature types of which the corresponding layers are to be marked as changed upon pop-up opening and closing
+     */
     changedLayers: string[];
+    /**
+     * properties that are set on {@link component} at the time of creation
+     */
     context?: Partial<Component>;
 
     /**

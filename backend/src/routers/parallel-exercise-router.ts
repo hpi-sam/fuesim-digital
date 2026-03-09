@@ -59,6 +59,7 @@ export const createParallelExerciseRouter = (
 
     router
         .route('/:id')
+        .all(isAuthenticatedMiddleware)
         .get(async (req, res) => {
             const id = parallelExerciseIdSchema.safeParse(req.params.id).data;
             if (!id) throw new ApiError();

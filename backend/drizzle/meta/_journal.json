@@ -57,6 +57,13 @@
             "when": 1772441450806,
             "tag": "0007_parallel_exercise",
             "breakpoints": true
+        },
+        {
+            "idx": 8,
+            "version": "7",
+            "when": 1773052820760,
+            "tag": "0008_access-keys-to-db",
+            "breakpoints": true
         }
     ]
 }

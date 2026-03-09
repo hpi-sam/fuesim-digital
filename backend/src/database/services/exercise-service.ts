@@ -14,7 +14,6 @@ import type { ExerciseRepository } from '../repositories/exercise-repository.js'
 import type { ExerciseInsert } from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
-import type { ExerciseClientWrapper } from '../../exercise/client-wrapper.js';
 import type { AccessKeyService } from './access-key-service.js';
 
 export class ExerciseService {
@@ -86,15 +85,6 @@ export class ExerciseService {
             exercise.trainerKey,
         ]);
         return exerciseEntry!;
-    }
-
-    public leaveExercise(
-        exerciseKey: ExerciseKey,
-        clientWrapper: ExerciseClientWrapper
-    ) {
-        this.getExerciseByKey(exerciseKey, clientWrapper.session).removeClient(
-            clientWrapper
-        );
     }
 
     /**

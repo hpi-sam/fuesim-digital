@@ -98,10 +98,7 @@ export class ExerciseClientWrapper extends ClientWrapper {
             return;
         }
 
-        this.services.exerciseService.leaveExercise(
-            this.chosenExercise.participantKey,
-            this
-        );
+        this.chosenExercise.removeClient(this);
         this.chosenExercise = undefined;
     }
 

@@ -1,0 +1,454 @@
+{
+    "id": "daa929ae-947c-42bc-850f-fe28a26649b3",
+    "prevId": "088146b5-2be3-461b-af15-1fa32f019723",
+    "version": "7",
+    "dialect": "postgresql",
+    "tables": {
+        "public.access_key": {
+            "name": "access_key",
+            "schema": "",
+            "columns": {
+                "key": {
+                    "name": "key",
+                    "type": "varchar",
+                    "primaryKey": true,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.action_entity": {
+            "name": "action_entity",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "emitterId": {
+                    "name": "emitterId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "index": {
+                    "name": "index",
+                    "type": "bigint",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "actionString": {
+                    "name": "actionString",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "exerciseId": {
+                    "name": "exerciseId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "FK_180a58767f06b503216ba2b0982": {
+                    "name": "FK_180a58767f06b503216ba2b0982",
+                    "tableFrom": "action_entity",
+                    "tableTo": "exercise_entity",
+                    "columnsFrom": ["exerciseId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "cascade"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.exercise_entity": {
+            "name": "exercise_entity",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "tickCounter": {
+                    "name": "tickCounter",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "initialStateString": {
+                    "name": "initialStateString",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "participantKey": {
+                    "name": "participantKey",
+                    "type": "char(6)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "trainerKey": {
+                    "name": "trainerKey",
+                    "type": "char(8)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "currentStateString": {
+                    "name": "currentStateString",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "stateVersion": {
+                    "name": "stateVersion",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "user": {
+                    "name": "user",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "lastUsedAt": {
+                    "name": "lastUsedAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "templateId": {
+                    "name": "templateId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "baseTemplateId": {
+                    "name": "baseTemplateId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "parallelExerciseId": {
+                    "name": "parallelExerciseId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "exercise_entity_user_users_id_fk": {
+                    "name": "exercise_entity_user_users_id_fk",
+                    "tableFrom": "exercise_entity",
+                    "tableTo": "users",
+                    "columnsFrom": ["user"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "exercise_entity_templateId_exercise_template_id_fk": {
+                    "name": "exercise_entity_templateId_exercise_template_id_fk",
+                    "tableFrom": "exercise_entity",
+                    "tableTo": "exercise_template",
+                    "columnsFrom": ["templateId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "exercise_entity_baseTemplateId_exercise_template_id_fk": {
+                    "name": "exercise_entity_baseTemplateId_exercise_template_id_fk",
+                    "tableFrom": "exercise_entity",
+                    "tableTo": "exercise_template",
+                    "columnsFrom": ["baseTemplateId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "set null",
+                    "onUpdate": "no action"
+                },
+                "exercise_entity_parallelExerciseId_parallel_exercise_id_fk": {
+                    "name": "exercise_entity_parallelExerciseId_parallel_exercise_id_fk",
+                    "tableFrom": "exercise_entity",
+                    "tableTo": "parallel_exercise",
+                    "columnsFrom": ["parallelExerciseId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.exercise_template": {
+            "name": "exercise_template",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "user": {
+                    "name": "user",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "lastExerciseCreatedAt": {
+                    "name": "lastExerciseCreatedAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "description": {
+                    "name": "description",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "''"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "exercise_template_user_users_id_fk": {
+                    "name": "exercise_template_user_users_id_fk",
+                    "tableFrom": "exercise_template",
+                    "tableTo": "users",
+                    "columnsFrom": ["user"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.parallel_exercise": {
+            "name": "parallel_exercise",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "user": {
+                    "name": "user",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "templateId": {
+                    "name": "templateId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "participantKey": {
+                    "name": "participantKey",
+                    "type": "char(7)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "joinViewportId": {
+                    "name": "joinViewportId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "parallel_exercise_user_users_id_fk": {
+                    "name": "parallel_exercise_user_users_id_fk",
+                    "tableFrom": "parallel_exercise",
+                    "tableTo": "users",
+                    "columnsFrom": ["user"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "parallel_exercise_templateId_exercise_template_id_fk": {
+                    "name": "parallel_exercise_templateId_exercise_template_id_fk",
+                    "tableFrom": "parallel_exercise",
+                    "tableTo": "exercise_template",
+                    "columnsFrom": ["templateId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.sessions": {
+            "name": "sessions",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp (3)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "expiresAt": {
+                    "name": "expiresAt",
+                    "type": "timestamp (3)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "accessToken": {
+                    "name": "accessToken",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "sessions_userId_users_id_fk": {
+                    "name": "sessions_userId_users_id_fk",
+                    "tableFrom": "sessions",
+                    "tableTo": "users",
+                    "columnsFrom": ["userId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "cascade"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.users": {
+            "name": "users",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "username": {
+                    "name": "username",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "displayName": {
+                    "name": "displayName",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp (3)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        }
+    },
+    "enums": {},
+    "schemas": {},
+    "sequences": {},
+    "roles": {},
+    "policies": {},
+    "views": {},
+    "_meta": {
+        "columns": {},
+        "schemas": {},
+        "tables": {}
+    }
+}

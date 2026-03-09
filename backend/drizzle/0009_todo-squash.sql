@@ -1,0 +1,1 @@
+ALTER TABLE "parallel_exercise" ADD COLUMN "name" varchar NOT NULL;

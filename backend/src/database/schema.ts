@@ -163,6 +163,7 @@ export const parallelExerciseTable = pgTable('parallel_exercise', {
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
         .defaultNow(),
+    name: varchar().notNull(),
     templateId: uuid()
         // TODO Cascade dangerous?
         .references(() => exerciseTemplateTable.id, { onDelete: 'cascade' })

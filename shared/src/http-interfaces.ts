@@ -6,6 +6,7 @@ import {
     trainerKeySchema,
 } from './exercise-keys.js';
 import { exerciseStatusSchema, logEntrySchema } from './models/index.js';
+import { validationMessages } from './validation-messages.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -133,6 +134,7 @@ export const getParallelExerciseResponseDataSchema = z.object({
     id: parallelExerciseIdSchema,
     participantKey: groupParticipantKeySchema,
     createdAt: stringToDate,
+    name: z.string(),
     joinViewportId: z.uuidv4(),
     template: getExerciseTemplateResponseDataWithoutTrainerKeySchema,
 });
@@ -147,8 +149,9 @@ export type GetParallelExercisesResponseData = z.infer<
 >;
 
 export const postParallelExerciseRequestDataSchema = z.object({
-    joinViewportId: z.uuidv4(),
+    joinViewportId: z.uuidv4(validationMessages.required),
     templateId: exerciseTemplateIdSchema,
+    name: z.string().nonempty(validationMessages.required).trim(),
 });
 export type PostParallelExerciseRequestData = z.infer<
     typeof postParallelExerciseRequestDataSchema

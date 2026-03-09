@@ -1,5 +1,11 @@
-import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, TemplateRef, inject, input } from '@angular/core';
+import {
+    OnDestroy,
+    signal,
+    Component,
+    TemplateRef,
+    inject,
+    effect,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
@@ -13,22 +19,24 @@ import {
     styleUrls: ['./signaller-modal-details-modal.component.scss'],
     standalone: false,
 })
-export class SignallerModalDetailsModalComponent implements OnInit, OnDestroy {
+export class SignallerModalDetailsModalComponent implements OnDestroy {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly hotkeysService = inject(HotkeysService);
 
-    readonly title = input('');
-    readonly body = input.required<TemplateRef<any>>();
-    readonly hotkeysEnabled = input(true);
+    readonly title = signal('');
+    readonly body = signal<TemplateRef<any> | null>(null);
+    readonly hotkeysEnabled = signal(true);
 
     private hotkeyLayer?: HotkeyLayer;
     private readonly closeHotkey = new Hotkey('Esc', false, () => this.close());
 
-    ngOnInit() {
-        if (this.hotkeysEnabled()) {
-            this.hotkeyLayer = this.hotkeysService.createLayer(true);
-            this.hotkeyLayer.addHotkey(this.closeHotkey);
-        }
+    constructor() {
+        effect(() => {
+            if (this.hotkeysEnabled() && !this.hotkeyLayer) {
+                this.hotkeyLayer = this.hotkeysService.createLayer(true);
+                this.hotkeyLayer.addHotkey(this.closeHotkey);
+            }
+        });
     }
 
     ngOnDestroy() {

@@ -1,5 +1,6 @@
 import { Component, input, inject } from '@angular/core';
 import type { UUIDSet, UUID } from 'fuesim-digital-shared';
+import { WritableDraft } from 'immer';
 import { SelectPatientService } from '../../../select-patient.service';
 import { StartTransferService } from '../../../start-transfer.service';
 import { ExerciseService } from '../../../../../../../../../core/exercise.service';

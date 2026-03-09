@@ -9,7 +9,9 @@
     ></button>
 </div>
 <div class="modal-body">
-    <ng-container [ngTemplateOutlet]="body()" />
+    @if (body(); as body) {
+        <ng-container [ngTemplateOutlet]="body" />
+    }
 </div>
 @if (hotkeysEnabled()) {
     <div class="modal-footer text-muted">

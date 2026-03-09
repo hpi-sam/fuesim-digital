@@ -21,9 +21,9 @@ export class SignallerModalDetailsService {
         const component =
             modal.componentInstance as SignallerModalDetailsModalComponent;
 
-        component.title.apply(title);
-        component.body.apply(body);
-        component.hotkeysEnabled.apply(hotkeysEnabled);
+        component.title.set(title);
+        component.body.set(body);
+        component.hotkeysEnabled.set(hotkeysEnabled);
 
         this.modals.push(modal);
     }

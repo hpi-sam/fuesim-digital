@@ -1,5 +1,4 @@
-import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import { effect, signal, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { toLonLat } from 'ol/proj';
 import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
@@ -10,29 +9,37 @@ import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
     styleUrls: ['./coordinate-picker-modal.component.scss'],
     standalone: false,
 })
-export class CoordinatePickerModalComponent implements OnInit {
+export class CoordinatePickerModalComponent {
     activeModal = inject(NgbActiveModal);
 
-    public readonly olMapManager = input.required<OlMapManager>();
+    public readonly olMapManager = signal<OlMapManager | null>(null);
 
-    public latitude = '';
-    public longitude = '';
+    public readonly latitude = signal('');
+    public readonly longitude = signal('');
 
-    ngOnInit() {
-        const center = this.olMapManager().getCoordinates();
+    constructor() {
+        effect(() => {
+            const olMapManager = this.olMapManager();
+            if (olMapManager && !this.latitude()) {
+                const center = olMapManager.getCoordinates();
 
-        if (!center) return;
+                if (!center) return;
 
-        const latLonCoordinates = toLonLat(center)
-            .reverse()
-            .map((coordinate) => coordinate.toFixed(6));
+                const latLonCoordinates = toLonLat(center)
+                    .reverse()
+                    .map((coordinate) => coordinate.toFixed(6));
 
-        this.latitude = latLonCoordinates[0]!;
-        this.longitude = latLonCoordinates[1]!;
+                this.latitude.set(latLonCoordinates[0]!);
+                this.longitude.set(latLonCoordinates[1]!);
+            }
+        });
     }
 
     public goToCoordinates() {
-        this.olMapManager().tryGoToCoordinates(+this.latitude, +this.longitude);
+        this.olMapManager()!.tryGoToCoordinates(
+            +this.latitude(),
+            +this.longitude()
+        );
         this.activeModal.close();
     }
 

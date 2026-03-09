@@ -90,7 +90,6 @@ export class ParallelExerciseService {
                 undefined,
                 { parallelExerciseId: parallelExercise.id }
             );
-        await this.exerciseService.loadExercise(exercise);
 
         const setAutojoinViewportAction: SetAutojoinViewportAction = {
             type: '[Exercise] Set autojoin viewport',

@@ -26,16 +26,19 @@ export class CreateParallelExerciseModalComponent {
 
     model = { joinViewportId: '' };
 
-    viewports: GetExerciseTemplateViewportsResponseData | undefined;
+    viewports = signal<GetExerciseTemplateViewportsResponseData | null>(null);
+    viewportsLoading = signal<boolean>(true);
 
     constructor() {
         effect(async () => {
             const exerciseTemplate = this.exerciseTemplate();
             if (!exerciseTemplate) return;
-            this.viewports =
+            this.viewports.set(
                 await this.apiService.getExerciseTemplateViewportsById(
                     exerciseTemplate.id
-                );
+                )
+            );
+            this.viewportsLoading.set(false);
         });
     }
 

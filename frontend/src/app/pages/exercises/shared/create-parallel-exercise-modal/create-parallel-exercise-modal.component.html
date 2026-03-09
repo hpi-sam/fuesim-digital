@@ -9,6 +9,7 @@
             <input
                 [value]="exerciseTemplate()?.name"
                 readonly
+                disabled
                 class="form-control"
                 type="text"
             />
@@ -25,11 +26,20 @@
                 #joinViewportInput="ngModel"
                 required
                 class="form-control"
+                [disabled]="!viewportsLoading() && !viewports()?.length"
+                [class.placeholder]="viewportsLoading()"
             >
-                @for (viewport of viewports; track viewport.id) {
+                @for (viewport of viewports(); track viewport.id) {
                     <option [value]="viewport.id">{{ viewport.name }}</option>
                 }
             </select>
+            @if (!viewportsLoading() && !viewports()?.length) {
+                <div class="alert alert-warning mt-2" role="alert">
+                    Diese Übungsvorlage hat keine Ansichten. Bitte fügen Sie
+                    mindestens eine Ansicht für Teilnehmende ein, damit diese
+                    der Übung beitreten können.
+                </div>
+            }
             <app-display-validation
                 [ngModelInput]="joinViewportInput"
             ></app-display-validation>

@@ -1,4 +1,4 @@
-import { Input, Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import type { CustomValidationErrors } from '../custom-validation-errors';
 
@@ -9,9 +9,9 @@ import type { CustomValidationErrors } from '../custom-validation-errors';
     standalone: false,
 })
 export class DisplayValidationComponent {
-    @Input() ngModelInput!: NgModel;
+    readonly ngModelInput = input.required<NgModel>();
 
     get errors(): CustomValidationErrors | null {
-        return this.ngModelInput.errors as CustomValidationErrors | null;
+        return this.ngModelInput().errors as CustomValidationErrors | null;
     }
 }

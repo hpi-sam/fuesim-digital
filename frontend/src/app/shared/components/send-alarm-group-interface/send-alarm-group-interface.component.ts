@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild, inject } from '@angular/core';
+import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     createVehicleParameters,
@@ -47,35 +47,34 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
     private readonly messageService = inject(MessageService);
     private readonly hotkeysService = inject(HotkeysService);
 
-    @Input()
-    useHotkeys = true;
+    readonly useHotkeys = input(true);
 
-    @Input()
-    useAlarmGroupButtons = false;
+    readonly useAlarmGroupButtons = input(false);
 
-    @Input()
-    useFirstVehicles = true;
+    readonly useFirstVehicles = input(true);
 
     private readonly destroy$ = new Subject<void>();
 
-    @ViewChild('selectAlarmGroupPopover')
-    selectAlarmGroupPopover!: NgbPopover;
-    @ViewChild('selectTargetPopover')
-    selectTargetPopover!: NgbPopover;
-    @ViewChild('selectFirstVehiclesTargetPopover')
-    selectFirstVehiclesTargetPopover!: NgbPopover;
-    @ViewChild('firstVehiclesInput')
-    firstVehiclesInput?: NgModel;
+    readonly selectAlarmGroupPopover = viewChild.required<NgbPopover>(
+        'selectAlarmGroupPopover'
+    );
+    readonly selectTargetPopover = viewChild.required<NgbPopover>(
+        'selectTargetPopover'
+    );
+    readonly selectFirstVehiclesTargetPopover = viewChild.required<NgbPopover>(
+        'selectFirstVehiclesTargetPopover'
+    );
+    readonly firstVehiclesInput = viewChild<NgModel>('firstVehiclesInput');
 
     private hotkeyLayer!: HotkeyLayer;
     public selectAlarmGroupHotkey = new Hotkey('A', false, () => {
-        this.selectAlarmGroupPopover.open();
+        this.selectAlarmGroupPopover().open();
     });
     public selectTargetHotkey = new Hotkey('Z', false, () => {
-        this.selectTargetPopover.open();
+        this.selectTargetPopover().open();
     });
     public selectFirstVehiclesTargetHotkey = new Hotkey('⇧ + Z', false, () => {
-        this.selectFirstVehiclesTargetPopover.open();
+        this.selectFirstVehiclesTargetPopover().open();
     });
     public submitHotkey = new Hotkey('Enter', false, () => {
         this.sendAlarmGroup();
@@ -153,7 +152,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     public get canSubmit() {
         return (
-            !(this.firstVehiclesInput?.invalid ?? false) &&
+            !(this.firstVehiclesInput()?.invalid ?? false) &&
             selectedAlarmGroup !== null &&
             selectedTarget !== null &&
             (firstVehiclesCount === 0 || selectedFirstVehiclesTarget !== null)
@@ -179,7 +178,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
-        if (this.useHotkeys) {
+        if (this.useHotkeys()) {
             this.hotkeyLayer.addHotkey(this.selectAlarmGroupHotkey);
             this.hotkeyLayer.addHotkey(this.selectTargetHotkey);
             this.hotkeyLayer.addHotkey(this.selectFirstVehiclesTargetHotkey);

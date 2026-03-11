@@ -1,10 +1,10 @@
 import {
     ChangeDetectorRef,
     Component,
-    Input,
     OnChanges,
     OnDestroy,
     inject,
+    input,
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import type { Hotkey, HotkeyState } from '../../services/hotkeys.service';
@@ -18,8 +18,8 @@ import type { Hotkey, HotkeyState } from '../../services/hotkeys.service';
 export class HotkeyIndicatorComponent implements OnChanges, OnDestroy {
     private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
-    @Input() hotkey: Hotkey | null = null;
-    @Input() keys: string | null = null;
+    readonly hotkey = input<Hotkey | null>(null);
+    readonly keys = input<string | null>(null);
 
     public state: HotkeyState = 'overridden';
 
@@ -28,8 +28,8 @@ export class HotkeyIndicatorComponent implements OnChanges, OnDestroy {
     ngOnChanges(): void {
         this.updateOrDestroy$.next();
 
-        this.hotkey?.state$
-            .pipe(takeUntil(this.updateOrDestroy$))
+        this.hotkey()
+            ?.state$.pipe(takeUntil(this.updateOrDestroy$))
             .subscribe((state) => {
                 this.state = state;
                 this.changeDetectorRef.detectChanges();

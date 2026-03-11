@@ -39,6 +39,7 @@ export default {
         '@angular-eslint/use-component-selector': 'warn',
         '@angular-eslint/use-lifecycle-interface': 'warn',
         '@angular-eslint/use-pipe-transform-interface': 'warn',
+        '@angular-eslint/prefer-signals': 'error',
 
         /**
          * eslint-plugin-rxjs

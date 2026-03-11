@@ -2,11 +2,10 @@ import type { AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import {
     Component,
     ElementRef,
-    EventEmitter,
-    Input,
-    Output,
-    ViewChild,
     inject,
+    input,
+    output,
+    viewChild,
 } from '@angular/core';
 import type { HotkeyLayer } from '../../services/hotkeys.service';
 import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
@@ -29,14 +28,13 @@ export class SearchableDropdownComponent
 {
     private readonly hotkeysService = inject(HotkeysService);
 
-    @Input()
-    public options: SearchableDropdownOption[] = [];
+    public readonly options = input<SearchableDropdownOption[]>([]);
 
     public filter = '';
     public selectedIndex = -1;
 
     public get filteredOptions() {
-        return this.options.filter((option) =>
+        return this.options().filter((option) =>
             option.name.toLowerCase().includes(this.filter.toLowerCase())
         );
     }
@@ -52,12 +50,10 @@ export class SearchableDropdownComponent
         this.confirmSelection()
     );
 
-    @Output()
-    public readonly selected: EventEmitter<SearchableDropdownOption> =
-        new EventEmitter();
+    public readonly selected = output<SearchableDropdownOption>();
 
-    @ViewChild('searchInput')
-    private readonly searchInput!: ElementRef;
+    private readonly searchInput =
+        viewChild.required<ElementRef>('searchInput');
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer(true);
@@ -67,7 +63,7 @@ export class SearchableDropdownComponent
     }
 
     ngAfterViewInit() {
-        this.searchInput.nativeElement.focus();
+        this.searchInput().nativeElement.focus();
     }
 
     ngOnDestroy(): void {
@@ -96,7 +92,7 @@ export class SearchableDropdownComponent
             this.selectedIndex > -1 &&
             this.selectedIndex < this.filteredOptions.length
         ) {
-            this.selected.emit(this.filteredOptions[this.selectedIndex]);
+            this.selected.emit(this.filteredOptions[this.selectedIndex]!);
         }
     }
 }

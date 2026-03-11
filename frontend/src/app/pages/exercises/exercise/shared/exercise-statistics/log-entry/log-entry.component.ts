@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { LogEntry } from 'fuesim-digital-shared';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
 
@@ -13,11 +13,11 @@ export class LogEntryComponent {
         StatisticsTimeSelectionService
     );
 
-    @Input() logEntry!: LogEntry;
+    readonly logEntry = input.required<LogEntry>();
 
     selectTime() {
         this.statisticsTimeSelectionService.selectTime(
-            this.logEntry.timestamp,
+            this.logEntry().timestamp,
             'log'
         );
     }

@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, ViewChild, inject } from '@angular/core';
+import { Component, inject, input, viewChild } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
@@ -24,9 +24,9 @@ export class OtherTransferPointTabComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() public transferPointId!: UUID;
+    public readonly transferPointId = input.required<UUID>();
 
-    @ViewChild(NgbPopover) popover!: NgbPopover;
+    readonly popover = viewChild.required(NgbPopover);
 
     public transferPoint$!: Observable<TransferPoint>;
 
@@ -41,7 +41,7 @@ export class OtherTransferPointTabComponent implements OnInit {
 
     ngOnInit() {
         this.transferPoint$ = this.store.select(
-            createSelectTransferPoint(this.transferPointId)
+            createSelectTransferPoint(this.transferPointId())
         );
 
         const transferPoints$ = this.store.select(selectTransferPoints);
@@ -49,11 +49,11 @@ export class OtherTransferPointTabComponent implements OnInit {
         this.transferPointsToBeAdded$ = transferPoints$.pipe(
             map((transferPoints) => {
                 const currentTransferPoint =
-                    transferPoints[this.transferPointId]!;
+                    transferPoints[this.transferPointId()]!;
                 return Object.entries(transferPoints)
                     .filter(
                         ([key]) =>
-                            key !== this.transferPointId &&
+                            key !== this.transferPointId() &&
                             !currentTransferPoint.reachableTransferPoints[key]
                     )
                     .map(([id, transferPoint]) => ({
@@ -82,7 +82,7 @@ export class OtherTransferPointTabComponent implements OnInit {
     public connectTransferPoint(transferPointId: UUID, duration?: number) {
         this.exerciseService.proposeAction({
             type: '[TransferPoint] Connect TransferPoints',
-            transferPointId1: this.transferPointId,
+            transferPointId1: this.transferPointId(),
             transferPointId2: transferPointId,
             duration,
         });
@@ -91,7 +91,7 @@ export class OtherTransferPointTabComponent implements OnInit {
     public disconnectTransferPoint(transferPointId: UUID) {
         this.exerciseService.proposeAction({
             type: '[TransferPoint] Disconnect TransferPoints',
-            transferPointId1: this.transferPointId,
+            transferPointId1: this.transferPointId(),
             transferPointId2: transferPointId,
         });
     }

@@ -7,8 +7,8 @@ import { Component, input, model, output } from '@angular/core';
     standalone: false,
 })
 export class InlineTextEditorComponent {
-    required = input<boolean>(false);
-    value = model<string>('');
+    readonly required = input<boolean>(false);
+    readonly value = model<string>('');
     newValue = '';
     readonly update = output<string>();
     edit = false;

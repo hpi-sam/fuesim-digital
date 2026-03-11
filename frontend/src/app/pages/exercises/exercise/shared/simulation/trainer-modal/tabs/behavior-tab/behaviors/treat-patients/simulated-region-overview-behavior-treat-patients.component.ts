@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UUID,
@@ -40,8 +40,8 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
     private readonly store = inject<Store<AppState>>(Store);
     readonly selectPatientService = inject(SelectPatientService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() treatPatientsBehaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly treatPatientsBehaviorId = input.required<UUID>();
 
     public treatPatientsBehaviorState$!: Observable<TreatPatientsBehaviorState>;
     public patientIds$!: Observable<UUID[]>;
@@ -70,8 +70,8 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
 
         this.treatPatientsBehaviorState$ = this.store.select(
             createSelectBehaviorState(
-                this.simulatedRegionId,
-                this.treatPatientsBehaviorId
+                this.simulatedRegionId(),
+                this.treatPatientsBehaviorId()
             )
         );
 
@@ -79,7 +79,7 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
             createSelector(
                 createSelectElementsInSimulatedRegion(
                     selectPatients,
-                    this.simulatedRegionId
+                    this.simulatedRegionId()
                 ),
                 selectConfiguration,
                 (patients, configuration) =>
@@ -96,7 +96,7 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
         );
 
         const simulatedRegion$ = this.store.select(
-            createSelectSimulatedRegion(this.simulatedRegionId)
+            createSelectSimulatedRegion(this.simulatedRegionId())
         );
 
         const currentTime$ = this.store.select(selectCurrentTime);
@@ -148,8 +148,8 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
     ) {
         this.exerciseService.proposeAction({
             type: '[TreatPatientsBehavior] Update TreatPatientsIntervals',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorStateId: this.treatPatientsBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorStateId: this.treatPatientsBehaviorId(),
             unknown,
             counted,
             triaged,

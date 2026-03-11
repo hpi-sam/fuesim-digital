@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { Patient } from 'fuesim-digital-shared';
@@ -18,11 +18,13 @@ export class PatientHeaderComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() patientId!: UUID;
+    readonly patientId = input.required<UUID>();
 
     patient$!: Observable<Patient>;
 
     ngOnChanges(): void {
-        this.patient$ = this.store.select(createSelectPatient(this.patientId));
+        this.patient$ = this.store.select(
+            createSelectPatient(this.patientId())
+        );
     }
 }

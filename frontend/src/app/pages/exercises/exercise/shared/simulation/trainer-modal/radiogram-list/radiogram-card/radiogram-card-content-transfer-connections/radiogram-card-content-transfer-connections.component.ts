@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferConnectionsRadiogram, UUID } from 'fuesim-digital-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
@@ -20,14 +20,14 @@ export class RadiogramCardContentTransferConnectionsComponent
 {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() radiogramId!: UUID;
+    readonly radiogramId = input.required<UUID>();
 
     connectedRegions$!: Observable<{ name: string; duration: number }[]>;
 
     ngOnInit(): void {
         const radiogram$ = this.store.select(
             createSelectRadiogram<TransferConnectionsRadiogram>(
-                this.radiogramId
+                this.radiogramId()
             )
         );
 

@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     RecurringEventActivityState,
@@ -31,8 +31,8 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() reportBehaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly reportBehaviorId = input.required<UUID>();
 
     reportBehaviorState$!: Observable<ReportBehaviorState>;
 
@@ -53,13 +53,13 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
     ngOnInit(): void {
         this.reportBehaviorState$ = this.store.select(
             createSelectBehaviorState<ReportBehaviorState>(
-                this.simulatedRegionId,
-                this.reportBehaviorId
+                this.simulatedRegionId(),
+                this.reportBehaviorId()
             )
         );
 
         const activities$ = this.store.select(
-            createSelectActivityStates(this.simulatedRegionId)
+            createSelectActivityStates(this.simulatedRegionId())
         );
 
         this.recurringActivities$ = combineLatest([
@@ -87,8 +87,8 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
     updateInterval(informationType: ReportableInformation, interval: string) {
         this.exerciseService.proposeAction({
             type: '[ReportBehavior] Update Recurring Report',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.reportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.reportBehaviorId(),
             informationType,
             interval: Number(interval) * 1000 * 60,
         });
@@ -97,8 +97,8 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
     removeRepeatingReports(informationType: ReportableInformation) {
         this.exerciseService.proposeAction({
             type: '[ReportBehavior] Remove Recurring Report',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.reportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.reportBehaviorId(),
             informationType,
         });
     }
@@ -113,15 +113,15 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
         if (repeating) {
             this.exerciseService.proposeAction({
                 type: '[ReportBehavior] Create Recurring Report',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.reportBehaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.reportBehaviorId(),
                 informationType,
                 interval: Number(interval) * 1000 * 60,
             });
         } else {
             this.exerciseService.proposeAction({
                 type: '[ReportBehavior] Create Report',
-                simulatedRegionId: this.simulatedRegionId,
+                simulatedRegionId: this.simulatedRegionId(),
                 informationType,
                 interfaceSignallerKey: null,
             });

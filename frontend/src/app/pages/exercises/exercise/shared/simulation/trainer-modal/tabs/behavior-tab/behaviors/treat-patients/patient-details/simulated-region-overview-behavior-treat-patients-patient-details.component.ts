@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import { Patient } from 'fuesim-digital-shared';
@@ -27,8 +27,8 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
 {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() patientId!: UUID;
-    @Input() cateringsActive!: boolean;
+    readonly patientId = input.required<UUID>();
+    readonly cateringsActive = input.required<boolean>();
 
     public caterings$!: Observable<
         {
@@ -46,7 +46,7 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
     }
 
     ngOnInit(): void {
-        const patientSelector = createSelectPatient(this.patientId);
+        const patientSelector = createSelectPatient(this.patientId());
 
         this.caterings$ = this.store
             .select(

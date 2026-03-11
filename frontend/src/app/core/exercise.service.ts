@@ -77,9 +77,8 @@ export class ExerciseService {
         SocketResponse
     >;
 
-    public additionalExerciseMeta = signal<JoinExerciseResponseData | null>(
-        null
-    );
+    public readonly additionalExerciseMeta =
+        signal<JoinExerciseResponseData | null>(null);
 
     constructor() {
         this.socket.on('performAction', (action: ExerciseAction) => {

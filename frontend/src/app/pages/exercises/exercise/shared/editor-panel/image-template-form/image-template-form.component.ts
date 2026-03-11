@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { cloneDeep } from 'lodash-es';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import { getImageAspectRatio } from '../../../../../../shared/functions/get-image-aspect-ratio';
@@ -14,14 +14,13 @@ import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple
 export class ImageTemplateFormComponent implements OnChanges {
     private readonly messageService = inject(MessageService);
 
-    @Input() initialValues!: EditableImageTemplateValues;
-    @Input() btnText!: string;
+    readonly initialValues = input.required<EditableImageTemplateValues>();
+    readonly btnText = input.required<string>();
 
     /**
      * Emits the changed values
      */
-    @Output() readonly submitImageTemplate =
-        new EventEmitter<ChangedImageTemplateValues>();
+    readonly submitImageTemplate = output<ChangedImageTemplateValues>();
 
     public values?: EditableImageTemplateValues;
 
@@ -31,7 +30,7 @@ export class ImageTemplateFormComponent implements OnChanges {
             return;
         }
         this.values = {
-            ...this.initialValues,
+            ...this.initialValues(),
             ...this.values,
         };
     }

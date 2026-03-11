@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Transfer } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
@@ -15,19 +15,19 @@ export class TransferTimeInputComponent {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() elementType!: 'personnel' | 'vehicle';
+    readonly elementType = input.required<'personnel' | 'vehicle'>();
 
-    @Input() elementId!: UUID;
+    readonly elementId = input.required<UUID>();
 
-    @Input() transfer!: Transfer;
+    readonly transfer = input.required<Transfer>();
 
     public readonly currentTime$ = this.store.select(selectCurrentTime);
 
     public addTransferTime(timeToAdd: number) {
         this.exerciseService.proposeAction({
             type: '[Transfer] Edit transfer',
-            elementType: this.elementType,
-            elementId: this.elementId,
+            elementType: this.elementType(),
+            elementId: this.elementId(),
             timeToAdd,
         });
     }
@@ -35,17 +35,17 @@ export class TransferTimeInputComponent {
     public togglePauseTransfer() {
         this.exerciseService.proposeAction({
             type: '[Transfer] Toggle pause transfer',
-            elementType: this.elementType,
-            elementId: this.elementId,
+            elementType: this.elementType(),
+            elementId: this.elementId(),
         });
     }
 
     public letElementArrive() {
         this.exerciseService.proposeAction({
             type: '[Transfer] Finish transfer',
-            elementType: this.elementType,
-            elementId: this.elementId,
-            targetTransferPointId: this.transfer.targetTransferPointId,
+            elementType: this.elementType(),
+            elementId: this.elementId(),
+            targetTransferPointId: this.transfer().targetTransferPointId,
         });
     }
 }

@@ -2,10 +2,10 @@ import type { AfterViewInit, OnChanges, OnDestroy } from '@angular/core';
 import {
     Component,
     ElementRef,
-    Input,
     NgZone,
-    ViewChild,
     inject,
+    input,
+    viewChild,
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
@@ -27,10 +27,10 @@ export class StackedBarChartComponent
         StatisticsTimeSelectionService
     );
 
-    @Input() statistics!: StackedBarChartStatistics;
+    readonly statistics = input.required<StackedBarChartStatistics>();
 
-    @ViewChild('chart', { static: true })
-    chartCanvas!: ElementRef<HTMLCanvasElement>;
+    readonly chartCanvas =
+        viewChild.required<ElementRef<HTMLCanvasElement>>('chart');
 
     private readonly destroy$ = new Subject<void>();
 
@@ -40,7 +40,7 @@ export class StackedBarChartComponent
         // Run outside angular zone for improved performance
         this.ngZone.runOutsideAngular(() => {
             this.chart = new StackedBarChart(
-                this.chartCanvas.nativeElement,
+                this.chartCanvas().nativeElement,
                 (time) => this.timeSelectionService.selectTime(time, 'chart')
             );
             this.timeSelectionService.selectedTime$
@@ -62,8 +62,8 @@ export class StackedBarChartComponent
     private updateChartData() {
         this.ngZone.runOutsideAngular(() => {
             this.chart?.setChartData(
-                this.statistics.labels,
-                this.statistics.datasets
+                this.statistics().labels,
+                this.statistics().datasets
             );
         });
     }

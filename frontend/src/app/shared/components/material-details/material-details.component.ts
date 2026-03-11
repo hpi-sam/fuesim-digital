@@ -14,7 +14,7 @@ import { createSelectMaterial } from '../../../state/application/selectors/exerc
 export class MaterialDetailsComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
 
-    public materialId = input<UUID>('');
+    public readonly materialId = input<UUID>('');
 
     public material$?: Observable<Material>;
 

@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
@@ -32,8 +32,8 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public behaviorState$!: Observable<ManagePatientTransportToHospitalBehaviorState>;
 
@@ -46,8 +46,8 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
     ngOnChanges(): void {
         this.behaviorState$ = this.store.select(
             createSelectBehaviorState<ManagePatientTransportToHospitalBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
 
@@ -90,8 +90,8 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
     ) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Add Vehicle Type For Patient Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             vehicleTypeName,
             patientStatus,
         });
@@ -103,8 +103,8 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
     ) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Remove Vehicle Type For Patient Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             vehicleTypeName,
             patientStatus,
         });

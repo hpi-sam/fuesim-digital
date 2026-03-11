@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import type { TreatmentProgress } from 'fuesim-digital-shared';
 
 @Component({
@@ -8,5 +8,5 @@ import type { TreatmentProgress } from 'fuesim-digital-shared';
     standalone: false,
 })
 export class TreatmentStatusBadgeComponent {
-    @Input() treatmentProgress!: TreatmentProgress;
+    readonly treatmentProgress = input.required<TreatmentProgress>();
 }

@@ -1,10 +1,10 @@
 import {
     Component,
-    Input,
     OnChanges,
     OnDestroy,
     OnInit,
     inject,
+    input,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
@@ -44,8 +44,8 @@ export class SignallerModalTransportRequestTargetEditorComponent
     private readonly hotkeysService = inject(HotkeysService);
     private readonly messageService = inject(MessageService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() transportBehaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly transportBehaviorId = input.required<UUID>();
 
     private hotkeyLayer!: HotkeyLayer;
     submitHotkey = new Hotkey('Enter', false, () => this.updateTarget());
@@ -66,8 +66,8 @@ export class SignallerModalTransportRequestTargetEditorComponent
         const currentTargetId$ = this.store
             .select(
                 createSelectBehaviorState(
-                    this.simulatedRegionId,
-                    this.transportBehaviorId
+                    this.simulatedRegionId(),
+                    this.transportBehaviorId()
                 )
             )
             .pipe(
@@ -126,8 +126,8 @@ export class SignallerModalTransportRequestTargetEditorComponent
         this.exerciseService
             .proposeAction({
                 type: '[ManagePatientsTransportToHospitalBehavior] Change Transport Request Target',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.transportBehaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.transportBehaviorId(),
                 requestTargetId: this.selectedTarget.key,
             })
             .then((result) => {

@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Viewport, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -15,13 +15,13 @@ import { createSelectViewport } from '../../../state/application/selectors/exerc
 export class ViewportNameComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() viewportId!: UUID;
+    readonly viewportId = input.required<UUID>();
 
     public viewport$?: Observable<Viewport>;
 
     ngOnChanges() {
         this.viewport$ = this.store.select(
-            createSelectViewport(this.viewportId)
+            createSelectViewport(this.viewportId())
         );
     }
 }

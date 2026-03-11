@@ -1,6 +1,6 @@
 <h5>Transportstatus</h5>
 
-<ng-container *appLet="radiogram$ | async as radiogram">
+@if (radiogram$ | async; as radiogram) {
     @if (radiogram.scope === 'singleRegion') {
         <p>Für diese Patientenablage.</p>
     }
@@ -71,4 +71,4 @@
             }
         </tbody>
     </table>
-</ng-container>
+}

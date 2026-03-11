@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Message } from '../../../core/messages/message';
 
 /**
@@ -12,5 +12,5 @@ import { Message } from '../../../core/messages/message';
     standalone: false,
 })
 export class MessageBodyComponent {
-    @Input() message!: Message;
+    readonly message = input.required<Message>();
 }

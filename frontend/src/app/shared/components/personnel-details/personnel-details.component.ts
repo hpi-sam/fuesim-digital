@@ -14,7 +14,7 @@ import { createSelectPersonnel } from '../../../state/application/selectors/exer
 export class PersonnelDetailsComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
 
-    public personnelId = input<UUID>('');
+    public readonly personnelId = input<UUID>('');
 
     public personnel$?: Observable<Personnel>;
 

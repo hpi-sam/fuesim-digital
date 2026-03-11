@@ -1,10 +1,10 @@
 import type { OnChanges, OnInit } from '@angular/core';
 import {
     Component,
-    Input,
     TemplateRef,
-    ViewChild,
     inject,
+    input,
+    viewChild,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ReportableInformation, UUID } from 'fuesim-digital-shared';
@@ -34,11 +34,11 @@ export class SignallerModalRegionInformationComponent
     private readonly store = inject<Store<AppState>>(Store);
     private readonly detailsModal = inject(SignallerModalDetailsService);
 
-    @Input()
-    simulatedRegionId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
 
-    @ViewChild('recurringReportEditor')
-    recurringReportEditor!: TemplateRef<any>;
+    readonly recurringReportEditor = viewChild.required<TemplateRef<any>>(
+        'recurringReportEditor'
+    );
 
     informationTypeToEdit: ReportableInformation | null = null;
 
@@ -275,7 +275,7 @@ export class SignallerModalRegionInformationComponent
 
     ngOnChanges() {
         const behaviors$ = this.store.select(
-            createSelectBehaviorStates(this.simulatedRegionId)
+            createSelectBehaviorStates(this.simulatedRegionId())
         );
 
         this.reportBehaviorId$ = behaviors$.pipe(
@@ -293,7 +293,7 @@ export class SignallerModalRegionInformationComponent
 
         this.detailsModal.open(
             'Automatischen Bericht bearbeiten',
-            this.recurringReportEditor
+            this.recurringReportEditor()
         );
     }
 
@@ -350,7 +350,7 @@ export class SignallerModalRegionInformationComponent
 
         this.exerciseService.proposeAction({
             type: '[ReportBehavior] Create Report',
-            simulatedRegionId: this.simulatedRegionId,
+            simulatedRegionId: this.simulatedRegionId(),
             informationType,
             interfaceSignallerKey: makeInterfaceSignallerKey(
                 this.clientId,

@@ -1,7 +1,7 @@
 import { Location as NgLocation } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 @Component({
@@ -19,15 +19,15 @@ export class AboutPlaceholderComponent implements OnInit {
     /**
      * The title of the page shown as h2 headline.
      */
-    @Input() pageTitle = '';
+    readonly pageTitle = input('');
 
     /**
      * The filename in the assets/about/ directory where the page content should be loaded from.
      */
-    @Input() contentFile = '';
+    readonly contentFile = input('');
 
     ngOnInit(): void {
-        this.content$ = this.http.get(`assets/about/${this.contentFile}`, {
+        this.content$ = this.http.get(`assets/about/${this.contentFile()}`, {
             responseType: 'text',
         });
     }

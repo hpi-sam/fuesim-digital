@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Personnel } from 'fuesim-digital-shared';
 import { AssignLeaderBehaviorState } from 'fuesim-digital-shared';
@@ -21,15 +21,16 @@ export class SimulatedRegionOverviewBehaviorAssignLeaderComponent
 {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input()
-    assignLeaderBehaviorState!: AssignLeaderBehaviorState;
+    readonly assignLeaderBehaviorState =
+        input.required<AssignLeaderBehaviorState>();
 
     currentLeader?: Observable<Personnel>;
 
     ngOnChanges(): void {
-        if (this.assignLeaderBehaviorState.leaderId) {
+        const assignLeaderBehaviorState = this.assignLeaderBehaviorState();
+        if (assignLeaderBehaviorState.leaderId) {
             this.currentLeader = this.store.select(
-                createSelectPersonnel(this.assignLeaderBehaviorState.leaderId)
+                createSelectPersonnel(assignLeaderBehaviorState.leaderId)
             );
         }
     }

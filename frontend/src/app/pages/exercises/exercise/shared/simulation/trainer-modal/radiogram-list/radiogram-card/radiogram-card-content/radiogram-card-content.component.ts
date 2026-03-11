@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import type { ExerciseRadiogram } from 'fuesim-digital-shared';
 
 @Component({
@@ -8,6 +8,6 @@ import type { ExerciseRadiogram } from 'fuesim-digital-shared';
     standalone: false,
 })
 export class RadiogramCardContentComponent {
-    @Input() radiogram!: ExerciseRadiogram;
-    @Input() shownInSignallerModal = false;
+    readonly radiogram = input.required<ExerciseRadiogram>();
+    readonly shownInSignallerModal = input(false);
 }

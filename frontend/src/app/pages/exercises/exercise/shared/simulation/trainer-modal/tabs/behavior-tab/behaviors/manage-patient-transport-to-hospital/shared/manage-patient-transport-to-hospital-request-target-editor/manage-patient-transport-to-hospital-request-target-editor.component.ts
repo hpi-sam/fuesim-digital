@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
@@ -30,8 +30,8 @@ export class ManagePatientTransportToHospitalRequestTargetEditorComponent
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public behaviorState$!: Observable<ManagePatientTransportToHospitalBehaviorState>;
     public possibleRequestTargets$!: Observable<SimulatedRegion[]>;
@@ -39,8 +39,8 @@ export class ManagePatientTransportToHospitalRequestTargetEditorComponent
     ngOnChanges(): void {
         this.behaviorState$ = this.store.select(
             createSelectBehaviorState<ManagePatientTransportToHospitalBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
 
@@ -59,15 +59,15 @@ export class ManagePatientTransportToHospitalRequestTargetEditorComponent
         if (requestTargetId === 'noTarget') {
             this.exerciseService.proposeAction({
                 type: '[ManagePatientsTransportToHospitalBehavior] Change Transport Request Target',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.behaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.behaviorId(),
             });
             return;
         }
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Change Transport Request Target',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             requestTargetId,
         });
     }

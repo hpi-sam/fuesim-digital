@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Hospital, TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -21,7 +21,7 @@ export class TransferHospitalsTabComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() public transferPointId!: UUID;
+    public readonly transferPointId = input.required<UUID>();
 
     public transferPoint$!: Observable<TransferPoint>;
 
@@ -33,7 +33,7 @@ export class TransferHospitalsTabComponent implements OnInit {
 
     ngOnInit() {
         this.transferPoint$ = this.store.select(
-            createSelectTransferPoint(this.transferPointId)
+            createSelectTransferPoint(this.transferPointId())
         );
 
         const hospitals$ = this.store.select(selectHospitals);
@@ -77,7 +77,7 @@ export class TransferHospitalsTabComponent implements OnInit {
     public connectHospital(hospitalId: UUID) {
         this.exerciseService.proposeAction({
             type: '[TransferPoint] Connect hospital',
-            transferPointId: this.transferPointId,
+            transferPointId: this.transferPointId(),
             hospitalId,
         });
     }
@@ -85,7 +85,7 @@ export class TransferHospitalsTabComponent implements OnInit {
     public disconnectHospital(hospitalId: UUID) {
         this.exerciseService.proposeAction({
             type: '[TransferPoint] Disconnect hospital',
-            transferPointId: this.transferPointId,
+            transferPointId: this.transferPointId(),
             hospitalId,
         });
     }

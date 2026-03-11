@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Patient, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -15,11 +15,13 @@ import { createSelectPatient } from '../../../../../../../state/application/sele
 export class PatientNameComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() patientId!: UUID;
+    readonly patientId = input.required<UUID>();
 
     patient$!: Observable<Patient>;
 
     ngOnInit(): void {
-        this.patient$ = this.store.select(createSelectPatient(this.patientId));
+        this.patient$ = this.store.select(
+            createSelectPatient(this.patientId())
+        );
     }
 }

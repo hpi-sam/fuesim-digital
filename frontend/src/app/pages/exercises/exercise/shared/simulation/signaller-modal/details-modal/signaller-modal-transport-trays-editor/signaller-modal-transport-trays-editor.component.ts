@@ -1,5 +1,5 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild, inject } from '@angular/core';
+import { Component, inject, input, viewChild } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
@@ -42,11 +42,14 @@ export class SignallerModalTransportTraysEditorComponent
     private readonly hotkeysService = inject(HotkeysService);
     private readonly detailsModal = inject(SignallerModalDetailsService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() transportBehaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly transportBehaviorId = input.required<UUID>();
 
-    @ViewChild('addRegionPopover') addRegionPopover!: NgbPopover;
-    @ViewChild('removeRegionPopover') removeRegionPopover!: NgbPopover;
+    readonly addRegionPopover =
+        viewChild.required<NgbPopover>('addRegionPopover');
+    readonly removeRegionPopover = viewChild.required<NgbPopover>(
+        'removeRegionPopover'
+    );
 
     private readonly inputs$ = new ReplaySubject<{
         simulatedRegionId: UUID;
@@ -118,7 +121,7 @@ export class SignallerModalTransportTraysEditorComponent
             '+',
             false,
             () => {
-                this.addRegionPopover.open();
+                this.addRegionPopover().open();
             },
             this.canAdd$
         );
@@ -126,7 +129,7 @@ export class SignallerModalTransportTraysEditorComponent
             '-',
             false,
             () => {
-                this.removeRegionPopover.open();
+                this.removeRegionPopover().open();
             },
             this.canRemove$
         );
@@ -139,8 +142,8 @@ export class SignallerModalTransportTraysEditorComponent
 
     ngOnChanges() {
         this.inputs$.next({
-            simulatedRegionId: this.simulatedRegionId,
-            transportBehaviorId: this.transportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            transportBehaviorId: this.transportBehaviorId(),
         });
     }
 
@@ -151,8 +154,8 @@ export class SignallerModalTransportTraysEditorComponent
     public addManagedRegion(selectedRegion: SearchableDropdownOption) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Add Simulated Region To Manage For Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transportBehaviorId(),
             managedSimulatedRegionId: selectedRegion.key,
         });
     }
@@ -160,8 +163,8 @@ export class SignallerModalTransportTraysEditorComponent
     public removeManagedRegion(selectedRegion: SearchableDropdownOption) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Remove Simulated Region To Manage From Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transportBehaviorId(),
             managedSimulatedRegionId: selectedRegion.key,
         });
     }

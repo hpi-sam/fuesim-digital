@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import {
@@ -24,7 +24,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
 export class PatientHealthPointDisplayComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() patientId!: UUID;
+    readonly patientId = input.required<UUID>();
 
     status$!: Observable<{
         real: PatientStatus;
@@ -39,7 +39,7 @@ export class PatientHealthPointDisplayComponent implements OnChanges {
     ngOnChanges(): void {
         this.status$ = this.store.select(
             createSelector(
-                createSelectPatient(this.patientId),
+                createSelectPatient(this.patientId()),
                 selectConfiguration,
                 (patient, configuration) => ({
                     real: patient.realStatus,

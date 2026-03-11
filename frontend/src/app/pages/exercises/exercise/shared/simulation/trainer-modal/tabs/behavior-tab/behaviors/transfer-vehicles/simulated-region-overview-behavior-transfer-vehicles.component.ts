@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import type { MemoizedSelector } from '@ngrx/store';
 import { Store, createSelector } from '@ngrx/store';
 import type {
@@ -54,9 +54,9 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() simulatedRegionId!: UUID;
-    @Input() transferBehaviorId!: UUID;
-    @Input() initialTransferOptions?: TransferOptions;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly transferBehaviorId = input.required<UUID>();
+    readonly initialTransferOptions = input<TransferOptions>();
 
     private readonly destroy$ = new Subject<void>();
     private readonly destroyPatients$ = new Subject<void>();
@@ -140,16 +140,15 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
     }
 
     ngOnInit(): void {
-        if (this.initialTransferOptions) {
+        const initialTransferOptions = this.initialTransferOptions();
+        if (initialTransferOptions) {
             this.transferCollapsed = false;
-            this.selectedVehicle =
-                this.initialTransferOptions.vehicleToTransfer;
+            this.selectedVehicle = initialTransferOptions.vehicleToTransfer;
             this.selectedDestination =
-                this.initialTransferOptions.transferDestination;
+                initialTransferOptions.transferDestination;
             this.selectedPatients =
-                cloneDeepMutable(
-                    this.initialTransferOptions.patientsToTransfer
-                ) ?? {};
+                cloneDeepMutable(initialTransferOptions.patientsToTransfer) ??
+                {};
             this.minPatients = Object.values(this.selectedPatients).filter(
                 (clicked) => clicked
             ).length;
@@ -159,8 +158,8 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
             AppState,
             TransferBehaviorState
         > = createSelectBehaviorState(
-            this.simulatedRegionId,
-            this.transferBehaviorId
+            this.simulatedRegionId(),
+            this.transferBehaviorId()
         );
 
         const bufferedTransferEventQueueSelector = createSelector(
@@ -197,7 +196,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
 
         const activeRecurringEventActivityStatesSelector =
             createSelectActivityStatesByType(
-                this.simulatedRegionId,
+                this.simulatedRegionId(),
                 'recurringEventActivity'
             );
 
@@ -232,7 +231,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
         );
 
         const activeActivityStatesSelector = createSelectActivityStatesByType(
-            this.simulatedRegionId,
+            this.simulatedRegionId(),
             'loadVehicleActivity'
         );
 
@@ -278,7 +277,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
                 Object.values(transferPoints).find((transferPoint) =>
                     isInSpecificSimulatedRegion(
                         transferPoint,
-                        this.simulatedRegionId
+                        this.simulatedRegionId()
                     )
                 )!
         );
@@ -286,7 +285,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
         const vehiclesInSimulatedRegionSelector =
             createSelectElementsInSimulatedRegion(
                 selectVehicles,
-                this.simulatedRegionId
+                this.simulatedRegionId()
             );
 
         const reachableTransferPointsSelector = createSelector(
@@ -366,24 +365,24 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
     public updatePatientLoadTime(loadTimePerPatient: number) {
         this.exerciseService.proposeAction({
             type: '[TransferBehavior] Update Patient Load Time',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transferBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transferBehaviorId(),
             loadTimePerPatient,
         });
     }
     public updatePersonnelLoadTime(personnelLoadTime: number) {
         this.exerciseService.proposeAction({
             type: '[TransferBehavior] Update Personnel Load Time',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transferBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transferBehaviorId(),
             personnelLoadTime,
         });
     }
     public updateSendDelay(delayBetweenSends: number) {
         this.exerciseService.proposeAction({
             type: '[TransferBehavior] Update Delay Between Sends',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transferBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transferBehaviorId(),
             delayBetweenSends,
         });
     }
@@ -417,8 +416,8 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
 
         this.exerciseService.proposeAction({
             type: '[TransferBehavior] Send Transfer Request Event',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transferBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transferBehaviorId(),
             vehicleId: this.selectedVehicle.id,
             destinationType: this.selectedDestination.type,
             destinationId: this.selectedDestination.id,
@@ -436,7 +435,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
         const patientsInSimulatedRegionSelector =
             createSelectElementsInSimulatedRegion(
                 selectPatients,
-                this.simulatedRegionId
+                this.simulatedRegionId()
             );
 
         const patientsInSelectedVehicleSelector = createSelector(

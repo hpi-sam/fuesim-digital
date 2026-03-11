@@ -2,7 +2,7 @@
     <div class="d-flex align-items-center flex-wrap gap-1">
         <input
             #nameInput="ngModel"
-            [ngModel]="alarmGroup.name"
+            [ngModel]="alarmGroup().name"
             (appSaveOnTyping)="renameAlarmGroup($event)"
             required
             placeholder="Name"
@@ -73,10 +73,10 @@
     </button>
 </div>
 
-@if ((alarmGroup.alarmGroupVehicles | values).length > 0) {
+@if ((alarmGroup().alarmGroupVehicles | values).length > 0) {
     <div class="d-flex flex-wrap">
         @for (
-            alarmGroupVehicle of alarmGroup.alarmGroupVehicles | values;
+            alarmGroupVehicle of alarmGroup().alarmGroupVehicles | values;
             track alarmGroupVehicle.id
         ) {
             <div

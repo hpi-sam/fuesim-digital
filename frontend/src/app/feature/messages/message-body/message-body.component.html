@@ -1,11 +1,11 @@
 <app-show-more defaultHeight="100px">
-    @if (message.config.body; as body) {
+    @if (message().config.body; as body) {
         {{ body }}
     }
-    @if (message.config.button; as button) {
+    @if (message().config.button; as button) {
         <button
             [class]="'btn btn-sm ms-2 btn-' + button.color"
-            (click)="message.event$.next('click')"
+            (click)="message().event$.next('click')"
         >
             {{ button.name }}
         </button>

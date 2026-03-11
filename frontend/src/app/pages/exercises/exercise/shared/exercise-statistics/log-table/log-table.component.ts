@@ -4,7 +4,7 @@ import type {
     SimpleChanges,
     AfterViewInit,
 } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import type { LogEntry, Tag } from 'fuesim-digital-shared';
 import { StrictObject } from 'fuesim-digital-shared';
 import { difference } from 'lodash-es';
@@ -30,7 +30,7 @@ export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
         StatisticsTimeSelectionService
     );
 
-    @Input() public logEntries!: readonly LogEntry[];
+    public readonly logEntries = input.required<readonly LogEntry[]>();
 
     public knownCategories: {
         [category: string]: { [specifier: string]: KnownSpecifier };
@@ -99,7 +99,7 @@ export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
                 );
             });
 
-        return this.logEntries.filter(predicate);
+        return this.logEntries().filter(predicate);
     }
 
     ngAfterViewInit(): void {
@@ -131,7 +131,7 @@ export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
         this.knownCategories = {};
 
         // Process all tags in reverse order to use the latest available display name and color
-        [...this.logEntries].reverse().forEach((logEntry) => {
+        [...this.logEntries()].reverse().forEach((logEntry) => {
             logEntry.tags.forEach((tag) => {
                 if (!(tag.category in this.knownCategories)) {
                     this.knownCategories[tag.category] = {};

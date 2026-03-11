@@ -10,7 +10,7 @@
             <div class="position-relative">
                 <app-radiogram-card-content
                     [radiogram]="radiogram!"
-                    [shownInSignallerModal]="shownInSignallerModal"
+                    [shownInSignallerModal]="shownInSignallerModal()"
                 ></app-radiogram-card-content>
                 @if ((status$ | async) === 'unread') {
                     <div
@@ -33,7 +33,7 @@
                     (click)="acceptRadiogram()"
                 >
                     Durchsagen
-                    @if (first && shownInSignallerModal) {
+                    @if (first() && shownInSignallerModal()) {
                         <app-hotkey-indicator [hotkey]="acceptHotkey" />
                     }
                 </button>
@@ -47,7 +47,7 @@
                             (click)="returnRadiogram()"
                         >
                             Zurücklegen
-                            @if (first && shownInSignallerModal) {
+                            @if (first() && shownInSignallerModal()) {
                                 <app-hotkey-indicator [hotkey]="returnHotkey" />
                             }
                         </button>
@@ -56,7 +56,7 @@
                             (click)="markRadiogramAsDone()"
                         >
                             Fertig
-                            @if (first && shownInSignallerModal) {
+                            @if (first() && shownInSignallerModal()) {
                                 <app-hotkey-indicator [hotkey]="acceptHotkey" />
                             }
                         </button>

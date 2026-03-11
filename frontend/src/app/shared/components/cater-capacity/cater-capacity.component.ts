@@ -1,4 +1,4 @@
-import { Input, Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import type { PatientStatus, CanCaterFor } from 'fuesim-digital-shared';
 
 @Component({
@@ -8,7 +8,7 @@ import type { PatientStatus, CanCaterFor } from 'fuesim-digital-shared';
     standalone: false,
 })
 export class CaterCapacityComponent {
-    @Input() canCaterFor!: CanCaterFor;
+    readonly canCaterFor = input.required<CanCaterFor>();
 
     caterForStatuses: (PatientStatus & keyof CanCaterFor)[] = [
         'red',

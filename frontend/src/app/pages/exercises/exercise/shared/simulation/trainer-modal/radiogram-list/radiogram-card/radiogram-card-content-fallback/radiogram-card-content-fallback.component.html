@@ -1,5 +1,7 @@
 <ng-container>
-    <h5 class="card-title">{{ radiogramType | humanReadableRadiogramType }}</h5>
+    <h5 class="card-title">
+        {{ radiogramType() | humanReadableRadiogramType }}
+    </h5>
     <p class="card-text">
         Jemand hat einen Funkspruch abgegeben. Hier sollte der Inhalt stehen.
     </p>

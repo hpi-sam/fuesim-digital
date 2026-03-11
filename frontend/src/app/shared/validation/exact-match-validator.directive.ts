@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Directive, Input } from '@angular/core';
+import { Directive, input } from '@angular/core';
 import type { AbstractControl, Validator, ValidatorFn } from '@angular/forms';
 import { NG_VALIDATORS } from '@angular/forms';
 import type { SimpleChangesGeneric } from '../types/simple-changes-generic';
@@ -22,11 +22,11 @@ export class ExactMatchValidatorDirective implements Validator, OnChanges {
     /**
      * The string to match
      */
-    @Input() appExactMatchValidator!: string;
+    readonly appExactMatchValidator = input.required<string>();
 
     ngOnChanges(changes: SimpleChangesGeneric<this>): void {
         this.validator = CustomValidators.exactMatchValidator(
-            this.appExactMatchValidator
+            this.appExactMatchValidator()
         );
     }
 

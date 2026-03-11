@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import type { UUID, Patient, PatientStatus } from 'fuesim-digital-shared';
 import { SelectPatientService } from '../select-patient.service';
 
@@ -17,14 +17,11 @@ export type Scope = 'simulatedRegion' | 'vehicle';
 export class SimulatedRegionOverviewPatientsTableComponent {
     readonly selectPatientService = inject(SelectPatientService);
 
-    @Input()
-    patients: PatientWithVisibleStatus[] = [];
+    readonly patients = input<PatientWithVisibleStatus[]>([]);
 
-    @Input()
-    selectedPatientId?: UUID;
+    readonly selectedPatientId = input<UUID>();
 
-    @Input()
-    scope!: Scope;
+    readonly scope = input.required<Scope>();
 
     readonly scopeDescriptions = {
         simulatedRegion: 'im simulierten Bereich',

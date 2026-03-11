@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseAction,
@@ -34,7 +34,7 @@ export class SignallerModalStartTransferOfCategoryModalComponent
     private readonly detailsModal = inject(SignallerModalDetailsService);
     private readonly messageService = inject(MessageService);
 
-    @Input() simulatedRegionId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
 
     private hotkeyLayer!: HotkeyLayer;
     private readonly destroy$ = new Subject<void>();
@@ -70,7 +70,7 @@ export class SignallerModalStartTransferOfCategoryModalComponent
     getTransportBehaviorState() {
         return selectStateSnapshot(
             createSelectBehaviorStatesByType(
-                this.simulatedRegionId,
+                this.simulatedRegionId(),
                 'managePatientTransportToHospitalBehavior'
             ),
             this.store
@@ -93,6 +93,7 @@ export class SignallerModalStartTransferOfCategoryModalComponent
         // Hence, all actions to be proposed are collected here and proposed in the end.
         const actionsToPropose: ExerciseAction[] = [];
 
+        const simulatedRegionId = this.simulatedRegionId();
         if (
             this.maximumStatus !==
             transportBehaviorState.maximumCategoryToTransport
@@ -101,7 +102,7 @@ export class SignallerModalStartTransferOfCategoryModalComponent
 
             actionsToPropose.push({
                 type: '[ManagePatientsTransportToHospitalBehavior] Update Maximum Category To Transport',
-                simulatedRegionId: this.simulatedRegionId,
+                simulatedRegionId,
                 behaviorId: transportBehaviorState.id,
                 maximumCategoryToTransport: this.maximumStatus,
             });
@@ -113,7 +114,7 @@ export class SignallerModalStartTransferOfCategoryModalComponent
                 type: this.transportStarted
                     ? '[ManagePatientsTransportToHospitalBehavior] Start Transport'
                     : '[ManagePatientsTransportToHospitalBehavior] Stop Transport',
-                simulatedRegionId: this.simulatedRegionId,
+                simulatedRegionId,
                 behaviorId: transportBehaviorState.id,
             });
         }

@@ -9,7 +9,7 @@
                             <th scope="col">Identifikation</th>
                             <td class="font-monospace">
                                 <app-patient-identifier
-                                    [patientId]="patientId"
+                                    [patientId]="patientId()"
                                 />
                             </td>
                         </tr>
@@ -30,12 +30,8 @@
                         </tr>
                         <tr>
                             <th scope="col">Geschlecht</th>
-                            <td
-                                *appLet="
-                                    patient.biometricInformation.sex as sex
-                                "
-                                class="font-monospace"
-                            >
+                            @let sex = patient.biometricInformation.sex;
+                            <td class="font-monospace">
                                 {{
                                     sex === 'male'
                                         ? 'männlich'

@@ -1,5 +1,10 @@
-import type { OnInit } from '@angular/core';
-import { Component, Input, ViewEncapsulation, inject } from '@angular/core';
+import {
+    OnInit,
+    signal,
+    Component,
+    ViewEncapsulation,
+    inject,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
@@ -21,8 +26,7 @@ export class SimulatedRegionsModalComponent implements OnInit {
 
     simulatedRegionIds$!: Observable<UUID[]>;
 
-    @Input()
-    currentSimulatedRegionId!: UUID;
+    readonly currentSimulatedRegionId = signal<UUID | null>(null);
 
     ngOnInit(): void {
         this.simulatedRegionIds$ = this.store

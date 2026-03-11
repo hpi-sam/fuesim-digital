@@ -1,8 +1,8 @@
 @if (alarmGroupsDropdownOptions$ | async; as alarmGroupOptions) {
     @if (alarmGroups$ | async; as alarmGroups) {
-        <ng-container *appLet="transferPoints$ | async as transferPoints">
-            <form (ngSubmit)="!useAlarmGroupButtons && sendAlarmGroup()">
-                @if (!useAlarmGroupButtons) {
+        @if (transferPoints$ | async; as transferPoints) {
+            <form (ngSubmit)="!useAlarmGroupButtons() && sendAlarmGroup()">
+                @if (!useAlarmGroupButtons()) {
                     <div class="d-flex flex-row align-items-center">
                         <label class="flex-shrink-1 text-nowrap"
                             >Alarmgruppe:</label
@@ -91,7 +91,7 @@
                         }
                     </ng-template>
                 </div>
-                @if (useFirstVehicles) {
+                @if (useFirstVehicles()) {
                     <div>
                         <h6 class="fw-bold mt-4">
                             Abweichendes Ziel für die ersten Fahrzeuge
@@ -182,7 +182,7 @@
                         }
                     </div>
                 }
-                @if (!useAlarmGroupButtons) {
+                @if (!useAlarmGroupButtons()) {
                     @let selectedAlarmGroup =
                         selectedAlarmGroupOption?.key === null
                             ? null
@@ -223,7 +223,7 @@
                         </div>
                     }
                 }
-                @if (useAlarmGroupButtons) {
+                @if (useAlarmGroupButtons()) {
                     <div class="d-flex flex-row flex-wrap gap-2 mt-4">
                         @for (
                             alarmGroup of alarmGroupOptions;
@@ -264,14 +264,14 @@
                     </div>
                 }
                 @if (
-                    !useAlarmGroupButtons ||
-                    (useAlarmGroupButtons && alarmGroupOptions.length > 0)
+                    !useAlarmGroupButtons() ||
+                    (useAlarmGroupButtons() && alarmGroupOptions.length > 0)
                 ) {
                     <span class="row g-0 mt-2 text-muted">
                         Sie können mehrere Alarmgruppen nacheinander starten.
                     </span>
                 }
             </form>
-        </ng-container>
+        }
     }
 }

@@ -1,4 +1,4 @@
-@if (errors && ngModelInput.dirty) {
+@if (errors && ngModelInput().dirty) {
     <div class="mt-2 text-danger validation-text">
         @if (errors['required']) {
             <div>Diese Eingabe ist erforderlich.</div>

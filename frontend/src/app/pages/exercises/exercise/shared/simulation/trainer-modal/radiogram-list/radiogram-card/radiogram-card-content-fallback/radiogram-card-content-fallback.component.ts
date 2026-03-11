@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import type { ExerciseRadiogram } from 'fuesim-digital-shared';
 
 @Component({
@@ -8,5 +8,5 @@ import type { ExerciseRadiogram } from 'fuesim-digital-shared';
     standalone: false,
 })
 export class RadiogramCardContentFallbackComponent {
-    @Input() radiogramType!: ExerciseRadiogram['type'];
+    readonly radiogramType = input.required<ExerciseRadiogram['type']>();
 }

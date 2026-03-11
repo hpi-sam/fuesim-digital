@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store, createSelector } from '@ngrx/store';
 import type { StartPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -15,14 +15,15 @@ import { createSelectAlarmGroup } from '../../../../../../state/application/sele
 export class StartPointNameComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() startPoint!: StartPoint;
+    readonly startPoint = input.required<StartPoint>();
 
     alarmGroupName$: Observable<string> | undefined;
 
     ngOnChanges(): void {
-        if (this.startPoint.type === 'alarmGroupStartPoint') {
+        const startPoint = this.startPoint();
+        if (startPoint.type === 'alarmGroupStartPoint') {
             const alarmGroupNameSelector = createSelector(
-                createSelectAlarmGroup(this.startPoint.alarmGroupId),
+                createSelectAlarmGroup(startPoint.alarmGroupId),
                 (alarmGroup) => alarmGroup.name
             );
             this.alarmGroupName$ = this.store.select(alarmGroupNameSelector);

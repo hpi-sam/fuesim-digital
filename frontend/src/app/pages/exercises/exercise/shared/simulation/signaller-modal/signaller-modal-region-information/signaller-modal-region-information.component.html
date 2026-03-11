@@ -9,7 +9,7 @@
 }
 
 <app-signaller-modal-interactions
-    [simulatedRegionId]="simulatedRegionId"
+    [simulatedRegionId]="simulatedRegionId()"
     [interactions]="informationInteractions"
     primaryActionLabel="Anfragen"
     filterHotkeyKeys="F3"
@@ -18,7 +18,7 @@
 <ng-template #recurringReportEditor>
     @if (informationTypeToEdit !== null) {
         <app-signaller-modal-recurring-report-modal
-            [simulatedRegionId]="simulatedRegionId"
+            [simulatedRegionId]="simulatedRegionId()"
             [informationType]="informationTypeToEdit"
         />
     }
@@ -28,7 +28,7 @@
 
 @if ((reportBehaviorId$ | async) !== null) {
     <app-simulation-event-based-report-editor
-        [simulatedRegionId]="simulatedRegionId"
+        [simulatedRegionId]="simulatedRegionId()"
         [reportBehaviorId]="(reportBehaviorId$ | async)!"
         [useHotkeys]="true"
     />

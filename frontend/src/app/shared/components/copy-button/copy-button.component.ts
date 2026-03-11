@@ -10,7 +10,7 @@ import { MessageService } from '../../../core/messages/message.service';
 export class CopyButtonComponent {
     private readonly messageService = inject(MessageService);
 
-    value = input<string>('');
+    readonly value = input<string>('');
 
     copy() {
         navigator.clipboard.writeText(this.value());

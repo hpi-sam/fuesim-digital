@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { SimulatedRegion, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -15,14 +15,14 @@ import { createSelectSimulatedRegion } from '../../../../../../../state/applicat
 export class SignallerModalRegionOverviewComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() simulatedRegionId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
 
     simulatedRegion$!: Observable<SimulatedRegion>;
     noLeaderOverlayVisible = false;
 
     ngOnChanges() {
         this.simulatedRegion$ = this.store.select(
-            createSelectSimulatedRegion(this.simulatedRegionId)
+            createSelectSimulatedRegion(this.simulatedRegionId())
         );
     }
 

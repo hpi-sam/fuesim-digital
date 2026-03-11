@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, VehicleTemplate } from 'fuesim-digital-shared';
 import { SimulatedRegion } from 'fuesim-digital-shared';
@@ -26,8 +26,7 @@ export class SimulatedRegionOverviewVehiclesTabComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     readonly startTransferService = inject(StartTransferService);
 
-    @Input()
-    simulatedRegion!: SimulatedRegion;
+    readonly simulatedRegion = input.required<SimulatedRegion>();
 
     selectedVehicle$ = new Subject<Vehicle | null>();
 
@@ -41,7 +40,7 @@ export class SimulatedRegionOverviewVehiclesTabComponent implements OnInit {
         const vehicles$ = this.store.select(
             createSelectElementsInSimulatedRegion(
                 selectVehicles,
-                this.simulatedRegion.id
+                this.simulatedRegion().id
             )
         );
 

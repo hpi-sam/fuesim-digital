@@ -1,5 +1,5 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     Material,
@@ -37,7 +37,7 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 
-    @Input() simulatedRegion!: SimulatedRegion;
+    readonly simulatedRegion = input.required<SimulatedRegion>();
 
     public readonly vehicleTemplates$ = this.store.select(
         selectVehicleTemplates
@@ -69,7 +69,7 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
     ngOnInit(): void {
         const containedPatientsSelector = createSelectElementsInSimulatedRegion(
             selectPatients,
-            this.simulatedRegion.id
+            this.simulatedRegion().id
         );
 
         this.patients.all$ = this.store.select(containedPatientsSelector);
@@ -87,7 +87,7 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
                 selectVehicleTemplates,
                 createSelectElementsInSimulatedRegion(
                     selectVehicles,
-                    this.simulatedRegion.id
+                    this.simulatedRegion().id
                 ),
                 (vehicleTemplates, vehicles) => {
                     const categorizedVehicles: { [Key in string]?: Vehicle[] } =
@@ -112,7 +112,7 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
             createSelector(
                 createSelectElementsInSimulatedRegion(
                     selectPersonnel,
-                    this.simulatedRegion.id
+                    this.simulatedRegion().id
                 ),
                 (personnel) => {
                     const categorizedPersonnel: {
@@ -140,7 +140,7 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
             createSelector(
                 createSelectElementsInSimulatedRegion(
                     selectMaterials,
-                    this.simulatedRegion.id
+                    this.simulatedRegion().id
                 ),
                 (materials) => {
                     const categorizedMaterials: {
@@ -174,7 +174,7 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
     public async renameSimulatedRegion(newName: string) {
         this.exerciseService.proposeAction({
             type: '[SimulatedRegion] Rename simulated region',
-            simulatedRegionId: this.simulatedRegion.id,
+            simulatedRegionId: this.simulatedRegion().id,
             newName,
         });
     }

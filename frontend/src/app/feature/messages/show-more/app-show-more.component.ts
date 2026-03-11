@@ -5,9 +5,9 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
-    Input,
-    ViewChild,
     inject,
+    input,
+    viewChild,
 } from '@angular/core';
 import type { HeightChangeObservationStrategies } from './height-change-observation-strategies';
 
@@ -52,21 +52,22 @@ export class AppShowMoreComponent
      * The maximum height that is shown by default without having to click on the "Show more"-button
      * You can use any valid css value like '100px', '100em', '10vh'
      */
-    @Input() defaultHeight!: string;
+    readonly defaultHeight = input.required<string>();
     /**
      * If the scrollHeight of the content changes, we could want to change wether the "Show more"-button is shown or not
      * Currently there seems to be no way to observe the scrollHeight of the content (https://stackoverflow.com/questions/44428370/detect-scrollheight-change-with-mutationobserver).
      * Therefore you can specify here which strategies you want to use.
      */
-    @Input()
-    heightChangeObservationStrategies: HeightChangeObservationStrategies = {
-        polling: false,
-        resizeObserver: true,
-        mutationObserver: true,
-    };
+    readonly heightChangeObservationStrategies =
+        input<HeightChangeObservationStrategies>({
+            polling: false,
+            resizeObserver: true,
+            mutationObserver: true,
+        });
 
-    @ViewChild('wrapper') wrapper?: ElementRef<HTMLDivElement>;
-    @ViewChild('contentWrapper') contentWrapper?: ElementRef<HTMLDivElement>;
+    readonly wrapper = viewChild<ElementRef<HTMLDivElement>>('wrapper');
+    readonly contentWrapper =
+        viewChild<ElementRef<HTMLDivElement>>('contentWrapper');
     private player?: AnimationPlayer;
 
     public fitsIn = true;
@@ -86,23 +87,26 @@ export class AppShowMoreComponent
         // TODO:
         // observe the height of the content and update the showingMore-state whenever it changes
         // therefore we make use of up to three different strategies to detect changes in the scrollHeight
-        if (this.heightChangeObservationStrategies.polling) {
+        const heightChangeObservationStrategies =
+            this.heightChangeObservationStrategies();
+        if (heightChangeObservationStrategies.polling) {
             this.pollingIntervallRef = setInterval(
                 () => this.updateState(),
                 1000
             );
         }
-        if (this.heightChangeObservationStrategies.resizeObserver) {
+        const contentWrapper = this.contentWrapper();
+        if (heightChangeObservationStrategies.resizeObserver) {
             this.resizeObserver = new ResizeObserver(() => {
                 this.updateState();
             });
-            this.resizeObserver.observe(this.contentWrapper!.nativeElement);
+            this.resizeObserver.observe(contentWrapper!.nativeElement);
         }
-        if (this.heightChangeObservationStrategies.mutationObserver) {
+        if (heightChangeObservationStrategies.mutationObserver) {
             this.mutationObserver = new MutationObserver(() => {
                 this.updateState();
             });
-            this.mutationObserver.observe(this.contentWrapper!.nativeElement, {
+            this.mutationObserver.observe(contentWrapper!.nativeElement, {
                 attributes: true,
                 attributeOldValue: false,
                 characterData: true,
@@ -113,12 +117,13 @@ export class AppShowMoreComponent
     }
 
     public toggleShowMore() {
-        if (!this.wrapper) {
+        const wrapper = this.wrapper();
+        if (!wrapper) {
             return;
         }
         this.showingMore = !this.showingMore;
-        const currentHeight = this.wrapper.nativeElement.clientHeight;
-        this.wrapper.nativeElement.style.maxHeight = '';
+        const currentHeight = wrapper.nativeElement.clientHeight;
+        wrapper.nativeElement.style.maxHeight = '';
         if (this.showingMore) {
             // expand
             this.playAnimation([
@@ -132,33 +137,35 @@ export class AppShowMoreComponent
                     '0.5s ease',
                     style({
                         // TODO: `min(defaultHeight, scrollHeight)` would be better, but because defaultHeight doesn't have to be in px, this function is not trivial
-                        height: this.defaultHeight,
+                        height: this.defaultHeight(),
                     })
                 ),
-                style({ height: '', 'max-height': this.defaultHeight }),
+                style({ height: '', 'max-height': this.defaultHeight() }),
             ]);
         }
     }
 
     private playAnimation(animation: AnimationMetadata[]) {
-        if (!this.wrapper) {
+        const wrapper = this.wrapper();
+        if (!wrapper) {
             return;
         }
         this.player?.destroy();
         // play the animation
         this.player = this.animationBuilder
             .build(animation)
-            .create(this.wrapper.nativeElement);
+            .create(wrapper.nativeElement);
         this.player.play();
     }
 
     private updateState() {
-        if (!this.wrapper || this.showingMore) {
+        const wrapper = this.wrapper();
+        if (!wrapper || this.showingMore) {
             return;
         }
         this.fitsIn =
-            this.wrapper.nativeElement.scrollHeight <=
-            this.wrapper.nativeElement.clientHeight;
+            wrapper.nativeElement.scrollHeight <=
+            wrapper.nativeElement.clientHeight;
         this.changeDetectorRef.markForCheck();
     }
 

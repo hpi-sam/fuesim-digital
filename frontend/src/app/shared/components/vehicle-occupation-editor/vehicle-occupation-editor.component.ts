@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import {
     type UUID,
     type ExerciseOccupation,
@@ -22,19 +22,19 @@ export class VehicleOccupationEditorComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    @Input() vehicleId!: UUID;
+    readonly vehicleId = input.required<UUID>();
     occupation$!: Observable<ExerciseOccupation>;
 
     ngOnChanges() {
         this.occupation$ = this.store
-            .select(createSelectVehicle(this.vehicleId))
+            .select(createSelectVehicle(this.vehicleId()))
             .pipe(map((vehicle) => vehicle.occupation));
     }
 
     cancelOccupation() {
         this.exerciseService.proposeAction({
             type: '[Vehicle] Set occupation',
-            vehicleId: this.vehicleId,
+            vehicleId: this.vehicleId(),
             occupation: newNoOccupation(),
         });
     }

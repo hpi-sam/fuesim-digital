@@ -97,15 +97,11 @@ export class ExerciseManagerService {
         ) {
             throw new PermissionDeniedError();
         }
-        const actions = await this.actionRepository.getActionsForExerciseId(
-            exerciseTemplate.exercise_entity.id
-        );
 
         const newExercise =
             await this.exerciseService.exerciseFactory.fromExerciseTemplate(
                 exerciseTemplate.exercise_template,
                 exerciseTemplate.exercise_entity,
-                actions,
                 type,
                 { ...optionalData, user: session ? session.user.id : null }
             );

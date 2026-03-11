@@ -22,9 +22,8 @@ export class CreateParallelExerciseModalComponent {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly router = inject(Router);
 
-    public readonly exerciseTemplate = signal<GetExerciseTemplateResponseData | null>(
-        null
-    );
+    public readonly exerciseTemplate =
+        signal<GetExerciseTemplateResponseData | null>(null);
     public readonly created = output<boolean>();
 
     readonly model = signal<PostParallelExerciseRequestData>({
@@ -43,7 +42,8 @@ export class CreateParallelExerciseModalComponent {
         );
     });
 
-    readonly viewports = signal<GetExerciseTemplateViewportsResponseData | null>(null);
+    readonly viewports =
+        signal<GetExerciseTemplateViewportsResponseData | null>(null);
     readonly viewportsLoading = signal<boolean>(true);
 
     constructor() {

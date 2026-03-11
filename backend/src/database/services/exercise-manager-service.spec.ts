@@ -57,10 +57,6 @@ describe('exercise manager service', () => {
         ).toMatchObject(action.alarmGroup);
 
         // Check correctness of actions
-        expect(newActiveExercise.temporaryActionHistory).toHaveLength(1);
-        expect(
-            newActiveExercise.temporaryActionHistory[0]!.getAction()
-                .actionString
-        ).toMatchObject(action);
+        expect(newActiveExercise.temporaryActionHistory).toHaveLength(0);
     });
 });

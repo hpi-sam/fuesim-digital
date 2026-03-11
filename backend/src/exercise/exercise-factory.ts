@@ -155,48 +155,26 @@ export class ExerciseFactory {
     public async fromExerciseTemplate(
         exerciseTemplate: ExerciseTemplateEntry,
         exercise: ExerciseEntry,
-        actions: ActionEntry[],
         type: ExerciseType = 'standalone',
         optionalData: Partial<ExerciseInsert> = {}
     ): Promise<ActiveExercise> {
         const exerciseKeys = await this.createKeys();
-        const actionsInWrapper: ActionWrapper[] = [];
+        const stateString = {
+            ...exercise.currentStateString,
+            participantKey: exerciseKeys.participantKey,
+            type,
+        };
         const newExerciseEntry = {
             ...optionalData,
             ...exerciseKeys,
             stateVersion: exercise.stateVersion,
-            initialStateString: {
-                ...exercise.initialStateString,
-                participantKey: exerciseKeys.participantKey,
-                type,
-            },
-            currentStateString: {
-                ...exercise.currentStateString,
-                participantKey: exerciseKeys.participantKey,
-                type,
-            },
+            initialStateString: stateString,
+            currentStateString: stateString,
             baseTemplateId: exerciseTemplate.id,
         };
         const newExercise =
             await this.exerciseService.createExercise(newExerciseEntry);
-        const newActiveExercise = new ActiveExercise(
-            newExercise,
-            actionsInWrapper
-        );
-        pushAll(
-            actionsInWrapper,
-            actions.map(
-                (action) =>
-                    new ActionWrapper(
-                        action.actionString,
-                        action.emitterId,
-                        newActiveExercise,
-                        action.index,
-                        action.id
-                    )
-            )
-        );
-        return newActiveExercise;
+        return new ActiveExercise(newExercise, []);
     }
 
     public restore(activeExercise: ActiveExercise, keepActions: boolean): void {

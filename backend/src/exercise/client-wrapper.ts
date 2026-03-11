@@ -7,8 +7,6 @@ import type {
     ParallelExerciseId,
 } from 'fuesim-digital-shared';
 import { Client, ClientRole } from 'fuesim-digital-shared';
-import type { ExerciseAction, ExerciseKey, UUID } from 'fuesim-digital-shared';
-import { Client } from 'fuesim-digital-shared';
 import { filter, type Subscription } from 'rxjs';
 import { newClient, newClientRole } from 'fuesim-digital-shared';
 import cookie from 'cookie';
@@ -189,7 +187,14 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
                 this.session
             );
         for (const activeExercise of activeExercises) {
-            activeExercise.applyAction(action, null);
+            try {
+                activeExercise.applyAction(action, null);
+            } catch (e: unknown) {
+                if (!(e instanceof ReducerError)) {
+                    throw e;
+                }
+                console.error(e);
+            }
         }
     }
 

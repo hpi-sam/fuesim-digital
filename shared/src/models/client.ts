@@ -1,14 +1,14 @@
 import { z } from 'zod';
-import { uuid } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/index.js';
 import type { ClientRole } from './client-role.js';
 import { clientRoleSchema } from './client-role.js';
 
 export const clientSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('client'),
     name: z.string().max(255),
     role: clientRoleSchema,
-    viewRestrictedToViewportId: z.uuidv4().optional(),
+    viewRestrictedToViewportId: uuidSchema.optional(),
     isInWaitingRoom: z.boolean(),
 });
 export type Client = z.infer<typeof clientSchema>;

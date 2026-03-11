@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { uuid, uuidSetSchema } from '../utils/index.js';
+import { uuid, uuidSchema, uuidSetSchema } from '../utils/index.js';
 import { isInSimulatedRegion, positionSchema } from './utils/index.js';
 import type { ImageProperties, Position } from './utils/index.js';
 
 export const reachableTransferPointsSchema = z.record(
-    z.uuidv4(),
+    uuidSchema,
     z.object({
         /**
          * The time in ms it takes to get from this transfer point to the other one.
@@ -17,7 +17,7 @@ export type ReachableTransferPoints = z.infer<
 >;
 
 export const transferPointSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('transferPoint'),
     position: positionSchema,
     reachableTransferPoints: reachableTransferPointsSchema,

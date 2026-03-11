@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { uuid, uuidSetSchema } from '../utils/index.js';
+import { uuid, uuidSchema, uuidSetSchema } from '../utils/index.js';
 
 export const hospitalSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('hospital'),
     name: z.string(),
     /**

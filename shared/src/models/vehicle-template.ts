@@ -1,16 +1,17 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
+import { uuidSchema } from '../utils/index.js';
 import { imagePropertiesSchema } from './utils/index.js';
 
 export const vehicleTemplateSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('vehicleTemplate'),
     vehicleType: z.string(),
     name: z.string(),
     image: imagePropertiesSchema,
     patientCapacity: z.number(),
-    personnelTemplateIds: z.array(z.uuidv4()),
-    materialTemplateIds: z.array(z.uuidv4()),
+    personnelTemplateIds: z.array(uuidSchema),
+    materialTemplateIds: z.array(uuidSchema),
 });
 
 export type VehicleTemplate = Immutable<z.infer<typeof vehicleTemplateSchema>>;

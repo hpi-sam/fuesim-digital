@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuid } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/index.js';
 import { healthPointsSchema } from './utils/index.js';
 
 /**
@@ -55,12 +55,12 @@ export const conditionParametersSchema = z.strictObject({
     /**
      * The id of the patients healthState to switch to when all the conditions match
      */
-    matchingHealthStateId: z.uuidv4(),
+    matchingHealthStateId: uuidSchema,
 });
 export type ConditionParameters = z.infer<typeof conditionParametersSchema>;
 
 export const patientHealthStateSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('patientHealthState'),
     functionParameters: functionParametersSchema,
     /**

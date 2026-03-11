@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { UUID } from '../utils/index.js';
-import { uuid } from '../utils/index.js';
+import { uuidSchema, uuid } from '../utils/index.js';
 import {
     newMapPositionAt,
     imagePropertiesSchema,
@@ -9,9 +9,9 @@ import {
 import type { MapCoordinates, ImageProperties } from './utils/index.js';
 import type { MapImageTemplate } from './map-image-template.js';
 export const mapImageSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('mapImage'),
-    templateId: z.uuidv4(),
+    templateId: uuidSchema,
     position: positionSchema,
     image: imagePropertiesSchema,
     /**

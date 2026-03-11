@@ -1,5 +1,6 @@
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
+import { uuidSchema } from '../utils/uuid.js';
 import {
     biometricInformationSchema,
     patientStatusSchema,
@@ -15,7 +16,7 @@ export const hospitalPatientSchema = z.strictObject({
     /**
      * Id of the patient that was transported to a hospital, the original patient gets deleted
      */
-    patientId: z.uuidv4(),
+    patientId: uuidSchema,
     type: z.literal('hospitalPatient'),
     identifier: z.string(),
     customQRCode: z.string(),
@@ -37,11 +38,11 @@ export const hospitalPatientSchema = z.strictObject({
     realStatus: patientStatusSchema,
     hasTransportPriority: z.boolean(),
     image: imagePropertiesSchema,
-    healthStates: z.record(z.uuidv4(), patientHealthStateSchema),
+    healthStates: z.record(uuidSchema, patientHealthStateSchema),
     /**
      * The id of the current health state in {@link healthStates}
      */
-    currentHealthStateId: z.uuidv4(),
+    currentHealthStateId: uuidSchema,
     health: healthPointsSchema,
     treatmentTime: z.number().nonnegative(),
 });

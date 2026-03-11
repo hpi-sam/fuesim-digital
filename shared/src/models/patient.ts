@@ -1,7 +1,7 @@
 import { isEmpty } from 'lodash-es';
 import { z } from 'zod';
 import type { UUID } from '../utils/index.js';
-import { uuid, uuidSetSchema } from '../utils/index.js';
+import { uuidSchema, uuid, uuidSetSchema } from '../utils/index.js';
 import type { PatientHealthState } from './patient-health-state.js';
 import { patientHealthStateSchema } from './patient-health-state.js';
 import type {
@@ -27,7 +27,7 @@ import { personalInformationSchema } from './utils/personal-information.js';
 import type { PretriageInformation } from './utils/pretriage-information.js';
 import { pretriageInformationSchema } from './utils/pretriage-information.js';
 export const patientSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('patient'),
     identifier: z.string(),
     customQRCode: z.string(),
@@ -44,11 +44,11 @@ export const patientSchema = z.strictObject({
      * The time the patient already is in the current state
      */
     stateTime: z.number(),
-    healthStates: z.record(z.uuidv4(), patientHealthStateSchema),
+    healthStates: z.record(uuidSchema, patientHealthStateSchema),
     /**
      * The id of the current health state in {@link healthStates}
      */
-    currentHealthStateId: z.uuidv4(),
+    currentHealthStateId: uuidSchema,
     health: healthPointsSchema,
     assignedPersonnelIds: uuidSetSchema,
     assignedMaterialIds: uuidSetSchema,

@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { uuid } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/index.js';
 
 export const eocLogEntrySchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('eocLogEntry'),
     exerciseTimestamp: z.int(),
     message: z.string().max(65535),

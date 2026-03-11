@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { UUID } from '../utils/index.js';
-import { cloneDeepMutable, uuid } from '../utils/index.js';
+import { uuidSchema, cloneDeepMutable, uuid } from '../utils/index.js';
 import type {
     BiometricInformation,
     HealthPoints,
@@ -26,13 +26,13 @@ import type { PretriageInformation } from './utils/pretriage-information.js';
 import { pretriageInformationSchema } from './utils/pretriage-information.js';
 
 export const patientTemplateSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('patientTemplate'),
     biometricInformation: biometricInformationSchema,
     pretriageInformation: pretriageInformationSchema,
     image: imagePropertiesSchema,
-    healthStates: z.record(z.uuidv4(), patientHealthStateSchema),
-    startingHealthStateId: z.uuidv4(),
+    healthStates: z.record(uuidSchema, patientHealthStateSchema),
+    startingHealthStateId: uuidSchema,
     health: healthPointsSchema,
 });
 export type PatientTemplate = z.infer<typeof patientTemplateSchema>;

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuid } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/index.js';
 import {
     lowerRightCornerOf,
     upperLeftCornerOf,
@@ -10,7 +10,7 @@ import {
 import type { ImageProperties, MapCoordinates, Size } from './utils/index.js';
 
 export const viewportSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('viewport'),
     position: positionSchema,
     size: sizeSchema,

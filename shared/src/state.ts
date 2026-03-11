@@ -34,8 +34,7 @@ import {
     randomStateSchema,
 } from './simulation/utils/randomness.js';
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
-import type { UUID } from './utils/index.js';
-import { uuid } from './utils/index.js';
+import { UUID, uuidSchema, uuid } from './utils/index.js';
 import { IsIdMap, IsMultiTypedIdMap } from './utils/validators/index.js';
 import {
     createCatchAllHospital,
@@ -71,7 +70,7 @@ import { hospitalPatientSchema } from './models/hospital-patient.js';
 import { patientCategorySchema } from './models/patient-category.js';
 
 export class ExerciseState {
-    @IsZodSchema(z.uuidv4())
+    @IsZodSchema(uuidSchema)
     public readonly id = uuid();
     /**
      * The number of ms since the start of the exercise.
@@ -89,7 +88,7 @@ export class ExerciseState {
     @IsZodSchema(randomStateSchema)
     public readonly randomState: RandomState = newSeededRandomState();
 
-    @IsZodSchema(z.record(z.uuidv4(), viewportSchema))
+    @IsZodSchema(z.record(uuidSchema, viewportSchema))
     public readonly viewports: { readonly [key: UUID]: Viewport } = {};
 
     @IsIdMap(SimulatedRegion)
@@ -97,43 +96,43 @@ export class ExerciseState {
         readonly [key: UUID]: SimulatedRegion;
     } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), vehicleSchema))
+    @IsZodSchema(z.record(uuidSchema, vehicleSchema))
     public readonly vehicles: { readonly [key: UUID]: Vehicle } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), personnelSchema))
+    @IsZodSchema(z.record(uuidSchema, personnelSchema))
     public readonly personnel: { readonly [key: UUID]: Personnel } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), patientSchema))
+    @IsZodSchema(z.record(uuidSchema, patientSchema))
     public readonly patients: { readonly [key: UUID]: Patient } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), materialSchema))
+    @IsZodSchema(z.record(uuidSchema, materialSchema))
     public readonly materials: { readonly [key: UUID]: Material } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), restrictedZoneSchema))
+    @IsZodSchema(z.record(uuidSchema, restrictedZoneSchema))
     public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
         {};
 
-    @IsZodSchema(z.record(z.uuidv4(), mapImageSchema))
+    @IsZodSchema(z.record(uuidSchema, mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), transferPointSchema))
+    @IsZodSchema(z.record(uuidSchema, transferPointSchema))
     public readonly transferPoints: { readonly [key: UUID]: TransferPoint } =
         {};
 
-    @IsZodSchema(z.record(z.uuidv4(), hospitalSchema))
+    @IsZodSchema(z.record(uuidSchema, hospitalSchema))
     public readonly hospitals: { readonly [key: UUID]: Hospital } = {
         [catchAllHospitalId]: createCatchAllHospital(),
     };
 
-    @IsZodSchema(z.record(z.uuidv4(), hospitalPatientSchema))
+    @IsZodSchema(z.record(uuidSchema, hospitalPatientSchema))
     public readonly hospitalPatients: {
         readonly [key: UUID]: HospitalPatient;
     } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), alarmGroupSchema))
+    @IsZodSchema(z.record(uuidSchema, alarmGroupSchema))
     public readonly alarmGroups: { readonly [key: UUID]: AlarmGroup } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), clientSchema))
+    @IsZodSchema(z.record(uuidSchema, clientSchema))
     public readonly clients: { readonly [key: UUID]: Client } = {};
 
     @IsMultiTypedIdMap(getRadiogramConstructor)
@@ -144,22 +143,22 @@ export class ExerciseState {
     @IsZodSchema(z.array(patientCategorySchema))
     public readonly patientCategories = defaultPatientCategories;
 
-    @IsZodSchema(z.record(z.uuidv4(), vehicleTemplateSchema))
+    @IsZodSchema(z.record(uuidSchema, vehicleTemplateSchema))
     public readonly vehicleTemplates: {
         readonly [key: UUID]: VehicleTemplate;
     } = defaultVehicleTemplatesById;
 
-    @IsZodSchema(z.record(z.uuidv4(), materialTemplateSchema))
+    @IsZodSchema(z.record(uuidSchema, materialTemplateSchema))
     public readonly materialTemplates: {
         readonly [key: UUID]: MaterialTemplate;
     } = defaultMaterialTemplatesById;
 
-    @IsZodSchema(z.record(z.uuidv4(), personnelTemplateSchema))
+    @IsZodSchema(z.record(uuidSchema, personnelTemplateSchema))
     public readonly personnelTemplates: {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;
 
-    @IsZodSchema(z.record(z.uuidv4(), mapImageTemplateSchema))
+    @IsZodSchema(z.record(uuidSchema, mapImageTemplateSchema))
     public readonly mapImageTemplates: {
         readonly [key: UUID]: MapImageTemplate;
     } = defaultMapImagesTemplatesById;

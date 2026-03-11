@@ -1,18 +1,18 @@
 import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import type { UUID } from '../utils/index.js';
-import { uuidSetSchema, uuid } from '../utils/index.js';
+import { uuidSchema, uuidSetSchema, uuid } from '../utils/index.js';
 import type { MaterialTemplate } from './material-template.js';
 import { type Position, positionSchema } from './utils/index.js';
 import { imagePropertiesSchema } from './utils/index.js';
 import { canCaterForSchema } from './utils/cater-for.js';
 
 export const materialSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('material'),
-    templateId: z.uuidv4(),
+    templateId: uuidSchema,
     typeName: z.string(),
-    vehicleId: z.uuidv4(),
+    vehicleId: uuidSchema,
     vehicleName: z.string(),
     assignedPatientIds: uuidSetSchema,
     canCaterFor: canCaterForSchema,

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
-import { uuid } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/index.js';
 import {
     type CanCaterFor,
     imagePropertiesSchema,
@@ -9,7 +9,7 @@ import {
 import { canCaterForSchema } from './utils/cater-for.js';
 
 export const personnelTemplateSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('personnelTemplate'),
     personnelType: z.string(),
     name: z.string(),

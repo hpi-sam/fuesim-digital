@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import { uuid } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/index.js';
 import { alarmGroupVehicleSchema } from './utils/alarm-group-vehicle.js';
 
 export const alarmGroupSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('alarmGroup'),
     name: z.string(),
-    alarmGroupVehicles: z.record(z.uuidv4(), alarmGroupVehicleSchema),
+    alarmGroupVehicles: z.record(uuidSchema, alarmGroupVehicleSchema),
     triggerCount: z.number().nonnegative(),
     triggerLimit: z.number().nonnegative().nullable(),
 });

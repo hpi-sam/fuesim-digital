@@ -1,14 +1,15 @@
 import * as z from 'zod';
 import type { UUID } from '../../utils/index.js';
+import { uuidSchema } from '../../utils/index.js';
 
 const transferStartPointSchema = z.strictObject({
     type: z.literal('transferStartPoint'),
-    transferPointId: z.uuidv4(),
+    transferPointId: uuidSchema,
 });
 
 const alarmGroupStartPointSchema = z.strictObject({
     type: z.literal('alarmGroupStartPoint'),
-    alarmGroupId: z.uuidv4(),
+    alarmGroupId: uuidSchema,
     duration: z.number().min(0),
 });
 

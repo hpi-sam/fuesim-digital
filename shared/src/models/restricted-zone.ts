@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import type { Immutable } from 'immer';
-import { type UUID, uuid } from '../utils/index.js';
+import { type UUID, uuid, uuidSchema } from '../utils/index.js';
 import type { ExerciseState } from '../state.js';
 import type { AllowedValues } from '../utils/validators/is-literal-union.js';
 import type { ImageProperties, MapCoordinates, Size } from './utils/index.js';
@@ -30,14 +30,14 @@ export const vehicleRestrictionAllowedValues: AllowedValues<VehicleRestriction> 
     };
 
 export const vehicleRestrictionsSchema = z.record(
-    z.uuidv4(),
+    uuidSchema,
     vehicleRestrictionSchema
 );
 
 export type VehicleRestrictions = z.infer<typeof vehicleRestrictionsSchema>;
 
 export const restrictedZoneSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('restrictedZone'),
     position: positionSchema,
     size: sizeSchema,

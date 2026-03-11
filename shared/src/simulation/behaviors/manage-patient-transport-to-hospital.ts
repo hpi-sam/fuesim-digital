@@ -22,8 +22,10 @@ import {
     patientStatusSchema,
     PatientStatus,
 } from '../../models/index.js';
-import type { UUID, UUIDSet } from '../../utils/index.js';
 import {
+    type UUID,
+    uuidSchema,
+    type UUIDSet,
     StrictObject,
     cloneDeepMutable,
     uuid,
@@ -121,7 +123,7 @@ export class ManagePatientTransportToHospitalBehaviorState
      * in {@link simulatedRegionsToManage}
      */
     @IsZodSchema(
-        z.record(z.uuidv4(), z.record(patientStatusSchema, z.number()))
+        z.record(uuidSchema, z.record(patientStatusSchema, z.number()))
     )
     public readonly patientsExpectedInRegions: PatientsPerRegion = {};
 

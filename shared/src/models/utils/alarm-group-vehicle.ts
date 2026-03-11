@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuid } from '../../utils/index.js';
+import { uuidSchema, uuid } from '../../utils/index.js';
 
 export const alarmGroupVehicleSchema = z.strictObject({
-    id: z.uuidv4(),
-    vehicleTemplateId: z.uuidv4(),
+    id: uuidSchema,
+    vehicleTemplateId: uuidSchema,
     /**
      * The time in ms until the vehicle arrives
      */

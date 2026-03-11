@@ -276,13 +276,15 @@
         </ng-container>
     }
     @if (patient$ | async; as patient) {
-        <ng-container ngbNavItem>
-            <!-- TODO @JohannesPotzi : Besserer Name-->
-            <a ngbNavLink data-cy="patientPopupScoutNav">Scout-Info</a>
-            <ng-template ngbNavContent>
-                <app-scoutable-object-nav-item />
-            </ng-template>
-        </ng-container>
+        @if ((currentRole$ | async) !== 'participant' || patient.scoutableId) {
+            <ng-container ngbNavItem>
+                <!-- TODO @JohannesPotzi : Besserer Name-->
+                <a ngbNavLink data-cy="patientPopupScoutNav">Scout-Info</a>
+                <ng-template ngbNavContent>
+                    <app-scoutable-object-nav-item [element]="patient" />
+                </ng-template>
+            </ng-container>
+        }
     }
 </nav>
 <div [ngbNavOutlet]="nav" class="mt-2"></div>

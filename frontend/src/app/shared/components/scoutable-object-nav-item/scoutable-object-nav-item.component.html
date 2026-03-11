@@ -1,12 +1,15 @@
 <div>
-    <textarea
-        [ngModel]="remarks$ | async"
-        (appSaveOnTyping)="updateRemarks($event)"
-        [appAutofocus]="true"
-        maxlength="65535"
-        placeholder="Schreiben Sie Informationen"
-        class="form-control form-control-sm no-validation w-100"
-        style="height: 100px; resize: none"
-        data-cy="scoutableTextArea"
-    ></textarea>
+    @if (scoutable(); as scoutable) {
+        <button (click)="assignContent()">Info-Block hinzufügen</button>
+    }
+</div>
+<div>
+    @if (scoutable(); as scoutable) {
+        @for (contentId of scoutable.userGeneratedContentIds; track contentId) {
+            <app-rich-text-editor
+                [contentAssignedElement]="scoutable"
+                [userGeneratedContentId]="contentId"
+            />
+        }
+    }
 </div>

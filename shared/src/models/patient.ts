@@ -68,6 +68,7 @@ export const patientSchema = z.strictObject({
      */
     remarks: z.string().max(65535),
     treatmentTime: z.number().nonnegative(),
+    scoutableId: uuidSchema.nullable(),
 });
 export type Patient = z.infer<typeof patientSchema>;
 export const patientPretriageTimeThreshold: number = 60 * 1000; // 1 minute
@@ -110,6 +111,7 @@ export function newPatient(
         timeSpeed: 1,
         visibleStatusChanged: false,
         treatmentTime: 0,
+        scoutableId: null,
     };
 }
 export function getPatientVisibleStatus(

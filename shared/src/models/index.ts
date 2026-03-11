@@ -25,3 +25,5 @@ export * from './tag.js';
 export * from './material-template.js';
 export * from './personnel-template.js';
 export * from './restricted-zone.js';
+export * from './scoutable.js';
+export * from './user-generated-content.js';

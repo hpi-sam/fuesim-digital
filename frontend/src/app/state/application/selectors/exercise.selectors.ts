@@ -27,7 +27,9 @@ export const selectExerciseState = (state: AppState) =>
     // TODO: we currently expect this to only be used of the exerciseStateMode is not undefined
     state.application.exerciseState!;
 
-function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
+export function selectPropertyFactory<Key extends keyof ExerciseState>(
+    key: Key
+) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
 }
 
@@ -66,10 +68,14 @@ export const selectExerciseType = selectPropertyFactory('type');
 export const selectCollectedClientNames = selectPropertyFactory(
     'collectedClientNames'
 );
+export const selectScoutables = selectPropertyFactory('scoutables');
+export const selectUserGeneratedContent = selectPropertyFactory(
+    'userGeneratedContents'
+);
 
 // Elements
 
-function createSelectElementFromMapFactory<Element>(
+export function createSelectElementFromMapFactory<Element>(
     elementsSelector: (state: AppState) => { [key: UUID]: Element }
 ) {
     return (id: UUID) =>
@@ -115,6 +121,10 @@ export const createSelectPersonnelTemplate = createSelectElementFromMapFactory(
 export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
     selectMapImagesTemplates
 );
+export const createSelectScoutable =
+    createSelectElementFromMapFactory(selectScoutables);
+export const createSelectUserGeneratedContent =
+    createSelectElementFromMapFactory(selectUserGeneratedContent);
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,

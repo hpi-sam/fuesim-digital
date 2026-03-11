@@ -162,23 +162,19 @@ export class ExerciseService {
         >(
             (exercise) =>
                 this.store.dispatch(
-                    createSetExerciseStateAction(
-                        exercise as WritableDraft<ExerciseState>
-                    )
+                    createSetExerciseStateAction(exercise as ExerciseState)
                 ),
             () => selectStateSnapshot(selectExerciseState, this.store),
             (action) =>
                 this.store.dispatch(
-                    createApplyServerActionAction(
-                        action as WritableDraft<ExerciseAction>
-                    )
+                    createApplyServerActionAction(action as ExerciseAction)
                 ),
             async (action) => {
                 const response = await new Promise<SocketResponse>(
                     (resolve) => {
                         this.socket.emit(
                             'proposeAction',
-                            action as WritableDraft<ExerciseAction>,
+                            action as ExerciseAction,
                             resolve
                         );
                     }

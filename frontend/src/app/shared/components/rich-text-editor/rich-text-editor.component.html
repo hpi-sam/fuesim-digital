@@ -1,0 +1,16 @@
+<ng-container>
+    <form (ngSubmit)="onSubmit()">
+        <div class="NgxEditor__Wrapper">
+            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
+            </ngx-editor-menu>
+            <ngx-editor
+                [editor]="editor"
+                [formField]="editorForm.editorContent"
+                [placeholder]="'Hier Text eingeben...'"
+            >
+            </ngx-editor>
+        </div>
+        <button type="submit">Speichern</button>
+        <!-- @JohannesPotzi: TODO Indikator, dass erfolreich gesafed wurde -->
+    </form>
+</ng-container>

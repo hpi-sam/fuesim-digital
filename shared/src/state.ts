@@ -35,6 +35,14 @@ import {
     type ExerciseType,
     type ExerciseStatus,
     logEntrySchema,
+    scoutableSchema,
+    userGeneratedContentSchema,
+} from './models/index.js';
+import type {
+    ExerciseStatus,
+    LogEntry,
+    Scoutable,
+    UserGeneratedContent,
 } from './models/index.js';
 import type { ExerciseRadiogram } from './models/radiogram/index.js';
 import { getRadiogramConstructor } from './models/radiogram/index.js';
@@ -220,6 +228,14 @@ export class ExerciseState {
 
     @Equals(undefined)
     public previousTreatmentAssignment?: TreatmentAssignment;
+
+    @IsZodSchema(z.record(z.uuidv4(), scoutableSchema))
+    public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
+
+    @IsZodSchema(z.record(z.uuidv4(), userGeneratedContentSchema))
+    public readonly userGeneratedContents: {
+        readonly [key: UUID]: UserGeneratedContent;
+    } = {};
 
     /**
      * @deprecated Use {@link create} instead.

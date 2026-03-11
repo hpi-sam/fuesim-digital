@@ -10,7 +10,8 @@ import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
 import OlMap from 'ol/Map';
 import { Subject, takeUntil } from 'rxjs';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
+import { z } from 'zod';
 import type { Coordinate } from 'ol/coordinate';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import { startingPosition } from '../../starting-position';
@@ -42,6 +43,22 @@ import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
 import { SatelliteLayerManager } from './satellite-layer-manager';
 import type { PopupService } from './popup.service';
+
+export const coordinateStringSchema = z
+    .string()
+    .regex(/^-?\d{1,3}(.\d+)?$/u, 'Die Eingabe ist keine gültige Koordinate.');
+const coordinateStringToNumber = z.codec(coordinateStringSchema, z.number(), {
+    decode: (str) => Number.parseFloat(str),
+    encode: (num) => num.toFixed(6),
+});
+
+export const olMapCoordinatesSchema = z.object({
+    longitude: coordinateStringToNumber,
+    latitude: coordinateStringToNumber,
+    zoom: coordinateStringToNumber.optional(),
+});
+export type OlMapCoordinates = z.infer<typeof olMapCoordinatesSchema>;
+export type OlMapCoordinatesInput = z.input<typeof olMapCoordinatesSchema>;
 
 export class OlMapManager {
     private readonly _olMap: OlMap;
@@ -222,7 +239,13 @@ export class OlMapManager {
         return this.olMap.getView().getCenter();
     }
 
-    public tryGoToCoordinates(latitude: number, longitude: number) {
+    public getLonLat() {
+        const center = this.getCoordinates();
+        if (!center) return;
+        return toLonLat(center);
+    }
+
+    public tryGoToCoordinates(coordinates: OlMapCoordinates) {
         if (
             selectStateSnapshot(selectCurrentMainRole, this.store) ===
                 'participant' &&
@@ -234,8 +257,20 @@ export class OlMapManager {
         }
 
         const view = this.olMap.getView();
-        view.setCenter(fromLonLat([longitude, latitude]));
-        view.setZoom(OlMapManager.defaultZoom);
+        view.setCenter(
+            fromLonLat([coordinates.longitude, coordinates.latitude])
+        );
+        view.setZoom(coordinates.zoom ?? OlMapManager.defaultZoom);
+    }
+
+    public getCoordinatesAsQueryParams() {
+        const coordinates = this.getLonLat();
+        if (!coordinates) return;
+        return olMapCoordinatesSchema.encode({
+            longitude: coordinates[0]!,
+            latitude: coordinates[1]!,
+            zoom: this.olMap.getView().getZoom(),
+        });
     }
 
     public changeZoom(mode: 'zoomIn' | 'zoomOut') {

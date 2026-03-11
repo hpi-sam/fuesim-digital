@@ -15,6 +15,7 @@ import { ApiService } from '../../../core/api.service';
 import { ParallelExerciseService } from '../../../core/parallel-exercise.service';
 import { selectStateSnapshot } from '../../../state/get-state-snapshot';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
+import { OlMapManagerService } from '../../../pages/exercises/exercise/shared/exercise-map/utility/ol-map-manager.service';
 
 @Component({
     selector: 'app-parallel-exercise-status-bar',
@@ -30,6 +31,7 @@ export class ParallelExerciseStatusBarComponent {
     );
     protected readonly exerciseService = inject(ExerciseService);
     private readonly router = inject(Router);
+    private readonly olMapManagerService = inject(OlMapManagerService);
 
     public readonly parallelExercise =
         signal<GetParallelExerciseResponseData | null>(null);
@@ -38,7 +40,10 @@ export class ParallelExerciseStatusBarComponent {
     protected clientNames$ = this.store.select(selectClientNames);
 
     openExerciseInstance(exerciseInstance: ParallelExerciseInstanceSummary) {
-        this.router.navigate(['/exercises', exerciseInstance.trainerKey]);
+        this.router.navigate(['/exercises', exerciseInstance.trainerKey], {
+            queryParams:
+                this.olMapManagerService.olMapManager?.getCoordinatesAsQueryParams(),
+        });
     }
 
     constructor() {

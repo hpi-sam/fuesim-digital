@@ -105,7 +105,10 @@ export class ParallelExerciseService {
     }
 
     public async createParallelExercise(
-        data: Pick<ParallelExerciseInsert, 'joinViewportId' | 'templateId'>,
+        data: Pick<
+            ParallelExerciseInsert,
+            'joinViewportId' | 'name' | 'templateId'
+        >,
         session: SessionInformation
     ) {
         const created =
@@ -176,6 +179,9 @@ export class ParallelExerciseService {
                 currentTime: state.currentTime,
                 currentStatus: state.currentStatus,
                 lastLogEntry: state.lastLogEntry,
+                isActive: Object.values(state.clients).some(
+                    (client) => client.role.mainRole === 'participant'
+                ),
             });
         });
     }

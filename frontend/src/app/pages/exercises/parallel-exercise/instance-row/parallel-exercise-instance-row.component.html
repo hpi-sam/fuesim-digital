@@ -1,5 +1,10 @@
 @if (exerciseInstance(); as exerciseInstance) {
     <td>
+        @if (exerciseInstance.isActive) {
+            <span class="badge bg-primary">aktiv</span>
+        }
+    </td>
+    <td>
         <code class="me-2">{{ exerciseInstance.participantKey }}</code>
         <app-copy-button [value]="participantUrl()" />
     </td>

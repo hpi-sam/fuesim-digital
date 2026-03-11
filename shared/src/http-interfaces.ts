@@ -178,6 +178,7 @@ export const parallelExerciseInstanceSummarySchema = z.object({
     currentTime: z.number(),
     currentStatus: exerciseStatusSchema,
     lastLogEntry: z.optional(logEntrySchema),
+    isActive: z.boolean(),
 });
 export type ParallelExerciseInstanceSummary = z.infer<
     typeof parallelExerciseInstanceSummarySchema

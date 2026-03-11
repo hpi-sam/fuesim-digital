@@ -22,12 +22,12 @@ export class CreateParallelExerciseModalComponent {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly router = inject(Router);
 
-    public exerciseTemplate = signal<GetExerciseTemplateResponseData | null>(
+    public readonly exerciseTemplate = signal<GetExerciseTemplateResponseData | null>(
         null
     );
     public readonly created = output<boolean>();
 
-    model = signal<PostParallelExerciseRequestData>({
+    readonly model = signal<PostParallelExerciseRequestData>({
         joinViewportId: '',
         name: '',
         templateId: '' as ExerciseTemplateId,
@@ -43,8 +43,8 @@ export class CreateParallelExerciseModalComponent {
         );
     });
 
-    viewports = signal<GetExerciseTemplateViewportsResponseData | null>(null);
-    viewportsLoading = signal<boolean>(true);
+    readonly viewports = signal<GetExerciseTemplateViewportsResponseData | null>(null);
+    readonly viewportsLoading = signal<boolean>(true);
 
     constructor() {
         effect(async () => {

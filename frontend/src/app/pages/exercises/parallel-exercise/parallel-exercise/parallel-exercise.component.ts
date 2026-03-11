@@ -24,7 +24,7 @@ export class ParallelExerciseComponent {
     parallelExercise: HttpResourceRef<
         GetParallelExerciseResponseData | undefined
     >;
-    participantUrl = computed(
+    readonly participantUrl = computed(
         () =>
             `${location.origin}/exercises/parallel/join/${this.parallelExercise.value()?.participantKey}`
     );

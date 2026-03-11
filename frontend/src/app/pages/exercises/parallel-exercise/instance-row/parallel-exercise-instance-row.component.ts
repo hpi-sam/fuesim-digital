@@ -20,8 +20,8 @@ export class ParallelExerciseInstanceRowComponent {
     public readonly parallelExerciseService = inject(ParallelExerciseService);
     private readonly messageService = inject(MessageService);
 
-    exerciseInstance = input<ParallelExerciseInstanceSummary>();
-    participantUrl = computed(
+    readonly exerciseInstance = input<ParallelExerciseInstanceSummary>();
+    readonly participantUrl = computed(
         () =>
             `${location.origin}/exercises/${this.exerciseInstance()?.participantKey}`
     );

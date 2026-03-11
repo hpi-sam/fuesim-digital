@@ -17,8 +17,8 @@ export class ParallelExerciseCardComponent {
         ConfirmationModalService
     );
 
-    parallelExercise = input<GetParallelExerciseResponseData>();
-    participantUrl = computed(
+    readonly parallelExercise = input<GetParallelExerciseResponseData>();
+    readonly participantUrl = computed(
         () =>
             `${location.origin}/exercises/${this.parallelExercise()?.participantKey}`
     );

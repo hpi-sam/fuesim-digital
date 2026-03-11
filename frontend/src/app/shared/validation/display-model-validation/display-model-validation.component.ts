@@ -8,5 +8,5 @@ import { FieldState } from '@angular/forms/signals';
     standalone: false,
 })
 export class DisplayModelValidationComponent {
-    field = input.required<FieldState<any>>();
+    readonly field = input.required<FieldState<any>>();
 }

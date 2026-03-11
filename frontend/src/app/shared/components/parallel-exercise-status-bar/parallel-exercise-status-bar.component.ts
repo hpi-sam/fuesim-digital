@@ -13,6 +13,8 @@ import {
 import { ExerciseService } from '../../../core/exercise.service';
 import { ApiService } from '../../../core/api.service';
 import { ParallelExerciseService } from '../../../core/parallel-exercise.service';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-parallel-exercise-status-bar',
@@ -29,9 +31,8 @@ export class ParallelExerciseStatusBarComponent {
     protected readonly exerciseService = inject(ExerciseService);
     private readonly router = inject(Router);
 
-    public parallelExercise = signal<GetParallelExerciseResponseData | null>(
-        null
-    );
+    public readonly parallelExercise =
+        signal<GetParallelExerciseResponseData | null>(null);
 
     public participantKey$ = this.store.select(selectParticipantKey);
     protected clientNames$ = this.store.select(selectClientNames);
@@ -46,7 +47,11 @@ export class ParallelExerciseStatusBarComponent {
                 this.exerciseService.additionalExerciseMeta()
                     ?.parallelExerciseId;
             console.log('effect', parallelExerciseId);
-            if (parallelExerciseId) {
+            if (
+                parallelExerciseId &&
+                selectStateSnapshot(selectCurrentMainRole, this.store) ===
+                    'trainer'
+            ) {
                 this.parallelExercise.set(
                     await this.apiService.getParallelExercise(
                         parallelExerciseId

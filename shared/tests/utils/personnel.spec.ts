@@ -1,11 +1,12 @@
-import type { Personnel } from '../../src/models/index.js';
+import type { WritableDraft } from 'immer';
+import type { Personnel } from '../../src/index.js';
 import {
     currentCoordinatesOf,
     isOnMap,
     SpatialTree,
-} from '../../src/models/utils/index.js';
+    cloneDeepMutable,
+} from '../../src/index.js';
 import type { ExerciseState } from '../../src/state.js';
-import { cloneDeepMutable } from '../../src/utils/index.js';
 
 export function addPersonnel(
     state: WritableDraft<ExerciseState>,

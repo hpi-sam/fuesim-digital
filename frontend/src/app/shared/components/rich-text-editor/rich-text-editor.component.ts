@@ -1,5 +1,6 @@
 import {
     Component,
+    inject,
     input,
     OnDestroy,
     OnInit,
@@ -14,11 +15,11 @@ import {
     newUserGeneratedContent,
     UserGeneratedContent,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Editor, Toolbar } from 'ngx-editor';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { AppState } from 'src/app/state/app.state';
-import { createSelectUserGeneratedContent } from 'src/app/state/application/selectors/exercise.selectors';
+import { ExerciseService } from '../../../core/exercise.service';
+import { AppState } from '../../../state/app.state';
+import { createSelectUserGeneratedContent } from '../../../state/application/selectors/exercise.selectors';
 @Component({
     selector: 'app-rich-text-editor',
     templateUrl: './rich-text-editor.component.html',
@@ -26,24 +27,23 @@ import { createSelectUserGeneratedContent } from 'src/app/state/application/sele
     standalone: false,
 })
 export class RichTextEditorComponent implements OnInit, OnDestroy {
-    userGeneratedContentId = input.required<UUID>();
-    contentAssignedElement = input.required<ContentAssignableElement>();
+    readonly userGeneratedContentId = input.required<UUID>();
+    readonly contentAssignedElement =
+        input.required<ContentAssignableElement>();
     userGeneratedContentElement: Signal<UserGeneratedContent | null> =
         signal(null);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
     editor!: Editor;
     toolbar: Toolbar = [['image']];
 
     /* TODO @JohannesPotzi: Validators for image urls */
-    editorModel = signal({
+    readonly editorModel = signal({
         editorContent: '',
     });
     editorForm = form(this.editorModel);
     readonly submitedContent = output<string | null | undefined>();
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
     ngOnInit(): void {
         this.editor = new Editor();
 

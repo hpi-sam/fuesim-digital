@@ -1,6 +1,7 @@
 import {
     Component,
     effect,
+    inject,
     input,
     OnInit,
     signal,
@@ -12,11 +13,11 @@ import {
     newUserGeneratedContent,
     Scoutable,
     ScoutableElement,
-} from 'digital-fuesim-manv-shared';
-import { AppState } from 'src/app/state/app.state';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { createSelectScoutable } from 'src/app/state/application/selectors/exercise.selectors';
+} from 'fuesim-digital-shared';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
+import { AppState } from '../../../state/app.state';
+import { ExerciseService } from '../../../core/exercise.service';
+import { createSelectScoutable } from '../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-scoutable-object-nav-item',
@@ -25,15 +26,14 @@ import { createSelectScoutable } from 'src/app/state/application/selectors/exerc
     standalone: false,
 })
 export class ScoutableObjectNavItemComponent implements OnInit {
-    element = input.required<ScoutableElement>();
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly element = input.required<ScoutableElement>();
     scoutable: Signal<Scoutable | null> = signal(null);
 
     readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {
+    constructor() {
         effect(() => {
             if (this.element().scoutableId) {
                 this.scoutable = this.store.selectSignal(

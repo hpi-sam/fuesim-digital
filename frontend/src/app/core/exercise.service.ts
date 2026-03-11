@@ -13,7 +13,7 @@ import {
     joinExerciseResponseDataSchema,
     socketIoTransports,
 } from 'fuesim-digital-shared';
-import { freeze, WritableDraft } from 'immer';
+import { freeze } from 'immer';
 import {
     debounceTime,
     filter,

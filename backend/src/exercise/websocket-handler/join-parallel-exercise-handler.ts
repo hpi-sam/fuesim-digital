@@ -6,6 +6,7 @@ import {
     ParallelExerciseClientWrapper,
 } from '../client-wrapper.js';
 import type { Services } from '../../database/services/index.js';
+import { Config } from '../../config.js';
 import { secureOn } from './secure-on.js';
 
 export const registerJoinParallelExerciseHandler = (
@@ -14,6 +15,14 @@ export const registerJoinParallelExerciseHandler = (
     services: Services
 ) => {
     secureOn(socket, 'joinParallelExercise', async (id: UUID, callback) => {
+        if (!Config.parallelExercisesEnabled) {
+            callback({
+                success: false,
+                message: 'This feature is not enabled.',
+                expected: false,
+            });
+            return;
+        }
         const clientWrapper = ClientWrapper.init(
             ParallelExerciseClientWrapper,
             socket,

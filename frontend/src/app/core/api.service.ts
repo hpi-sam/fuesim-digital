@@ -23,6 +23,7 @@ import {
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
+import { z } from 'zod';
 import type { AppState } from '../state/app.state';
 import { selectExerciseKey } from '../state/application/selectors/application.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
@@ -89,6 +90,23 @@ export class ApiService {
         return httpResource(() => `${httpOrigin}/api/exercise_templates/`, {
             parse: getExerciseTemplatesResponseDataSchema.parse,
         });
+    }
+
+    public getParallelExercisesEnabledResource() {
+        return httpResource(
+            () => `${httpOrigin}/api/parallel_exercises/enabled`,
+            {
+                parse: z.boolean().parse,
+            }
+        );
+    }
+
+    public async getParallelExercisesEnabled() {
+        return lastValueFrom(
+            this.httpClient
+                .get(`${httpOrigin}/api/parallel_exercises/enabled`)
+                .pipe(map((v) => z.boolean().parse(v)))
+        );
     }
 
     public getParallelExerciseResource(id: ParallelExerciseId) {

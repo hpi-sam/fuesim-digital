@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import type { AppState } from '../../../../../state/app.state';
 import {
     selectExerciseStatus,
@@ -10,7 +11,7 @@ import {
     selector: 'app-exercise-state-badge',
     templateUrl: './exercise-state-badge.component.html',
     styleUrls: ['./exercise-state-badge.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe, DatePipe],
 })
 export class ExerciseStateBadgeComponent {
     private readonly store = inject<Store<AppState>>(Store);

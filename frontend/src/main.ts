@@ -1,10 +1,27 @@
 /// <reference types="@angular/localize" />
 
-import { enableProdMode, LOCALE_ID } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { enableProdMode, importProvidersFrom } from '@angular/core';
 
-import { AppModule } from './app/app.module';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { StoreModule } from '@ngrx/store';
+import { AppRoutingModule } from './app/app-routing.module';
+import {
+    withCredentialsInterceptor,
+    errorHandlingInterceptor,
+} from './app/shared/functions/http';
 import { environment } from './environments/environment';
+import type { AppState } from './app/state/app.state';
+import { appReducers } from './app/state/app.reducer';
+import { LandingPageModule } from './app/pages/landing-page/landing-page.module';
+import { Error404Module } from './app/pages/error-404/error-404.module';
+import { SharedModule } from './app/shared/shared.module';
+import { ConfirmationModalModule } from './app/core/confirmation-modal/confirmation-modal.module';
+import { MessagesModule } from './app/feature/messages/messages.module';
+import { AboutModule } from './app/pages/about/about.module';
+import { AppComponent } from './app/app.component';
 
 if (environment.production) {
     enableProdMode();
@@ -19,8 +36,26 @@ if (environment.production) {
     };
 }
 
-platformBrowserDynamic()
-    .bootstrapModule(AppModule, {
-        providers: [{ provide: LOCALE_ID, useValue: 'de-DE' }],
-    })
-    .catch((err) => console.error(err));
+bootstrapApplication(AppComponent, {
+    providers: [
+        importProvidersFrom(
+            CommonModule,
+            BrowserModule,
+            BrowserAnimationsModule,
+            AppRoutingModule,
+            StoreModule.forRoot<AppState>(appReducers),
+            LandingPageModule,
+            Error404Module,
+            SharedModule,
+            ConfirmationModalModule,
+            MessagesModule,
+            AboutModule
+        ),
+        provideHttpClient(
+            withInterceptors([
+                withCredentialsInterceptor,
+                errorHandlingInterceptor,
+            ])
+        ),
+    ],
+}).catch((err) => console.error(err));

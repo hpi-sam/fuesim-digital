@@ -5,7 +5,11 @@ import { SharedModule } from '../../../../../shared/shared.module';
 import { CoordinatePickerModalComponent } from './coordinate-picker-modal/coordinate-picker-modal.component';
 
 @NgModule({
-    declarations: [CoordinatePickerModalComponent],
-    imports: [CommonModule, FormsModule, SharedModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        SharedModule,
+        CoordinatePickerModalComponent,
+    ],
 })
 export class CoordinatePickerModule {}

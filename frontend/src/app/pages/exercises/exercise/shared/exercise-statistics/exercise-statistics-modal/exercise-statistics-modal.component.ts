@@ -1,10 +1,24 @@
 import type { OnInit } from '@angular/core';
 import { Component, ViewEncapsulation, inject } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbActiveModal,
+    NgbNav,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavContent,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { PatientStatus, UUID, LogEntry } from 'fuesim-digital-shared';
 import { statusNames } from 'fuesim-digital-shared';
 import { combineLatest, Observable, map } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { StatisticsService } from '../../core/statistics/statistics.service';
 import { AreaStatisticsService } from '../area-statistics.service';
 import type { StackedBarChartStatistics } from '../stacked-bar-chart/stacked-bar-chart.component';
@@ -17,13 +31,36 @@ import {
     selectVehicleTemplates,
     selectPersonnelTemplates,
 } from '../../../../../../state/application/selectors/exercise.selectors';
+import { ViewportNameComponent } from '../../../../../../shared/components/viewport-name/viewport-name.component';
+import { SimulatedRegionNameComponent } from '../../../../../../shared/components/simulated-region-name/simulated-region-name.component';
+import { StackedBarChartComponent } from '../stacked-bar-chart/stacked-bar-chart.component';
+import { HospitalPatientsTableComponent } from '../hospital-patients-table/hospital-patients-table.component';
+import { LogTableComponent } from '../log-table/log-table.component';
 
 @Component({
     selector: 'app-exercise-statistics-modal',
     templateUrl: './exercise-statistics-modal.component.html',
     styleUrls: ['./exercise-statistics-modal.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: false,
+    imports: [
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbNavContent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        ViewportNameComponent,
+        SimulatedRegionNameComponent,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        StackedBarChartComponent,
+        HospitalPatientsTableComponent,
+        NgbNavOutlet,
+        LogTableComponent,
+        AsyncPipe,
+    ],
 })
 export class ExerciseStatisticsModalComponent implements OnInit {
     activeModal = inject(NgbActiveModal);

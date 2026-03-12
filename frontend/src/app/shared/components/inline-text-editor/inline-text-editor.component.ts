@@ -1,10 +1,12 @@
 import { Component, input, model, output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
 
 @Component({
     selector: 'app-inline-text-editor',
     templateUrl: './inline-text-editor.component.html',
     styleUrls: ['./inline-text-editor.component.scss'],
-    standalone: false,
+    imports: [FormsModule, DisplayValidationComponent],
 })
 export class InlineTextEditorComponent {
     readonly required = input<boolean>(false);

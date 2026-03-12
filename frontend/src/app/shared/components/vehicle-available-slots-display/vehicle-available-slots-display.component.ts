@@ -3,6 +3,7 @@ import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import { createSelectVehicle } from '../../../state/application/selectors/exercise.selectors';
 
@@ -10,7 +11,7 @@ import { createSelectVehicle } from '../../../state/application/selectors/exerci
     selector: 'app-vehicle-available-slots-display',
     templateUrl: './vehicle-available-slots-display.component.html',
     styleUrls: ['./vehicle-available-slots-display.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe, KeyValuePipe],
 })
 export class VehicleAvailableSlotsDisplayComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

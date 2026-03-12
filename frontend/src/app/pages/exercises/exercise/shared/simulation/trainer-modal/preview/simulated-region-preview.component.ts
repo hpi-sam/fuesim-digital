@@ -11,6 +11,7 @@ import type {
     VehicleTemplate,
 } from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
+import { AsyncPipe } from '@angular/common';
 import { comparePatientsByVisibleStatus } from '../tabs/compare-patients';
 import { PatientWithVisibleStatus } from '../patients-table/simulated-region-overview-patients-table.component';
 import type { AppState } from '../../../../../../../state/app.state';
@@ -24,12 +25,28 @@ import {
     selectVehicleTemplates,
     selectMaterials,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { SimulatedRegionPreviewCardComponent } from '../preview-card/simulated-region-preview-card.component';
+import { PatientHeaderComponent } from '../../../../../../../shared/components/patient-header/patient-header.component';
+import { PatientsDetailsComponent } from '../../../../../../../shared/components/patients-details/patients-details.component';
+import { SimulatedRegionOverviewPatientInteractionBarComponent } from '../tabs/patients-tab/interaction-bar/simulated-region-overview-patient-interaction-bar.component';
+import { PersonnelDetailsComponent } from '../../../../../../../shared/components/personnel-details/personnel-details.component';
+import { MaterialDetailsComponent } from '../../../../../../../shared/components/material-details/material-details.component';
+import { SimulatedRegionOverviewVehicleDetailsComponent } from '../tabs/vehicles-tab/details/simulated-region-overview-vehicle-details.component';
 
 @Component({
     selector: 'app-simulated-region-preview',
     templateUrl: './simulated-region-preview.component.html',
     styleUrls: ['./simulated-region-preview.component.scss'],
-    standalone: false,
+    imports: [
+        SimulatedRegionPreviewCardComponent,
+        PatientHeaderComponent,
+        PatientsDetailsComponent,
+        SimulatedRegionOverviewPatientInteractionBarComponent,
+        PersonnelDetailsComponent,
+        MaterialDetailsComponent,
+        SimulatedRegionOverviewVehicleDetailsComponent,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionPreviewComponent implements OnInit, OnDestroy {
     private readonly store = inject<Store<AppState>>(Store);

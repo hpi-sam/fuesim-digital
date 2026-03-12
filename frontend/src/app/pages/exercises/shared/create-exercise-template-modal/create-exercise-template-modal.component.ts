@@ -2,14 +2,16 @@ import type { OnDestroy } from '@angular/core';
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
-import { NgForm } from '@angular/forms';
+import { NgForm, FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/api.service';
+import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
+import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 
 @Component({
     selector: 'app-create-exercise-template-modal',
     templateUrl: './create-exercise-template-modal.component.html',
     styleUrls: ['./create-exercise-template-modal.component.scss'],
-    standalone: false,
+    imports: [FormsModule, AutofocusDirective, DisplayValidationComponent],
 })
 export class CreateExerciseTemplateModalComponent implements OnDestroy {
     private readonly apiService = inject(ApiService);

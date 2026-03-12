@@ -1,6 +1,6 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { Component, inject, input, viewChild } from '@angular/core';
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { NgbPopover, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
@@ -14,6 +14,7 @@ import {
     switchMap,
     type Observable,
 } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
@@ -21,18 +22,30 @@ import {
     HotkeysService,
 } from '../../../../../../../../shared/services/hotkeys.service';
 import { ExerciseService } from '../../../../../../../../core/exercise.service';
-import { SearchableDropdownOption } from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import {
+    SearchableDropdownOption,
+    SearchableDropdownComponent,
+} from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { AppState } from '../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
     selectSimulatedRegions,
 } from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-transport-trays-editor',
     templateUrl: './signaller-modal-transport-trays-editor.component.html',
     styleUrls: ['./signaller-modal-transport-trays-editor.component.scss'],
-    standalone: false,
+    imports: [
+        NgbTooltip,
+        NgbPopover,
+        AutofocusDirective,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalTransportTraysEditorComponent
     implements OnInit, OnChanges, OnDestroy

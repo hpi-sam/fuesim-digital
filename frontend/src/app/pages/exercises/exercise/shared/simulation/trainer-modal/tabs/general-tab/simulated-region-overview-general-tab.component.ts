@@ -10,6 +10,9 @@ import type {
 } from 'fuesim-digital-shared';
 import { SimulatedRegion } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../state/app.state';
 import {
@@ -23,6 +26,11 @@ import {
     selectPersonnel,
     selectMaterials,
 } from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { DisplayValidationComponent } from '../../../../../../../../shared/validation/display-validation/display-validation.component';
+import { PatientStatusBadgeComponent } from '../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { ValuesPipe } from '../../../../../../../../shared/pipes/values.pipe';
+import { WithDollarPipe } from './utils/with-dollar';
 
 const patientCategories = ['red', 'yellow', 'green', 'black'] as const;
 export type PatientCategory = (typeof patientCategories)[number];
@@ -31,7 +39,16 @@ export type PatientCategory = (typeof patientCategories)[number];
     selector: 'app-simulated-region-overview-general-tab',
     templateUrl: './simulated-region-overview-general-tab.component.html',
     styleUrls: ['./simulated-region-overview-general-tab.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        DisplayValidationComponent,
+        NgbCollapse,
+        PatientStatusBadgeComponent,
+        ValuesPipe,
+        AsyncPipe,
+        WithDollarPipe,
+    ],
 })
 export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);

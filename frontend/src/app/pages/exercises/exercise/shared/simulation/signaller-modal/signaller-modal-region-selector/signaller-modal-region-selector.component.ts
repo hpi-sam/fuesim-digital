@@ -4,6 +4,7 @@ import type { Observable } from 'rxjs';
 import { map, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import {
     eocId,
     overviewId,
@@ -14,15 +15,24 @@ import {
     Hotkey,
     HotkeysService,
 } from '../../../../../../../shared/services/hotkeys.service';
-import { SearchableDropdownOption } from '../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import {
+    SearchableDropdownOption,
+    SearchableDropdownComponent,
+} from '../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { AppState } from '../../../../../../../state/app.state';
 import { selectSimulatedRegions } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { HotkeyIndicatorComponent } from '../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-region-selector',
     templateUrl: './signaller-modal-region-selector.component.html',
     styleUrls: ['./signaller-modal-region-selector.component.scss'],
-    standalone: false,
+    imports: [
+        NgbPopover,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalRegionSelectorComponent
     implements OnInit, OnDestroy

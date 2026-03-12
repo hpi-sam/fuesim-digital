@@ -3,17 +3,19 @@ import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferConnectionsRadiogram, UUID } from 'fuesim-digital-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../state/app.state';
 import {
     createSelectRadiogram,
     selectSimulatedRegions,
 } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { FormatDurationPipe } from '../../../../../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-radiogram-card-content-transfer-connections',
     templateUrl: './radiogram-card-content-transfer-connections.component.html',
     styleUrls: ['./radiogram-card-content-transfer-connections.component.scss'],
-    standalone: false,
+    imports: [FormatDurationPipe, AsyncPipe],
 })
 export class RadiogramCardContentTransferConnectionsComponent
     implements OnInit

@@ -13,10 +13,7 @@ const occupationShortNamesDictionary: {
     patientTransferOccupation: 'Reserviert für Patiententransport',
 };
 
-@Pipe({
-    name: 'occupationShortName',
-    standalone: false,
-})
+@Pipe({ name: 'occupationShortName' })
 export class OccupationShortNamePipe implements PipeTransform {
     transform(occupationType: ExerciseOccupationType | undefined): string {
         if (!occupationType) return '';

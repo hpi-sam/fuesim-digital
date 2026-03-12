@@ -5,7 +5,6 @@ import { Tag } from 'fuesim-digital-shared';
     selector: 'app-tag',
     templateUrl: './tag.component.html',
     styleUrls: ['./tag.component.scss'],
-    standalone: false,
 })
 export class TagComponent {
     readonly tag = input.required<Tag>();

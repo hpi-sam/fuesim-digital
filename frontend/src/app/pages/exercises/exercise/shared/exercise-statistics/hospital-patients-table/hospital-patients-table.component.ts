@@ -4,17 +4,20 @@ import { Store } from '@ngrx/store';
 import { statusNames } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, startWith, Subject } from 'rxjs';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../state/app.state';
 import {
     selectHospitalPatients,
     selectHospitals,
 } from '../../../../../../state/application/selectors/exercise.selectors';
+import { FormatDurationPipe } from '../../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-hospital-patients-table',
     templateUrl: './hospital-patients-table.component.html',
     styleUrls: ['./hospital-patients-table.component.scss'],
-    standalone: false,
+    imports: [MatSort, MatSortHeader, AsyncPipe, FormatDurationPipe],
 })
 export class HospitalPatientsTableComponent {
     readonly store = inject<Store<AppState>>(Store);

@@ -17,7 +17,6 @@ import { StackedBarChart } from './time-line-area-chart';
     selector: 'app-stacked-bar-chart',
     templateUrl: './stacked-bar-chart.component.html',
     styleUrls: ['./stacked-bar-chart.component.scss'],
-    standalone: false,
 })
 export class StackedBarChartComponent
     implements AfterViewInit, OnChanges, OnDestroy

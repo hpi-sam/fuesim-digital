@@ -7,6 +7,7 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import { HotkeysService } from '../../../../../../../../shared/services/hotkeys.service';
@@ -15,6 +16,9 @@ import { MessageService } from '../../../../../../../../core/messages/message.se
 import type { AppState } from '../../../../../../../../state/app.state';
 import { createSelectBehaviorStatesByType } from '../../../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../../../state/get-state-snapshot';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { PatientStatusDropdownComponent } from '../../../../../../../../shared/components/patient-status-dropdown/patient-status-dropdown.component';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-start-transfer-of-category-modal',
@@ -23,7 +27,12 @@ import { selectStateSnapshot } from '../../../../../../../../state/get-state-sna
     styleUrls: [
         './signaller-modal-start-transfer-of-category-modal.component.scss',
     ],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AutofocusDirective,
+        PatientStatusDropdownComponent,
+        HotkeyIndicatorComponent,
+    ],
 })
 export class SignallerModalStartTransferOfCategoryModalComponent
     implements OnInit, OnDestroy

@@ -10,6 +10,7 @@ import {
     Subject,
     distinctUntilChanged,
 } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../state/app.state';
 import {
     createSelectBehaviorStatesByType,
@@ -20,7 +21,7 @@ import {
     selector: 'app-signaller-modal-region-leader',
     templateUrl: './signaller-modal-region-leader.component.html',
     styleUrls: ['./signaller-modal-region-leader.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class SignallerModalRegionLeaderComponent
     implements OnChanges, OnDestroy

@@ -11,18 +11,16 @@ import { ExerciseTemplateListComponent } from './template-list/exercise-template
 import { CreateExerciseTemplateModalComponent } from './shared/create-exercise-template-modal/create-exercise-template-modal.component';
 
 @NgModule({
-    declarations: [
-        JoinExerciseModalComponent,
-        ExerciseListComponent,
-        ExerciseTemplateListComponent,
-        CreateExerciseTemplateModalComponent,
-    ],
     imports: [
         CommonModule,
         ExercisesRoutingModule,
         ExerciseModule,
         FormsModule,
         SharedModule,
+        JoinExerciseModalComponent,
+        ExerciseListComponent,
+        ExerciseTemplateListComponent,
+        CreateExerciseTemplateModalComponent,
     ],
 })
 export class ExercisesModule {}

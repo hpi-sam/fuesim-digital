@@ -8,6 +8,7 @@ import {
     statusNames,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { NgStyle, AsyncPipe, PercentPipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import {
     createSelectPatient,
@@ -19,7 +20,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-patient-health-point-display',
     templateUrl: './patient-health-point-display.component.html',
     styleUrls: ['./patient-health-point-display.component.scss'],
-    standalone: false,
+    imports: [NgStyle, AsyncPipe, PercentPipe],
 })
 export class PatientHealthPointDisplayComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

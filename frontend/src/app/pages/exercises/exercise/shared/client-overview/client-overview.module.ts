@@ -7,7 +7,13 @@ import { ClientOverviewModalComponent } from './client-overview-modal/client-ove
 import { ClientOverviewTableComponent } from './client-overview-table/client-overview-table.component';
 
 @NgModule({
-    declarations: [ClientOverviewModalComponent, ClientOverviewTableComponent],
-    imports: [CommonModule, NgbModule, FormsModule, SharedModule],
+    imports: [
+        CommonModule,
+        NgbModule,
+        FormsModule,
+        SharedModule,
+        ClientOverviewModalComponent,
+        ClientOverviewTableComponent,
+    ],
 })
 export class ClientOverviewModule {}

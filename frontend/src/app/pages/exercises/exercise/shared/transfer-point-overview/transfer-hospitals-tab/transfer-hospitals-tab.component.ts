@@ -4,18 +4,39 @@ import { Store } from '@ngrx/store';
 import type { Hospital, TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
     createSelectTransferPoint,
     selectHospitals,
 } from '../../../../../../state/application/selectors/exercise.selectors';
+import { HospitalNameComponent } from '../../../../../../shared/components/hospital-name/hospital-name.component';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
+import { OrderByPipe } from '../../../../../../shared/pipes/order-by.pipe';
 
 @Component({
     selector: 'app-transfer-hospitals-tab',
     templateUrl: './transfer-hospitals-tab.component.html',
     styleUrls: ['./transfer-hospitals-tab.component.scss'],
-    standalone: false,
+    imports: [
+        HospitalNameComponent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+        ValuesPipe,
+        OrderByPipe,
+    ],
 })
 export class TransferHospitalsTabComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);

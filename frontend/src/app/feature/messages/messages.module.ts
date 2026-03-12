@@ -7,8 +7,9 @@ import { MessageBodyComponent } from './message-body/message-body.component';
 import { AppShowMoreComponent } from './show-more/app-show-more.component';
 
 @NgModule({
-    imports: [CommonModule, SharedModule],
-    declarations: [
+    imports: [
+        CommonModule,
+        SharedModule,
         AppShowMoreComponent,
         DisplayMessagesComponent,
         MessageBodyComponent,

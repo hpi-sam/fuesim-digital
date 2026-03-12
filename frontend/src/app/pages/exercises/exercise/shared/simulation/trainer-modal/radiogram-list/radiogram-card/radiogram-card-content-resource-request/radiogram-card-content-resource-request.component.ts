@@ -4,6 +4,7 @@ import { createSelector, Store } from '@ngrx/store';
 import type { ResourceRequestRadiogram, UUID } from 'fuesim-digital-shared';
 import { isAccepted, isDone } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import {
     Hotkey,
     HotkeyLayer,
@@ -12,12 +13,14 @@ import {
 import { ExerciseService } from '../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../state/app.state';
 import { createSelectRadiogram } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { HotkeyIndicatorComponent } from '../../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
+import { KeysPipe } from '../../../../../../../../../shared/pipes/keys.pipe';
 
 @Component({
     selector: 'app-radiogram-card-content-resource-request',
     templateUrl: './radiogram-card-content-resource-request.component.html',
     styleUrls: ['./radiogram-card-content-resource-request.component.scss'],
-    standalone: false,
+    imports: [HotkeyIndicatorComponent, KeysPipe, AsyncPipe],
 })
 export class RadigoramCardContentResourceRequestComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

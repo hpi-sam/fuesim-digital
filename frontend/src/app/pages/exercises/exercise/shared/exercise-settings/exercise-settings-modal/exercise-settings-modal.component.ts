@@ -1,7 +1,9 @@
 import { Component, inject } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { cloneDeepMutable } from 'fuesim-digital-shared';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
@@ -9,12 +11,24 @@ import {
     selectConfiguration,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { UrlValidatorDirective } from '../../../../../../shared/validation/url-validator.directive';
+import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
+import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
+import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 
 @Component({
     selector: 'app-exercise-settings-modal',
     templateUrl: './exercise-settings-modal.component.html',
     styleUrls: ['./exercise-settings-modal.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        UrlValidatorDirective,
+        AutofocusDirective,
+        DisplayValidationComponent,
+        NgbTooltip,
+        AppSaveOnTypingDirective,
+        AsyncPipe,
+    ],
 })
 export class ExerciseSettingsModalComponent {
     private readonly store = inject<Store<AppState>>(Store);

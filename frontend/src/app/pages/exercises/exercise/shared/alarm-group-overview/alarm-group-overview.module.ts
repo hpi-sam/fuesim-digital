@@ -8,11 +8,14 @@ import { VehicleTemplateDisplayComponent } from './vehicle-template-display/vehi
 import { AlarmGroupItemComponent } from './alarm-group-item/alarm-group-item.component';
 
 @NgModule({
-    declarations: [
+    imports: [
+        CommonModule,
+        SharedModule,
+        FormsModule,
+        NgbDropdownModule,
         AlarmGroupOverviewModalComponent,
         VehicleTemplateDisplayComponent,
         AlarmGroupItemComponent,
     ],
-    imports: [CommonModule, SharedModule, FormsModule, NgbDropdownModule],
 })
 export class AlarmGroupOverviewModule {}

@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import type { VehicleCountRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
+import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../state/app.state';
 import { createSelectRadiogram } from '../../../../../../../../../state/application/selectors/exercise.selectors';
 
@@ -11,7 +12,7 @@ import { createSelectRadiogram } from '../../../../../../../../../state/applicat
     selector: 'app-radiogram-card-content-vehicle-count',
     templateUrl: './radiogram-card-content-vehicle-count.component.html',
     styleUrls: ['./radiogram-card-content-vehicle-count.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe, KeyValuePipe],
 })
 export class RadiogramCardContentVehicleCountComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

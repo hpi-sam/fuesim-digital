@@ -3,18 +3,21 @@ import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Hospital, TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import {
     createSelectReachableTransferPoints,
     createSelectReachableHospitals,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { TransferPointNameComponent } from '../../../../../../../shared/components/transfer-point-name/transfer-point-name.component';
+import { HospitalNameComponent } from '../../../../../../../shared/components/hospital-name/hospital-name.component';
 
 @Component({
     selector: 'app-choose-transfer-target-popup',
     templateUrl: './choose-transfer-target-popup.component.html',
     styleUrls: ['./choose-transfer-target-popup.component.scss'],
-    standalone: false,
+    imports: [TransferPointNameComponent, HospitalNameComponent, AsyncPipe],
 })
 export class ChooseTransferTargetPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

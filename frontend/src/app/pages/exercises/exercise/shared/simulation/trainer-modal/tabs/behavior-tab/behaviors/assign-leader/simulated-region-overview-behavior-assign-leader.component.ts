@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import type { Personnel } from 'fuesim-digital-shared';
 import { AssignLeaderBehaviorState } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../../state/app.state';
 import { createSelectPersonnel } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
 
@@ -14,7 +15,7 @@ import { createSelectPersonnel } from '../../../../../../../../../../state/appli
     styleUrls: [
         './simulated-region-overview-behavior-assign-leader.component.scss',
     ],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class SimulatedRegionOverviewBehaviorAssignLeaderComponent
     implements OnChanges

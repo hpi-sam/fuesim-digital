@@ -11,7 +11,8 @@ import {
 import type { Observable } from 'rxjs';
 import { Subject, map, takeUntil } from 'rxjs';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { NgModel } from '@angular/forms';
+import { NgModel, FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import type { HotkeyLayer } from '../../services/hotkeys.service';
 import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
 import { ExerciseService } from '../../../core/exercise.service';
@@ -28,6 +29,11 @@ import {
 import { selectOwnClient } from '../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../state/get-state-snapshot';
 import type { SearchableDropdownOption } from '../searchable-dropdown/searchable-dropdown.component';
+import { AutofocusDirective } from '../../directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../hotkey-indicator/hotkey-indicator.component';
+import { SearchableDropdownComponent } from '../searchable-dropdown/searchable-dropdown.component';
+import { IntegerValidatorDirective } from '../../validation/integer-validator.directive';
+import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
 
 // We want to remember this
 let selectedAlarmGroup: SearchableDropdownOption | null = null;
@@ -39,7 +45,16 @@ let firstVehiclesCount = 0;
     selector: 'app-send-alarm-group-interface',
     templateUrl: './send-alarm-group-interface.component.html',
     styleUrls: ['./send-alarm-group-interface.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        NgbPopover,
+        AutofocusDirective,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        IntegerValidatorDirective,
+        DisplayValidationComponent,
+        AsyncPipe,
+    ],
 })
 export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
     private readonly exerciseService = inject(ExerciseService);

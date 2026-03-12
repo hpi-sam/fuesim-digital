@@ -3,17 +3,26 @@ import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, Viewport } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectViewport } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../shared/directives/app-save-on-typing.directive';
+import { DisplayValidationComponent } from '../../../../../../../shared/validation/display-validation/display-validation.component';
 
 @Component({
     selector: 'app-viewport-popup',
     templateUrl: './viewport-popup.component.html',
     styleUrls: ['./viewport-popup.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        DisplayValidationComponent,
+        AsyncPipe,
+    ],
 })
 export class ViewportPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

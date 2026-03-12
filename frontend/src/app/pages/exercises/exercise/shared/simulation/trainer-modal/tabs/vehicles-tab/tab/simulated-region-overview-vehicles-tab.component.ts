@@ -6,6 +6,7 @@ import { SimulatedRegion } from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { StartTransferService } from '../../../start-transfer.service';
 import { ExerciseService } from '../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../state/app.state';
@@ -14,12 +15,13 @@ import {
     selectVehicles,
     selectVehicleTemplates,
 } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { SimulatedRegionOverviewVehicleDetailsComponent } from '../details/simulated-region-overview-vehicle-details.component';
 
 @Component({
     selector: 'app-simulated-region-overview-vehicles-tab',
     templateUrl: './simulated-region-overview-vehicles-tab.component.html',
     styleUrls: ['./simulated-region-overview-vehicles-tab.component.scss'],
-    standalone: false,
+    imports: [SimulatedRegionOverviewVehicleDetailsComponent, AsyncPipe],
 })
 export class SimulatedRegionOverviewVehiclesTabComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

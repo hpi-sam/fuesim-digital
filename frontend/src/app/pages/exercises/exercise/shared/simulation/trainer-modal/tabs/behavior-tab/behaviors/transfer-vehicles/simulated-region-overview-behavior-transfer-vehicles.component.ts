@@ -19,6 +19,16 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { FormsModule } from '@angular/forms';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { comparePatientsByVisibleStatus } from '../../../compare-patients';
 import type { TransferOptions } from '../../../../start-transfer.service';
 import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
@@ -34,6 +44,11 @@ import {
     selectPatients,
     selectConfiguration,
 } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { PatientIdentifierComponent } from '../../../../../../../../../../shared/components/patient-identifier/patient-identifier.component';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { PatientStatusDisplayComponent } from '../../../../../../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
+import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
 
 let globalLastInformationCollapsed = true;
 let globalLastSettingsCollapsed = true;
@@ -46,7 +61,21 @@ let globalLastTransferCollapsed = true;
     styleUrls: [
         './simulated-region-overview-behavior-transfer-vehicles.component.scss',
     ],
-    standalone: false,
+    imports: [
+        NgbCollapse,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        PatientIdentifierComponent,
+        PatientStatusBadgeComponent,
+        PatientStatusDisplayComponent,
+        FormatDurationPipe,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
     implements OnInit, OnDestroy

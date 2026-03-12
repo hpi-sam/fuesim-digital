@@ -9,6 +9,7 @@ import {
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCoordinatePickerModal } from '../coordinate-picker/open-coordinate-picker-modal';
@@ -18,6 +19,7 @@ import {
     selectRestrictedViewport,
     selectCurrentMainRole,
 } from '../../../../../state/application/selectors/shared.selectors';
+import { DisplayMessagesComponent } from '../../../../../feature/messages/display-messages/display-messages.component';
 import { OlMapManager } from './utility/ol-map-manager';
 import { PopupManager } from './utility/popup-manager';
 import { PopupService } from './utility/popup.service';
@@ -26,7 +28,7 @@ import { PopupService } from './utility/popup.service';
     selector: 'app-exercise-map',
     templateUrl: './exercise-map.component.html',
     styleUrls: ['./exercise-map.component.scss'],
-    standalone: false,
+    imports: [DisplayMessagesComponent, AsyncPipe],
 })
 export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     private readonly store = inject<Store<AppState>>(Store);

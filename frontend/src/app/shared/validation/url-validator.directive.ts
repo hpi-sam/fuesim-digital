@@ -12,7 +12,6 @@ import { CustomValidators } from './custom-validators';
             multi: true,
         },
     ],
-    standalone: false,
 })
 export class UrlValidatorDirective implements Validator {
     private readonly validator = CustomValidators.urlValidator();

@@ -5,12 +5,15 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
 import { CreateExerciseTemplateModalComponent } from '../shared/create-exercise-template-modal/create-exercise-template-modal.component';
 import { ApiService } from '../../../core/api.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { ExerciseTemplateCardComponent } from '../../../shared/components/exercise-template-card/exercise-template-card.component';
+import { FooterComponent } from '../../../shared/components/footer/footer.component';
 
 @Component({
     selector: 'app-exercise-template-list',
     templateUrl: './exercise-template-list.component.html',
     styleUrls: ['./exercise-template-list.component.scss'],
-    standalone: false,
+    imports: [HeaderComponent, ExerciseTemplateCardComponent, FooterComponent],
 })
 export class ExerciseTemplateListComponent {
     private readonly apiService = inject(ApiService);

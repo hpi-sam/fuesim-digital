@@ -16,6 +16,8 @@ import {
     takeUntil,
     type Observable,
 } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import {
@@ -28,6 +30,8 @@ import {
     Hotkey,
     HotkeysService,
 } from '../../../../../../../shared/services/hotkeys.service';
+import { AppSaveOnTypingDirective } from '../../../../../../../shared/directives/app-save-on-typing.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 type ReportPropertyName = Exclude<
     keyof ReportBehaviorState,
@@ -76,7 +80,12 @@ interface EventBasedReport {
     selector: 'app-simulation-event-based-report-editor',
     templateUrl: './simulation-event-based-report-editor.component.html',
     styleUrls: ['./simulation-event-based-report-editor.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        HotkeyIndicatorComponent,
+        AsyncPipe,
+    ],
 })
 export class SimulationEventBasedReportEditorComponent
     implements OnChanges, OnDestroy, OnInit

@@ -6,9 +6,18 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../../../state/app.state';
 import { createSelectBehaviorState } from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 
 @Component({
     selector:
@@ -18,7 +27,15 @@ import { createSelectBehaviorState } from '../../../../../../../../../../../../s
     styleUrls: [
         './manage-patient-transport-to-hospital-maximum-category-editor.component.scss',
     ],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        PatientStatusBadgeComponent,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+    ],
 })
 export class ManagePatientTransportToHospitalMaximumCategoryEditorComponent
     implements OnChanges

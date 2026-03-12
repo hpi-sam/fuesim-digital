@@ -1,5 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbModal,
+    NgbAccordionDirective,
+    NgbAccordionItem,
+    NgbAccordionHeader,
+    NgbAccordionToggle,
+    NgbAccordionButton,
+    NgbAccordionCollapse,
+    NgbAccordionBody,
+    NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
     Viewport,
@@ -10,6 +20,9 @@ import {
 } from 'fuesim-digital-shared';
 import type { PatientCategory, UUID } from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
@@ -29,6 +42,13 @@ import {
     selectExerciseState,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
+import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
+import { FileInputDirective } from '../../../../../shared/directives/file-input.directive';
+import { MapEditorCardComponent } from '../editor-panel/map-editor-card/map-editor-card.component';
+import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
+import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
+import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -44,7 +64,27 @@ type FilterCategory =
     selector: 'app-trainer-map-editor',
     templateUrl: './trainer-map-editor.component.html',
     styleUrls: ['./trainer-map-editor.component.scss'],
-    standalone: false,
+    imports: [
+        ExerciseMapComponent,
+        FileInputDirective,
+        NgbAccordionDirective,
+        NgbAccordionItem,
+        NgbAccordionHeader,
+        NgbAccordionToggle,
+        NgbAccordionButton,
+        NgbCollapse,
+        NgbAccordionCollapse,
+        NgbAccordionBody,
+        MapEditorCardComponent,
+        FormsModule,
+        PatientStatusBadgeComponent,
+        NgbTooltip,
+        PatientStatusDisplayComponent,
+        TrainerToolbarComponent,
+        AsyncPipe,
+        KeyValuePipe,
+        ValuesPipe,
+    ],
 })
 /**
  * A wrapper around the map that provides trainers with more options and tools.

@@ -12,12 +12,6 @@ import { EmergencyOperationsCenterFullComponent } from './emergency-operations-c
 import { SendAlarmGroupsCardComponent } from './send-alarm-groups-card/send-alarm-groups-card.component';
 
 @NgModule({
-    declarations: [
-        EmergencyOperationsCenterModalComponent,
-        EmergencyOperationsCenterFullComponent,
-        EocLogInterfaceComponent,
-        SendAlarmGroupsCardComponent,
-    ],
     exports: [EmergencyOperationsCenterFullComponent],
     imports: [
         CommonModule,
@@ -25,6 +19,10 @@ import { SendAlarmGroupsCardComponent } from './send-alarm-groups-card/send-alar
         SharedModule,
         NgbDropdownModule,
         NgbCollapseModule,
+        EmergencyOperationsCenterModalComponent,
+        EmergencyOperationsCenterFullComponent,
+        EocLogInterfaceComponent,
+        SendAlarmGroupsCardComponent,
     ],
 })
 export class EmergencyOperationsCenterModule {}

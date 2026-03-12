@@ -12,6 +12,8 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
@@ -20,6 +22,9 @@ import {
     createSelectActivityStates,
     selectCurrentTime,
 } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
+import { KeysPipe } from '../../../../../../../../../../shared/pipes/keys.pipe';
 
 type RequestTargetOption = UUID | 'trainees';
 
@@ -30,7 +35,13 @@ type RequestTargetOption = UUID | 'trainees';
     styleUrls: [
         './simulated-region-overview-behavior-request-vehicles.component.scss',
     ],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        FormatDurationPipe,
+        KeysPipe,
+        AsyncPipe,
+    ],
 })
 export class RequestVehiclesComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

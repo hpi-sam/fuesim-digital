@@ -5,7 +5,6 @@ import { MessageService } from '../../../core/messages/message.service';
     selector: 'app-copy-button',
     templateUrl: './copy-button.component.html',
     styleUrls: ['./copy-button.component.scss'],
-    standalone: false,
 })
 export class CopyButtonComponent {
     private readonly messageService = inject(MessageService);

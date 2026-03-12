@@ -10,13 +10,15 @@ import { TermsComponent } from './terms/terms.component';
 import { AboutPlaceholderComponent } from './about-placeholder/about-placeholder.component';
 
 @NgModule({
-    declarations: [
+    imports: [
+        CommonModule,
+        AboutRoutingModule,
+        SharedModule,
         ImprintComponent,
         TermsComponent,
         PrivacyComponent,
         LicenseComponent,
         AboutPlaceholderComponent,
     ],
-    imports: [CommonModule, AboutRoutingModule, SharedModule],
 })
 export class AboutModule {}

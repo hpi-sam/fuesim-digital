@@ -3,6 +3,7 @@ import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import { createSelectTransferPoint } from '../../../state/application/selectors/exercise.selectors';
 
@@ -10,7 +11,7 @@ import { createSelectTransferPoint } from '../../../state/application/selectors/
     selector: 'app-transfer-point-name',
     templateUrl: './transfer-point-name.component.html',
     styleUrls: ['./transfer-point-name.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class TransferPointNameComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

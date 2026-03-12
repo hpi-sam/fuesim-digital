@@ -38,23 +38,6 @@ import { CoordinatePickerModule } from './shared/coordinate-picker/coordinate-pi
 import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/map-editor-card.component';
 
 @NgModule({
-    declarations: [
-        ExerciseComponent,
-        MapEditorCardComponent,
-        TrainerMapEditorComponent,
-        TrainerToolbarComponent,
-        ExerciseStateBadgeComponent,
-        ExerciseSettingsModalComponent,
-        TimeTravelComponent,
-        CreateImageTemplateModalComponent,
-        CreateVehicleTemplateModalComponent,
-        EditImageTemplateModalComponent,
-        EditVehicleTemplateModalComponent,
-        ImageTemplateFormComponent,
-        VehicleTemplateFormComponent,
-        PartialExportModalComponent,
-        PartialImportModalComponent,
-    ],
     exports: [ExerciseComponent],
     imports: [
         CommonModule,
@@ -72,6 +55,21 @@ import { MapEditorCardComponent } from './shared/editor-panel/map-editor-card/ma
         NgbTooltipModule,
         NgbAccordionModule,
         RouterLink,
+        ExerciseComponent,
+        MapEditorCardComponent,
+        TrainerMapEditorComponent,
+        TrainerToolbarComponent,
+        ExerciseStateBadgeComponent,
+        ExerciseSettingsModalComponent,
+        TimeTravelComponent,
+        CreateImageTemplateModalComponent,
+        CreateVehicleTemplateModalComponent,
+        EditImageTemplateModalComponent,
+        EditVehicleTemplateModalComponent,
+        ImageTemplateFormComponent,
+        VehicleTemplateFormComponent,
+        PartialExportModalComponent,
+        PartialImportModalComponent,
     ],
     providers: [
         provideHttpClient(

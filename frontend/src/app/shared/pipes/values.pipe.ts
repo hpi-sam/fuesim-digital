@@ -1,10 +1,7 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
 
-@Pipe({
-    name: 'values',
-    standalone: false,
-})
+@Pipe({ name: 'values' })
 export class ValuesPipe implements PipeTransform {
     /**
      * @param object The **immutable** object to get the values from

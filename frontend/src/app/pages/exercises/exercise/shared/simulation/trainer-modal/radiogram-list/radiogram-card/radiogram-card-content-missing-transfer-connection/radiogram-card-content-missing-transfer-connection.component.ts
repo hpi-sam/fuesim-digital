@@ -7,6 +7,7 @@ import type {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../state/app.state';
 import {
     createSelectRadiogram,
@@ -20,7 +21,7 @@ import {
     styleUrls: [
         './radiogram-card-content-missing-transfer-connection.component.scss',
     ],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class RadigoramCardContentMissingTransferConnectionComponent
     implements OnInit

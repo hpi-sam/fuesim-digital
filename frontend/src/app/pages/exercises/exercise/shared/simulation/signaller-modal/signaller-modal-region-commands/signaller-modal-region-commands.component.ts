@@ -13,6 +13,7 @@ import type {
 import { isInSpecificSimulatedRegion } from 'fuesim-digital-shared';
 import { Store, createSelector } from '@ngrx/store';
 import { map, type Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
 import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 import type { AppState } from '../../../../../../../state/app.state';
@@ -20,12 +21,28 @@ import {
     selectTransferPoints,
     createSelectBehaviorStatesByType,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { SignallerModalInteractionsComponent } from '../signaller-modal-interactions/signaller-modal-interactions.component';
+import { SignallerModalTransferConnectionsEditorComponent } from '../details-modal/signaller-modal-transfer-connections-editor/signaller-modal-transfer-connections-editor.component';
+import { SignallerModalTransportTraysEditorComponent } from '../details-modal/signaller-modal-transport-trays-editor/signaller-modal-transport-trays-editor.component';
+import { SignallerModalStartTransferOfCategoryModalComponent } from '../details-modal/signaller-modal-start-transfer-of-category-modal/signaller-modal-start-transfer-of-category-modal.component';
+import { SignallerModalProvideVehiclesEditorComponent } from '../details-modal/signaller-modal-provide-vehicles-editor/signaller-modal-provide-vehicles-editor.component';
+import { SignallerModalRequestDestinationEditorComponent } from '../details-modal/signaller-modal-request-target-editor/signaller-modal-request-target-editor.component';
+import { SignallerModalTransportRequestTargetEditorComponent } from '../details-modal/signaller-modal-transport-request-target-editor/signaller-modal-transport-request-target-editor.component';
 
 @Component({
     selector: 'app-signaller-modal-region-commands',
     templateUrl: './signaller-modal-region-commands.component.html',
     styleUrls: ['./signaller-modal-region-commands.component.scss'],
-    standalone: false,
+    imports: [
+        SignallerModalInteractionsComponent,
+        SignallerModalTransferConnectionsEditorComponent,
+        SignallerModalTransportTraysEditorComponent,
+        SignallerModalStartTransferOfCategoryModalComponent,
+        SignallerModalProvideVehiclesEditorComponent,
+        SignallerModalRequestDestinationEditorComponent,
+        SignallerModalTransportRequestTargetEditorComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalRegionCommandsComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

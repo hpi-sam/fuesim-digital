@@ -9,10 +9,7 @@ import { Directive, HostListener, output } from '@angular/core';
  * <input type="file" (appFileInput)="processFileList($event)" />
  * ````
  */
-@Directive({
-    selector: 'input[appFileInput]',
-    standalone: false,
-})
+@Directive({ selector: 'input[appFileInput]' })
 export class FileInputDirective {
     readonly appFileInput = output<FileList>();
 

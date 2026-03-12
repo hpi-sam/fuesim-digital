@@ -1,21 +1,23 @@
 import type { OnInit } from '@angular/core';
 import { Component, inject } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID, SimulatedRegion } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { openSimulationTrainerModal } from '../../../simulation/trainer-modal/open-simulation-trainer-modal';
 import { openPreviewModal } from '../../../simulation/trainer-modal/open-preview-modal';
 import { PopupService } from '../../utility/popup.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectSimulatedRegion } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
+import { SimulatedRegionOverviewGeneralComponent } from '../../../simulation/trainer-modal/overview/simulated-region-overview.component';
 
 @Component({
     selector: 'app-simulated-region-popup',
     templateUrl: './simulated-region-popup.component.html',
     styleUrls: ['./simulated-region-popup.component.scss'],
-    standalone: false,
+    imports: [NgbTooltip, SimulatedRegionOverviewGeneralComponent, AsyncPipe],
 })
 export class SimulatedRegionPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

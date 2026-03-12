@@ -11,6 +11,9 @@ import {
     TraineesRequestTargetConfiguration,
 } from 'fuesim-digital-shared';
 import { map, tap, type Observable, combineLatest } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
@@ -18,19 +21,31 @@ import {
 } from '../../../../../../../../shared/services/hotkeys.service';
 import { ExerciseService } from '../../../../../../../../core/exercise.service';
 import { MessageService } from '../../../../../../../../core/messages/message.service';
-import { SearchableDropdownOption } from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import {
+    SearchableDropdownOption,
+    SearchableDropdownComponent,
+} from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { AppState } from '../../../../../../../../state/app.state';
 import {
     selectSimulatedRegions,
     createSelectBehaviorState,
 } from '../../../../../../../../state/application/selectors/exercise.selectors';
 import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-request-target-editor',
     templateUrl: './signaller-modal-request-target-editor.component.html',
     styleUrls: ['./signaller-modal-request-target-editor.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        NgbPopover,
+        AutofocusDirective,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalRequestDestinationEditorComponent
     implements OnInit, OnChanges, OnDestroy

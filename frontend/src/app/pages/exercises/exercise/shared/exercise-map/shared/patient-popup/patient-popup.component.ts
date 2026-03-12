@@ -2,15 +2,23 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Component, OnInit, inject } from '@angular/core';
 import type { Patient, UUID } from 'fuesim-digital-shared';
+import { NgClass, AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectPatient } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientHeaderComponent } from '../../../../../../../shared/components/patient-header/patient-header.component';
+import { PatientsDetailsComponent } from '../../../../../../../shared/components/patients-details/patients-details.component';
 
 @Component({
     selector: 'app-patient-popup',
     templateUrl: './patient-popup.component.html',
     styleUrls: ['./patient-popup.component.scss'],
-    standalone: false,
+    imports: [
+        NgClass,
+        PatientHeaderComponent,
+        PatientsDetailsComponent,
+        AsyncPipe,
+    ],
 })
 export class PatientPopupComponent implements OnInit {
     private readonly popupService = inject(PopupService);

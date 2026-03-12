@@ -3,16 +3,18 @@ import type {
     GetExerciseTemplateResponseData,
     PatchExerciseTemplateRequestData,
 } from 'fuesim-digital-shared';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
+import { InlineTextEditorComponent } from '../inline-text-editor/inline-text-editor.component';
 
 @Component({
     selector: 'app-exercise-template-card',
     templateUrl: './exercise-template-card.component.html',
     styleUrls: ['./exercise-template-card.component.scss'],
-    standalone: false,
+    imports: [InlineTextEditorComponent, RouterLink, DatePipe],
 })
 export class ExerciseTemplateCardComponent {
     private readonly apiService = inject(ApiService);

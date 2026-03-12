@@ -15,14 +15,6 @@ import { TagComponent } from './tag/tag.component';
 import { LogTableComponent } from './log-table/log-table.component';
 
 @NgModule({
-    declarations: [
-        ExerciseStatisticsModalComponent,
-        StackedBarChartComponent,
-        HospitalPatientsTableComponent,
-        LogEntryComponent,
-        TagComponent,
-        LogTableComponent,
-    ],
     imports: [
         CommonModule,
         NgbDropdownModule,
@@ -30,6 +22,12 @@ import { LogTableComponent } from './log-table/log-table.component';
         MatSortModule,
         NgbNavModule,
         NgbPopoverModule,
+        ExerciseStatisticsModalComponent,
+        StackedBarChartComponent,
+        HospitalPatientsTableComponent,
+        LogEntryComponent,
+        TagComponent,
+        LogTableComponent,
     ],
 })
 export class ExerciseStatisticsModule {}

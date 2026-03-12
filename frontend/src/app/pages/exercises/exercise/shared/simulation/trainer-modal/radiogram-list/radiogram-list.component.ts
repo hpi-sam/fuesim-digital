@@ -14,17 +14,20 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../state/app.state';
 import { selectOwnClientId } from '../../../../../../../state/application/selectors/application.selectors';
 import { selectRadiograms } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
 import { RadiogramListService } from './radiogram-list.service';
+import { RadiogramCardComponent } from './radiogram-card/radiogram-card.component';
 
 @Component({
     selector: 'app-radiogram-list',
     templateUrl: './radiogram-list.component.html',
     styleUrls: ['./radiogram-list.component.scss'],
-    standalone: false,
+    imports: [FormsModule, RadiogramCardComponent, AsyncPipe],
 })
 export class RadiogramListComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

@@ -5,8 +5,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { Error404Component } from './error-404.component';
 
 @NgModule({
-    imports: [CommonModule, RouterModule, SharedModule],
-    declarations: [Error404Component],
+    imports: [CommonModule, RouterModule, SharedModule, Error404Component],
     exports: [Error404Component],
 })
 export class Error404Module {}

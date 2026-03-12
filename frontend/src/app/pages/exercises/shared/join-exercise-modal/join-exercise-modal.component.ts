@@ -2,13 +2,15 @@ import { OnDestroy, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import type { ExerciseKey } from 'fuesim-digital-shared';
+import { FormsModule } from '@angular/forms';
 import { ApplicationService } from '../../../../core/application.service';
+import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 
 @Component({
     selector: 'app-join-exercise-modal',
     templateUrl: './join-exercise-modal.component.html',
     styleUrls: ['./join-exercise-modal.component.scss'],
-    standalone: false,
+    imports: [FormsModule, AutofocusDirective],
 })
 export class JoinExerciseModalComponent implements OnDestroy {
     private readonly applicationService = inject(ApplicationService);

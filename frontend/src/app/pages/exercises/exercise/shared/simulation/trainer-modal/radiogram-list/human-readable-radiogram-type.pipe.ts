@@ -17,10 +17,7 @@ const map: { [Key in ExerciseRadiogram['type']]: string } = {
     newPatientDataRequestedRadiogram: 'Anfrage nach Patientenzahlen',
 };
 
-@Pipe({
-    name: 'humanReadableRadiogramType',
-    standalone: false,
-})
+@Pipe({ name: 'humanReadableRadiogramType' })
 export class HumanReadableRadiogramTypePipe implements PipeTransform {
     transform(value: ExerciseRadiogram['type']): string {
         return map[value];

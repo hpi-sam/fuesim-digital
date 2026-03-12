@@ -7,8 +7,13 @@ import { SharedModule } from '../../shared/shared.module';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 
 @NgModule({
-    declarations: [LandingPageComponent],
-    imports: [CommonModule, FormsModule, SharedModule, RouterLink],
+    imports: [
+        CommonModule,
+        FormsModule,
+        SharedModule,
+        RouterLink,
+        LandingPageComponent,
+    ],
     exports: [LandingPageComponent],
 })
 export class LandingPageModule {}

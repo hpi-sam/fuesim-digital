@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import { createSelectSimulatedRegion } from '../../../state/application/selectors/exercise.selectors';
 
@@ -11,7 +12,7 @@ import { createSelectSimulatedRegion } from '../../../state/application/selector
     selector: 'app-simulated-region-name',
     templateUrl: './simulated-region-name.component.html',
     styleUrls: ['./simulated-region-name.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class SimulatedRegionNameComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

@@ -23,7 +23,6 @@ interface ArrivingVehicle {
     styleUrls: [
         './signaller-modal-eoc-information-arriving-vehicles.component.scss',
     ],
-    standalone: false,
 })
 export class SignallerModalEocInformationArrivingVehiclesComponent {
     arrivingVehicles: ArrivingVehicle[];

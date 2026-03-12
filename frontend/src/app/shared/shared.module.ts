@@ -66,7 +66,16 @@ import { PatientHeaderComponent } from './components/patient-header/patient-head
 import { MaterialDetailsComponent } from './components/material-details/material-details.component';
 
 @NgModule({
-    declarations: [
+    imports: [
+        CommonModule,
+        FormsModule,
+        RouterModule,
+        NgbDropdownModule,
+        NgbNavModule,
+        NgbTooltip,
+        NgbAccordionModule,
+        NgbPopover,
+        QrCodeComponent,
         UserAccountNavbarItemComponent,
         AutofocusDirective,
         AppSaveOnTypingDirective,
@@ -120,17 +129,6 @@ import { MaterialDetailsComponent } from './components/material-details/material
         ExerciseTemplateCardComponent,
         InlineTextEditorComponent,
         CopyButtonComponent,
-    ],
-    imports: [
-        CommonModule,
-        FormsModule,
-        RouterModule,
-        NgbDropdownModule,
-        NgbNavModule,
-        NgbTooltip,
-        NgbAccordionModule,
-        NgbPopover,
-        QrCodeComponent,
     ],
     exports: [
         UserAccountNavbarItemComponent,

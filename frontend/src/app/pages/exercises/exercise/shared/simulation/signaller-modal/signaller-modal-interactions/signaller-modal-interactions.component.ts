@@ -23,6 +23,8 @@ import {
     map,
     takeUntil,
 } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import { SearchableDropdownOption } from '../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { HotkeyLayer } from '../../../../../../../shared/services/hotkeys.service';
@@ -37,6 +39,8 @@ import {
     selectRadiograms,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
+import { HotkeyIndicatorComponent } from '../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
+import { RadiogramCardComponent } from '../../trainer-modal/radiogram-list/radiogram-card/radiogram-card.component';
 
 export type InterfaceSignallerInteraction = Omit<
     SearchableDropdownOption,
@@ -81,7 +85,12 @@ export function setLoadingState(
     selector: 'app-signaller-modal-interactions',
     templateUrl: './signaller-modal-interactions.component.html',
     styleUrls: ['./signaller-modal-interactions.component.scss'],
-    standalone: false,
+    imports: [
+        HotkeyIndicatorComponent,
+        FormsModule,
+        RadiogramCardComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalInteractionsComponent
     implements OnInit, OnChanges, OnDestroy

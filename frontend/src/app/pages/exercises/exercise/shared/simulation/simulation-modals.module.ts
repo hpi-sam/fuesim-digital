@@ -91,7 +91,25 @@ import { SimulatedRegionOverviewVehicleDetailsComponent } from './trainer-modal/
 import { SimulatedRegionOverviewPatientDetailsComponent } from './trainer-modal/tabs/patients-tab/details/simulated-region-overview-patient-details.component';
 
 @NgModule({
-    declarations: [
+    exports: [SimulatedRegionOverviewGeneralComponent],
+    providers: [
+        SelectPatientService,
+        StartTransferService,
+        SelectSignallerRegionService,
+        SignallerModalDetailsService,
+    ],
+    imports: [
+        FormsModule,
+        SharedModule,
+        CommonModule,
+        NgbNavModule,
+        NgbCollapseModule,
+        NgbDropdownModule,
+        NgbProgressbarModule,
+        NgbTooltipModule,
+        NgbPopoverModule,
+        DragDropModule,
+        TransferPointOverviewModule,
         SimulatedRegionOverviewGeneralComponent,
         SimulatedRegionOverviewBehaviorTabComponent,
         SimulatedRegionOverviewGeneralTabComponent,
@@ -165,26 +183,6 @@ import { SimulatedRegionOverviewPatientDetailsComponent } from './trainer-modal/
         SignallerModalEocInformationAlarmGroupsSentComponent,
         SignallerModalEocInformationArrivingVehiclesComponent,
         RadiogramCardContentVehicleOccupationsComponent,
-    ],
-    exports: [SimulatedRegionOverviewGeneralComponent],
-    providers: [
-        SelectPatientService,
-        StartTransferService,
-        SelectSignallerRegionService,
-        SignallerModalDetailsService,
-    ],
-    imports: [
-        FormsModule,
-        SharedModule,
-        CommonModule,
-        NgbNavModule,
-        NgbCollapseModule,
-        NgbDropdownModule,
-        NgbProgressbarModule,
-        NgbTooltipModule,
-        NgbPopoverModule,
-        DragDropModule,
-        TransferPointOverviewModule,
     ],
 })
 export class SimulationModalsModule {}

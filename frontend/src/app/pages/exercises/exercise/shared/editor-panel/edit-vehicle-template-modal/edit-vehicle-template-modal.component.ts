@@ -20,12 +20,13 @@ import {
     selectPersonnelTemplates,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { VehicleTemplateFormComponent } from '../vehicle-template-form/vehicle-template-form.component';
 
 @Component({
     selector: 'app-edit-vehicle-template-modal',
     templateUrl: './edit-vehicle-template-modal.component.html',
     styleUrls: ['./edit-vehicle-template-modal.component.scss'],
-    standalone: false,
+    imports: [VehicleTemplateFormComponent],
 })
 export class EditVehicleTemplateModalComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);

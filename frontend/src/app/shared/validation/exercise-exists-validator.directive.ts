@@ -12,7 +12,6 @@ import { ApiService } from '../../core/api.service';
             multi: true,
         },
     ],
-    standalone: false,
 })
 export class ExerciseExistsValidatorDirective implements AsyncValidator {
     private readonly apiService = inject(ApiService);

@@ -10,16 +10,14 @@ import { OtherTransferPointTabComponent } from './other-transfer-point-tab/other
 import { TransferHospitalsTabComponent } from './transfer-hospitals-tab/transfer-hospitals-tab.component';
 
 @NgModule({
-    declarations: [
-        OtherTransferPointTabComponent,
-        TransferHospitalsTabComponent,
-    ],
     imports: [
         CommonModule,
         SharedModule,
         FormsModule,
         NgbDropdownModule,
         NgbPopoverModule,
+        OtherTransferPointTabComponent,
+        TransferHospitalsTabComponent,
     ],
     exports: [OtherTransferPointTabComponent, TransferHospitalsTabComponent],
 })

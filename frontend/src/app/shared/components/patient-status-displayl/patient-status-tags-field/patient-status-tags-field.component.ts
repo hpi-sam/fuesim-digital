@@ -6,7 +6,6 @@ import type { Tags } from 'fuesim-digital-shared';
     selector: 'app-patient-status-tags-field',
     templateUrl: './patient-status-tags-field.component.html',
     styleUrls: ['./patient-status-tags-field.component.scss'],
-    standalone: false,
 })
 export class PatientStatusTagsFieldComponent implements OnChanges {
     readonly patientStatusTagsField = input.required<Tags>();

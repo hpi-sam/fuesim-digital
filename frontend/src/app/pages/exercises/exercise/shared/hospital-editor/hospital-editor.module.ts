@@ -6,7 +6,12 @@ import { SharedModule } from '../../../../../shared/shared.module';
 import { HospitalEditorModalComponent } from './hospital-editor-modal/hospital-editor-modal.component';
 
 @NgModule({
-    declarations: [HospitalEditorModalComponent],
-    imports: [CommonModule, SharedModule, FormsModule, NgbDropdownModule],
+    imports: [
+        CommonModule,
+        SharedModule,
+        FormsModule,
+        NgbDropdownModule,
+        HospitalEditorModalComponent,
+    ],
 })
 export class HospitalEditorModule {}

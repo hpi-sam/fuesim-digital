@@ -9,12 +9,21 @@ import type {
 import { StrictObject } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
     selectVehicleTemplates,
 } from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 
 @Component({
     selector:
@@ -24,7 +33,15 @@ import {
     styleUrls: [
         './manage-patient-transport-to-hospital-vehicles-for-categories-editor.component.scss',
     ],
-    standalone: false,
+    imports: [
+        PatientStatusBadgeComponent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+    ],
 })
 export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent
     implements OnChanges

@@ -9,13 +9,15 @@ import { TransferTimeInputComponent } from './transfer-time-input/transfer-time-
 import { StartPointNameComponent } from './start-point-name/start-point-name.component';
 
 @NgModule({
-    declarations: [
+    imports: [
+        CommonModule,
+        SharedModule,
+        NgbDropdownModule,
         TransferOverviewModalComponent,
         TransferOverviewTableComponent,
         TransferTargetInputComponent,
         TransferTimeInputComponent,
         StartPointNameComponent,
     ],
-    imports: [CommonModule, SharedModule, NgbDropdownModule],
 })
 export class TransferOverviewModule {}

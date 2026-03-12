@@ -25,20 +25,6 @@ import { PatientNameComponent } from './shared/patient-name/patient-name.compone
 import { RestrictedZonePopupComponent } from './shared/restricted-zone-popup/restricted-zone-popup.component';
 
 @NgModule({
-    declarations: [
-        ExerciseMapComponent,
-        VehiclePopupComponent,
-        MapImagePopupComponent,
-        PatientPopupComponent,
-        TransferPointPopupComponent,
-        ViewportPopupComponent,
-        ChooseTransferTargetPopupComponent,
-        PersonnelPopupComponent,
-        MaterialPopupComponent,
-        SimulatedRegionPopupComponent,
-        PatientNameComponent,
-        RestrictedZonePopupComponent,
-    ],
     exports: [ExerciseMapComponent],
     imports: [
         CommonModule,
@@ -51,6 +37,18 @@ import { RestrictedZonePopupComponent } from './shared/restricted-zone-popup/res
         SimulationModalsModule,
         TransferPointOverviewModule,
         EmergencyOperationsCenterModule,
+        ExerciseMapComponent,
+        VehiclePopupComponent,
+        MapImagePopupComponent,
+        PatientPopupComponent,
+        TransferPointPopupComponent,
+        ViewportPopupComponent,
+        ChooseTransferTargetPopupComponent,
+        PersonnelPopupComponent,
+        MaterialPopupComponent,
+        SimulatedRegionPopupComponent,
+        PatientNameComponent,
+        RestrictedZonePopupComponent,
     ],
 })
 export class ExerciseMapModule {}

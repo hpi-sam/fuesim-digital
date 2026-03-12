@@ -8,17 +8,30 @@ import type {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { firstValueFrom } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../state/app.state';
 import { createSelectMapImage } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
+import { ImageExistsValidatorDirective } from '../../../../../../../shared/validation/image-exists-validator.directive';
+import { DisplayValidationComponent } from '../../../../../../../shared/validation/display-validation/display-validation.component';
+import { IntegerValidatorDirective } from '../../../../../../../shared/validation/integer-validator.directive';
+import { AppSaveOnTypingDirective } from '../../../../../../../shared/directives/app-save-on-typing.directive';
 
 @Component({
     selector: 'app-map-image-popup',
     templateUrl: './map-image-popup.component.html',
     styleUrls: ['./map-image-popup.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        ImageExistsValidatorDirective,
+        DisplayValidationComponent,
+        IntegerValidatorDirective,
+        AppSaveOnTypingDirective,
+        AsyncPipe,
+    ],
 })
 export class MapImagePopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

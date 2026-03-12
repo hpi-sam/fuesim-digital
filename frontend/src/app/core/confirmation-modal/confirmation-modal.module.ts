@@ -5,7 +5,11 @@ import { SharedModule } from '../../shared/shared.module';
 import { ConfirmationModalComponent } from './confirmation-modal.component';
 
 @NgModule({
-    declarations: [ConfirmationModalComponent],
-    imports: [CommonModule, FormsModule, SharedModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        SharedModule,
+        ConfirmationModalComponent,
+    ],
 })
 export class ConfirmationModalModule {}

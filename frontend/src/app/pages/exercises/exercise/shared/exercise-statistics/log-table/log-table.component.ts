@@ -9,8 +9,11 @@ import type { LogEntry, Tag } from 'fuesim-digital-shared';
 import { StrictObject } from 'fuesim-digital-shared';
 import { difference } from 'lodash-es';
 import { Subject, takeUntil } from 'rxjs';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
 import type { SearchableDropdownOption } from '../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import { SearchableDropdownComponent } from '../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import { LogEntryComponent } from '../log-entry/log-entry.component';
 
 type KnownSpecifier = Omit<Tag, 'category'>;
 
@@ -23,7 +26,7 @@ interface Filter {
     selector: 'app-log-table',
     templateUrl: './log-table.component.html',
     styleUrls: ['./log-table.component.scss'],
-    standalone: false,
+    imports: [NgbPopover, SearchableDropdownComponent, LogEntryComponent],
 })
 export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
     private readonly statisticsTimeSelectionService = inject(

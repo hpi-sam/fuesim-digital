@@ -14,10 +14,7 @@ const occupationNamesDictionary: {
         'Das Fahrzeug ist für den Transport von Patienten ins Krankenhaus reserviert',
 };
 
-@Pipe({
-    name: 'occupationName',
-    standalone: false,
-})
+@Pipe({ name: 'occupationName' })
 export class OccupationNamePipe implements PipeTransform {
     transform(occupationType: ExerciseOccupationType | undefined): string {
         if (!occupationType) return '';

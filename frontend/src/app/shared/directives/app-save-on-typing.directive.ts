@@ -22,10 +22,7 @@ import { isBeingTestedByCypress } from '../functions/cypress';
  *
  * Inspired by https://stackoverflow.com/a/65079996
  */
-@Directive({
-    selector: '[appSaveOnTyping][ngModel]',
-    standalone: false,
-})
+@Directive({ selector: '[appSaveOnTyping][ngModel]' })
 export class AppSaveOnTypingDirective implements OnDestroy {
     destroy$ = new Subject<void>();
     readonly appSaveOnTyping = output<any>();

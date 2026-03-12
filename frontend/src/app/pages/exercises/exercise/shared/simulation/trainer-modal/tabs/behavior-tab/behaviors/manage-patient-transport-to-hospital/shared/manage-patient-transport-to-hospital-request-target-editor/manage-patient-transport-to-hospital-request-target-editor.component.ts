@@ -8,6 +8,8 @@ import type {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../../../state/app.state';
 import {
@@ -22,7 +24,7 @@ import {
     styleUrls: [
         './manage-patient-transport-to-hospital-request-target-editor.component.scss',
     ],
-    standalone: false,
+    imports: [FormsModule, AsyncPipe],
 })
 export class ManagePatientTransportToHospitalRequestTargetEditorComponent
     implements OnChanges

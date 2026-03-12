@@ -10,9 +10,11 @@ import { Store } from '@ngrx/store';
 import type { ReportableInformation, UUID } from 'fuesim-digital-shared';
 import { makeInterfaceSignallerKey } from 'fuesim-digital-shared';
 import { type Observable, BehaviorSubject, map } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import {
     setLoadingState,
     type InterfaceSignallerInteraction,
+    SignallerModalInteractionsComponent,
 } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
@@ -20,12 +22,19 @@ import type { AppState } from '../../../../../../../state/app.state';
 import { selectOwnClientId } from '../../../../../../../state/application/selectors/application.selectors';
 import { createSelectBehaviorStates } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
+import { SignallerModalRecurringReportModalComponent } from '../details-modal/signaller-modal-recurring-report-modal/signaller-modal-recurring-report-modal.component';
+import { SimulationEventBasedReportEditorComponent } from '../../shared/simulation-event-based-report-editor/simulation-event-based-report-editor.component';
 
 @Component({
     selector: 'app-signaller-modal-region-information',
     templateUrl: './signaller-modal-region-information.component.html',
     styleUrls: ['./signaller-modal-region-information.component.scss'],
-    standalone: false,
+    imports: [
+        SignallerModalInteractionsComponent,
+        SignallerModalRecurringReportModalComponent,
+        SimulationEventBasedReportEditorComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalRegionInformationComponent
     implements OnInit, OnChanges

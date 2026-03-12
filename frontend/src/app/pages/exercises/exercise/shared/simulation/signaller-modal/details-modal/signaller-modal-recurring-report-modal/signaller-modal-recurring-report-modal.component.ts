@@ -3,6 +3,7 @@ import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID, ReportableInformation } from 'fuesim-digital-shared';
 import { reportableInformationTypeToGermanNameDictionary } from 'fuesim-digital-shared';
+import { FormsModule } from '@angular/forms';
 import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 import { ExerciseService } from '../../../../../../../../core/exercise.service';
 import { MessageService } from '../../../../../../../../core/messages/message.service';
@@ -12,6 +13,8 @@ import {
     createSelectActivityStatesByType,
 } from '../../../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../../../state/get-state-snapshot';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 const defaultInterval = 15 * 60 * 1000; // 15 minutes
 
@@ -19,7 +22,7 @@ const defaultInterval = 15 * 60 * 1000; // 15 minutes
     selector: 'app-signaller-modal-recurring-report-modal',
     templateUrl: './signaller-modal-recurring-report-modal.component.html',
     styleUrls: ['./signaller-modal-recurring-report-modal.component.scss'],
-    standalone: false,
+    imports: [FormsModule, AutofocusDirective, HotkeyIndicatorComponent],
 })
 export class SignallerModalRecurringReportModalComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);

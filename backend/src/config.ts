@@ -289,7 +289,9 @@ export class Config {
             testing && env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 : env.DFM_AUTH_SELF_SERVICE_URL;
-        this._parallelExercisesEnabled = env.DFM_PARALLEL_EXERCISES_ENABLED;
+        this._parallelExercisesEnabled = testing
+            ? true
+            : env.DFM_PARALLEL_EXERCISES_ENABLED;
         this.isInitialized = true;
     }
 }

@@ -45,7 +45,7 @@ export const createParallelExerciseRouter = (
                     req.session!
                 );
 
-            res.send(
+            res.status(201).send(
                 getParallelExerciseResponseDataSchema.encode(parallelExercise)
             );
         });
@@ -65,7 +65,7 @@ export const createParallelExerciseRouter = (
                 await parallelExerciseService.joinParallelExerciseByParticipantKey(
                     key
                 );
-            res.send(
+            res.status(201).send(
                 postJoinParallelExerciseResponseDataSchema.encode({
                     participantKey: exercise.participantKey,
                 })
@@ -84,7 +84,7 @@ export const createParallelExerciseRouter = (
                     id,
                     req.session!
                 );
-            res.status(201).send(
+            res.send(
                 getParallelExerciseResponseDataSchema.encode(parallelExercise)
             );
         })

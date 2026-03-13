@@ -58,10 +58,7 @@ export class ParallelExerciseService {
         return parallelExercise;
     }
 
-    public async getParallelExerciseByParticipantKey(
-        key: GroupParticipantKey,
-        session: SessionInformation
-    ) {
+    public async getParallelExerciseByParticipantKey(key: GroupParticipantKey) {
         const parallelExercise =
             await this.parallelExerciseRepository.getParallelExerciseByParticipantKey(
                 key
@@ -76,12 +73,7 @@ export class ParallelExerciseService {
         key: GroupParticipantKey
     ) {
         const parallelExercise =
-            await this.parallelExerciseRepository.getParallelExerciseByParticipantKey(
-                key
-            );
-        if (!parallelExercise) {
-            throw new NotFoundError();
-        }
+            await this.getParallelExerciseByParticipantKey(key);
 
         const exercise =
             await this.exerciseManagerService.createExerciseFromTemplate(

@@ -3,10 +3,14 @@ import type {
     PostParallelExerciseRequestData,
     AddViewportAction,
     GetParallelExerciseResponseData,
+    ExerciseState,
+    SetAutojoinViewportAction,
 } from 'fuesim-digital-shared';
 import {
     getParallelExerciseResponseDataSchema,
     getParallelExercisesResponseDataSchema,
+    postJoinParallelExerciseResponseDataSchema,
+    uuid,
     Viewport,
 } from 'fuesim-digital-shared';
 import type { TestEnvironment } from '../test/utils.js';
@@ -122,6 +126,63 @@ describe('parallel exercise router', () => {
             expect(parsed).toMatchObject(exercise);
         });
     });
+
+    describe('GET /api/parallel_exercises/:id', () => {
+        let parallelExercise: GetParallelExerciseResponseData;
+        beforeEach(async () => {
+            parallelExercise = await createParallelExercise(
+                environment,
+                session
+            );
+        });
+
+        it('fails with 403 if not authenticated', async () => {
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/${parallelExercise.id}`
+                )
+                .expect(403);
+        });
+
+        it('fails with wrong id', async () => {
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/${uuid()}`,
+                    session
+                )
+                .expect(404);
+        });
+
+        it('fails with wrong user', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    session2
+                )
+                .expect(403);
+        });
+
+        it('returns own parallel exercises', async () => {
+            const response = await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    session
+                )
+                .expect(200);
+            const parsed = getParallelExerciseResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed).toMatchObject(parallelExercise);
+        });
+    });
+
     describe('POST /api/parallel_exercises', () => {
         it('fails with 403 if not authenticated', async () => {
             await environment
@@ -225,6 +286,75 @@ describe('parallel exercise router', () => {
                 environment.services.exerciseService.TESTING_getExerciseMap()
                     .size
             ).toBe(3);
+        });
+    });
+
+    describe('POST /api/parallel_exercises/join/:key', () => {
+        let parallelExercise: GetParallelExerciseResponseData;
+        beforeEach(async () => {
+            parallelExercise = await createParallelExercise(
+                environment,
+                session
+            );
+        });
+
+        it('fails joining with invalid key', async () => {
+            const invalidKey =
+                await environment.services.accessKeyService.generateKey(7);
+            await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/join/${invalidKey}`
+                )
+                .expect(404);
+        });
+
+        it('succeeds joining with correct key', async () => {
+            const templateExercise = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .values()
+                .next().value!;
+            const response = await environment
+                .httpRequest(
+                    'post',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(201);
+            const parsed = postJoinParallelExerciseResponseDataSchema.parse(
+                response.body
+            );
+            const newExercise = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(parsed.participantKey)!;
+
+            expect(newExercise.participantKey).not.toBe(
+                parallelExercise.participantKey
+            );
+
+            const expectedState: ExerciseState = {
+                ...templateExercise.exercise.currentStateString,
+                type: 'parallel',
+                participantKey: parsed.participantKey,
+            };
+
+            expect(newExercise.exercise.initialStateString).toMatchObject(
+                expectedState
+            );
+            expect(newExercise.exercise.currentStateString).toMatchObject({
+                ...expectedState,
+                autojoinViewportId: parallelExercise.joinViewportId,
+            });
+
+            const action: SetAutojoinViewportAction = {
+                type: '[Exercise] Set autojoin viewport',
+                viewportId: parallelExercise.joinViewportId,
+            };
+            expect(newExercise.temporaryActionHistory).toHaveLength(1);
+            expect(
+                newExercise.temporaryActionHistory[0]!.getAction().actionString
+            ).toMatchObject(action);
+
+            // TODO test newJoin signal
         });
     });
 });

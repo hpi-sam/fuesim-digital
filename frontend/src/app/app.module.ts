@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { inject, NgModule, provideAppInitializer } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -20,6 +20,7 @@ import {
     errorHandlingInterceptor,
     withCredentialsInterceptor,
 } from './shared/functions/http';
+import { AuthService } from './core/auth.service';
 
 @NgModule({
     declarations: [AppComponent, HealthPageComponent],
@@ -43,6 +44,10 @@ import {
                 withCredentialsInterceptor,
                 errorHandlingInterceptor,
             ])
+        ),
+        // Returns promise to block application loading until AuthService is initialized
+        provideAppInitializer(
+            async (): Promise<void> => inject(AuthService).initialize()
         ),
     ],
 })

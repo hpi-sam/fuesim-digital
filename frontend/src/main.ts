@@ -1,6 +1,11 @@
 /// <reference types="@angular/localize" />
 
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+import {
+    enableProdMode,
+    importProvidersFrom,
+    inject,
+    provideAppInitializer,
+} from '@angular/core';
 
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -17,6 +22,7 @@ import type { AppState } from './app/state/app.state';
 import { appReducers } from './app/state/app.reducer';
 import { AppComponent } from './app/app.component';
 import { appRoutes } from './app/app.routes';
+import { AuthService } from './app/core/auth.service';
 
 if (environment.production) {
     enableProdMode();
@@ -45,6 +51,10 @@ bootstrapApplication(AppComponent, {
                 withCredentialsInterceptor,
                 errorHandlingInterceptor,
             ])
+        ),
+        // Returns promise to block application loading until AuthService is initialized
+        provideAppInitializer(
+            async (): Promise<void> => inject(AuthService).initialize()
         ),
     ],
 }).catch((err) => console.error(err));

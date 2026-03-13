@@ -28,8 +28,7 @@ export const registerJoinParallelExerciseHandler = (
             socket,
             services
         );
-        if (!clientWrapper) return;
-        if (clientWrapper.exercise) {
+        if (!clientWrapper) {
             callback({
                 success: false,
                 message: 'The client has already joined a parallel exercise',
@@ -47,8 +46,9 @@ export const registerJoinParallelExerciseHandler = (
             return;
         }
         clientWrapper.getSessionInformation().then(() => {
-            try {
-                clientWrapper.joinParallelExercise(parsedId.data).then(() => {
+            clientWrapper
+                .joinParallelExercise(parsedId.data)
+                .then(() => {
                     clientWrapper
                         .getInstanceSummaries()
                         .then((exerciseInstanceSummaries) => {
@@ -60,21 +60,19 @@ export const registerJoinParallelExerciseHandler = (
                                 },
                             });
                         });
+                })
+                .catch((e: unknown) => {
+                    if (
+                        e instanceof NotFoundError ||
+                        e instanceof PermissionDeniedError
+                    ) {
+                        callback({
+                            success: false,
+                            message: 'The exercise does not exist',
+                            expected: false,
+                        });
+                    }
                 });
-            } catch (e: unknown) {
-                if (
-                    e instanceof NotFoundError ||
-                    e instanceof PermissionDeniedError
-                ) {
-                    callback({
-                        success: false,
-                        message: 'The exercise does not exist',
-                        expected: false,
-                    });
-                    return;
-                }
-                throw e;
-            }
         });
     });
 };

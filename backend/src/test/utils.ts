@@ -99,6 +99,17 @@ export class WebsocketClient {
         this.socket.on(event, callback as any);
     }
 
+    public async waitOn<
+        EventKey extends keyof AllServerToClientEvents,
+        Callback extends
+            AllServerToClientEvents[EventKey] = AllServerToClientEvents[EventKey],
+        Response extends Parameters<Callback>[0] = Parameters<Callback>[0],
+    >(event: EventKey): Promise<Response> {
+        return new Promise<Response>((resolve) => {
+            this.socket.on(event, resolve as any);
+        });
+    }
+
     private readonly calls: Map<
         string,
         Parameters<AllServerToClientEvents[keyof AllServerToClientEvents]>[]

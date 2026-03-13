@@ -1,7 +1,5 @@
 import type {
-    GetExerciseTemplateResponseData,
     PostParallelExerciseRequestData,
-    AddViewportAction,
     GetParallelExerciseResponseData,
     ExerciseState,
     SetAutojoinViewportAction,
@@ -11,59 +9,17 @@ import {
     getParallelExercisesResponseDataSchema,
     postJoinParallelExerciseResponseDataSchema,
     uuid,
-    Viewport,
 } from 'fuesim-digital-shared';
-import type { TestEnvironment } from '../test/utils.js';
 import {
     alternativeTestUserSessionData,
     createTestUserSession,
     createTestEnvironment,
     createExerciseTemplate,
 } from '../test/utils.js';
-import type { ActiveExercise } from '../exercise/active-exercise.js';
-
-function createViewport(exercise: ActiveExercise): Viewport {
-    const addViewportAction: AddViewportAction = {
-        type: '[Viewport] Add viewport',
-        viewport: Viewport.create(
-            {
-                x: 0,
-                y: 0,
-            },
-            {
-                height: 1,
-                width: 1,
-            },
-            ''
-        ),
-    };
-    exercise.applyAction(addViewportAction, null);
-    return Object.values(exercise.exercise.currentStateString.viewports)[0]!;
-}
-
-async function createParallelExercise(
-    environment: TestEnvironment,
-    session: string,
-    template?: GetExerciseTemplateResponseData
-) {
-    template ??= await createExerciseTemplate(environment, session);
-
-    const viewport = createViewport(
-        environment.services.exerciseService
-            .TESTING_getExerciseMap()
-            .get(template.trainerKey)!
-    );
-    const response = await environment
-        .httpRequest('post', '/api/parallel_exercises/', session)
-        .send({
-            name: 'Test Parallel Exercise',
-            templateId: template.id,
-            joinViewportId: viewport.id,
-        } satisfies PostParallelExerciseRequestData)
-        .expect(201);
-
-    return getParallelExerciseResponseDataSchema.parse(response.body);
-}
+import {
+    createParallelExercise,
+    createViewport,
+} from '../test/parallel-exercise-utils.js';
 
 describe('parallel exercise router', () => {
     const environment = createTestEnvironment();

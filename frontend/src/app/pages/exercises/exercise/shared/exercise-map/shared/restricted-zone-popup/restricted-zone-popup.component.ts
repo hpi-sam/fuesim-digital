@@ -10,6 +10,16 @@ import {
     sortObject,
     stringCompare,
 } from 'fuesim-digital-shared';
+import {
+    NgbNav,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavContent,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../state/app.state';
@@ -19,6 +29,8 @@ import {
     selectVehicles,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../shared/directives/app-save-on-typing.directive';
+import { DisplayValidationComponent } from '../../../../../../../shared/validation/display-validation/display-validation.component';
 
 type NavIds = 'settings' | 'vehicleRestrictions';
 
@@ -31,7 +43,19 @@ let activeNavId: NavIds = 'settings';
     selector: 'app-restricted-zone-popup',
     templateUrl: './restricted-zone-popup.component.html',
     styleUrls: ['./restricted-zone-popup.component.scss'],
-    standalone: false,
+    imports: [
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbNavContent,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        DisplayValidationComponent,
+        NgbNavOutlet,
+        AsyncPipe,
+        KeyValuePipe,
+    ],
 })
 export class RestrictedZonePopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

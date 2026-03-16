@@ -8,6 +8,7 @@ import {
 import type { OnChanges, OnDestroy } from '@angular/core';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ReplaySubject, Subject, delay, switchMap, takeUntil, tap } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { CustomTimer } from '../../../core/messages/custom-timer';
 import { SimpleChangesGeneric } from '../../../shared/types/simple-changes-generic';
 
@@ -45,7 +46,7 @@ import { SimpleChangesGeneric } from '../../../shared/types/simple-changes-gener
         ]),
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class CustomTimerProgressBarComponent implements OnChanges, OnDestroy {
     readonly timer = input.required<CustomTimer>();

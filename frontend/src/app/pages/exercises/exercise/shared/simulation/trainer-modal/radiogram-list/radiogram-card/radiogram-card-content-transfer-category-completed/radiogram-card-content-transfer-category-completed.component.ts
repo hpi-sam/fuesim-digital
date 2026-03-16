@@ -6,8 +6,10 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../state/app.state';
 import { createSelectRadiogram } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 
 @Component({
     selector: 'app-radiogram-card-content-transfer-category-completed',
@@ -16,7 +18,7 @@ import { createSelectRadiogram } from '../../../../../../../../../state/applicat
     styleUrls: [
         './radiogram-card-content-transfer-category-completed.component.scss',
     ],
-    standalone: false,
+    imports: [PatientStatusBadgeComponent, AsyncPipe],
 })
 export class RadiogramCardContentTransferCategoryCompletedComponent
     implements OnInit

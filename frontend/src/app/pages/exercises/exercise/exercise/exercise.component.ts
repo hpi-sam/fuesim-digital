@@ -1,6 +1,14 @@
 import type { OnDestroy } from '@angular/core';
 import { Component, inject } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbModal,
+    NgbTooltip,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
     StateExport,
@@ -9,6 +17,8 @@ import {
     exportPatientsToCSV,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { AsyncPipe } from '@angular/common';
 import Package from '../../../../../../package.json';
 import { openPartialExportModal } from '../shared/partial-export/open-partial-export-selection-modal';
 import { ExerciseService } from '../../../../core/exercise.service';
@@ -28,12 +38,33 @@ import {
 } from '../../../../state/application/selectors/exercise.selectors';
 import { selectOwnClient } from '../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
+import { ExerciseStateBadgeComponent } from '../shared/exercise-state-badge/exercise-state-badge.component';
+import { TimeTravelComponent } from '../shared/time-travel/time-travel.component';
+import { ExerciseMapComponent } from '../shared/exercise-map/exercise-map.component';
+import { TrainerMapEditorComponent } from '../shared/trainer-map-editor/trainer-map-editor.component';
+import { EmergencyOperationsCenterFullComponent } from '../shared/emergency-operations-center/emergency-operations-center-full/emergency-operations-center-full.component';
+import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-exercise',
     templateUrl: './exercise.component.html',
     styleUrls: ['./exercise.component.scss'],
-    standalone: false,
+    imports: [
+        RouterLink,
+        ExerciseStateBadgeComponent,
+        NgbTooltip,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        TimeTravelComponent,
+        ExerciseMapComponent,
+        TrainerMapEditorComponent,
+        EmergencyOperationsCenterFullComponent,
+        AsyncPipe,
+        FormatDurationPipe,
+    ],
 })
 export class ExerciseComponent implements OnDestroy {
     private readonly store = inject<Store<AppState>>(Store);

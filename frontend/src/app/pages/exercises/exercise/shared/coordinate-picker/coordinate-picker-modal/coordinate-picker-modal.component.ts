@@ -1,13 +1,15 @@
 import { effect, signal, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { toLonLat } from 'ol/proj';
+import { FormsModule } from '@angular/forms';
 import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
+import { GeographicCoordinateDirective } from '../../../../../../shared/validation/geographic-coordinate-validator.directive';
 
 @Component({
     selector: 'app-coordinate-picker-modal',
     templateUrl: './coordinate-picker-modal.component.html',
     styleUrls: ['./coordinate-picker-modal.component.scss'],
-    standalone: false,
+    imports: [FormsModule, GeographicCoordinateDirective],
 })
 export class CoordinatePickerModalComponent {
     activeModal = inject(NgbActiveModal);

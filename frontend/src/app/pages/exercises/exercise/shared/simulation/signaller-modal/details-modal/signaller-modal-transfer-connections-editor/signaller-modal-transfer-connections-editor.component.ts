@@ -5,6 +5,9 @@ import type { UUID } from 'fuesim-digital-shared';
 import { TransferPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
@@ -13,18 +16,30 @@ import {
 } from '../../../../../../../../shared/services/hotkeys.service';
 import { ExerciseService } from '../../../../../../../../core/exercise.service';
 import { MessageService } from '../../../../../../../../core/messages/message.service';
-import { SearchableDropdownOption } from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import {
+    SearchableDropdownOption,
+    SearchableDropdownComponent,
+} from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { AppState } from '../../../../../../../../state/app.state';
 import {
     createSelectTransferPoint,
     selectTransferPoints,
 } from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-transfer-connections-editor',
     templateUrl: './signaller-modal-transfer-connections-editor.component.html',
     styleUrls: ['./signaller-modal-transfer-connections-editor.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        NgbPopover,
+        AutofocusDirective,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalTransferConnectionsEditorComponent
     implements OnInit, OnChanges, OnDestroy

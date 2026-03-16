@@ -4,7 +4,6 @@ import { Component, input, output } from '@angular/core';
     selector: 'app-simulated-region-preview-card',
     templateUrl: './simulated-region-preview-card.component.html',
     styleUrls: ['./simulated-region-preview-card.component.scss'],
-    standalone: false,
 })
 export class SimulatedRegionPreviewCardComponent {
     readonly elementMousedown = output<MouseEvent>();

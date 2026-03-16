@@ -5,6 +5,22 @@ import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import { Patient } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
+import {
+    NgbNav,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavContent,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { QrCodeComponent } from 'ng-qrcode';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../core/exercise.service';
 import type { AppState } from '../../../state/app.state';
 import {
@@ -12,12 +28,39 @@ import {
     createSelectPatient,
 } from '../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
+import { PatientIdentifierComponent } from '../patient-identifier/patient-identifier.component';
+import { PatientStatusDisplayComponent } from '../patient-status-displayl/patient-status-display/patient-status-display.component';
+import { AutofocusDirective } from '../../directives/autofocus.directive';
+import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.directive';
+import { PatientStatusBadgeComponent } from '../patient-status-badge/patient-status-badge.component';
+import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
 
 @Component({
     selector: 'app-patients-details',
     templateUrl: './patients-details.component.html',
     styleUrls: ['./patients-details.component.scss'],
-    standalone: false,
+    imports: [
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbNavContent,
+        PatientIdentifierComponent,
+        PatientStatusDisplayComponent,
+        FormsModule,
+        AutofocusDirective,
+        AppSaveOnTypingDirective,
+        NgbDropdown,
+        NgbDropdownToggle,
+        PatientStatusBadgeComponent,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        DisplayValidationComponent,
+        QrCodeComponent,
+        NgbNavOutlet,
+        AsyncPipe,
+    ],
 })
 export class PatientsDetailsComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

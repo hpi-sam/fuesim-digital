@@ -6,6 +6,8 @@ import type { UUID } from 'fuesim-digital-shared';
 import { TransferPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { SearchableDropdownOption } from '../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { AppState } from '../../../../../../state/app.state';
@@ -13,12 +15,24 @@ import {
     createSelectTransferPoint,
     selectTransferPoints,
 } from '../../../../../../state/application/selectors/exercise.selectors';
+import { TransferPointNameComponent } from '../../../../../../shared/components/transfer-point-name/transfer-point-name.component';
+import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
+import { SearchableDropdownComponent } from '../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-other-transfer-point-tab',
     templateUrl: './other-transfer-point-tab.component.html',
     styleUrls: ['./other-transfer-point-tab.component.scss'],
-    standalone: false,
+    imports: [
+        TransferPointNameComponent,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        NgbPopover,
+        SearchableDropdownComponent,
+        AsyncPipe,
+        ValuesPipe,
+    ],
 })
 export class OtherTransferPointTabComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

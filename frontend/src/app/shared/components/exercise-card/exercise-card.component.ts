@@ -1,14 +1,17 @@
 import { Component, computed, input, output, inject } from '@angular/core';
 import type { GetExerciseResponseData } from 'fuesim-digital-shared';
+import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
+import { CopyButtonComponent } from '../copy-button/copy-button.component';
 
 @Component({
     selector: 'app-exercise-card',
     templateUrl: './exercise-card.component.html',
     styleUrls: ['./exercise-card.component.scss'],
-    standalone: false,
+    imports: [CopyButtonComponent, RouterLink, DatePipe],
 })
 export class ExerciseCardComponent {
     private readonly apiService = inject(ApiService);

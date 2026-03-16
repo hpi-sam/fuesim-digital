@@ -7,8 +7,10 @@ import {
     output,
     viewChild,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import type { HotkeyLayer } from '../../services/hotkeys.service';
 import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
+import { HotkeyIndicatorComponent } from '../hotkey-indicator/hotkey-indicator.component';
 
 export interface SearchableDropdownOption {
     key: string;
@@ -21,7 +23,7 @@ export interface SearchableDropdownOption {
     selector: 'app-searchable-dropdown',
     templateUrl: './searchable-dropdown.component.html',
     styleUrls: ['./searchable-dropdown.component.scss'],
-    standalone: false,
+    imports: [FormsModule, HotkeyIndicatorComponent],
 })
 export class SearchableDropdownComponent
     implements OnInit, AfterViewInit, OnDestroy

@@ -9,6 +9,15 @@ import type {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../../../state/app.state';
 import {
@@ -16,6 +25,8 @@ import {
     selectSimulatedRegions,
     selectConfiguration,
 } from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../../../shared/directives/app-save-on-typing.directive';
 
 @Component({
     selector: 'app-manage-patient-transport-to-hospital-managed-regions-table',
@@ -24,7 +35,17 @@ import {
     styleUrls: [
         './manage-patient-transport-to-hospital-managed-regions-table.component.scss',
     ],
-    standalone: false,
+    imports: [
+        PatientStatusBadgeComponent,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+    ],
 })
 export class ManagePatientTransportToHospitalManagedRegionsTableComponent
     implements OnChanges

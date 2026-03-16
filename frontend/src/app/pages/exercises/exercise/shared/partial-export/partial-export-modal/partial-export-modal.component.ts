@@ -5,7 +5,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
     selector: 'app-partial-export-modal',
     templateUrl: './partial-export-modal.component.html',
     styleUrls: ['./partial-export-modal.component.scss'],
-    standalone: false,
 })
 export class PartialExportModalComponent {
     private readonly activeModal = inject(NgbActiveModal);

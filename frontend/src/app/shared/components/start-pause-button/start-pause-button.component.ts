@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { AsyncPipe } from '@angular/common';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from '../../../core/exercise.service';
 import type { AppState } from '../../../state/app.state';
@@ -11,7 +12,7 @@ import { selectStateSnapshot } from '../../../state/get-state-snapshot';
     selector: 'app-start-pause-button',
     templateUrl: './start-pause-button.component.html',
     styleUrls: ['./start-pause-button.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class StartPauseButtonComponent {
     private readonly store = inject<Store<AppState>>(Store);

@@ -9,6 +9,8 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import type { PatientWithVisibleStatus } from '../../../patients-table/simulated-region-overview-patients-table.component';
 import { StartTransferService } from '../../../start-transfer.service';
 import { ExerciseService } from '../../../../../../../../../core/exercise.service';
@@ -18,12 +20,25 @@ import {
     selectPatients,
     selectConfiguration,
 } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { VehicleNameEditorComponent } from '../../../../../../../../../shared/components/vehicle-name-editor/vehicle-name-editor.component';
+import { VehicleOccupationEditorComponent } from '../../../../../../../../../shared/components/vehicle-occupation-editor/vehicle-occupation-editor.component';
+import { VehicleLoadUnloadControlsComponent } from '../../../../../../../../../shared/components/vehicle-load-unload-controls/vehicle-load-unload-controls.component';
+import { VehicleAvailableSlotsDisplayComponent } from '../../../../../../../../../shared/components/vehicle-available-slots-display/vehicle-available-slots-display.component';
+import { SimulatedRegionOverviewPatientsTableComponent } from '../../../patients-table/simulated-region-overview-patients-table.component';
 
 @Component({
     selector: 'app-simulated-region-overview-vehicle-details',
     templateUrl: './simulated-region-overview-vehicle-details.component.html',
     styleUrls: ['./simulated-region-overview-vehicle-details.component.scss'],
-    standalone: false,
+    imports: [
+        VehicleNameEditorComponent,
+        VehicleOccupationEditorComponent,
+        VehicleLoadUnloadControlsComponent,
+        VehicleAvailableSlotsDisplayComponent,
+        SimulatedRegionOverviewPatientsTableComponent,
+        NgbTooltip,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewVehicleDetailsComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

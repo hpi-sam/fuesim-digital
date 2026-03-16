@@ -9,6 +9,9 @@ import type {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { SelectPatientService } from '../../../../select-patient.service';
 import { comparePatientsByVisibleStatus } from '../../../compare-patients';
 import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
@@ -21,6 +24,10 @@ import {
     createSelectSimulatedRegion,
     selectCurrentTime,
 } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { TreatmentStatusBadgeComponent } from '../../../../treatment-status-badge/treatment-status-badge.component';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
+import { SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent } from './patient-details/simulated-region-overview-behavior-treat-patients-patient-details.component';
 
 let globalLastSettingsCollapsed = true;
 let globalLastInformationCollapsed = true;
@@ -31,7 +38,15 @@ let globalLastInformationCollapsed = true;
     styleUrls: [
         './simulated-region-overview-behavior-treat-patients.component.scss',
     ],
-    standalone: false,
+    imports: [
+        TreatmentStatusBadgeComponent,
+        NgbCollapse,
+        SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        FormatDurationPipe,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
     implements OnInit

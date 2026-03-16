@@ -10,10 +10,7 @@ const behaviorIconMap: { [Key in BehaviourCode]: string } = {
     E: 'bi-x-circle-fill',
 };
 
-@Pipe({
-    name: 'patientBehaviorIcon',
-    standalone: false,
-})
+@Pipe({ name: 'patientBehaviorIcon' })
 export class PatientBehaviorIconPipe implements PipeTransform {
     transform(value: BehaviourCode): string {
         return behaviorIconMap[value];

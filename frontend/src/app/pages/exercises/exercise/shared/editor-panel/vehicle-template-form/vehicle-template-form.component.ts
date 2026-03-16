@@ -7,6 +7,15 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import { cloneDeep } from 'lodash-es';
+import { FormsModule } from '@angular/forms';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import { getImageAspectRatio } from '../../../../../../shared/functions/get-image-aspect-ratio';
 import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
@@ -15,12 +24,32 @@ import {
     selectMaterialTemplates,
     selectPersonnelTemplates,
 } from '../../../../../../state/application/selectors/exercise.selectors';
+import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
+import { ImageExistsValidatorDirective } from '../../../../../../shared/validation/image-exists-validator.directive';
+import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
+import { IntegerValidatorDirective } from '../../../../../../shared/validation/integer-validator.directive';
+import { MapEditorCardComponent } from '../map-editor-card/map-editor-card.component';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-vehicle-template-form',
     templateUrl: './vehicle-template-form.component.html',
     styleUrls: ['./vehicle-template-form.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        DisplayValidationComponent,
+        ImageExistsValidatorDirective,
+        AutofocusDirective,
+        IntegerValidatorDirective,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        MapEditorCardComponent,
+        AsyncPipe,
+        ValuesPipe,
+    ],
 })
 export class VehicleTemplateFormComponent implements OnChanges {
     private readonly messageService = inject(MessageService);

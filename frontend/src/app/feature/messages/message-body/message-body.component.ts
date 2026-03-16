@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Message } from '../../../core/messages/message';
+import { AppShowMoreComponent } from '../show-more/app-show-more.component';
 
 /**
  * Displays the body of a message (for a toast or alert)
@@ -9,7 +10,7 @@ import { Message } from '../../../core/messages/message';
     templateUrl: './message-body.component.html',
     styleUrls: ['./message-body.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false,
+    imports: [AppShowMoreComponent],
 })
 export class MessageBodyComponent {
     readonly message = input.required<Message>();

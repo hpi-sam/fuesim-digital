@@ -6,7 +6,6 @@ import type { CustomValidationErrors } from '../custom-validation-errors';
     selector: 'app-display-validation',
     templateUrl: './display-validation.component.html',
     styleUrls: ['./display-validation.component.scss'],
-    standalone: false,
 })
 export class DisplayValidationComponent {
     readonly ngModelInput = input.required<NgModel>();

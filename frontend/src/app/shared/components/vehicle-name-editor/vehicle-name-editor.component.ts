@@ -3,15 +3,24 @@ import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../core/exercise.service';
 import type { AppState } from '../../../state/app.state';
 import { createSelectVehicle } from '../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.directive';
+import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
 
 @Component({
     selector: 'app-vehicle-name-editor',
     templateUrl: './vehicle-name-editor.component.html',
     styleUrls: ['./vehicle-name-editor.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        DisplayValidationComponent,
+        AsyncPipe,
+    ],
 })
 export class VehicleNameEditorComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

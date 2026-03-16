@@ -15,10 +15,7 @@ import { Directive, ElementRef, inject, input } from '@angular/core';
  *
  * If multiple autofocus directives are used on elements, that are loaded at the same time, it leads to a race condition.
  */
-@Directive({
-    selector: '[appAutofocus]',
-    standalone: false,
-})
+@Directive({ selector: '[appAutofocus]' })
 // See https://netbasal.com/autofocus-that-works-anytime-in-angular-apps-68cb89a3f057
 // and https://jhapriti09.medium.com/autofocus-directive-that-works-in-angular-10-db352ef70399
 export class AutofocusDirective implements AfterViewInit {

@@ -4,7 +4,6 @@ import { Component } from '@angular/core';
     selector: 'app-health-page',
     templateUrl: './health-page.component.html',
     styleUrls: ['./health-page.component.scss'],
-    standalone: false,
 })
 /**
  * This page is used to determine whether the frontend itself is running.

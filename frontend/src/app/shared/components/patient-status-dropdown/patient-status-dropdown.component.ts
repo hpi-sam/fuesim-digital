@@ -1,11 +1,26 @@
 import { Component, input, output } from '@angular/core';
 import type { PatientStatus } from 'fuesim-digital-shared';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { PatientStatusBadgeComponent } from '../patient-status-badge/patient-status-badge.component';
 
 @Component({
     selector: 'app-patient-status-dropdown',
     templateUrl: './patient-status-dropdown.component.html',
     styleUrls: ['./patient-status-dropdown.component.scss'],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        PatientStatusBadgeComponent,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+    ],
 })
 export class PatientStatusDropdownComponent<
     AllowedStatus extends PatientStatus,

@@ -2,12 +2,21 @@ import { Component, TemplateRef, inject, viewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
+import { SignallerModalInteractionsComponent } from '../signaller-modal-interactions/signaller-modal-interactions.component';
+import { SignallerModalEocInformationAlarmGroupsSentComponent } from '../details-modal/eoc-information/signaller-modal-eoc-information-alarm-groups-sent/signaller-modal-eoc-information-alarm-groups-sent.component';
+import { SignallerModalEocInformationArrivingVehiclesComponent } from '../details-modal/eoc-information/signaller-modal-eoc-information-arriving-vehicles/signaller-modal-eoc-information-arriving-vehicles.component';
+import { SendAlarmGroupInterfaceComponent } from '../../../../../../../shared/components/send-alarm-group-interface/send-alarm-group-interface.component';
 
 @Component({
     selector: 'app-signaller-modal-eoc',
     templateUrl: './signaller-modal-eoc.component.html',
     styleUrls: ['./signaller-modal-eoc.component.scss'],
-    standalone: false,
+    imports: [
+        SignallerModalInteractionsComponent,
+        SignallerModalEocInformationAlarmGroupsSentComponent,
+        SignallerModalEocInformationArrivingVehiclesComponent,
+        SendAlarmGroupInterfaceComponent,
+    ],
 })
 export class SignallerModalEocComponent {
     private readonly detailsModal = inject(SignallerModalDetailsService);

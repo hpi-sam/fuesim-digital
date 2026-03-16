@@ -5,12 +5,18 @@ import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import { Patient } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { NgbProgressbar } from '@ng-bootstrap/ng-bootstrap/progressbar';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../../../state/app.state';
 import {
     createSelectPatient,
     selectPersonnel,
     selectConfiguration,
 } from '../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientIdentifierComponent } from '../../../../../../../../../../../shared/components/patient-identifier/patient-identifier.component';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { PatientStatusDisplayComponent } from '../../../../../../../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 
 @Component({
     selector:
@@ -20,7 +26,14 @@ import {
     styleUrls: [
         './simulated-region-overview-behavior-treat-patients-patient-details.component.scss',
     ],
-    standalone: false,
+    imports: [
+        PatientIdentifierComponent,
+        PatientStatusBadgeComponent,
+        PatientStatusDisplayComponent,
+        NgbProgressbar,
+        NgbTooltip,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
     implements OnInit, OnDestroy

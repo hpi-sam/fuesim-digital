@@ -6,12 +6,13 @@ import type {
     EditableImageTemplateValues,
 } from '../image-template-form/image-template-form.component';
 import { ExerciseService } from '../../../../../../core/exercise.service';
+import { ImageTemplateFormComponent } from '../image-template-form/image-template-form.component';
 
 @Component({
     selector: 'app-create-image-template-modal',
     templateUrl: './create-image-template-modal.component.html',
     styleUrls: ['./create-image-template-modal.component.scss'],
-    standalone: false,
+    imports: [ImageTemplateFormComponent],
 })
 export class CreateImageTemplateModalComponent {
     readonly activeModal = inject(NgbActiveModal);

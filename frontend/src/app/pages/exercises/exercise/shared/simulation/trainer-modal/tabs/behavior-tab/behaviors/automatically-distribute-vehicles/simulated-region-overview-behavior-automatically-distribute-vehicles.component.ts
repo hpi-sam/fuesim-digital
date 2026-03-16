@@ -10,6 +10,15 @@ import {
     TransferPoint,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
@@ -17,6 +26,10 @@ import {
     selectVehicleTemplates,
     selectTransferPoints,
 } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { TransferPointNameComponent } from '../../../../../../../../../../shared/components/transfer-point-name/transfer-point-name.component';
+import { ValuesPipe } from '../../../../../../../../../../shared/pipes/values.pipe';
+import { OrderByPipe } from '../../../../../../../../../../shared/pipes/order-by.pipe';
 
 @Component({
     selector:
@@ -26,7 +39,19 @@ import {
     styleUrls: [
         './simulated-region-overview-behavior-automatically-distribute-vehicles.component.scss',
     ],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        TransferPointNameComponent,
+        ValuesPipe,
+        OrderByPipe,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent
     implements OnInit

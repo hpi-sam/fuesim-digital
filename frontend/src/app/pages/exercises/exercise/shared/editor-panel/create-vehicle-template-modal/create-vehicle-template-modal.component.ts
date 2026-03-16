@@ -6,12 +6,13 @@ import type {
     EditableVehicleTemplateValues,
 } from '../vehicle-template-form/vehicle-template-form.component';
 import { ExerciseService } from '../../../../../../core/exercise.service';
+import { VehicleTemplateFormComponent } from '../vehicle-template-form/vehicle-template-form.component';
 
 @Component({
     selector: 'app-create-vehicle-template-modal',
     templateUrl: './create-vehicle-template-modal.component.html',
     styleUrls: ['./create-vehicle-template-modal.component.scss'],
-    standalone: false,
+    imports: [VehicleTemplateFormComponent],
 })
 export class CreateVehicleTemplateModalComponent {
     private readonly activeModal = inject(NgbActiveModal);

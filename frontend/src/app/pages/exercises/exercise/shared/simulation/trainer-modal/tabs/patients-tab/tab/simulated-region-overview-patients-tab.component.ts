@@ -4,6 +4,7 @@ import { createSelector, Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { Patient, SimulatedRegion } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { comparePatientsByVisibleStatus } from '../../compare-patients';
 import type { PatientWithVisibleStatus } from '../../../patients-table/simulated-region-overview-patients-table.component';
 import type { AppState } from '../../../../../../../../../state/app.state';
@@ -12,12 +13,18 @@ import {
     selectPatients,
     selectConfiguration,
 } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { SimulatedRegionOverviewPatientsTableComponent } from '../../../patients-table/simulated-region-overview-patients-table.component';
+import { SimulatedRegionOverviewPatientDetailsComponent } from '../details/simulated-region-overview-patient-details.component';
 
 @Component({
     selector: 'app-simulated-region-overview-patients-tab',
     templateUrl: './simulated-region-overview-patients-tab.component.html',
     styleUrls: ['./simulated-region-overview-patients-tab.component.scss'],
-    standalone: false,
+    imports: [
+        SimulatedRegionOverviewPatientsTableComponent,
+        SimulatedRegionOverviewPatientDetailsComponent,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewPatientsTabComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);

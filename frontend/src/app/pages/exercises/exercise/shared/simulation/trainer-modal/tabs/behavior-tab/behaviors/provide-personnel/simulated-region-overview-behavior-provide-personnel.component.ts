@@ -9,6 +9,15 @@ import type {
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject, takeUntil } from 'rxjs';
 import type { CdkDragDrop } from '@angular/cdk/drag-drop';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
@@ -23,7 +32,16 @@ import {
     styleUrls: [
         './simulated-region-overview-behavior-provide-personnel.component.scss',
     ],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        CdkDropList,
+        CdkDrag,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
     implements OnInit, OnDestroy

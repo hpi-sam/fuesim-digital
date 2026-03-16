@@ -6,9 +6,12 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../../../state/app.state';
 import { createSelectBehaviorState } from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../../../shared/directives/app-save-on-typing.directive';
 
 @Component({
     selector: 'app-manage-patient-transport-to-hospital-settings-editor',
@@ -17,7 +20,7 @@ import { createSelectBehaviorState } from '../../../../../../../../../../../../s
     styleUrls: [
         './manage-patient-transport-to-hospital-settings-editor.component.scss',
     ],
-    standalone: false,
+    imports: [FormsModule, AppSaveOnTypingDirective, AsyncPipe],
 })
 export class ManagePatientTransportToHospitalSettingsEditorComponent
     implements OnChanges

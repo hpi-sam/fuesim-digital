@@ -2,6 +2,15 @@ import { Component, inject, OnInit, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import { AlarmGroup, AlarmGroupVehicle } from 'fuesim-digital-shared';
+import { FormsModule } from '@angular/forms';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
@@ -9,12 +18,26 @@ import {
     createSelectVehicleTemplate,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
+import { VehicleTemplateDisplayComponent } from '../vehicle-template-display/vehicle-template-display.component';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-alarm-group-item',
     templateUrl: './alarm-group-item.component.html',
     styleUrls: ['./alarm-group-item.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        VehicleTemplateDisplayComponent,
+        AsyncPipe,
+        ValuesPipe,
+    ],
 })
 export class AlarmGroupItemComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);

@@ -7,17 +7,20 @@ import {
     effect,
 } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgTemplateOutlet } from '@angular/common';
 import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
 } from '../../../../../../../../shared/services/hotkeys.service';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-details-modal',
     templateUrl: './signaller-modal-details-modal.component.html',
     styleUrls: ['./signaller-modal-details-modal.component.scss'],
-    standalone: false,
+    imports: [AutofocusDirective, NgTemplateOutlet, HotkeyIndicatorComponent],
 })
 export class SignallerModalDetailsModalComponent implements OnDestroy {
     private readonly activeModal = inject(NgbActiveModal);

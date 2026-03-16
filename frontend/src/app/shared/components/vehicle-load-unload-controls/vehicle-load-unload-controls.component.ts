@@ -5,6 +5,7 @@ import type { Role, UUID } from 'fuesim-digital-shared';
 import { isInSpecificVehicle } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, startWith, switchMap } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../core/exercise.service';
 import type { AppState } from '../../../state/app.state';
 import {
@@ -19,7 +20,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-vehicle-load-unload-controls',
     templateUrl: './vehicle-load-unload-controls.component.html',
     styleUrls: ['./vehicle-load-unload-controls.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class VehicleLoadUnloadControlsComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

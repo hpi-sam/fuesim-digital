@@ -1,6 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbModal,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { TrainerKey } from 'fuesim-digital-shared';
 import { openAlarmGroupOverviewModal } from '../alarm-group-overview/open-alarm-group-overview-modal';
@@ -21,12 +28,20 @@ import type { AppState } from '../../../../../state/app.state';
 import { selectExerciseKey } from '../../../../../state/application/selectors/application.selectors';
 import { selectExerciseStatus } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
+import { StartPauseButtonComponent } from '../../../../../shared/components/start-pause-button/start-pause-button.component';
 
 @Component({
     selector: 'app-trainer-toolbar',
     templateUrl: './trainer-toolbar.component.html',
     styleUrls: ['./trainer-toolbar.component.scss'],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        StartPauseButtonComponent,
+    ],
 })
 export class TrainerToolbarComponent {
     private readonly store = inject<Store<AppState>>(Store);

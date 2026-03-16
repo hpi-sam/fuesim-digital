@@ -4,6 +4,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { cloneDeepMutable, StateExport } from 'fuesim-digital-shared';
 import { throttle } from 'lodash-es';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { openClientOverviewModal } from '../client-overview/open-client-overview-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
 import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
@@ -14,12 +16,14 @@ import type { AppState } from '../../../../../state/app.state';
 import { selectTimeConstraints } from '../../../../../state/application/selectors/application.selectors';
 import { selectExerciseState } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
+import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
+import { FormatDurationPipe } from '../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-time-travel',
     templateUrl: './time-travel.component.html',
     styleUrls: ['./time-travel.component.scss'],
-    standalone: false,
+    imports: [ExerciseMapComponent, FormsModule, AsyncPipe, FormatDurationPipe],
 })
 export class TimeTravelComponent implements OnDestroy {
     private readonly modalService = inject(NgbModal);

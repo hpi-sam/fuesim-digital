@@ -10,10 +10,7 @@ const behaviorDescriptionMap: { [Key in BehaviourCode]: string } = {
     E: 'Verstorben',
 };
 
-@Pipe({
-    name: 'patientBehaviorDescription',
-    standalone: false,
-})
+@Pipe({ name: 'patientBehaviorDescription' })
 export class PatientBehaviorDescriptionPipe implements PipeTransform {
     transform(value: BehaviourCode): string {
         return behaviorDescriptionMap[value];

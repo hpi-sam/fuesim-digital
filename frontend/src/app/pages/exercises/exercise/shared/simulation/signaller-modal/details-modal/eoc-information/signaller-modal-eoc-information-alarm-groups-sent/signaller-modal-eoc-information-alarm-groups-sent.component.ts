@@ -11,7 +11,6 @@ import { selectStateSnapshot } from '../../../../../../../../../state/get-state-
     styleUrls: [
         './signaller-modal-eoc-information-alarm-groups-sent.component.scss',
     ],
-    standalone: false,
 })
 export class SignallerModalEocInformationAlarmGroupsSentComponent {
     alarmGroupsSent: string[];

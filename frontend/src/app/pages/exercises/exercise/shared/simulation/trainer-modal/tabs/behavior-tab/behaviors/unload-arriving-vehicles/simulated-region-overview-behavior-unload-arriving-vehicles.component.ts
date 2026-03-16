@@ -9,6 +9,8 @@ import type {
 import { StrictObject } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
@@ -17,6 +19,9 @@ import {
     selectVehicles,
     selectCurrentTime,
 } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { DisplayValidationComponent } from '../../../../../../../../../../shared/validation/display-validation/display-validation.component';
+import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-unload-arriving-vehicles',
@@ -25,7 +30,13 @@ import {
     styleUrls: [
         './simulated-region-overview-behavior-unload-arriving-vehicles.component.scss',
     ],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        DisplayValidationComponent,
+        FormatDurationPipe,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent
     implements OnInit

@@ -13,6 +13,9 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
@@ -20,12 +23,21 @@ import {
     createSelectActivityStates,
     selectCurrentTime,
 } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { SimulationEventBasedReportEditorComponent } from '../../../../../shared/simulation-event-based-report-editor/simulation-event-based-report-editor.component';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-report',
     templateUrl: './simulated-region-overview-behavior-report.component.html',
     styleUrls: ['./simulated-region-overview-behavior-report.component.scss'],
-    standalone: false,
+    imports: [
+        NgbCollapse,
+        FormsModule,
+        SimulationEventBasedReportEditorComponent,
+        AppSaveOnTypingDirective,
+        AsyncPipe,
+        DatePipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);

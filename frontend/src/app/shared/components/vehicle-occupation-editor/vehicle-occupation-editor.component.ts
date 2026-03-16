@@ -8,15 +8,17 @@ import {
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../core/exercise.service';
 import type { AppState } from '../../../state/app.state';
 import { createSelectVehicle } from '../../../state/application/selectors/exercise.selectors';
+import { OccupationNamePipe } from '../../pipes/occupation-name.pipe';
 
 @Component({
     selector: 'app-vehicle-occupation-editor',
     templateUrl: './vehicle-occupation-editor.component.html',
     styleUrls: ['./vehicle-occupation-editor.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe, OccupationNamePipe],
 })
 export class VehicleOccupationEditorComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

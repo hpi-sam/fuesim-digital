@@ -1,15 +1,26 @@
 import type { OnChanges } from '@angular/core';
 import { Component, inject, input, output } from '@angular/core';
 import { cloneDeep } from 'lodash-es';
+import { FormsModule } from '@angular/forms';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import { getImageAspectRatio } from '../../../../../../shared/functions/get-image-aspect-ratio';
 import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
+import { ImageExistsValidatorDirective } from '../../../../../../shared/validation/image-exists-validator.directive';
+import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
+import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
+import { IntegerValidatorDirective } from '../../../../../../shared/validation/integer-validator.directive';
 
 @Component({
     selector: 'app-image-template-form',
     templateUrl: './image-template-form.component.html',
     styleUrls: ['./image-template-form.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        ImageExistsValidatorDirective,
+        AutofocusDirective,
+        DisplayValidationComponent,
+        IntegerValidatorDirective,
+    ],
 })
 export class ImageTemplateFormComponent implements OnChanges {
     private readonly messageService = inject(MessageService);

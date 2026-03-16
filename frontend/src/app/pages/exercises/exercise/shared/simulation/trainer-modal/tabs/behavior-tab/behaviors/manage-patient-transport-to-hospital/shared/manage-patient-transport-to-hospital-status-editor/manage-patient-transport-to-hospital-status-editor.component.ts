@@ -6,6 +6,7 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../../../../state/app.state';
 import { createSelectBehaviorState } from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
 import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
@@ -17,7 +18,7 @@ import { ExerciseService } from '../../../../../../../../../../../../core/exerci
     styleUrls: [
         './manage-patient-transport-to-hospital-status-editor.component.scss',
     ],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class ManagePatientTransportToHospitalStatusEditorComponent
     implements OnChanges

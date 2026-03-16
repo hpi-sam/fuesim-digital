@@ -10,12 +10,13 @@ import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import { createSelectMapImageTemplate } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { ImageTemplateFormComponent } from '../image-template-form/image-template-form.component';
 
 @Component({
     selector: 'app-edit-image-template-modal',
     templateUrl: './edit-image-template-modal.component.html',
     styleUrls: ['./edit-image-template-modal.component.scss'],
-    standalone: false,
+    imports: [ImageTemplateFormComponent],
 })
 export class EditImageTemplateModalComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);

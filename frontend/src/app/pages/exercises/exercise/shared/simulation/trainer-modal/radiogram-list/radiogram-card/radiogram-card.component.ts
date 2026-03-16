@@ -21,6 +21,7 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
+import { NgClass, AsyncPipe } from '@angular/common';
 import { SelectSignallerRegionService } from '../../../signaller-modal/select-signaller-region.service';
 import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
@@ -36,6 +37,8 @@ import {
     selectClients,
 } from '../../../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../../../state/get-state-snapshot';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
+import { RadiogramCardContentComponent } from './radiogram-card-content/radiogram-card-content.component';
 
 // Clients that leave are lost from the state but radiograms might point to them.
 // This is a fallback to show something useful in the UI
@@ -48,7 +51,12 @@ const unavailableClient = Client.create(
     selector: 'app-radiogram-card',
     templateUrl: './radiogram-card.component.html',
     styleUrls: ['./radiogram-card.component.scss'],
-    standalone: false,
+    imports: [
+        NgClass,
+        RadiogramCardContentComponent,
+        HotkeyIndicatorComponent,
+        AsyncPipe,
+    ],
 })
 export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
     private readonly store = inject<Store<AppState>>(Store);

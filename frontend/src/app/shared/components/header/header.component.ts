@@ -1,12 +1,30 @@
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import {
+    NgbNav,
+    NgbNavItem,
+    NgbNavItemRole,
+    NgbNavLink,
+    NgbNavLinkBase,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { AuthService } from '../../../core/auth.service';
+import { UserAccountNavbarItemComponent } from '../user-account-navbar-item/user-account-navbar-item.component';
 
 @Component({
     selector: 'app-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
-    standalone: false,
+    imports: [
+        RouterLink,
+        NgbNav,
+        NgbNavItem,
+        NgbNavItemRole,
+        NgbNavLink,
+        NgbNavLinkBase,
+        UserAccountNavbarItemComponent,
+        AsyncPipe,
+    ],
 })
 export class HeaderComponent {
     route = inject(ActivatedRoute);

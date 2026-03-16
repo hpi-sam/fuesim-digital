@@ -11,6 +11,8 @@ import { groupBy } from 'lodash-es';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, tap } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { SignallerModalDetailsService } from '../signaller-modal-details.service';
 import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
@@ -19,7 +21,10 @@ import {
 } from '../../../../../../../../shared/services/hotkeys.service';
 import { ExerciseService } from '../../../../../../../../core/exercise.service';
 import { MessageService } from '../../../../../../../../core/messages/message.service';
-import { SearchableDropdownOption } from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import {
+    SearchableDropdownOption,
+    SearchableDropdownComponent,
+} from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
 import type { AppState } from '../../../../../../../../state/app.state';
 import {
     selectVehicleTemplates,
@@ -27,12 +32,25 @@ import {
     selectCurrentTime,
     selectTransferPoints,
 } from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { IntegerValidatorDirective } from '../../../../../../../../shared/validation/integer-validator.directive';
+import { DisplayValidationComponent } from '../../../../../../../../shared/validation/display-validation/display-validation.component';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
+import { ValuesPipe } from '../../../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-signaller-modal-provide-vehicles-editor',
     templateUrl: './signaller-modal-provide-vehicles-editor.component.html',
     styleUrls: ['./signaller-modal-provide-vehicles-editor.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        IntegerValidatorDirective,
+        DisplayValidationComponent,
+        NgbPopover,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        ValuesPipe,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalProvideVehiclesEditorComponent
     implements OnInit, OnChanges, OnDestroy

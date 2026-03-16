@@ -5,6 +5,16 @@ import type { SimulatedRegion, UUID } from 'fuesim-digital-shared';
 import { isInSpecificSimulatedRegion } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';
+import {
+    NgbNav,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbTooltip,
+    NgbNavContent,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { SelectPatientService } from '../select-patient.service';
 import type { TransferOptions } from '../start-transfer.service';
 import { StartTransferService } from '../start-transfer.service';
@@ -13,6 +23,11 @@ import {
     createSelectSimulatedRegion,
     selectTransferPoints,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { SimulatedRegionOverviewGeneralTabComponent } from '../tabs/general-tab/simulated-region-overview-general-tab.component';
+import { SimulatedRegionOverviewPatientsTabComponent } from '../tabs/patients-tab/tab/simulated-region-overview-patients-tab.component';
+import { SimulatedRegionOverviewVehiclesTabComponent } from '../tabs/vehicles-tab/tab/simulated-region-overview-vehicles-tab.component';
+import { OtherTransferPointTabComponent } from '../../../transfer-point-overview/other-transfer-point-tab/other-transfer-point-tab.component';
+import { SimulatedRegionOverviewBehaviorTabComponent } from '../tabs/behavior-tab/simulated-region-overview-behavior-tab.component';
 
 type NavIds =
     | 'behaviors'
@@ -31,7 +46,21 @@ let activeNavId: NavIds = 'general';
     templateUrl: './simulated-region-overview.component.html',
     styleUrls: ['./simulated-region-overview.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: false,
+    imports: [
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbTooltip,
+        NgbNavContent,
+        SimulatedRegionOverviewGeneralTabComponent,
+        SimulatedRegionOverviewPatientsTabComponent,
+        SimulatedRegionOverviewVehiclesTabComponent,
+        OtherTransferPointTabComponent,
+        SimulatedRegionOverviewBehaviorTabComponent,
+        NgbNavOutlet,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewGeneralComponent
     implements OnInit, OnDestroy

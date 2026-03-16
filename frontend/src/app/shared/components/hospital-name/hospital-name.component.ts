@@ -3,6 +3,7 @@ import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Hospital, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import { createSelectHospital } from '../../../state/application/selectors/exercise.selectors';
 
@@ -10,7 +11,7 @@ import { createSelectHospital } from '../../../state/application/selectors/exerc
     selector: 'app-hospital-name',
     templateUrl: './hospital-name.component.html',
     styleUrls: ['./hospital-name.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class HospitalNameComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);

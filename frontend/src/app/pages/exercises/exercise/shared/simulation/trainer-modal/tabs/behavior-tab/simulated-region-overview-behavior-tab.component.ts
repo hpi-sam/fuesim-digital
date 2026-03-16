@@ -12,6 +12,14 @@ import {
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import type { TransferOptions } from '../../start-transfer.service';
 import { ExerciseService } from '../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../state/app.state';
@@ -20,6 +28,18 @@ import {
     selectVehicleTemplates,
 } from '../../../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../../../state/get-state-snapshot';
+import { SimulatedRegionOverviewBehaviorAssignLeaderComponent } from './behaviors/assign-leader/simulated-region-overview-behavior-assign-leader.component';
+import { SimulatedRegionOverviewBehaviorTreatPatientsComponent } from './behaviors/treat-patients/simulated-region-overview-behavior-treat-patients.component';
+import { SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent } from './behaviors/unload-arriving-vehicles/simulated-region-overview-behavior-unload-arriving-vehicles.component';
+import { SimulatedRegionOverviewBehaviorReportComponent } from './behaviors/report/simulated-region-overview-behavior-report.component';
+import { SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent } from './behaviors/automatically-distribute-vehicles/simulated-region-overview-behavior-automatically-distribute-vehicles.component';
+import { SimulatedRegionOverviewBehaviorProvidePersonnelComponent } from './behaviors/provide-personnel/simulated-region-overview-behavior-provide-personnel.component';
+import { SimulatedRegionOverviewBehaviorAnswerVehicleRequestsComponent } from './behaviors/answer-vehicle-requests/simulated-region-overview-behavior-answer-vehicle-requests.component';
+import { RequestVehiclesComponent } from './behaviors/request-vehicles/simulated-region-overview-behavior-request-vehicles.component';
+import { SimulatedRegionOverviewBehaviorTransferVehiclesComponent } from './behaviors/transfer-vehicles/simulated-region-overview-behavior-transfer-vehicles.component';
+import { SimulatedRegionOverviewBehaviorTransferToHospitalComponent } from './behaviors/transfer-to-hospital/simulated-region-overview-behavior-transfer-to-hospital.component';
+import { SimulatedRegionOverviewBehaviorManagePatientTransportToHospitalComponent } from './behaviors/manage-patient-transport-to-hospital/simulated-region-overview-behavior-manage-patient-transport-to-hospital.component';
+import { BehaviorTypeToGermanNamePipe } from './utils/behavior-to-german-name.pipe';
 
 let globalLastBehaviorType: ExerciseSimulationBehaviorType | undefined;
 
@@ -27,7 +47,26 @@ let globalLastBehaviorType: ExerciseSimulationBehaviorType | undefined;
     selector: 'app-simulated-region-overview-behavior-tab',
     templateUrl: './simulated-region-overview-behavior-tab.component.html',
     styleUrls: ['./simulated-region-overview-behavior-tab.component.scss'],
-    standalone: false,
+    imports: [
+        SimulatedRegionOverviewBehaviorAssignLeaderComponent,
+        SimulatedRegionOverviewBehaviorTreatPatientsComponent,
+        SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent,
+        SimulatedRegionOverviewBehaviorReportComponent,
+        SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent,
+        SimulatedRegionOverviewBehaviorProvidePersonnelComponent,
+        SimulatedRegionOverviewBehaviorAnswerVehicleRequestsComponent,
+        RequestVehiclesComponent,
+        SimulatedRegionOverviewBehaviorTransferVehiclesComponent,
+        SimulatedRegionOverviewBehaviorTransferToHospitalComponent,
+        SimulatedRegionOverviewBehaviorManagePatientTransportToHospitalComponent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+        BehaviorTypeToGermanNamePipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorTabComponent
     implements OnChanges, OnInit

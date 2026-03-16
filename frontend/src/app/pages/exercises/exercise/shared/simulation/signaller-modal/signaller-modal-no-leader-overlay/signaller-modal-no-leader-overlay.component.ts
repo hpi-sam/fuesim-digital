@@ -5,12 +5,13 @@ import {
     Hotkey,
     HotkeysService,
 } from '../../../../../../../shared/services/hotkeys.service';
+import { HotkeyIndicatorComponent } from '../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-no-leader-overlay',
     templateUrl: './signaller-modal-no-leader-overlay.component.html',
     styleUrls: ['./signaller-modal-no-leader-overlay.component.scss'],
-    standalone: false,
+    imports: [HotkeyIndicatorComponent],
 })
 export class SignallerModalNoLeaderOverlayComponent
     implements OnInit, OnDestroy

@@ -1,16 +1,34 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import type { ExportImportFile } from 'fuesim-digital-shared';
 import { escapeRegExp } from 'lodash-es';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/auth.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { JoinIdDirective } from '../../../shared/validation/join-id-validator.directive';
+import { ExerciseExistsValidatorDirective } from '../../../shared/validation/exercise-exists-validator.directive';
+import { AutofocusDirective } from '../../../shared/directives/autofocus.directive';
+import { DisplayValidationComponent } from '../../../shared/validation/display-validation/display-validation.component';
+import { FileInputDirective } from '../../../shared/directives/file-input.directive';
+import { FooterComponent } from '../../../shared/components/footer/footer.component';
 
 @Component({
     selector: 'app-landing-page',
     templateUrl: './landing-page.component.html',
     styleUrls: ['./landing-page.component.scss'],
-    standalone: false,
+    imports: [
+        HeaderComponent,
+        FormsModule,
+        JoinIdDirective,
+        ExerciseExistsValidatorDirective,
+        AutofocusDirective,
+        DisplayValidationComponent,
+        RouterLink,
+        FileInputDirective,
+        FooterComponent,
+    ],
 })
 export class LandingPageComponent {
     private readonly apiService = inject(ApiService);

@@ -1,6 +1,7 @@
 import { Component, input, inject } from '@angular/core';
 import type { UUIDSet, UUID } from 'fuesim-digital-shared';
 import { WritableDraft } from 'immer';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { SelectPatientService } from '../../../select-patient.service';
 import { StartTransferService } from '../../../start-transfer.service';
 import { ExerciseService } from '../../../../../../../../../core/exercise.service';
@@ -12,7 +13,7 @@ import { ExerciseService } from '../../../../../../../../../core/exercise.servic
     styleUrls: [
         './simulated-region-overview-patient-interaction-bar.component.scss',
     ],
-    standalone: false,
+    imports: [NgbTooltip],
 })
 export class SimulatedRegionOverviewPatientInteractionBarComponent {
     private readonly exerciseService = inject(ExerciseService);

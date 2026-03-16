@@ -39,7 +39,7 @@ describe('access key service', () => {
         });
 
         it('should allow another key after freeing', async () => {
-            await environment.services.accessKeyService.free(generatedKeys[0]!);
+            await environment.services.accessKeyService.free(generatedKeys[0]);
             await expect(async () =>
                 environment.services.accessKeyService.generateKey()
             ).resolves.not.toThrow(RangeError);
@@ -48,7 +48,7 @@ describe('access key service', () => {
 
     describe('different length', () => {
         beforeEach(async () => {
-            await environment.services.accessKeyService.free(generatedKeys[0]!);
+            await environment.services.accessKeyService.free(generatedKeys[0]);
         });
 
         it('succeeds creating a key longer than 6', async () => {
@@ -56,7 +56,7 @@ describe('access key service', () => {
                 (await environment.services.accessKeyService.generateKey(8))
                     .length
             ).toBe(8);
-            await environment.services.accessKeyService.free(generatedKeys[1]!);
+            await environment.services.accessKeyService.free(generatedKeys[1]);
             expect(
                 (await environment.services.accessKeyService.generateKey(50))
                     .length

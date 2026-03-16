@@ -127,10 +127,7 @@ describe('join parallel exercise', () => {
 
     it('get update on client gets added', async () => {
         await environment.withWebsocket(async (socket) => {
-            const join = await socket.emit(
-                'joinParallelExercise',
-                parallelExercise.id
-            );
+            await socket.emit('joinParallelExercise', parallelExercise.id);
 
             const joinedParticipant = await joinParallelExercise(
                 environment,
@@ -151,10 +148,7 @@ describe('join parallel exercise', () => {
     it('get update on client gets active', async () => {
         await environment.withWebsocket(async (socket) => {
             const clientName = 'someRandomName';
-            const join = await socket.emit(
-                'joinParallelExercise',
-                parallelExercise.id
-            );
+            await socket.emit('joinParallelExercise', parallelExercise.id);
 
             const joinedParticipant = await joinParallelExercise(
                 environment,
@@ -164,14 +158,13 @@ describe('join parallel exercise', () => {
             socket.spyOn('updateExerciseInstances');
 
             await environment.withWebsocket(async (clientSocket) => {
-                const joinExercise = await clientSocket.emit(
+                await clientSocket.emit(
                     'joinExercise',
                     joinedParticipant.participantKey,
                     clientName
                 );
 
                 const response = await socket.waitOn('updateExerciseInstances');
-                console.log(response);
                 expect(response.exerciseInstances.length).toBe(1);
                 const exerciseInstance = response.exerciseInstances[0]!;
                 expect(exerciseInstance.participantKey).toBe(
@@ -185,5 +178,96 @@ describe('join parallel exercise', () => {
         }, session);
     });
 
-    // TODO Client names kept on leave
+    it('get update on client gets inactive', async () => {
+        await environment.withWebsocket(async (socket) => {
+            const clientName = 'someRandomName';
+            await socket.emit('joinParallelExercise', parallelExercise.id);
+
+            const joinedParticipant = await joinParallelExercise(
+                environment,
+                parallelExercise
+            );
+
+            socket.spyOn('updateExerciseInstances');
+
+            await environment.withWebsocket(async (clientSocket) => {
+                await clientSocket.emit(
+                    'joinExercise',
+                    joinedParticipant.participantKey,
+                    clientName
+                );
+
+                await socket.waitOn('updateExerciseInstances');
+            });
+
+            const response = await socket.waitOn('updateExerciseInstances');
+
+            expect(response.exerciseInstances.length).toBe(1);
+            const exerciseInstance = response.exerciseInstances[0]!;
+            expect(exerciseInstance.participantKey).toBe(
+                joinedParticipant.participantKey
+            );
+            expect(exerciseInstance.isActive).toBe(false);
+            expect(exerciseInstance.clientNames).toStrictEqual([clientName]);
+        }, session);
+    });
+
+    it('start and stop parallel exercise', async () => {
+        await environment.withWebsocket(async (socket) => {
+            await socket.emit('joinParallelExercise', parallelExercise.id);
+
+            const joinedParticipant1 = await joinParallelExercise(
+                environment,
+                parallelExercise
+            );
+            const joinedParticipant2 = await joinParallelExercise(
+                environment,
+                parallelExercise
+            );
+
+            await environment.withWebsocket(async (clientSocket1) => {
+                await clientSocket1.emit(
+                    'joinExercise',
+                    joinedParticipant1.participantKey,
+                    ''
+                );
+
+                await environment.withWebsocket(async (clientSocket2) => {
+                    await clientSocket2.emit(
+                        'joinExercise',
+                        joinedParticipant2.participantKey,
+                        ''
+                    );
+
+                    await socket.emit('startParallelExercise');
+
+                    for (const joinedParticipant of [
+                        joinedParticipant1,
+                        joinedParticipant2,
+                    ]) {
+                        const state = environment.services.exerciseService
+                            .TESTING_getExerciseMap()
+                            .get(joinedParticipant.participantKey)!.exercise
+                            .currentStateString;
+
+                        expect(state.currentStatus).toBe('running');
+                    }
+
+                    await socket.emit('pauseParallelExercise');
+
+                    for (const joinedParticipant of [
+                        joinedParticipant1,
+                        joinedParticipant2,
+                    ]) {
+                        const state = environment.services.exerciseService
+                            .TESTING_getExerciseMap()
+                            .get(joinedParticipant.participantKey)!.exercise
+                            .currentStateString;
+
+                        expect(state.currentStatus).toBe('paused');
+                    }
+                });
+            });
+        }, session);
+    });
 });

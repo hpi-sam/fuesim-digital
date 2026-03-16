@@ -2,10 +2,10 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     ClientToServerEvents,
+    ParallelExerciseId,
     ParallelExerciseInstanceSummary,
     ServerToClientEvents,
     SocketResponse,
-    UUID,
     UpdateParallelExerciseResponseData,
     joinParallelExerciseResponseDataSchema,
     socketIoTransports,
@@ -36,6 +36,8 @@ export class ParallelExerciseService {
     public readonly exerciseInstances = signal<
         ParallelExerciseInstanceSummary[]
     >([]);
+    private readonly joinedParallelExerciseId =
+        signal<ParallelExerciseId | null>(null);
     constructor() {
         this.socket.on(
             'updateExerciseInstances',
@@ -44,6 +46,8 @@ export class ParallelExerciseService {
             }
         );
         this.socket.on('disconnect', (reason) => {
+            this.joinedParallelExerciseId.set(null);
+            this.exerciseInstances.set([]);
             if (reason === 'io client disconnect') {
                 return;
             }
@@ -52,7 +56,14 @@ export class ParallelExerciseService {
         });
     }
 
-    public async joinParallelExercise(id: UUID) {
+    public async joinParallelExercise(id: ParallelExerciseId) {
+        if (this.socket.connected && this.joinedParallelExerciseId() === id) {
+            // already joined
+            return;
+        } else if (this.socket.connected) {
+            // wrong parallel exercise joined
+            this.leaveParallelExercise();
+        }
         this.socket.connect().on('connect_error', (error) => {
             this.messageService.postError({
                 title: 'Fehler beim Verbinden zum Server',
@@ -75,6 +86,7 @@ export class ParallelExerciseService {
         const parsedResponse = joinParallelExerciseResponseDataSchema.parse(
             joinResponse.payload
         );
+        this.joinedParallelExerciseId.set(id);
         this.exerciseInstances.set(parsedResponse.exerciseInstances);
         return true;
     }

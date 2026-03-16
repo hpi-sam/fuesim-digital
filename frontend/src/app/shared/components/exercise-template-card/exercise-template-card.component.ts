@@ -5,7 +5,13 @@ import type {
 } from 'fuesim-digital-shared';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbDropdown,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+    NgbModal,
+} from '@ng-bootstrap/ng-bootstrap';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
@@ -16,7 +22,15 @@ import { CreateParallelExerciseModalComponent } from '../../../pages/exercises/s
     selector: 'app-exercise-template-card',
     templateUrl: './exercise-template-card.component.html',
     styleUrls: ['./exercise-template-card.component.scss'],
-    imports: [InlineTextEditorComponent, RouterLink, DatePipe],
+    imports: [
+        InlineTextEditorComponent,
+        RouterLink,
+        DatePipe,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownItem,
+    ],
 })
 export class ExerciseTemplateCardComponent {
     private readonly apiService = inject(ApiService);

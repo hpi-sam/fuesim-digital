@@ -8,14 +8,21 @@ import {
     postParallelExerciseRequestDataSchema,
 } from 'fuesim-digital-shared';
 import { Router } from '@angular/router';
-import { disabled, form, validateStandardSchema } from '@angular/forms/signals';
+import {
+    disabled,
+    form,
+    FormField,
+    validateStandardSchema,
+} from '@angular/forms/signals';
+import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/api.service';
+import { DisplayModelValidationComponent } from '../../../../shared/validation/display-model-validation/display-model-validation.component';
 
 @Component({
     selector: 'app-create-parallel-exercise-modal',
     templateUrl: './create-parallel-exercise-modal.component.html',
     styleUrls: ['./create-parallel-exercise-modal.component.scss'],
-    standalone: false,
+    imports: [DisplayModelValidationComponent, FormsModule, FormField],
 })
 export class CreateParallelExerciseModalComponent {
     private readonly apiService = inject(ApiService);

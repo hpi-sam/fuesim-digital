@@ -1,23 +1,25 @@
 import { effect, signal, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { form, validateStandardSchema } from '@angular/forms/signals';
+import {
+    form,
+    FormField,
+    validateStandardSchema,
+} from '@angular/forms/signals';
 import { z } from 'zod';
+import { FormsModule } from '@angular/forms';
 import {
     coordinateStringSchema,
     OlMapCoordinatesInput,
     olMapCoordinatesSchema,
 } from '../../exercise-map/utility/ol-map-manager';
 import { OlMapManagerService } from '../../exercise-map/utility/ol-map-manager.service';
-import { toLonLat } from 'ol/proj';
-import { FormsModule } from '@angular/forms';
-import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
-import { GeographicCoordinateDirective } from '../../../../../../shared/validation/geographic-coordinate-validator.directive';
+import { DisplayModelValidationComponent } from '../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 
 @Component({
     selector: 'app-coordinate-picker-modal',
     templateUrl: './coordinate-picker-modal.component.html',
     styleUrls: ['./coordinate-picker-modal.component.scss'],
-    imports: [FormsModule, GeographicCoordinateDirective],
+    imports: [FormsModule, DisplayModelValidationComponent, FormField],
 })
 export class CoordinatePickerModalComponent {
     activeModal = inject(NgbActiveModal);

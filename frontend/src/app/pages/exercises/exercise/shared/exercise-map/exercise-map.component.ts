@@ -21,8 +21,7 @@ import {
     selectCurrentMainRole,
 } from '../../../../../state/application/selectors/shared.selectors';
 import { DisplayMessagesComponent } from '../../../../../feature/messages/display-messages/display-messages.component';
-import { OlMapManager } from './utility/ol-map-manager';
-import { olMapCoordinatesSchema, OlMapManager } from './utility/ol-map-manager';
+import { OlMapManager, olMapCoordinatesSchema } from './utility/ol-map-manager';
 import { PopupManager } from './utility/popup-manager';
 import { PopupService } from './utility/popup.service';
 import { OlMapManagerService } from './utility/ol-map-manager.service';

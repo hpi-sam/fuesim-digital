@@ -5,7 +5,6 @@ import { FieldState } from '@angular/forms/signals';
     selector: 'app-display-model-validation',
     templateUrl: './display-model-validation.component.html',
     styleUrls: ['./display-model-validation.component.scss'],
-    standalone: false,
 })
 export class DisplayModelValidationComponent {
     readonly field = input.required<FieldState<any>>();

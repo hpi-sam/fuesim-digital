@@ -39,15 +39,14 @@ import {
 } from '../../../../state/application/selectors/exercise.selectors';
 import { selectOwnClient } from '../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
-import {
-    ExerciseStateBadgeComponent,
-} from '../shared/exercise-state-badge/exercise-state-badge.component';
 import { TimeTravelComponent } from '../shared/time-travel/time-travel.component';
 import { ExerciseMapComponent } from '../shared/exercise-map/exercise-map.component';
 import { TrainerMapEditorComponent } from '../shared/trainer-map-editor/trainer-map-editor.component';
 import { EmergencyOperationsCenterFullComponent } from '../shared/emergency-operations-center/emergency-operations-center-full/emergency-operations-center-full.component';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
 import { shareLink } from '../../../../shared/functions/share';
+import { ExerciseStateBadgeComponent } from '../../../../shared/components/exercise-state-badge/exercise-state-badge.component';
+import { ParallelExerciseStatusBarComponent } from '../../../../shared/components/parallel-exercise-status-bar/parallel-exercise-status-bar.component';
 
 @Component({
     selector: 'app-exercise',
@@ -68,6 +67,7 @@ import { shareLink } from '../../../../shared/functions/share';
         EmergencyOperationsCenterFullComponent,
         AsyncPipe,
         FormatDurationPipe,
+        ParallelExerciseStatusBarComponent,
     ],
 })
 export class ExerciseComponent implements OnDestroy {

@@ -1,14 +1,17 @@
 import { Component, computed, input, output, inject } from '@angular/core';
 import type { GetParallelExerciseResponseData } from 'fuesim-digital-shared';
+import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
+import { CopyButtonComponent } from '../copy-button/copy-button.component';
 
 @Component({
     selector: 'app-parallel-exercise-card',
     templateUrl: './parallel-exercise-card.component.html',
     styleUrls: ['./parallel-exercise-card.component.scss'],
-    standalone: false,
+    imports: [CopyButtonComponent, RouterLink, DatePipe],
 })
 export class ParallelExerciseCardComponent {
     private readonly apiService = inject(ApiService);

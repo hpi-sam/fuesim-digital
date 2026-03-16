@@ -4,7 +4,14 @@ import {
     GetParallelExerciseResponseData,
     ParallelExerciseInstanceSummary,
 } from 'fuesim-digital-shared';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import {
+    NgbDropdown,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import {
     selectClientNames,
@@ -16,12 +23,21 @@ import { ParallelExerciseService } from '../../../core/parallel-exercise.service
 import { selectStateSnapshot } from '../../../state/get-state-snapshot';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 import { OlMapManagerService } from '../../../pages/exercises/exercise/shared/exercise-map/utility/ol-map-manager.service';
+import { ExerciseStateBadgeComponent } from '../exercise-state-badge/exercise-state-badge.component';
 
 @Component({
     selector: 'app-parallel-exercise-status-bar',
     templateUrl: './parallel-exercise-status-bar.component.html',
     styleUrls: ['./parallel-exercise-status-bar.component.scss'],
-    standalone: false,
+    imports: [
+        RouterLink,
+        ExerciseStateBadgeComponent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownItem,
+        AsyncPipe,
+    ],
 })
 export class ParallelExerciseStatusBarComponent {
     private readonly store = inject<Store<AppState>>(Store);

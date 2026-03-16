@@ -1,18 +1,30 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { GetParallelExerciseResponseData } from 'fuesim-digital-shared';
 import { ActivatedRoute } from '@angular/router';
+import { QrCodeComponent } from 'ng-qrcode';
 import { ApiService } from '../../../../core/api.service';
 import { ParallelExerciseService } from '../../../../core/parallel-exercise.service';
 import { shareLink } from '../../../../shared/functions/share';
 import { MessageService } from '../../../../core/messages/message.service';
+import { HeaderComponent } from '../../../../shared/components/header/header.component';
+import { ExerciseStateBadgeInnerComponent } from '../../../../shared/components/exercise-state-badge-inner/exercise-state-badge-inner.component';
+import { ParallelExerciseInstanceRowComponent } from '../instance-row/parallel-exercise-instance-row.component';
+import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 
 @Component({
     selector: 'app-parallel-exercise',
     templateUrl: './parallel-exercise.component.html',
     styleUrls: ['./parallel-exercise.component.scss'],
-    standalone: false,
+    imports: [
+        HeaderComponent,
+        ExerciseStateBadgeInnerComponent,
+        QrCodeComponent,
+        ParallelExerciseInstanceRowComponent,
+        FooterComponent,
+        NgbTooltip,
+    ],
 })
 export class ParallelExerciseComponent {
     private readonly apiService = inject(ApiService);

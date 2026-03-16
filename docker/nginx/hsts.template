@@ -1,3 +1,0 @@
-# WARNING: HSTS headers, if set, it is saved locally in every browser visiting this page,
-#          going back to http needs intervention in every browser
-add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;

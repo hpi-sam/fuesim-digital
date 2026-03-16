@@ -1,26 +1,33 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UUID,
     TreatPatientsBehaviorState,
     DelayEventActivityState,
     ReassignTreatmentsActivityState,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { SelectPatientService } from '../../../../select-patient.service';
+import { comparePatientsByVisibleStatus } from '../../../compare-patients';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
     createSelectElementsInSimulatedRegion,
-    createSelectSimulatedRegion,
-    selectConfiguration,
-    selectCurrentTime,
     selectPatients,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { SelectPatientService } from '../../../../select-patient.service';
-import { comparePatientsByVisibleStatus } from '../../../compare-patients';
+    selectConfiguration,
+    createSelectSimulatedRegion,
+    selectCurrentTime,
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { TreatmentStatusBadgeComponent } from '../../../../treatment-status-badge/treatment-status-badge.component';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
+import { SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent } from './patient-details/simulated-region-overview-behavior-treat-patients-patient-details.component';
 
 let globalLastSettingsCollapsed = true;
 let globalLastInformationCollapsed = true;
@@ -31,13 +38,25 @@ let globalLastInformationCollapsed = true;
     styleUrls: [
         './simulated-region-overview-behavior-treat-patients.component.scss',
     ],
-    standalone: false,
+    imports: [
+        TreatmentStatusBadgeComponent,
+        NgbCollapse,
+        SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        FormatDurationPipe,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
     implements OnInit
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() treatPatientsBehaviorId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly selectPatientService = inject(SelectPatientService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly treatPatientsBehaviorId = input.required<UUID>();
 
     public treatPatientsBehaviorState$!: Observable<TreatPatientsBehaviorState>;
     public patientIds$!: Observable<UUID[]>;
@@ -60,20 +79,14 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
         globalLastInformationCollapsed = value;
     }
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        readonly selectPatientService: SelectPatientService
-    ) {}
-
     ngOnInit(): void {
         this.settingsCollapsed = globalLastSettingsCollapsed;
         this.informationCollapsed = globalLastInformationCollapsed;
 
         this.treatPatientsBehaviorState$ = this.store.select(
             createSelectBehaviorState(
-                this.simulatedRegionId,
-                this.treatPatientsBehaviorId
+                this.simulatedRegionId(),
+                this.treatPatientsBehaviorId()
             )
         );
 
@@ -81,7 +94,7 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
             createSelector(
                 createSelectElementsInSimulatedRegion(
                     selectPatients,
-                    this.simulatedRegionId
+                    this.simulatedRegionId()
                 ),
                 selectConfiguration,
                 (patients, configuration) =>
@@ -98,7 +111,7 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
         );
 
         const simulatedRegion$ = this.store.select(
-            createSelectSimulatedRegion(this.simulatedRegionId)
+            createSelectSimulatedRegion(this.simulatedRegionId())
         );
 
         const currentTime$ = this.store.select(selectCurrentTime);
@@ -150,8 +163,8 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
     ) {
         this.exerciseService.proposeAction({
             type: '[TreatPatientsBehavior] Update TreatPatientsIntervals',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorStateId: this.treatPatientsBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorStateId: this.treatPatientsBehaviorId(),
             unknown,
             counted,
             triaged,

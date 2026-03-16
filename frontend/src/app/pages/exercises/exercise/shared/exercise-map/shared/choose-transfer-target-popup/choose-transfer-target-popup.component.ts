@@ -1,22 +1,28 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Hospital, TransferPoint, UUID } from 'digital-fuesim-manv-shared';
+import type { Hospital, TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    createSelectReachableHospitals,
-    createSelectReachableTransferPoints,
-} from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import {
+    createSelectReachableTransferPoints,
+    createSelectReachableHospitals,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
+import { TransferPointNameComponent } from '../../../../../../../shared/components/transfer-point-name/transfer-point-name.component';
+import { HospitalNameComponent } from '../../../../../../../shared/components/hospital-name/hospital-name.component';
 
 @Component({
     selector: 'app-choose-transfer-target-popup',
     templateUrl: './choose-transfer-target-popup.component.html',
     styleUrls: ['./choose-transfer-target-popup.component.scss'],
-    standalone: false,
+    imports: [TransferPointNameComponent, HospitalNameComponent, AsyncPipe],
 })
 export class ChooseTransferTargetPopupComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly popupService = inject(PopupService);
+
     // These properties are only set after OnInit
     public transferPointId!: UUID;
     public droppedElementType!: 'personnel' | 'vehicle';
@@ -29,11 +35,6 @@ export class ChooseTransferTargetPopupComponent implements OnInit {
     public reachableTransferPoints$?: Observable<TransferPoint[]>;
 
     public reachableHospitals$?: Observable<Hospital[]>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly popupService: PopupService
-    ) {}
 
     ngOnInit(): void {
         this.reachableTransferPoints$ = this.store.select(

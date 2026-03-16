@@ -1,4 +1,5 @@
-import type { Mutable, UUID } from '../utils/index.js';
+import type { WritableDraft } from 'immer';
+import type { UUID } from '../utils/index.js';
 import { uuid } from '../utils/index.js';
 import type { ExerciseState } from '../state.js';
 import type { Migration } from './migration-functions.js';
@@ -164,7 +165,7 @@ export const generalizeMaterialsPersonnel44: Migration = {
     action: (intermediaryState, action) => {
         const actionType = (action as { type: string }).type;
         const mutableIntermediaryState =
-            intermediaryState as Mutable<ExerciseState>;
+            intermediaryState as WritableDraft<ExerciseState>;
 
         const { mapImageTemplateIds, vehicleTemplateIds } = getTemplateIds(
             Object.values(mutableIntermediaryState.vehicleTemplates),

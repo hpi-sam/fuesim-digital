@@ -1,0 +1,43 @@
+<div class="modal-header">
+    <h4 class="modal-title">Neue Übungsvorlage erstellen</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    <form #f="ngForm" (ngSubmit)="createExerciseTemplate(f)">
+        <div class="form-group mb-2">
+            <label class="form-label">Name</label>
+            <input
+                [(ngModel)]="model.name"
+                name="name"
+                #nameInput="ngModel"
+                class="form-control"
+                required
+                [appAutofocus]="true"
+                [maxlength]="255"
+                type="text"
+            />
+            <app-display-validation
+                [ngModelInput]="nameInput"
+            ></app-display-validation>
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="form-label">Beschreibung</label>
+
+            <textarea
+                [(ngModel)]="model.description"
+                name="description"
+                #descriptionInput="ngModel"
+                class="form-control"
+                rows="3"
+            ></textarea>
+            <app-display-validation
+                [ngModelInput]="descriptionInput"
+            ></app-display-validation>
+        </div>
+
+        <button class="btn btn-primary" [disabled]="!f.form.valid">
+            Übungsvorlage erstellen
+        </button>
+    </form>
+</div>

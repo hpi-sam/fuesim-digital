@@ -7,6 +7,5 @@ import { Component } from '@angular/core';
     styleUrls: [
         './simulated-region-overview-behavior-answer-vehicle-requests.component.scss',
     ],
-    standalone: false,
 })
 export class SimulatedRegionOverviewBehaviorAnswerVehicleRequestsComponent {}

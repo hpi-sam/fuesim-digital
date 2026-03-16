@@ -1,5 +1,5 @@
 {
-    "name": "digital-fuesim-manv-backend",
+    "name": "fuesim-digital-backend",
     "version": "0.10.0",
     "type": "module",
     "scripts": {
@@ -13,9 +13,9 @@
         "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,html}\"",
         "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,html}\"",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose",
-        "test:migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose ./test/http-migration.spec.ts",
-        "test:ci-no-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci --testPathIgnorePatterns ./test/http-migration.spec.ts",
-        "test:ci-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci ./test/http-migration.spec.ts",
+        "test:migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose ./src/test/http-migration.spec.ts",
+        "test:ci-no-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci --testPathIgnorePatterns ./src/test/http-migration.spec.ts",
+        "test:ci-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci ./src/test/http-migration.spec.ts",
         "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --verbose --watch",
         "migration:generate": "npx drizzle-kit generate",
         "migration:run": "npx drizzle-kit migrate",
@@ -43,22 +43,24 @@
         "class-validator": "^0.14.1",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
-        "digital-fuesim-manv-shared": "file:../shared",
         "dotenv": "^16.4.7",
         "drizzle-kit": "^0.31.7",
         "drizzle-orm": "^0.44.7",
         "envalid": "^8.0.0",
         "express": "^5.2.0",
+        "fuesim-digital-shared": "file:../shared",
+        "immer": "^11.1.4",
         "lodash-es": "^4.17.23",
         "openid-client": "^6.8.1",
         "pg": "^8.14.1",
         "socket.io": "^4.8.1",
         "supertest": "^7.1.0",
-        "zod": "^4.1.12"
+        "zod": "^4.1.13"
     },
     "devDependencies": {
         "@eslint/compat": "^1.4.0",
         "@eslint/js": "^9.36.0",
+        "@types/cookie": "^0.6.0",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",
         "@types/jest": "^30.0.0",
@@ -75,7 +77,7 @@
         "ts-jest": "^29.4.5",
         "tsx": "^4.19.3",
         "typescript": "~5.9.3",
-        "typescript-eslint": "^8.45.0"
+        "typescript-eslint": "^8.55.0"
     },
     "overrides": {
         "@istanbuljs/load-nyc-config": {

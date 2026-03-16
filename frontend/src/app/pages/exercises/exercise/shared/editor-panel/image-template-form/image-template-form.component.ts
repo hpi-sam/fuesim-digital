@@ -1,29 +1,39 @@
 import type { OnChanges } from '@angular/core';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { cloneDeep } from 'lodash-es';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { getImageAspectRatio } from 'src/app/shared/functions/get-image-aspect-ratio';
-import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
+import { FormsModule } from '@angular/forms';
+import { MessageService } from '../../../../../../core/messages/message.service';
+import { getImageAspectRatio } from '../../../../../../shared/functions/get-image-aspect-ratio';
+import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
+import { ImageExistsValidatorDirective } from '../../../../../../shared/validation/image-exists-validator.directive';
+import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
+import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
+import { IntegerValidatorDirective } from '../../../../../../shared/validation/integer-validator.directive';
 
 @Component({
     selector: 'app-image-template-form',
     templateUrl: './image-template-form.component.html',
     styleUrls: ['./image-template-form.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        ImageExistsValidatorDirective,
+        AutofocusDirective,
+        DisplayValidationComponent,
+        IntegerValidatorDirective,
+    ],
 })
 export class ImageTemplateFormComponent implements OnChanges {
-    @Input() initialValues!: EditableImageTemplateValues;
-    @Input() btnText!: string;
+    private readonly messageService = inject(MessageService);
+
+    readonly initialValues = input.required<EditableImageTemplateValues>();
+    readonly btnText = input.required<string>();
 
     /**
      * Emits the changed values
      */
-    @Output() readonly submitImageTemplate =
-        new EventEmitter<ChangedImageTemplateValues>();
+    readonly submitImageTemplate = output<ChangedImageTemplateValues>();
 
     public values?: EditableImageTemplateValues;
-
-    constructor(private readonly messageService: MessageService) {}
 
     ngOnChanges(changes: SimpleChangesGeneric<this>): void {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -31,7 +41,7 @@ export class ImageTemplateFormComponent implements OnChanges {
             return;
         }
         this.values = {
-            ...this.initialValues,
+            ...this.initialValues(),
             ...this.values,
         };
     }

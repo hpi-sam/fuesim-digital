@@ -1,8 +1,10 @@
 import type {
     StateExport,
-    ExerciseKeys,
     ExerciseAction,
-} from 'digital-fuesim-manv-shared';
+    ParticipantKey,
+    TrainerKey,
+    ExerciseKeys,
+} from 'fuesim-digital-shared';
 import {
     ExerciseState,
     applyAction,
@@ -12,26 +14,41 @@ import {
     validateExerciseAction,
     migrateStateExport,
     validateExerciseExport,
-} from 'digital-fuesim-manv-shared';
+    isParticipantKey,
+    isTrainerKey,
+} from 'fuesim-digital-shared';
 import type { InferSelectModel } from 'drizzle-orm';
 import { Config } from '../config.js';
-import type { exerciseTable, actionTable } from '../database/schema.js';
+import type {
+    exerciseTable,
+    actionTable,
+    exerciseTemplateTable,
+} from '../database/schema.js';
 import { pushAll } from '../utils/array.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
+import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
 import { ActiveExercise } from './active-exercise.js';
-import { isParticipantKey, isTrainerKey } from './exercise-keys.js';
 
 export class ExerciseFactory {
-    public static fromBlank(exerciseKeys: ExerciseKeys) {
+    public static createKeys(): ExerciseKeys {
+        const participantKey = UserReadableIdGenerator.generateId(
+            6
+        ) as ParticipantKey;
+        const trainerKey = UserReadableIdGenerator.generateId(8) as TrainerKey;
+        return { participantKey, trainerKey };
+    }
+
+    public static fromBlank() {
+        const exerciseKeys = this.createKeys();
+
         if (
             !isParticipantKey(exerciseKeys.participantKey) ||
             !isTrainerKey(exerciseKeys.trainerKey)
         ) {
             throw new Error('Invalid exercise keys provided');
         }
-
         return new ActiveExercise(
             exerciseKeys.participantKey,
             exerciseKeys.trainerKey
@@ -41,10 +58,9 @@ export class ExerciseFactory {
     /**
      * @param file A **valid** import file
      */
-    public static fromFile(
-        file: StateExport,
-        exerciseKeys: ExerciseKeys
-    ): ActiveExercise {
+    public static fromFile(file: StateExport): ActiveExercise {
+        const exerciseKeys = this.createKeys();
+
         if (
             !isParticipantKey(exerciseKeys.participantKey) ||
             !isTrainerKey(exerciseKeys.trainerKey)
@@ -64,8 +80,8 @@ export class ExerciseFactory {
         const newCurrentState = migratedImportObject.currentState;
 
         // Set new participant id
-        newInitialState.participantId = exerciseKeys.participantKey;
-        newCurrentState.participantId = exerciseKeys.participantKey;
+        newInitialState.participantKey = exerciseKeys.participantKey;
+        newCurrentState.participantKey = exerciseKeys.participantKey;
 
         const exercise = new ActiveExercise(
             exerciseKeys.participantKey,
@@ -101,21 +117,12 @@ export class ExerciseFactory {
 
     public static fromDatabase(
         dbEntry: InferSelectModel<typeof exerciseTable>,
-        actions: InferSelectModel<typeof actionTable>[],
-        exerciseKeys?: ExerciseKeys
+        actions: InferSelectModel<typeof actionTable>[]
     ): ActiveExercise {
-        const participantKey =
-            exerciseKeys?.participantKey ?? dbEntry.participantId;
-        const trainerKey = exerciseKeys?.trainerKey ?? dbEntry.trainerId;
-
-        if (!isParticipantKey(participantKey) || !isTrainerKey(trainerKey)) {
-            throw new Error('Invalid exercise keys provided');
-        }
-
         const actionsInWrapper: ActionWrapper[] = [];
         const exercise = new ActiveExercise(
-            participantKey,
-            trainerKey,
+            dbEntry.participantKey,
+            dbEntry.trainerKey,
             actionsInWrapper,
             dbEntry.stateVersion,
             dbEntry.initialStateString,
@@ -138,6 +145,44 @@ export class ExerciseFactory {
         exercise.setTickCounter(dbEntry.tickCounter);
         exercise.markAsSaved();
         return exercise;
+    }
+
+    public static fromExerciseTemplate(
+        exerciseTemplate: InferSelectModel<typeof exerciseTemplateTable>,
+        exercise: InferSelectModel<typeof exerciseTable>,
+        actions: InferSelectModel<typeof actionTable>[]
+    ): ActiveExercise {
+        const exerciseKeys = this.createKeys();
+        const actionsInWrapper: ActionWrapper[] = [];
+        const newExercise = new ActiveExercise(
+            exerciseKeys.participantKey,
+            exerciseKeys.trainerKey,
+            actionsInWrapper,
+            exercise.stateVersion,
+            {
+                ...exercise.initialStateString,
+                participantKey: exerciseKeys.participantKey,
+            },
+            {
+                ...exercise.currentStateString,
+                participantKey: exerciseKeys.participantKey,
+            }
+        );
+        pushAll(
+            actionsInWrapper,
+            actions.map(
+                (action) =>
+                    new ActionWrapper(
+                        action.actionString,
+                        action.emitterId,
+                        newExercise,
+                        action.index,
+                        action.id
+                    )
+            )
+        );
+        newExercise.setTickCounter(exercise.tickCounter);
+        return newExercise;
     }
 
     public static restore(

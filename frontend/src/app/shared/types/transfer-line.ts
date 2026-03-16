@@ -1,4 +1,4 @@
-import type { MapCoordinates, UUID } from 'digital-fuesim-manv-shared';
+import type { MapCoordinates, UUID } from 'fuesim-digital-shared';
 
 export interface TransferLine {
     readonly id: `${UUID}:${UUID}`;

@@ -1,5 +1,5 @@
-import type { ImageProperties } from 'digital-fuesim-manv-shared';
-import { normalZoom } from 'digital-fuesim-manv-shared';
+import type { ImageProperties } from 'fuesim-digital-shared';
+import { normalZoom } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import Icon from 'ol/style/Icon';
 import Style from 'ol/style/Style';

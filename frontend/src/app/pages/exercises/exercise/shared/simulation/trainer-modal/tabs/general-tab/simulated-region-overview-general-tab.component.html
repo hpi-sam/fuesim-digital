@@ -3,7 +3,7 @@
         <label class="form-label">Name</label>
         <input
             #nameInput="ngModel"
-            [ngModel]="simulatedRegion.name"
+            [ngModel]="simulatedRegion().name"
             (appSaveOnTyping)="renameSimulatedRegion($event)"
             required
             type="text"

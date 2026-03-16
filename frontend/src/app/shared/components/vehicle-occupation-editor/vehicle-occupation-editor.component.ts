@@ -1,42 +1,42 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import {
     type UUID,
     type ExerciseOccupation,
     newNoOccupation,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { Store } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { createSelectVehicle } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../core/exercise.service';
+import type { AppState } from '../../../state/app.state';
+import { createSelectVehicle } from '../../../state/application/selectors/exercise.selectors';
+import { OccupationNamePipe } from '../../pipes/occupation-name.pipe';
 
 @Component({
     selector: 'app-vehicle-occupation-editor',
     templateUrl: './vehicle-occupation-editor.component.html',
     styleUrls: ['./vehicle-occupation-editor.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe, OccupationNamePipe],
 })
 export class VehicleOccupationEditorComponent implements OnChanges {
-    @Input() vehicleId!: UUID;
-    occupation$!: Observable<ExerciseOccupation>;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
+    readonly vehicleId = input.required<UUID>();
+    occupation$!: Observable<ExerciseOccupation>;
 
     ngOnChanges() {
         this.occupation$ = this.store
-            .select(createSelectVehicle(this.vehicleId))
+            .select(createSelectVehicle(this.vehicleId()))
             .pipe(map((vehicle) => vehicle.occupation));
     }
 
     cancelOccupation() {
         this.exerciseService.proposeAction({
             type: '[Vehicle] Set occupation',
-            vehicleId: this.vehicleId,
+            vehicleId: this.vehicleId(),
             occupation: newNoOccupation(),
         });
     }

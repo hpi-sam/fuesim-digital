@@ -1,8 +1,8 @@
 import type {
     ExerciseConfiguration,
     PatientStatus,
-} from 'digital-fuesim-manv-shared';
-import { Patient } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { Patient } from 'fuesim-digital-shared';
 
 const patientCategoryOrderDictionary: {
     [Key in PatientStatus]: number;

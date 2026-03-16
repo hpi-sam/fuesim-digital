@@ -8,7 +8,8 @@ import {
     mapCoordinatesSchema,
     newMapPositionAt,
     newSimulatedRegionPositionIn,
-    Size,
+    type Size,
+    sizeSchema,
 } from '../../models/index.js';
 import {
     changePosition,
@@ -75,8 +76,7 @@ export class ResizeSimulatedRegionAction implements Action {
 
     @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
-    @ValidateNested()
-    @Type(() => Size)
+    @IsZodSchema(sizeSchema)
     public readonly newSize!: Size;
 }
 

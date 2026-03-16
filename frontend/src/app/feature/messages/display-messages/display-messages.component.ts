@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { MessageService } from 'src/app/core/messages/message.service';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { AsyncPipe, SlicePipe } from '@angular/common';
 import { fade } from '../animations/fade';
+import { MessageService } from '../../../core/messages/message.service';
+import { CustomTimerProgressBarComponent } from '../custom-timer-progress-bar/custom-timer-progress-bar.component';
+import { MessageBodyComponent } from '../message-body/message-body.component';
 
 /**
  * This component displays all the messages from the MessageService.
@@ -15,8 +18,13 @@ import { fade } from '../animations/fade';
     styleUrls: ['./display-messages.component.scss'],
     animations: [fade()],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false,
+    imports: [
+        CustomTimerProgressBarComponent,
+        MessageBodyComponent,
+        AsyncPipe,
+        SlicePipe,
+    ],
 })
 export class DisplayMessagesComponent {
-    constructor(public readonly messageService: MessageService) {}
+    readonly messageService = inject(MessageService);
 }

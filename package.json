@@ -1,5 +1,5 @@
 {
-    "name": "digital-fuesim-manv",
+    "name": "fuesim-digital",
     "version": "0.10.0",
     "type": "module",
     "scripts": {
@@ -10,6 +10,7 @@
         "cy:install": "cd frontend && npm run cy:install",
         "benchmark": "cd benchmark && npm run benchmark",
         "install:all": "npm i && (cd shared && npm i) && concurrently \"cd frontend && npm i \" \"cd backend && npm i \" \"cd benchmark && npm i \"",
+        "install:all-ci": "npm ci --no-audit && (cd shared && npm ci --no-audit) && (cd frontend && npm ci) && (cd backend && npm ci --no-audit) && (cd benchmark && npm ci --no-audit)",
         "setup": "npm i && cd shared && npm i && npm run build && cd .. && concurrently \"cd frontend && npm i \" \"cd backend && npm i \" \"cd benchmark && npm i \"",
         "setup:package-lock-only": "npm i --package-lock-only && cd shared && npm i --package-lock-only && cd ../frontend && npm i --package-lock-only && cd ../backend && npm i --package-lock-only && cd ../benchmark && npm i --package-lock-only",
         "prune": "npm prune && cd shared && npm prune && cd ../frontend && npm prune && cd ../backend && npm prune",
@@ -29,7 +30,7 @@
         "licensing:third-party-licenses:json": "license-reporter --output frontend/src/assets/source-code/THIRD-PARTY-LICENSE-ACKNOWLEDGEMENTS.json --force",
         "licensing:third-party-licenses:html": "node third-party-license-json-to-html.cjs",
         "licensing:third-party-licenses": "npm-run-all -s -n -c licensing:third-party-licenses:json licensing:third-party-licenses:html",
-        "licensing:source-code-zip-file": "git archive --output=./frontend/src/assets/source-code/digital-fuesim-manv.zip --format=zip HEAD",
+        "licensing:source-code-zip-file": "git archive --output=./frontend/src/assets/source-code/fuesim-digital.zip --format=zip HEAD",
         "licensing:all": "npm-run-all -s -n -c licensing:third-party-licenses licensing:source-code-zip-file"
     },
     "private": true,

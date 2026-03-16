@@ -1,14 +1,16 @@
+import type { Immutable, WritableDraft } from 'immer';
 import { freeze } from 'immer';
 import { cloneDeep } from 'lodash-es';
-import type { Immutable, Mutable } from './immutability.js';
 
 /**
  * @param obj The object to clone
  * @returns The deep (recursively) cloned object with the mutable type
  * If you need an immutable clone of the object use {@link cloneDeepImmutable}
  */
-export function cloneDeepMutable<T>(obj: T): T extends object ? Mutable<T> : T {
-    return cloneDeep(obj) as T extends object ? Mutable<T> : T;
+export function cloneDeepMutable<T>(
+    obj: T
+): T extends object ? WritableDraft<T> : T {
+    return cloneDeep(obj) as T extends object ? WritableDraft<T> : T;
 }
 
 /**

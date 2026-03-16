@@ -1,10 +1,6 @@
 import type { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import {
-    newMapCoordinatesAt,
-    Size,
-    Viewport,
-} from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
+import { newMapCoordinatesAt, newSize, Viewport } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type { Coordinate } from 'ol/coordinate';
 import type { Polygon } from 'ol/geom';
@@ -12,13 +8,6 @@ import type OlMap from 'ol/Map';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectCurrentMainRole,
-    selectVisibleViewports,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { ViewportPopupComponent } from '../shared/viewport-popup/viewport-popup.component';
 import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
 import type { FeatureManager } from '../utility/feature-manager';
@@ -27,6 +16,13 @@ import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
 import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectVisibleViewports,
+    selectCurrentMainRole,
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export function isInViewport(
@@ -64,7 +60,7 @@ export class ViewportFeatureManager
     ) {
         super(
             olMap,
-            (targetPositions, viewport) => {
+            async (targetPositions, viewport) =>
                 exerciseService.proposeAction(
                     {
                         type: '[Viewport] Move viewport',
@@ -72,8 +68,7 @@ export class ViewportFeatureManager
                         targetPosition: targetPositions[0]![0]!,
                     },
                     true
-                );
-            },
+                ),
             new PolygonGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => [
@@ -122,7 +117,7 @@ export class ViewportFeatureManager
                             topLeftCoordinate[0]!,
                             topLeftCoordinate[1]!
                         ),
-                        newSize: Size.create(
+                        newSize: newSize(
                             currentElement.size.width * scale.x,
                             currentElement.size.height * scale.y
                         ),

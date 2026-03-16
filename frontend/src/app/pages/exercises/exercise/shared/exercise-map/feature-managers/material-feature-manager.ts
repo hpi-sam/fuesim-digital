@@ -1,12 +1,9 @@
 import type { Store } from '@ngrx/store';
-import type { Material, UUID } from 'digital-fuesim-manv-shared';
-import { normalZoom } from 'digital-fuesim-manv-shared';
+import type { Material, UUID } from 'fuesim-digital-shared';
+import { normalZoom } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectVisibleMaterials } from 'src/app/state/application/selectors/shared.selectors';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
 import { MaterialPopupComponent } from '../shared/material-popup/material-popup.component';
@@ -17,6 +14,9 @@ import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';
 import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectVisibleMaterials } from '../../../../../../state/application/selectors/shared.selectors';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class MaterialFeatureManager extends MoveableFeatureManager<Material> {
@@ -70,7 +70,7 @@ export class MaterialFeatureManager extends MoveableFeatureManager<Material> {
     ) {
         super(
             olMap,
-            (targetPosition, material) => {
+            async (targetPosition, material) =>
                 exerciseService.proposeAction(
                     {
                         type: '[Material] Move material',
@@ -78,8 +78,7 @@ export class MaterialFeatureManager extends MoveableFeatureManager<Material> {
                         targetPosition,
                     },
                     true
-                );
-            },
+                ),
             new PointGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => {

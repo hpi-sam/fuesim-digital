@@ -1,5 +1,5 @@
-import { Type } from 'class-transformer';
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
+import { WritableDraft } from 'immer';
 import {
     newMapPositionAt,
     type ExerciseOccupation,
@@ -14,8 +14,11 @@ import {
     isInVehicle,
     isOnMap,
     type MapCoordinates,
-    VehicleParameters,
+    type VehicleParameters,
     mapCoordinatesSchema,
+    newVehiclePositionIn,
+    newSimulatedRegionPositionIn,
+    vehicleParametersSchema,
 } from '../../models/index.js';
 import {
     changePosition,
@@ -23,7 +26,7 @@ import {
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
 import { imageSizeToPosition } from '../../state-helpers/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import {
     cloneDeepMutable,
     StrictObject,
@@ -42,15 +45,13 @@ import {
     VehicleRemovedEvent,
 } from '../../simulation/index.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import {
-    newVehiclePositionIn,
-    newSimulatedRegionPositionIn,
-} from '../../models/index.js';
+import { newNoPosition } from '../../models/utils/position/no-position.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
 import { getElement } from './utils/index.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
 import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
+import { checkRestrictedVehicleMovementOrThrow } from './utils/restricted-vehicle-movement.js';
 
 /**
  * Performs all necessary actions to remove a vehicle from the state.
@@ -58,7 +59,7 @@ import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
  * @param vehicleId The ID of the vehicle to be deleted
  */
 export function deleteVehicle(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     vehicleId: UUID
 ) {
     logVehicleRemoved(draftState, vehicleId);
@@ -121,8 +122,7 @@ export class AddVehicleAction implements Action {
     @IsValue('[Vehicle] Add vehicle' as const)
     public readonly type = '[Vehicle] Add vehicle';
 
-    @ValidateNested()
-    @Type(() => VehicleParameters)
+    @IsZodSchema(vehicleParametersSchema)
     public readonly vehicleParameters!: VehicleParameters;
 }
 
@@ -242,6 +242,14 @@ export namespace VehicleActionReducers {
                     'Vehicle personnel ids do not match personnel ids'
                 );
             }
+
+            checkRestrictedVehicleMovementOrThrow(
+                draftState,
+                vehicle,
+                newNoPosition(),
+                vehicle.position
+            );
+
             draftState.vehicles[vehicle.id] = cloneDeepMutable(vehicle);
             for (const material of cloneDeepMutable(materials)) {
                 changePosition(

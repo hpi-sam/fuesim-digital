@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -7,7 +7,7 @@ import type {
     MapImageTemplate,
     PatientCategory,
     VehicleTemplate,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     uuid,
     createVehicleParameters,
@@ -18,22 +18,24 @@ import {
     Viewport,
     newMapPositionAt,
     newSimulatedRegionPositionIn,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Pixel } from 'ol/pixel';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectExerciseState,
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region';
 import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region';
 import type { FeatureManager } from '../exercise-map/utility/feature-manager';
+import type { RestrictedZoneDragTemplate } from '../editor-panel/templates/restricted-zone';
+import { reconstituteRestrictedZoneTemplate } from '../editor-panel/templates/restricted-zone';
+import { ExerciseService } from '../../../../../core/exercise.service';
+import type { AppState } from '../../../../../state/app.state';
+import {
+    selectMaterialTemplates,
+    selectPersonnelTemplates,
+    selectExerciseState,
+} from '../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 
 @Injectable({
     providedIn: 'root',
@@ -42,13 +44,11 @@ import type { FeatureManager } from '../exercise-map/utility/feature-manager';
  * This service handles the adding of elements via drag and drop from the trainer map editor to the map
  */
 export class DragElementService {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     private olMap?: OlMap;
     layerFeatureManagerDictionary?: Map<VectorLayer, FeatureManager<any>>;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
 
     public registerMap(olMap: OlMap) {
         this.olMap = olMap;
@@ -306,6 +306,26 @@ export class DragElementService {
                     createdElement = simulatedRegion;
                 }
                 break;
+            case 'restrictedZone':
+                {
+                    const restrictedZone = reconstituteRestrictedZoneTemplate(
+                        this.transferringTemplate.template.stereotype,
+                        selectStateSnapshot(selectExerciseState, this.store)
+                    );
+                    restrictedZone.position = newMapPositionAt({
+                        x: position.x - restrictedZone.size.width / 2,
+                        y: position.y + restrictedZone.size.height / 2,
+                    });
+                    this.exerciseService.proposeAction(
+                        {
+                            type: '[RestrictedZone] Add restricted zone',
+                            restrictedZone,
+                        },
+                        true
+                    );
+                    createdElement = restrictedZone;
+                }
+                break;
 
             default:
                 break;
@@ -365,6 +385,10 @@ type TransferTemplate =
     | {
           type: 'patient';
           template: PatientCategory;
+      }
+    | {
+          type: 'restrictedZone';
+          template: RestrictedZoneDragTemplate;
       }
     | {
           type: 'simulatedRegion';

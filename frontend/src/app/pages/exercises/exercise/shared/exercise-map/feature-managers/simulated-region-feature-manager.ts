@@ -4,8 +4,8 @@ import type {
     SimulatedRegion,
     // eslint-disable-next-line @typescript-eslint/no-shadow
     Element,
-} from 'digital-fuesim-manv-shared';
-import { Size, newMapCoordinatesAt } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { newMapCoordinatesAt, newSize } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type { Polygon } from 'ol/geom';
 import type { TranslateEvent } from 'ol/interaction/Translate';
@@ -14,13 +14,6 @@ import { Fill } from 'ol/style';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectCurrentMainRole,
-    selectVisibleSimulatedRegions,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { SimulatedRegionPopupComponent } from '../shared/simulated-region-popup/simulated-region-popup.component';
 import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
 import type { FeatureManager } from '../utility/feature-manager';
@@ -29,6 +22,13 @@ import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
 import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectVisibleSimulatedRegions,
+    selectCurrentMainRole,
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class SimulatedRegionFeatureManager
@@ -56,7 +56,7 @@ export class SimulatedRegionFeatureManager
     ) {
         super(
             olMap,
-            (targetPositions, simulatedRegion) => {
+            async (targetPositions, simulatedRegion) =>
                 exerciseService.proposeAction(
                     {
                         type: '[SimulatedRegion] Move simulated region',
@@ -64,8 +64,7 @@ export class SimulatedRegionFeatureManager
                         targetPosition: targetPositions[0]![0]!,
                     },
                     true
-                );
-            },
+                ),
             new PolygonGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => [
@@ -118,7 +117,7 @@ export class SimulatedRegionFeatureManager
                             topLeftCoordinate[0]!,
                             topLeftCoordinate[1]!
                         ),
-                        newSize: Size.create(
+                        newSize: newSize(
                             currentElement.size.width * scale.x,
                             currentElement.size.height * scale.y
                         ),

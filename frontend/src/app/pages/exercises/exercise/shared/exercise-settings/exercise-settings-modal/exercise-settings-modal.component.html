@@ -7,11 +7,11 @@
         <div class="card-header">Karte</div>
         <div class="card-body">
             <div class="form-group mb-3">
-                <label class="form-label">Serveradresse:</label>
-                <p class="small">
+                <label class="form-label mb-1">Serveradresse:</label>
+                <p class="small text-muted mb-2">
                     <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
                     Unter dieser Adresse werden die Karten-Kacheln geladen. Die
-                    Url muss die Platzhalter für die Koordinaten
+                    URL muss die Platzhalter für die Koordinaten
                     <code>{{ '{' }}x{{ '}' }}</code
                     >, <code>{{ '{' }}y{{ '}' }}</code> oder
                     <code>{{ '{' }}-y{{ '}' }}</code
@@ -34,7 +34,7 @@
                     [ngModelInput]="tileUrlInput"
                 ></app-display-validation>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label class="form-label">Maximaler Zoom:</label>
                 <input
                     #maxZoomInput="ngModel"
@@ -51,19 +51,20 @@
                     [ngModelInput]="maxZoomInput"
                 ></app-display-validation>
             </div>
+
+            <button
+                (click)="updateTileMapProperties()"
+                class="btn btn-primary"
+                data-cy="settingsSaveTileMapPropertiesButton"
+            >
+                Karteneinstellungen speichern
+            </button>
         </div>
-        <button
-            (click)="updateTileMapProperties()"
-            class="btn btn-primary"
-            data-cy="settingsSaveTileMapPropertiesButton"
-        >
-            Speichern
-        </button>
     </div>
     <br />
     @if (configuration$ | async; as configuration) {
         <div class="card">
-            <div class="card-header">Übungsmodus</div>
+            <div class="card-header">Patienten</div>
             <div class="card-body">
                 <div class="form-group mb-3">
                     Mit Vorsichtung üben?
@@ -92,9 +93,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label mb-0"
-                        >Präfix der Patienten-IDs:</label
-                    >
+                    <label class="form-label mb-1">
+                        Präfix der Patienten-IDs:
+                    </label>
                     <span
                         class="text-warning"
                         ngbTooltip="Das Präfix bestehender IDs wird nicht geändert!"
@@ -108,7 +109,7 @@
                             kürzeres Präfix in Betracht.
                         </span>
                     }
-                    <span class="text-muted d-block">
+                    <p class="text-muted small mb-2">
                         Mit den aktuellen Einstellungen haben Patienten-IDs die
                         folgende Form:
                         <code
@@ -116,7 +117,7 @@
                                 configuration.patientIdentifierPrefix
                             }}1234</code
                         >
-                    </span>
+                    </p>
                     <input
                         #patientIdentifierPrefixInput="ngModel"
                         [ngModel]="configuration.patientIdentifierPrefix"
@@ -130,6 +131,54 @@
                     <app-display-validation
                         [ngModelInput]="patientIdentifierPrefixInput"
                     />
+                </div>
+            </div>
+        </div>
+    }
+    <br />
+    @if (configuration$ | async; as configuration) {
+        <div class="card">
+            <div class="card-header">Statusanzeige für Fahrzeuge</div>
+            <div class="card-body">
+                <p class="small text-muted">
+                    Die Statusanzeige zeigt über jedem Fahrzeug an, wie viele
+                    Patienten sich aktuell im Fahrzeug befinden und wie viele
+                    Plätze das Fahrzeug insgesamt bietet. Sie kann optional in
+                    der Farbe der Sichtungskategorie des Patienten angezeigt
+                    werden, bei mehreren Patienten wird die Kategorie mit der
+                    höchsten Priorität gewählt.
+                </p>
+                <div class="form-group mb-3">
+                    Statusanzeige für Fahrzeuge aktivieren?
+                    <div class="form-switch">
+                        <input
+                            [ngModel]="configuration.vehicleStatusHighlight"
+                            (ngModelChange)="
+                                setVehicleStatusHighlightFlag($event)
+                            "
+                            class="form-check-input"
+                            type="checkbox"
+                            data-cy="settingsVehicleStatusHighlightCheckbox"
+                        />
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    Statusanzeige in zugehörige SK-Farbe einfärben?
+                    <div class="form-switch">
+                        <input
+                            [ngModel]="
+                                configuration.vehicleStatusInPatientStatusColor
+                            "
+                            (ngModelChange)="
+                                setVehicleStatusInPatientStatusColorFlag($event)
+                            "
+                            class="form-check-input"
+                            type="checkbox"
+                            data-cy="settingsvehicleStatusInSkColorCheckbox"
+                            [disabled]="!configuration.vehicleStatusHighlight"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

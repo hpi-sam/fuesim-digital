@@ -1,6 +1,6 @@
 import type { Store } from '@ngrx/store';
 // eslint-disable-next-line @typescript-eslint/no-shadow
-import type { Element } from 'digital-fuesim-manv-shared';
+import type { Element } from 'fuesim-digital-shared';
 import type { MapBrowserEvent } from 'ol';
 import { Feature } from 'ol';
 import LineString from 'ol/geom/LineString';
@@ -10,14 +10,14 @@ import type OlMap from 'ol/Map';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
-import type { TransferLine } from 'src/app/shared/types/transfer-line';
-import type { AppState } from 'src/app/state/app.state';
-import { selectTransferLines } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
+import type { TransferLine } from '../../../../../../shared/types/transfer-line';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectTransferLines } from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { ElementManager } from './element-manager';
 
 export class TransferLinesFeatureManager

@@ -1,9 +1,9 @@
 <span
     class="badge rounded-pill"
     [ngStyle]="{
-        'background-color': status === 'white' ? 'aliceblue' : status,
+        'background-color': status() === 'white' ? 'aliceblue' : status(),
     }"
-    [class.text-dark]="status === 'yellow' || status === 'white'"
+    [class.text-dark]="status() === 'yellow' || status() === 'white'"
 >
-    {{ statusNames[status] }}
+    {{ statusNames[status()] }}
 </span>

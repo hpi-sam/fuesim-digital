@@ -1,5 +1,5 @@
 {
-    "name": "digital-fuesim-manv-benchmark",
+    "name": "fuesim-digital-benchmark",
     "version": "0.10.0",
     "type": "module",
     "scripts": {
@@ -23,7 +23,7 @@
         }
     },
     "dependencies": {
-        "digital-fuesim-manv-shared": "file:../shared",
+        "fuesim-digital-shared": "file:../shared",
         "immer": "^10.1.1",
         "lodash-es": "^4.17.23"
     },
@@ -38,7 +38,7 @@
         "eslint-plugin-unicorn": "^56.0.1",
         "tsx": "^4.19.3",
         "typescript": "~5.9.3",
-        "typescript-eslint": "^8.45.0"
+        "typescript-eslint": "^8.55.0"
     },
     "overrides": {
         "@istanbuljs/load-nyc-config": {

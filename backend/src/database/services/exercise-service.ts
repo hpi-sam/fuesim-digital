@@ -1,4 +1,9 @@
-import type { ExerciseTimeline, Role } from 'digital-fuesim-manv-shared';
+import {
+    isTrainerKey,
+    type ExerciseKey,
+    type ExerciseTimeline,
+} from 'fuesim-digital-shared';
+import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import type { ClientWrapper } from '../../exercise/client-wrapper.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
@@ -8,7 +13,9 @@ import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type { ExerciseKey } from '../../exercise/exercise-keys.js';
+import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
+import type { SessionInformation } from '../../auth/auth-service.js';
+import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
 
 export class ExerciseService {
     public constructor(
@@ -18,26 +25,58 @@ export class ExerciseService {
 
     private readonly exerciseMap = new Map<ExerciseKey, ActiveExercise>();
 
-    public hasExerciseKey(exerciseKey: ExerciseKey) {
-        return this.exerciseMap.has(exerciseKey);
-    }
+    public getExerciseByKey(
+        exerciseKey: ExerciseKey,
+        session?: SessionInformation
+    ) {
+        const exercise = this.exerciseMap.get(exerciseKey);
+        if (!exercise) {
+            throw new NotFoundError();
+        }
 
-    public getExerciseByKey(exerciseKey: ExerciseKey) {
-        return this.exerciseMap.get(exerciseKey);
+        if (
+            exercise.template &&
+            (exercise.template.user !== session?.user.id ||
+                !isTrainerKey(exerciseKey))
+        ) {
+            throw new PermissionDeniedError();
+        }
+        return exercise;
     }
 
     public getAllExercises() {
         return new Set(this.exerciseMap.values());
     }
 
-    public async loadExercise(activeExercise: ActiveExercise) {
-        const result =
-            await this.exerciseRepository.createExerciseIfNotExists(
-                activeExercise
-            );
-        if (result.length === 1 && result[0]?.id) {
-            activeExercise.setExerciseId(result[0].id);
-        }
+    /**
+     * Removes `exercise` from the set of active exercises
+     */
+    public unloadExercise(exercise: ActiveExercise) {
+        exercise.unload();
+
+        this.exerciseMap.delete(exercise.participantKey);
+        this.exerciseMap.delete(exercise.trainerKey);
+    }
+
+    public async createTemplate(
+        templateExercise: ActiveExercise,
+        exerciseTemplate: ExerciseTemplateEntry
+    ) {
+        templateExercise.template = exerciseTemplate;
+        await this.createExercise(templateExercise, {
+            templateId: exerciseTemplate.id,
+        });
+    }
+
+    public async createExercise(
+        activeExercise: ActiveExercise,
+        optionalData?: Partial<InferInsertModel<typeof exerciseTable>>
+    ) {
+        const result = await this.exerciseRepository.createExercise(
+            activeExercise,
+            optionalData
+        );
+        activeExercise.setExerciseId(result!.id);
 
         this.exerciseMap.set(activeExercise.participantKey, activeExercise);
         this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
@@ -48,7 +87,7 @@ export class ExerciseService {
     }
 
     public leaveExercise(exerciseKey: ExerciseKey, client: ClientWrapper) {
-        this.getExerciseByKey(exerciseKey)?.removeClient(client);
+        this.getExerciseByKey(exerciseKey, client.session).removeClient(client);
     }
 
     /**
@@ -77,12 +116,16 @@ export class ExerciseService {
                         async (exerciseEntity) => {
                             const actions = await this.actionRepository
                                 .withConnection(exerciseRepoTransaction)
-                                .getActionsForExerciseId(exerciseEntity.id);
+                                .getActionsForExerciseId(
+                                    exerciseEntity.exercise_entity.id
+                                );
 
                             const exercise = ExerciseFactory.fromDatabase(
-                                exerciseEntity,
+                                exerciseEntity.exercise_entity,
                                 actions
                             );
+                            exercise.template =
+                                exerciseEntity.exercise_template;
                             removeAll(exercise.temporaryActionHistory);
 
                             // Load all actions
@@ -92,7 +135,7 @@ export class ExerciseService {
                                     await this.actionRepository
                                         .withConnection(exerciseRepoTransaction)
                                         .getActionsForExerciseId(
-                                            exerciseEntity.id
+                                            exerciseEntity.exercise_entity.id
                                         )
                                 ).map(
                                     (actionEntity) =>
@@ -125,23 +168,45 @@ export class ExerciseService {
         );
     }
 
-    public async deleteExercise(exerciseKey: ExerciseKey) {
-        const activeExercise = this.getExerciseByKey(exerciseKey);
-        if (!activeExercise) {
-            throw new UnknownExerciseError(exerciseKey);
+    /**
+     * Deletes an exercise from the database and unloads it from the server
+     * @param exerciseKey the trainerKey of the deleting trainer
+     *                    (participants are not authorized)
+     * @param session optionally, the session of a logged-in user. User-owned
+     *                exercises can only be deleted by themselves
+     */
+    public async deleteExercise(
+        exerciseKey: ExerciseKey,
+        session?: SessionInformation
+    ) {
+        if (!isTrainerKey(exerciseKey)) {
+            throw new PermissionDeniedError();
         }
 
-        activeExercise.destroy();
+        const activeExercise = this.getExerciseByKey(exerciseKey, session);
 
-        this.exerciseMap.delete(activeExercise.participantKey);
-        this.exerciseMap.delete(activeExercise.trainerKey);
-        if (activeExercise.exerciseId) {
-            // only delete if exercise has been saved before in database
-            await this.exerciseRepository.deleteExerciseById(
-                activeExercise.exerciseId
-            );
+        const exerciseEntry = await this.exerciseRepository.getExerciseById(
+            activeExercise.exerciseId
+        );
+        if (!exerciseEntry) {
+            throw new NotFoundError();
         }
-        activeExercise.markAsSaved();
+
+        if (exerciseEntry.exercise_template) {
+            throw new PermissionDeniedError();
+        }
+        if (
+            exerciseEntry.exercise_entity.user &&
+            exerciseEntry.exercise_entity.user !== session?.user.id
+        ) {
+            throw new PermissionDeniedError();
+        }
+
+        this.unloadExercise(activeExercise);
+
+        await this.exerciseRepository.deleteExerciseById(
+            activeExercise.exerciseId
+        );
     }
 
     public async saveUnsavedExercises() {
@@ -167,11 +232,10 @@ export class ExerciseService {
     }
 
     public async getTimeline(
-        exerciseKey: ExerciseKey
+        exerciseKey: ExerciseKey,
+        session?: SessionInformation
     ): Promise<ExerciseTimeline> {
-        const activeExercise = this.getExerciseByKey(exerciseKey);
-        if (activeExercise === undefined)
-            throw new UnknownExerciseError(exerciseKey);
+        const activeExercise = this.getExerciseByKey(exerciseKey, session);
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
                 await this.actionRepository.getActionsForExerciseId(
@@ -197,29 +261,10 @@ export class ExerciseService {
         };
     }
 
-    public getRoleFromKey(exerciseKey: string): Role {
-        switch (exerciseKey.length) {
-            case 6:
-                return 'participant';
-            case 8:
-                return 'trainer';
-            default:
-                throw new RangeError(`Incorrect id: ${exerciseKey}`);
-        }
-    }
-
     /**
      * THIS SHOULD ONLY BE USED FOR TESTING PURPOSES
      */
     public TESTING_getExerciseMap() {
         return this.exerciseMap;
-    }
-}
-
-export class UnknownExerciseError extends Error {
-    public constructor(exerciseId: string) {
-        super(
-            `Exercise with id ${exerciseId} was requested but not found on server`
-        );
     }
 }

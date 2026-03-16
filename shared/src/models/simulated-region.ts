@@ -13,15 +13,16 @@ import {
     getSimulationActivityConstructor,
     simulationBehaviorTypeOptions,
 } from '../simulation/index.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
 import {
     newMapPositionAt,
     ImageProperties,
     MapCoordinates,
     getCreate,
-    Size,
     IsPosition,
+    sizeSchema,
 } from './utils/index.js';
-import type { Position } from './utils/index.js';
+import type { Position, Size } from './utils/index.js';
 
 export class SimulatedRegion {
     @IsUUID(4, uuidValidationOptions)
@@ -38,8 +39,7 @@ export class SimulatedRegion {
     @IsPosition()
     public readonly position: Position;
 
-    @ValidateNested()
-    @Type(() => Size)
+    @IsZodSchema(sizeSchema)
     public readonly size: Size;
 
     @IsString()

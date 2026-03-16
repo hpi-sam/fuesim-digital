@@ -1,55 +1,64 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import type { ExportImportFile } from 'digital-fuesim-manv-shared';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import type { ExportImportFile } from 'fuesim-digital-shared';
 import { escapeRegExp } from 'lodash-es';
-import { ApiService } from 'src/app/core/api.service';
-import { MessageService } from 'src/app/core/messages/message.service';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/auth.service';
+import { ApiService } from '../../../core/api.service';
+import { MessageService } from '../../../core/messages/message.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { JoinIdDirective } from '../../../shared/validation/join-id-validator.directive';
+import { ExerciseExistsValidatorDirective } from '../../../shared/validation/exercise-exists-validator.directive';
+import { AutofocusDirective } from '../../../shared/directives/autofocus.directive';
+import { DisplayValidationComponent } from '../../../shared/validation/display-validation/display-validation.component';
+import { FileInputDirective } from '../../../shared/directives/file-input.directive';
+import { FooterComponent } from '../../../shared/components/footer/footer.component';
 
 @Component({
     selector: 'app-landing-page',
     templateUrl: './landing-page.component.html',
     styleUrls: ['./landing-page.component.scss'],
-    standalone: false,
+    imports: [
+        HeaderComponent,
+        FormsModule,
+        JoinIdDirective,
+        ExerciseExistsValidatorDirective,
+        AutofocusDirective,
+        DisplayValidationComponent,
+        RouterLink,
+        FileInputDirective,
+        FooterComponent,
+    ],
 })
 export class LandingPageComponent {
+    private readonly apiService = inject(ApiService);
+    private readonly router = inject(Router);
+    private readonly messageService = inject(MessageService);
+    readonly auth = inject(AuthService);
+
+    public loginUrl = this.auth.loginUrl;
+
     public exerciseId = '';
 
     public exerciseHasBeenCreated = false;
 
-    public trainerId = '';
+    public trainerKey = '';
 
-    public participantId = '';
-
-    constructor(
-        private readonly apiService: ApiService,
-        private readonly router: Router,
-        private readonly messageService: MessageService
-    ) {}
+    public participantKey = '';
 
     public async createExercise() {
-        this.apiService
-            .createExercise()
-            .then((ids) => {
-                this.trainerId = ids.trainerId;
-                this.exerciseId = this.trainerId;
-                this.participantId = ids.participantId;
-                this.exerciseHasBeenCreated = true;
+        this.apiService.createExercise().then((exerciseKeys) => {
+            this.trainerKey = exerciseKeys.trainerKey;
+            this.exerciseId = this.trainerKey;
+            this.participantKey = exerciseKeys.participantKey;
+            this.exerciseHasBeenCreated = true;
 
-                this.messageService.postMessage(
-                    {
-                        title: 'Übung erstellt',
-                        body: 'Sie können nun der Übung beitreten.',
-                        color: 'success',
-                    },
-                    'toast'
-                );
-            })
-            .catch((error) => {
-                this.messageService.postError({
-                    title: 'Fehler beim Erstellen der Übung',
-                    error: error.message,
-                });
+            this.messageService.postMessage({
+                title: 'Übung erstellt',
+                body: 'Sie können nun der Übung beitreten.',
+                color: 'success',
             });
+        });
     }
 
     public importingExercise = false;
@@ -68,21 +77,18 @@ export class LandingPageComponent {
             }
             switch (importPlain.type) {
                 case 'complete': {
-                    const ids =
+                    const exerciseKeys =
                         await this.apiService.importExercise(importPlain);
-                    this.trainerId = ids.trainerId;
-                    this.exerciseId = this.trainerId;
-                    this.participantId = ids.participantId;
+                    this.trainerKey = exerciseKeys.trainerKey;
+                    this.exerciseId = this.trainerKey;
+                    this.participantKey = exerciseKeys.participantKey;
                     this.exerciseHasBeenCreated = true;
 
-                    this.messageService.postMessage(
-                        {
-                            color: 'success',
-                            title: 'Übung importiert',
-                            body: 'Sie können nun der Übung beitreten',
-                        },
-                        'toast'
-                    );
+                    this.messageService.postMessage({
+                        color: 'success',
+                        title: 'Übung importiert',
+                        body: 'Sie können nun der Übung beitreten',
+                    });
                     break;
                 }
                 case 'partial': {

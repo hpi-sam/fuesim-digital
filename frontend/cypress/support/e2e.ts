@@ -16,7 +16,7 @@
 
 // When a command from ./commands is ready to use, import with `import './commands'` syntax
 
-import type { JsonObject } from 'digital-fuesim-manv-shared';
+import type { JsonObject } from 'fuesim-digital-shared';
 import {
     dragToMap,
     store,

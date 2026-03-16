@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { ExerciseOccupationType } from 'digital-fuesim-manv-shared';
+import type { ExerciseOccupationType } from 'fuesim-digital-shared';
 
 const occupationShortNamesDictionary: {
     [key in ExerciseOccupationType]: string;
@@ -13,10 +13,7 @@ const occupationShortNamesDictionary: {
     patientTransferOccupation: 'Reserviert für Patiententransport',
 };
 
-@Pipe({
-    name: 'occupationShortName',
-    standalone: false,
-})
+@Pipe({ name: 'occupationShortName' })
 export class OccupationShortNamePipe implements PipeTransform {
     transform(occupationType: ExerciseOccupationType | undefined): string {
         if (!occupationType) return '';

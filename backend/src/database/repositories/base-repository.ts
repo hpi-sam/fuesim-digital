@@ -1,4 +1,4 @@
-import type { Constructor } from 'digital-fuesim-manv-shared';
+import type { Constructor } from 'fuesim-digital-shared';
 import type {
     DatabaseConnection,
     DatabaseTransaction,

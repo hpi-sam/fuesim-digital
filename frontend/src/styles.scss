@@ -1,5 +1,7 @@
+@use 'sass:map';
+
 /* Importing Bootstrap SCSS file. */
-@import 'bootstrap/scss/bootstrap';
+@use 'bootstrap/scss/bootstrap';
 
 .dropdown-menu {
     overflow: auto;
@@ -25,9 +27,7 @@
 .preview-image-container {
     // TODO: Set the height depending on the current grid tier https://getbootstrap.com/docs/5.1/layout/breakpoints/
     height: 70px !important;
-    padding: map-get($spacers, 2);
-    padding-left: map-get($spacers, 3);
-    padding-right: map-get($spacers, 3);
+    padding: map.get(bootstrap.$spacers, 2) map.get(bootstrap.$spacers, 3);
     img {
         // fill out the whole container
         max-width: 100%;
@@ -42,7 +42,7 @@
 
     &.small-image {
         height: 50px !important;
-        padding: map-get($spacers, 1);
+        padding: map.get(bootstrap.$spacers, 1);
     }
 }
 
@@ -52,4 +52,13 @@
 
 .accordion-button:focus {
     box-shadow: none;
+}
+
+main {
+    min-height: calc(100vh - 160px);
+}
+
+.modal-xxl {
+    width: 90%;
+    max-width: 90%;
 }

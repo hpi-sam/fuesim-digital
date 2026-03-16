@@ -1,35 +1,56 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import { TransferPoint } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
+import { TransferPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import { FormsModule } from '@angular/forms';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
+} from '../../../../../../../../shared/services/hotkeys.service';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import { MessageService } from '../../../../../../../../core/messages/message.service';
+import {
+    SearchableDropdownOption,
+    SearchableDropdownComponent,
+} from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { AppState } from '../../../../../../../../state/app.state';
 import {
     createSelectTransferPoint,
     selectTransferPoints,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-transfer-connections-editor',
     templateUrl: './signaller-modal-transfer-connections-editor.component.html',
     styleUrls: ['./signaller-modal-transfer-connections-editor.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        NgbPopover,
+        AutofocusDirective,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalTransferConnectionsEditorComponent
     implements OnInit, OnChanges, OnDestroy
 {
-    @Input() transferPointId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+    private readonly hotkeysService = inject(HotkeysService);
+    private readonly messageService = inject(MessageService);
+
+    readonly transferPointId = input.required<UUID>();
 
     private hotkeyLayer!: HotkeyLayer;
     submitHotkey = new Hotkey('Enter', false, () => this.addConnection());
@@ -40,14 +61,6 @@ export class SignallerModalTransferConnectionsEditorComponent
     public connectedTransferPointNames$!: Observable<string[]>;
     public transferPointsToBeAdded$!: Observable<SearchableDropdownOption[]>;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly detailsModal: SignallerModalDetailsService,
-        private readonly hotkeysService: HotkeysService,
-        private readonly messageService: MessageService
-    ) {}
-
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
         this.hotkeyLayer.addHotkey(this.submitHotkey);
@@ -55,7 +68,7 @@ export class SignallerModalTransferConnectionsEditorComponent
 
     ngOnChanges() {
         const transferPoint$ = this.store.select(
-            createSelectTransferPoint(this.transferPointId)
+            createSelectTransferPoint(this.transferPointId())
         );
 
         const transferPoints$ = this.store.select(selectTransferPoints);
@@ -63,11 +76,11 @@ export class SignallerModalTransferConnectionsEditorComponent
         this.transferPointsToBeAdded$ = transferPoints$.pipe(
             map((transferPoints) => {
                 const currentTransferPoint =
-                    transferPoints[this.transferPointId]!;
+                    transferPoints[this.transferPointId()]!;
                 return Object.entries(transferPoints)
                     .filter(
                         ([key]) =>
-                            key !== this.transferPointId &&
+                            key !== this.transferPointId() &&
                             !currentTransferPoint.reachableTransferPoints[key]
                     )
                     .map(([id, transferPoint]) => ({
@@ -107,7 +120,7 @@ export class SignallerModalTransferConnectionsEditorComponent
         this.exerciseService
             .proposeAction({
                 type: '[TransferPoint] Connect TransferPoints',
-                transferPointId1: this.transferPointId,
+                transferPointId1: this.transferPointId(),
                 transferPointId2: this.selectedTransferPoint.key,
             })
             .then((result) => {

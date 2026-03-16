@@ -1,7 +1,7 @@
 import type { OnChanges, OnDestroy } from '@angular/core';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Personnel, UUID } from 'digital-fuesim-manv-shared';
+import type { Personnel, UUID } from 'fuesim-digital-shared';
 import {
     combineLatest,
     map,
@@ -10,28 +10,29 @@ import {
     Subject,
     distinctUntilChanged,
 } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../../state/app.state';
 import {
     createSelectBehaviorStatesByType,
     selectPersonnel,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-signaller-modal-region-leader',
     templateUrl: './signaller-modal-region-leader.component.html',
     styleUrls: ['./signaller-modal-region-leader.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class SignallerModalRegionLeaderComponent
     implements OnChanges, OnDestroy
 {
-    @Input() simulatedRegionId!: UUID;
-    @Output() readonly hasLeader = new EventEmitter<boolean>();
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly hasLeader = output<boolean>();
 
     leader$!: Observable<Personnel | null>;
     private readonly changeOrDestroy$ = new Subject<void>();
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnChanges() {
         this.changeOrDestroy$.next();
@@ -39,7 +40,7 @@ export class SignallerModalRegionLeaderComponent
         const assignLeaderBehaviorState$ = this.store
             .select(
                 createSelectBehaviorStatesByType(
-                    this.simulatedRegionId,
+                    this.simulatedRegionId(),
                     'assignLeaderBehavior'
                 )
             )

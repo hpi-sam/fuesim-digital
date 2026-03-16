@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     createVehicleParameters,
@@ -7,27 +7,33 @@ import {
     StrictObject,
     TransferPoint,
     uuid,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, map, takeUntil } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    createSelectAlarmGroup,
-    selectAlarmGroups,
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
-    selectTransferPoints,
-    selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { NgModel } from '@angular/forms';
+import { NgModel, FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import type { HotkeyLayer } from '../../services/hotkeys.service';
 import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
+import { ExerciseService } from '../../../core/exercise.service';
+import { MessageService } from '../../../core/messages/message.service';
+import type { AppState } from '../../../state/app.state';
+import {
+    selectAlarmGroups,
+    selectTransferPoints,
+    createSelectAlarmGroup,
+    selectVehicleTemplates,
+    selectMaterialTemplates,
+    selectPersonnelTemplates,
+} from '../../../state/application/selectors/exercise.selectors';
+import { selectOwnClient } from '../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
+import type { SearchableDropdownOption } from '../searchable-dropdown/searchable-dropdown.component';
+import { AutofocusDirective } from '../../directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../hotkey-indicator/hotkey-indicator.component';
+import { SearchableDropdownComponent } from '../searchable-dropdown/searchable-dropdown.component';
+import { IntegerValidatorDirective } from '../../validation/integer-validator.directive';
+import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
 
 // We want to remember this
 let selectedAlarmGroup: SearchableDropdownOption | null = null;
@@ -39,38 +45,51 @@ let firstVehiclesCount = 0;
     selector: 'app-send-alarm-group-interface',
     templateUrl: './send-alarm-group-interface.component.html',
     styleUrls: ['./send-alarm-group-interface.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        NgbPopover,
+        AutofocusDirective,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        IntegerValidatorDirective,
+        DisplayValidationComponent,
+        AsyncPipe,
+    ],
 })
 export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
-    @Input()
-    useHotkeys = true;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
+    private readonly hotkeysService = inject(HotkeysService);
 
-    @Input()
-    useAlarmGroupButtons = false;
+    readonly useHotkeys = input(true);
 
-    @Input()
-    useFirstVehicles = true;
+    readonly useAlarmGroupButtons = input(false);
+
+    readonly useFirstVehicles = input(true);
 
     private readonly destroy$ = new Subject<void>();
 
-    @ViewChild('selectAlarmGroupPopover')
-    selectAlarmGroupPopover!: NgbPopover;
-    @ViewChild('selectTargetPopover')
-    selectTargetPopover!: NgbPopover;
-    @ViewChild('selectFirstVehiclesTargetPopover')
-    selectFirstVehiclesTargetPopover!: NgbPopover;
-    @ViewChild('firstVehiclesInput')
-    firstVehiclesInput?: NgModel;
+    readonly selectAlarmGroupPopover = viewChild.required<NgbPopover>(
+        'selectAlarmGroupPopover'
+    );
+    readonly selectTargetPopover = viewChild.required<NgbPopover>(
+        'selectTargetPopover'
+    );
+    readonly selectFirstVehiclesTargetPopover = viewChild.required<NgbPopover>(
+        'selectFirstVehiclesTargetPopover'
+    );
+    readonly firstVehiclesInput = viewChild<NgModel>('firstVehiclesInput');
 
     private hotkeyLayer!: HotkeyLayer;
     public selectAlarmGroupHotkey = new Hotkey('A', false, () => {
-        this.selectAlarmGroupPopover.open();
+        this.selectAlarmGroupPopover().open();
     });
     public selectTargetHotkey = new Hotkey('Z', false, () => {
-        this.selectTargetPopover.open();
+        this.selectTargetPopover().open();
     });
     public selectFirstVehiclesTargetHotkey = new Hotkey('⇧ + Z', false, () => {
-        this.selectFirstVehiclesTargetPopover.open();
+        this.selectFirstVehiclesTargetPopover().open();
     });
     public submitHotkey = new Hotkey('Enter', false, () => {
         this.sendAlarmGroup();
@@ -78,38 +97,29 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     public loading = false;
 
-    public readonly alarmGroups$: Observable<SearchableDropdownOption[]> =
-        this.store.select(selectAlarmGroups).pipe(
-            map((alarmGroups) =>
-                Object.values(alarmGroups)
-                    .map((alarmGroup) => {
-                        const dropdownOption: SearchableDropdownOption & {
-                            sent: boolean;
-                        } = {
-                            key: alarmGroup.id,
-                            name: alarmGroup.name,
-                            sent: alarmGroup.sent,
-                        };
+    public readonly alarmGroups$ = this.store.select(selectAlarmGroups);
 
-                        if (alarmGroup.sent) {
-                            dropdownOption.name += ' (bereits alarmiert)';
-                            dropdownOption.color = '#bbbbbb';
-                        }
+    public readonly alarmGroupsDropdownOptions$: Observable<
+        SearchableDropdownOption[]
+    > = this.store.select(selectAlarmGroups).pipe(
+        map((alarmGroups) =>
+            Object.values(alarmGroups)
+                .map((alarmGroup) => {
+                    const dropdownOption: SearchableDropdownOption = {
+                        key: alarmGroup.id,
+                        name: alarmGroup.name,
+                    };
 
-                        return dropdownOption;
-                    })
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .sort((a, b) => Number(a.sent) - Number(b.sent))
-                    .map((alarmGroup) => {
-                        delete (
-                            alarmGroup as SearchableDropdownOption & {
-                                sent?: boolean;
-                            }
-                        ).sent;
-                        return alarmGroup;
-                    })
-            )
-        );
+                    if (alarmGroup.triggerCount > 0) {
+                        dropdownOption.name += ' (bereits alarmiert)';
+                        dropdownOption.color = '#bbbbbb';
+                    }
+
+                    return dropdownOption;
+                })
+                .sort((a, b) => a.name.localeCompare(b.name))
+        )
+    );
 
     public readonly transferPoints$: Observable<SearchableDropdownOption[]> =
         this.store.select(selectTransferPoints).pipe(
@@ -123,10 +133,12 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
             )
         );
 
-    public get selectedAlarmGroup() {
+    public get selectedAlarmGroupOption() {
         return selectedAlarmGroup;
     }
-    public set selectedAlarmGroup(value: SearchableDropdownOption | null) {
+    public set selectedAlarmGroupOption(
+        value: SearchableDropdownOption | null
+    ) {
         selectedAlarmGroup = value;
     }
 
@@ -155,19 +167,14 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     public get canSubmit() {
         return (
-            !(this.firstVehiclesInput?.invalid ?? false) &&
+            !(this.firstVehiclesInput()?.invalid ?? false) &&
             selectedAlarmGroup !== null &&
             selectedTarget !== null &&
             (firstVehiclesCount === 0 || selectedFirstVehiclesTarget !== null)
         );
     }
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService,
-        private readonly hotkeysService: HotkeysService
-    ) {
+    constructor() {
         // reset chosen targetTransferPoint if it gets deleted
         this.transferPoints$
             .pipe(takeUntil(this.destroy$))
@@ -186,7 +193,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
-        if (this.useHotkeys) {
+        if (this.useHotkeys()) {
             this.hotkeyLayer.addHotkey(this.selectAlarmGroupHotkey);
             this.hotkeyLayer.addHotkey(this.selectTargetHotkey);
             this.hotkeyLayer.addHotkey(this.selectFirstVehiclesTargetHotkey);

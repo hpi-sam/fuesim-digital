@@ -1,21 +1,24 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { UUID } from 'digital-fuesim-manv-shared';
+import { UUID } from 'fuesim-digital-shared';
 import { combineLatest, map, type Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../../state/app.state';
 import {
-    selectPersonnel,
     selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectPersonnel,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-signaller-modal-regions-overview',
     templateUrl: './signaller-modal-regions-overview.component.html',
     styleUrls: ['./signaller-modal-regions-overview.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class SignallerModalRegionsOverviewComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+
     regions$!: Observable<
         (
             | {
@@ -32,8 +35,6 @@ export class SignallerModalRegionsOverviewComponent implements OnInit {
               }
         )[]
     >;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnInit() {
         const simulatedRegions$ = this.store.select(selectSimulatedRegions);

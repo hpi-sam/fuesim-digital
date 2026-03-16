@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
-import { selectAlarmGroups } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import type { AppState } from '../../../../../../../../../state/app.state';
+import { selectAlarmGroups } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-signaller-modal-eoc-information-alarm-groups-sent',
@@ -11,16 +11,17 @@ import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
     styleUrls: [
         './signaller-modal-eoc-information-alarm-groups-sent.component.scss',
     ],
-    standalone: false,
 })
 export class SignallerModalEocInformationAlarmGroupsSentComponent {
     alarmGroupsSent: string[];
 
-    constructor(store: Store<AppState>) {
+    constructor() {
+        const store = inject<Store<AppState>>(Store);
+
         this.alarmGroupsSent = Object.values(
             selectStateSnapshot(selectAlarmGroups, store)
         )
-            .filter((alarmGroup) => alarmGroup.sent)
+            .filter((alarmGroup) => alarmGroup.triggerCount > 0)
             .map((alarmGroup) => alarmGroup.name)
             .sort((a, b) => a.localeCompare(b));
     }

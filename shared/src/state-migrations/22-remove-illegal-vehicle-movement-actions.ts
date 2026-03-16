@@ -1,6 +1,7 @@
+import type { WritableDraft } from 'immer';
 import { getElement } from '../store/action-reducers/utils/index.js';
 import { isCompletelyLoaded } from '../store/action-reducers/utils/completely-load-vehicle.js';
-import type { Mutable, UUID } from '../utils/index.js';
+import type { UUID } from '../utils/index.js';
 import type { ExerciseState } from '../state.js';
 import type { Migration } from './migration-functions.js';
 
@@ -20,7 +21,7 @@ export const removeIllegalVehicleMovementActions22: Migration = {
                     vehicleId
                 );
                 return isCompletelyLoaded(
-                    intermediaryState as Mutable<ExerciseState>,
+                    intermediaryState as WritableDraft<ExerciseState>,
                     vehicle
                 );
             }
@@ -36,7 +37,7 @@ export const removeIllegalVehicleMovementActions22: Migration = {
                         elementToBeAddedId
                     );
                     return isCompletelyLoaded(
-                        intermediaryState as Mutable<ExerciseState>,
+                        intermediaryState as WritableDraft<ExerciseState>,
                         vehicle
                     );
                 }

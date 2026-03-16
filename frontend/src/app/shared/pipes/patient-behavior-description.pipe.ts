@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { BehaviourCode } from 'digital-fuesim-manv-shared';
+import type { BehaviourCode } from 'fuesim-digital-shared';
 
 const behaviorDescriptionMap: { [Key in BehaviourCode]: string } = {
     A: 'Stabil',
@@ -10,10 +10,7 @@ const behaviorDescriptionMap: { [Key in BehaviourCode]: string } = {
     E: 'Verstorben',
 };
 
-@Pipe({
-    name: 'patientBehaviorDescription',
-    standalone: false,
-})
+@Pipe({ name: 'patientBehaviorDescription' })
 export class PatientBehaviorDescriptionPipe implements PipeTransform {
     transform(value: BehaviourCode): string {
         return behaviorDescriptionMap[value];

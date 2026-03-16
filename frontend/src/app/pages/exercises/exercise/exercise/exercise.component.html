@@ -1,34 +1,51 @@
 @if (exerciseStateMode$ | async; as mode) {
     <div class="p-2 d-flex flex-column" style="height: 100vh">
         <div class="px-2">
-            <h2>
-                Übung:
-                <span class="font-monospace fw-bold user-select-all">{{
-                    participantId$ | async
-                }}</span>
-                @if (mode === 'exercise') {
-                    <app-exercise-state-badge
-                        class="ms-3"
-                    ></app-exercise-state-badge>
-                    @if (participantId$ | async) {
-                        <button
-                            (click)="shareExercise('participantId')"
-                            class="btn btn-light ms-3"
-                            ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen von Ihnen bestätigt werden."
-                        >
-                            Teilnehmerlink teilen
-                        </button>
-                    }
-                    @if (
-                        (ownClient$ | async)?.role?.mainRole !== 'participant'
-                    ) {
-                        <button
-                            (click)="shareExercise('trainerId')"
-                            class="btn btn-outline-warning ms-3"
-                            ngbTooltip="Über diesen Link können weitere Personen diese Übung verwalten. Teilen Sie diesen Link nicht mit Teilnehmenden!"
-                        >
-                            Übungsleiterlink teilen
-                        </button>
+            <h2 class="d-flex align-items-center">
+                @if (
+                    exerciseService.additionalExerciseMeta()?.exerciseTemplate;
+                    as exerciseTemplate
+                ) {
+                    <a
+                        [routerLink]="`/exercises/templates/`"
+                        class="btn btn-outline-secondary me-4"
+                    >
+                        <i class="bi bi-chevron-left me-2"></i>
+                        Zurück zur Liste
+                    </a>
+                    Übungsvorlage: {{ exerciseTemplate.name }}
+                } @else {
+                    <div>
+                        Übung:
+                        <span class="font-monospace fw-bold user-select-all">
+                            {{ participantKey$ | async }}
+                        </span>
+                    </div>
+                    @if (mode === 'exercise') {
+                        <app-exercise-state-badge
+                            class="ms-3"
+                        ></app-exercise-state-badge>
+                        @if (participantKey$ | async) {
+                            <button
+                                (click)="shareExercise('participantKey')"
+                                class="btn btn-light ms-3"
+                                ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen von Ihnen bestätigt werden."
+                            >
+                                Teilnehmerlink teilen
+                            </button>
+                        }
+                        @if (
+                            (ownClient$ | async)?.role?.mainRole !==
+                            'participant'
+                        ) {
+                            <button
+                                (click)="shareExercise('trainerKey')"
+                                class="btn btn-outline-warning ms-3"
+                                ngbTooltip="Über diesen Link können weitere Personen diese Übung verwalten. Teilen Sie diesen Link nicht mit Teilnehmenden!"
+                            >
+                                Übungsleiterlink teilen
+                            </button>
+                        }
                     }
                 }
                 @if (mode === 'timeTravel') {
@@ -40,7 +57,8 @@
                         Übung wieder beitreten
                     </button>
                 }
-                <div class="d-inline-block float-end">
+                <div class="flex-grow-1"></div>
+                <div>
                     <div ngbDropdown class="d-inline-block">
                         <button
                             type="button"
@@ -136,7 +154,7 @@
                             <a
                                 ngbDropdownItem
                                 class="btn btn-outline-secondary"
-                                href="mailto:kontakt@manv-simulation.de?subject=Anfrage zur Digitalen FüSim MANV Version {{
+                                href="mailto:kontakt@manv-simulation.de?subject=Anfrage zur FüSim Digital Version {{
                                     version
                                 }}"
                             >

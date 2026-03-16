@@ -1,5 +1,5 @@
-@if (errors && ngModelInput.dirty) {
-    <div class="mt-2 text-danger">
+@if (errors && ngModelInput().dirty) {
+    <div class="mt-2 text-danger validation-text">
         @if (errors['required']) {
             <div>Diese Eingabe ist erforderlich.</div>
         }
@@ -56,7 +56,7 @@
                 >.
             </div>
         }
-        @if (errors['exerciseExists']; as exerciseExistsError) {
+        @if (errors['exerciseDoesNotExist']; as exerciseExistsError) {
             <div>
                 Es existiert keine Übung mit der Id
                 <span class="font-monospace">{{ exerciseExistsError.id }}</span

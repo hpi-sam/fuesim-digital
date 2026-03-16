@@ -1,4 +1,4 @@
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import type { AreaStatistics } from './area-statistics';
 
 export interface StatisticsEntry {

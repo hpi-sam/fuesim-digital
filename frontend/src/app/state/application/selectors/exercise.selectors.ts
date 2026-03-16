@@ -9,14 +9,14 @@ import type {
     ExerciseState,
     UUID,
     WithPosition,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     isInSpecificSimulatedRegion,
     isInTransfer,
     nestedCoordinatesOf,
-} from 'digital-fuesim-manv-shared';
-import type { TransferLine } from 'src/app/shared/types/transfer-line';
+} from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';
+import type { TransferLine } from '../../../shared/types/transfer-line';
 
 // Properties
 
@@ -45,6 +45,7 @@ export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
 export const selectRadiograms = selectPropertyFactory('radiograms');
+export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
 export const selectOperationalSections = selectPropertyFactory(
     'operationalSections'
 );
@@ -62,7 +63,7 @@ export const selectPatientCategories =
 export const selectConfiguration = selectPropertyFactory('configuration');
 export const selectEocLogEntries = selectPropertyFactory('eocLog');
 export const selectExerciseStatus = selectPropertyFactory('currentStatus');
-export const selectParticipantId = selectPropertyFactory('participantId');
+export const selectParticipantKey = selectPropertyFactory('participantKey');
 export const selectCurrentTime = selectPropertyFactory('currentTime');
 
 // Elements
@@ -93,6 +94,9 @@ export const createSelectHospital =
     createSelectElementFromMapFactory(selectHospitals);
 export const createSelectViewport =
     createSelectElementFromMapFactory(selectViewports);
+export const createSelectRestrictedZone = createSelectElementFromMapFactory(
+    selectRestrictedZones
+);
 export const createSelectSimulatedRegion = createSelectElementFromMapFactory(
     selectSimulatedRegions
 );

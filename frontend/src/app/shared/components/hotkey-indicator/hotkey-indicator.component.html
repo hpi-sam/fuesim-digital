@@ -1,4 +1,4 @@
-@if (hotkey) {
+@if (hotkey(); as hotkey) {
     <kbd
         class="badge text-bg-dark"
         [ngClass]="{
@@ -10,6 +10,6 @@
     </kbd>
 } @else {
     <kbd class="badge text-bg-dark">
-        <small>{{ keys }}</small>
+        <small>{{ keys() }}</small>
     </kbd>
 }

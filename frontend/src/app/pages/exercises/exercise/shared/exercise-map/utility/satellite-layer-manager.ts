@@ -2,8 +2,8 @@ import type { Store } from '@ngrx/store';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
 import { takeUntil } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { selectTileMapProperties } from 'src/app/state/application/selectors/exercise.selectors';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectTileMapProperties } from '../../../../../../state/application/selectors/exercise.selectors';
 
 export class SatelliteLayerManager {
     private readonly _satelliteLayer: TileLayer<XYZ>;

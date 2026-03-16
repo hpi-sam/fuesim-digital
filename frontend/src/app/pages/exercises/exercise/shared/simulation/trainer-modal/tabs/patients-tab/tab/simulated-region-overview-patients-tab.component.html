@@ -1,0 +1,23 @@
+<div class="container d-flex flex-row h-100" style="min-height: 0; gap: 4px">
+    <div
+        class="col mh-100 overflow-auto border-end border-secondary pe-1"
+        style="max-width: 35%"
+    >
+        <app-simulated-region-overview-patients-table
+            [patients]="(patients$ | async) ?? []"
+            [selectedPatientId]="selectedPatientId()"
+            scope="simulatedRegion"
+        />
+    </div>
+    <div class="col overflow-hidden d-flex flex-column" style="max-width: 65%">
+        @if (selectedPatientId(); as patientId) {
+            <app-simulated-region-overview-patient-details
+                [patientId]="patientId"
+            />
+        } @else {
+            <p class="text-muted">
+                Bitte wählen Sie einen Patienten links aus der Liste.
+            </p>
+        }
+    </div>
+</div>

@@ -1,48 +1,72 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ResourceDescription, UUID } from 'digital-fuesim-manv-shared';
+import type { ResourceDescription, UUID } from 'fuesim-digital-shared';
 import {
     TransferPoint,
     isInSpecificSimulatedRegion,
     isUnoccupiedImmutable,
-} from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+} from 'fuesim-digital-shared';
+import { groupBy } from 'lodash-es';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import type { Observable } from 'rxjs';
+import { combineLatest, map, tap } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
-import { combineLatest, map, tap, type Observable } from 'rxjs';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
+} from '../../../../../../../../shared/services/hotkeys.service';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import { MessageService } from '../../../../../../../../core/messages/message.service';
 import {
-    selectCurrentTime,
-    selectTransferPoints,
+    SearchableDropdownOption,
+    SearchableDropdownComponent,
+} from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { AppState } from '../../../../../../../../state/app.state';
+import {
     selectVehicleTemplates,
     selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { groupBy } from 'lodash-es';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+    selectCurrentTime,
+    selectTransferPoints,
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { IntegerValidatorDirective } from '../../../../../../../../shared/validation/integer-validator.directive';
+import { DisplayValidationComponent } from '../../../../../../../../shared/validation/display-validation/display-validation.component';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
+import { ValuesPipe } from '../../../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-signaller-modal-provide-vehicles-editor',
     templateUrl: './signaller-modal-provide-vehicles-editor.component.html',
     styleUrls: ['./signaller-modal-provide-vehicles-editor.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        IntegerValidatorDirective,
+        DisplayValidationComponent,
+        NgbPopover,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        ValuesPipe,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalProvideVehiclesEditorComponent
     implements OnInit, OnChanges, OnDestroy
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() transferBehaviorId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+    private readonly hotkeysService = inject(HotkeysService);
+    private readonly messageService = inject(MessageService);
 
-    @ViewChild('selectVehiclePopover')
-    selectVehiclePopover!: NgbPopover;
-    @ViewChild('selectTargetPopover')
-    selectTargetPopover!: NgbPopover;
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly transferBehaviorId = input.required<UUID>();
+
+    readonly selectTargetPopover = viewChild.required<NgbPopover>(
+        'selectTargetPopover'
+    );
 
     public get canSend() {
         return (
@@ -53,7 +77,7 @@ export class SignallerModalProvideVehiclesEditorComponent
 
     private hotkeyLayer!: HotkeyLayer;
     selectTargetHotkey = new Hotkey('Z', false, () =>
-        this.selectTargetPopover.open()
+        this.selectTargetPopover().open()
     );
     submitHotkey = new Hotkey('Enter', false, () => this.startTransfer());
 
@@ -66,14 +90,6 @@ export class SignallerModalProvideVehiclesEditorComponent
     selectedTarget: SearchableDropdownOption | null = null;
 
     loading = false;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly detailsModal: SignallerModalDetailsService,
-        private readonly hotkeysService: HotkeysService,
-        private readonly messageService: MessageService
-    ) {}
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
@@ -91,7 +107,7 @@ export class SignallerModalProvideVehiclesEditorComponent
                     (vehicle) =>
                         isInSpecificSimulatedRegion(
                             vehicle,
-                            this.simulatedRegionId
+                            this.simulatedRegionId()
                         ) && isUnoccupiedImmutable(vehicle, currentTime)
                 )
             ),
@@ -116,7 +132,7 @@ export class SignallerModalProvideVehiclesEditorComponent
                     (transferPoint) =>
                         !isInSpecificSimulatedRegion(
                             transferPoint,
-                            this.simulatedRegionId
+                            this.simulatedRegionId()
                         )
                 )
             ),
@@ -173,8 +189,8 @@ export class SignallerModalProvideVehiclesEditorComponent
         this.exerciseService
             .proposeAction({
                 type: '[TransferBehavior] Transfer Vehicles',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.transferBehaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.transferBehaviorId(),
                 requestedVehicles: this.vehicleAmounts,
                 destinationType: 'transferPoint',
                 destinationId: this.selectedTarget!.key,

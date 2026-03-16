@@ -1,16 +1,22 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
-import { Patient } from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'fuesim-digital-shared';
+import { Patient } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import { NgbProgressbar } from '@ng-bootstrap/ng-bootstrap/progressbar';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../../../../../../state/app.state';
 import {
     createSelectPatient,
-    selectConfiguration,
     selectPersonnel,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectConfiguration,
+} from '../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientIdentifierComponent } from '../../../../../../../../../../../shared/components/patient-identifier/patient-identifier.component';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { PatientStatusDisplayComponent } from '../../../../../../../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 
 @Component({
     selector:
@@ -20,13 +26,22 @@ import {
     styleUrls: [
         './simulated-region-overview-behavior-treat-patients-patient-details.component.scss',
     ],
-    standalone: false,
+    imports: [
+        PatientIdentifierComponent,
+        PatientStatusBadgeComponent,
+        PatientStatusDisplayComponent,
+        NgbProgressbar,
+        NgbTooltip,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
     implements OnInit, OnDestroy
 {
-    @Input() patientId!: UUID;
-    @Input() cateringsActive!: boolean;
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly patientId = input.required<UUID>();
+    readonly cateringsActive = input.required<boolean>();
 
     public caterings$!: Observable<
         {
@@ -39,14 +54,12 @@ export class SimulatedRegionOverviewBehaviorTreatPatientsPatientDetailsComponent
     public visibleStatus$?: Observable<PatientStatus>;
     public patient$!: Observable<Patient>;
     public destroy$ = new Subject<void>();
-
-    constructor(private readonly store: Store<AppState>) {}
     ngOnDestroy(): void {
         this.destroy$.next();
     }
 
     ngOnInit(): void {
-        const patientSelector = createSelectPatient(this.patientId);
+        const patientSelector = createSelectPatient(this.patientId());
 
         this.caterings$ = this.store
             .select(

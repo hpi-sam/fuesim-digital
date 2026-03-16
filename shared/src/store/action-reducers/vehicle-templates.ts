@@ -1,15 +1,12 @@
-import { Type } from 'class-transformer';
+import { IsString, IsUUID, IsInt, IsArray } from 'class-validator';
+import { WritableDraft } from 'immer';
 import {
-    IsString,
-    ValidateNested,
-    IsUUID,
-    IsInt,
-    IsArray,
-} from 'class-validator';
-import { VehicleTemplate, imagePropertiesSchema } from '../../models/index.js';
-import type { ImageProperties } from '../../models/index.js';
+    type VehicleTemplate,
+    imagePropertiesSchema,
+    type ImageProperties,
+} from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsValue } from '../../utils/validators/is-value.js';
@@ -19,13 +16,13 @@ import {
     uuidValidationOptions,
     cloneDeepMutable,
 } from '../../utils/index.js';
+import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
 
 export class AddVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Add vehicleTemplate')
     public readonly type = '[VehicleTemplate] Add vehicleTemplate';
 
-    @ValidateNested()
-    @Type(() => VehicleTemplate)
+    @IsZodSchema(vehicleTemplateSchema)
     public readonly vehicleTemplate!: VehicleTemplate;
 }
 
@@ -134,9 +131,9 @@ export namespace VehicleTemplateActionReducers {
 }
 
 function getVehicleTemplate(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     id: UUID
-): Mutable<VehicleTemplate> {
+): WritableDraft<VehicleTemplate> {
     const vehicleTemplate = state.vehicleTemplates[id];
     if (!vehicleTemplate) {
         throw new ReducerError(`VehicleTemplate with id ${id} does not exist`);

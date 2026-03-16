@@ -1,22 +1,24 @@
+import type { WritableDraft } from 'immer';
 import { ExerciseState } from '../state.js';
 import type { ExerciseAction } from '../store/index.js';
 import { ReducerError, applyAction } from '../store/index.js';
-import type { Mutable, UUID } from '../utils/index.js';
+import type { UUID } from '../utils/index.js';
 import { cloneDeepMutable } from '../utils/index.js';
 import type { MigratedStateExport } from '../export-import/file-format/index.js';
 import {
     PartialExport,
     StateExport,
 } from '../export-import/file-format/index.js';
+import type { ParticipantKey } from '../exercise-keys.js';
 import type { Migration } from './migration-functions.js';
 import { migrations } from './migration-functions.js';
 
 export function migrateStateExport(
     stateExportToMigrate: StateExport
-): Mutable<MigratedStateExport> {
+): WritableDraft<MigratedStateExport> {
     const stateExport = cloneDeepMutable(
         stateExportToMigrate
-    ) as Mutable<MigratedStateExport>;
+    ) as WritableDraft<MigratedStateExport>;
     const {
         newVersion,
         migratedProperties: { currentState, history },
@@ -37,7 +39,7 @@ export function migrateStateExport(
             stateExport.history = {
                 actionHistory: history.actions.filter(
                     // Remove actions that are marked to be removed by the migrations
-                    (action): action is Mutable<ExerciseAction> =>
+                    (action): action is WritableDraft<ExerciseAction> =>
                         action !== null
                 ),
                 initialState: history.initialState,
@@ -51,10 +53,12 @@ export function migrateStateExport(
 export function migratePartialExport(
     partialExportToMigrate: PartialExport,
     currentState: ExerciseState
-): Mutable<PartialExport> {
+): WritableDraft<PartialExport> {
     // Encapsulate the partial export in a state export and migrate it
     const mutablePartialExport = cloneDeepMutable(partialExportToMigrate);
-    const dummyState = cloneDeepMutable(ExerciseState.create('123456'));
+    const dummyState = cloneDeepMutable(
+        ExerciseState.create('123456' as ParticipantKey)
+    );
     const stateExport = cloneDeepMutable(
         new StateExport({
             ...dummyState,
@@ -143,13 +147,13 @@ export function applyMigrations<
 ): {
     newVersion: number;
     migratedProperties: {
-        currentState: Mutable<ExerciseState>;
+        currentState: WritableDraft<ExerciseState>;
         history: H extends undefined
             ? undefined
             :
                   | {
-                        initialState: Mutable<ExerciseState>;
-                        actions: (Mutable<ExerciseAction> | null)[];
+                        initialState: WritableDraft<ExerciseState>;
+                        actions: (WritableDraft<ExerciseAction> | null)[];
                     }
                   | undefined;
     };
@@ -166,7 +170,7 @@ export function applyMigrations<
         migrateState(migrationsToApply, history.initialState);
         const intermediaryState = cloneDeepMutable(
             history.initialState
-        ) as Mutable<ExerciseState>;
+        ) as WritableDraft<ExerciseState>;
         try {
             history.actions.forEach((action, index) => {
                 if (action !== null) {
@@ -218,7 +222,7 @@ export function applyMigrations<
     }
     migrateState(migrationsToApply, propertiesToMigrate.currentState);
     const currentState =
-        propertiesToMigrate.currentState as Mutable<ExerciseState>;
+        propertiesToMigrate.currentState as WritableDraft<ExerciseState>;
     return {
         newVersion,
         migratedProperties: {

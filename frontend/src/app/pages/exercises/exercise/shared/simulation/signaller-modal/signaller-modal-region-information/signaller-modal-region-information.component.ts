@@ -1,34 +1,53 @@
 import type { OnChanges, OnInit } from '@angular/core';
-import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
+import {
+    Component,
+    TemplateRef,
+    inject,
+    input,
+    viewChild,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ReportableInformation, UUID } from 'digital-fuesim-manv-shared';
-import { makeInterfaceSignallerKey } from 'digital-fuesim-manv-shared';
+import type { ReportableInformation, UUID } from 'fuesim-digital-shared';
+import { makeInterfaceSignallerKey } from 'fuesim-digital-shared';
 import { type Observable, BehaviorSubject, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { createSelectBehaviorStates } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
 import {
     setLoadingState,
     type InterfaceSignallerInteraction,
+    SignallerModalInteractionsComponent,
 } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import { selectOwnClientId } from '../../../../../../../state/application/selectors/application.selectors';
+import { createSelectBehaviorStates } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
+import { SignallerModalRecurringReportModalComponent } from '../details-modal/signaller-modal-recurring-report-modal/signaller-modal-recurring-report-modal.component';
+import { SimulationEventBasedReportEditorComponent } from '../../shared/simulation-event-based-report-editor/simulation-event-based-report-editor.component';
 
 @Component({
     selector: 'app-signaller-modal-region-information',
     templateUrl: './signaller-modal-region-information.component.html',
     styleUrls: ['./signaller-modal-region-information.component.scss'],
-    standalone: false,
+    imports: [
+        SignallerModalInteractionsComponent,
+        SignallerModalRecurringReportModalComponent,
+        SimulationEventBasedReportEditorComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalRegionInformationComponent
     implements OnInit, OnChanges
 {
-    @Input()
-    simulatedRegionId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
 
-    @ViewChild('recurringReportEditor')
-    recurringReportEditor!: TemplateRef<any>;
+    readonly simulatedRegionId = input.required<UUID>();
+
+    readonly recurringReportEditor = viewChild.required<TemplateRef<any>>(
+        'recurringReportEditor'
+    );
 
     informationTypeToEdit: ReportableInformation | null = null;
 
@@ -259,19 +278,13 @@ export class SignallerModalRegionInformationComponent
     ];
     reportBehaviorId$!: Observable<UUID | null>;
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly detailsModal: SignallerModalDetailsService
-    ) {}
-
     ngOnInit() {
         this.clientId = selectStateSnapshot(selectOwnClientId, this.store)!;
     }
 
     ngOnChanges() {
         const behaviors$ = this.store.select(
-            createSelectBehaviorStates(this.simulatedRegionId)
+            createSelectBehaviorStates(this.simulatedRegionId())
         );
 
         this.reportBehaviorId$ = behaviors$.pipe(
@@ -289,7 +302,7 @@ export class SignallerModalRegionInformationComponent
 
         this.detailsModal.open(
             'Automatischen Bericht bearbeiten',
-            this.recurringReportEditor
+            this.recurringReportEditor()
         );
     }
 
@@ -346,7 +359,7 @@ export class SignallerModalRegionInformationComponent
 
         this.exerciseService.proposeAction({
             type: '[ReportBehavior] Create Report',
-            simulatedRegionId: this.simulatedRegionId,
+            simulatedRegionId: this.simulatedRegionId(),
             informationType,
             interfaceSignallerKey: makeInterfaceSignallerKey(
                 this.clientId,

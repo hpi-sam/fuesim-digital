@@ -1,22 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectEocLogEntries } from 'src/app/state/application/selectors/exercise.selectors';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectEocLogEntries } from '../../../../../../state/application/selectors/exercise.selectors';
 import {
     selectCurrentMainRole,
     selectOwnClient,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
+import { FormatDurationPipe } from '../../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-eoc-log-interface',
     templateUrl: './eoc-log-interface.component.html',
     styleUrls: ['./eoc-log-interface.component.scss'],
-    standalone: false,
+    imports: [FormsModule, AutofocusDirective, AsyncPipe, FormatDurationPipe],
 })
 export class EocLogInterfaceComponent {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     public readonly eocLogEntries$ = this.store
         .select(selectEocLogEntries)
         // We want to display the most recent message at the top
@@ -27,11 +34,6 @@ export class EocLogInterfaceComponent {
     public sendingPrivateLog = true;
     public readonly clientIsTrainer =
         selectStateSnapshot(selectCurrentMainRole, this.store) === 'trainer';
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
 
     public async addEocLogEntry() {
         const response = await this.exerciseService.proposeAction({

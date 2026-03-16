@@ -1,4 +1,0 @@
-location  /.well-known/acme-challenge {
-    default_type text/plain;
-    alias /var/www/acme-challenge/.well-known/acme-challenge;
-}

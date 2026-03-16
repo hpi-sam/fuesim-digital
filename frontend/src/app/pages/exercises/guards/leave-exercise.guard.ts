@@ -1,24 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type {
     ActivatedRouteSnapshot,
     RouterStateSnapshot,
 } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { ApplicationService } from 'src/app/core/application.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { ApplicationService } from '../../../core/application.service';
+import { MessageService } from '../../../core/messages/message.service';
+import type { AppState } from '../../../state/app.state';
+import { selectExerciseStateMode } from '../../../state/application/selectors/application.selectors';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
 
 @Injectable({
     providedIn: 'root',
 })
 export class LeaveExerciseGuard {
-    constructor(
-        private readonly applicationService: ApplicationService,
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService
-    ) {}
+    private readonly applicationService = inject(ApplicationService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
 
     canDeactivate(
         component: unknown,

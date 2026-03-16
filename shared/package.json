@@ -1,5 +1,5 @@
 {
-    "name": "digital-fuesim-manv-shared",
+    "name": "fuesim-digital-shared",
     "version": "0.10.0",
     "type": "module",
     "main": "./dist/index.js",
@@ -40,10 +40,10 @@
         "lodash-es": "^4.17.23",
         "papaparse": "^5.5.3",
         "rbush": "^4.0.1",
-        "rbush-knn": "github:mourner/rbush-knn#semver:^4.0.0",
+        "rbush-knn": "^4.0.0",
         "reflect-metadata": "^0.2.2",
         "uuid": "^11.1.0",
-        "zod": "^4.1.12"
+        "zod": "^4.1.13"
     },
     "devDependencies": {
         "@eslint/compat": "^1.4.0",
@@ -59,9 +59,10 @@
         "eslint-plugin-unicorn": "^56.0.1",
         "jest": "^30.2.0",
         "jest-extended": "^4.0.2",
+        "socket.io": "^4.8.3",
         "ts-jest": "^29.4.5",
         "typescript": "~5.9.3",
-        "typescript-eslint": "^8.45.0"
+        "typescript-eslint": "^8.55.0"
     },
     "exports": {
         ".": {

@@ -1,20 +1,29 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ProvidePersonnelBehaviorState,
     VehicleTemplate,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, Subject, takeUntil } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import type { CdkDragDrop } from '@angular/cdk/drag-drop';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
     selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import type { CdkDragDrop } from '@angular/cdk/drag-drop';
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-provide-personnel',
@@ -23,13 +32,25 @@ import type { CdkDragDrop } from '@angular/cdk/drag-drop';
     styleUrls: [
         './simulated-region-overview-behavior-provide-personnel.component.scss',
     ],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        CdkDropList,
+        CdkDrag,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
     implements OnInit, OnDestroy
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    readonly store = inject<Store<AppState>>(Store);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public vehicleTemplatesToAdd$!: Observable<readonly VehicleTemplate[]>;
     public vehicleTemplatesCurrent$!: Observable<readonly VehicleTemplate[]>;
@@ -38,16 +59,11 @@ export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
 
     private readonly destroy$ = new Subject<void>();
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        public readonly store: Store<AppState>
-    ) {}
-
     ngOnInit(): void {
         const behaviorState$ = this.store.select(
             createSelectBehaviorState<ProvidePersonnelBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
 
@@ -103,8 +119,8 @@ export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
         this.exerciseService.proposeAction(
             {
                 type: '[ProvidePersonnelBehavior] Update VehiclePriorities',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.behaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.behaviorId(),
                 priorities: newPriorities,
             },
             true

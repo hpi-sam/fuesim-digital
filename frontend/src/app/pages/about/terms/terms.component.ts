@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
+import { AboutPlaceholderComponent } from '../about-placeholder/about-placeholder.component';
 
 @Component({
     selector: 'app-terms',
     templateUrl: './terms.component.html',
     styleUrls: ['./terms.component.scss'],
-    standalone: false,
+    imports: [AboutPlaceholderComponent],
 })
 export class TermsComponent {}

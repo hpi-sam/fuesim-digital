@@ -6,6 +6,7 @@ import {
     MaxLength,
     ValidateNested,
 } from 'class-validator';
+import { WritableDraft } from 'immer';
 import { Patient } from '../../models/patient.js';
 import {
     newMapPositionAt,
@@ -24,7 +25,7 @@ import {
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import {
     cloneDeepMutable,
     StrictObject,
@@ -47,7 +48,7 @@ import { logPatientAdded, logPatientRemoved } from './utils/log.js';
  * @param patientId The ID of the patient to be deleted
  */
 export function deletePatient(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     patientId: UUID
 ) {
     const patient = getElement(draftState, 'patient', patientId);

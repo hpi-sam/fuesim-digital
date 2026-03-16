@@ -1,7 +1,7 @@
 <h5>Befehle</h5>
 
 <app-signaller-modal-interactions
-    [simulatedRegionId]="simulatedRegionId"
+    [simulatedRegionId]="simulatedRegionId()"
     [interactions]="commandInteractions"
     primaryActionLabel="Anordnen"
     [showSecondaryButton]="false"
@@ -19,7 +19,7 @@
 <ng-template #transferTraysEditor>
     @if (manageTransportBehaviorId$ | async; as transportBehaviorId) {
         <app-signaller-modal-transport-trays-editor
-            [simulatedRegionId]="simulatedRegionId"
+            [simulatedRegionId]="simulatedRegionId()"
             [transportBehaviorId]="transportBehaviorId"
         />
     } @else {
@@ -31,14 +31,14 @@
 
 <ng-template #transportOfCategoryEditor>
     <app-signaller-modal-start-transfer-of-category-modal
-        [simulatedRegionId]="simulatedRegionId"
+        [simulatedRegionId]="simulatedRegionId()"
     />
 </ng-template>
 
 <ng-template #provideVehiclesEditor>
     @if (transferVehiclesBehaviorId$ | async; as transferVehiclesBehaviorId) {
         <app-signaller-modal-provide-vehicles-editor
-            [simulatedRegionId]="simulatedRegionId"
+            [simulatedRegionId]="simulatedRegionId()"
             [transferBehaviorId]="transferVehiclesBehaviorId"
         />
     } @else {
@@ -51,7 +51,7 @@
 <ng-template #requestTargetEditor>
     @if (requestBehaviorId$ | async; as requestBehaviorId) {
         <app-signaller-modal-request-target-editor
-            [simulatedRegionId]="simulatedRegionId"
+            [simulatedRegionId]="simulatedRegionId()"
             [requestBehaviorId]="requestBehaviorId"
         />
     } @else {
@@ -62,7 +62,7 @@
 <ng-template #transportRequestTargetEditor>
     @if (manageTransportBehaviorId$ | async; as transportBehaviorId) {
         <app-signaller-modal-transport-request-target-editor
-            [simulatedRegionId]="simulatedRegionId"
+            [simulatedRegionId]="simulatedRegionId()"
             [transportBehaviorId]="transportBehaviorId"
         />
     } @else {

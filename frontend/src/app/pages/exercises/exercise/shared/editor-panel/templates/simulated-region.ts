@@ -2,8 +2,7 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseState,
     ImageProperties,
-    Mutable,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     TransferToHospitalBehaviorState,
     ManagePatientTransportToHospitalBehaviorState,
@@ -19,9 +18,11 @@ import {
     RequestBehaviorState,
     TreatPatientsBehaviorState,
     UnloadArrivingVehiclesBehaviorState,
-    newMapPositionAt,
     StrictObject,
-} from 'digital-fuesim-manv-shared';
+    newNoPosition,
+} from 'fuesim-digital-shared';
+import type { WritableDraft } from 'immer';
+import { toUtf8Base64 } from './utils/base64';
 
 export interface SimulatedRegionDragTemplate {
     editorName: string;
@@ -35,7 +36,7 @@ const size = {
     height,
     width,
 };
-const position = newMapPositionAt({ x: 0, y: 0 });
+const position = newNoPosition();
 
 const stereotypes: SimulatedRegion[] = [
     {
@@ -122,7 +123,7 @@ function coloredImageUrl(borderColor: string): ImageProperties {
          y="0.036193207" />
     </svg>
     `;
-    const url = `data:image/svg+xml;base64,${window.btoa(content)}`;
+    const url = `data:image/svg+xml;base64,${toUtf8Base64(content)}`;
     return {
         ...SimulatedRegion.image,
         url,
@@ -139,7 +140,7 @@ export const simulatedRegionDragTemplates: SimulatedRegionDragTemplate[] =
     }));
 
 function reconstituteBehavior(
-    behavior: Mutable<ExerciseSimulationBehaviorState>,
+    behavior: WritableDraft<ExerciseSimulationBehaviorState>,
     state: ExerciseState
 ) {
     behavior.id = uuid();

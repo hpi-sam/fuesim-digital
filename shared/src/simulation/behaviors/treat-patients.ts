@@ -7,6 +7,7 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { groupBy } from 'lodash-es';
+import { WritableDraft } from 'immer';
 import type {
     PatientCountRadiogram,
     TreatmentStatusRadiogram,
@@ -17,7 +18,7 @@ import {
 } from '../../models/utils/index.js';
 import type { ExerciseState } from '../../state.js';
 import { getActivityById } from '../../store/action-reducers/utils/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { uuid, uuidValidationOptions } from '../../utils/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import { DelayEventActivityState } from '../activities/index.js';
@@ -218,7 +219,7 @@ export const treatPatientsBehavior: SimulationBehavior<TreatPatientsBehaviorStat
                             }
 
                             const patientCountRadiogram =
-                                radiogram as Mutable<PatientCountRadiogram>;
+                                radiogram as WritableDraft<PatientCountRadiogram>;
 
                             const patientCount =
                                 patientCountRadiogram.patientCount;
@@ -259,7 +260,7 @@ export const treatPatientsBehavior: SimulationBehavior<TreatPatientsBehaviorStat
                         }
                         case 'treatmentStatus': {
                             const treatmentStatusRadiogram =
-                                radiogram as Mutable<TreatmentStatusRadiogram>;
+                                radiogram as WritableDraft<TreatmentStatusRadiogram>;
 
                             treatmentStatusRadiogram.treatmentStatus =
                                 behaviorState.treatmentProgress;
@@ -280,9 +281,9 @@ export const treatPatientsBehavior: SimulationBehavior<TreatPatientsBehaviorStat
     };
 
 function startNewTreatmentReassignment(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<TreatPatientsBehaviorState>
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<TreatPatientsBehaviorState>
 ) {
     if (
         behaviorState.treatmentActivityId &&

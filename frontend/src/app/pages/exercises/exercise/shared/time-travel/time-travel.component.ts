@@ -1,36 +1,38 @@
 import type { OnDestroy } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { cloneDeepMutable, StateExport } from 'digital-fuesim-manv-shared';
+import { cloneDeepMutable, StateExport } from 'fuesim-digital-shared';
 import { throttle } from 'lodash-es';
-import { ApiService } from 'src/app/core/api.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { TimeTravelService } from 'src/app/core/time-travel.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectTimeConstraints } from 'src/app/state/application/selectors/application.selectors';
-import { selectExerciseState } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { openClientOverviewModal } from '../client-overview/open-client-overview-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
 import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
+import { ApiService } from '../../../../../core/api.service';
+import { MessageService } from '../../../../../core/messages/message.service';
+import { TimeTravelService } from '../../../../../core/time-travel.service';
+import type { AppState } from '../../../../../state/app.state';
+import { selectTimeConstraints } from '../../../../../state/application/selectors/application.selectors';
+import { selectExerciseState } from '../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
+import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
+import { FormatDurationPipe } from '../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-time-travel',
     templateUrl: './time-travel.component.html',
     styleUrls: ['./time-travel.component.scss'],
-    standalone: false,
+    imports: [ExerciseMapComponent, FormsModule, AsyncPipe, FormatDurationPipe],
 })
 export class TimeTravelComponent implements OnDestroy {
-    public timeConstraints$ = this.store.select(selectTimeConstraints);
+    private readonly modalService = inject(NgbModal);
+    private readonly apiService = inject(ApiService);
+    private readonly timeTravelService = inject(TimeTravelService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
 
-    constructor(
-        private readonly modalService: NgbModal,
-        private readonly apiService: ApiService,
-        private readonly timeTravelService: TimeTravelService,
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService
-    ) {}
+    public timeConstraints$ = this.store.select(selectTimeConstraints);
 
     public openClientOverview() {
         openClientOverviewModal(this.modalService);
@@ -116,16 +118,16 @@ export class TimeTravelComponent implements OnDestroy {
             selectExerciseState,
             this.store
         );
-        const { trainerId } = await this.apiService.importExercise(
+        const { trainerKey } = await this.apiService.importExercise(
             new StateExport(cloneDeepMutable(currentExerciseState))
         );
         this.messageService.postMessage({
             color: 'success',
             title: 'Neue Übung erstellt',
-            body: `ÜbungsleiterId: ${trainerId}`,
+            body: `Übungsleiter-ID: ${trainerKey}`,
         });
         window
-            .open(`${location.origin}/exercises/${trainerId}`, '_blank')
+            .open(`${location.origin}/exercises/${trainerKey}`, '_blank')
             ?.focus();
     }
 

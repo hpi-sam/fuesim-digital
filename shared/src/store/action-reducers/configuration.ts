@@ -38,6 +38,25 @@ export class SetPatientIdentifierPrefixAction implements Action {
     public readonly patientIdentifierPrefix!: string;
 }
 
+export class SetVehicleStatusHighlightEnabled implements Action {
+    @IsValue('[Configuration] Set vehicleStatusHighlightEnabled' as const)
+    public readonly type = '[Configuration] Set vehicleStatusHighlightEnabled';
+
+    @IsBoolean()
+    public readonly vehicleStatusHighlightEnabled!: boolean;
+}
+
+export class SetVehicleStatusInPatientStatusColorEnabled implements Action {
+    @IsValue(
+        '[Configuration] Set vehicleStatusInPatientStatusColorEnabled' as const
+    )
+    public readonly type =
+        '[Configuration] Set vehicleStatusInPatientStatusColorEnabled';
+
+    @IsBoolean()
+    public readonly vehicleStatusInPatientStatusColor!: boolean;
+}
+
 export namespace ConfigurationActionReducers {
     export const setTileMapProperties: ActionReducer<SetTileMapPropertiesAction> =
         {
@@ -76,6 +95,28 @@ export namespace ConfigurationActionReducers {
             reducer(draftState, { patientIdentifierPrefix }) {
                 draftState.configuration.patientIdentifierPrefix =
                     patientIdentifierPrefix;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setVehicleStatusHighlight: ActionReducer<SetVehicleStatusHighlightEnabled> =
+        {
+            action: SetVehicleStatusHighlightEnabled,
+            reducer(draftState, { vehicleStatusHighlightEnabled }) {
+                draftState.configuration.vehicleStatusHighlight =
+                    vehicleStatusHighlightEnabled;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setVehicleStatusInSkColor: ActionReducer<SetVehicleStatusInPatientStatusColorEnabled> =
+        {
+            action: SetVehicleStatusInPatientStatusColorEnabled,
+            reducer(draftState, { vehicleStatusInPatientStatusColor }) {
+                draftState.configuration.vehicleStatusInPatientStatusColor =
+                    vehicleStatusInPatientStatusColor;
                 return draftState;
             },
             rights: 'trainer',

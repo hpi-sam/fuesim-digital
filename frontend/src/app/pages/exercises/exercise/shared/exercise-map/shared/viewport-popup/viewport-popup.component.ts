@@ -1,32 +1,39 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID, Viewport } from 'digital-fuesim-manv-shared';
+import type { UUID, Viewport } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectViewport } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import { createSelectViewport } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../shared/directives/app-save-on-typing.directive';
+import { DisplayValidationComponent } from '../../../../../../../shared/validation/display-validation/display-validation.component';
 
 @Component({
     selector: 'app-viewport-popup',
     templateUrl: './viewport-popup.component.html',
     styleUrls: ['./viewport-popup.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        DisplayValidationComponent,
+        AsyncPipe,
+    ],
 })
 export class ViewportPopupComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly popupService = inject(PopupService);
+
     // These properties are only set after OnInit
     public viewportId!: UUID;
 
     public viewport$?: Observable<Viewport>;
     public readonly currentRole$ = this.store.select(selectCurrentMainRole);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly popupService: PopupService
-    ) {}
 
     ngOnInit() {
         this.viewport$ = this.store.select(

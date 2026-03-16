@@ -36,6 +36,20 @@
             "when": 1769525695314,
             "tag": "0004_oidc",
             "breakpoints": true
+        },
+        {
+            "idx": 5,
+            "version": "7",
+            "when": 1770139425609,
+            "tag": "0005_exercise_manager",
+            "breakpoints": true
+        },
+        {
+            "idx": 6,
+            "version": "7",
+            "when": 1771952577306,
+            "tag": "0006_ids_to_keys",
+            "breakpoints": true
         }
     ]
 }

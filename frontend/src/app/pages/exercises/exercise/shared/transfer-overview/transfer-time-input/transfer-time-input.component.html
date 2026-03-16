@@ -24,15 +24,17 @@
     </button>
     <button
         class="btn btn-small btn-outline-secondary fw-bolder"
-        [class.text-dark]="!transfer.isPaused"
+        [class.text-dark]="!transfer().isPaused"
         (click)="togglePauseTransfer()"
-        [title]="'Transfer ist ' + (transfer.isPaused ? 'pausiert' : 'aktiv')"
+        [title]="'Transfer ist ' + (transfer().isPaused ? 'pausiert' : 'aktiv')"
         data-cy="transferTimeTogglePauseButton"
     >
-        <i [ngClass]="transfer.isPaused ? 'bi-pause-fill' : 'bi-play-fill'"></i>
+        <i
+            [ngClass]="transfer().isPaused ? 'bi-pause-fill' : 'bi-play-fill'"
+        ></i>
         <!-- TODO: `??` would be a bit better than `||`, but messes up the code highlighting -->
         {{
-            transfer.endTimeStamp - ((currentTime$ | async) || 0)
+            transfer().endTimeStamp - ((currentTime$ | async) || 0)
                 | formatDuration
         }}
     </button>

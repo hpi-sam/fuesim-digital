@@ -1,6 +1,6 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { BehaviourCode } from 'digital-fuesim-manv-shared';
+import type { BehaviourCode } from 'fuesim-digital-shared';
 
 const behaviorIconMap: { [Key in BehaviourCode]: string } = {
     A: 'bi-arrow-right-square-fill',
@@ -10,10 +10,7 @@ const behaviorIconMap: { [Key in BehaviourCode]: string } = {
     E: 'bi-x-circle-fill',
 };
 
-@Pipe({
-    name: 'patientBehaviorIcon',
-    standalone: false,
-})
+@Pipe({ name: 'patientBehaviorIcon' })
 export class PatientBehaviorIconPipe implements PipeTransform {
     transform(value: BehaviourCode): string {
         return behaviorIconMap[value];

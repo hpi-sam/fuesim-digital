@@ -1,4 +1,5 @@
-import type { Immutable, JsonObject } from 'digital-fuesim-manv-shared';
+import type { JsonObject } from 'fuesim-digital-shared';
+import type { Immutable } from 'immer';
 
 /**
  * Compares two immutable dictionaries and calls the correct handler for each element that is different between the two dictionaries.

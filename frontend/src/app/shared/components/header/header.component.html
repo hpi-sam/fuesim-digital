@@ -1,0 +1,29 @@
+<nav class="navbar bg-body-tertiary mb-4">
+    <div class="container container-fluid">
+        <a routerLink="/" class="navbar-brand">FüSim Digital</a>
+        <ul
+            ngbNav
+            [activeId]="route.url | async"
+            class="navbar-nav d-flex flex-row"
+        >
+            @if (auth.authData().user) {
+                <li ngbNavItem="exercises" class="nav-item mx-2">
+                    <a ngbNavLink class="nav-link" routerLink="/exercises/">
+                        Meine Übungen
+                    </a>
+                </li>
+                <li ngbNavItem="exercise_templates" class="nav-item mx-2">
+                    <a
+                        ngbNavLink
+                        class="nav-link"
+                        routerLink="/exercises/templates"
+                    >
+                        Meine Übungsvorlagen
+                    </a>
+                </li>
+            }
+        </ul>
+
+        <app-user-account-navbar-item></app-user-account-navbar-item>
+    </div>
+</nav>

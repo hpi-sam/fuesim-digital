@@ -1,42 +1,73 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
+import {
+    Component,
+    TemplateRef,
+    inject,
+    input,
+    viewChild,
+} from '@angular/core';
 import type {
     ExerciseSimulationBehaviorType,
     UUID,
-} from 'digital-fuesim-manv-shared';
-import { isInSpecificSimulatedRegion } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { isInSpecificSimulatedRegion } from 'fuesim-digital-shared';
 import { Store, createSelector } from '@ngrx/store';
-import type { AppState } from 'src/app/state/app.state';
 import { map, type Observable } from 'rxjs';
-import {
-    createSelectBehaviorStatesByType,
-    selectTransferPoints,
-} from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
 import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component';
+import type { AppState } from '../../../../../../../state/app.state';
+import {
+    selectTransferPoints,
+    createSelectBehaviorStatesByType,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
+import { SignallerModalInteractionsComponent } from '../signaller-modal-interactions/signaller-modal-interactions.component';
+import { SignallerModalTransferConnectionsEditorComponent } from '../details-modal/signaller-modal-transfer-connections-editor/signaller-modal-transfer-connections-editor.component';
+import { SignallerModalTransportTraysEditorComponent } from '../details-modal/signaller-modal-transport-trays-editor/signaller-modal-transport-trays-editor.component';
+import { SignallerModalStartTransferOfCategoryModalComponent } from '../details-modal/signaller-modal-start-transfer-of-category-modal/signaller-modal-start-transfer-of-category-modal.component';
+import { SignallerModalProvideVehiclesEditorComponent } from '../details-modal/signaller-modal-provide-vehicles-editor/signaller-modal-provide-vehicles-editor.component';
+import { SignallerModalRequestDestinationEditorComponent } from '../details-modal/signaller-modal-request-target-editor/signaller-modal-request-target-editor.component';
+import { SignallerModalTransportRequestTargetEditorComponent } from '../details-modal/signaller-modal-transport-request-target-editor/signaller-modal-transport-request-target-editor.component';
 
 @Component({
     selector: 'app-signaller-modal-region-commands',
     templateUrl: './signaller-modal-region-commands.component.html',
     styleUrls: ['./signaller-modal-region-commands.component.scss'],
-    standalone: false,
+    imports: [
+        SignallerModalInteractionsComponent,
+        SignallerModalTransferConnectionsEditorComponent,
+        SignallerModalTransportTraysEditorComponent,
+        SignallerModalStartTransferOfCategoryModalComponent,
+        SignallerModalProvideVehiclesEditorComponent,
+        SignallerModalRequestDestinationEditorComponent,
+        SignallerModalTransportRequestTargetEditorComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalRegionCommandsComponent implements OnChanges {
-    @Input()
-    simulatedRegionId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
 
-    @ViewChild('transferConnectionsEditor')
-    transferConnectionsEditor!: TemplateRef<any>;
-    @ViewChild('transferTraysEditor')
-    transferTraysEditor!: TemplateRef<any>;
-    @ViewChild('transportOfCategoryEditor')
-    transportOfCategoryEditor!: TemplateRef<any>;
-    @ViewChild('provideVehiclesEditor')
-    provideVehiclesEditor!: TemplateRef<any>;
-    @ViewChild('requestTargetEditor')
-    requestTargetEditor!: TemplateRef<any>;
-    @ViewChild('transportRequestTargetEditor')
-    transportRequestTargetEditor!: TemplateRef<any>;
+    readonly simulatedRegionId = input.required<UUID>();
+
+    readonly transferConnectionsEditor = viewChild.required<TemplateRef<any>>(
+        'transferConnectionsEditor'
+    );
+    readonly transferTraysEditor = viewChild.required<TemplateRef<any>>(
+        'transferTraysEditor'
+    );
+    readonly transportOfCategoryEditor = viewChild.required<TemplateRef<any>>(
+        'transportOfCategoryEditor'
+    );
+    readonly provideVehiclesEditor = viewChild.required<TemplateRef<any>>(
+        'provideVehiclesEditor'
+    );
+    readonly requestTargetEditor = viewChild.required<TemplateRef<any>>(
+        'requestTargetEditor'
+    );
+    readonly transportRequestTargetEditor = viewChild.required<
+        TemplateRef<any>
+    >('transportRequestTargetEditor');
 
     ownTransferPointId$!: Observable<UUID>;
     manageTransportBehaviorId$!: Observable<UUID | null>;
@@ -180,11 +211,6 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
         },
     ];
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly detailsModal: SignallerModalDetailsService
-    ) {}
-
     ngOnChanges() {
         this.ownTransferPointId$ = this.store.select(
             createSelector(
@@ -193,7 +219,7 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
                     Object.values(transferPoints).find((transferPoint) =>
                         isInSpecificSimulatedRegion(
                             transferPoint,
-                            this.simulatedRegionId
+                            this.simulatedRegionId()
                         )
                     )!.id
             )
@@ -212,7 +238,7 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
     selectBehaviorId(type: ExerciseSimulationBehaviorType) {
         return this.store
             .select(
-                createSelectBehaviorStatesByType(this.simulatedRegionId, type)
+                createSelectBehaviorStatesByType(this.simulatedRegionId(), type)
             )
             .pipe(map((behaviorStates) => behaviorStates[0]?.id ?? null));
     }
@@ -220,42 +246,42 @@ export class SignallerModalRegionCommandsComponent implements OnChanges {
     editTransferConnections() {
         this.detailsModal.open(
             'Transferverbindungen bearbeiten',
-            this.transferConnectionsEditor
+            this.transferConnectionsEditor()
         );
     }
 
     editTransferPatientTrays() {
         this.detailsModal.open(
             'PAs für Abtransport festlegen',
-            this.transferTraysEditor
+            this.transferTraysEditor()
         );
     }
 
     startTransportOfCategory() {
         this.detailsModal.open(
             'Abtransport starten/stoppen/ändern',
-            this.transportOfCategoryEditor
+            this.transportOfCategoryEditor()
         );
     }
 
     provideVehicles() {
         this.detailsModal.open(
             'Fahrzeuge bereitstellen',
-            this.provideVehiclesEditor
+            this.provideVehiclesEditor()
         );
     }
 
     setRequestTarget() {
         this.detailsModal.open(
             'Ziel für Fahrzeuganfragen (PA/B-Raum)',
-            this.requestTargetEditor
+            this.requestTargetEditor()
         );
     }
 
     setTransportRequestTarget() {
         this.detailsModal.open(
             'Ziel für Fahrzeuganfragen (Transport)',
-            this.transportRequestTargetEditor
+            this.transportRequestTargetEditor()
         );
     }
 }

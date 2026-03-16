@@ -5,7 +5,6 @@ import {
     IsArray,
     IsInt,
     IsObject,
-    IsString,
     IsUUID,
     Min,
     ValidateNested,
@@ -18,6 +17,7 @@ import {
     EocLogEntry,
     Hospital,
     HospitalPatient,
+    RestrictedZone,
     MapImage,
     MapImageTemplate,
     Material,
@@ -61,6 +61,13 @@ import { IsZodSchema } from './utils/validators/is-zod-object.js';
 import { vehicleSchema } from './models/vehicle.js';
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import type { TreatmentAssignment } from './store/index.js';
+import { restrictedZoneSchema } from './models/restricted-zone.js';
+import { materialSchema } from './models/material.js';
+import { materialTemplateSchema } from './models/material-template.js';
+import { personnelTemplateSchema } from './models/personnel-template.js';
+import { personnelSchema } from './models/personnel.js';
+import { vehicleTemplateSchema } from './models/vehicle-template.js';
+import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
 import {
     operationalSectionSchema,
     OperationalSection,
@@ -96,12 +103,15 @@ export class ExerciseState {
     @IsZodSchema(z.record(z.uuidv4(), vehicleSchema))
     public readonly vehicles: { readonly [key: UUID]: Vehicle } = {};
 
-    @IsIdMap(Personnel)
+    @IsZodSchema(z.record(z.uuidv4(), personnelSchema))
     public readonly personnel: { readonly [key: UUID]: Personnel } = {};
     @IsIdMap(Patient)
     public readonly patients: { readonly [key: UUID]: Patient } = {};
-    @IsIdMap(Material)
+    @IsZodSchema(z.record(z.uuidv4(), materialSchema))
     public readonly materials: { readonly [key: UUID]: Material } = {};
+    @IsZodSchema(z.record(z.uuidv4(), restrictedZoneSchema))
+    public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
+        {};
     @IsIdMap(MapImage)
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
     @IsIdMap(TransferPoint)
@@ -132,15 +142,15 @@ export class ExerciseState {
     @Type(() => PatientCategory)
     public readonly patientCategories = defaultPatientCategories;
 
-    @IsIdMap(VehicleTemplate)
+    @IsZodSchema(z.record(z.uuidv4(), vehicleTemplateSchema))
     public readonly vehicleTemplates: {
         readonly [key: UUID]: VehicleTemplate;
     } = defaultVehicleTemplatesById;
-    @IsIdMap(MaterialTemplate)
+    @IsZodSchema(z.record(z.uuidv4(), materialTemplateSchema))
     public readonly materialTemplates: {
         readonly [key: UUID]: MaterialTemplate;
     } = defaultMaterialTemplatesById;
-    @IsIdMap(PersonnelTemplate)
+    @IsZodSchema(z.record(z.uuidv4(), personnelTemplateSchema))
     public readonly personnelTemplates: {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;
@@ -153,10 +163,11 @@ export class ExerciseState {
     @ValidateNested()
     @Type(() => EocLogEntry)
     public readonly eocLog: readonly EocLogEntry[] = [];
-    @IsString()
-    public readonly participantId: string;
 
-    // Mutable<ExerciseState>` could still have immutable objects in spatialTree
+    @IsZodSchema(participantKeySchema)
+    public readonly participantKey: ParticipantKey;
+
+    // WritableDraft<ExerciseState>` could still have immutable objects in spatialTree
     @IsObject()
     public readonly spatialTrees: {
         [type in SpatialElementPlural]: SpatialTree;
@@ -188,8 +199,8 @@ export class ExerciseState {
     /**
      * @deprecated Use {@link create} instead.
      */
-    constructor(participantId: string) {
-        this.participantId = participantId;
+    constructor(participantKey: ParticipantKey) {
+        this.participantKey = participantKey;
     }
 
     static readonly create = getCreate(this);
@@ -199,5 +210,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 45;
+    static readonly currentStateVersion = 47;
 }

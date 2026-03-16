@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { SetPretriageEnabledAction } from '../../../../shared/dist/store/action-reducers/configuration.js';
-import { createTestEnvironment } from '../../../test/utils.js';
+import { createTestEnvironment } from '../../test/utils.js';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
 import { actionTable } from '../schema.js';
@@ -22,10 +22,7 @@ describe('ActionRepository', () => {
         //
         // This is to test, wether action before exercise id assignment
         // are saved and retrieved correctly with this exerciseId.
-        const activeExercise = ExerciseFactory.fromBlank({
-            participantKey: '123456',
-            trainerKey: '12345678',
-        });
+        const activeExercise = ExerciseFactory.fromBlank();
 
         const actions = [
             new ActionWrapper(
@@ -50,7 +47,7 @@ describe('ActionRepository', () => {
 
         // Save exercise in database and therefore assign id, after actions are created
         expect(activeExercise.exerciseId).toBeUndefined();
-        await environment.exerciseService.loadExercise(activeExercise);
+        await environment.exerciseService.createExercise(activeExercise);
         expect(activeExercise.exerciseId).toBeDefined();
 
         await environment.actionRepository.saveActions(actions);
@@ -84,8 +81,8 @@ describe('ActionRepository', () => {
         const exerciseActionsNoId = exerciseActions.map(removeId);
 
         expect(exerciseActionsNoId.length).toBe(2);
-        expect(exerciseActionsNoId[0]!).toEqual(expectedActions[0]!);
-        expect(exerciseActionsNoId[1]!).toEqual(expectedActions[1]!);
+        expect(exerciseActionsNoId[0]).toEqual(expectedActions[0]!);
+        expect(exerciseActionsNoId[1]).toEqual(expectedActions[1]!);
 
         // REPOSITORY METHOD CHECK
         const exerciseActions2 =
@@ -100,7 +97,7 @@ describe('ActionRepository', () => {
         const exerciseActions2NoId = exerciseActions.map(removeId);
 
         expect(exerciseActions2NoId.length).toBe(2);
-        expect(exerciseActions2NoId[0]!).toEqual(expectedActions[0]!);
-        expect(exerciseActions2NoId[1]!).toEqual(expectedActions[1]!);
+        expect(exerciseActions2NoId[0]).toEqual(expectedActions[0]!);
+        expect(exerciseActions2NoId[1]).toEqual(expectedActions[1]!);
     });
 });

@@ -1,54 +1,82 @@
-<h2>
-    <input
-        #nameInput="ngModel"
-        [ngModel]="alarmGroup.name"
-        (appSaveOnTyping)="renameAlarmGroup($event)"
-        required
-        placeholder="Name"
-        type="text"
-        class="form-control d-inline-block fw-bold"
-        style="width: 200px"
-        data-cy="alarmGroupRenameInput"
-    />
-    <div ngbDropdown autoClose="outside" class="d-inline-block">
-        <button
-            ngbDropdownToggle
-            type="button"
-            class="btn btn-outline-primary ms-3"
-            data-cy="alarmGroupAddVehicleButton"
+<div class="d-flex align-items-center justify-content-between gap-1 mb-3">
+    <div class="d-flex align-items-center flex-wrap gap-1">
+        <input
+            #nameInput="ngModel"
+            [ngModel]="alarmGroup().name"
+            (appSaveOnTyping)="renameAlarmGroup($event)"
+            required
+            placeholder="Name"
+            type="text"
+            class="form-control d-inline-block fw-bold"
+            style="width: 200px"
+            data-cy="alarmGroupRenameInput"
+        />
+        <div ngbDropdown autoClose="outside" class="d-inline-block">
+            <button
+                ngbDropdownToggle
+                type="button"
+                class="btn btn-outline-primary ms-3"
+                data-cy="alarmGroupAddVehicleButton"
+            >
+                Fahrzeug hinzufügen
+            </button>
+            <div ngbDropdownMenu data-cy="alarmGroupAddVehicleSelect">
+                @for (
+                    vehicleTemplate of vehicleTemplates$ | async | values;
+                    track vehicleTemplate.id
+                ) {
+                    <button
+                        ngbDropdownItem
+                        (click)="createAlarmGroupVehicle(vehicleTemplate.id)"
+                        type="button"
+                        class="btn"
+                    >
+                        <i class="bi bi-plus"></i>
+                        {{ vehicleTemplate.vehicleType }}
+                    </button>
+                }
+            </div>
+        </div>
+        <div
+            class="form-check w-auto d-inline-block ms-3"
+            style="font-size: 1rem"
         >
-            Fahrzeug hinzufügen
-        </button>
-        <div ngbDropdownMenu data-cy="alarmGroupAddVehicleSelect">
-            @for (
-                vehicleTemplate of vehicleTemplates$ | async | values;
-                track vehicleTemplate.id
-            ) {
-                <button
-                    ngbDropdownItem
-                    (click)="createAlarmGroupVehicle(vehicleTemplate.id)"
-                    type="button"
-                    class="btn"
-                >
-                    <i class="bi bi-plus"></i> {{ vehicleTemplate.vehicleType }}
-                </button>
-            }
+            <label class="d-flex flex-row gap-2 align-items-center">
+                <input
+                    class="form-check-input no-validation"
+                    type="checkbox"
+                    role="switch"
+                    [ngModel]="hasTriggerLimit"
+                    (ngModelChange)="toggleTriggerLimit($event)"
+                    tabindex="1"
+                />
+                <span>max. Auslösungen</span>
+                <input
+                    [hidden]="!hasTriggerLimit"
+                    [ngModel]="triggerLimit"
+                    (appSaveOnTyping)="limitAlarmGroup($event)"
+                    class="form-control"
+                    type="number"
+                    placeholder="-"
+                    style="width: 6rem"
+                />
+            </label>
         </div>
     </div>
 
     <button
         (click)="removeAlarmGroup()"
-        class="btn btn-outline-danger float-end"
+        class="btn btn-outline-danger align-self-end"
         data-cy="alarmGroupsRemoveButton"
     >
         <i class="bi bi-trash"></i> Löschen
     </button>
-</h2>
+</div>
 
-@if ((alarmGroup.alarmGroupVehicles | values).length > 0) {
+@if ((alarmGroup().alarmGroupVehicles | values).length > 0) {
     <div class="d-flex flex-wrap">
         @for (
-            alarmGroupVehicle of alarmGroup.alarmGroupVehicles | values;
+            alarmGroupVehicle of alarmGroup().alarmGroupVehicles | values;
             track alarmGroupVehicle.id
         ) {
             <div

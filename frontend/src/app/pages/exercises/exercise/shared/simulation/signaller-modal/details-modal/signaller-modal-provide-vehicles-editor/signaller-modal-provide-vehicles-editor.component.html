@@ -8,53 +8,48 @@
         let index = $index
     ) {
         <div class="row" [class.mt-2]="!first">
-            <ng-container
-                *appLet="
-                    (availableVehicles$ | async)?.[
-                        vehicleTemplate.vehicleType
-                    ] ?? 0 as availableVehicles
-                "
+            @let availableVehicles =
+                (availableVehicles$ | async)?.[vehicleTemplate.vehicleType] ??
+                0;
+            <label class="col text-nowrap"
+                >{{ vehicleTemplate.name }}<br /><span class="text-muted">
+                    ({{ availableVehicles }} verfügbar)</span
+                ></label
             >
-                <label class="col text-nowrap"
-                    >{{ vehicleTemplate.name }}<br /><span class="text-muted">
-                        ({{ availableVehicles }} verfügbar)</span
-                    ></label
+            <input
+                [ngModel]="vehicleAmounts[vehicleTemplate.vehicleType] ?? 0"
+                (ngModelChange)="
+                    vehicleAmounts[vehicleTemplate.vehicleType] = $event
+                "
+                [name]="vehicleTemplate.vehicleType + 'Count'"
+                [tabIndex]="index + 1"
+                #amountInput="ngModel"
+                required
+                appIntegerValidator
+                type="number"
+                min="0"
+                [max]="availableVehicles"
+                step="1"
+                class="form-control col ms-2"
+                style="width: 1px"
+            />
+            <div class="btn-group col-auto ms-2" role="group">
+                <button
+                    type="button"
+                    class="btn btn-outline-success"
+                    (click)="increaseAmount(vehicleTemplate.vehicleType)"
                 >
-                <input
-                    [ngModel]="vehicleAmounts[vehicleTemplate.vehicleType] ?? 0"
-                    (ngModelChange)="
-                        vehicleAmounts[vehicleTemplate.vehicleType] = $event
-                    "
-                    [name]="vehicleTemplate.vehicleType + 'Count'"
-                    [tabIndex]="index + 1"
-                    #amountInput="ngModel"
-                    required
-                    appIntegerValidator
-                    type="number"
-                    min="0"
-                    [max]="availableVehicles"
-                    step="1"
-                    class="form-control col ms-2"
-                    style="width: 1px"
-                />
-                <div class="btn-group col-auto ms-2" role="group">
-                    <button
-                        type="button"
-                        class="btn btn-outline-success"
-                        (click)="increaseAmount(vehicleTemplate.vehicleType)"
-                    >
-                        +
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-outline-danger"
-                        (click)="decreaseAmount(vehicleTemplate.vehicleType)"
-                    >
-                        -
-                    </button>
-                </div>
-                <app-display-validation [ngModelInput]="amountInput" />
-            </ng-container>
+                    +
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="decreaseAmount(vehicleTemplate.vehicleType)"
+                >
+                    -
+                </button>
+            </div>
+            <app-display-validation [ngModelInput]="amountInput" />
         </div>
     }
     <div class="mt-2 d-flex flex-row align-items-center">

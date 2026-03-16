@@ -3,7 +3,7 @@ import type OlMap from 'ol/Map';
 import type RenderEvent from 'ol/render/Event';
 import type { Feature } from 'ol';
 import { getVectorContext } from 'ol/render';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import { isEqual } from 'lodash-es';
 import type {
     Coordinates,

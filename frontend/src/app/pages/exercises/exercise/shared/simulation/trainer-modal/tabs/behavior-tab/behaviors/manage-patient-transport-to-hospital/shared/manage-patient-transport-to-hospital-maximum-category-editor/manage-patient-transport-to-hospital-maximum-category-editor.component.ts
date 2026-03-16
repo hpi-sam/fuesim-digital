@@ -1,14 +1,23 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectBehaviorState } from 'src/app/state/application/selectors/exercise.selectors';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../../../state/app.state';
+import { createSelectBehaviorState } from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 
 @Component({
     selector:
@@ -18,28 +27,34 @@ import { createSelectBehaviorState } from 'src/app/state/application/selectors/e
     styleUrls: [
         './manage-patient-transport-to-hospital-maximum-category-editor.component.scss',
     ],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        PatientStatusBadgeComponent,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+    ],
 })
 export class ManagePatientTransportToHospitalMaximumCategoryEditorComponent
     implements OnChanges
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public behaviorState$!: Observable<ManagePatientTransportToHospitalBehaviorState>;
 
     public patientStatusForTransport = ['red', 'yellow', 'green'] as const;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
-
     ngOnChanges(): void {
         this.behaviorState$ = this.store.select(
             createSelectBehaviorState<ManagePatientTransportToHospitalBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
     }
@@ -54,8 +69,8 @@ export class ManagePatientTransportToHospitalMaximumCategoryEditorComponent
         }
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Update Maximum Category To Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             maximumCategoryToTransport,
         });
     }

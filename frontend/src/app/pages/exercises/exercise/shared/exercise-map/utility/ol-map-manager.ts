@@ -1,24 +1,10 @@
 import type { Store } from '@ngrx/store';
-import {
-    upperLeftCornerOf,
-    lowerRightCornerOf,
-} from 'digital-fuesim-manv-shared';
+import { upperLeftCornerOf, lowerRightCornerOf } from 'fuesim-digital-shared';
 import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
 import OlMap from 'ol/Map';
 import { Subject, takeUntil } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectSimulatedRegions,
-    selectViewports,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import {
-    selectCurrentMainRole,
-    selectRestrictedViewport,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { fromLonLat } from 'ol/proj';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import { startingPosition } from '../../starting-position';
@@ -36,6 +22,18 @@ import {
     isInViewport,
     ViewportFeatureManager,
 } from '../feature-managers/viewport-feature-manager';
+import { RestrictedZoneFeatureManager } from '../feature-managers/restricted-zone-feature-manager';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectViewports,
+    selectSimulatedRegions,
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import {
+    selectRestrictedViewport,
+    selectCurrentMainRole,
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
@@ -304,6 +302,13 @@ export class OlMapManager {
             this.olMap
         );
 
+        const restrictedZoneFeatureManager = new RestrictedZoneFeatureManager(
+            this.olMap,
+            this.exerciseService,
+            this.store,
+            this.popupService
+        );
+
         const viewportFeatureManager = new ViewportFeatureManager(
             this.olMap,
             this.exerciseService,
@@ -328,6 +333,7 @@ export class OlMapManager {
 
         this.featureManagers = [
             deleteFeatureManager,
+            restrictedZoneFeatureManager,
             transferLinesFeatureManager,
             simulatedRegionFeatureManager,
             mapImageFeatureManager,
@@ -375,6 +381,10 @@ export class OlMapManager {
         this.featureNameFeatureManagerDictionary.set(
             'viewport',
             viewportFeatureManager
+        );
+        this.featureNameFeatureManagerDictionary.set(
+            'restrictedZone',
+            restrictedZoneFeatureManager
         );
         this.featureNameFeatureManagerDictionary.set(
             'delete',

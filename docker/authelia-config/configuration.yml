@@ -81,8 +81,8 @@ identity_providers:
             allowed_origins:
                 - 'http://localhost:4200'
         clients:
-            - client_id: 'dfm-backend'
-              client_name: 'Digitale FüSim MANV'
+            - client_id: 'fuesim-digital'
+              client_name: 'FüSim Digital'
               # ZMuRxjZ0AbSvKAtvWH85kOf1db2OmLoXzFw4UsZC~TcewXaiMExdGPVXv9qP4eNj3GG55Tky
               client_secret: '$pbkdf2-sha512$310000$bB3bu5juXUfr6Y1MBfTEOw$uBKK4tJMXfS0S3mA5cdPMKimN1u9mhZdVvqhJcsAkg3XZrueVTW5m77mS0l6SyUM8EF.36qQ461rGwQkuxBGFQ'
               public: false

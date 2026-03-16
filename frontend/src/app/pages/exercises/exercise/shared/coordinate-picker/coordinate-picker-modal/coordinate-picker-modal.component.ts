@@ -1,39 +1,47 @@
-import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { effect, signal, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { toLonLat } from 'ol/proj';
+import { FormsModule } from '@angular/forms';
 import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
+import { GeographicCoordinateDirective } from '../../../../../../shared/validation/geographic-coordinate-validator.directive';
 
 @Component({
     selector: 'app-coordinate-picker-modal',
     templateUrl: './coordinate-picker-modal.component.html',
     styleUrls: ['./coordinate-picker-modal.component.scss'],
-    standalone: false,
+    imports: [FormsModule, GeographicCoordinateDirective],
 })
-export class CoordinatePickerModalComponent implements OnInit {
-    @Input()
-    public olMapManager!: OlMapManager;
+export class CoordinatePickerModalComponent {
+    activeModal = inject(NgbActiveModal);
 
-    public latitude = '';
-    public longitude = '';
+    public readonly olMapManager = signal<OlMapManager | null>(null);
 
-    constructor(public activeModal: NgbActiveModal) {}
+    public readonly latitude = signal('');
+    public readonly longitude = signal('');
 
-    ngOnInit() {
-        const center = this.olMapManager.getCoordinates();
+    constructor() {
+        effect(() => {
+            const olMapManager = this.olMapManager();
+            if (olMapManager && !this.latitude()) {
+                const center = olMapManager.getCoordinates();
 
-        if (!center) return;
+                if (!center) return;
 
-        const latLonCoordinates = toLonLat(center)
-            .reverse()
-            .map((coordinate) => coordinate.toFixed(6));
+                const latLonCoordinates = toLonLat(center)
+                    .reverse()
+                    .map((coordinate) => coordinate.toFixed(6));
 
-        this.latitude = latLonCoordinates[0]!;
-        this.longitude = latLonCoordinates[1]!;
+                this.latitude.set(latLonCoordinates[0]!);
+                this.longitude.set(latLonCoordinates[1]!);
+            }
+        });
     }
 
     public goToCoordinates() {
-        this.olMapManager.tryGoToCoordinates(+this.latitude, +this.longitude);
+        this.olMapManager()!.tryGoToCoordinates(
+            +this.latitude(),
+            +this.longitude()
+        );
         this.activeModal.close();
     }
 

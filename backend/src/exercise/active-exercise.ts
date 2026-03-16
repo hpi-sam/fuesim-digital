@@ -1,19 +1,25 @@
-import type { ExerciseAction, Role, UUID } from 'digital-fuesim-manv-shared';
-import { ExerciseState, reduceExerciseState } from 'digital-fuesim-manv-shared';
-import type { ExerciseEntry, ExerciseId } from '../database/schema.js';
+import type {
+    ExerciseAction,
+    Role,
+    UUID,
+    ExerciseKey,
+    ParticipantKey,
+    TrainerKey,
+    ExerciseId,
+} from 'fuesim-digital-shared';
+import { ExerciseState, reduceExerciseState } from 'fuesim-digital-shared';
+import type {
+    ExerciseTemplateEntry,
+    ExerciseInsert,
+} from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { ActionWrapper } from './action-wrapper.js';
 import type { ClientWrapper } from './client-wrapper.js';
 import { patientTick } from './patient-ticking.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
-import type {
-    ExerciseKey,
-    ParticipantKey,
-    TrainerKey,
-} from './exercise-keys.js';
 
 export class ActiveExercise {
-    private readonly exercise: Omit<ExerciseEntry, 'id'>;
+    private readonly exercise: Omit<ExerciseInsert, 'id'>;
 
     // We need to make sure this is set by
     // the ExerciseService when creating/loading
@@ -34,18 +40,20 @@ export class ActiveExercise {
         this._exerciseId = value;
     }
 
+    public template: ExerciseTemplateEntry | null = null;
+
     public getExercise() {
         return this.exercise;
     }
 
     public get participantKey(): ParticipantKey {
         // This should always be valid, since we are creating all active exercises in the exercise factory which ensures valid keys
-        return this.exercise.participantId as ParticipantKey;
+        return this.exercise.participantKey;
     }
 
     public get trainerKey(): TrainerKey {
         // This should always be valid, since we are creating all active exercises in the exercise factory which ensures valid keys
-        return this.exercise.trainerId as TrainerKey;
+        return this.exercise.trainerKey;
     }
 
     private _changedSinceSave = true;
@@ -161,8 +169,8 @@ export class ActiveExercise {
         this.exercise = {
             currentStateString: currentState,
             initialStateString: initialState,
-            participantId: participantKey,
-            trainerId: trainerKey,
+            participantKey,
+            trainerKey,
             stateVersion,
             tickCounter: 0,
         };
@@ -176,13 +184,13 @@ export class ActiveExercise {
      */
     public getRoleFromUsedKey(id: ExerciseKey): Role {
         switch (id) {
-            case this.exercise.participantId:
+            case this.exercise.participantKey:
                 return 'participant';
-            case this.exercise.trainerId:
+            case this.exercise.trainerKey:
                 return 'trainer';
             default:
                 throw new RangeError(
-                    `Incorrect id: ${id} where pid=${this.exercise.participantId} and tid=${this.exercise.trainerId}`
+                    `Incorrect id: ${id} where pid=${this.exercise.participantKey} and tid=${this.exercise.trainerKey}`
                 );
         }
     }
@@ -290,7 +298,7 @@ export class ActiveExercise {
         this.markAsModified();
     }
 
-    public destroy() {
+    public unload() {
         this.clients.forEach((client) => client.disconnect());
         // Pause the exercise to stop the tick
         this.pause();

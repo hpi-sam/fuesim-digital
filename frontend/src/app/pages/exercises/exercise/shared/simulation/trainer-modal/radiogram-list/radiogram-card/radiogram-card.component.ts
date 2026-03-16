@@ -4,13 +4,13 @@ import type {
     OnInit,
     SimpleChanges,
 } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
     SimulatedRegion,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     Client,
     ClientRole,
@@ -18,24 +18,27 @@ import {
     isAccepted,
     isDone,
     isUnread,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
-import {
-    createSelectRadiogram,
-    selectClients,
-    selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import { NgClass, AsyncPipe } from '@angular/common';
+import { SelectSignallerRegionService } from '../../../signaller-modal/select-signaller-region.service';
+import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import { SelectSignallerRegionService } from '../../../signaller-modal/select-signaller-region.service';
+} from '../../../../../../../../shared/services/hotkeys.service';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../state/app.state';
+import { selectOwnClientId } from '../../../../../../../../state/application/selectors/application.selectors';
+import {
+    createSelectRadiogram,
+    selectSimulatedRegions,
+    selectClients,
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../../state/get-state-snapshot';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
+import { RadiogramCardContentComponent } from './radiogram-card-content/radiogram-card-content.component';
 
 // Clients that leave are lost from the state but radiograms might point to them.
 // This is a fallback to show something useful in the UI
@@ -48,12 +51,22 @@ const unavailableClient = Client.create(
     selector: 'app-radiogram-card',
     templateUrl: './radiogram-card.component.html',
     styleUrls: ['./radiogram-card.component.scss'],
-    standalone: false,
+    imports: [
+        NgClass,
+        RadiogramCardContentComponent,
+        HotkeyIndicatorComponent,
+        AsyncPipe,
+    ],
 })
 export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
-    @Input() radiogramId!: UUID;
-    @Input() shownInSignallerModal = false;
-    @Input() first!: boolean;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly hotkeyService = inject(HotkeysService);
+    private readonly selectRegionService = inject(SelectSignallerRegionService);
+
+    readonly radiogramId = input.required<UUID>();
+    readonly shownInSignallerModal = input(false);
+    readonly first = input.required<boolean>();
 
     radiogram$!: Observable<ExerciseRadiogram>;
     simulatedRegion$!: Observable<SimulatedRegion | undefined>;
@@ -73,7 +86,7 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
         if (
             isAccepted(
                 selectStateSnapshot(
-                    createSelectRadiogram(this.radiogramId),
+                    createSelectRadiogram(this.radiogramId()),
                     this.store
                 )
             )
@@ -82,12 +95,7 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
         }
     });
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly hotkeyService: HotkeysService,
-        private readonly selectRegionService: SelectSignallerRegionService
-    ) {
+    constructor() {
         this.hotkeyLayer = this.hotkeyService.createLayer(false, false);
         this.hotkeyLayer.addHotkey(this.acceptHotkey);
         this.hotkeyLayer.addHotkey(this.returnHotkey);
@@ -96,7 +104,7 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
     ngOnInit(): void {
         this.ownClientId = selectStateSnapshot(selectOwnClientId, this.store)!;
 
-        const selectRadiogram = createSelectRadiogram(this.radiogramId);
+        const selectRadiogram = createSelectRadiogram(this.radiogramId());
         this.radiogram$ = this.store.select(selectRadiogram);
 
         this.simulatedRegion$ = this.store.select(
@@ -139,7 +147,8 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
 
     ngOnChanges(changes: SimpleChanges) {
         if ('first' in changes) {
-            this.hotkeyLayer.enabled = this.first && this.shownInSignallerModal;
+            this.hotkeyLayer.enabled =
+                this.first() && this.shownInSignallerModal();
         }
     }
 
@@ -151,7 +160,7 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
         if (
             isAccepted(
                 selectStateSnapshot(
-                    createSelectRadiogram(this.radiogramId),
+                    createSelectRadiogram(this.radiogramId()),
                     this.store
                 )
             )
@@ -167,13 +176,13 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
             .proposeAction({
                 type: '[Radiogram] Accept radiogram',
                 clientId: this.ownClientId,
-                radiogramId: this.radiogramId,
+                radiogramId: this.radiogramId(),
             })
             .then((result) => {
-                if (result.success && this.shownInSignallerModal) {
+                if (result.success && this.shownInSignallerModal()) {
                     this.selectRegionService.selectSimulatedRegion(
                         selectStateSnapshot(
-                            createSelectRadiogram(this.radiogramId),
+                            createSelectRadiogram(this.radiogramId()),
                             this.store
                         ).simulatedRegionId
                     );
@@ -184,7 +193,7 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
     returnRadiogram() {
         this.exerciseService.proposeAction({
             type: '[Radiogram] Return radiogram',
-            radiogramId: this.radiogramId,
+            radiogramId: this.radiogramId(),
         });
     }
 
@@ -192,7 +201,7 @@ export class RadiogramCardComponent implements OnInit, OnChanges, OnDestroy {
         this.exerciseService.proposeAction({
             type: '[Radiogram] Mark as done',
             clientId: this.ownClientId,
-            radiogramId: this.radiogramId,
+            radiogramId: this.radiogramId(),
         });
     }
 }

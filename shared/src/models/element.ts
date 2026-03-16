@@ -2,6 +2,7 @@ import type {
     AlarmGroup,
     Client,
     Hospital,
+    RestrictedZone,
     MapImage,
     Material,
     Patient,
@@ -20,6 +21,7 @@ export type Element =
     | Material
     | Patient
     | Personnel
+    | RestrictedZone
     | SimulatedRegion
     | TransferPoint
     | Vehicle

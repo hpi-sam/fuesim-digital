@@ -16,6 +16,15 @@
         >
             <i class="bi bi-box-arrow-up-right"></i>
         </a>
+        <a
+            (click)="openPreviewModal()"
+            role="button"
+            class="link-secondary float-end me-2"
+            placements="bottom"
+            ngbTooltip="Vorschau des Bereichs öffnen"
+        >
+            <i class="bi bi-eye-fill"></i>
+        </a>
     </h5>
     <div class="popover-body" style="width: 650px; height: 400px">
         @if ((currentRole$ | async) === 'trainer') {

@@ -1,4 +1,5 @@
 import { IsInt, IsOptional, IsUUID, Min } from 'class-validator';
+import type { Immutable, WritableDraft } from 'immer';
 import type { ExerciseState } from '../../state.js';
 import type { CatersFor } from '../../store/action-reducers/utils/calculate-treatments.js';
 import {
@@ -6,7 +7,6 @@ import {
     removeTreatmentsOfElement,
     tryToCaterFor,
 } from '../../store/action-reducers/utils/calculate-treatments.js';
-import type { Immutable, Mutable } from '../../utils/immutability.js';
 import { stringCompare, type UUID } from '../../utils/index.js';
 import { uuidValidationOptions } from '../../utils/uuid.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
@@ -260,12 +260,12 @@ type TreatablePatientStatus = Exclude<
 >;
 
 interface CateringMaterial {
-    material: Mutable<Material>;
+    material: WritableDraft<Material>;
     catersFor: CatersFor;
 }
 
 interface CateringPersonnel {
-    personnel: Mutable<Personnel>;
+    personnel: WritableDraft<Personnel>;
     priority: number;
     catersFor: CatersFor;
 }
@@ -288,7 +288,7 @@ interface PersonnelSubstitution {
 }
 
 function createCateringMaterials(
-    materials: Mutable<Material>[]
+    materials: WritableDraft<Material>[]
 ): CateringMaterial[] {
     return materials.map((material) => ({
         material,
@@ -377,7 +377,7 @@ const reversedPersonnelTypePriorityList = [
 ].reverse();
 
 function createCateringPersonnel(
-    personnel: Mutable<Personnel>[]
+    personnel: WritableDraft<Personnel>[]
 ): CateringPersonnel[] {
     return personnel.map((pers) => ({
         personnel: pers,
@@ -398,9 +398,9 @@ function createCateringPersonnel(
  * @returns Whether all patients have been counted
  */
 function count(
-    draftState: Mutable<ExerciseState>,
-    activityState: Mutable<ReassignTreatmentsActivityState>,
-    patients: Mutable<Patient>[]
+    draftState: WritableDraft<ExerciseState>,
+    activityState: WritableDraft<ReassignTreatmentsActivityState>,
+    patients: WritableDraft<Patient>[]
 ): boolean {
     if (activityState.countingStartedAt) {
         return (
@@ -424,12 +424,12 @@ function count(
  * @returns Whether all patients are triaged and estimated numbers of personnel that is missing to secure treatment
  */
 function triage(
-    draftState: Mutable<ExerciseState>,
-    patients: Mutable<Patient>[],
-    personnel: Mutable<Personnel>[],
-    materials: Mutable<Material>[]
+    draftState: WritableDraft<ExerciseState>,
+    patients: WritableDraft<Patient>[],
+    personnel: WritableDraft<Personnel>[],
+    materials: WritableDraft<Material>[]
 ): [boolean, ResourceDescription] {
-    const patientsToTreat: Mutable<Patient>[] = [];
+    const patientsToTreat: WritableDraft<Patient>[] = [];
     const cateringPersonnel = createCateringPersonnel(personnel).sort(
         (a, b) => a.priority - b.priority
     );
@@ -501,10 +501,10 @@ function triage(
  * @returns Whether the treatment for all patients is secured and numbers of personnel that is missing to secure treatment.
  */
 function treat(
-    draftState: Mutable<ExerciseState>,
-    patients: Mutable<Patient>[],
-    personnel: Mutable<Personnel>[],
-    materials: Mutable<Material>[]
+    draftState: WritableDraft<ExerciseState>,
+    patients: WritableDraft<Patient>[],
+    personnel: WritableDraft<Personnel>[],
+    materials: WritableDraft<Material>[]
 ): [boolean, ResourceDescription] {
     return assignTreatments(
         draftState,
@@ -663,10 +663,10 @@ function findAssignablePersonnel(
  * @returns Whether the treatment for all patients is secured and numbers of personnel that is missing to secure treatment.
  */
 function assignTreatments(
-    draftState: Mutable<ExerciseState>,
-    patients: Mutable<Patient>[],
+    draftState: WritableDraft<ExerciseState>,
+    patients: WritableDraft<Patient>[],
     cateringPersonnel: CateringPersonnel[],
-    materials: Mutable<Material>[]
+    materials: WritableDraft<Material>[]
 ): [boolean, ResourceDescription] {
     const groupedPatients = groupBy(patients, (patient) =>
         Patient.getVisibleStatus(
@@ -773,14 +773,14 @@ function assignTreatments(
 }
 
 function tryAssignPersonnel(
-    patient: Mutable<Patient>,
+    patient: WritableDraft<Patient>,
     patientStatus: TreatablePatientStatus,
     minType: string,
     context: {
         groupedPersonnel: { [K in string]?: CateringPersonnel[] };
         personnelTreatments: PersonnelToPatientCategoryDict;
         patientTreatments: PatientToPersonnelDict;
-        draftState: Mutable<ExerciseState>;
+        draftState: WritableDraft<ExerciseState>;
     },
     mixWithHigherStatus = true,
     maxPatients: number = 2

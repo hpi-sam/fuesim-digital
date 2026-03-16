@@ -1,20 +1,21 @@
-import { Type } from 'class-transformer';
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 import type { UUID } from '../utils/index.js';
 import { uuid, uuidValidationOptions } from '../utils/index.js';
 import { IsValue } from '../utils/validators/index.js';
+import { IsZodSchema } from '../utils/validators/is-zod-object.js';
 import {
     IsPosition,
     getCreate,
     lowerRightCornerOf,
-    Size,
     upperLeftCornerOf,
     newMapPositionAt,
+    sizeSchema,
 } from './utils/index.js';
 import type {
     Position,
     ImageProperties,
     MapCoordinates,
+    Size,
 } from './utils/index.js';
 
 export class Viewport {
@@ -32,8 +33,7 @@ export class Viewport {
     @IsPosition()
     public readonly position: Position;
 
-    @ValidateNested()
-    @Type(() => Size)
+    @IsZodSchema(sizeSchema)
     public readonly size: Size;
 
     @IsString()

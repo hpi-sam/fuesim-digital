@@ -1,3 +1,4 @@
+import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../../state.js';
 import { getElement } from '../../../store/action-reducers/utils/index.js';
 import {
@@ -9,8 +10,14 @@ import {
     removeElementPosition,
     updateElementPosition,
 } from '../../../store/action-reducers/utils/spatial-elements.js';
-import type { Mutable, UUID } from '../../../utils/index.js';
+import type { UUID } from '../../../utils/index.js';
 import { cloneDeepMutable } from '../../../utils/index.js';
+import { checkRestrictedVehicleMovementOrThrow } from '../../../store/action-reducers/utils/restricted-vehicle-movement.js';
+// eslint-disable-next-line @typescript-eslint/no-shadow
+import type { Element } from '../../element.js';
+import type { AlarmGroup } from '../../alarm-group.js';
+import type { Client } from '../../client.js';
+import type { Hospital } from '../../hospital.js';
 import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
 import type { Position } from './position.js';
@@ -20,68 +27,52 @@ import {
     isOnMap,
 } from './position-helpers.js';
 
-type MutablePosition = Mutable<Position>;
-
-interface WithMutablePosition {
-    position: MutablePosition;
-    type: MovableType;
-}
-interface WithMutablePositionAndId extends WithMutablePosition {
-    id: UUID;
-}
-type MovableType =
-    | 'alarmGroup'
-    | 'client'
-    | 'hospital'
-    | 'mapImage'
-    | 'material'
-    | 'patient'
-    | 'personnel'
-    | 'simulatedRegion'
-    | 'transferPoint'
-    | 'vehicle'
-    | 'viewport';
+type MovableElement = Exclude<Element, AlarmGroup | Client | Hospital>;
+type MovableType = MovableElement['type'];
 
 export function changePositionWithId(
     of: UUID,
     to: Position,
     type: MovableType,
-    inState: Mutable<ExerciseState>
+    inState: WritableDraft<ExerciseState>
 ) {
-    changePosition(getElement(inState, type, of) as any, to, inState);
+    changePosition(getElement(inState, type, of), to, inState);
 }
 
 export function changePosition(
-    element: WithMutablePosition,
+    element: WritableDraft<MovableElement>,
     to: Position,
-    state: Mutable<ExerciseState>
+    state: WritableDraft<ExerciseState>
 ) {
     if (
         element.type === 'patient' ||
         element.type === 'personnel' ||
         element.type === 'material'
     ) {
-        updateSpatialElementTree(
-            element as WithMutablePositionAndId,
-            to,
-            element.type,
-            state
-        );
+        updateSpatialElementTree(element, to, element.type, state);
         if (element.position.type !== to.type) {
-            removeTreatmentsOfElement(state, element as any);
+            removeTreatmentsOfElement(state, element);
         }
         element.position = cloneDeepMutable(to);
-        updateTreatments(state, element as any);
+        updateTreatments(state, element);
         return;
+    }
+    if (element.type === 'vehicle') {
+        checkRestrictedVehicleMovementOrThrow(
+            state,
+            element,
+            element.position,
+            to
+        );
     }
     element.position = cloneDeepMutable(to);
 }
 
 function updateSpatialElementTree(
-    element: WithMutablePositionAndId,
+    element: WritableDraft<MovableElement>,
     to: Position,
     type: SpatialElementType,
-    state: Mutable<ExerciseState>
+    state: WritableDraft<ExerciseState>
 ) {
     if (isOnMap(element) && isPositionOnMap(to)) {
         updateElementPosition(
@@ -103,7 +94,7 @@ function updateSpatialElementTree(
 }
 
 export function offsetMapPositionBy(
-    position: Mutable<MapPosition>,
+    position: WritableDraft<MapPosition>,
     offset: MapCoordinates
 ) {
     position.coordinates.x += offset.x;

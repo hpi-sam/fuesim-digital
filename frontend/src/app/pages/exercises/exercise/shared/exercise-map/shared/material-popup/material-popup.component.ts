@@ -1,27 +1,27 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID, Material } from 'digital-fuesim-manv-shared';
+import type { UUID, Material } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectMaterial } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
 import { PopupService } from '../../utility/popup.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import { createSelectMaterial } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { MaterialDetailsComponent } from '../../../../../../../shared/components/material-details/material-details.component';
 
 @Component({
     selector: 'app-material-popup',
     templateUrl: './material-popup.component.html',
     styleUrls: ['./material-popup.component.scss'],
-    standalone: false,
+    imports: [MaterialDetailsComponent, AsyncPipe],
 })
 export class MaterialPopupComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly popupService = inject(PopupService);
+
     public materialId!: UUID;
 
     public material$?: Observable<Material>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly popupService: PopupService
-    ) {}
 
     ngOnInit(): void {
         this.material$ = this.store.select(

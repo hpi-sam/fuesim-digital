@@ -2,7 +2,7 @@ import type {
     ExerciseAction,
     ExerciseState,
     StateExport,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     applyAction,
     cloneDeepMutable,
@@ -11,7 +11,7 @@ import {
     sortObject,
     StrictObject,
     validateExerciseExport,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { produce, freeze } from 'immer';
 import { isEqual } from 'lodash-es';
 import type { BenchmarkValue } from './benchmark.js';

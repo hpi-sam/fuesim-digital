@@ -1,5 +1,4 @@
 import {
-    IsArray,
     IsBoolean,
     IsInt,
     IsOptional,
@@ -7,15 +6,16 @@ import {
     IsUUID,
     MaxLength,
     Min,
-    ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { z } from 'zod';
+import { WritableDraft } from 'immer';
 import {
     EocLogEntry,
     newAlarmGroupStartPoint,
     VehicleParameters,
+    vehicleParametersSchema,
 } from '../../models/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import {
     StrictObject,
     cloneDeepMutable,
@@ -24,6 +24,7 @@ import {
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { getElement } from './utils/index.js';
 import { VehicleActionReducers } from './vehicle.js';
 import { TransferActionReducers } from './transfer.js';
@@ -53,9 +54,7 @@ export class SendAlarmGroupAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly alarmGroupId!: UUID;
 
-    @IsArray()
-    @ValidateNested()
-    @Type(() => VehicleParameters)
+    @IsZodSchema(z.array(vehicleParametersSchema))
     public readonly sortedVehicleParameters!: readonly VehicleParameters[];
 
     @IsUUID(4, uuidValidationOptions)
@@ -170,7 +169,7 @@ export namespace EmergencyOperationCenterActionReducers {
             });
 
             logAlarmGroupSent(draftState, alarmGroupId);
-            alarmGroup.sent = true;
+            alarmGroup.triggerCount += 1;
 
             return draftState;
         },
@@ -179,7 +178,7 @@ export namespace EmergencyOperationCenterActionReducers {
 }
 
 function sendAlarmGroupVehicle(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     vehicleParameters: VehicleParameters,
     time: number,
     alarmGroupId: UUID,

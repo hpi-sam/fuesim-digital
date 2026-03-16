@@ -1,28 +1,47 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import { SpecificRole } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import type { UUID } from 'fuesim-digital-shared';
+import { SpecificRole } from 'fuesim-digital-shared';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
 import {
     selectClients,
     selectViewports,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { SpecificRoleDisplayNamePipe } from '../../../../../../shared/pipes/specific-role-display-name.pipe';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-client-overview-table',
     templateUrl: './client-overview-table.component.html',
     styleUrls: ['./client-overview-table.component.scss'],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        FormsModule,
+        AsyncPipe,
+        SpecificRoleDisplayNamePipe,
+        ValuesPipe,
+    ],
 })
 export class ClientOverviewTableComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
     public readonly clients$ = this.store.select(selectClients);
     public readonly viewports$ = this.store.select(selectViewports);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public async restrictToViewport(
         clientId: UUID,

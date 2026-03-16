@@ -1,7 +1,7 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ExerciseRadiogram, UUID } from 'digital-fuesim-manv-shared';
+import type { ExerciseRadiogram, UUID } from 'fuesim-digital-shared';
 import {
     currentParticipantIdOf,
     isAccepted,
@@ -11,32 +11,33 @@ import {
     StrictObject,
     isUnread,
     isInterfaceSignallerKey,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
-import { selectRadiograms } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../../state/app.state';
+import { selectOwnClientId } from '../../../../../../../state/application/selectors/application.selectors';
+import { selectRadiograms } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
 import { RadiogramListService } from './radiogram-list.service';
+import { RadiogramCardComponent } from './radiogram-card/radiogram-card.component';
 
 @Component({
     selector: 'app-radiogram-list',
     templateUrl: './radiogram-list.component.html',
     styleUrls: ['./radiogram-list.component.scss'],
-    standalone: false,
+    imports: [FormsModule, RadiogramCardComponent, AsyncPipe],
 })
 export class RadiogramListComponent implements OnInit {
-    @Input() shownInSignallerModal = false;
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly radiogramListService = inject(RadiogramListService);
+
+    readonly shownInSignallerModal = input(false);
 
     ownClientId!: UUID;
     publishedRadiograms$!: Observable<ExerciseRadiogram[]>;
     visibleRadiograms$!: Observable<ExerciseRadiogram[]>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        public readonly radiogramListService: RadiogramListService
-    ) {}
 
     ngOnInit(): void {
         this.ownClientId = selectStateSnapshot(selectOwnClientId, this.store)!;

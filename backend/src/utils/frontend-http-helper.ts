@@ -1,4 +1,4 @@
-import type { AuthQueryParams } from 'digital-fuesim-manv-shared';
+import type { AuthQueryParams } from 'fuesim-digital-shared';
 import { Config } from '../config.js';
 
 export function toFrontend(path: string = '', data?: AuthQueryParams): string {

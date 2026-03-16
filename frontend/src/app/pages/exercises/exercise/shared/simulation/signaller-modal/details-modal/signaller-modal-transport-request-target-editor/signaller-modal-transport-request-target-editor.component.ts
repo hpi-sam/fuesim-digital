@@ -1,24 +1,39 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import {
+    Component,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    inject,
+    input,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Observable, map, combineLatest, tap } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
+import { FormsModule } from '@angular/forms';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
+import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
-    HotkeyLayer,
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import { AppState } from 'src/app/state/app.state';
+} from '../../../../../../../../shared/services/hotkeys.service';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import { MessageService } from '../../../../../../../../core/messages/message.service';
+import {
+    SearchableDropdownOption,
+    SearchableDropdownComponent,
+} from '../../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { AppState } from '../../../../../../../../state/app.state';
 import {
     selectSimulatedRegions,
     createSelectBehaviorState,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-transport-request-target-editor',
@@ -26,13 +41,26 @@ import { SignallerModalDetailsService } from '../signaller-modal-details.service
         './signaller-modal-transport-request-target-editor.component.html',
     styleUrl:
         './signaller-modal-transport-request-target-editor.component.scss',
-    standalone: false,
+    imports: [
+        FormsModule,
+        NgbPopover,
+        AutofocusDirective,
+        HotkeyIndicatorComponent,
+        SearchableDropdownComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalTransportRequestTargetEditorComponent
     implements OnInit, OnChanges, OnDestroy
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() transportBehaviorId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+    private readonly hotkeysService = inject(HotkeysService);
+    private readonly messageService = inject(MessageService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly transportBehaviorId = input.required<UUID>();
 
     private hotkeyLayer!: HotkeyLayer;
     submitHotkey = new Hotkey('Enter', false, () => this.updateTarget());
@@ -41,14 +69,6 @@ export class SignallerModalTransportRequestTargetEditorComponent
     currentTargetName$!: Observable<string>;
     selectedTarget: SearchableDropdownOption | null = null;
     loading = false;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly detailsModal: SignallerModalDetailsService,
-        private readonly hotkeysService: HotkeysService,
-        private readonly messageService: MessageService
-    ) {}
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
@@ -61,8 +81,8 @@ export class SignallerModalTransportRequestTargetEditorComponent
         const currentTargetId$ = this.store
             .select(
                 createSelectBehaviorState(
-                    this.simulatedRegionId,
-                    this.transportBehaviorId
+                    this.simulatedRegionId(),
+                    this.transportBehaviorId()
                 )
             )
             .pipe(
@@ -121,8 +141,8 @@ export class SignallerModalTransportRequestTargetEditorComponent
         this.exerciseService
             .proposeAction({
                 type: '[ManagePatientsTransportToHospitalBehavior] Change Transport Request Target',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.transportBehaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.transportBehaviorId(),
                 requestTargetId: this.selectedTarget.key,
             })
             .then((result) => {

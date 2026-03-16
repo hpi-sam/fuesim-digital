@@ -1,25 +1,30 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     RecurringEventActivityState,
     RequestBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     SimulatedRegionRequestTargetConfiguration,
     TraineesRequestTargetConfiguration,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
-    createSelectActivityStates,
-    createSelectBehaviorState,
     selectSimulatedRegions,
+    createSelectBehaviorState,
+    createSelectActivityStates,
     selectCurrentTime,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
+import { KeysPipe } from '../../../../../../../../../../shared/pipes/keys.pipe';
 
 type RequestTargetOption = UUID | 'trainees';
 
@@ -30,11 +35,20 @@ type RequestTargetOption = UUID | 'trainees';
     styleUrls: [
         './simulated-region-overview-behavior-request-vehicles.component.scss',
     ],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        FormatDurationPipe,
+        KeysPipe,
+        AsyncPipe,
+    ],
 })
 export class RequestVehiclesComponent implements OnChanges {
-    @Input() simulatedRegionId!: UUID;
-    @Input() requestBehaviorId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly requestBehaviorId = input.required<UUID>();
 
     requestBehaviorState$!: Observable<RequestBehaviorState>;
 
@@ -46,11 +60,6 @@ export class RequestVehiclesComponent implements OnChanges {
 
     selectedRequestTarget$!: Observable<RequestTargetOption>;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
-
     ngOnChanges(): void {
         this.requestTargetOptions$ = this.store
             .select(selectSimulatedRegions)
@@ -61,7 +70,9 @@ export class RequestVehiclesComponent implements OnChanges {
                             id,
                             `[Simuliert] ${simulatedRegion.name}`,
                         ])
-                        .filter(([id, _name]) => id !== this.simulatedRegionId)
+                        .filter(
+                            ([id, _name]) => id !== this.simulatedRegionId()
+                        )
                         .sort(([_id1, name1], [_id2, name2]) =>
                             name1 === name2 ? 0 : name1! < name2! ? -1 : 1
                         );
@@ -72,8 +83,8 @@ export class RequestVehiclesComponent implements OnChanges {
 
         this.requestBehaviorState$ = this.store.select(
             createSelectBehaviorState(
-                this.simulatedRegionId,
-                this.requestBehaviorId
+                this.simulatedRegionId(),
+                this.requestBehaviorId()
             )
         );
 
@@ -91,7 +102,7 @@ export class RequestVehiclesComponent implements OnChanges {
         );
 
         const activities$ = this.store.select(
-            createSelectActivityStates(this.simulatedRegionId)
+            createSelectActivityStates(this.simulatedRegionId())
         );
 
         const currentTime$ = this.store.select(selectCurrentTime);
@@ -122,8 +133,8 @@ export class RequestVehiclesComponent implements OnChanges {
     updateRequestInterval(interval: number) {
         this.exerciseService.proposeAction({
             type: '[RequestBehavior] Update RequestInterval',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.requestBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.requestBehaviorId(),
             requestInterval: interval,
         });
     }
@@ -131,8 +142,8 @@ export class RequestVehiclesComponent implements OnChanges {
     updatePromiseInterval(interval: number) {
         this.exerciseService.proposeAction({
             type: '[RequestBehavior] Update Promise invalidation interval',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.requestBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.requestBehaviorId(),
             promiseInvalidationInterval: interval,
         });
     }
@@ -148,8 +159,8 @@ export class RequestVehiclesComponent implements OnChanges {
         }
         this.exerciseService.proposeAction({
             type: '[RequestBehavior] Update RequestTarget',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.requestBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.requestBehaviorId(),
             requestTarget: requestTargetConfiguration,
         });
     }

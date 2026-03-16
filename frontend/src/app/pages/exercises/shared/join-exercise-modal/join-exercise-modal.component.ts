@@ -1,17 +1,22 @@
-import type { OnDestroy } from '@angular/core';
-import { Component } from '@angular/core';
+import { OnDestroy, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
-import { ApplicationService } from 'src/app/core/application.service';
+import type { ExerciseKey } from 'fuesim-digital-shared';
+import { FormsModule } from '@angular/forms';
+import { ApplicationService } from '../../../../core/application.service';
+import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 
 @Component({
     selector: 'app-join-exercise-modal',
     templateUrl: './join-exercise-modal.component.html',
     styleUrls: ['./join-exercise-modal.component.scss'],
-    standalone: false,
+    imports: [FormsModule, AutofocusDirective],
 })
 export class JoinExerciseModalComponent implements OnDestroy {
-    public exerciseId!: string;
+    private readonly applicationService = inject(ApplicationService);
+    private readonly activeModal = inject(NgbActiveModal);
+
+    public exerciseKey!: ExerciseKey;
     public clientName = '';
     /**
      * Emits true when the exercise was successfully joined.
@@ -19,14 +24,9 @@ export class JoinExerciseModalComponent implements OnDestroy {
      */
     public exerciseJoined$ = new Subject<boolean>();
 
-    constructor(
-        private readonly applicationService: ApplicationService,
-        private readonly activeModal: NgbActiveModal
-    ) {}
-
     public async joinExercise() {
         const successfullyJoined = await this.applicationService.joinExercise(
-            this.exerciseId,
+            this.exerciseKey,
             this.clientName
         );
         this.exerciseJoined$.next(successfullyJoined);

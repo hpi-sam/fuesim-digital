@@ -5,6 +5,7 @@ on:
         branches:
             - main
             - dev
+            - dev-next
     pull_request:
         # The first three types are the default value (see https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request).
         # `ready_for_review` is needed since actions from pipelines (such as the PRs created by the release pipeline) don't trigger additional pipelines.
@@ -22,23 +23,81 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    build-shared:
+    cache-dependencies:
         timeout-minutes: 5
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v6
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-install
               with:
-                  node-version: ${{ env.NODE_VERSION }}
-            - name: Cache node modules and shared/dist
-              id: cache-build
-              uses: ./.github/actions/cache-build
-            - name: Setup project
-              if: ${{ steps.cache-build.outputs.node-modules-cache-hit != 'true' }}
-              run: npm run setup:ci
+                  cache-only: true
+                  download-shared: false
+
+    audit-dependencies:
+        timeout-minutes: 10
+        runs-on: ubuntu-latest
+
+        if: startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/head/dev') || github.ref == 'refs/head/main'
+
+        needs: cache-dependencies
+
+        continue-on-error: true
+
+        steps:
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-install
+              with:
+                  download-shared: false
+            - name: Audit root
+              if: always()
+              run: npm audit
+            - name: Audit shared
+              if: always()
+              run: cd shared && npm audit
+            - name: Audit frontend
+              if: always()
+              run: cd frontend && npm audit
+            - name: Audit backend
+              if: always()
+              run: cd backend && npm audit
+            - name: Audit benchmark
+              if: always()
+              run: cd benchmark && npm audit
+
+    build-docker:
+        timeout-minutes: 10
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v6
+            - name: Build docker image
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: docker/Dockerfile
+                  push: false # We only build the image to check whether the build succeeds
+                  tags: fuesim-digital
+
+    build-shared:
+        timeout-minutes: 5
+        runs-on: ubuntu-latest
+
+        needs: cache-dependencies
+
+        steps:
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-install
+              with:
+                  install-command: cd shared && npm ci --no-audit
+                  download-shared: false
             - name: Build shared
-              run: cd shared && npm run build && cd ..
+              run: cd shared && npm run build
+            - name: Upload shared dist
+              uses: actions/upload-artifact@v6
+              with:
+                  name: shared-dist
+                  path: shared/dist
 
     build-frontend:
         timeout-minutes: 5
@@ -47,14 +106,12 @@ jobs:
         needs: build-shared
 
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v6
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-install
               with:
-                  node-version: ${{ env.NODE_VERSION }}
-            - name: Cache node modules and shared/dist
-              uses: ./.github/actions/cache-build
+                  install-command: (cd shared && npm ci --no-audit) && (cd frontend && npm ci --no-audit)
             - name: Build frontend
-              run: cd frontend && npm run build && cd ..
+              run: cd frontend && npm run build
 
     build-backend:
         timeout-minutes: 5
@@ -63,14 +120,12 @@ jobs:
         needs: build-shared
 
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v6
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-install
               with:
-                  node-version: ${{ env.NODE_VERSION }}
-            - name: Cache node modules and shared/dist
-              uses: ./.github/actions/cache-build
+                  install-command: (cd shared && npm ci --no-audit) && (cd backend && npm ci --no-audit)
             - name: Build backend
-              run: cd backend && npm run build && cd ..
+              run: cd backend && npm run build
 
     lint:
         timeout-minutes: 5
@@ -79,48 +134,13 @@ jobs:
         needs: build-shared
 
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v6
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-            - name: Cache node modules and shared/dist
-              uses: ./.github/actions/cache-build
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-install
             - name: Run ESLint
               run: npm run lint
             - name: Run Prettier
               if: always()
               run: npm run prettier:check
-
-    dependencies:
-        timeout-minutes: 10
-        runs-on: ubuntu-latest
-
-        needs: build-shared
-
-        continue-on-error: true
-
-        steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v6
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-            - name: Cache node modules and shared/dist
-              uses: ./.github/actions/cache-build
-            - name: Audit root
-              if: always()
-              run: npm audit
-            - name: Audit shared
-              if: always()
-              run: cd shared; npm audit; cd ..
-            - name: Audit frontend
-              if: always()
-              run: cd frontend; npm audit; cd ..
-            - name: Audit backend
-              if: always()
-              run: cd backend; npm audit; cd ..
-            - name: Audit benchmark
-              if: always()
-              run: cd benchmark; npm audit; cd ..
 
     test:
         timeout-minutes: 4
@@ -147,14 +167,10 @@ jobs:
                     --tmpfs /var/lib/postgresql/data
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-install
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
-            - uses: actions/setup-node@v6
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-            - name: Cache node modules and shared/dist
-              uses: ./.github/actions/cache-build
             - name: Create .env
               run: >
                   cat ./.env.example
@@ -166,21 +182,21 @@ jobs:
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
                   > ./.env
             - name: Run migrations
-              run: cd backend && npm run migration:run && cd ..
+              run: cd backend && npm run migration:run
             - name: Run Backend Tests
-              run: cd backend && npm run test:ci-no-migration; cd ..
+              run: cd backend && npm run test:ci-no-migration
               if: always()
             - name: Run Frontend Tests
-              run: cd frontend && npm run test:ci; cd ..
+              run: cd frontend && npm run test:ci
               if: always()
             - name: Run Shared Tests
-              run: cd shared && npm run test:ci; cd ..
+              run: cd shared && npm run test:ci
               if: always()
             - name: Merge coverage
               run: npm run merge-coverage
               if: always()
             - name: Upload coverage
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               if: always()
               with:
                   name: coverage-output
@@ -211,14 +227,12 @@ jobs:
                     --tmpfs /var/lib/postgresql/data
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
+              with:
+                  submodules: true
+            - uses: ./.github/actions/setup-install
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
-            - uses: actions/setup-node@v6
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-            - name: Cache node modules and shared/dist
-              uses: ./.github/actions/cache-build
             - name: Create .env
               run: >
                   cat ./.env.example
@@ -230,11 +244,9 @@ jobs:
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
                   > ./.env
             - name: Run migrations
-              run: cd backend && npm run migration:run && cd ..
-            - name: Fetch Test Scenarios
-              run: git submodule update --init --recursive
+              run: cd backend && npm run migration:run
             - name: Run Migration Tests
-              run: cd backend && npm run test:ci-migration; cd ..
+              run: cd backend && npm run test:ci-migration
 
     cypress:
         timeout-minutes: 20
@@ -267,23 +279,10 @@ jobs:
             fail-fast: false
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-install
             - name: Start Authelia
               uses: ./.github/actions/start-authelia
-            - uses: actions/setup-node@v6
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-            - name: Cache node modules and shared/dist
-              uses: ./.github/actions/cache-build
-            - name: Cache Cypress binary
-              uses: actions/cache@v3
-              id: cache-cypress
-              with:
-                  path: ~/.cache/Cypress
-                  key: cypress-${{ hashFiles('package-lock.json', '**/package-lock.json') }}-${{ runner.os }}
-            - name: Install Cypress
-              if: steps.cache-cypress.outputs.cache-hit != 'true'
-              run: npm run cy:install
             - name: Create .env
               run: >
                   cat ./.env.example
@@ -295,19 +294,21 @@ jobs:
                   | sed -e "s|^DFM_AUTH_URL=.*$|DFM_AUTH_URL=http://127.0.0.1:${{ env.AUTHELIA_CONTAINER_PORT }}|"
                   > ./.env
             - name: Run migrations
-              run: cd backend && npm run migration:run && cd ..
+              run: cd backend && npm run migration:run
             - name: Run Cypress
-              uses: cypress-io/github-action@v5
+              uses: cypress-io/github-action@v7
               with:
                   start: npm --prefix .. -- run start:all
                   working-directory: frontend
+                  install-command: 'npm run cy:install'
+                  package-manager-cache: false # This is handled by actions/setup-node (used internally by our setup-install action)
                   browser: ${{ matrix.browser }}
                   wait-on: 'http://127.0.0.1:4200/, http://127.0.0.1:3201/api/health'
                   wait-on-timeout: 90
                   command-prefix: '--' # So cypress is using our node version: https://github.com/cypress-io/github-action/issues/489#issuecomment-1021379037
             - name: Archive cypress screenshots
               if: always()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: cypress-screenshots-${{ matrix.browser }}
                   path: frontend/cypress/screenshots
@@ -316,6 +317,7 @@ jobs:
     tests-done:
         if: always()
         needs:
+            - build-docker
             - build-shared
             - build-frontend
             - build-backend
@@ -325,7 +327,7 @@ jobs:
             - migration-test
         runs-on: ubuntu-latest
         steps:
-            - uses: matrix-org/done-action@v2
+            - uses: matrix-org/done-action@v3
               with:
                   needs: ${{ toJSON (needs) }}
 
@@ -337,23 +339,73 @@ jobs:
 
         if: github.ref == 'refs/heads/dev'
 
+        permissions:
+            contents: read
+            packages: write
+
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version
-            - name: Login to docker
-              uses: docker/login-action@v2
+            - name: Login to Dockerhub
+              uses: docker/login-action@v3
               with:
                   username: ${{ secrets.DOCKER_HUB_USERNAME }}
                   password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+            - name: Login to GitHub Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
             - name: Build and push
-              uses: docker/build-push-action@v3
+              uses: docker/build-push-action@v6
               with:
                   context: .
                   file: docker/Dockerfile
                   push: true
-                  tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:dev
+                  tags: >
+                      ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:dev ,
+                      ghcr.io/${{ github.repository }}:dev ,
+
+    deploy-dev-next:
+        timeout-minutes: 10
+        runs-on: ubuntu-latest
+
+        needs: tests-done
+
+        if: github.ref == 'refs/heads/dev-next'
+
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - uses: actions/checkout@v6
+            # Source: https://docs.docker.com/ci-cd/github-actions/
+            - name: Add commit hash to version
+              uses: ./.github/actions/add-commit-hash-to-version
+            - name: Login to Dockerhub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKER_HUB_USERNAME }}
+                  password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+            - name: Login to GitHub Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Build and push
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: docker/Dockerfile
+                  push: true
+                  tags: >
+                      ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:dev-next ,
+                      ghcr.io/${{ github.repository }}:dev-next ,
 
     deploy-main:
         timeout-minutes: 10
@@ -363,24 +415,36 @@ jobs:
 
         if: github.ref == 'refs/heads/main'
 
+        permissions:
+            contents: read
+            packages: write
+
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - uses: ./.github/actions/extract-version
             # Source: https://docs.docker.com/ci-cd/github-actions/
-            - name: Login to docker
-              uses: docker/login-action@v2
+            - name: Login to Dockerhub
+              uses: docker/login-action@v3
               with:
                   username: ${{ secrets.DOCKER_HUB_USERNAME }}
                   password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+            - name: Login to GitHub Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
             - name: Build and push
-              uses: docker/build-push-action@v3
+              uses: docker/build-push-action@v6
               with:
                   context: .
                   file: docker/Dockerfile
                   push: true
                   tags: >
                       ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:latest ,
-                      ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:${{ env.VERSION_NAME }}
+                      ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:${{ env.VERSION_NAME }} ,
+                      ghcr.io/${{ github.repository }}:latest ,
+                      ghcr.io/${{ github.repository }}:${{ env.VERSION_NAME }}
 
     release-main:
         timeout-minutes: 2
@@ -390,15 +454,13 @@ jobs:
         permissions:
             contents: write
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - uses: ./.github/actions/extract-version
             - name: Extract release notes
               id: extract_release_notes
-              uses: ffurrer2/extract-release-notes@v1
+              uses: ffurrer2/extract-release-notes@v3
             - name: Create release
-              uses: softprops/action-gh-release@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: softprops/action-gh-release@v2
               with:
                   tag_name: v${{ env.VERSION_NAME }}
                   name: v${{ env.VERSION_NAME }}

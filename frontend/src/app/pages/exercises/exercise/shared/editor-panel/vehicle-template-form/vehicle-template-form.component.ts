@@ -1,50 +1,76 @@
 import type { OnChanges } from '@angular/core';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     MaterialTemplate,
     PersonnelTemplate,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { cloneDeep } from 'lodash-es';
-import { MessageService } from 'src/app/core/messages/message.service';
-import { getImageAspectRatio } from 'src/app/shared/functions/get-image-aspect-ratio';
-import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
-import type { AppState } from 'src/app/state/app.state';
+import { FormsModule } from '@angular/forms';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
+import { MessageService } from '../../../../../../core/messages/message.service';
+import { getImageAspectRatio } from '../../../../../../shared/functions/get-image-aspect-ratio';
+import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
+import type { AppState } from '../../../../../../state/app.state';
 import {
     selectMaterialTemplates,
     selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
+import { ImageExistsValidatorDirective } from '../../../../../../shared/validation/image-exists-validator.directive';
+import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
+import { IntegerValidatorDirective } from '../../../../../../shared/validation/integer-validator.directive';
+import { MapEditorCardComponent } from '../map-editor-card/map-editor-card.component';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-vehicle-template-form',
     templateUrl: './vehicle-template-form.component.html',
     styleUrls: ['./vehicle-template-form.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        DisplayValidationComponent,
+        ImageExistsValidatorDirective,
+        AutofocusDirective,
+        IntegerValidatorDirective,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        MapEditorCardComponent,
+        AsyncPipe,
+        ValuesPipe,
+    ],
 })
 export class VehicleTemplateFormComponent implements OnChanges {
-    @Input() initialValues!: EditableVehicleTemplateValues;
-    @Input() btnText!: string;
+    private readonly messageService = inject(MessageService);
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly initialValues = input.required<EditableVehicleTemplateValues>();
+    readonly btnText = input.required<string>();
 
     /**
      * Emits the changed values
      */
-    @Output() readonly submitVehicleTemplate =
-        new EventEmitter<ChangedVehicleTemplateValues>();
+    readonly submitVehicleTemplate = output<ChangedVehicleTemplateValues>();
 
     public values?: EditableVehicleTemplateValues;
 
     public materialTemplates$ = this.store.select(selectMaterialTemplates);
     public personnelTemplates$ = this.store.select(selectPersonnelTemplates);
 
-    constructor(
-        private readonly messageService: MessageService,
-        private readonly store: Store<AppState>
-    ) {}
-
     ngOnChanges(_changes: SimpleChangesGeneric<this>): void {
         this.values = {
-            ...this.initialValues,
+            ...this.initialValues(),
             ...this.values,
         };
     }

@@ -1,20 +1,29 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
     PatientStatusForTransport,
     UUID,
-} from 'digital-fuesim-manv-shared';
-import { StrictObject } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { StrictObject } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
     selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 
 @Component({
     selector:
@@ -24,13 +33,24 @@ import {
     styleUrls: [
         './manage-patient-transport-to-hospital-vehicles-for-categories-editor.component.scss',
     ],
-    standalone: false,
+    imports: [
+        PatientStatusBadgeComponent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+    ],
 })
 export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent
     implements OnChanges
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public behaviorState$!: Observable<ManagePatientTransportToHospitalBehaviorState>;
 
@@ -40,16 +60,11 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
 
     public patientStatusForTransport = ['red', 'yellow', 'green'] as const;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
-
     ngOnChanges(): void {
         this.behaviorState$ = this.store.select(
             createSelectBehaviorState<ManagePatientTransportToHospitalBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
 
@@ -92,8 +107,8 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
     ) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Add Vehicle Type For Patient Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             vehicleTypeName,
             patientStatus,
         });
@@ -105,8 +120,8 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
     ) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Remove Vehicle Type For Patient Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             vehicleTypeName,
             patientStatus,
         });

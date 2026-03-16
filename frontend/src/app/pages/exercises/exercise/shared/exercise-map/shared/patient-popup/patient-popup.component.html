@@ -4,12 +4,7 @@
         style="border-color: red !important"
     >
         <h5 class="popover-header d-flex align-items-center gap-1">
-            <app-patient-identifier [patientId]="patientId" />
-            <span>{{ ' ' }}</span>
-            <app-patient-health-point-display [patientId]="patientId" />
-            @if (patient.hasTransportPriority) {
-                <div class="badge" style="background-color: red">TP</div>
-            }
+            <app-patient-header [patientId]="patientId" />
             <div class="flex-grow-1"></div>
             <button
                 (click)="closePopup()"

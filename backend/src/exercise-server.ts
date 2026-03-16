@@ -3,7 +3,7 @@ import type {
     InterServerEvents,
     ServerToClientEvents,
     SocketData,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Server, Socket } from 'socket.io';
 
 export type ExerciseServer = Server<

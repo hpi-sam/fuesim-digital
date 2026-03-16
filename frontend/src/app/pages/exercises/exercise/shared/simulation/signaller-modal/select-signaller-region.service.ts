@@ -1,10 +1,10 @@
 import type { OnDestroy } from '@angular/core';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import { ReplaySubject, Subject, takeUntil } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectSimulatedRegion } from 'src/app/state/application/selectors/exercise.selectors';
+import type { AppState } from '../../../../../../state/app.state';
+import { createSelectSimulatedRegion } from '../../../../../../state/application/selectors/exercise.selectors';
 
 export const eocId = 'emergencyOperationsCenter';
 export const overviewId = 'overview';
@@ -13,12 +13,12 @@ export type SignallerRegionID = UUID | typeof eocId | typeof overviewId;
 
 @Injectable()
 export class SelectSignallerRegionService implements OnDestroy {
+    private readonly store = inject<Store<AppState>>(Store);
+
     public readonly selectedSimulatedRegion$ =
         new ReplaySubject<SignallerRegionID | null>(1);
 
     private readonly destroy$ = new Subject<void>();
-
-    constructor(private readonly store: Store<AppState>) {}
 
     public selectSimulatedRegion(id: SignallerRegionID) {
         this.selectedSimulatedRegion$.next(id);

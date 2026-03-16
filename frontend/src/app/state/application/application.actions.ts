@@ -1,9 +1,10 @@
 import { createAction } from '@ngrx/store';
 import type {
     ExerciseAction,
+    ExerciseKey,
     ExerciseState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 
 export const createStartTimeTravelAction = createAction(
     '[Application] Start time travel',
@@ -26,12 +27,12 @@ export const createJoinExerciseAction = createAction(
     (
         ownClientId: UUID,
         exerciseState: ExerciseState,
-        exerciseId: UUID,
+        exerciseKey: ExerciseKey,
         clientName: string
     ) => ({
         ownClientId,
         exerciseState,
-        exerciseId,
+        exerciseKey,
         clientName,
     })
 );

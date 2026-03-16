@@ -1,6 +1,7 @@
+import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../../state.js';
 import { getElement } from '../../../store/action-reducers/utils/index.js';
-import type { Mutable, UUID } from '../../../utils/index.js';
+import type { UUID } from '../../../utils/index.js';
 import type { SimulatedRegion } from '../../simulated-region.js';
 import type { Transfer } from '../transfer.js';
 import type { MapCoordinates } from './map-coordinates.js';
@@ -84,9 +85,9 @@ export function currentSimulatedRegionIdOf(withPosition: WithPosition): UUID {
 }
 
 export function currentSimulatedRegionOf(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     withPosition: WithPosition
-): Mutable<SimulatedRegion> {
+): WritableDraft<SimulatedRegion> {
     if (isInSimulatedRegion(withPosition)) {
         return getElement(
             draftState,

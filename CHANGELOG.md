@@ -11,9 +11,26 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Provide CSV export for patients to import them into IVENA MANV.
 - Enable users to login with SSO via an OpenID Connect providers.
+- Restricted Zones can be used to limit the number of vehicles that can be placed in a specific area. The restrictions can be applied per vehicle template.
+- Vehicles on the map have an indicator that shows the number of occupied and total patient slots. This indicator is disabled by default and can be enabled for an exercise. Optionally, the indicator is drawn in the status color of the most urgent patient in the vehicle.
+- Add exercise manager to allow logged-in users to manage their own exercises and exercise templates.
+- Alarm groups can now be limited to a maximum number of activations. When the limit is reached, the alarm group cannot be sent anymore.
+- Docker images are now also available on GHCR.
 - Add a new role "Einsatztablet" ("operations tablet") that simulates the view of a tablet device used by operation commanders on site
     - Add overview map with 3d view and on-location-vehicles as well as in-transfer-vehicles list
     - Add view to manage on-location vehicles in operational sections
+
+### Changed
+
+- Improve hints for exercise settings.
+- Add hints for transfer point settings.
+- The Docker image of the software has been redesigned, including the following breaking changes:
+    - TLS handling has been dropped from the image. Please use a separate reverse proxy for TLS. The variables `DFM_ENABLE_SSL`, `DFM_ENABLE_HSTS`, and `DFM_FORCE_NEW_SSL_CERTS` have no effect and the container only accepts connections on port 80.
+    - With the removal of TLS handling, the application container does not need a volume any longer. The variable `DFM_PERSISTENT_DATA_PATH` has been removed.
+    - The `DFM_UPLOAD_LIMIT` variable now supports custom units. For the previous behavior (megabytes), please append a "m" suffix.
+    - Assets have to be mounted to `/usr/local/app/frontend/assets/about` (dropped `dist/digital-fuesim-manv` from the path).
+    - Several other internal changes to the container, especially the nginx configuration. If you relied on overwriting config files for your setup, please review the code diff.
+- Show large, non-dismissable modal if the connection to the server got lost.
 
 ### Fixed
 
@@ -26,6 +43,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Trainees can mark patients for transport priority. Those patients show a red outline around their popup.
 - Participants can now be assigned to an emergency operations view, allowing them to send alarm groups and write public messages to the emergency operations center log.
 - The emergency operations center log now differentiates between public messages and private messages only visible to trainers.
+- From the simulated region pop-up, a visual overview of all objects inside the region can be opened as a modal.
 
 ### Changed
 
@@ -343,19 +361,19 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.10.0...HEAD
-[0.10.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.9.0...v0.10.0
-[0.9.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.1...v0.9.0
-[0.8.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.0...v0.8.1
-[0.8.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.1...v0.8.0
-[0.7.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.0...v0.7.1
-[0.7.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.5.1...v0.6.0
-[0.5.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.5.0...v0.5.1
-[0.5.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.2.1...v0.3.0
-[0.2.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.0.0...v0.1.0
-[0.0.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/37bd43bc1beb4aa9ad597b1ac763dd71b5709737...v0.0.0
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.9.0...v0.10.0
+[0.9.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.8.1...v0.9.0
+[0.8.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.7.1...v0.8.0
+[0.7.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.5.1...v0.6.0
+[0.5.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.0.0...v0.1.0
+[0.0.0]: https://github.com/hpi-sam/fuesim-digital/compare/37bd43bc1beb4aa9ad597b1ac763dd71b5709737...v0.0.0

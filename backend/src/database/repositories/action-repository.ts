@@ -1,6 +1,6 @@
 import { eq, asc, and, inArray } from 'drizzle-orm';
-import type { ExerciseAction } from 'digital-fuesim-manv-shared';
-import { actionTable, type ExerciseId } from '../schema.js';
+import type { ExerciseAction, ExerciseId } from 'fuesim-digital-shared';
+import { actionTable } from '../schema.js';
 import type { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { BaseRepository } from './base-repository.js';
 import { DatabaseService } from './../services/database-service.js';

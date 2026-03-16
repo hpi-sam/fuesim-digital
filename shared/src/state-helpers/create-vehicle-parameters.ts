@@ -4,18 +4,19 @@ import type {
     MaterialTemplate,
     PersonnelTemplate,
     MapCoordinates,
+    VehicleParameters,
 } from '../models/index.js';
 import {
+    newVehicleParameters,
     newNoOccupation,
     newVehiclePositionIn,
     newMapPositionAt,
-    VehicleParameters,
-    Material,
-    Personnel,
 } from '../models/index.js';
 
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
 import type { UUID } from '../utils/index.js';
+import { newMaterialFromTemplate } from '../models/material.js';
+import { newPersonnelFromTemplate } from '../models/personnel.js';
 
 /**
  * @returns a vehicle with personnel and materials to be added to the map
@@ -32,7 +33,7 @@ export function createVehicleParameters(
         .map((materialTemplateId: UUID) => {
             const materialTemplate = materialTemplates[materialTemplateId];
             if (!materialTemplate) return null;
-            return Material.generateMaterial(
+            return newMaterialFromTemplate(
                 materialTemplate,
                 vehicleId,
                 vehicleTemplate.name,
@@ -44,7 +45,7 @@ export function createVehicleParameters(
         .map((personnelTemplateId: UUID) => {
             const personnelTemplate = personnelTemplates[personnelTemplateId];
             if (!personnelTemplate) return null;
-            return Personnel.generatePersonnel(
+            return newPersonnelFromTemplate(
                 personnelTemplate,
                 vehicleId,
                 vehicleTemplate.name,
@@ -69,5 +70,5 @@ export function createVehicleParameters(
         operationalAssignment: null,
     };
 
-    return VehicleParameters.create(vehicle, materials, personnel);
+    return newVehicleParameters(vehicle, materials, personnel);
 }

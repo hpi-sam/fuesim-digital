@@ -1,0 +1,39 @@
+@if (edit) {
+    <form class="d-flex flex-grow-1" #f="ngForm" (ngSubmit)="save()">
+        <div class="flex-grow-1">
+            <textarea
+                #inlineInput="ngModel"
+                class="form-control form-control-sm"
+                rows="3"
+                [(ngModel)]="newValue"
+                [required]="required()"
+                name="inline"
+                autofocus
+            ></textarea>
+            <app-display-validation
+                [ngModelInput]="inlineInput"
+            ></app-display-validation>
+        </div>
+
+        <button
+            class="btn btn-primary ms-2"
+            type="submit"
+            [disabled]="!f.form.valid"
+        >
+            <i class="bi bi-save"></i>
+        </button>
+    </form>
+} @else {
+    <div class="d-flex">
+        <div class="flex-grow-1">
+            @if (value()) {
+                {{ value() }}
+            } @else {
+                –
+            }
+        </div>
+        <button class="btn btn-sm" (click)="startEdit()">
+            <i class="bi bi-pencil"></i>
+        </button>
+    </div>
+}

@@ -1,12 +1,12 @@
 import { createServer } from 'node:http';
 import type * as core from 'express-serve-static-core';
 import { Server } from 'socket.io';
-import { socketIoTransports } from 'digital-fuesim-manv-shared';
+import { socketIoTransports } from 'fuesim-digital-shared';
 import { Config } from '../config.js';
 import type { ExerciseSocket, ExerciseServer } from '../exercise-server.js';
+import type { AuthService } from '../auth/auth-service.js';
 import type { ExerciseService } from './../database/services/exercise-service.js';
 import { clientMap } from './client-map.js';
-import { ClientWrapper } from './client-wrapper.js';
 import {
     registerGetStateHandler,
     registerJoinExerciseHandler,
@@ -17,7 +17,8 @@ export class ExerciseWebsocketServer {
     public readonly exerciseServer: ExerciseServer;
     public constructor(
         app: core.Express,
-        private readonly exerciseService: ExerciseService
+        private readonly exerciseService: ExerciseService,
+        private readonly authService: AuthService
     ) {
         Config.initialize();
 
@@ -33,23 +34,36 @@ export class ExerciseWebsocketServer {
         this.exerciseServer.listen(Config.websocketPort);
 
         this.exerciseServer.on('connection', (socket) => {
-            this.registerClient(socket);
+            try {
+                this.registerClient(socket);
+            } catch (e) {
+                console.error(e);
+            }
         });
     }
 
-    private registerClient(client: ExerciseSocket): void {
-        // Add client
-        clientMap.set(client, new ClientWrapper(client, this.exerciseService));
-
+    private registerClient(client: ExerciseSocket) {
         // register handlers
+        registerJoinExerciseHandler(
+            this.exerciseServer,
+            client,
+            this.authService,
+            this.exerciseService
+        );
         registerGetStateHandler(this.exerciseServer, client);
         registerProposeActionHandler(this.exerciseServer, client);
-        registerJoinExerciseHandler(this.exerciseServer, client);
 
         // Register disconnect handler
         client.on('disconnect', () => {
-            clientMap.get(client)!.leaveExercise();
-            clientMap.delete(client);
+            try {
+                const clientWrapper = clientMap.get(client);
+                if (clientWrapper) {
+                    clientWrapper.leaveExercise();
+                    clientMap.delete(client);
+                }
+            } catch (e) {
+                console.error(e);
+            }
         });
     }
 

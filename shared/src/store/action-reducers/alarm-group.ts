@@ -4,11 +4,13 @@ import {
     IsString,
     IsUUID,
     Min,
+    ValidateIf,
     ValidateNested,
 } from 'class-validator';
+import { WritableDraft } from 'immer';
 import { AlarmGroup } from '../../models/alarm-group.js';
 import { AlarmGroupVehicle } from '../../models/utils/alarm-group-vehicle.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
@@ -34,6 +36,20 @@ export class RenameAlarmGroupAction implements Action {
     @IsString()
     public readonly name!: string;
 }
+
+export class LimitAlarmGroupAction implements Action {
+    @IsValue('[AlarmGroup] Limit AlarmGroup' as const)
+    public readonly type = '[AlarmGroup] Limit AlarmGroup';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly alarmGroupId!: UUID;
+
+    @ValidateIf((_, value) => value !== null)
+    @IsNumber()
+    @Min(0)
+    public readonly triggerLimit!: number | null;
+}
+
 export class RemoveAlarmGroupAction implements Action {
     @IsValue('[AlarmGroup] Remove AlarmGroup' as const)
     public readonly type = '[AlarmGroup] Remove AlarmGroup';
@@ -100,6 +116,20 @@ export namespace AlarmGroupActionReducers {
                 alarmGroupId
             );
             alarmGroup.name = name;
+            return draftState;
+        },
+        rights: 'trainer',
+    };
+
+    export const limitAlarmGroup: ActionReducer<LimitAlarmGroupAction> = {
+        action: LimitAlarmGroupAction,
+        reducer: (draftState, { alarmGroupId, triggerLimit }) => {
+            const alarmGroup = getElement(
+                draftState,
+                'alarmGroup',
+                alarmGroupId
+            );
+            alarmGroup.triggerLimit = triggerLimit ?? null;
             return draftState;
         },
         rights: 'trainer',
@@ -172,7 +202,7 @@ export namespace AlarmGroupActionReducers {
 }
 
 function getAlarmGroupVehicle(
-    alarmGroup: Mutable<AlarmGroup>,
+    alarmGroup: WritableDraft<AlarmGroup>,
     alarmGroupVehicleId: UUID
 ) {
     const alarmGroupVehicle =

@@ -12,5 +12,5 @@ export function openCoordinatePickerModal(
 
     (
         modalRef.componentInstance as CoordinatePickerModalComponent
-    ).olMapManager = olMapManager;
+    ).olMapManager.set(olMapManager);
 }

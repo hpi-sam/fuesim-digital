@@ -1,22 +1,35 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UUID,
     AutomaticallyDistributeVehiclesBehaviorState,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     isInSpecificSimulatedRegion,
     TransferPoint,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
-    selectTransferPoints,
     selectVehicleTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectTransferPoints,
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { TransferPointNameComponent } from '../../../../../../../../../../shared/components/transfer-point-name/transfer-point-name.component';
+import { ValuesPipe } from '../../../../../../../../../../shared/pipes/values.pipe';
+import { OrderByPipe } from '../../../../../../../../../../shared/pipes/order-by.pipe';
 
 @Component({
     selector:
@@ -26,13 +39,28 @@ import {
     styleUrls: [
         './simulated-region-overview-behavior-automatically-distribute-vehicles.component.scss',
     ],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        TransferPointNameComponent,
+        ValuesPipe,
+        OrderByPipe,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent
     implements OnInit
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() automaticallyDistributeVehiclesBehaviorId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly automaticallyDistributeVehiclesBehaviorId = input.required<UUID>();
 
     public automaticallyDistributeVehiclesBehaviorState$!: Observable<AutomaticallyDistributeVehiclesBehaviorState>;
     public distributionLimits$!: Observable<
@@ -51,16 +79,11 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
 
     public readonly infinity = Number.MAX_VALUE;
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
-
     ngOnInit(): void {
         const automaticallyDistributeVehiclesBehaviorStateSelector =
             createSelectBehaviorState<AutomaticallyDistributeVehiclesBehaviorState>(
-                this.simulatedRegionId,
-                this.automaticallyDistributeVehiclesBehaviorId
+                this.simulatedRegionId(),
+                this.automaticallyDistributeVehiclesBehaviorId()
             );
 
         const distributionLimitsSelector = createSelector(
@@ -120,7 +143,7 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
                 Object.values(transferPoints).find((transferPoint) =>
                     isInSpecificSimulatedRegion(
                         transferPoint,
-                        this.simulatedRegionId
+                        this.simulatedRegionId()
                     )
                 )!
         );
@@ -167,8 +190,8 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
     public addVehicle(vehicleType: string) {
         this.exerciseService.proposeAction({
             type: '[AutomaticDistributionBehavior] Change Limit',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.automaticallyDistributeVehiclesBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.automaticallyDistributeVehiclesBehaviorId(),
             vehicleType,
             newLimit: 1,
         });
@@ -177,8 +200,8 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
     public removeVehicle(vehicleType: string) {
         this.exerciseService.proposeAction({
             type: '[AutomaticDistributionBehavior] Change Limit',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.automaticallyDistributeVehiclesBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.automaticallyDistributeVehiclesBehaviorId(),
             vehicleType,
             newLimit: 0,
         });
@@ -187,8 +210,8 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
     public changeLimitOfVehicle(vehicleType: string, newLimit: number) {
         this.exerciseService.proposeAction({
             type: '[AutomaticDistributionBehavior] Change Limit',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.automaticallyDistributeVehiclesBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.automaticallyDistributeVehiclesBehaviorId(),
             vehicleType,
             newLimit,
         });
@@ -197,8 +220,8 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
     public unlimitedLimitOfVehicle(vehicleType: string) {
         this.exerciseService.proposeAction({
             type: '[AutomaticDistributionBehavior] Change Limit',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.automaticallyDistributeVehiclesBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.automaticallyDistributeVehiclesBehaviorId(),
             vehicleType,
             newLimit: this.infinity,
         });
@@ -210,8 +233,8 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
     ) {
         this.exerciseService.proposeAction({
             type: '[AutomaticDistributionBehavior] Change Limit',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.automaticallyDistributeVehiclesBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.automaticallyDistributeVehiclesBehaviorId(),
             vehicleType,
             newLimit: currentlyDistributed,
         });
@@ -220,8 +243,8 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
     public addDistributionDestination(destinationId: UUID) {
         this.exerciseService.proposeAction({
             type: '[AutomaticDistributionBehavior] Add Destination',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.automaticallyDistributeVehiclesBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.automaticallyDistributeVehiclesBehaviorId(),
             destinationId,
         });
     }
@@ -229,8 +252,8 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
     public removeDistributionDestination(destinationId: UUID) {
         this.exerciseService.proposeAction({
             type: '[AutomaticDistributionBehavior] Remove Destination',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.automaticallyDistributeVehiclesBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.automaticallyDistributeVehiclesBehaviorId(),
             destinationId,
         });
     }

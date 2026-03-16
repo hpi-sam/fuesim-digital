@@ -1,6 +1,5 @@
 <h5>Transport für SK abgeschlossen</h5>
-
-<ng-container *appLet="radiogram$ | async as radiogram">
+@if (radiogram$ | async; as radiogram) {
     <span>
         In
         @if (radiogram.scope === 'singleRegion') {
@@ -16,4 +15,4 @@
     </span>
     <app-patient-status-badge [status]="radiogram.completedCategory" />
     <span> abgeschlossen.</span>
-</ng-container>
+}

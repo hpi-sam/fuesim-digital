@@ -1,35 +1,35 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID, Transfer } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectCurrentTime } from 'src/app/state/application/selectors/exercise.selectors';
+import type { UUID, Transfer } from 'fuesim-digital-shared';
+import { NgClass, AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectCurrentTime } from '../../../../../../state/application/selectors/exercise.selectors';
+import { FormatDurationPipe } from '../../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-transfer-time-input',
     templateUrl: './transfer-time-input.component.html',
     styleUrls: ['./transfer-time-input.component.scss'],
-    standalone: false,
+    imports: [NgClass, AsyncPipe, FormatDurationPipe],
 })
 export class TransferTimeInputComponent {
-    @Input() elementType!: 'personnel' | 'vehicle';
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
 
-    @Input() elementId!: UUID;
+    readonly elementType = input.required<'personnel' | 'vehicle'>();
 
-    @Input() transfer!: Transfer;
+    readonly elementId = input.required<UUID>();
+
+    readonly transfer = input.required<Transfer>();
 
     public readonly currentTime$ = this.store.select(selectCurrentTime);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public addTransferTime(timeToAdd: number) {
         this.exerciseService.proposeAction({
             type: '[Transfer] Edit transfer',
-            elementType: this.elementType,
-            elementId: this.elementId,
+            elementType: this.elementType(),
+            elementId: this.elementId(),
             timeToAdd,
         });
     }
@@ -37,17 +37,17 @@ export class TransferTimeInputComponent {
     public togglePauseTransfer() {
         this.exerciseService.proposeAction({
             type: '[Transfer] Toggle pause transfer',
-            elementType: this.elementType,
-            elementId: this.elementId,
+            elementType: this.elementType(),
+            elementId: this.elementId(),
         });
     }
 
     public letElementArrive() {
         this.exerciseService.proposeAction({
             type: '[Transfer] Finish transfer',
-            elementType: this.elementType,
-            elementId: this.elementId,
-            targetTransferPointId: this.transfer.targetTransferPointId,
+            elementType: this.elementType(),
+            elementId: this.elementId(),
+            targetTransferPointId: this.transfer().targetTransferPointId,
         });
     }
 }

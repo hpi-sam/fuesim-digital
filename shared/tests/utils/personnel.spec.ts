@@ -5,11 +5,10 @@ import {
     SpatialTree,
 } from '../../src/models/utils/index.js';
 import type { ExerciseState } from '../../src/state.js';
-import type { Mutable } from '../../src/utils/index.js';
 import { cloneDeepMutable } from '../../src/utils/index.js';
 
 export function addPersonnel(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     personnel: Personnel
 ) {
     const mutablePersonnel = cloneDeepMutable(personnel);

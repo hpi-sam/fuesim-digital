@@ -1,7 +1,7 @@
 import {
     currentCoordinatesOf,
     newMapCoordinatesAt,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
 import type {

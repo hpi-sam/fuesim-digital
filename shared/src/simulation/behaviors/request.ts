@@ -7,8 +7,9 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { WritableDraft } from 'immer';
 import { IsStringMap } from '../../utils/validators/is-string-map.js';
-import type { UUID, Mutable } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, StrictObject, uuid } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import {
@@ -182,7 +183,7 @@ export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
                             simulatedRegion.id,
                             event.generateReportActivityId,
                             'generateReportActivity'
-                        ).radiogram as Mutable<ResourceRequestRadiogram>;
+                        ).radiogram as WritableDraft<ResourceRequestRadiogram>;
 
                         const requiredResources =
                             getRequiredResources(behaviorState);
@@ -226,14 +227,14 @@ export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
     },
 };
 
-function requestBehaviorKey(simulatedRegion: Mutable<SimulatedRegion>) {
+function requestBehaviorKey(simulatedRegion: WritableDraft<SimulatedRegion>) {
     return `${simulatedRegion.id}-request`;
 }
 
 export function updateBehaviorsRequestTarget(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<RequestBehaviorState>,
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<RequestBehaviorState>,
     requestTarget: ExerciseRequestTargetConfiguration
 ) {
     addActivity(
@@ -249,9 +250,9 @@ export function updateBehaviorsRequestTarget(
 }
 
 export function updateBehaviorsRequestInterval(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<RequestBehaviorState>,
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<RequestBehaviorState>,
     requestInterval: number
 ) {
     if (behaviorState.recurringEventActivityId) {
@@ -266,7 +267,9 @@ export function updateBehaviorsRequestInterval(
     behaviorState.requestInterval = requestInterval;
 }
 
-function getRequiredResources(behaviorState: Mutable<RequestBehaviorState>) {
+function getRequiredResources(
+    behaviorState: WritableDraft<RequestBehaviorState>
+) {
     return addPartialResourceDescriptions(
         StrictObject.values(behaviorState.requestedResources).map(
             (resource) => resource.vehicleCounts
@@ -275,8 +278,8 @@ function getRequiredResources(behaviorState: Mutable<RequestBehaviorState>) {
 }
 
 function getPromisedResources(
-    draftState: Mutable<ExerciseState>,
-    behaviorState: Mutable<RequestBehaviorState>
+    draftState: WritableDraft<ExerciseState>,
+    behaviorState: WritableDraft<RequestBehaviorState>
 ) {
     // remove invalidated resources
     let firstValidIndex = behaviorState.promisedResources.findIndex(
@@ -296,8 +299,8 @@ function getPromisedResources(
 }
 
 export function getResourcesToRequest(
-    draftState: Mutable<ExerciseState>,
-    behaviorState: Mutable<RequestBehaviorState>
+    draftState: WritableDraft<ExerciseState>,
+    behaviorState: WritableDraft<RequestBehaviorState>
 ) {
     const requestedResources = getRequiredResources(behaviorState);
     const promisedResources = getPromisedResources(draftState, behaviorState);

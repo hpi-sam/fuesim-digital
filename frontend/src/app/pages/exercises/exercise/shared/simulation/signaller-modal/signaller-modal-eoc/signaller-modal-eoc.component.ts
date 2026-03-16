@@ -1,21 +1,35 @@
-import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { Component, TemplateRef, inject, viewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import type { InterfaceSignallerInteraction } from '../signaller-modal-interactions/signaller-modal-interactions.component';
 import { SignallerModalDetailsService } from '../details-modal/signaller-modal-details.service';
+import { SignallerModalInteractionsComponent } from '../signaller-modal-interactions/signaller-modal-interactions.component';
+import { SignallerModalEocInformationAlarmGroupsSentComponent } from '../details-modal/eoc-information/signaller-modal-eoc-information-alarm-groups-sent/signaller-modal-eoc-information-alarm-groups-sent.component';
+import { SignallerModalEocInformationArrivingVehiclesComponent } from '../details-modal/eoc-information/signaller-modal-eoc-information-arriving-vehicles/signaller-modal-eoc-information-arriving-vehicles.component';
+import { SendAlarmGroupInterfaceComponent } from '../../../../../../../shared/components/send-alarm-group-interface/send-alarm-group-interface.component';
 
 @Component({
     selector: 'app-signaller-modal-eoc',
     templateUrl: './signaller-modal-eoc.component.html',
     styleUrls: ['./signaller-modal-eoc.component.scss'],
-    standalone: false,
+    imports: [
+        SignallerModalInteractionsComponent,
+        SignallerModalEocInformationAlarmGroupsSentComponent,
+        SignallerModalEocInformationArrivingVehiclesComponent,
+        SendAlarmGroupInterfaceComponent,
+    ],
 })
 export class SignallerModalEocComponent {
-    @ViewChild('alarmGroupsSentDisplay')
-    alarmGroupsSentDisplay!: TemplateRef<any>;
-    @ViewChild('arrivingVehiclesDisplay')
-    arrivingVehiclesDisplay!: TemplateRef<any>;
-    @ViewChild('sendAlarmGroupEditor')
-    sendAlarmGroupEditor!: TemplateRef<any>;
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+
+    readonly alarmGroupsSentDisplay = viewChild.required<TemplateRef<any>>(
+        'alarmGroupsSentDisplay'
+    );
+    readonly arrivingVehiclesDisplay = viewChild.required<TemplateRef<any>>(
+        'arrivingVehiclesDisplay'
+    );
+    readonly sendAlarmGroupEditor = viewChild.required<TemplateRef<any>>(
+        'sendAlarmGroupEditor'
+    );
 
     informationInteractions: InterfaceSignallerInteraction[] = [
         {
@@ -92,26 +106,24 @@ export class SignallerModalEocComponent {
         },
     ];
 
-    constructor(private readonly detailsModal: SignallerModalDetailsService) {}
-
     requestAlarmGroupsSent() {
         this.detailsModal.open(
             'Bereit alarmierte Alarmgruppen',
-            this.alarmGroupsSentDisplay
+            this.alarmGroupsSentDisplay()
         );
     }
 
     requestArrivingVehicles() {
         this.detailsModal.open(
             'Fahrzeuge auf Anfahrt',
-            this.arrivingVehiclesDisplay
+            this.arrivingVehiclesDisplay()
         );
     }
 
     sendAlarmGroup() {
         this.detailsModal.open(
             'Alarmgruppe alarmieren',
-            this.sendAlarmGroupEditor
+            this.sendAlarmGroupEditor()
         );
     }
 }

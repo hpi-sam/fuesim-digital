@@ -1,19 +1,21 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
     SimulatedRegion,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
     selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-manage-patient-transport-to-hospital-request-target-editor',
@@ -22,27 +24,25 @@ import {
     styleUrls: [
         './manage-patient-transport-to-hospital-request-target-editor.component.scss',
     ],
-    standalone: false,
+    imports: [FormsModule, AsyncPipe],
 })
 export class ManagePatientTransportToHospitalRequestTargetEditorComponent
     implements OnChanges
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public behaviorState$!: Observable<ManagePatientTransportToHospitalBehaviorState>;
     public possibleRequestTargets$!: Observable<SimulatedRegion[]>;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
-
     ngOnChanges(): void {
         this.behaviorState$ = this.store.select(
             createSelectBehaviorState<ManagePatientTransportToHospitalBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
 
@@ -61,15 +61,15 @@ export class ManagePatientTransportToHospitalRequestTargetEditorComponent
         if (requestTargetId === 'noTarget') {
             this.exerciseService.proposeAction({
                 type: '[ManagePatientsTransportToHospitalBehavior] Change Transport Request Target',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.behaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.behaviorId(),
             });
             return;
         }
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Change Transport Request Target',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             requestTargetId,
         });
     }

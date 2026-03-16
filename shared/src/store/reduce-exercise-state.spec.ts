@@ -3,6 +3,7 @@ import { newMapPositionAt } from '../models/index.js';
 import { ExerciseState } from '../state.js';
 import type { UUID } from '../utils/index.js';
 import { uuid } from '../utils/index.js';
+import type { ParticipantKey } from '../exercise-keys.js';
 import { reduceExerciseState } from './reduce-exercise-state.js';
 import { ReducerError } from './reducer-error.js';
 
@@ -34,7 +35,7 @@ describe('exerciseReducer', () => {
     }
 
     beforeEach(() => {
-        state = ExerciseState.create('123456');
+        state = ExerciseState.create('123456' as ParticipantKey);
     });
 
     it('should apply simple actions', () => {

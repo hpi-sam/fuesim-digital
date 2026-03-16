@@ -1,28 +1,31 @@
-import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import type { OnChanges } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import {
     healthPointsDefaults,
     Patient,
     statusNames,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import { NgStyle, AsyncPipe, PercentPipe } from '@angular/common';
+import type { AppState } from '../../../state/app.state';
 import {
     createSelectPatient,
     selectConfiguration,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
+} from '../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-patient-health-point-display',
     templateUrl: './patient-health-point-display.component.html',
     styleUrls: ['./patient-health-point-display.component.scss'],
-    standalone: false,
+    imports: [NgStyle, AsyncPipe, PercentPipe],
 })
-export class PatientHealthPointDisplayComponent implements OnInit {
-    @Input() patientId!: UUID;
+export class PatientHealthPointDisplayComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly patientId = input.required<UUID>();
 
     status$!: Observable<{
         real: PatientStatus;
@@ -34,12 +37,10 @@ export class PatientHealthPointDisplayComponent implements OnInit {
 
     public readonly healthPointsDefaults = healthPointsDefaults;
 
-    constructor(private readonly store: Store<AppState>) {}
-
-    ngOnInit(): void {
+    ngOnChanges(): void {
         this.status$ = this.store.select(
             createSelector(
-                createSelectPatient(this.patientId),
+                createSelectPatient(this.patientId()),
                 selectConfiguration,
                 (patient, configuration) => ({
                     real: patient.realStatus,

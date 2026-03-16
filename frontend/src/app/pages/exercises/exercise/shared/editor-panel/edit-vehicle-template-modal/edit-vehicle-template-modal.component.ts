@@ -1,45 +1,47 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
     UUID,
-    Mutable,
     VehicleTemplate,
     MaterialTemplate,
     PersonnelTemplate,
-} from 'digital-fuesim-manv-shared';
-import { cloneDeepMutable } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+} from 'fuesim-digital-shared';
+import { cloneDeepMutable } from 'fuesim-digital-shared';
+import { WritableDraft } from 'immer';
+import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehicle-template-form.component';
+import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
 import {
     createSelectVehicleTemplate,
     selectMaterialTemplates,
     selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
-import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehicle-template-form.component';
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { VehicleTemplateFormComponent } from '../vehicle-template-form/vehicle-template-form.component';
 
 @Component({
     selector: 'app-edit-vehicle-template-modal',
     templateUrl: './edit-vehicle-template-modal.component.html',
     styleUrls: ['./edit-vehicle-template-modal.component.scss'],
-    standalone: false,
+    imports: [VehicleTemplateFormComponent],
 })
 export class EditVehicleTemplateModalComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
+
     // This is set after the modal creation and therefore accessible in ngOnInit
     public vehicleTemplateId!: UUID;
 
-    public vehicleTemplate?: Mutable<VehicleTemplate>;
-    public materialTemplates?: Mutable<MaterialTemplate[]> = [];
-    public personnelTemplates?: Mutable<PersonnelTemplate[]> = [];
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly activeModal: NgbActiveModal,
-        private readonly confirmationModalService: ConfirmationModalService
-    ) {}
+    public vehicleTemplate?: WritableDraft<VehicleTemplate>;
+    public materialTemplates?: WritableDraft<MaterialTemplate[]> = [];
+    public personnelTemplates?: WritableDraft<PersonnelTemplate[]> = [];
 
     ngOnInit(): void {
         this.vehicleTemplate = cloneDeepMutable(

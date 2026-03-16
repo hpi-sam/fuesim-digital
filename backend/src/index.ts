@@ -1,5 +1,5 @@
 import * as util from 'node:util';
-import { ReducerError } from 'digital-fuesim-manv-shared';
+import { ReducerError } from 'fuesim-digital-shared';
 import { DatabaseService } from './database/services/database-service.js';
 import { ValidationErrorWrapper } from './utils/validation-error-wrapper.js';
 import { RestoreError } from './utils/restore-error.js';
@@ -11,6 +11,7 @@ import { ExerciseService } from './database/services/exercise-service.js';
 import { UserRepository } from './database/repositories/user-repository.js';
 import { SessionRepository } from './database/repositories/session-repository.js';
 import { AuthService } from './auth/auth-service.js';
+import { ExerciseManagerService } from './database/services/exercise-manager-service.js';
 
 async function main() {
     Config.initialize();
@@ -44,6 +45,10 @@ async function main() {
     );
 
     const exerciseService = new ExerciseService(
+        exerciseRepository,
+        actionRepository
+    );
+    const exerciseManagerService = new ExerciseManagerService(
         exerciseRepository,
         actionRepository
     );
@@ -95,7 +100,12 @@ async function main() {
     }
 
     // eslint-disable-next-line no-new
-    new FuesimServer(databaseService, exerciseService, authService);
+    new FuesimServer(
+        databaseService,
+        exerciseService,
+        authService,
+        exerciseManagerService
+    );
 }
 
 main();

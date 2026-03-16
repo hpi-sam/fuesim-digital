@@ -5,7 +5,7 @@
         </h3>
         <h4 class="d-inline-block ms-4">
             <app-signaller-modal-region-leader
-                [simulatedRegionId]="simulatedRegionId"
+                [simulatedRegionId]="simulatedRegionId()"
                 (hasLeader)="setNoLeaderOverlayState(!$event)"
             />
         </h4>
@@ -17,13 +17,13 @@
         >
             <div class="flex-grow-1 overflow-auto" style="max-width: 50%">
                 <app-signaller-modal-region-information
-                    [simulatedRegionId]="simulatedRegionId"
+                    [simulatedRegionId]="simulatedRegionId()"
                 />
             </div>
             <div class="vr mx-1 h-100"></div>
             <div class="flex-grow-1 overflow-auto" style="max-width: 50%">
                 <app-signaller-modal-region-commands
-                    [simulatedRegionId]="simulatedRegionId"
+                    [simulatedRegionId]="simulatedRegionId()"
                 />
             </div>
         </div>

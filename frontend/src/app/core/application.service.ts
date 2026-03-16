@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { assertExhaustiveness } from 'digital-fuesim-manv-shared';
+import { assertExhaustiveness } from 'fuesim-digital-shared';
 import type { AppState } from '../state/app.state';
 import {
-    selectExerciseId,
+    selectExerciseKey,
     selectExerciseStateMode,
     selectLastClientName,
 } from '../state/application/selectors/application.selectors';
@@ -19,11 +19,9 @@ import { TimeTravelService } from './time-travel.service';
     providedIn: 'root',
 })
 export class ApplicationService {
-    constructor(
-        private readonly timeTravelService: TimeTravelService,
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
+    private readonly timeTravelService = inject(TimeTravelService);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
 
     /**
      * A new mode must be set immediately after this function is called
@@ -63,7 +61,7 @@ export class ApplicationService {
      */
     public async rejoinExercise() {
         return this.joinExercise(
-            selectStateSnapshot(selectExerciseId, this.store)!,
+            selectStateSnapshot(selectExerciseKey, this.store)!,
             selectStateSnapshot(selectLastClientName, this.store)!
         );
     }

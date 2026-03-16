@@ -1,24 +1,24 @@
 import type VectorLayer from 'ol/layer/Vector';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import type { Interaction } from 'ol/interaction';
 import { defaults as defaultInteractions } from 'ol/interaction';
 import type { Subject } from 'rxjs';
 import { combineLatest, takeUntil } from 'rxjs';
-import { selectExerciseStatus } from 'src/app/state/application/selectors/exercise.selectors';
 import type { Feature } from 'ol';
 import { Collection } from 'ol';
 import type OlMap from 'ol/Map';
-import type { AppState } from 'src/app/state/app.state';
 import type { Store } from '@ngrx/store';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import type { ExerciseStatus, Role, UUID } from 'digital-fuesim-manv-shared';
+import type { ExerciseStatus, Role, UUID } from 'fuesim-digital-shared';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type { Pixel } from 'ol/pixel';
-import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
 import { featureElementKey } from '../feature-managers/element-manager';
-import { TranslateInteraction } from './translate-interaction';
-import type { PopupManager } from './popup-manager';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectExerciseStateMode } from '../../../../../../state/application/selectors/application.selectors';
+import { selectExerciseStatus } from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { FeatureManager } from './feature-manager';
+import type { PopupManager } from './popup-manager';
+import { TranslateInteraction } from './translate-interaction';
 
 export class OlMapInteractionsManager {
     private readonly featureLayers: VectorLayer[] = [];

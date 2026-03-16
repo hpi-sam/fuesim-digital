@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4 class="modal-title">{{ title }}</h4>
+    <h4 class="modal-title">{{ title() }}</h4>
     <button
         type="button"
         class="btn-close"
@@ -9,9 +9,11 @@
     ></button>
 </div>
 <div class="modal-body">
-    <ng-container [ngTemplateOutlet]="body" />
+    @if (body(); as body) {
+        <ng-container [ngTemplateOutlet]="body" />
+    }
 </div>
-@if (hotkeysEnabled) {
+@if (hotkeysEnabled()) {
     <div class="modal-footer text-muted">
         <small>
             <app-hotkey-indicator keys="Leertaste" />: Aktuelles Steuerelement

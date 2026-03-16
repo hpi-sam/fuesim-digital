@@ -1,4 +1,5 @@
 import { IsInt, IsOptional, IsUUID } from 'class-validator';
+import { WritableDraft } from 'immer';
 import {
     type StartPoint,
     type MapPosition,
@@ -17,7 +18,7 @@ import {
     offsetMapPositionBy,
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import type { AllowedValues } from '../../utils/validators/index.js';
 import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
@@ -51,7 +52,7 @@ const transferableElementTypeAllowedValues: AllowedValues<TransferableElementTyp
  * @param elementId of an element that is in transfer
  */
 export function letElementArrive(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     elementType: TransferableElementType,
     elementId: UUID
 ) {
@@ -67,7 +68,7 @@ export function letElementArrive(
     );
     const newPosition = cloneDeepMutable(targetTransferPoint.position);
     if (isPositionOnMap(newPosition)) {
-        offsetMapPositionBy(newPosition as Mutable<MapPosition>, {
+        offsetMapPositionBy(newPosition as WritableDraft<MapPosition>, {
             x: 0,
             y: imageSizeToPosition(TransferPoint.image.height / 3),
         });
@@ -99,7 +100,7 @@ export function letElementArrive(
                 createVehicleActionTag(draftState, 'arrived'),
                 createTransferPointTag(draftState, targetTransferPoint.id),
             ],
-            `${(element as Mutable<Vehicle>).name} ist an ${
+            `${(element as WritableDraft<Vehicle>).name} ist an ${
                 targetTransferPoint.externalName
             } angekommen`,
             elementId

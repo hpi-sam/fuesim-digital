@@ -42,6 +42,9 @@ import { addPatientTransportPriority41 } from './41-add-patient-transport-prio.j
 import { replaceClientRoles42 } from './42-replace-clientroles.js';
 import { addEmergencyOperationsCenterViewport43 } from './43-add-eoc-viewport.js';
 import { generalizeMaterialsPersonnel44 } from './44-generalize-materials-personnel.js';
+import { addRestrictedZones45 } from './45-add-restricted-zones.js';
+import { limitedAlarmgroups46 } from './46-limited-alarm-groups.js';
+import { participantIdToKey47 } from './47-participant-id-to-key.js';
 import { addOperationsTabletView45 } from './45-add-operations-tablet-view.js';
 
 /**
@@ -113,5 +116,7 @@ export const migrations: {
     42: replaceClientRoles42,
     43: addEmergencyOperationsCenterViewport43,
     44: generalizeMaterialsPersonnel44,
-    45: addOperationsTabletView45,
+    45: addRestrictedZones45,
+    46: limitedAlarmgroups46,
+    47: participantIdToKey47,
 };

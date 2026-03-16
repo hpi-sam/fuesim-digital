@@ -11,11 +11,11 @@ import {
     newMapCoordinatesAt,
     SimulatedRegion,
     newSimulatedRegionPositionIn,
-    Size,
     TransferPoint,
+    newSize,
 } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
-import type { Mutable, UUIDSet } from '../../utils/index.js';
+import type { UUIDSet } from '../../utils/index.js';
 import { cloneDeepMutable, uuid } from '../../utils/index.js';
 import { handleSimulationEvents } from '../utils/simulation.js';
 import type { PatientCategoryTransferToHospitalFinishedEvent } from '../events/index.js';
@@ -26,21 +26,22 @@ import type {
     TransferPatientToHospitalActivityState,
 } from '../activities/index.js';
 import { newVehicle } from '../../models/vehicle.js';
+import type { ParticipantKey } from '../../exercise-keys.js';
 import { TransferToHospitalBehaviorState } from './transfer-to-hospital.js';
 
-const emptyState = ExerciseState.create('123456');
+const emptyState = ExerciseState.create('123456' as ParticipantKey);
 const currentTime = 10_000;
 
 function setupStateAndInteract(
     mutateBeforeState?: (
-        state: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<TransferToHospitalBehaviorState>
+        state: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<TransferToHospitalBehaviorState>
     ) => void
 ) {
     const simulatedRegion = SimulatedRegion.create(
         newMapCoordinatesAt(0, 0),
-        Size.create(10, 10),
+        newSize(10, 10),
         'test region'
     );
     const transferPoint = TransferPoint.create(
@@ -66,7 +67,7 @@ function setupStateAndInteract(
         const mutableSimulatedRegion =
             draftState.simulatedRegions[simulatedRegion.id]!;
         const behaviorState = mutableSimulatedRegion
-            .behaviors[0] as Mutable<TransferToHospitalBehaviorState>;
+            .behaviors[0] as WritableDraft<TransferToHospitalBehaviorState>;
 
         mutateBeforeState?.(draftState, mutableSimulatedRegion, behaviorState);
     });
@@ -257,7 +258,7 @@ describe('transfer to hospital behavior', () => {
             });
 
             it('selects the most urgent patient', () => {
-                let redPatient: Mutable<Patient>;
+                let redPatient: WritableDraft<Patient>;
 
                 const {
                     afterState,
@@ -373,7 +374,7 @@ describe('transfer to hospital behavior', () => {
             });
 
             it('selects as many patients as the vehicle has capacity for', () => {
-                const redPatients: Mutable<Patient>[] = [];
+                const redPatients: WritableDraft<Patient>[] = [];
 
                 const {
                     afterState,
@@ -419,7 +420,7 @@ describe('transfer to hospital behavior', () => {
                         .activities
                 )[0] as TransferPatientToHospitalActivityState;
 
-                const patientsUUIDSet: Mutable<UUIDSet> = {};
+                const patientsUUIDSet: WritableDraft<UUIDSet> = {};
                 redPatients.forEach(
                     (patient) => (patientsUUIDSet[patient.id] = true)
                 );

@@ -1,40 +1,77 @@
 import type { OnInit } from '@angular/core';
-import { Component, ViewEncapsulation } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Store } from '@ngrx/store';
-import type { PatientStatus, UUID, LogEntry } from 'digital-fuesim-manv-shared';
-import { statusNames } from 'digital-fuesim-manv-shared';
-import { combineLatest, Observable, map } from 'rxjs';
-import { getRgbaColor } from 'src/app/shared/functions/colors';
-import type { AppState } from 'src/app/state/app.state';
+import { Component, ViewEncapsulation, inject } from '@angular/core';
 import {
-    selectPersonnelTemplates,
-    selectSimulatedRegions,
-    selectVehicleTemplates,
-    selectViewports,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    NgbActiveModal,
+    NgbNav,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavContent,
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngrx/store';
+import type { PatientStatus, UUID, LogEntry } from 'fuesim-digital-shared';
+import { statusNames } from 'fuesim-digital-shared';
+import { combineLatest, Observable, map } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 import { StatisticsService } from '../../core/statistics/statistics.service';
 import { AreaStatisticsService } from '../area-statistics.service';
 import type { StackedBarChartStatistics } from '../stacked-bar-chart/stacked-bar-chart.component';
 import { StackedBarChart } from '../stacked-bar-chart/time-line-area-chart';
+import { getRgbaColor } from '../../../../../../shared/functions/colors';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectViewports,
+    selectSimulatedRegions,
+    selectVehicleTemplates,
+    selectPersonnelTemplates,
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { ViewportNameComponent } from '../../../../../../shared/components/viewport-name/viewport-name.component';
+import { SimulatedRegionNameComponent } from '../../../../../../shared/components/simulated-region-name/simulated-region-name.component';
+import { StackedBarChartComponent } from '../stacked-bar-chart/stacked-bar-chart.component';
+import { HospitalPatientsTableComponent } from '../hospital-patients-table/hospital-patients-table.component';
+import { LogTableComponent } from '../log-table/log-table.component';
 
 @Component({
     selector: 'app-exercise-statistics-modal',
     templateUrl: './exercise-statistics-modal.component.html',
     styleUrls: ['./exercise-statistics-modal.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: false,
+    imports: [
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbNavContent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        ViewportNameComponent,
+        SimulatedRegionNameComponent,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        StackedBarChartComponent,
+        HospitalPatientsTableComponent,
+        NgbNavOutlet,
+        LogTableComponent,
+        AsyncPipe,
+    ],
 })
 export class ExerciseStatisticsModalComponent implements OnInit {
+    activeModal = inject(NgbActiveModal);
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly statisticsService = inject(StatisticsService);
+    readonly areaStatisticsService = inject(AreaStatisticsService);
+
     public viewportIds$!: Observable<UUID[]>;
     public simulatedRegionIds$!: Observable<UUID[]>;
 
-    constructor(
-        public activeModal: NgbActiveModal,
-        private readonly store: Store<AppState>,
-        public readonly statisticsService: StatisticsService,
-        public readonly areaStatisticsService: AreaStatisticsService
-    ) {
+    constructor() {
         this.statisticsService.updateStatistics();
     }
     ngOnInit(): void {

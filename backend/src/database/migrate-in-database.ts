@@ -1,28 +1,28 @@
 import type {
     ExerciseAction,
+    ExerciseId,
     ExerciseState,
-    Mutable,
-} from 'digital-fuesim-manv-shared';
-import { applyMigrations } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { applyMigrations } from 'fuesim-digital-shared';
+import type { WritableDraft } from 'immer';
 import { RestoreError } from '../utils/restore-error.js';
 import type { ExerciseRepository } from './repositories/exercise-repository.js';
 import type { ActionRepository } from './repositories/action-repository.js';
-import type { ExerciseId } from './schema.js';
 
 export async function migrateInDatabase(
     exerciseId: ExerciseId,
     exerciseRepository: ExerciseRepository,
     actionRepository: ActionRepository
 ): Promise<void> {
-    const exercises = await exerciseRepository.getExerciseById(exerciseId);
-    if (exercises.length === 0 && exercises[0] === undefined) {
+    const exercise = (await exerciseRepository.getExerciseById(exerciseId))
+        ?.exercise_entity;
+    if (!exercise) {
         throw new RestoreError(
             'Cannot find exercise to convert in database',
             exerciseId
         );
     }
 
-    const exercise = exercises[0]!;
     const loadedInitialState = exercise.initialStateString;
     const loadedCurrentState = exercise.currentStateString;
     const loadedActions = (
@@ -38,7 +38,7 @@ export async function migrateInDatabase(
             actions: loadedActions,
         },
     });
-    const initialState: Mutable<ExerciseState> =
+    const initialState: WritableDraft<ExerciseState> =
         history?.initialState ?? currentState;
     const actions = history?.actions ?? [];
 

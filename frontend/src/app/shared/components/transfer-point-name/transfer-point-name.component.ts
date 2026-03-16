@@ -1,27 +1,28 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { TransferPoint, UUID } from 'digital-fuesim-manv-shared';
+import type { TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectTransferPoint } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../state/app.state';
+import { createSelectTransferPoint } from '../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-transfer-point-name',
     templateUrl: './transfer-point-name.component.html',
     styleUrls: ['./transfer-point-name.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class TransferPointNameComponent implements OnChanges {
-    @Input() transferPointId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly transferPointId = input.required<UUID>();
 
     public transferPoint$?: Observable<TransferPoint>;
 
-    constructor(private readonly store: Store<AppState>) {}
-
     ngOnChanges() {
         this.transferPoint$ = this.store.select(
-            createSelectTransferPoint(this.transferPointId)
+            createSelectTransferPoint(this.transferPointId())
         );
     }
 }

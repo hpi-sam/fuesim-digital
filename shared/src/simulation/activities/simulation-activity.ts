@@ -1,6 +1,7 @@
+import type { WritableDraft } from 'immer';
 import type { SimulatedRegion } from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import type { Constructor, Mutable, UUID } from '../../utils/index.js';
+import type { Constructor, UUID } from '../../utils/index.js';
 
 export class SimulationActivityState {
     readonly type!: `${string}Activity`;
@@ -10,15 +11,15 @@ export class SimulationActivityState {
 export interface SimulationActivity<S extends SimulationActivityState> {
     readonly activityState: Constructor<S>;
     readonly tick: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        activityState: Mutable<S>,
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        activityState: WritableDraft<S>,
         tickInterval: number,
         terminate: () => void
     ) => void;
     readonly onTerminate?: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
         activityId: UUID
     ) => void;
 }

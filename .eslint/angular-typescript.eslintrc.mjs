@@ -35,10 +35,11 @@ export default {
         '@angular-eslint/no-queries-metadata-property': 'warn',
         '@angular-eslint/pipe-prefix': 'warn',
         '@angular-eslint/prefer-output-readonly': 'warn',
-        '@angular-eslint/prefer-standalone': 'off',
+        '@angular-eslint/prefer-standalone': 'warn',
         '@angular-eslint/use-component-selector': 'warn',
         '@angular-eslint/use-lifecycle-interface': 'warn',
         '@angular-eslint/use-pipe-transform-interface': 'warn',
+        '@angular-eslint/prefer-signals': 'warn',
 
         /**
          * eslint-plugin-rxjs

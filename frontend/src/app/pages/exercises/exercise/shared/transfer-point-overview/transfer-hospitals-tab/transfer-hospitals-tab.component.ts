@@ -1,24 +1,48 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Hospital, TransferPoint, UUID } from 'digital-fuesim-manv-shared';
+import type { Hospital, TransferPoint, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
 import {
     createSelectTransferPoint,
     selectHospitals,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { HospitalNameComponent } from '../../../../../../shared/components/hospital-name/hospital-name.component';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
+import { OrderByPipe } from '../../../../../../shared/pipes/order-by.pipe';
 
 @Component({
     selector: 'app-transfer-hospitals-tab',
     templateUrl: './transfer-hospitals-tab.component.html',
     styleUrls: ['./transfer-hospitals-tab.component.scss'],
-    standalone: false,
+    imports: [
+        HospitalNameComponent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+        ValuesPipe,
+        OrderByPipe,
+    ],
 })
 export class TransferHospitalsTabComponent implements OnInit {
-    @Input() public transferPointId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
+    public readonly transferPointId = input.required<UUID>();
 
     public transferPoint$!: Observable<TransferPoint>;
 
@@ -28,14 +52,9 @@ export class TransferHospitalsTabComponent implements OnInit {
 
     public hospitalsToBeAdded$!: Observable<{ [key: UUID]: Hospital }>;
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
-
     ngOnInit() {
         this.transferPoint$ = this.store.select(
-            createSelectTransferPoint(this.transferPointId)
+            createSelectTransferPoint(this.transferPointId())
         );
 
         const hospitals$ = this.store.select(selectHospitals);
@@ -79,7 +98,7 @@ export class TransferHospitalsTabComponent implements OnInit {
     public connectHospital(hospitalId: UUID) {
         this.exerciseService.proposeAction({
             type: '[TransferPoint] Connect hospital',
-            transferPointId: this.transferPointId,
+            transferPointId: this.transferPointId(),
             hospitalId,
         });
     }
@@ -87,7 +106,7 @@ export class TransferHospitalsTabComponent implements OnInit {
     public disconnectHospital(hospitalId: UUID) {
         this.exerciseService.proposeAction({
             type: '[TransferPoint] Disconnect hospital',
-            transferPointId: this.transferPointId,
+            transferPointId: this.transferPointId(),
             hospitalId,
         });
     }

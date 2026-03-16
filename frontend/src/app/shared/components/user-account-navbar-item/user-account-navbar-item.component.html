@@ -1,9 +1,8 @@
-@let authData = userData$ | async;
-@let userData = authData?.user;
-@if (userData) {
+@let authData = auth.authData();
+@if (authData.user) {
     <div ngbDropdown>
         <span ngbDropdownToggle style="cursor: pointer">{{
-            userData?.displayName
+            authData.user.displayName
         }}</span>
         <div ngbDropdownMenu>
             @if (authData?.userSelfServiceEnabled) {
@@ -14,7 +13,7 @@
             <a ngbDropdownItem [href]="logoutUrl">Ausloggen</a>
         </div>
     </div>
-} @else if (userData === null) {
+} @else if (authData.user === null) {
     @if (authData?.userRegistrationsEnabled) {
         <div class="d-flex gap-2">
             <div class="d-flex gap-2">
@@ -36,6 +35,6 @@
             <a class="btn btn-outline-primary" [href]="loginUrl">Anmelden</a>
         </div>
     }
-} @else if (userData === undefined) {
+} @else if (authData.user === undefined) {
     <div><!--UserData is loading--></div>
 }

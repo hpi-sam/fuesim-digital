@@ -1,9 +1,5 @@
-import type { Mutable } from './index.js';
+import type { ServerOptions } from 'socket.io';
 
-const _socketIoTransports = {
+export const socketIoTransports = {
     transports: ['websocket'],
-} as const;
-
-export const socketIoTransports = _socketIoTransports as Mutable<
-    typeof _socketIoTransports
->;
+} satisfies Partial<ServerOptions>;

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type {
     ActivatedRouteSnapshot,
     RouterStateSnapshot,
@@ -6,26 +6,24 @@ import type {
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { ApiService } from 'src/app/core/api.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { tryToJoinExercise } from '../shared/join-exercise-modal/try-to-join-exercise';
 import { ApplicationService } from '../../../core/application.service';
+import { ApiService } from '../../../core/api.service';
+import { MessageService } from '../../../core/messages/message.service';
+import type { AppState } from '../../../state/app.state';
+import { selectExerciseStateMode } from '../../../state/application/selectors/application.selectors';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
 
 @Injectable({
     providedIn: 'root',
 })
 export class JoinExerciseGuard {
-    constructor(
-        private readonly ngbModalService: NgbModal,
-        private readonly router: Router,
-        private readonly apiService: ApiService,
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService,
-        private readonly applicationService: ApplicationService
-    ) {}
+    private readonly ngbModalService = inject(NgbModal);
+    private readonly router = inject(Router);
+    private readonly apiService = inject(ApiService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
+    private readonly applicationService = inject(ApplicationService);
 
     async canActivate(
         route: ActivatedRouteSnapshot,
@@ -38,33 +36,31 @@ export class JoinExerciseGuard {
         ) {
             return true;
         }
-        const exerciseExists = await this.apiService.exerciseExists(exerciseId);
-        if (!exerciseExists) {
-            this.messageService.postMessage({
-                title: 'Diese Übung existiert nicht',
-                color: 'danger',
-            });
+        try {
+            const exerciseExists = await this.apiService.exerciseExists(
+                route.params['exerciseId']
+            );
+
+            let successfullyJoined = false;
+            if (exerciseExists.isTemplate) {
+                successfullyJoined = await this.applicationService.joinExercise(
+                    route.params['exerciseId'],
+                    ''
+                );
+            } else {
+                successfullyJoined = await tryToJoinExercise(
+                    this.ngbModalService,
+                    route.params['exerciseId']
+                );
+            }
+
+            if (!successfullyJoined) {
+                this.router.navigate(['/']);
+            }
+            return successfullyJoined;
+        } catch {
             this.router.navigate(['/']);
             return false;
         }
-
-        let successfullyJoined = false;
-
-        if (route.queryParams['autojoin']) {
-            successfullyJoined = await this.applicationService.joinExercise(
-                exerciseId,
-                route.queryParams['autojoin'] ?? 'Gast'
-            );
-        } else {
-            successfullyJoined = await tryToJoinExercise(
-                this.ngbModalService,
-                exerciseId
-            );
-        }
-
-        if (!successfullyJoined) {
-            this.router.navigate(['/']);
-        }
-        return successfullyJoined;
     }
 }

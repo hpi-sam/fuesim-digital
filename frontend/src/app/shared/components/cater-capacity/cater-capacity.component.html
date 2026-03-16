@@ -1,0 +1,16 @@
+<div class="container">
+    @for (status of caterForStatuses; track status) {
+        <div class="row gx-2">
+            @if (canCaterFor()[status] > 0) {
+                <div class="col-6 text-end">
+                    <app-patient-status-badge
+                        [status]="status"
+                    ></app-patient-status-badge>
+                </div>
+                <div class="col-6">
+                    {{ canCaterFor()[status] }}
+                </div>
+            }
+        </div>
+    }
+</div>

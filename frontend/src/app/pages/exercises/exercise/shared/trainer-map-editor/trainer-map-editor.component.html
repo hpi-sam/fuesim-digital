@@ -107,8 +107,8 @@
                             <ng-template>
                                 <div class="cards">
                                     @for (
-                                        simulatedRegionTemplate of simulatedRegionTemplates;
-                                        track simulatedRegionTemplate
+                                        simulatedRegionDragTemplate of simulatedRegionDragTemplates;
+                                        track simulatedRegionDragTemplate
                                     ) {
                                         <app-map-editor-card
                                             (elementMousedown)="
@@ -117,21 +117,65 @@
                                                     {
                                                         type: 'simulatedRegion',
                                                         template:
-                                                            simulatedRegionTemplate,
+                                                            simulatedRegionDragTemplate,
                                                     }
                                                 )
                                             "
                                             dataCy="draggableSimulatedRegionDiv"
                                             [imageUrl]="
-                                                simulatedRegionTemplate.image
+                                                simulatedRegionDragTemplate
+                                                    .image.url
+                                            "
+                                            [darkBackground]="true"
+                                            [title]="
+                                                simulatedRegionDragTemplate.editorName
+                                            "
+                                        >
+                                        </app-map-editor-card>
+                                    }
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+                <div ngbAccordionItem="restrictedZones">
+                    <h5 ngbAccordionHeader>
+                        <button
+                            ngbAccordionButton
+                            data-cy="restrictedZonesAccordionButton"
+                        >
+                            Zonen
+                        </button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="cards">
+                                    @for (
+                                        restrictedZoneDragTemplate of restrictedZoneDragTemplates;
+                                        track restrictedZoneDragTemplate
+                                    ) {
+                                        <app-map-editor-card
+                                            (elementMousedown)="
+                                                dragElementService.onMouseDown(
+                                                    $event,
+                                                    {
+                                                        type: 'restrictedZone',
+                                                        template:
+                                                            restrictedZoneDragTemplate,
+                                                    }
+                                                )
+                                            "
+                                            dataCy="draggablerestrictedZoneDiv"
+                                            [imageUrl]="
+                                                restrictedZoneDragTemplate.image
                                                     .url
                                             "
                                             [darkBackground]="true"
                                             [title]="
-                                                simulatedRegionTemplate.editorName
+                                                restrictedZoneDragTemplate.editorName
                                             "
-                                        >
-                                        </app-map-editor-card>
+                                        />
                                     }
                                 </div>
                             </ng-template>
@@ -150,12 +194,10 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
-                                <ng-container
-                                    *appLet="
-                                        selectedCategories$
-                                            | async as selectedCategories
-                                    "
-                                >
+                                @if (
+                                    selectedCategories$ | async;
+                                    as selectedCategories
+                                ) {
                                     <div
                                         class="btn-group btn-group-sm mb-2"
                                         role="group"
@@ -279,7 +321,7 @@
                                             <hr class="mt-1 mb-2" />
                                         }
                                     }
-                                </ng-container>
+                                }
                             </ng-template>
                         </div>
                     </div>

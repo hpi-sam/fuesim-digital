@@ -3,7 +3,7 @@ import type {
     Position,
     Size,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type { Coordinate } from 'ol/coordinate';
 import type { Geometry } from 'ol/geom';

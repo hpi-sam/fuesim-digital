@@ -1,17 +1,13 @@
 import { jest } from '@jest/globals';
-import { sleep } from 'digital-fuesim-manv-shared';
-import { createTestEnvironment } from '../../test/utils.js';
-import { clientMap } from './client-map.js';
-import { ActiveExercise } from './active-exercise.js';
 import type {
     ExerciseKey,
     ParticipantKey,
     TrainerKey,
-} from './exercise-keys.js';
+} from 'fuesim-digital-shared';
+import { sleep } from 'fuesim-digital-shared';
+import { ActiveExercise } from './active-exercise.js';
 
 describe('Active Exercise', () => {
-    const environment = createTestEnvironment();
-
     it('fails getting a role for the wrong key', () => {
         const exercise = new ActiveExercise(
             '123456' as ParticipantKey,
@@ -21,51 +17,6 @@ describe('Active Exercise', () => {
         expect(() =>
             exercise.getRoleFromUsedKey('wrong key' as ExerciseKey)
         ).toThrow(RangeError);
-    });
-
-    it('does nothing adding a client that is not set up', async () => {
-        const exercise = new ActiveExercise(
-            '123456' as ParticipantKey,
-            '12345678' as TrainerKey
-        );
-        // Use a websocket in order to have a ClientWrapper set up
-        await environment.withWebsocket(async () => {
-            // Sleep a bit to allow the socket to connect.
-            await sleep(100);
-            const client = clientMap.values().next().value;
-            expect(client).toBeDefined();
-
-            const applySpy = jest.spyOn(
-                ActiveExercise.prototype,
-                'applyAction'
-            );
-            exercise.addClient(client!);
-
-            expect(applySpy).not.toHaveBeenCalled();
-        });
-    });
-
-    it('does nothing removing a client that is not joined', async () => {
-        const exercise = new ActiveExercise(
-            '123456' as ParticipantKey,
-            '12345678' as TrainerKey
-        );
-        // Use a websocket in order to have a ClientWrapper set up
-        await environment.withWebsocket(async () => {
-            // Sleep a bit to allow the socket to connect.
-            await sleep(100);
-            const client = clientMap.values().next().value;
-            expect(client).toBeDefined();
-
-            const applySpy = jest.spyOn(
-                ActiveExercise.prototype,
-                'applyAction'
-            );
-            applySpy.mockClear();
-            exercise.removeClient(client!);
-
-            expect(applySpy).not.toHaveBeenCalled();
-        });
     });
 
     describe('Started Exercise', () => {

@@ -1,7 +1,7 @@
-import { Directive } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 import type { AbstractControl, AsyncValidator } from '@angular/forms';
 import { NG_ASYNC_VALIDATORS } from '@angular/forms';
-import { ApiService } from 'src/app/core/api.service';
+import { ApiService } from '../../core/api.service';
 
 @Directive({
     selector: '[appExerciseExistsValidator]',
@@ -12,30 +12,30 @@ import { ApiService } from 'src/app/core/api.service';
             multi: true,
         },
     ],
-    standalone: false,
 })
 export class ExerciseExistsValidatorDirective implements AsyncValidator {
-    constructor(private readonly apiService: ApiService) {}
+    private readonly apiService = inject(ApiService);
 
     async validate(
         control: AbstractControl
     ): Promise<ExerciseExistsValidatorError | null> {
         // Because the ids are randomly generated, we can expect the exerciseId
         // to not become valid without the user typing a new id.
-        return this.apiService.exerciseExists(control.value).then((exists) =>
-            exists
-                ? null
-                : {
-                      exerciseExists: {
-                          id: control.value,
-                      },
-                  }
-        );
+        try {
+            await this.apiService.exerciseExists(control.value);
+            return null;
+        } catch {
+            return {
+                exerciseDoesNotExist: {
+                    id: control.value,
+                },
+            };
+        }
     }
 }
 
 export interface ExerciseExistsValidatorError {
-    exerciseExists: {
+    exerciseDoesNotExist: {
         id: number;
     };
 }

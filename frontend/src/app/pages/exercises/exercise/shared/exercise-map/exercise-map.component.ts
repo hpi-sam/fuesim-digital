@@ -2,21 +2,24 @@ import type { AfterViewInit, OnDestroy } from '@angular/core';
 import {
     Component,
     ElementRef,
-    ViewChild,
     ViewContainerRef,
+    inject,
+    viewChild,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectCurrentMainRole,
-    selectRestrictedViewport,
-} from 'src/app/state/application/selectors/shared.selectors';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCoordinatePickerModal } from '../coordinate-picker/open-coordinate-picker-modal';
+import { ExerciseService } from '../../../../../core/exercise.service';
+import type { AppState } from '../../../../../state/app.state';
+import {
+    selectRestrictedViewport,
+    selectCurrentMainRole,
+} from '../../../../../state/application/selectors/shared.selectors';
+import { DisplayMessagesComponent } from '../../../../../feature/messages/display-messages/display-messages.component';
 import { OlMapManager } from './utility/ol-map-manager';
 import { PopupManager } from './utility/popup-manager';
 import { PopupService } from './utility/popup.service';
@@ -25,15 +28,24 @@ import { PopupService } from './utility/popup.service';
     selector: 'app-exercise-map',
     templateUrl: './exercise-map.component.html',
     styleUrls: ['./exercise-map.component.scss'],
-    standalone: false,
+    imports: [DisplayMessagesComponent, AsyncPipe],
 })
 export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
-    @ViewChild('openLayersContainer')
-    openLayersContainer!: ElementRef<HTMLDivElement>;
-    @ViewChild('popoverContainer')
-    popoverContainer!: ElementRef<HTMLDivElement>;
-    @ViewChild('popoverContent', { read: ViewContainerRef })
-    popoverContent!: ViewContainerRef;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    readonly dragElementService = inject(DragElementService);
+    readonly transferLinesService = inject(TransferLinesService);
+    private readonly popupService = inject(PopupService);
+    private readonly modalService = inject(NgbModal);
+
+    readonly openLayersContainer = viewChild.required<
+        ElementRef<HTMLDivElement>
+    >('openLayersContainer');
+    readonly popoverContainer =
+        viewChild.required<ElementRef<HTMLDivElement>>('popoverContainer');
+    readonly popoverContent = viewChild.required('popoverContent', {
+        read: ViewContainerRef,
+    });
 
     private readonly destroy$ = new Subject<void>();
     public olMapManager?: OlMapManager;
@@ -43,25 +55,16 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     );
     public readonly currentRole$ = this.store.select(selectCurrentMainRole);
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        public readonly dragElementService: DragElementService,
-        public readonly transferLinesService: TransferLinesService,
-        private readonly popupService: PopupService,
-        private readonly modalService: NgbModal
-    ) {}
-
     ngAfterViewInit(): void {
         this.popupManager = new PopupManager(
-            this.popoverContent,
-            this.popoverContainer.nativeElement,
+            this.popoverContent(),
+            this.popoverContainer().nativeElement,
             this.popupService
         );
         this.olMapManager = new OlMapManager(
             this.store,
             this.exerciseService,
-            this.openLayersContainer.nativeElement,
+            this.openLayersContainer().nativeElement,
             this.transferLinesService,
             this.popupManager,
             this.popupService
@@ -72,7 +75,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
         );
 
         // Check whether the map is fullscreen
-        this.openLayersContainer.nativeElement.addEventListener(
+        this.openLayersContainer().nativeElement.addEventListener(
             'fullscreenchange',
             (event) => {
                 this.fullscreenEnabled = document.fullscreenElement !== null;
@@ -83,7 +86,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     public fullscreenEnabled = false;
     public toggleFullscreen() {
         if (!this.fullscreenEnabled) {
-            this.openLayersContainer.nativeElement.requestFullscreen();
+            this.openLayersContainer().nativeElement.requestFullscreen();
         } else {
             document.exitFullscreen();
         }

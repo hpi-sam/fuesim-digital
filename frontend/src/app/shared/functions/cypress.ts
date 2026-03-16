@@ -1,6 +1,6 @@
 import type { Store } from '@ngrx/store';
-import { environment } from 'src/environments/environment';
 import { defaults } from 'lodash-es';
+import { environment } from '../../../environments/environment';
 
 export interface CypressTestingValues {
     store: Store;

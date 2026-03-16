@@ -2,25 +2,25 @@ import { produce } from 'immer';
 import type { PatientStatus, Position } from '../../../models/index.js';
 import {
     newVehiclePositionIn,
-    CanCaterFor,
     newMapPositionAt,
-    Personnel,
 } from '../../../models/index.js';
 import { ExerciseState } from '../../../state.js';
-import type { Mutable } from '../../../utils/index.js';
-import { cloneDeepMutable, uuid } from '../../../utils/index.js';
+import { uuid } from '../../../utils/index.js';
 import { addMaterial } from '../../../../tests/utils/materials.spec.js';
 import { addPatient } from '../../../../tests/utils/patients.spec.js';
 import { addPersonnel } from '../../../../tests/utils/personnel.spec.js';
 import { assertCatering } from '../../../../tests/utils/catering.spec.js';
 import { defaultPersonnelTemplates } from '../../../data/default-state/personnel-templates.js';
+import { newCanCaterFor } from '../../../models/utils/cater-for.js';
+import { newPersonnelFromTemplate } from '../../../models/personnel.js';
+import type { ParticipantKey } from '../../../exercise-keys.js';
 import { updateTreatments } from './calculate-treatments.js';
 
-const emptyState = ExerciseState.create('123456');
+const emptyState = ExerciseState.create('123456' as ParticipantKey);
 
 function createNotSan(position: Position) {
     const template = defaultPersonnelTemplates.notSan;
-    const notSan = Personnel.generatePersonnel(
+    return newPersonnelFromTemplate(
         {
             ...template,
             canCaterFor: {
@@ -34,7 +34,6 @@ function createNotSan(position: Position) {
         'RTW 3/83/1',
         position
     );
-    return notSan;
 }
 
 /**
@@ -43,7 +42,7 @@ function createNotSan(position: Position) {
  * @returns The state before and after calling `calculateTreatments`
  */
 function setupStateAndApplyTreatments(
-    mutateBeforeState?: (state: Mutable<ExerciseState>) => void
+    mutateBeforeState?: (state: WritableDraft<ExerciseState>) => void
 ) {
     const beforeState = produce(emptyState, (draftState) => {
         mutateBeforeState?.(draftState);
@@ -78,7 +77,10 @@ describe('calculate treatment', () => {
     it('does nothing when there is only personnel outside vehicle', () => {
         const { beforeState, newState } = setupStateAndApplyTreatments(
             (state) => {
-                addPersonnel(state, createNotSan(newVehiclePositionIn('')));
+                addPersonnel(
+                    state,
+                    createNotSan(newMapPositionAt({ x: 0, y: 0 }))
+                );
             }
         );
         expect(newState).toStrictEqual(beforeState);
@@ -87,7 +89,7 @@ describe('calculate treatment', () => {
     it('does nothing when there is only material in vehicle', () => {
         const { beforeState, newState } = setupStateAndApplyTreatments(
             (state) => {
-                addMaterial(state, newMapPositionAt({ x: 0, y: 0 }));
+                addMaterial(state, newVehiclePositionIn(''));
             }
         );
         expect(newState).toStrictEqual(beforeState);
@@ -263,7 +265,7 @@ describe('calculate treatment', () => {
         assertCatering(beforeState, newState, []);
     });
 
-    it('treats both patients when there is capacity', () => {
+    it('treats multiple patients when there is capacity', () => {
         const ids = {
             material: '',
             greenPatient: '',
@@ -287,9 +289,7 @@ describe('calculate treatment', () => {
                     state,
                     newMapPositionAt({ x: 0, y: 0 })
                 );
-                material.canCaterFor = cloneDeepMutable(
-                    CanCaterFor.create(1, 0, 1, 'and')
-                );
+                material.canCaterFor = newCanCaterFor(1, 0, 1, 'and');
                 ids.material = material.id;
             }
         );

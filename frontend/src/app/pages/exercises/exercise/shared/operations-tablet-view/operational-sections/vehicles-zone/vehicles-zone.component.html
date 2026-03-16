@@ -1,0 +1,10 @@
+<div
+    class="operationalSectionVehicles"
+    cdkDropList
+    cdkDropListOrientation="mixed"
+    (cdkDropListDropped)="vehicleDropped.emit($event.item.data)"
+>
+    @for (vehicle of vehicles(); track vehicle.id) {
+        <app-vehicle-tag [vehicle]="vehicle"></app-vehicle-tag>
+    }
+</div>

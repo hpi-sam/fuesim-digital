@@ -5,13 +5,9 @@
     display: block;
     height: vars.$vehicleTagHeight;
     width: vars.$vehicleTagWidth;
-    @extend .px-2;
-    @extend .py-1;
-    border-radius: vars.$borderRadius;
-    border: solid black;
-    @extend .border-3;
-    background-color: #ffffff;
     position: relative;
+    @extend .card;
+    overflow: hidden;
 }
 
 ::ng-deep {

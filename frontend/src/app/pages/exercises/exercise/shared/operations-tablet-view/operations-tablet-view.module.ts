@@ -21,14 +21,14 @@ import { SharedModule } from '../../../../../shared/shared.module';
 import { OperationsTabletViewComponent } from './operations-tablet-view.component';
 import { OperationalSectionContainerComponent } from './operational-sections/operational-section-container/operational-section-container.component';
 import { VehicleTagComponent } from './operational-sections/vehicle-tag/vehicle-tag.component';
-import { VehiclesOnLocationComponent } from './operational-sections/vehicles-on-location/vehicles-on-location.component';
 import { SectionLeaderSlotComponent } from './operational-sections/section-leader-slot/section-leader-slot.component';
-import { LocalSectionLeaderComponent } from './operational-sections/local-section-leader/local-section-leader.component';
+import { LocalOperationalLeaderComponent } from './operational-sections/local-operational-leader/local-operational-leader.component';
 import { OperationDetailsTabComponent } from './operation-details/operation-details.component';
 import { OperationalSectionsTabComponent } from './operational-sections/operational-sections.component';
 import { OperationsMapComponent } from './operation-details/operations-map/operations-map.component';
 import { OperationsVehiclesComponent } from './operation-details/operations-vehicles/operations-vehicles.component';
 import { OperationsVehicleItemComponent } from './operation-details/operations-vehicles/operations-vehicle-item/operations-vehicle-item.component';
+import { VehiclesZoneComponent } from './operational-sections/vehicles-zone/vehicles-zone.component';
 
 @NgModule({
     declarations: [
@@ -36,13 +36,13 @@ import { OperationsVehicleItemComponent } from './operation-details/operations-v
         OperationalSectionContainerComponent,
         OperationalSectionsTabComponent,
         VehicleTagComponent,
-        VehiclesOnLocationComponent,
         SectionLeaderSlotComponent,
-        LocalSectionLeaderComponent,
+        LocalOperationalLeaderComponent,
         OperationDetailsTabComponent,
         OperationsMapComponent,
         OperationsVehiclesComponent,
         OperationsVehicleItemComponent,
+        VehiclesZoneComponent,
     ],
     imports: [
         CommonModule,

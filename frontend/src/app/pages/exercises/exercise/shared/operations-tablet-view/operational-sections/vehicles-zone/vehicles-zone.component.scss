@@ -1,0 +1,23 @@
+@use 'bootstrap/scss/bootstrap' as bootstrap;
+@use './../_variables.scss' as vars;
+
+.operationalSectionVehicles {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    row-gap: vars.$vehicleTagGap;
+    column-gap: vars.$vehicleTagGap;
+    align-content: flex-start;
+
+    @extend .mt-4;
+
+    min-height: vars.$vehicleTagHeight + (2 * vars.$innerBoxPadding);
+    padding: vars.$innerBoxPadding;
+    height: 100%;
+    width: vars.$innerContainerWidth;
+
+    border-radius: vars.$borderRadius;
+
+    border: vars.$borderSize vars.$dashedBorderColor dashed;
+}

@@ -1,19 +1,17 @@
 @use './../_variables.scss' as vars;
 
-.localSectionLeaderContainer {
+.localOperationalLeaderContainer {
     padding: vars.$outerBoxPadding;
     display: flex;
     flex-direction: column;
 
     border-radius: vars.$borderRadius;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 }
 
 .label {
-    writing-mode: sideways-lr;
+    &:not(:first-child) {
+        margin-top: vars.$innerBoxPadding;
+    }
     font-size: 1.7rem;
     font-weight: bold;
     margin-bottom: vars.$outerBoxPadding;

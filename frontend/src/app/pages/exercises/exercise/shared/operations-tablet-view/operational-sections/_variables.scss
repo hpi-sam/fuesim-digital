@@ -1,6 +1,6 @@
 @use 'bootstrap/scss/bootstrap' as bootstrap;
 
-$vehicleTagHeight: 60px;
+$vehicleTagHeight: 100px;
 $vehicleTagWidth: 150px;
 
 $borderRadius: bootstrap.$border-radius-sm;
@@ -8,8 +8,11 @@ $borderRadius: bootstrap.$border-radius-sm;
 $outerBoxPadding: 8px;
 $innerBoxPadding: 12px;
 
+$tabContainerPadding: 12px;
+
 $vehicleTagGap: 8px;
-$borderSize: 2px;
+$borderSize: 1px;
+$dashedBorderColor: bootstrap.$gray-600;
 
 $innerContainerWidth: 2 * ($vehicleTagWidth + $innerBoxPadding + $borderSize) +
     $vehicleTagGap;

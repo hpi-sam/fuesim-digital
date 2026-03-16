@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { map, Observable } from 'rxjs';
 import { Vehicle } from 'digital-fuesim-manv-shared';
 import { AppState } from 'src/app/state/app.state';
@@ -63,8 +62,8 @@ export class OperationalSectionContainerComponent implements OnInit {
         );
     }
 
-    public onVehicleDropped(event: CdkDragDrop<string[]>) {
-        this.assignVehicle(event.item.data, false);
+    public onVehicleDropped(vehicleId: string) {
+        this.assignVehicle(vehicleId, false);
     }
 
     public assignVehicle(vehicleId: string, asSectionLeader: boolean) {

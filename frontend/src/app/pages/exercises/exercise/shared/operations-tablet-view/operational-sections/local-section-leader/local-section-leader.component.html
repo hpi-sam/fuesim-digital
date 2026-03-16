@@ -1,9 +1,0 @@
-<div class="localSectionLeaderContainer bg-white border h-100">
-    <div class="mt-2">
-        <app-section-leader-slot
-            [vehicle]="(localSectionLeader$ | async) ?? null"
-            (vehicleAssigned)="onVehicleAssigned($event)"
-        ></app-section-leader-slot>
-    </div>
-    <span class="label">Örtliche Einsatzleitung</span>
-</div>

@@ -26,14 +26,11 @@
             [vehicle]="(operationalSectionLeader$ | async) ?? null"
         ></app-section-leader-slot>
     </div>
-    <div
-        class="operationalSectionVehicles"
-        cdkDropList
-        cdkDropListOrientation="mixed"
-        (cdkDropListDropped)="onVehicleDropped($event)"
-    >
-        @for (vehicle of operationalSectionMembers$ | async; track vehicle.id) {
-            <app-vehicle-tag [vehicle]="vehicle"></app-vehicle-tag>
-        }
-    </div>
+    @let vehicles = operationalSectionMembers$ | async;
+    @if (vehicles !== null) {
+        <app-vehicles-zone
+            [vehicles]="vehicles"
+            (vehicleDropped)="onVehicleDropped($event)"
+        />
+    }
 </div>

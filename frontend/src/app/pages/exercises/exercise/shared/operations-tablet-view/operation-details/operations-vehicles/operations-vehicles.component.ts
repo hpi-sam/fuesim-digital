@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { map, zip } from 'rxjs';
+import { combineLatest, map } from 'rxjs';
 import { AppState } from 'src/app/state/app.state';
 import { selectVehiclesInTransfer } from 'src/app/state/application/selectors/exercise.selectors';
 import { selectVisibleVehicles } from 'src/app/state/application/selectors/shared.selectors';
@@ -30,10 +30,10 @@ export class OperationsVehiclesComponent {
             )
         );
 
-    public vehiclesOnLocation$ = zip(
+    public vehiclesOnLocation$ = combineLatest([
         this.visibleVehicles$,
-        this.vehiclesInBetweenTransferpoints$
-    ).pipe(
+        this.vehiclesInBetweenTransferpoints$,
+    ]).pipe(
         map(([visibleVehicles, vehiclesInBetweenTransferpoints]) => {
             const data = [
                 ...visibleVehicles,

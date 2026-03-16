@@ -1,23 +1,44 @@
 import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ExerciseService } from 'src/app/core/exercise.service';
+import { createSelector, Store } from '@ngrx/store';
 import { AppState } from 'src/app/state/app.state';
-import { selectVisibleVehicles } from 'src/app/state/application/selectors/shared.selectors';
-import { map, zip } from 'rxjs';
-import { selectVehiclesInTransfer } from '../../../../../../../state/application/selectors/exercise.selectors';
+import {
+    selectVehicles,
+    selectVehiclesInTransfer,
+} from 'src/app/state/application/selectors/exercise.selectors';
+import { ExerciseService } from 'src/app/core/exercise.service';
+import { combineLatest, map } from 'rxjs';
+import { selectVisibleVehicles } from '../../../../../../../state/application/selectors/shared.selectors';
 
 @Component({
-    selector: 'app-vehicles-on-location',
+    selector: 'app-local-operational-leader',
     standalone: false,
-    templateUrl: './vehicles-on-location.component.html',
-    styleUrl: './vehicles-on-location.component.scss',
+    templateUrl: './local-operational-leader.component.html',
+    styleUrl: './local-operational-leader.component.scss',
 })
-export class VehiclesOnLocationComponent {
+export class LocalOperationalLeaderComponent {
     constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
+        private readonly store: Store<AppState>,
+        private readonly exerciseService: ExerciseService
     ) {}
+
+    public localSectionLeader$ = this.store.select(
+        createSelector(selectVehicles, (vehicles) =>
+            Object.values(vehicles).find(
+                (v) =>
+                    v.operationalAssignment?.type === 'localOperationsCommand'
+            )
+        )
+    );
+
+    public onVehicleAssigned(vehicleId: string) {
+        this.exerciseService.proposeAction(
+            {
+                type: '[OperationalSection] Assign Local Operations Command',
+                vehicleId,
+            },
+            true
+        );
+    }
 
     private readonly visibleVehicles$ = this.store
         .select(selectVisibleVehicles)
@@ -35,10 +56,10 @@ export class VehiclesOnLocationComponent {
             )
         );
 
-    public vehicles$ = zip(
+    public vehicles$ = combineLatest([
         this.visibleVehicles$,
-        this.vehiclesInBetweenTransferpoints$
-    ).pipe(
+        this.vehiclesInBetweenTransferpoints$,
+    ]).pipe(
         map(([visibleVehicles, vehiclesInBetweenTransferpoints]) => {
             const data = [
                 ...visibleVehicles,
@@ -52,12 +73,12 @@ export class VehiclesOnLocationComponent {
         )
     );
 
-    public onVehicleDropped(event: CdkDragDrop<string[]>) {
+    public onVehicleDroppedUnassignment(vehicleId: string) {
         this.exerciseService.proposeAction(
             {
                 type: '[OperationalSection] Move Vehicle To Operational Section',
                 sectionId: null,
-                vehicleId: event.item.data,
+                vehicleId,
                 assignAsSectionLeader: false,
             },
             true

@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
-import { Hospital, catchAllHospitalId } from 'fuesim-digital-shared';
+import { catchAllHospitalId, newHospital } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../core/exercise.service';
@@ -28,7 +28,7 @@ export class HospitalEditorModalComponent {
     public addHospital() {
         this.exerciseService.proposeAction({
             type: '[Hospital] Add hospital',
-            hospital: Hospital.create('Krankenhaus-???', 60 * 60 * 1000),
+            hospital: newHospital('Krankenhaus-???', 60 * 60 * 1000),
         });
     }
 

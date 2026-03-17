@@ -1,44 +1,30 @@
-import { Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, ValidateNested } from 'class-validator';
-import { IsValue } from '../utils/validators/index.js';
-import { IsZodSchema } from '../utils/validators/is-zod-object.js';
-import { PatientTemplate } from './patient-template.js';
+import { z } from 'zod';
+import type { PatientTemplate } from './patient-template.js';
+import { patientTemplateSchema } from './patient-template.js';
 import type { ImageProperties } from './utils/index.js';
 import {
-    getCreate,
+    patientStatusCodeSchema,
     imagePropertiesSchema,
-    PatientStatusCode,
+    newPatientStatusCode,
 } from './utils/index.js';
 
-export class PatientCategory {
-    @IsValue('patientCategory' as const)
-    public readonly type = 'patientCategory';
+export const patientCategorySchema = z.strictObject({
+    type: z.literal('patientCategory'),
+    name: patientStatusCodeSchema,
+    image: imagePropertiesSchema,
+    patientTemplates: z.array(patientTemplateSchema).nonempty(),
+});
+export type PatientCategory = z.infer<typeof patientCategorySchema>;
 
-    @ValidateNested()
-    @Type(() => PatientStatusCode)
-    public readonly name: PatientStatusCode;
-
-    @IsZodSchema(imagePropertiesSchema)
-    public readonly image: ImageProperties;
-
-    @IsArray()
-    @ArrayNotEmpty()
-    @ValidateNested({ each: true })
-    @Type(() => PatientTemplate)
-    public readonly patientTemplates: readonly PatientTemplate[] = [];
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        name: string,
-        image: ImageProperties,
-        patientTemplates: PatientTemplate[]
-    ) {
-        this.name = PatientStatusCode.create(name);
-        this.image = image;
-        this.patientTemplates = patientTemplates;
-    }
-
-    static readonly create = getCreate(this);
+export function newPatientCategory(
+    name: string,
+    image: ImageProperties,
+    patientTemplates: PatientTemplate[]
+): PatientCategory {
+    return {
+        type: 'patientCategory',
+        name: newPatientStatusCode(name),
+        image,
+        patientTemplates,
+    };
 }

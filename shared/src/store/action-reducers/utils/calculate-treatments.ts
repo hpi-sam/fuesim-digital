@@ -16,7 +16,8 @@ import { maxTreatmentRange } from '../../../state-helpers/max-treatment-range.js
 import type { UUID } from '../../../utils/index.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import type { Material } from '../../../models/material.js';
-import { Patient } from '../../../models/patient.js';
+import type { Patient } from '../../../models/patient.js';
+import { getPatientVisibleStatus } from '../../../models/patient.js';
 import { getElement } from './get-element.js';
 
 // TODO: `caterFor` and `treat` are currently used as synonyms without a clear distinction.
@@ -84,7 +85,7 @@ export function tryToCaterFor(
     bluePatientsEnabled: boolean
 ) {
     const status = getCateringStatus(
-        Patient.getVisibleStatus(patient, pretriageEnabled, bluePatientsEnabled)
+        getPatientVisibleStatus(patient, pretriageEnabled, bluePatientsEnabled)
     );
 
     if (!couldCaterFor(status, cateringElement, catersFor)) {
@@ -293,7 +294,7 @@ function updateCatering(
 
     const patientsPerStatus = groupBy(patientsInTreatmentRange, (patient) =>
         getCateringStatus(
-            Patient.getVisibleStatus(
+            getPatientVisibleStatus(
                 patient,
                 state.configuration.pretriageEnabled,
                 state.configuration.bluePatientsEnabled

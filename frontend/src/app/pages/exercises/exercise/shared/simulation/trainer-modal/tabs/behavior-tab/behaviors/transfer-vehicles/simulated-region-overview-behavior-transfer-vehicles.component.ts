@@ -16,6 +16,7 @@ import {
     isInSpecificVehicle,
     isInSpecificSimulatedRegion,
     Patient,
+    getPatientVisibleStatus,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';
@@ -489,7 +490,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
                             )
                         )
                         .map((patient) => ({
-                            visibleStatus: Patient.getVisibleStatus(
+                            visibleStatus: getPatientVisibleStatus(
                                 patient,
                                 configuration.pretriageEnabled,
                                 configuration.bluePatientsEnabled

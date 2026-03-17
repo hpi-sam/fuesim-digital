@@ -1,7 +1,10 @@
 import type { Store } from '@ngrx/store';
 // eslint-disable-next-line @typescript-eslint/no-shadow
-import type { UUID, Element } from 'fuesim-digital-shared';
-import { TransferPoint, newTransferStartPoint } from 'fuesim-digital-shared';
+import type { UUID, Element, TransferPoint } from 'fuesim-digital-shared';
+import {
+    newTransferStartPoint,
+    transferPointImage,
+} from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
 import type { TranslateEvent } from 'ol/interaction/Translate';
@@ -71,11 +74,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
     }
 
     private readonly imageStyleHelper = new ImageStyleHelper(
-        (feature: Feature) => ({
-            url: TransferPoint.image.url,
-            height: TransferPoint.image.height,
-            aspectRatio: TransferPoint.image.aspectRatio,
-        })
+        (feature: Feature) => transferPointImage
     );
     private readonly nameStyleHelper = new NameStyleHelper(
         (feature: Feature) => ({

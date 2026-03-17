@@ -1,28 +1,23 @@
-import { Type } from 'class-transformer';
-import {
-    IsNumber,
-    IsString,
-    IsUUID,
-    Min,
-    ValidateIf,
-    ValidateNested,
-} from 'class-validator';
+import { IsNumber, IsString, IsUUID, Min, ValidateIf } from 'class-validator';
 import { WritableDraft } from 'immer';
-import { AlarmGroup } from '../../models/alarm-group.js';
-import { AlarmGroupVehicle } from '../../models/utils/alarm-group-vehicle.js';
+import { type AlarmGroup, alarmGroupSchema } from '../../models/alarm-group.js';
+import {
+    type AlarmGroupVehicle,
+    alarmGroupVehicleSchema,
+} from '../../models/utils/alarm-group-vehicle.js';
 import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { getElement } from './utils/get-element.js';
 
 export class AddAlarmGroupAction implements Action {
     @IsValue('[AlarmGroup] Add AlarmGroup' as const)
     public readonly type = '[AlarmGroup] Add AlarmGroup';
 
-    @ValidateNested()
-    @Type(() => AlarmGroup)
+    @IsZodSchema(alarmGroupSchema)
     public readonly alarmGroup!: AlarmGroup;
 }
 
@@ -64,8 +59,7 @@ export class AddAlarmGroupVehicleAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly alarmGroupId!: UUID;
 
-    @ValidateNested()
-    @Type(() => AlarmGroupVehicle)
+    @IsZodSchema(alarmGroupVehicleSchema)
     public readonly alarmGroupVehicle!: AlarmGroupVehicle;
 }
 export class EditAlarmGroupVehicleAction implements Action {

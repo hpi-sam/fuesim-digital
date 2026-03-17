@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { uuidSchema } from './utils/index.js';
 
-export const exerciseIdSchema = z.uuidv4().brand<'ExerciseId'>();
+export const exerciseIdSchema = uuidSchema.brand<'ExerciseId'>();
 export type ExerciseId = z.infer<typeof exerciseIdSchema>;
 
 export const exerciseTemplateIdSchema = z
@@ -8,5 +9,5 @@ export const exerciseTemplateIdSchema = z
     .brand<'ExerciseTemplateId'>();
 export type ExerciseTemplateId = z.infer<typeof exerciseTemplateIdSchema>;
 
-export const actionIdSchema = z.uuidv4().brand<'ActionId'>();
+export const actionIdSchema = uuidSchema.brand<'ActionId'>();
 export type ActionId = z.infer<typeof actionIdSchema>;

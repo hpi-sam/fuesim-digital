@@ -1,8 +1,11 @@
 import { IsNumber, IsUUID, Min } from 'class-validator';
-import type { HealthPoints } from '../../../models/utils/health-points.js';
-import { IsValidHealthPoint } from '../../../models/utils/health-points.js';
+import {
+    type HealthPoints,
+    healthPointsSchema,
+} from '../../../models/utils/health-points.js';
 import type { UUID } from '../../../utils/index.js';
 import { uuidValidationOptions } from '../../../utils/uuid.js';
+import { IsZodSchema } from '../../../utils/validators/is-zod-object.js';
 
 export class PatientUpdate {
     /**
@@ -14,7 +17,7 @@ export class PatientUpdate {
     /**
      * The new {@link HealthPoints} the patient should have
      */
-    @IsValidHealthPoint()
+    @IsZodSchema(healthPointsSchema)
     public readonly nextHealthPoints: HealthPoints;
 
     /**

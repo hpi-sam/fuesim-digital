@@ -2,7 +2,7 @@ import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
-import { TransferPoint } from 'fuesim-digital-shared';
+import { getTransferPointFullName } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -85,7 +85,7 @@ export class SignallerModalTransferConnectionsEditorComponent
                     )
                     .map(([id, transferPoint]) => ({
                         key: id,
-                        name: TransferPoint.getFullName(transferPoint),
+                        name: getTransferPointFullName(transferPoint),
                     }));
             })
         );
@@ -97,7 +97,7 @@ export class SignallerModalTransferConnectionsEditorComponent
             map(([transferPoint, transferPoints]) =>
                 Object.entries(transferPoint.reachableTransferPoints)
                     .map(([key, value]) =>
-                        TransferPoint.getFullName(transferPoints[key]!)
+                        getTransferPointFullName(transferPoints[key]!)
                     )
                     .sort((a, b) => a.localeCompare(b))
             )

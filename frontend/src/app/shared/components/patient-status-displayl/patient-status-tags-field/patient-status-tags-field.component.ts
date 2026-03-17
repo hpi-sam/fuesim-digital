@@ -1,6 +1,6 @@
 import type { OnChanges } from '@angular/core';
+import { PatientTag } from 'fuesim-digital-shared';
 import { Component, input } from '@angular/core';
-import type { Tags } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-patient-status-tags-field',
@@ -8,7 +8,7 @@ import type { Tags } from 'fuesim-digital-shared';
     styleUrls: ['./patient-status-tags-field.component.scss'],
 })
 export class PatientStatusTagsFieldComponent implements OnChanges {
-    readonly patientStatusTagsField = input.required<Tags>();
+    readonly patientStatusTagsField = input.required<PatientTag[]>();
     isPregnant!: boolean;
 
     ngOnChanges(): void {

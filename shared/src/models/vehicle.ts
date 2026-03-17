@@ -1,7 +1,7 @@
 import type { Immutable } from 'immer';
 import * as z from 'zod';
 import type { UUID, UUIDSet } from '../utils/index.js';
-import { uuid, uuidSetSchema } from '../utils/index.js';
+import { uuidSchema, uuid, uuidSetSchema } from '../utils/index.js';
 import {
     exerciseOccupationSchema,
     imagePropertiesSchema,
@@ -14,11 +14,11 @@ import type {
 } from './utils/index.js';
 
 export const vehicleSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('vehicle'),
     vehicleType: z.string(),
     name: z.string(),
-    templateId: z.uuidv4(),
+    templateId: uuidSchema,
     materialIds: uuidSetSchema,
     patientCapacity: z.int().nonnegative(),
     position: positionSchema,

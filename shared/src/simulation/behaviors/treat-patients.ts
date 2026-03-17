@@ -28,8 +28,8 @@ import { TreatmentsTimerEvent } from '../events/treatments-timer-event.js';
 import { nextUUID } from '../utils/randomness.js';
 import type { TreatmentProgress } from '../utils/treatment.js';
 import { treatmentProgressAllowedValues } from '../utils/treatment.js';
-import { Patient } from '../../models/patient.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { getPatientVisibleStatus } from '../../models/patient.js';
 import type {
     SimulationBehavior,
     SimulationBehaviorState,
@@ -234,7 +234,7 @@ export const treatPatientsBehavior: SimulationBehavior<TreatPatientsBehaviorStat
                             const groupedPatients = groupBy(
                                 patients,
                                 (patient) =>
-                                    Patient.getVisibleStatus(
+                                    getPatientVisibleStatus(
                                         patient,
                                         draftState.configuration
                                             .pretriageEnabled,

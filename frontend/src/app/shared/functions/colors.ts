@@ -17,7 +17,7 @@ export const rgbColorPalette = {
     grey: 'rgb(173, 181, 189)',
     black: 'rgb(33, 37, 41)',
     white: 'rgb(248, 249, 250)',
-};
+} as const;
 
 /**
  * @param color

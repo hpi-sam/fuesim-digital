@@ -1,9 +1,10 @@
 import * as z from 'zod';
 import type { UUID } from '../../../index.js';
+import { uuidSchema } from '../../../index.js';
 
 export const vehiclePositionSchema = z.strictObject({
     type: z.literal('vehicle'),
-    vehicleId: z.uuidv4(),
+    vehicleId: uuidSchema,
 });
 
 export type VehiclePosition = z.infer<typeof vehiclePositionSchema>;

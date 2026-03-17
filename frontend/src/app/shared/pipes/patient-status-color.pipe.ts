@@ -12,9 +12,7 @@ const colorCodeMap = {
 
 @Pipe({ name: 'patientStatusColor' })
 export class PatientStatusColorPipe implements PipeTransform {
-    transform<AllowedCode extends ColorCode>(
-        value: AllowedCode
-    ): (typeof colorCodeMap)[AllowedCode] {
+    transform(value: ColorCode) {
         return colorCodeMap[value];
     }
 }

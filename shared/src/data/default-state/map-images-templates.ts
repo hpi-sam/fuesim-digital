@@ -1,15 +1,20 @@
-import { MapImageTemplate, newImageProperties } from '../../models/index.js';
+import type { MapImageTemplate } from '../../models/index.js';
+import { newImageProperties } from '../../models/index.js';
 import type { UUID } from '../../utils/index.js';
 
-const fireMapImageTemplate = MapImageTemplate.create(
-    'Feuer',
-    newImageProperties('/assets/fire.svg', 427, 313 / 427)
-);
+const fireMapImageTemplate: MapImageTemplate = {
+    id: '47df49cf-3769-43c8-bfb2-87c6d3a43baa',
+    type: 'mapImageTemplate',
+    name: 'Feuer',
+    image: newImageProperties('/assets/fire.svg', 427, 313 / 427),
+};
 
-const houseFireMapImageTemplate = MapImageTemplate.create(
-    'Brennendes Haus',
-    newImageProperties('/assets/house-fire.svg', 623, 393 / 623)
-);
+const houseFireMapImageTemplate: MapImageTemplate = {
+    id: 'c8847e93-3462-4d94-82af-2b0d7e82ae46',
+    type: 'mapImageTemplate',
+    name: 'Brennendes Haus',
+    image: newImageProperties('/assets/house-fire.svg', 623, 393 / 623),
+};
 
 export const defaultMapImagesTemplates: readonly MapImageTemplate[] = [
     fireMapImageTemplate,

@@ -25,7 +25,6 @@ import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import { TransferPoint } from '../../models/index.js';
 import {
     PersonnelAvailableEvent,
     VehicleArrivedEvent,
@@ -33,6 +32,7 @@ import {
 import { imageSizeToPosition } from '../../state-helpers/index.js';
 import type { Vehicle } from '../../models/vehicle.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { transferPointImage } from '../../models/transfer-point.js';
 import { getElement } from './utils/index.js';
 import {
     logElementAddedToTransfer,
@@ -70,7 +70,7 @@ export function letElementArrive(
     if (isPositionOnMap(newPosition)) {
         offsetMapPositionBy(newPosition as WritableDraft<MapPosition>, {
             x: 0,
-            y: imageSizeToPosition(TransferPoint.image.height / 3),
+            y: imageSizeToPosition(transferPointImage.height / 3),
         });
     }
     if (isPositionInSimulatedRegion(newPosition)) {

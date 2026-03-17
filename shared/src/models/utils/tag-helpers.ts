@@ -15,7 +15,7 @@ import {
     getExerciseRadiogramById,
 } from '../../store/action-reducers/utils/get-element.js';
 import type { UUID } from '../../utils/index.js';
-import { Patient } from '../patient.js';
+import { getPatientVisibleStatus } from '../patient.js';
 import { radiogramTypeToGermanDictionary } from '../radiogram/exercise-radiogram.js';
 import type { ExerciseRadiogramStatus } from '../radiogram/status/exercise-radiogram-status.js';
 import { radiogramStatusTypeToGermanDictionary } from '../radiogram/status/exercise-radiogram-status.js';
@@ -62,7 +62,7 @@ export function createTagsForSinglePatient(
     return [
         createPatientStatusTag(
             draftState,
-            Patient.getVisibleStatus(
+            getPatientVisibleStatus(
                 patient,
                 draftState.configuration.pretriageEnabled,
                 draftState.configuration.bluePatientsEnabled

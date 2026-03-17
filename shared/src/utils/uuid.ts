@@ -1,5 +1,6 @@
 import type { ValidationArguments, ValidationOptions } from 'class-validator';
 import { v4 } from 'uuid';
+import { z } from 'zod';
 
 /**
  * Generates a v4 uuid
@@ -23,3 +24,4 @@ export const uuidArrayValidationOptions: ValidationOptions = {
     ...uuidValidationOptions,
     each: true,
 };
+export const uuidSchema = z.uuidv4();

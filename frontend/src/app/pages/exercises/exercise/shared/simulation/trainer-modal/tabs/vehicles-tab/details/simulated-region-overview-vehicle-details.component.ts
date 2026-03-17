@@ -3,7 +3,7 @@ import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Personnel, Vehicle } from 'fuesim-digital-shared';
 import {
-    Patient,
+    getPatientVisibleStatus,
     isInSpecificVehicle,
     SimulatedRegion,
 } from 'fuesim-digital-shared';
@@ -79,7 +79,7 @@ export class SimulatedRegionOverviewVehicleDetailsComponent implements OnInit {
                     .map((id) => patients[id]!)
                     .map((patient) => ({
                         ...patient,
-                        visibleStatus: Patient.getVisibleStatus(
+                        visibleStatus: getPatientVisibleStatus(
                             patient,
                             configuration.pretriageEnabled,
                             configuration.bluePatientsEnabled

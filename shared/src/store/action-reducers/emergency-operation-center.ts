@@ -10,21 +10,17 @@ import {
 import { z } from 'zod';
 import { WritableDraft } from 'immer';
 import {
-    EocLogEntry,
     newAlarmGroupStartPoint,
     VehicleParameters,
     vehicleParametersSchema,
 } from '../../models/index.js';
 import type { UUID } from '../../utils/index.js';
-import {
-    StrictObject,
-    cloneDeepMutable,
-    uuidValidationOptions,
-} from '../../utils/index.js';
+import { StrictObject, uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { newEocLogEntry } from '../../models/eoc-log-entry.js';
 import { getElement } from './utils/index.js';
 import { VehicleActionReducers } from './vehicle.js';
 import { TransferActionReducers } from './transfer.js';
@@ -73,13 +69,13 @@ export namespace EmergencyOperationCenterActionReducers {
     export const addLogEntry: ActionReducer<AddLogEntryAction> = {
         action: AddLogEntryAction,
         reducer: (draftState, { name, message, isPrivate }) => {
-            const logEntry = EocLogEntry.create(
+            const logEntry = newEocLogEntry(
                 draftState.currentTime,
                 message,
                 name,
                 isPrivate
             );
-            draftState.eocLog.push(cloneDeepMutable(logEntry));
+            draftState.eocLog.push(logEntry);
             return draftState;
         },
         rights: (client, action) => {

@@ -5,7 +5,7 @@ export * from './patient.js';
 export * from './personnel.js';
 export * from './vehicle.js';
 export * from './viewport.js';
-export * from './map-images.js';
+export * from './map-image.js';
 export * from './action-reducers.js';
 export * from './vehicle-templates.js';
 export * from './restricted-zone.js';

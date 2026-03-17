@@ -5,9 +5,9 @@ import {
     newNoOccupation,
     newSimulatedRegionPositionIn,
     newSize,
+    newTransferPoint,
     SimulatedRegion,
     SimulatedRegionRequestTargetConfiguration,
-    TransferPoint,
     VehicleResource,
 } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
@@ -88,10 +88,8 @@ function setupStateAndInteract(
         newSize(10, 10),
         'test region'
     );
-    const transferPoint = TransferPoint.create(
+    const transferPoint = newTransferPoint(
         newSimulatedRegionPositionIn(simulatedRegion.id),
-        {},
-        {},
         '',
         `[Simuliert] test region`
     );
@@ -183,10 +181,8 @@ const updateRequestTarget = (
             'requestable region'
         )
     );
-    const transferPoint = TransferPoint.create(
+    const transferPoint = newTransferPoint(
         newSimulatedRegionPositionIn(otherSimulatedRegion.id),
-        {},
-        {},
         '',
         `[Simuliert] requestable region`
     );

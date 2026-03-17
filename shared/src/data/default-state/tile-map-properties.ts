@@ -1,4 +1,4 @@
-import type { TileMapProperties } from '../../models/utils/index.js';
+import type { TileMapProperties } from '../../models/index.js';
 
 export const defaultTileMapProperties: TileMapProperties = {
     tileUrl:

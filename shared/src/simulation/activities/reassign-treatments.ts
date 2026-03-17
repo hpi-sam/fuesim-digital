@@ -23,7 +23,11 @@ import { StrictObject } from '../../utils/strict-object.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import type { Material } from '../../models/material.js';
 import type { Personnel } from '../../models/personnel.js';
-import { Patient } from '../../models/patient.js';
+import {
+    getPatientVisibleStatus,
+    Patient,
+    isPretriageStatusLocked,
+} from '../../models/patient.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import {
     addResourceDescription,
@@ -437,7 +441,7 @@ function triage(
     const triagePersonnelSubstitution: PersonnelSubstitution[] = [];
 
     patients.forEach((patient) => {
-        if (Patient.pretriageStatusIsLocked(patient)) {
+        if (isPretriageStatusLocked(patient)) {
             patientsToTreat.push(patient);
             return;
         }
@@ -585,9 +589,7 @@ function sumOfTreatments(cateringPersonnel: CateringPersonnel): number {
  * Determines if {@link patients} contains no patient that is not triaged.
  */
 function allPatientsTriaged(patients: Patient[]): boolean {
-    return patients.every((patient) =>
-        Patient.pretriageStatusIsLocked(patient)
-    );
+    return patients.every(isPretriageStatusLocked);
 }
 
 /**
@@ -669,7 +671,7 @@ function assignTreatments(
     materials: WritableDraft<Material>[]
 ): [boolean, ResourceDescription] {
     const groupedPatients = groupBy(patients, (patient) =>
-        Patient.getVisibleStatus(
+        getPatientVisibleStatus(
             patient,
             draftState.configuration.pretriageEnabled,
             draftState.configuration.bluePatientsEnabled

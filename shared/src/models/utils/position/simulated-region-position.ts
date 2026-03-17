@@ -1,12 +1,13 @@
 import * as z from 'zod';
 import type { UUID } from '../../../utils/index.js';
+import { uuidSchema } from '../../../utils/index.js';
 
 export const simulatedRegionPositionSchema = z.strictObject({
     type: z.literal('simulatedRegion'),
     /**
      * @deprecated Use {@link isInSimulatedRegion } instead
      */
-    simulatedRegionId: z.uuidv4(),
+    simulatedRegionId: uuidSchema,
 });
 
 export type SimulatedRegionPosition = z.infer<

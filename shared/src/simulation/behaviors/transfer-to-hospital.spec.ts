@@ -1,6 +1,8 @@
+import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
 import type { Patient } from '../../models/index.js';
 import {
+    newTransferPoint,
     newPatientTransferOccupation,
     newImageProperties,
     newWaitForTransferOccupation,
@@ -11,7 +13,6 @@ import {
     newMapCoordinatesAt,
     SimulatedRegion,
     newSimulatedRegionPositionIn,
-    TransferPoint,
     newSize,
 } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
@@ -44,10 +45,8 @@ function setupStateAndInteract(
         newSize(10, 10),
         'test region'
     );
-    const transferPoint = TransferPoint.create(
+    const transferPoint = newTransferPoint(
         newSimulatedRegionPositionIn(simulatedRegion.id),
-        {},
-        {},
         '',
         `[Simuliert] test region`
     );

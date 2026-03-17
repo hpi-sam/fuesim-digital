@@ -1,16 +1,19 @@
-import { getCreate } from '../../models/utils/get-create.js';
-import type { PatientStatus } from '../../models/utils/patient-status.js';
-import { patientStatusAllowedValues } from '../../models/utils/patient-status.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { z } from 'zod';
+import {
+    getCreate,
+    type PatientStatus,
+    patientStatusSchema,
+    type ResourceDescription,
+} from '../../models/index.js';
 import { IsValue } from '../../utils/validators/index.js';
-import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type { SimulationEvent } from './simulation-event.js';
 
 export class PatientsCountedEvent implements SimulationEvent {
     @IsValue('patientsCountedEvent')
     readonly type = 'patientsCountedEvent';
 
-    @IsResourceDescription(patientStatusAllowedValues)
+    @IsZodSchema(z.record(patientStatusSchema, z.number()))
     readonly patientCount: ResourceDescription<PatientStatus>;
 
     /**

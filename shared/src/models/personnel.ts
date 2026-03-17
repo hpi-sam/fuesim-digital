@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import type { UUID } from '../utils/index.js';
-import { uuidSetSchema, uuid } from '../utils/index.js';
+import { uuidSchema, uuidSetSchema, uuid } from '../utils/index.js';
 import type { PersonnelTemplate } from './personnel-template.js';
 import {
     imagePropertiesSchema,
@@ -11,15 +11,15 @@ import {
 import { canCaterForSchema } from './utils/cater-for.js';
 
 export const personnelSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('personnel'),
-    vehicleId: z.uuidv4(),
+    vehicleId: uuidSchema,
     vehicleName: z.string(),
     /**
      * @deprecated This will be refactored into a capability-based system. Please already consider using {@link templateId} if you only need an opaque identifier of the type and you don't assert any properties of the personnel.
      */
     personnelType: z.string(),
-    templateId: z.uuidv4(),
+    templateId: uuidSchema,
     typeName: z.string(),
     typeAbbreviation: z.string(),
     assignedPatientIds: uuidSetSchema,

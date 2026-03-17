@@ -1,21 +1,22 @@
 import { IsUUID } from 'class-validator';
 import { difference, groupBy } from 'lodash-es';
 import { WritableDraft } from 'immer';
+import { z } from 'zod';
 import { IsValue } from '../../utils/validators/is-value.js';
 import type { UUID, UUIDSet } from '../../utils/index.js';
 import {
-    StrictObject,
     stringCompare,
     uuid,
     uuidValidationOptions,
 } from '../../utils/index.js';
-import type { PatientStatus } from '../../models/utils/index.js';
 import {
+    PatientStatus,
+    patientStatusSchema,
     getCreate,
     isInSpecificSimulatedRegion,
     patientStatusAllowedValues,
-} from '../../models/utils/index.js';
-import { Patient } from '../../models/patient.js';
+} from '../../models/index.js';
+import { getPatientVisibleStatus, Patient } from '../../models/patient.js';
 import type { ExerciseState } from '../../state.js';
 import { addActivity } from '../activities/utils.js';
 import { DelayEventActivityState } from '../activities/index.js';
@@ -27,10 +28,10 @@ import {
 } from '../../store/action-reducers/utils/index.js';
 import { IsUUIDSet } from '../../utils/validators/index.js';
 import { TransferPatientToHospitalActivityState } from '../activities/transfer-patient-to-hospital.js';
-import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import type { TransferCountsRadiogram } from '../../models/radiogram/index.js';
 import { logLastPatientTransportedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type {
     SimulationBehavior,
     SimulationBehaviorState,
@@ -48,7 +49,7 @@ export class TransferToHospitalBehaviorState
     @IsUUIDSet()
     public readonly patientIdsSelectedForTransfer: UUIDSet = {};
 
-    @IsResourceDescription(patientStatusAllowedValues)
+    @IsZodSchema(z.record(patientStatusSchema, z.number()))
     public readonly transferredPatientsCount: ResourceDescription<PatientStatus> =
         {
             red: 0,
@@ -159,38 +160,36 @@ export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBe
                             getVisiblePatientStatus(patient, draftState)
                     );
 
-                    StrictObject.keys(patientStatusAllowedValues).forEach(
-                        (status) => {
-                            // If patients of this triage category just have been in this region
-                            if ((groupedPatients[status]?.length ?? 0) > 0) {
-                                // But there are no patients of this status right now
-                                if (
-                                    (groupedRemainingPatients[status]?.length ??
-                                        0) === 0
-                                ) {
-                                    // Then we want to report that we have finished this triage category
-                                    // Note:
-                                    // These conditions can be true for multiple times in one exercise if patient statuses change or new patients are added
-                                    addActivity(
-                                        simulatedRegion,
-                                        DelayEventActivityState.create(
-                                            nextUUID(draftState),
-                                            PatientCategoryTransferToHospitalFinishedEvent.create(
-                                                status,
-                                                true
-                                            ),
-                                            draftState.currentTime
-                                        )
-                                    );
-                                    logLastPatientTransportedInSimulatedRegion(
-                                        draftState,
-                                        status,
-                                        simulatedRegion.id
-                                    );
-                                }
+                    patientStatusAllowedValues.forEach((status) => {
+                        // If patients of this triage category just have been in this region
+                        if ((groupedPatients[status]?.length ?? 0) > 0) {
+                            // But there are no patients of this status right now
+                            if (
+                                (groupedRemainingPatients[status]?.length ??
+                                    0) === 0
+                            ) {
+                                // Then we want to report that we have finished this triage category
+                                // Note:
+                                // These conditions can be true for multiple times in one exercise if patient statuses change or new patients are added
+                                addActivity(
+                                    simulatedRegion,
+                                    DelayEventActivityState.create(
+                                        nextUUID(draftState),
+                                        PatientCategoryTransferToHospitalFinishedEvent.create(
+                                            status,
+                                            true
+                                        ),
+                                        draftState.currentTime
+                                    )
+                                );
+                                logLastPatientTransportedInSimulatedRegion(
+                                    draftState,
+                                    status,
+                                    simulatedRegion.id
+                                );
                             }
                         }
-                    );
+                    });
 
                     selectedPatients.forEach((patient) => {
                         behaviorState.transferredPatientsCount[
@@ -257,7 +256,7 @@ function getOwnPatients(
 }
 
 function getVisiblePatientStatus(patient: Patient, state: ExerciseState) {
-    return Patient.getVisibleStatus(
+    return getPatientVisibleStatus(
         patient,
         state.configuration.pretriageEnabled,
         state.configuration.bluePatientsEnabled

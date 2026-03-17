@@ -1,9 +1,6 @@
-import type { AllowedValues } from '../../utils/validators/index.js';
+import { z } from 'zod';
 
-export type Sex = 'diverse' | 'female' | 'male';
+export const sexAllowedValues = ['diverse', 'female', 'male'] as const;
 
-export const sexAllowedValues: AllowedValues<Sex> = {
-    diverse: true,
-    female: true,
-    male: true,
-};
+export const sexSchema = z.literal(sexAllowedValues);
+export type Sex = z.infer<typeof sexSchema>;

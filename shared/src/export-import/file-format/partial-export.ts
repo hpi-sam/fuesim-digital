@@ -1,30 +1,27 @@
-import { Type } from 'class-transformer';
-import { IsArray, IsOptional, ValidateNested } from 'class-validator';
 import { z } from 'zod';
-import { MapImageTemplate, VehicleTemplate } from '../../models/index.js';
+import {
+    MapImageTemplate,
+    mapImageTemplateSchema,
+    patientCategorySchema,
+    VehicleTemplate,
+    PatientCategory,
+    vehicleTemplateSchema,
+} from '../../models/index.js';
 import { IsValue } from '../../utils/validators/index.js';
-import { PatientCategory } from '../../models/patient-category.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
 import { BaseExportImportFile } from './base-file.js';
 
 export class PartialExport extends BaseExportImportFile {
     @IsValue('partial' as const)
     public readonly type: 'partial' = 'partial';
 
-    @IsOptional()
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => PatientCategory)
+    @IsZodSchema(z.array(patientCategorySchema).optional())
     public readonly patientCategories?: PatientCategory[];
 
     @IsZodSchema(z.array(vehicleTemplateSchema).optional())
     public readonly vehicleTemplates?: VehicleTemplate[];
 
-    @IsOptional()
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => MapImageTemplate)
+    @IsZodSchema(z.array(mapImageTemplateSchema).optional())
     public readonly mapImageTemplates?: MapImageTemplate[];
 
     public constructor(

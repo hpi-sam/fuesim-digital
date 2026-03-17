@@ -24,7 +24,7 @@ import { treatmentProgressToGermanNameDictionary } from '../../../simulation/uti
 import type { ExerciseState } from '../../../state.js';
 import type { UUID } from '../../../utils/index.js';
 import { formatDuration, StrictObject } from '../../../utils/index.js';
-import { Patient } from '../../../models/patient.js';
+import { getPatientVisibleStatus } from '../../../models/patient.js';
 import type {
     PatientStatus,
     Personnel,
@@ -127,7 +127,7 @@ export function logPatientVisibleStatusChanged(
 
     const patient = getElement(state, 'patient', patientId);
 
-    const visibleStatus = Patient.getVisibleStatus(
+    const visibleStatus = getPatientVisibleStatus(
         patient,
         state.configuration.pretriageEnabled,
         state.configuration.bluePatientsEnabled

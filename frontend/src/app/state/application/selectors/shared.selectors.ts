@@ -10,8 +10,13 @@ import type {
     Vehicle,
     WithPosition,
     RestrictedZone,
+    Viewport,
 } from 'fuesim-digital-shared';
-import { currentCoordinatesOf, isOnMap, Viewport } from 'fuesim-digital-shared';
+import {
+    currentCoordinatesOf,
+    isInViewport,
+    isOnMap,
+} from 'fuesim-digital-shared';
 import { pickBy } from 'lodash-es';
 import type { AppState } from '../../app.state';
 import type { CateringLine } from '../../../shared/types/catering-line';
@@ -71,10 +76,10 @@ function selectVisibleElementsFactory<
     },
 >(
     selectElements: (state: AppState) => Elements,
-    isInViewport: (element: Element, viewport: Viewport) => boolean = (
+    isInViewportHelper: (element: Element, viewport: Viewport) => boolean = (
         element,
         viewport
-    ) => Viewport.isInViewport(viewport, currentCoordinatesOf(element))
+    ) => isInViewport(viewport, currentCoordinatesOf(element))
 ) {
     return createSelector(
         selectRestrictedViewport,
@@ -87,7 +92,7 @@ function selectVisibleElementsFactory<
                     isOnMap(element) &&
                     // No viewport restriction
                     (!restrictedViewport ||
-                        isInViewport(element, restrictedViewport))
+                        isInViewportHelper(element, restrictedViewport))
             )
     );
 }
@@ -147,8 +152,8 @@ export const selectVisibleCateringLines = createSelector(
             .filter(
                 ({ catererPosition, patientPosition }) =>
                     !viewport ||
-                    Viewport.isInViewport(viewport, catererPosition) ||
-                    Viewport.isInViewport(viewport, patientPosition)
+                    isInViewport(viewport, catererPosition) ||
+                    isInViewport(viewport, patientPosition)
             )
             .reduce<{ [id: `${UUID}:${UUID}`]: CateringLine }>(
                 (cateringLinesObject, cateringLine) => {

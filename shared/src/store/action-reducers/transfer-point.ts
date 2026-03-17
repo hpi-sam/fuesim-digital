@@ -1,15 +1,8 @@
-import { Type } from 'class-transformer';
-import {
-    IsNumber,
-    IsOptional,
-    IsString,
-    IsUUID,
-    ValidateNested,
-} from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 import {
     mapCoordinatesSchema,
     newMapPositionAt,
-    TransferPoint,
+    type TransferPoint,
     currentTransferOf,
     isInTransfer,
     type MapCoordinates,
@@ -22,6 +15,7 @@ import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { transferPointSchema } from '../../models/transfer-point.js';
 import { letElementArrive } from './transfer.js';
 import { calculateDistance, getElement } from './utils/index.js';
 import {
@@ -34,8 +28,8 @@ import {
 export class AddTransferPointAction implements Action {
     @IsValue('[TransferPoint] Add TransferPoint' as const)
     public readonly type = `[TransferPoint] Add TransferPoint`;
-    @ValidateNested()
-    @Type(() => TransferPoint)
+
+    @IsZodSchema(transferPointSchema)
     public readonly transferPoint!: TransferPoint;
 }
 

@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { AlarmGroup } from 'fuesim-digital-shared';
 import { AsyncPipe } from '@angular/common';
+import { newAlarmGroup } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
@@ -38,7 +38,7 @@ export class AlarmGroupOverviewModalComponent {
     public addAlarmGroup() {
         this.exerciseService.proposeAction({
             type: '[AlarmGroup] Add AlarmGroup',
-            alarmGroup: AlarmGroup.create('???'),
+            alarmGroup: newAlarmGroup('???'),
         });
     }
 }

@@ -1,8 +1,10 @@
+import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
 import type { PatientStatus, Position } from '../../../models/index.js';
 import {
     newVehiclePositionIn,
     newMapPositionAt,
+    newPersonnelFromTemplate,
 } from '../../../models/index.js';
 import { ExerciseState } from '../../../state.js';
 import { uuid } from '../../../utils/index.js';
@@ -12,7 +14,6 @@ import { addPersonnel } from '../../../../tests/utils/personnel.spec.js';
 import { assertCatering } from '../../../../tests/utils/catering.spec.js';
 import { defaultPersonnelTemplates } from '../../../data/default-state/personnel-templates.js';
 import { newCanCaterFor } from '../../../models/utils/cater-for.js';
-import { newPersonnelFromTemplate } from '../../../models/personnel.js';
 import type { ParticipantKey } from '../../../exercise-keys.js';
 import { updateTreatments } from './calculate-treatments.js';
 

@@ -11,13 +11,14 @@ import type {
 import {
     uuid,
     createVehicleParameters,
-    MapImage,
     normalZoom,
-    PatientTemplate,
-    TransferPoint,
-    Viewport,
     newMapPositionAt,
     newSimulatedRegionPositionIn,
+    newMapImageFromTemplate,
+    newViewport,
+    defaultViewportSize,
+    newTransferPoint,
+    newPatientFromTemplate,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -190,7 +191,7 @@ export class DragElementService {
                 break;
             case 'patient':
                 {
-                    const patient = PatientTemplate.generatePatient(
+                    const patient = newPatientFromTemplate(
                         this.transferringTemplate.template.patientTemplates[
                             Math.floor(
                                 Math.random() *
@@ -213,17 +214,10 @@ export class DragElementService {
                 break;
             case 'viewport':
                 {
-                    // This ratio has been determined by trial and error
-                    const height = Viewport.image.height / 23.5;
-                    const width = height * Viewport.image.aspectRatio;
-                    const viewport = Viewport.create(
+                    const viewport = newViewport(
                         {
-                            x: position.x - width / 2,
-                            y: position.y + height / 2,
-                        },
-                        {
-                            height,
-                            width,
+                            x: position.x - defaultViewportSize.width / 2,
+                            y: position.y + defaultViewportSize.height / 2,
                         },
                         'Ansicht ???'
                     );
@@ -241,13 +235,11 @@ export class DragElementService {
             case 'mapImage':
                 {
                     const template = this.transferringTemplate.template;
-                    const mapImage = MapImage.create(
-                        template.id,
-                        position,
-                        template.image,
-                        false,
-                        0
+                    const mapImage = newMapImageFromTemplate(
+                        template,
+                        position
                     );
+
                     this.exerciseService.proposeAction({
                         type: '[MapImage] Add MapImage',
                         mapImage,
@@ -257,10 +249,8 @@ export class DragElementService {
                 break;
             case 'transferPoint':
                 {
-                    const transferPoint = TransferPoint.create(
+                    const transferPoint = newTransferPoint(
                         newMapPositionAt(position),
-                        {},
-                        {},
                         '???',
                         '???'
                     );
@@ -288,10 +278,8 @@ export class DragElementService {
                         x: position.x - simulatedRegion.size.width / 2,
                         y: position.y + simulatedRegion.size.height / 2,
                     });
-                    const transferPoint = TransferPoint.create(
+                    const transferPoint = newTransferPoint(
                         newSimulatedRegionPositionIn(simulatedRegion.id),
-                        {},
-                        {},
                         '',
                         `[Simuliert] ${simulatedRegion.name}`
                     );

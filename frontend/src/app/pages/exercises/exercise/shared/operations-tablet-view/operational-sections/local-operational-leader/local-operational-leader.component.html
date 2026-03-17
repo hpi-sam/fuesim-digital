@@ -4,16 +4,22 @@
     <span class="label">Leitung</span>
     <div class="mt-2">
         <app-section-leader-slot
+            innerTitle="Einsatzleitung"
             [vehicle]="(localSectionLeader$ | async) ?? null"
             (vehicleAssigned)="onVehicleAssigned($event)"
         ></app-section-leader-slot>
     </div>
-    <span class="label">Vor Ort</span>
+    <span class="label mb-2">Vor Ort</span>
     @let vehicles = vehicles$ | async;
     @if (vehicles !== null) {
         <app-vehicles-zone
             [vehicles]="vehicles"
             (vehicleDropped)="onVehicleDroppedUnassignment($event)"
         />
+    }
+
+    <span class="label mb-2">Alarmiert</span>
+    @for (vehicle of vehiclesFromAlarmgroups$ | async; track vehicle.id) {
+        <app-operations-vehicle-item [vehicle]="vehicle" />
     }
 </div>

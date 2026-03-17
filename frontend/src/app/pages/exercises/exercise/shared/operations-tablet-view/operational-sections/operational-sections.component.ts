@@ -1,22 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { uuid } from 'fuesim-digital-shared';
 import { map } from 'rxjs';
-import { uuid } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { AppState } from 'src/app/state/app.state';
-import { selectOperationalSections } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
+import { CdkDropListGroup } from '@angular/cdk/drag-drop';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import { AppState } from '../../../../../../state/app.state';
+import { selectOperationalSections } from '../../../../../../state/application/selectors/exercise.selectors';
+import { LocalOperationalLeaderComponent } from './local-operational-leader/local-operational-leader.component';
+import { OperationalSectionContainerComponent } from './operational-section-container/operational-section-container.component';
 
 @Component({
     selector: 'app-operational-sections-tab',
-    standalone: false,
     templateUrl: './operational-sections.component.html',
     styleUrl: './operational-sections.component.scss',
+    imports: [
+        LocalOperationalLeaderComponent,
+        AsyncPipe,
+        OperationalSectionContainerComponent,
+        CdkDropListGroup,
+    ],
 })
 export class OperationalSectionsTabComponent {
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject(Store<AppState>);
 
     public readonly operationalSections$ = this.store
         .select(selectOperationalSections)

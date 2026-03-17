@@ -1,6 +1,6 @@
 <div cdkDropListGroup class="d-flex flex-column h-100">
     <div class="otvOperationalSectionsTab flex-grow-1">
-        <app-local-section-leader></app-local-section-leader>
+        <app-local-operational-leader />
         @for (section of operationalSections$ | async; track section.id) {
             <app-operational-section-container
                 [operationalSection]="section"

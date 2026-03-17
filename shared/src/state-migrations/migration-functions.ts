@@ -45,7 +45,6 @@ import { generalizeMaterialsPersonnel44 } from './44-generalize-materials-person
 import { addRestrictedZones45 } from './45-add-restricted-zones.js';
 import { limitedAlarmgroups46 } from './46-limited-alarm-groups.js';
 import { participantIdToKey47 } from './47-participant-id-to-key.js';
-import { addOperationsTabletView45 } from './45-add-operations-tablet-view.js';
 
 /**
  * Migrate a single action

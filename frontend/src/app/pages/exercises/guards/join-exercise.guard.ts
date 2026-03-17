@@ -29,7 +29,6 @@ export class JoinExerciseGuard {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ) {
-        const exerciseId = route.params['exerciseId'];
         if (
             selectStateSnapshot(selectExerciseStateMode, this.store) ===
             'exercise'

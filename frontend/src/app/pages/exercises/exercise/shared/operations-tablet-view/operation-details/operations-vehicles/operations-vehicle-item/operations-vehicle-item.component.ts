@@ -1,24 +1,25 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Vehicle } from 'digital-fuesim-manv-shared';
-import { AppState } from 'src/app/state/app.state';
+import { Vehicle } from 'fuesim-digital-shared';
+import { AsyncPipe } from '@angular/common';
 import {
     selectTransferPoints,
     selectAlarmGroups,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppState } from '../../../../../../../../state/app.state';
 
 @Component({
     selector: 'app-operations-vehicle-item',
-    standalone: false,
     templateUrl: './operations-vehicle-item.component.html',
     styleUrl: './operations-vehicle-item.component.scss',
+    imports: [AsyncPipe],
 })
 export class OperationsVehicleItemComponent {
-    public constructor(private readonly store: Store<AppState>) {}
+    private readonly store = inject(Store<AppState>);
 
-    public vehicle = input.required<Vehicle>();
+    public readonly vehicle = input.required<Vehicle>();
 
-    public showTransfer = input<boolean>(true);
+    public readonly showTransfer = input<boolean>(true);
 
     public availableTransferPoints$ = this.store.select(selectTransferPoints);
     public availableAlarmGroups$ = this.store.select(selectAlarmGroups);

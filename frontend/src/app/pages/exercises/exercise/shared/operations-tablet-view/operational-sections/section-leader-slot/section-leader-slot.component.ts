@@ -1,19 +1,21 @@
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Vehicle } from 'digital-fuesim-manv-shared';
-import { MessageService } from 'src/app/core/messages/message.service';
+import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { Component, EventEmitter, inject, input, Output } from '@angular/core';
+import { type Vehicle } from 'fuesim-digital-shared';
+import { VehicleTagComponent } from '../vehicle-tag/vehicle-tag.component';
+import { MessageService } from '../../../../../../../core/messages/message.service';
 
 @Component({
     selector: 'app-section-leader-slot',
-    standalone: false,
     templateUrl: './section-leader-slot.component.html',
     styleUrl: './section-leader-slot.component.scss',
+    imports: [VehicleTagComponent, CdkDropList],
 })
 export class SectionLeaderSlotComponent {
-    constructor(private readonly messageService: MessageService) {}
+    private readonly messageService = inject(MessageService);
 
-    @Input()
-    public vehicle: Vehicle | null = null;
+    public readonly vehicle = input<Vehicle | null>();
+
+    public readonly innerTitle = input<string>('Abschnittsleitung');
 
     /**
      * Emits the ID of the vehicle that was assigned to this slot
@@ -23,13 +25,13 @@ export class SectionLeaderSlotComponent {
 
     public onlySigleItemDropPredicate() {
         // we can only drop if there is no vehicle assigned yet
-        return this.vehicle === null;
+        return this.vehicle() === null;
     }
 
     public onVehicleDropped(event: CdkDragDrop<string[]>) {
-        if (event.item.data === this.vehicle?.id) return;
+        if (event.item.data === this.vehicle()?.id) return;
 
-        if (this.vehicle !== null) {
+        if (this.vehicle() !== null) {
             this.messageService.postMessage({
                 color: 'warning',
                 title: 'Fahrzeugzuweisung fehlgeschlagen',

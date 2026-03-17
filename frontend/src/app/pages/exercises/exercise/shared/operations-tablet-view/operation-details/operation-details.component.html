@@ -1,16 +1,16 @@
 <div class="d-flex flex-row h-100 w-100 gap-4 p-4">
     <div class="d-flex flex-column h-100 gap-4 flex-8" style="flex: 12">
-        @if (showExerciseDetails) {
+        @if (showExerciseDetails()) {
             <div
                 class="bg-white d-flex flex-row justify-content-between border border-secondary-subtle align-items-center px-3 py-2 h3"
             >
                 <span class="fw-bold m-0"
                     >Übung {{ participantId$ | async }}</span
                 >
-                <app-exercise-state-badge></app-exercise-state-badge>
+                <app-exercise-state-badge />
             </div>
         }
-        <app-operations-map class="flex-grow-1"></app-operations-map>
+        <app-operations-map class="flex-grow-1" />
     </div>
-    <app-operations-vehicles style="flex: 4"></app-operations-vehicles>
+    <app-operations-vehicles style="flex: 4" />
 </div>

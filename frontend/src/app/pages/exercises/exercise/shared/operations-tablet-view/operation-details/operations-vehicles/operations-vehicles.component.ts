@@ -1,18 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, map } from 'rxjs';
-import { AppState } from 'src/app/state/app.state';
-import { selectVehiclesInTransfer } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectVisibleVehicles } from 'src/app/state/application/selectors/shared.selectors';
+import { AsyncPipe } from '@angular/common';
+import { AppState } from '../../../../../../../state/app.state';
+import { selectVehiclesInTransfer } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectVisibleVehicles } from '../../../../../../../state/application/selectors/shared.selectors';
+import { OperationsVehicleItemComponent } from './operations-vehicle-item/operations-vehicle-item.component';
 
 @Component({
     selector: 'app-operations-vehicles',
-    standalone: false,
     templateUrl: './operations-vehicles.component.html',
     styleUrl: './operations-vehicles.component.scss',
+    imports: [OperationsVehicleItemComponent, AsyncPipe],
 })
 export class OperationsVehiclesComponent {
-    constructor(private readonly store: Store<AppState>) {}
+    private readonly store = inject(Store<AppState>);
 
     private readonly visibleVehicles$ = this.store
         .select(selectVisibleVehicles)

@@ -44,6 +44,7 @@ import { ExerciseMapComponent } from '../shared/exercise-map/exercise-map.compon
 import { TrainerMapEditorComponent } from '../shared/trainer-map-editor/trainer-map-editor.component';
 import { EmergencyOperationsCenterFullComponent } from '../shared/emergency-operations-center/emergency-operations-center-full/emergency-operations-center-full.component';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
+import { OperationsTabletViewComponent } from '../shared/operations-tablet-view/operations-tablet-view.component';
 
 @Component({
     selector: 'app-exercise',
@@ -64,6 +65,7 @@ import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pip
         EmergencyOperationsCenterFullComponent,
         AsyncPipe,
         FormatDurationPipe,
+        OperationsTabletViewComponent,
     ],
 })
 export class ExerciseComponent implements OnDestroy {

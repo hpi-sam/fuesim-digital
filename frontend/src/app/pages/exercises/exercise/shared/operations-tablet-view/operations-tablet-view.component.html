@@ -6,18 +6,18 @@
         class="nav-tabs"
         [class.fullscreenEnabled]="fullscreenEnabled"
     >
+        <ng-container ngbNavItem>
+            <button ngbNavLink>Einsatzabschnitte</button>
+            <ng-template ngbNavContent>
+                <app-operational-sections-tab></app-operational-sections-tab>
+            </ng-template>
+        </ng-container>
         <ng-container ngbNavItem [destroyOnHide]="false">
             <button ngbNavLink>Einsatzdetails</button>
             <ng-template ngbNavContent>
                 <app-operation-details-tab
                     [showExerciseDetails]="fullscreenEnabled"
                 ></app-operation-details-tab>
-            </ng-template>
-        </ng-container>
-        <ng-container ngbNavItem>
-            <button ngbNavLink>Einsatzabschnitte</button>
-            <ng-template ngbNavContent>
-                <app-operational-sections-tab></app-operational-sections-tab>
             </ng-template>
         </ng-container>
         <div style="margin-left: auto">

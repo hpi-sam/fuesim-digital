@@ -10,7 +10,7 @@
     outline-offset: -(vars.$borderSize + 1px);
 
     &:empty::after {
-        content: 'Abschnittsleitung';
+        content: var(--innerTitle);
         position: relative;
         top: 4px;
         left: 8px;

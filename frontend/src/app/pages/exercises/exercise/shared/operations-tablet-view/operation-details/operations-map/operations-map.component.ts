@@ -1,39 +1,39 @@
 import {
     Component,
     ElementRef,
+    inject,
     OnDestroy,
     OnInit,
-    ViewChild,
+    viewChild,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import {
-    defaultTileMapProperties,
-    lowerRightCornerOf,
-    upperLeftCornerOf,
-} from 'digital-fuesim-manv-shared';
 import maplibregl from 'maplibre-gl';
 // eslint-disable-next-line no-restricted-imports
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { map, first, Subject, takeUntil } from 'rxjs';
-import { AppState } from 'src/app/state/app.state';
 import {
-    selectSimulatedRegions,
-    selectTileMapProperties,
-    selectViewports,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+    upperLeftCornerOf,
+    lowerRightCornerOf,
+    defaultTileMapProperties,
+} from 'fuesim-digital-shared';
 import { startingPosition } from '../../../starting-position';
+import { AppState } from '../../../../../../../state/app.state';
+import {
+    selectViewports,
+    selectTileMapProperties,
+    selectSimulatedRegions,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
 
 @Component({
     selector: 'app-operations-map',
-    standalone: false,
     templateUrl: './operations-map.component.html',
     styleUrl: './operations-map.component.scss',
 })
 export class OperationsMapComponent implements OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
-
-    constructor(private readonly store: Store<AppState>) {}
+    private readonly store = inject(Store<AppState>);
+    public readonly INITIAL_ZOOM = 17;
 
     public availableViewports$ = this.store
         .select(selectViewports)
@@ -52,8 +52,7 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
             this.map?.triggerRepaint();
         });
 
-    @ViewChild('mapContainer', { static: true })
-    public mapContainerRef: ElementRef<HTMLElement> | undefined;
+    public readonly mapContainerRef = viewChild<ElementRef<HTMLElement>>('mapContainer');
     private map: maplibregl.Map | undefined;
     public is3dBuildingsEnabled = true;
     private readonly savedViewSettings: { bearing: number; pitch: number } = {
@@ -73,9 +72,14 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
         ];
 
         if (elements.length === 0) {
-            this.map.setCenter(
-                this.metersToLngLat([startingPosition.x, startingPosition.y])
-            );
+            this.map.flyTo({
+                center: this.metersToLngLat([
+                    startingPosition.x,
+                    startingPosition.y,
+                ]),
+                zoom: this.INITIAL_ZOOM,
+                animate,
+            });
             return;
         }
         const minX = Math.min(
@@ -130,7 +134,7 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
     }
 
     async ngOnInit() {
-        if (!this.mapContainerRef) {
+        if (!this.mapContainerRef()) {
             throw new Error('Map container reference is undefined');
         }
         this.store
@@ -142,8 +146,12 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
     }
 
     private initMap(defaultTileUrl: string = defaultTileMapProperties.tileUrl) {
+        const mapContainer = this.mapContainerRef()?.nativeElement;
+        if (mapContainer === undefined) {
+            throw new Error('Map container reference is undefined');
+        }
         this.map = new maplibregl.Map({
-            container: this.mapContainerRef!.nativeElement,
+            container: mapContainer,
             style: {
                 version: 8,
                 sources: {
@@ -198,7 +206,7 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
                 startingPosition.x,
                 startingPosition.y,
             ]),
-            zoom: 17,
+            zoom: this.INITIAL_ZOOM,
             bearing: this.savedViewSettings.bearing,
             pitch: this.savedViewSettings.pitch,
             maxPitch: this.MAX_PITCH_3D_BUILDINGS,

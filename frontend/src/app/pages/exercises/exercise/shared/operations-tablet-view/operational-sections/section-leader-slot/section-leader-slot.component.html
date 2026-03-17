@@ -3,8 +3,9 @@
     cdkDropList
     [cdkDropListEnterPredicate]="onlySigleItemDropPredicate.bind(this)"
     (cdkDropListDropped)="onVehicleDropped($event)"
+    [style]="{ '--innerTitle': `'${innerTitle()}'` }"
 >
-    @if (vehicle) {
+    @if (vehicle(); as vehicle) {
         <app-vehicle-tag [vehicle]="vehicle"></app-vehicle-tag>
     }
 </div>

@@ -1,25 +1,32 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import { AppState } from 'src/app/state/app.state';
+import { combineLatest, map } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
+import { selectVisibleVehicles } from '../../../../../../../state/application/selectors/shared.selectors';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import { AppState } from '../../../../../../../state/app.state';
 import {
     selectVehicles,
     selectVehiclesInTransfer,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { combineLatest, map } from 'rxjs';
-import { selectVisibleVehicles } from '../../../../../../../state/application/selectors/shared.selectors';
+} from '../../../../../../../state/application/selectors/exercise.selectors';
+import { SectionLeaderSlotComponent } from '../section-leader-slot/section-leader-slot.component';
+import { VehiclesZoneComponent } from '../vehicles-zone/vehicles-zone.component';
+import { OperationsVehicleItemComponent } from '../../operation-details/operations-vehicles/operations-vehicle-item/operations-vehicle-item.component';
 
 @Component({
     selector: 'app-local-operational-leader',
-    standalone: false,
     templateUrl: './local-operational-leader.component.html',
     styleUrl: './local-operational-leader.component.scss',
+    imports: [
+        SectionLeaderSlotComponent,
+        VehiclesZoneComponent,
+        AsyncPipe,
+        OperationsVehicleItemComponent,
+    ],
 })
 export class LocalOperationalLeaderComponent {
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
+    private readonly store = inject(Store<AppState>);
+    private readonly exerciseService = inject(ExerciseService);
 
     public localSectionLeader$ = this.store.select(
         createSelector(selectVehicles, (vehicles) =>
@@ -84,4 +91,17 @@ export class LocalOperationalLeaderComponent {
             true
         );
     }
+
+    public vehiclesFromAlarmgroups$ = this.store
+        .select(selectVehiclesInTransfer)
+        .pipe(
+            map((vehicles) =>
+                Object.values(vehicles).filter(
+                    (vehicle) =>
+                        vehicle.position.type === 'transfer' &&
+                        vehicle.position.transfer.startPoint.type ===
+                            'alarmGroupStartPoint'
+                )
+            )
+        );
 }

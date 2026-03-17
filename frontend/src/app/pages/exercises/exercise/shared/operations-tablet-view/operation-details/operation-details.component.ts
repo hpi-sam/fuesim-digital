@@ -1,23 +1,30 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState } from 'src/app/state/app.state';
+import { AsyncPipe } from '@angular/common';
+import { AppState } from '../../../../../../state/app.state';
 import {
     selectCurrentTime,
-    selectParticipantId,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectParticipantKey,
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { ExerciseStateBadgeComponent } from '../../exercise-state-badge/exercise-state-badge.component';
+import { OperationsMapComponent } from './operations-map/operations-map.component';
+import { OperationsVehiclesComponent } from './operations-vehicles/operations-vehicles.component';
 
 @Component({
     selector: 'app-operation-details-tab',
-    standalone: false,
     templateUrl: './operation-details.component.html',
     styleUrl: './operation-details.component.scss',
+    imports: [
+        AsyncPipe,
+        ExerciseStateBadgeComponent,
+        OperationsMapComponent,
+        OperationsVehiclesComponent,
+    ],
 })
 export class OperationDetailsTabComponent {
-    @Input()
-    public showExerciseDetails = false;
+    public readonly showExerciseDetails = input(false);
+    private readonly store = inject(Store<AppState>);
 
-    public constructor(private readonly store: Store<AppState>) {}
-
-    public readonly participantId$ = this.store.select(selectParticipantId);
+    public readonly participantId$ = this.store.select(selectParticipantKey);
     public readonly currentTime$ = this.store.select(selectCurrentTime);
 }

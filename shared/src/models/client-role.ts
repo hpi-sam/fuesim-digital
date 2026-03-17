@@ -35,7 +35,7 @@ export class ClientRole {
                 eoc: 'Leitstelle',
                 mapOperator: 'Kartenansicht',
                 trainer: 'Trainer',
-                operationsTablet: 'Einsatztablet',
+                operationsTablet: 'Einsatzübersicht',
             } satisfies { [key in SpecificRole]: string }
         )[specificRole];
     }

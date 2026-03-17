@@ -4,7 +4,7 @@
             #inlineInput="ngModel"
             class="form-control form-control-lg"
             rows="3"
-            [ngModel]="operationalSection.title"
+            [ngModel]="operationalSection().title"
             (ngModelChange)="updateOperationalSectionTitle($event)"
             name="inline"
             autofocus
@@ -12,15 +12,11 @@
         <app-display-validation
             [ngModelInput]="inlineInput"
         ></app-display-validation>
-        <button class="btn">
-            <i
-                class="bi bi-trash-fill text-danger"
-                (click)="deleteOperationalSection()"
-            >
-            </i>
+        <button class="btn" (click)="deleteOperationalSection()">
+            <i class="bi bi-trash-fill text-danger"></i>
         </button>
     </div>
-    <div class="ml-auto mr-2">
+    <div class="ml-auto mr-2 mb-4">
         <app-section-leader-slot
             (vehicleAssigned)="assignVehicle($event, true)"
             [vehicle]="(operationalSectionLeader$ | async) ?? null"

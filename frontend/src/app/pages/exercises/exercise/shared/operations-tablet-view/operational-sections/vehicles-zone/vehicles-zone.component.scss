@@ -10,8 +10,6 @@
     column-gap: vars.$vehicleTagGap;
     align-content: flex-start;
 
-    @extend .mt-4;
-
     min-height: vars.$vehicleTagHeight + (2 * vars.$innerBoxPadding);
     padding: vars.$innerBoxPadding;
     height: 100%;

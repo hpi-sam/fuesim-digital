@@ -1,26 +1,33 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import { map, Observable } from 'rxjs';
-import { Vehicle } from 'digital-fuesim-manv-shared';
-import { AppState } from 'src/app/state/app.state';
-import { createSelectVehiclesInOperationalSection } from 'src/app/state/application/selectors/exercise.selectors';
-import { type OperationalSection } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
+import { type OperationalSection, Vehicle } from 'fuesim-digital-shared';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { VehiclesZoneComponent } from '../vehicles-zone/vehicles-zone.component';
+import { SectionLeaderSlotComponent } from '../section-leader-slot/section-leader-slot.component';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import { AppState } from '../../../../../../../state/app.state';
+import { createSelectVehiclesInOperationalSection } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { DisplayValidationComponent } from '../../../../../../../shared/validation/display-validation/display-validation.component';
 
 @Component({
     selector: 'app-operational-section-container',
-    standalone: false,
     templateUrl: './operational-section-container.component.html',
     styleUrl: './operational-section-container.component.scss',
+    imports: [
+        AsyncPipe,
+        DisplayValidationComponent,
+        FormsModule,
+        SectionLeaderSlotComponent,
+        VehiclesZoneComponent,
+    ],
 })
 export class OperationalSectionContainerComponent implements OnInit {
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject(Store<AppState>);
 
-    @Input()
-    public operationalSection!: OperationalSection;
+    public readonly operationalSection = input.required<OperationalSection>();
 
     public operationalSectionMembers$?: Observable<Vehicle[]>;
 
@@ -31,7 +38,7 @@ export class OperationalSectionContainerComponent implements OnInit {
             .select(
                 createSelector(
                     createSelectVehiclesInOperationalSection(
-                        this.operationalSection.id
+                        this.operationalSection().id
                     ),
                     (vehicles) =>
                         Object.values(vehicles).filter(
@@ -48,7 +55,7 @@ export class OperationalSectionContainerComponent implements OnInit {
         this.operationalSectionMembers$ = this.store.select(
             createSelector(
                 createSelectVehiclesInOperationalSection(
-                    this.operationalSection.id
+                    this.operationalSection().id
                 ),
                 (vehicles) =>
                     Object.values(vehicles).filter(
@@ -70,7 +77,7 @@ export class OperationalSectionContainerComponent implements OnInit {
         this.exerciseService.proposeAction(
             {
                 type: '[OperationalSection] Move Vehicle To Operational Section',
-                sectionId: this.operationalSection.id,
+                sectionId: this.operationalSection().id,
                 vehicleId,
                 assignAsSectionLeader: asSectionLeader,
             },
@@ -81,7 +88,7 @@ export class OperationalSectionContainerComponent implements OnInit {
     public updateOperationalSectionTitle(newTitle: string) {
         this.exerciseService.proposeAction({
             type: '[OperationalSection] Rename Operational Section',
-            sectionId: this.operationalSection.id,
+            sectionId: this.operationalSection().id,
             newTitle,
         });
     }
@@ -89,7 +96,7 @@ export class OperationalSectionContainerComponent implements OnInit {
     public deleteOperationalSection() {
         this.exerciseService.proposeAction({
             type: '[OperationalSection] Remove Operational Section',
-            sectionId: this.operationalSection.id,
+            sectionId: this.operationalSection().id,
         });
     }
 }

@@ -21,7 +21,7 @@ export type TechnicalChallengeStateId = z.infer<
 export const technicalChallengeStateSchema = z.object({
     id: technicalChallengeStateIdSchema,
     title: z.string(),
-    mapImage: imagePropertiesSchema,
+    image: imagePropertiesSchema,
     possibleTasks: z.record(taskSchema.shape.id, z.number()),
 });
 export type TechnicalChallengeState = z.infer<
@@ -30,14 +30,18 @@ export type TechnicalChallengeState = z.infer<
 
 export function createTechnicalChallengeState(
     title: string,
-    mapImage: ImageProperties,
-    possibleTasks: { [key: UUID]: number } = {}
+    image: ImageProperties,
+    possibleTasks: UUID[] | { [key: UUID]: number } = {}
 ): TechnicalChallengeState {
+    if (possibleTasks instanceof Array) {
+        // eslint-disable-next-line no-param-reassign
+        possibleTasks = Object.fromEntries(possibleTasks.map((id) => [id, 1]));
+    }
     return {
         id: uuid() as TechnicalChallengeStateId,
         title,
-        mapImage,
-        possibleTasks: {},
+        image,
+        possibleTasks,
     };
 }
 
@@ -109,20 +113,29 @@ export const isGuardFulfilled = (
 };
 
 export const stateMachineSchema = z.strictObject({
-    states: z.array(technicalChallengeStateSchema),
-    relevantTasks: z.array(taskSchema),
+    states: z.record(
+        technicalChallengeStateSchema.shape.id,
+        technicalChallengeStateSchema
+    ),
+    relevantTasks: z.record(taskSchema.shape.id, taskSchema),
     transitions: z.array(transitionSchema),
 });
 
 const getStateOf = (
     technicalChallenge: TechnicalChallenge,
     stateId: TechnicalChallengeStateId
-): TechnicalChallengeState | undefined =>
-    technicalChallenge.states.find((state) => state.id === stateId);
+): TechnicalChallengeState | undefined => technicalChallenge.states[stateId];
+
 export const currentStateOf = (
     technicalChallenge: TechnicalChallenge
-): TechnicalChallengeState =>
-    getStateOf(technicalChallenge, technicalChallenge.currentStateId)!;
+): TechnicalChallengeState => {
+    const state = getStateOf(
+        technicalChallenge,
+        technicalChallenge.currentStateId
+    );
+    if (!state) throw Error('currentStateId does not exist in states array!');
+    return state;
+};
 
 export const simulateTechnicalChallenge = (
     technicalChallenge: TechnicalChallenge,

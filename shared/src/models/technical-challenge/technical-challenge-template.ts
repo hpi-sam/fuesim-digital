@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { cloneDeep } from 'lodash-es';
-import { imagePropertiesSchema, newNoPosition } from '../utils/index.js';
+import {
+    imagePropertiesSchema,
+    newNoPosition,
+    newSize,
+} from '../utils/index.js';
 import { uuid } from '../../utils/uuid.js';
 import type {
     TechnicalChallenge,
@@ -34,8 +38,9 @@ export function createTechnicalChallengeFromTemplate(
         type: 'technicalChallenge',
         templateId: template.id,
         position: newNoPosition(),
+        size: newSize(40, 40),
         taskProgress: Object.fromEntries(
-            relevantTasks.map((task) => [task.id, 0])
+            Object.values(relevantTasks).map((task) => [task.id, 0])
         ),
         currentStateId: template.initialStateId,
         assignedPersonnel: {},

@@ -22,7 +22,7 @@ import { RestrictedZoneActionReducers } from './restricted-zone.js';
 import { OperationalSectionActionReducers } from './operational-section.js';
 import { ScoutableActionReducers } from './scoutable.js';
 import { UserGeneratedContentActionReducers } from './user-generated-content.js';
-import { TechnicalChallengeActionReducers } from './technical-challenge.js';
+import TechnicalChallengeActionReducers from './technical-challenge.js';
 
 /**
  * All action reducers of the exercise must be registered here
@@ -85,11 +85,10 @@ const exerciseActionTypeDictionary: ExerciseActionTypeDictionary =
                 reducer: actionReducer,
             } as const;
         })
-        .reduce(function (accumulator, value) {
+        .reduce((accumulator, value) => {
             // TODO: Dig into this error and look at plausible workarounds
             // @ts-expect-error Results in TS2590; too complex union type ¯\_(ツ)_/¯
-            accumulator[value.type as keyof ExerciseActionTypeDictionary] =
-                value.reducer;
+            accumulator[value.type] = value.reducer;
             return accumulator;
         }, {} as ExerciseActionTypeDictionary);
 

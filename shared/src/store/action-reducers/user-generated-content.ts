@@ -21,6 +21,13 @@ export class AssignNewContentToElementAction implements Action {
     @IsZodSchema(userGeneratedContentSchema)
     public readonly content!: UserGeneratedContent;
 }
+export class DeleteContentAction implements Action {
+    @IsValue('[UserGeneratedContent] Delete content' as const)
+    public readonly type = '[UserGeneratedContent] Delete content';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly contentId!: UUID;
+}
 export class UpdateContentAction implements Action {
     @IsValue('[UserGeneratedContent] Update content' as const)
     public readonly type = '[UserGeneratedContent] Update content';
@@ -45,6 +52,15 @@ export namespace UserGeneratedContentActionReducers {
             },
             rights: 'trainer',
         };
+    export const deleteContent: ActionReducer<DeleteContentAction> = {
+        action: DeleteContentAction,
+        reducer: (draftState, { contentId }) => {
+            getElement(draftState, 'userGeneratedContent', contentId);
+            delete draftState['userGeneratedContents'][contentId];
+            return draftState;
+        },
+        rights: 'trainer',
+    };
     export const updateContent: ActionReducer<UpdateContentAction> = {
         action: UpdateContentAction,
         reducer: (draftState, { contentId, newContentString }) => {

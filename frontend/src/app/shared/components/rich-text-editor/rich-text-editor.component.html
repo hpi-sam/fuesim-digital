@@ -1,16 +1,31 @@
-<ng-container>
-    <form (ngSubmit)="onSubmit()">
-        <div class="NgxEditor__Wrapper">
-            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
-            </ngx-editor-menu>
-            <ngx-editor
-                [editor]="editor"
-                [formField]="editorForm.editorContent"
-                [placeholder]="'Hier Text eingeben...'"
+@if (this.currentRole() == 'trainer') {
+    <ng-container>
+        <form (ngSubmit)="onSubmit()">
+            <div class="NgxEditor__Wrapper">
+                <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
+                </ngx-editor-menu>
+                <ngx-editor
+                    [editor]="editor"
+                    [formField]="editorForm.editorContent"
+                    [placeholder]="'Hier Text eingeben...'"
+                >
+                </ngx-editor>
+            </div>
+            <button type="submit" class="btn btn-primary">Speichern</button>
+            <!-- deleteContent() -->
+            <button
+                class="btn btn-danger float-end"
+                (click)="this.editor.destroy()"
             >
-            </ngx-editor>
-        </div>
-        <button type="submit">Speichern</button>
-        <!-- @JohannesPotzi: TODO Indikator, dass erfolreich gesafed wurde -->
-    </form>
-</ng-container>
+                Löschen
+            </button>
+            <!-- @JohannesPotzi: TODO Indikator, dass erfolreich gesafed wurde -->
+        </form>
+    </ng-container>
+}
+<hr />
+@if (this.currentRole() !== 'trainer') {
+    <ng-container>
+        <div [innerHTML]="editorForm.editorContent().value()"></div>
+    </ng-container>
+}

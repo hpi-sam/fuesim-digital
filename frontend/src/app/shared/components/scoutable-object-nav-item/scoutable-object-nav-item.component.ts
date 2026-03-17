@@ -31,7 +31,7 @@ export class ScoutableObjectNavItemComponent implements OnInit {
     readonly element = input.required<ScoutableElement>();
     scoutable: Signal<Scoutable | null> = signal(null);
 
-    readonly currentRole$ = this.store.select(selectCurrentMainRole);
+    readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
     constructor() {
         effect(() => {

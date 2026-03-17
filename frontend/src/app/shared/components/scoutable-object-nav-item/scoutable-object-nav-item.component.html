@@ -1,6 +1,13 @@
 <div>
     @if (scoutable(); as scoutable) {
-        <button (click)="assignContent()">Info-Block hinzufügen</button>
+        @if (currentRole() == 'trainer') {
+            <button
+                class="btn btn-outline-primary ms-3"
+                (click)="assignContent()"
+            >
+                Info-Block hinzufügen
+            </button>
+        }
     }
 </div>
 <div>

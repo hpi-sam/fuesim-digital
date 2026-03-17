@@ -20,6 +20,7 @@ import { Editor, Toolbar } from 'ngx-editor';
 import { ExerciseService } from '../../../core/exercise.service';
 import { AppState } from '../../../state/app.state';
 import { createSelectUserGeneratedContent } from '../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 @Component({
     selector: 'app-rich-text-editor',
     templateUrl: './rich-text-editor.component.html',
@@ -34,6 +35,9 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
         signal(null);
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
+    public readonly currentRole = this.store.selectSignal(
+        selectCurrentMainRole
+    );
     editor!: Editor;
     toolbar: Toolbar = [['image']];
 
@@ -66,6 +70,12 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
             type: '[UserGeneratedContent] Update content',
             contentId: this.userGeneratedContentId(),
             newContentString: this.editorForm.editorContent().value(),
+        });
+    }
+    deleteContent() {
+        this.exerciseService.proposeAction({
+            type: '[UserGeneratedContent] Delete content',
+            contentId: this.userGeneratedContentId(),
         });
     }
     ngOnDestroy(): void {

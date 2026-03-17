@@ -13,10 +13,14 @@
 <div>
     @if (scoutable(); as scoutable) {
         @for (contentId of scoutable.userGeneratedContentIds; track contentId) {
-            <app-rich-text-editor
-                [contentAssignedElement]="scoutable"
-                [userGeneratedContentId]="contentId"
-            />
+            @if (
+                scoutable.userGeneratedContentIds.find((id) => id == contentId)
+            ) {
+                <app-rich-text-editor
+                    [contentAssignedElement]="scoutable"
+                    [userGeneratedContentId]="contentId"
+                />
+            }
         }
     }
 </div>

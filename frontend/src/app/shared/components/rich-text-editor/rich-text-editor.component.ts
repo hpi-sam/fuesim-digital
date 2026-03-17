@@ -76,6 +76,7 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
         this.exerciseService.proposeAction({
             type: '[UserGeneratedContent] Delete content',
             contentId: this.userGeneratedContentId(),
+            assignedElement: this.contentAssignedElement(),
         });
     }
     ngOnDestroy(): void {

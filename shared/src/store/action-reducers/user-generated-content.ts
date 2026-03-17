@@ -1,14 +1,16 @@
-import { IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsDefined, IsString, IsUUID, MaxLength } from 'class-validator';
 import { uuidValidationOptions, type UUID } from '../../utils/uuid.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { Action, ActionReducer } from '../action-reducer.js';
 import {
+    type ContentAssignableElement,
     type UserGeneratedContent,
     userGeneratedContentSchema,
 } from '../../models/user-generated-content.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { getElement } from './utils/get-element.js';
+import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
 
 export class AssignNewContentToElementAction implements Action {
     @IsValue('[UserGeneratedContent] Assign new content to element' as const)
@@ -27,6 +29,9 @@ export class DeleteContentAction implements Action {
 
     @IsUUID(4, uuidValidationOptions)
     public readonly contentId!: UUID;
+
+    @IsDefined()
+    public readonly assignedElement!: ContentAssignableElement;
 }
 export class UpdateContentAction implements Action {
     @IsValue('[UserGeneratedContent] Update content' as const)
@@ -54,8 +59,14 @@ export namespace UserGeneratedContentActionReducers {
         };
     export const deleteContent: ActionReducer<DeleteContentAction> = {
         action: DeleteContentAction,
-        reducer: (draftState, { contentId }) => {
+        reducer: (draftState, { contentId, assignedElement }) => {
             getElement(draftState, 'userGeneratedContent', contentId);
+            const index = assignedElement.userGeneratedContentIds.findIndex(
+                (id) => id == contentId
+            );
+            delete draftState[elementTypePluralMap[assignedElement.type]][
+                assignedElement.id
+            ]!.userGeneratedContentIds[index];
             delete draftState['userGeneratedContents'][contentId];
             return draftState;
         },

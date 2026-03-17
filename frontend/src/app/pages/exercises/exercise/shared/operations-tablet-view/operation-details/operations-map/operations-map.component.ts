@@ -52,7 +52,8 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
             this.map?.triggerRepaint();
         });
 
-    public readonly mapContainerRef = viewChild<ElementRef<HTMLElement>>('mapContainer');
+    public readonly mapContainerRef =
+        viewChild<ElementRef<HTMLElement>>('mapContainer');
     private map: maplibregl.Map | undefined;
     public is3dBuildingsEnabled = true;
     private readonly savedViewSettings: { bearing: number; pitch: number } = {

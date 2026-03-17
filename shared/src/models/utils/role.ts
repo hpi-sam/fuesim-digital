@@ -20,5 +20,5 @@ export const specificRoleDisplayNames: { [key in SpecificRole]: string } = {
     operationsTablet: 'Einsatzübersicht',
 } as const;
 export function getSpecificRoleDisplayName(specificRole: SpecificRole): string {
-    return specificRoleDisplayNames[specificRole]!;
+    return specificRoleDisplayNames[specificRole];
 }

@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import type { ActionReducer, MapPosition } from '../../index.js';
 import {
+    getElement,
+    sizeSchema,
+    technicalChallengeIdSchema,
     newMapPositionAt,
     uuidSchema,
     mapCoordinatesSchema,
@@ -34,7 +37,14 @@ const assignTechnicalChallengeActionSchema = z.strictObject({
     personnelId: personnelSchema.shape.id,
 });
 
-export namespace TechnicalChallengeActionReducers {
+const resizeTechnicalChallengeActionSchema = z.strictObject({
+    type: z.literal('[TechnicalChallenge] Resize technical challenge'),
+    technicalChallengeId: technicalChallengeIdSchema,
+    targetPosition: mapCoordinatesSchema,
+    newSize: sizeSchema,
+});
+
+namespace TechnicalChallengeActionReducers {
     export const addTechnicalChallenge: ActionReducer<CreateTechnicalChallengeAction> =
         {
             type: '[TechnicalChallenge] Create technical challenge',
@@ -70,19 +80,39 @@ export namespace TechnicalChallengeActionReducers {
         type: assignTechnicalChallengeActionSchema.shape.type.value,
         actionSchema: assignTechnicalChallengeActionSchema,
         reducer: (draftState, { technicalChallengeId, personnelId }) => {
-            const technicalChallenge =
-                draftState.technicalChallenges[technicalChallengeId];
-            console.log(
-                `assigning: ${technicalChallenge!.relevantTasks[0]!.id}`
+            const technicalChallenge = getElement(
+                draftState,
+                'technicalChallenge',
+                technicalChallengeId
             );
-            if (technicalChallenge) {
-                // TODO: assign task & validate if exists
-                technicalChallenge.assignedPersonnel[personnelId] =
-                    // @ts-expect-error TODO: testing
-                    technicalChallenge.relevantTasks[0].id;
-            }
+
+            const task = Object.values(technicalChallenge.relevantTasks)[0]!;
+            console.log(`assigning: ${task.taskName} (${task.id})`);
+
+            // TODO: assign task & validate if exists
+            technicalChallenge.assignedPersonnel[personnelId] = task.id;
             return draftState;
         },
         rights: 'participant',
     };
+    export const resizeTechnicalChallenge: ActionReducer<
+        z.infer<typeof resizeTechnicalChallengeActionSchema>
+    > = {
+        type: resizeTechnicalChallengeActionSchema.shape.type.value,
+        actionSchema: resizeTechnicalChallengeActionSchema,
+        reducer: (draftState, action) => {
+            const technicalChallenge = getElement(
+                draftState,
+                'technicalChallenge',
+                action.technicalChallengeId
+            );
+            technicalChallenge.position = newMapPositionAt(
+                action.targetPosition
+            );
+            technicalChallenge.size = action.newSize;
+            return draftState;
+        },
+        rights: 'trainer',
+    };
 }
+export default TechnicalChallengeActionReducers;

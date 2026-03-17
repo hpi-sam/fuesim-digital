@@ -47,15 +47,12 @@ import {
 } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
-import type {
-    ExerciseRequestTargetConfiguration,
-    PatientStatus,
-    PatientStatusForTransport,
-} from '../../models/index.js';
 import {
+    type ExerciseRequestTargetConfiguration,
+    type PatientStatus,
+    type PatientStatusForTransport,
+    patientStatusForTransportSchema,
     requestTargetTypeOptions,
-    patientStatusForTransportAllowedValues,
-    patientStatusAllowedValues,
     statusNames,
     createSimulatedRegionTag,
     createPatientStatusTag,
@@ -63,11 +60,13 @@ import {
     isInSimulatedRegion,
     currentSimulatedRegionIdOf,
     createTransferPointTag,
+    patientStatusSchema,
 } from '../../models/index.js';
 import type { TransferDestination } from '../../simulation/utils/transfer-destination.js';
 import { transferDestinationTypeAllowedValues } from '../../simulation/utils/transfer-destination.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { getActivityById, getBehaviorById, getElement } from './utils/index.js';
 import { logBehavior } from './utils/log.js';
 
@@ -516,7 +515,7 @@ export class UpdatePatientsExpectedInRegionForTransportAction
     @Min(0)
     public readonly patientsExpected!: number;
 
-    @IsLiteralUnion(patientStatusAllowedValues)
+    @IsZodSchema(patientStatusSchema)
     public readonly patientStatus!: PatientStatus;
 }
 
@@ -536,7 +535,7 @@ export class AddVehicleTypeForPatientTransportAction implements Action {
     @IsString()
     public readonly vehicleTypeName!: string;
 
-    @IsLiteralUnion(patientStatusForTransportAllowedValues)
+    @IsZodSchema(patientStatusForTransportSchema)
     public readonly patientStatus!: PatientStatusForTransport;
 }
 
@@ -556,7 +555,7 @@ export class RemoveVehicleTypeForPatientTransportAction implements Action {
     @IsString()
     public readonly vehicleTypeName!: string;
 
-    @IsLiteralUnion(patientStatusForTransportAllowedValues)
+    @IsZodSchema(patientStatusForTransportSchema)
     public readonly patientStatus!: PatientStatusForTransport;
 }
 
@@ -633,7 +632,7 @@ export class UpdateMaximumCategoryToTransportAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly behaviorId!: UUID;
 
-    @IsLiteralUnion(patientStatusForTransportAllowedValues)
+    @IsZodSchema(patientStatusForTransportSchema)
     public readonly maximumCategoryToTransport!: PatientStatusForTransport;
 }
 

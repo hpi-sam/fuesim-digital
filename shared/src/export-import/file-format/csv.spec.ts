@@ -1,3 +1,4 @@
+import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
 import { ExerciseState } from '../../state.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';

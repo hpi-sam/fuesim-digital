@@ -1,5 +1,10 @@
-import type { ExerciseAction, ExerciseKey, UUID } from 'fuesim-digital-shared';
-import { Client, ClientRole } from 'fuesim-digital-shared';
+import type {
+    ExerciseAction,
+    ExerciseKey,
+    UUID,
+    Client,
+} from 'fuesim-digital-shared';
+import { newClient, newClientRole } from 'fuesim-digital-shared';
 import cookie from 'cookie';
 import type { ExerciseSocket } from '../exercise-server.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
@@ -43,16 +48,12 @@ export class ClientWrapper {
         // as the provided id is guaranteed to be one of the ids of the exercise as the exercise
         // was fetched with this exact id from the exercise map.
         const role = this.chosenExercise.getRoleFromUsedKey(exerciseKey);
-        this.relatedExerciseClient = Client.create(
+        this.relatedExerciseClient = newClient(
             clientName,
-            ClientRole.create(
-                role,
-                role === 'trainer' ? 'trainer' : 'mapOperator'
-            ),
+            newClientRole(role, role === 'trainer' ? 'trainer' : 'mapOperator'),
             Config.devNoWaitingRoom && isDevelopment()
                 ? false
-                : role !== 'trainer',
-            undefined
+                : role !== 'trainer'
         );
         this.chosenExercise.addClient(this);
         return this.relatedExerciseClient.id;

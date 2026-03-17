@@ -1,7 +1,5 @@
 import { Component, inject, OnInit, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID } from 'fuesim-digital-shared';
-import { AlarmGroup, AlarmGroupVehicle } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import {
     NgbDropdown,
@@ -11,6 +9,11 @@ import {
     NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AsyncPipe } from '@angular/common';
+import {
+    type UUID,
+    type AlarmGroup,
+    newAlarmGroupVehicle,
+} from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
@@ -136,7 +139,7 @@ export class AlarmGroupItemComponent implements OnInit {
         this.exerciseService.proposeAction({
             type: '[AlarmGroup] Add AlarmGroupVehicle',
             alarmGroupId: this.alarmGroup().id,
-            alarmGroupVehicle: AlarmGroupVehicle.create(
+            alarmGroupVehicle: newAlarmGroupVehicle(
                 vehicleTemplateId,
                 5 * 60 * 1000,
                 vehicleTemplate.name

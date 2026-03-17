@@ -1,16 +1,5 @@
-import type { ValidationOptions, ValidationArguments } from 'class-validator';
-import { isNumber, registerDecorator } from 'class-validator';
+import { z } from 'zod';
 import type { PatientStatus } from './patient-status.js';
-
-/**
- * `100_000` healthPoints is the maximum;
- * `0` healthPoints is the minimum;
- * `=== 0` healthPoints is black;
- * `> 0` and `<= 33_000` healthPoints is red;
- * `> 33_000` and `<= 66_000` healthPoints is yellow;
- * `> 66_000` healthPoints is green
- */
-export type HealthPoints = number;
 
 export const healthPointsDefaults = {
     max: 100_000,
@@ -23,6 +12,12 @@ export const healthPointsDefaults = {
     redAverage: 20_000,
     blackMax: 0,
 };
+
+export const healthPointsSchema = z
+    .number()
+    .min(healthPointsDefaults.min)
+    .max(healthPointsDefaults.max);
+export type HealthPoints = z.infer<typeof healthPointsSchema>;
 
 export function getStatus(health: HealthPoints): PatientStatus {
     if (health <= healthPointsDefaults.blackMax) {
@@ -76,28 +71,4 @@ export function isAlive(health: HealthPoints) {
         health > healthPointsDefaults.blackMax &&
         health <= healthPointsDefaults.greenMax
     );
-}
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export function IsValidHealthPoint(validationOptions?: ValidationOptions) {
-    // Disabled as this is the suggested way for [class-validator](https://github.com/typestack/class-validator#custom-validation-decorators)
-    // eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
-    return function (object: Object, propertyName: string) {
-        registerDecorator({
-            name: 'isValidHealthpoint',
-            target: object.constructor,
-            propertyName,
-            options: {
-                message:
-                    validationOptions?.message ??
-                    'Value must be a correct health point',
-                ...validationOptions,
-            },
-            validator: {
-                validate(value: any, args: ValidationArguments) {
-                    return isNumber(value) && isValidHealthPoint(value);
-                },
-            },
-        });
-    };
 }

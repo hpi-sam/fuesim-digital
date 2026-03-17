@@ -1,8 +1,10 @@
-import { Type } from 'class-transformer';
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 import { WritableDraft } from 'immer';
-import { MapImageTemplate, imagePropertiesSchema } from '../../models/index.js';
-import type { ImageProperties } from '../../models/index.js';
+import {
+    type MapImageTemplate,
+    imagePropertiesSchema,
+    type ImageProperties,
+} from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
 import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
@@ -10,13 +12,13 @@ import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { mapImageTemplateSchema } from '../../models/map-image-template.js';
 
 export class AddMapImageTemplateAction implements Action {
     @IsValue('[MapImageTemplate] Add mapImageTemplate' as const)
     public readonly type = '[MapImageTemplate] Add mapImageTemplate';
 
-    @ValidateNested()
-    @Type(() => MapImageTemplate)
+    @IsZodSchema(mapImageTemplateSchema)
     public readonly mapImageTemplate!: MapImageTemplate;
 }
 

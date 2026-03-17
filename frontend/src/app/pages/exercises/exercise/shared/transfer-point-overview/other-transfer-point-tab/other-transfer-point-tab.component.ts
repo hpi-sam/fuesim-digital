@@ -3,7 +3,7 @@ import { Component, inject, input, viewChild } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
-import { TransferPoint } from 'fuesim-digital-shared';
+import { getTransferPointFullName, TransferPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -72,7 +72,7 @@ export class OtherTransferPointTabComponent implements OnInit {
                     )
                     .map(([id, transferPoint]) => ({
                         key: id,
-                        name: TransferPoint.getFullName(transferPoint),
+                        name: getTransferPointFullName(transferPoint),
                     }));
             })
         );
@@ -85,7 +85,7 @@ export class OtherTransferPointTabComponent implements OnInit {
                 Object.entries(transferPoint.reachableTransferPoints)
                     .map(([key, value]) => ({
                         id: key,
-                        name: TransferPoint.getFullName(transferPoints[key]!),
+                        name: getTransferPointFullName(transferPoints[key]!),
                         duration: value.duration,
                     }))
                     .sort((a, b) => a.name.localeCompare(b.name))
@@ -112,5 +112,5 @@ export class OtherTransferPointTabComponent implements OnInit {
 
     public getTransferPointOrderByValue: (
         transferPoint: TransferPoint
-    ) => string = (transferPoint) => TransferPoint.getFullName(transferPoint);
+    ) => string = (transferPoint) => getTransferPointFullName(transferPoint);
 }

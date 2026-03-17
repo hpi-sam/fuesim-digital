@@ -5,11 +5,11 @@ import {
     isOnMap,
     loopTroughTime,
     uuid,
-    Viewport,
     isInSpecificSimulatedRegion,
     cloneDeepMutable,
     isInVehicle,
     isInTransfer,
+    isInViewport,
 } from 'fuesim-digital-shared';
 import type {
     Personnel,
@@ -117,7 +117,7 @@ export class StatisticsService {
             draftState.viewports,
             (viewport, element) =>
                 isOnMap(element) &&
-                Viewport.isInViewport(viewport, currentCoordinatesOf(element)),
+                isInViewport(viewport, currentCoordinatesOf(element)),
             true
         );
         const simulatedRegionsStatistics = this.generateFilteredAreaStatistics(

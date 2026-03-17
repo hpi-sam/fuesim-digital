@@ -1,12 +1,15 @@
-import type { AllowedValues } from '../../utils/validators/index.js';
+import { z } from 'zod';
 
-export type PatientStatus =
-    | 'black'
-    | 'blue'
-    | 'green'
-    | 'red'
-    | 'white'
-    | 'yellow';
+export const patientStatusAllowedValues = [
+    'black',
+    'blue',
+    'green',
+    'red',
+    'white',
+    'yellow',
+] as const;
+export const patientStatusSchema = z.literal(patientStatusAllowedValues);
+export type PatientStatus = z.infer<typeof patientStatusSchema>;
 
 export const statusNames: {
     [key in PatientStatus]: string;
@@ -17,22 +20,16 @@ export const statusNames: {
     red: 'SK I',
     white: 'Ungesichtet',
     yellow: 'SK II',
-};
+} as const;
 
-export const patientStatusAllowedValues: AllowedValues<PatientStatus> = {
-    black: true,
-    blue: true,
-    green: true,
-    red: true,
-    white: true,
-    yellow: true,
-};
-
-export type PatientStatusForTransport = 'green' | 'red' | 'yellow';
-
-export const patientStatusForTransportAllowedValues: AllowedValues<PatientStatusForTransport> =
-    {
-        green: true,
-        red: true,
-        yellow: true,
-    };
+export const patientStatusForTransportAllowedValues = [
+    'green',
+    'red',
+    'yellow',
+] as const;
+export const patientStatusForTransportSchema = z.literal(
+    patientStatusForTransportAllowedValues
+);
+export type PatientStatusForTransport = z.infer<
+    typeof patientStatusForTransportSchema
+>;

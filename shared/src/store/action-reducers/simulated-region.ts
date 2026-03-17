@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import { IsString, IsUUID, ValidateNested } from 'class-validator';
 import {
     SimulatedRegion,
-    TransferPoint,
+    type TransferPoint,
     isInSpecificSimulatedRegion,
     type MapCoordinates,
     mapCoordinatesSchema,
@@ -31,6 +31,7 @@ import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { transferPointSchema } from '../../models/transfer-point.js';
 import { TransferPointActionReducers } from './transfer-point.js';
 import { isCompletelyLoaded } from './utils/completely-load-vehicle.js';
 import { getElement, getElementByPredicate } from './utils/index.js';
@@ -47,8 +48,8 @@ export class AddSimulatedRegionAction implements Action {
     @ValidateNested()
     @Type(() => SimulatedRegion)
     public simulatedRegion!: SimulatedRegion;
-    @ValidateNested()
-    @Type(() => TransferPoint)
+
+    @IsZodSchema(transferPointSchema)
     public transferPoint!: TransferPoint;
 }
 

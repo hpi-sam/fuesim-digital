@@ -3,9 +3,9 @@ import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     createVehicleParameters,
+    getTransferPointFullName,
     newMapCoordinatesAt,
     StrictObject,
-    TransferPoint,
     uuid,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -127,7 +127,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
                 Object.values(transferPoints)
                     .map((transferPoint) => ({
                         key: transferPoint.id,
-                        name: TransferPoint.getFullName(transferPoint),
+                        name: getTransferPointFullName(transferPoint),
                     }))
                     .sort((a, b) => a.name.localeCompare(b.name))
             )

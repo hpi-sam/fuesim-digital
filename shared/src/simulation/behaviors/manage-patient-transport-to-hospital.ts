@@ -9,30 +9,29 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import type { WritableDraft } from 'immer';
+import { z } from 'zod';
 import {
     newPatientTransferOccupation,
-    PatientStatus,
     type PatientStatusForTransport,
     type ResourceDescription,
     SimulatedRegion,
     currentSimulatedRegionOf,
     getCreate,
     isInSpecificSimulatedRegion,
-    patientStatusAllowedValues,
     addResourceDescription,
+    patientStatusSchema,
+    PatientStatus,
 } from '../../models/index.js';
-import type { UUID, UUIDSet } from '../../utils/index.js';
 import {
+    type UUID,
+    uuidSchema,
+    type UUIDSet,
     StrictObject,
     cloneDeepMutable,
     uuid,
     uuidValidationOptions,
 } from '../../utils/index.js';
-import {
-    IsLiteralUnion,
-    IsUUIDSet,
-    IsValue,
-} from '../../utils/validators/index.js';
+import { IsUUIDSet, IsValue } from '../../utils/validators/index.js';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
 import {
@@ -53,7 +52,6 @@ import {
     RadiogramUnpublishedStatus,
     NewPatientDataRequestedRadiogram,
 } from '../../models/radiogram/index.js';
-import { IsPatientsPerUUID } from '../../utils/validators/is-patients-per-uuid.js';
 import type { ExerciseState } from '../../state.js';
 import {
     getActivityById,
@@ -61,8 +59,8 @@ import {
     getElementByPredicate,
 } from '../../store/action-reducers/utils/index.js';
 import { PatientsTransportPromise } from '../utils/patients-transported-promise.js';
-import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
 import { logLastPatientTransportedInMultipleSimulatedRegions } from '../../store/action-reducers/utils/log.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type {
     SimulationBehavior,
     SimulationBehaviorState,
@@ -124,7 +122,9 @@ export class ManagePatientTransportToHospitalBehaviorState
      * regions, one must filter this object to only contain keys that are also
      * in {@link simulatedRegionsToManage}
      */
-    @IsPatientsPerUUID()
+    @IsZodSchema(
+        z.record(uuidSchema, z.record(patientStatusSchema, z.number()))
+    )
     public readonly patientsExpectedInRegions: PatientsPerRegion = {};
 
     @Type(() => PatientsTransportPromise)
@@ -132,7 +132,7 @@ export class ManagePatientTransportToHospitalBehaviorState
     public readonly patientsExpectedToStillBeTransportedByRegion: readonly PatientsTransportPromise[] =
         [];
 
-    @IsResourceDescription(patientStatusAllowedValues)
+    @IsZodSchema(z.record(patientStatusSchema, z.number()))
     public readonly transferredPatientCounts: ResourceDescription<PatientStatus> =
         {
             red: 0,
@@ -166,7 +166,7 @@ export class ManagePatientTransportToHospitalBehaviorState
     @Min(0)
     public readonly promiseInvalidationInterval: number = 30 * 60 * 1000;
 
-    @IsLiteralUnion(patientStatusAllowedValues)
+    @IsZodSchema(patientStatusSchema)
     public readonly maximumCategoryToTransport: PatientStatusForTransport =
         'red';
 
@@ -215,19 +215,20 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                         break;
                     }
 
-                    const patientsExpectedInRegions = Object.fromEntries(
-                        Object.entries(
-                            patientsExpectedInRegionsAfterTransports(
-                                draftState,
-                                behaviorState
+                    const patientsExpectedInRegions: PatientsPerRegion =
+                        Object.fromEntries(
+                            Object.entries(
+                                patientsExpectedInRegionsAfterTransports(
+                                    draftState,
+                                    behaviorState
+                                )
+                            ).filter(
+                                ([simulatedRegionId, _]) =>
+                                    behaviorState.simulatedRegionsToManage[
+                                        simulatedRegionId
+                                    ]
                             )
-                        ).filter(
-                            ([simulatedRegionId, _]) =>
-                                behaviorState.simulatedRegionsToManage[
-                                    simulatedRegionId
-                                ]
-                        )
-                    );
+                        );
 
                     const highestCategoryThatIsNeeded =
                         orderedPatientCategories.find((category) =>

@@ -1,143 +1,84 @@
-import { Type } from 'class-transformer';
-import {
-    IsBoolean,
-    IsNumber,
-    IsOptional,
-    IsUUID,
-    ValidateNested,
-} from 'class-validator';
-import type { UUID } from '../utils/index.js';
-import { uuid, uuidValidationOptions } from '../utils/index.js';
-import { IsValue } from '../utils/validators/index.js';
-import { getCreate } from './utils/get-create.js';
-import type { HealthPoints } from './utils/health-points.js';
-import { IsValidHealthPoint } from './utils/health-points.js';
+import { z } from 'zod';
+import { uuid, uuidSchema } from '../utils/index.js';
+import { healthPointsSchema } from './utils/index.js';
 
 /**
  * These parameters determine the increase or decrease of a patients health every second
  */
-export class FunctionParameters {
+export const functionParametersSchema = z.strictObject({
     /**
      * Every second the health points are increased by this value
      */
-    @IsNumber()
-    public readonly constantChange: number;
+    constantChange: z.number(),
     /**
      * Every second the health points are increased by this value multiplied by the weighted number of notarzt personnel
      */
-    @IsNumber()
-    public readonly notarztModifier: number;
+    notarztModifier: z.number(),
     /**
      * Every second the health points are increased by this value multiplied by the weighted number of notSan personnel
      */
-    @IsNumber()
-    public readonly notSanModifier: number;
+    notSanModifier: z.number(),
     /**
      * Every second the health points are increased by this value multiplied by the weighted number of rettSan personnel
      */
-    @IsNumber()
-    public readonly rettSanModifier: number;
-
+    rettSanModifier: z.number(),
     // TODO: sanModifier not included
+});
+export type FunctionParameters = z.infer<typeof functionParametersSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        constantChange: number,
-        notarztModifier: number,
-        notSanModifier: number,
-        rettSanModifier: number
-    ) {
-        this.constantChange = constantChange;
-        this.notarztModifier = notarztModifier;
-        this.rettSanModifier = rettSanModifier;
-        this.notSanModifier = notSanModifier;
-    }
-
-    static readonly create = getCreate(this);
+export function newFunctionParameters(
+    constantChange: number,
+    notarztModifier: number,
+    notSanModifier: number,
+    rettSanModifier: number
+): FunctionParameters {
+    return {
+        constantChange,
+        notarztModifier,
+        notSanModifier,
+        rettSanModifier,
+    };
 }
-
 /**
  * If all conditions apply the patient should switch to the next state
  * if a condition is undefined it is ignored
  */
-export class ConditionParameters {
+export const conditionParametersSchema = z.strictObject({
     /**
      * How long the patient is in the current state already
      */
-    @IsOptional()
-    @IsNumber()
-    public readonly earliestTime?: number;
-    @IsOptional()
-    @IsNumber()
-    public readonly latestTime?: number;
-    @IsOptional()
-    @IsValidHealthPoint()
-    public readonly minimumHealth?: HealthPoints;
-    @IsOptional()
-    @IsValidHealthPoint()
-    public readonly maximumHealth?: HealthPoints;
-    @IsOptional()
-    @IsBoolean()
-    public readonly isBeingTreated?: boolean;
+    earliestTime: z.number().optional(),
+    latestTime: z.number().optional(),
+    minimumHealth: healthPointsSchema.optional(),
+    maximumHealth: healthPointsSchema.optional(),
+    isBeingTreated: z.boolean().optional(),
     /**
      * The id of the patients healthState to switch to when all the conditions match
      */
-    @IsUUID(4, uuidValidationOptions)
-    public readonly matchingHealthStateId: UUID;
+    matchingHealthStateId: uuidSchema,
+});
+export type ConditionParameters = z.infer<typeof conditionParametersSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        earliestTime: number | undefined,
-        latestTime: number | undefined,
-        minimumHealth: HealthPoints | undefined,
-        maximumHealth: HealthPoints | undefined,
-        isBeingTreated: boolean | undefined,
-        matchingHealthStateId: UUID
-    ) {
-        this.earliestTime = earliestTime;
-        this.latestTime = latestTime;
-        this.minimumHealth = minimumHealth;
-        this.maximumHealth = maximumHealth;
-        this.isBeingTreated = isBeingTreated;
-        this.matchingHealthStateId = matchingHealthStateId;
-    }
-
-    static readonly create = getCreate(this);
-}
-
-export class PatientHealthState {
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
-
-    @IsValue('patientHealthState' as const)
-    public readonly type = 'patientHealthState';
-
-    @Type(() => FunctionParameters)
-    @ValidateNested()
-    public readonly functionParameters: FunctionParameters;
-
+export const patientHealthStateSchema = z.strictObject({
+    id: uuidSchema,
+    type: z.literal('patientHealthState'),
+    functionParameters: functionParametersSchema,
     /**
      * The first matching conditions are selected.
      * When nothing matches, the state is not changed.
      */
-    @Type(() => ConditionParameters)
-    @ValidateNested({ each: true })
-    public readonly nextStateConditions: readonly ConditionParameters[];
+    nextStateConditions: z.array(conditionParametersSchema),
+});
+export type PatientHealthState = z.infer<typeof patientHealthStateSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        functionParameters: FunctionParameters,
-        nextStateConditions: readonly ConditionParameters[]
-    ) {
-        this.functionParameters = functionParameters;
-        this.nextStateConditions = nextStateConditions;
-    }
-
-    static readonly create = getCreate(this);
+export function newPatientHealthState(
+    functionParameters: FunctionParameters,
+    nextStateConditions: ConditionParameters[]
+): PatientHealthState {
+    return {
+        id: uuid(),
+        type: 'patientHealthState',
+        functionParameters,
+        nextStateConditions,
+    };
 }

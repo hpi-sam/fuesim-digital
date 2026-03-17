@@ -1,9 +1,6 @@
-import type { AllowedValues } from '../../utils/validators/index.js';
+import { z } from 'zod';
 
-export type ExerciseStatus = 'notStarted' | 'paused' | 'running';
+export const exerciseStatusAllowedValues = ['notStarted', 'paused', 'running'];
 
-export const exerciseStatusAllowedValues: AllowedValues<ExerciseStatus> = {
-    notStarted: true,
-    paused: true,
-    running: true,
-};
+export const exerciseStatusSchema = z.literal(exerciseStatusAllowedValues);
+export type ExerciseStatus = z.infer<typeof exerciseStatusSchema>;

@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
-import { PatientStatusDataField } from 'fuesim-digital-shared';
 import { NgClass, NgStyle } from '@angular/common';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { type PatientStatusDataField } from 'fuesim-digital-shared';
 import { rgbColorPalette } from '../../../functions/colors';
 import { PatientStatusColorPipe } from '../../../pipes/patient-status-color.pipe';
 import { PatientBehaviorIconPipe } from '../../../pipes/patient-behavior-icon.pipe';

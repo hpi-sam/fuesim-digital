@@ -17,7 +17,7 @@ import {
     getElement,
     tryGetElement,
 } from '../../store/action-reducers/utils/index.js';
-import { Patient } from '../../models/patient.js';
+import { getPatientVisibleStatus } from '../../models/patient.js';
 import type {
     SimulationActivity,
     SimulationActivityState,
@@ -110,7 +110,7 @@ export const transferPatientToHospitalActivity: SimulationActivity<TransferPatie
                     sendSimulationEvent(
                         transferManagementRegion,
                         PatientTransferToHospitalSuccessfulEvent.create(
-                            Patient.getVisibleStatus(
+                            getPatientVisibleStatus(
                                 patient,
                                 draftState.configuration.pretriageEnabled,
                                 draftState.configuration.bluePatientsEnabled

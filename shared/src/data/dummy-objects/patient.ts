@@ -1,19 +1,20 @@
+import type { Patient } from '../../models/index.js';
 import {
     newMapPositionAt,
-    FunctionParameters,
-    Patient,
-    PatientHealthState,
-    PatientStatusCode,
+    newPatientHealthState,
+    newFunctionParameters,
+    newPatientStatusCode,
 } from '../../models/index.js';
 import { defaultPatientCategories } from '../default-state/patient-templates.js';
+import { newPatient } from '../../models/patient.js';
 
 export function generateDummyPatient(): Patient {
     const template = defaultPatientCategories[0]!.patientTemplates[0]!;
-    const healthState = PatientHealthState.create(
-        FunctionParameters.create(-10_000, 0, 0, 0),
+    const healthState = newPatientHealthState(
+        newFunctionParameters(-10_000, 0, 0, 0),
         []
     );
-    return Patient.create(
+    return newPatient(
         {
             address: 'Musterstraße 1',
             name: 'John Doe',
@@ -21,7 +22,7 @@ export function generateDummyPatient(): Patient {
         },
         template.biometricInformation,
         template.pretriageInformation,
-        PatientStatusCode.create('ZAZAZA'),
+        newPatientStatusCode('ZAZAZA'),
         'green',
         'green',
         { [healthState.id]: healthState },

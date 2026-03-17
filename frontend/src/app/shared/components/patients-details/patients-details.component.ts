@@ -2,7 +2,11 @@ import type { OnChanges } from '@angular/core';
 import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
-import { Patient } from 'fuesim-digital-shared';
+import {
+    getPatientVisibleStatus,
+    Patient,
+    isPretriageStatusLocked,
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import {
@@ -91,7 +95,7 @@ export class PatientsDetailsComponent implements OnChanges {
                 createSelectPatient(this.patientId()),
                 selectConfiguration,
                 (patient, configuration) =>
-                    Patient.getVisibleStatus(
+                    getPatientVisibleStatus(
                         patient,
                         configuration.pretriageEnabled,
                         configuration.bluePatientsEnabled
@@ -99,7 +103,7 @@ export class PatientsDetailsComponent implements OnChanges {
             )
         );
         this.pretriageStatusIsLocked$ = this.patient$.pipe(
-            map((patient) => Patient.pretriageStatusIsLocked(patient))
+            map(isPretriageStatusLocked)
         );
     }
 

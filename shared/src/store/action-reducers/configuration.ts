@@ -1,16 +1,18 @@
-import { Type } from 'class-transformer';
-import { IsBoolean, IsString, ValidateNested } from 'class-validator';
-import { TileMapProperties } from '../../models/utils/index.js';
+import { IsBoolean, IsString } from 'class-validator';
+import {
+    type TileMapProperties,
+    tileMapPropertiesSchema,
+} from '../../models/index.js';
 import { cloneDeepMutable } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 
 export class SetTileMapPropertiesAction implements Action {
     @IsValue('[Configuration] Set tileMapProperties' as const)
     public readonly type = '[Configuration] Set tileMapProperties';
 
-    @ValidateNested()
-    @Type(() => TileMapProperties)
+    @IsZodSchema(tileMapPropertiesSchema)
     public readonly tileMapProperties!: TileMapProperties;
 }
 

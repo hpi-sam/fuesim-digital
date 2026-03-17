@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { Patient, UUID } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-simulated-region-preview-card',
@@ -12,4 +13,5 @@ export class SimulatedRegionPreviewCardComponent {
     readonly title = input.required<string>();
     readonly imageUrl = input.required<string>();
     readonly darkBackground = input(false);
+    readonly patient = input<Patient>();
 }

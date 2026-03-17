@@ -23,6 +23,7 @@
                             [imageUrl]="patient.image.url"
                             [darkBackground]="selected()?.id === patient.id"
                             [title]="patient.identifier"
+                            [patient]="patient"
                             (elementMousedown)="selectElement(patient)"
                         >
                         </app-simulated-region-preview-card>

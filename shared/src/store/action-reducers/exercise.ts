@@ -199,7 +199,7 @@ export namespace ExerciseActionReducers {
 
             return draftState;
         },
-        rights: 'server',
+        rights: 'trainer',
     };
 
     export const templateImport: ActionReducer<ImportTemplatesAction> = {

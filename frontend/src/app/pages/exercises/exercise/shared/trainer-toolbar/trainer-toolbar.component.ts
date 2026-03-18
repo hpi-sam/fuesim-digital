@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, isDevMode } from '@angular/core';
 import { Router } from '@angular/router';
 import {
     NgbModal,
@@ -118,4 +118,6 @@ export class TrainerToolbarComponent {
                 this.router.navigate(['/']);
             });
     }
+
+    protected readonly isDevMode = isDevMode;
 }

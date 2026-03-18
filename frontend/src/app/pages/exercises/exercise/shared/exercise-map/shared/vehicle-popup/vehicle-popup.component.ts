@@ -11,6 +11,7 @@ import { selectCurrentMainRole } from '../../../../../../../state/application/se
 import { VehicleNameEditorComponent } from '../../../../../../../shared/components/vehicle-name-editor/vehicle-name-editor.component';
 import { VehicleAvailableSlotsDisplayComponent } from '../../../../../../../shared/components/vehicle-available-slots-display/vehicle-available-slots-display.component';
 import { VehicleLoadUnloadControlsComponent } from '../../../../../../../shared/components/vehicle-load-unload-controls/vehicle-load-unload-controls.component';
+import { HelpButtonComponent } from '../../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-vehicle-popup',
@@ -21,6 +22,7 @@ import { VehicleLoadUnloadControlsComponent } from '../../../../../../../shared/
         VehicleAvailableSlotsDisplayComponent,
         VehicleLoadUnloadControlsComponent,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class VehiclePopupComponent implements OnInit {
@@ -31,7 +33,9 @@ export class VehiclePopupComponent implements OnInit {
     public vehicleId!: UUID;
 
     public vehicle$?: Observable<Vehicle>;
-    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
+    public readonly currentRole = this.store.selectSignal(
+        selectCurrentMainRole
+    );
 
     ngOnInit() {
         this.vehicle$ = this.store.select(createSelectVehicle(this.vehicleId));

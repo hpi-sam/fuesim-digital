@@ -141,6 +141,10 @@ jobs:
             - name: Run Prettier
               if: always()
               run: npm run prettier:check
+            - name: Download mdbook-lint
+              run: cd docs && wget https://github.com/joshrotenberg/mdbook-lint/releases/download/v0.14.3/mdbook-lint-x86_64-unknown-linux-gnu.tar.xz && tar -xf mdbook-lint-x86_64-unknown-linux-gnu.tar.xz
+            - name: Lint mdBook
+              run: cd docs && ./mdbook-lint-x86_64-unknown-linux-gnu/mdbook-lint lint src/
 
     test:
         timeout-minutes: 4

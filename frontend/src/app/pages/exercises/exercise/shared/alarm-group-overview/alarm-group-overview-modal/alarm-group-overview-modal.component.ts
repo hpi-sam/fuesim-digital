@@ -11,12 +11,18 @@ import {
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { AlarmGroupItemComponent } from '../alarm-group-item/alarm-group-item.component';
 import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-alarm-group-overview-modal',
     templateUrl: './alarm-group-overview-modal.component.html',
     styleUrls: ['./alarm-group-overview-modal.component.scss'],
-    imports: [AlarmGroupItemComponent, AsyncPipe, ValuesPipe],
+    imports: [
+        AlarmGroupItemComponent,
+        AsyncPipe,
+        ValuesPipe,
+        HelpButtonComponent,
+    ],
 })
 export class AlarmGroupOverviewModalComponent {
     activeModal = inject(NgbActiveModal);

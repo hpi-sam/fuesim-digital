@@ -16,6 +16,7 @@ import { UrlValidatorDirective } from '../../../../../../shared/validation/url-v
 import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { TileServerSelectorComponent } from '../tile-server-selector/tile-server-selector.component';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-exercise-settings-modal',
@@ -29,6 +30,7 @@ import { TileServerSelectorComponent } from '../tile-server-selector/tile-server
         AppSaveOnTypingDirective,
         AsyncPipe,
         TileServerSelectorComponent,
+        HelpButtonComponent,
     ],
 })
 export class ExerciseSettingsModalComponent {

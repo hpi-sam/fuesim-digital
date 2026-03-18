@@ -10,6 +10,7 @@ import { uuidValidationOptions } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { removeInvalidAssignments } from '../../state-helpers/technical-challenge-assignment.js';
 
 export class MovePersonnelAction implements Action {
     @IsValue('[Personnel] Move personnel' as const)
@@ -32,6 +33,9 @@ export namespace PersonnelActionReducers {
                 'personnel',
                 draftState
             );
+
+            removeInvalidAssignments(personnelId, draftState);
+
             return draftState;
         },
         rights: 'participant',

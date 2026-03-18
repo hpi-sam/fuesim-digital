@@ -25,6 +25,17 @@ WORKDIR $PRODUCTION_PATH
 # install for production and cleanup
 RUN npm run deployment
 
+FROM rust AS docs-builder
+RUN cargo install mdbook
+
+# add the source code to app
+COPY ./docs $PRODUCTION_PATH/docs
+
+# set workdir
+WORKDIR $PRODUCTION_PATH/docs
+
+RUN mdbook build
+
 ####  building done  ####
 #########################
 ####  prod container ####
@@ -71,6 +82,9 @@ COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/drizzle $
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/drizzle.config.ts $PRODUCTION_PATH/backend/drizzle.config.ts
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/node_modules $PRODUCTION_PATH/backend/node_modules
 COPY --chown=www-data:www-data --from=builder $PRODUCTION_PATH/backend/package.json $PRODUCTION_PATH/backend
+
+# copy docs
+COPY --chown=www-data:www-data --from=docs-builder $PRODUCTION_PATH/docs/book $PRODUCTION_PATH/frontend/help
 
 # set correct working directory for docker-entrypoint.sh
 WORKDIR $PRODUCTION_PATH/backend

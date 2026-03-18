@@ -7,10 +7,12 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
+    TechnicalChallengeId,
     UUID,
     WithPosition,
 } from 'fuesim-digital-shared';
 import {
+    currentStateOf,
     isInSpecificSimulatedRegion,
     isInTransfer,
     nestedCoordinatesOf,
@@ -282,5 +284,23 @@ export function createSelectActivityStatesByType<
                 (activity): activity is ExerciseSimulationActivityState<T> =>
                     activity.type === activityType
             )
+    );
+}
+
+function createSelectAvailableTaskIds(
+    technicalChallengeId: TechnicalChallengeId
+) {
+    return createSelector(
+        createSelectTechnicalChallenge(technicalChallengeId),
+        (challenge) => Object.keys(currentStateOf(challenge).possibleTasks)
+    );
+}
+export function createSelectAvailableTasks(
+    technicalChallengeId: TechnicalChallengeId
+) {
+    return createSelector(
+        createSelectAvailableTaskIds(technicalChallengeId),
+        selectTasks,
+        (taskIds, taskMap) => taskIds.map((id) => taskMap[id]!)
     );
 }

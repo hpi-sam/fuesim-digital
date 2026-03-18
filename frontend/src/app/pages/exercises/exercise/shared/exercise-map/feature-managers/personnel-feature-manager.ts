@@ -1,11 +1,13 @@
 import type { Store } from '@ngrx/store';
 import type { Personnel, UUID } from 'fuesim-digital-shared';
-import { normalZoom } from 'fuesim-digital-shared';
+import { isTechnicalChallenge, normalZoom } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
 import { type Observable, type Subject, takeUntil } from 'rxjs';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
+import type { Point } from 'ol/geom';
+import type { FeatureLike } from 'ol/Feature';
 import { PersonnelPopupComponent } from '../shared/personnel-popup/personnel-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
@@ -17,6 +19,7 @@ import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import { selectVisiblePersonnel } from '../../../../../../state/application/selectors/shared.selectors';
+import type { Positions } from '../utility/geometry-helper';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
@@ -177,5 +180,26 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
                 this.workingPersonnel = workingPersonnel;
                 this.layer.changed();
             });
+    }
+
+    protected override async onTranslateEnd(
+        newPosition: Positions<Point>,
+        element: Personnel,
+        elementFeature: Feature<Point>
+    ): Promise<void> {
+        // check if on technical challenge
+        const pixel = this.olMap.getPixelFromCoordinate([
+            newPosition.x,
+            newPosition.y,
+        ]);
+        const features = this.olMap.getFeaturesAtPixel(pixel);
+        const isFeatureLikeTechnicalChallenge = (f: FeatureLike) =>
+            isTechnicalChallenge(this.getElementFromFeature(f as Feature));
+        const challenge = features.find(isFeatureLikeTechnicalChallenge);
+        if (challenge) {
+            return;
+        }
+
+        return super.onTranslateEnd(newPosition, element, elementFeature);
     }
 }

@@ -1,0 +1,20 @@
+<div
+    class="dropdown-menu"
+    style="
+        position: static;
+        display: block;
+        max-height: 200px;
+        overflow-y: auto;
+    "
+>
+    @for (task of availableTasks$ | async; track task.id) {
+        <button
+            (click)="assignTask(task.id)"
+            type="button"
+            class="dropdown-item"
+            data-cy="chooseTaskPopupAssignTaskButton"
+        >
+            {{ task.taskName }}
+        </button>
+    }
+</div>

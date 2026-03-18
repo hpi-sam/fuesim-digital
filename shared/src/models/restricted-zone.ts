@@ -2,11 +2,10 @@ import * as z from 'zod';
 import type { Immutable } from 'immer';
 import { type UUID, uuid, uuidSchema } from '../utils/index.js';
 import type { ExerciseState } from '../state.js';
-import type { AllowedValues } from '../utils/validators/is-literal-union.js';
+import type { AllowedValues } from '../utils/validators/index.js';
 import type { ImageProperties, MapCoordinates, Size } from './utils/index.js';
 import {
-    lowerRightCornerOf,
-    upperLeftCornerOf,
+    isWithinExtent,
     newMapPositionAt,
     positionSchema,
     isOnMap,
@@ -93,14 +92,7 @@ export function isInRestrictedZone(
     restrictedZone: RestrictedZone,
     coordinates: MapCoordinates
 ): boolean {
-    const upperLeftCorner = upperLeftCornerOf(restrictedZone);
-    const lowerRightCorner = lowerRightCornerOf(restrictedZone);
-    return (
-        upperLeftCorner.x <= coordinates.x &&
-        coordinates.x <= lowerRightCorner.x &&
-        lowerRightCorner.y <= coordinates.y &&
-        coordinates.y <= upperLeftCorner.y
-    );
+    return isWithinExtent(restrictedZone, coordinates);
 }
 
 /**

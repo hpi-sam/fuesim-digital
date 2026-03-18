@@ -26,6 +26,17 @@ export function isInSimulatedRegion(withPosition: WithPosition): boolean {
     return isPositionInSimulatedRegion(withPosition.position);
 }
 
+export function isWithinExtent(element: WithExtent, coordinates: MapCoordinates): boolean {
+    const upperLeftCorner = upperLeftCornerOf(element);
+    const lowerRightCorner = lowerRightCornerOf(element);
+    return (
+        upperLeftCorner.x <= coordinates.x &&
+        coordinates.x <= lowerRightCorner.x &&
+        lowerRightCorner.y <= coordinates.y &&
+        coordinates.y <= upperLeftCorner.y
+    );
+}
+
 export function isInSpecificVehicle(
     withPosition: WithPosition,
     vehicleId: UUID

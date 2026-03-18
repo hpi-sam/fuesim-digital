@@ -131,6 +131,11 @@ export function joinExerciseAsParticipant() {
     return cy;
 }
 
+export function closeAllToasts() {
+    cy.get('.toast-header .btn-close').click();
+    return cy;
+}
+
 export function initializeParticipantSocket() {
     cy.get('@websocketBaseUrl', { log: false }).then(
         (websocketBaseUrl: any) => {

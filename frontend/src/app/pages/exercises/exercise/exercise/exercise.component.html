@@ -64,6 +64,7 @@
                             type="button"
                             class="btn btn-outline-primary"
                             ngbDropdownToggle
+                            data-cy="exportMenuButton"
                         >
                             <i class="bi-cloud-download me-2"> </i>
                             Exportieren
@@ -103,6 +104,7 @@
                             <button
                                 ngbDropdownItem
                                 (click)="patientsCsvExport()"
+                                data-cy="exportPatientsCsvButton"
                             >
                                 <i class="bi-hospital me-2"> </i>
                                 Patienten für IVENA MANV

@@ -1,13 +1,9 @@
 <div class="modal-header">
     <h4 class="modal-title">
         Krankenhäuser
-        <button
-            class="ms-3 btn btn-outline-primary"
-            (click)="addHospital()"
-            data-cy="hospitalAddButton"
-        >
-            <i class="bi bi-plus"></i> Hinzufügen
-        </button>
+        <app-help-button
+            url="2_exercises/3_exercise_elements.html#krankenhäuser"
+        />
     </h4>
     <button
         type="button"
@@ -18,6 +14,13 @@
 </div>
 @if (hospitals$ | async | values; as hospitals) {
     <div class="modal-body" style="min-height: 60vh">
+        <button
+            class="btn btn-sm btn-outline-primary"
+            (click)="addHospital()"
+            data-cy="hospitalAddButton"
+        >
+            <i class="bi bi-plus"></i> Hinzufügen
+        </button>
         @if (hospitals.length > 0) {
             <table class="table">
                 <thead>

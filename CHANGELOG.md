@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Added
+
+- Add documentation for most features and integrate it with the software.
+
 ### Fixed
 
 - Creating a parallel exercise with many (>10) exercise instances no longer slows down the server significantly.

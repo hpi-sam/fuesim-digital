@@ -36,5 +36,5 @@ frontend/cypress*
 ## more unnecessary for production, not needed inside the docker container
 
 docker-compose.yml
-**/README.md
 
+docs/book

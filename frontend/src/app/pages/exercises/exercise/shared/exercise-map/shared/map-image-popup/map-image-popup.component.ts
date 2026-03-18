@@ -5,12 +5,13 @@ import { PopupService } from '../../utility/popup.service';
 import { MapImagesDetailsComponent } from '../../../../../../../shared/components/map-images-details/map-images-details.component';
 import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
 import { AppState } from '../../../../../../../state/app.state';
+import { HelpButtonComponent } from '../../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-map-image-popup',
     templateUrl: './map-image-popup.component.html',
     styleUrls: ['./map-image-popup.component.scss'],
-    imports: [MapImagesDetailsComponent],
+    imports: [MapImagesDetailsComponent, HelpButtonComponent],
 })
 export class MapImagePopupComponent {
     private readonly popupService = inject(PopupService);

@@ -52,6 +52,7 @@ import {
     openParticipantsModal,
     openTrainersModal,
 } from '../shared/clients-modal/open-clients-modal';
+import { environment } from '../../../../../environments/environment.js';
 
 @Component({
     selector: 'app-exercise',
@@ -107,6 +108,7 @@ export class ExerciseComponent implements OnDestroy {
     );
 
     readonly version: string = Package.version;
+    readonly docsUrl = environment.docsUrl;
 
     public openInviteModal() {
         openInviteModal(this.modalService);

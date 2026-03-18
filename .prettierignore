@@ -19,3 +19,6 @@ frontend/src/assets/source-code
 
 # custom html files
 inspired-by-or-copied-from-list.html
+
+# mdbook template
+docs/theme/index.hbs

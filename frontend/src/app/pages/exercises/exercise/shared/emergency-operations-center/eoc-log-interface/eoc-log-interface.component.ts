@@ -17,12 +17,19 @@ import {
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
 import { FormatDurationPipe } from '../../../../../../shared/pipes/format-duration.pipe';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-eoc-log-interface',
     templateUrl: './eoc-log-interface.component.html',
     styleUrls: ['./eoc-log-interface.component.scss'],
-    imports: [FormsModule, AutofocusDirective, AsyncPipe, FormatDurationPipe],
+    imports: [
+        FormsModule,
+        AutofocusDirective,
+        AsyncPipe,
+        FormatDurationPipe,
+        HelpButtonComponent,
+    ],
 })
 export class EocLogInterfaceComponent {
     private readonly exerciseService = inject(ExerciseService);

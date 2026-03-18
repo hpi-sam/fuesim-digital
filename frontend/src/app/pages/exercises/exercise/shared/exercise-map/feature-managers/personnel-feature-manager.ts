@@ -3,7 +3,7 @@ import type { Personnel, UUID } from 'fuesim-digital-shared';
 import { normalZoom } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
-import type { Subject } from 'rxjs';
+import { type Observable, type Subject, takeUntil } from 'rxjs';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import { PersonnelPopupComponent } from '../shared/personnel-popup/personnel-popup.component';
@@ -29,6 +29,8 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
             destroy$,
             mapInteractionsManager
         );
+
+        this.trackWorkingPersonnel(destroy$);
     }
     private readonly imageStyleHelper = new ImageStyleHelper(
         (feature) => (this.getElementFromFeature(feature) as Personnel).image
@@ -45,6 +47,8 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
         'top'
     );
 
+    private workingPersonnel!: Set<UUID>;
+
     private readonly popupHelper = new ImagePopupHelper(this.olMap, this.layer);
 
     private readonly openPopupCircleStyleHelper = new CircleStyleHelper(
@@ -60,6 +64,15 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
         }),
         0.025,
         (_) => [0, 0]
+    );
+
+    private readonly currentlyWorkingStyleHelper = new CircleStyleHelper(
+        (feature) => ({
+            radius: 25,
+            fill: new Fill({ color: 'green' }),
+        }),
+        0.025,
+        (feature) => [1, 1.5]
     );
 
     constructor(
@@ -83,10 +96,23 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
         );
 
         this.layer.setStyle((feature, resolution) => {
+            const personnel = this.getElementFromFeature(
+                feature as Feature
+            ) as Personnel;
+
             const styles = [
                 this.nameStyleHelper.getStyle(feature as Feature, resolution),
                 this.imageStyleHelper.getStyle(feature as Feature, resolution),
             ];
+
+            if (this.workingPersonnel.has(personnel.id)) {
+                styles.push(
+                    this.currentlyWorkingStyleHelper.getStyle(
+                        feature as Feature,
+                        resolution
+                    )
+                );
+            }
             this.addMarking(
                 feature,
                 styles,
@@ -124,5 +150,33 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
                 }
             )
         );
+    }
+
+    private trackWorkingPersonnel($destroy: Observable<void>) {
+        this.store
+            .select((state) => {
+                // TODO: move selector into helper.
+                // TODO: reduce number of state changes
+                // TODO: think about using bilateral mapping to depend on
+                //       the state of the personnel in question.
+                const workingPersonnelSet = new Set<UUID>();
+                const challenges = Object.values(
+                    state.application.exerciseState!.technicalChallenges
+                );
+                for (const challenge of challenges) {
+                    // eslint-disable-next-line guard-for-in
+                    for (const personnelId in challenge.assignedPersonnel) {
+                        console.log(personnelId);
+                        workingPersonnelSet.add(personnelId);
+                    }
+                }
+                return workingPersonnelSet;
+            })
+            .pipe(takeUntil($destroy))
+            .subscribe((workingPersonnel) => {
+                console.log('working personnel changed');
+                this.workingPersonnel = workingPersonnel;
+                this.layer.changed();
+            });
     }
 }

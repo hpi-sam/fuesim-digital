@@ -29,6 +29,7 @@ import { selectExerciseKey } from '../../../../../state/application/selectors/ap
 import { selectExerciseStatus } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { StartPauseButtonComponent } from '../../../../../shared/components/start-pause-button/start-pause-button.component';
+import { SingleTickButtonComponent } from '../../../../../shared/components/single-tick-button/single-tick-button.component';
 
 @Component({
     selector: 'app-trainer-toolbar',
@@ -41,6 +42,7 @@ import { StartPauseButtonComponent } from '../../../../../shared/components/star
         NgbDropdownButtonItem,
         NgbDropdownItem,
         StartPauseButtonComponent,
+        SingleTickButtonComponent,
     ],
 })
 export class TrainerToolbarComponent {

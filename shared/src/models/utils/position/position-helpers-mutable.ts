@@ -20,12 +20,16 @@ import type { Client } from '../../client.js';
 import type { Hospital } from '../../hospital.js';
 import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
+import { newMapPositionAt } from './map-position.js';
 import type { Position } from './position.js';
 import {
     coordinatesOfPosition,
     isPositionOnMap,
     isOnMap,
+    currentCoordinatesOf,
+    calculateDelta,
 } from './position-helpers.js';
+import type { WithPosition } from './with-position.js';
 
 type MovableElement = Exclude<Element, AlarmGroup | Client | Hospital>;
 type MovableType = MovableElement['type'];
@@ -65,7 +69,41 @@ export function changePosition(
             to
         );
     }
+    if (element.type === 'technicalChallenge' && to.type === 'coordinates') {
+        const assignedPersonnel = Object.keys(element.assignedPersonnel).map(
+            (id) => getElement(state, 'personnel', id)
+        );
+        moveAssociatedElements(element, to, assignedPersonnel, state);
+    }
     element.position = cloneDeepMutable(to);
+}
+
+function moveAssociatedElements(
+    element: WithPosition,
+    to: MapPosition,
+    associatedElements: WritableDraft<MovableElement>[],
+    state: WritableDraft<ExerciseState>
+) {
+    const from = currentCoordinatesOf(element);
+    const delta = calculateDelta(from, coordinatesOfPosition(to));
+    const move = (position: Position): Position => {
+        console.assert(position.type === 'coordinates');
+
+        if (!isPositionOnMap(position)) return position;
+        const coordinates = coordinatesOfPosition(position);
+
+        return newMapPositionAt({
+            x: coordinates.x + delta.deltaX,
+            y: coordinates.y + delta.deltaY,
+        });
+    };
+    for (const associatedElement of associatedElements) {
+        changePosition(
+            associatedElement,
+            move(associatedElement.position),
+            state
+        );
+    }
 }
 
 function updateSpatialElementTree(

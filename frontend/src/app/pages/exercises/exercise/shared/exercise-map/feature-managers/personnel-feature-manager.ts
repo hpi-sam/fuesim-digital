@@ -166,7 +166,6 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
                 for (const challenge of challenges) {
                     // eslint-disable-next-line guard-for-in
                     for (const personnelId in challenge.assignedPersonnel) {
-                        console.log(personnelId);
                         workingPersonnelSet.add(personnelId);
                     }
                 }

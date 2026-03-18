@@ -70,6 +70,7 @@ namespace TechnicalChallengeActionReducers {
                     'technicalChallenge',
                     draftState
                 );
+
                 return draftState;
             },
             rights: 'trainer',

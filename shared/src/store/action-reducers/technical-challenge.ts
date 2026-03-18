@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import type { ActionReducer, MapPosition } from '../../index.js';
 import {
+    lookupReducerFor,
+    currentStateOf,
+    ReducerError,
+    taskSchema,
     getElement,
     sizeSchema,
     technicalChallengeIdSchema,
@@ -8,9 +12,11 @@ import {
     uuidSchema,
     mapCoordinatesSchema,
 } from '../../index.js';
-import { technicalChallengeSchema } from '../../models/index.js';
+import {
+    technicalChallengeSchema,
+    personnelSchema,
+} from '../../models/index.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
-import { personnelSchema } from '../../models/personnel.js';
 
 const createTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Create technical challenge'),
@@ -35,6 +41,11 @@ const assignTechnicalChallengeActionSchema = z.strictObject({
     ),
     technicalChallengeId: technicalChallengeSchema.shape.id,
     personnelId: personnelSchema.shape.id,
+    /**
+     * assigned personnel is also moved to specified position
+     */
+    targetPosition: mapCoordinatesSchema,
+    taskId: taskSchema.shape.id,
 });
 
 const resizeTechnicalChallengeActionSchema = z.strictObject({
@@ -80,18 +91,29 @@ namespace TechnicalChallengeActionReducers {
     > = {
         type: assignTechnicalChallengeActionSchema.shape.type.value,
         actionSchema: assignTechnicalChallengeActionSchema,
-        reducer: (draftState, { technicalChallengeId, personnelId }) => {
+        reducer: (
+            draftState,
+            { technicalChallengeId, personnelId, taskId, targetPosition }
+        ) => {
             const technicalChallenge = getElement(
                 draftState,
                 'technicalChallenge',
                 technicalChallengeId
             );
 
-            const task = Object.values(technicalChallenge.relevantTasks)[0]!;
-            console.log(`assigning: ${task.taskName} (${task.id})`);
+            if (!(taskId in currentStateOf(technicalChallenge).possibleTasks)) {
+                throw new ReducerError(
+                    `Task ${taskId} is not possible in current state ${technicalChallenge.currentStateId}`
+                );
+            }
+            technicalChallenge.assignedPersonnel[personnelId] = taskId;
 
-            // TODO: assign task & validate if exists
-            technicalChallenge.assignedPersonnel[personnelId] = task.id;
+            lookupReducerFor('[Personnel] Move personnel').reducer(draftState, {
+                type: '[Personnel] Move personnel',
+                personnelId,
+                targetPosition,
+            });
+
             return draftState;
         },
         rights: 'participant',

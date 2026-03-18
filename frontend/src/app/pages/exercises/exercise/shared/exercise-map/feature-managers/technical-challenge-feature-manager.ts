@@ -3,10 +3,12 @@ import {
     currentStateOf,
     newMapCoordinatesAt,
     newSize,
-    type TechnicalChallengeState,
-    type TechnicalChallenge,
-    type UUID,
-    type Element,
+} from 'fuesim-digital-shared';
+import type {
+    TechnicalChallengeState,
+    TechnicalChallenge,
+    UUID,
+    Element as StateElement,
 } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
@@ -20,18 +22,9 @@ import { TechnicalChallengePopupComponent } from '../shared/technical-challenge-
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import type { PopupService } from '../utility/popup.service';
-import type { ExerciseService } from '../../../../../../core/exercise.service';
-import type { AppState } from '../../../../../../state/app.state';
-import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
-import {
-    selectCurrentMainRole,
-    selectVisibleTechnicalChallenges,
-} from '../../../../../../state/application/selectors/shared.selectors';
-import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
 import type { FeatureManager } from '../utility/feature-manager';
 import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction';
-import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
@@ -39,7 +32,11 @@ import {
     selectCurrentMainRole,
     selectVisibleTechnicalChallenges,
 } from '../../../../../../state/application/selectors/shared.selectors';
+import { ChooseTaskPopupComponent } from '../shared/choose-task-popup/choose-task-popup.component';
+import { PointRelativePopupHelper } from '../utility/point-relative-popup-helper';
+import type { OlMapManager } from '../utility/ol-map-manager';
 import { MoveableFeatureManager } from './moveable-feature-manager';
+import type { PersonnelFeatureManager } from './personnel-feature-manager';
 
 export class TechnicalChallengeFeatureManager
     extends MoveableFeatureManager<TechnicalChallenge, Polygon>
@@ -70,10 +67,11 @@ export class TechnicalChallengeFeatureManager
     private readonly imageStyleHelper = new ImageStyleHelper(
         (feature) => this.currentStateOfFeature(feature).image
     );
-    private readonly popupHelper = new ImagePopupHelper(this.olMap, this.layer);
+    private readonly popupHelper = new PointRelativePopupHelper(this.olMap);
 
     constructor(
         olMap: OlMap,
+        private readonly olMapManager: OlMapManager,
         private readonly exerciseService: ExerciseService,
         private readonly store: Store<AppState>,
         private readonly popupService: PopupService
@@ -132,31 +130,21 @@ export class TechnicalChallengeFeatureManager
     ): void {
         super.onFeatureClicked(event, feature);
 
-        const zoom = this.olMap.getView().getZoom()!;
-        const margin = 10 / zoom;
+        const technicalChallengeId = feature.getId() as UUID;
 
-        this.popupService.togglePopup({
-            ...this.popupHelper.getPopupOptions(
+        this.popupService.togglePopup(
+            this.popupHelper.getPopupOptions(
                 TechnicalChallengePopupComponent,
-                feature,
-                [feature.getId() as UUID],
-                [],
-                [],
-                [],
-                {
-                    technicalChallengeId: feature.getId() as UUID,
-                }
-            ),
-            // We want the popup to be centered on the mouse position
-            ...calculatePopupPositioning(
                 event.coordinate,
+                [technicalChallengeId],
+                [],
+                [],
+                [],
                 {
-                    height: margin,
-                    width: margin,
-                },
-                this.olMap.getView().getCenter()!
-            ),
-        });
+                    technicalChallengeId,
+                }
+            )
+        );
     }
 
     public override onFeatureDrop(
@@ -171,20 +159,61 @@ export class TechnicalChallengeFeatureManager
                 dropEvent
             );
         }
+        // personnel can't be dragged from the editor -> always a TranslateEvent
+        const translateEvent = dropEvent as TranslateEvent;
         const technicalChallenge = this.getElementFromFeature(
             droppedOnFeature
         ) as TechnicalChallenge;
+        const personnelManager =
+            this.olMapManager.featureNameFeatureManagerDictionary.get(
+                'personnel'
+            ) as PersonnelFeatureManager;
+        const personnelFeature =
+            personnelManager.getFeatureFromElement(droppedElement)!;
 
-        // TODO: simply trigger task selection popup
+        const revertPersonnelMoveCallback = () => {
+            personnelManager.movementAnimator.animateFeatureMovement(
+                personnelFeature,
+                translateEvent.startCoordinate
+            );
+        };
+        const assignTaskCallback = async (taskId: UUID) => {
+            const response = await this.exerciseService.proposeAction(
+                {
+                    type: '[TechnicalChallenge] Assign a personnel to technical challenge',
+                    technicalChallengeId: technicalChallenge.id,
+                    personnelId: droppedElement.id,
+                    taskId,
+                    targetPosition:
+                        personnelManager.geometryHelper.getFeaturePosition(
+                            personnelFeature
+                        ),
+                },
+                true
+            );
 
-        this.exerciseService.proposeAction(
-            {
-                type: '[TechnicalChallenge] Assign a personnel to technical challenge',
-                technicalChallengeId: technicalChallenge.id,
-                personnelId: droppedElement.id,
-            },
-            true
-        );
+            if (!response.success) {
+                revertPersonnelMoveCallback();
+            }
+        };
+
+        this.popupService.togglePopup({
+            onDismissCallback: revertPersonnelMoveCallback,
+            ...this.popupHelper.getPopupOptions(
+                ChooseTaskPopupComponent,
+                translateEvent.coordinate,
+                [],
+                [],
+                [],
+                [],
+                {
+                    technicalChallengeId: technicalChallenge.id,
+                    personnelId: droppedElement.id,
+                    assignTaskCallback,
+                }
+            ),
+        });
+
         return true;
     }
 

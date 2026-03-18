@@ -52,8 +52,8 @@ export class ImageStyleHelper extends StyleHelper<Style, Feature> {
         const imageStyle = initialStyle;
 
         let geometry = feature.getGeometry()!;
-        if (geometry.getType() === "Polygon") {
-            geometry = (geometry as Polygon).getInteriorPoint()
+        if (geometry.getType() === 'Polygon') {
+            geometry = (geometry as Polygon).getInteriorPoint();
         }
         imageStyle.setGeometry(geometry);
 

@@ -9,6 +9,7 @@ import type {
     Guard,
 } from 'fuesim-digital-shared';
 import { currentStateOf } from 'fuesim-digital-shared';
+import { values } from 'lodash-es';
 import {
     createSelectPersonnel,
     createSelectTask,
@@ -17,11 +18,13 @@ import {
 } from '../../../../../../../state/application/selectors/exercise.selectors';
 import type { AppState } from '../../../../../../../state/app.state';
 import { PopupService } from '../../utility/popup.service';
+import { ValuesPipe } from '../../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-technical-challenge-popup',
     templateUrl: './technical-challenge-popup.component.html',
     styleUrls: ['./technical-challenge-popup.component.scss'],
+    imports: [ValuesPipe],
 })
 export class TechnicalChallengePopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
@@ -74,4 +77,6 @@ export class TechnicalChallengePopupComponent implements OnInit {
     public closePopup() {
         this.popupService.dismissPopup();
     }
+
+    protected readonly values = values;
 }

@@ -32,6 +32,13 @@ import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
 import type { FeatureManager } from '../utility/feature-manager';
 import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction';
 import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import {
+    selectCurrentMainRole,
+    selectVisibleTechnicalChallenges,
+} from '../../../../../../state/application/selectors/shared.selectors';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class TechnicalChallengeFeatureManager

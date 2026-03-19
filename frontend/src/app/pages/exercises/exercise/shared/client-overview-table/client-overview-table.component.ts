@@ -11,14 +11,14 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
-import { ExerciseService } from '../../../../../../core/exercise.service';
-import type { AppState } from '../../../../../../state/app.state';
+import { ExerciseService } from '../../../../../core/exercise.service';
+import type { AppState } from '../../../../../state/app.state';
 import {
     selectClients,
     selectViewports,
-} from '../../../../../../state/application/selectors/exercise.selectors';
-import { SpecificRoleDisplayNamePipe } from '../../../../../../shared/pipes/specific-role-display-name.pipe';
-import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
+} from '../../../../../state/application/selectors/exercise.selectors';
+import { SpecificRoleDisplayNamePipe } from '../../../../../shared/pipes/specific-role-display-name.pipe';
+import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-client-overview-table',

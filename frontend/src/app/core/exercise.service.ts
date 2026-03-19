@@ -252,11 +252,11 @@ export class ExerciseService {
                 handleChanges(oldClients, newClients, {
                     createHandler: (newClient) => {
                         this.messageService.postMessage({
-                            title: `${newClient.name} ist als ${
+                            title: `${
                                 newClient.role.mainRole === 'trainer'
-                                    ? 'Trainer'
-                                    : 'Teilnehmer'
-                            } beigetreten.`,
+                                    ? 'Übungsleitende'
+                                    : 'Teilnehmende'
+                            }: ${newClient.name} ist beigetreten.`,
                             color: 'info',
                         });
                     },

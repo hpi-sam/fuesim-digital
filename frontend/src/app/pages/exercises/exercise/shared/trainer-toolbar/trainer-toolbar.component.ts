@@ -11,7 +11,7 @@ import {
 import { Store } from '@ngrx/store';
 import type { TrainerKey } from 'fuesim-digital-shared';
 import { openAlarmGroupOverviewModal } from '../alarm-group-overview/open-alarm-group-overview-modal';
-import { openClientOverviewModal } from '../client-overview/open-client-overview-modal';
+import { openClientsModal } from '../clients-modal/open-clients-modal';
 import { openEmergencyOperationsCenterModal } from '../emergency-operations-center/open-emergency-operations-center-modal';
 import { openExerciseSettingsModal } from '../exercise-settings/open-exercise-settings-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
@@ -57,8 +57,8 @@ export class TrainerToolbarComponent {
 
     public exerciseStatus$ = this.store.select(selectExerciseStatus);
 
-    public openClientOverview() {
-        openClientOverviewModal(this.modalService);
+    public openClientsModal() {
+        openClientsModal(this.modalService);
     }
 
     public openTransferOverview() {

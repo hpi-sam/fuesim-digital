@@ -319,12 +319,13 @@ export class DragElementService {
                 break;
         }
 
-        this.executeDropSideEffects(pixel, createdElement);
+        this.executeDropSideEffects(pixel, createdElement, event);
     };
 
     private executeDropSideEffects(
         pixel: Pixel,
-        createdElement: Element | null
+        createdElement: Element | null,
+        event: MouseEvent
     ) {
         if (
             createdElement === null ||
@@ -343,7 +344,7 @@ export class DragElementService {
             // We stop propagating the event as soon as the onFeatureDropped function returns true
             return this.layerFeatureManagerDictionary
                 .get(layer as VectorLayer)!
-                .onFeatureDrop(createdElement, droppedOnFeature as Feature);
+                .onFeatureDrop(createdElement, droppedOnFeature as Feature, event);
         });
     }
 

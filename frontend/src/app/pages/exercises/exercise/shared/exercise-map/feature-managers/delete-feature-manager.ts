@@ -87,7 +87,7 @@ export class DeleteFeatureManager implements FeatureManager<Point> {
     public onFeatureDrop(
         droppedElement: Element,
         droppedOnFeature: Feature<Point>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) {
         const id = droppedElement.id;
         switch (droppedElement.type) {

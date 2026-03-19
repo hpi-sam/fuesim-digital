@@ -215,7 +215,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
     public override onFeatureDrop(
         droppedElement: Element | undefined,
         droppedOnFeature: Feature<Point>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) {
         const droppedOnVehicle = this.getElementFromFeature(
             droppedOnFeature

@@ -1,29 +1,31 @@
 import { produce, type WritableDraft } from 'immer';
 import {
-    SimulatedRegion,
     newSimulatedRegionPositionIn,
     newMapCoordinatesAt,
     newSize,
     newTransferPoint,
+    newPersonnelFromTemplate,
+    newSimulatedRegion,
 } from '../../models/index.js';
-import type { PatientStatus } from '../../models/index.js';
+import type { PatientStatus, SimulatedRegion } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
 import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuid } from '../../utils/index.js';
-import { AssignLeaderBehaviorState } from '../behaviors/index.js';
+import type { AssignLeaderBehaviorState } from '../behaviors/index.js';
+import { newAssignLeaderBehaviorState } from '../behaviors/index.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
 import { addPersonnel } from '../../../tests/utils/personnel.spec.js';
 import { defaultPersonnelTemplates } from '../../data/default-state/personnel-templates.js';
-import { TreatmentProgressChangedEvent } from '../events/index.js';
+import { newTreatmentProgressChangedEvent } from '../events/index.js';
 import { assertCatering } from '../../../tests/utils/catering.spec.js';
 import { addMaterial } from '../../../tests/utils/materials.spec.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import { newPersonnelFromTemplate } from '../../models/personnel.js';
 import { newCanCaterFor } from '../../models/utils/cater-for.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
+import type { ReassignTreatmentsActivityState } from './reassign-treatments.js';
 import {
+    newReassignTreatmentsActivityState,
     reassignTreatmentsActivity,
-    ReassignTreatmentsActivityState,
 } from './reassign-treatments.js';
 
 const emptyState = ExerciseState.create('123456' as ParticipantKey);
@@ -42,7 +44,7 @@ function setupStateAndApplyTreatments(
         simulatedRegion: SimulatedRegion
     ) => void
 ) {
-    const simulatedRegion = SimulatedRegion.create(
+    const simulatedRegion = newSimulatedRegion(
         newMapCoordinatesAt(0, 0),
         newSize(10, 10),
         'test region'
@@ -52,7 +54,7 @@ function setupStateAndApplyTreatments(
         '',
         `[Simuliert] test region`
     );
-    const leaderBehaviorState = AssignLeaderBehaviorState.create();
+    const leaderBehaviorState = newAssignLeaderBehaviorState();
     const beforeState = produce(emptyState, (draftState) => {
         draftState.simulatedRegions[simulatedRegion.id] =
             cloneDeepMutable(simulatedRegion);
@@ -102,12 +104,12 @@ describe('reassign treatment', () => {
             it('goes to noTreatment when there is nothing', () => {
                 const { beforeState, newState, simulatedRegion, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(uuid(), state, 0)
+                        newReassignTreatmentsActivityState(uuid(), state, 0)
                     );
                 const shouldState = produce(beforeState, (draftState) => {
                     sendSimulationEvent(
                         draftState.simulatedRegions[simulatedRegion!.id]!,
-                        TreatmentProgressChangedEvent.create('noTreatment')
+                        newTreatmentProgressChangedEvent('noTreatment')
                     );
                 });
                 expect(newState).toStrictEqual(shouldState);
@@ -117,11 +119,7 @@ describe('reassign treatment', () => {
             it('goes to noTreatment when there is no personnel', () => {
                 const { beforeState, newState, simulatedRegion, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         undefined,
                         (draftState, { id }) => {
                             addPatient(
@@ -135,7 +133,7 @@ describe('reassign treatment', () => {
                 const shouldState = produce(beforeState, (draftState) => {
                     sendSimulationEvent(
                         draftState.simulatedRegions[simulatedRegion!.id]!,
-                        TreatmentProgressChangedEvent.create('noTreatment')
+                        newTreatmentProgressChangedEvent('noTreatment')
                     );
                 });
                 expect(newState).toStrictEqual(shouldState);
@@ -145,11 +143,7 @@ describe('reassign treatment', () => {
             it('goes to noTreatment when there is no leading personnel', () => {
                 const { beforeState, newState, simulatedRegion, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         undefined,
                         (draftState, { id }) => {
                             addPatient(
@@ -173,7 +167,7 @@ describe('reassign treatment', () => {
                 const shouldState = produce(beforeState, (draftState) => {
                     sendSimulationEvent(
                         draftState.simulatedRegions[simulatedRegion!.id]!,
-                        TreatmentProgressChangedEvent.create('noTreatment')
+                        newTreatmentProgressChangedEvent('noTreatment')
                     );
                 });
                 expect(newState).toStrictEqual(shouldState);
@@ -185,11 +179,7 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, simulatedRegion) => {
                             addPatient(
@@ -226,7 +216,7 @@ describe('reassign treatment', () => {
                 let catererId: UUID = '';
 
                 const { beforeState, newState } = setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, simulatedRegion) => {
                         addPatient(
@@ -284,11 +274,7 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate, newActivityState } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(
-                        uuid(),
-                        'unknown',
-                        0
-                    ),
+                    newReassignTreatmentsActivityState(uuid(), 'unknown', 0),
                     leaderId,
                     (draftState, simulatedRegion) => {
                         addPatient(
@@ -332,7 +318,7 @@ describe('reassign treatment', () => {
             const countingTime = 1000 * 20;
 
             const activityState = cloneDeepMutable(
-                ReassignTreatmentsActivityState.create(
+                newReassignTreatmentsActivityState(
                     uuid(),
                     'unknown',
                     countingTime
@@ -387,7 +373,7 @@ describe('reassign treatment', () => {
             const countingTime = 1000 * 20;
 
             const activityState = cloneDeepMutable(
-                ReassignTreatmentsActivityState.create(
+                newReassignTreatmentsActivityState(
                     uuid(),
                     'unknown',
                     countingTime
@@ -455,11 +441,7 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(
-                        uuid(),
-                        'counted',
-                        0
-                    ),
+                    newReassignTreatmentsActivityState(uuid(), 'counted', 0),
                     leaderId,
                     (draftState, simulatedRegion) => {
                         patientId = addPatient(
@@ -509,11 +491,7 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(
-                        uuid(),
-                        'counted',
-                        0
-                    ),
+                    newReassignTreatmentsActivityState(uuid(), 'counted', 0),
                     leaderId,
                     (draftState, simulatedRegion) => {
                         addPatient(
@@ -572,7 +550,7 @@ describe('reassign treatment', () => {
             const leaderId = uuid();
 
             const { terminate, simulatedRegion } = setupStateAndApplyTreatments(
-                ReassignTreatmentsActivityState.create(uuid(), 'counted', 0),
+                newReassignTreatmentsActivityState(uuid(), 'counted', 0),
                 leaderId,
                 (draftState, _simulatedRegion) => {
                     addPatient(
@@ -602,7 +580,7 @@ describe('reassign treatment', () => {
             const leaderId = uuid();
 
             const { terminate, simulatedRegion } = setupStateAndApplyTreatments(
-                ReassignTreatmentsActivityState.create(uuid(), 'counted', 0),
+                newReassignTreatmentsActivityState(uuid(), 'counted', 0),
                 leaderId,
                 (draftState, _simulatedRegion) => {
                     addPatient(
@@ -668,7 +646,7 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, _simulatedRegion) => {
                         redPatientIds.push(
@@ -759,7 +737,7 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, _simulatedRegion) => {
                         addPatient(
@@ -827,11 +805,7 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             addPatient(
@@ -902,7 +876,7 @@ describe('reassign treatment', () => {
             let catererId: UUID = '';
 
             const { newState, terminate } = setupStateAndApplyTreatments(
-                ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                newReassignTreatmentsActivityState(uuid(), state, 0),
                 leaderId,
                 (draftState, _simulatedRegion) => {
                     for (let i = 0; i < 10; i++) {
@@ -949,7 +923,7 @@ describe('reassign treatment', () => {
             let catererId: UUID = '';
 
             const { newState, terminate } = setupStateAndApplyTreatments(
-                ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                newReassignTreatmentsActivityState(uuid(), state, 0),
                 leaderId,
                 (draftState, _simulatedRegion) => {
                     for (let i = 0; i < 10; i++) {
@@ -998,11 +972,7 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             addPatient(
@@ -1061,11 +1031,7 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             patientId = addPatient(
@@ -1122,7 +1088,7 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, _simulatedRegion) => {
                         patientId = addPatient(
@@ -1192,7 +1158,7 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, _simulatedRegion) => {
                         patientId = addPatient(
@@ -1256,11 +1222,7 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             higherPatientId = addPatient(
@@ -1399,7 +1361,7 @@ describe('reassign treatment', () => {
 
                 const { terminate, simulatedRegion } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
+                        newReassignTreatmentsActivityState(
                             uuid(),
                             'triaged',
                             0
@@ -1477,7 +1439,7 @@ describe('reassign treatment', () => {
 
                 const { terminate, simulatedRegion } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
+                        newReassignTreatmentsActivityState(
                             uuid(),
                             'triaged',
                             0

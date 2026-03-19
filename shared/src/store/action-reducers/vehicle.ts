@@ -37,12 +37,12 @@ import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import {
-    MaterialAvailableEvent,
-    MaterialRemovedEvent,
-    NewPatientEvent,
-    PersonnelAvailableEvent,
-    PersonnelRemovedEvent,
-    VehicleRemovedEvent,
+    newMaterialAvailableEvent,
+    newMaterialRemovedEvent,
+    newNewPatientEvent,
+    newPersonnelAvailableEvent,
+    newPersonnelRemovedEvent,
+    newVehicleRemovedEvent,
 } from '../../simulation/index.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { newNoPosition } from '../../models/utils/position/no-position.js';
@@ -77,7 +77,7 @@ export function deleteVehicle(
             );
             sendSimulationEvent(
                 simulatedRegion,
-                MaterialRemovedEvent.create(materialId)
+                newMaterialRemovedEvent(materialId)
             );
         }
 
@@ -94,7 +94,7 @@ export function deleteVehicle(
             );
             sendSimulationEvent(
                 simulatedRegion,
-                PersonnelRemovedEvent.create(personnelId)
+                newPersonnelRemovedEvent(personnelId)
             );
         }
 
@@ -120,10 +120,7 @@ export function deleteVehicle(
 
     if (isInSimulatedRegion(vehicle)) {
         const simulatedRegion = currentSimulatedRegionOf(draftState, vehicle);
-        sendSimulationEvent(
-            simulatedRegion,
-            VehicleRemovedEvent.create(vehicleId)
-        );
+        sendSimulationEvent(simulatedRegion, newVehicleRemovedEvent(vehicleId));
     }
 
     // Delete the vehicle
@@ -418,7 +415,7 @@ export namespace VehicleActionReducers {
                     );
                     sendSimulationEvent(
                         simulatedRegion,
-                        NewPatientEvent.create(patientId)
+                        newNewPatientEvent(patientId)
                     );
                     delete vehicle.patientIds[patientId];
                 }
@@ -439,7 +436,7 @@ export namespace VehicleActionReducers {
                         );
                         sendSimulationEvent(
                             simulatedRegion,
-                            PersonnelAvailableEvent.create(personnelId)
+                            newPersonnelAvailableEvent(personnelId)
                         );
                     }
                 }
@@ -459,7 +456,7 @@ export namespace VehicleActionReducers {
                         );
                         sendSimulationEvent(
                             simulatedRegion,
-                            MaterialAvailableEvent.create(materialId)
+                            newMaterialAvailableEvent(materialId)
                         );
                     }
                 }
@@ -580,7 +577,7 @@ export namespace VehicleActionReducers {
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    VehicleRemovedEvent.create(vehicleId)
+                    newVehicleRemovedEvent(vehicleId)
                 );
 
                 const coordinates = cloneDeepMutable(

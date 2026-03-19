@@ -1,129 +1,103 @@
-import { Type } from 'class-transformer';
-import {
-    IsInt,
-    IsOptional,
-    IsUUID,
-    Min,
-    ValidateNested,
-} from 'class-validator';
 import { groupBy } from 'lodash-es';
-import { WritableDraft } from 'immer';
+import type { WritableDraft } from 'immer';
+import { z } from 'zod';
 import type {
     PatientCountRadiogram,
     TreatmentStatusRadiogram,
 } from '../../models/radiogram/index.js';
-import {
-    getCreate,
-    isInSpecificSimulatedRegion,
-} from '../../models/utils/index.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/index.js';
 import type { ExerciseState } from '../../state.js';
 import { getActivityById } from '../../store/action-reducers/utils/index.js';
-import type { UUID } from '../../utils/index.js';
-import { uuid, uuidValidationOptions } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import { DelayEventActivityState } from '../activities/index.js';
-import { ReassignTreatmentsActivityState } from '../activities/reassign-treatments.js';
+import { uuidSchema, uuid } from '../../utils/index.js';
+import {
+    newDelayEventActivityState,
+    newReassignTreatmentsActivityState,
+} from '../activities/index.js';
 import { addActivity, terminateActivity } from '../activities/utils.js';
-import { TreatmentsTimerEvent } from '../events/treatments-timer-event.js';
+import { newTreatmentsTimerEvent } from '../events/treatments-timer-event.js';
 import { nextUUID } from '../utils/randomness.js';
-import type { TreatmentProgress } from '../utils/treatment.js';
-import { treatmentProgressAllowedValues } from '../utils/treatment.js';
+import { treatmentProgressSchema } from '../utils/treatment.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
-} from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
+import { simulationBehaviorStateSchema } from './simulation-behavior.js';
 
-export class TreatPatientsIntervals {
+export const treatPatientsIntervalsSchema = z.strictObject({
     /**
      * How frequent reassignments should occur when the personnel just arrived and the situation in unclear
      */
-    @IsInt()
-    @Min(0)
-    public readonly unknown: number;
-
+    unknown: z.int().nonnegative(),
     /**
      * How frequent reassignments should occur when the patients have been counted
      */
-    @IsInt()
-    @Min(0)
-    public readonly counted: number;
-
+    counted: z.int().nonnegative(),
     /**
      * How frequent reassignments should occur when all patients are triaged
      */
-    @IsInt()
-    @Min(0)
-    public readonly triaged: number;
-
+    triaged: z.int().nonnegative(),
     /**
      * How frequent reassignments should occur when there is enough personnel to fulfil each patient's treatment needs
      */
-    @IsInt()
-    @Min(0)
-    public readonly secured: number;
-
+    secured: z.int().nonnegative(),
     /**
      * How long counting each patient should take.
      * Counting will be finished after {patient count} times this value.
      */
-    @IsInt()
-    @Min(0)
-    public readonly countingTimePerPatient: number;
+    countingTimePerPatient: z.int().nonnegative(),
+});
+export type TreatPatientsIntervals = z.infer<
+    typeof treatPatientsIntervalsSchema
+>;
 
-    constructor(
-        unknown: number,
-        counted: number,
-        triaged: number,
-        secured: number,
-        countingTimePerPatient: number
-    ) {
-        this.unknown = unknown;
-        this.counted = counted;
-        this.triaged = triaged;
-        this.secured = secured;
-        this.countingTimePerPatient = countingTimePerPatient;
-    }
-
-    static readonly create = getCreate(this);
+export function newTreatPatientsIntervals(
+    unknown: number,
+    counted: number,
+    triaged: number,
+    secured: number,
+    countingTimePerPatient: number
+): TreatPatientsIntervals {
+    return {
+        unknown,
+        counted,
+        triaged,
+        secured,
+        countingTimePerPatient,
+    };
 }
 
-export class TreatPatientsBehaviorState implements SimulationBehaviorState {
-    @IsValue('treatPatientsBehavior' as const)
-    readonly type = `treatPatientsBehavior`;
+export const treatPatientsBehaviorStateSchema = z.strictObject({
+    ...simulationBehaviorStateSchema.shape,
+    type: z.literal('treatPatientsBehavior'),
+    intervals: treatPatientsIntervalsSchema,
+    delayActivityId: uuidSchema.nullable(),
+    treatmentActivityId: uuidSchema.nullable(),
+    treatmentProgress: treatmentProgressSchema,
+});
+export type TreatPatientsBehaviorState = z.infer<
+    typeof treatPatientsBehaviorStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
-
-    @Type(() => TreatPatientsIntervals)
-    @ValidateNested()
-    public readonly intervals: TreatPatientsIntervals =
-        TreatPatientsIntervals.create(
+export function newTreatPatientsBehaviorState(): TreatPatientsBehaviorState {
+    return {
+        id: uuid(),
+        type: 'treatPatientsBehavior',
+        intervals: newTreatPatientsIntervals(
             1000 * 10, // 10 seconds
             1000 * 60, // 1 minute, as this is how long it takes to triage one patient
             1000 * 60 * 5, // 5 minutes
             1000 * 60 * 10, // 10 minutes
             1000 * 20 // 20 seconds
-        );
-
-    @IsOptional()
-    @IsUUID(4, uuidValidationOptions)
-    public readonly delayActivityId: UUID | null = null;
-
-    @IsOptional()
-    @IsUUID(4, uuidValidationOptions)
-    public readonly treatmentActivityId: UUID | null = null;
-
-    @IsLiteralUnion(treatmentProgressAllowedValues)
-    public readonly treatmentProgress: TreatmentProgress = 'noTreatment';
-
-    static readonly create = getCreate(this);
+        ),
+        delayActivityId: null,
+        treatmentActivityId: null,
+        treatmentProgress: 'noTreatment',
+    };
 }
 
 export const treatPatientsBehavior: SimulationBehavior<TreatPatientsBehaviorState> =
     {
-        behaviorState: TreatPatientsBehaviorState,
+        behaviorStateSchema: treatPatientsBehaviorStateSchema,
+        newBehaviorState: newTreatPatientsBehaviorState,
         handleEvent(draftState, simulatedRegion, behaviorState, event) {
             switch (event.type) {
                 case 'tickEvent':
@@ -146,9 +120,9 @@ export const treatPatientsBehavior: SimulationBehavior<TreatPatientsBehaviorStat
                         const id = nextUUID(draftState);
                         addActivity(
                             simulatedRegion,
-                            DelayEventActivityState.create(
+                            newDelayEventActivityState(
                                 id,
-                                TreatmentsTimerEvent.create(),
+                                newTreatmentsTimerEvent(),
                                 draftState.currentTime +
                                     behaviorState.intervals[
                                         behaviorState.treatmentProgress
@@ -300,7 +274,7 @@ function startNewTreatmentReassignment(
     const id = nextUUID(draftState);
     addActivity(
         simulatedRegion,
-        ReassignTreatmentsActivityState.create(
+        newReassignTreatmentsActivityState(
             id,
             behaviorState.treatmentProgress,
             behaviorState.intervals.countingTimePerPatient

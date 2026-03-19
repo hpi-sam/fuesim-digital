@@ -1,12 +1,5 @@
-import {
-    IsBoolean,
-    IsInt,
-    IsOptional,
-    IsString,
-    IsUUID,
-    Min,
-} from 'class-validator';
 import { difference } from 'lodash-es';
+import { z } from 'zod';
 import {
     type ExerciseOccupation,
     newSimulatedRegionPositionIn,
@@ -14,117 +7,83 @@ import {
     exerciseOccupationSchema,
     changeOccupation,
     createVehicleActionTag,
-    getCreate,
     isInSpecificSimulatedRegion,
     newIntermediateOccupation,
 } from '../../models/index.js';
 import type { UUID, UUIDSet } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import {
-    IsLiteralUnion,
-    IsUUIDSet,
-    IsValue,
-} from '../../utils/validators/index.js';
+    uuidSchema,
+    uuidSetSchema,
+    cloneDeepMutable,
+} from '../../utils/index.js';
 import type { TransferDestination } from '../utils/transfer-destination.js';
-import { transferDestinationTypeAllowedValues } from '../utils/transfer-destination.js';
+import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
 import {
     getElement,
     tryGetElement,
 } from '../../store/action-reducers/utils/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import {
-    MaterialRemovedEvent,
-    NewPatientEvent,
-    PatientRemovedEvent,
-    PersonnelRemovedEvent,
-    StartTransferEvent,
+    newMaterialRemovedEvent,
+    newNewPatientEvent,
+    newPatientRemovedEvent,
+    newPersonnelRemovedEvent,
+    newStartTransferEvent,
 } from '../events/index.js';
 import { completelyLoadVehicle } from '../../store/action-reducers/utils/completely-load-vehicle.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
 import { logVehicle } from '../../store/action-reducers/utils/log.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export class LoadVehicleActivityState implements SimulationActivityState {
-    @IsValue('loadVehicleActivity' as const)
-    public readonly type = 'loadVehicleActivity';
+export const loadVehicleActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('loadVehicleActivity'),
+    vehicleId: uuidSchema,
+    transferDestinationType: transferDestinationTypeSchema,
+    transferDestinationId: uuidSchema,
+    patientsToBeLoaded: uuidSetSchema,
+    loadDelay: z.int().nonnegative().optional(),
+    loadTimePerPatient: z.int().nonnegative(),
+    personnelLoadTime: z.int().nonnegative(),
+    key: z.string().optional(),
+    hasBeenStarted: z.boolean(),
+    startTime: z.int().nonnegative(),
+    successorOccupation: exerciseOccupationSchema.optional(),
+});
+export type LoadVehicleActivityState = z.infer<
+    typeof loadVehicleActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId: UUID;
-
-    @IsLiteralUnion(transferDestinationTypeAllowedValues)
-    readonly transferDestinationType: TransferDestination;
-
-    @IsUUID(4, uuidValidationOptions)
-    readonly transferDestinationId: UUID;
-
-    @IsUUIDSet()
-    public readonly patientsToBeLoaded: UUIDSet;
-
-    @IsInt()
-    @Min(0)
-    @IsOptional()
-    public readonly loadDelay?: number = undefined;
-
-    @IsInt()
-    @Min(0)
-    public readonly loadTimePerPatient: number;
-
-    @IsInt()
-    @Min(0)
-    public readonly personnelLoadTime: number;
-
-    @IsOptional()
-    @IsString()
-    public readonly key?: string;
-
-    @IsBoolean()
-    public readonly hasBeenStarted: boolean = false;
-
-    @IsInt()
-    @Min(0)
-    public readonly startTime: number = 0;
-
-    @IsZodSchema(exerciseOccupationSchema.optional())
-    readonly successorOccupation?: ExerciseOccupation;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        vehicleId: UUID,
-        transferDestinationType: TransferDestination,
-        transferDestinationId: UUID,
-        patientsToBeLoaded: UUIDSet,
-        loadTimePerPatient: number,
-        personnelLoadTime: number,
-        key?: string,
-        successorOccupation?: ExerciseOccupation
-    ) {
-        this.id = id;
-        this.vehicleId = vehicleId;
-        this.transferDestinationType = transferDestinationType;
-        this.transferDestinationId = transferDestinationId;
-        this.patientsToBeLoaded = patientsToBeLoaded;
-        this.loadTimePerPatient = loadTimePerPatient;
-        this.personnelLoadTime = personnelLoadTime;
-        this.key = key;
-        this.successorOccupation = successorOccupation;
-    }
-
-    static readonly create = getCreate(this);
+export function newLoadVehicleActivityState(
+    id: UUID,
+    vehicleId: UUID,
+    transferDestinationType: TransferDestination,
+    transferDestinationId: UUID,
+    patientsToBeLoaded: UUIDSet,
+    loadTimePerPatient: number,
+    personnelLoadTime: number,
+    key?: string,
+    successorOccupation?: ExerciseOccupation
+): LoadVehicleActivityState {
+    return {
+        id,
+        type: 'loadVehicleActivity',
+        vehicleId,
+        transferDestinationType,
+        transferDestinationId,
+        patientsToBeLoaded,
+        loadTimePerPatient,
+        personnelLoadTime,
+        key,
+        successorOccupation,
+        hasBeenStarted: false,
+        startTime: 0,
+    };
 }
-
 export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
     {
-        activityState: LoadVehicleActivityState,
+        activityStateSchema: loadVehicleActivityStateSchema,
         tick(
             draftState,
             simulatedRegion,
@@ -166,7 +125,7 @@ export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
                     ) {
                         sendSimulationEvent(
                             simulatedRegion,
-                            PersonnelRemovedEvent.create(personnelId)
+                            newPersonnelRemovedEvent(personnelId)
                         );
                         personnelToLoadCount++;
                     }
@@ -185,7 +144,7 @@ export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
                     ) {
                         sendSimulationEvent(
                             simulatedRegion,
-                            MaterialRemovedEvent.create(materialId)
+                            newMaterialRemovedEvent(materialId)
                         );
                     }
                 });
@@ -204,7 +163,7 @@ export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
                         ) {
                             sendSimulationEvent(
                                 simulatedRegion,
-                                PatientRemovedEvent.create(patientId)
+                                newPatientRemovedEvent(patientId)
                             );
                         }
                     }
@@ -236,7 +195,7 @@ export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
                     // Inform the region that a new patient has left the vehicle
                     sendSimulationEvent(
                         simulatedRegion,
-                        NewPatientEvent.create(patientId)
+                        newNewPatientEvent(patientId)
                     );
                 });
 
@@ -279,7 +238,7 @@ export const loadVehicleActivity: SimulationActivity<LoadVehicleActivityState> =
             ) {
                 sendSimulationEvent(
                     simulatedRegion,
-                    StartTransferEvent.create(
+                    newStartTransferEvent(
                         activityState.vehicleId,
                         activityState.transferDestinationType,
                         activityState.transferDestinationId,

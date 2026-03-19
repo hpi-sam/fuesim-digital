@@ -5,8 +5,8 @@ import {
     markRadiogramDone,
     returnRadiogram,
 } from '../../models/radiogram/radiogram-helpers-mutable.js';
-import { VehicleResource } from '../../models/utils/rescue-resource.js';
-import { VehiclesSentEvent } from '../../simulation/index.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import { newVehiclesSentEvent } from '../../simulation/index.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import type { UUID } from '../../utils/index.js';
 import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
@@ -114,8 +114,8 @@ export namespace RadiogramActionReducers {
                 sendSimulationEvent(
                     simulatedRegion,
                     cloneDeepMutable(
-                        VehiclesSentEvent.create(
-                            VehicleResource.create({}),
+                        newVehiclesSentEvent(
+                            newVehicleResource({}),
                             transferPoint.id
                         )
                     )
@@ -163,7 +163,7 @@ export namespace RadiogramActionReducers {
                 sendSimulationEvent(
                     simulatedRegion,
                     cloneDeepMutable(
-                        VehiclesSentEvent.create(
+                        newVehiclesSentEvent(
                             radiogram.requiredResource,
                             transferPoint.id
                         )
@@ -212,8 +212,8 @@ export namespace RadiogramActionReducers {
                 sendSimulationEvent(
                     simulatedRegion,
                     cloneDeepMutable(
-                        VehiclesSentEvent.create(
-                            VehicleResource.create({}),
+                        newVehiclesSentEvent(
+                            newVehicleResource({}),
                             transferPoint.id
                         )
                     )

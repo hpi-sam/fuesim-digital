@@ -1,39 +1,34 @@
-import { Type } from 'class-transformer';
-import { IsUUID, ValidateNested } from 'class-validator';
+import { z } from 'zod';
 import type { ExerciseRadiogram } from '../../models/radiogram/exercise-radiogram.js';
-import { radiogramTypeOptions } from '../../models/radiogram/exercise-radiogram.js';
+import { exerciseRadiogramSchema } from '../../models/radiogram/exercise-radiogram.js';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
-import { getCreate } from '../../models/utils/get-create.js';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export class PublishRadiogramActivityState implements SimulationActivityState {
-    @IsValue('publishRadiogramActivity')
-    readonly type = 'publishRadiogramActivity';
+export const publishRadiogramActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('publishRadiogramActivity'),
+    radiogram: exerciseRadiogramSchema,
+});
+export type PublishRadiogramActivityState = z.infer<
+    typeof publishRadiogramActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly id: UUID;
-
-    @Type(...radiogramTypeOptions)
-    @ValidateNested()
-    readonly radiogram: ExerciseRadiogram;
-
-    constructor(id: UUID, radiogram: ExerciseRadiogram) {
-        this.id = id;
-        this.radiogram = radiogram;
-    }
-
-    static readonly create = getCreate(this);
+export function newPublishRadiogramActivityState(
+    id: UUID,
+    radiogram: ExerciseRadiogram
+): PublishRadiogramActivityState {
+    return {
+        id,
+        type: 'publishRadiogramActivity',
+        radiogram,
+    };
 }
 
 export const publishRadiogramActivity: SimulationActivity<PublishRadiogramActivityState> =
     {
-        activityState: PublishRadiogramActivityState,
+        activityStateSchema: publishRadiogramActivityStateSchema,
         tick(
             draftState,
             _simulatedRegion,

@@ -1,60 +1,45 @@
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { RequestTarget } from '../../models/utils/request-target/request-target.js';
 import type { ExerciseRequestTargetConfiguration } from '../../models/utils/request-target/exercise-request-target.js';
 import {
+    exerciseRequestTargetConfigurationSchema,
     requestTargetDictionary,
-    requestTargetTypeOptions,
 } from '../../models/utils/request-target/exercise-request-target.js';
-import { VehicleResource } from '../../models/utils/rescue-resource.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import type { VehicleResource } from '../../models/utils/rescue-resource.js';
+import { vehicleResourceSchema } from '../../models/utils/rescue-resource.js';
+import type { SimulationActivity } from './simulation-activity.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export class CreateRequestActivityState implements SimulationActivityState {
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
+export const createRequestActivityStateSchema =
+    simulationActivityStateSchema.extend({
+        type: z.literal('createRequestActivity'),
+        targetConfiguration: exerciseRequestTargetConfigurationSchema,
+        requestedResource: vehicleResourceSchema,
+        key: z.string(),
+    });
+export type CreateRequestActivityState = z.infer<
+    typeof createRequestActivityStateSchema
+>;
 
-    @IsValue('createRequestActivity')
-    public readonly type = 'createRequestActivity';
-
-    @Type(...requestTargetTypeOptions)
-    @ValidateNested()
-    public readonly targetConfiguration: ExerciseRequestTargetConfiguration;
-
-    @Type(() => VehicleResource)
-    @ValidateNested()
-    public readonly requestedResource: VehicleResource;
-
-    @IsString()
-    public readonly key: string;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        target: ExerciseRequestTargetConfiguration,
-        requestedResource: VehicleResource,
-        key: string
-    ) {
-        this.id = id;
-        this.targetConfiguration = target;
-        this.requestedResource = requestedResource;
-        this.key = key;
-    }
-
-    static readonly create = getCreate(this);
+export function newCreateRequestActivityState(
+    id: UUID,
+    targetConfiguration: ExerciseRequestTargetConfiguration,
+    requestedResource: VehicleResource,
+    key: string
+): CreateRequestActivityState {
+    return {
+        id,
+        type: 'createRequestActivity',
+        targetConfiguration,
+        requestedResource,
+        key,
+    };
 }
 
 export const createRequestActivity: SimulationActivity<CreateRequestActivityState> =
     {
-        activityState: CreateRequestActivityState,
+        activityStateSchema: createRequestActivityStateSchema,
         tick: (
             draftState,
             simulatedRegion,

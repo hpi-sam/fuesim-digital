@@ -4,7 +4,6 @@ import {
     IsObject,
     IsOptional,
     IsUUID,
-    ValidateNested,
 } from 'class-validator';
 import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
 import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
@@ -31,6 +30,7 @@ import {
     MaterialTemplate,
     PersonnelTemplate,
     exerciseStatusSchema,
+    simulatedRegionSchema,
     exerciseTypeSchema,
     type ExerciseType,
     type ExerciseStatus,
@@ -40,8 +40,10 @@ import {
     Scoutable,
     UserGeneratedContent,
 } from './models/index.js';
-import type { ExerciseRadiogram } from './models/radiogram/index.js';
-import { getRadiogramConstructor } from './models/radiogram/index.js';
+import {
+    ExerciseRadiogram,
+    exerciseRadiogramSchema,
+} from './models/radiogram/index.js';
 import {
     newSeededRandomState,
     type RandomState,
@@ -49,7 +51,6 @@ import {
 } from './simulation/utils/randomness.js';
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
 import type { UUID } from './utils/index.js';
-import { IsIdMap, IsMultiTypedIdMap } from './utils/validators/index.js';
 import { uuidSchema, uuid, uuidValidationOptions } from './utils/index.js';
 import {
     createCatchAllHospital,
@@ -117,7 +118,7 @@ export class ExerciseState {
     @IsOptional()
     public readonly autojoinViewportId: UUID | null = null;
 
-    @IsIdMap(SimulatedRegion)
+    @IsZodSchema(z.record(uuidSchema, simulatedRegionSchema))
     public readonly simulatedRegions: {
         readonly [key: UUID]: SimulatedRegion;
     } = {};
@@ -165,8 +166,7 @@ export class ExerciseState {
     @IsZodSchema(z.array(z.string()))
     public readonly collectedClientNames: string[] = [];
 
-    @IsMultiTypedIdMap(getRadiogramConstructor)
-    @ValidateNested()
+    @IsZodSchema(z.record(uuidSchema, exerciseRadiogramSchema))
     public readonly radiograms: { readonly [key: UUID]: ExerciseRadiogram } =
         {};
     @IsZodSchema(z.record(uuidSchema, operationalSectionSchema))

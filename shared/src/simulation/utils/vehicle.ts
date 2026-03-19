@@ -11,9 +11,9 @@ import type { ExerciseState } from '../../state.js';
 import { getElement } from '../../store/action-reducers/utils/index.js';
 import { logVehicle } from '../../store/action-reducers/utils/log.js';
 import {
-    NewPatientEvent,
-    MaterialAvailableEvent,
-    PersonnelAvailableEvent,
+    newNewPatientEvent,
+    newPersonnelAvailableEvent,
+    newMaterialAvailableEvent,
 } from '../events/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
 
@@ -57,19 +57,19 @@ export function unloadVehicle(
                     case 'material':
                         sendSimulationEvent(
                             simulatedRegion,
-                            MaterialAvailableEvent.create(element.id)
+                            newMaterialAvailableEvent(element.id)
                         );
                         break;
                     case 'personnel':
                         sendSimulationEvent(
                             simulatedRegion,
-                            PersonnelAvailableEvent.create(element.id)
+                            newPersonnelAvailableEvent(element.id)
                         );
                         break;
                     case 'patient':
                         sendSimulationEvent(
                             simulatedRegion,
-                            NewPatientEvent.create(element.id)
+                            newNewPatientEvent(element.id)
                         );
                         break;
                 }

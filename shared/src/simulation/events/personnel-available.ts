@@ -1,23 +1,20 @@
-import { IsUUID } from 'class-validator';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { z } from 'zod';
+import { uuidSchema } from '../../utils/index.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class PersonnelAvailableEvent implements SimulationEvent {
-    @IsValue('personnelAvailableEvent')
-    readonly type = 'personnelAvailableEvent';
+export const personnelAvailableEventSchema = simulationEventSchema.extend({
+    type: z.literal('personnelAvailableEvent'),
+    personnelId: uuidSchema,
+});
+export type PersonnelAvailableEvent = z.infer<
+    typeof personnelAvailableEventSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly personnelId: UUID;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(personnelId: UUID) {
-        this.personnelId = personnelId;
-    }
-
-    static readonly create = getCreate(this);
+export function newPersonnelAvailableEvent(
+    personnelId: string
+): PersonnelAvailableEvent {
+    return {
+        type: 'personnelAvailableEvent',
+        personnelId,
+    };
 }

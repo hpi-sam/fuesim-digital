@@ -26,8 +26,8 @@ import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import {
-    PersonnelAvailableEvent,
-    VehicleArrivedEvent,
+    newPersonnelAvailableEvent,
+    newVehicleArrivedEvent,
 } from '../../simulation/index.js';
 import { imageSizeToPosition } from '../../state-helpers/index.js';
 import type { Vehicle } from '../../models/vehicle.js';
@@ -82,13 +82,13 @@ export function letElementArrive(
         if (elementType === 'personnel') {
             sendSimulationEvent(
                 simulatedRegion,
-                PersonnelAvailableEvent.create(elementId)
+                newPersonnelAvailableEvent(elementId)
             );
         }
         if (elementType === 'vehicle') {
             sendSimulationEvent(
                 simulatedRegion,
-                VehicleArrivedEvent.create(elementId, draftState.currentTime)
+                newVehicleArrivedEvent(elementId, draftState.currentTime)
             );
         }
     }

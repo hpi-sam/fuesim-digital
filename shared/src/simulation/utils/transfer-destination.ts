@@ -1,9 +1,11 @@
-import type { AllowedValues } from '../../utils/validators/index.js';
+import { z } from 'zod';
 
-export type TransferDestination = 'hospital' | 'transferPoint';
+export const transferDestinationTypeAllowedValues = [
+    'hospital',
+    'transferPoint',
+] as const;
 
-export const transferDestinationTypeAllowedValues: AllowedValues<TransferDestination> =
-    {
-        hospital: true,
-        transferPoint: true,
-    };
+export const transferDestinationTypeSchema = z.literal(
+    transferDestinationTypeAllowedValues
+);
+export type TransferDestination = z.infer<typeof transferDestinationTypeSchema>;

@@ -1,23 +1,19 @@
-import { IsUUID } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { uuidSchema } from '../../utils/index.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class TryToSendToHospitalEvent implements SimulationEvent {
-    @IsValue('tryToSendToHospitalEvent')
-    readonly type = 'tryToSendToHospitalEvent';
+export const tryToSendToHospitalEventSchema = simulationEventSchema.extend({
+    type: z.literal('tryToSendToHospitalEvent'),
+    behaviorId: uuidSchema,
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId: UUID;
+export type TryToSendToHospitalEvent = z.infer<
+    typeof tryToSendToHospitalEventSchema
+>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(behaviorId: UUID) {
-        this.behaviorId = behaviorId;
-    }
-
-    static readonly create = getCreate(this);
+export function newTryToSendToHospitalEvent(
+    behaviorId: UUID
+): TryToSendToHospitalEvent {
+    return { type: 'tryToSendToHospitalEvent', behaviorId };
 }

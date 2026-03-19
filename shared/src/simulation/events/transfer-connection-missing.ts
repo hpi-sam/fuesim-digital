@@ -1,28 +1,26 @@
-import { IsOptional, IsString, IsUUID } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { uuidSchema } from '../../utils/index.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class TransferConnectionMissingEvent implements SimulationEvent {
-    @IsValue('transferConnectionMissingEvent')
-    readonly type = 'transferConnectionMissingEvent';
+export const transferConnectionMissingEventSchema =
+    simulationEventSchema.extend({
+        type: z.literal('transferConnectionMissingEvent'),
+        transferPointId: uuidSchema,
+        key: z.string().optional(),
+    });
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId: UUID;
+export type TransferConnectionMissingEvent = z.infer<
+    typeof transferConnectionMissingEventSchema
+>;
 
-    @IsOptional()
-    @IsString()
-    public readonly key?: string;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(transferPointId: UUID, key?: string) {
-        this.transferPointId = transferPointId;
-        this.key = key;
-    }
-
-    static readonly create = getCreate(this);
+export function newTransferConnectionMissingEvent(
+    transferPointId: UUID,
+    key?: string
+): TransferConnectionMissingEvent {
+    return {
+        type: 'transferConnectionMissingEvent',
+        transferPointId,
+        key,
+    };
 }

@@ -1,23 +1,21 @@
-import { IsUUID } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { uuidSchema } from '../../utils/index.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class AskForPatientDataEvent implements SimulationEvent {
-    @IsValue('askForPatientDataEvent')
-    readonly type = 'askForPatientDataEvent';
+export const askForPatientDataEventSchema = simulationEventSchema.extend({
+    type: z.literal('askForPatientDataEvent'),
+    behaviorId: uuidSchema,
+});
+export type AskForPatientDataEvent = z.infer<
+    typeof askForPatientDataEventSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly behaviorId: UUID;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(behaviorId: UUID) {
-        this.behaviorId = behaviorId;
-    }
-
-    static readonly create = getCreate(this);
+export function newAskForPatientDataEvent(
+    behaviorId: UUID
+): AskForPatientDataEvent {
+    return {
+        type: 'askForPatientDataEvent',
+        behaviorId,
+    };
 }

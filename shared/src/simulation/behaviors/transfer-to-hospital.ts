@@ -1,71 +1,67 @@
-import { IsUUID } from 'class-validator';
 import { difference, groupBy } from 'lodash-es';
-import { WritableDraft } from 'immer';
+import type { WritableDraft } from 'immer';
 import { z } from 'zod';
-import { IsValue } from '../../utils/validators/is-value.js';
 import type { UUID, UUIDSet } from '../../utils/index.js';
+import { uuid, uuidSetSchema, stringCompare } from '../../utils/index.js';
+import type { PatientStatus } from '../../models/index.js';
 import {
-    stringCompare,
-    uuid,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import {
-    PatientStatus,
     patientStatusSchema,
-    getCreate,
     isInSpecificSimulatedRegion,
     patientStatusAllowedValues,
 } from '../../models/index.js';
-import { getPatientVisibleStatus, Patient } from '../../models/patient.js';
+import type { Patient } from '../../models/patient.js';
+import { getPatientVisibleStatus } from '../../models/patient.js';
 import type { ExerciseState } from '../../state.js';
 import { addActivity } from '../activities/utils.js';
-import { DelayEventActivityState } from '../activities/index.js';
+import {
+    newDelayEventActivityState,
+    newTransferPatientToHospitalActivityState,
+} from '../activities/index.js';
 import { nextUUID } from '../utils/randomness.js';
-import { PatientCategoryTransferToHospitalFinishedEvent } from '../events/index.js';
+import { newPatientCategoryTransferToHospitalFinishedEvent } from '../events/index.js';
 import {
     getActivityById,
     tryGetElement,
 } from '../../store/action-reducers/utils/index.js';
-import { IsUUIDSet } from '../../utils/validators/index.js';
-import { TransferPatientToHospitalActivityState } from '../activities/transfer-patient-to-hospital.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import type { TransferCountsRadiogram } from '../../models/radiogram/index.js';
 import { logLastPatientTransportedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
-} from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
+import { simulationBehaviorStateSchema } from './simulation-behavior.js';
 
-export class TransferToHospitalBehaviorState
-    implements SimulationBehaviorState
-{
-    @IsValue('transferToHospitalBehavior')
-    readonly type = 'transferToHospitalBehavior';
+export const transferToHospitalBehaviorStateSchema = z.strictObject({
+    ...simulationBehaviorStateSchema.shape,
+    type: z.literal('transferToHospitalBehavior'),
+    patientIdsSelectedForTransfer: uuidSetSchema,
+    transferredPatientsCount: z.record(
+        patientStatusSchema,
+        z.int().nonnegative()
+    ),
+});
+export type TransferToHospitalBehaviorState = z.infer<
+    typeof transferToHospitalBehaviorStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
-
-    @IsUUIDSet()
-    public readonly patientIdsSelectedForTransfer: UUIDSet = {};
-
-    @IsZodSchema(z.record(patientStatusSchema, z.number()))
-    public readonly transferredPatientsCount: ResourceDescription<PatientStatus> =
-        {
+export function newTransferToHospitalBehaviorState(): TransferToHospitalBehaviorState {
+    return {
+        id: uuid(),
+        type: 'transferToHospitalBehavior',
+        patientIdsSelectedForTransfer: {},
+        transferredPatientsCount: {
             red: 0,
             yellow: 0,
             green: 0,
             blue: 0,
             black: 0,
             white: 0,
-        };
-
-    static readonly create = getCreate(this);
+        },
+    };
 }
 
 export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBehaviorState> =
     {
-        behaviorState: TransferToHospitalBehaviorState,
+        behaviorStateSchema: transferToHospitalBehaviorStateSchema,
+        newBehaviorState: newTransferToHospitalBehaviorState,
         handleEvent: (draftState, simulatedRegion, behaviorState, event) => {
             switch (event.type) {
                 case 'vehicleArrivedEvent': {
@@ -126,7 +122,7 @@ export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBe
 
                     addActivity(
                         simulatedRegion,
-                        TransferPatientToHospitalActivityState.create(
+                        newTransferPatientToHospitalActivityState(
                             nextUUID(draftState),
                             patientsToTransfer,
                             event.vehicleId,
@@ -173,9 +169,9 @@ export const transferToHospitalBehavior: SimulationBehavior<TransferToHospitalBe
                                 // These conditions can be true for multiple times in one exercise if patient statuses change or new patients are added
                                 addActivity(
                                     simulatedRegion,
-                                    DelayEventActivityState.create(
+                                    newDelayEventActivityState(
                                         nextUUID(draftState),
-                                        PatientCategoryTransferToHospitalFinishedEvent.create(
+                                        newPatientCategoryTransferToHospitalFinishedEvent(
                                             status,
                                             true
                                         ),

@@ -135,7 +135,9 @@ export function getBehaviorById<T extends ExerciseSimulationBehaviorType>(
             `Expected behavior with id ${behaviorId} to be of type ${behaviorType}, but was ${behavior.type}`
         );
     }
-    return behavior as WritableDraft<ExerciseSimulationBehaviorState<T>>;
+    return behavior as WritableDraft<
+        ExerciseSimulationBehaviorState & { type: T }
+    >;
 }
 
 export function getActivityById<T extends ExerciseSimulationActivityType>(
@@ -160,5 +162,7 @@ export function getActivityById<T extends ExerciseSimulationActivityType>(
             `Expected activity with id ${activityId} to be of type ${activityType}, but was ${activity.type}`
         );
     }
-    return activity as WritableDraft<ExerciseSimulationActivityState<T>>;
+    return activity as WritableDraft<
+        ExerciseSimulationActivityState & { type: T }
+    >;
 }

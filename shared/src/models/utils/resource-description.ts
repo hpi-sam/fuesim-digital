@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { StrictObject } from '../../utils/index.js';
 
 export const addResourceDescription = createCombine((a, b) => a + b);
@@ -6,6 +7,11 @@ export const greaterEqualResourceDescription = createCompare((a, b) => a >= b);
 export const scaleResourceDescription = createMap((a, s) => a * s);
 export const ceilResourceDescription = createMap(Math.ceil);
 export const maxResourceDescription = createMap(Math.max);
+
+export const resourceDescriptionSchema = z.record(
+    z.string(),
+    z.int().nonnegative()
+);
 
 export type ResourceDescription<K extends string = string> = {
     [key in K]: number;

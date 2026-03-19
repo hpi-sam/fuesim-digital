@@ -27,7 +27,7 @@ import {
 import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
-import { PatientRemovedEvent } from '../../simulation/index.js';
+import { newPatientRemovedEvent } from '../../simulation/index.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { updateTreatments } from './utils/calculate-treatments.js';
@@ -47,10 +47,7 @@ export function deletePatient(
     const patient = getElement(draftState, 'patient', patientId);
     if (isInSimulatedRegion(patient)) {
         const simulatedRegion = currentSimulatedRegionOf(draftState, patient);
-        sendSimulationEvent(
-            simulatedRegion,
-            PatientRemovedEvent.create(patientId)
-        );
+        sendSimulationEvent(simulatedRegion, newPatientRemovedEvent(patientId));
     }
     removeElementPosition(draftState, 'patient', patientId);
     delete draftState.patients[patientId];
@@ -233,7 +230,7 @@ export namespace PatientActionReducers {
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    PatientRemovedEvent.create(patientId)
+                    newPatientRemovedEvent(patientId)
                 );
 
                 const coordinates = cloneDeepMutable(
@@ -269,7 +266,7 @@ export namespace PatientActionReducers {
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    PatientRemovedEvent.create(patientId)
+                    newPatientRemovedEvent(patientId)
                 );
             }
             logPatientRemoved(draftState, patientId);

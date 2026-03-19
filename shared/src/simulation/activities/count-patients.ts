@@ -1,41 +1,33 @@
-import { IsUUID } from 'class-validator';
+import { z } from 'zod';
 import { groupBy } from 'lodash-es';
-import { IsValue } from '../../utils/validators/is-value.js';
 import type { UUID } from '../../utils/index.js';
-import { StrictObject, uuidValidationOptions } from '../../utils/index.js';
-import { getCreate } from '../../models/utils/get-create.js';
+import { StrictObject, uuidSchema } from '../../utils/index.js';
 import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import { PatientsCountedEvent } from '../events/patients-counted.js';
+import { newPatientsCountedEvent } from '../events/patients-counted.js';
 import type { PatientStatus } from '../../models/utils/patient-status.js';
 import { patientStatusAllowedValues } from '../../models/utils/patient-status.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
-export class CountPatientsActivityState implements SimulationActivityState {
-    @IsValue('countPatientsActivity' as const)
-    public readonly type = 'countPatientsActivity';
+export const countPatientsActivityStateSchema = z.strictObject({
+    type: z.literal('countPatientsActivity' as const),
+    id: uuidSchema,
+});
+export type CountPatientsActivityState = z.infer<
+    typeof countPatientsActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(id: UUID) {
-        this.id = id;
-    }
-
-    static readonly create = getCreate(this);
+export function newCountPatientsActivityState(
+    id: UUID
+): CountPatientsActivityState {
+    return { id, type: 'countPatientsActivity' };
 }
 
 export const countPatientsActivity: SimulationActivity<CountPatientsActivityState> =
     {
-        activityState: CountPatientsActivityState,
+        activityStateSchema: countPatientsActivityStateSchema,
         tick(
             draftState,
             simulatedRegion,
@@ -68,7 +60,7 @@ export const countPatientsActivity: SimulationActivity<CountPatientsActivityStat
 
             sendSimulationEvent(
                 simulatedRegion,
-                PatientsCountedEvent.create(
+                newPatientsCountedEvent(
                     patientCount as ResourceDescription<PatientStatus>
                 )
             );

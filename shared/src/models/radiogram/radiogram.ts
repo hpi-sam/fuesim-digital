@@ -1,11 +1,12 @@
-import type { UUID } from '../../utils/index.js';
-import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
+import { z } from 'zod';
+import { uuidSchema } from '../../utils/index.js';
+import { exerciseRadiogramStatusSchema } from './status/exercise-radiogram-status.js';
 
-export class Radiogram {
-    readonly id!: UUID;
-    readonly type!: `${string}Radiogram`;
-    readonly simulatedRegionId!: UUID;
-    readonly status!: ExerciseRadiogramStatus;
-    readonly informationAvailable!: boolean;
-    readonly informationRequestKey!: string | null;
-}
+export const radiogramSchema = z.strictObject({
+    id: uuidSchema,
+    type: z.literal('radiogram'),
+    simulatedRegionId: uuidSchema,
+    status: exerciseRadiogramStatusSchema,
+    informationAvailable: z.boolean(),
+    informationRequestKey: z.string().nullable(),
+});

@@ -6,7 +6,7 @@ import {
     isUnpublishedRadiogramStatus,
     participantIdOfRadiogramStatus,
     publishTimeOfRadiogramStatus,
-} from './status/radiogram-status-helpers.js';
+} from './status/index.js';
 
 export function isUnread(radiogram: ExerciseRadiogram) {
     return isUnreadRadiogramStatus(radiogram.status);

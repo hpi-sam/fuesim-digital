@@ -7,8 +7,8 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import {
-    SimulatedRegionRequestTargetConfiguration,
-    TraineesRequestTargetConfiguration,
+    newSimulatedRegionRequestTargetConfiguration,
+    newTraineesRequestTargetConfiguration,
 } from 'fuesim-digital-shared';
 import { map, tap, type Observable, combineLatest } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -153,9 +153,9 @@ export class SignallerModalRequestDestinationEditorComponent
         let requestTarget: ExerciseRequestTargetConfiguration;
 
         if (this.selectedTarget.key === this.TRAINEES_ID) {
-            requestTarget = TraineesRequestTargetConfiguration.create();
+            requestTarget = newTraineesRequestTargetConfiguration();
         } else {
-            requestTarget = SimulatedRegionRequestTargetConfiguration.create(
+            requestTarget = newSimulatedRegionRequestTargetConfiguration(
                 this.selectedTarget.key
             );
         }

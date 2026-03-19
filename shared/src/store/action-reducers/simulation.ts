@@ -7,30 +7,26 @@ import {
     IsUUID,
     Min,
     ValidateIf,
-    ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { WritableDraft } from 'immer';
-import type {
+import {
     ExerciseSimulationEvent,
-    ReportableInformation,
+    newTransferVehiclesRequestEvent,
+    type ReportableInformation,
     TreatPatientsBehaviorState,
     UnloadArrivingVehiclesBehaviorState,
-} from '../../simulation/index.js';
-import {
     reportableInformationTypeToGermanNameDictionary,
     behaviorTypeToGermanNameDictionary,
     updateRequestPatientCountsDelay,
     updateRequestVehiclesDelay,
-    TransferPatientsInSpecificVehicleRequestEvent,
-    TransferSpecificVehicleRequestEvent,
     updateBehaviorsRequestTarget,
     updateBehaviorsRequestInterval,
-    reportableInformationAllowedValues,
-    RecurringEventActivityState,
-    TransferVehiclesRequestEvent,
+    newRecurringEventActivityState,
+    newTransferSpecificVehicleRequestEvent,
+    newTransferPatientsInSpecificVehicleRequestEvent,
+    reportableInformationSchema,
 } from '../../simulation/index.js';
-import { StartCollectingInformationEvent } from '../../simulation/events/start-collecting.js';
+import { newStartCollectingInformationEvent } from '../../simulation/events/start-collecting.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import { nextUUID } from '../../simulation/utils/randomness.js';
 import type { UUID, UUIDSet } from '../../utils/index.js';
@@ -40,11 +36,7 @@ import {
     uuidArrayValidationOptions,
     formatDuration,
 } from '../../utils/index.js';
-import {
-    IsLiteralUnion,
-    IsUUIDSet,
-    IsValue,
-} from '../../utils/validators/index.js';
+import { IsUUIDSet, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
 import {
@@ -52,7 +44,6 @@ import {
     type PatientStatus,
     type PatientStatusForTransport,
     patientStatusForTransportSchema,
-    requestTargetTypeOptions,
     statusNames,
     createSimulatedRegionTag,
     createPatientStatusTag,
@@ -61,11 +52,14 @@ import {
     currentSimulatedRegionIdOf,
     createTransferPointTag,
     patientStatusSchema,
+    resourceDescriptionSchema,
+    exerciseRequestTargetConfigurationSchema,
 } from '../../models/index.js';
-import type { TransferDestination } from '../../simulation/utils/transfer-destination.js';
-import { transferDestinationTypeAllowedValues } from '../../simulation/utils/transfer-destination.js';
+import {
+    type TransferDestination,
+    transferDestinationTypeSchema,
+} from '../../simulation/utils/transfer-destination.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { getActivityById, getBehaviorById, getElement } from './utils/index.js';
 import { logBehavior } from './utils/log.js';
@@ -149,7 +143,7 @@ export class CreateReportAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly simulatedRegionId!: UUID;
 
-    @IsLiteralUnion(reportableInformationAllowedValues)
+    @IsZodSchema(reportableInformationSchema)
     public readonly informationType!: ReportableInformation;
 
     @IsString()
@@ -224,7 +218,7 @@ export class CreateRecurringReportsAction implements Action {
     @Min(0)
     public readonly interval!: number;
 
-    @IsLiteralUnion(reportableInformationAllowedValues)
+    @IsZodSchema(reportableInformationSchema)
     public readonly informationType!: ReportableInformation;
 }
 
@@ -242,7 +236,7 @@ export class UpdateRecurringReportsAction implements Action {
     @Min(0)
     public readonly interval!: number;
 
-    @IsLiteralUnion(reportableInformationAllowedValues)
+    @IsZodSchema(reportableInformationSchema)
     public readonly informationType!: ReportableInformation;
 }
 
@@ -256,7 +250,7 @@ export class RemoveRecurringReportsAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly behaviorId!: UUID;
 
-    @IsLiteralUnion(reportableInformationAllowedValues)
+    @IsZodSchema(reportableInformationSchema)
     public readonly informationType!: ReportableInformation;
 }
 
@@ -316,8 +310,7 @@ export class UpdateRequestTargetAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly behaviorId!: UUID;
 
-    @Type(...requestTargetTypeOptions)
-    @ValidateNested()
+    @IsZodSchema(exerciseRequestTargetConfigurationSchema)
     public readonly requestTarget!: ExerciseRequestTargetConfiguration;
 }
 
@@ -409,7 +402,7 @@ export class SendTransferRequestEventAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly vehicleId!: UUID;
 
-    @IsLiteralUnion(transferDestinationTypeAllowedValues)
+    @IsZodSchema(transferDestinationTypeSchema)
     public readonly destinationType!: TransferDestination;
 
     @IsUUID(4, uuidValidationOptions)
@@ -429,10 +422,10 @@ export class TransferVehiclesAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly behaviorId!: UUID;
 
-    @IsResourceDescription()
+    @IsZodSchema(resourceDescriptionSchema)
     readonly requestedVehicles!: ResourceDescription;
 
-    @IsLiteralUnion(transferDestinationTypeAllowedValues)
+    @IsZodSchema(transferDestinationTypeSchema)
     public readonly destinationType!: TransferDestination;
 
     @IsUUID(4, uuidValidationOptions)
@@ -843,7 +836,7 @@ export namespace SimulationActionReducers {
             );
             sendSimulationEvent(
                 simulatedRegion,
-                StartCollectingInformationEvent.create(
+                newStartCollectingInformationEvent(
                     informationType,
                     interfaceSignallerKey
                 )
@@ -1031,9 +1024,9 @@ export namespace SimulationActionReducers {
                 const activityId = nextUUID(draftState);
                 reportBehaviorState.activityIds[informationType] = activityId;
                 simulatedRegion.activities[activityId] = cloneDeepMutable(
-                    RecurringEventActivityState.create(
+                    newRecurringEventActivityState(
                         activityId,
-                        StartCollectingInformationEvent.create(informationType),
+                        newStartCollectingInformationEvent(informationType),
                         draftState.currentTime + interval,
                         interval
                     )
@@ -1676,21 +1669,20 @@ export namespace SimulationActionReducers {
 
                 let event: ExerciseSimulationEvent;
                 if (Object.keys(cloneDeepMutable(patients)).length === 0) {
-                    event = TransferSpecificVehicleRequestEvent.create(
+                    event = newTransferSpecificVehicleRequestEvent(
                         vehicleId,
                         destinationType,
                         destinationId,
                         destinationId
                     );
                 } else {
-                    event =
-                        TransferPatientsInSpecificVehicleRequestEvent.create(
-                            patients,
-                            vehicleId,
-                            destinationType,
-                            destinationId,
-                            destinationId
-                        );
+                    event = newTransferPatientsInSpecificVehicleRequestEvent(
+                        patients,
+                        vehicleId,
+                        destinationType,
+                        destinationId,
+                        destinationId
+                    );
                 }
 
                 sendSimulationEvent(simulatedRegion, event);
@@ -1718,7 +1710,7 @@ export namespace SimulationActionReducers {
 
             sendSimulationEvent(
                 simulatedRegion,
-                TransferVehiclesRequestEvent.create(
+                newTransferVehiclesRequestEvent(
                     requestedVehicles,
                     destinationType,
                     destinationId

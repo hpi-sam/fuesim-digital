@@ -1,28 +1,23 @@
-import { IsInt, IsUUID, Min } from 'class-validator';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { uuidSchema } from '../../utils/index.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class VehicleArrivedEvent implements SimulationEvent {
-    @IsValue('vehicleArrivedEvent')
-    readonly type = 'vehicleArrivedEvent';
+export const vehicleArrivedEventSchema = simulationEventSchema.extend({
+    type: z.literal('vehicleArrivedEvent'),
+    vehicleId: uuidSchema,
+    arrivalTime: z.int().nonnegative(),
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly vehicleId: UUID;
+export type VehicleArrivedEvent = z.infer<typeof vehicleArrivedEventSchema>;
 
-    @IsInt()
-    @Min(0)
-    readonly arrivalTime: number;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(vehicleId: UUID, arrivalTime: number) {
-        this.vehicleId = vehicleId;
-        this.arrivalTime = arrivalTime;
-    }
-
-    static readonly create = getCreate(this);
+export function newVehicleArrivedEvent(
+    vehicleId: UUID,
+    arrivalTime: number
+): VehicleArrivedEvent {
+    return {
+        type: 'vehicleArrivedEvent',
+        vehicleId,
+        arrivalTime,
+    };
 }

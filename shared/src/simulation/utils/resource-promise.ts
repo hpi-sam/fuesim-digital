@@ -1,28 +1,22 @@
-import { Type } from 'class-transformer';
-import { IsInt, Min, ValidateNested } from 'class-validator';
-import { VehicleResource } from '../../models/utils/rescue-resource.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import { IsValue } from '../../utils/validators/is-value.js';
+import { z } from 'zod';
+import type { VehicleResource } from '../../models/index.js';
+import { vehicleResourceSchema } from '../../models/index.js';
 
-export class ResourcePromise {
-    @IsValue('resourcePromise')
-    readonly type = 'resourcePromise';
+export const resourcePromiseSchema = z.strictObject({
+    type: z.literal('resourcePromise'),
+    promisedTime: z.number().int().nonnegative(),
+    resource: vehicleResourceSchema,
+});
 
-    @IsInt()
-    @Min(0)
-    readonly promisedTime: number;
+export type ResourcePromise = z.infer<typeof resourcePromiseSchema>;
 
-    @Type(() => VehicleResource)
-    @ValidateNested()
-    readonly resource: VehicleResource;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(promisedTime: number, resource: VehicleResource) {
-        this.promisedTime = promisedTime;
-        this.resource = resource;
-    }
-
-    static readonly create = getCreate(this);
+export function newResourcePromise(
+    promisedTime: number,
+    resource: VehicleResource
+): ResourcePromise {
+    return {
+        type: 'resourcePromise',
+        promisedTime,
+        resource,
+    };
 }

@@ -1,46 +1,36 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsUUID, Min, ValidateNested } from 'class-validator';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import { getCreate } from '../../models/utils/get-create.js';
 import type { ExerciseSimulationEvent } from '../events/exercise-simulation-event.js';
-import { simulationEventTypeOptions } from '../events/exercise-simulation-event.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import { exerciseSimulationEventSchema } from '../events/exercise-simulation-event.js';
+import type { SimulationActivity } from './simulation-activity.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export class DelayEventActivityState implements SimulationActivityState {
-    @IsValue('delayEventActivity' as const)
-    public readonly type = 'delayEventActivity';
+export const delayEventActivityStateSchema =
+    simulationActivityStateSchema.extend({
+        type: z.literal('delayEventActivity'),
+        event: exerciseSimulationEventSchema,
+        endTime: z.int().nonnegative(),
+    });
+export type DelayEventActivityState = z.infer<
+    typeof delayEventActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    @Type(...simulationEventTypeOptions)
-    @ValidateNested()
-    public readonly event: ExerciseSimulationEvent;
-
-    @IsInt()
-    @Min(0)
-    public readonly endTime: number;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(id: UUID, event: ExerciseSimulationEvent, endTime: number) {
-        this.id = id;
-        this.event = event;
-        this.endTime = endTime;
-    }
-
-    static readonly create = getCreate(this);
+export function newDelayEventActivityState(
+    id: UUID,
+    event: ExerciseSimulationEvent,
+    endTime: number
+): DelayEventActivityState {
+    return {
+        id,
+        type: 'delayEventActivity',
+        event,
+        endTime,
+    };
 }
 
 export const delayEventActivity: SimulationActivity<DelayEventActivityState> = {
-    activityState: DelayEventActivityState,
+    activityStateSchema: delayEventActivityStateSchema,
     tick(draftState, simulatedRegion, activityState, _tickInterval, terminate) {
         if (draftState.currentTime >= activityState.endTime) {
             sendSimulationEvent(simulatedRegion, activityState.event);

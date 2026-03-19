@@ -1,49 +1,38 @@
-import { IsUUID } from 'class-validator';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
+import { uuidSchema } from '../../utils/index.js';
 import type { TransferDestination } from '../utils/transfer-destination.js';
-import { transferDestinationTypeAllowedValues } from '../utils/transfer-destination.js';
+import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
 import type { ExerciseOccupation } from '../../models/index.js';
-import { exerciseOccupationSchema, getCreate } from '../../models/index.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { exerciseOccupationSchema } from '../../models/utils/occupations/exercise-occupation.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class TransferSpecificVehicleRequestEvent implements SimulationEvent {
-    @IsValue('transferSpecificVehicleRequestEvent')
-    readonly type = 'transferSpecificVehicleRequestEvent';
+export const transferSpecificVehicleRequestEventSchema =
+    simulationEventSchema.extend({
+        type: z.literal('transferSpecificVehicleRequestEvent'),
+        vehicleId: uuidSchema,
+        transferInitiatingRegionId: uuidSchema.optional(),
+        transferDestinationType: transferDestinationTypeSchema,
+        transferDestinationId: uuidSchema,
+        successorOccupation: exerciseOccupationSchema.optional(),
+    });
+export type TransferSpecificVehicleRequestEvent = z.infer<
+    typeof transferSpecificVehicleRequestEventSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly vehicleId: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    readonly transferInitiatingRegionId?: UUID;
-
-    @IsLiteralUnion(transferDestinationTypeAllowedValues)
-    readonly transferDestinationType: TransferDestination;
-
-    @IsUUID(4, uuidValidationOptions)
-    readonly transferDestinationId: UUID;
-
-    @IsZodSchema(exerciseOccupationSchema.optional())
-    readonly successorOccupation?: ExerciseOccupation;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        vehicleId: UUID,
-        transferDestinationType: TransferDestination,
-        transferDestinationId: UUID,
-        transferInitiatingRegionId?: UUID,
-        successorOccupation?: ExerciseOccupation
-    ) {
-        this.vehicleId = vehicleId;
-        this.transferInitiatingRegionId = transferInitiatingRegionId;
-        this.transferDestinationType = transferDestinationType;
-        this.transferDestinationId = transferDestinationId;
-        this.successorOccupation = successorOccupation;
-    }
-
-    static readonly create = getCreate(this);
+export function newTransferSpecificVehicleRequestEvent(
+    vehicleId: UUID,
+    transferDestinationType: TransferDestination,
+    transferDestinationId: UUID,
+    transferInitiatingRegionId?: UUID,
+    successorOccupation?: ExerciseOccupation
+): TransferSpecificVehicleRequestEvent {
+    return {
+        type: 'transferSpecificVehicleRequestEvent',
+        vehicleId,
+        transferInitiatingRegionId,
+        transferDestinationType,
+        transferDestinationId,
+        successorOccupation,
+    };
 }

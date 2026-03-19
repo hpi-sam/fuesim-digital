@@ -4,7 +4,7 @@ import type { ExerciseState } from '../../state.js';
 import { simulationActivityDictionary } from '../activities/index.js';
 import { terminateActivity } from '../activities/utils.js';
 import { simulationBehaviorDictionary } from '../behaviors/index.js';
-import { TickEvent } from '../events/tick.js';
+import { newTickEvent } from '../events/tick.js';
 import { sendSimulationEvent } from '../events/utils.js';
 
 export function simulateAllRegions(
@@ -21,7 +21,7 @@ function simulateSingleRegion(
     simulatedRegion: WritableDraft<SimulatedRegion>,
     tickInterval: number
 ) {
-    sendSimulationEvent(simulatedRegion, TickEvent.create(tickInterval));
+    sendSimulationEvent(simulatedRegion, newTickEvent(tickInterval));
     handleSimulationEvents(draftState, simulatedRegion);
     tickActivities(draftState, simulatedRegion, tickInterval);
 }

@@ -1,60 +1,53 @@
-import { IsBoolean, isUUID, IsUUID } from 'class-validator';
-import { RadiogramUnpublishedStatus } from '../../models/radiogram/status/radiogram-unpublished-status.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { UUID } from '../../utils/index.js';
+import { z } from 'zod';
 import {
     cloneDeepMutable,
     StrictObject,
     uuid,
-    uuidValidationOptions,
+    uuidSchema,
 } from '../../utils/index.js';
-import { IsLiteralUnionMap, IsValue } from '../../utils/validators/index.js';
-import { GenerateReportActivityState } from '../activities/generate-report.js';
-import { CollectInformationEvent } from '../events/collect.js';
-import { nextUUID } from '../utils/randomness.js';
 import {
-    TransferCategoryCompletedRadiogram,
-    TreatmentStatusRadiogram,
+    newRadiogramUnpublishedStatus,
+    newTransferCategoryCompletedRadiogram,
+    newTreatmentStatusRadiogram,
 } from '../../models/radiogram/index.js';
+import { newGenerateReportActivityState } from '../activities/generate-report.js';
+import { nextUUID } from '../utils/randomness.js';
 import { addActivity } from '../activities/utils.js';
-import { PublishRadiogramActivityState } from '../activities/index.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
-} from './simulation-behavior.js';
-import type { ReportableInformation } from './utils.js';
-import {
-    createRadiogramMap,
-    reportableInformationAllowedValues,
-} from './utils.js';
+import { newPublishRadiogramActivityState } from '../activities/index.js';
+import { newCollectInformationEvent } from '../events/collect.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
+import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import { createRadiogramMap } from './utils.js';
+import { reportableInformationSchema } from './reportable-information.js';
 
-export class ReportBehaviorState implements SimulationBehaviorState {
-    @IsValue('reportBehavior')
-    readonly type = 'reportBehavior';
+export const reportBehaviorStateSchema = z.strictObject({
+    ...simulationBehaviorStateSchema.shape,
+    type: z.literal('reportBehavior'),
+    activityIds: z.partialRecord(
+        reportableInformationSchema,
+        uuidSchema.optional()
+    ),
+    reportTreatmentProgressChanges: z.boolean(),
+    reportTransferOfCategoryInSingleRegionCompleted: z.boolean(),
+    reportTransferOfCategoryInMultipleRegionsCompleted: z.boolean(),
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export type ReportBehaviorState = z.infer<typeof reportBehaviorStateSchema>;
 
-    @IsLiteralUnionMap(reportableInformationAllowedValues, ((value) =>
-        isUUID(value, 4)) as (value: unknown) => value is UUID)
-    public readonly activityIds: { [key in ReportableInformation]?: UUID } = {};
-
-    @IsBoolean()
-    public readonly reportTreatmentProgressChanges: boolean = true;
-
-    @IsBoolean()
-    public readonly reportTransferOfCategoryInSingleRegionCompleted: boolean =
-        false;
-
-    @IsBoolean()
-    public readonly reportTransferOfCategoryInMultipleRegionsCompleted: boolean =
-        true;
-
-    static readonly create = getCreate(this);
+export function newReportBehaviorState(): ReportBehaviorState {
+    return {
+        type: 'reportBehavior',
+        id: uuid(),
+        activityIds: {},
+        reportTreatmentProgressChanges: true,
+        reportTransferOfCategoryInSingleRegionCompleted: false,
+        reportTransferOfCategoryInMultipleRegionsCompleted: true,
+    };
 }
 
 export const reportBehavior: SimulationBehavior<ReportBehaviorState> = {
-    behaviorState: ReportBehaviorState,
+    behaviorStateSchema: reportBehaviorStateSchema,
+    newBehaviorState: newReportBehaviorState,
     handleEvent: (draftState, simulatedRegion, behaviorState, event) => {
         switch (event.type) {
             case 'startCollectingInformationEvent': {
@@ -62,15 +55,15 @@ export const reportBehavior: SimulationBehavior<ReportBehaviorState> = {
 
                 addActivity(
                     simulatedRegion,
-                    GenerateReportActivityState.create(
+                    newGenerateReportActivityState(
                         activityId,
                         createRadiogramMap[event.informationType](
                             nextUUID(draftState),
                             simulatedRegion.id,
                             event.interfaceSignallerKey,
-                            RadiogramUnpublishedStatus.create()
+                            newRadiogramUnpublishedStatus()
                         ),
-                        CollectInformationEvent.create(
+                        newCollectInformationEvent(
                             activityId,
                             event.informationType
                         )
@@ -88,11 +81,11 @@ export const reportBehavior: SimulationBehavior<ReportBehaviorState> = {
                 }
 
                 const radiogram = cloneDeepMutable(
-                    TreatmentStatusRadiogram.create(
+                    newTreatmentStatusRadiogram(
                         nextUUID(draftState),
                         simulatedRegion.id,
                         null,
-                        RadiogramUnpublishedStatus.create()
+                        newRadiogramUnpublishedStatus()
                     )
                 );
                 radiogram.treatmentStatus = event.newProgress;
@@ -101,7 +94,7 @@ export const reportBehavior: SimulationBehavior<ReportBehaviorState> = {
 
                 addActivity(
                     simulatedRegion,
-                    PublishRadiogramActivityState.create(
+                    newPublishRadiogramActivityState(
                         nextUUID(draftState),
                         radiogram
                     )
@@ -116,10 +109,10 @@ export const reportBehavior: SimulationBehavior<ReportBehaviorState> = {
                         behaviorState.reportTransferOfCategoryInMultipleRegionsCompleted)
                 ) {
                     const radiogram = cloneDeepMutable(
-                        TransferCategoryCompletedRadiogram.create(
+                        newTransferCategoryCompletedRadiogram(
                             nextUUID(draftState),
                             simulatedRegion.id,
-                            RadiogramUnpublishedStatus.create()
+                            newRadiogramUnpublishedStatus()
                         )
                     );
                     radiogram.completedCategory = event.patientCategory;
@@ -130,7 +123,7 @@ export const reportBehavior: SimulationBehavior<ReportBehaviorState> = {
 
                     addActivity(
                         simulatedRegion,
-                        PublishRadiogramActivityState.create(
+                        newPublishRadiogramActivityState(
                             nextUUID(draftState),
                             radiogram
                         )

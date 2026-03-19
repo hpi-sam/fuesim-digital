@@ -1,56 +1,40 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsUUID, Min, ValidateNested } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { ExerciseSimulationEvent } from '../events/exercise-simulation-event.js';
-import { simulationEventTypeOptions } from '../events/exercise-simulation-event.js';
+import { exerciseSimulationEventSchema } from '../events/exercise-simulation-event.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export class RecurringEventActivityState implements SimulationActivityState {
-    @IsValue('recurringEventActivity' as const)
-    public readonly type = 'recurringEventActivity';
+export const recurringEventActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('recurringEventActivity'),
+    event: exerciseSimulationEventSchema,
+    lastOccurrenceTime: z.int().nonnegative(),
+    recurrenceIntervalTime: z.int().nonnegative(),
+});
+export type RecurringEventActivityState = z.infer<
+    typeof recurringEventActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    @Type(...simulationEventTypeOptions)
-    @ValidateNested()
-    public readonly event: ExerciseSimulationEvent;
-
-    @IsInt()
-    @Min(0)
-    public readonly lastOccurrenceTime: number;
-
-    @Min(0)
-    public readonly recurrenceIntervalTime: number;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        event: ExerciseSimulationEvent,
-        firstOccurrenceTime: number,
-        recurrenceIntervalTime: number
-    ) {
-        this.id = id;
-        this.event = event;
-        this.lastOccurrenceTime = firstOccurrenceTime - recurrenceIntervalTime;
-        this.recurrenceIntervalTime = recurrenceIntervalTime;
-    }
-
-    static readonly create = getCreate(this);
+export function newRecurringEventActivityState(
+    id: UUID,
+    event: ExerciseSimulationEvent,
+    firstOccurrenceTime: number,
+    recurrenceIntervalTime: number
+): RecurringEventActivityState {
+    return {
+        id,
+        type: 'recurringEventActivity',
+        event,
+        lastOccurrenceTime: firstOccurrenceTime - recurrenceIntervalTime,
+        recurrenceIntervalTime,
+    };
 }
 
 export const recurringEventActivity: SimulationActivity<RecurringEventActivityState> =
     {
-        activityState: RecurringEventActivityState,
+        activityStateSchema: recurringEventActivityStateSchema,
         tick(draftState, simulatedRegion, activityState) {
             if (
                 draftState.currentTime >=

@@ -12,8 +12,8 @@ import {
     changePositionWithId,
 } from '../../../models/utils/position/position-helpers-mutable.js';
 import {
-    MaterialRemovedEvent,
-    PersonnelRemovedEvent,
+    newMaterialRemovedEvent,
+    newPersonnelRemovedEvent,
 } from '../../../simulation/index.js';
 import { sendSimulationEvent } from '../../../simulation/events/utils.js';
 import type { ExerciseState } from '../../../state.js';
@@ -83,7 +83,7 @@ export function completelyLoadVehicle(
         if (inSimulation) {
             sendSimulationEvent(
                 simulatedRegion!,
-                MaterialRemovedEvent.create(materialId)
+                newMaterialRemovedEvent(materialId)
             );
         }
     });
@@ -97,7 +97,7 @@ export function completelyLoadVehicle(
             if (inSimulation) {
                 sendSimulationEvent(
                     simulatedRegion!,
-                    PersonnelRemovedEvent.create(personnelId)
+                    newPersonnelRemovedEvent(personnelId)
                 );
             }
         }

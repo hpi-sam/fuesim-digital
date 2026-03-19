@@ -1,5 +1,5 @@
-import { IsInt, IsOptional, IsUUID, Min } from 'class-validator';
 import type { Immutable, WritableDraft } from 'immer';
+import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
 import type { CatersFor } from '../../store/action-reducers/utils/calculate-treatments.js';
 import {
@@ -8,84 +8,68 @@ import {
     tryToCaterFor,
 } from '../../store/action-reducers/utils/calculate-treatments.js';
 import { stringCompare, type UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/uuid.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { TreatmentProgress } from '../utils/treatment.js';
-import { treatmentProgressAllowedValues } from '../utils/treatment.js';
+import { treatmentProgressSchema } from '../utils/treatment.js';
 import {
-    ResourceRequiredEvent,
-    TreatmentProgressChangedEvent,
+    newResourceRequiredEvent,
+    newTreatmentProgressChangedEvent,
 } from '../events/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import type { AssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
+import type { AssignLeaderBehaviorState } from '../behaviors/index.js';
 import { defaultPersonnelTemplates } from '../../data/default-state/personnel-templates.js';
-import { StrictObject } from '../../utils/strict-object.js';
-import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { StrictObject, cloneDeepMutable } from '../../utils/index.js';
 import type { Material } from '../../models/material.js';
-import type { Personnel } from '../../models/personnel.js';
+import type {
+    Personnel,
+    ResourceDescription,
+    PatientStatus,
+} from '../../models/index.js';
+import type { Patient } from '../../models/patient.js';
 import {
     getPatientVisibleStatus,
-    Patient,
     isPretriageStatusLocked,
 } from '../../models/patient.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import {
     addResourceDescription,
     ceilResourceDescription,
     maxResourceDescription,
     scaleResourceDescription,
     subtractResourceDescription,
-} from '../../models/utils/resource-description.js';
+    isInSpecificSimulatedRegion,
+    newPersonnelResource,
+} from '../../models/index.js';
 import { logTreatmentStatusChangedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
-import { PersonnelResource } from '../../models/utils/rescue-resource.js';
-import type { PatientStatus } from '../../models/utils/patient-status.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export class ReassignTreatmentsActivityState
-    implements SimulationActivityState
-{
-    @IsValue('reassignTreatmentsActivity' as const)
-    public readonly type = 'reassignTreatmentsActivity';
+export const reassignTreatmentsActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('reassignTreatmentsActivity'),
+    treatmentProgress: treatmentProgressSchema,
+    countingStartedAt: z.int().nonnegative().optional(),
+    countingTimePerPatient: z.int().nonnegative(),
+});
+export type ReassignTreatmentsActivityState = z.infer<
+    typeof reassignTreatmentsActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    @IsLiteralUnion(treatmentProgressAllowedValues)
-    public readonly treatmentProgress: TreatmentProgress;
-
-    @IsOptional()
-    @IsInt()
-    @Min(0)
-    public readonly countingStartedAt: number | undefined;
-
-    @IsInt()
-    @Min(0)
-    public readonly countingTimePerPatient: number;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        treatmentProgress: TreatmentProgress,
-        countingTimePerPatient: number
-    ) {
-        this.id = id;
-        this.treatmentProgress = treatmentProgress;
-        this.countingTimePerPatient = countingTimePerPatient;
-    }
-
-    static readonly create = getCreate(this);
+export function newReassignTreatmentsActivityState(
+    id: UUID,
+    treatmentProgress: TreatmentProgress,
+    countingTimePerPatient: number
+): ReassignTreatmentsActivityState {
+    return {
+        id,
+        type: 'reassignTreatmentsActivity',
+        treatmentProgress,
+        countingTimePerPatient,
+        countingStartedAt: undefined,
+    };
 }
 
 export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsActivityState> =
     {
-        activityState: ReassignTreatmentsActivityState,
+        activityStateSchema: reassignTreatmentsActivityStateSchema,
         tick(draftState, simulatedRegion, activityState, _, terminate) {
             const patients = Object.values(draftState.patients)
                 .filter((patient) =>
@@ -122,7 +106,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                 if (progress !== 'noTreatment') {
                     sendSimulationEvent(
                         simulatedRegion,
-                        TreatmentProgressChangedEvent.create('noTreatment')
+                        newTreatmentProgressChangedEvent('noTreatment')
                     );
                     logTreatmentStatusChangedInSimulatedRegion(
                         draftState,
@@ -151,7 +135,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                     // Since we've reached this line, there is a leader and other personnel so treatment can start
                     sendSimulationEvent(
                         simulatedRegion,
-                        TreatmentProgressChangedEvent.create('unknown')
+                        newTreatmentProgressChangedEvent('unknown')
                     );
                     logTreatmentStatusChangedInSimulatedRegion(
                         draftState,
@@ -165,7 +149,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                     if (finished) {
                         sendSimulationEvent(
                             simulatedRegion,
-                            TreatmentProgressChangedEvent.create('counted')
+                            newTreatmentProgressChangedEvent('counted')
                         );
                         logTreatmentStatusChangedInSimulatedRegion(
                             draftState,
@@ -191,7 +175,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                         } else {
                             sendSimulationEvent(
                                 simulatedRegion,
-                                TreatmentProgressChangedEvent.create('counted')
+                                newTreatmentProgressChangedEvent('counted')
                             );
                             logTreatmentStatusChangedInSimulatedRegion(
                                 draftState,
@@ -213,7 +197,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                     if (secured && progress !== 'secured') {
                         sendSimulationEvent(
                             simulatedRegion,
-                            TreatmentProgressChangedEvent.create('secured')
+                            newTreatmentProgressChangedEvent('secured')
                         );
                         logTreatmentStatusChangedInSimulatedRegion(
                             draftState,
@@ -225,7 +209,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                     if (!secured && progress !== 'triaged') {
                         sendSimulationEvent(
                             simulatedRegion,
-                            TreatmentProgressChangedEvent.create('triaged')
+                            newTreatmentProgressChangedEvent('triaged')
                         );
                         logTreatmentStatusChangedInSimulatedRegion(
                             draftState,
@@ -239,12 +223,12 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
             }
 
             if (missingPersonnel !== undefined) {
-                const missingResource = PersonnelResource.create(
+                const missingResource = newPersonnelResource(
                     ceilResourceDescription(missingPersonnel)
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    ResourceRequiredEvent.create(
+                    newResourceRequiredEvent(
                         simulatedRegion.id,
                         missingResource,
                         'reassignTreatmentsActivity'

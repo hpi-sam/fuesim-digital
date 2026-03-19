@@ -1,51 +1,39 @@
-import { Type } from 'class-transformer';
-import { IsUUID, ValidateNested } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
+import { uuidSchema } from '../../utils/index.js';
 import type { ExerciseSimulationEvent } from '../events/index.js';
-import { simulationEventTypeOptions } from '../events/index.js';
+import { exerciseSimulationEventSchema } from '../events/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { tryGetElement } from '../../store/action-reducers/utils/index.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export class SendRemoteEventActivityState implements SimulationActivityState {
-    @IsValue('sendRemoteEventActivity' as const)
-    public readonly type = 'sendRemoteEventActivity';
+export const sendRemoteEventActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('sendRemoteEventActivity'),
+    targetSimulatedRegionId: uuidSchema,
+    event: exerciseSimulationEventSchema,
+});
+export type SendRemoteEventActivityState = z.infer<
+    typeof sendRemoteEventActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly targetSimulatedRegionId: UUID;
-
-    @Type(...simulationEventTypeOptions)
-    @ValidateNested()
-    public readonly event: ExerciseSimulationEvent;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        targetSimulatedRegionId: UUID,
-        event: ExerciseSimulationEvent
-    ) {
-        this.id = id;
-        this.targetSimulatedRegionId = targetSimulatedRegionId;
-        this.event = event;
-    }
-
-    static readonly create = getCreate(this);
+export function newSendRemoteEventActivityState(
+    id: UUID,
+    targetSimulatedRegionId: UUID,
+    event: ExerciseSimulationEvent
+): SendRemoteEventActivityState {
+    return {
+        id,
+        type: 'sendRemoteEventActivity',
+        targetSimulatedRegionId,
+        event,
+    };
 }
 
 export const sendRemoteEventActivity: SimulationActivity<SendRemoteEventActivityState> =
     {
-        activityState: SendRemoteEventActivityState,
+        activityStateSchema: sendRemoteEventActivityStateSchema,
         tick(
             draftState,
             _simulatedRegion,

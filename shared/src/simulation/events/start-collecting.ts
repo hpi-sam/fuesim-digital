@@ -1,31 +1,24 @@
-import { IsString, ValidateIf } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import type { ReportableInformation } from '../behaviors/utils.js';
-import { reportableInformationAllowedValues } from '../behaviors/utils.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { z } from 'zod';
+import type { ReportableInformation } from '../behaviors/reportable-information.js';
+import { reportableInformationSchema } from '../behaviors/reportable-information.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class StartCollectingInformationEvent implements SimulationEvent {
-    @IsValue('startCollectingInformationEvent')
-    readonly type = 'startCollectingInformationEvent';
+export const startCollectingInformationSchema = simulationEventSchema.extend({
+    type: z.literal('startCollectingInformationEvent'),
+    informationType: reportableInformationSchema,
+    interfaceSignallerKey: z.string().nullable(),
+});
+export type StartCollectingInformationEvent = z.infer<
+    typeof startCollectingInformationSchema
+>;
 
-    @IsLiteralUnion(reportableInformationAllowedValues)
-    readonly informationType: ReportableInformation;
-
-    @IsString()
-    @ValidateIf((_, value) => value !== null)
-    public readonly interfaceSignallerKey!: string | null;
-
-    /**
-     * @deprecated Use {@link create} instead.
-     */
-    constructor(
-        informationType: ReportableInformation,
-        interfaceSignallerKey: string | null = null
-    ) {
-        this.informationType = informationType;
-        this.interfaceSignallerKey = interfaceSignallerKey;
-    }
-
-    static readonly create = getCreate(this);
+export function newStartCollectingInformationEvent(
+    informationType: ReportableInformation,
+    interfaceSignallerKey: string | null = null
+): StartCollectingInformationEvent {
+    return {
+        type: 'startCollectingInformationEvent',
+        informationType,
+        interfaceSignallerKey,
+    };
 }

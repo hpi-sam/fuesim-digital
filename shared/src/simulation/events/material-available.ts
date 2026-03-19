@@ -1,23 +1,18 @@
-import { IsUUID } from 'class-validator';
+import { z } from 'zod';
 import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { uuidSchema } from '../../utils/index.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class MaterialAvailableEvent implements SimulationEvent {
-    @IsValue('materialAvailableEvent')
-    readonly type = 'materialAvailableEvent';
+export const materialAvailableEventSchema = simulationEventSchema.extend({
+    type: z.literal('materialAvailableEvent'),
+    materialId: uuidSchema,
+});
+export type MaterialAvailableEvent = z.infer<
+    typeof materialAvailableEventSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly materialId: UUID;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(materialId: UUID) {
-        this.materialId = materialId;
-    }
-
-    static readonly create = getCreate(this);
+export function newMaterialAvailableEvent(
+    materialId: UUID
+): MaterialAvailableEvent {
+    return { type: 'materialAvailableEvent', materialId };
 }

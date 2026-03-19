@@ -1,17 +1,11 @@
+import { z } from 'zod';
+import type { WritableDraft } from 'immer';
 import {
-    IsArray,
-    IsInt,
-    IsOptional,
-    IsUUID,
-    Min,
-    ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { WritableDraft } from 'immer';
-import { IsStringMap } from '../../utils/validators/is-string-map.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, StrictObject, uuid } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
+    cloneDeepMutable,
+    StrictObject,
+    uuid,
+    uuidSchema,
+} from '../../utils/index.js';
 import {
     getActivityById,
     tryGetElement,
@@ -19,67 +13,62 @@ import {
 import type { ExerciseState } from '../../state.js';
 import { addActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
-import { RecurringEventActivityState } from '../activities/index.js';
-import { SendRequestEvent } from '../events/send-request.js';
-import { CreateRequestActivityState } from '../activities/create-request.js';
-import { VehicleResource } from '../../models/utils/rescue-resource.js';
-import type { ExerciseRequestTargetConfiguration } from '../../models/utils/request-target/exercise-request-target.js';
-import { requestTargetTypeOptions } from '../../models/utils/request-target/exercise-request-target.js';
-import { TraineesRequestTargetConfiguration } from '../../models/utils/request-target/trainees.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { SimulatedRegion } from '../../models/index.js';
-import { ResourcePromise } from '../utils/resource-promise.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { newRecurringEventActivityState } from '../activities/index.js';
+import { newSendRequestEvent } from '../events/send-request.js';
+import { newCreateRequestActivityState } from '../activities/create-request.js';
 import {
+    newVehicleResource,
+    vehicleResourceSchema,
+    exerciseRequestTargetConfigurationSchema,
+    newTraineesRequestTargetConfiguration,
     addPartialResourceDescriptions,
     subtractPartialResourceDescriptions,
-} from '../../models/utils/resource-description.js';
-import type { ResourceRequestRadiogram } from '../../models/radiogram/index.js';
+} from '../../models/index.js';
 import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
-} from './simulation-behavior.js';
+    ExerciseRequestTargetConfiguration,
+    SimulatedRegion,
+    ResourceDescription,
+} from '../../models/index.js';
+import {
+    newResourcePromise,
+    resourcePromiseSchema,
+} from '../utils/resource-promise.js';
+import type { ResourceRequestRadiogram } from '../../models/radiogram/index.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
+import { simulationBehaviorStateSchema } from './simulation-behavior.js';
 
-export class RequestBehaviorState implements SimulationBehaviorState {
-    @IsValue('requestBehavior')
-    readonly type = 'requestBehavior';
-
-    @IsUUID()
-    public readonly id: UUID = uuid();
-
-    @IsUUID()
-    @IsOptional()
-    public readonly recurringEventActivityId?: UUID;
-
-    @IsStringMap(VehicleResource)
-    public readonly requestedResources: { [key: string]: VehicleResource } = {};
-
-    @IsArray()
-    @Type(() => ResourcePromise)
-    @ValidateNested({ each: true })
-    public readonly promisedResources: readonly ResourcePromise[] = [];
-
+export const requestBehaviorStateSchema = z.strictObject({
+    ...simulationBehaviorStateSchema.shape,
+    type: z.literal('requestBehavior'),
+    recurringEventActivityId: uuidSchema.optional(),
+    requestedResources: z.record(z.string(), vehicleResourceSchema),
+    promisedResources: z.array(resourcePromiseSchema),
     /**
      * @deprecated Use {@link updateBehaviorsRequestInterval} instead
      */
-    @IsInt()
-    @Min(0)
-    public readonly requestInterval: number = 1000 * 60 * 5;
+    requestInterval: z.number().int().nonnegative(),
+    invalidatePromiseInterval: z.number().int().nonnegative(),
+    requestTarget: exerciseRequestTargetConfigurationSchema,
+});
 
-    @IsInt()
-    @Min(0)
-    public readonly invalidatePromiseInterval: number = 1000 * 60 * 30;
+export type RequestBehaviorState = z.infer<typeof requestBehaviorStateSchema>;
 
-    @Type(...requestTargetTypeOptions)
-    @ValidateNested()
-    public readonly requestTarget: ExerciseRequestTargetConfiguration =
-        TraineesRequestTargetConfiguration.create();
-
-    static readonly create = getCreate(this);
+export function newRequestBehaviorState(): RequestBehaviorState {
+    return {
+        type: 'requestBehavior',
+        id: uuid(),
+        recurringEventActivityId: undefined,
+        requestedResources: {},
+        promisedResources: [],
+        requestInterval: 1000 * 60 * 5,
+        invalidatePromiseInterval: 1000 * 60 * 30,
+        requestTarget: newTraineesRequestTargetConfiguration(),
+    };
 }
 
 export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
-    behaviorState: RequestBehaviorState,
+    behaviorStateSchema: requestBehaviorStateSchema,
+    newBehaviorState: newRequestBehaviorState,
     handleEvent(draftState, simulatedRegion, behaviorState, event) {
         switch (event.type) {
             case 'tickEvent': {
@@ -88,9 +77,9 @@ export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
                         nextUUID(draftState);
                     addActivity(
                         simulatedRegion,
-                        RecurringEventActivityState.create(
+                        newRecurringEventActivityState(
                             behaviorState.recurringEventActivityId,
-                            SendRequestEvent.create(),
+                            newSendRequestEvent(),
                             draftState.currentTime,
                             behaviorState.requestInterval
                         )
@@ -111,7 +100,7 @@ export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
             case 'vehiclesSentEvent': {
                 behaviorState.promisedResources.push(
                     cloneDeepMutable(
-                        ResourcePromise.create(
+                        newResourcePromise(
                             draftState.currentTime,
                             event.vehiclesSent
                         )
@@ -161,12 +150,12 @@ export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
                     draftState,
                     behaviorState
                 );
-                const resource = VehicleResource.create(
+                const resource = newVehicleResource(
                     resourcesToRequest as ResourceDescription
                 );
                 addActivity(
                     simulatedRegion,
-                    CreateRequestActivityState.create(
+                    newCreateRequestActivityState(
                         nextUUID(draftState),
                         behaviorState.requestTarget,
                         resource,
@@ -192,12 +181,12 @@ export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
                             behaviorState
                         );
                         radiogram.requiredResource = cloneDeepMutable(
-                            VehicleResource.create(
+                            newVehicleResource(
                                 requiredResources as ResourceDescription
                             )
                         );
                         radiogram.alreadyPromisedResource = cloneDeepMutable(
-                            VehicleResource.create(
+                            newVehicleResource(
                                 alreadyPromisedResources as ResourceDescription
                             )
                         );
@@ -217,10 +206,10 @@ export const requestBehavior: SimulationBehavior<RequestBehaviorState> = {
     onRemove(draftState, simulatedRegion, behaviorState) {
         addActivity(
             simulatedRegion,
-            CreateRequestActivityState.create(
+            newCreateRequestActivityState(
                 nextUUID(draftState),
                 behaviorState.requestTarget,
-                VehicleResource.create({}),
+                newVehicleResource({}),
                 requestBehaviorKey(simulatedRegion)
             )
         );
@@ -239,10 +228,10 @@ export function updateBehaviorsRequestTarget(
 ) {
     addActivity(
         simulatedRegion,
-        CreateRequestActivityState.create(
+        newCreateRequestActivityState(
             nextUUID(draftState),
             behaviorState.requestTarget,
-            VehicleResource.create({}),
+            newVehicleResource({}),
             requestBehaviorKey(simulatedRegion)
         )
     );

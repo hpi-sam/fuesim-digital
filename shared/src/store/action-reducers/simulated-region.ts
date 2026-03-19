@@ -1,7 +1,6 @@
-import { Type } from 'class-transformer';
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 import {
-    SimulatedRegion,
+    type SimulatedRegion,
     type TransferPoint,
     isInSpecificSimulatedRegion,
     type MapCoordinates,
@@ -10,19 +9,20 @@ import {
     newSimulatedRegionPositionIn,
     type Size,
     sizeSchema,
+    simulatedRegionSchema,
 } from '../../models/index.js';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import type { ExerciseSimulationBehaviorState } from '../../simulation/index.js';
 import {
-    simulationBehaviorTypeOptions,
-    VehicleArrivedEvent,
-    PersonnelAvailableEvent,
-    NewPatientEvent,
-    MaterialAvailableEvent,
+    type ExerciseSimulationBehaviorState,
+    newMaterialAvailableEvent,
+    newNewPatientEvent,
+    newPersonnelAvailableEvent,
+    newVehicleArrivedEvent,
     simulationBehaviorDictionary,
+    exerciseSimulationBehaviorStateSchema,
 } from '../../simulation/index.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import type { UUID } from '../../utils/index.js';
@@ -45,8 +45,8 @@ import {
 export class AddSimulatedRegionAction implements Action {
     @IsValue('[SimulatedRegion] Add simulated region' as const)
     readonly type = '[SimulatedRegion] Add simulated region';
-    @ValidateNested()
-    @Type(() => SimulatedRegion)
+
+    @IsZodSchema(simulatedRegionSchema)
     public simulatedRegion!: SimulatedRegion;
 
     @IsZodSchema(transferPointSchema)
@@ -122,8 +122,7 @@ export class AddBehaviorToSimulatedRegionAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly simulatedRegionId!: UUID;
 
-    @Type(...simulationBehaviorTypeOptions)
-    @ValidateNested()
+    @IsZodSchema(exerciseSimulationBehaviorStateSchema)
     public readonly behaviorState!: ExerciseSimulationBehaviorState;
 }
 
@@ -297,7 +296,7 @@ export namespace SimulatedRegionActionReducers {
                     case 'vehicle':
                         sendSimulationEvent(
                             simulatedRegion,
-                            VehicleArrivedEvent.create(
+                            newVehicleArrivedEvent(
                                 element.id,
                                 draftState.currentTime
                             )
@@ -306,19 +305,19 @@ export namespace SimulatedRegionActionReducers {
                     case 'patient':
                         sendSimulationEvent(
                             simulatedRegion,
-                            NewPatientEvent.create(element.id)
+                            newNewPatientEvent(element.id)
                         );
                         break;
                     case 'personnel':
                         sendSimulationEvent(
                             simulatedRegion,
-                            PersonnelAvailableEvent.create(element.id)
+                            newPersonnelAvailableEvent(element.id)
                         );
                         break;
                     case 'material':
                         sendSimulationEvent(
                             simulatedRegion,
-                            MaterialAvailableEvent.create(element.id)
+                            newMaterialAvailableEvent(element.id)
                         );
                         break;
                 }

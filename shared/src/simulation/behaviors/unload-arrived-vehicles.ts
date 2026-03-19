@@ -1,61 +1,44 @@
-import { IsInt, IsUUID, Min } from 'class-validator';
+import { z } from 'zod';
 import {
-    getCreate,
     changeOccupation,
     isUnoccupied,
     newUnloadingOccupation,
 } from '../../models/index.js';
 import type { UUID } from '../../utils/index.js';
-import {
-    StrictObject,
-    uuid,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { UUIDSquaredMap } from '../../utils/validators/is-uuid-uuid-map.js';
-import { IsUUIDSquaredMap } from '../../utils/validators/is-uuid-uuid-map.js';
-import { UnloadVehicleActivityState } from '../activities/index.js';
+import { uuidSchema, StrictObject, uuid } from '../../utils/index.js';
+import { newUnloadVehicleActivityState } from '../activities/index.js';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
 import { tryGetElement } from '../../store/action-reducers/utils/index.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
-} from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
+import { simulationBehaviorStateSchema } from './simulation-behavior.js';
 
-export class UnloadArrivingVehiclesBehaviorState
-    implements SimulationBehaviorState
-{
-    @IsValue('unloadArrivingVehiclesBehavior' as const)
-    readonly type = 'unloadArrivingVehiclesBehavior';
+export const unloadArrivingVehiclesBehaviorStateSchema = z.strictObject({
+    ...simulationBehaviorStateSchema.shape,
+    type: z.literal('unloadArrivingVehiclesBehavior'),
+    unloadDelay: z.int().nonnegative(),
+    vehicleActivityMap: z.record(uuidSchema, uuidSchema),
+});
+export type UnloadArrivingVehiclesBehaviorState = z.infer<
+    typeof unloadArrivingVehiclesBehaviorStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly id: UUID = uuid();
-
-    @IsInt()
-    @Min(0)
-    readonly unloadDelay: number;
-
-    @IsUUIDSquaredMap()
-    readonly vehicleActivityMap: UUIDSquaredMap;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        unloadDelay: number = 2 * 60 * 1000,
-        vehicleActivityMap: UUIDSquaredMap = {}
-    ) {
-        this.unloadDelay = unloadDelay;
-        this.vehicleActivityMap = vehicleActivityMap;
-    }
-
-    static readonly create = getCreate(this);
+export function newUnloadArrivingVehiclesBehaviorState(
+    unloadDelay: number = 2 * 60 * 1000,
+    vehicleActivityMap: { [key in UUID]: UUID } = {}
+): UnloadArrivingVehiclesBehaviorState {
+    return {
+        id: uuid(),
+        type: 'unloadArrivingVehiclesBehavior',
+        unloadDelay,
+        vehicleActivityMap,
+    };
 }
 
 export const unloadArrivingVehiclesBehavior: SimulationBehavior<UnloadArrivingVehiclesBehaviorState> =
     {
-        behaviorState: UnloadArrivingVehiclesBehaviorState,
+        behaviorStateSchema: unloadArrivingVehiclesBehaviorStateSchema,
+        newBehaviorState: newUnloadArrivingVehiclesBehaviorState,
         handleEvent(draftState, simulatedRegion, behaviorState, event) {
             switch (event.type) {
                 case 'tickEvent': {
@@ -85,7 +68,7 @@ export const unloadArrivingVehiclesBehavior: SimulationBehavior<UnloadArrivingVe
                         );
                         addActivity(
                             simulatedRegion,
-                            UnloadVehicleActivityState.create(
+                            newUnloadVehicleActivityState(
                                 activityId,
                                 event.vehicleId,
                                 event.arrivalTime,

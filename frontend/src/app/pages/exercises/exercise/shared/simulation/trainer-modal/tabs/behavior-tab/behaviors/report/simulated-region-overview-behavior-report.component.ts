@@ -9,7 +9,7 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     reportableInformationTypeToGermanNameDictionary,
-    reportableInformations,
+    reportableInformationAllowedValues,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
@@ -54,7 +54,7 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
 
     currentTime$!: Observable<number>;
 
-    reportableInformations = reportableInformations;
+    reportableInformation = reportableInformationAllowedValues;
     reportableInformationTranslationMap =
         reportableInformationTypeToGermanNameDictionary;
 

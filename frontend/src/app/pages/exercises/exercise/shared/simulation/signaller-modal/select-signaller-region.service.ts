@@ -11,7 +11,9 @@ export const overviewId = 'overview';
 
 export type SignallerRegionID = UUID | typeof eocId | typeof overviewId;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SelectSignallerRegionService implements OnDestroy {
     private readonly store = inject<Store<AppState>>(Store);
 

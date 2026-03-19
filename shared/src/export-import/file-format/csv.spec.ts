@@ -141,6 +141,16 @@ describe('csv export', () => {
         const csvContent = exportPatientsToCSV(state);
         expect(csvContent).toBe(patientsCsvExportColumns.join(';'));
     });
+    it('at least one correct patient in CSV', () => {
+        let patient: Patient;
+        const state = setupState((draftState: WritableDraft<ExerciseState>) => {
+            patient = addPatient(draftState, 'red', 'red');
+            patient.identifier = 'xyz';
+        });
+        const csvContent = exportPatientsToCSV(state);
+        expect(csvContent).toStartWith(patientsCsvExportColumns.join(';'));
+        expect(csvContent).toInclude(patient!.identifier);
+    });
     it('multiple patients', () => {
         let patients: Patient[] = [];
         const state = setupState((draftState: WritableDraft<ExerciseState>) => {

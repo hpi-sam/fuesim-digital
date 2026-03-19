@@ -5,10 +5,10 @@ import type {
     StartExerciseAction,
     PauseExerciseAction,
     ParallelExerciseId,
+    Client,
 } from 'fuesim-digital-shared';
-import { Client, ClientRole } from 'fuesim-digital-shared';
+import { ReducerError, newClient, newClientRole } from 'fuesim-digital-shared';
 import { filter, type Subscription } from 'rxjs';
-import { newClient, newClientRole } from 'fuesim-digital-shared';
 import cookie from 'cookie';
 import type { ExerciseSocket } from '../exercise-server.js';
 import type { ParallelExercise } from '../database/schema.js';

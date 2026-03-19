@@ -3,11 +3,12 @@ import type {
     GetExerciseTemplateResponseData,
     GetParallelExerciseResponseData,
     PostParallelExerciseRequestData,
+    Viewport,
 } from 'fuesim-digital-shared';
 import {
     getParallelExerciseResponseDataSchema,
+    newViewport,
     postJoinParallelExerciseResponseDataSchema,
-    Viewport,
 } from 'fuesim-digital-shared';
 import type { ActiveExercise } from '../exercise/active-exercise.js';
 import type { TestEnvironment } from './utils.js';
@@ -16,14 +17,10 @@ import { createExerciseTemplate } from './utils.js';
 export function createViewport(exercise: ActiveExercise): Viewport {
     const addViewportAction: AddViewportAction = {
         type: '[Viewport] Add viewport',
-        viewport: Viewport.create(
+        viewport: newViewport(
             {
                 x: 0,
                 y: 0,
-            },
-            {
-                height: 1,
-                width: 1,
             },
             ''
         ),

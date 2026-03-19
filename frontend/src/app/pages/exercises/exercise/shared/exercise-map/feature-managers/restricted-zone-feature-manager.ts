@@ -17,7 +17,6 @@ import { pairwise, startWith, takeUntil, type Subject } from 'rxjs';
 import { asArray } from 'ol/color';
 import { Fill } from 'ol/style';
 import { isEmpty } from 'lodash-es';
-import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
@@ -37,6 +36,7 @@ import {
     selectCurrentMainRole,
 } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { PointRelativePopupHelper } from '../utility/point-relative-popup-helper';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class RestrictedZoneFeatureManager
@@ -190,6 +190,8 @@ export class RestrictedZoneFeatureManager
         'top'
     );
 
+    private readonly popupHelper = new PointRelativePopupHelper(this.olMap);
+
     override createFeature(element: RestrictedZone): Feature<Polygon> {
         const feature = super.createFeature(element);
         ResizeRectangleInteraction.onResize(
@@ -241,29 +243,9 @@ export class RestrictedZoneFeatureManager
         feature: Feature<any>
     ): void {
         super.onFeatureClicked(event, feature);
-        const zoom = this.olMap.getView().getZoom()!;
-        const margin = 10 / zoom;
 
-        this.popupService.openPopup({
-            elementUUID: feature.getId()?.toString(),
-            component: RestrictedZonePopupComponent,
-            closingUUIDs: [feature.getId() as UUID],
-            markedForParticipantUUIDs: [],
-            markedForTrainerUUIDs: [],
-            changedLayers: [],
-            context: {
-                restrictedZoneId: feature.getId() as UUID,
-            },
-            // We want the popup to be centered on the mouse position
-            ...calculatePopupPositioning(
-                event.coordinate,
-                {
-                    height: margin,
-                    width: margin,
-                },
-                this.olMap.getView().getCenter()!
-            ),
-        });
+        const restrictedZoneId = feature.getId() as UUID;
+        this.popupService.openPopup(this.popupHelper.getPopupOptions(RestrictedZonePopupComponent,event.coordinate,[restrictedZoneId],[],[],[],{restrictedZoneId}))
     }
 
     public override isFeatureTranslatable(feature: Feature<Polygon>): boolean {

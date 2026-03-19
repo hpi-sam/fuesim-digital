@@ -22,6 +22,11 @@
                 erstellt am {{ exerciseTemplate.createdAt | date: 'medium' }}
             </li>
             <li class="list-group-item">
+                <i class="bi bi-clock me-2"></i>
+                zuletzt geändert am
+                {{ exerciseTemplate.lastUpdatedAt | date: 'medium' }}
+            </li>
+            <li class="list-group-item">
                 <i class="bi bi-rocket me-2"></i>
                 @if (exerciseTemplate.lastExerciseCreatedAt) {
                     Letzte Übung erstellt am

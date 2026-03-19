@@ -77,6 +77,9 @@ export const exerciseTemplateTable = pgTable('exercise_template', {
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
         .defaultNow(),
+    lastUpdatedAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
     lastExerciseCreatedAt: timestamp({
         withTimezone: true,
         mode: 'date',

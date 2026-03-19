@@ -1,0 +1,1 @@
+ALTER TABLE "exercise_template" ADD COLUMN "lastUpdatedAt" timestamp with time zone DEFAULT now() NOT NULL;

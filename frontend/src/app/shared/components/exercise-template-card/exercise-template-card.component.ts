@@ -48,22 +48,21 @@ export class ExerciseTemplateCardComponent {
         const exerciseTemplate = this.exerciseTemplate();
         if (!exerciseTemplate) return;
         await this.apiService.patchExerciseTemplate(exerciseTemplate.id, data);
+        this.updated.emit();
     }
 
-    createExercise() {
+    async createExercise() {
         const exerciseTemplate = this.exerciseTemplate();
         if (!exerciseTemplate) return;
-        this.apiService
-            .createExerciseFromTemplate(exerciseTemplate.id)
-            .then(({ trainerKey }) => {
-                this.messageService.postMessage({
-                    title: 'Übung erfolgreich erstellt',
-                    body: '',
-                    color: 'success',
-                });
-
-                this.router.navigate(['/exercises', trainerKey]);
-            });
+        const { trainerKey } = await this.apiService.createExerciseFromTemplate(
+            exerciseTemplate.id
+        );
+        this.messageService.postMessage({
+            title: 'Übung erfolgreich erstellt',
+            body: '',
+            color: 'success',
+        });
+        this.router.navigate(['/exercises', trainerKey]);
     }
 
     createParallelExercise() {
@@ -87,14 +86,11 @@ export class ExerciseTemplateCardComponent {
         if (!deletionConfirmed) {
             return;
         }
-        this.apiService
-            .deleteExerciseTemplate(exerciseTemplate.id)
-            .then((response) => {
-                this.messageService.postMessage({
-                    title: 'Übungsvorlage erfolgreich gelöscht',
-                    color: 'success',
-                });
-                this.updated.emit();
-            });
+        await this.apiService.deleteExerciseTemplate(exerciseTemplate.id);
+        this.messageService.postMessage({
+            title: 'Übungsvorlage erfolgreich gelöscht',
+            color: 'success',
+        });
+        this.updated.emit();
     }
 }

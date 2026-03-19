@@ -9,7 +9,27 @@
             Neue Übungsvorlage erstellen
         </button>
     </h1>
-    @if (exerciseTemplates.isLoading()) {
+    @if (exerciseTemplates.hasValue()) {
+        <div class="row row-cols-3">
+            @for (
+                exerciseTemplate of exerciseTemplates.value();
+                track exerciseTemplate.trainerKey
+            ) {
+                <div class="col mb-4">
+                    <app-exercise-template-card
+                        [exerciseTemplate]="exerciseTemplate"
+                        (updated)="exerciseTemplates.reload()"
+                    />
+                </div>
+            } @empty {
+                <div class="col flex-grow-1">
+                    <p class="bg-light p-4 rounded-3 lead mb-0">
+                        Sie haben noch keine Übungsvorlagen erstellt.
+                    </p>
+                </div>
+            }
+        </div>
+    } @else if (exerciseTemplates.isLoading()) {
         <div class="row row-cols-3">
             @for (_ of [1, 2, 3]; track $index) {
                 <div class="col">
@@ -28,27 +48,6 @@
                             ></a>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
-    }
-    @if (exerciseTemplates.hasValue()) {
-        <div class="row row-cols-3">
-            @for (
-                exerciseTemplate of exerciseTemplates.value();
-                track exerciseTemplate.trainerKey
-            ) {
-                <div class="col mb-4">
-                    <app-exercise-template-card
-                        [exerciseTemplate]="exerciseTemplate"
-                        (updated)="exerciseTemplates.reload()"
-                    />
-                </div>
-            } @empty {
-                <div class="col flex-grow-1">
-                    <p class="bg-light p-4 rounded-3 lead mb-0">
-                        Sie haben noch keine Übungsvorlagen erstellt.
-                    </p>
                 </div>
             }
         </div>

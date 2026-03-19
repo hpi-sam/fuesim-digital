@@ -62,27 +62,35 @@ export abstract class MoveableFeatureManager<
         );
     }
 
+    /**
+     * Callback called on {@link TranslateInteraction.onTranslateEnd}.
+     * @protected
+     */
+    protected async onTranslateEnd(
+        newPosition: Positions<FeatureType>,
+        element: ManagedElement,
+        elementFeature: Feature<FeatureType>
+    ) {
+        if (!(await this.proposeMovementAction(newPosition, element)).success) {
+            // Roll back movement if it wasn't successful
+            const oldPosition =
+                this.geometryHelper.getElementCoordinates(element);
+            this.movementAnimator.animateFeatureMovement(
+                elementFeature,
+                oldPosition
+            );
+            elementFeature.changed();
+        }
+    }
+
     createFeature(element: ManagedElement): Feature<FeatureType> {
         const elementFeature = this.geometryHelper.create(element);
         elementFeature.setId(element.id);
         this.layer.getSource()!.addFeature(elementFeature);
         TranslateInteraction.onTranslateEnd<FeatureType>(
             elementFeature,
-            async (newPosition) => {
-                if (
-                    !(await this.proposeMovementAction(newPosition, element))
-                        .success
-                ) {
-                    // Roll back movement if it wasn't successful
-                    this.movementAnimator.animateFeatureMovement(
-                        elementFeature,
-                        this.geometryHelper.getElementCoordinates(
-                            this.getElementFromFeature(elementFeature)
-                        )
-                    );
-                    elementFeature.changed();
-                }
-            },
+            async (newCoordinates) =>
+                this.onTranslateEnd(newCoordinates, element, elementFeature),
             this.geometryHelper.getFeaturePosition
         );
         return elementFeature;

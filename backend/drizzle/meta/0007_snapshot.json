@@ -1,5 +1,5 @@
 {
-    "id": "61e5be2d-3e1d-442e-976a-88d0a3510400",
+    "id": "79f76261-3c4e-47c8-8041-56a65cf0549b",
     "prevId": "c18a95bf-3849-46e9-b391-d66b5f6c2f14",
     "version": "7",
     "dialect": "postgresql",
@@ -294,6 +294,12 @@
                     "primaryKey": false,
                     "notNull": true,
                     "default": "now()"
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
                 },
                 "templateId": {
                     "name": "templateId",

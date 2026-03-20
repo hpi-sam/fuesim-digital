@@ -10,26 +10,22 @@ export class AccessKeyService {
         return Math.floor(Math.random() * maximum);
     }
 
-    public async getKeyCount() {
-        return this.accessKeyRepository.getKeyCount();
-    }
-
     /**
-     * Generates and blocks a new key
+     * Generates and locks a new key
      * @param length The desired length of the output. Defaults to 6. Should be an integer. Must be at least 6.
      * @returns A random integer string (decimal) in [0, 10^{@link length})
      */
-    public async generateKey(length: number = 6) {
+    public async generateKey(length: number) {
         return (await this.generateKeys(length))[0]!;
     }
 
     /**
-     * Generates and blocks a number of new keys
+     * Generates and locks a number of new keys
      * @param length The desired length of the output. Defaults to 6. Should be an integer. Must be at least 6.
-     * @param count The count of keys to generate
+     * @param count The number of keys to generate
      * @returns A random integer string (decimal) in [0, 10^{@link length})
      */
-    public async generateKeys(length: number = 6, count: number = 1) {
+    public async generateKeys(length: number, count: number = 1) {
         if (length < 6) {
             throw new RangeError('length must be at least 6.');
         }
@@ -64,17 +60,10 @@ export class AccessKeyService {
 
     /**
      * Frees the allocation of a key
-     * @param key The key to be removed from the list of blocked keys
+     * @param key The key to be removed from the list of locked keys
      */
     public async free(key: AccessKey) {
         await this.accessKeyRepository.free(key);
-    }
-
-    /**
-     * Frees the allocation of every currently allocated key
-     */
-    public async freeAll() {
-        await this.accessKeyRepository.freeAll();
     }
 
     /**

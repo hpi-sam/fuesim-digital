@@ -1,4 +1,4 @@
-import { count, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type { AccessKey } from 'fuesim-digital-shared';
 import { accessKeyTable } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
@@ -6,7 +6,6 @@ import { BaseRepository } from './base-repository.js';
 export class AccessKeyRepository extends BaseRepository {
     /**
      * Get all allocated keys
-     * @param tx optional database transaction
      */
     public async getAll() {
         const res = await this.databaseConnection.select().from(accessKeyTable);
@@ -29,10 +28,7 @@ export class AccessKeyRepository extends BaseRepository {
      * Get count of currently allocated keys
      */
     public async getKeyCount() {
-        const res = await this.databaseConnection
-            .select({ count: count() })
-            .from(accessKeyTable);
-        return this.onlySingle(res)?.count ?? 0;
+        return this.databaseConnection.$count(accessKeyTable);
     }
 
     /**
@@ -55,7 +51,6 @@ export class AccessKeyRepository extends BaseRepository {
     /**
      * Notes all provided {@link keys} as used.
      * @param keys to lock
-     * @param tx optional database transaction
      */
     public async lock(keys: AccessKey[]) {
         if (keys.length === 0) {
@@ -71,14 +66,13 @@ export class AccessKeyRepository extends BaseRepository {
 
     public async generateAndLock(
         generator: (existingKeys: Set<AccessKey>) => AccessKey[]
-    ) {
-        let newKeys: AccessKey[];
+    ): Promise<AccessKey[]> {
         // Do this in a transaction to ensure that the list of existing keys is correct
-        await this.transaction(async (tx) => {
+        return this.transaction(async (tx) => {
             const existingKeys = await tx.getAll();
-            newKeys = generator(existingKeys);
+            const newKeys = generator(existingKeys);
             await tx.lock(newKeys);
+            return newKeys;
         });
-        return newKeys!;
     }
 }

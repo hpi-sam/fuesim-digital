@@ -8,7 +8,7 @@ describe('ActionRepository', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
-        await environment.services.accessKeyService.freeAll();
+        await environment.repositories.accessKeyRepository.freeAll();
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
     });
 

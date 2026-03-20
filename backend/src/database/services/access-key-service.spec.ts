@@ -6,7 +6,7 @@ describe('access key service', () => {
 
     let generatedKeys = new Array<AccessKey>();
     beforeEach(async () => {
-        await environment.services.accessKeyService.freeAll();
+        await environment.repositories.accessKeyRepository.freeAll();
         generatedKeys =
             await environment.services.accessKeyService.generateKeys(6, 10_000);
     });
@@ -34,21 +34,23 @@ describe('access key service', () => {
         it('should fail when no key is left', async () => {
             // We already have the maximum amount of keys in our collection
             await expect(async () =>
-                environment.services.accessKeyService.generateKey()
+                environment.services.accessKeyService.generateKey(6)
             ).rejects.toThrow(RangeError);
         });
 
         it('should allow another key after freeing', async () => {
-            await environment.services.accessKeyService.free(generatedKeys[0]);
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            await environment.services.accessKeyService.free(generatedKeys[0]!);
             await expect(async () =>
-                environment.services.accessKeyService.generateKey()
+                environment.services.accessKeyService.generateKey(6)
             ).resolves.not.toThrow(RangeError);
         });
     });
 
     describe('different length', () => {
         beforeEach(async () => {
-            await environment.services.accessKeyService.free(generatedKeys[0]);
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            await environment.services.accessKeyService.free(generatedKeys[0]!);
         });
 
         it('succeeds creating a key longer than 6', async () => {
@@ -56,7 +58,8 @@ describe('access key service', () => {
                 (await environment.services.accessKeyService.generateKey(8))
                     .length
             ).toBe(8);
-            await environment.services.accessKeyService.free(generatedKeys[1]);
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            await environment.services.accessKeyService.free(generatedKeys[1]!);
             expect(
                 (await environment.services.accessKeyService.generateKey(50))
                     .length
@@ -75,14 +78,14 @@ describe('access key service', () => {
 
             // We now have the maximum amount of keys in our collection
             await expect(async () =>
-                environment.services.accessKeyService.generateKey()
+                environment.services.accessKeyService.generateKey(6)
             ).rejects.toThrow(RangeError);
 
             await environment.services.accessKeyService.free(key);
 
             // After freeing there should be one available again.
             expect(async () => {
-                await environment.services.accessKeyService.generateKey();
+                await environment.services.accessKeyService.generateKey(6);
             }).not.toThrow(RangeError);
         });
     });

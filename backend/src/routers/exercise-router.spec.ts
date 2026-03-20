@@ -18,7 +18,7 @@ describe('exercise router', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
-        await environment.services.accessKeyService.freeAll();
+        await environment.repositories.accessKeyRepository.freeAll();
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
     });
     describe('POST /api/exercise', () => {
@@ -192,7 +192,7 @@ describe('exercise router', () => {
             await environment
                 .httpRequest(
                     'get',
-                    `/api/exercise/${await environment.services.accessKeyService.generateKey()}`
+                    `/api/exercise/${await environment.services.accessKeyService.generateKey(6)}`
                 )
                 .expect(404);
         });
@@ -369,7 +369,7 @@ describe('exercise router', () => {
 
         it('fails with 404 for non-existing exercise', async () => {
             const exerciseKey =
-                await environment.services.accessKeyService.generateKey();
+                await environment.services.accessKeyService.generateKey(6);
             await environment
                 .httpRequest('get', `/api/exercise/${exerciseKey}/history`)
                 .expect(404);

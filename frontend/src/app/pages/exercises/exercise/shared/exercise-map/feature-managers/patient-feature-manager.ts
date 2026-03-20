@@ -11,7 +11,7 @@ import type { Subject } from 'rxjs';
 import { PatientPopupComponent } from '../shared/patient-popup/patient-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
-import { ImagePopupHelper } from '../utility/popup-helper';
+import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import type { PopupService } from '../utility/popup.service';

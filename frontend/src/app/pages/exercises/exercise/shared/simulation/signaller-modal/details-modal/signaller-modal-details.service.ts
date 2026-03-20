@@ -4,7 +4,9 @@ import type { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SignallerModalDetailsModalComponent } from './signaller-modal-details-modal/signaller-modal-details-modal.component';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SignallerModalDetailsService {
     private readonly ngbModalService = inject(NgbModal);
 

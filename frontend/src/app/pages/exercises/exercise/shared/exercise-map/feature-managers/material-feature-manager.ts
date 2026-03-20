@@ -9,7 +9,7 @@ import Fill from 'ol/style/Fill';
 import { MaterialPopupComponent } from '../shared/material-popup/material-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
-import { ImagePopupHelper } from '../utility/popup-helper';
+import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';

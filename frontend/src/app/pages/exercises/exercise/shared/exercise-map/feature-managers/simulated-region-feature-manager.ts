@@ -151,7 +151,7 @@ export class SimulatedRegionFeatureManager
     public override onFeatureDrop(
         droppedElement: Element | undefined,
         droppedOnFeature: Feature<any>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) {
         const droppedOnSimulatedRegion = this.getElementFromFeature(
             droppedOnFeature

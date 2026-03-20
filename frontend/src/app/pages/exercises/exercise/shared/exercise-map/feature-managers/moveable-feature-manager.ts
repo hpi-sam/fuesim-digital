@@ -158,7 +158,7 @@ export abstract class MoveableFeatureManager<
     public onFeatureDrop(
         droppedElement: Element,
         droppedOnFeature: Feature<FeatureType>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ): boolean {
         return false;
     }

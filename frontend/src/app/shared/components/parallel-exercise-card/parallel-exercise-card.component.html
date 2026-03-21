@@ -2,7 +2,17 @@
     <div class="card">
         <div class="card-body">
             <h2 class="card-title h4 d-flex">
-                {{ parallelExercise.name }}
+                <app-inline-text-editor
+                    class="flex-grow-1"
+                    [required]="true"
+                    [value]="parallelExercise.name"
+                    (update)="
+                        patchParallelExercise({
+                            name: $event,
+                        })
+                    "
+                    [singleLine]="true"
+                />
             </h2>
             <p class="card-text">
                 Teilnehmer-ID: {{ parallelExercise.participantKey }}

@@ -1,7 +1,10 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
 import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
-import { GetParallelExerciseResponseData } from 'fuesim-digital-shared';
+import {
+    GetParallelExerciseResponseData,
+    PatchParallelExerciseRequestData,
+} from 'fuesim-digital-shared';
 import { ActivatedRoute } from '@angular/router';
 import { QrCodeComponent } from 'ng-qrcode';
 import { ApiService } from '../../../../core/api.service';
@@ -12,6 +15,7 @@ import { HeaderComponent } from '../../../../shared/components/header/header.com
 import { ExerciseStateBadgeInnerComponent } from '../../../../shared/components/exercise-state-badge-inner/exercise-state-badge-inner.component';
 import { ParallelExerciseInstanceRowComponent } from '../instance-row/parallel-exercise-instance-row.component';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
+import { InlineTextEditorComponent } from '../../../../shared/components/inline-text-editor/inline-text-editor.component';
 
 @Component({
     selector: 'app-parallel-exercise',
@@ -24,6 +28,7 @@ import { FooterComponent } from '../../../../shared/components/footer/footer.com
         ParallelExerciseInstanceRowComponent,
         FooterComponent,
         NgbTooltip,
+        InlineTextEditorComponent,
     ],
 })
 export class ParallelExerciseComponent {
@@ -43,6 +48,13 @@ export class ParallelExerciseComponent {
 
     shareParticipantLink() {
         shareLink(this.participantUrl(), this.messageService);
+    }
+
+    async patchParallelExercise(data: PatchParallelExerciseRequestData) {
+        const parallelExercise = this.parallelExercise.value();
+        if (!parallelExercise) return;
+        await this.apiService.patchParallelExercise(parallelExercise.id, data);
+        this.parallelExercise.reload();
     }
 
     constructor() {

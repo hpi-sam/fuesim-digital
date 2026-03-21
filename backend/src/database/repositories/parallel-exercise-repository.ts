@@ -78,6 +78,19 @@ export class ParallelExerciseRepository extends BaseRepository {
         );
     }
 
+    public async updateParallelExercise(
+        id: ParallelExerciseId,
+        data: Partial<ParallelExerciseInsert>
+    ) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .update(parallelExerciseTable)
+                .set(data)
+                .where(eq(parallelExerciseTable.id, id))
+                .returning()
+        );
+    }
+
     public deleteParallelExerciseById(id: ParallelExerciseId) {
         return this.databaseConnection
             .delete(parallelExerciseTable)

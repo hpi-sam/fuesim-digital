@@ -1,31 +1,21 @@
 <app-header />
 <div class="container">
-    @if (parallelExercise.isLoading()) {
-        <div class="row row-cols-3">
-            @for (_ of [1, 2, 3]; track $index) {
-                <div class="col">
-                    <div class="card" aria-hidden="true">
-                        <div class="card-body">
-                            <h2 class="card-title h4 placeholder-glow">
-                                <span class="placeholder col-6"></span>
-                            </h2>
-                            <p class="card-text placeholder-glow">
-                                <span class="placeholder col-4"></span>
-                                <span class="placeholder col-4"></span>
-                            </p>
-                            <a
-                                class="btn btn-primary disabled placeholder col-6"
-                                aria-disabled="true"
-                            ></a>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
     @if (parallelExercise.hasValue()) {
         @let exercise = parallelExercise.value();
-        <h1 class="mb-4">Parallelübung: {{ exercise.name }}</h1>
+        <h1 class="mb-4 d-flex align-items-center">
+            <div>Parallelübung:&nbsp;</div>
+            <app-inline-text-editor
+                class="flex-grow-1"
+                [required]="true"
+                [value]="exercise.name"
+                (update)="
+                    patchParallelExercise({
+                        name: $event,
+                    })
+                "
+                [singleLine]="true"
+            />
+        </h1>
         <div class="row mb-4 align-items-stretch">
             <div class="col">
                 <div class="card h-100">
@@ -149,6 +139,28 @@
                     </table>
                 </div>
             </div>
+        </div>
+    } @else if (parallelExercise.isLoading()) {
+        <div class="row row-cols-3">
+            @for (_ of [1, 2, 3]; track $index) {
+                <div class="col">
+                    <div class="card" aria-hidden="true">
+                        <div class="card-body">
+                            <h2 class="card-title h4 placeholder-glow">
+                                <span class="placeholder col-6"></span>
+                            </h2>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-4"></span>
+                            </p>
+                            <a
+                                class="btn btn-primary disabled placeholder col-6"
+                                aria-disabled="true"
+                            ></a>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     }
 </div>

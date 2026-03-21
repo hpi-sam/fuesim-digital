@@ -187,6 +187,68 @@ describe('parallel exercise router', () => {
         });
     });
 
+    describe('PATCH /api/parallel_exercises/:id', () => {
+        let parallelExercise: GetParallelExerciseResponseData;
+        beforeEach(async () => {
+            parallelExercise = await createParallelExercise(
+                environment,
+                session
+            );
+        });
+
+        it('fails with 403 if not authenticated', async () => {
+            await environment
+                .httpRequest(
+                    'patch',
+                    `/api/parallel_exercises/${parallelExercise.id}`
+                )
+                .send({ name: 'Other name' })
+                .expect(403);
+        });
+
+        it('fails with 403 if wrong user', async () => {
+            const wrongSession = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            await environment
+                .httpRequest(
+                    'patch',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    wrongSession
+                )
+                .send({ name: 'Other name' })
+                .expect(403);
+        });
+
+        it('fails with 400 if wrong data', async () => {
+            await environment
+                .httpRequest(
+                    'patch',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    session
+                )
+                .send({ name: '' })
+                .expect(400);
+        });
+
+        it('succeeds updating', async () => {
+            const newData = { name: 'Other name' };
+            await environment
+                .httpRequest(
+                    'patch',
+                    `/api/parallel_exercises/${parallelExercise.id}`,
+                    session
+                )
+                .send(newData)
+                .expect(200);
+            const parallelExerciseEntry =
+                (await environment.repositories.parallelExerciseRepository.getParallelExerciseById(
+                    parallelExercise.id
+                ))!;
+            expect(parallelExerciseEntry.name).toBe(newData.name);
+        });
+    });
+
     describe('DELETE /api/parallel_exercises/:id', () => {
         let parallelExercise: GetParallelExerciseResponseData;
         beforeEach(async () => {

@@ -119,6 +119,33 @@ export class ParallelExerciseService {
         return parallelExercise!;
     }
 
+    public async updateParallelExercise(
+        id: ParallelExerciseId,
+        session: SessionInformation,
+        data: Partial<ParallelExerciseInsert>
+    ) {
+        const parallelExercise =
+            await this.parallelExerciseRepository.getParallelExerciseById(id);
+        if (!parallelExercise) {
+            throw new NotFoundError();
+        }
+        if (parallelExercise.user !== session.user.id) {
+            throw new PermissionDeniedError();
+        }
+        await this.parallelExerciseRepository.updateParallelExercise(
+            parallelExercise.id,
+            data
+        );
+        const updatedParallelExercise =
+            await this.parallelExerciseRepository.getParallelExerciseById(
+                parallelExercise.id
+            );
+        if (!updatedParallelExercise) {
+            throw new ApiError();
+        }
+        return updatedParallelExercise;
+    }
+
     public async deleteParallelExercise(
         id: ParallelExerciseId,
         session: SessionInformation

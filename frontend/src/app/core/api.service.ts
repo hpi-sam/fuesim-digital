@@ -20,6 +20,7 @@ import {
     type PatchExerciseTemplateRequestData,
     ExerciseTemplateId,
     ParallelExerciseId,
+    PatchParallelExerciseRequestData,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -189,6 +190,19 @@ export class ApiService {
         return lastValueFrom(
             this.httpClient
                 .post(`${httpOrigin}/api/parallel_exercises/`, data)
+                .pipe(
+                    map((v) => getParallelExerciseResponseDataSchema.parse(v))
+                )
+        );
+    }
+
+    public async patchParallelExercise(
+        id: ParallelExerciseId,
+        data: PatchParallelExerciseRequestData
+    ) {
+        return lastValueFrom(
+            this.httpClient
+                .patch(`${httpOrigin}/api/parallel_exercises/${id}`, data)
                 .pipe(
                     map((v) => getParallelExerciseResponseDataSchema.parse(v))
                 )

@@ -6,6 +6,7 @@ import {
     parallelExerciseIdSchema,
     groupParticipantKeySchema,
     postJoinParallelExerciseResponseDataSchema,
+    patchParallelExerciseRequestDataSchema,
 } from 'fuesim-digital-shared';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { ApiError, PermissionDeniedError } from '../utils/http.js';
@@ -83,6 +84,23 @@ export const createParallelExerciseRouter = (
                 await parallelExerciseService.getParallelExerciseById(
                     id,
                     req.session!
+                );
+            res.send(
+                getParallelExerciseResponseDataSchema.encode(parallelExercise)
+            );
+        })
+        .patch(async (req, res) => {
+            const id = parallelExerciseIdSchema.parse(req.params.id);
+
+            const parsedData = patchParallelExerciseRequestDataSchema.parse(
+                req.body
+            );
+
+            const parallelExercise =
+                await parallelExerciseService.updateParallelExercise(
+                    id,
+                    req.session!,
+                    parsedData
                 );
             res.send(
                 getParallelExerciseResponseDataSchema.encode(parallelExercise)

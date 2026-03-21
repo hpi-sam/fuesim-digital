@@ -1,18 +1,33 @@
 @if (edit) {
     <form class="d-flex flex-grow-1" #f="ngForm" (ngSubmit)="save()">
         <div class="flex-grow-1">
-            <textarea
-                #inlineInput="ngModel"
-                class="form-control form-control-sm"
-                rows="3"
-                [(ngModel)]="newValue"
-                [required]="required()"
-                name="inline"
-                autofocus
-            ></textarea>
-            <app-display-validation
-                [ngModelInput]="inlineInput"
-            ></app-display-validation>
+            @if (singleLine()) {
+                <input
+                    #inlineInput="ngModel"
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="newValue"
+                    [required]="required()"
+                    name="inline"
+                    [appAutofocus]="true"
+                />
+                <app-display-validation
+                    [ngModelInput]="inlineInput"
+                ></app-display-validation>
+            } @else {
+                <textarea
+                    #inlineInput="ngModel"
+                    class="form-control form-control-sm"
+                    rows="3"
+                    [(ngModel)]="newValue"
+                    [required]="required()"
+                    name="inline"
+                    [appAutofocus]="true"
+                ></textarea>
+                <app-display-validation
+                    [ngModelInput]="inlineInput"
+                ></app-display-validation>
+            }
         </div>
 
         <button

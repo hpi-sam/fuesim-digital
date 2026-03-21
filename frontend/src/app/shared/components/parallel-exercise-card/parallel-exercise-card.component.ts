@@ -1,17 +1,26 @@
 import { Component, computed, input, output, inject } from '@angular/core';
-import type { GetParallelExerciseResponseData } from 'fuesim-digital-shared';
+import type {
+    GetParallelExerciseResponseData,
+    PatchParallelExerciseRequestData,
+} from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { CopyButtonComponent } from '../copy-button/copy-button.component';
+import { InlineTextEditorComponent } from '../inline-text-editor/inline-text-editor.component';
 
 @Component({
     selector: 'app-parallel-exercise-card',
     templateUrl: './parallel-exercise-card.component.html',
     styleUrls: ['./parallel-exercise-card.component.scss'],
-    imports: [CopyButtonComponent, RouterLink, DatePipe],
+    imports: [
+        CopyButtonComponent,
+        RouterLink,
+        DatePipe,
+        InlineTextEditorComponent,
+    ],
 })
 export class ParallelExerciseCardComponent {
     private readonly apiService = inject(ApiService);
@@ -27,6 +36,13 @@ export class ParallelExerciseCardComponent {
     );
     readonly updated = output();
 
+    async patchParallelExercise(data: PatchParallelExerciseRequestData) {
+        const parallelExercise = this.parallelExercise();
+        if (!parallelExercise) return;
+        await this.apiService.patchParallelExercise(parallelExercise.id, data);
+        this.updated.emit();
+    }
+
     async deleteExercise() {
         const id = this.parallelExercise()?.id;
         if (!id) return;
@@ -39,12 +55,11 @@ export class ParallelExerciseCardComponent {
         if (!deletionConfirmed) {
             return;
         }
-        this.apiService.deleteParallelExercise(id).then((response) => {
-            this.messageService.postMessage({
-                title: 'Parallelübung erfolgreich gelöscht',
-                color: 'success',
-            });
-            this.updated.emit();
+        await this.apiService.deleteParallelExercise(id);
+        this.messageService.postMessage({
+            title: 'Parallelübung erfolgreich gelöscht',
+            color: 'success',
         });
+        this.updated.emit();
     }
 }

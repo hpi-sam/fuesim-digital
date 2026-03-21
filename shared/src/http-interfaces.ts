@@ -157,6 +157,12 @@ export type PostParallelExerciseRequestData = z.infer<
     typeof postParallelExerciseRequestDataSchema
 >;
 
+export const patchParallelExerciseRequestDataSchema =
+    postParallelExerciseRequestDataSchema.pick({ name: true });
+export type PatchParallelExerciseRequestData = z.infer<
+    typeof patchParallelExerciseRequestDataSchema
+>;
+
 export const getExerciseTemplateViewportsResponseDataSchema = z.array(
     z.object({
         id: z.uuidv4(),

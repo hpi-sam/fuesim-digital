@@ -3,7 +3,8 @@ import RBush from 'rbush';
 // @ts-expect-error doesn't have a type
 import knn from 'rbush-knn';
 import type { Immutable, WritableDraft } from 'immer';
-import type { JsonObject, UUID } from '../../utils/index.js';
+import type { JsonObject } from '../../utils/immutability.js';
+import type { UUID } from '../../utils/uuid.js';
 import { getCreate } from './get-create.js';
 import type { MapCoordinates } from './position/map-coordinates.js';
 import type { Size } from './size.js';

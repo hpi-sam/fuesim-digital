@@ -1,12 +1,13 @@
 import { z } from 'zod';
-import { uuidSchema, uuid } from '../utils/index.js';
-import {
-    exerciseSimulationEventSchema,
-    exerciseSimulationActivityStateSchema,
-    exerciseSimulationBehaviorStateSchema,
-} from '../simulation/index.js';
-import { newMapPositionAt, sizeSchema, positionSchema } from './utils/index.js';
-import type { Size, ImageProperties, MapCoordinates } from './utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { exerciseSimulationEventSchema } from '../simulation/events/exercise-simulation-event.js';
+import { exerciseSimulationBehaviorStateSchema } from '../simulation/behaviors/exercise-simulation-behavior.js';
+import { exerciseSimulationActivityStateSchema } from '../simulation/activities/exercise-simulation-activity.js';
+import type { ImageProperties } from './utils/image-properties.js';
+import { positionSchema } from './utils/position/position.js';
+import { type Size, sizeSchema } from './utils/size.js';
+import type { MapCoordinates } from './utils/position/map-coordinates.js';
+import { newMapPositionAt } from './utils/position/map-position.js';
 
 export const simulatedRegionSchema = z.strictObject({
     id: uuidSchema,

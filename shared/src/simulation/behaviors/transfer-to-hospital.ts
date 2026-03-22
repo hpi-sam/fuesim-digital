@@ -1,33 +1,32 @@
 import { difference, groupBy } from 'lodash-es';
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
-import type { UUID, UUIDSet } from '../../utils/index.js';
-import { uuid, uuidSetSchema, stringCompare } from '../../utils/index.js';
-import type { PatientStatus } from '../../models/index.js';
-import {
-    patientStatusSchema,
-    isInSpecificSimulatedRegion,
-    patientStatusAllowedValues,
-} from '../../models/index.js';
 import type { Patient } from '../../models/patient.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
 import type { ExerciseState } from '../../state.js';
 import { addActivity } from '../activities/utils.js';
-import {
-    newDelayEventActivityState,
-    newTransferPatientToHospitalActivityState,
-} from '../activities/index.js';
 import { nextUUID } from '../utils/randomness.js';
-import { newPatientCategoryTransferToHospitalFinishedEvent } from '../events/index.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { logLastPatientTransportedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
+import {
+    type PatientStatus,
+    patientStatusAllowedValues,
+    patientStatusSchema,
+} from '../../models/utils/patient-status.js';
 import {
     getActivityById,
     tryGetElement,
-} from '../../store/action-reducers/utils/index.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import type { TransferCountsRadiogram } from '../../models/radiogram/index.js';
-import { logLastPatientTransportedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
-import type { SimulationBehavior } from './simulation-behavior.js';
+} from '../../store/action-reducers/utils/get-element.js';
+import { newTransferPatientToHospitalActivityState } from '../activities/transfer-patient-to-hospital.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { newPatientCategoryTransferToHospitalFinishedEvent } from '../events/patient-category-transfer-to-hospital-finished.js';
+import type { TransferCountsRadiogram } from '../../models/radiogram/transfer-counts-radiogram.js';
+import { uuid, type UUID } from '../../utils/uuid.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
+import { stringCompare } from '../../utils/string-compare.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
 
 export const transferToHospitalBehaviorStateSchema = z.strictObject({
     ...simulationBehaviorStateSchema.shape,

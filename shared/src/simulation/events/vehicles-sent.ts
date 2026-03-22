@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import type { VehicleResource } from '../../models/utils/rescue-resource.js';
 import { vehicleResourceSchema } from '../../models/utils/rescue-resource.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema } from '../../utils/index.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
 export const vehiclesSentEventSchema = simulationEventSchema.extend({

@@ -1,8 +1,10 @@
 import type { WritableDraft } from 'immer';
 import { freeze, produce } from 'immer';
 import type { ExerciseState } from '../state.js';
-import type { ExerciseAction } from './action-reducers/index.js';
-import { getExerciseActionTypeDictionary } from './action-reducers/index.js';
+import {
+    type ExerciseAction,
+    getExerciseActionTypeDictionary,
+} from './action-reducers/action-reducers.js';
 
 const exerciseActionTypeDictionary = getExerciseActionTypeDictionary();
 

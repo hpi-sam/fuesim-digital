@@ -1,16 +1,14 @@
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
 import { uuidSchema } from '../utils/uuid.js';
-import {
-    biometricInformationSchema,
-    patientStatusSchema,
-    imagePropertiesSchema,
-    healthPointsSchema,
-} from './utils/index.js';
 
 import { personalInformationSchema } from './utils/personal-information.js';
 import { patientHealthStateSchema } from './patient-health-state.js';
-import type { Patient } from './index.js';
+import { biometricInformationSchema } from './utils/biometric-information.js';
+import { patientStatusSchema } from './utils/patient-status.js';
+import { imagePropertiesSchema } from './utils/image-properties.js';
+import { healthPointsSchema } from './utils/health-points.js';
+import type { Patient } from './patient.js';
 
 export const hospitalPatientSchema = z.strictObject({
     /**

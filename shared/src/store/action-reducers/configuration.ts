@@ -1,14 +1,14 @@
 import { IsBoolean, IsString } from 'class-validator';
+import type { Action, ActionReducer } from '../action-reducer.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { IsValue } from '../../utils/validators/is-value.js';
 import {
     type TileMapProperties,
     tileMapPropertiesSchema,
     type OperationsMapProperties,
     operationsMapPropertiesSchema,
-} from '../../models/index.js';
-import { cloneDeepMutable } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+} from '../../models/utils/tile-map-properties.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 
 export class SetTileMapPropertiesAction implements Action {
     @IsValue('[Configuration] Set tileMapProperties' as const)

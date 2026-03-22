@@ -1,6 +1,9 @@
 import { z } from 'zod';
-import { type PatientStatus, patientStatusSchema } from '../../models/index.js';
-import { uuidSchema } from '../../utils/index.js';
+import {
+    type PatientStatus,
+    patientStatusSchema,
+} from '../../models/utils/patient-status.js';
+import { uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
 export const patientTransferToHospitalSuccessfulEventSchema =

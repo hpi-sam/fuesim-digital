@@ -14,7 +14,6 @@ import {
     getExerciseBehaviorById,
     getExerciseRadiogramById,
 } from '../../store/action-reducers/utils/get-element.js';
-import type { UUID } from '../../utils/index.js';
 import { getPatientVisibleStatus } from '../patient.js';
 import { radiogramTypeToGermanDictionary } from '../radiogram/exercise-radiogram.js';
 import type { ExerciseRadiogramStatus } from '../radiogram/status/exercise-radiogram-status.js';
@@ -23,8 +22,11 @@ import type { Tag } from '../tag.js';
 import { newTag } from '../tag.js';
 import type { Personnel } from '../personnel.js';
 import type { PersonnelTemplate } from '../personnel-template.js';
-import type { ExerciseOccupation } from './occupations/index.js';
-import { occupationToGermanDictionary } from './occupations/exercise-occupation.js';
+import type { UUID } from '../../utils/uuid.js';
+import {
+    type ExerciseOccupation,
+    occupationToGermanDictionary,
+} from './occupations/exercise-occupation.js';
 import { statusNames } from './patient-status.js';
 import type { PatientStatus } from './patient-status.js';
 import {

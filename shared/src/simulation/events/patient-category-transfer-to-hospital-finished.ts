@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { type PatientStatus, patientStatusSchema } from '../../models/index.js';
+import {
+    type PatientStatus,
+    patientStatusSchema,
+} from '../../models/utils/patient-status.js';
 import { simulationEventSchema } from './simulation-event.js';
 
 export const patientCategoryTransferToHospitalFinishedEventSchema =

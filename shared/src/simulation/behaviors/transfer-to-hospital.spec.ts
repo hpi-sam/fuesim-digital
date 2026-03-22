@@ -1,33 +1,34 @@
 import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
-import type { Patient, SimulatedRegion } from '../../models/index.js';
-import {
-    newSimulatedRegion,
-    newTransferPoint,
-    newPatientTransferOccupation,
-    newImageProperties,
-    newWaitForTransferOccupation,
-    newUnloadingOccupation,
-    newLoadOccupation,
-    newIntermediateOccupation,
-    newNoOccupation,
-    newMapCoordinatesAt,
-    newSimulatedRegionPositionIn,
-    newSize,
-} from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
-import type { UUIDSet } from '../../utils/index.js';
-import { cloneDeepMutable, uuid } from '../../utils/index.js';
 import { handleSimulationEvents } from '../utils/simulation.js';
-import type { PatientCategoryTransferToHospitalFinishedEvent } from '../events/index.js';
-import { newTickEvent, newVehicleArrivedEvent } from '../events/index.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
-import type {
-    DelayEventActivityState,
-    TransferPatientToHospitalActivityState,
-} from '../activities/index.js';
 import { newVehicle } from '../../models/vehicle.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
+import { newImageProperties } from '../../models/utils/image-properties.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newVehicleArrivedEvent } from '../events/vehicle-arrived.js';
+import { newPatientTransferOccupation } from '../../models/utils/occupations/patient-transfer-occupation.js';
+import type { Patient } from '../../models/patient.js';
+import type { TransferPatientToHospitalActivityState } from '../activities/transfer-patient-to-hospital.js';
+import type { UUIDSet } from '../../utils/uuid-set.js';
+import type { DelayEventActivityState } from '../activities/delay-event.js';
+import type { PatientCategoryTransferToHospitalFinishedEvent } from '../events/patient-category-transfer-to-hospital-finished.js';
+import { newTickEvent } from '../events/tick.js';
+import {
+    newSimulatedRegion,
+    type SimulatedRegion,
+} from '../../models/simulated-region.js';
+import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
+import { newSize } from '../../models/utils/size.js';
+import { newTransferPoint } from '../../models/transfer-point.js';
+import { newNoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { newIntermediateOccupation } from '../../models/utils/occupations/intermediate-occupation.js';
+import { newLoadOccupation } from '../../models/utils/occupations/load-occupation.js';
+import { newUnloadingOccupation } from '../../models/utils/occupations/unloading-occupation.js';
+import { uuid } from '../../utils/uuid.js';
+import { newWaitForTransferOccupation } from '../../models/utils/occupations/wait-for-transfer-occupation.js';
 import type { TransferToHospitalBehaviorState } from './transfer-to-hospital.js';
 import { newTransferToHospitalBehaviorState } from './transfer-to-hospital.js';
 

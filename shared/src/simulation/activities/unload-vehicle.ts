@@ -1,15 +1,12 @@
 import { z } from 'zod';
-import {
-    changeOccupation,
-    isInSpecificSimulatedRegion,
-    newNoOccupation,
-} from '../../models/index.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema } from '../../utils/index.js';
 import { unloadVehicle } from '../utils/vehicle.js';
-import { tryGetElement } from '../../store/action-reducers/utils/index.js';
-import type { SimulationActivity } from './simulation-activity.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { tryGetElement } from '../../store/action-reducers/utils/get-element.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { changeOccupation } from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newNoOccupation } from '../../models/utils/occupations/no-occupation.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
 export const unloadVehicleActivityStateSchema = z.strictObject({
     ...simulationActivityStateSchema.shape,

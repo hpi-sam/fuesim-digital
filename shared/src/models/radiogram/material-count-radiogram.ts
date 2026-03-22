@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
 import { canCaterForSchema } from '../utils/cater-for.js';
+import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
-import type { ExerciseRadiogramStatus } from './status/index.js';
+import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
 
 export const materialCountRadiogramSchema = z.strictObject({
     ...radiogramSchema.shape,

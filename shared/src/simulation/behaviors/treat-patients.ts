@@ -1,24 +1,20 @@
 import { groupBy } from 'lodash-es';
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
-import type {
-    PatientCountRadiogram,
-    TreatmentStatusRadiogram,
-} from '../../models/radiogram/index.js';
-import { isInSpecificSimulatedRegion } from '../../models/utils/index.js';
 import type { ExerciseState } from '../../state.js';
-import { getActivityById } from '../../store/action-reducers/utils/index.js';
-import { uuidSchema, uuid } from '../../utils/index.js';
-import {
-    newDelayEventActivityState,
-    newReassignTreatmentsActivityState,
-} from '../activities/index.js';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { newTreatmentsTimerEvent } from '../events/treatments-timer-event.js';
 import { nextUUID } from '../utils/randomness.js';
 import { treatmentProgressSchema } from '../utils/treatment.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
+import { getActivityById } from '../../store/action-reducers/utils/get-element.js';
+import type { PatientCountRadiogram } from '../../models/radiogram/patient-count-radiogram.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import type { TreatmentStatusRadiogram } from '../../models/radiogram/treatment-status-radiogram.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { newReassignTreatmentsActivityState } from '../activities/reassign-treatments.js';
 import type { SimulationBehavior } from './simulation-behavior.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
 

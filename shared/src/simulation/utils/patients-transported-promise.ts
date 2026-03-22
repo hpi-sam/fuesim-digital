@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema } from '../../utils/index.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 
 export const patientsTransportPromiseSchema = z.strictObject({
     type: z.literal('patientsTransportPromise'),

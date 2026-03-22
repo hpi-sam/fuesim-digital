@@ -1,10 +1,11 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema } from '../../utils/index.js';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
-import type { ExerciseOccupation } from '../../models/index.js';
-import { exerciseOccupationSchema } from '../../models/index.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import {
+    type ExerciseOccupation,
+    exerciseOccupationSchema,
+} from '../../models/utils/occupations/exercise-occupation.js';
 import { simulationEventSchema } from './simulation-event.js';
 
 export const startTransferEventSchema = simulationEventSchema.extend({

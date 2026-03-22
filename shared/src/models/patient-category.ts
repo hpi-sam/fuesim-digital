@@ -1,12 +1,14 @@
 import { z } from 'zod';
 import type { PatientTemplate } from './patient-template.js';
 import { patientTemplateSchema } from './patient-template.js';
-import type { ImageProperties } from './utils/index.js';
 import {
-    patientStatusCodeSchema,
-    imagePropertiesSchema,
     newPatientStatusCode,
-} from './utils/index.js';
+    patientStatusCodeSchema,
+} from './utils/patient-status-code.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from './utils/image-properties.js';
 
 export const patientCategorySchema = z.strictObject({
     type: z.literal('patientCategory'),

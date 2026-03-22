@@ -1,14 +1,14 @@
 import type { WritableDraft } from 'immer';
 import { defaultMaterialTemplates } from '../../src/data/default-state/material-templates.js';
-import type { Position } from '../../src/index.js';
+import type { ExerciseState } from '../../src/state.js';
+import type { Position } from '../../src/models/utils/position/position.js';
+import { newMaterialFromTemplate } from '../../src/models/material.js';
 import {
     currentCoordinatesOf,
     isPositionOnMap,
-    SpatialTree,
-    uuid,
-    newMaterialFromTemplate,
-} from '../../src/index.js';
-import type { ExerciseState } from '../../src/state.js';
+} from '../../src/models/utils/position/position-helpers.js';
+import { SpatialTree } from '../../src/models/utils/spatial-tree.js';
+import { uuid } from '../../src/utils/uuid.js';
 
 export function addMaterial(
     state: WritableDraft<ExerciseState>,

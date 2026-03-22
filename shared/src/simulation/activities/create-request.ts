@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
 import type { RequestTarget } from '../../models/utils/request-target/request-target.js';
 import type { ExerciseRequestTargetConfiguration } from '../../models/utils/request-target/exercise-request-target.js';
 import {
@@ -8,6 +7,7 @@ import {
 } from '../../models/utils/request-target/exercise-request-target.js';
 import type { VehicleResource } from '../../models/utils/rescue-resource.js';
 import { vehicleResourceSchema } from '../../models/utils/rescue-resource.js';
+import type { UUID } from '../../utils/uuid.js';
 import type { SimulationActivity } from './simulation-activity.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
 

@@ -1,26 +1,19 @@
 import { cloneDeep } from 'lodash-es';
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
-import {
-    cloneDeepMutable,
-    uuid,
-    uuidSetSchema,
-    uuidSchema,
-} from '../../utils/index.js';
-import { resourceDescriptionSchema } from '../../models/index.js';
-import {
-    newDelayEventActivityState,
-    newRecurringEventActivityState,
-} from '../activities/index.js';
-import { addActivity } from '../activities/utils.js';
-import {
-    newTryToDistributeEvent,
-    newTransferVehiclesRequestEvent,
-} from '../events/index.js';
 import { nextUUID } from '../utils/randomness.js';
-import type { SimulationBehavior } from './simulation-behavior.js';
+import { uuidSetSchema } from '../../utils/uuid-set.js';
+import { resourceDescriptionSchema } from '../../models/utils/resource-description.js';
+import type { UUID } from '../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
+import { addActivity } from '../activities/utils.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { newTryToDistributeEvent } from '../events/try-to-distribute.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { newTransferVehiclesRequestEvent } from '../events/transfer-vehicles-request.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
 
 export const automaticallyDistributeVehiclesBehaviorStateSchema =
     z.strictObject({

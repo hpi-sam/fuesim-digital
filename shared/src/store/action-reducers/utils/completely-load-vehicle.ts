@@ -1,22 +1,20 @@
 import type { WritableDraft } from 'immer';
-import type { Vehicle } from '../../../models/index.js';
+import {
+    changePosition,
+    changePositionWithId,
+} from '../../../models/utils/position/position-helpers-mutable.js';
+import { sendSimulationEvent } from '../../../simulation/events/utils.js';
+import type { ExerciseState } from '../../../state.js';
+import { newMaterialRemovedEvent } from '../../../simulation/events/material-removed.js';
+import { newPersonnelRemovedEvent } from '../../../simulation/events/personnel-removed.js';
 import {
     currentSimulatedRegionIdOf,
     isInSimulatedRegion,
     isInSpecificVehicle,
     isInTransfer,
-    newVehiclePositionIn,
-} from '../../../models/index.js';
-import {
-    changePosition,
-    changePositionWithId,
-} from '../../../models/utils/position/position-helpers-mutable.js';
-import {
-    newMaterialRemovedEvent,
-    newPersonnelRemovedEvent,
-} from '../../../simulation/index.js';
-import { sendSimulationEvent } from '../../../simulation/events/utils.js';
-import type { ExerciseState } from '../../../state.js';
+} from '../../../models/utils/position/position-helpers.js';
+import type { Vehicle } from '../../../models/vehicle.js';
+import { newVehiclePositionIn } from '../../../models/utils/position/vehicle-position.js';
 import { getElement } from './get-element.js';
 
 /**

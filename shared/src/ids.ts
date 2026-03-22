@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuidSchema } from './utils/index.js';
+import { uuidSchema } from './utils/uuid.js';
 
 export const exerciseIdSchema = uuidSchema.brand<'ExerciseId'>();
 export type ExerciseId = z.infer<typeof exerciseIdSchema>;

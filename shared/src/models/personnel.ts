@@ -1,14 +1,11 @@
 import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
-import type { UUID } from '../utils/index.js';
-import { uuidSchema, uuidSetSchema, uuid } from '../utils/index.js';
+import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
+import { uuidSetSchema } from '../utils/uuid-set.js';
 import type { PersonnelTemplate } from './personnel-template.js';
-import {
-    imagePropertiesSchema,
-    type Position,
-    positionSchema,
-} from './utils/index.js';
 import { canCaterForSchema } from './utils/cater-for.js';
+import { imagePropertiesSchema } from './utils/image-properties.js';
+import { type Position, positionSchema } from './utils/position/position.js';
 
 export const personnelSchema = z.strictObject({
     id: uuidSchema,

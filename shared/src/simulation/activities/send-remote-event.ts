@@ -1,12 +1,13 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema } from '../../utils/index.js';
-import type { ExerciseSimulationEvent } from '../events/index.js';
-import { exerciseSimulationEventSchema } from '../events/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import { tryGetElement } from '../../store/action-reducers/utils/index.js';
-import type { SimulationActivity } from './simulation-activity.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import {
+    type ExerciseSimulationEvent,
+    exerciseSimulationEventSchema,
+} from '../events/exercise-simulation-event.js';
+import { tryGetElement } from '../../store/action-reducers/utils/get-element.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
 export const sendRemoteEventActivityStateSchema = z.strictObject({
     ...simulationActivityStateSchema.shape,

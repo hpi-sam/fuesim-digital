@@ -1,21 +1,22 @@
 import { z } from 'zod';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import {
-    isInSpecificSimulatedRegion,
-    newVehicleResource,
-} from '../../models/index.js';
-import { getElementByPredicate } from '../../store/action-reducers/utils/index.js';
-import { cloneDeepMutable, uuid } from '../../utils/index.js';
-import { addActivity } from '../activities/utils.js';
-import { nextUUID } from '../utils/randomness.js';
-import { newDelayEventActivityState } from '../activities/index.js';
-import {
-    transferVehiclesRequestEventSchema,
     newTransferVehiclesRequestEvent,
-    newResourceRequiredEvent,
-} from '../events/index.js';
-import type { ResourceDescription } from '../../models/index.js';
-import type { SimulationBehavior } from './simulation-behavior.js';
-import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+    transferVehiclesRequestEventSchema,
+} from '../events/transfer-vehicles-request.js';
+import { getElementByPredicate } from '../../store/action-reducers/utils/get-element.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { addActivity } from '../activities/utils.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { nextUUID } from '../utils/randomness.js';
+import { newResourceRequiredEvent } from '../events/resources-required.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import { uuid } from '../../utils/uuid.js';
+import {
+    type SimulationBehavior,
+    simulationBehaviorStateSchema,
+} from './simulation-behavior.js';
 
 export const answerRequestsBehaviorStateSchema = z.strictObject({
     ...simulationBehaviorStateSchema.shape,

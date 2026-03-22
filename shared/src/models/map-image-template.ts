@@ -1,7 +1,9 @@
 import { z } from 'zod';
-import { uuid, uuidSchema } from '../utils/index.js';
-import type { ImageProperties } from './utils/index.js';
-import { imagePropertiesSchema } from './utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from './utils/image-properties.js';
 
 export const mapImageTemplateSchema = z.strictObject({
     id: uuidSchema,

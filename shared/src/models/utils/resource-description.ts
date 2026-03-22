@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { StrictObject } from '../../utils/index.js';
+import { StrictObject } from '../../utils/strict-object.js';
 
 export const addResourceDescription = createCombine((a, b) => a + b);
 export const subtractResourceDescription = createCombine((a, b) => a - b);

@@ -1,6 +1,5 @@
-import * as z from 'zod';
-import type { UUID } from '../../../index.js';
-import { uuidSchema } from '../../../index.js';
+import { z } from 'zod';
+import { type UUID, uuidSchema } from '../../../utils/uuid.js';
 
 export const vehiclePositionSchema = z.strictObject({
     type: z.literal('vehicle'),

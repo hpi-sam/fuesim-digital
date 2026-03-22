@@ -7,14 +7,11 @@ import { newTransferConnectionsRadiogram } from '../../models/radiogram/transfer
 import { newTreatmentStatusRadiogram } from '../../models/radiogram/treatment-status-radiogram.js';
 import { newVehicleCountRadiogram } from '../../models/radiogram/vehicle-count-radiogram.js';
 import { newVehicleOccupationsRadiogram } from '../../models/radiogram/vehicle-occupations-radiogram.js';
-
-import type {
-    ExerciseRadiogram,
-    ExerciseRadiogramStatus,
-} from '../../models/radiogram/index.js';
-import type { UUID } from '../../utils/index.js';
-import type { ExerciseSimulationBehaviorType } from './exercise-simulation-behavior.js';
+import type { UUID } from '../../utils/uuid.js';
+import type { ExerciseRadiogramStatus } from '../../models/radiogram/status/exercise-radiogram-status.js';
+import type { ExerciseRadiogram } from '../../models/radiogram/exercise-radiogram.js';
 import type { ReportableInformation } from './reportable-information.js';
+import type { ExerciseSimulationBehaviorType } from './exercise-simulation-behavior.js';
 
 export const createRadiogramMap: {
     [Key in ReportableInformation]: (

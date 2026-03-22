@@ -1,12 +1,13 @@
 import { z } from 'zod';
-import type { ResourceDescription } from '../../models/index.js';
-import { resourceDescriptionSchema } from '../../models/index.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema } from '../../utils/index.js';
 import {
     transferDestinationTypeSchema,
     type TransferDestination,
 } from '../utils/transfer-destination.js';
+import {
+    type ResourceDescription,
+    resourceDescriptionSchema,
+} from '../../models/utils/resource-description.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
 export const requestReceivedEventSchema = simulationEventSchema.extend({

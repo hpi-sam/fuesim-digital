@@ -1,5 +1,5 @@
-import type { Action } from '../store/index.js';
-import type { UUID } from '../utils/index.js';
+import type { Action } from '../store/action-reducer.js';
+import type { UUID } from '../utils/uuid.js';
 import type { Migration } from './migration-functions.js';
 
 export const removeIsBeingTreated9: Migration = {

@@ -1,31 +1,31 @@
 import { produce, type WritableDraft } from 'immer';
-import type { SimulatedRegion } from '../../models/index.js';
-import {
-    newSimulatedRegion,
-    newImageProperties,
-    newMapCoordinatesAt,
-    newNoOccupation,
-    newSimulatedRegionPositionIn,
-    newSimulatedRegionRequestTargetConfiguration,
-    newSize,
-    newTransferPoint,
-    newVehicleResource,
-} from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
-import {
-    newResourceRequiredEvent,
-    newVehicleArrivedEvent,
-    newVehiclesSentEvent,
-} from '../events/index.js';
-import { cloneDeepMutable, StrictObject, uuid } from '../../utils/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { handleSimulationEvents } from '../utils/simulation.js';
-import { newRecurringEventActivityState } from '../activities/index.js';
 import { addActivity } from '../activities/utils.js';
 import { newSendRequestEvent } from '../events/send-request.js';
 import { newResourcePromise } from '../utils/resource-promise.js';
 import { newVehicle } from '../../models/vehicle.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { newImageProperties } from '../../models/utils/image-properties.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { newNoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newVehicleArrivedEvent } from '../events/vehicle-arrived.js';
+import {
+    newSimulatedRegion,
+    type SimulatedRegion,
+} from '../../models/simulated-region.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
+import { newSize } from '../../models/utils/size.js';
+import { newTransferPoint } from '../../models/transfer-point.js';
+import { uuid } from '../../utils/uuid.js';
+import { newSimulatedRegionRequestTargetConfiguration } from '../../models/utils/request-target/simulated-region.js';
+import { newResourceRequiredEvent } from '../events/resources-required.js';
+import { newVehiclesSentEvent } from '../events/vehicles-sent.js';
 import type { RequestBehaviorState } from './request.js';
 import {
     getResourcesToRequest,

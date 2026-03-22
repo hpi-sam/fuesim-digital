@@ -1,7 +1,5 @@
 import { z } from 'zod';
 import { groupBy } from 'lodash-es';
-import type { UUID } from '../../utils/index.js';
-import { StrictObject, uuidSchema } from '../../utils/index.js';
 import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
 import { sendSimulationEvent } from '../events/utils.js';
@@ -9,6 +7,8 @@ import { newPatientsCountedEvent } from '../events/patients-counted.js';
 import type { PatientStatus } from '../../models/utils/patient-status.js';
 import { patientStatusAllowedValues } from '../../models/utils/patient-status.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { StrictObject } from '../../utils/strict-object.js';
 import type { SimulationActivity } from './simulation-activity.js';
 
 export const countPatientsActivityStateSchema = z.strictObject({

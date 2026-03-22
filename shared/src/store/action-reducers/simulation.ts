@@ -9,59 +9,77 @@ import {
     ValidateIf,
 } from 'class-validator';
 import { WritableDraft } from 'immer';
-import {
-    ExerciseSimulationEvent,
-    newTransferVehiclesRequestEvent,
-    type ReportableInformation,
-    TreatPatientsBehaviorState,
-    UnloadArrivingVehiclesBehaviorState,
-    reportableInformationTypeToGermanNameDictionary,
-    behaviorTypeToGermanNameDictionary,
-    updateRequestPatientCountsDelay,
-    updateRequestVehiclesDelay,
-    updateBehaviorsRequestTarget,
-    updateBehaviorsRequestInterval,
-    newRecurringEventActivityState,
-    newTransferSpecificVehicleRequestEvent,
-    newTransferPatientsInSpecificVehicleRequestEvent,
-    reportableInformationSchema,
-} from '../../simulation/index.js';
 import { newStartCollectingInformationEvent } from '../../simulation/events/start-collecting.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
 import { nextUUID } from '../../simulation/utils/randomness.js';
-import type { UUID, UUIDSet } from '../../utils/index.js';
-import {
-    uuidValidationOptions,
-    cloneDeepMutable,
-    uuidArrayValidationOptions,
-    formatDuration,
-} from '../../utils/index.js';
-import { IsUUIDSet, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
-import {
-    type ExerciseRequestTargetConfiguration,
-    type PatientStatus,
-    type PatientStatusForTransport,
-    patientStatusForTransportSchema,
-    statusNames,
-    createSimulatedRegionTag,
-    createPatientStatusTag,
-    createVehicleTypeTag,
-    isInSimulatedRegion,
-    currentSimulatedRegionIdOf,
-    createTransferPointTag,
-    patientStatusSchema,
-    resourceDescriptionSchema,
-    exerciseRequestTargetConfigurationSchema,
-} from '../../models/index.js';
 import {
     type TransferDestination,
     transferDestinationTypeSchema,
 } from '../../simulation/utils/transfer-destination.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import {
+    type ResourceDescription,
+    resourceDescriptionSchema,
+} from '../../models/utils/resource-description.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { getActivityById, getBehaviorById, getElement } from './utils/index.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import {
+    type UUID,
+    uuidArrayValidationOptions,
+    uuidValidationOptions,
+} from '../../utils/uuid.js';
+import {
+    type ReportableInformation,
+    reportableInformationSchema,
+    reportableInformationTypeToGermanNameDictionary,
+} from '../../simulation/behaviors/reportable-information.js';
+import {
+    type ExerciseRequestTargetConfiguration,
+    exerciseRequestTargetConfigurationSchema,
+} from '../../models/utils/request-target/exercise-request-target.js';
+import { IsUUIDSet } from '../../utils/validators/is-uuid-set.js';
+import type { UUIDSet } from '../../utils/uuid-set.js';
+import {
+    type PatientStatus,
+    type PatientStatusForTransport,
+    patientStatusForTransportSchema,
+    patientStatusSchema,
+    statusNames,
+} from '../../models/utils/patient-status.js';
+import type { TreatPatientsBehaviorState } from '../../simulation/behaviors/treat-patients.js';
+import { behaviorTypeToGermanNameDictionary } from '../../simulation/behaviors/utils.js';
+import { formatDuration } from '../../utils/format-duration.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newRecurringEventActivityState } from '../../simulation/activities/recurring-event.js';
+import {
+    createPatientStatusTag,
+    createSimulatedRegionTag,
+    createTransferPointTag,
+    createVehicleTypeTag,
+} from '../../models/utils/tag-helpers.js';
+import {
+    updateBehaviorsRequestInterval,
+    updateBehaviorsRequestTarget,
+} from '../../simulation/behaviors/request.js';
+import {
+    currentSimulatedRegionIdOf,
+    isInSimulatedRegion,
+} from '../../models/utils/position/position-helpers.js';
+import type { ExerciseSimulationEvent } from '../../simulation/events/exercise-simulation-event.js';
+import { newTransferSpecificVehicleRequestEvent } from '../../simulation/events/transfer-specific-vehicle-request.js';
+import { newTransferPatientsInSpecificVehicleRequestEvent } from '../../simulation/events/transfer-patients-in-specific-vehicle-request.js';
+import { newTransferVehiclesRequestEvent } from '../../simulation/events/transfer-vehicles-request.js';
+import {
+    updateRequestPatientCountsDelay,
+    updateRequestVehiclesDelay,
+} from '../../simulation/behaviors/manage-patient-transport-to-hospital.js';
+import { UnloadArrivingVehiclesBehaviorState } from '../../simulation/behaviors/unload-arrived-vehicles.js';
+import {
+    getActivityById,
+    getBehaviorById,
+    getElement,
+} from './utils/get-element.js';
 import { logBehavior } from './utils/log.js';
 
 export class UpdateTreatPatientsIntervalsAction implements Action {

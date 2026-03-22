@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/uuid.js';
 
 export const randomStateSchema = z.strictObject({
     type: z.literal('randomState'),

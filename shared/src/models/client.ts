@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuid, uuidSchema } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
 import type { ClientRole } from './client-role.js';
 import { clientRoleSchema } from './client-role.js';
 

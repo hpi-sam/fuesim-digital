@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema } from '../../utils/index.js';
 import type { ReportableInformation } from '../behaviors/reportable-information.js';
 import { reportableInformationAllowedValues } from '../behaviors/reportable-information.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
 export const collectInformationEventSchema = simulationEventSchema.extend({

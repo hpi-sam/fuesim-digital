@@ -1,11 +1,10 @@
 import type { WritableDraft } from 'immer';
 import { nextUUID } from '../simulation/utils/randomness.js';
 import type { ExerciseState } from '../state.js';
-import { getElement } from '../store/action-reducers/utils/index.js';
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
-import type { UUID } from '../utils/index.js';
-import { uuid } from '../utils/index.js';
-import type { VehicleTemplate } from '../models/index.js';
+import { uuid, type UUID } from '../utils/uuid.js';
+import { getElement } from '../store/action-reducers/utils/get-element.js';
+import type { VehicleTemplate } from '../models/vehicle-template.js';
 import type { Migration } from './migration-functions.js';
 
 interface VehicleParameters {

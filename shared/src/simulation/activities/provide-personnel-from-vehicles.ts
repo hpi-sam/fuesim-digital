@@ -1,23 +1,21 @@
 import { z } from 'zod';
-import type {
-    SimulatedRegion,
-    ResourceDescription,
-} from '../../models/index.js';
+import type { ExerciseState } from '../../state.js';
+import { sendSimulationEvent } from '../events/utils.js';
 import {
-    newVehicleResource,
-    resourceDescriptionSchema,
     addResourceDescription,
     greaterEqualResourceDescription,
-} from '../../models/index.js';
-import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema, StrictObject } from '../../utils/index.js';
-import { newResourceRequiredEvent } from '../events/index.js';
-import { sendSimulationEvent } from '../events/utils.js';
-import { tryGetElement } from '../../store/action-reducers/utils/index.js';
-import type { SimulationActivity } from './simulation-activity.js';
-import { simulationActivityStateSchema } from './simulation-activity.js';
+    type ResourceDescription,
+    resourceDescriptionSchema,
+} from '../../models/utils/resource-description.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { newResourceRequiredEvent } from '../events/resources-required.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { tryGetElement } from '../../store/action-reducers/utils/get-element.js';
 import type { UnloadVehicleActivityState } from './unload-vehicle.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
 export const providePersonnelFromVehiclesActivitySchema = z.strictObject({
     ...simulationActivityStateSchema.shape,

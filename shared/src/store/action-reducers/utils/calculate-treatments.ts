@@ -1,23 +1,21 @@
 import { groupBy } from 'lodash-es';
 import type { WritableDraft } from 'immer';
-import type {
-    MapCoordinates,
-    PatientStatus,
-    Personnel,
-} from '../../../models/index.js';
-import {
-    isOnMap,
-    currentCoordinatesOf,
-    isInSimulatedRegion,
-    SpatialTree,
-} from '../../../models/index.js';
 import type { ExerciseState } from '../../../state.js';
 import { maxTreatmentRange } from '../../../state-helpers/max-treatment-range.js';
-import type { UUID } from '../../../utils/index.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import type { Material } from '../../../models/material.js';
 import type { Patient } from '../../../models/patient.js';
 import { getPatientVisibleStatus } from '../../../models/patient.js';
+import {
+    currentCoordinatesOf,
+    isInSimulatedRegion,
+    isOnMap,
+} from '../../../models/utils/position/position-helpers.js';
+import { SpatialTree } from '../../../models/utils/spatial-tree.js';
+import type { PatientStatus } from '../../../models/utils/patient-status.js';
+import type { Personnel } from '../../../models/personnel.js';
+import type { MapCoordinates } from '../../../models/utils/position/map-coordinates.js';
+import type { UUID } from '../../../utils/uuid.js';
 import { getElement } from './get-element.js';
 
 // TODO: `caterFor` and `treat` are currently used as synonyms without a clear distinction.

@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
-import { patientStatusSchema } from '../utils/index.js';
+import { patientStatusSchema } from '../utils/patient-status.js';
+import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
-import type { ExerciseRadiogramStatus } from './status/index.js';
+import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
 
 export const patientCountRadiogramSchema = z.strictObject({
     ...radiogramSchema.shape,

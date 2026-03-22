@@ -1,17 +1,17 @@
 import { z } from 'zod';
+import { addActivity, terminateActivity } from '../activities/utils.js';
+import { nextUUID } from '../utils/randomness.js';
+import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { tryGetElement } from '../../store/action-reducers/utils/get-element.js';
 import {
     changeOccupation,
     isUnoccupied,
-    newUnloadingOccupation,
-} from '../../models/index.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema, StrictObject, uuid } from '../../utils/index.js';
-import { newUnloadVehicleActivityState } from '../activities/index.js';
-import { addActivity, terminateActivity } from '../activities/utils.js';
-import { nextUUID } from '../utils/randomness.js';
-import { tryGetElement } from '../../store/action-reducers/utils/index.js';
-import type { SimulationBehavior } from './simulation-behavior.js';
+} from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newUnloadingOccupation } from '../../models/utils/occupations/unloading-occupation.js';
+import { newUnloadVehicleActivityState } from '../activities/unload-vehicle.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
 
 export const unloadArrivingVehiclesBehaviorStateSchema = z.strictObject({
     ...simulationBehaviorStateSchema.shape,

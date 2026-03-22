@@ -1,18 +1,20 @@
-import {
-    coordinatesOfPosition,
-    countRestrictedVehiclesInRestrictedZone,
-    getVehicleTemplateRestriction,
-    isInRestrictedZone,
-    isPositionInSimulatedRegion,
-    isPositionInTransfer,
-    isPositionOnMap,
-    type Position,
-} from '../../../models/index.js';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { NoPosition } from '../../../models/utils/position/no-position.js';
 import type { Vehicle } from '../../../models/vehicle.js';
 import type { ExerciseState } from '../../../state.js';
+import {
+    coordinatesOfPosition,
+    isPositionInSimulatedRegion,
+    isPositionInTransfer,
+    isPositionOnMap,
+} from '../../../models/utils/position/position-helpers.js';
+import {
+    countRestrictedVehiclesInRestrictedZone,
+    getVehicleTemplateRestriction,
+    isInRestrictedZone,
+} from '../../../models/restricted-zone.js';
 import { ExpectedReducerError } from '../../reducer-error.js';
+import type { Position } from '../../../models/utils/position/position.js';
 
 /**
  * Checks whether moving the vehicle from the old to the new position is allowed under the constraints of all restricted zones.

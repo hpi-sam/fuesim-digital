@@ -9,22 +9,22 @@ import {
 } from 'class-validator';
 import { z } from 'zod';
 import { WritableDraft } from 'immer';
-import {
-    newAlarmGroupStartPoint,
-    VehicleParameters,
-    vehicleParametersSchema,
-} from '../../models/index.js';
-import type { UUID } from '../../utils/index.js';
-import { StrictObject, uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { newEocLogEntry } from '../../models/eoc-log-entry.js';
-import { getElement } from './utils/index.js';
-import { VehicleActionReducers } from './vehicle.js';
-import { TransferActionReducers } from './transfer.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    type VehicleParameters,
+    vehicleParametersSchema,
+} from '../../models/utils/vehicle-parameters.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { newAlarmGroupStartPoint } from '../../models/utils/start-points.js';
+import { getElement } from './utils/get-element.js';
 import { logAlarmGroupSent } from './utils/log.js';
+import { TransferActionReducers } from './transfer.js';
+import { VehicleActionReducers } from './vehicle.js';
 
 export class AddLogEntryAction implements Action {
     @IsValue('[Emergency Operation Center] Add Log Entry' as const)

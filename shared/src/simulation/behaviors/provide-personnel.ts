@@ -1,9 +1,8 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
-import { uuid, uuidSchema } from '../../utils/index.js';
-import { newProvidePersonnelFromVehiclesActivityState } from '../activities/index.js';
 import { addActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
+import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
+import { newProvidePersonnelFromVehiclesActivityState } from '../activities/provide-personnel-from-vehicles.js';
 import type { SimulationBehavior } from './simulation-behavior.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
 

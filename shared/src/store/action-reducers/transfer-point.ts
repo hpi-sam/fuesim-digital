@@ -1,27 +1,32 @@
 import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
-import {
-    mapCoordinatesSchema,
-    newMapPositionAt,
-    type TransferPoint,
-    currentTransferOf,
-    isInTransfer,
-    type MapCoordinates,
-    nestedCoordinatesOf,
-} from '../../models/index.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { transferPointSchema } from '../../models/transfer-point.js';
-import { letElementArrive } from './transfer.js';
-import { calculateDistance, getElement } from './utils/index.js';
+import {
+    type TransferPoint,
+    transferPointSchema,
+} from '../../models/transfer-point.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import {
+    currentTransferOf,
+    isInTransfer,
+    nestedCoordinatesOf,
+} from '../../models/utils/position/position-helpers.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { getElement } from './utils/get-element.js';
 import {
     logTransferPointConnection,
     logTransferPointConnectionRemoved,
 } from './utils/log.js';
+import { letElementArrive } from './transfer.js';
+import { calculateDistance } from './utils/calculate-distance.js';
 
 // TODO check: type "TransferPoint" the T is big, in other files, the second word starts with a small letter
 

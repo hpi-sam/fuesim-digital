@@ -7,40 +7,38 @@ import {
     removeTreatmentsOfElement,
     tryToCaterFor,
 } from '../../store/action-reducers/utils/calculate-treatments.js';
-import { stringCompare, type UUID } from '../../utils/index.js';
 import type { TreatmentProgress } from '../utils/treatment.js';
 import { treatmentProgressSchema } from '../utils/treatment.js';
-import {
-    newResourceRequiredEvent,
-    newTreatmentProgressChangedEvent,
-} from '../events/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import type { AssignLeaderBehaviorState } from '../behaviors/index.js';
 import { defaultPersonnelTemplates } from '../../data/default-state/personnel-templates.js';
-import { StrictObject, cloneDeepMutable } from '../../utils/index.js';
 import type { Material } from '../../models/material.js';
-import type {
-    Personnel,
-    ResourceDescription,
-    PatientStatus,
-} from '../../models/index.js';
 import type { Patient } from '../../models/patient.js';
 import {
     getPatientVisibleStatus,
     isPretriageStatusLocked,
 } from '../../models/patient.js';
+import { logTreatmentStatusChangedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
+import type { UUID } from '../../utils/uuid.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { stringCompare } from '../../utils/string-compare.js';
+import type { AssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
+import { newTreatmentProgressChangedEvent } from '../events/treatment-progress-changed.js';
 import {
     addResourceDescription,
     ceilResourceDescription,
     maxResourceDescription,
+    type ResourceDescription,
     scaleResourceDescription,
     subtractResourceDescription,
-    isInSpecificSimulatedRegion,
-    newPersonnelResource,
-} from '../../models/index.js';
-import { logTreatmentStatusChangedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
-import type { SimulationActivity } from './simulation-activity.js';
+} from '../../models/utils/resource-description.js';
+import { newPersonnelResource } from '../../models/utils/rescue-resource.js';
+import { newResourceRequiredEvent } from '../events/resources-required.js';
+import type { PatientStatus } from '../../models/utils/patient-status.js';
+import type { Personnel } from '../../models/personnel.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
 export const reassignTreatmentsActivityStateSchema = z.strictObject({
     ...simulationActivityStateSchema.shape,

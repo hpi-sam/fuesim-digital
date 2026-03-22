@@ -1,14 +1,18 @@
 import { z } from 'zod';
-import {
-    MapImageTemplate,
-    mapImageTemplateSchema,
-    patientCategorySchema,
-    VehicleTemplate,
-    PatientCategory,
-    vehicleTemplateSchema,
-} from '../../models/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import {
+    type PatientCategory,
+    patientCategorySchema,
+} from '../../models/patient-category.js';
+import {
+    type VehicleTemplate,
+    vehicleTemplateSchema,
+} from '../../models/vehicle-template.js';
+import {
+    type MapImageTemplate,
+    mapImageTemplateSchema,
+} from '../../models/map-image-template.js';
 import { BaseExportImportFile } from './base-file.js';
 
 export class PartialExport extends BaseExportImportFile {

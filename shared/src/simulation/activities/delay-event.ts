@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import type { ExerciseSimulationEvent } from '../events/exercise-simulation-event.js';
 import { exerciseSimulationEventSchema } from '../events/exercise-simulation-event.js';
+import type { UUID } from '../../utils/uuid.js';
 import type { SimulationActivity } from './simulation-activity.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
 

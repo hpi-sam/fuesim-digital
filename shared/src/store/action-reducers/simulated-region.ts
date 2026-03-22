@@ -1,46 +1,50 @@
 import { IsString, IsUUID } from 'class-validator';
+import type { Action, ActionReducer } from '../action-reducer.js';
+import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
-    type SimulatedRegion,
     type TransferPoint,
-    isInSpecificSimulatedRegion,
-    type MapCoordinates,
-    mapCoordinatesSchema,
-    newMapPositionAt,
-    newSimulatedRegionPositionIn,
-    type Size,
-    sizeSchema,
-    simulatedRegionSchema,
-} from '../../models/index.js';
+    transferPointSchema,
+} from '../../models/transfer-point.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import {
+    type ExerciseSimulationBehaviorState,
+    exerciseSimulationBehaviorStateSchema,
+    simulationBehaviorDictionary,
+} from '../../simulation/behaviors/exercise-simulation-behavior.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import {
-    type ExerciseSimulationBehaviorState,
-    newMaterialAvailableEvent,
-    newNewPatientEvent,
-    newPersonnelAvailableEvent,
-    newVehicleArrivedEvent,
-    simulationBehaviorDictionary,
-    exerciseSimulationBehaviorStateSchema,
-} from '../../simulation/index.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { transferPointSchema } from '../../models/transfer-point.js';
+import { newVehicleArrivedEvent } from '../../simulation/events/vehicle-arrived.js';
+import { newNewPatientEvent } from '../../simulation/events/new-patient.js';
+import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
+import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
+import {
+    type SimulatedRegion,
+    simulatedRegionSchema,
+} from '../../models/simulated-region.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { type Size, sizeSchema } from '../../models/utils/size.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
 import { TransferPointActionReducers } from './transfer-point.js';
 import { isCompletelyLoaded } from './utils/completely-load-vehicle.js';
-import { getElement, getElementByPredicate } from './utils/index.js';
 import {
     logBehaviorAdded,
     logBehaviorRemoved,
     logSimulatedRegionAddElement,
     logSimulatedRegionNameChange,
 } from './utils/log.js';
+import { getElement, getElementByPredicate } from './utils/get-element.js';
 
 export class AddSimulatedRegionAction implements Action {
     @IsValue('[SimulatedRegion] Add simulated region' as const)

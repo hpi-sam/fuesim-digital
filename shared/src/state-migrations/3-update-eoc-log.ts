@@ -1,5 +1,6 @@
-import type { Client, EocLogEntry } from '../models/index.js';
-import type { UUID } from '../utils/index.js';
+import type { EocLogEntry } from '../models/eoc-log-entry.js';
+import type { UUID } from '../utils/uuid.js';
+import type { Client } from '../models/client.js';
 import type { Migration } from './migration-functions.js';
 
 export const updateEocLog3: Migration = {

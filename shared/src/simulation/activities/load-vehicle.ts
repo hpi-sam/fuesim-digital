@@ -1,40 +1,35 @@
 import { difference } from 'lodash-es';
 import { z } from 'zod';
-import {
-    type ExerciseOccupation,
-    newSimulatedRegionPositionIn,
-    newVehiclePositionIn,
-    exerciseOccupationSchema,
-    changeOccupation,
-    createVehicleActionTag,
-    isInSpecificSimulatedRegion,
-    newIntermediateOccupation,
-} from '../../models/index.js';
-import type { UUID, UUIDSet } from '../../utils/index.js';
-import {
-    uuidSchema,
-    uuidSetSchema,
-    cloneDeepMutable,
-} from '../../utils/index.js';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
-import {
-    getElement,
-    tryGetElement,
-} from '../../store/action-reducers/utils/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import {
-    newMaterialRemovedEvent,
-    newNewPatientEvent,
-    newPatientRemovedEvent,
-    newPersonnelRemovedEvent,
-    newStartTransferEvent,
-} from '../events/index.js';
 import { completelyLoadVehicle } from '../../store/action-reducers/utils/completely-load-vehicle.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
 import { logVehicle } from '../../store/action-reducers/utils/log.js';
-import type { SimulationActivity } from './simulation-activity.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
+import {
+    type ExerciseOccupation,
+    exerciseOccupationSchema,
+} from '../../models/utils/occupations/exercise-occupation.js';
+import {
+    getElement,
+    tryGetElement,
+} from '../../store/action-reducers/utils/get-element.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { newPersonnelRemovedEvent } from '../events/personnel-removed.js';
+import { newMaterialRemovedEvent } from '../events/material-removed.js';
+import { newPatientRemovedEvent } from '../events/patient-removed.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { newNewPatientEvent } from '../events/new-patient.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newVehiclePositionIn } from '../../models/utils/position/vehicle-position.js';
+import { newStartTransferEvent } from '../events/start-transfer.js';
+import { createVehicleActionTag } from '../../models/utils/tag-helpers.js';
+import { changeOccupation } from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newIntermediateOccupation } from '../../models/utils/occupations/intermediate-occupation.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
 export const loadVehicleActivityStateSchema = z.strictObject({
     ...simulationActivityStateSchema.shape,

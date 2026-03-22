@@ -1,8 +1,8 @@
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
 import { cloneDeepMutable } from '../../../utils/clone-deep.js';
-import { newRadiogramUnpublishedStatus } from '../../../models/radiogram/status/radiogram-unpublished-status.js';
-import { publishRadiogram } from '../../../models/radiogram/radiogram-helpers-mutable.js';
+import { newRadiogramUnpublishedStatus } from '../../radiogram/status/radiogram-unpublished-status.js';
+import { publishRadiogram } from '../../radiogram/radiogram-helpers-mutable.js';
 import { nextUUID } from '../../../simulation/utils/randomness.js';
 import type { ResourceRequestRadiogram } from '../../radiogram/resource-request-radiogram.js';
 import { newResourceRequestRadiogram } from '../../radiogram/resource-request-radiogram.js';

@@ -43,6 +43,22 @@ export default defineConfig([
         },
     },
     {
+        files: ['!**/index.ts'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: ['**/*/index.js'],
+                            message: 'Please use specific import paths.',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
         files: ['**/*.js'],
 
         extends: [ts.configs.disableTypeChecked],

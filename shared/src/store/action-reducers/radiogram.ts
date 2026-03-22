@@ -1,27 +1,25 @@
 import { IsUUID } from 'class-validator';
-import type { ResourceRequestRadiogram } from '../../models/radiogram/index.js';
 import {
     acceptRadiogram,
     markRadiogramDone,
     returnRadiogram,
 } from '../../models/radiogram/radiogram-helpers-mutable.js';
 import { newVehicleResource } from '../../models/utils/rescue-resource.js';
-import { newVehiclesSentEvent } from '../../simulation/index.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
-import {
-    createRadiogramActionTag,
-    isInSpecificSimulatedRegion,
-} from '../../models/index.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newVehiclesSentEvent } from '../../simulation/events/vehicles-sent.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { createRadiogramActionTag } from '../../models/utils/tag-helpers.js';
+import type { ResourceRequestRadiogram } from '../../models/radiogram/resource-request-radiogram.js';
 import {
     getElement,
     getElementByPredicate,
     getExerciseRadiogramById,
     getRadiogramById,
-} from './utils/index.js';
+} from './utils/get-element.js';
 import { logRadiogram } from './utils/log.js';
 
 export class AcceptRadiogramAction implements Action {

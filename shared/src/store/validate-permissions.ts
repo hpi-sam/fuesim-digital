@@ -1,7 +1,9 @@
-import type { Client } from '../models/index.js';
 import type { ExerciseState } from '../state.js';
-import type { ExerciseAction } from './action-reducers/index.js';
-import { getExerciseActionTypeDictionary } from './action-reducers/action-reducers.js';
+import type { Client } from '../models/client.js';
+import {
+    type ExerciseAction,
+    getExerciseActionTypeDictionary,
+} from './action-reducers/action-reducers.js';
 import type { ReducerRights } from './action-reducer.js';
 
 const exerciseActionTypeDictionary = getExerciseActionTypeDictionary();

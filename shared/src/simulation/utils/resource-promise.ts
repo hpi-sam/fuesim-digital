@@ -1,6 +1,8 @@
 import { z } from 'zod';
-import type { VehicleResource } from '../../models/index.js';
-import { vehicleResourceSchema } from '../../models/index.js';
+import {
+    type VehicleResource,
+    vehicleResourceSchema,
+} from '../../models/utils/rescue-resource.js';
 
 export const resourcePromiseSchema = z.strictObject({
     type: z.literal('resourcePromise'),

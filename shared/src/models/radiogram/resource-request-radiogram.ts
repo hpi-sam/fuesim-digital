@@ -1,8 +1,11 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
-import { newVehicleResource, vehicleResourceSchema } from '../utils/index.js';
+import {
+    newVehicleResource,
+    vehicleResourceSchema,
+} from '../utils/rescue-resource.js';
+import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
-import type { ExerciseRadiogramStatus } from './status/index.js';
+import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
 
 export const resourceRequestRadiogramSchema = z.strictObject({
     ...radiogramSchema.shape,

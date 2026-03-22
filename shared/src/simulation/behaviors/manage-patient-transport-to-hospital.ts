@@ -1,57 +1,51 @@
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
-import {
-    newPatientTransferOccupation,
-    type PatientStatusForTransport,
-    type ResourceDescription,
-    type SimulatedRegion,
-    currentSimulatedRegionOf,
-    isInSpecificSimulatedRegion,
-    addResourceDescription,
-    patientStatusSchema,
-    type PatientStatus,
-    patientStatusForTransportSchema,
-} from '../../models/index.js';
-import {
-    type UUID,
-    uuidSchema,
-    StrictObject,
-    cloneDeepMutable,
-    uuid,
-} from '../../utils/index.js';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
-import {
-    newSendRemoteEventActivityState,
-    newDelayEventActivityState,
-    newCountPatientsActivityState,
-    newPublishRadiogramActivityState,
-    newRecurringEventActivityState,
-} from '../activities/index.js';
-import {
-    newAskForPatientDataEvent,
-    newPatientCategoryTransferToHospitalFinishedEvent,
-    newTransferVehiclesRequestEvent,
-    newTryToSendToHospitalEvent,
-} from '../events/index.js';
-import type { TransferCountsRadiogram } from '../../models/radiogram/index.js';
-import {
-    newNewPatientDataRequestedRadiogram,
-    newRadiogramUnpublishedStatus,
-} from '../../models/radiogram/index.js';
-import type { ExerciseState } from '../../state.js';
-import {
-    getActivityById,
-    getElement,
-    getElementByPredicate,
-} from '../../store/action-reducers/utils/index.js';
 import {
     patientsTransportPromiseSchema,
     newPatientsTransportPromise,
 } from '../utils/patients-transported-promise.js';
 import { logLastPatientTransportedInMultipleSimulatedRegions } from '../../store/action-reducers/utils/log.js';
-import type { SimulationBehavior } from './simulation-behavior.js';
+import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
+import {
+    type PatientStatus,
+    type PatientStatusForTransport,
+    patientStatusForTransportSchema,
+    patientStatusSchema,
+} from '../../models/utils/patient-status.js';
+import {
+    getActivityById,
+    getElement,
+    getElementByPredicate,
+} from '../../store/action-reducers/utils/get-element.js';
+import {
+    currentSimulatedRegionOf,
+    isInSpecificSimulatedRegion,
+} from '../../models/utils/position/position-helpers.js';
+import { newSendRemoteEventActivityState } from '../activities/send-remote-event.js';
+import { newTransferVehiclesRequestEvent } from '../events/transfer-vehicles-request.js';
+import { newPatientTransferOccupation } from '../../models/utils/occupations/patient-transfer-occupation.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { newPatientCategoryTransferToHospitalFinishedEvent } from '../events/patient-category-transfer-to-hospital-finished.js';
+import { newCountPatientsActivityState } from '../activities/count-patients.js';
+import { newPublishRadiogramActivityState } from '../activities/publish-radiogram.js';
+import { newNewPatientDataRequestedRadiogram } from '../../models/radiogram/new-patient-data-requested-radiogram.js';
+import { newRadiogramUnpublishedStatus } from '../../models/radiogram/status/radiogram-unpublished-status.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import type { TransferCountsRadiogram } from '../../models/radiogram/transfer-counts-radiogram.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import {
+    addResourceDescription,
+    type ResourceDescription,
+} from '../../models/utils/resource-description.js';
+import type { ExerciseState } from '../../state.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { newAskForPatientDataEvent } from '../events/ask-for-patient-data-event.js';
+import { newTryToSendToHospitalEvent } from '../events/try-to-send-to-hospital.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
 
 interface PatientsPerRegion {
     [simulatedRegionId: UUID]: ResourceDescription<PatientStatus>;

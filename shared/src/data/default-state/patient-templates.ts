@@ -5,8 +5,8 @@ import {
     newPatientHealthState,
 } from '../../models/patient-health-state.js';
 import { newPatientTemplate } from '../../models/patient-template.js';
-import type { ImageProperties } from '../../models/utils/index.js';
-import { healthPointsDefaults } from '../../models/utils/index.js';
+import { healthPointsDefaults } from '../../models/utils/health-points.js';
+import type { ImageProperties } from '../../models/utils/image-properties.js';
 
 const defaultPatientImage: ImageProperties = {
     url: '/assets/patient.svg',

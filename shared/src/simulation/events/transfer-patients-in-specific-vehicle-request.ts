@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import type { UUID, UUIDSet } from '../../utils/index.js';
-import { uuidSchema, uuidSetSchema } from '../../utils/index.js';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
+import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 
 export const transferPatientsInSpecificVehicleRequestEventSchema =
     z.strictObject({

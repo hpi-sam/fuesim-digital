@@ -1,8 +1,8 @@
 import Papa from 'papaparse';
-import * as z from 'zod';
+import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
-import type { PatientStatus } from '../../models/index.js';
 import type { Sex } from '../../models/utils/sex.js';
+import type { PatientStatus } from '../../models/utils/patient-status.js';
 
 const statusCodeToExportMap: { [key in PatientStatus]: string } = {
     red: '1',

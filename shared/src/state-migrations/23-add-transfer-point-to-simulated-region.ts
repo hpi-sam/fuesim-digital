@@ -1,4 +1,4 @@
-import { uuid } from '../utils/index.js';
+import { uuid } from '../utils/uuid.js';
 import type { Migration } from './migration-functions.js';
 
 export const addTransferPointToSimulatedRegion23: Migration = {

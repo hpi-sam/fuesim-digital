@@ -1,16 +1,18 @@
 import type { WritableDraft } from 'immer';
-import type { ExerciseRadiogram } from '../../../models/radiogram/index.js';
-import type {
-    ExerciseSimulationActivityState,
-    ExerciseSimulationActivityType,
-    ExerciseSimulationBehaviorState,
-    ExerciseSimulationBehaviorType,
-} from '../../../simulation/index.js';
 import type { ExerciseState } from '../../../state.js';
-import type { UUID } from '../../../utils/index.js';
 import type { ElementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { ReducerError } from '../../reducer-error.js';
+import type { UUID } from '../../../utils/uuid.js';
+import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
+import type {
+    ExerciseSimulationBehaviorState,
+    ExerciseSimulationBehaviorType,
+} from '../../../simulation/behaviors/exercise-simulation-behavior.js';
+import type {
+    ExerciseSimulationActivityState,
+    ExerciseSimulationActivityType,
+} from '../../../simulation/activities/exercise-simulation-activity.js';
 
 /**
  * @returns The element with the given id

@@ -1,10 +1,9 @@
 import type { WritableDraft } from 'immer';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
-import type { SimulatedRegion } from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema } from '../../utils/index.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
 
 export const simulationActivityStateSchema = z.strictObject({
     type: z.string(),

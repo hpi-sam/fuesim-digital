@@ -1,5 +1,5 @@
-import * as z from 'zod';
-import { uuidSchema } from '../../utils/index.js';
+import { z } from 'zod';
+import { uuidSchema } from '../../utils/uuid.js';
 import { startPointSchema } from './start-points.js';
 
 export const transferSchema = z.strictObject({

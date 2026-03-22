@@ -1,9 +1,9 @@
 import type { WritableDraft } from 'immer';
 import { string, z } from 'zod';
-import type { SimulatedRegion } from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import { uuidSchema } from '../../utils/index.js';
-import type { ExerciseSimulationEvent } from '../events/index.js';
+import { uuidSchema } from '../../utils/uuid.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import type { ExerciseSimulationEvent } from '../events/exercise-simulation-event.js';
 
 export const simulationBehaviorStateSchema = z.strictObject({
     type: z.literal(`${string}Behavior`),

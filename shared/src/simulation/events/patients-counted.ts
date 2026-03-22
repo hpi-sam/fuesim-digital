@@ -2,8 +2,8 @@ import { z } from 'zod';
 import {
     type PatientStatus,
     patientStatusSchema,
-    type ResourceDescription,
-} from '../../models/index.js';
+} from '../../models/utils/patient-status.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import { simulationEventSchema } from './simulation-event.js';
 
 export const patientsCountedEventSchema = simulationEventSchema.extend({

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import { uuidSchema } from '../utils/index.js';
-import { imagePropertiesSchema } from './utils/index.js';
+import { uuidSchema } from '../utils/uuid.js';
+import { imagePropertiesSchema } from './utils/image-properties.js';
 
 export const vehicleTemplateSchema = z.strictObject({
     id: uuidSchema,

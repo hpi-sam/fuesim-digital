@@ -1,11 +1,11 @@
 import type { WritableDraft } from 'immer';
-import type { SimulatedRegion } from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import { simulationActivityDictionary } from '../activities/index.js';
 import { terminateActivity } from '../activities/utils.js';
-import { simulationBehaviorDictionary } from '../behaviors/index.js';
 import { newTickEvent } from '../events/tick.js';
 import { sendSimulationEvent } from '../events/utils.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { simulationActivityDictionary } from '../activities/exercise-simulation-activity.js';
+import { simulationBehaviorDictionary } from '../behaviors/exercise-simulation-behavior.js';
 
 export function simulateAllRegions(
     draftState: WritableDraft<ExerciseState>,

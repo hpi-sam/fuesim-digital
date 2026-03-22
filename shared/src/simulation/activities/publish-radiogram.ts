@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { ExerciseRadiogram } from '../../models/radiogram/exercise-radiogram.js';
 import { exerciseRadiogramSchema } from '../../models/radiogram/exercise-radiogram.js';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
-import type { UUID } from '../../utils/index.js';
+import type { UUID } from '../../utils/uuid.js';
 import type { SimulationActivity } from './simulation-activity.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
 

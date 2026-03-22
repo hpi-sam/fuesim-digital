@@ -1,36 +1,34 @@
 import { groupBy } from 'lodash-es';
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
-import type {
-    MaterialCountRadiogram,
-    PersonnelCountRadiogram,
-    TransferConnectionsRadiogram,
-    VehicleCountRadiogram,
-    VehicleOccupationsRadiogram,
-} from '../../models/radiogram/index.js';
+import { StrictObject } from '../../utils/strict-object.js';
 import {
     getActivityById,
     getElement,
     getElementByPredicate,
-} from '../../store/action-reducers/utils/index.js';
-import type { UUID } from '../../utils/index.js';
-import { StrictObject, uuid, uuidSchema } from '../../utils/index.js';
-import { newLeaderChangedEvent } from '../events/index.js';
-import type { ExerciseState } from '../../state.js';
-import { nextUUID } from '../utils/randomness.js';
+} from '../../store/action-reducers/utils/get-element.js';
+import type { VehicleOccupationsRadiogram } from '../../models/radiogram/vehicle-occupations-radiogram.js';
 import {
     currentSimulatedRegionIdOf,
     isInSimulatedRegion,
     isInSpecificSimulatedRegion,
-} from '../../models/index.js';
-import type {
-    SimulatedRegion,
-    ResourceDescription,
-} from '../../models/index.js';
+} from '../../models/utils/position/position-helpers.js';
+import type { ExerciseState } from '../../state.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import { addActivity } from '../activities/utils.js';
-import { newDelayEventActivityState } from '../activities/index.js';
-import type { SimulationBehavior } from './simulation-behavior.js';
-import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { nextUUID } from '../utils/randomness.js';
+import { newLeaderChangedEvent } from '../events/leader-changed.js';
+import type { MaterialCountRadiogram } from '../../models/radiogram/material-count-radiogram.js';
+import type { PersonnelCountRadiogram } from '../../models/radiogram/personnel-count-radiogram.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import type { TransferConnectionsRadiogram } from '../../models/radiogram/transfer-connections-radiogram.js';
+import type { VehicleCountRadiogram } from '../../models/radiogram/vehicle-count-radiogram.js';
+import {
+    type SimulationBehavior,
+    simulationBehaviorStateSchema,
+} from './simulation-behavior.js';
 
 export const assignLeaderBehaviorStateSchema = z.strictObject({
     ...simulationBehaviorStateSchema.shape,

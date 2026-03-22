@@ -1,31 +1,39 @@
 import { isEmpty } from 'lodash-es';
 import { z } from 'zod';
-import type { UUID } from '../utils/index.js';
-import { uuidSchema, uuid, uuidSetSchema } from '../utils/index.js';
+import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
+import { uuidSetSchema } from '../utils/uuid-set.js';
 import type { PatientHealthState } from './patient-health-state.js';
 import { patientHealthStateSchema } from './patient-health-state.js';
-import type {
-    BiometricInformation,
-    PatientStatusCode,
-    PatientStatus,
-    ImageProperties,
-    HealthPoints,
-    Position,
-} from './utils/index.js';
-import {
-    biometricInformationSchema,
-    patientStatusCodeSchema,
-    isInSimulatedRegion,
-    isOnMap,
-    imagePropertiesSchema,
-    patientStatusSchema,
-    positionSchema,
-    healthPointsSchema,
-} from './utils/index.js';
 import type { PersonalInformation } from './utils/personal-information.js';
 import { personalInformationSchema } from './utils/personal-information.js';
 import type { PretriageInformation } from './utils/pretriage-information.js';
 import { pretriageInformationSchema } from './utils/pretriage-information.js';
+import {
+    type HealthPoints,
+    healthPointsSchema,
+} from './utils/health-points.js';
+import {
+    type BiometricInformation,
+    biometricInformationSchema,
+} from './utils/biometric-information.js';
+import {
+    type PatientStatusCode,
+    patientStatusCodeSchema,
+} from './utils/patient-status-code.js';
+import {
+    type PatientStatus,
+    patientStatusSchema,
+} from './utils/patient-status.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from './utils/image-properties.js';
+import { positionSchema, type Position } from './utils/position/position.js';
+import {
+    isInSimulatedRegion,
+    isOnMap,
+} from './utils/position/position-helpers.js';
+
 export const patientSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('patient'),

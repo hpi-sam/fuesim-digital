@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import { z } from 'zod';
 import type { MapCoordinates } from './map-coordinates.js';
 import { mapCoordinatesSchema } from './map-coordinates.js';
 

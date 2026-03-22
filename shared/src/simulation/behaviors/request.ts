@@ -1,41 +1,40 @@
 import { z } from 'zod';
 import type { WritableDraft } from 'immer';
-import {
-    cloneDeepMutable,
-    StrictObject,
-    uuid,
-    uuidSchema,
-} from '../../utils/index.js';
-import {
-    getActivityById,
-    tryGetElement,
-} from '../../store/action-reducers/utils/index.js';
 import type { ExerciseState } from '../../state.js';
 import { addActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
-import { newRecurringEventActivityState } from '../activities/index.js';
 import { newSendRequestEvent } from '../events/send-request.js';
 import { newCreateRequestActivityState } from '../activities/create-request.js';
-import {
-    newVehicleResource,
-    vehicleResourceSchema,
-    exerciseRequestTargetConfigurationSchema,
-    newTraineesRequestTargetConfiguration,
-    addPartialResourceDescriptions,
-    subtractPartialResourceDescriptions,
-} from '../../models/index.js';
-import type {
-    ExerciseRequestTargetConfiguration,
-    SimulatedRegion,
-    ResourceDescription,
-} from '../../models/index.js';
 import {
     newResourcePromise,
     resourcePromiseSchema,
 } from '../utils/resource-promise.js';
-import type { ResourceRequestRadiogram } from '../../models/radiogram/index.js';
-import type { SimulationBehavior } from './simulation-behavior.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
+import {
+    newVehicleResource,
+    vehicleResourceSchema,
+} from '../../models/utils/rescue-resource.js';
+import {
+    type ExerciseRequestTargetConfiguration,
+    exerciseRequestTargetConfigurationSchema,
+} from '../../models/utils/request-target/exercise-request-target.js';
+import { newTraineesRequestTargetConfiguration } from '../../models/utils/request-target/trainees.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import {
+    addPartialResourceDescriptions,
+    type ResourceDescription,
+    subtractPartialResourceDescriptions,
+} from '../../models/utils/resource-description.js';
+import type { ResourceRequestRadiogram } from '../../models/radiogram/resource-request-radiogram.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import {
+    getActivityById,
+    tryGetElement,
+} from '../../store/action-reducers/utils/get-element.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
 
 export const requestBehaviorStateSchema = z.strictObject({
     ...simulationBehaviorStateSchema.shape,

@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { uuid, uuidSchema } from '../utils/index.js';
-import { healthPointsSchema } from './utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { healthPointsSchema } from './utils/health-points.js';
 
 /**
  * These parameters determine the increase or decrease of a patients health every second

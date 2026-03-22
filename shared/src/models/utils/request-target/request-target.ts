@@ -1,9 +1,9 @@
 import type { WritableDraft } from 'immer';
 import type { ZodType } from 'zod';
 import { z } from 'zod';
-import type { VehicleResource } from '../../../models/index.js';
 import type { ExerciseState } from '../../../state.js';
-import type { UUID } from '../../../utils/index.js';
+import type { UUID } from '../../../utils/uuid.js';
+import type { VehicleResource } from '../rescue-resource.js';
 
 export const requestTargetConfigurationSchema = z.strictObject({
     type: z.string('requestTarget'),

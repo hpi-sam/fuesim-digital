@@ -1,23 +1,19 @@
 import { z } from 'zod';
-import {
-    changeOccupation,
-    newIntermediateOccupation,
-} from '../../models/index.js';
-import type { UUID, UUIDSet } from '../../utils/index.js';
-import { uuidSchema, uuidSetSchema } from '../../utils/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import {
-    newPatientTransferToHospitalSuccessfulEvent,
-    newTransferPatientsInSpecificVehicleRequestEvent,
-} from '../events/index.js';
-import { catchAllHospitalId } from '../../data/index.js';
+import { getPatientVisibleStatus } from '../../models/patient.js';
+import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import {
     getElement,
     tryGetElement,
-} from '../../store/action-reducers/utils/index.js';
-import { getPatientVisibleStatus } from '../../models/patient.js';
-import type { SimulationActivity } from './simulation-activity.js';
+} from '../../store/action-reducers/utils/get-element.js';
+import { changeOccupation } from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newIntermediateOccupation } from '../../models/utils/occupations/intermediate-occupation.js';
+import { newTransferPatientsInSpecificVehicleRequestEvent } from '../events/transfer-patients-in-specific-vehicle-request.js';
+import { catchAllHospitalId } from '../../data/default-state/catch-all-hospital.js';
+import { newPatientTransferToHospitalSuccessfulEvent } from '../events/patient-transfer-to-hospital-successful.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
 export const transferPatientToHospitalActivityStateSchema = z.strictObject({
     ...simulationActivityStateSchema.shape,

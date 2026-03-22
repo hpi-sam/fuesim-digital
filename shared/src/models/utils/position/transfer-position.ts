@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import { z } from 'zod';
 import type { Transfer } from '../transfer.js';
 import { transferSchema } from '../transfer.js';
 

@@ -1,27 +1,26 @@
 import { produce, type WritableDraft } from 'immer';
-import {
-    newSimulatedRegionPositionIn,
-    newMapCoordinatesAt,
-    newSize,
-    newTransferPoint,
-    newPersonnelFromTemplate,
-    newSimulatedRegion,
-} from '../../models/index.js';
-import type { PatientStatus, SimulatedRegion } from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuid } from '../../utils/index.js';
-import type { AssignLeaderBehaviorState } from '../behaviors/index.js';
-import { newAssignLeaderBehaviorState } from '../behaviors/index.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
 import { addPersonnel } from '../../../tests/utils/personnel.spec.js';
 import { defaultPersonnelTemplates } from '../../data/default-state/personnel-templates.js';
-import { newTreatmentProgressChangedEvent } from '../events/index.js';
 import { assertCatering } from '../../../tests/utils/catering.spec.js';
 import { addMaterial } from '../../../tests/utils/materials.spec.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { newCanCaterFor } from '../../models/utils/cater-for.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
+import { uuid, type UUID } from '../../utils/uuid.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { newSimulatedRegion } from '../../models/simulated-region.js';
+import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
+import { newSize } from '../../models/utils/size.js';
+import { newTransferPoint } from '../../models/transfer-point.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import type { AssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
+import { newAssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newPersonnelFromTemplate } from '../../models/personnel.js';
+import type { PatientStatus } from '../../models/utils/patient-status.js';
+import { newTreatmentProgressChangedEvent } from '../events/treatment-progress-changed.js';
 import type { ReassignTreatmentsActivityState } from './reassign-treatments.js';
 import {
     newReassignTreatmentsActivityState,

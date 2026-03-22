@@ -1,40 +1,39 @@
 import { groupBy } from 'lodash-es';
 import { z } from 'zod';
+import { addActivity, terminateActivity } from '../activities/utils.js';
+import { nextUUID } from '../utils/randomness.js';
+import { amountOfResourcesInVehicle } from '../../models/utils/amount-of-resources-in-vehicle.js';
+import {
+    getElement,
+    tryGetElement,
+} from '../../store/action-reducers/utils/get-element.js';
+import {
+    changeOccupation,
+    isUnoccupied,
+    isUnoccupiedOrIntermediarilyOccupied,
+} from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newWaitForTransferOccupation } from '../../models/utils/occupations/wait-for-transfer-occupation.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { newDoTransferEvent } from '../events/do-transfer.js';
+import { newTransferVehicleActivityState } from '../activities/transfer-vehicle.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { startTransferEventSchema } from '../events/start-transfer.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
 import {
     currentSimulatedRegionOf,
     isInSimulatedRegion,
     isInSpecificSimulatedRegion,
-    changeOccupation,
-    isUnoccupied,
-    isUnoccupiedOrIntermediarilyOccupied,
-    newLoadOccupation,
-    newWaitForTransferOccupation,
-    newVehicleResource,
-} from '../../models/index.js';
-import { uuidSchema, cloneDeepMutable, uuid } from '../../utils/index.js';
-import { addActivity, terminateActivity } from '../activities/utils.js';
-import { nextUUID } from '../utils/randomness.js';
-import {
-    getElement,
-    tryGetElement,
-} from '../../store/action-reducers/utils/index.js';
-import {
-    newDelayEventActivityState,
-    newLoadVehicleActivityState,
-    newRecurringEventActivityState,
-    newSendRemoteEventActivityState,
-    newTransferVehicleActivityState,
-} from '../activities/index.js';
-import { amountOfResourcesInVehicle } from '../../models/utils/amount-of-resources-in-vehicle.js';
-import type { ResourceDescription } from '../../models/index.js';
-import {
-    newDoTransferEvent,
-    newRequestReceivedEvent,
-    newVehiclesSentEvent,
-    startTransferEventSchema,
-} from '../events/index.js';
-import type { SimulationBehavior } from './simulation-behavior.js';
+} from '../../models/utils/position/position-helpers.js';
+import { newLoadOccupation } from '../../models/utils/occupations/load-occupation.js';
+import { newLoadVehicleActivityState } from '../activities/load-vehicle.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { newRequestReceivedEvent } from '../events/request-received.js';
+import { newSendRemoteEventActivityState } from '../activities/send-remote-event.js';
+import { newVehiclesSentEvent } from '../events/vehicles-sent.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
 
 export const transferBehaviorStateSchema = z.strictObject({
     ...simulationBehaviorStateSchema.shape,

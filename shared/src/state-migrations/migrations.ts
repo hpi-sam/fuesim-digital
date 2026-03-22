@@ -1,17 +1,18 @@
 import type { WritableDraft } from 'immer';
 import { ExerciseState } from '../state.js';
-import type { ExerciseAction } from '../store/index.js';
-import { ReducerError, applyAction } from '../store/index.js';
-import type { UUID } from '../utils/index.js';
-import { cloneDeepMutable } from '../utils/index.js';
-import type { MigratedStateExport } from '../export-import/file-format/index.js';
-import {
-    PartialExport,
-    StateExport,
-} from '../export-import/file-format/index.js';
 import type { ParticipantKey } from '../exercise-keys.js';
-import type { Migration } from './migration-functions.js';
+import {
+    StateExport,
+    type MigratedStateExport,
+} from '../export-import/file-format/state-export.js';
+import { cloneDeepMutable } from '../utils/clone-deep.js';
+import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
+import { PartialExport } from '../export-import/file-format/partial-export.js';
+import { applyAction } from '../store/reduce-exercise-state.js';
+import { ReducerError } from '../store/reducer-error.js';
+import type { UUID } from '../utils/uuid.js';
 import { migrations } from './migration-functions.js';
+import type { Migration } from './migration-functions.js';
 
 export function migrateStateExport(
     stateExportToMigrate: StateExport

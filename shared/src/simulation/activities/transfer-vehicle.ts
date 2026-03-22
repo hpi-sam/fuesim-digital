@@ -1,39 +1,37 @@
 import { z } from 'zod';
-import {
-    newMissingTransferConnectionRadiogram,
-    newRadiogramUnpublishedStatus,
-} from '../../models/radiogram/index.js';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
-import {
-    type ResourceDescription,
-    type ExerciseOccupation,
-    newTransferStartPoint,
-    exerciseOccupationSchema,
-    changeOccupation,
-    isInSpecificSimulatedRegion,
-    isInSpecificVehicle,
-    newNoOccupation,
-    newVehicleResource,
-} from '../../models/index.js';
-import { TransferActionReducers } from '../../store/action-reducers/transfer.js';
-import {
-    getElement,
-    getElementByPredicate,
-    tryGetElement,
-} from '../../store/action-reducers/utils/index.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema, cloneDeepMutable } from '../../utils/index.js';
-import {
-    newTransferConnectionMissingEvent,
-    newVehicleTransferSuccessfulEvent,
-} from '../events/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { nextUUID } from '../utils/randomness.js';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
 import { HospitalActionReducers } from '../../store/action-reducers/hospital.js';
-import type { SimulationActivity } from './simulation-activity.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import {
+    type ExerciseOccupation,
+    exerciseOccupationSchema,
+} from '../../models/utils/occupations/exercise-occupation.js';
+import {
+    getElement,
+    getElementByPredicate,
+    tryGetElement,
+} from '../../store/action-reducers/utils/get-element.js';
+import {
+    isInSpecificSimulatedRegion,
+    isInSpecificVehicle,
+} from '../../models/utils/position/position-helpers.js';
+import { changeOccupation } from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newNoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { newTransferConnectionMissingEvent } from '../events/transfer-connection-missing.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newMissingTransferConnectionRadiogram } from '../../models/radiogram/missing-transfer-connection-radiogram.js';
+import { newRadiogramUnpublishedStatus } from '../../models/radiogram/status/radiogram-unpublished-status.js';
+import { TransferActionReducers } from '../../store/action-reducers/transfer.js';
+import { newTransferStartPoint } from '../../models/utils/start-points.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { newVehicleTransferSuccessfulEvent } from '../events/vehicle-transfer-successful.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
 export const transferVehicleActivityStateSchema = z.strictObject({
     ...simulationActivityStateSchema.shape,

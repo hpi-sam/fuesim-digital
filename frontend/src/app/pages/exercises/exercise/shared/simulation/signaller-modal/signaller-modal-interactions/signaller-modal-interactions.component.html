@@ -33,87 +33,83 @@
         let index = $index
     ) {
         <li class="list-group-item" [class.active]="index === selectedIndex">
-            @if (interaction.requestable$ | async; as requestable) {
-                <div class="d-flex flex-row mb-2">
-                    <div class="flex-grow-1">
-                        <span [class.text-muted]="!requestable">
-                            <strong>{{ interaction.name }}</strong>
-                            @if (interaction.details; as details) {
-                                <span>
-                                    {{ details }}
-                                </span>
-                            }
-                        </span>
-                        @if (!requestable && interaction.errorMessage) {
-                            <br />
-                            <span class="text-warning">{{
-                                interaction.errorMessage
-                            }}</span>
+            @let requestable = interaction.requestable$ | async;
+            <div class="d-flex flex-row mb-2">
+                <div class="flex-grow-1">
+                    <span [class.text-muted]="!requestable">
+                        <strong>{{ interaction.name }}</strong>
+                        @if (interaction.details; as details) {
+                            <span>
+                                {{ details }}
+                            </span>
                         }
-                    </div>
-                    <div class="flex-shrink-1 text-nowrap">
-                        @let loading =
-                            interaction.loading$ === undefined
-                                ? false
-                                : (interaction.loading$ | async);
+                    </span>
+                    @if (!requestable && interaction.errorMessage) {
+                        <br />
+                        <span class="text-warning">{{
+                            interaction.errorMessage
+                        }}</span>
+                    }
+                </div>
+                <div class="flex-shrink-1 text-nowrap">
+                    @let loading =
+                        interaction.loading$ === undefined
+                            ? false
+                            : (interaction.loading$ | async);
+                    <button
+                        [disabled]="!requestable || loading"
+                        class="btn btn-primary"
+                        [class.btn-primary]="index !== selectedIndex"
+                        [class.btn-outline-light]="index === selectedIndex"
+                        (click)="interaction.callback()"
+                    >
+                        {{ primaryActionLabel() }}
+                        @if (loading) {
+                            <span
+                                class="spinner-border spinner-border-sm"
+                                role="status"
+                                aria-hidden="true"
+                            ></span>
+                        } @else {
+                            @if (index !== selectedIndex) {
+                                <app-hotkey-indicator
+                                    [hotkey]="interaction.hotkeys.primary"
+                                />
+                            }
+                            @if (index === selectedIndex) {
+                                <app-hotkey-indicator
+                                    [hotkey]="confirmHotkey"
+                                />
+                            }
+                        }
+                    </button>
+                    @if (showSecondaryButton()) {
                         <button
-                            [disabled]="!requestable || loading"
-                            class="btn btn-primary"
-                            [class.btn-primary]="index !== selectedIndex"
-                            [class.btn-outline-light]="index === selectedIndex"
-                            (click)="interaction.callback()"
+                            [disabled]="
+                                !requestable || !interaction.hasSecondaryAction
+                            "
+                            class="btn btn-secondary ms-1"
+                            (click)="tryCallSecondaryAction(interaction)"
                         >
-                            {{ primaryActionLabel() }}
-                            @if (loading) {
-                                <span
-                                    class="spinner-border spinner-border-sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                ></span>
-                            } @else {
+                            <i class="bi bi-clock-history"></i>
+                            @if (interaction.hotkeys.secondary) {
                                 @if (index !== selectedIndex) {
                                     <app-hotkey-indicator
-                                        [hotkey]="interaction.hotkeys.primary"
+                                        [hotkey]="interaction.hotkeys.secondary"
+                                        class="ms-1"
                                     />
                                 }
                                 @if (index === selectedIndex) {
                                     <app-hotkey-indicator
-                                        [hotkey]="confirmHotkey"
+                                        [hotkey]="confirmSecondaryHotkey"
+                                        class="ms-1"
                                     />
                                 }
                             }
                         </button>
-                        @if (showSecondaryButton()) {
-                            <button
-                                [disabled]="
-                                    !requestable ||
-                                    !interaction.hasSecondaryAction
-                                "
-                                class="btn btn-secondary ms-1"
-                                (click)="tryCallSecondaryAction(interaction)"
-                            >
-                                <i class="bi bi-clock-history"></i>
-                                @if (interaction.hotkeys.secondary) {
-                                    @if (index !== selectedIndex) {
-                                        <app-hotkey-indicator
-                                            [hotkey]="
-                                                interaction.hotkeys.secondary
-                                            "
-                                            class="ms-1"
-                                        />
-                                    }
-                                    @if (index === selectedIndex) {
-                                        <app-hotkey-indicator
-                                            [hotkey]="confirmSecondaryHotkey"
-                                            class="ms-1"
-                                        />
-                                    }
-                                }
-                            </button>
-                        }
-                    </div>
+                    }
                 </div>
-            }
+            </div>
 
             @for (
                 radiogram of (requestedRadiograms$ | async)?.[

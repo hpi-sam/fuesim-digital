@@ -30,6 +30,7 @@ import type { AppState } from '../../../state/app.state';
 import {
     selectConfiguration,
     createSelectPatient,
+    createSelectScoutable,
 } from '../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 import { PatientIdentifierComponent } from '../patient-identifier/patient-identifier.component';
@@ -71,6 +72,8 @@ export class PatientsDetailsComponent implements OnChanges {
     private readonly exerciseService = inject(ExerciseService);
 
     readonly patientId = input.required<UUID>();
+    readonly openScoutInfo = input<boolean>();
+    activeId!: number;
 
     readonly currentRole$ = this.store.select(selectCurrentMainRole);
     configuration$ = this.store.select(selectConfiguration);
@@ -85,11 +88,28 @@ export class PatientsDetailsComponent implements OnChanges {
                     : ['white', 'black', 'red', 'yellow', 'green']
             )
         );
+    IsScoutableInfoPaticipantVisible$?: Observable<boolean>;
 
     ngOnChanges(): void {
         this.patient$ = this.store.select(
             createSelectPatient(this.patientId())
         );
+        this.IsScoutableInfoPaticipantVisible$ = this.patient$.pipe(
+            map((patient) => {
+                if (patient.scoutableId) {
+                    const scoutable = this.store.selectSignal(
+                        createSelectScoutable(patient.scoutableId)
+                    );
+                    return scoutable().isPaticipantVisible;
+                }
+                return false;
+            })
+        );
+        if (this.openScoutInfo()) {
+            this.activeId = 1;
+        } else {
+            this.activeId = 0;
+        }
         this.visibleStatus$ = this.store.select(
             createSelector(
                 createSelectPatient(this.patientId()),

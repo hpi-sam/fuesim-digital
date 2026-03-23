@@ -1,26 +1,45 @@
-<div>
-    @if (scoutable(); as scoutable) {
-        @if (currentRole() == 'trainer') {
-            <button
-                class="btn btn-outline-primary ms-3"
-                (click)="assignContent()"
+@if (scoutable(); as scoutable) {
+    <div>
+        @if (currentRole() === 'trainer') {
+            <!-- <button
+            class="btn btn-outline-primary ms-3"
+            (click)="assignContent()"
             >
                 Info-Block hinzufügen
-            </button>
-        }
-    }
-</div>
-<div>
-    @if (scoutable(); as scoutable) {
-        @for (contentId of scoutable.userGeneratedContentIds; track contentId) {
-            @if (
-                scoutable.userGeneratedContentIds.find((id) => id == contentId)
-            ) {
-                <app-rich-text-editor
-                    [contentAssignedElement]="scoutable"
-                    [userGeneratedContentId]="contentId"
-                />
+            </button> -->
+            @if (scoutable.isPaticipantVisible === true) {
+                <button
+                    class="btn btn-outline-primary ms-3"
+                    ngbTooltip="Für Teilnehmer verstecken"
+                    (click)="setVisibility(false)"
+                >
+                    <i class="bi bi-eye"></i>
+                </button>
+                <span> Inhalte sind für Teilnehmer sichtbar.</span>
             }
+            @if (scoutable.isPaticipantVisible === false) {
+                <button
+                    class="btn btn-outline-primary ms-3"
+                    ngbTooltip="Für Teilnehmer sichtbar machen"
+                    (click)="setVisibility(true)"
+                >
+                    <i class="bi bi-eye-slash"></i>
+                </button>
+                <span> Inhalte sind für Teilnehmer nicht sichtbar.</span>
+            }
+            <hr />
         }
+    </div>
+    @if (
+        (currentRole() === 'trainer' || scoutable.isPaticipantVisible) &&
+            scoutable.userGeneratedContentId;
+        as contentId
+    ) {
+        <div>
+            <app-rich-text-editor
+                [contentAssignedElement]="scoutable"
+                [userGeneratedContentId]="contentId"
+            />
+        </div>
     }
-</div>
+}

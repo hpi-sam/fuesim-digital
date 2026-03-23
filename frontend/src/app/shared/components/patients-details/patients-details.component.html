@@ -1,6 +1,6 @@
-<nav #nav="ngbNav" ngbNav class="nav-tabs">
+<nav #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="activeId">
     @if (patient$ | async; as patient) {
-        <ng-container ngbNavItem>
+        <ng-container ngbNavItem [ngbNavItem]="0">
             <a ngbNavLink data-cy="patientPopupGeneralNav">Allgemein</a>
             <ng-template ngbNavContent>
                 <table class="table table-sm small mb-0">
@@ -276,8 +276,11 @@
         </ng-container>
     }
     @if (patient$ | async; as patient) {
-        @if ((currentRole$ | async) !== 'participant' || patient.scoutableId) {
-            <ng-container ngbNavItem>
+        @if (
+            (currentRole$ | async) !== 'participant' ||
+            (IsScoutableInfoPaticipantVisible$ | async)
+        ) {
+            <ng-container ngbNavItem [ngbNavItem]="1">
                 <!-- TODO @JohannesPotzi : Besserer Name-->
                 <a ngbNavLink data-cy="patientPopupScoutNav">Scout-Info</a>
                 <ng-template ngbNavContent>

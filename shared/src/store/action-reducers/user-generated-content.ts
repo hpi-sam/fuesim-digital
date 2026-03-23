@@ -9,8 +9,8 @@ import {
 } from '../../models/user-generated-content.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { getElement } from './utils/get-element.js';
 import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
+import { getElement } from './utils/get-element.js';
 
 export class AssignNewContentToElementAction implements Action {
     @IsValue('[UserGeneratedContent] Assign new content to element' as const)
@@ -52,7 +52,7 @@ export namespace UserGeneratedContentActionReducers {
                 draftState.userGeneratedContents[content.id] =
                     cloneDeepMutable(content);
                 const element = getElement(draftState, 'scoutable', elementId);
-                element.userGeneratedContentIds.push(content.id);
+                element.userGeneratedContentId = content.id;
                 return draftState;
             },
             rights: 'trainer',
@@ -61,13 +61,10 @@ export namespace UserGeneratedContentActionReducers {
         action: DeleteContentAction,
         reducer: (draftState, { contentId, assignedElement }) => {
             getElement(draftState, 'userGeneratedContent', contentId);
-            const index = assignedElement.userGeneratedContentIds.findIndex(
-                (id) => id == contentId
-            );
-            delete draftState[elementTypePluralMap[assignedElement.type]][
+            draftState[elementTypePluralMap[assignedElement.type]][
                 assignedElement.id
-            ]!.userGeneratedContentIds[index];
-            delete draftState['userGeneratedContents'][contentId];
+            ]!.userGeneratedContentId = null;
+            delete draftState.userGeneratedContents[contentId];
             return draftState;
         },
         rights: 'trainer',

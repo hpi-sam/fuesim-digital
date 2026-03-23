@@ -5,7 +5,6 @@ import {
     input,
     OnInit,
     signal,
-    Signal,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
@@ -29,38 +28,59 @@ export class ScoutableObjectNavItemComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     readonly element = input.required<ScoutableElement>();
-    scoutable: Signal<Scoutable | null> = signal(null);
+    readonly scoutable = signal<Scoutable | null>(null);
 
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
     constructor() {
         effect(() => {
             if (this.element().scoutableId) {
-                this.scoutable = this.store.selectSignal(
-                    createSelectScoutable(this.element().scoutableId!)
+                this.scoutable.set(
+                    this.store.selectSignal(
+                        createSelectScoutable(this.element().scoutableId!)
+                    )()
                 );
             }
         });
     }
 
-    ngOnInit(): void {
-        if (!this.element().scoutableId) {
-            this.makeScoutable(this.element());
+    async ngOnInit(): Promise<void> {
+        if (this.element().scoutableId === null) {
+            await this.makeScoutable(this.element());
+        }
+        this.scoutable.set(
+            this.store.selectSignal(
+                createSelectScoutable(this.element().scoutableId!)
+            )()
+        );
+        if (!this.scoutable()?.userGeneratedContentId) {
+            await this.assignContent();
         }
     }
-    public assignContent() {
+    public async assignContent() {
+        const content = newUserGeneratedContent();
         this.exerciseService.proposeAction({
             type: '[UserGeneratedContent] Assign new content to element',
             elementId: this.scoutable()!.id,
-            content: newUserGeneratedContent(),
+            content,
         });
     }
 
-    makeScoutable(element: ScoutableElement) {
+    async makeScoutable(element: ScoutableElement) {
+        await this.exerciseService.proposeAction(
+            {
+                type: '[Scoutable] Make scoutable',
+                element,
+                scoutable: newScoutable(),
+            },
+            true
+        );
+    }
+    setVisibility(value: boolean) {
         this.exerciseService.proposeAction({
-            type: '[Scoutable] Make scoutable',
-            element: element,
-            scoutable: newScoutable(),
+            type: '[Scoutable] Set isPaticipantVisible',
+            scoutableId: this.scoutable()!.id,
+            value,
         });
     }
 }

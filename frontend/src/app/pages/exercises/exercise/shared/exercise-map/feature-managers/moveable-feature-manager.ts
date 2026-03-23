@@ -148,7 +148,8 @@ export abstract class MoveableFeatureManager<
 
     public onFeatureClicked(
         event: MapBrowserEvent<any>,
-        feature: Feature<FeatureType>
+        feature: Feature<FeatureType>,
+        condition?: boolean
         // eslint-disable-next-line @typescript-eslint/no-empty-function
     ): void {}
 

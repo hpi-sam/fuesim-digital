@@ -11,12 +11,14 @@ import type {
     WithPosition,
 } from 'fuesim-digital-shared';
 import {
+    scoutableElementKeys,
     isInSpecificSimulatedRegion,
     isInTransfer,
     nestedCoordinatesOf,
 } from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
+import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
 
 // Properties
 
@@ -32,6 +34,10 @@ export function selectPropertyFactory<Key extends keyof ExerciseState>(
 ) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
 }
+
+export const scoutableElementSelectors = scoutableElementKeys.map((key) =>
+    selectPropertyFactory(elementTypePluralMap[key])
+);
 
 // UUIDMap properties
 export const selectViewports = selectPropertyFactory('viewports');
@@ -131,6 +137,13 @@ export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
         (radiograms) => radiograms[id] as R
     );
 }
+
+export const elementTypeNameCreateSelectorDectionary = new Map<
+    string,
+    (id: string) => MemoizedSelector<AppState, any, any>
+>()
+    .set('patient', createSelectPatient)
+    .set('mapImage', createSelectMapImage);
 
 // Misc selectors
 

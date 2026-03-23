@@ -1,4 +1,4 @@
-@if (this.currentRole() == 'trainer') {
+@if (this.currentRole() === 'trainer') {
     <ng-container>
         <form (ngSubmit)="onSubmit()">
             <div class="NgxEditor__Wrapper">
@@ -11,12 +11,14 @@
                 >
                 </ngx-editor>
             </div>
-            <button type="submit" class="btn btn-primary">Speichern</button>
-            <!-- deleteContent() -->
-            <button class="btn btn-danger float-end" (click)="deleteContent()">
-                Löschen
-            </button>
-            <!-- @JohannesPotzi: TODO Indikator, dass erfolreich gesafed wurde -->
+            @if (
+                editorForm.editorContent().value() ===
+                this.userGeneratedContentElement()?.content
+            ) {
+                <button class="btn btn-outline-success">Gespeichert</button>
+            } @else {
+                <button type="submit" class="btn btn-primary">Speichern</button>
+            }
         </form>
     </ng-container>
 }

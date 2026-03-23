@@ -5,7 +5,6 @@ import {
     OnDestroy,
     OnInit,
     output,
-    Signal,
     signal,
 } from '@angular/core';
 import { form } from '@angular/forms/signals';
@@ -31,15 +30,24 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
     readonly userGeneratedContentId = input.required<UUID>();
     readonly contentAssignedElement =
         input.required<ContentAssignableElement>();
-    userGeneratedContentElement: Signal<UserGeneratedContent | null> =
-        signal(null);
+    readonly userGeneratedContentElement = signal<UserGeneratedContent | null>(
+        null
+    );
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     public readonly currentRole = this.store.selectSignal(
         selectCurrentMainRole
     );
     editor!: Editor;
-    toolbar: Toolbar = [['image']];
+    toolbar: Toolbar = [
+        ['bold', 'italic'],
+        ['underline', 'strike'],
+        ['blockquote'],
+        ['ordered_list', 'bullet_list'],
+        ['link', 'image'],
+        ['text_color', 'background_color'],
+        ['align_left', 'align_center', 'align_right', 'align_justify'],
+    ];
 
     /* TODO @JohannesPotzi: Validators for image urls */
     readonly editorModel = signal({
@@ -50,9 +58,10 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.editor = new Editor();
-
-        this.userGeneratedContentElement = this.store.selectSignal(
-            createSelectUserGeneratedContent(this.userGeneratedContentId())
+        this.userGeneratedContentElement.set(
+            this.store.selectSignal(
+                createSelectUserGeneratedContent(this.userGeneratedContentId())
+            )()
         );
         this.editorForm
             .editorContent()

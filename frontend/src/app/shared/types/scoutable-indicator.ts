@@ -1,6 +1,13 @@
-import { MapCoordinates, UUID } from 'fuesim-digital-shared';
+import type {
+    MapCoordinates,
+    ScoutableElementType,
+    UUID,
+} from 'fuesim-digital-shared';
 
 export interface ScoutableIndicator {
     readonly id: `${UUID}:${UUID}`;
-    readonly elementPosition: MapCoordinates;
+    readonly position: MapCoordinates;
+    readonly scoutableElementType: ScoutableElementType;
+    readonly scoutableElementId: UUID;
+    readonly isPaticipantVisible: boolean;
 }

@@ -239,7 +239,7 @@ describe('join parallel exercise', () => {
                         ''
                     );
 
-                    await socket.emit('startParallelExercise');
+                    await socket.emit('controlParallelExercise', 'start');
 
                     for (const joinedParticipant of [
                         joinedParticipant1,
@@ -253,7 +253,7 @@ describe('join parallel exercise', () => {
                         expect(state.currentStatus).toBe('running');
                     }
 
-                    await socket.emit('pauseParallelExercise');
+                    await socket.emit('controlParallelExercise', 'pause');
 
                     for (const joinedParticipant of [
                         joinedParticipant1,

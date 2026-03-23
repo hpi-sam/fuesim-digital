@@ -98,7 +98,7 @@ export class ParallelExerciseService {
 
     public async startParallelExercise() {
         const joinResponse = await new Promise<SocketResponse>((resolve) => {
-            this.socket.emit('startParallelExercise', resolve);
+            this.socket.emit('controlParallelExercise', 'start', resolve);
         });
 
         if (!joinResponse.success) {
@@ -113,7 +113,7 @@ export class ParallelExerciseService {
 
     public async pauseParallelExercise() {
         const joinResponse = await new Promise<SocketResponse>((resolve) => {
-            this.socket.emit('pauseParallelExercise', resolve);
+            this.socket.emit('controlParallelExercise', 'pause', resolve);
         });
 
         if (!joinResponse.success) {

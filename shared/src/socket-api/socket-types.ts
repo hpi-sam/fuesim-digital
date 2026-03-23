@@ -35,10 +35,8 @@ export interface ClientToServerEvents {
             response: SocketResponse<JoinParallelExerciseResponseData>
         ) => void
     ) => void;
-    startParallelExercise: (
-        callback: (response: SocketResponse) => void
-    ) => void;
-    pauseParallelExercise: (
+    controlParallelExercise: (
+        action: 'pause' | 'start',
         callback: (response: SocketResponse) => void
     ) => void;
 }

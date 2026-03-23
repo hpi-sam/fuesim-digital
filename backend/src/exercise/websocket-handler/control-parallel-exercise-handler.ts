@@ -3,11 +3,11 @@ import { clientMap } from '../client-map.js';
 import { ParallelExerciseClientWrapper } from '../client-wrapper.js';
 import { secureOn } from './secure-on.js';
 
-export const registerPauseParallelExerciseHandler = (
+export const registerControlParallelExerciseHandler = (
     io: ExerciseServer,
     socket: ExerciseSocket
 ) => {
-    secureOn(socket, 'pauseParallelExercise', async (callback) => {
+    secureOn(socket, 'controlParallelExercise', async (action, callback) => {
         const clientWrapper = clientMap.get(socket);
         if (!(clientWrapper instanceof ParallelExerciseClientWrapper)) {
             return;
@@ -20,7 +20,14 @@ export const registerPauseParallelExerciseHandler = (
             });
             return;
         }
-        await clientWrapper.pause();
+        switch (action) {
+            case 'start':
+                await clientWrapper.start();
+                break;
+            case 'pause':
+                await clientWrapper.pause();
+                break;
+        }
         callback({
             success: true,
         });

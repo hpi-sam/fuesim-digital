@@ -19,6 +19,7 @@ import {
 import {
     createParallelExercise,
     createViewport,
+    joinParallelExercise,
 } from '../test/parallel-exercise-utils.js';
 
 describe('parallel exercise router', () => {
@@ -281,8 +282,11 @@ describe('parallel exercise router', () => {
         });
 
         it('succeeds deleting', async () => {
-            // TODO Ensure that all exercise instances are cleaned up, too
-            // → join
+            await joinParallelExercise(environment, parallelExercise);
+            expect(
+                environment.services.exerciseService.TESTING_getExerciseMap()
+                    .size
+            ).toBe(6);
 
             await environment
                 .httpRequest(
@@ -371,8 +375,6 @@ describe('parallel exercise router', () => {
             expect(
                 newExercise.temporaryActionHistory[0]!.getAction().actionString
             ).toMatchObject(action);
-
-            // TODO test newJoin signal
         });
     });
 });

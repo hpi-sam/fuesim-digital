@@ -159,6 +159,17 @@ export class ParallelExerciseService {
             throw new PermissionDeniedError();
         }
 
+        const exerciseInstances =
+            await this.parallelExerciseRepository.getParallelExerciseInstancesById(
+                parallelExercise.id
+            );
+
+        await Promise.all(
+            exerciseInstances.map(async (exerciseEntry) =>
+                this.exerciseService.deleteExercise(exerciseEntry.trainerKey)
+            )
+        );
+
         await this.parallelExerciseRepository.deleteParallelExerciseById(id);
         await this.accessKeyService.free(parallelExercise.participantKey);
     }

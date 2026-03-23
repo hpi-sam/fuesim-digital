@@ -68,63 +68,58 @@
                 }
                 <div class="flex-grow-1"></div>
                 <div>
-                    @if (exerciseType !== 'parallel') {
-                        <div ngbDropdown class="d-inline-block">
+                    <div ngbDropdown class="d-inline-block">
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary"
+                            ngbDropdownToggle
+                            data-cy="exportMenuButton"
+                        >
+                            <i class="bi-cloud-download me-2"> </i>
+                            Exportieren
+                        </button>
+                        <!-- "position: absolute" is only set with a delay by "ngbDropdownMenu", therefore the map canvas has the wrong height when it is initialized -->
+                        <div ngbDropdownMenu class="position-absolute">
                             <button
-                                type="button"
-                                class="btn btn-outline-primary"
-                                ngbDropdownToggle
-                                data-cy="exportMenuButton"
+                                ngbDropdownItem
+                                (click)="exportExerciseWithHistory()"
+                            >
+                                <i class="bi-clock-history me-2"> </i>
+                                Kompletten Verlauf
+                            </button>
+                            <button
+                                ngbDropdownItem
+                                (click)="exportExerciseState()"
                             >
                                 <i class="bi-cloud-download me-2"> </i>
-                                Exportieren
+                                Aktuellen Zustand
+                                @if (
+                                    timeConstraints$ | async;
+                                    as timeConstraints
+                                ) {
+                                    <span class="text-muted">
+                                        um
+                                        {{
+                                            timeConstraints.current
+                                                | formatDuration
+                                        }}
+                                    </span>
+                                }
                             </button>
-                            <!-- "position: absolute" is only set with a delay by "ngbDropdownMenu", therefore the map canvas has the wrong height when it is initialized -->
-                            <div ngbDropdownMenu class="position-absolute">
-                                <button
-                                    ngbDropdownItem
-                                    (click)="exportExerciseWithHistory()"
-                                >
-                                    <i class="bi-clock-history me-2"> </i>
-                                    Kompletten Verlauf
-                                </button>
-                                <button
-                                    ngbDropdownItem
-                                    (click)="exportExerciseState()"
-                                >
-                                    <i class="bi-cloud-download me-2"> </i>
-                                    Aktuellen Zustand
-                                    @if (
-                                        timeConstraints$ | async;
-                                        as timeConstraints
-                                    ) {
-                                        <span class="text-muted">
-                                            um
-                                            {{
-                                                timeConstraints.current
-                                                    | formatDuration
-                                            }}
-                                        </span>
-                                    }
-                                </button>
-                                <button
-                                    ngbDropdownItem
-                                    (click)="partialExport()"
-                                >
-                                    <i class="bi-card-list me-2"> </i>
-                                    Vorlagen exportieren
-                                </button>
-                                <button
-                                    ngbDropdownItem
-                                    (click)="patientsCsvExport()"
-                                    data-cy="exportPatientsCsvButton"
-                                >
-                                    <i class="bi-hospital me-2"> </i>
-                                    Patienten für IVENA MANV
-                                </button>
-                            </div>
+                            <button ngbDropdownItem (click)="partialExport()">
+                                <i class="bi-card-list me-2"> </i>
+                                Vorlagen exportieren
+                            </button>
+                            <button
+                                ngbDropdownItem
+                                (click)="patientsCsvExport()"
+                                data-cy="exportPatientsCsvButton"
+                            >
+                                <i class="bi-hospital me-2"> </i>
+                                Patienten für IVENA MANV
+                            </button>
                         </div>
-                    }
+                    </div>
                     <div class="btn-group ms-3" role="group">
                         <a
                             class="btn btn-outline-secondary"

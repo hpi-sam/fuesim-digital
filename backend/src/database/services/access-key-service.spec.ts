@@ -39,7 +39,6 @@ describe('access key service', () => {
         });
 
         it('should allow another key after freeing', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
             await environment.services.accessKeyService.free(generatedKeys[0]!);
             await expect(async () =>
                 environment.services.accessKeyService.generateKey(6)
@@ -49,7 +48,6 @@ describe('access key service', () => {
 
     describe('different length', () => {
         beforeEach(async () => {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
             await environment.services.accessKeyService.free(generatedKeys[0]!);
         });
 
@@ -58,7 +56,7 @@ describe('access key service', () => {
                 (await environment.services.accessKeyService.generateKey(8))
                     .length
             ).toBe(8);
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+
             await environment.services.accessKeyService.free(generatedKeys[1]!);
             expect(
                 (await environment.services.accessKeyService.generateKey(50))

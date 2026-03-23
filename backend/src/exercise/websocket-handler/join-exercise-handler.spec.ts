@@ -34,7 +34,6 @@ describe('join exercise', () => {
             expect(joinExercise.payload).toBeDefined();
 
             const getState = await clientSocket.emit('getState');
-
             expect(getState.success).toBe(true);
 
             assert(getState.success);
@@ -108,7 +107,7 @@ describe('join exercise', () => {
         });
 
         it('fails joining with participant key if not logged in', async () => {
-            const exercise = environment.exerciseService
+            const exercise = environment.services.exerciseService
                 .TESTING_getExerciseMap()
                 .get(exerciseTemplate.trainerKey)!;
             await environment.withWebsocket(async (socket) => {
@@ -122,7 +121,7 @@ describe('join exercise', () => {
             });
         });
         it('fails joining with participant key if logged in', async () => {
-            const exercise = environment.exerciseService
+            const exercise = environment.services.exerciseService
                 .TESTING_getExerciseMap()
                 .get(exerciseTemplate.trainerKey)!;
             await environment.withWebsocket(async (socket) => {

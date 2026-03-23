@@ -10,6 +10,7 @@ import {
 import { AsyncPipe } from '@angular/common';
 import { AuthService } from '../../../core/auth.service';
 import { UserAccountNavbarItemComponent } from '../user-account-navbar-item/user-account-navbar-item.component';
+import { ApiService } from '../../../core/api.service';
 
 @Component({
     selector: 'app-header',
@@ -29,4 +30,8 @@ import { UserAccountNavbarItemComponent } from '../user-account-navbar-item/user
 export class HeaderComponent {
     route = inject(ActivatedRoute);
     readonly auth = inject(AuthService);
+    readonly apiService = inject(ApiService);
+
+    readonly parallelExercisesEnabled =
+        this.apiService.getParallelExercisesEnabledResource();
 }

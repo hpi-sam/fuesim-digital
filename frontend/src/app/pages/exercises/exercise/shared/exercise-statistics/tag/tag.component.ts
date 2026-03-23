@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { Tag } from 'fuesim-digital-shared';
+import type { Tag } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-tag',

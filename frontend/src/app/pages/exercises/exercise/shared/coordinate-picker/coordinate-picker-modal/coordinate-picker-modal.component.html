@@ -10,11 +10,9 @@
         <input
             class="form-control"
             type="text"
-            [(ngModel)]="latitude"
-            required
-            appGeographicCoordinateValidator
-            #latInput="ngModel"
+            [formField]="coordinatesForm.latitude"
         />
+        <app-display-model-validation [field]="coordinatesForm.latitude()" />
     </div>
 
     <div class="form-group mb-3">
@@ -22,18 +20,16 @@
         <input
             class="form-control"
             type="text"
-            [(ngModel)]="longitude"
-            required
-            appGeographicCoordinateValidator
-            #lonInput="ngModel"
+            [formField]="coordinatesForm.longitude"
         />
+        <app-display-model-validation [field]="coordinatesForm.longitude()" />
     </div>
 
     <button
         (click)="goToCoordinates()"
         class="btn btn-primary me-1"
         type="button"
-        [disabled]="latInput.invalid || lonInput.invalid"
+        [disabled]="coordinatesForm().invalid()"
     >
         Übernehmen
     </button>

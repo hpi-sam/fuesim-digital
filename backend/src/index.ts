@@ -12,6 +12,12 @@ import { UserRepository } from './database/repositories/user-repository.js';
 import { SessionRepository } from './database/repositories/session-repository.js';
 import { AuthService } from './auth/auth-service.js';
 import { ExerciseManagerService } from './database/services/exercise-manager-service.js';
+import { AccessKeyService } from './database/services/access-key-service.js';
+import { AccessKeyRepository } from './database/repositories/access-key-repository.js';
+import type { Repositories } from './database/repositories/index.js';
+import { ParallelExerciseRepository } from './database/repositories/parallel-exercise-repository.js';
+import type { Services } from './database/services/index.js';
+import { ParallelExerciseService } from './database/services/parallel-exercise-service.js';
 
 async function main() {
     Config.initialize();
@@ -31,38 +37,63 @@ async function main() {
     }
     console.log('Successfully connected to the database.');
 
-    const exerciseRepository = new ExerciseRepository(
-        databaseService.databaseConnection
-    );
-    const actionRepository = new ActionRepository(
-        databaseService.databaseConnection
-    );
-    const userRepository = new UserRepository(
-        databaseService.databaseConnection
-    );
-    const sessionRepository = new SessionRepository(
-        databaseService.databaseConnection
-    );
+    const repositories: Repositories = {
+        exerciseRepository: new ExerciseRepository(
+            databaseService.databaseConnection
+        ),
+        actionRepository: new ActionRepository(
+            databaseService.databaseConnection
+        ),
+        userRepository: new UserRepository(databaseService.databaseConnection),
+        sessionRepository: new SessionRepository(
+            databaseService.databaseConnection
+        ),
+        accessKeyRepository: new AccessKeyRepository(
+            databaseService.databaseConnection
+        ),
+        parallelExerciseRepository: new ParallelExerciseRepository(
+            databaseService.databaseConnection
+        ),
+    };
 
+    const accessKeyService = new AccessKeyService(
+        repositories.accessKeyRepository
+    );
     const exerciseService = new ExerciseService(
-        exerciseRepository,
-        actionRepository
+        repositories.exerciseRepository,
+        repositories.actionRepository,
+        accessKeyService
     );
     const exerciseManagerService = new ExerciseManagerService(
-        exerciseRepository,
-        actionRepository
+        repositories.exerciseRepository,
+        exerciseService
+    );
+    const parallelExerciseService = new ParallelExerciseService(
+        repositories.parallelExerciseRepository,
+        accessKeyService,
+        exerciseManagerService,
+        exerciseService
     );
 
     let authService: AuthService;
     try {
         authService = await new AuthService(
-            userRepository,
-            sessionRepository
+            repositories.userRepository,
+            repositories.sessionRepository
         ).initialize();
     } catch (e: unknown) {
         console.error('Error initializing AuthService:');
         throw e;
     }
+
+    const services: Services = {
+        authService,
+        exerciseManagerService,
+        exerciseService,
+        parallelExerciseService,
+        accessKeyService,
+        databaseService,
+    };
 
     if (Config.useDb) {
         try {
@@ -100,12 +131,7 @@ async function main() {
     }
 
     // eslint-disable-next-line no-new
-    new FuesimServer(
-        databaseService,
-        exerciseService,
-        authService,
-        exerciseManagerService
-    );
+    new FuesimServer(services);
 }
 
 main();

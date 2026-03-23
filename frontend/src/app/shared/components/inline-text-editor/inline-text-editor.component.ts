@@ -1,15 +1,17 @@
 import { Component, input, model, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
+import { AutofocusDirective } from '../../directives/autofocus.directive';
 
 @Component({
     selector: 'app-inline-text-editor',
     templateUrl: './inline-text-editor.component.html',
     styleUrls: ['./inline-text-editor.component.scss'],
-    imports: [FormsModule, DisplayValidationComponent],
+    imports: [FormsModule, DisplayValidationComponent, AutofocusDirective],
 })
 export class InlineTextEditorComponent {
     readonly required = input<boolean>(false);
+    readonly singleLine = input<boolean>(false);
     readonly value = model<string>('');
     newValue = '';
     readonly update = output<string>();

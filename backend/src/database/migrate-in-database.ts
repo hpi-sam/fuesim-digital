@@ -46,7 +46,7 @@ export async function migrateInDatabase(
     exercise.initialStateString = initialState;
     exercise.currentStateString = currentState;
 
-    await exerciseRepository.saveExerciseState(exerciseId, exercise);
+    await exerciseRepository.saveExerciseState(exercise);
 
     // Save actions
     let patchedActionsIndex = 0;

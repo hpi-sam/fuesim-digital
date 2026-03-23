@@ -1,29 +1,36 @@
 import {
+    type ExerciseId,
     isTrainerKey,
     type ExerciseKey,
     type ExerciseTimeline,
 } from 'fuesim-digital-shared';
-import type { InferInsertModel } from 'drizzle-orm';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
-import type { ClientWrapper } from '../../exercise/client-wrapper.js';
 import { ExerciseFactory } from '../../exercise/exercise-factory.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { removeAll, pushAll } from '../../utils/array.js';
-import { UserReadableIdGenerator } from '../../utils/user-readable-id-generator.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type { exerciseTable, ExerciseTemplateEntry } from '../schema.js';
+import type { ExerciseInsert } from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
+import type { AccessKeyService } from './access-key-service.js';
 
 export class ExerciseService {
+    public readonly exerciseFactory: ExerciseFactory;
+
     public constructor(
         private readonly exerciseRepository: ExerciseRepository,
-        private readonly actionRepository: ActionRepository
-    ) {}
+        private readonly actionRepository: ActionRepository,
+        private readonly accessKeyService: AccessKeyService
+    ) {
+        this.exerciseFactory = new ExerciseFactory(accessKeyService, this);
+    }
 
-    private readonly exerciseMap = new Map<ExerciseKey, ActiveExercise>();
+    private readonly exerciseMap = new Map<
+        ExerciseId | ExerciseKey,
+        ActiveExercise
+    >();
 
     public getExerciseByKey(
         exerciseKey: ExerciseKey,
@@ -48,6 +55,12 @@ export class ExerciseService {
         return new Set(this.exerciseMap.values());
     }
 
+    public async loadExercise(activeExercise: ActiveExercise) {
+        this.exerciseMap.set(activeExercise.participantKey, activeExercise);
+        this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
+        this.exerciseMap.set(activeExercise.exercise.id, activeExercise);
+    }
+
     /**
      * Removes `exercise` from the set of active exercises
      */
@@ -56,38 +69,22 @@ export class ExerciseService {
 
         this.exerciseMap.delete(exercise.participantKey);
         this.exerciseMap.delete(exercise.trainerKey);
+        this.exerciseMap.delete(exercise.exercise.id);
     }
 
-    public async createTemplate(
-        templateExercise: ActiveExercise,
-        exerciseTemplate: ExerciseTemplateEntry
-    ) {
-        templateExercise.template = exerciseTemplate;
-        await this.createExercise(templateExercise, {
-            templateId: exerciseTemplate.id,
-        });
+    public async freeExerciseKeys(exercise: ActiveExercise) {
+        await this.accessKeyService.free(exercise.participantKey);
+        await this.accessKeyService.free(exercise.trainerKey);
     }
 
-    public async createExercise(
-        activeExercise: ActiveExercise,
-        optionalData?: Partial<InferInsertModel<typeof exerciseTable>>
-    ) {
-        const result = await this.exerciseRepository.createExercise(
-            activeExercise,
-            optionalData
-        );
-        activeExercise.setExerciseId(result!.id);
-
-        this.exerciseMap.set(activeExercise.participantKey, activeExercise);
-        this.exerciseMap.set(activeExercise.trainerKey, activeExercise);
-        UserReadableIdGenerator.lock([
-            activeExercise.participantKey,
-            activeExercise.trainerKey,
+    public async createExercise(exercise: ExerciseInsert) {
+        const exerciseEntry =
+            await this.exerciseRepository.createExercise(exercise);
+        await this.accessKeyService.lock([
+            exercise.participantKey,
+            exercise.trainerKey,
         ]);
-    }
-
-    public leaveExercise(exerciseKey: ExerciseKey, client: ClientWrapper) {
-        this.getExerciseByKey(exerciseKey, client.session).removeClient(client);
+        return exerciseEntry!;
     }
 
     /**
@@ -120,7 +117,7 @@ export class ExerciseService {
                                     exerciseEntity.exercise_entity.id
                                 );
 
-                            const exercise = ExerciseFactory.fromDatabase(
+                            const exercise = this.exerciseFactory.fromDatabase(
                                 exerciseEntity.exercise_entity,
                                 actions
                             );
@@ -155,14 +152,15 @@ export class ExerciseService {
                 await Promise.all(
                     // The actions have already been saved in the database -> do not keep them
                     exercises.map(async (exercise) =>
-                        ExerciseFactory.restore(exercise, false)
+                        this.exerciseFactory.restore(exercise, false)
                     )
                 );
                 exercises.forEach((exercise) => {
                     this.exerciseMap.set(exercise.participantKey, exercise);
                     this.exerciseMap.set(exercise.trainerKey, exercise);
+                    this.exerciseMap.set(exercise.exercise.id, exercise);
+                    this.loadExercise(exercise);
                 });
-                UserReadableIdGenerator.lock([...this.exerciseMap.keys()]);
                 return exercises;
             }
         );
@@ -186,7 +184,7 @@ export class ExerciseService {
         const activeExercise = this.getExerciseByKey(exerciseKey, session);
 
         const exerciseEntry = await this.exerciseRepository.getExerciseById(
-            activeExercise.exerciseId
+            activeExercise.exercise.id
         );
         if (!exerciseEntry) {
             throw new NotFoundError();
@@ -205,8 +203,9 @@ export class ExerciseService {
         this.unloadExercise(activeExercise);
 
         await this.exerciseRepository.deleteExerciseById(
-            activeExercise.exerciseId
+            activeExercise.exercise.id
         );
+        await this.freeExerciseKeys(activeExercise);
     }
 
     public async saveUnsavedExercises() {
@@ -217,13 +216,12 @@ export class ExerciseService {
                     .map(async (activeExercise) => {
                         activeExercise.markAsAboutToBeSaved();
                         await repoTransaction.saveExerciseState(
-                            activeExercise.exerciseId,
-                            activeExercise.getExercise()
+                            activeExercise.exercise
                         );
 
                         await this.actionRepository
                             .withConnection(repoTransaction)
-                            .saveActions(activeExercise.getSaveableActions());
+                            .saveActions(activeExercise.getSavableActions());
 
                         activeExercise.markAsSaved();
                     })
@@ -239,7 +237,7 @@ export class ExerciseService {
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
                 await this.actionRepository.getActionsForExerciseId(
-                    activeExercise.exerciseId
+                    activeExercise.exercise.id
                 )
             ).map((action) => ({
                 action: action.actionString,
@@ -256,9 +254,19 @@ export class ExerciseService {
             .sort((a, b) => a.time - b.time);
 
         return {
-            initialState: activeExercise.getExercise().initialStateString,
+            initialState: activeExercise.exercise.initialStateString,
             actionsWrappers: completeHistory,
         };
+    }
+
+    public getExercisesViewportsById(id: ExerciseId) {
+        const activeExercise = this.exerciseMap.get(id);
+        if (!activeExercise) {
+            throw new NotFoundError();
+        }
+        return Object.values(
+            activeExercise.exercise.currentStateString.viewports
+        );
     }
 
     /**

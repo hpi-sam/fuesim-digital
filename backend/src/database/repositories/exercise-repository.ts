@@ -1,10 +1,8 @@
 import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
 import { ExerciseState } from 'fuesim-digital-shared';
-import type { InferInsertModel } from 'drizzle-orm';
 import { sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
-import type { ExerciseTemplateInsert } from '../schema.js';
+import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
-import type { ActiveExercise } from '../../exercise/active-exercise.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
@@ -145,46 +143,29 @@ export class ExerciseRepository extends BaseRepository {
             );
     }
 
-    public async saveExerciseState(
-        exerciseId: ExerciseId,
-        exercisePatch: InferInsertModel<typeof exerciseTable>
-    ) {
-        const exercisePatchWithId = {
-            id: exerciseId,
-            ...exercisePatch,
+    public async saveExerciseState(exercise: ExerciseInsert) {
+        const exercisePatch = {
+            ...exercise,
             lastUsedAt: new Date(),
         };
 
         return this.onlySingle(
             await this.databaseConnection
                 .insert(exerciseTable)
-                .values(exercisePatchWithId)
+                .values(exercisePatch)
                 .onConflictDoUpdate({
                     target: exerciseTable.id,
-                    set: exercisePatchWithId,
+                    set: exercisePatch,
                 })
                 .returning()
         );
     }
 
-    public async createExercise(
-        activeExercise: ActiveExercise,
-        optionalData?: Partial<InferInsertModel<typeof exerciseTable>>
-    ) {
-        const exercise = activeExercise.getExercise();
+    public async createExercise(exercise: ExerciseInsert) {
         return this.onlySingle(
             await this.databaseConnection
                 .insert(exerciseTable)
-                .values({
-                    ...(optionalData ?? {}),
-                    id: activeExercise.exerciseId,
-                    currentStateString: exercise.currentStateString,
-                    initialStateString: exercise.initialStateString,
-                    tickCounter: exercise.tickCounter,
-                    stateVersion: exercise.stateVersion,
-                    trainerKey: exercise.trainerKey,
-                    participantKey: exercise.participantKey,
-                })
+                .values(exercise)
                 .returning()
         );
     }

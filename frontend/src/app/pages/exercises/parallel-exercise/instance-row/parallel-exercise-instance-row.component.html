@@ -1,0 +1,23 @@
+<td>
+    @if (exerciseInstance().isActive) {
+        <span class="badge bg-primary">aktiv</span>
+    }
+</td>
+<td>
+    <code class="me-2">{{ exerciseInstance().participantKey }}</code>
+    <app-copy-button [value]="participantUrl()" />
+</td>
+<td>{{ exerciseInstance().clientNames.join(', ') }}</td>
+<td>
+    @if (exerciseInstance().lastLogEntry; as lastLogEntry) {
+        <app-log-entry [logEntry]="lastLogEntry" />
+    }
+</td>
+<td>
+    <a
+        [routerLink]="`/exercises/${exerciseInstance().trainerKey}`"
+        class="btn btn-sm btn-outline-primary float-end"
+    >
+        Öffnen
+    </a>
+</td>

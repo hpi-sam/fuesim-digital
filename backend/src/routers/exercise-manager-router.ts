@@ -3,17 +3,16 @@ import {
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     postExerciseTemplateRequestDataSchema,
+    getExerciseTemplateViewportsResponseDataSchema,
     patchExerciseTemplateRequestDataSchema,
     exerciseTemplateIdSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
-import type { ExerciseService } from '../database/services/exercise-service.js';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 
 export const createExerciseManagerRouter = (
-    exerciseManagerService: ExerciseManagerService,
-    exerciseService: ExerciseService
+    exerciseManagerService: ExerciseManagerService
 ): Router => {
     const router = Router();
 
@@ -42,8 +41,7 @@ export const createExerciseManagerRouter = (
             const exerciseTemplate =
                 await exerciseManagerService.createExerciseTemplate(
                     parsedData,
-                    req.session!,
-                    exerciseService
+                    req.session!
                 );
 
             res.status(201).send(
@@ -59,8 +57,8 @@ export const createExerciseManagerRouter = (
             const newExercise =
                 await exerciseManagerService.createExerciseFromTemplate(
                     templateId,
-                    req.session!,
-                    exerciseService
+                    'standalone',
+                    req.session
                 );
 
             res.status(201).send({
@@ -68,6 +66,19 @@ export const createExerciseManagerRouter = (
                 trainerKey: newExercise.trainerKey,
             });
         });
+
+    router.get('/exercise_templates/:id/viewports', async (req, res) => {
+        const templateId = exerciseTemplateIdSchema.parse(req.params.id);
+        const viewports =
+            await exerciseManagerService.getExerciseTemplateViewportsById(
+                templateId,
+                req.session!
+            );
+
+        res.status(201).send(
+            getExerciseTemplateViewportsResponseDataSchema.encode(viewports)
+        );
+    });
 
     router
         .route('/exercise_templates/:id')
@@ -94,8 +105,7 @@ export const createExerciseManagerRouter = (
 
             await exerciseManagerService.deleteExerciseTemplate(
                 templateId,
-                req.session!,
-                exerciseService
+                req.session!
             );
             res.status(204).send();
         });

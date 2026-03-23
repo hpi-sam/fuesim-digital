@@ -1,46 +1,71 @@
 import { effect, signal, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { toLonLat } from 'ol/proj';
+import {
+    form,
+    FormField,
+    validateStandardSchema,
+} from '@angular/forms/signals';
+import { z } from 'zod';
 import { FormsModule } from '@angular/forms';
-import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
-import { GeographicCoordinateDirective } from '../../../../../../shared/validation/geographic-coordinate-validator.directive';
+import {
+    coordinateStringSchema,
+    OlMapCoordinatesInput,
+    olMapCoordinatesSchema,
+} from '../../exercise-map/utility/ol-map-manager';
+import { OlMapManagerService } from '../../exercise-map/utility/ol-map-manager.service';
+import { DisplayModelValidationComponent } from '../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 
 @Component({
     selector: 'app-coordinate-picker-modal',
     templateUrl: './coordinate-picker-modal.component.html',
     styleUrls: ['./coordinate-picker-modal.component.scss'],
-    imports: [FormsModule, GeographicCoordinateDirective],
+    imports: [FormsModule, DisplayModelValidationComponent, FormField],
 })
 export class CoordinatePickerModalComponent {
     activeModal = inject(NgbActiveModal);
+    private readonly olMapManagerService = inject(OlMapManagerService);
 
-    public readonly olMapManager = signal<OlMapManager | null>(null);
-
-    public readonly latitude = signal('');
-    public readonly longitude = signal('');
+    public readonly coordinatesModel = signal<OlMapCoordinatesInput>({
+        longitude: '',
+        latitude: '',
+    });
+    public readonly coordinatesForm = form(
+        this.coordinatesModel,
+        (schemaPath) => {
+            validateStandardSchema(
+                schemaPath,
+                z.object({
+                    longitude: coordinateStringSchema,
+                    latitude: coordinateStringSchema,
+                })
+            );
+        }
+    );
 
     constructor() {
         effect(() => {
-            const olMapManager = this.olMapManager();
-            if (olMapManager && !this.latitude()) {
-                const center = olMapManager.getCoordinates();
+            if (
+                this.olMapManagerService.olMapManager &&
+                !this.coordinatesModel().longitude
+            ) {
+                const coordinates =
+                    this.olMapManagerService.olMapManager.getLonLat();
 
-                if (!center) return;
+                if (!coordinates) return;
 
-                const latLonCoordinates = toLonLat(center)
-                    .reverse()
-                    .map((coordinate) => coordinate.toFixed(6));
-
-                this.latitude.set(latLonCoordinates[0]!);
-                this.longitude.set(latLonCoordinates[1]!);
+                this.coordinatesModel.set(
+                    olMapCoordinatesSchema.encode({
+                        longitude: coordinates[0]!,
+                        latitude: coordinates[1]!,
+                    })
+                );
             }
         });
     }
 
     public goToCoordinates() {
-        this.olMapManager()!.tryGoToCoordinates(
-            +this.latitude(),
-            +this.longitude()
+        this.olMapManagerService.olMapManager!.tryGoToCoordinates(
+            olMapCoordinatesSchema.parse(this.coordinatesModel())
         );
         this.activeModal.close();
     }

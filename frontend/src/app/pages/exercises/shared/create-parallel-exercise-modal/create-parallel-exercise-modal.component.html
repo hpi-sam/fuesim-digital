@@ -1,0 +1,72 @@
+<div class="modal-header">
+    <h4 class="modal-title">Neue Parallelübung erstellen</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    @if (exerciseTemplate(); as exerciseTemplate) {
+        <form #f="ngForm" (ngSubmit)="create()">
+            <div class="form-group mb-2">
+                <label class="form-label">Übungsvorlage</label>
+                <input
+                    [value]="exerciseTemplate.name"
+                    readonly
+                    disabled
+                    class="form-control"
+                    type="text"
+                />
+            </div>
+
+            <div class="form-group mb-2">
+                <label class="form-label">Name der Parallelübung</label>
+                <p class="small text-muted mb-1">
+                    Vergeben Sie einen Namen, um die Übung später leicht
+                    wiederzufinden.
+                </p>
+                <input
+                    [formField]="parallelExerciseForm.name"
+                    class="form-control"
+                    type="text"
+                />
+                <app-display-model-validation
+                    [field]="parallelExerciseForm.name()"
+                />
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label">Startansicht</label>
+                <p class="small text-muted mb-1">
+                    Dieser Ansicht werden die Teilnehmenden automatisch
+                    beitreten.
+                </p>
+                <select
+                    [formField]="parallelExerciseForm.joinViewportId"
+                    class="form-control"
+                    [class.placeholder]="viewportsLoading()"
+                >
+                    @for (viewport of viewports(); track viewport.id) {
+                        <option [value]="viewport.id">
+                            {{ viewport.name }}
+                        </option>
+                    }
+                </select>
+                <app-display-model-validation
+                    [field]="parallelExerciseForm.joinViewportId()"
+                />
+                @if (!viewportsLoading() && !viewports()?.length) {
+                    <div class="alert alert-warning mt-2" role="alert">
+                        Diese Übungsvorlage hat keine Ansichten. Bitte fügen Sie
+                        mindestens eine Ansicht für Teilnehmende ein, damit
+                        diese der Übung beitreten können.
+                    </div>
+                }
+            </div>
+
+            <button
+                class="btn btn-primary"
+                [disabled]="parallelExerciseForm().invalid()"
+            >
+                Parallelübung erstellen
+            </button>
+        </form>
+    }
+</div>

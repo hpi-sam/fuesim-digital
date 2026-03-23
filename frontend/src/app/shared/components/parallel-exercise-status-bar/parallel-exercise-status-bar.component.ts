@@ -1,0 +1,79 @@
+import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Store } from '@ngrx/store';
+import {
+    GetParallelExerciseResponseData,
+    ParallelExerciseId,
+    ParallelExerciseInstanceSummary,
+} from 'fuesim-digital-shared';
+import { Router, RouterLink } from '@angular/router';
+import {
+    NgbDropdown,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
+import type { AppState } from '../../../state/app.state';
+import {
+    selectCollectedClientNames,
+    selectParticipantKey,
+} from '../../../state/application/selectors/exercise.selectors';
+import { ExerciseService } from '../../../core/exercise.service';
+import { ApiService } from '../../../core/api.service';
+import { ParallelExerciseService } from '../../../core/parallel-exercise.service';
+import { OlMapManagerService } from '../../../pages/exercises/exercise/shared/exercise-map/utility/ol-map-manager.service';
+import { ExerciseStateBadgeComponent } from '../exercise-state-badge/exercise-state-badge.component';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
+
+@Component({
+    selector: 'app-parallel-exercise-status-bar',
+    templateUrl: './parallel-exercise-status-bar.component.html',
+    styleUrls: ['./parallel-exercise-status-bar.component.scss'],
+    imports: [
+        RouterLink,
+        ExerciseStateBadgeComponent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownItem,
+    ],
+})
+export class ParallelExerciseStatusBarComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly apiService = inject(ApiService);
+    protected readonly parallelExerciseService = inject(
+        ParallelExerciseService
+    );
+    protected readonly exerciseService = inject(ExerciseService);
+    private readonly router = inject(Router);
+    private readonly olMapManagerService = inject(OlMapManagerService);
+
+    public readonly parallelExerciseId = input.required<ParallelExerciseId>();
+    public readonly parallelExercise =
+        signal<GetParallelExerciseResponseData | null>(null);
+
+    protected participantKey = this.store.selectSignal(selectParticipantKey);
+    protected collectedClientNames = this.store.selectSignal(
+        selectCollectedClientNames
+    );
+
+    openExerciseInstance(exerciseInstance: ParallelExerciseInstanceSummary) {
+        this.router.navigate(['/exercises', exerciseInstance.trainerKey], {
+            queryParams:
+                this.olMapManagerService.olMapManager?.getCoordinatesAsQueryParams(),
+        });
+    }
+
+    async ngOnInit() {
+        if (
+            selectStateSnapshot(selectCurrentMainRole, this.store) !== 'trainer'
+        )
+            return;
+        this.parallelExercise.set(
+            await this.apiService.getParallelExercise(this.parallelExerciseId())
+        );
+        await this.parallelExerciseService.joinParallelExercise(
+            this.parallelExerciseId()
+        );
+    }
+}

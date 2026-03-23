@@ -11,3 +11,8 @@ export type ExerciseTemplateId = z.infer<typeof exerciseTemplateIdSchema>;
 
 export const actionIdSchema = uuidSchema.brand<'ActionId'>();
 export type ActionId = z.infer<typeof actionIdSchema>;
+
+export const parallelExerciseIdSchema = z
+    .uuidv4()
+    .brand<'ParallelExerciseId'>();
+export type ParallelExerciseId = z.infer<typeof parallelExerciseIdSchema>;

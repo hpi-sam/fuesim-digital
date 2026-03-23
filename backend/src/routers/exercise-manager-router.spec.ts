@@ -5,7 +5,6 @@ import {
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
 } from 'fuesim-digital-shared';
-import { UserReadableIdGenerator } from '../utils/user-readable-id-generator.js';
 import {
     alternativeTestUserSessionData,
     createExercise,
@@ -18,8 +17,8 @@ describe('exercise manager router', () => {
     const environment = createTestEnvironment();
     let session: string;
     beforeEach(async () => {
-        UserReadableIdGenerator.freeAll();
-        environment.exerciseService.TESTING_getExerciseMap().clear();
+        await environment.repositories.accessKeyRepository.freeAll();
+        environment.services.exerciseService.TESTING_getExerciseMap().clear();
         session = await createTestUserSession(environment);
     });
     describe('GET /api/exercises', () => {
@@ -221,7 +220,7 @@ describe('exercise manager router', () => {
                 .send(newData)
                 .expect(200);
             const exerciseTemplateEntry =
-                (await environment.exerciseRepository.getExerciseTemplateById(
+                (await environment.repositories.exerciseRepository.getExerciseTemplateById(
                     exerciseTemplate.id
                 ))!;
             expect(exerciseTemplateEntry.exercise_template.name).toBe(
@@ -243,7 +242,7 @@ describe('exercise manager router', () => {
                 .send(newData)
                 .expect(200);
             const exerciseTemplateEntry =
-                (await environment.exerciseRepository.getExerciseTemplateById(
+                (await environment.repositories.exerciseRepository.getExerciseTemplateById(
                     exerciseTemplate.id
                 ))!;
             expect(exerciseTemplateEntry.exercise_template.name).toBe(
@@ -296,14 +295,15 @@ describe('exercise manager router', () => {
                 .expect(204);
 
             const exerciseTemplateEntry =
-                await environment.exerciseRepository.getExerciseTemplateById(
+                await environment.repositories.exerciseRepository.getExerciseTemplateById(
                     exerciseTemplate.id
                 );
             expect(exerciseTemplateEntry).toBe(null);
 
             // Related exercise also has to be deleted
             expect(
-                environment.exerciseService.TESTING_getExerciseMap().size
+                environment.services.exerciseService.TESTING_getExerciseMap()
+                    .size
             ).toBe(0);
         });
     });
@@ -374,7 +374,7 @@ describe('exercise manager router', () => {
 
             // Ensure that lastExerciseCreatedAt has been updated
             const exerciseTemplateEntry =
-                (await environment.exerciseRepository.getExerciseTemplateById(
+                (await environment.repositories.exerciseRepository.getExerciseTemplateById(
                     exerciseTemplate.id
                 ))!;
             expect(

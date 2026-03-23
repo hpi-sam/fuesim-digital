@@ -1,5 +1,5 @@
 import type { WritableDraft } from 'immer';
-import { LogEntry } from '../../../models/log-entry.js';
+import { newLogEntry } from '../../../models/log-entry.js';
 import type { ExerciseRadiogram } from '../../../models/radiogram/index.js';
 import type { Tag } from '../../../models/tag.js';
 import { statusNames } from '../../../models/utils/patient-status.js';
@@ -52,7 +52,14 @@ export function log(
 ) {
     if (!logActive(state)) return;
 
-    state.logEntries!.push(new LogEntry(description, tags, state.currentTime));
+    const logEntry = newLogEntry(description, tags, state.currentTime);
+
+    if (state.logEntries) {
+        state.logEntries.push(logEntry);
+    }
+    if (state.type === 'parallel') {
+        state.lastLogEntry = logEntry;
+    }
 }
 
 export function logAlarmGroup(
@@ -892,5 +899,5 @@ function generateCountString<K extends string>(
 }
 
 export function logActive(state: WritableDraft<ExerciseState>): boolean {
-    return !!state.logEntries;
+    return !!state.logEntries || state.type === 'parallel';
 }

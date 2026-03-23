@@ -5,16 +5,16 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import { createExerciseRouter } from './routers/exercise-router.js';
 import { createAuthRouter } from './routers/auth-router.js';
-import type { ExerciseManagerService } from './database/services/exercise-manager-service.js';
-import type { AuthService, SessionInformation } from './auth/auth-service.js';
+import type { SessionInformation } from './auth/auth-service.js';
 import {
     createSessionMiddleware,
     errorHandler,
 } from './utils/http-handlers.js';
-import type { ExerciseService } from './database/services/exercise-service.js';
 import { Config } from './config.js';
 import { createExerciseManagerRouter } from './routers/exercise-manager-router.js';
 import { healthRouter } from './routers/health-router.js';
+import type { Services } from './database/services/index.js';
+import { createParallelExerciseRouter } from './routers/parallel-exercise-router.js';
 
 declare global {
     namespace Express {
@@ -26,12 +26,7 @@ declare global {
 
 export class ApiHttpServer {
     public readonly httpServer: HttpServer;
-    public constructor(
-        app: Express,
-        exerciseService: ExerciseService,
-        authService: AuthService,
-        exerciseManagerService: ExerciseManagerService
-    ) {
+    public constructor(app: Express, services: Services) {
         Config.initialize();
 
         app.use(
@@ -42,20 +37,25 @@ export class ApiHttpServer {
         );
 
         app.use(cookieParser());
-        app.use(createSessionMiddleware(authService));
+        app.use(createSessionMiddleware(services.authService));
 
         app.use(express.json({ limit: `${Config.uploadLimit}mb` }));
 
         app.use('/api', healthRouter);
 
-        app.use('/api', createExerciseRouter(exerciseService));
+        app.use('/api', createExerciseRouter(services.exerciseService));
 
         app.use(
             '/api',
-            createExerciseManagerRouter(exerciseManagerService, exerciseService)
+            createExerciseManagerRouter(services.exerciseManagerService)
         );
 
-        app.use('/api/auth', createAuthRouter(authService));
+        app.use(
+            '/api/parallel_exercises/',
+            createParallelExerciseRouter(services.parallelExerciseService)
+        );
+
+        app.use('/api/auth', createAuthRouter(services.authService));
 
         app.use(errorHandler);
 

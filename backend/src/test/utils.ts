@@ -247,7 +247,6 @@ export const createTestEnvironment = (): TestEnvironment => {
         ).initialize({ skipOidcDiscovery: true });
         exerciseManagerService = new ExerciseManagerService(
             exerciseRepository,
-            actionRepository,
             exerciseService
         );
         parallelExerciseService = new ParallelExerciseService(

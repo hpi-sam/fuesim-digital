@@ -1,6 +1,5 @@
 import type { ExerciseType, ExerciseTemplateId } from 'fuesim-digital-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type { ActionRepository } from '../repositories/action-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
 import {
@@ -13,7 +12,6 @@ import type { ExerciseService } from './exercise-service.js';
 export class ExerciseManagerService {
     public constructor(
         private readonly exerciseRepository: ExerciseRepository,
-        private readonly actionRepository: ActionRepository,
         private readonly exerciseService: ExerciseService
     ) {}
 

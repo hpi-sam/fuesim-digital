@@ -4,7 +4,7 @@ export const addAutojoinViewport48: Migration = {
     action: null,
     state: (state: any) => {
         state.autojoinViewportId = null;
-        state.clientNames = [];
+        state.collectedClientNames = [];
         state.type = 'standalone';
     },
 };

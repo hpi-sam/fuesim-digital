@@ -18,7 +18,7 @@ describe('ActionRepository', () => {
         // before the exercise actually has an id assigned
         // by the database.
         //
-        // This is to test, wether action before exercise id assignment
+        // This is to test whether actions before exercise id assignment
         // are saved and retrieved correctly with this exerciseId.
         const activeExercise =
             await environment.services.exerciseService.exerciseFactory.fromBlank();

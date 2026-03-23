@@ -35,7 +35,6 @@ export const registerJoinExerciseHandler = (
                 });
                 return;
             }
-            let clientId: UUID | undefined;
             if (!isExerciseKey(exerciseKey)) {
                 callback({
                     success: false,
@@ -46,6 +45,7 @@ export const registerJoinExerciseHandler = (
             }
 
             clientWrapper.getSessionInformation().then(() => {
+                let clientId: UUID | undefined;
                 try {
                     clientId = clientWrapper.joinExercise(
                         exerciseKey,

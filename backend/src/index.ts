@@ -66,7 +66,6 @@ async function main() {
     );
     const exerciseManagerService = new ExerciseManagerService(
         repositories.exerciseRepository,
-        repositories.actionRepository,
         exerciseService
     );
     const parallelExerciseService = new ParallelExerciseService(

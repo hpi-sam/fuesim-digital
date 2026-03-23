@@ -205,7 +205,7 @@ export class ParallelExerciseService {
             return parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,
                 trainerKey: exercise.trainerKey,
-                clientNames: state.clientNames,
+                clientNames: state.collectedClientNames,
                 currentTime: state.currentTime,
                 currentStatus: state.currentStatus,
                 lastLogEntry: state.lastLogEntry,

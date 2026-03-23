@@ -71,9 +71,9 @@ export namespace ClientActionReducers {
             draftState.clients[client.id] = clientMutable;
             if (
                 clientMutable.name &&
-                !draftState.clientNames.includes(clientMutable.name)
+                !draftState.collectedClientNames.includes(clientMutable.name)
             ) {
-                draftState.clientNames.push(clientMutable.name);
+                draftState.collectedClientNames.push(clientMutable.name);
             }
             return draftState;
         },

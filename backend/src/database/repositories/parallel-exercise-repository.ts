@@ -19,21 +19,23 @@ export class ParallelExerciseRepository extends BaseRepository {
         };
     }
 
+    private get parallelExerciseQuery() {
+        return this.databaseConnection
+            .select(this.getColumns())
+            .from(parallelExerciseTable)
+            .innerJoin(
+                exerciseTemplateTable,
+                eq(exerciseTemplateTable.id, parallelExerciseTable.templateId)
+            );
+    }
+
     public async getParallelExerciseById(
         id: ParallelExerciseId
     ): Promise<ParallelExercise | null> {
         return this.onlySingle(
-            await this.databaseConnection
-                .select(this.getColumns())
-                .from(parallelExerciseTable)
-                .innerJoin(
-                    exerciseTemplateTable,
-                    eq(
-                        exerciseTemplateTable.id,
-                        parallelExerciseTable.templateId
-                    )
-                )
-                .where(eq(parallelExerciseTable.id, id))
+            await this.parallelExerciseQuery.where(
+                eq(parallelExerciseTable.id, id)
+            )
         );
     }
 
@@ -41,30 +43,16 @@ export class ParallelExerciseRepository extends BaseRepository {
         key: GroupParticipantKey
     ): Promise<ParallelExercise | null> {
         return this.onlySingle(
-            await this.databaseConnection
-                .select(this.getColumns())
-                .from(parallelExerciseTable)
-                .innerJoin(
-                    exerciseTemplateTable,
-                    eq(
-                        exerciseTemplateTable.id,
-                        parallelExerciseTable.templateId
-                    )
-                )
-                .where(eq(parallelExerciseTable.participantKey, key))
+            await this.parallelExerciseQuery.where(
+                eq(parallelExerciseTable.participantKey, key)
+            )
         );
     }
 
     public async getParallelExercisesOfOwner(
         userId: string
     ): Promise<ParallelExercise[]> {
-        return this.databaseConnection
-            .select(this.getColumns())
-            .from(parallelExerciseTable)
-            .innerJoin(
-                exerciseTemplateTable,
-                eq(exerciseTemplateTable.id, parallelExerciseTable.templateId)
-            )
+        return this.parallelExerciseQuery
             .where(eq(parallelExerciseTable.user, userId))
             .orderBy(desc(parallelExerciseTable.createdAt));
     }

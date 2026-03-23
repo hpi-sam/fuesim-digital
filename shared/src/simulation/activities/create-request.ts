@@ -11,13 +11,13 @@ import type { UUID } from '../../utils/uuid.js';
 import type { SimulationActivity } from './simulation-activity.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export const createRequestActivityStateSchema =
-    simulationActivityStateSchema.extend({
-        type: z.literal('createRequestActivity'),
-        targetConfiguration: exerciseRequestTargetConfigurationSchema,
-        requestedResource: vehicleResourceSchema,
-        key: z.string(),
-    });
+export const createRequestActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('createRequestActivity'),
+    targetConfiguration: exerciseRequestTargetConfigurationSchema,
+    requestedResource: vehicleResourceSchema,
+    key: z.string(),
+});
 export type CreateRequestActivityState = z.infer<
     typeof createRequestActivityStateSchema
 >;

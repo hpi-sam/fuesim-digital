@@ -3,9 +3,11 @@ import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
 import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { simulationEventSchema } from './simulation-event.js';
 
 export const transferPatientsInSpecificVehicleRequestEventSchema =
     z.strictObject({
+        ...simulationEventSchema.shape,
         type: z.literal('transferPatientsInSpecificVehicleRequestEvent'),
         patientIds: uuidSetSchema,
         vehicleId: uuidSchema,

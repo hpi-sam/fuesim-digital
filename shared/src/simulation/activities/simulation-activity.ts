@@ -6,7 +6,7 @@ import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
 
 export const simulationActivityStateSchema = z.strictObject({
-    type: z.string(),
+    type: z.templateLiteral([z.string(), 'Activity']),
     id: uuidSchema,
 });
 export type SimulationActivityState = z.infer<

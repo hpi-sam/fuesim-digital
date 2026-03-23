@@ -12,7 +12,8 @@ import {
 } from '../../models/utils/occupations/exercise-occupation.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const transferVehiclesRequestEventSchema = simulationEventSchema.extend({
+export const transferVehiclesRequestEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('transferVehiclesRequestEvent'),
     requestedVehicles: resourceDescriptionSchema,
     transferInitiatingRegionId: uuidSchema.optional(),

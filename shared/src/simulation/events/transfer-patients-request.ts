@@ -5,7 +5,8 @@ import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const transferPatientsRequestEventSchema = simulationEventSchema.extend({
+export const transferPatientsRequestEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('transferPatientsRequestEvent'),
     vehicleType: z.string(),
     patientIds: uuidSetSchema,

@@ -5,11 +5,7 @@ import {
     resourceDescriptionSchema,
 } from './resource-description.js';
 
-export const rescueResourceSchema = z.strictObject({
-    type: z.literal('RescueResource'),
-});
-
-export const vehicleResourceSchema = rescueResourceSchema.extend({
+export const vehicleResourceSchema = z.strictObject({
     type: z.literal('vehicleResource'),
     vehicleCounts: resourceDescriptionSchema,
 });

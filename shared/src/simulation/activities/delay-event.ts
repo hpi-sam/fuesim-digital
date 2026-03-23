@@ -6,12 +6,12 @@ import type { UUID } from '../../utils/uuid.js';
 import type { SimulationActivity } from './simulation-activity.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export const delayEventActivityStateSchema =
-    simulationActivityStateSchema.extend({
-        type: z.literal('delayEventActivity'),
-        event: exerciseSimulationEventSchema,
-        endTime: z.int().nonnegative(),
-    });
+export const delayEventActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('delayEventActivity'),
+    event: exerciseSimulationEventSchema,
+    endTime: z.int().nonnegative(),
+});
 export type DelayEventActivityState = z.infer<
     typeof delayEventActivityStateSchema
 >;

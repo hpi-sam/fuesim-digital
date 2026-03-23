@@ -8,7 +8,8 @@ import {
 } from '../../models/utils/occupations/exercise-occupation.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const startTransferEventSchema = simulationEventSchema.extend({
+export const startTransferEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('startTransferEvent'),
     vehicleId: uuidSchema,
     transferDestinationType: transferDestinationTypeSchema,

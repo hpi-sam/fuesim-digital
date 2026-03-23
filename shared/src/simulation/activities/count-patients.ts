@@ -7,13 +7,16 @@ import { newPatientsCountedEvent } from '../events/patients-counted.js';
 import type { PatientStatus } from '../../models/utils/patient-status.js';
 import { patientStatusAllowedValues } from '../../models/utils/patient-status.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { type UUID } from '../../utils/uuid.js';
 import { StrictObject } from '../../utils/strict-object.js';
-import type { SimulationActivity } from './simulation-activity.js';
+import {
+    type SimulationActivity,
+    simulationActivityStateSchema,
+} from './simulation-activity.js';
 
 export const countPatientsActivityStateSchema = z.strictObject({
-    type: z.literal('countPatientsActivity' as const),
-    id: uuidSchema,
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('countPatientsActivity'),
 });
 export type CountPatientsActivityState = z.infer<
     typeof countPatientsActivityStateSchema

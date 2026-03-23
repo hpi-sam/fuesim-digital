@@ -7,11 +7,11 @@ import { newResourceRequiredEvent } from '../../../simulation/events/resources-r
 import type { RequestTarget } from './request-target.js';
 import { requestTargetConfigurationSchema } from './request-target.js';
 
-export const simulatedRegionRequestTargetConfigurationSchema =
-    requestTargetConfigurationSchema.extend({
-        type: z.literal('simulatedRegionRequestTarget'),
-        targetSimulatedRegionId: uuidSchema,
-    });
+export const simulatedRegionRequestTargetConfigurationSchema = z.strictObject({
+    ...requestTargetConfigurationSchema.shape,
+    type: z.literal('simulatedRegionRequestTarget'),
+    targetSimulatedRegionId: uuidSchema,
+});
 export type SimulatedRegionRequestTargetConfiguration = z.infer<
     typeof simulatedRegionRequestTargetConfigurationSchema
 >;

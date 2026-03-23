@@ -8,15 +8,15 @@ import {
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const transferSpecificVehicleRequestEventSchema =
-    simulationEventSchema.extend({
-        type: z.literal('transferSpecificVehicleRequestEvent'),
-        vehicleId: uuidSchema,
-        transferInitiatingRegionId: uuidSchema.optional(),
-        transferDestinationType: transferDestinationTypeSchema,
-        transferDestinationId: uuidSchema,
-        successorOccupation: exerciseOccupationSchema.optional(),
-    });
+export const transferSpecificVehicleRequestEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
+    type: z.literal('transferSpecificVehicleRequestEvent'),
+    vehicleId: uuidSchema,
+    transferInitiatingRegionId: uuidSchema.optional(),
+    transferDestinationType: transferDestinationTypeSchema,
+    transferDestinationId: uuidSchema,
+    successorOccupation: exerciseOccupationSchema.optional(),
+});
 export type TransferSpecificVehicleRequestEvent = z.infer<
     typeof transferSpecificVehicleRequestEventSchema
 >;

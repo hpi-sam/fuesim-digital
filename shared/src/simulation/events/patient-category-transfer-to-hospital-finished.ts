@@ -6,7 +6,8 @@ import {
 import { simulationEventSchema } from './simulation-event.js';
 
 export const patientCategoryTransferToHospitalFinishedEventSchema =
-    simulationEventSchema.extend({
+    z.strictObject({
+        ...simulationEventSchema.shape,
         type: z.literal('patientCategoryTransferToHospitalFinishedEvent'),
         patientCategory: patientStatusSchema,
         /**

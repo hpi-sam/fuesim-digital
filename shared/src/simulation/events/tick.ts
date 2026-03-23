@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const tickEventSchema = simulationEventSchema.extend({
+export const tickEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('tickEvent'),
     tickInterval: z.int().positive(),
 });

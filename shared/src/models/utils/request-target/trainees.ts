@@ -12,10 +12,10 @@ import { isEmptyResource } from '../rescue-resource.js';
 import type { RequestTarget } from './request-target.js';
 import { requestTargetConfigurationSchema } from './request-target.js';
 
-export const traineesRequestTargetConfigurationSchema =
-    requestTargetConfigurationSchema.extend({
-        type: z.literal('traineesRequestTarget'),
-    });
+export const traineesRequestTargetConfigurationSchema = z.strictObject({
+    ...requestTargetConfigurationSchema.shape,
+    type: z.literal('traineesRequestTarget'),
+});
 export type TraineesRequestTargetConfiguration = z.infer<
     typeof traineesRequestTargetConfigurationSchema
 >;

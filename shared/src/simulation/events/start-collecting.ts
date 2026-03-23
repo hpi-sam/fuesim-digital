@@ -3,7 +3,8 @@ import type { ReportableInformation } from '../behaviors/reportable-information.
 import { reportableInformationSchema } from '../behaviors/reportable-information.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const startCollectingInformationSchema = simulationEventSchema.extend({
+export const startCollectingInformationSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('startCollectingInformationEvent'),
     informationType: reportableInformationSchema,
     interfaceSignallerKey: z.string().nullable(),

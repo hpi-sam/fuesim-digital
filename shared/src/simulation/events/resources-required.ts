@@ -4,7 +4,8 @@ import { exerciseRescueResourceSchema } from '../../models/utils/rescue-resource
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const resourceRequiredEventSchema = simulationEventSchema.extend({
+export const resourceRequiredEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('resourceRequiredEvent'),
     requiringSimulatedRegionId: uuidSchema,
     requiredResource: exerciseRescueResourceSchema,

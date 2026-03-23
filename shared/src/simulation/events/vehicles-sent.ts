@@ -4,7 +4,8 @@ import { vehicleResourceSchema } from '../../models/utils/rescue-resource.js';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const vehiclesSentEventSchema = simulationEventSchema.extend({
+export const vehiclesSentEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('vehiclesSentEvent'),
     vehiclesSent: vehicleResourceSchema,
     destinationTransferPointId: uuidSchema,

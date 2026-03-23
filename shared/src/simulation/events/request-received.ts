@@ -10,7 +10,8 @@ import {
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const requestReceivedEventSchema = simulationEventSchema.extend({
+export const requestReceivedEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('requestReceivedEvent'),
     availableVehicles: resourceDescriptionSchema,
     transferDestinationType: transferDestinationTypeSchema,

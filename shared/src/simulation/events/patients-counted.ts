@@ -6,7 +6,8 @@ import {
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const patientsCountedEventSchema = simulationEventSchema.extend({
+export const patientsCountedEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('patientsCountedEvent'),
     patientCount: z.record(patientStatusSchema, z.number()),
 });

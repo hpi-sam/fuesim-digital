@@ -2,7 +2,8 @@ import { z } from 'zod';
 import { uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const personnelAvailableEventSchema = simulationEventSchema.extend({
+export const personnelAvailableEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('personnelAvailableEvent'),
     personnelId: uuidSchema,
 });

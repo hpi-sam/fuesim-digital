@@ -4,7 +4,8 @@ import { reportableInformationAllowedValues } from '../behaviors/reportable-info
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { simulationEventSchema } from './simulation-event.js';
 
-export const collectInformationEventSchema = simulationEventSchema.extend({
+export const collectInformationEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
     type: z.literal('collectInformationEvent'),
     generateReportActivityId: uuidSchema,
     informationType: reportableInformationAllowedValues,

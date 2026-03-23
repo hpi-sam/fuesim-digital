@@ -17,6 +17,7 @@ import { ExerciseStateBadgeInnerComponent } from '../exercise-state-badge-inner/
 export class ExerciseStateBadgeComponent {
     private readonly store = inject<Store<AppState>>(Store);
 
-    public readonly exerciseStatus$ = this.store.select(selectExerciseStatus);
-    public readonly currentTime$ = this.store.select(selectCurrentTime);
+    public readonly exerciseStatus =
+        this.store.selectSignal(selectExerciseStatus);
+    public readonly currentTime = this.store.selectSignal(selectCurrentTime);
 }

@@ -1,4 +1,3 @@
-@let exerciseType = exerciseType$ | async;
 @if (exerciseStateMode$ | async; as mode) {
     <div class="p-2 d-flex flex-column" style="height: 100vh">
         <div class="pb-2">
@@ -18,9 +17,12 @@
                         Übungsvorlage: {{ exerciseTemplate.name }}
                     </h2>
                 } @else if (
-                    exerciseService.additionalExerciseMeta()?.parallelExerciseId
+                    exerciseService.additionalExerciseMeta()
+                        ?.parallelExerciseId;
+                    as parallelExerciseId
                 ) {
                     <app-parallel-exercise-status-bar
+                        [parallelExerciseId]="parallelExerciseId"
                         class="d-flex align-items-center"
                     />
                 } @else {

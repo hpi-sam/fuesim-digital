@@ -29,33 +29,35 @@ export class ParallelExerciseCardComponent {
         ConfirmationModalService
     );
 
-    readonly parallelExercise = input<GetParallelExerciseResponseData>();
+    readonly parallelExercise =
+        input.required<GetParallelExerciseResponseData>();
     readonly participantUrl = computed(
         () =>
-            `${location.origin}/exercises/${this.parallelExercise()?.participantKey}`
+            `${location.origin}/exercises/${this.parallelExercise().participantKey}`
     );
     readonly updated = output();
 
     async patchParallelExercise(data: PatchParallelExerciseRequestData) {
-        const parallelExercise = this.parallelExercise();
-        if (!parallelExercise) return;
-        await this.apiService.patchParallelExercise(parallelExercise.id, data);
+        await this.apiService.patchParallelExercise(
+            this.parallelExercise().id,
+            data
+        );
         this.updated.emit();
     }
 
     async deleteExercise() {
-        const id = this.parallelExercise()?.id;
-        if (!id) return;
         const deletionConfirmed = await this.confirmationModalService.confirm({
             title: 'Parallelübung löschen',
             description:
                 'Möchten Sie die Parallelübung wirklich unwiederbringlich löschen?',
-            confirmationString: this.parallelExercise()?.participantKey,
+            confirmationString: this.parallelExercise().participantKey,
         });
         if (!deletionConfirmed) {
             return;
         }
-        await this.apiService.deleteParallelExercise(id);
+        await this.apiService.deleteParallelExercise(
+            this.parallelExercise().id
+        );
         this.messageService.postMessage({
             title: 'Parallelübung erfolgreich gelöscht',
             color: 'success',

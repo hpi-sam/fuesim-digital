@@ -1,9 +1,5 @@
-@if (exerciseStatus$ | async; as exerciseStatus) {
-    @if (currentTime$ | async; as currentTime) {
-        <app-exercise-state-badge-inner
-            [exerciseStatus]="exerciseStatus"
-            [currentTime]="currentTime"
-            class="h2"
-        />
-    }
-}
+<app-exercise-state-badge-inner
+    [exerciseStatus]="exerciseStatus()"
+    [currentTime]="currentTime()"
+    class="h2"
+/>

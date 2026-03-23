@@ -34,6 +34,7 @@ export const routes: Routes = [
     },
     {
         path: 'parallel/join/:key',
+        // This component is never actually shown, as JoinParallelExerciseGuard will redirect
         component: ParallelExerciseComponent,
         canActivate: [
             AreParallelExercisesEnabledGuard,

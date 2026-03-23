@@ -1,7 +1,8 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     GetParallelExerciseResponseData,
+    ParallelExerciseId,
     ParallelExerciseInstanceSummary,
 } from 'fuesim-digital-shared';
 import { Router, RouterLink } from '@angular/router';
@@ -19,10 +20,10 @@ import {
 import { ExerciseService } from '../../../core/exercise.service';
 import { ApiService } from '../../../core/api.service';
 import { ParallelExerciseService } from '../../../core/parallel-exercise.service';
-import { selectStateSnapshot } from '../../../state/get-state-snapshot';
-import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 import { OlMapManagerService } from '../../../pages/exercises/exercise/shared/exercise-map/utility/ol-map-manager.service';
 import { ExerciseStateBadgeComponent } from '../exercise-state-badge/exercise-state-badge.component';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-parallel-exercise-status-bar',
@@ -37,7 +38,7 @@ import { ExerciseStateBadgeComponent } from '../exercise-state-badge/exercise-st
         NgbDropdownItem,
     ],
 })
-export class ParallelExerciseStatusBarComponent {
+export class ParallelExerciseStatusBarComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly apiService = inject(ApiService);
     protected readonly parallelExerciseService = inject(
@@ -47,6 +48,7 @@ export class ParallelExerciseStatusBarComponent {
     private readonly router = inject(Router);
     private readonly olMapManagerService = inject(OlMapManagerService);
 
+    public readonly parallelExerciseId = input.required<ParallelExerciseId>();
     public readonly parallelExercise =
         signal<GetParallelExerciseResponseData | null>(null);
 
@@ -62,26 +64,16 @@ export class ParallelExerciseStatusBarComponent {
         });
     }
 
-    constructor() {
-        effect(async () => {
-            const parallelExerciseId =
-                this.exerciseService.additionalExerciseMeta()
-                    ?.parallelExerciseId;
-            console.log('effect', parallelExerciseId);
-            if (
-                parallelExerciseId &&
-                selectStateSnapshot(selectCurrentMainRole, this.store) ===
-                    'trainer'
-            ) {
-                this.parallelExercise.set(
-                    await this.apiService.getParallelExercise(
-                        parallelExerciseId
-                    )
-                );
-                await this.parallelExerciseService.joinParallelExercise(
-                    parallelExerciseId
-                );
-            }
-        });
+    async ngOnInit() {
+        if (
+            selectStateSnapshot(selectCurrentMainRole, this.store) !== 'trainer'
+        )
+            return;
+        this.parallelExercise.set(
+            await this.apiService.getParallelExercise(this.parallelExerciseId())
+        );
+        await this.parallelExerciseService.joinParallelExercise(
+            this.parallelExerciseId()
+        );
     }
 }

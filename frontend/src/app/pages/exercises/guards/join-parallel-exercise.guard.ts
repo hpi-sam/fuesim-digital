@@ -6,6 +6,10 @@ import type {
 import { Router } from '@angular/router';
 import { ApiService } from '../../../core/api.service';
 
+/**
+ * Guard for handling the join of parallel exercises
+ * Attention: Not an actual guard, just used for side effects
+ */
 @Injectable({
     providedIn: 'root',
 })

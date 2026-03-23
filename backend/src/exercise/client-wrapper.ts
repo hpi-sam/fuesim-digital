@@ -139,7 +139,7 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
 
         // We watch for new exercise instances to join the parallel exercise
         // to register watchers for them
-        this.services.parallelExerciseService.newJoin
+        const sub = this.services.parallelExerciseService.newJoin
             .pipe(filter((join) => id === join.parallelExerciseId))
             .subscribe((join) => {
                 const sub = join.activeExercise.actionApplied.subscribe(
@@ -148,6 +148,7 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
                 this.subscriptions.push(sub);
                 this.onActionApplied();
             });
+        this.subscriptions.push(sub);
 
         // Watch for changes in the exercise instances to send updates
         for (const activeExercise of activeExercises) {

@@ -35,7 +35,6 @@ import {
 import {
     selectParticipantKey,
     selectExerciseState,
-    selectExerciseType,
 } from '../../../../state/application/selectors/exercise.selectors';
 import { selectOwnClient } from '../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
@@ -86,7 +85,6 @@ export class ExerciseComponent implements OnDestroy {
     public readonly participantKey$ = this.store.select(selectParticipantKey);
     public readonly timeConstraints$ = this.store.select(selectTimeConstraints);
     public readonly ownClient$ = this.store.select(selectOwnClient);
-    public readonly exerciseType$ = this.store.select(selectExerciseType);
 
     readonly version: string = Package.version;
 

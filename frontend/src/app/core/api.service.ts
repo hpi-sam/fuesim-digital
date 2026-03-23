@@ -104,10 +104,8 @@ export class ApiService {
 
     public async getParallelExercisesEnabled() {
         return lastValueFrom(
-            this.httpClient
-                .get(`${httpOrigin}/api/parallel_exercises/enabled`)
-                .pipe(map((v) => z.boolean().parse(v)))
-        );
+            this.httpClient.get(`${httpOrigin}/api/parallel_exercises/enabled`)
+        ).then(z.boolean().parse);
     }
 
     public getParallelExerciseResource(id: ParallelExerciseId) {
@@ -120,12 +118,8 @@ export class ApiService {
     }
     public async getParallelExercise(id: ParallelExerciseId) {
         return lastValueFrom(
-            this.httpClient
-                .get(`${httpOrigin}/api/parallel_exercises/${id}`)
-                .pipe(
-                    map((v) => getParallelExerciseResponseDataSchema.parse(v))
-                )
-        );
+            this.httpClient.get(`${httpOrigin}/api/parallel_exercises/${id}`)
+        ).then(getParallelExerciseResponseDataSchema.parse);
     }
     public getParallelExercisesResource() {
         return httpResource(() => `${httpOrigin}/api/parallel_exercises/`, {
@@ -134,24 +128,16 @@ export class ApiService {
     }
     public async getExerciseTemplateViewportsById(id: ExerciseTemplateId) {
         return lastValueFrom(
-            this.httpClient
-                .get(`${httpOrigin}/api/exercise_templates/${id}/viewports`)
-                .pipe(
-                    map((v) =>
-                        getExerciseTemplateViewportsResponseDataSchema.parse(v)
-                    )
-                )
-        );
+            this.httpClient.get(
+                `${httpOrigin}/api/exercise_templates/${id}/viewports`
+            )
+        ).then(getExerciseTemplateViewportsResponseDataSchema.parse);
     }
 
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
-            this.httpClient
-                .post(`${httpOrigin}/api/exercise_templates`, data)
-                .pipe(
-                    map((v) => getExerciseTemplateResponseDataSchema.parse(v))
-                )
-        );
+            this.httpClient.post(`${httpOrigin}/api/exercise_templates`, data)
+        ).then(getExerciseTemplateResponseDataSchema.parse);
     }
 
     public async patchExerciseTemplate(
@@ -188,12 +174,8 @@ export class ApiService {
 
     public async createParallelExercise(data: PostParallelExerciseRequestData) {
         return lastValueFrom(
-            this.httpClient
-                .post(`${httpOrigin}/api/parallel_exercises/`, data)
-                .pipe(
-                    map((v) => getParallelExerciseResponseDataSchema.parse(v))
-                )
-        );
+            this.httpClient.post(`${httpOrigin}/api/parallel_exercises/`, data)
+        ).then(getParallelExerciseResponseDataSchema.parse);
     }
 
     public async patchParallelExercise(
@@ -201,12 +183,11 @@ export class ApiService {
         data: PatchParallelExerciseRequestData
     ) {
         return lastValueFrom(
-            this.httpClient
-                .patch(`${httpOrigin}/api/parallel_exercises/${id}`, data)
-                .pipe(
-                    map((v) => getParallelExerciseResponseDataSchema.parse(v))
-                )
-        );
+            this.httpClient.patch(
+                `${httpOrigin}/api/parallel_exercises/${id}`,
+                data
+            )
+        ).then(getParallelExerciseResponseDataSchema.parse);
     }
 
     public async deleteParallelExercise(id: ParallelExerciseId) {
@@ -217,16 +198,10 @@ export class ApiService {
 
     public async joinParallelExercise(key: string) {
         return lastValueFrom(
-            this.httpClient
-                .post(
-                    `${httpOrigin}/api/parallel_exercises/join/${key}`,
-                    undefined
-                )
-                .pipe(
-                    map((v) =>
-                        postJoinParallelExerciseResponseDataSchema.parse(v)
-                    )
-                )
-        );
+            this.httpClient.post(
+                `${httpOrigin}/api/parallel_exercises/join/${key}`,
+                undefined
+            )
+        ).then(postJoinParallelExerciseResponseDataSchema.parse);
     }
 }

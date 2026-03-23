@@ -9,7 +9,6 @@ import { Store } from '@ngrx/store';
 import { tryToJoinExercise } from '../shared/join-exercise-modal/try-to-join-exercise';
 import { ApplicationService } from '../../../core/application.service';
 import { ApiService } from '../../../core/api.service';
-import { MessageService } from '../../../core/messages/message.service';
 import type { AppState } from '../../../state/app.state';
 import { selectExerciseStateMode } from '../../../state/application/selectors/application.selectors';
 import { selectStateSnapshot } from '../../../state/get-state-snapshot';
@@ -22,7 +21,6 @@ export class JoinExerciseGuard {
     private readonly router = inject(Router);
     private readonly apiService = inject(ApiService);
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly messageService = inject(MessageService);
     private readonly applicationService = inject(ApplicationService);
 
     async canActivate(

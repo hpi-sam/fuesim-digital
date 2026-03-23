@@ -11,10 +11,9 @@ import {
     NgbDropdownMenu,
     NgbDropdownToggle,
 } from '@ng-bootstrap/ng-bootstrap';
-import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import {
-    selectClientNames,
+    selectCollectedClientNames,
     selectParticipantKey,
 } from '../../../state/application/selectors/exercise.selectors';
 import { ExerciseService } from '../../../core/exercise.service';
@@ -36,7 +35,6 @@ import { ExerciseStateBadgeComponent } from '../exercise-state-badge/exercise-st
         NgbDropdownToggle,
         NgbDropdownMenu,
         NgbDropdownItem,
-        AsyncPipe,
     ],
 })
 export class ParallelExerciseStatusBarComponent {
@@ -52,8 +50,10 @@ export class ParallelExerciseStatusBarComponent {
     public readonly parallelExercise =
         signal<GetParallelExerciseResponseData | null>(null);
 
-    public participantKey$ = this.store.select(selectParticipantKey);
-    protected clientNames$ = this.store.select(selectClientNames);
+    protected participantKey = this.store.selectSignal(selectParticipantKey);
+    protected collectedClientNames = this.store.selectSignal(
+        selectCollectedClientNames
+    );
 
     openExerciseInstance(exerciseInstance: ParallelExerciseInstanceSummary) {
         this.router.navigate(['/exercises', exerciseInstance.trainerKey], {

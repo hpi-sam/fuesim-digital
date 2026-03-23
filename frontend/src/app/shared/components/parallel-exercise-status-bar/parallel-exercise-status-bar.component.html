@@ -1,5 +1,3 @@
-@let participantKey = participantKey$ | async;
-@let clientNames = clientNames$ | async;
 <div class="d-flex align-items-center me-3">
     @if (parallelExercise(); as parallelExercise) {
         <a
@@ -13,7 +11,7 @@
     <h2 class="mb-0">
         Parallelübung:
         <span class="font-monospace fw-bold user-select-all">
-            {{ parallelExercise()?.participantKey ?? participantKey }}
+            {{ parallelExercise()?.participantKey ?? participantKey() }}
         </span>
     </h2>
 </div>
@@ -29,9 +27,9 @@
             [disabled]="!parallelExerciseService.exerciseInstances().length"
         >
             <i class="bi-people me-2"> </i>
-            #{{ participantKey }}
-            @if (clientNames && clientNames.length) {
-                : {{ clientNames.join(', ') }}
+            #{{ participantKey() }}
+            @if (collectedClientNames().length) {
+                : {{ collectedClientNames().join(', ') }}
             }
         </button>
         <div ngbDropdownMenu>
@@ -43,14 +41,14 @@
                     ngbDropdownItem
                     (click)="openExerciseInstance(exerciseInstance)"
                     [disabled]="
-                        exerciseInstance.participantKey === participantKey
+                        exerciseInstance.participantKey === participantKey()
                     "
                 >
                     #{{ exerciseInstance.participantKey }}
                     @if (exerciseInstance.clientNames.length) {
                         : {{ exerciseInstance.clientNames.join(', ') }}
                     }
-                    @if (exerciseInstance.participantKey === participantKey) {
+                    @if (exerciseInstance.participantKey === participantKey()) {
                         <span class="badge bg-primary ms-2">ausgewählt</span>
                     }
                 </button>

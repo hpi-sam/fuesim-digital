@@ -63,7 +63,9 @@ export const selectExerciseStatus = selectPropertyFactory('currentStatus');
 export const selectParticipantKey = selectPropertyFactory('participantKey');
 export const selectCurrentTime = selectPropertyFactory('currentTime');
 export const selectExerciseType = selectPropertyFactory('type');
-export const selectClientNames = selectPropertyFactory('clientNames');
+export const selectCollectedClientNames = selectPropertyFactory(
+    'collectedClientNames'
+);
 
 // Elements
 

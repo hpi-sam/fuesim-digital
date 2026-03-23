@@ -38,6 +38,7 @@ export class ParallelExerciseService {
     >([]);
     private readonly joinedParallelExerciseId =
         signal<ParallelExerciseId | null>(null);
+
     constructor() {
         this.socket.on(
             'updateExerciseInstances',
@@ -54,6 +55,10 @@ export class ParallelExerciseService {
             console.error(reason);
             openConnectionLostModal(this.ngbModalService);
         });
+    }
+
+    public get isJoined(): boolean {
+        return this.joinedParallelExerciseId() !== null;
     }
 
     public async joinParallelExercise(id: ParallelExerciseId) {

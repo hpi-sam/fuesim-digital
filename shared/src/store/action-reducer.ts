@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type { ZodType } from 'zod';
 import type { Client } from '../models/client.js';
 import type { Role, SpecificRole } from '../models/utils/role.js';
@@ -85,7 +85,7 @@ export interface Action {
 type ReducerFunction<A extends Action> = (
     // These functions can only work with a mutable state object, because we expect them to be executed in immers produce context.
     draftState: WritableDraft<ExerciseState>,
-    action: A
+    action: Immutable<A>
 ) => WritableDraft<ExerciseState>;
 
 export type ReducerRights<A extends Action> =

@@ -38,7 +38,6 @@ export class PopupManager {
             .pipe(pairwise(), takeUntil(this.destroy$))
             .subscribe(([oldProposal, newProposal]) => {
                 if (newProposal.action === 'dismiss') {
-                    console.log('dismissing ');
                     oldProposal.options?.onDismissCallback?.call(undefined);
                 }
 

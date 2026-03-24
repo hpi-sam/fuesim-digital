@@ -26,6 +26,8 @@
     @if (vehicles !== null) {
         <app-vehicles-zone
             [vehicles]="vehicles"
+            class="flex-grow-1 overflow-hidden"
+            mode="y-scroll"
             (vehicleDropped)="onVehicleDropped($event)"
         />
     }

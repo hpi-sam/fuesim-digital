@@ -1,0 +1,11 @@
+<div class="panel-surface w-100 d-flex bg-white">
+    <span class="side-title flex-shrink-0">Vor Ort</span>
+    <div class="flex-grow-1">
+        <app-vehicles-zone
+            class="w-100"
+            [vehicles]="vehicles()"
+            mode="x-scroll"
+            (vehicleDropped)="onVehicleDropped($event)"
+        />
+    </div>
+</div>

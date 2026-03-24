@@ -2,11 +2,16 @@
 @use './../_variables.scss' as vars;
 
 :host {
+    @extend .card;
+
     display: block;
+
     height: vars.$vehicleTagHeight;
     width: vars.$vehicleTagWidth;
+
+    text-align: center;
+
     position: relative;
-    @extend .card;
     overflow: hidden;
 }
 

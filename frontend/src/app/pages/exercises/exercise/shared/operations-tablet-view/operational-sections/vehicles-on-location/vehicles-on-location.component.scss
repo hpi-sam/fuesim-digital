@@ -1,21 +1,15 @@
 @use './../_variables.scss' as vars;
 
-.panel-fixed-width {
-    width: vars.$containerWidth;
-}
-
 .panel-surface {
     padding: vars.$outerBoxPadding;
     border-radius: vars.$borderRadius;
-    min-height: 0;
 }
 
-.panel-title {
-    &:not(:first-child) {
-        margin-top: vars.$innerBoxPadding;
-    }
-
+.side-title {
+    margin-top: vars.$innerBoxPadding;
     font-size: 1.7rem;
     font-weight: bold;
     margin-bottom: vars.$outerBoxPadding;
+    writing-mode: sideways-lr;
+    align-self: center;
 }

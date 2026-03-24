@@ -1,4 +1,4 @@
-<div class="ovtRoot" #otvRoot>
+<div class="otvRoot" #otvRoot>
     <nav
         ngbNav
         [animation]="false"
@@ -20,7 +20,7 @@
                 ></app-operation-details-tab>
             </ng-template>
         </ng-container>
-        <div style="margin-left: auto">
+        <div class="ms-auto">
             <button
                 class="btn"
                 [class.btn-outline-dark]="!fullscreenEnabled"
@@ -28,7 +28,7 @@
                 title="Vollbildmodus"
                 (click)="toggleFullscreen()"
             >
-                <span style="padding-right: 8px">
+                <span class="pe-2">
                     {{ fullscreenEnabled ? 'Vollbild verlassen' : 'Vollbild' }}
                 </span>
                 <i
@@ -39,7 +39,7 @@
         </div>
     </nav>
 
-    <div class="ovtContent flex-grow-1">
+    <div class="otvContent">
         <div [ngbNavOutlet]="nav"></div>
     </div>
 </div>

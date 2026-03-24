@@ -1,25 +1,19 @@
 <div
-    class="localOperationalLeaderContainer d-flex flex-column bg-white border h-100"
+    class="panel-surface panel-fixed-width d-flex flex-column bg-white border h-100"
 >
-    <span class="label">Leitung</span>
-    <div class="mt-2">
+    <span class="panel-title">Leitung</span>
+    <div class="mt-2 flex-shrink-0">
         <app-section-leader-slot
             innerTitle="Einsatzleitung"
             [vehicle]="(localSectionLeader$ | async) ?? null"
             (vehicleAssigned)="onVehicleAssigned($event)"
         ></app-section-leader-slot>
     </div>
-    <span class="label mb-2">Vor Ort</span>
-    @let vehicles = vehicles$ | async;
-    @if (vehicles !== null) {
-        <app-vehicles-zone
-            [vehicles]="vehicles"
-            (vehicleDropped)="onVehicleDroppedUnassignment($event)"
-        />
-    }
 
-    <span class="label mb-2">Alarmiert</span>
-    @for (vehicle of vehiclesFromAlarmgroups$ | async; track vehicle.id) {
-        <app-operations-vehicle-item [vehicle]="vehicle" />
-    }
+    <span class="panel-title mb-2">Alarmiert</span>
+    <div class="flex-grow-1 overflow-auto">
+        @for (vehicle of vehiclesFromAlarmgroups$ | async; track vehicle.id) {
+            <app-operations-vehicle-item [vehicle]="vehicle" />
+        }
+    </div>
 </div>

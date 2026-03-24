@@ -47,6 +47,6 @@ export class ChooseTransferTargetPopupComponent implements OnInit {
 
     public transferTo(targetId: UUID, type: 'hospital' | 'transferPoint') {
         this.transferToCallback(targetId, type);
-        this.popupService.closePopup();
+        this.popupService.dismissPopup();
     }
 }

@@ -50,6 +50,6 @@ export class ViewportPopupComponent implements OnInit {
     }
 
     public closePopup() {
-        this.popupService.closePopup();
+        this.popupService.dismissPopup();
     }
 }

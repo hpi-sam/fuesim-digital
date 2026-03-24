@@ -256,7 +256,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
 
         const vehicle = this.getElementFromFeature(feature) as Vehicle;
 
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 VehiclePopupComponent,
                 feature,

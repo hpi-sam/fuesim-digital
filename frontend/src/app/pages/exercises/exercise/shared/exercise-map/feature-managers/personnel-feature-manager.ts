@@ -107,7 +107,7 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
     ): void {
         super.onFeatureClicked(event, feature);
 
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 PersonnelPopupComponent,
                 feature,

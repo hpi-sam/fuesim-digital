@@ -106,7 +106,7 @@ export class MaterialFeatureManager extends MoveableFeatureManager<Material> {
     ): void {
         super.onFeatureClicked(event, feature);
 
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 MaterialPopupComponent,
                 feature,

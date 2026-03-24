@@ -13,6 +13,7 @@ import type {
     Viewport,
     Scoutable,
     UserGeneratedContent,
+    TechnicalChallenge,
 } from './index.js';
 
 export type Element =
@@ -26,6 +27,7 @@ export type Element =
     | RestrictedZone
     | Scoutable
     | SimulatedRegion
+    | TechnicalChallenge
     | TransferPoint
     | UserGeneratedContent
     | Vehicle

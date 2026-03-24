@@ -35,6 +35,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - Viewports are now consistently called "Ansicht" in the frontend and some other incorrect usages of "Einsatzabschnitt" have been corrected.
+- The map is now visible again in replay mode.
 
 ## [0.10.0] - 2025-12-08
 

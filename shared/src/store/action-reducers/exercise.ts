@@ -32,6 +32,7 @@ import {
 import { type UUID, uuid, uuidValidationOptions } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { simulateAllTechnicalChallenges } from '../../models/technical-challenge/state-machine.js';
 import { PatientUpdate } from './utils/patient-updates.js';
 import {
     logPatientVisibleStatusChanged,
@@ -181,6 +182,8 @@ export namespace ExerciseActionReducers {
 
             simulateAllRegions(draftState, tickInterval);
 
+            simulateAllTechnicalChallenges(draftState, tickInterval);
+
             if (logActive(draftState)) {
                 const newTreatmentAssignment =
                     calculateTreatmentAssignment(draftState);
@@ -193,7 +196,7 @@ export namespace ExerciseActionReducers {
 
             return draftState;
         },
-        rights: 'server',
+        rights: 'trainer',
     };
 
     export const templateImport: ActionReducer<ImportTemplatesAction> = {

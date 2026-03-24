@@ -11,8 +11,7 @@ import { newMapPositionAt } from './utils/position/map-position.js';
 import {
     currentCoordinatesOf,
     isOnMap,
-    lowerRightCornerOf,
-    upperLeftCornerOf,
+    isWithinExtent,
 } from './utils/position/position-helpers.js';
 
 export const vehicleRestrictionSchema = z.literal([
@@ -94,14 +93,7 @@ export function isInRestrictedZone(
     restrictedZone: RestrictedZone,
     coordinates: MapCoordinates
 ): boolean {
-    const upperLeftCorner = upperLeftCornerOf(restrictedZone);
-    const lowerRightCorner = lowerRightCornerOf(restrictedZone);
-    return (
-        upperLeftCorner.x <= coordinates.x &&
-        coordinates.x <= lowerRightCorner.x &&
-        lowerRightCorner.y <= coordinates.y &&
-        coordinates.y <= upperLeftCorner.y
-    );
+    return isWithinExtent(restrictedZone, coordinates);
 }
 
 /**

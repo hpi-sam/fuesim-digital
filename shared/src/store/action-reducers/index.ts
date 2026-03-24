@@ -12,5 +12,6 @@ export * from './operational-section.js';
 export * from './restricted-zone.js';
 export * from './scoutable.js';
 export * from './user-generated-content.js';
+export * from './technical-challenge.js';
 
 // Don't forget to register the actionReducer in `action-reducers.ts`

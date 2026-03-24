@@ -16,7 +16,7 @@ import { HospitalNameComponent } from '../../../../../../../shared/components/ho
 @Component({
     selector: 'app-choose-transfer-target-popup',
     templateUrl: './choose-transfer-target-popup.component.html',
-    styleUrls: ['./choose-transfer-target-popup.component.scss'],
+    styleUrls: ['../chooser-popup.scss'],
     imports: [TransferPointNameComponent, HospitalNameComponent, AsyncPipe],
 })
 export class ChooseTransferTargetPopupComponent implements OnInit {

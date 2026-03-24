@@ -34,15 +34,15 @@ export abstract class MoveableFeatureManager<
     extends ElementManager<ManagedElement, FeatureType>
     implements FeatureManager<FeatureType>
 {
-    protected movementAnimator: MovementAnimator<FeatureType>;
+    public readonly movementAnimator: MovementAnimator<FeatureType>;
     public layer: VectorLayer;
-    constructor(
+    protected constructor(
         protected readonly olMap: OlMap,
         private readonly proposeMovementAction: (
             newPosition: Positions<FeatureType>,
             element: ManagedElement
         ) => Promise<{ success: boolean }>,
-        protected readonly geometryHelper: GeometryHelper<
+        public readonly geometryHelper: GeometryHelper<
             FeatureType,
             ManagedElement
         >,
@@ -139,7 +139,6 @@ export abstract class MoveableFeatureManager<
         markingStyle: any
     ) {
         const currentPopup = popupService.currentPopupOptions;
-        console.log('redrawing markings', currentPopup);
         if (
             (currentPopup?.markedForTrainerUUIDs.includes(
                 feature.getId() as UUID

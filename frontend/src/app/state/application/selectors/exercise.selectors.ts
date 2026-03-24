@@ -8,12 +8,14 @@ import type {
     ExerciseSimulationBehaviorType,
     ExerciseState,
     ScoutableElementType,
+    TechnicalChallengeId,
     UUID,
     Vehicle,
     WithPosition,
 } from 'fuesim-digital-shared';
 import {
     scoutableElementKeys,
+    currentStateOf,
     isInSpecificSimulatedRegion,
     isInTransfer,
     nestedCoordinatesOf,
@@ -49,6 +51,7 @@ export const selectVehicles = selectPropertyFactory('vehicles');
 export const selectPersonnel = selectPropertyFactory('personnel');
 export const selectAlarmGroups = selectPropertyFactory('alarmGroups');
 export const selectMaterials = selectPropertyFactory('materials');
+export const selectTasks = selectPropertyFactory('tasks');
 export const selectTransferPoints = selectPropertyFactory('transferPoints');
 export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
@@ -57,6 +60,9 @@ export const selectRadiograms = selectPropertyFactory('radiograms');
 export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
 export const selectOperationalSections = selectPropertyFactory(
     'operationalSections'
+);
+export const selectTechnicalChallenges = selectPropertyFactory(
+    'technicalChallenges'
 );
 export const selectVehicleTemplates = selectPropertyFactory('vehicleTemplates');
 export const selectPersonnelTemplates =
@@ -99,6 +105,7 @@ export const createSelectPersonnel =
     createSelectElementFromMapFactory(selectPersonnel);
 export const createSelectMaterial =
     createSelectElementFromMapFactory(selectMaterials);
+export const createSelectTask = createSelectElementFromMapFactory(selectTasks);
 export const createSelectPatient =
     createSelectElementFromMapFactory(selectPatients);
 export const createSelectVehicle =
@@ -116,6 +123,9 @@ export const createSelectRestrictedZone = createSelectElementFromMapFactory(
 );
 export const createSelectSimulatedRegion = createSelectElementFromMapFactory(
     selectSimulatedRegions
+);
+export const createSelectTechnicalChallenge = createSelectElementFromMapFactory(
+    selectTechnicalChallenges
 );
 export const createSelectClient =
     createSelectElementFromMapFactory(selectClients);
@@ -397,3 +407,36 @@ export function createSelectActivityStatesByType<
             )
     );
 }
+
+function createSelectAvailableTaskIds(
+    technicalChallengeId: TechnicalChallengeId
+) {
+    return createSelector(
+        createSelectTechnicalChallenge(technicalChallengeId),
+        (challenge) => Object.keys(currentStateOf(challenge).possibleTasks)
+    );
+}
+export function createSelectAvailableTasks(
+    technicalChallengeId: TechnicalChallengeId
+) {
+    return createSelector(
+        createSelectAvailableTaskIds(technicalChallengeId),
+        selectTasks,
+        (taskIds, taskMap) => taskIds.map((id) => taskMap[id]!)
+    );
+}
+
+export const selectWorkingPersonnel = createSelector(
+    selectTechnicalChallenges,
+    (challenges) => {
+        const workingPersonnel = new Set<UUID>();
+        for (const challenge of Object.values(challenges)) {
+            for (const personnelId of Object.keys(
+                challenge.assignedPersonnel
+            )) {
+                workingPersonnel.add(personnelId);
+            }
+        }
+        return workingPersonnel;
+    }
+);

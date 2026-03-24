@@ -4,3 +4,5 @@ export * from './default-state/vehicle-templates.js';
 export * from './default-state/map-properties.js';
 export * from './default-state/catch-all-hospital.js';
 export * from './dummy-objects/patient.js';
+
+export { getDefaultTechnicalChallengeTemplate } from './default-state/tmp-default-technical-challenge.js';

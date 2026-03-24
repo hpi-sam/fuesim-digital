@@ -1,10 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { OnInit, inject, Component, Signal, signal } from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,
     NgbAccordionItem,
     NgbAccordionHeader,
-    NgbAccordionToggle,
     NgbAccordionButton,
     NgbAccordionCollapse,
     NgbAccordionBody,
@@ -17,10 +16,14 @@ import {
     transferPointImage,
     validateExerciseExport,
     viewportImage,
+    getDefaultTechnicalChallengeTemplate,
 } from 'fuesim-digital-shared';
-import type { PatientCategory, UUID } from 'fuesim-digital-shared';
+import type {
+    PatientCategory,
+    UUID,
+    TechnicalChallengeTemplate,
+} from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
-import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import { DragElementService } from '../core/drag-element.service';
@@ -70,9 +73,7 @@ type FilterCategory =
         NgbAccordionDirective,
         NgbAccordionItem,
         NgbAccordionHeader,
-        NgbAccordionToggle,
         NgbAccordionButton,
-        NgbCollapse,
         NgbAccordionCollapse,
         NgbAccordionBody,
         MapEditorCardComponent,
@@ -122,6 +123,10 @@ export class TrainerMapEditorComponent implements OnInit {
     public readonly mapImageTemplates$ = this.store.select(
         selectMapImagesTemplates
     );
+
+    public readonly technicalChallengeTemplates: Signal<
+        TechnicalChallengeTemplate[]
+    > = signal([getDefaultTechnicalChallengeTemplate()]);
 
     public patientCategories$?: Observable<{
         [key in FilterCategory]?: PatientCategory[];

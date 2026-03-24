@@ -20,7 +20,10 @@ import { VehicleTagComponent } from '../vehicle-tag/vehicle-tag.component';
 })
 export class VehiclesZoneComponent {
     public readonly vehicles = input<Vehicle[]>();
-    public readonly vehicleDropped = output<string>();
+    public readonly vehicleDropped = output<{
+        vehicleId: string;
+        position: number;
+    }>();
 
     public readonly mode = input<'x-scroll' | 'y-scroll'>('x-scroll');
     public readonly isX = computed(() => this.mode() === 'x-scroll');

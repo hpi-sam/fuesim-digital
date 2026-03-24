@@ -51,6 +51,7 @@ export class VehiclesOnLocationComponent {
                 sectionId: null,
                 vehicleId,
                 assignAsSectionLeader: false,
+                position: undefined,
             },
             true
         );

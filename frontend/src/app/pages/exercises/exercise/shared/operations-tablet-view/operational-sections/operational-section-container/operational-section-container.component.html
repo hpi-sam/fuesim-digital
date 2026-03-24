@@ -28,7 +28,9 @@
             [vehicles]="vehicles"
             class="flex-grow-1 overflow-hidden"
             mode="y-scroll"
-            (vehicleDropped)="onVehicleDropped($event)"
+            (vehicleDropped)="
+                assignVehicle($event.vehicleId, false, $event.position)
+            "
         />
     }
 </div>

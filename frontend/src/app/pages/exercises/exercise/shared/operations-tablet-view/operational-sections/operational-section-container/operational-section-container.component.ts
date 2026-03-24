@@ -57,29 +57,49 @@ export class OperationalSectionContainerComponent implements OnInit {
                 createSelectVehiclesInOperationalSection(
                     this.operationalSection().id
                 ),
-                (vehicles) =>
-                    Object.values(vehicles).filter(
+                (vehicles) => {
+                    const data = Object.values(vehicles).filter(
                         (vehicle) =>
                             vehicle.operationalAssignment?.type ===
                                 'operationalSection' &&
                             vehicle.operationalAssignment.role ===
                                 'operationalSectionMember'
-                    )
+                    );
+                    data.sort((a, b) => {
+                        const positionA =
+                            a.operationalAssignment?.type ===
+                                'operationalSection' &&
+                            a.operationalAssignment.role ===
+                                'operationalSectionMember'
+                                ? a.operationalAssignment.position
+                                : -1;
+                        const positionB =
+                            b.operationalAssignment?.type ===
+                                'operationalSection' &&
+                            b.operationalAssignment.role ===
+                                'operationalSectionMember'
+                                ? b.operationalAssignment.position
+                                : -1;
+                        return positionA - positionB;
+                    });
+                    return data;
+                }
             )
         );
     }
 
-    public onVehicleDropped(vehicleId: string) {
-        this.assignVehicle(vehicleId, false);
-    }
-
-    public assignVehicle(vehicleId: string, asSectionLeader: boolean) {
+    public assignVehicle(
+        vehicleId: string,
+        asSectionLeader: boolean,
+        position: number | undefined = undefined
+    ) {
         this.exerciseService.proposeAction(
             {
                 type: '[OperationalSection] Move Vehicle To Operational Section',
                 sectionId: this.operationalSection().id,
                 vehicleId,
                 assignAsSectionLeader: asSectionLeader,
+                position,
             },
             true
         );

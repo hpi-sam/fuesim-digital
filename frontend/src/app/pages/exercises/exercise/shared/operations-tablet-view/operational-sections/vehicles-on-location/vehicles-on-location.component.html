@@ -5,7 +5,7 @@
             class="w-100"
             [vehicles]="vehicles()"
             mode="x-scroll"
-            (vehicleDropped)="onVehicleDropped($event)"
+            (vehicleDropped)="onVehicleDropped($event.vehicleId)"
         />
     </div>
 </div>

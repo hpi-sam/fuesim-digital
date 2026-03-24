@@ -21,7 +21,12 @@
         [class.layout-two-rows]="isX()"
         cdkDropList
         cdkDropListOrientation="mixed"
-        (cdkDropListDropped)="vehicleDropped.emit($event.item.data)"
+        (cdkDropListDropped)="
+            vehicleDropped.emit({
+                vehicleId: $event.item.data,
+                position: $event.currentIndex,
+            })
+        "
     >
         @for (vehicle of vehicles(); track vehicle.id) {
             <app-vehicle-tag [vehicle]="vehicle"></app-vehicle-tag>

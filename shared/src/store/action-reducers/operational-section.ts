@@ -1,4 +1,5 @@
 import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
+import { z } from 'zod';
 import { uuidValidationOptions } from '../../utils/uuid.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { Action, ActionReducer } from '../action-reducer.js';
@@ -7,6 +8,8 @@ import {
     operationalSectionAssignmentSchema,
     operationalSectionSchema,
 } from '../../models/operational-section.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { ReducerError } from '../reducer-error.js';
 
 export class AddOperationalSectionAction implements Action {
     @IsValue('[OperationalSection] Add Operational Section')
@@ -52,9 +55,12 @@ export class MoveVehicleToOperationalSectionAction implements Action {
 
     @IsBoolean()
     public readonly assignAsSectionLeader!: boolean;
+
+    @IsZodSchema(z.number().optional())
+    public readonly position!: number | undefined;
 }
 
-export class AssingLocalOperationsCommandAction implements Action {
+export class AssignLocalOperationsCommandAction implements Action {
     @IsValue('[OperationalSection] Assign Local Operations Command')
     public readonly type =
         '[OperationalSection] Assign Local Operations Command';
@@ -131,7 +137,7 @@ export namespace OperationalSectionActionReducers {
             action: MoveVehicleToOperationalSectionAction,
             reducer: (
                 draftState,
-                { sectionId, vehicleId, assignAsSectionLeader }
+                { sectionId, vehicleId, assignAsSectionLeader, position }
             ) => {
                 if (sectionId) {
                     const section = draftState.operationalSections[sectionId];
@@ -163,25 +169,80 @@ export namespace OperationalSectionActionReducers {
                     }
                 }
 
+                const previousAssignment = vehicle.operationalAssignment;
+
+                if (
+                    previousAssignment?.type === 'operationalSection' &&
+                    previousAssignment.role === 'operationalSectionMember'
+                ) {
+                    // Update position of all vehicles in the previous section that have to be moved
+                    Object.values(draftState.vehicles).forEach((v) => {
+                        if (
+                            v.operationalAssignment?.type ===
+                                'operationalSection' &&
+                            v.operationalAssignment.role ===
+                                'operationalSectionMember' &&
+                            v.operationalAssignment.sectionId ===
+                                previousAssignment.sectionId &&
+                            v.operationalAssignment.position >
+                                previousAssignment.position
+                        ) {
+                            v.operationalAssignment.position -= 1;
+                        }
+                    });
+                }
+
+                if (sectionId === null) {
+                    vehicle.operationalAssignment = null;
+                    return draftState;
+                }
+
+                if (assignAsSectionLeader) {
+                    vehicle.operationalAssignment =
+                        operationalSectionAssignmentSchema.parse({
+                            type: 'operationalSection',
+                            role: 'operationalSectionLeader',
+                            sectionId,
+                        });
+                    return draftState;
+                }
+
+                if (position === undefined)
+                    throw new ReducerError(
+                        'position cannot be undefined if assignAsSectionLeader is false'
+                    );
+
                 vehicle.operationalAssignment =
-                    sectionId === null
-                        ? null
-                        : operationalSectionAssignmentSchema.parse({
-                              type: 'operationalSection',
-                              role: assignAsSectionLeader
-                                  ? 'operationalSectionLeader'
-                                  : 'operationalSectionMember',
-                              sectionId,
-                          });
+                    operationalSectionAssignmentSchema.parse({
+                        type: 'operationalSection',
+                        role: 'operationalSectionMember',
+                        sectionId,
+                        position,
+                    });
+
+                // Update position of all vehicles in this section that have to be moved
+                Object.values(draftState.vehicles).forEach((v) => {
+                    if (
+                        v.operationalAssignment?.type ===
+                            'operationalSection' &&
+                        v.operationalAssignment.role ===
+                            'operationalSectionMember' &&
+                        v.operationalAssignment.sectionId === sectionId &&
+                        v.operationalAssignment.position >= position &&
+                        v.id !== vehicleId
+                    ) {
+                        v.operationalAssignment.position += 1;
+                    }
+                });
 
                 return draftState;
             },
             rights: 'operationsTablet',
         };
 
-    export const assignLocalOperationsCommand: ActionReducer<AssingLocalOperationsCommandAction> =
+    export const assignLocalOperationsCommand: ActionReducer<AssignLocalOperationsCommandAction> =
         {
-            action: AssingLocalOperationsCommandAction,
+            action: AssignLocalOperationsCommandAction,
             reducer: (draftState, { vehicleId }) => {
                 const vehicle = draftState.vehicles[vehicleId];
 

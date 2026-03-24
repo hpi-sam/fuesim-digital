@@ -1,22 +1,38 @@
 import * as z from 'zod';
+import { uuidSchema } from '../utils/uuid.js';
 
 export const operationalSectionSchema = z.object({
     type: z.literal('operationalSection'),
-    id: z.uuidv4(),
+    id: uuidSchema,
     title: z.string().optional(),
 });
 
 export type OperationalSection = z.infer<typeof operationalSectionSchema>;
 
-export const localOperationsCommandAssignmentSchema = z.object({
+export const localOperationsCommandAssignmentSchema = z.strictObject({
     type: z.literal('localOperationsCommand'),
 });
 
-export const operationalSectionAssignmentSchema = z.object({
+export const operationalSectionBaseAssignmentSchema = z.strictObject({
     type: z.literal('operationalSection'),
-    role: z.literal(['operationalSectionLeader', 'operationalSectionMember']),
-    sectionId: z.uuidv4(),
+    sectionId: uuidSchema,
 });
+
+export const operationalSectionLeaderAssignmentSchema = z.strictObject({
+    ...operationalSectionBaseAssignmentSchema.shape,
+    role: z.literal('operationalSectionLeader'),
+});
+
+export const operationalSectionMemberAssignmentSchema = z.strictObject({
+    ...operationalSectionBaseAssignmentSchema.shape,
+    role: z.literal('operationalSectionMember'),
+    position: z.number(),
+});
+
+export const operationalSectionAssignmentSchema = z.union([
+    operationalSectionLeaderAssignmentSchema,
+    operationalSectionMemberAssignmentSchema,
+]);
 
 export type OperationalSectionAssignment = z.infer<
     typeof operationalSectionAssignmentSchema

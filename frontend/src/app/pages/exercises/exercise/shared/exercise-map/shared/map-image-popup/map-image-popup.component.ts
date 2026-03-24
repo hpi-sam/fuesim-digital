@@ -89,6 +89,6 @@ export class MapImagePopupComponent implements OnInit {
     }
 
     public closePopup() {
-        this.popupService.closePopup();
+        this.popupService.dismissPopup();
     }
 }

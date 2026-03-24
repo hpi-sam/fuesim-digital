@@ -140,7 +140,7 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
     ): void {
         super.onFeatureClicked(event, feature);
 
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 PatientPopupComponent,
                 feature,

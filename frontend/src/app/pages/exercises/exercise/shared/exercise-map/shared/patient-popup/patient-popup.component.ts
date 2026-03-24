@@ -33,6 +33,6 @@ export class PatientPopupComponent implements OnInit {
     }
 
     public closePopup() {
-        this.popupService.closePopup();
+        this.popupService.dismissPopup();
     }
 }

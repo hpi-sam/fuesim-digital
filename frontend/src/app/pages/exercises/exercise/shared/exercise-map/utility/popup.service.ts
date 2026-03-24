@@ -1,53 +1,61 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import type { OpenPopupOptions } from './popup-manager';
 
+type PopupProposal =
+    | {
+          action: 'toggle';
+          options: OpenPopupOptions;
+      }
+    | { action: 'dismiss' | 'submit'; options?: undefined };
+
+/**
+ * Allows for opening and closing popups using {@link togglePopup},
+ * {@link submitPopup} and {@link dismissPopup}.
+ *
+ * Submitting a popup does not trigger it's {@link OpenPopupOptions.onDismissCallback}.
+ */
 @Injectable({
     providedIn: 'root',
 })
 export class PopupService {
     /**
-     * The currently open popup
+     * New popup proposals are emitted via this subject.
+     * @deprecated should only be subscribed by {@link PopupManager} and never
+     *             emitted to.
      */
-    public currentPopup: OpenPopupOptions | undefined;
-    /**
-     * This emits the current popup whenever it changes.
-     */
-    public readonly currentPopup$ = new Subject<{
-        nextPopup: OpenPopupOptions | undefined;
-        previousPopup: OpenPopupOptions | undefined;
-    }>();
-    /**
-     * This should be notified, whenever the current popup should be changed
-     */
-    public readonly proposePopup$ = new Subject<OpenPopupOptions | undefined>();
+    public readonly nextProposal$ = new BehaviorSubject<PopupProposal>({
+        action: 'dismiss',
+    });
 
     /**
-     * Closes the currently open popup.
+     * The {@link OpenPopupOptions} of the currently shown popup or `undefined`
+     * if there is none.
      */
-    public closePopup() {
-        this.proposePopup$.next(undefined);
+    get currentPopupOptions() {
+        return this.nextProposal$.getValue().options;
+    }
+
+    /**
+     * Closes the currently open popup without changes
+     */
+    public dismissPopup() {
+        this.nextProposal$.next({ action: 'dismiss' });
+    }
+
+    /**
+     * Closes the currently open popup after submitting new data
+     */
+    public submitPopup() {
+        this.nextProposal$.next({ action: 'submit' });
     }
 
     /**
      * Opens a popup with the specified options.
      * If a popup with these exact options is already open,
      * it will be closed instead.
-     * @param options The options for the popup
      */
-    public openPopup(options: OpenPopupOptions) {
-        this.proposePopup$.next(options);
-    }
-
-    /**
-     *  Notifies all listeners, that a new popup was opened
-     */
-    public popupOpened(options: OpenPopupOptions | undefined) {
-        const previousPopup = this.currentPopup;
-        this.currentPopup = options;
-        this.currentPopup$.next({
-            nextPopup: options,
-            previousPopup,
-        });
+    public togglePopup(options: OpenPopupOptions) {
+        this.nextProposal$.next({ action: 'toggle', options });
     }
 }

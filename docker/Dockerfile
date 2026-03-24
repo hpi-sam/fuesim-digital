@@ -26,6 +26,10 @@ WORKDIR $PRODUCTION_PATH
 RUN npm run deployment
 
 FROM rust AS docs-builder
+
+# needed to use PRODUCTION_PATH before the first FROM
+ARG PRODUCTION_PATH
+
 RUN cargo install mdbook
 
 # add the source code to app

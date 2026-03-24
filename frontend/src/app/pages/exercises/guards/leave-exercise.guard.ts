@@ -36,7 +36,7 @@ export class LeaveExerciseGuard {
             if (!this.parallelExerciseService.isJoined) {
                 this.messageService.postMessage({
                     title: 'Übung verlassen',
-                    body: 'Sie können der Übung über die Übungs-ID wieder beitreten.',
+                    body: 'Sie können der Übung über die Übungs-PIN wieder beitreten.',
                     color: 'info',
                 });
             }

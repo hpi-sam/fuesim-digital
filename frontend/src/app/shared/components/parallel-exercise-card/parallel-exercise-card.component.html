@@ -14,8 +14,8 @@
             />
         </h2>
         <p class="card-text">
-            Teilnehmer-ID: {{ parallelExercise().participantKey }}
-            <app-copy-button [value]="participantUrl()" />
+            Teilnehmenden-PIN: {{ parallelExercise().participantKey }}
+            <button app-copy-button [value]="participantUrl()"></button>
         </p>
     </div>
     <ul class="list-group list-group-flush">

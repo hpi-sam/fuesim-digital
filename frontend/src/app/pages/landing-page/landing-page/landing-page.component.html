@@ -6,7 +6,7 @@
             <div class="p-4 bg-light rounded-3 h-100">
                 <h2>Übung beitreten</h2>
                 <p class="lead">
-                    Bitte geben Sie hier die Übungs-ID ein, die sie von der
+                    Bitte geben Sie hier die Übungs-PIN ein, die sie von der
                     Übungsleitung erhalten haben:
                 </p>
                 <div class="input-group">
@@ -25,7 +25,7 @@
                         appJoinIdValidator
                         appExerciseExistsValidator
                         class="form-control form-control-lg"
-                        placeholder="Übungs-ID"
+                        placeholder="Übungs-PIN"
                         type="text"
                         data-cy="exerciseIdInput"
                         #exerciseIdInput="ngModel"
@@ -107,12 +107,12 @@
 
                 @if (exerciseHasBeenCreated) {
                     <div class="alert alert-success" role="alert">
-                        Sie haben eine Übung mit der Übungsleiter-ID
+                        Sie haben eine Übung mit der Übungsleitungs-PIN
                         <span
                             class="font-monospace fw-bolder user-select-all"
                             >{{ trainerKey }}</span
                         >
-                        und der Teilnehmer-ID
+                        und der Teilnehmenden-PIN
                         <span
                             class="font-monospace fw-bolder user-select-all"
                             >{{ participantKey }}</span

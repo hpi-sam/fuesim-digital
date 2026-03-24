@@ -6,7 +6,7 @@ import { cloneDeepMutable, StateExport } from 'fuesim-digital-shared';
 import { throttle } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
-import { openClientOverviewModal } from '../client-overview/open-client-overview-modal';
+import { openClientsModal } from '../clients-modal/open-clients-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
 import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
 import { ApiService } from '../../../../../core/api.service';
@@ -34,8 +34,8 @@ export class TimeTravelComponent implements OnDestroy {
 
     public timeConstraints$ = this.store.select(selectTimeConstraints);
 
-    public openClientOverview() {
-        openClientOverviewModal(this.modalService);
+    public openClientsModal() {
+        openClientsModal(this.modalService);
     }
 
     public openTransferOverview() {
@@ -124,7 +124,7 @@ export class TimeTravelComponent implements OnDestroy {
         this.messageService.postMessage({
             color: 'success',
             title: 'Neue Übung erstellt',
-            body: `Übungsleiter-ID: ${trainerKey}`,
+            body: `Übungsleitungs-PIN: ${trainerKey}`,
         });
         window
             .open(`${location.origin}/exercises/${trainerKey}`, '_blank')

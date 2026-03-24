@@ -9,7 +9,7 @@ describe('Active Exercise', () => {
 
     it('fails getting a role for the wrong key', async () => {
         const exercise =
-            await environment.services.exerciseService.exerciseFactory.fromBlank();
+            await environment.services.exerciseService.createExerciseFromBlank();
 
         expect(() =>
             exercise.getRoleFromUsedKey('wrong key' as ExerciseKey)
@@ -20,7 +20,7 @@ describe('Active Exercise', () => {
         let exercise: ActiveExercise | undefined;
         beforeEach(async () => {
             exercise =
-                await environment.services.exerciseService.exerciseFactory.fromBlank();
+                await environment.services.exerciseService.createExerciseFromBlank();
             exercise.start();
         });
         afterEach(() => {
@@ -47,7 +47,7 @@ describe('Active Exercise', () => {
     describe('Reactions to Actions', () => {
         it('calls start when matching action is sent', async () => {
             const exercise =
-                await environment.services.exerciseService.exerciseFactory.fromBlank();
+                await environment.services.exerciseService.createExerciseFromBlank();
 
             const startMock = jest.spyOn(ActiveExercise.prototype, 'start');
             startMock.mockImplementation(() => ({}));
@@ -61,7 +61,7 @@ describe('Active Exercise', () => {
 
         it('calls pause when matching action is sent', async () => {
             const exercise =
-                await environment.services.exerciseService.exerciseFactory.fromBlank();
+                await environment.services.exerciseService.createExerciseFromBlank();
 
             const pause = jest.spyOn(ActiveExercise.prototype, 'pause');
             pause.mockImplementation(() => ({}));

@@ -5,7 +5,6 @@ import {
 } from 'fuesim-digital-shared';
 import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
-import { importExercise } from '../utils/import-exercise.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ApiError, NotFoundError } from '../utils/http.js';
 
@@ -17,13 +16,11 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
             ? { user: req.session.user.id }
             : undefined;
         const exercise = isEmpty(req.body)
-            ? await exerciseService.exerciseFactory.fromBlank(optionalData)
-            : await importExercise(
+            ? await exerciseService.createExerciseFromBlank(optionalData)
+            : await exerciseService.createExerciseFromFile(
                   req.body,
-                  exerciseService.exerciseFactory,
                   optionalData
               );
-        await exerciseService.loadExercise(exercise);
 
         res.status(201).send({
             participantKey: exercise.participantKey,

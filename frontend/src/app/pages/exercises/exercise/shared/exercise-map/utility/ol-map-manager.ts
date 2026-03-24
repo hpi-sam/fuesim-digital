@@ -121,6 +121,7 @@ export class OlMapManager {
             this.olMap.getInteractions(),
             store,
             popupManager,
+            popupService,
             this.olMap,
             this.layerFeatureManagerDictionary,
             this.destroy$

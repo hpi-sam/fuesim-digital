@@ -197,7 +197,7 @@ export class SimulatedRegionFeatureManager
         }
 
         const simulatedRegionId = feature.getId() as UUID;
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 SimulatedRegionPopupComponent,
                 event.coordinate,

@@ -4,8 +4,7 @@ import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Observable, Subject } from 'rxjs';
-// eslint-disable-next-line @typescript-eslint/no-shadow
-import type { Element, UUID } from 'fuesim-digital-shared';
+import type { Element as StateElement, UUID } from 'fuesim-digital-shared';
 import type { FeatureLike } from 'ol/Feature';
 import type Style from 'ol/style/Style';
 import type { FeatureManager } from '../utility/feature-manager';
@@ -20,6 +19,7 @@ import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-ma
 import { TranslateInteraction } from '../utility/translate-interaction';
 import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import type { PopupService } from '../utility/popup.service';
 import { ElementManager } from './element-manager';
 
 /**
@@ -126,17 +126,19 @@ export abstract class MoveableFeatureManager<
     protected addMarking(
         feature: FeatureLike,
         styles: Style[],
-        popupService: any,
+        popupService: PopupService,
         store: any,
         markingStyle: any
     ) {
+        const currentPopup = popupService.currentPopupOptions;
+        console.log('redrawing markings', currentPopup);
         if (
-            (popupService.currentPopup?.markedForTrainerUUIDs.includes(
+            (currentPopup?.markedForTrainerUUIDs.includes(
                 feature.getId() as UUID
             ) &&
                 selectStateSnapshot(selectCurrentMainRole, store) ===
                     'trainer') ||
-            (popupService.currentPopup?.markedForParticipantUUIDs.includes(
+            (currentPopup?.markedForParticipantUUIDs.includes(
                 feature.getId() as UUID
             ) &&
                 selectStateSnapshot(selectCurrentMainRole, store) ===
@@ -157,7 +159,7 @@ export abstract class MoveableFeatureManager<
      * The standard implementation is to ignore these events.
      */
     public onFeatureDrop(
-        droppedElement: Element,
+        droppedElement: StateElement,
         droppedOnFeature: Feature<FeatureType>,
         dropEvent: MouseEvent | TranslateEvent
     ): boolean {

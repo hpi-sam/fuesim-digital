@@ -35,6 +35,10 @@ import {
     type ExerciseType,
     type ExerciseStatus,
     logEntrySchema,
+    technicalChallengeSchema,
+    TechnicalChallenge,
+    taskSchema,
+    Task,
 } from './models/index.js';
 import type { ExerciseRadiogram } from './models/radiogram/index.js';
 import { getRadiogramConstructor } from './models/radiogram/index.js';
@@ -52,10 +56,9 @@ import {
     catchAllHospitalId,
     defaultPatientCategories,
     defaultMapImagesTemplatesById,
-} from './data/index.js';
+ defaultVehicleTemplatesById } from './data/index.js';
 import { IsZodSchema } from './utils/validators/is-zod-object.js';
 import { vehicleSchema } from './models/vehicle.js';
-import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import type { TreatmentAssignment } from './store/index.js';
 import { restrictedZoneSchema } from './models/restricted-zone.js';
 import { materialSchema } from './models/material.js';
@@ -132,6 +135,12 @@ export class ExerciseState {
 
     @IsZodSchema(z.record(uuidSchema, mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
+
+    @IsZodSchema(z.record(z.uuidv4(), taskSchema))
+    public tasks: { [key: UUID]: Task } = {};
+
+    @IsZodSchema(z.record(z.uuidv4(), technicalChallengeSchema))
+    public technicalChallenges: { [key: UUID]: TechnicalChallenge } = {};
 
     @IsZodSchema(z.record(uuidSchema, transferPointSchema))
     public readonly transferPoints: { readonly [key: UUID]: TransferPoint } =

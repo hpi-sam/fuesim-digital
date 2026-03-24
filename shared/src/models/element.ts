@@ -11,6 +11,7 @@ import type {
     TransferPoint,
     Vehicle,
     Viewport,
+    TechnicalChallenge,
 } from './index.js';
 
 export type Element =
@@ -23,6 +24,7 @@ export type Element =
     | Personnel
     | RestrictedZone
     | SimulatedRegion
+    | TechnicalChallenge
     | TransferPoint
     | Vehicle
     | Viewport;

@@ -38,3 +38,4 @@ frontend/cypress*
 docker-compose.yml
 **/README.md
 
+docs/book

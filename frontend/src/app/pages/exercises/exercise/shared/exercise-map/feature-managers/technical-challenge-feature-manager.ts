@@ -1,13 +1,18 @@
 import type { Store } from '@ngrx/store';
-import type {
-    MoveTechnicalChallengeAction,
-    TechnicalChallenge,
-    UUID,
+import {
+    currentStateOf,
+    type TechnicalChallengeState,
+    type MoveTechnicalChallengeAction,
+    type TechnicalChallenge,
+    type UUID,
+    type Element,
 } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
 import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
+import type { TranslateEvent } from 'ol/interaction/Translate';
+import type { Polygon } from 'ol/geom';
 import { TechnicalChallengePopupComponent } from '../shared/technical-challenge-popup/technical-challenge-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
@@ -23,7 +28,7 @@ import {
 import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
-export class TechnicalChallengeFeatureManager extends MoveableFeatureManager<TechnicalChallenge> {
+export class TechnicalChallengeFeatureManager extends MoveableFeatureManager<TechnicalChallenge, Polygon> {
     public override register(
         destroy$: Subject<void>,
         mapInteractionsManager: OlMapInteractionsManager
@@ -37,9 +42,13 @@ export class TechnicalChallengeFeatureManager extends MoveableFeatureManager<Tec
         // TODO: listen for state changes
     }
 
+    private currentStateOf(feature: Feature): TechnicalChallengeState {
+        return currentStateOf(this.getElementFromFeature(feature) as TechnicalChallenge)
+    }
+
     private readonly imageStyleHelper = new ImageStyleHelper(
         (feature) =>
-            (this.getElementFromFeature(feature) as TechnicalChallenge).image
+            this.currentStateOf(feature).mapImage
     );
     private readonly popupHelper = new ImagePopupHelper(this.olMap, this.layer);
 
@@ -83,6 +92,35 @@ export class TechnicalChallengeFeatureManager extends MoveableFeatureManager<Tec
                 }
             )
         );
+    }
+
+    public override onFeatureDrop(
+        droppedElement: StateElement,
+        droppedOnFeature: Feature<Polygon>,
+        dropEvent: MouseEvent | TranslateEvent
+    ): boolean {
+        if (droppedElement.type !== 'personnel') {
+            return super.onFeatureDrop(
+                droppedElement,
+                droppedOnFeature,
+                dropEvent
+            );
+        }
+        const technicalChallenge = this.getElementFromFeature(
+            droppedOnFeature
+        ) as TechnicalChallenge;
+
+        // TODO: simply trigger task selection popup
+
+        this.exerciseService.proposeAction(
+            {
+                type: '[TechnicalChallenge] Assign a personnel to technical challenge',
+                technicalChallengeId: technicalChallenge.id,
+                personnelId: droppedElement.id,
+            },
+            true
+        );
+        return true;
     }
 
     override isFeatureTranslatable(feature: Feature<Point>): boolean {

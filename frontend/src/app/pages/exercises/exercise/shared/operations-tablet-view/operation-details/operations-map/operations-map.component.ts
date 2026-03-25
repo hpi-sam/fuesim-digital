@@ -1,5 +1,7 @@
 import {
     Component,
+    computed,
+    effect,
     ElementRef,
     inject,
     OnDestroy,
@@ -10,18 +12,20 @@ import { Store } from '@ngrx/store';
 import maplibregl from 'maplibre-gl';
 // eslint-disable-next-line no-restricted-imports
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { map, first, Subject, takeUntil } from 'rxjs';
+import { first, Subject, takeUntil } from 'rxjs';
 import {
     upperLeftCornerOf,
     lowerRightCornerOf,
     defaultTileMapProperties,
+    defaultOperationsMapProperties,
 } from 'fuesim-digital-shared';
 import { startingPosition } from '../../../starting-position';
 import { AppState } from '../../../../../../../state/app.state';
 import {
     selectViewports,
-    selectTileMapProperties,
     selectSimulatedRegions,
+    selectOperationsMapProperties,
+    selectConfiguration,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
 
@@ -35,22 +39,40 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
     private readonly store = inject(Store<AppState>);
     public readonly INITIAL_ZOOM = 17;
 
-    public availableViewports$ = this.store
-        .select(selectViewports)
-        .pipe(map((viewports) => Object.values(viewports)));
+    private readonly availableViewportsSignal =
+        this.store.selectSignal(selectViewports);
+    public readonly availableViewports = computed(() =>
+        Object.values(this.availableViewportsSignal())
+    );
 
-    private readonly tileMapPropertiesSubscription = this.store
-        .select(selectTileMapProperties)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((tileMapProperties) => {
+    public readonly operationsMapProperties = this.store.selectSignal(
+        selectOperationsMapProperties
+    );
+
+    constructor() {
+        effect(() => {
+            const operationsMapProperties = this.operationsMapProperties();
+            this.is3dBuildingsEnabled =
+                operationsMapProperties.enable3dBuildings;
+            this.updateDisplay3DBuildings();
+
             const source = this.map?.getSource(
+                'openfreemap'
+            ) as maplibregl.RasterTileSource | null;
+            if (source) {
+                source.setUrl(operationsMapProperties.dataUrl);
+            }
+
+            const tilesSource = this.map?.getSource(
                 'raster-tiles'
             ) as maplibregl.RasterTileSource | null;
-            if (!source) return;
+            if (tilesSource) {
+                tilesSource.setTiles([operationsMapProperties.tileUrl]);
+            }
 
-            source.setTiles([tileMapProperties.tileUrl]);
             this.map?.triggerRepaint();
         });
+    }
 
     public readonly mapContainerRef =
         viewChild<ElementRef<HTMLElement>>('mapContainer');
@@ -109,6 +131,12 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
         if (!this.map) return;
 
         this.is3dBuildingsEnabled = !this.is3dBuildingsEnabled;
+        this.updateDisplay3DBuildings();
+    }
+
+    public updateDisplay3DBuildings() {
+        if (!this.map) return;
+
         const visibility = this.is3dBuildingsEnabled ? 'visible' : 'none';
 
         this.map.setLayoutProperty('3d-buildings', 'visibility', visibility);
@@ -139,14 +167,20 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
             throw new Error('Map container reference is undefined');
         }
         this.store
-            .select(selectTileMapProperties)
+            .select(selectConfiguration)
             .pipe(first(), takeUntil(this.destroy$))
-            .subscribe((tileMapProperties) => {
-                this.initMap(tileMapProperties.tileUrl);
+            .subscribe((configuration) => {
+                this.initMap(
+                    configuration.tileMapProperties.tileUrl,
+                    configuration.operationsMapProperties.dataUrl
+                );
             });
     }
 
-    private initMap(defaultTileUrl: string = defaultTileMapProperties.tileUrl) {
+    private initMap(
+        defaultTileUrl: string = defaultTileMapProperties.tileUrl,
+        defaultOperationsMapUrl: string = defaultOperationsMapProperties.dataUrl
+    ) {
         const mapContainer = this.mapContainerRef()?.nativeElement;
         if (mapContainer === undefined) {
             throw new Error('Map container reference is undefined');
@@ -164,7 +198,7 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
                         maxzoom: 19,
                     },
                     openfreemap: {
-                        url: `https://tiles.openfreemap.org/planet`,
+                        url: defaultOperationsMapUrl,
                         type: 'vector',
                     },
                 },
@@ -242,7 +276,6 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.tileMapPropertiesSubscription.unsubscribe();
         this.map?.remove();
         this.destroy$.next();
     }

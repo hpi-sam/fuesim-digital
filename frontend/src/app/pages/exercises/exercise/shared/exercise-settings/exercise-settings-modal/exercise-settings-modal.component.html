@@ -24,7 +24,7 @@
                     [(ngModel)]="tileMapProperties.tileUrl"
                     [appAutofocus]="true"
                     appUrlValidator
-                    [pattern]="tileMapUrlRegex"
+                    [pattern]="tileUrlRegex"
                     required
                     type="url"
                     class="form-control"
@@ -58,6 +58,84 @@
                 data-cy="settingsSaveTileMapPropertiesButton"
             >
                 Karteneinstellungen speichern
+            </button>
+        </div>
+    </div>
+    <br />
+    <div class="card">
+        <div class="card-header">Einsatzkarte</div>
+        <div class="card-body">
+            <div class="form-group mb-3">
+                <label class="form-label mb-1">Serveradresse:</label>
+                <p class="small text-muted mb-2">
+                    <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
+                    Unter dieser Adresse werden die Karten-Kacheln für die
+                    Einsatzansicht geladen. Die URL muss die Platzhalter für die
+                    Koordinaten
+                    <code>{{ '{' }}x{{ '}' }}</code
+                    >, <code>{{ '{' }}y{{ '}' }}</code> oder
+                    <code>{{ '{' }}-y{{ '}' }}</code
+                    >, sowie der Zoomstufe
+                    <code>{{ '{' }}z{{ '}' }}</code> enthalten. Bitte beachten
+                    Sie die Lizenzbedingungen der entsprechenden Karten-Server.
+                </p>
+                <input
+                    #operationsMapTileUrlInput="ngModel"
+                    [(ngModel)]="operationsMapProperties.tileUrl"
+                    [appAutofocus]="true"
+                    appUrlValidator
+                    [pattern]="tileUrlRegex"
+                    required
+                    type="url"
+                    class="form-control"
+                    placeholder="https://a.tile.openstreetmap.de/{z}/{x}/{y}.png"
+                />
+                <app-display-validation
+                    [ngModelInput]="operationsMapTileUrlInput"
+                ></app-display-validation>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label mb-1"
+                    >Serveradresse Gebäudedaten:</label
+                >
+                <p class="small text-muted mb-2">
+                    Unter dieser Adresse werden die 3D Gebäudedaten geladen.
+                    Bitte beachten Sie die Lizenzbedingungen der entsprechenden
+                    Karten-Server.
+                </p>
+                <input
+                    #operationsUrlInput="ngModel"
+                    [(ngModel)]="operationsMapProperties.dataUrl"
+                    [appAutofocus]="true"
+                    appUrlValidator
+                    required
+                    type="url"
+                    class="form-control"
+                    placeholder="https://tiles.openfreemap.org/planet"
+                />
+                <app-display-validation
+                    [ngModelInput]="operationsUrlInput"
+                ></app-display-validation>
+            </div>
+
+            <div class="form-group mb-3">
+                3D Gebäude anzeigen?
+                <div class="form-switch">
+                    <input
+                        [(ngModel)]="operationsMapProperties.enable3dBuildings"
+                        class="form-check-input"
+                        type="checkbox"
+                        data-cy="settingsOperationsMap3dBuildingsCheckbox"
+                    />
+                </div>
+            </div>
+
+            <button
+                (click)="updateOperationsMapProperties()"
+                class="btn btn-primary"
+                data-cy="settingsSaveTileMapPropertiesButton"
+            >
+                Einsatzkarteneinstellungen speichern
             </button>
         </div>
     </div>

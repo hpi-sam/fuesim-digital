@@ -9,6 +9,7 @@ import type { AppState } from '../../../../../../state/app.state';
 import {
     selectTileMapProperties,
     selectConfiguration,
+    selectOperationsMapProperties,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { UrlValidatorDirective } from '../../../../../../shared/validation/url-validator.directive';
@@ -39,8 +40,11 @@ export class ExerciseSettingsModalComponent {
         selectStateSnapshot(selectTileMapProperties, this.store)
     );
 
-    public readonly tileMapUrlRegex =
-        /^(?=.*\{x\})(?=.*\{-?y\})(?=.*\{z\}).*$/u;
+    public operationsMapProperties = cloneDeepMutable(
+        selectStateSnapshot(selectOperationsMapProperties, this.store)
+    );
+
+    public readonly tileUrlRegex = /^(?=.*\{x\})(?=.*\{-?y\})(?=.*\{z\}).*$/u;
 
     public configuration$ = this.store.select(selectConfiguration);
 
@@ -48,6 +52,13 @@ export class ExerciseSettingsModalComponent {
         this.exerciseService.proposeAction({
             type: '[Configuration] Set tileMapProperties',
             tileMapProperties: this.tileMapProperties,
+        });
+    }
+
+    public updateOperationsMapProperties() {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set operationsMapProperties',
+            operationsMapProperties: this.operationsMapProperties,
         });
     }
 

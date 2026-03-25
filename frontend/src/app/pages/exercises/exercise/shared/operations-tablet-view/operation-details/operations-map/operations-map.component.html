@@ -1,21 +1,22 @@
-<div
-    class="bg-white d-flex flex-column flex-grow-1 border border-secondary-subtle h-100"
->
+<div class="bg-white d-flex flex-column border border-secondary-subtle h-100">
     <div class="flex-grow-1" #mapContainer></div>
     <div class="d-flex flex-row gap-1">
+        @if (operationsMapProperties().enable3dBuildings) {
+            <button
+                class="btn btn-sm rounded-0 px-3"
+                [class.btn-success]="is3dBuildingsEnabled"
+                [class.btn-light]="!is3dBuildingsEnabled"
+                (click)="toggle3DBuildings()"
+            >
+                3D
+            </button>
+        }
         <button
-            class="btn btn-sm rounded-0 px-3"
-            [class.btn-success]="is3dBuildingsEnabled"
-            [class.btn-light]="!is3dBuildingsEnabled"
-            (click)="toggle3DBuildings()"
-        >
-            3D
-        </button>
-        <button
-            class="btn btn-sm btn-light rounded-0 px-3 d-flex flex-row align-items-center gap-1"
+            class="btn btn-sm btn-light rounded-0 px-3 gap-1"
             (click)="gotoHomeLocation()"
         >
-            <i class="bi bi-house-fill"></i> <span>Zurück zum Einsatzort</span>
+            <i class="bi bi-house-fill me-2"></i>
+            <span>Zurück zum Einsatzort</span>
         </button>
     </div>
 </div>

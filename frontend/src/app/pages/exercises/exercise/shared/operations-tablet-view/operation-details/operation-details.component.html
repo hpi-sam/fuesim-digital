@@ -1,16 +1,6 @@
-<div class="d-flex flex-row h-100 w-100 gap-4 p-4">
-    <div class="d-flex flex-column h-100 gap-4 flex-8" style="flex: 12">
-        @if (showExerciseDetails()) {
-            <div
-                class="bg-white d-flex flex-row justify-content-between border border-secondary-subtle align-items-center px-3 py-2 h3"
-            >
-                <span class="fw-bold m-0"
-                    >Übung {{ participantId$ | async }}</span
-                >
-                <app-exercise-state-badge />
-            </div>
-        }
-        <app-operations-map class="flex-grow-1" />
+<div class="d-flex flex-column h-100">
+    <div class="fill p-2 d-flex">
+        <app-operations-map class="col-10" />
+        <app-operations-vehicles class="col-2" />
     </div>
-    <app-operations-vehicles style="flex: 4" />
 </div>

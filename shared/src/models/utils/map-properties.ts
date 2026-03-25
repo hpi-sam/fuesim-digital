@@ -17,3 +17,13 @@ export const tileMapPropertiesSchema = z.strictObject({
     maxZoom: z.number().positive(),
 });
 export type TileMapProperties = z.infer<typeof tileMapPropertiesSchema>;
+
+export const operationsMapPropertiesSchema = z.strictObject({
+    tileUrl: tileUrlSchema,
+    dataUrl: z.url(),
+    enable3dBuildings: z.boolean(),
+});
+
+export type OperationsMapProperties = z.infer<
+    typeof operationsMapPropertiesSchema
+>;

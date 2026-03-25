@@ -128,6 +128,11 @@ export const selectTileMapProperties = createSelector(
     (configuration) => configuration.tileMapProperties
 );
 
+export const selectOperationsMapProperties = createSelector(
+    selectConfiguration,
+    (configuration) => configuration.operationsMapProperties
+);
+
 export const selectTransferLines = createSelector(
     selectExerciseState,
     selectTransferPoints,

@@ -89,7 +89,7 @@ export function exportPatientsToCSV(state: ExerciseState) {
     return Papa.unparse(
         [
             Object.values(patientsCsvExportColumns),
-            ...preparePatientsForCSVExport(state),
+            ...preparePatientsForCSVExport(state).map(Object.values),
         ],
         {
             delimiter: ';',

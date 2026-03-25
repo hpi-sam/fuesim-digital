@@ -27,6 +27,12 @@ import { UserRepository } from '../database/repositories/user-repository.js';
 import { SessionRepository } from '../database/repositories/session-repository.js';
 import { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import type { OidcService } from '../auth/oidc-service.js';
+import { AccessKeyService } from '../database/services/access-key-service.js';
+import { AccessKeyRepository } from '../database/repositories/access-key-repository.js';
+import type { Services } from '../database/services/index.js';
+import { ParallelExerciseService } from '../database/services/parallel-exercise-service.js';
+import { ParallelExerciseRepository } from '../database/repositories/parallel-exercise-repository.js';
+import type { Repositories } from '../database/repositories/index.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -93,6 +99,17 @@ export class WebsocketClient {
         this.socket.on(event, callback as any);
     }
 
+    public async waitOn<
+        EventKey extends keyof AllServerToClientEvents,
+        Callback extends
+            AllServerToClientEvents[EventKey] = AllServerToClientEvents[EventKey],
+        Response extends Parameters<Callback>[0] = Parameters<Callback>[0],
+    >(event: EventKey): Promise<Response> {
+        return new Promise<Response>((resolve) => {
+            this.socket.on(event, resolve as any);
+        });
+    }
+
     private readonly calls: Map<
         string,
         Parameters<AllServerToClientEvents[keyof AllServerToClientEvents]>[]
@@ -120,34 +137,15 @@ export class WebsocketClient {
 
 export class TestEnvironment {
     public server!: FuesimServer;
-    private _databaseService!: DatabaseService;
-    private _exerciseService!: ExerciseService;
-    private _exerciseRepository!: ExerciseRepository;
-    private _actionRepository!: ActionRepository;
-    private _authService!: AuthService;
-    private _exerciseManagerService!: ExerciseManagerService;
+    private _services!: Services;
+    private _repositories!: Repositories;
 
-    public get databaseService(): DatabaseService {
-        return this._databaseService;
-    }
-    public get exerciseService(): ExerciseService {
-        return this._exerciseService;
+    public get repositories(): Repositories {
+        return this._repositories;
     }
 
-    public get authService(): AuthService {
-        return this._authService;
-    }
-
-    public get exerciseManagerService() {
-        return this._exerciseManagerService;
-    }
-
-    public get exerciseRepository(): ExerciseRepository {
-        return this._exerciseRepository;
-    }
-
-    public get actionRepository(): ActionRepository {
-        return this._actionRepository;
+    public get services(): Services {
+        return this._services;
     }
 
     public httpRequest(
@@ -159,11 +157,17 @@ export class TestEnvironment {
         if (session) {
             req.set(
                 'Cookie',
-                `${this.authService.SESSION_COOKIE_NAME}=${session}`
+                `${this.services.authService.SESSION_COOKIE_NAME}=${session}`
             );
         }
 
         return req;
+    }
+
+    public init(repositories: Repositories, services: Services) {
+        this._repositories = repositories;
+        this._services = services;
+        this.server = new FuesimServer(this.services);
     }
 
     /**
@@ -181,7 +185,7 @@ export class TestEnvironment {
                 ...(session
                     ? {
                           extraHeaders: {
-                              Cookie: `${this.authService.SESSION_COOKIE_NAME}=${session}`,
+                              Cookie: `${this.services.authService.SESSION_COOKIE_NAME}=${session}`,
                           },
                       }
                     : {}),
@@ -192,28 +196,6 @@ export class TestEnvironment {
             clientSocket?.close();
         }
     }
-
-    public init(
-        databaseService: DatabaseService,
-        exerciseService: ExerciseService,
-        exerciseRepository: ExerciseRepository,
-        actionRepository: ActionRepository,
-        authService: AuthService,
-        exerciseManagerService: ExerciseManagerService
-    ) {
-        this._databaseService = databaseService;
-        this._exerciseService = exerciseService;
-        this._authService = authService;
-        this._exerciseManagerService = exerciseManagerService;
-        this._exerciseRepository = exerciseRepository;
-        this._actionRepository = actionRepository;
-        this.server = new FuesimServer(
-            this.databaseService,
-            exerciseService,
-            authService,
-            exerciseManagerService
-        );
-    }
 }
 
 export const createTestEnvironment = (): TestEnvironment => {
@@ -223,10 +205,14 @@ export const createTestEnvironment = (): TestEnvironment => {
     let exerciseService: ExerciseService;
     let authService: AuthService;
     let exerciseManagerService: ExerciseManagerService;
+    let accessKeyService: AccessKeyService;
     let exerciseRepository: ExerciseRepository;
     let actionRepository: ActionRepository;
     let userRepository: UserRepository;
     let sessionRepository: SessionRepository;
+    let accessKeyRepository: AccessKeyRepository;
+    let parallelExerciseService: ParallelExerciseService;
+    let parallelExerciseRepository: ParallelExerciseRepository;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
@@ -237,30 +223,56 @@ export const createTestEnvironment = (): TestEnvironment => {
         actionRepository = new ActionRepository(
             databaseService.databaseConnection
         );
+        accessKeyRepository = new AccessKeyRepository(
+            databaseService.databaseConnection
+        );
+        parallelExerciseRepository = new ParallelExerciseRepository(
+            databaseService.databaseConnection
+        );
+
+        accessKeyService = new AccessKeyService(accessKeyRepository);
         exerciseService = new ExerciseService(
             exerciseRepository,
-            actionRepository
+            actionRepository,
+            accessKeyService
         );
         userRepository = new UserRepository(databaseService.databaseConnection);
         sessionRepository = new SessionRepository(
             databaseService.databaseConnection
         );
+
         authService = await new AuthService(
             userRepository,
             sessionRepository
         ).initialize({ skipOidcDiscovery: true });
         exerciseManagerService = new ExerciseManagerService(
             exerciseRepository,
-            actionRepository
+            exerciseService
         );
-        environment.init(
-            databaseService,
-            exerciseService,
+        parallelExerciseService = new ParallelExerciseService(
+            parallelExerciseRepository,
+            accessKeyService,
+            exerciseManagerService,
+            exerciseService
+        );
+
+        const repositories: Repositories = {
             exerciseRepository,
             actionRepository,
+            accessKeyRepository,
+            parallelExerciseRepository,
+            sessionRepository,
+            userRepository,
+        };
+        const services: Services = {
             authService,
-            exerciseManagerService
-        );
+            exerciseManagerService,
+            exerciseService,
+            parallelExerciseService,
+            accessKeyService,
+            databaseService,
+        };
+        environment.init(repositories, services);
     });
     afterEach(async () => {
         // Prevent the dataSource from being closed too soon.
@@ -287,7 +299,7 @@ export async function createTestUserSession(
     environment: TestEnvironment,
     data?: { user?: OidcService.UserInfo; expired?: boolean }
 ) {
-    const session = await environment.authService.createNewSession({
+    const session = await environment.services.authService.createNewSession({
         user: data?.user ?? defaultTestUserSessionData,
         accessToken: 'abc',
         validityDurationMs: data?.expired ? 0 : undefined,

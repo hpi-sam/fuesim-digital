@@ -37,7 +37,7 @@ export class AuthService {
         if (!authData.user) return;
         setInterval(() => {
             lastValueFrom(
-                this.httpClient.get(`${httpOrigin}/api/auth/refresh-session`, {
+                this.httpClient.post(`${httpOrigin}/api/auth/refresh-session`, {
                     withCredentials: true,
                 })
             )

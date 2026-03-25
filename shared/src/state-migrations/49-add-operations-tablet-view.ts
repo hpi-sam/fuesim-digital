@@ -7,7 +7,7 @@ interface VehicleParameters {
     };
 }
 
-export const addOperationsTabletView48: Migration = {
+export const addOperationsTabletView49: Migration = {
     action: (intermediateState, action) => {
         const typedAction = action as { type: string };
         switch (typedAction.type) {

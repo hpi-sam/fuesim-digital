@@ -14,14 +14,14 @@
         (click)="$event.stopPropagation()"
     >
         <button
-            (click)="olMapManager?.changeZoom('zoomIn')"
+            (click)="olMapManagerService.olMapManager?.changeZoom('zoomIn')"
             class="btn btn-sm btn-light"
             title="Vergrößern"
         >
             <i class="bi-zoom-in"></i>
         </button>
         <button
-            (click)="olMapManager?.changeZoom('zoomOut')"
+            (click)="olMapManagerService.olMapManager?.changeZoom('zoomOut')"
             class="btn btn-sm btn-light"
             title="Verkleinern"
         >
@@ -32,7 +32,9 @@
             (restrictedToViewport$ | async) === undefined
         ) {
             <button
-                (click)="olMapManager?.tryToFitViewForOverview()"
+                (click)="
+                    olMapManagerService.olMapManager?.tryToFitViewForOverview()
+                "
                 class="btn btn-sm btn-light"
                 title="Alle Ansichten anzeigen"
             >

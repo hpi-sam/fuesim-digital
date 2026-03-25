@@ -49,12 +49,12 @@ export const selectOwnClient = createSelector(
  */
 export const selectCurrentRole = createSelector(
     selectOwnClient,
-    (ownClient) => ownClient!.role
+    (ownClient) => ownClient?.role
 );
 
 export const selectCurrentMainRole = createSelector(
     selectCurrentRole,
-    (currentRole) => currentRole.mainRole
+    (currentRole) => currentRole?.mainRole
 );
 
 export const selectRestrictedViewport = createSelector(

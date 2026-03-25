@@ -5,7 +5,10 @@ import type {
     ExerciseState,
     ExerciseTemplateId,
     ParticipantKey,
+    AccessKey,
     TrainerKey,
+    GroupParticipantKey,
+    ParallelExerciseId,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
@@ -29,6 +32,10 @@ const baseTable = <T>() => ({
         .default(sql`uuid_generate_v4()`)
         .primaryKey()
         .notNull(),
+});
+
+export const accessKeyTable = pgTable('access_key', {
+    key: varchar().$type<AccessKey>().primaryKey().notNull(),
 });
 
 export const userTable = pgTable('users', {
@@ -106,6 +113,11 @@ export const exerciseTable = pgTable('exercise_entity', {
         .references(() => exerciseTemplateTable.id, {
             onDelete: 'set null',
         }),
+    parallelExerciseId: uuid()
+        .$type<ParallelExerciseId>()
+        .references(() => parallelExerciseTable.id, {
+            onDelete: 'cascade',
+        }),
 });
 export type ExerciseEntry = InferSelectModel<typeof exerciseTable>;
 export type ExerciseInsert = InferInsertModel<typeof exerciseTable>;
@@ -142,3 +154,30 @@ export const actionEntityRelations = relations(actionTable, ({ one }) => ({
 export const exerciseEntityRelations = relations(exerciseTable, ({ many }) => ({
     actionWrapperEntities: many(actionTable),
 }));
+
+export const parallelExerciseTable = pgTable('parallel_exercise', {
+    ...baseTable<ParallelExerciseId>(),
+    user: varchar()
+        .references(() => userTable.id, { onDelete: 'cascade' })
+        .notNull(),
+    createdAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
+    name: varchar().notNull(),
+    templateId: uuid()
+        // TODO Cascade dangerous?
+        .references(() => exerciseTemplateTable.id, { onDelete: 'cascade' })
+        .notNull(),
+    participantKey: char({ length: 7 }).$type<GroupParticipantKey>().notNull(),
+    // Participants will join this viewport
+    joinViewportId: uuid().notNull(),
+});
+export type ParallelExerciseEntry = InferSelectModel<
+    typeof parallelExerciseTable
+>;
+export type ParallelExerciseInsert = InferInsertModel<
+    typeof parallelExerciseTable
+>;
+export interface ParallelExercise extends ParallelExerciseEntry {
+    template: ExerciseTemplateEntry;
+}

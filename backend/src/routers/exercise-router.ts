@@ -1,12 +1,12 @@
 import {
     exerciseExistsResponseDataSchema,
     isExerciseKey,
+    isTrainerKey,
 } from 'fuesim-digital-shared';
 import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
 import { importExercise } from '../utils/import-exercise.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
-import { ExerciseFactory } from '../exercise/exercise-factory.js';
 import { ApiError } from '../utils/http.js';
 
 export const createExerciseRouter = (
@@ -15,13 +15,18 @@ export const createExerciseRouter = (
     const router = Router();
 
     router.post('/exercise', async (req, res) => {
-        const exercise = isEmpty(req.body)
-            ? ExerciseFactory.fromBlank()
-            : importExercise(req.body);
         const optionalData = req.session
             ? { user: req.session.user.id }
             : undefined;
-        await exerciseService.createExercise(exercise, optionalData);
+        const exercise = isEmpty(req.body)
+            ? await exerciseService.exerciseFactory.fromBlank(optionalData)
+            : await importExercise(
+                  req.body,
+                  exerciseService.exerciseFactory,
+                  optionalData
+              );
+        await exerciseService.loadExercise(exercise);
+
         res.status(201).send({
             participantKey: exercise.participantKey,
             trainerKey: exercise.trainerKey,
@@ -39,8 +44,11 @@ export const createExerciseRouter = (
                 req.session
             );
             res.send(
-                exerciseExistsResponseDataSchema.parse({
-                    isTemplate: !!exercise.template,
+                exerciseExistsResponseDataSchema.encode({
+                    autojoin:
+                        !!exercise.exercise.templateId ||
+                        (!!exercise.exercise.parallelExerciseId &&
+                            isTrainerKey(req.params.exerciseKey)),
                 })
             );
         })

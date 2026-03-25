@@ -37,7 +37,7 @@ export interface FeatureManager<T extends Geometry> {
     onFeatureDrop: (
         droppedElement: Element,
         droppedOnFeature: Feature<T>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) => boolean;
 
     register: (

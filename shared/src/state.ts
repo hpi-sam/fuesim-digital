@@ -1,5 +1,11 @@
 import * as z from 'zod';
-import { Equals, IsObject, ValidateNested } from 'class-validator';
+import {
+    Equals,
+    IsObject,
+    IsOptional,
+    IsUUID,
+    ValidateNested,
+} from 'class-validator';
 import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
 import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
 import {
@@ -8,6 +14,7 @@ import {
     EocLogEntry,
     Hospital,
     HospitalPatient,
+    type LogEntry,
     RestrictedZone,
     MapImage,
     MapImageTemplate,
@@ -24,8 +31,11 @@ import {
     MaterialTemplate,
     PersonnelTemplate,
     exerciseStatusSchema,
+    exerciseTypeSchema,
+    type ExerciseType,
+    type ExerciseStatus,
+    logEntrySchema,
 } from './models/index.js';
-import type { ExerciseStatus, LogEntry } from './models/index.js';
 import type { ExerciseRadiogram } from './models/radiogram/index.js';
 import { getRadiogramConstructor } from './models/radiogram/index.js';
 import {
@@ -34,8 +44,9 @@ import {
     randomStateSchema,
 } from './simulation/utils/randomness.js';
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
-import { UUID, uuidSchema, uuid } from './utils/index.js';
+import type { UUID } from './utils/index.js';
 import { IsIdMap, IsMultiTypedIdMap } from './utils/validators/index.js';
+import { uuidSchema, uuid, uuidValidationOptions } from './utils/index.js';
 import {
     createCatchAllHospital,
     catchAllHospitalId,
@@ -86,6 +97,9 @@ export class ExerciseState {
     @IsZodSchema(z.int().nonnegative())
     public readonly currentTime: number = 0;
 
+    @IsZodSchema(exerciseTypeSchema)
+    public readonly type: ExerciseType = 'standalone';
+
     @IsZodSchema(exerciseStatusSchema)
     public readonly currentStatus: ExerciseStatus = 'notStarted';
 
@@ -94,6 +108,10 @@ export class ExerciseState {
 
     @IsZodSchema(z.record(uuidSchema, viewportSchema))
     public readonly viewports: { readonly [key: UUID]: Viewport } = {};
+
+    @IsUUID(4, uuidValidationOptions)
+    @IsOptional()
+    public readonly autojoinViewportId: UUID | null = null;
 
     @IsIdMap(SimulatedRegion)
     public readonly simulatedRegions: {
@@ -138,6 +156,10 @@ export class ExerciseState {
 
     @IsZodSchema(z.record(uuidSchema, clientSchema))
     public readonly clients: { readonly [key: UUID]: Client } = {};
+
+    /** All client names that are currently in the exercise or joined the exercise in the past */
+    @IsZodSchema(z.array(z.string()))
+    public readonly collectedClientNames: string[] = [];
 
     @IsMultiTypedIdMap(getRadiogramConstructor)
     @ValidateNested()
@@ -198,8 +220,11 @@ export class ExerciseState {
      * This must not be defined on a normal state,
      * unless the statistics are currently being generated.
      */
-    @Equals(undefined)
+    @IsZodSchema(z.undefined())
     public logEntries?: LogEntry[];
+
+    @IsZodSchema(z.optional(logEntrySchema))
+    public lastLogEntry?: LogEntry;
 
     @Equals(undefined)
     public previousTreatmentAssignment?: TreatmentAssignment;
@@ -218,5 +243,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 47;
+    static readonly currentStateVersion = 49;
 }

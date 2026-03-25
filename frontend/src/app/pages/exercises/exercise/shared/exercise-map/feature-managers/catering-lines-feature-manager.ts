@@ -106,7 +106,7 @@ export class CateringLinesFeatureManager
     onFeatureDrop(
         droppedElement: Element,
         droppedOnFeature: Feature<LineString>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) {
         return false;
     }

@@ -10,6 +10,7 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AsyncPipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCoordinatePickerModal } from '../coordinate-picker/open-coordinate-picker-modal';
@@ -20,9 +21,10 @@ import {
     selectCurrentMainRole,
 } from '../../../../../state/application/selectors/shared.selectors';
 import { DisplayMessagesComponent } from '../../../../../feature/messages/display-messages/display-messages.component';
-import { OlMapManager } from './utility/ol-map-manager';
+import { OlMapManager, olMapCoordinatesSchema } from './utility/ol-map-manager';
 import { PopupManager } from './utility/popup-manager';
 import { PopupService } from './utility/popup.service';
+import { OlMapManagerService } from './utility/ol-map-manager.service';
 
 @Component({
     selector: 'app-exercise-map',
@@ -37,6 +39,8 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     readonly transferLinesService = inject(TransferLinesService);
     private readonly popupService = inject(PopupService);
     private readonly modalService = inject(NgbModal);
+    private readonly route = inject(ActivatedRoute);
+    readonly olMapManagerService = inject(OlMapManagerService);
 
     readonly openLayersContainer = viewChild.required<
         ElementRef<HTMLDivElement>
@@ -48,7 +52,6 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     });
 
     private readonly destroy$ = new Subject<void>();
-    public olMapManager?: OlMapManager;
     private popupManager?: PopupManager;
     public readonly restrictedToViewport$ = this.store.select(
         selectRestrictedViewport
@@ -61,7 +64,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
             this.popoverContainer().nativeElement,
             this.popupService
         );
-        this.olMapManager = new OlMapManager(
+        this.olMapManagerService.olMapManager = new OlMapManager(
             this.store,
             this.exerciseService,
             this.openLayersContainer().nativeElement,
@@ -69,9 +72,11 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
             this.popupManager,
             this.popupService
         );
-        this.dragElementService.registerMap(this.olMapManager.olMap);
+        this.dragElementService.registerMap(
+            this.olMapManagerService.olMapManager.olMap
+        );
         this.dragElementService.registerLayerFeatureManagerDictionary(
-            this.olMapManager.layerFeatureManagerDictionary
+            this.olMapManagerService.olMapManager.layerFeatureManagerDictionary
         );
 
         // Check whether the map is fullscreen
@@ -81,6 +86,14 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
                 this.fullscreenEnabled = document.fullscreenElement !== null;
             }
         );
+
+        const queryParams = this.route.snapshot.queryParams;
+        const result = olMapCoordinatesSchema.safeParse(queryParams);
+        if (result.success) {
+            this.olMapManagerService.olMapManager.tryGoToCoordinates(
+                result.data
+            );
+        }
     }
 
     public fullscreenEnabled = false;
@@ -93,9 +106,9 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     }
 
     public goToCoordinates() {
-        if (!this.olMapManager) return;
+        if (!this.olMapManagerService.olMapManager) return;
 
-        openCoordinatePickerModal(this.modalService, this.olMapManager);
+        openCoordinatePickerModal(this.modalService);
     }
 
     ngOnDestroy(): void {

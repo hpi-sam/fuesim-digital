@@ -13,7 +13,9 @@ export interface TransferOptions {
     transferDestination?: Hospital | TransferPoint;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class StartTransferService {
     public readonly transferOptions = new Subject<TransferOptions>();
 

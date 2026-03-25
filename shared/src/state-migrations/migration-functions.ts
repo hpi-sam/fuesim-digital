@@ -45,7 +45,8 @@ import { generalizeMaterialsPersonnel44 } from './44-generalize-materials-person
 import { addRestrictedZones45 } from './45-add-restricted-zones.js';
 import { limitedAlarmgroups46 } from './46-limited-alarm-groups.js';
 import { participantIdToKey47 } from './47-participant-id-to-key.js';
-import { addOperationsTabletView48 } from './48-add-operations-tablet-view.js';
+import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
+import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
 
 /**
  * Migrate a single action
@@ -119,5 +120,6 @@ export const migrations: {
     45: addRestrictedZones45,
     46: limitedAlarmgroups46,
     47: participantIdToKey47,
-    48: addOperationsTabletView48,
+    48: addAutojoinViewport48,
+    49: addOperationsTabletView49,
 };

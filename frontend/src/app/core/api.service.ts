@@ -8,15 +8,23 @@ import {
     getExercisesResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
+    getExerciseTemplateViewportsResponseDataSchema,
+    getParallelExerciseResponseDataSchema,
+    getParallelExercisesResponseDataSchema,
     PostExerciseTemplateRequestData,
+    postJoinParallelExerciseResponseDataSchema,
+    PostParallelExerciseRequestData,
     TrainerKey,
     type ExerciseTimeline,
     type StateExport,
     type PatchExerciseTemplateRequestData,
     ExerciseTemplateId,
+    ParallelExerciseId,
+    PatchParallelExerciseRequestData,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
+import { z } from 'zod';
 import type { AppState } from '../state/app.state';
 import { selectExerciseKey } from '../state/application/selectors/application.selectors';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
@@ -85,14 +93,51 @@ export class ApiService {
         });
     }
 
+    public getParallelExercisesEnabledResource() {
+        return httpResource(
+            () => `${httpOrigin}/api/parallel_exercises/enabled`,
+            {
+                parse: z.boolean().parse,
+            }
+        );
+    }
+
+    public async getParallelExercisesEnabled() {
+        return lastValueFrom(
+            this.httpClient.get(`${httpOrigin}/api/parallel_exercises/enabled`)
+        ).then(z.boolean().parse);
+    }
+
+    public getParallelExerciseResource(id: ParallelExerciseId) {
+        return httpResource(
+            () => `${httpOrigin}/api/parallel_exercises/${id}`,
+            {
+                parse: getParallelExerciseResponseDataSchema.parse,
+            }
+        );
+    }
+    public async getParallelExercise(id: ParallelExerciseId) {
+        return lastValueFrom(
+            this.httpClient.get(`${httpOrigin}/api/parallel_exercises/${id}`)
+        ).then(getParallelExerciseResponseDataSchema.parse);
+    }
+    public getParallelExercisesResource() {
+        return httpResource(() => `${httpOrigin}/api/parallel_exercises/`, {
+            parse: getParallelExercisesResponseDataSchema.parse,
+        });
+    }
+    public async getExerciseTemplateViewportsById(id: ExerciseTemplateId) {
+        return lastValueFrom(
+            this.httpClient.get(
+                `${httpOrigin}/api/exercise_templates/${id}/viewports`
+            )
+        ).then(getExerciseTemplateViewportsResponseDataSchema.parse);
+    }
+
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
-            this.httpClient
-                .post(`${httpOrigin}/api/exercise_templates`, data)
-                .pipe(
-                    map((v) => getExerciseTemplateResponseDataSchema.parse(v))
-                )
-        );
+            this.httpClient.post(`${httpOrigin}/api/exercise_templates`, data)
+        ).then(getExerciseTemplateResponseDataSchema.parse);
     }
 
     public async patchExerciseTemplate(
@@ -125,5 +170,38 @@ export class ApiService {
                 `${httpOrigin}/api/exercise_templates/${templateId}`
             )
         );
+    }
+
+    public async createParallelExercise(data: PostParallelExerciseRequestData) {
+        return lastValueFrom(
+            this.httpClient.post(`${httpOrigin}/api/parallel_exercises/`, data)
+        ).then(getParallelExerciseResponseDataSchema.parse);
+    }
+
+    public async patchParallelExercise(
+        id: ParallelExerciseId,
+        data: PatchParallelExerciseRequestData
+    ) {
+        return lastValueFrom(
+            this.httpClient.patch(
+                `${httpOrigin}/api/parallel_exercises/${id}`,
+                data
+            )
+        ).then(getParallelExerciseResponseDataSchema.parse);
+    }
+
+    public async deleteParallelExercise(id: ParallelExerciseId) {
+        return lastValueFrom(
+            this.httpClient.delete(`${httpOrigin}/api/parallel_exercises/${id}`)
+        );
+    }
+
+    public async joinParallelExercise(key: string) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/parallel_exercises/join/${key}`,
+                undefined
+            )
+        ).then(postJoinParallelExerciseResponseDataSchema.parse);
     }
 }

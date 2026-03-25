@@ -5,6 +5,7 @@ import {
     IsBoolean,
     IsInt,
     IsPositive,
+    IsUUID,
 } from 'class-validator';
 import { WritableDraft } from 'immer';
 import {
@@ -22,8 +23,13 @@ import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import { simulateAllRegions } from '../../simulation/utils/simulation.js';
 import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, StrictObject, uuid } from '../../utils/index.js';
+import {
+    type UUID,
+    uuidValidationOptions,
+    cloneDeepMutable,
+    StrictObject,
+    uuid,
+} from '../../utils/index.js';
 import type { ElementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
@@ -47,6 +53,14 @@ export class PauseExerciseAction implements Action {
 export class StartExerciseAction implements Action {
     @IsValue('[Exercise] Start' as const)
     public readonly type = '[Exercise] Start';
+}
+
+export class SetAutojoinViewportAction implements Action {
+    @IsValue('[Exercise] Set autojoin viewport' as const)
+    public readonly type = '[Exercise] Set autojoin viewport';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly viewportId!: UUID;
 }
 
 export class ExerciseTickAction implements Action {
@@ -111,6 +125,16 @@ export namespace ExerciseActionReducers {
         },
         rights: 'trainer',
     };
+
+    export const setAutojoinViewport: ActionReducer<SetAutojoinViewportAction> =
+        {
+            action: SetAutojoinViewportAction,
+            reducer: (draftState, { viewportId }) => {
+                draftState.autojoinViewportId = viewportId;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
 
     export const exerciseTick: ActionReducer<ExerciseTickAction> = {
         action: ExerciseTickAction,

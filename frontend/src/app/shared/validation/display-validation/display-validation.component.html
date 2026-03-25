@@ -1,7 +1,7 @@
 @if (errors && ngModelInput().dirty) {
     <div class="mt-2 text-danger validation-text">
         @if (errors['required']) {
-            <div>Diese Eingabe ist erforderlich.</div>
+            <div>{{ validationMessages.required }}</div>
         }
         @if (errors['minlength']; as minLengthError) {
             <div>
@@ -77,7 +77,8 @@
         }
         @if (errors['joinId']) {
             <div>
-                Die Eingabe muss eine gültige Übungs-ID (6 oder 8 Ziffern) sein.
+                Die Eingabe muss eine gültige Übungs-PIN (6 oder 8 Ziffern)
+                sein.
             </div>
         }
     </div>

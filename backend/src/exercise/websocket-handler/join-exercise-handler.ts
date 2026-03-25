@@ -1,53 +1,51 @@
 import {
-    type ExerciseKey,
-    isExerciseKey,
-    joinExerciseResponseDataSchema,
     type UUID,
+    type ExerciseKey,
+    joinExerciseResponseDataSchema,
+    isExerciseKey,
 } from 'fuesim-digital-shared';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
-import { clientMap } from '../client-map.js';
 import { NotFoundError, PermissionDeniedError } from '../../utils/http.js';
-import type { AuthService } from '../../auth/auth-service.js';
-import type { ExerciseService } from '../../database/services/exercise-service.js';
-import { ClientWrapper } from '../client-wrapper.js';
+import { ClientWrapper, ExerciseClientWrapper } from '../client-wrapper.js';
+import type { Services } from '../../database/services/index.js';
 import { secureOn } from './secure-on.js';
 
 export const registerJoinExerciseHandler = (
     io: ExerciseServer,
-    client: ExerciseSocket,
-    authService: AuthService,
-    exerciseService: ExerciseService
+    socket: ExerciseSocket,
+    services: Services
 ) => {
     secureOn(
-        client,
+        socket,
         'joinExercise',
         (exerciseKey: ExerciseKey, clientName: string, callback) => {
-            const clientWrapper = new ClientWrapper(
-                client,
-                exerciseService,
-                authService
+            const clientWrapper = ClientWrapper.init(
+                ExerciseClientWrapper,
+                socket,
+                services
             );
-            clientMap.set(client, clientWrapper);
+            if (!clientWrapper) return;
+
+            // When this listener is registered the socket is in the map.
+            if (clientWrapper.exercise) {
+                callback({
+                    success: false,
+                    message: 'The client has already joined an exercise',
+                    expected: false,
+                });
+                return;
+            }
+            if (!isExerciseKey(exerciseKey)) {
+                callback({
+                    success: false,
+                    message: `Invalid payload: Invalid exercise key`,
+                    expected: false,
+                });
+                return;
+            }
 
             clientWrapper.getSessionInformation().then(() => {
-                // When this listener is registered the socket is in the map.
-                if (clientWrapper.exercise) {
-                    callback({
-                        success: false,
-                        message: 'The client has already joined an exercise',
-                        expected: false,
-                    });
-                    return;
-                }
                 let clientId: UUID | undefined;
-                if (!isExerciseKey(exerciseKey)) {
-                    callback({
-                        success: false,
-                        message: `Invalid payload: Invalid exercise key`,
-                        expected: false,
-                    });
-                    return;
-                }
                 try {
                     clientId = clientWrapper.joinExercise(
                         exerciseKey,
@@ -83,6 +81,8 @@ export const registerJoinExerciseHandler = (
                                       clientWrapper.exercise!.trainerKey,
                               }
                             : null,
+                        parallelExerciseId:
+                            clientWrapper.exercise!.exercise.parallelExerciseId,
                     }),
                 });
             });

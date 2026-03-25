@@ -3,11 +3,19 @@
         <div class="card-body">
             <h2 class="card-title h4 d-flex">
                 #{{ exercise.participantKey }}
-                <app-copy-button [value]="participantUrl()" />
+                <button
+                    app-copy-button
+                    class="btn btn-light btn-sm"
+                    [value]="participantUrl()"
+                ></button>
             </h2>
             <p class="card-text">
-                Übungsleiter-ID: {{ exercise.trainerKey }}
-                <app-copy-button [value]="trainerUrl()" />
+                Übungsleitungs-PIN: {{ exercise.trainerKey }}
+                <button
+                    app-copy-button
+                    class="btn btn-light btn-sm"
+                    [value]="trainerUrl()"
+                ></button>
             </p>
         </div>
         <ul class="list-group list-group-flush">

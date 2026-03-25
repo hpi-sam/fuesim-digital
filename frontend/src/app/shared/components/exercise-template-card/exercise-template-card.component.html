@@ -11,6 +11,7 @@
                             name: $event,
                         })
                     "
+                    [singleLine]="true"
                 />
             </h2>
         </div>
@@ -49,9 +50,29 @@
             >
                 Öffnen
             </a>
-            <a class="btn btn-primary" (click)="createExercise()">
-                Neue Übung
-            </a>
+
+            <div ngbDropdown autoClose="outside">
+                <button ngbDropdownToggle type="button" class="btn btn-primary">
+                    Neue Übung
+                </button>
+                <div ngbDropdownMenu>
+                    <button
+                        ngbDropdownItem
+                        class="btn btn-primary"
+                        (click)="createExercise()"
+                    >
+                        Einzelübung
+                    </button>
+                    <button
+                        ngbDropdownItem
+                        class="btn btn-primary"
+                        (click)="createParallelExercise()"
+                    >
+                        Parallelübung
+                    </button>
+                </div>
+            </div>
+
             <div class="flex-grow-1"></div>
             <button
                 class="btn btn-outline-danger"

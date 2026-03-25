@@ -16,7 +16,7 @@ import { Fill, Stroke, Style, Text as OlText } from 'ol/style';
 import { VehiclePopupComponent } from '../shared/vehicle-popup/vehicle-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
-import { ImagePopupHelper } from '../utility/popup-helper';
+import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';
@@ -215,7 +215,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
     public override onFeatureDrop(
         droppedElement: Element | undefined,
         droppedOnFeature: Feature<Point>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) {
         const droppedOnVehicle = this.getElementFromFeature(
             droppedOnFeature

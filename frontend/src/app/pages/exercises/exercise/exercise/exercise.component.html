@@ -1,7 +1,7 @@
 @if (exerciseStateMode$ | async; as mode) {
     <div class="p-2 d-flex flex-column" style="height: 100vh">
-        <div class="px-2">
-            <h2 class="d-flex align-items-center">
+        <div class="pb-2">
+            <div class="d-flex align-items-center">
                 @if (
                     exerciseService.additionalExerciseMeta()?.exerciseTemplate;
                     as exerciseTemplate
@@ -13,38 +13,70 @@
                         <i class="bi bi-chevron-left me-2"></i>
                         Zurück zur Liste
                     </a>
-                    Übungsvorlage: {{ exerciseTemplate.name }}
+                    <h2 class="mb-0">
+                        Übungsvorlage: {{ exerciseTemplate.name }}
+                    </h2>
+                } @else if (
+                    exerciseService.additionalExerciseMeta()
+                        ?.parallelExerciseId;
+                    as parallelExerciseId
+                ) {
+                    <app-parallel-exercise-status-bar
+                        [parallelExerciseId]="parallelExerciseId"
+                        class="d-flex align-items-center"
+                    />
                 } @else {
-                    <div>
+                    <h2 class="mb-0">
                         Übung:
                         <span class="font-monospace fw-bold user-select-all">
-                            {{ participantKey$ | async }}
+                            {{ participantKey() }}
                         </span>
-                    </div>
+                    </h2>
                     @if (mode === 'exercise') {
                         <app-exercise-state-badge
                             class="ms-3"
                         ></app-exercise-state-badge>
-                        @if (participantKey$ | async) {
+                        <div class="btn-group ms-3" role="group">
                             <button
-                                (click)="shareExercise('participantKey')"
-                                class="btn btn-light ms-3"
-                                ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen von Ihnen bestätigt werden."
+                                (click)="
+                                    isTrainer()
+                                        ? openAddParticipantModal()
+                                        : openInviteModal()
+                                "
+                                class="btn btn-outline-secondary"
                             >
-                                Teilnehmerlink teilen
+                                Teilnehmende einladen
                             </button>
-                        }
-                        @if (
-                            (ownClient$ | async)?.role?.mainRole !==
-                            'participant'
-                        ) {
                             <button
-                                (click)="shareExercise('trainerKey')"
-                                class="btn btn-outline-warning ms-3"
-                                ngbTooltip="Über diesen Link können weitere Personen diese Übung verwalten. Teilen Sie diesen Link nicht mit Teilnehmenden!"
-                            >
-                                Übungsleiterlink teilen
-                            </button>
+                                app-copy-button
+                                class="btn btn-outline-secondary"
+                                [value]="participantUrl()!"
+                                icon="link-45deg"
+                                ngbTooltip="Über diesen Link können Teilnehmende der Übung beitreten. Alle Teilnehmenden müssen {{
+                                    isTrainer()
+                                        ? 'von Ihnen'
+                                        : 'von Übungsleitenden'
+                                }} bestätigt werden."
+                                container="body"
+                            ></button>
+                        </div>
+                        @if (isTrainer()) {
+                            <div class="btn-group ms-3" role="group">
+                                <button
+                                    (click)="openAddTrainerModal()"
+                                    class="btn btn-outline-warning"
+                                >
+                                    Übungsleitende einladen
+                                </button>
+                                <button
+                                    app-copy-button
+                                    class="btn btn-outline-warning"
+                                    [value]="trainerUrl()!"
+                                    icon="link-45deg"
+                                    ngbTooltip="Über diesen Link können weitere Personen diese Übung verwalten. Teilen Sie diesen Link nicht mit Teilnehmenden!"
+                                    container="body"
+                                ></button>
+                            </div>
                         }
                     }
                 }
@@ -64,6 +96,7 @@
                             type="button"
                             class="btn btn-outline-primary"
                             ngbDropdownToggle
+                            data-cy="exportMenuButton"
                         >
                             <i class="bi-cloud-download me-2"> </i>
                             Exportieren
@@ -103,6 +136,7 @@
                             <button
                                 ngbDropdownItem
                                 (click)="patientsCsvExport()"
+                                data-cy="exportPatientsCsvButton"
                             >
                                 <i class="bi-hospital me-2"> </i>
                                 Patienten für IVENA MANV
@@ -163,7 +197,7 @@
                         </div>
                     </div>
                 </div>
-            </h2>
+            </div>
         </div>
 
         <div class="flex-fill">
@@ -171,7 +205,7 @@
                 <app-time-travel></app-time-travel>
             }
             @if (mode === 'exercise') {
-                @if (ownClient$ | async; as ownClient) {
+                @if (ownClient(); as ownClient) {
                     @if (!ownClient.isInWaitingRoom) {
                         @switch (ownClient.role.specificRole) {
                             @case ('mapOperator') {
@@ -195,7 +229,7 @@
                             <div class="p-5 bg-light rounded-3">
                                 <p class="lead mb-0">
                                     Sie sind im Warteraum. Bitte warten Sie, bis
-                                    ein Übungsleiter Sie zuweist.
+                                    Sie zugewiesen werden.
                                 </p>
                                 <!-- TODO: Add a nice waiting animation to fill the space -->
                             </div>

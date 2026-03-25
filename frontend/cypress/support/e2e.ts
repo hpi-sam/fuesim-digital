@@ -32,8 +32,8 @@ import {
     initializeParticipantSocket,
     initializeTrainerSocket,
     atKey,
+    closeAllToasts,
 } from './commands';
-
 declare global {
     namespace Cypress {
         interface Chainable {
@@ -46,6 +46,7 @@ declare global {
             createExercise(): Chainable;
             joinExerciseAsTrainer(): Chainable;
             joinExerciseAsParticipant(): Chainable;
+            closeAllToasts(): Chainable;
             firstElement(): Chainable;
             lastElement(): Chainable;
             atPosition(n: number): Chainable;
@@ -83,6 +84,7 @@ Cypress.Commands.addAll({
     createExercise,
     joinExerciseAsParticipant,
     joinExerciseAsTrainer,
+    closeAllToasts,
     initializeParticipantSocket,
     initializeTrainerSocket,
 });

@@ -1,0 +1,73 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        @if (shareRoleInfo()) {
+            {{ shareRoleInfo()?.name }} einladen
+        } @else {
+            Teilnehmende
+        }
+    </h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    @if (shareRoleInfo(); as roleInfo) {
+        <div
+            class="alert mb-4"
+            [class.alert-info]="roleInfo.alertType === 'info'"
+            [class.alert-warning]="roleInfo.alertType === 'warning'"
+        >
+            {{ roleInfo.qrHintText }}
+        </div>
+    }
+
+    <ng-template #qrCardContent>
+        <div class="card h-100">
+            <div class="card-header h4 d-flex align-content-center">
+                <div>
+                    {{ shareRoleInfo()?.keyName }}:
+                    <span class="font-monospace fw-bold">{{ shareKey() }}</span>
+                </div>
+                <div class="flex-grow-1"></div>
+                <button
+                    app-copy-button
+                    class="btn btn-light"
+                    [value]="shareUrl()"
+                    icon="link-45deg"
+                    [ngbTooltip]="shareRoleInfo()?.linkHintText"
+                    container="body"
+                ></button>
+            </div>
+            <div class="card-body d-flex justify-content-center py-0">
+                <qr-code
+                    [value]="shareUrl()"
+                    [scale]="10"
+                    styleClass="w-100 h-100"
+                    errorCorrectionLevel="M"
+                />
+            </div>
+        </div>
+    </ng-template>
+
+    @if (showTable()) {
+        <div class="row mb-4 align-items-stretch">
+            <div
+                class="col"
+                [class.col-md-8]="showQrCode()"
+                [class.col-md-12]="!showQrCode()"
+            >
+                <div class="card h-100">
+                    <app-client-overview-table />
+                </div>
+            </div>
+
+            @if (showQrCode()) {
+                <div class="col col-md-4">
+                    <ng-container [ngTemplateOutlet]="qrCardContent" />
+                </div>
+            }
+        </div>
+    } @else if (showQrCode()) {
+        <div class="w-100">
+            <ng-container [ngTemplateOutlet]="qrCardContent" />
+        </div>
+    }
+</div>

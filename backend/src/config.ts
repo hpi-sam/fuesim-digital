@@ -39,6 +39,8 @@ export class Config {
 
     private static _devNoWaitingRoom?: boolean;
 
+    private static _parallelExercisesEnabled?: boolean;
+
     public static get websocketPort(): number {
         this.throwIfNotInitialized();
         return this._websocketPort!;
@@ -129,6 +131,11 @@ export class Config {
         return this._devNoWaitingRoom!;
     }
 
+    public static get parallelExercisesEnabled(): boolean {
+        this.throwIfNotInitialized();
+        return this._parallelExercisesEnabled!;
+    }
+
     private static createTCPPortValidator() {
         return makeValidator((x) => {
             const int = Number.parseInt(x);
@@ -207,6 +214,7 @@ export class Config {
             DFM_AUTH_SELF_SERVICE_URL: url({ default: '' }),
             DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
             DFM_DEV_NO_WAITING_ROOM: bool({ default: false }),
+            DFM_PARALLEL_EXERCISES_ENABLED: bool({ default: true }),
         });
     }
 
@@ -290,6 +298,9 @@ export class Config {
                 ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 : env.DFM_AUTH_SELF_SERVICE_URL;
         this._devNoWaitingRoom = env.DFM_DEV_NO_WAITING_ROOM;
+        this._parallelExercisesEnabled = testing
+            ? true
+            : env.DFM_PARALLEL_EXERCISES_ENABLED;
         this.isInitialized = true;
     }
 }

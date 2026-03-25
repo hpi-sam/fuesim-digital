@@ -19,7 +19,8 @@ import { getPatientVisibleStatus } from '../patient.js';
 import { radiogramTypeToGermanDictionary } from '../radiogram/exercise-radiogram.js';
 import type { ExerciseRadiogramStatus } from '../radiogram/status/exercise-radiogram-status.js';
 import { radiogramStatusTypeToGermanDictionary } from '../radiogram/status/exercise-radiogram-status.js';
-import { Tag } from '../tag.js';
+import type { Tag } from '../tag.js';
+import { newTag } from '../tag.js';
 import type { Personnel } from '../personnel.js';
 import type { PersonnelTemplate } from '../personnel-template.js';
 import type { ExerciseOccupation } from './occupations/index.js';
@@ -35,7 +36,7 @@ export function createPatientStatusTag(
     _draftState: WritableDraft<ExerciseState>,
     patientStatus: PatientStatus
 ): Tag {
-    return new Tag(
+    return newTag(
         'Sichtungskategorie',
         patientStatus,
         patientStatus === 'yellow' || patientStatus === 'white'
@@ -51,7 +52,7 @@ export function createPatientTag(
     patientId: UUID
 ): Tag {
     const patient = getElement(draftState, 'patient', patientId);
-    return new Tag('Patient', 'cyan', 'black', patient.identifier, patientId);
+    return newTag('Patient', 'cyan', 'black', patient.identifier, patientId);
 }
 
 export function createTagsForSinglePatient(
@@ -86,7 +87,7 @@ export function createRadiogramTypeTag(
 ): Tag {
     const radiogram = getExerciseRadiogramById(draftState, radiogramId);
 
-    return new Tag(
+    return newTag(
         'Funkspruchtyp',
         'green',
         'white',
@@ -110,7 +111,7 @@ export function createRadiogramActionTag(
     } else {
         name = radiogramStatusTypeToGermanDictionary[radiogramStatus];
     }
-    return new Tag(
+    return newTag(
         'Funkspruchaktion',
         'lightgreen',
         'black',
@@ -140,7 +141,7 @@ export function createSimulatedRegionTagWithName(
     simulatedRegionId: UUID,
     name: string
 ): Tag {
-    return new Tag(
+    return newTag(
         'Simulierter Bereich',
         'lightblue',
         'black',
@@ -158,7 +159,7 @@ export function createTransferPointTag(
         'transferPoint',
         transferPointId
     );
-    return new Tag(
+    return newTag(
         'Transferpunkt',
         'lightgreen',
         'black',
@@ -171,7 +172,7 @@ export function createTreatmentProgressTag(
     draftState: WritableDraft<ExerciseState>,
     treatmentProgress: TreatmentProgress
 ): Tag {
-    return new Tag(
+    return newTag(
         'Behandlungsfortschritt',
         'orange',
         'white',
@@ -185,7 +186,7 @@ export function createAlarmGroupTag(
     alarmGroupId: UUID
 ): Tag {
     const alarmGroup = getElement(draftState, 'alarmGroup', alarmGroupId);
-    return new Tag(
+    return newTag(
         'Alarmgruppe',
         'lightgreen',
         'black',
@@ -199,21 +200,21 @@ export function createVehicleTag(
     vehicleId: UUID
 ): Tag {
     const vehicle = getElement(draftState, 'vehicle', vehicleId);
-    return new Tag('Fahrzeug', 'grey', 'white', vehicle.name, vehicleId);
+    return newTag('Fahrzeug', 'grey', 'white', vehicle.name, vehicleId);
 }
 
 export function createVehicleTypeTag(
     _draftState: WritableDraft<ExerciseState>,
     vehicleType: UUID
 ): Tag {
-    return new Tag('Fahrzeugtyp', 'grey', 'white', vehicleType, vehicleType);
+    return newTag('Fahrzeugtyp', 'grey', 'white', vehicleType, vehicleType);
 }
 
 export function createOccupationTag(
     _draftState: WritableDraft<ExerciseState>,
     occupation: ExerciseOccupation
 ): Tag {
-    return new Tag(
+    return newTag(
         'Tätigkeit',
         'black',
         'white',
@@ -241,7 +242,7 @@ export function createVehicleActionTag(
             vehicleActionName = 'Entladen';
             break;
     }
-    return new Tag(
+    return newTag(
         'Fahrzeugaktion',
         'purple',
         'white',
@@ -255,7 +256,7 @@ export function createHospitalTag(
     hospitalId: UUID
 ): Tag {
     const hospital = getElement(draftState, 'hospital', hospitalId);
-    return new Tag(
+    return newTag(
         'Krankenhaus',
         'firebrick',
         'white',
@@ -274,7 +275,7 @@ export function createBehaviorTag(
         simulatedRegionId,
         behaviorId
     );
-    return new Tag(
+    return newTag(
         'Verhalten',
         'lightgreen',
         'black',
@@ -286,7 +287,7 @@ export function createPersonnelTypeTag(
     _draftState: WritableDraft<ExerciseState>,
     personnel: Personnel | PersonnelTemplate
 ): Tag {
-    return new Tag(
+    return newTag(
         'Personaltyp',
         'chocolate',
         'white',

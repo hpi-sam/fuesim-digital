@@ -7,6 +7,7 @@ import {
 } from 'fuesim-digital-shared';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
+import { ExerciseClientWrapper } from '../client-wrapper.js';
 import { secureOn } from './secure-on.js';
 
 export const registerProposeActionHandler = (
@@ -18,12 +19,10 @@ export const registerProposeActionHandler = (
         'proposeAction',
         (action: ExerciseAction, callback): void => {
             const clientWrapper = clientMap.get(client);
-            if (!clientWrapper) {
-                // There is no client. Skip.
-                console.error('Got an action from missing client');
+            if (!(clientWrapper instanceof ExerciseClientWrapper)) {
                 callback({
                     success: false,
-                    message: `Client didn't join an exercise`,
+                    message: 'No exercise selected',
                     expected: false,
                 });
                 return;

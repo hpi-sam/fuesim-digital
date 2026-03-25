@@ -113,7 +113,7 @@ export class TransferLinesFeatureManager
     onFeatureDrop(
         droppedElement: Element,
         droppedOnFeature: Feature<LineString>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) {
         return false;
     }

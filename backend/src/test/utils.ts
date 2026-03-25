@@ -198,7 +198,7 @@ export class TestEnvironment {
     }
 }
 
-export const createTestEnvironment = (): TestEnvironment => {
+export function createTestEnvironment(): TestEnvironment {
     Config.initialize(true);
     const environment = new TestEnvironment();
     let databaseService: DatabaseService;
@@ -283,7 +283,7 @@ export const createTestEnvironment = (): TestEnvironment => {
     });
 
     return environment;
-};
+}
 
 export const defaultTestUserSessionData: OidcService.UserInfo = {
     displayName: 'Test User',

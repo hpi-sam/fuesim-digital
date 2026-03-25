@@ -10,6 +10,8 @@ export const noPositionSchema = z.strictObject({
  */
 export type NoPosition = z.infer<typeof noPositionSchema>;
 
-export const newNoPosition = (): NoPosition => ({
-    type: 'no',
-});
+export function newNoPosition(): NoPosition {
+    return {
+        type: 'no',
+    };
+}

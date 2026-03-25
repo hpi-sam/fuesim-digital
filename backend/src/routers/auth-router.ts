@@ -4,7 +4,7 @@ import type { AuthService } from '../auth/auth-service.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';
 import { warnError } from '../utils/http-handlers.js';
 
-export const createAuthRouter = (authService: AuthService) => {
+export function createAuthRouter(authService: AuthService) {
     const router = Router();
 
     router.get('/register', (req, res) => {
@@ -115,4 +115,4 @@ export const createAuthRouter = (authService: AuthService) => {
     });
 
     return router;
-};
+}

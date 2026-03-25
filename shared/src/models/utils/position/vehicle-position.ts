@@ -9,7 +9,9 @@ export const vehiclePositionSchema = z.strictObject({
 
 export type VehiclePosition = z.infer<typeof vehiclePositionSchema>;
 
-export const newVehiclePositionIn = (vehicleId: UUID): VehiclePosition => ({
-    type: 'vehicle',
-    vehicleId,
-});
+export function newVehiclePositionIn(vehicleId: UUID): VehiclePosition {
+    return {
+        type: 'vehicle',
+        vehicleId,
+    };
+}

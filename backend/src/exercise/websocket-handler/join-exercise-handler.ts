@@ -10,11 +10,11 @@ import { ClientWrapper, ExerciseClientWrapper } from '../client-wrapper.js';
 import type { Services } from '../../database/services/index.js';
 import { secureOn } from './secure-on.js';
 
-export const registerJoinExerciseHandler = (
+export function registerJoinExerciseHandler(
     io: ExerciseServer,
     socket: ExerciseSocket,
     services: Services
-) => {
+) {
     secureOn(
         socket,
         'joinExercise',
@@ -88,4 +88,4 @@ export const registerJoinExerciseHandler = (
             });
         }
     );
-};
+}

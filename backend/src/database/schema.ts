@@ -25,14 +25,18 @@ import {
     text,
 } from 'drizzle-orm/pg-core';
 
-const typedUUID = <T>() => uuid().$type<T>();
+function typedUUID<T>() {
+    return uuid().$type<T>();
+}
 
-const baseTable = <T>() => ({
-    id: typedUUID<T>()
-        .default(sql`uuid_generate_v4()`)
-        .primaryKey()
-        .notNull(),
-});
+function baseTable<T>() {
+    return {
+        id: typedUUID<T>()
+            .default(sql`uuid_generate_v4()`)
+            .primaryKey()
+            .notNull(),
+    };
+}
 
 export const accessKeyTable = pgTable('access_key', {
     key: varchar().$type<AccessKey>().primaryKey().notNull(),

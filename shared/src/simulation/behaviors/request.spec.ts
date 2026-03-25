@@ -156,24 +156,24 @@ function setupStateAndInteract(
     };
 }
 
-const updateRequestInterval = (
+function updateRequestInterval(
     draftState: WritableDraft<ExerciseState>,
     simulatedRegion: WritableDraft<SimulatedRegion>,
     behaviorState: WritableDraft<RequestBehaviorState>
-) => {
+) {
     updateBehaviorsRequestInterval(
         draftState,
         simulatedRegion,
         behaviorState,
         newRequestInterval
     );
-};
+}
 
-const updateRequestTarget = (
+function updateRequestTarget(
     draftState: WritableDraft<ExerciseState>,
     simulatedRegion: WritableDraft<SimulatedRegion>,
     behaviorState: WritableDraft<RequestBehaviorState>
-) => {
+) {
     const otherSimulatedRegion = cloneDeepMutable(
         SimulatedRegion.create(
             newMapCoordinatesAt(0, 0),
@@ -198,17 +198,17 @@ const updateRequestTarget = (
             otherSimulatedRegion.id
         )
     );
-};
+}
 
-const updateInvalidationInterval = (
+function updateInvalidationInterval(
     draftState: WritableDraft<ExerciseState>,
     simulatedRegion: WritableDraft<SimulatedRegion>,
     behaviorState: WritableDraft<RequestBehaviorState>
-) => {
+) {
     behaviorState.invalidatePromiseInterval = newInvalidationInterval;
     // update its promised resources
     getResourcesToRequest(draftState, behaviorState);
-};
+}
 
 // factories
 const addRequestsAndPromises = {

@@ -2,8 +2,9 @@ import { createSelector } from '@ngrx/store';
 import type { AppState } from '../../app.state';
 import type { ApplicationState } from '../application.state';
 
-const selectApplication = (state: AppState) => state.application;
-
+function selectApplication(state: AppState) {
+    return state.application;
+}
 function createSelectProperty<Key extends keyof ApplicationState>(key: Key) {
     return createSelector(selectApplication, (application) => application[key]);
 }

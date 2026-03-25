@@ -3,10 +3,10 @@ import { clientMap } from '../client-map.js';
 import { ExerciseClientWrapper } from '../client-wrapper.js';
 import { secureOn } from './secure-on.js';
 
-export const registerGetStateHandler = (
+export function registerGetStateHandler(
     io: ExerciseServer,
     client: ExerciseSocket
-) => {
+) {
     secureOn(client, 'getState', (callback): void => {
         const clientWrapper = clientMap.get(client);
         if (!(clientWrapper instanceof ExerciseClientWrapper)) {
@@ -30,4 +30,4 @@ export const registerGetStateHandler = (
             payload: clientWrapper.exercise.getStateSnapshot(),
         });
     });
-};
+}

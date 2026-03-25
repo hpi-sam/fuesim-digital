@@ -22,21 +22,23 @@ export type StartPoint = z.infer<typeof startPointSchema>;
 export type TransferStartPoint = z.infer<typeof transferStartPointSchema>;
 export type AlarmGroupStartPoint = z.infer<typeof alarmGroupStartPointSchema>;
 
-export const newTransferStartPoint = (
+export function newTransferStartPoint(
     transferPointId: UUID
-): TransferStartPoint => ({
-    type: 'transferStartPoint',
-    transferPointId,
-});
+): TransferStartPoint {
+    return {
+        type: 'transferStartPoint',
+        transferPointId,
+    };
+}
 
-export const newAlarmGroupStartPoint = (
+export function newAlarmGroupStartPoint(
     alarmGroupId: UUID,
     duration: number
-): AlarmGroupStartPoint => {
+): AlarmGroupStartPoint {
     const startPoint = {
         type: 'alarmGroupStartPoint',
         alarmGroupId,
         duration,
     } satisfies AlarmGroupStartPoint;
     return alarmGroupStartPointSchema.parse(startPoint);
-};
+}

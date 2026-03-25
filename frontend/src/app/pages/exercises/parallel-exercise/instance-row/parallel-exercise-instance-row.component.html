@@ -5,7 +5,11 @@
 </td>
 <td>
     <code class="me-2">{{ exerciseInstance().participantKey }}</code>
-    <button app-copy-button [value]="participantUrl()"></button>
+    <button
+        app-copy-button
+        class="btn btn-light btn-sm"
+        [value]="participantUrl()"
+    ></button>
 </td>
 <td>{{ exerciseInstance().clientNames.join(', ') }}</td>
 <td>

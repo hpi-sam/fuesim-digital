@@ -124,7 +124,7 @@ export class TrainerMapEditorComponent implements OnInit {
         selectMapImagesTemplates
     );
 
-    public readonly technicalChallengeTemplates$: Signal<
+    public readonly technicalChallengeTemplates: Signal<
         TechnicalChallengeTemplate[]
     > = signal([getDefaultTechnicalChallengeTemplate()]);
 

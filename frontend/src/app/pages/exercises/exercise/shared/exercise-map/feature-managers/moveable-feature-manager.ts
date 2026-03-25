@@ -139,7 +139,6 @@ export abstract class MoveableFeatureManager<
         markingStyle: any
     ) {
         const currentPopup = popupService.currentPopupOptions;
-        console.log('redrawing markings', currentPopup);
         if (
             (currentPopup?.markedForTrainerUUIDs.includes(
                 feature.getId() as UUID

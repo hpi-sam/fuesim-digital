@@ -52,7 +52,6 @@ export class TechnicalChallengeFeatureManager
             mapInteractionsManager
         );
 
-        // TODO: listen for state changes
         mapInteractionsManager.addTrainerInteraction(
             new ResizeRectangleInteraction(this.layer.getSource()!)
         );

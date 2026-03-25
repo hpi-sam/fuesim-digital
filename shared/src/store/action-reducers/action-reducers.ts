@@ -22,7 +22,7 @@ import { RestrictedZoneActionReducers } from './restricted-zone.js';
 import { OperationalSectionActionReducers } from './operational-section.js';
 import { ScoutableActionReducers } from './scoutable.js';
 import { UserGeneratedContentActionReducers } from './user-generated-content.js';
-import TechnicalChallengeActionReducers from './technical-challenge.js';
+import { TechnicalChallengeActionReducers } from './technical-challenge.js';
 
 /**
  * All action reducers of the exercise must be registered here

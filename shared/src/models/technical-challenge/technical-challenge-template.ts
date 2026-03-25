@@ -5,7 +5,7 @@ import {
     newNoPosition,
     newSize,
 } from '../utils/index.js';
-import { uuid } from '../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,
@@ -16,18 +16,18 @@ import {
 } from './state-machine.js';
 
 export const technicalChallengeTemplateSchema = z.strictObject({
-    id: z.uuidv4(),
+    ...stateMachineSchema.shape,
+    id: uuidSchema,
     image: imagePropertiesSchema,
     name: z.string(),
     initialStateId: technicalChallengeStateIdSchema,
-    ...stateMachineSchema.shape,
 });
 
 export type TechnicalChallengeTemplate = z.infer<
     typeof technicalChallengeTemplateSchema
 >;
 
-export function createTechnicalChallengeFromTemplate(
+export function newTechnicalChallengeFromTemplate(
     template: TechnicalChallengeTemplate
 ): TechnicalChallenge {
     const { states, relevantTasks, transitions, name, image } =

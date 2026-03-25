@@ -395,7 +395,7 @@
                             ngbAccordionButton
                             data-cy="technicalChallengesAccordianButton"
                         >
-                            Herausforderungen
+                            Technische Herausforderungen
                         </button>
                     </h5>
                     <div ngbAccordionCollapse>
@@ -403,7 +403,7 @@
                             <ng-template>
                                 <div class="cards">
                                     @for (
-                                        template of technicalChallengeTemplates$();
+                                        template of technicalChallengeTemplates();
                                         track template.id
                                     ) {
                                         <app-map-editor-card

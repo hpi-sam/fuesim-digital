@@ -138,10 +138,12 @@ export class ExerciseState {
     @IsZodSchema(z.record(uuidSchema, mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), taskSchema))
+    @IsZodSchema(z.record(taskSchema.shape.id, taskSchema))
     public tasks: { [key: UUID]: Task } = getDefaultTasks();
 
-    @IsZodSchema(z.record(z.uuidv4(), technicalChallengeSchema))
+    @IsZodSchema(
+        z.record(technicalChallengeSchema.shape.id, technicalChallengeSchema)
+    )
     public technicalChallenges: { [key: UUID]: TechnicalChallenge } = {};
 
     @IsZodSchema(z.record(uuidSchema, transferPointSchema))

@@ -19,7 +19,7 @@ import { SimulationActionReducers } from './simulation.js';
 import { RadiogramActionReducers } from './radiogram.js';
 import { VehicleTemplateActionReducers } from './vehicle-templates.js';
 import { RestrictedZoneActionReducers } from './restricted-zone.js';
-import TechnicalChallengeActionReducers from './technical-challenge.js';
+import { TechnicalChallengeActionReducers } from './technical-challenge.js';
 
 /**
  * All action reducers of the exercise must be registered here

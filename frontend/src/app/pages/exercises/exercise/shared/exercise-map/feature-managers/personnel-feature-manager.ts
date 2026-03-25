@@ -176,7 +176,6 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
             })
             .pipe(takeUntil($destroy))
             .subscribe((workingPersonnel) => {
-                console.log('working personnel changed');
                 this.workingPersonnel = workingPersonnel;
                 this.layer.changed();
             });

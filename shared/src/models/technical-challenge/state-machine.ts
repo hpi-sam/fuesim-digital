@@ -6,6 +6,7 @@ import type { ExerciseState } from '../../state.js';
 import { taskSchema } from '../task.js';
 import type { ImageProperties } from '../utils/index.js';
 import { imagePropertiesSchema } from '../utils/index.js';
+import { getElement } from '../../store/action-reducers/utils/index.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,
@@ -28,7 +29,7 @@ export type TechnicalChallengeState = z.infer<
     typeof technicalChallengeStateSchema
 >;
 
-export function createTechnicalChallengeState(
+export function newTechnicalChallengeState(
     title: string,
     image: ImageProperties,
     possibleTasks: UUID[] | { [key: UUID]: number } = {}
@@ -46,7 +47,7 @@ export function createTechnicalChallengeState(
 }
 
 const progressGuardSchema = z.object({
-    type: z.literal('ProgressGuard'),
+    type: z.literal('progressGuard'),
     minProgress: z.number().optional(),
     maxProgress: z.number().optional(),
     taskId: uuidSchema,
@@ -55,34 +56,36 @@ const progressGuardSchema = z.object({
 export type ProgressGuard = z.infer<typeof progressGuardSchema>;
 
 const timerGuardSchema = z.object({
-    type: z.literal('TimerGuard'),
+    type: z.literal('timerGuard'),
     /** Time in exercise time */
     minTimePassed: z.number().nonnegative(),
     name: z.string().optional(),
 });
 export type TimerGuard = z.infer<typeof timerGuardSchema>;
 
-const isProgressGuardFulfilled = (
+function isProgressGuardFulfilled(
     progressGuard: ProgressGuard,
     technicalChallengeId: TechnicalChallengeId,
     exerciseState: ExerciseState
-): boolean => {
-    const challenge = exerciseState.technicalChallenges[technicalChallengeId];
-    console.assert(
-        challenge,
-        `TechnicalChallenge ${technicalChallengeId} not found.`
+): boolean {
+    const challenge = getElement(
+        exerciseState,
+        'technicalChallenge',
+        technicalChallengeId
     );
-    const progress = challenge?.taskProgress[progressGuard.taskId] ?? 0;
+    const progress = challenge.taskProgress[progressGuard.taskId] ?? 0;
     return (
         progress < (progressGuard.maxProgress ?? Number.MAX_VALUE) &&
         progress > (progressGuard.minProgress ?? 0)
     );
-};
+}
 
-const isTimerGuardFulfilled = (
+function isTimerGuardFulfilled(
     timerGuard: TimerGuard,
     exerciseState: ExerciseState
-): boolean => exerciseState.currentTime >= timerGuard.minTimePassed;
+): boolean {
+    return exerciseState.currentTime >= timerGuard.minTimePassed;
+}
 
 export const guardSchema = z.union([progressGuardSchema, timerGuardSchema]);
 export type Guard = ProgressGuard | TimerGuard;
@@ -95,22 +98,22 @@ export const transitionSchema = z.object({
 
 export type Transition = z.infer<typeof transitionSchema>;
 
-export const isGuardFulfilled = (
+export function isGuardFulfilled(
     guard: Guard,
     technicalChallengeId: TechnicalChallengeId,
     exerciseState: ExerciseState
-): boolean => {
+): boolean {
     switch (guard.type) {
-        case 'ProgressGuard':
+        case 'progressGuard':
             return isProgressGuardFulfilled(
                 guard,
                 technicalChallengeId,
                 exerciseState
             );
-        case 'TimerGuard':
+        case 'timerGuard':
             return isTimerGuardFulfilled(guard, exerciseState);
     }
-};
+}
 
 export const stateMachineSchema = z.strictObject({
     states: z.record(
@@ -121,27 +124,22 @@ export const stateMachineSchema = z.strictObject({
     transitions: z.array(transitionSchema),
 });
 
-const getStateOf = (
-    technicalChallenge: TechnicalChallenge,
-    stateId: TechnicalChallengeStateId
-): TechnicalChallengeState | undefined => technicalChallenge.states[stateId];
-
-export const currentStateOf = (
+export function currentStateOf(
     technicalChallenge: TechnicalChallenge
-): TechnicalChallengeState => {
-    const state = getStateOf(
-        technicalChallenge,
-        technicalChallenge.currentStateId
+): TechnicalChallengeState {
+    const state = technicalChallenge.states[technicalChallenge.currentStateId];
+    console.assert(
+        !!state,
+        `Invalid current state: ${technicalChallenge.currentStateId} for challenge ${technicalChallenge.id}`
     );
-    if (!state) throw Error('currentStateId does not exist in states array!');
-    return state;
-};
+    return state!;
+}
 
-export const simulateTechnicalChallenge = (
+export function simulateTechnicalChallenge(
     technicalChallenge: TechnicalChallenge,
     exerciseState: WritableDraft<ExerciseState>,
     tickInterval: number
-) => {
+) {
     const state = currentStateOf(technicalChallenge);
     for (const taskId of Object.values(technicalChallenge.assignedPersonnel)) {
         if (state.possibleTasks[taskId]) {
@@ -165,13 +163,13 @@ export const simulateTechnicalChallenge = (
     if (!nextTransition) return;
 
     technicalChallenge.currentStateId = nextTransition.to;
-};
+}
 
-export const simulateAllTechnicalChallenges = (
+export function simulateAllTechnicalChallenges(
     draftState: WritableDraft<ExerciseState>,
     tickInterval: number
-) => {
+) {
     Object.values(draftState.technicalChallenges).forEach((challenge) =>
         simulateTechnicalChallenge(challenge, draftState, tickInterval)
     );
-};
+}

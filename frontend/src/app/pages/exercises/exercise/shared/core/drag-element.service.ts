@@ -22,7 +22,7 @@ import {
     newTransferPoint,
     newPatientFromTemplate,
     CreateTechnicalChallengeAction,
-    createTechnicalChallengeFromTemplate,
+    newTechnicalChallengeFromTemplate,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -321,7 +321,7 @@ export class DragElementService {
 
             case 'technicalChallenge': {
                 const technicalChallenge: TechnicalChallenge =
-                    createTechnicalChallengeFromTemplate(
+                    newTechnicalChallengeFromTemplate(
                         this.transferringTemplate.template
                     );
                 technicalChallenge.position = newMapPositionAt(position);
@@ -332,10 +332,6 @@ export class DragElementService {
                 createdElement = technicalChallenge;
                 break;
             }
-            default:
-                // TODO: do template-types exist, where we do not want a mousup
-                //       action?
-                break;
         }
 
         this.executeDropSideEffects(pixel, createdElement, event);

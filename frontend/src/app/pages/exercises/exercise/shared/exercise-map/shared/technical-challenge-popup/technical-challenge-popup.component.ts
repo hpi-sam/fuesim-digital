@@ -9,7 +9,6 @@ import type {
     Guard,
 } from 'fuesim-digital-shared';
 import { currentStateOf } from 'fuesim-digital-shared';
-import { values } from 'lodash-es';
 import {
     createSelectPersonnel,
     createSelectTask,
@@ -47,18 +46,14 @@ export class TechnicalChallengePopupComponent implements OnInit {
         this.technicalChallenge().transitions.map(({ guard }) => guard)
     );
     public readonly progressGuards = computed(() =>
-        this.guards().filter((guard) => guard.type === 'ProgressGuard')
+        this.guards().filter((guard) => guard.type === 'progressGuard')
     );
     public readonly progressGuardsByTaskId = computed(
         () =>
-            new Map(
-                this.progressGuards().map(
-                    (guard) => [guard.taskId, guard] as const
-                )
-            )
+            new Map(this.progressGuards().map((guard) => [guard.taskId, guard]))
     );
     public readonly timerGuards = computed(() =>
-        this.guards().filter((guard) => guard.type === 'TimerGuard')
+        this.guards().filter((guard) => guard.type === 'timerGuard')
     );
 
     public exerciseTime = this.store.selectSignal(selectCurrentTime);
@@ -77,6 +72,4 @@ export class TechnicalChallengePopupComponent implements OnInit {
     public closePopup() {
         this.popupService.dismissPopup();
     }
-
-    protected readonly values = values;
 }

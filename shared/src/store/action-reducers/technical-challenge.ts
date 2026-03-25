@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { ActionReducer, MapPosition } from '../../index.js';
+import type { ActionReducer } from '../../index.js';
 import {
     lookupReducerFor,
     currentStateOf,
@@ -55,15 +55,12 @@ const resizeTechnicalChallengeActionSchema = z.strictObject({
     newSize: sizeSchema,
 });
 
-namespace TechnicalChallengeActionReducers {
+export namespace TechnicalChallengeActionReducers {
     export const addTechnicalChallenge: ActionReducer<CreateTechnicalChallengeAction> =
         {
             type: '[TechnicalChallenge] Create technical challenge',
             actionSchema: createTechnicalChallengeActionSchema,
             reducer: (draftState, action) => {
-                console.log(
-                    `want to place ${action.technicalChallenge.name} at ${(action.technicalChallenge.position as MapPosition).coordinates.x}${(action.technicalChallenge.position as MapPosition).coordinates.y}`
-                );
                 draftState.technicalChallenges[action.technicalChallenge.id] =
                     action.technicalChallenge;
                 return draftState;
@@ -138,4 +135,3 @@ namespace TechnicalChallengeActionReducers {
         rights: 'trainer',
     };
 }
-export default TechnicalChallengeActionReducers;

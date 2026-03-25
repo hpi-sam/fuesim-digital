@@ -16,5 +16,7 @@
         >
             {{ task.taskName }}
         </button>
+    } @empty {
+        <div class="text-muted p-1 fst-italic">Keine Aktion möglich.</div>
     }
 </div>

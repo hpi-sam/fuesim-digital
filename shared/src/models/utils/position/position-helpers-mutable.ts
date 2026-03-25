@@ -78,6 +78,13 @@ export function changePosition(
     element.position = cloneDeepMutable(to);
 }
 
+/**
+ * Helper to move {@link associatedElements} of an {@link element} relatively
+ * to it, if itself is moved to {@link to} by changing their position by the
+ * same movement vector.
+ *
+ * {@link element} is not moved.
+ */
 function moveAssociatedElements(
     element: WithPosition,
     to: MapPosition,
@@ -87,8 +94,6 @@ function moveAssociatedElements(
     const from = currentCoordinatesOf(element);
     const delta = calculateDelta(from, coordinatesOfPosition(to));
     const move = (position: Position): Position => {
-        console.assert(position.type === 'coordinates');
-
         if (!isPositionOnMap(position)) return position;
         const coordinates = coordinatesOfPosition(position);
 

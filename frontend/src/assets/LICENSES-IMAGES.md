@@ -78,6 +78,6 @@ License: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 [blue_car_broken.png](blue_car_broken.png),
 [blue_car_broken_burning.png](blue_car_broken_burning.png),
-[blue_car_burnedOut.png](blue_car_burnedOut.png)
+[blue_car_burned_out.png](blue_car_burned_out.png)
 Felix Koch, based on <https://illustoon.com/?dl=9476> and <https://illustoon.com/?id=2723> by [DESIGNALIKE](https://illustoon.com)
 License: CC0 1.0

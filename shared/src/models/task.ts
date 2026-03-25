@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { uuidSchema } from '../utils/index.js';
 
 export const taskSchema = z.object({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('task'),
     taskName: z.string(),
 });

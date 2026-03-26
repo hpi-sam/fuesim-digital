@@ -4,8 +4,8 @@
         @if (operationsMapProperties().enable3dBuildings) {
             <button
                 class="btn btn-sm rounded-0 px-3"
-                [class.btn-success]="is3dBuildingsEnabled"
-                [class.btn-light]="!is3dBuildingsEnabled"
+                [class.btn-success]="are3dBuildingsEnabled"
+                [class.btn-light]="!are3dBuildingsEnabled"
                 (click)="toggle3DBuildings()"
             >
                 3D
@@ -13,7 +13,7 @@
         }
         <button
             class="btn btn-sm btn-light rounded-0 px-3 gap-1"
-            (click)="gotoHomeLocation()"
+            (click)="goToHomeLocation()"
         >
             <i class="bi bi-house-fill me-2"></i>
             <span>Zurück zum Einsatzort</span>

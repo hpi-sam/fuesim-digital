@@ -18,7 +18,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Docker images are now also available on GHCR.
 - Add a new role "Einsatzübersicht" ("operations detail view") that simulates the view of a tablet device used by operation commanders on site
     - Add view to manage on-location vehicles in operational sections
-    - Add overview map with 3d view and on-location-vehicles as well as in-transfer-vehicles list
+    - Add overview map with 3D view and on-location-vehicles as well as in-transfer-vehicles list
 
 ### Changed
 

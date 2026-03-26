@@ -5,14 +5,12 @@ import {
     ElementRef,
     inject,
     OnDestroy,
-    OnInit,
     viewChild,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import maplibregl from 'maplibre-gl';
 // eslint-disable-next-line no-restricted-imports
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { first, Subject, takeUntil } from 'rxjs';
 import {
     upperLeftCornerOf,
     lowerRightCornerOf,
@@ -34,25 +32,36 @@ import { selectStateSnapshot } from '../../../../../../../state/get-state-snapsh
     templateUrl: './operations-map.component.html',
     styleUrl: './operations-map.component.scss',
 })
-export class OperationsMapComponent implements OnInit, OnDestroy {
-    private readonly destroy$ = new Subject<void>();
+export class OperationsMapComponent implements OnDestroy {
     private readonly store = inject(Store<AppState>);
     public readonly INITIAL_ZOOM = 17;
 
-    private readonly availableViewportsSignal =
+    private readonly availableViewportsMap =
         this.store.selectSignal(selectViewports);
     public readonly availableViewports = computed(() =>
-        Object.values(this.availableViewportsSignal())
+        Object.values(this.availableViewportsMap())
     );
 
     public readonly operationsMapProperties = this.store.selectSignal(
         selectOperationsMapProperties
     );
 
+    private readonly configuration =
+        this.store.selectSignal(selectConfiguration);
+
     constructor() {
+        const initializationEffectRef = effect(() => {
+            const configuration = this.configuration();
+            this.initMap(
+                configuration.tileMapProperties.tileUrl,
+                configuration.operationsMapProperties.dataUrl
+            );
+            initializationEffectRef.destroy();
+        });
+
         effect(() => {
             const operationsMapProperties = this.operationsMapProperties();
-            this.is3dBuildingsEnabled =
+            this.are3dBuildingsEnabled =
                 operationsMapProperties.enable3dBuildings;
             this.updateDisplay3DBuildings();
 
@@ -77,14 +86,14 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
     public readonly mapContainerRef =
         viewChild<ElementRef<HTMLElement>>('mapContainer');
     private map: maplibregl.Map | undefined;
-    public is3dBuildingsEnabled = true;
+    public are3dBuildingsEnabled = true;
     private readonly savedViewSettings: { bearing: number; pitch: number } = {
         bearing: -15,
         pitch: 37,
     };
     public readonly MAX_PITCH_3D_BUILDINGS = 60;
 
-    public gotoHomeLocation(animate = true) {
+    public goToHomeLocation(animate = true) {
         if (!this.map) return;
 
         const elements = [
@@ -130,14 +139,14 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
     public toggle3DBuildings() {
         if (!this.map) return;
 
-        this.is3dBuildingsEnabled = !this.is3dBuildingsEnabled;
+        this.are3dBuildingsEnabled = !this.are3dBuildingsEnabled;
         this.updateDisplay3DBuildings();
     }
 
     public updateDisplay3DBuildings() {
         if (!this.map) return;
 
-        const visibility = this.is3dBuildingsEnabled ? 'visible' : 'none';
+        const visibility = this.are3dBuildingsEnabled ? 'visible' : 'none';
 
         this.map.setLayoutProperty('3d-buildings', 'visibility', visibility);
         this.map.setLayoutProperty(
@@ -146,7 +155,7 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
             visibility
         );
 
-        if (this.is3dBuildingsEnabled) {
+        if (this.are3dBuildingsEnabled) {
             this.map.setMaxPitch(this.MAX_PITCH_3D_BUILDINGS);
             this.map.setPitch(this.savedViewSettings.pitch);
             this.map.setBearing(this.savedViewSettings.bearing);
@@ -160,21 +169,6 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
             this.map.touchPitch.disable();
             this.map.setMaxPitch(0);
         }
-    }
-
-    async ngOnInit() {
-        if (!this.mapContainerRef()) {
-            throw new Error('Map container reference is undefined');
-        }
-        this.store
-            .select(selectConfiguration)
-            .pipe(first(), takeUntil(this.destroy$))
-            .subscribe((configuration) => {
-                this.initMap(
-                    configuration.tileMapProperties.tileUrl,
-                    configuration.operationsMapProperties.dataUrl
-                );
-            });
     }
 
     private initMap(
@@ -248,7 +242,7 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
         });
         this.map.on('load', () => {
             this.map?.resize();
-            this.gotoHomeLocation(false);
+            this.goToHomeLocation(false);
         });
     }
 
@@ -277,6 +271,5 @@ export class OperationsMapComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.map?.remove();
-        this.destroy$.next();
     }
 }

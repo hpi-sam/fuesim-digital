@@ -22,7 +22,7 @@ export * from './exercise-configuration.js';
 export * from './utils/index.js';
 export * from './log-entry.js';
 export * from './tag.js';
-export type { OperationalSection } from './operational-section.js';
+export * from './operational-section.js';
 export * from './material-template.js';
 export * from './personnel-template.js';
 export * from './restricted-zone.js';

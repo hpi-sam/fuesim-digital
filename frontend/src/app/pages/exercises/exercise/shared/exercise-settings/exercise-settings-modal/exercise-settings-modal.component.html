@@ -63,15 +63,15 @@
     </div>
     <br />
     <div class="card">
-        <div class="card-header">Einsatzkarte</div>
+        <div class="card-header">Einsatzübersicht</div>
         <div class="card-body">
             <div class="form-group mb-3">
                 <label class="form-label mb-1">Serveradresse:</label>
                 <p class="small text-muted mb-2">
                     <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
                     Unter dieser Adresse werden die Karten-Kacheln für die
-                    Einsatzansicht geladen. Die URL muss die Platzhalter für die
-                    Koordinaten
+                    Einsatzübersicht geladen. Die URL muss die Platzhalter für
+                    die Koordinaten
                     <code>{{ '{' }}x{{ '}' }}</code
                     >, <code>{{ '{' }}y{{ '}' }}</code> oder
                     <code>{{ '{' }}-y{{ '}' }}</code
@@ -95,13 +95,13 @@
                 ></app-display-validation>
             </div>
             <div class="form-group mb-3">
-                <label class="form-label mb-1"
-                    >Serveradresse Gebäudedaten:</label
-                >
+                <label class="form-label mb-1">
+                    Serveradresse für Gebäudedaten:
+                </label>
                 <p class="small text-muted mb-2">
-                    Unter dieser Adresse werden die 3D Gebäudedaten geladen.
+                    Unter dieser Adresse werden die 3D-Gebäudedaten geladen.
                     Bitte beachten Sie die Lizenzbedingungen der entsprechenden
-                    Karten-Server.
+                    Server.
                 </p>
                 <input
                     #operationsUrlInput="ngModel"
@@ -119,7 +119,7 @@
             </div>
 
             <div class="form-group mb-3">
-                3D Gebäude anzeigen?
+                3D-Gebäude anzeigen?
                 <div class="form-switch">
                     <input
                         [(ngModel)]="operationsMapProperties.enable3dBuildings"
@@ -135,7 +135,7 @@
                 class="btn btn-primary"
                 data-cy="settingsSaveTileMapPropertiesButton"
             >
-                Einsatzkarteneinstellungen speichern
+                Einstellungen für die Einsatzübersicht speichern
             </button>
         </div>
     </div>

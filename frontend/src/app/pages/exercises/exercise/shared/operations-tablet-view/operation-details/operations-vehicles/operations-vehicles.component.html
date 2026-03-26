@@ -7,7 +7,7 @@
     </span>
     <div class="overflow-y-scroll">
         @for (
-            vehicleAtLocation of vehiclesOnLocation$ | async;
+            vehicleAtLocation of vehiclesOnLocation();
             track vehicleAtLocation.id
         ) {
             <app-operations-vehicle-item
@@ -21,7 +21,7 @@
     </span>
     <div class="overflow-y-scroll">
         @for (
-            vehicleInTransfer of vehiclesInTransfer$ | async;
+            vehicleInTransfer of alarmGroupVehiclesInTransfer();
             track vehicleInTransfer.id
         ) {
             <app-operations-vehicle-item

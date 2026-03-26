@@ -1,10 +1,4 @@
-import { Component, inject, input } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../../../../../state/app.state';
-import {
-    selectCurrentTime,
-    selectParticipantKey,
-} from '../../../../../../state/application/selectors/exercise.selectors';
+import { Component } from '@angular/core';
 import { OperationsMapComponent } from './operations-map/operations-map.component';
 import { OperationsVehiclesComponent } from './operations-vehicles/operations-vehicles.component';
 
@@ -14,10 +8,4 @@ import { OperationsVehiclesComponent } from './operations-vehicles/operations-ve
     styleUrl: './operation-details.component.scss',
     imports: [OperationsMapComponent, OperationsVehiclesComponent],
 })
-export class OperationDetailsTabComponent {
-    public readonly showExerciseDetails = input(false);
-    private readonly store = inject(Store<AppState>);
-
-    public readonly participantId$ = this.store.select(selectParticipantKey);
-    public readonly currentTime$ = this.store.select(selectCurrentTime);
-}
+export class OperationDetailsTabComponent {}

@@ -19,10 +19,10 @@
     <div class="ml-auto mr-2 mb-4">
         <app-section-leader-slot
             (vehicleAssigned)="assignVehicle($event, true)"
-            [vehicle]="(operationalSectionLeader$ | async) ?? null"
+            [vehicle]="operationalSectionLeader() ?? null"
         ></app-section-leader-slot>
     </div>
-    @let vehicles = operationalSectionMembers$ | async;
+    @let vehicles = operationalSectionMembers();
     @if (vehicles !== null) {
         <app-vehicles-zone
             [vehicles]="vehicles"

@@ -1,5 +1,5 @@
 import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, inject, input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, input, output, Output } from '@angular/core';
 import { type Vehicle } from 'fuesim-digital-shared';
 import { VehicleTagComponent } from '../vehicle-tag/vehicle-tag.component';
 import { MessageService } from '../../../../../../../core/messages/message.service';
@@ -20,10 +20,9 @@ export class SectionLeaderSlotComponent {
     /**
      * Emits the ID of the vehicle that was assigned to this slot
      */
-    @Output()
-    public readonly vehicleAssigned = new EventEmitter<string>();
+    public readonly vehicleAssigned = output<string>();
 
-    public onlySigleItemDropPredicate() {
+    public onlySingleItemDropPredicate() {
         // we can only drop if there is no vehicle assigned yet
         return this.vehicle() === null;
     }

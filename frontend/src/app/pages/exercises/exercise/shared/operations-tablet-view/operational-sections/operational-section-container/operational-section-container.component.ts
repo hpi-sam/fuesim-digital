@@ -1,14 +1,15 @@
-import { Component, inject, input, OnInit } from '@angular/core';
-import { createSelector, Store } from '@ngrx/store';
-import { map, Observable } from 'rxjs';
-import { type OperationalSection, Vehicle } from 'fuesim-digital-shared';
+import { Component, computed, inject, input } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { type OperationalSection } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
-import { AsyncPipe } from '@angular/common';
 import { VehiclesZoneComponent } from '../vehicles-zone/vehicles-zone.component';
 import { SectionLeaderSlotComponent } from '../section-leader-slot/section-leader-slot.component';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import { AppState } from '../../../../../../../state/app.state';
-import { createSelectVehiclesInOperationalSection } from '../../../../../../../state/application/selectors/exercise.selectors';
+import {
+    createSelectOperationalSectionLeader,
+    createSelectSortedOperationalSectionMembers,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
 import { DisplayValidationComponent } from '../../../../../../../shared/validation/display-validation/display-validation.component';
 
 @Component({
@@ -16,77 +17,31 @@ import { DisplayValidationComponent } from '../../../../../../../shared/validati
     templateUrl: './operational-section-container.component.html',
     styleUrl: './operational-section-container.component.scss',
     imports: [
-        AsyncPipe,
         DisplayValidationComponent,
         FormsModule,
         SectionLeaderSlotComponent,
         VehiclesZoneComponent,
     ],
 })
-export class OperationalSectionContainerComponent implements OnInit {
+export class OperationalSectionContainerComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject(Store<AppState>);
 
     public readonly operationalSection = input.required<OperationalSection>();
 
-    public operationalSectionMembers$?: Observable<Vehicle[]>;
+    public readonly operationalSectionLeader = computed(() =>
+        this.store.selectSignal(
+            createSelectOperationalSectionLeader(this.operationalSection().id)
+        )()
+    );
 
-    public operationalSectionLeader$?: Observable<Vehicle | undefined>;
-
-    ngOnInit() {
-        this.operationalSectionLeader$ = this.store
-            .select(
-                createSelector(
-                    createSelectVehiclesInOperationalSection(
-                        this.operationalSection().id
-                    ),
-                    (vehicles) =>
-                        Object.values(vehicles).filter(
-                            (vehicle) =>
-                                vehicle.operationalAssignment?.type ===
-                                    'operationalSection' &&
-                                vehicle.operationalAssignment.role ===
-                                    'operationalSectionLeader'
-                        )
-                )
+    public readonly operationalSectionMembers = computed(() =>
+        this.store.selectSignal(
+            createSelectSortedOperationalSectionMembers(
+                this.operationalSection().id
             )
-            .pipe(map((vehicles) => vehicles[0]));
-
-        this.operationalSectionMembers$ = this.store.select(
-            createSelector(
-                createSelectVehiclesInOperationalSection(
-                    this.operationalSection().id
-                ),
-                (vehicles) => {
-                    const data = Object.values(vehicles).filter(
-                        (vehicle) =>
-                            vehicle.operationalAssignment?.type ===
-                                'operationalSection' &&
-                            vehicle.operationalAssignment.role ===
-                                'operationalSectionMember'
-                    );
-                    data.sort((a, b) => {
-                        const positionA =
-                            a.operationalAssignment?.type ===
-                                'operationalSection' &&
-                            a.operationalAssignment.role ===
-                                'operationalSectionMember'
-                                ? a.operationalAssignment.position
-                                : -1;
-                        const positionB =
-                            b.operationalAssignment?.type ===
-                                'operationalSection' &&
-                            b.operationalAssignment.role ===
-                                'operationalSectionMember'
-                                ? b.operationalAssignment.position
-                                : -1;
-                        return positionA - positionB;
-                    });
-                    return data;
-                }
-            )
-        );
-    }
+        )()
+    );
 
     public assignVehicle(
         vehicleId: string,

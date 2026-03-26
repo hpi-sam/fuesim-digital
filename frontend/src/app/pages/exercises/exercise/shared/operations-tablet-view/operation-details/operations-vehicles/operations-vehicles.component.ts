@@ -1,7 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { combineLatest, map } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
 import { AppState } from '../../../../../../../state/app.state';
 import { selectVehiclesInTransfer } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectVisibleVehicles } from '../../../../../../../state/application/selectors/shared.selectors';
@@ -11,51 +9,43 @@ import { OperationsVehicleItemComponent } from './operations-vehicle-item/operat
     selector: 'app-operations-vehicles',
     templateUrl: './operations-vehicles.component.html',
     styleUrl: './operations-vehicles.component.scss',
-    imports: [OperationsVehicleItemComponent, AsyncPipe],
+    imports: [OperationsVehicleItemComponent],
 })
 export class OperationsVehiclesComponent {
     private readonly store = inject(Store<AppState>);
 
-    private readonly visibleVehicles$ = this.store
-        .select(selectVisibleVehicles)
-        .pipe(map((vehicles) => Object.values(vehicles)));
-    private readonly vehiclesInBetweenTransferpoints$ = this.store
-        .select(selectVehiclesInTransfer)
-        .pipe(
-            map((vehicles) =>
-                Object.values(vehicles).filter(
-                    (vehicle) =>
-                        vehicle.position.type === 'transfer' &&
-                        vehicle.position.transfer.startPoint.type ===
-                            'transferStartPoint'
-                )
-            )
-        );
-
-    public vehiclesOnLocation$ = combineLatest([
-        this.visibleVehicles$,
-        this.vehiclesInBetweenTransferpoints$,
-    ]).pipe(
-        map(([visibleVehicles, vehiclesInBetweenTransferpoints]) => {
-            const data = [
-                ...visibleVehicles,
-                ...vehiclesInBetweenTransferpoints,
-            ];
-            data.sort((a, b) => a.name.localeCompare(b.name));
-            return data;
-        })
+    private readonly visibleVehiclesMap = this.store.selectSignal(
+        selectVisibleVehicles
+    );
+    private readonly visibleVehicles = computed(() =>
+        Object.values(this.visibleVehiclesMap())
     );
 
-    public vehiclesInTransfer$ = this.store
-        .select(selectVehiclesInTransfer)
-        .pipe(
-            map((vehicles) =>
-                Object.values(vehicles).filter(
-                    (vehicle) =>
-                        vehicle.position.type === 'transfer' &&
-                        vehicle.position.transfer.startPoint.type ===
-                            'alarmGroupStartPoint'
-                )
-            )
-        );
+    private readonly vehiclesInTransfer = this.store.selectSignal(
+        selectVehiclesInTransfer
+    );
+    private readonly vehiclesInBetweenTransferpoints = computed(() =>
+        Object.values(this.vehiclesInTransfer()).filter(
+            (vehicle) =>
+                vehicle.position.type === 'transfer' &&
+                vehicle.position.transfer.startPoint.type ===
+                    'transferStartPoint'
+        )
+    );
+
+    public readonly vehiclesOnLocation = computed(() =>
+        [
+            ...this.visibleVehicles(),
+            ...this.vehiclesInBetweenTransferpoints(),
+        ].sort((a, b) => a.name.localeCompare(b.name))
+    );
+
+    public readonly alarmGroupVehiclesInTransfer = computed(() =>
+        Object.values(this.vehiclesInTransfer()).filter(
+            (vehicle) =>
+                vehicle.position.type === 'transfer' &&
+                vehicle.position.transfer.startPoint.type ===
+                    'alarmGroupStartPoint'
+        )
+    );
 }

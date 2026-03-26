@@ -8,6 +8,7 @@ import type {
     ExerciseSimulationBehaviorType,
     ExerciseState,
     UUID,
+    Vehicle,
     WithPosition,
 } from 'fuesim-digital-shared';
 import {
@@ -212,6 +213,77 @@ export const selectPersonnelInTransfer = createSelector(
     (personnel) =>
         Object.values(personnel).filter((_personnel) =>
             isInTransfer(_personnel)
+        )
+);
+
+export const selectLocalOperationsCommand = createSelector(
+    selectVehicles,
+    (vehicles) =>
+        Object.values(vehicles).find(
+            (v) => v.operationalAssignment?.type === 'localOperationsCommand'
+        )
+);
+
+export function createSelectOperationalSectionLeader(sectionId: string) {
+    return createSelector(
+        createSelectVehiclesInOperationalSection(sectionId),
+        (vehicles) =>
+            Object.values(vehicles)
+                .filter(
+                    (vehicle) =>
+                        vehicle.operationalAssignment?.type ===
+                            'operationalSection' &&
+                        vehicle.operationalAssignment.role ===
+                            'operationalSectionLeader'
+                )
+                .at(0)
+    );
+}
+
+export function createSelectOperationalSectionMembers(sectionId: string) {
+    return createSelector(
+        createSelectVehiclesInOperationalSection(sectionId),
+        (vehicles) =>
+            Object.values(vehicles).filter(
+                // This type annotation is necessary to not have to repeat the same conditions later
+                (
+                    vehicle
+                ): vehicle is Vehicle & {
+                    operationalAssignment: NonNullable<
+                        Vehicle['operationalAssignment']
+                    > & {
+                        role: 'operationalSectionMember';
+                        position: number;
+                    };
+                } =>
+                    vehicle.operationalAssignment?.type ===
+                        'operationalSection' &&
+                    vehicle.operationalAssignment.role ===
+                        'operationalSectionMember'
+            )
+    );
+}
+
+export function createSelectSortedOperationalSectionMembers(sectionId: string) {
+    return createSelector(
+        createSelectOperationalSectionMembers(sectionId),
+        (vehicles) =>
+            vehicles.sort(
+                (a, b) =>
+                    a.operationalAssignment.position -
+                    b.operationalAssignment.position
+            )
+    );
+}
+
+export const selectVehiclesInTransferFromAlarmgroup = createSelector(
+    selectVehiclesInTransfer,
+    (vehicles) =>
+        Object.values(vehicles).filter(
+            (vehicle) =>
+                vehicle.position.type === 'transfer' &&
+                vehicle.position.transfer.startPoint.type ===
+                    'alarmGroupStartPoint'
         )
 );
 

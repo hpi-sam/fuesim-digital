@@ -165,7 +165,7 @@ export class ExerciseState {
     @ValidateNested()
     public readonly radiograms: { readonly [key: UUID]: ExerciseRadiogram } =
         {};
-    @IsZodSchema(z.record(z.uuidv4(), operationalSectionSchema))
+    @IsZodSchema(z.record(uuidSchema, operationalSectionSchema))
     public readonly operationalSections: {
         readonly [key: UUID]: OperationalSection;
     } = {};

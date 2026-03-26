@@ -2,17 +2,18 @@
     <nav
         ngbNav
         [animation]="false"
+        [(activeId)]="activeTab"
         #nav="ngbNav"
         class="nav-tabs"
-        [class.fullscreenEnabled]="fullscreenEnabled"
+        [class.fullscreenEnabled]="fullscreenEnabled()"
     >
-        <ng-container ngbNavItem>
+        <ng-container ngbNavItem="operational-sections">
             <button ngbNavLink>Einsatzabschnitte</button>
             <ng-template ngbNavContent>
-                <app-operational-sections-tab></app-operational-sections-tab>
+                <app-operational-sections-tab />
             </ng-template>
         </ng-container>
-        <ng-container ngbNavItem [destroyOnHide]="false">
+        <ng-container ngbNavItem="operation-details" [destroyOnHide]="false">
             <button ngbNavLink>Einsatzdetails</button>
             <ng-template ngbNavContent>
                 <app-operation-details-tab />
@@ -21,17 +22,19 @@
         <div class="ms-auto">
             <button
                 class="btn"
-                [class.btn-outline-dark]="!fullscreenEnabled"
-                [class.btn-outline-light]="fullscreenEnabled"
+                [class.btn-outline-dark]="!fullscreenEnabled()"
+                [class.btn-outline-light]="fullscreenEnabled()"
                 title="Vollbildmodus"
                 (click)="toggleFullscreen()"
             >
                 <span class="pe-2">
-                    {{ fullscreenEnabled ? 'Vollbild verlassen' : 'Vollbild' }}
+                    {{
+                        fullscreenEnabled() ? 'Vollbild verlassen' : 'Vollbild'
+                    }}
                 </span>
                 <i
-                    [class.bi-fullscreen]="!fullscreenEnabled"
-                    [class.bi-fullscreen-exit]="fullscreenEnabled"
+                    [class.bi-fullscreen]="!fullscreenEnabled()"
+                    [class.bi-fullscreen-exit]="fullscreenEnabled()"
                 ></i>
             </button>
         </div>

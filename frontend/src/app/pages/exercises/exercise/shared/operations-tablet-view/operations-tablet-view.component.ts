@@ -3,6 +3,7 @@ import {
     Component,
     ElementRef,
     OnDestroy,
+    signal,
     viewChild,
 } from '@angular/core';
 import { NgbNav, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
@@ -24,28 +25,30 @@ export class OperationsTabletViewComponent implements AfterViewInit, OnDestroy {
     public readonly operationsTabletViewRoot =
         viewChild<ElementRef<HTMLDivElement>>('otvRoot');
 
-    public fullscreenEnabled = false;
+    public readonly fullscreenEnabled = signal<boolean>(false);
+
+    public readonly activeTab = signal<string>('operational-sections');
 
     public fullscreenEventListener() {
-        this.fullscreenEnabled = document.fullscreenElement !== null;
+        this.fullscreenEnabled.set(document.fullscreenElement !== null);
     }
 
-    public toggleFullscreen(): void {
-        if (!this.fullscreenEnabled) {
+    public toggleFullscreen() {
+        if (!this.fullscreenEnabled()) {
             this.operationsTabletViewRoot()?.nativeElement.requestFullscreen();
         } else {
             document.exitFullscreen();
         }
     }
 
-    ngAfterViewInit(): void {
+    ngAfterViewInit() {
         this.operationsTabletViewRoot()?.nativeElement.addEventListener(
             'fullscreenchange',
             this.fullscreenEventListener.bind(this)
         );
     }
 
-    ngOnDestroy(): void {
+    ngOnDestroy() {
         this.operationsTabletViewRoot()?.nativeElement.removeEventListener(
             'fullscreenchange',
             this.fullscreenEventListener.bind(this)

@@ -1,5 +1,5 @@
 import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, inject, input, output, Output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { type Vehicle } from 'fuesim-digital-shared';
 import { VehicleTagComponent } from '../vehicle-tag/vehicle-tag.component';
 import { MessageService } from '../../../../../../../core/messages/message.service';

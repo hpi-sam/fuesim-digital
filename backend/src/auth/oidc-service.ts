@@ -174,9 +174,7 @@ export class OidcService {
             return;
         }
 
-        const fullUrl = new URL(
-            `${req.protocol}://${req.host}${req.originalUrl}`
-        );
+        const fullUrl = new URL(`${this._publicUrl}${req.originalUrl}`);
 
         const tokens = await oidc.authorizationCodeGrant(this.config, fullUrl, {
             expectedState: state,

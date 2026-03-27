@@ -1,4 +1,8 @@
-import type { ErrorRequestHandler, RequestHandler } from 'express';
+import type {
+    ErrorRequestHandler,
+    RequestHandler,
+    Request as HttpRequest,
+} from 'express';
 import { z, ZodError } from 'zod';
 import type { AuthService } from '../auth/auth-service.js';
 import { PermissionDeniedError, ApiError } from './http.js';
@@ -34,6 +38,15 @@ export const isAuthenticatedMiddleware: RequestHandler = (req, res, next) => {
     next();
 };
 
+export function warnError(req: HttpRequest, err: any) {
+    console.warn(
+        `An error occurred on http request ${req.path}: ${err}`,
+        err instanceof Error && err.stack
+            ? `at ${err.stack}`
+            : 'no error or no stack'
+    );
+}
+
 export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     try {
         if (err instanceof ApiError) {
@@ -42,12 +55,7 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
             // Input validation failed
             res.status(400).send({ message: z.treeifyError(err) });
         } else {
-            console.warn(
-                `An error occurred on http request ${req.path}: ${err}`,
-                err instanceof Error && err.stack
-                    ? `at ${err.stack}`
-                    : 'no error or no stack'
-            );
+            warnError(req, err);
             res.status(500).send({
                 message: 'Es ist ein interner Serverfehler aufgetreten.',
             });

@@ -85,6 +85,13 @@ import {
     userGeneratedContentSchema,
 } from './models/user-generated-content.js';
 import { type Scoutable, scoutableSchema } from './models/scoutable.js';
+import {
+    Measure,
+    measureSchema,
+    MeasureTemplate,
+    measureTemplateSchema,
+} from './models/global-measure.js';
+import { defaultMeasureTemplatesById } from './data/default-state/measure-templates.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -135,6 +142,11 @@ export class ExerciseState {
     @IsZodSchema(z.record(uuidSchema, restrictedZoneSchema))
     public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
         {};
+
+    @IsZodSchema(z.record(uuidSchema, measureSchema))
+    public readonly measures: {
+        readonly [key: UUID]: Measure;
+    } = {};
 
     @IsZodSchema(z.record(uuidSchema, mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
@@ -188,6 +200,11 @@ export class ExerciseState {
     public readonly personnelTemplates: {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;
+
+    @IsZodSchema(z.record(uuidSchema, measureTemplateSchema))
+    public readonly measureTemplates: {
+        readonly [key: UUID]: MeasureTemplate;
+    } = defaultMeasureTemplatesById;
 
     @IsZodSchema(z.record(uuidSchema, mapImageTemplateSchema))
     public readonly mapImageTemplates: {

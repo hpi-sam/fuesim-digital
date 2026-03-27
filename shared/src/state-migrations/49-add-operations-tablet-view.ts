@@ -1,3 +1,4 @@
+import { defaultOperationsMapProperties } from '../data/index.js';
 import type { UUID } from '../utils/index.js';
 import type { Migration } from './migration-functions.js';
 
@@ -43,11 +44,16 @@ export const addOperationsTabletView49: Migration = {
                     operationalAssignment: null | undefined;
                 };
             };
+            configuration: {
+                operationsMapProperties: any;
+            };
         };
 
         typedState.operationalSections = {};
         Object.values(typedState.vehicles).forEach((vehicle) => {
             vehicle.operationalAssignment = null;
         });
+        typedState.configuration.operationsMapProperties =
+            defaultOperationsMapProperties;
     },
 };

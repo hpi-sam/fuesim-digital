@@ -1,0 +1,27 @@
+<div class="bg-body bg-opacity-50 rounded shadow p-2">
+    <div class="row g-2">
+        @for (measureTemplate of measureTemplates(); track measureTemplate.id) {
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                <button
+                    class="btn p-0 border rounded bg-white overflow-hidden d-flex flex-column"
+                    (click)="onMeasureTemplateSelect(measureTemplate)"
+                >
+                    <div class="ratio ratio-1x1 bg-body-tertiary">
+                        <div
+                            class="d-flex align-items-center justify-content-center p-2 h-100 w-100"
+                        >
+                            <img
+                                [src]="measureTemplate.image.url"
+                                [alt]="measureTemplate.name"
+                                class="img-fluid object-fit-contain"
+                            />
+                        </div>
+                    </div>
+                    <div class="border-top p-2 small text-center text-truncate">
+                        {{ measureTemplate.name }}
+                    </div>
+                </button>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,16 @@
+.toolbar-animated-collapse {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(0.5rem);
+    transition:
+        max-height 220ms ease,
+        opacity 180ms ease,
+        transform 220ms ease;
+}
+
+.toolbar-animated-collapse.show {
+    max-height: 24rem;
+    opacity: 1;
+    transform: translateY(0);
+}

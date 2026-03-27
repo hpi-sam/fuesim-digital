@@ -209,9 +209,7 @@
                     @if (!ownClient.isInWaitingRoom) {
                         @switch (ownClient.role.specificRole) {
                             @case ('mapOperator') {
-                                <app-exercise-map
-                                    class="h-100 rounded overflow-hidden"
-                                ></app-exercise-map>
+                                <app-map-operator-map-editor />
                             }
                             @case ('trainer') {
                                 <app-trainer-map-editor></app-trainer-map-editor>

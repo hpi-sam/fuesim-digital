@@ -1,47 +1,14 @@
 @let position = vehicle().position;
 
-<div class="border px-2 py-1 d-flex flex-column gap-1">
+<div class="border p-2 d-flex flex-row justify-content-between gap-1">
     <span class="h5 m-0">
         {{ vehicle().name }}
     </span>
     @if (position.type === 'transfer' && showTransfer()) {
-        <div class="d-flex flex-row" style="opacity: 0.8">
-            <div>
-                @if (
-                    position.transfer.startPoint.type === 'alarmGroupStartPoint'
-                ) {
-                    <span class="bg-info-subtle px-1 rounded-1"
-                        ><small>{{
-                            availableAlarmGroups()[
-                                position.transfer.startPoint.alarmGroupId
-                            ]?.name ?? 'Alarmgruppe'
-                        }}</small></span
-                    >
-                }
-
-                @if (
-                    position.transfer.startPoint.type === 'transferStartPoint'
-                ) {
-                    <span class="bg-secondary-subtle px-1 rounded-1"
-                        ><small>{{
-                            availableTransferPoints()[
-                                position.transfer.startPoint.transferPointId
-                            ]?.externalName ?? 'Transferpunkt'
-                        }}</small></span
-                    >
-                }
-            </div>
-            <i class="bi-arrow-right-short"></i>
-            <div>
-                <span class="bg-secondary-subtle px-1 rounded-1"
-                    ><small>{{
-                        availableTransferPoints()[
-                            position.transfer.targetTransferPointId
-                        ]?.externalName ?? 'Transferpunkt'
-                    }}</small></span
-                >
-            </div>
-        </div>
+        <span class="text-muted">
+            {{
+                ceil((position.transfer.endTimeStamp - time()) / (1000 * 60))
+            }} min
+        </span>
     }
-    <span> </span>
 </div>

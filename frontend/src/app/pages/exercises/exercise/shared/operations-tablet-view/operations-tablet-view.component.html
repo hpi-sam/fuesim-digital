@@ -2,18 +2,17 @@
     <nav
         ngbNav
         [animation]="false"
-        [(activeId)]="activeTab"
         #nav="ngbNav"
         class="nav-tabs"
         [class.fullscreenEnabled]="fullscreenEnabled()"
     >
-        <ng-container ngbNavItem="operational-sections">
+        <ng-container ngbNavItem>
             <button ngbNavLink>Einsatzabschnitte</button>
             <ng-template ngbNavContent>
                 <app-operational-sections-tab />
             </ng-template>
         </ng-container>
-        <ng-container ngbNavItem="operation-details" [destroyOnHide]="false">
+        <ng-container ngbNavItem [destroyOnHide]="false">
             <button ngbNavLink>Einsatzdetails</button>
             <ng-template ngbNavContent>
                 <app-operation-details-tab />

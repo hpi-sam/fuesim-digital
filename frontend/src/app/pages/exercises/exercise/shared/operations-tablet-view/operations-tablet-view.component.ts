@@ -27,8 +27,6 @@ export class OperationsTabletViewComponent implements AfterViewInit, OnDestroy {
 
     public readonly fullscreenEnabled = signal<boolean>(false);
 
-    public readonly activeTab = signal<string>('operational-sections');
-
     public fullscreenEventListener() {
         this.fullscreenEnabled.set(document.fullscreenElement !== null);
     }

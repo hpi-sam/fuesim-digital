@@ -69,10 +69,5 @@
             "node": "./dist/index.js",
             "default": "./dist/index.js"
         }
-    },
-    "overrides": {
-        "@istanbuljs/load-nyc-config": {
-            "js-yaml": "^4.1.1"
-        }
     }
 }

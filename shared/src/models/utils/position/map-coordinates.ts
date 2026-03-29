@@ -7,7 +7,9 @@ export const mapCoordinatesSchema = z.strictObject({
 
 export type MapCoordinates = z.infer<typeof mapCoordinatesSchema>;
 
-export const newMapCoordinatesAt = (x: number, y: number): MapCoordinates => ({
-    x,
-    y,
-});
+export function newMapCoordinatesAt(x: number, y: number): MapCoordinates {
+    return {
+        x,
+        y,
+    };
+}

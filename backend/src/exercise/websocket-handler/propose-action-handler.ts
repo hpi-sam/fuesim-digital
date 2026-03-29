@@ -10,10 +10,10 @@ import { clientMap } from '../client-map.js';
 import { ExerciseClientWrapper } from '../client-wrapper.js';
 import { secureOn } from './secure-on.js';
 
-export const registerProposeActionHandler = (
+export function registerProposeActionHandler(
     io: ExerciseServer,
     client: ExerciseSocket
-) => {
+) {
     secureOn(
         client,
         'proposeAction',
@@ -113,4 +113,4 @@ export const registerProposeActionHandler = (
             });
         }
     );
-};
+}

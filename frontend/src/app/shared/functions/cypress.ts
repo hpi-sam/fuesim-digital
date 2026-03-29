@@ -8,15 +8,16 @@ export interface CypressTestingValues {
     websocketBaseUrl: string;
 }
 
-export const isBeingTestedByCypress = () =>
-    'Cypress' in window && !environment.production;
+export function isBeingTestedByCypress() {
+    return 'Cypress' in window && !environment.production;
+}
 
-export const setupCypressTestingValues = (
+export function setupCypressTestingValues(
     values: Partial<CypressTestingValues>
-) => {
+) {
     const anyWindow = window as any;
     if (isBeingTestedByCypress()) {
         anyWindow.cypressTestingValues ??= {};
         defaults(anyWindow.cypressTestingValues, values);
     }
-};
+}

@@ -23,9 +23,10 @@ import type { TransferLine } from '../../../shared/types/transfer-line';
 /**
  * Check before via selectExerciseStateMode whether the exerciseState is defined
  */
-export const selectExerciseState = (state: AppState) =>
+export function selectExerciseState(state: AppState) {
     // TODO: we currently expect this to only be used of the exerciseStateMode is not undefined
-    state.application.exerciseState!;
+    return state.application.exerciseState!;
+}
 
 function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);

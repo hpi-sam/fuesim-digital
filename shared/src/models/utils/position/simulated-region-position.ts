@@ -14,9 +14,11 @@ export type SimulatedRegionPosition = z.infer<
     typeof simulatedRegionPositionSchema
 >;
 
-export const newSimulatedRegionPositionIn = (
+export function newSimulatedRegionPositionIn(
     simulatedRegionId: UUID
-): SimulatedRegionPosition => ({
-    type: 'simulatedRegion',
-    simulatedRegionId,
-});
+): SimulatedRegionPosition {
+    return {
+        type: 'simulatedRegion',
+        simulatedRegionId,
+    };
+}

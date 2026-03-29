@@ -64,13 +64,15 @@ export interface GeometryHelper<
     getFeaturePosition: (feature: Feature<T>) => Positions<T>;
 }
 
-export const interpolate = (
+export function interpolate(
     startCoordinate: Coordinate,
     endCoordinate: Coordinate,
     lerpFactor: number
-): Coordinate => [
-    startCoordinate[0]! +
-        (endCoordinate[0]! - startCoordinate[0]!) * lerpFactor,
-    startCoordinate[1]! +
-        (endCoordinate[1]! - startCoordinate[1]!) * lerpFactor,
-];
+): Coordinate {
+    return [
+        startCoordinate[0]! +
+            (endCoordinate[0]! - startCoordinate[0]!) * lerpFactor,
+        startCoordinate[1]! +
+            (endCoordinate[1]! - startCoordinate[1]!) * lerpFactor,
+    ];
+}

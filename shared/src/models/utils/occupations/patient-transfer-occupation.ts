@@ -11,9 +11,11 @@ export type PatientTransferOccupation = z.infer<
     typeof patientTransferOccupation
 >;
 
-export const newPatientTransferOccupation = (
+export function newPatientTransferOccupation(
     transportManagementRegionId: UUID
-): PatientTransferOccupation => ({
-    type: 'patientTransferOccupation',
-    transportManagementRegionId,
-});
+): PatientTransferOccupation {
+    return {
+        type: 'patientTransferOccupation',
+        transportManagementRegionId,
+    };
+}

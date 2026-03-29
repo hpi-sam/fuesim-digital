@@ -1,3 +1,5 @@
+import esLintAntfuPlugin from 'eslint-plugin-antfu';
+
 export default {
     files: ['**/*.ts', '**/*.js'],
 
@@ -6,6 +8,10 @@ export default {
         '**/migrations/**/*.js',
         'jest.config.js',
     ],
+
+    plugins: {
+        antfu: esLintAntfuPlugin,
+    },
 
     rules: {
         /**
@@ -410,5 +416,6 @@ export default {
         '@typescript-eslint/no-misused-new': 'warn',
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+        'antfu/top-level-function': 'error',
     },
 };

@@ -1,0 +1,11 @@
+.measure-label {
+    font-size: 0.65rem;
+    line-height: 1.3em;
+    min-height: 2.6em;
+    overflow: hidden;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+}

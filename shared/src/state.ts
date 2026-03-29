@@ -90,7 +90,7 @@ import {
     measureSchema,
     MeasureTemplate,
     measureTemplateSchema,
-} from './models/global-measure.js';
+} from './models/measure/index.js';
 import { defaultMeasureTemplatesById } from './data/default-state/measure-templates.js';
 
 export class ExerciseState {

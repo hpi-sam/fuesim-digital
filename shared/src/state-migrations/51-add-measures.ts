@@ -1,6 +1,6 @@
 import type { Migration } from './migration-functions.js';
 
-export const addGlobalMeasures49: Migration = {
+export const addMeasures51: Migration = {
     action: null,
 
     state: (state: any) => {

@@ -1,27 +1,46 @@
 import type { Immutable } from 'immer';
-import * as z from 'zod';
-import { uuidSchema } from '../utils/uuid.js';
-import { imagePropertiesSchema } from './index.js';
+import { z } from 'zod';
 
+// ========== General ==========
 export const measurePropertyTypeSchema = z.literal([
     'manualConfirm',
     'response',
+    'delay',
 ]);
 
+export type MeasurePropertyType = Immutable<
+    z.infer<typeof measurePropertyTypeSchema>
+>;
+
+// ========== Dependencies ==========
 export const requiresAnyOfSchema = z.strictObject({
     anyOf: z.array(measurePropertyTypeSchema),
 });
 
 export type RequiresAnyOf = Immutable<z.infer<typeof requiresAnyOfSchema>>;
 
-export const measurePropertyBaseSchema = z.strictObject({
+export const measurePropertyDefinitionSchema = z.strictObject({
     blockedBy: z.array(measurePropertyTypeSchema),
     requires: z.array(requiresAnyOfSchema),
 });
 
+export type MeasurePropertyDefinition = Immutable<
+    z.infer<typeof measurePropertyDefinitionSchema>
+>;
+
+export const measurePropertyDefinitions: {
+    [key in MeasurePropertyType]: MeasurePropertyDefinition;
+} = {
+    manualConfirm: { blockedBy: [], requires: [] },
+    response: { blockedBy: [], requires: [] },
+    delay: { blockedBy: [], requires: [] },
+};
+
+// ========== Properties ==========
 export const manualConfirmPropertySchema = z.strictObject({
     type: z.literal('manualConfirm'),
-    ...measurePropertyBaseSchema.shape,
+    prompt: z.string(),
+    confirmationString: z.string().optional(),
 });
 
 export type ManualConfirmProperty = Immutable<
@@ -30,7 +49,6 @@ export type ManualConfirmProperty = Immutable<
 
 export const responsePropertySchema = z.strictObject({
     type: z.literal('response'),
-    ...measurePropertyBaseSchema.shape,
     response: z.string(),
 });
 
@@ -38,27 +56,18 @@ export type ResponseProperty = Immutable<
     z.infer<typeof responsePropertySchema>
 >;
 
+export const delayPropertySchema = z.strictObject({
+    type: z.literal('delay'),
+    delay: z.number().positive(),
+});
+
+export type DelayProperty = Immutable<z.infer<typeof delayPropertySchema>>;
+
+// ========== Final ==========
 export const measurePropertySchema = z.union([
     manualConfirmPropertySchema,
     responsePropertySchema,
+    delayPropertySchema,
 ]);
 
 export type MeasureProperty = Immutable<z.infer<typeof measurePropertySchema>>;
-
-export const measureTemplateSchema = z.strictObject({
-    id: uuidSchema,
-    name: z.string(),
-    image: imagePropertiesSchema,
-    properties: z.array(measurePropertySchema),
-});
-
-export type MeasureTemplate = Immutable<z.infer<typeof measureTemplateSchema>>;
-
-export const measureSchema = z.strictObject({
-    id: uuidSchema,
-    timestamp: z.number(),
-    clientName: z.string(),
-    template: uuidSchema,
-});
-
-export type Measure = Immutable<z.infer<typeof measureSchema>>;

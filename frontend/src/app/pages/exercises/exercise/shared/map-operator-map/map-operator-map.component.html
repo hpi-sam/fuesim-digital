@@ -3,21 +3,23 @@
         <app-exercise-map class="h-100 rounded overflow-hidden" />
     </div>
 
-    <div
-        class="position-absolute start-50 translate-middle-x bottom-0 w-100 px-2 px-md-4 pb-2 d-flex flex-column align-items-center"
-    >
-        <button
-            class="map-toolbar-toggle btn btn-light btn-sm shadow rounded-circle mb-2"
-            (click)="toggleToolbar()"
-        >
-            {{ isToolbarVisible() ? '▼' : '▲' }}
-        </button>
-
+    @if (exerciseStatus() === 'running') {
         <div
-            class="toolbar-animated-collapse w-100"
-            [class.show]="isToolbarVisible()"
+            class="position-absolute start-50 translate-middle-x bottom-0 w-100 px-2 px-md-4 pb-2 d-flex flex-column align-items-center"
         >
-            <app-map-operator-toolbar />
+            <button
+                class="map-toolbar-toggle btn btn-light btn-sm shadow rounded-circle mb-2"
+                (click)="toggleToolbar()"
+            >
+                {{ isToolbarVisible() ? '▼' : '▲' }}
+            </button>
+
+            <div
+                class="toolbar-animated-collapse w-100"
+                [class.show]="isToolbarVisible()"
+            >
+                <app-map-operator-toolbar />
+            </div>
         </div>
-    </div>
+    }
 </div>

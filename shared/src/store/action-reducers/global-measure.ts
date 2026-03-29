@@ -1,4 +1,4 @@
-import { measureSchema, type Measure } from '../../models/global-measure.js';
+import { measureSchema, type Measure } from '../../models/measure/index.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type { Action, ActionReducer } from '../index.js';

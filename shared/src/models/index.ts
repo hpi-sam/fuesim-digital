@@ -6,6 +6,7 @@ export * from './hospital-patient.js';
 export * from './map-image.js';
 export * from './map-image-template.js';
 export * from './material.js';
+export * from './measure/index.js';
 export * from './patient.js';
 export * from './patient-health-state.js';
 export * from './patient-template.js';

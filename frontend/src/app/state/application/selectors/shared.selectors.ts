@@ -132,7 +132,7 @@ export const selectVisibleCateringLines = createSelector(
     selectPersonnel,
     selectPatients,
     (viewport, materials, personnel, patients) =>
-        // Mostly, there are fewer untreated elements than materials and personnel that are not treating
+        // Mostly, there are fewer untreated patients than materials and personnel that are not treating
         Object.values(patients)
             .filter((patient) => isOnMap(patient))
             .flatMap((patient) =>
@@ -167,7 +167,7 @@ export const selectVisibleCateringLines = createSelector(
             )
 );
 
-export const selectVisibleScoutIndicators = createSelector(
+export const selectVisibleScoutableIndicators = createSelector(
     selectCurrentMainRole,
     selectScoutables,
     selectRestrictedViewport,
@@ -201,7 +201,8 @@ export const selectVisibleScoutIndicators = createSelector(
                             position: indicatorPos,
                             scoutableElementType: element.type,
                             scoutableElementId: element.id,
-                            isPaticipantVisible: scoutable.isPaticipantVisible,
+                            isVisibleForParticipants:
+                                scoutable.isVisibleForParticipants,
                         };
                     })
             )
@@ -213,7 +214,7 @@ export const selectVisibleScoutIndicators = createSelector(
                             viewport,
                             scoutableIndicator.position
                         )) &&
-                    (scoutableIndicator.isPaticipantVisible ||
+                    (scoutableIndicator.isVisibleForParticipants ||
                         currentRole === 'trainer')
             )
             .reduce<{ [id: `${UUID}:${UUID}`]: ScoutableIndicator }>(

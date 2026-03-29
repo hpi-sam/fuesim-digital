@@ -7,7 +7,7 @@
                 <ngx-editor
                     [editor]="editor"
                     [formField]="editorForm.editorContent"
-                    [placeholder]="'Hier Text eingeben...'"
+                    [placeholder]="'Hier erkundbare Infos eingeben...'"
                 >
                 </ngx-editor>
             </div>
@@ -15,16 +15,21 @@
                 editorForm.editorContent().value() ===
                 this.userGeneratedContentElement()?.content
             ) {
-                <button class="btn btn-outline-success">Gespeichert</button>
+                <button class="btn btn-outline-success" disabled>
+                    Gespeichert
+                </button>
             } @else {
                 <button type="submit" class="btn btn-primary">Speichern</button>
             }
         </form>
     </ng-container>
-}
-<hr />
-@if (this.currentRole() !== 'trainer') {
+} @else {
+    <hr />
     <ng-container>
         <div [innerHTML]="editorForm.editorContent().value()"></div>
     </ng-container>
 }
+<!-- debugging info -->
+<hr />
+<span> contentId: {{ this.userGeneratedContentId() }}</span>
+<span> editor content: {{ this.editorForm.editorContent().value() }}</span>

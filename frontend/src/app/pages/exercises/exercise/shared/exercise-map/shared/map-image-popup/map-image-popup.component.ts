@@ -26,21 +26,12 @@ import { AppSaveOnTypingDirective } from '../../../../../../../shared/directives
         AsyncPipe,
     ],
 })
-export class MapImagePopupComponent implements OnInit {
-    private readonly store = inject<Store<AppState>>(Store);
+export class MapImagePopupComponent {
     private readonly popupService = inject(PopupService);
 
-    // These properties are only set after OnInit
     public mapImageId!: UUID;
-    readonly mapImage = signal<MapImage | null>(null);
 
     public openScoutInfo!: boolean;
-
-    ngOnInit() {
-        this.mapImage.set(
-            this.store.selectSignal(createSelectMapImage(this.mapImageId))()
-        );
-    }
 
     public closePopup() {
         this.popupService.closePopup();

@@ -1,4 +1,4 @@
-@if (mapImage(); as mapImage) {
+@if (mapImageId) {
     <h5 class="popover-header">
         Bildinformationen
         <button
@@ -9,7 +9,7 @@
     </h5>
     <div class="popover-body p-0" style="width: 350px">
         <app-map-images-details
-            [mapImageId]="mapImage.id"
+            [mapImageId]="mapImageId"
             [openScoutInfo]="openScoutInfo"
         />
     </div>

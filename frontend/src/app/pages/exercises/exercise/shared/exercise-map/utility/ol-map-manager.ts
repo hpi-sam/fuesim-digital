@@ -348,15 +348,7 @@ export class OlMapManager {
             this.olMap
         );
         const scoutableIndicatorsFeatureManger =
-            new ScoutableIndicatorsFeatureManager(
-                this.store,
-                this.olMap,
-                this.popupService,
-                this.exerciseService,
-                patientFeatureManager,
-                mapImageFeatureManager,
-                this
-            );
+            new ScoutableIndicatorsFeatureManager(this.store, this.olMap, this);
 
         const restrictedZoneFeatureManager = new RestrictedZoneFeatureManager(
             this.olMap,

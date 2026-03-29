@@ -8,7 +8,7 @@ export const scoutableSchema = z.strictObject({
     id: z.uuidv4(),
     type: z.literal('scoutable'),
     userGeneratedContentId: z.uuidv4().nullable(),
-    isPaticipantVisible: z.boolean(),
+    isVisibleForParticipants: z.boolean(),
 });
 export type Scoutable = Immutable<z.infer<typeof scoutableSchema>>;
 
@@ -34,6 +34,6 @@ export function newScoutable(): Scoutable {
         id: uuid(),
         type: 'scoutable',
         userGeneratedContentId: null,
-        isPaticipantVisible: true,
+        isVisibleForParticipants: true,
     };
 }

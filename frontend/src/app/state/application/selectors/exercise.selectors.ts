@@ -29,9 +29,7 @@ export const selectExerciseState = (state: AppState) =>
     // TODO: we currently expect this to only be used of the exerciseStateMode is not undefined
     state.application.exerciseState!;
 
-export function selectPropertyFactory<Key extends keyof ExerciseState>(
-    key: Key
-) {
+function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
 }
 
@@ -81,7 +79,7 @@ export const selectUserGeneratedContent = selectPropertyFactory(
 
 // Elements
 
-export function createSelectElementFromMapFactory<Element>(
+function createSelectElementFromMapFactory<Element>(
     elementsSelector: (state: AppState) => { [key: UUID]: Element }
 ) {
     return (id: UUID) =>

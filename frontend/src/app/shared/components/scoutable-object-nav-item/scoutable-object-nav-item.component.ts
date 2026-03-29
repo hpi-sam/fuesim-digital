@@ -43,7 +43,6 @@ export class ScoutableObjectNavItemComponent implements OnInit {
             }
         });
     }
-
     async ngOnInit(): Promise<void> {
         if (this.element().scoutableId === null) {
             await this.makeScoutable(this.element());
@@ -65,20 +64,20 @@ export class ScoutableObjectNavItemComponent implements OnInit {
             content,
         });
     }
-
     async makeScoutable(element: ScoutableElement) {
         await this.exerciseService.proposeAction(
             {
                 type: '[Scoutable] Make scoutable',
                 element,
                 scoutable: newScoutable(),
+                content: newUserGeneratedContent(),
             },
             true
         );
     }
     setVisibility(value: boolean) {
         this.exerciseService.proposeAction({
-            type: '[Scoutable] Set isPaticipantVisible',
+            type: '[Scoutable] Set isVisibleForParticipants',
             scoutableId: this.scoutable()!.id,
             value,
         });

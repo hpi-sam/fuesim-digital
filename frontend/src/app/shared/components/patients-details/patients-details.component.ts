@@ -100,7 +100,7 @@ export class PatientsDetailsComponent implements OnChanges {
                     const scoutable = this.store.selectSignal(
                         createSelectScoutable(patient.scoutableId)
                     );
-                    return scoutable().isPaticipantVisible;
+                    return scoutable().isVisibleForParticipants;
                 }
                 return false;
             })

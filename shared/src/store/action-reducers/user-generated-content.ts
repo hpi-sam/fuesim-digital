@@ -72,12 +72,12 @@ export namespace UserGeneratedContentActionReducers {
     export const updateContent: ActionReducer<UpdateContentAction> = {
         action: UpdateContentAction,
         reducer: (draftState, { contentId, newContentString }) => {
-            const oldContent = getElement(
+            const element = getElement(
                 draftState,
                 'userGeneratedContent',
                 contentId
             );
-            oldContent.content = newContentString;
+            element.content = newContentString;
             return draftState;
         },
         rights: 'trainer',

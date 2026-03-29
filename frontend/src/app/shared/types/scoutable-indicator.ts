@@ -9,5 +9,5 @@ export interface ScoutableIndicator {
     readonly position: MapCoordinates;
     readonly scoutableElementType: ScoutableElementType;
     readonly scoutableElementId: UUID;
-    readonly isPaticipantVisible: boolean;
+    readonly isVisibleForParticipants: boolean;
 }

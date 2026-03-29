@@ -4,7 +4,6 @@ import {
     input,
     OnDestroy,
     OnInit,
-    output,
     signal,
 } from '@angular/core';
 import { form } from '@angular/forms/signals';
@@ -28,8 +27,6 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
 })
 export class RichTextEditorComponent implements OnInit, OnDestroy {
     readonly userGeneratedContentId = input.required<UUID>();
-    readonly contentAssignedElement =
-        input.required<ContentAssignableElement>();
     readonly userGeneratedContentElement = signal<UserGeneratedContent | null>(
         null
     );
@@ -48,17 +45,14 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
         ['text_color', 'background_color'],
         ['align_left', 'align_center', 'align_right', 'align_justify'],
     ];
-
-    /* TODO @JohannesPotzi: Validators for image urls */
     readonly editorModel = signal({
         editorContent: '',
     });
     editorForm = form(this.editorModel);
-    readonly submitedContent = output<string | null | undefined>();
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
         this.editor = new Editor();
-        this.userGeneratedContentElement.set(
+        await this.userGeneratedContentElement.set(
             this.store.selectSignal(
                 createSelectUserGeneratedContent(this.userGeneratedContentId())
             )()
@@ -67,26 +61,16 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
             .editorContent()
             .value.set(this.userGeneratedContentElement()!.content);
     }
-    public assignContent(element: ContentAssignableElement) {
-        this.exerciseService.proposeAction({
-            type: '[UserGeneratedContent] Assign new content to element',
-            elementId: element.id,
-            content: newUserGeneratedContent(),
-        });
-    }
     onSubmit() {
         this.exerciseService.proposeAction({
             type: '[UserGeneratedContent] Update content',
             contentId: this.userGeneratedContentId(),
             newContentString: this.editorForm.editorContent().value(),
         });
-    }
-    deleteContent() {
-        this.exerciseService.proposeAction({
-            type: '[UserGeneratedContent] Delete content',
-            contentId: this.userGeneratedContentId(),
-            assignedElement: this.contentAssignedElement(),
-        });
+        console.log(
+            'content updated! New value: ' +
+                this.userGeneratedContentElement()?.content
+        );
     }
     ngOnDestroy(): void {
         this.editor.destroy();

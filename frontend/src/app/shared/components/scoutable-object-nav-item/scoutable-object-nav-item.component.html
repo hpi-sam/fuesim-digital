@@ -1,13 +1,7 @@
 @if (scoutable(); as scoutable) {
     <div>
         @if (currentRole() === 'trainer') {
-            <!-- <button
-            class="btn btn-outline-primary ms-3"
-            (click)="assignContent()"
-            >
-                Info-Block hinzufügen
-            </button> -->
-            @if (scoutable.isPaticipantVisible === true) {
+            @if (scoutable.isVisibleForParticipants === true) {
                 <button
                     class="btn btn-outline-primary ms-3"
                     ngbTooltip="Für Teilnehmer verstecken"
@@ -15,9 +9,9 @@
                 >
                     <i class="bi bi-eye"></i>
                 </button>
-                <span> Inhalte sind für Teilnehmer sichtbar.</span>
+                <span>Inhalte sind für Teilnehmende sichtbar.</span>
             }
-            @if (scoutable.isPaticipantVisible === false) {
+            @if (scoutable.isVisibleForParticipants === false) {
                 <button
                     class="btn btn-outline-primary ms-3"
                     ngbTooltip="Für Teilnehmer sichtbar machen"
@@ -25,21 +19,18 @@
                 >
                     <i class="bi bi-eye-slash"></i>
                 </button>
-                <span> Inhalte sind für Teilnehmer nicht sichtbar.</span>
+                <span>Inhalte sind für Teilnehmende nicht sichtbar.</span>
             }
             <hr />
         }
     </div>
     @if (
-        (currentRole() === 'trainer' || scoutable.isPaticipantVisible) &&
+        (currentRole() === 'trainer' || scoutable.isVisibleForParticipants) &&
             scoutable.userGeneratedContentId;
         as contentId
     ) {
         <div>
-            <app-rich-text-editor
-                [contentAssignedElement]="scoutable"
-                [userGeneratedContentId]="contentId"
-            />
+            <app-rich-text-editor [userGeneratedContentId]="contentId" />
         </div>
     }
 }

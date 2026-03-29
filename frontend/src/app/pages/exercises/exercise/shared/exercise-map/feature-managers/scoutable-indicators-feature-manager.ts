@@ -10,21 +10,19 @@ import type { Element, ScoutableElement } from 'fuesim-digital-shared';
 import { newImageProperties } from 'fuesim-digital-shared';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
-import { selectVisibleScoutIndicators } from '../../../../../../state/application/selectors/shared.selectors';
-import type { PopupService } from '../utility/popup.service';
+import { selectVisibleScoutableIndicators } from '../../../../../../state/application/selectors/shared.selectors';
 import type { AppState } from '../../../../../../state/app.state';
-import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { ScoutableIndicator } from '../../../../../../shared/types/scoutable-indicator';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
-import { ImagePopupHelper } from '../utility/popup-helper';
-import { elementTypeNameCreateSelectorDectionary } from '../../../../../../state/application/selectors/exercise.selectors';
+import {
+    elementTypeNameCreateSelectorDectionary,
+    scoutableElementTypeSelectorMap,
+} from '../../../../../../state/application/selectors/exercise.selectors';
 import type { OlMapManager } from '../utility/ol-map-manager';
 import type { MoveableFeatureManager } from './moveable-feature-manager';
 import { ElementManager } from './element-manager';
-import type { PatientFeatureManager } from './patient-feature-manager';
-import type { MapImageFeatureManager } from './map-images-feature-manager';
 
 export class ScoutableIndicatorsFeatureManager
     extends ElementManager<ScoutableIndicator, Point>
@@ -74,7 +72,7 @@ export class ScoutableIndicatorsFeatureManager
         mapInteractionsManager.addFeatureLayer(this.layer);
         // Propagate the changes on an element to the featureManager
         this.registerChangeHandlers(
-            this.store.select(selectVisibleScoutIndicators),
+            this.store.select(selectVisibleScoutableIndicators),
             destroy$,
             (element) => this.onElementCreated(element),
             (element) => this.onElementDeleted(element),
@@ -83,19 +81,13 @@ export class ScoutableIndicatorsFeatureManager
         );
     }
     private readonly imageStyleHelper = new ImageStyleHelper((feature) =>
-        /* TODO @JohannesPotzi : add a magnifying glass svg (with license) */
-        newImageProperties('/assets/Magnifying-glass.svg', 40, 313 / 427)
+        newImageProperties('/assets/magnifying-glass.svg', 40, 313 / 427)
     );
     public readonly layer: VectorLayer;
-    private readonly popupHelper: ImagePopupHelper;
 
     constructor(
         private readonly store: Store<AppState>,
         private readonly olMap: OlMap,
-        private readonly popupService: PopupService,
-        private readonly exerciseService: ExerciseService,
-        private readonly patientFeatureManager: PatientFeatureManager,
-        private readonly mapImageFeatureManager: MapImageFeatureManager,
         private readonly olMapManager: OlMapManager
     ) {
         super();
@@ -108,8 +100,6 @@ export class ScoutableIndicatorsFeatureManager
             );
             return style;
         });
-
-        this.popupHelper = new ImagePopupHelper(this.olMap, this.layer);
     }
 
     onFeatureClicked(

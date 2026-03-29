@@ -11,6 +11,8 @@ import {
     cloneDeepMutable,
     getElement,
     ReducerError,
+    type UserGeneratedContent,
+    userGeneratedContentSchema,
     type UUID,
     uuidValidationOptions,
 } from '../../index.js';
@@ -26,10 +28,13 @@ export class MakeElementScoutableAction implements Action {
 
     @IsZodSchema(scoutableSchema)
     public readonly scoutable!: Scoutable;
+
+    @IsZodSchema(userGeneratedContentSchema)
+    public readonly content!: UserGeneratedContent;
 }
-export class SetisPaticipantVisible implements Action {
-    @IsValue('[Scoutable] Set isPaticipantVisible' as const)
-    public readonly type = '[Scoutable] Set isPaticipantVisible';
+export class SetisVisibleForParticipants implements Action {
+    @IsValue('[Scoutable] Set isVisibleForParticipants' as const)
+    public readonly type = '[Scoutable] Set isVisibleForParticipants';
 
     @IsUUID(4, uuidValidationOptions)
     public readonly scoutableId!: UUID;
@@ -42,7 +47,12 @@ export namespace ScoutableActionReducers {
     export const makeElementScoutable: ActionReducer<MakeElementScoutableAction> =
         {
             action: MakeElementScoutableAction,
-            reducer: (draftState, { element, scoutable }) => {
+            reducer: (draftState, { element, scoutable, content }) => {
+                /* const scout = cloneDeepMutable(scoutable);
+                scout.userGeneratedContentId = content.id;
+                draftState.userGeneratedContents[content.id] =
+                    cloneDeepMutable(content);
+                draftState.scoutables[scoutable.id] = cloneDeepMutable(scout); */
                 draftState.scoutables[scoutable.id] =
                     cloneDeepMutable(scoutable);
                 if (
@@ -59,16 +69,16 @@ export namespace ScoutableActionReducers {
             },
             rights: 'trainer',
         };
-    export const setisPaticipantVisible: ActionReducer<SetisPaticipantVisible> =
+    export const setisVisibleForParticipants: ActionReducer<SetisVisibleForParticipants> =
         {
-            action: SetisPaticipantVisible,
+            action: SetisVisibleForParticipants,
             reducer: (draftState, { scoutableId, value }) => {
                 const scoutable = getElement(
                     draftState,
                     'scoutable',
                     scoutableId
                 );
-                scoutable.isPaticipantVisible = value;
+                scoutable.isVisibleForParticipants = value;
                 return draftState;
             },
             rights: 'trainer',

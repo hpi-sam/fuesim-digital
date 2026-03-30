@@ -304,3 +304,17 @@ export function createSelectAvailableTasks(
         (taskIds, taskMap) => taskIds.map((id) => taskMap[id]!)
     );
 }
+
+export const selectWorkingPersonnel = createSelector(
+    selectTechnicalChallenges,
+    (challenges) => {
+        const workingPersonnel = new Set<UUID>();
+        for (const challenge of Object.values(challenges)) {
+            // eslint-disable-next-line guard-for-in
+            for (const personnelId in challenge.assignedPersonnel) {
+                workingPersonnel.add(personnelId);
+            }
+        }
+        return workingPersonnel;
+    }
+);

@@ -1,27 +1,33 @@
 import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
 import { ExerciseState } from 'fuesim-digital-shared';
-import { sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
+import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
-    public async getExerciseById(id: ExerciseId) {
-        return this.onlySingle(
-            await this.databaseConnection
-                .select()
-                .from(exerciseTable)
-                .leftJoin(
-                    exerciseTemplateTable,
-                    eq(exerciseTemplateTable.id, exerciseTable.templateId)
-                )
-                .where(eq(exerciseTable.id, id))
-        );
+    private get exerciseTemplateQuery() {
+        return this.databaseConnection
+            .select({
+                ...getTableColumns(exerciseTemplateTable),
+                trainerKey: exerciseTable.trainerKey,
+                exercise: { ...getTableColumns(exerciseTable) },
+            })
+            .from(exerciseTemplateTable)
+            .innerJoin(
+                exerciseTable,
+                eq(exerciseTemplateTable.id, exerciseTable.templateId)
+            );
     }
 
-    public getAllExercises() {
+    private get exerciseQuery() {
         return this.databaseConnection
-            .select()
+            .select({
+                ...getTableColumns(exerciseTable),
+                template: {
+                    ...getTableColumns(exerciseTemplateTable),
+                },
+            })
             .from(exerciseTable)
             .leftJoin(
                 exerciseTemplateTable,
@@ -29,14 +35,20 @@ export class ExerciseRepository extends BaseRepository {
             );
     }
 
+    public async getExerciseById(id: ExerciseId) {
+        return this.onlySingle(
+            await this.exerciseQuery.where(eq(exerciseTable.id, id))
+        );
+    }
+
+    public getAllExercises() {
+        return this.exerciseQuery;
+    }
+
     public getAllExercisesOfOwner(userId: string) {
         return this.databaseConnection
             .select({
-                id: exerciseTable.id,
-                participantKey: exerciseTable.participantKey,
-                trainerKey: exerciseTable.trainerKey,
-                createdAt: exerciseTable.createdAt,
-                lastUsedAt: exerciseTable.lastUsedAt,
+                ...getTableColumns(exerciseTable),
                 baseTemplate: {
                     id: exerciseTemplateTable.id,
                     name: exerciseTemplateTable.name,
@@ -57,39 +69,20 @@ export class ExerciseRepository extends BaseRepository {
     }
 
     public getAllExerciseTemplatesOfOwner(userId: string) {
-        return this.databaseConnection
-            .select({
-                id: exerciseTemplateTable.id,
-                trainerKey: exerciseTable.trainerKey,
-                createdAt: exerciseTemplateTable.createdAt,
-                lastExerciseCreatedAt:
-                    exerciseTemplateTable.lastExerciseCreatedAt,
-                name: exerciseTemplateTable.name,
-                description: exerciseTemplateTable.description,
-            })
-            .from(exerciseTemplateTable)
-            .innerJoin(
-                exerciseTable,
-                eq(exerciseTemplateTable.id, exerciseTable.templateId)
-            )
+        return this.exerciseTemplateQuery
             .where(eq(exerciseTemplateTable.user, userId))
             .orderBy(
                 desc(
-                    sql<Date>`COALESCE("exercise_template"."lastExerciseCreatedAt", "exercise_template"."createdAt")`
+                    sql<Date>`COALESCE("exercise_template"."lastExerciseCreatedAt", "exercise_template"."lastUpdatedAt")`
                 )
             );
     }
 
     public async getExerciseTemplateById(id: ExerciseTemplateId) {
         return this.onlySingle(
-            await this.databaseConnection
-                .select()
-                .from(exerciseTemplateTable)
-                .innerJoin(
-                    exerciseTable,
-                    eq(exerciseTemplateTable.id, exerciseTable.templateId)
-                )
-                .where(eq(exerciseTemplateTable.id, id))
+            await this.exerciseTemplateQuery.where(
+                eq(exerciseTemplateTable.id, id)
+            )
         );
     }
 
@@ -109,7 +102,7 @@ export class ExerciseRepository extends BaseRepository {
         return this.onlySingle(
             await this.databaseConnection
                 .update(exerciseTemplateTable)
-                .set(data)
+                .set({ ...data, lastUpdatedAt: new Date() })
                 .where(eq(exerciseTemplateTable.id, id))
                 .returning()
         );

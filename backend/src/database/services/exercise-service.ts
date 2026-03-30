@@ -113,16 +113,13 @@ export class ExerciseService {
                         async (exerciseEntity) => {
                             const actions = await this.actionRepository
                                 .withConnection(exerciseRepoTransaction)
-                                .getActionsForExerciseId(
-                                    exerciseEntity.exercise_entity.id
-                                );
+                                .getActionsForExerciseId(exerciseEntity.id);
 
                             const exercise = this.exerciseFactory.fromDatabase(
-                                exerciseEntity.exercise_entity,
+                                exerciseEntity,
                                 actions
                             );
-                            exercise.template =
-                                exerciseEntity.exercise_template;
+                            exercise.template = exerciseEntity.template ?? null;
                             removeAll(exercise.temporaryActionHistory);
 
                             // Load all actions
@@ -132,7 +129,7 @@ export class ExerciseService {
                                     await this.actionRepository
                                         .withConnection(exerciseRepoTransaction)
                                         .getActionsForExerciseId(
-                                            exerciseEntity.exercise_entity.id
+                                            exerciseEntity.id
                                         )
                                 ).map(
                                     (actionEntity) =>
@@ -190,13 +187,10 @@ export class ExerciseService {
             throw new NotFoundError();
         }
 
-        if (exerciseEntry.exercise_template) {
+        if (exerciseEntry.template) {
             throw new PermissionDeniedError();
         }
-        if (
-            exerciseEntry.exercise_entity.user &&
-            exerciseEntry.exercise_entity.user !== session?.user.id
-        ) {
+        if (exerciseEntry.user && exerciseEntry.user !== session?.user.id) {
             throw new PermissionDeniedError();
         }
 
@@ -218,6 +212,12 @@ export class ExerciseService {
                         await repoTransaction.saveExerciseState(
                             activeExercise.exercise
                         );
+                        if (activeExercise.template) {
+                            await repoTransaction.updateExerciseTemplate(
+                                activeExercise.template.id,
+                                {}
+                            );
+                        }
 
                         await this.actionRepository
                             .withConnection(repoTransaction)

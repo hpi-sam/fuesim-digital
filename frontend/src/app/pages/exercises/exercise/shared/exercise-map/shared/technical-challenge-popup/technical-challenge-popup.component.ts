@@ -60,7 +60,6 @@ export class TechnicalChallengePopupComponent implements OnInit {
 
     public readonly currentState: Signal<TechnicalChallengeState> = computed(
         () => currentStateOf(this.technicalChallenge())
-        // TODO: better state selector
     );
 
     ngOnInit(): void {

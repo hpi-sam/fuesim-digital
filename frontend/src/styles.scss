@@ -62,3 +62,10 @@ main {
     width: 90%;
     max-width: 90%;
 }
+
+.chooser-popup-component {
+    position: static;
+    display: block;
+    max-height: 200px;
+    overflow-y: auto;
+}

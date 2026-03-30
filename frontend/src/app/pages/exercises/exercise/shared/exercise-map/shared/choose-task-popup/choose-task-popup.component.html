@@ -1,12 +1,4 @@
-<div
-    class="dropdown-menu"
-    style="
-        position: static;
-        display: block;
-        max-height: 200px;
-        overflow-y: auto;
-    "
->
+<div class="dropdown-menu chooser-popup-component">
     @for (task of availableTasks(); track task.id) {
         <button
             (click)="assignTask(task.id)"

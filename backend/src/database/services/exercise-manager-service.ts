@@ -144,7 +144,7 @@ export class ExerciseManagerService {
             exerciseTemplate.id,
             { lastExerciseCreatedAt: new Date() }
         );
-        return newExercise;
+        return activeExercise;
     }
 
     public async deleteExerciseTemplate(

@@ -4,6 +4,8 @@ import {
     getExercisesResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
+    newViewport,
+    StateExport,
 } from 'fuesim-digital-shared';
 import {
     alternativeTestUserSessionData,
@@ -119,6 +121,64 @@ describe('exercise manager router', () => {
                 .httpRequest('post', '/api/exercise_templates', session)
                 .send(testData)
                 .expect(400);
+        });
+    });
+
+    describe('POST /api/exercise_templates/import', () => {
+        it('fails with 403 if not authenticated', async () => {
+            await environment
+                .httpRequest('post', '/api/exercise_templates/import')
+                .expect(403);
+        });
+
+        it('succeeds creating an exercise template', async () => {
+            const beforeCreation = new Date();
+            const exercise =
+                await environment.services.exerciseService.createExerciseFromBlank();
+            exercise.applyAction(
+                {
+                    type: '[Viewport] Add viewport',
+                    viewport: newViewport(
+                        {
+                            x: 0,
+                            y: 0,
+                        },
+                        ''
+                    ),
+                },
+                null
+            );
+
+            const exportData = new StateExport(
+                exercise.exercise.currentStateString
+            );
+            const response = await environment
+                .httpRequest('post', '/api/exercise_templates/import', session)
+                .send(exportData)
+                .expect(201);
+
+            const parsed = getExerciseTemplateResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed.name).toEqual('Importierte Datei');
+            expect(parsed.description).toEqual('');
+            expect(parsed.createdAt.getTime()).toBeGreaterThan(
+                beforeCreation.getTime()
+            );
+            expect(parsed.createdAt.getTime()).toBeLessThan(Date.now());
+            expect(parsed.lastUpdatedAt.getTime()).toBeGreaterThan(
+                beforeCreation.getTime()
+            );
+            expect(parsed.lastUpdatedAt.getTime()).toBeLessThan(Date.now());
+            expect(parsed.lastExerciseCreatedAt).toBe(null);
+
+            const importedExercise = environment.services.exerciseService
+                .TESTING_getExerciseMap()
+                .get(parsed.trainerKey)!;
+            expect(importedExercise.exercise.currentStateString).toMatchObject({
+                ...exercise.exercise.currentStateString,
+                participantKey: importedExercise.participantKey,
+            });
         });
     });
 

@@ -20,6 +20,7 @@ import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import { selectVisiblePersonnel } from '../../../../../../state/application/selectors/shared.selectors';
 import type { Positions } from '../utility/geometry-helper';
+import { selectWorkingPersonnel } from '../../../../../../state/application/selectors/exercise.selectors';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
@@ -157,23 +158,8 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
 
     private trackWorkingPersonnel($destroy: Observable<void>) {
         this.store
-            .select((state) => {
-                // TODO: move selector into helper.
-                // TODO: reduce number of state changes
-                // TODO: think about using bilateral mapping to depend on
-                //       the state of the personnel in question.
-                const workingPersonnelSet = new Set<UUID>();
-                const challenges = Object.values(
-                    state.application.exerciseState!.technicalChallenges
-                );
-                for (const challenge of challenges) {
-                    // eslint-disable-next-line guard-for-in
-                    for (const personnelId in challenge.assignedPersonnel) {
-                        workingPersonnelSet.add(personnelId);
-                    }
-                }
-                return workingPersonnelSet;
-            })
+            .select(selectWorkingPersonnel)
+
             .pipe(takeUntil($destroy))
             .subscribe((workingPersonnel) => {
                 this.workingPersonnel = workingPersonnel;

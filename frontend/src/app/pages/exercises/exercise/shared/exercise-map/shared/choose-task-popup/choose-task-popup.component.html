@@ -7,7 +7,7 @@
         overflow-y: auto;
     "
 >
-    @for (task of availableTasks$ | async; track task.id) {
+    @for (task of availableTasks(); track task.id) {
         <button
             (click)="assignTask(task.id)"
             type="button"

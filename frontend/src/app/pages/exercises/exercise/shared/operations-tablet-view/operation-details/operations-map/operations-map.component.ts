@@ -12,10 +12,7 @@ import { Store } from '@ngrx/store';
 import maplibregl from 'maplibre-gl';
 // eslint-disable-next-line no-restricted-imports
 import 'maplibre-gl/dist/maplibre-gl.css';
-import {
-    upperLeftCornerOf,
-    lowerRightCornerOf,
-} from 'fuesim-digital-shared';
+import { upperLeftCornerOf, lowerRightCornerOf } from 'fuesim-digital-shared';
 import { startingPosition } from '../../../starting-position';
 import { AppState } from '../../../../../../../state/app.state';
 import {
@@ -116,17 +113,15 @@ export class OperationsMapComponent implements OnDestroy {
     public updateTileSources() {
         if (!this.mapReady() || !this.map) return;
 
-        const source = this.map.getSource(
-            'openfreemap'
-        )!;
+        const source: maplibregl.RasterTileSource =
+            this.map.getSource('openfreemap')!;
         const newDataUrl = this.operationsMapProperties().dataUrl;
         if (source.url !== newDataUrl) {
             source.setUrl(this.operationsMapProperties().dataUrl);
         }
 
-        const tilesSource = this.map.getSource(
-            'raster-tiles'
-        )!;
+        const tilesSource: maplibregl.RasterTileSource =
+            this.map.getSource('raster-tiles')!;
         const newTileUrl = this.operationsMapProperties().dataUrl;
         if (tilesSource.url !== newTileUrl) {
             tilesSource.setTiles([this.operationsMapProperties().tileUrl]);

@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { DragElementService } from '../core/drag-element.service';
@@ -6,7 +6,7 @@ import { TransferLinesService } from '../core/transfer-lines.service';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { MapOperatorToolbarComponent } from '../map-operator-toolbar/map-operator-toolbar.component';
 import { AppState } from '../../../../../state/app.state';
-import { selectExerciseStatus } from '../../../../../state/application/selectors/exercise.selectors';
+import { selectExerciseStatus, selectMeasureTemplates } from '../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-map-operator-map-editor',
@@ -25,7 +25,13 @@ export class MapOperatorMapComponent {
     public readonly exerciseStatus =
         this.store.selectSignal(selectExerciseStatus);
 
-    public readonly isToolbarVisible = signal(true);
+    private readonly measureTemplatesMap = this.store.selectSignal(
+        selectMeasureTemplates
+    );
+
+    public readonly doMeasuresExist = computed(() => this.measureTemplatesMap.length > 0);
+
+    public readonly isToolbarVisible = signal(false);
 
     public toggleToolbar() {
         this.isToolbarVisible.update((value) => !value);

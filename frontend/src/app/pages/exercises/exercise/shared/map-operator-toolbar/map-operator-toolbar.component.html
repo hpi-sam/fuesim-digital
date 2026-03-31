@@ -1,28 +1,12 @@
 <div class="bg-body bg-opacity-50 rounded shadow p-2">
-    <div class="row g-2">
+    <div class="d-flex flex-row align-items-stretch">
         @for (measureTemplate of measureTemplates(); track measureTemplate.id) {
-            <div class="col-4 col-sm-3 col-md-2 col-lg-1">
-                <button
-                    class="btn p-0 border rounded bg-white overflow-hidden d-flex flex-column w-100 h-100"
-                    (click)="onMeasureTemplateSelect(measureTemplate)"
-                    [ngbTooltip]="measureTemplate.name"
-                >
-                    <div class="ratio ratio-1x1 bg-body-tertiary">
-                        <div
-                            class="d-flex align-items-center justify-content-center p-1 h-100 w-100"
-                        >
-                            <img
-                                [src]="measureTemplate.image.url"
-                                [alt]="measureTemplate.name"
-                                class="img-fluid object-fit-contain"
-                            />
-                        </div>
-                    </div>
-                    <div class="border-top p-1 text-center measure-label">
-                        {{ measureTemplate.name }}
-                    </div>
-                </button>
-            </div>
+            <button
+                class="btn btn-light mx-1 col-sm-3 col-md-2 col-lg-2 col-xl-2"
+                (click)="onMeasureTemplateSelect(measureTemplate)"
+            >
+                {{ measureTemplate.name }}
+            </button>
         }
     </div>
 </div>

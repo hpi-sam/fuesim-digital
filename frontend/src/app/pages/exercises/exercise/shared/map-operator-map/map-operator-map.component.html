@@ -3,15 +3,15 @@
         <app-exercise-map class="h-100 rounded overflow-hidden" />
     </div>
 
-    @if (exerciseStatus() === 'running') {
+    @if (exerciseStatus() === 'running' && doMeasuresExist()) {
         <div
             class="position-absolute start-50 translate-middle-x bottom-0 w-100 px-2 px-md-4 pb-2 d-flex flex-column align-items-center"
         >
             <button
-                class="map-toolbar-toggle btn btn-light btn-sm shadow rounded-circle mb-2"
+                class="map-toolbar-toggle btn btn-light btn-lg shadow rounded mb-2"
                 (click)="toggleToolbar()"
             >
-                {{ isToolbarVisible() ? '▼' : '▲' }}
+                Maßnahmen
             </button>
 
             <div

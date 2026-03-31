@@ -154,6 +154,8 @@ export function simulateTechnicalChallenge(
     const guardFulfilled = (t: Transition) =>
         isGuardFulfilled(t.guard, technicalChallenge.id, exerciseState);
 
+    // the next transition is not necessarily the first one to have its guard
+    // fulfilled
     const nextTransition = technicalChallenge.transitions
         .filter(fromCurrentState)
         .find(guardFulfilled);

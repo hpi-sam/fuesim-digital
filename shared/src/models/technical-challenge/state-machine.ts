@@ -147,8 +147,6 @@ export function simulateTechnicalChallenge(
             technicalChallenge.taskProgress[taskId] +=
                 tickInterval * state.possibleTasks[taskId];
         }
-
-        // TODO: think about what happens when the tick interval is > 1000
     }
 
     const fromCurrentState = (t: Transition) =>

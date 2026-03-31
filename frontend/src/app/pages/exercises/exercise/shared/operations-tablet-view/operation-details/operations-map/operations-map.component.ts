@@ -6,6 +6,7 @@ import {
     inject,
     OnDestroy,
     viewChild,
+    signal,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import maplibregl from 'maplibre-gl';
@@ -14,8 +15,6 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import {
     upperLeftCornerOf,
     lowerRightCornerOf,
-    defaultTileMapProperties,
-    defaultOperationsMapProperties,
 } from 'fuesim-digital-shared';
 import { startingPosition } from '../../../starting-position';
 import { AppState } from '../../../../../../../state/app.state';
@@ -23,7 +22,6 @@ import {
     selectViewports,
     selectSimulatedRegions,
     selectOperationsMapProperties,
-    selectConfiguration,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
 
@@ -34,7 +32,21 @@ import { selectStateSnapshot } from '../../../../../../../state/get-state-snapsh
 })
 export class OperationsMapComponent implements OnDestroy {
     private readonly store = inject(Store<AppState>);
+
     public readonly INITIAL_ZOOM = 17;
+    public readonly MAX_PITCH_3D_BUILDINGS = 60;
+
+    private readonly savedViewSettings: { bearing: number; pitch: number } = {
+        bearing: -15,
+        pitch: 37,
+    };
+    public readonly mapContainerRef =
+        viewChild<ElementRef<HTMLElement>>('mapContainer');
+    private map: maplibregl.Map | undefined;
+
+    public readonly are3dBuildingsEnabled = signal<boolean>(true);
+
+    private readonly mapReady = signal<boolean>(false);
 
     private readonly availableViewportsMap =
         this.store.selectSignal(selectViewports);
@@ -46,55 +58,20 @@ export class OperationsMapComponent implements OnDestroy {
         selectOperationsMapProperties
     );
 
-    private readonly configuration =
-        this.store.selectSignal(selectConfiguration);
-
     constructor() {
         const initializationEffectRef = effect(() => {
-            const configuration = this.configuration();
-            this.initMap(
-                configuration.tileMapProperties.tileUrl,
-                configuration.operationsMapProperties.dataUrl
-            );
+            this.initMap();
             initializationEffectRef.destroy();
         });
 
         effect(() => {
-            const operationsMapProperties = this.operationsMapProperties();
-            this.are3dBuildingsEnabled =
-                operationsMapProperties.enable3dBuildings;
             this.updateDisplay3DBuildings();
-
-            const source = this.map?.getSource(
-                'openfreemap'
-            ) as maplibregl.RasterTileSource | null;
-            if (source) {
-                source.setUrl(operationsMapProperties.dataUrl);
-            }
-
-            const tilesSource = this.map?.getSource(
-                'raster-tiles'
-            ) as maplibregl.RasterTileSource | null;
-            if (tilesSource) {
-                tilesSource.setTiles([operationsMapProperties.tileUrl]);
-            }
-
-            this.map?.triggerRepaint();
+            this.updateTileSources();
         });
     }
 
-    public readonly mapContainerRef =
-        viewChild<ElementRef<HTMLElement>>('mapContainer');
-    private map: maplibregl.Map | undefined;
-    public are3dBuildingsEnabled = true;
-    private readonly savedViewSettings: { bearing: number; pitch: number } = {
-        bearing: -15,
-        pitch: 37,
-    };
-    public readonly MAX_PITCH_3D_BUILDINGS = 60;
-
     public goToHomeLocation(animate = true) {
-        if (!this.map) return;
+        if (!this.mapReady() || !this.map) return;
 
         const elements = [
             ...Object.values(selectStateSnapshot(selectViewports, this.store)),
@@ -136,17 +113,40 @@ export class OperationsMapComponent implements OnDestroy {
         );
     }
 
-    public toggle3DBuildings() {
-        if (!this.map) return;
+    public updateTileSources() {
+        if (!this.mapReady() || !this.map) return;
 
-        this.are3dBuildingsEnabled = !this.are3dBuildingsEnabled;
-        this.updateDisplay3DBuildings();
+        const source = this.map.getSource(
+            'openfreemap'
+        )!;
+        const newDataUrl = this.operationsMapProperties().dataUrl;
+        if (source.url !== newDataUrl) {
+            source.setUrl(this.operationsMapProperties().dataUrl);
+        }
+
+        const tilesSource = this.map.getSource(
+            'raster-tiles'
+        )!;
+        const newTileUrl = this.operationsMapProperties().dataUrl;
+        if (tilesSource.url !== newTileUrl) {
+            tilesSource.setTiles([this.operationsMapProperties().tileUrl]);
+        }
+
+        this.map.triggerRepaint();
+    }
+
+    public toggle3DBuildings() {
+        this.are3dBuildingsEnabled.set(!this.are3dBuildingsEnabled());
     }
 
     public updateDisplay3DBuildings() {
-        if (!this.map) return;
+        if (!this.mapReady() || !this.map) return;
 
-        const visibility = this.are3dBuildingsEnabled ? 'visible' : 'none';
+        const enabled =
+            this.are3dBuildingsEnabled() &&
+            this.operationsMapProperties().enable3dBuildings;
+
+        const visibility = enabled ? 'visible' : 'none';
 
         this.map.setLayoutProperty('3d-buildings', 'visibility', visibility);
         this.map.setLayoutProperty(
@@ -155,7 +155,7 @@ export class OperationsMapComponent implements OnDestroy {
             visibility
         );
 
-        if (this.are3dBuildingsEnabled) {
+        if (enabled) {
             this.map.setMaxPitch(this.MAX_PITCH_3D_BUILDINGS);
             this.map.setPitch(this.savedViewSettings.pitch);
             this.map.setBearing(this.savedViewSettings.bearing);
@@ -171,10 +171,7 @@ export class OperationsMapComponent implements OnDestroy {
         }
     }
 
-    private initMap(
-        defaultTileUrl: string = defaultTileMapProperties.tileUrl,
-        defaultOperationsMapUrl: string = defaultOperationsMapProperties.dataUrl
-    ) {
+    private initMap() {
         const mapContainer = this.mapContainerRef()?.nativeElement;
         if (mapContainer === undefined) {
             throw new Error('Map container reference is undefined');
@@ -186,13 +183,13 @@ export class OperationsMapComponent implements OnDestroy {
                 sources: {
                     'raster-tiles': {
                         type: 'raster',
-                        tiles: [defaultTileUrl],
+                        tiles: [this.operationsMapProperties().tileUrl],
                         tileSize: 256,
                         minzoom: 0,
                         maxzoom: 19,
                     },
                     openfreemap: {
-                        url: defaultOperationsMapUrl,
+                        url: this.operationsMapProperties().dataUrl,
                         type: 'vector',
                     },
                 },
@@ -241,6 +238,7 @@ export class OperationsMapComponent implements OnDestroy {
             maxPitch: this.MAX_PITCH_3D_BUILDINGS,
         });
         this.map.on('load', () => {
+            this.mapReady.set(true);
             this.map?.resize();
             this.goToHomeLocation(false);
         });
@@ -271,5 +269,7 @@ export class OperationsMapComponent implements OnDestroy {
 
     ngOnDestroy(): void {
         this.map?.remove();
+        this.map = undefined;
+        this.mapReady.set(false);
     }
 }

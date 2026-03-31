@@ -4,8 +4,8 @@
         @if (operationsMapProperties().enable3dBuildings) {
             <button
                 class="btn btn-sm rounded-0 px-3"
-                [class.btn-success]="are3dBuildingsEnabled"
-                [class.btn-light]="!are3dBuildingsEnabled"
+                [class.btn-success]="are3dBuildingsEnabled()"
+                [class.btn-light]="!are3dBuildingsEnabled()"
                 (click)="toggle3DBuildings()"
             >
                 3D

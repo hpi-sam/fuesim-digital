@@ -52,4 +52,13 @@ export class UsedCollectionItemComponent {
             importFrom: newVersion.versionId,
         });
     }
+
+    public async removeCollectionDependency(
+        collectionVersionId: CollectionVersionId
+    ) {
+        await this.collectionService.removeCollectionDependency({
+            removeFrom: this.currentCollectionEntityId(),
+            removeVersionId: collectionVersionId,
+        });
+    }
 }

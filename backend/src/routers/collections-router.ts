@@ -11,6 +11,19 @@ import { NotFoundError } from '../utils/http.js';
 import { CollectionService } from '../database/services/collection-service.js';
 import { CollectionEventSender } from '../collections/collection-event-sender.js';
 
+/**
+ * Routes:
+ *
+ *  /
+ *  -> /my
+ *  -> /create
+ *  -> /:collectionEntityId
+ *     -> /
+ *        -> GET:
+ *        -> PATCH:
+ *
+ */
+
 export function createCollectionsRouter(collectionService: CollectionService) {
     const router = Router();
 
@@ -384,9 +397,10 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             req.body
         );
 
-        const data = await collectionService.updateExerciseElementObject(
+        const data = await collectionService.updateElement(
             elementEntityId,
-            parsedBody.data
+            parsedBody.data,
+            parsedBody.conflictResolution
         );
 
         if (!data) {
@@ -401,32 +415,71 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
+    router.post(
+        '/:collectionEntityId/element/:elementEntityId/version/:elementVersionId/duplicate',
+        async (req, res) => {
+            const { elementVersionId, collectionEntityId } = req.params;
+            if (!isCollectionEntityId(collectionEntityId)) {
+                throw new Error('Invalid exercise element set entity id');
+            }
+            if (!isElementVersionId(elementVersionId)) {
+                throw new Error('Invalid exercise element object entity id');
+            }
 
-    router.post('/:collectionEntityId/element/:elementEntityId/version/:elementVersionId/duplicate', async (req, res) => {
-        const { elementVersionId, collectionEntityId } = req.params;
-        if(!isCollectionEntityId(collectionEntityId)) {
-            throw new Error('Invalid exercise element set entity id');
+            const data = await collectionService.duplicateElementVersion(
+                elementVersionId,
+                collectionEntityId
+            );
+
+            if (!data) {
+                throw new Error('Failed to duplicate exercise element object');
+            }
+
+            res.send(
+                Marketplace.Element.Duplicate.responseSchema.encode({
+                    newSetVersionId: data.draftState.versionId,
+                    result: data.duplicatedElement,
+                })
+            );
         }
-        if (!isElementVersionId(elementVersionId)) {
-            throw new Error('Invalid exercise element object entity id');
+    );
+
+    router.get(
+        '/:collectionEntityId/version/:collectionVersionId/element/:elementEntityId/version/:elementVersionId/internaldependencies',
+        async (req, res) => {
+            const { elementVersionId, elementEntityId, collectionVersionId } =
+                req.params;
+            if (!isElementVersionId(elementVersionId)) {
+                throw new Error('Invalid exercise element set entity id');
+            }
+            if (!isElementEntityId(elementEntityId)) {
+                throw new Error('Invalid exercise element object entity id');
+            }
+            if (!isCollectionVersionId(collectionVersionId)) {
+                throw new Error('Invalid exercise element set version id');
+            }
+
+            const data = await collectionService.getDependingElements(
+                {
+                    entityId: elementEntityId,
+                    versionId: elementVersionId,
+                },
+                collectionVersionId
+            );
+
+            if (!data) {
+                throw new Error('Failed to duplicate exercise element object');
+            }
+
+            res.send(
+                Marketplace.Element.GetInternalDependencies.responseSchema.encode(
+                    {
+                        result: data,
+                    }
+                )
+            );
         }
-
-        const data = await collectionService.duplicateElementVersion(
-            elementVersionId,
-            collectionEntityId,
-        );
-
-        if (!data) {
-            throw new Error('Failed to duplicate exercise element object');
-        }
-
-        res.send(
-            Marketplace.Element.Duplicate.responseSchema.encode({
-                newSetVersionId: data.draftState.versionId,
-                result: data.duplicatedElement,
-            })
-        );
-    });
+    );
 
     router.delete(
         '/:setEntityId/element/:elementEntityId',

@@ -1,3 +1,4 @@
+<div class="container">
 @if (selectedSetData(); as setData) {
     <div class="d-flex flex-row justify-content-between container w-100">
         <h2>{{ setData.collection.title }}</h2>
@@ -16,33 +17,30 @@
     <div
         class="d-flex flex-row justify-content-between align-items-center container w-100 mb-3"
     >
-        <div class="d-flex flex-row gap-2 align-items-center">
+        <div class="d-flex flex-column gap-1">
             <span class="text-muted">
                 Version {{ setData.collection.version }} &middot;
                 Erstellungsdatum:
-                {{ setData.collection.createdAt | localeDate }} &middot; 5
+                {{ setData.collection.createdAt | localeDate }} &middot;
+                {{setData.objects.direct.length}}
                 Einträge
             </span>
-            <span>
-                {{ setData.collection.draftState }}
-            </span>
-
+            <span class="text-muted d-flex flex-row gap-1 align-items-center">
+            @if(setData.objects.transitive.length > 0) {
+            Verwendet Sammlungen:
             @for (
                 dependency of setData.objects.transitive;
                 track dependency.collection.versionId
             ) {
                 <span
                     class="badge bg-secondary"
-                    (click)="
-                        removeCollectionDependency(
-                            dependency.collection.versionId
-                        )
-                    "
                     style="cursor: pointer"
                 >
                     {{ dependency.collection.title }}
                 </span>
             }
+            }
+            </span>
         </div>
         <div class="d-flex flex-row gap-2 align-items-center"></div>
     </div>
@@ -139,3 +137,4 @@
 
     <div [ngbNavOutlet]="nav" class="mt-2"></div>
 }
+</div>

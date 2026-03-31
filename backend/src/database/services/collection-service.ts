@@ -9,6 +9,7 @@ import {
     isElementVersionId,
     Marketplace,
     VersionedElementContent,
+    VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import type { z } from 'zod';
 import { Subject } from 'rxjs';
@@ -542,16 +543,17 @@ export class CollectionService {
     }
 
     private async isElementInLatestCollectionVersion(
-        elementEntityId: ElementEntityId,
-        tx: CollectionRepository
+        elementEntityId: ElementEntityId
     ): Promise<[boolean, CollectionDto]> {
         const latestContainingCollection = this.exists(
             'element set',
-            await tx.getLatestCollectionOfElementEntity(elementEntityId)
+            await this.collectionRepository.getLatestCollectionOfElementEntity(
+                elementEntityId
+            )
         );
         const latestVersionOfContainingCollection = this.exists(
             'latest version of element set',
-            await tx.getLatestCollectionByEntityId(
+            await this.collectionRepository.getLatestCollectionByEntityId(
                 latestContainingCollection.entityId,
                 { allowDraftState: true }
             )
@@ -567,17 +569,19 @@ export class CollectionService {
         return [true, latestVersionOfContainingCollection];
     }
 
-    public async updateExerciseElementObject(
+    public async updateElement(
         entityId: ElementEntityId,
-        content: VersionedElementContent
+        content: VersionedElementContent,
+        resolutionStrategy?: Marketplace.Element.EditConflictResolution
     ) {
-        return this.collectionRepository.transaction(async (tx) => {
-            const eventBuffer = this.newDeferredEventBuffer();
+        return this.transaction(async (tx) => {
+            const eventBuffer = tx.newDeferredEventBuffer();
 
+            // We can only update an element if its present in the lastest collection version
             const [
                 elementIsInLatestCollectionVersion,
                 latestContainingCollection,
-            ] = await this.isElementInLatestCollectionVersion(entityId, tx);
+            ] = await tx.isElementInLatestCollectionVersion(entityId);
 
             if (!elementIsInLatestCollectionVersion) {
                 throw new Error(
@@ -585,8 +589,9 @@ export class CollectionService {
                 );
             }
 
+            // create a new draft state to apply the changes to
             const [draftState, createdNewDraftState] =
-                await tx.getOrCreateDraftState(
+                await tx.collectionRepository.getOrCreateDraftState(
                     latestContainingCollection.entityId
                 );
             if (createdNewDraftState) {
@@ -599,18 +604,47 @@ export class CollectionService {
 
             const latestElementVersion = this.exists(
                 'latest exercise element',
-                await tx.getLatestElementVersion(entityId)
+                await tx.collectionRepository.getLatestElementVersion(entityId)
             );
 
             let newElementVersion: ElementDto;
 
-            const elementMapping = await tx.getElementCollectionMapping(
-                latestElementVersion.versionId,
-                draftState.versionId
-            );
-            if (elementMapping.isBaseReference === true) {
+
+            // Check if we have other elements in this collection, which
+            // depend on the element we want to update.
+            // If we do, check if we have accounted for them in the resolutionStrategy
+            const dependingElements = await tx.getDependingElements(latestElementVersion, draftState.versionId);
+            if (dependingElements.length > 0) {
+                if (!resolutionStrategy) {
+                    throw new Error("depending elements exist, but no resolution strategy provided")
+                }
+                else if (!dependingElements.every(de => resolutionStrategy.affectingElementIds.includes(de.versionId))) {
+                    throw new Error("the provided resolution strategy does not account for all depending elements.")
+                }
+
+            }
+
+
+            const elementMapping =
+                await tx.collectionRepository.getElementCollectionMapping(
+                    latestElementVersion.versionId,
+                    draftState.versionId
+                );
+
+            if (resolutionStrategy?.strategy === 'createCopy') {
+                const duplicatedElement = await tx.createExerciseObject(
+                    latestContainingCollection.entityId,
+                    content
+                );
+                newElementVersion = tx.exists(
+                    'duplicated element',
+                    duplicatedElement.result
+                );
+            } else if (elementMapping.isBaseReference === true) {
                 // just overwrite the already mapped element
-                newElementVersion = this.exists(
+                // if it is the base reference in the current draftstate
+                // and therefore not referenced by any other collection version
+                newElementVersion = tx.exists(
                     'updated element',
                     await this.collectionRepository.updateElementContent(
                         latestElementVersion.versionId,
@@ -618,13 +652,13 @@ export class CollectionService {
                     )
                 );
             } else {
-                // we just have a secondary reference
+                // we only have a secondary reference
                 // we need to create a new copy of the element
                 // and switch the reference from the old element to the new one in the collection mapping
 
-                newElementVersion = this.exists(
+                newElementVersion = tx.exists(
                     'new exercise element',
-                    await tx.createElementVersion({
+                    await tx.collectionRepository.createElementVersion({
                         content,
                         version: latestElementVersion.version + 1,
                         entityId,
@@ -635,10 +669,22 @@ export class CollectionService {
                 // we dont need to care about removing the old element from the collection,
                 // because it is not mapped as base reference and therefore
                 // belongs to a different collection version
-                await tx.addElementToCollection(
+                await tx.collectionRepository.addElementToCollection(
                     newElementVersion.versionId,
                     draftState.versionId
                 );
+            }
+
+            // If cascade was chosen as a resolution strategy, we need to update all depending elements
+            if (resolutionStrategy?.strategy === 'cascadeChanges') {
+                for (const dependingElement of dependingElements) {
+                    const newContent = JSON.parse(
+                        JSON.stringify(
+                            dependingElement.content
+                        ).replaceAll(latestElementVersion.versionId, newElementVersion.versionId)
+                    );
+                    await tx.updateElement(dependingElement.entityId, newContent, resolutionStrategy);
+                }
             }
 
             eventBuffer.next({
@@ -656,18 +702,29 @@ export class CollectionService {
         });
     }
 
-    private async getDependencyElementsOfElement(
-        element: ElementDto,
-        tx: CollectionRepository = this.collectionRepository
-    ) {
-        return (
+    /**
+     * Finds all directly AND TRANSITIVELY referenced element versions in the content of an element
+     */
+    private async getDependenciesOfElement(element: ElementDto): Promise<ElementDto[]> {
+        const directElementReferences = (
             await Promise.all(
                 this.findEntityVersionsInContent(element.content).map(
                     (elementVersionId) =>
-                        tx.getElementVersionByVersionId(elementVersionId)
+                        this.collectionRepository.getElementVersionByVersionId(
+                            elementVersionId
+                        )
                 )
             )
         ).filter((elem) => elem !== null);
+
+
+        const transitiveElementReferences = (await Promise.all(
+            directElementReferences.map((directReference) =>
+                this.getDependenciesOfElement(directReference))
+        )).flat();
+
+
+        return [...directElementReferences, ...transitiveElementReferences];
     }
 
     public async deleteElementFromCollection(
@@ -676,21 +733,23 @@ export class CollectionService {
         let response: typeof Marketplace.Element.Delete.Response | undefined =
             undefined;
         try {
-            return await this.collectionRepository.transaction(async (tx) => {
-                const eventBuffer = this.newDeferredEventBuffer();
+            return await this.transaction(async (tx) => {
+                const eventBuffer = tx.newDeferredEventBuffer();
 
-                const containingSet = this.exists(
+                const containingSet = tx.exists(
                     'containing set',
-                    await tx.getLatestCollectionOfElementEntity(elementEntityId)
+                    await tx.collectionRepository.getLatestCollectionOfElementEntity(
+                        elementEntityId
+                    )
                 );
 
                 const [
                     elementIsInLatestCollectionVersion,
                     _latestContainingSet,
-                ] = await this.isElementInLatestCollectionVersion(
-                    elementEntityId,
-                    tx
-                );
+                ] =
+                    await this.isElementInLatestCollectionVersion(
+                        elementEntityId
+                    );
 
                 if (!elementIsInLatestCollectionVersion) {
                     throw new Error(
@@ -699,7 +758,9 @@ export class CollectionService {
                 }
 
                 const [draftState, createdNewDraftState] =
-                    await tx.getOrCreateDraftState(containingSet.entityId);
+                    await tx.collectionRepository.getOrCreateDraftState(
+                        containingSet.entityId
+                    );
                 if (createdNewDraftState) {
                     eventBuffer.next({
                         event: 'collection:update',
@@ -708,41 +769,24 @@ export class CollectionService {
                     });
                 }
 
-                const latestElementVersion = this.exists(
+                const latestElementVersion = tx.exists(
                     'latest exercise element',
-                    await tx.getLatestElementVersion(elementEntityId)
-                );
-
-                const elementsInCollection =
-                    await tx.getElementsOfCollectionVersion(
-                        draftState.versionId
-                    );
-
-                // TODO: @Quixelation - check if circular dependencies can cause performance issues here
-                const dependingElements = (
-                    await Promise.all(
-                        elementsInCollection.map(async (element) => ({
-                            element,
-                            dependsOn:
-                                await this.getDependencyElementsOfElement(
-                                    element,
-                                    tx
-                                ),
-                        }))
-                    )
-                ).filter((element) =>
-                    element.dependsOn.some(
-                        (dependency) => dependency?.entityId === elementEntityId
+                    await tx.collectionRepository.getLatestElementVersion(
+                        elementEntityId
                     )
                 );
 
+                const dependingElements = await tx.getDependingElements(
+                    latestElementVersion,
+                    draftState.versionId
+                );
                 console.log(JSON.stringify(dependingElements, null, 2));
                 if (dependingElements.length > 0) {
                     response = {
                         newSetVersionId: null,
                         requiresConfirmation: dependingElements.map(
                             (dependingElement) => ({
-                                element: dependingElement.element,
+                                element: dependingElement,
                                 blocking: true,
                             })
                         ),
@@ -752,21 +796,22 @@ export class CollectionService {
                     );
                 }
 
-                const elementMapping = await tx.getElementCollectionMapping(
-                    latestElementVersion.versionId,
-                    draftState.versionId
-                );
+                const elementMapping =
+                    await tx.collectionRepository.getElementCollectionMapping(
+                        latestElementVersion.versionId,
+                        draftState.versionId
+                    );
 
                 if (elementMapping.isBaseReference === true) {
                     // just delete the element, when it's the only reference in the current draftstate
                     // (no other collection version references this element version)
-                    await tx.deleteElementVersion(
+                    await tx.collectionRepository.deleteElementVersion(
                         latestElementVersion.versionId
                     );
                 } else {
                     // unmap the reference to the element since it is not the base reference
                     // and therefore belongs to a different collection version
-                    await tx.unmapElementFromCollection(
+                    await tx.collectionRepository.unmapElementFromCollection(
                         elementEntityId,
                         draftState.versionId
                     );
@@ -795,6 +840,40 @@ export class CollectionService {
         }
     }
 
+    /**
+     * Fetches all elements inside a collection which depend on the given element
+     *
+     * INCLUDES TRANSITIVE
+     */
+    public async getDependingElements(
+        element: VersionedElementPartial,
+        collectionVersionId: CollectionVersionId
+    ) {
+        const elementsInCollection =
+            await this.collectionRepository.getElementsOfCollectionVersion(
+                collectionVersionId
+            );
+
+        // TODO: @Quixelation - check if circular dependencies can cause performance issues here
+        const dependingElements = (
+            await Promise.all(
+                elementsInCollection.map(async (element) => ({
+                    element,
+                    dependsOn:
+                        await this.getDependenciesOfElement(element),
+                }))
+            )
+        )
+            .filter((f) =>
+                f.dependsOn.some(
+                    (dependency) => dependency?.entityId === element.entityId
+                )
+            )
+            .map((m) => m.element);
+
+        return dependingElements;
+    }
+
     public async makeCollectionPublic(setEntityId: CollectionEntityId) {
         const data = await this.collectionRepository.setCollectionVisibility(
             setEntityId,
@@ -810,10 +889,14 @@ export class CollectionService {
         return data;
     }
 
-    public async duplicateElementVersion(elementVersionId: ElementVersionId, targetCollectionEntity: CollectionEntityId) {
+    public async duplicateElementVersion(
+        elementVersionId: ElementVersionId,
+        targetCollectionEntity: CollectionEntityId
+    ) {
         return this.collectionRepository.transaction(async (tx) => {
             const eventBuffer = this.newDeferredEventBuffer();
-            const [draftState, createdNewDraftState] = await tx.getOrCreateDraftState(targetCollectionEntity);
+            const [draftState, createdNewDraftState] =
+                await tx.getOrCreateDraftState(targetCollectionEntity);
 
             if (createdNewDraftState) {
                 eventBuffer.next({
@@ -829,13 +912,17 @@ export class CollectionService {
             );
 
             const duplicatedElement = this.exists(
-                "duplicated elemnen",
+                'duplicated elemnen',
                 await tx.createElementVersion({
                     content: sourceElement.content,
-                    version: 1
-                }))
+                    version: 1,
+                })
+            );
 
-            await tx.addElementToCollection(duplicatedElement.versionId, draftState.versionId);
+            await tx.addElementToCollection(
+                duplicatedElement.versionId,
+                draftState.versionId
+            );
 
             eventBuffer.next({
                 event: 'element:create',
@@ -847,9 +934,9 @@ export class CollectionService {
 
             return {
                 duplicatedElement,
-                draftState
-            }
-        })
+                draftState,
+            };
+        });
     }
 
     public async duplicateCollectionVersion(
@@ -900,7 +987,7 @@ export class CollectionService {
         collectionVersionId: CollectionVersionId
     ): Promise<ElementDto[]> {
         const elementDependencies =
-            await this.getDependencyElementsOfElement(element);
+            await this.getDependenciesOfElement(element);
         const relevantDependencies: {
             collection: CollectionVersionId;
             element: ElementDto;
@@ -1067,7 +1154,7 @@ export class CollectionService {
     }
 
     private findEntityVersionsInContent(
-        content: any[] | object | string | null | undefined
+        content: any[] | object | string | null | undefined,
     ): ElementVersionId[] {
         if (content === null || content === undefined) {
             return [];

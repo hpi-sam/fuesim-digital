@@ -20,7 +20,7 @@ export const appRoutes: Routes = [
             import('./pages/exercises/exercises.routes').then((m) => m.routes),
     },
     {
-        path: 'marketplace',
+        path: 'elements',
         // eslint-disable-next-line @typescript-eslint/promise-function-async
         loadChildren: () =>
             import('./pages/marketplace/marketplace.routes').then(

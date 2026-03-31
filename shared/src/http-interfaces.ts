@@ -19,6 +19,7 @@ import {
     collectionVisibilitySchema,
     elementDtoSchema,
     elementEntityIdSchema,
+    elementVersionIdSchema,
     versionedElementContentSchema,
 } from './models/index.js';
 
@@ -245,9 +246,20 @@ export namespace Marketplace {
             }),
         });
 
+        export const editConflictResolutionSchema = z.object({
+            // This is used to check server-side if the user is aware of all changes,
+            // or if there are new changes that they should be aware of before saving their changes
+            affectingElementIds: z.array(elementVersionIdSchema),
+            strategy: z.enum(["createCopy", "cascadeChanges"])
+        });
+
+        export type EditConflictResolution = z.infer<typeof editConflictResolutionSchema>;
+
         export const Edit = new Route({
             request: z.object({
                 data: versionedElementContentSchema,
+                conflictResolution:
+                    editConflictResolutionSchema.optional()
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
@@ -275,6 +287,12 @@ export namespace Marketplace {
         });
 
         export const GetByEntityId = new Route({
+            response: z.object({
+                result: z.array(elementDtoSchema),
+            }),
+        });
+
+        export const GetInternalDependencies = new Route({
             response: z.object({
                 result: z.array(elementDtoSchema),
             }),
@@ -374,13 +392,13 @@ export namespace Marketplace {
         });
 
         class TypedSchema<D, T> {
-            constructor(public readonly schema: T) {}
+            constructor(public readonly schema: T) { }
 
             public readonly Type!: T extends z.ZodType
                 ? // if D is defined (override type), use D, otherwise infer from T
-                  D extends unknown
-                    ? z.infer<T>
-                    : D
+                D extends unknown
+                ? z.infer<T>
+                : D
                 : never;
         }
 

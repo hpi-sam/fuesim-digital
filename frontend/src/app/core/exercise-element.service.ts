@@ -12,6 +12,7 @@ import {
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
+import z from 'zod';
 
 export type ExerciseElementSetSubscriptionData = {
     collection: CollectionDto;
@@ -159,10 +160,10 @@ export class CollectionService {
                         val.map((m) =>
                             m.entityId === setEntityId
                                 ? {
-                                      ...m,
-                                      title: changeEvent.data.title,
-                                      description: changeEvent.data.description,
-                                  }
+                                    ...m,
+                                    title: changeEvent.data.title,
+                                    description: changeEvent.data.description,
+                                }
                                 : m
                         )
                     );
@@ -347,13 +348,15 @@ export class CollectionService {
     public async updateElement(
         entityId: ElementEntityId,
         content: object,
-        setEntityId: CollectionEntityId
+        setEntityId: CollectionEntityId,
+        conflictResolution?: Marketplace.Element.EditConflictResolution
     ) {
         const data = await lastValueFrom(
             this.httpClient.put<typeof Marketplace.Element.Edit.Response>(
                 `${this.ENDPOINT}/${setEntityId}/element/${entityId}`,
                 Marketplace.Element.Edit.requestSchema.parse({
                     data: content,
+                    conflictResolution,
                 })
             )
         );
@@ -499,14 +502,34 @@ export class CollectionService {
         return typedData.result;
     }
 
+    public async getDependentElements(
+        childElement: VersionedElementPartial,
+        collection: VersionedCollectionPartial
+    ) {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Element.GetInternalDependencies.Response
+            >(
+                `${this.ENDPOINT}/${collection.entityId}/version/${collection.versionId}/element/${childElement.entityId}/version/${childElement.versionId}/internaldependencies`
+            )
+        );
+
+        const typedData =
+            Marketplace.Element.GetInternalDependencies.responseSchema.parse(
+                data
+            );
+
+        return typedData.result;
+    }
+
     public async checkNewerVersionAvailable(
         collection: VersionedCollectionPartial
     ): Promise<
         | { newerVersionAvailable: false }
         | {
-              newerVersionAvailable: true;
-              latestVersion: VersionedCollectionPartial;
-          }
+            newerVersionAvailable: true;
+            latestVersion: VersionedCollectionPartial;
+        }
     > {
         console.log('f', collection);
         const latestCollection =
@@ -537,9 +560,9 @@ export class CollectionService {
     }
 
     async duplicateElement(opts: {
-        collectionEntity: CollectionEntityId,
-        element: VersionedElementPartial
-    }){
+        collectionEntity: CollectionEntityId;
+        element: VersionedElementPartial;
+    }) {
         const data = await lastValueFrom(
             this.httpClient.post<typeof Marketplace.Element.Duplicate.Response>(
                 `${this.ENDPOINT}/${opts.collectionEntity}/element/${opts.element.entityId}/version/${opts.element.versionId}/duplicate`,
@@ -547,7 +570,8 @@ export class CollectionService {
             )
         );
 
-        const typedData = Marketplace.Element.Duplicate.responseSchema.parse(data);
+        const typedData =
+            Marketplace.Element.Duplicate.responseSchema.parse(data);
 
         return typedData.result;
     }

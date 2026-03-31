@@ -860,7 +860,7 @@ describe('Collection Router', () => {
                         await environment.collectionService.saveDraftState(
                             collection.entityId
                         );
-                        await environment.collectionService.updateExerciseElementObject(
+                        await environment.collectionService.updateElement(
                             element.entityId,
                             element.content
                         );

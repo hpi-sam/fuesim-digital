@@ -40,7 +40,7 @@
         }
         <div class="modal-body">
             @if (timeTravelMode()) {
-                <div class="alert alert-warning" role="alert">
+                <div class="alert alert-info" role="alert">
                     Sie betrachten eine frühere Version der Fahrzeugvorlage.
                     <br />
                     Bitte wechseln Sie zurück zur aktuellen Version, um
@@ -72,6 +72,24 @@
                         [disabled]="timeTravelMode()"
                     />
                 }
+            }
+            @if (
+                !timeTravelMode() &&
+                dependentElements.hasValue() &&
+                dependentElements.value().length > 0
+            ) {
+                <div class="alert alert-warning mt-2" role="alert">
+                    Folgenden Elemente der Sammlung verwenden diese Version:
+                    <ul>
+                        @for (
+                            dependentElement of dependentElements.value();
+                            track dependentElement.entityId
+                        ) {
+                            <li>{{ dependentElement.title }}</li>
+                        }
+                    </ul>
+                    Sie werden beim Speichern dazu aufgefordert, eine Konfliktlösung durchzuführen.
+                </div>
             }
         </div>
     </div>

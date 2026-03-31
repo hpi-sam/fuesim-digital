@@ -8,35 +8,25 @@ import {
     AlarmGroup,
     CollectionEntityId,
     CollectionVersionId,
-    ElementEntityId,
     isCollectionEntityId,
-    Marketplace,
-    VersionedCollectionPartial,
+    VehicleTemplate,
+    vehicleTemplateSchema,
     VersionedElementContent,
 } from 'fuesim-digital-shared';
 import { Subject, takeUntil } from 'rxjs';
 import {
-    NgbDropdown,
-    NgbDropdownItem,
-    NgbDropdownMenu,
     NgbDropdownModule,
     NgbModal,
     NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import {
-    VehicleTemplate,
-    vehicleTemplateSchema,
-} from '../../../../../../shared/dist/models/vehicle-template';
-import {
     CreatingVersionedElementModalData,
-    EditingVersionedElementModalData,
     VersionedElementModalComponent,
 } from '../editor-modals/versioned-element-modal/versioned-element-modal.component';
 import { ElementCardComponent } from '../element-card/element-card.component';
 import { LocaleDatePipe } from '../../../shared/pipes/localeDate.pipe';
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { VersionedElementDisplayNamePipe } from '../../../shared/pipes/versioned-element-type-display-name.pipe';
-import { Collection } from 'ol';
 import { UsedCollectionsTabComponent } from './used-collections-tab/used-collections-tab.component';
 import { CollectionDetailsTabComponent } from './collection-details-tab/collection-details-tab.component';
 
@@ -89,6 +79,7 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
     private subscription: (() => void) | null = null;
 
     constructor() {
+        console.log("FUCUCUCU")
         this.activatedRoute.paramMap
             .pipe(takeUntil(this.destroy$))
             .subscribe((params) => {
@@ -174,10 +165,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
         } satisfies CreatingVersionedElementModalData<VehicleTemplate>;
     }
 
-    public async deleteExerciseObject(entityId: ElementEntityId) {
-        await this.collectionService.deleteElement(entityId, this._setEntityId);
-    }
-
     public async duplicateSet() {
         const selectedVersion = this.selectedSetData()?.collection.versionId;
         if (!selectedVersion) return;
@@ -189,14 +176,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
         );
     }
 
-    public async removeCollectionDependency(
-        collectionVersionId: CollectionVersionId
-    ) {
-        await this.collectionService.removeCollectionDependency({
-            removeFrom: this._setEntityId,
-            removeVersionId: collectionVersionId,
-        });
-    }
 
     public async saveDraftState() {
         await this.collectionService.saveDraftState(this._setEntityId);

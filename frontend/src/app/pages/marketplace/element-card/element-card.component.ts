@@ -51,11 +51,12 @@ export class ElementCardComponent {
         modal.componentInstance.data = {
             isEditMode: true,
             type: this.element().content.type,
-            onSubmit: async (data) => {
+            onSubmit: async (data, conflictResolution) => {
                 this.collectionService.updateElement(
                     this.element().entityId,
                     data,
-                    this.collection()!.entityId
+                    this.collection()!.entityId,
+                    conflictResolution
                 );
             },
             collection: this.collection()!,
@@ -74,7 +75,7 @@ export class ElementCardComponent {
     async duplicateElement() {
         this.collectionService.duplicateElement({
             collectionEntity: this.collection()!.entityId,
-            element: this.element()
-        })
+            element: this.element(),
+        });
     }
 }

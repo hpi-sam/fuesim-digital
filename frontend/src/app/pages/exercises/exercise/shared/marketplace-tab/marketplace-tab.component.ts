@@ -2,7 +2,6 @@ import { Component, effect, inject, signal } from '@angular/core';
 import {
     CollectionDto,
     ElementDto,
-    Marketplace,
     uuid,
     Vehicle,
     VersionedCollectionPartial,

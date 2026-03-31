@@ -45,4 +45,5 @@ export class UsedCollectionsTabComponent {
             importFrom: collectionVersionId,
         });
     }
+
 }

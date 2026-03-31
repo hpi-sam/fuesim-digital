@@ -56,7 +56,7 @@ Its main purpose is the `reduce` method, allowing an `ExerciseAction` to be appl
 
 ### Database
 
-We are using [PostgreSQL 14](https://www.postgresql.org/) for persistence with [Drizzle](https://orm.drizzle.team) as an in-between layer for interaction with the database.
+We are using [PostgreSQL 18](https://www.postgresql.org/) for persistence with [Drizzle](https://orm.drizzle.team) as an in-between layer for interaction with the database.
 
 The credentials and other parameters of the database must match the [`.env` file in the root directory](../.env).
 
@@ -76,7 +76,7 @@ There are two main ways to start the database.
 
 ##### Option 2 using PostgreSQL directly
 
-You can also [install PostgreSQL 14 from the official page](https://www.postgresql.org/download/). However, this is untested and not supported by us. If you have any further questions refer to official sources for PostgreSQL, e.g. the [documentation](https://www.postgresql.org/docs/).
+You can also [install PostgreSQL 18 from the official page](https://www.postgresql.org/download/). However, this is untested and not supported by us. If you have any further questions refer to official sources for PostgreSQL, e.g. the [documentation](https://www.postgresql.org/docs/).
 
 #### `npm` scripts
 

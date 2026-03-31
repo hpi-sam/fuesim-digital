@@ -9,11 +9,11 @@
 </h5>
 <div class="popover-body" style="width: 300px">
     <div class="mb-2">
-        <h6>Status:</h6>
+        <h6>Zustand:</h6>
         {{ currentState().title }}
     </div>
 
-    <div class="mb-2">
+    <div class="mb-3">
         <h6>Aufgaben:</h6>
         <ul>
             @for (
@@ -34,7 +34,7 @@
         </ul>
     </div>
 
-    <div class="mb-2">
+    <div class="mb-3">
         <h6>Timer:</h6>
         Current ExerciseTime: {{ exerciseTime() }}
         <ul>
@@ -47,10 +47,9 @@
         </ul>
     </div>
 
-    <div class="mb-2">
+    <div class="mb-3">
         <h6>Zugewiesenes Personal:</h6>
         <ul>
-            <!--            //  TODO: is this track correct?-->
             @for (
                 assignment of assignedPersonnel();
                 track assignment[0].id + assignment[1].id

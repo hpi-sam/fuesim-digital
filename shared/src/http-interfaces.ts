@@ -68,7 +68,8 @@ export type GetExercisesResponseDataInput = z.input<
 >;
 
 export const exerciseExistsResponseDataSchema = z.object({
-    autojoin: z.boolean(),
+    exists: z.boolean(),
+    autojoin: z.boolean().optional(),
 });
 
 export type ExerciseExistsResponseDataInput = z.input<

@@ -10,29 +10,19 @@
                     Übungsleitung erhalten haben:
                 </p>
                 <div class="input-group">
-                    <!--
-                Still using `[maxLength]` and `[minLength]` in addition to `appJoinIdValidator`
-                since this automatically prevents input of more than 8 chars
-            -->
                     <input
-                        [(ngModel)]="exerciseId"
                         [appAutofocus]="true"
                         (keydown.enter)="joinExercise()"
-                        (paste)="pasteExerciseId($event)"
-                        [minLength]="6"
-                        [maxLength]="8"
-                        required
-                        appJoinIdValidator
-                        appExerciseExistsValidator
+                        (paste)="pasteExerciseKey($event)"
+                        [formField]="joinForm.joinKey"
                         class="form-control form-control-lg"
                         placeholder="Übungs-PIN"
                         type="text"
-                        data-cy="exerciseIdInput"
-                        #exerciseIdInput="ngModel"
+                        data-cy="exerciseKeyInput"
                     />
                     <button
                         (click)="joinExercise()"
-                        [disabled]="exerciseIdInput.invalid"
+                        [disabled]="joinForm().invalid()"
                         class="btn btn-primary"
                         type="button"
                         data-cy="joinExerciseButton"
@@ -40,9 +30,11 @@
                         Übung beitreten
                     </button>
                 </div>
-                <app-display-validation
-                    [ngModelInput]="exerciseIdInput"
-                ></app-display-validation>
+                @if (model().joinKey.length > 0) {
+                    <app-display-model-validation
+                        [field]="joinForm.joinKey()"
+                    />
+                }
             </div>
         </div>
 

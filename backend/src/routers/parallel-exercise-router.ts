@@ -4,12 +4,17 @@ import {
     getParallelExercisesResponseDataSchema,
     postParallelExerciseRequestDataSchema,
     parallelExerciseIdSchema,
-    groupParticipantKeySchema,
     postJoinParallelExerciseResponseDataSchema,
     patchParallelExerciseRequestDataSchema,
+    isGroupParticipantKey,
+    exerciseExistsResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
-import { ApiError, PermissionDeniedError } from '../utils/http.js';
+import {
+    ApiError,
+    NotFoundError,
+    PermissionDeniedError,
+} from '../utils/http.js';
 import type { ParallelExerciseService } from '../database/services/parallel-exercise-service.js';
 import { Config } from '../config.js';
 
@@ -58,14 +63,32 @@ export function createParallelExerciseRouter(
     router
         .route('/join/:key')
         .all(areParallelExercisesEnabled)
+        .get(async (req, res) => {
+            if (!isGroupParticipantKey(req.params.key)) {
+                throw new ApiError();
+            }
+            let exercise = null;
+            try {
+                exercise =
+                    await parallelExerciseService.getParallelExerciseByParticipantKey(
+                        req.params.key
+                    );
+            } catch (error: unknown) {
+                if (!(error instanceof NotFoundError)) {
+                    throw error;
+                }
+            }
+            res.send(
+                exerciseExistsResponseDataSchema.encode({
+                    exists: exercise !== null,
+                })
+            );
+        })
         .post(async (req, res) => {
-            const key = groupParticipantKeySchema.safeParse(
-                req.params.key
-            ).data;
-            if (!key) throw new ApiError();
+            if (!isGroupParticipantKey(req.params.key)) throw new ApiError();
             const exercise =
                 await parallelExerciseService.joinParallelExerciseByParticipantKey(
-                    key
+                    req.params.key
                 );
             res.status(201).send(
                 postJoinParallelExerciseResponseDataSchema.encode({

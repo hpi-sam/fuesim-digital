@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash-es';
 import { Router } from 'express';
 import { importExercise } from '../utils/import-exercise.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
-import { ApiError } from '../utils/http.js';
+import { ApiError, NotFoundError } from '../utils/http.js';
 
 export function createExerciseRouter(exerciseService: ExerciseService): Router {
     const router = Router();
@@ -37,16 +37,26 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
             if (!isExerciseKey(req.params.exerciseKey)) {
                 throw new ApiError();
             }
-            const exercise = exerciseService.getExerciseByKey(
-                req.params.exerciseKey,
-                req.session
-            );
+            let exercise = null;
+            try {
+                exercise = exerciseService.getExerciseByKey(
+                    req.params.exerciseKey,
+                    req.session
+                );
+            } catch (error: unknown) {
+                if (!(error instanceof NotFoundError)) {
+                    throw error;
+                }
+            }
+            const autojoin = exercise
+                ? !!exercise.exercise.templateId ||
+                  (!!exercise.exercise.parallelExerciseId &&
+                      isTrainerKey(req.params.exerciseKey))
+                : undefined;
             res.send(
                 exerciseExistsResponseDataSchema.encode({
-                    autojoin:
-                        !!exercise.exercise.templateId ||
-                        (!!exercise.exercise.parallelExerciseId &&
-                            isTrainerKey(req.params.exerciseKey)),
+                    exists: exercise !== null,
+                    autojoin,
                 })
             );
         })

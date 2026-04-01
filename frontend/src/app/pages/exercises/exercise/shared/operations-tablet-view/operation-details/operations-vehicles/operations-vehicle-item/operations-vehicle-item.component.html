@@ -6,9 +6,7 @@
     </span>
     @if (position.type === 'transfer' && showTransfer()) {
         <span class="text-muted">
-            {{
-                ceil((position.transfer.endTimeStamp - time()) / (1000 * 60))
-            }}
+            {{ ceil((position.transfer.endTimeStamp - time()) / (1000 * 60)) }}
             min
         </span>
     }

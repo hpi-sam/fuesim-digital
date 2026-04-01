@@ -10,6 +10,10 @@ import {
 } from '../../models/operational-section.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { ReducerError } from '../reducer-error.js';
+import {
+    fillPositionAt,
+    freePositionAt,
+} from './utils/operational-assignment-positions.js';
 
 export class AddOperationalSectionAction implements Action {
     @IsValue('[OperationalSection] Add Operational Section')
@@ -175,21 +179,11 @@ export namespace OperationalSectionActionReducers {
                     previousAssignment?.type === 'operationalSection' &&
                     previousAssignment.role === 'operationalSectionMember'
                 ) {
-                    // Update position of all vehicles in the previous section that have to be moved
-                    Object.values(draftState.vehicles).forEach((v) => {
-                        if (
-                            v.operationalAssignment?.type ===
-                                'operationalSection' &&
-                            v.operationalAssignment.role ===
-                                'operationalSectionMember' &&
-                            v.operationalAssignment.sectionId ===
-                                previousAssignment.sectionId &&
-                            v.operationalAssignment.position >
-                                previousAssignment.position
-                        ) {
-                            v.operationalAssignment.position -= 1;
-                        }
-                    });
+                    fillPositionAt(
+                        draftState,
+                        previousAssignment.sectionId,
+                        previousAssignment.position
+                    );
                 }
 
                 if (sectionId === null) {
@@ -212,6 +206,8 @@ export namespace OperationalSectionActionReducers {
                         'position cannot be undefined if assignAsSectionLeader is false'
                     );
 
+                freePositionAt(draftState, sectionId, position);
+
                 vehicle.operationalAssignment =
                     operationalSectionAssignmentSchema.parse({
                         type: 'operationalSection',
@@ -219,21 +215,6 @@ export namespace OperationalSectionActionReducers {
                         sectionId,
                         position,
                     });
-
-                // Update position of all vehicles in this section that have to be moved
-                Object.values(draftState.vehicles).forEach((v) => {
-                    if (
-                        v.operationalAssignment?.type ===
-                            'operationalSection' &&
-                        v.operationalAssignment.role ===
-                            'operationalSectionMember' &&
-                        v.operationalAssignment.sectionId === sectionId &&
-                        v.operationalAssignment.position >= position &&
-                        v.id !== vehicleId
-                    ) {
-                        v.operationalAssignment.position += 1;
-                    }
-                });
 
                 return draftState;
             },

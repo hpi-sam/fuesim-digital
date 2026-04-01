@@ -5,6 +5,7 @@ import type {
     RestrictedZone,
     MapImage,
     Material,
+    OperationalSection,
     Patient,
     Personnel,
     SimulatedRegion,
@@ -19,6 +20,7 @@ export type Element =
     | Hospital
     | MapImage
     | Material
+    | OperationalSection
     | Patient
     | Personnel
     | RestrictedZone

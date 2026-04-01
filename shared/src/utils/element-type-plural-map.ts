@@ -11,7 +11,6 @@ export const elementTypePluralMap = {
     restrictedZone: 'restrictedZones',
     mapImage: 'mapImages',
     material: 'materials',
-    operationalSection: 'operationalSections',
     patient: 'patients',
     personnel: 'personnel',
     simulatedRegion: 'simulatedRegions',

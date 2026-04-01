@@ -109,7 +109,7 @@ export function deleteVehicle(
 
     if (
         vehicle.operationalAssignment?.type === 'operationalSection' &&
-        vehicle.operationalAssignment?.role === 'operationalSectionMember'
+        vehicle.operationalAssignment.role === 'operationalSectionMember'
     ) {
         fillPositionAt(
             draftState,

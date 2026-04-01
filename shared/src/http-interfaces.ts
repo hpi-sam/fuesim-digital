@@ -8,14 +8,11 @@ import {
 import { validationMessages } from './validation-messages.js';
 import { exerciseStatusSchema } from './models/utils/exercise-status.js';
 import { logEntrySchema } from './models/log-entry.js';
-import { vehicleTemplateSchema } from './models/vehicle-template.js';
-import { alarmGroupSchema } from './models/alarm-group.js';
 import { stringToDate } from './models/utils/date.js';
+import type { CollectionEntityId } from './models/index.js';
 import {
     collectionDtoSchema,
-    CollectionEntityId,
     collectionEntityIdSchema,
-    collectionRelationshipTypeAllowedValues,
     collectionRelationshipTypeSchema,
     collectionVersionIdSchema,
     collectionVisibilitySchema,
@@ -218,8 +215,6 @@ export type UpdateParallelExerciseResponseData = z.infer<
     typeof updateParallelExerciseInstancesSchema
 >;
 
-// ###### Exercise Element Set ######
-
 class Route<TRequest = never, TResponse = never> {
     constructor(opts: { request?: TRequest; response?: TResponse }) {
         this.requestSchema = opts.request as TRequest;
@@ -235,6 +230,8 @@ class Route<TRequest = never, TResponse = never> {
         ? z.infer<TResponse>
         : never;
 }
+
+/* eslint-disable @typescript-eslint/naming-convention */
 
 export namespace Marketplace {
     export namespace Element {
@@ -302,7 +299,7 @@ export namespace Marketplace {
         });
     }
 
-    export namespace Set {
+    export namespace Collection {
         export const inviteCodeDtoSchema = z.object({
             code: z.string(),
             expiresAt: stringToDate,
@@ -515,7 +512,7 @@ export namespace Marketplace {
                 collectionDtoSchema
             );
 
-            export const Event = new TypedSchema(
+            export const SSEvent = new TypedSchema(
                 z.union([
                     CollectionUpdate.schema,
                     DependencyAdd.schema,
@@ -529,3 +526,5 @@ export namespace Marketplace {
         }
     }
 }
+
+/* eslint-enable @typescript-eslint/naming-convention */

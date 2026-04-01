@@ -1,4 +1,4 @@
-import {
+import type {
     AlarmGroup,
     ElementDto,
     ElementEntityId,
@@ -19,7 +19,7 @@ describe('Collection Service', () => {
             versionId: `element_version_${version}` as ElementVersionId,
             entityId: `element_entity_${name}` as ElementEntityId,
             title: name,
-            version: version,
+            version,
             content: {
                 id: `element_entity_test` as ElementEntityId,
                 alarmGroupVehicles: {},

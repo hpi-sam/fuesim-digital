@@ -1,12 +1,15 @@
-import { Request, Response } from 'express';
+import type {
+    Request as ExpressRequest,
+    Response as ExpressResponse,
+} from 'express';
 import { interval, Subject, takeUntil } from 'rxjs';
 
 export class SSE {
-    public HEARTBEAT_INTERVAL = 1_000; // 1 seconds
+    public readonly HEARTBEAT_INTERVAL = 1_000; // 1 seconds
 
-    constructor(
-        private req: Request,
-        private res: Response
+    public constructor(
+        private readonly req: ExpressRequest,
+        private readonly res: ExpressResponse
     ) {
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
@@ -24,21 +27,21 @@ export class SSE {
         });
     }
 
-    private _destroy$ = new Subject<void>();
+    private readonly _destroy$ = new Subject<void>();
     public get destroy$() {
         return this._destroy$.asObservable();
     }
 
-    send(data: any) {
+    public send(data: any) {
         this.res.write(`data: ${JSON.stringify(data)}\n\n`);
     }
 
-    sendEvent(event: string, data: any) {
+    public sendEvent(event: string, data: any) {
         this.res.write(`event: ${event}\n`);
         this.send(data);
     }
 
-    close() {
+    public close() {
         this.res.end();
     }
 }

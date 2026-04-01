@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { stateVersionedEntitySchema } from './state-versioned-entity.js';
 
 // This is typed separately in case we ever want to have a more complex visibility type
@@ -51,10 +51,9 @@ export type CollectionRelationshipType = z.infer<
     typeof collectionRelationshipTypeSchema
 >;
 
-export const collectionRelationshipTypesDisplayNames: Record<
-    CollectionRelationshipType,
-    string
-> = {
+export const collectionRelationshipTypesDisplayNames: {
+    [key in (typeof collectionRelationshipTypeAllowedValues)[number]]: string;
+} = {
     admin: 'Admin',
     editor: 'Bearbeiter',
     viewer: 'Betrachter',
@@ -70,15 +69,12 @@ export function checkCollectionRole(currentRole: CollectionRelationshipType) {
     };
 
     return {
-        isStrictly: (desiredRole: CollectionRelationshipType) => {
-            return roleCompare(desiredRole) === 0;
-        },
-        isAtLeast: (desiredRole: CollectionRelationshipType) => {
-            return roleCompare(desiredRole) >= 0;
-        },
-        indexOf: () => {
-            return collectionRelationshipTypeAllowedValues.indexOf(currentRole);
-        },
+        isStrictly: (desiredRole: CollectionRelationshipType) =>
+            roleCompare(desiredRole) === 0,
+        isAtLeast: (desiredRole: CollectionRelationshipType) =>
+            roleCompare(desiredRole) >= 0,
+        indexOf: () =>
+            collectionRelationshipTypeAllowedValues.indexOf(currentRole),
     };
 }
 

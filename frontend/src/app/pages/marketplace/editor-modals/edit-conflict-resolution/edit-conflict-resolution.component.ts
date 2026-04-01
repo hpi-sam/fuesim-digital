@@ -1,16 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 import { FormsModule } from '@angular/forms';
-import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
 import { AsyncPipe, JsonPipe } from '@angular/common';
-import { ValuesPipe } from '../../../../shared/pipes/values.pipe';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { VersionedElementModalData } from '../versioned-element-modal/versioned-element-modal.component';
-import {
-    ElementDto,
-    ElementVersionId,
-    Marketplace,
-} from 'fuesim-digital-shared';
+import { ElementDto, Marketplace } from 'fuesim-digital-shared';
+import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
+import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
+import { ValuesPipe } from '../../../../shared/pipes/values.pipe';
+import { VersionedElementModalData } from '../base-versioned-element-submodal';
 
 @Component({
     selector: 'app-edit-conflict-resolution',
@@ -34,8 +30,6 @@ export class EditConflictResolutionComponent {
     public readonly contentToBeSubmitted!: any;
     public readonly onDone!: () => void;
 
-    constructor() {}
-
     public resolveConflict(
         resolution: Marketplace.Element.EditConflictResolution['strategy']
     ) {
@@ -52,7 +46,7 @@ export class EditConflictResolutionComponent {
             ),
         });
         this.close();
-        this.onDone?.();
+        this.onDone();
     }
 
     public close() {

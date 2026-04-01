@@ -2,65 +2,31 @@ import {
     Component,
     computed,
     inject,
-    input,
     resource,
     signal,
+    OnInit,
 } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {
-    ElementDto,
-    ElementVersionId,
-    Marketplace,
-    VersionedCollectionPartial,
-    VersionedElementContent,
-} from 'fuesim-digital-shared';
+import { ElementDto } from 'fuesim-digital-shared';
+import { DatePipe } from '@angular/common';
 import { CollectionService } from '../../../../core/exercise-element.service';
 import { VehicleTemplateFormMarketplaceComponent } from '../vehicle-template-form/vehicle-template-form.component';
 import { AlarmgroupElementModalComponent } from '../alarmgroup-element-modal/alarmgroup-element-modal.component';
-import { LocaleDatePipe } from '../../../../shared/pipes/localeDate.pipe';
-import { JsonPipe } from '@angular/common';
 import { EditConflictResolutionComponent } from '../edit-conflict-resolution/edit-conflict-resolution.component';
 import { MessageService } from '../../../../core/messages/message.service';
-
-export interface SharedVersionedElementModalData<T> {
-    onSubmit: (
-        values: T,
-        conflictResolution?: Marketplace.Element.EditConflictResolution
-    ) => void;
-    type: VersionedElementContent['type'];
-    collection: VersionedCollectionPartial;
-    isEditMode: boolean;
-    availableCollectionElements: ElementDto[];
-}
-
-export interface CreatingVersionedElementModalData<T>
-    extends SharedVersionedElementModalData<T> {
-    isEditMode: false;
-}
-
-export interface EditingVersionedElementModalData<T>
-    extends SharedVersionedElementModalData<T> {
-    isEditMode: true;
-    element: ElementDto;
-}
-
-export type VersionedElementModalData<T> =
-    | CreatingVersionedElementModalData<T>
-    | EditingVersionedElementModalData<T>;
+import { VersionedElementModalData } from '../base-versioned-element-submodal';
 
 @Component({
     selector: 'app-versioned-element-modal',
     imports: [
         VehicleTemplateFormMarketplaceComponent,
         AlarmgroupElementModalComponent,
-        LocaleDatePipe,
-        JsonPipe,
-        EditConflictResolutionComponent,
+        DatePipe,
     ],
     templateUrl: './versioned-element-modal.component.html',
     styleUrl: './versioned-element-modal.component.scss',
 })
-export class VersionedElementModalComponent {
+export class VersionedElementModalComponent implements OnInit {
     private readonly collectionService = inject(CollectionService);
     private readonly activeModal = inject(NgbActiveModal);
     private readonly messageService = inject(MessageService);
@@ -83,7 +49,7 @@ export class VersionedElementModalComponent {
     });
 
     public readonly timeTravelMode = computed<boolean>(() => {
-        if (this.data.isEditMode === false) return false;
+        if (!this.data.isEditMode) return false;
         if (this.selectedVersion() === null) return false;
 
         return this.selectedVersion() !== this.data.element.version;
@@ -116,7 +82,7 @@ export class VersionedElementModalComponent {
             : null;
 
         if (!versionData) {
-            throw new Error('Version data not found for version ' + version);
+            throw new Error(`Version data not found for version ${version}`);
         }
 
         return versionData;
@@ -130,10 +96,7 @@ export class VersionedElementModalComponent {
             );
             this.versionHistory.set(versionData);
 
-            if (
-                this.selectedVersion() === null &&
-                this.data.element.version !== null
-            ) {
+            if (this.selectedVersion() === null) {
                 this.selectedVersion.set(this.data.element.version);
             }
         }

@@ -1,4 +1,4 @@
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { JsonPipe } from '@angular/common';
 import {
     Component,
     computed,
@@ -10,17 +10,15 @@ import {
 } from '@angular/core';
 import {
     CollectionDto,
-    CollectionEntityId,
-    CollectionRelationshipType,
     collectionRelationshipTypeAllowedValues,
     collectionRelationshipTypeSchema,
 } from 'fuesim-digital-shared';
-import { CollectionService } from '../../../../core/exercise-element.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { CollectionService } from '../../../../core/exercise-element.service';
 import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 import { CopyButtonComponent } from '../../../../shared/components/copy-button/copy-button.component';
-import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionRelationshipTypeDisplayNamePipe } from '../../../../shared/pipes/collection-relationship-type-display-name.pipe';
 import { AuthService } from '../../../../core/auth.service';
 
@@ -50,11 +48,8 @@ export class CollectionDetailsTabComponent {
         params: () => ({
             collectionEntityId: this.collection().entityId,
         }),
-        loader: async ({ params: { collectionEntityId } }) => {
-            return await this.collectionService.getCollectionMembers(
-                collectionEntityId
-            );
-        },
+        loader: async ({ params: { collectionEntityId } }) =>
+            this.collectionService.getCollectionMembers(collectionEntityId),
     });
 
     public readonly ownUserId = computed(

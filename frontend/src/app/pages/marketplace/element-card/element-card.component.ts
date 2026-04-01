@@ -1,16 +1,12 @@
-import { JsonPipe } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import {
     ElementDto,
-    Marketplace,
-    VehicleTemplate,
-    vehicleTemplateSchema,
     VersionedCollectionPartial,
     VersionedElementContent,
 } from 'fuesim-digital-shared';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ValuesPipe } from '../../../shared/pipes/values.pipe';
 import { GenericElementCardComponent } from '../generic-element-card/generic-element-card.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
     VersionedElementModalComponent,
     EditingVersionedElementModalData,
@@ -34,7 +30,7 @@ export class ElementCardComponent {
     public readonly editable = input(true);
 
     constructor() {
-        if (this.editable() && this.collection === undefined) {
+        if (this.editable() && this.collection() === undefined) {
             throw new Error(
                 'ElementCardComponent is editable but no collection was provided.'
             );

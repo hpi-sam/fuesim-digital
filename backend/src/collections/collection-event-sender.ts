@@ -1,27 +1,30 @@
-import {
+import type {
     CollectionEntityId,
     CollectionVersionId,
-    Marketplace,
 } from 'fuesim-digital-shared';
-import { Request, Response } from 'express';
-import { SSE } from '../sse.js';
-import { CollectionService } from '../database/services/collection-service.js';
+import { Marketplace } from 'fuesim-digital-shared';
+import type {
+    Request as ExpressRequest,
+    Response as ExpressResponse,
+} from 'express';
 import { filter, takeUntil } from 'rxjs';
+import { SSE } from '../sse.js';
+import type { CollectionService } from '../database/services/collection-service.js';
 
 export class CollectionEventSender {
     private readonly sse: SSE;
     private dependencies: CollectionEntityId[] = [];
 
-    //INFO: strictness is only enforced because all uses should happen after loadLatestCollectionVersion
+    // INFO: strictness is only enforced because all uses should happen after loadLatestCollectionVersion
     private latestCollectionVersion!: CollectionVersionId;
 
     public get destroy$() {
         return this.sse.destroy$;
     }
 
-    constructor(
-        req: Request,
-        res: Response,
+    public constructor(
+        req: ExpressRequest,
+        res: ExpressResponse,
         public readonly collectionEntityId: CollectionEntityId,
         private readonly collectionService: CollectionService,
         private readonly userId: string
@@ -32,9 +35,8 @@ export class CollectionEventSender {
 
     private abort(error: string) {
         console.error(error);
-        this.sse.sendEvent('error', { message: error ?? 'An error occurred' });
+        this.sse.sendEvent('error', { message: error });
         this.sse.close();
-        return;
     }
 
     private async init() {
@@ -44,7 +46,9 @@ export class CollectionEventSender {
         await this.listen();
     }
 
-    private notifyChange(update: typeof Marketplace.Set.Events.Event.Type) {
+    private notifyChange(
+        update: typeof Marketplace.Collection.Events.SSEvent.Type
+    ) {
         this.sse.sendEvent('change', update);
     }
 
@@ -59,13 +63,12 @@ export class CollectionEventSender {
                 takeUntil(this.destroy$)
             )
             .subscribe(async (update) => {
-                if (!update) return;
                 switch (update.event) {
                     case 'dependency:add':
                         await this.loadDependencies();
                         this.notifyChange(update);
                         this.notifyChange(
-                            Marketplace.Set.Events.DependencyReplaceData.schema.encode(
+                            Marketplace.Collection.Events.DependencyReplaceData.schema.encode(
                                 {
                                     event: 'dependency:replace-data',
                                     collectionEntityId: this.collectionEntityId,
@@ -77,7 +80,7 @@ export class CollectionEventSender {
                                             )
                                         ).transitive ?? [],
                                 }
-                            ) as typeof Marketplace.Set.Events.DependencyReplaceData.Type
+                            ) as typeof Marketplace.Collection.Events.DependencyReplaceData.Type
                         );
                         break;
                     default:
@@ -135,13 +138,8 @@ export class CollectionEventSender {
             return;
         }
 
-        if (!data) {
-            this.abort('No elements found for collection');
-            return;
-        }
-
         this.notifyChange(
-            Marketplace.Set.Events.InitialData.schema.encode({
+            Marketplace.Collection.Events.InitialData.schema.encode({
                 collectionEntityId: this.collectionEntityId,
                 event: 'initialdata',
                 data: {
@@ -152,7 +150,7 @@ export class CollectionEventSender {
                     },
                     userRelationship,
                 },
-            }) as typeof Marketplace.Set.Events.InitialData.Type
+            }) as typeof Marketplace.Collection.Events.InitialData.Type
         );
     }
 }

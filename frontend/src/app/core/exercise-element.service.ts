@@ -13,13 +13,12 @@ import {
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
-import z from 'zod';
 
-export type ExerciseElementSetSubscriptionData = {
+export interface ExerciseElementSetSubscriptionData {
     collection: CollectionDto;
-    objects: typeof Marketplace.Set.GetLatestElementsBySetVersionId.Response;
+    objects: typeof Marketplace.Collection.GetLatestElementsBySetVersionId.Response;
     ownRole: CollectionRelationshipType;
-};
+}
 
 @Injectable({
     providedIn: 'root',
@@ -28,38 +27,39 @@ export class CollectionService {
     private readonly httpClient = inject(HttpClient);
     private readonly messageService = inject(MessageService);
 
-    public readonly ENDPOINT = httpOrigin + '/api/collections';
-    private _elementSets = signal<CollectionDto[]>([]);
-    private _elementSetSubscriptions = new Map<
+    public readonly ENDPOINT = `${httpOrigin}/api/collections`;
+    private readonly _collections = signal<CollectionDto[]>([]);
+    private readonly _collectionSubscriptions = new Map<
         CollectionEntityId,
         BehaviorSubject<ExerciseElementSetSubscriptionData | null>
     >();
 
-    public get elementSets() {
-        return this._elementSets.asReadonly();
+    public get collections() {
+        return this._collections.asReadonly();
     }
 
     public subscribeToCollection(
         setEntityId: CollectionEntityId,
         callback: (data: ExerciseElementSetSubscriptionData) => void
     ): () => void {
-        let collectionEventSource = new EventSource(
+        const collectionEventSource = new EventSource(
             `${this.ENDPOINT}/${setEntityId}/events`,
             { withCredentials: true }
         );
 
-        this._elementSetSubscriptions.set(
+        this._collectionSubscriptions.set(
             setEntityId,
             new BehaviorSubject<ExerciseElementSetSubscriptionData | null>(null)
         );
         collectionEventSource.addEventListener('change', (event) => {
-            const changeEvent = Marketplace.Set.Events.Event.schema.parse(
-                JSON.parse(event.data)
-            );
+            const changeEvent =
+                Marketplace.Collection.Events.SSEvent.schema.parse(
+                    JSON.parse(event.data)
+                );
 
             switch (changeEvent.event) {
                 case 'initialdata': {
-                    this._elementSetSubscriptions.get(setEntityId)?.next({
+                    this._collectionSubscriptions.get(setEntityId)?.next({
                         collection: changeEvent.data.collection,
                         objects: changeEvent.data.elements,
                         ownRole: changeEvent.data.userRelationship,
@@ -67,7 +67,7 @@ export class CollectionService {
                     break;
                 }
                 case 'element:create': {
-                    const currentValue = this._elementSetSubscriptions
+                    const currentValue = this._collectionSubscriptions
                         .get(setEntityId)
                         ?.getValue();
                     if (!currentValue) return;
@@ -81,13 +81,13 @@ export class CollectionService {
                             ],
                         },
                     };
-                    this._elementSetSubscriptions
+                    this._collectionSubscriptions
                         .get(setEntityId)
                         ?.next(newValue);
                     break;
                 }
                 case 'element:update': {
-                    const currentValue = this._elementSetSubscriptions
+                    const currentValue = this._collectionSubscriptions
                         .get(setEntityId)
                         ?.getValue();
                     if (!currentValue) return;
@@ -102,14 +102,14 @@ export class CollectionService {
                             ),
                         },
                     };
-                    this._elementSetSubscriptions
+                    this._collectionSubscriptions
                         .get(setEntityId)
                         ?.next(newValue);
                     break;
                 }
 
                 case 'element:delete': {
-                    const currentValue = this._elementSetSubscriptions
+                    const currentValue = this._collectionSubscriptions
                         .get(setEntityId)
                         ?.getValue();
                     if (!currentValue) return;
@@ -124,7 +124,7 @@ export class CollectionService {
                             ),
                         },
                     };
-                    this._elementSetSubscriptions
+                    this._collectionSubscriptions
                         .get(setEntityId)
                         ?.next(newValue);
                     break;
@@ -137,7 +137,7 @@ export class CollectionService {
                 }
 
                 case 'dependency:replace-data': {
-                    const currentValue = this._elementSetSubscriptions
+                    const currentValue = this._collectionSubscriptions
                         .get(setEntityId)
                         ?.getValue();
                     if (!currentValue) return;
@@ -148,26 +148,26 @@ export class CollectionService {
                             transitive: changeEvent.data,
                         },
                     };
-                    this._elementSetSubscriptions
+                    this._collectionSubscriptions
                         .get(setEntityId)
                         ?.next(newValue);
                     break;
                 }
 
                 case 'collection:update': {
-                    this._elementSets.update((val) =>
-                        val.map((m) =>
-                            m.entityId === setEntityId
+                    this._collections.update((collections) =>
+                        collections.map((collection) =>
+                            collection.entityId === setEntityId
                                 ? {
-                                      ...m,
+                                      ...collection,
                                       title: changeEvent.data.title,
                                       description: changeEvent.data.description,
                                   }
-                                : m
+                                : collection
                         )
                     );
 
-                    const currentValue = this._elementSetSubscriptions
+                    const currentValue = this._collectionSubscriptions
                         .get(setEntityId)
                         ?.getValue();
                     if (!currentValue) return;
@@ -175,7 +175,7 @@ export class CollectionService {
                         ...currentValue,
                         collection: changeEvent.data,
                     };
-                    this._elementSetSubscriptions
+                    this._collectionSubscriptions
                         .get(setEntityId)
                         ?.next(newValue);
                     break;
@@ -198,41 +198,41 @@ export class CollectionService {
                 body: 'Die Verbindung zum Server wurde unterbrochen. Bitte überprüfen Sie Ihre Internetverbindung und laden Sie die Seite neu.',
             });
         };
-        const firstValue = this._elementSetSubscriptions
+        const firstValue = this._collectionSubscriptions
             .get(setEntityId)
             ?.getValue();
         if (firstValue) {
             callback(firstValue);
         }
-        this._elementSetSubscriptions.get(setEntityId)!.subscribe((data) => {
+        this._collectionSubscriptions.get(setEntityId)!.subscribe((data) => {
             if (!data) return;
             callback(data);
         });
 
         return () => {
             collectionEventSource.close();
-            this._elementSetSubscriptions.get(setEntityId)?.complete();
-            this._elementSetSubscriptions.delete(setEntityId);
+            this._collectionSubscriptions.get(setEntityId)?.complete();
+            this._collectionSubscriptions.delete(setEntityId);
         };
     }
 
     public async loadCollections() {
         const data = await lastValueFrom(
-            this.httpClient.get<typeof Marketplace.Set.LoadMy.Response>(
+            this.httpClient.get<typeof Marketplace.Collection.LoadMy.Response>(
                 `${this.ENDPOINT}/my`
             )
         );
 
-        this._elementSets.set(data.result);
+        this._collections.set(data.result);
     }
 
     public async getLatestCollectionVersionByEntityId(
         entityId: CollectionEntityId
     ) {
         const data = await lastValueFrom(
-            this.httpClient.get<typeof Marketplace.Set.GetByEntityId.Response>(
-                `${this.ENDPOINT}/${entityId}`
-            )
+            this.httpClient.get<
+                typeof Marketplace.Collection.GetByEntityId.Response
+            >(`${this.ENDPOINT}/${entityId}`)
         );
 
         return data.result;
@@ -240,30 +240,31 @@ export class CollectionService {
 
     public async updateCollectionData(
         collectionEntityId: CollectionEntityId,
-        data: Marketplace.Set.EditableCollectionProperties
+        data: Marketplace.Collection.EditableCollectionProperties
     ) {
         const response = await lastValueFrom(
-            this.httpClient.patch<typeof Marketplace.Set.Edit.Response>(
+            this.httpClient.patch<typeof Marketplace.Collection.Edit.Response>(
                 `${this.ENDPOINT}/${collectionEntityId}`,
-                Marketplace.Set.Edit.requestSchema.parse(data)
+                Marketplace.Collection.Edit.requestSchema.parse(data)
             )
         );
 
-        const parsedData = Marketplace.Set.Edit.responseSchema.parse(response);
+        const parsedData =
+            Marketplace.Collection.Edit.responseSchema.parse(response);
 
-        if (parsedData.result) {
-            this.messageService.postMessage({
-                color: 'success',
-                title: 'Sammlung aktualisiert',
-                body: 'Die Sammlungsdaten wurden erfolgreich aktualisiert.',
-            });
-        }
+        this.messageService.postMessage({
+            color: 'success',
+            title: 'Sammlung aktualisiert',
+            body: 'Die Sammlungsdaten wurden erfolgreich aktualisiert.',
+        });
+
+        return parsedData.result;
     }
 
     public async getLatestElementsByCollectionId(setId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.get<
-                typeof Marketplace.Set.GetLatestElementsBySetVersionId.Response
+                typeof Marketplace.Collection.GetLatestElementsBySetVersionId.Response
             >(`${this.ENDPOINT}/${setId}/latest`)
         );
 
@@ -279,7 +280,7 @@ export class CollectionService {
                 `${this.ENDPOINT}/${setEntityId}/element/${elementEntityId}`
             )
         );
-        //TODO: Make this interface nicer / with confirm button
+        // TODO: Make this interface nicer / with confirm button
         if (result.requiresConfirmation.length > 0) {
             this.messageService.postError({
                 title: 'Entfernen nicht möglich',
@@ -290,15 +291,15 @@ export class CollectionService {
 
     public async createColletion(title: string) {
         const data = await lastValueFrom(
-            this.httpClient.post<typeof Marketplace.Set.Create.Response>(
+            this.httpClient.post<typeof Marketplace.Collection.Create.Response>(
                 `${this.ENDPOINT}/create`,
                 {
                     title,
-                } satisfies typeof Marketplace.Set.Create.Request
+                } satisfies typeof Marketplace.Collection.Create.Request
             )
         );
 
-        this._elementSets.update((elementSets) => [
+        this._collections.update((elementSets) => [
             ...elementSets,
             data.result,
         ]);
@@ -355,24 +356,27 @@ export class CollectionService {
     public async makeCollectionPublic(setEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.post<
-                typeof Marketplace.Set.ChangeVisibility.Response
+                typeof Marketplace.Collection.ChangeVisibility.Response
             >(
                 `${this.ENDPOINT}/${setEntityId}/change-visibility`,
-                Marketplace.Set.ChangeVisibility.requestSchema.parse({
+                Marketplace.Collection.ChangeVisibility.requestSchema.parse({
                     visibility: 'public',
                 })
             )
         );
 
-        if (data.status === 'success') {
-            this._elementSets.update((elementSets) =>
-                elementSets.map((set) =>
-                    set.entityId === setEntityId
-                        ? { ...set, visibility: 'public' }
-                        : set
-                )
-            );
-        }
+        this._collections.update((elementSets) =>
+            elementSets.map((set) =>
+                set.entityId === setEntityId
+                    ? { ...set, visibility: 'public' }
+                    : set
+            )
+        );
+
+        const parsedData =
+            Marketplace.Collection.ChangeVisibility.responseSchema.parse(data);
+
+        return parsedData;
     }
 
     public async duplicateCollection(
@@ -380,15 +384,18 @@ export class CollectionService {
         specificSetVersionId: CollectionVersionId
     ) {
         const data = await lastValueFrom(
-            this.httpClient.post<typeof Marketplace.Set.Duplicate.Response>(
+            this.httpClient.post<
+                typeof Marketplace.Collection.Duplicate.Response
+            >(
                 `${this.ENDPOINT}/${setVersionId}/version/${specificSetVersionId}/duplicate`,
                 {}
             )
         );
 
-        const parsedData = Marketplace.Set.Duplicate.responseSchema.parse(data);
+        const parsedData =
+            Marketplace.Collection.Duplicate.responseSchema.parse(data);
 
-        this._elementSets.update((elementSets) => [
+        this._collections.update((elementSets) => [
             ...elementSets,
             parsedData.createdSet,
         ]);
@@ -398,7 +405,7 @@ export class CollectionService {
             this.httpClient.delete(`${this.ENDPOINT}/${setEntityId}/entity`)
         );
 
-        this._elementSets.update((val) =>
+        this._collections.update((val) =>
             val.filter((f) => f.entityId !== setEntityId)
         );
     }
@@ -407,8 +414,8 @@ export class CollectionService {
         importTo: CollectionEntityId;
         importFrom: CollectionVersionId;
     }) {
-        const data = await lastValueFrom(
-            this.httpClient.post<typeof Marketplace.Set.Import.Response>(
+        await lastValueFrom(
+            this.httpClient.post<typeof Marketplace.Collection.Import.Response>(
                 `${this.ENDPOINT}/${opts.importTo}/dependencies/${opts.importFrom}`,
                 {}
             )
@@ -429,14 +436,14 @@ export class CollectionService {
     public async saveDraftState(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.post<
-                typeof Marketplace.Set.SaveDraftState.Response
+                typeof Marketplace.Collection.SaveDraftState.Response
             >(`${this.ENDPOINT}/${collectionEntityId}/save`, {})
         );
 
         const parsedData =
-            Marketplace.Set.SaveDraftState.responseSchema.parse(data);
+            Marketplace.Collection.SaveDraftState.responseSchema.parse(data);
 
-        if (parsedData.saved === false || parsedData.result === null) {
+        if (!parsedData.saved || parsedData.result === null) {
             this.messageService.postError({
                 title: 'Sammlung konnte nicht gespeichert werden',
                 body: 'Probieren Sie es erneut oder laden Sie die Seite neu.',
@@ -444,7 +451,7 @@ export class CollectionService {
             return;
         }
 
-        this._elementSets.update((elementSets) =>
+        this._collections.update((elementSets) =>
             elementSets.map((set) =>
                 set.entityId === collectionEntityId
                     ? { ...set, draftState: data.result!.draftState }
@@ -458,14 +465,14 @@ export class CollectionService {
     ) {
         const data = await lastValueFrom(
             this.httpClient.get<
-                typeof Marketplace.Set.GetElementsOfCollectionVersion.Response
+                typeof Marketplace.Collection.GetElementsOfCollectionVersion.Response
             >(
                 `${this.ENDPOINT}/${collection.entityId}/version/${collection.versionId}/elements`
             )
         );
 
         const typedData =
-            Marketplace.Set.GetElementsOfCollectionVersion.responseSchema.parse(
+            Marketplace.Collection.GetElementsOfCollectionVersion.responseSchema.parse(
                 data
             );
 
@@ -477,14 +484,16 @@ export class CollectionService {
     ) {
         const data = await lastValueFrom(
             this.httpClient.get<
-                typeof Marketplace.Set.GetCollectionVersion.Response
+                typeof Marketplace.Collection.GetCollectionVersion.Response
             >(
                 `${this.ENDPOINT}/${collection.entityId}/version/${collection.versionId}`
             )
         );
 
         const typedData =
-            Marketplace.Set.GetCollectionVersion.responseSchema.parse(data);
+            Marketplace.Collection.GetCollectionVersion.responseSchema.parse(
+                data
+            );
 
         return typedData.result;
     }
@@ -512,11 +521,11 @@ export class CollectionService {
     public async checkNewerVersionAvailable(
         collection: VersionedCollectionPartial
     ): Promise<
-        | { newerVersionAvailable: false }
         | {
               newerVersionAvailable: true;
               latestVersion: VersionedCollectionPartial;
           }
+        | { newerVersionAvailable: false }
     > {
         const latestCollection =
             await this.getLatestCollectionVersionByEntityId(
@@ -533,15 +542,14 @@ export class CollectionService {
 
         if (latestCollection.version === currentCollection.version) {
             return { newerVersionAvailable: false };
-        } else {
-            return {
-                newerVersionAvailable: true,
-                latestVersion: {
-                    versionId: latestCollection.versionId,
-                    entityId: latestCollection.entityId,
-                },
-            };
         }
+        return {
+            newerVersionAvailable: true,
+            latestVersion: {
+                versionId: latestCollection.versionId,
+                entityId: latestCollection.entityId,
+            },
+        };
     }
 
     async duplicateElement(opts: {
@@ -563,12 +571,13 @@ export class CollectionService {
 
     public async getMyCollections(includeDraftState: boolean = true) {
         const data = await lastValueFrom(
-            this.httpClient.get<typeof Marketplace.Set.LoadMy.Response>(
+            this.httpClient.get<typeof Marketplace.Collection.LoadMy.Response>(
                 `${this.ENDPOINT}/my?includeDraftState=${includeDraftState}`
             )
         );
 
-        const typedData = Marketplace.Set.LoadMy.responseSchema.parse(data);
+        const typedData =
+            Marketplace.Collection.LoadMy.responseSchema.parse(data);
 
         return typedData.result;
     }
@@ -577,13 +586,13 @@ export class CollectionService {
         collectionEntityId: CollectionEntityId
     ) {
         const data = await lastValueFrom(
-            this.httpClient.get<typeof Marketplace.Set.GetInviteCode.Response>(
-                `${this.ENDPOINT}/${collectionEntityId}/invitecode`
-            )
+            this.httpClient.get<
+                typeof Marketplace.Collection.GetInviteCode.Response
+            >(`${this.ENDPOINT}/${collectionEntityId}/invitecode`)
         );
 
         const typedData =
-            Marketplace.Set.GetInviteCode.responseSchema.parse(data);
+            Marketplace.Collection.GetInviteCode.responseSchema.parse(data);
 
         return typedData.result;
     }
@@ -592,14 +601,13 @@ export class CollectionService {
         collectionEntityId: CollectionEntityId
     ) {
         const data = await lastValueFrom(
-            this.httpClient.put<typeof Marketplace.Set.PutInviteCode.Response>(
-                `${this.ENDPOINT}/${collectionEntityId}/invitecode`,
-                {}
-            )
+            this.httpClient.put<
+                typeof Marketplace.Collection.PutInviteCode.Response
+            >(`${this.ENDPOINT}/${collectionEntityId}/invitecode`, {})
         );
 
         const typedData =
-            Marketplace.Set.PutInviteCode.responseSchema.parse(data);
+            Marketplace.Collection.PutInviteCode.responseSchema.parse(data);
 
         return typedData.result;
     }
@@ -607,12 +615,14 @@ export class CollectionService {
     public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.get<
-                typeof Marketplace.Set.GetCollectionMembers.Response
+                typeof Marketplace.Collection.GetCollectionMembers.Response
             >(`${this.ENDPOINT}/${collectionEntityId}/members`)
         );
 
         const typedData =
-            Marketplace.Set.GetCollectionMembers.responseSchema.parse(data);
+            Marketplace.Collection.GetCollectionMembers.responseSchema.parse(
+                data
+            );
 
         return typedData.result;
     }
@@ -621,11 +631,11 @@ export class CollectionService {
         collectionEntityId: CollectionEntityId,
         userId: string
     ) {
-        const data = await lastValueFrom(
+        await lastValueFrom(
             this.httpClient.delete(
                 `${this.ENDPOINT}/${collectionEntityId}/members/`,
                 {
-                    body: Marketplace.Set.DeleteCollectionMember.requestSchema.encode(
+                    body: Marketplace.Collection.DeleteCollectionMember.requestSchema.encode(
                         {
                             userId,
                         }
@@ -640,13 +650,15 @@ export class CollectionService {
         userId: string,
         role: CollectionRelationshipType
     ) {
-        const data = await lastValueFrom(
+        await lastValueFrom(
             this.httpClient.patch(
                 `${this.ENDPOINT}/${collectionEntityId}/members/`,
-                Marketplace.Set.PatchCollectionMember.requestSchema.encode({
-                    userId,
-                    role,
-                })
+                Marketplace.Collection.PatchCollectionMember.requestSchema.encode(
+                    {
+                        userId,
+                        role,
+                    }
+                )
             )
         );
     }

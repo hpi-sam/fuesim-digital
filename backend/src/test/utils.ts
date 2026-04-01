@@ -33,9 +33,9 @@ import type { Services } from '../database/services/index.js';
 import { ParallelExerciseService } from '../database/services/parallel-exercise-service.js';
 import { ParallelExerciseRepository } from '../database/repositories/parallel-exercise-repository.js';
 import type { Repositories } from '../database/repositories/index.js';
-import type { SocketReservedEvents } from './socket-reserved-events.js';
 import { CollectionRepository } from '../database/repositories/collection-repository.js';
 import { CollectionService } from '../database/services/collection-service.js';
+import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
 /**
@@ -150,7 +150,7 @@ export class TestEnvironment {
         return this._services;
     }
 
-    public httpRequest<TData extends string | object>(
+    public httpRequest<TData extends object | string>(
         method: HttpMethod,
         url: string,
         session?: string,

@@ -1,7 +1,7 @@
 import { Component, inject, resource } from '@angular/core';
-import { CollectionService } from '../../../core/exercise-element.service';
 import { DatePipe, JsonPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { CollectionService } from '../../../core/exercise-element.service';
 
 @Component({
     selector: 'app-marketplace',

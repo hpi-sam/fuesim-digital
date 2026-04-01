@@ -30,7 +30,7 @@
                                     >{{ version.stateVersion }}</span
                                 >)
                             </b>
-                            <span>{{ version.createdAt | localeDate }}</span>
+                            <span>{{ version.createdAt | date }}</span>
                         </li>
                     }
                 } @else {
@@ -51,7 +51,7 @@
                 @case ('vehicleTemplate') {
                     <app-vehicle-template-form-marketplace
                         [data]="selectedVersionData()"
-                        (submit)="submit($event)"
+                        (dataSubmit)="submit($event)"
                         [btnText]="
                             data.isEditMode
                                 ? 'Änderungen speichern'
@@ -68,7 +68,7 @@
                                 ? 'Änderungen speichern'
                                 : 'Alarmgruppe hinzufügen'
                         "
-                        (submit)="submit($event)"
+                        (dataSubmit)="submit($event)"
                         [disabled]="timeTravelMode()"
                     />
                 }

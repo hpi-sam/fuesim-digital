@@ -1,9 +1,5 @@
 import * as z from 'zod';
-import { stateVersionedEntitySchema } from './state-versioned-entity.js';
-import {
-    versionedElementContentSchema,
-    VersionedElementContent,
-} from './utils/versioned-element-content.js';
+import type { VersionedElementContent } from './utils/versioned-element-content.js';
 
 export const elementEntityIdSchema = z
     .string()

@@ -3,29 +3,26 @@ import {
     computed,
     effect,
     input,
-    OnInit,
     output,
     signal,
 } from '@angular/core';
-import { VersionedElementModalData } from '../versioned-element-modal/versioned-element-modal.component';
 import {
     AlarmGroup,
-    AlarmGroupVehicle,
     cloneDeepMutable,
-    ElementDto,
     ElementVersionId,
-    Marketplace,
     TypedElementDto,
     uuid,
     VehicleTemplate,
 } from 'fuesim-digital-shared';
-import { MapEditorCardComponent } from '../../../../shared/components/map-editor-card/map-editor-card.component';
-import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { MapEditorCardComponent } from '../../../../shared/components/map-editor-card/map-editor-card.component';
+import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 import { ValuesPipe } from '../../../../shared/pipes/values.pipe';
-import { JsonPipe } from '@angular/common';
-import { BaseVersionedElementSubmodal } from '../base-versioned-element-submodal';
+import {
+    BaseVersionedElementSubmodal,
+    VersionedElementModalData,
+} from '../base-versioned-element-submodal';
 
 @Component({
     selector: 'app-alarmgroup-element-modal',
@@ -35,7 +32,6 @@ import { BaseVersionedElementSubmodal } from '../base-versioned-element-submodal
         FormsModule,
         NgbDropdownModule,
         ValuesPipe,
-        JsonPipe,
     ],
     templateUrl: './alarmgroup-element-modal.component.html',
     styleUrl: './alarmgroup-element-modal.component.scss',
@@ -43,14 +39,14 @@ import { BaseVersionedElementSubmodal } from '../base-versioned-element-submodal
 export class AlarmgroupElementModalComponent
     implements BaseVersionedElementSubmodal<AlarmGroup>
 {
-    public data = input.required<VersionedElementModalData<any>>();
-    public btnText = input.required<string>();
+    public readonly data = input.required<VersionedElementModalData<any>>();
+    public readonly btnText = input.required<string>();
 
-    public disabled = input<boolean>(false);
+    public readonly disabled = input<boolean>(false);
 
-    public submit = output<AlarmGroup>();
+    public readonly dataSubmit = output<AlarmGroup>();
 
-    public values = signal<AlarmGroup>({
+    public readonly values = signal<AlarmGroup>({
         id: uuid(),
         type: 'alarmGroup',
         alarmGroupVehicles: {},
@@ -59,7 +55,7 @@ export class AlarmgroupElementModalComponent
         triggerLimit: null,
     });
 
-    public availableVehicles = computed(() => {
+    public readonly availableVehicles = computed(() => {
         const vehicles = this.data().availableCollectionElements;
         return vehicles.filter(
             (v) => v.content.type === 'vehicleTemplate'
@@ -107,12 +103,10 @@ export class AlarmgroupElementModalComponent
     public getAvailableVehicleByVersionId(
         versionId: ElementVersionId
     ): TypedElementDto<VehicleTemplate> | undefined {
-        return this.availableVehicles().find(
-            (v) => v.versionId === versionId
-        ) as TypedElementDto<VehicleTemplate> | undefined;
+        return this.availableVehicles().find((v) => v.versionId === versionId);
     }
 
     public submitData() {
-        this.submit.emit(this.values());
+        this.dataSubmit.emit(this.values());
     }
 }

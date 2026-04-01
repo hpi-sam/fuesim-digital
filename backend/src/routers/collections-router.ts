@@ -1,16 +1,16 @@
 import { Router } from 'express';
-import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
+import type { CollectionRelationshipType } from 'fuesim-digital-shared';
 import {
     checkCollectionRole,
-    CollectionRelationshipType,
     isCollectionEntityId,
     isCollectionVersionId,
     isElementEntityId,
     isElementVersionId,
     Marketplace,
 } from 'fuesim-digital-shared';
+import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { NotFoundError } from '../utils/http.js';
-import { CollectionService } from '../database/services/collection-service.js';
+import type { CollectionService } from '../database/services/collection-service.js';
 import { CollectionEventSender } from '../collections/collection-event-sender.js';
 import { Config } from '../config.js';
 
@@ -22,7 +22,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     ) => {
         const router = Router({ mergeParams: true });
         router.use('/:collectionEntityId', async (req, res, next) => {
-            const collectionEntityId = req.params['collectionEntityId'] ?? '';
+            const collectionEntityId = req.params.collectionEntityId ?? '';
             if (!isCollectionEntityId(collectionEntityId)) {
                 res.status(400).send({ error: 'Invalid collection id' });
                 return;
@@ -91,7 +91,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
 
         return res.send(
-            Marketplace.Set.LoadMy.responseSchema.encode({
+            Marketplace.Collection.LoadMy.responseSchema.encode({
                 result,
             })
         );
@@ -104,7 +104,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                 joinCode,
                 req.session!.user.id
             );
-            res.redirect(Config.httpFrontendUrl + `/collections/${result}`);
+            res.redirect(`${Config.httpFrontendUrl}/collections/${result}`);
             return;
         } catch (err) {
             console.error(
@@ -112,14 +112,16 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                 err
             );
         }
-        res.redirect(Config.httpFrontendUrl + `/collections`);
+        res.redirect(`${Config.httpFrontendUrl}/collections`);
     });
 
     /*
      * Creates a new Collection
      */
     router.post('/create', async (req, res) => {
-        const parsedBody = Marketplace.Set.Create.requestSchema.parse(req.body);
+        const parsedBody = Marketplace.Collection.Create.requestSchema.parse(
+            req.body
+        );
 
         const result = await collectionService.createCollection(
             parsedBody.title,
@@ -131,7 +133,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
 
         return res.send(
-            Marketplace.Set.Create.responseSchema.encode({
+            Marketplace.Collection.Create.responseSchema.encode({
                 result,
             })
         );
@@ -155,7 +157,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
 
         return res.send(
-            Marketplace.Set.GetByEntityId.responseSchema.encode({
+            Marketplace.Collection.GetByEntityId.responseSchema.encode({
                 result,
             })
         );
@@ -167,7 +169,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             throw new Error('Invalid exercise element set version id');
         }
 
-        const parsedBody = Marketplace.Set.Edit.requestSchema.parse(req.body);
+        const parsedBody = Marketplace.Collection.Edit.requestSchema.parse(
+            req.body
+        );
 
         const result = await collectionService.updateCollectionMetadata(
             collectionEntityId,
@@ -179,7 +183,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
 
         res.send(
-            Marketplace.Set.Edit.responseSchema.encode({
+            Marketplace.Collection.Edit.responseSchema.encode({
                 result,
             })
         );
@@ -225,14 +229,14 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             await collectionService.getCollectionInviteCode(collectionEntityId);
 
         res.send(
-            Marketplace.Set.GetInviteCode.responseSchema.encode({
+            Marketplace.Collection.GetInviteCode.responseSchema.encode({
                 result: inviteCode,
             })
         );
     });
 
     adminRouter.put('/:collectionEntityId/invitecode', async (req, res) => {
-        //TODO: Restrict this endpoint to only admins
+        // TODO: Restrict this endpoint to only admins
         const { collectionEntityId } = req.params;
         if (!isCollectionEntityId(collectionEntityId)) {
             throw new Error('Invalid exercise element set version id');
@@ -244,7 +248,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             );
 
         res.send(
-            Marketplace.Set.PutInviteCode.responseSchema.encode({
+            Marketplace.Collection.PutInviteCode.responseSchema.encode({
                 result: inviteCode,
             })
         );
@@ -260,7 +264,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             await collectionService.getCollectionMembers(collectionEntityId);
 
         res.send(
-            Marketplace.Set.GetCollectionMembers.responseSchema.encode({
+            Marketplace.Collection.GetCollectionMembers.responseSchema.encode({
                 result: data,
             })
         );
@@ -273,7 +277,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
 
         const parsedBody =
-            Marketplace.Set.PatchCollectionMember.requestSchema.parse(req.body);
+            Marketplace.Collection.PatchCollectionMember.requestSchema.parse(
+                req.body
+            );
 
         await collectionService.setCollectionMemberRole(
             collectionEntityId,
@@ -291,7 +297,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
 
         const parsedBody =
-            Marketplace.Set.DeleteCollectionMember.requestSchema.parse(
+            Marketplace.Collection.DeleteCollectionMember.requestSchema.parse(
                 req.body
             );
 
@@ -323,7 +329,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             );
 
             res.send(
-                Marketplace.Set.Import.responseSchema.encode({
+                Marketplace.Collection.Import.responseSchema.encode({
                     importedSet: {
                         collection: data.collection,
                         elements: data.elements,
@@ -366,7 +372,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
 
         res.send(
-            Marketplace.Set.GetLatestElementsBySetVersionId.responseSchema.encode(
+            Marketplace.Collection.GetLatestElementsBySetVersionId.responseSchema.encode(
                 {
                     transitive: data.transitive ?? [],
                     direct: data.direct,
@@ -402,9 +408,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         try {
             newCollectionState =
                 await collectionService.saveDraftState(collectionEntityId);
-        } catch (e) {
+        } catch {
             res.send(
-                Marketplace.Set.SaveDraftState.responseSchema.encode({
+                Marketplace.Collection.SaveDraftState.responseSchema.encode({
                     result: null,
                     saved: false,
                 })
@@ -416,7 +422,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
 
         res.send(
-            Marketplace.Set.SaveDraftState.responseSchema.encode({
+            Marketplace.Collection.SaveDraftState.responseSchema.encode({
                 result: newCollectionState,
                 saved: true,
             })
@@ -438,7 +444,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                 );
 
             res.send(
-                Marketplace.Set.ChangeVisibility.responseSchema.encode({
+                Marketplace.Collection.ChangeVisibility.responseSchema.encode({
                     status: 'success',
                 })
             );
@@ -460,7 +466,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                 );
 
             res.send(
-                Marketplace.Set.Duplicate.responseSchema.encode({
+                Marketplace.Collection.Duplicate.responseSchema.encode({
                     createdSet,
                 })
             );
@@ -487,9 +493,11 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             }
 
             res.send(
-                Marketplace.Set.GetCollectionVersion.responseSchema.encode({
-                    result: collection,
-                })
+                Marketplace.Collection.GetCollectionVersion.responseSchema.encode(
+                    {
+                        result: collection,
+                    }
+                )
             );
         }
     );
@@ -514,7 +522,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             }
 
             res.send(
-                Marketplace.Set.GetElementsOfCollectionVersion.responseSchema.encode(
+                Marketplace.Collection.GetElementsOfCollectionVersion.responseSchema.encode(
                     {
                         transitive: data.transitive ?? [],
                         direct: data.direct,

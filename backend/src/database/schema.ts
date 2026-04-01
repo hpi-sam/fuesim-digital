@@ -9,7 +9,6 @@ import type {
     ExerciseId,
     ExerciseState,
     ExerciseTemplateId,
-    Marketplace,
     ParticipantKey,
     AccessKey,
     TrainerKey,
@@ -18,7 +17,7 @@ import type {
     ParallelExerciseId,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { and, eq, getTableColumns, max, relations, sql } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
     char,
     integer,
@@ -31,10 +30,7 @@ import {
     timestamp,
     unique,
     text,
-    pgView,
-    pgEnum,
     boolean,
-    check,
 } from 'drizzle-orm/pg-core';
 
 function typedUUID<T = string>() {
@@ -163,17 +159,17 @@ export const actionTable = pgTable(
 export type ActionEntry = InferSelectModel<typeof actionTable>;
 
 const stateVersionedEntity = <EntityBrand, VersionBrand>(prefix: string) => ({
-    versionId: defaultPrefixedUUID(prefix + '_version')
+    versionId: defaultPrefixedUUID(`${prefix}_version`)
         .unique()
         .notNull()
         .primaryKey()
         .$type<VersionBrand>(),
-    entityId: defaultPrefixedUUID(prefix + '_entity')
+    entityId: defaultPrefixedUUID(`${prefix}_entity`)
         .notNull()
         .$type<EntityBrand>(),
     version: integer().notNull(),
     stateVersion: integer().notNull(),
-    createdBy: varchar().notNull().default('unknown'), //TODO: @Quixelation - replace with actual user id when creating sets and elements
+    createdBy: varchar().notNull().default('unknown'), // TODO: @Quixelation - replace with actual user id when creating sets and elements
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .defaultNow()
         .notNull(),

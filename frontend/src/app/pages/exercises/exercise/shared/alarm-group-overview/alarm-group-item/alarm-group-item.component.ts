@@ -13,7 +13,6 @@ import {
     type UUID,
     type AlarmGroup,
     newAlarmGroupVehicle,
-    Marketplace,
     ElementVersionId,
 } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';

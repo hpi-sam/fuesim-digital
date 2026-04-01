@@ -1,13 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
+import { ElementDto } from 'fuesim-digital-shared';
+import { z } from 'zod';
+import { JsonPipe } from '@angular/common';
+import { CollectionService } from '../../../../../core/exercise-element.service';
+import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import {
     ChangeImpact,
     RemovedElementChangeImpact,
-} from '../marketplace-tab/marketplace-tab.component';
-import { ElementDto, Marketplace } from 'fuesim-digital-shared';
-import { z } from 'zod';
-import { CollectionService } from '../../../../../core/exercise-element.service';
-import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
-import { JsonPipe } from '@angular/common';
+} from './change-impact-types';
 
 @Component({
     selector: 'app-change-impact-modal',
@@ -21,15 +21,15 @@ export class ChangeImpactModalComponent {
     public readonly changes: ChangeImpact[] = [];
     public readonly newCollectionElements!: ElementDto[];
 
-    public selectedChangeIndex = signal<number | null>(null);
+    public readonly selectedChangeIndex = signal<number | null>(null);
 
     public selectChange(index: number) {
         console.log('Selected change index:', index);
         this.selectedChangeIndex.set(index);
     }
 
-    public changesToApply = signal<Record<string, ChangeApply>>({});
-    public elementsOfNewCollection = signal<ElementDto[] | null>(null);
+    public readonly changesToApply = signal<{ [key: string]: ChangeApply }>({});
+    public readonly elementsOfNewCollection = signal<ElementDto[] | null>(null);
 
     public setRemovalActionType(type: RemoveChangeApply['action']) {
         const index = this.selectedChangeIndex();
@@ -47,14 +47,13 @@ export class ChangeImpactModalComponent {
         this.changesToApply.update((current) => {
             let existingEntry = current[selectedChange.id];
 
-            if (!existingEntry) {
-                existingEntry = {
-                    type: selectedChange.type,
-                    change: selectedChange,
-                    action: type,
-                    replaceWith: undefined,
-                } satisfies RemoveChangeApply;
-            }
+            existingEntry ??= {
+                type: selectedChange.type,
+                change: selectedChange,
+                action: type,
+                replaceWith: undefined,
+            } satisfies RemoveChangeApply;
+
             existingEntry.action = type;
 
             console.log(existingEntry);
@@ -67,9 +66,9 @@ export class ChangeImpactModalComponent {
     }
 }
 
-type ChangeApply = RemoveChangeApply | EditableChangeApply | AddedChangeApply;
+type ChangeApply = AddedChangeApply | EditableChangeApply | RemoveChangeApply;
 
-const removeChangeApplyActionSchema = z.literal([
+export const removeChangeApplyActionSchema = z.literal([
     'remove',
     'replace',
     'placeholder',

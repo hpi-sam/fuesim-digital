@@ -1,14 +1,14 @@
-import {
+import type {
     AlarmGroup,
     CollectionDto,
     CollectionEntityId,
     ElementDto,
-    Marketplace,
-    uuid,
     VehicleTemplate,
 } from 'fuesim-digital-shared';
+import { Marketplace, uuid } from 'fuesim-digital-shared';
 import { createTestEnvironment, createTestUserSession } from '../test/utils.js';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const ENDPOINT = '/api/collections';
 
 describe('Collection Router', () => {
@@ -51,11 +51,11 @@ describe('Collection Router', () => {
         it('returns user collections', async () => {
             const collections = await environment.httpRequest(
                 'get',
-                ENDPOINT + '/my',
+                `${ENDPOINT}/my`,
                 session
             );
 
-            const parsed = Marketplace.Set.LoadMy.responseSchema.parse(
+            const parsed = Marketplace.Collection.LoadMy.responseSchema.parse(
                 collections.body
             );
 
@@ -70,17 +70,17 @@ describe('Collection Router', () => {
         it('creates a new collection', async () => {
             const title = 'Test Collection';
 
-            const data = Marketplace.Set.Create.requestSchema.encode({
+            const data = Marketplace.Collection.Create.requestSchema.encode({
                 title,
             });
 
             const response = await environment.httpRequest(
                 'post',
-                ENDPOINT + '/create',
+                `${ENDPOINT}/create`,
                 session,
                 data
             );
-            const parsed = Marketplace.Set.Create.responseSchema.parse(
+            const parsed = Marketplace.Collection.Create.responseSchema.parse(
                 response.body
             );
 
@@ -141,7 +141,7 @@ describe('Collection Router', () => {
 
                 const element = await environment.httpRequest(
                     'post',
-                    ENDPOINT + `/${collection.entityId}/create`,
+                    `${ENDPOINT}/${collection.entityId}/create`,
                     session,
                     Marketplace.Element.Create.requestSchema.encode({
                         data: content,
@@ -199,7 +199,7 @@ describe('Collection Router', () => {
 
                 const secondElement = await environment.httpRequest(
                     'post',
-                    ENDPOINT + `/${collection.entityId}/create`,
+                    `${ENDPOINT}/${collection.entityId}/create`,
                     session,
                     Marketplace.Element.Create.requestSchema.encode({
                         data: content,
@@ -286,15 +286,14 @@ describe('Collection Router', () => {
                     )
                 ).not.toBe(-1);
 
-                expect(
-                    async () =>
-                        await environment.collectionService.getElementsOfCollectionVersion(
-                            secondElement.newSetVersionId,
-                            {
-                                allowDraftState: false,
-                                includeDependencies: false,
-                            }
-                        )
+                expect(async () =>
+                    environment.collectionService.getElementsOfCollectionVersion(
+                        secondElement.newSetVersionId,
+                        {
+                            allowDraftState: false,
+                            includeDependencies: false,
+                        }
+                    )
                 ).rejects.toThrow();
             });
 
@@ -315,7 +314,7 @@ describe('Collection Router', () => {
 
                     const response = await environment.httpRequest(
                         'post',
-                        ENDPOINT + `/${id}/create`,
+                        `${ENDPOINT}/${id}/create`,
                         session,
                         Marketplace.Element.Create.requestSchema.encode({
                             data: content,
@@ -366,14 +365,15 @@ describe('Collection Router', () => {
 
                         const data = await environment.httpRequest(
                             'post',
-                            ENDPOINT +
-                                `/${collection.entityId}/dependencies/${collection2_v2.versionId}`,
+                            `${
+                                ENDPOINT
+                            }/${collection.entityId}/dependencies/${collection2_v2.versionId}`,
                             session,
                             undefined
                         );
 
                         const parsed =
-                            Marketplace.Set.Import.responseSchema.parse(
+                            Marketplace.Collection.Import.responseSchema.parse(
                                 data.body
                             );
                         expect(parsed.importedSet.collection.versionId).toBe(
@@ -392,13 +392,14 @@ describe('Collection Router', () => {
 
                         const data = await environment.httpRequest(
                             'post',
-                            ENDPOINT +
-                                `/${collection.entityId}/dependencies/${collection2_v2.versionId}`,
+                            `${
+                                ENDPOINT
+                            }/${collection.entityId}/dependencies/${collection2_v2.versionId}`,
                             session,
                             undefined
                         );
                         const parsed =
-                            Marketplace.Set.Import.responseSchema.parse(
+                            Marketplace.Collection.Import.responseSchema.parse(
                                 data.body
                             );
                         // does not contained elements from newer collection versions
@@ -418,13 +419,14 @@ describe('Collection Router', () => {
                         // Add Dependency A_1 -> B_1
                         const data = await environment.httpRequest(
                             'post',
-                            ENDPOINT +
-                                `/${collection.entityId}/dependencies/${collection2.versionId}`,
+                            `${
+                                ENDPOINT
+                            }/${collection.entityId}/dependencies/${collection2.versionId}`,
                             session,
                             undefined
                         );
                         const parsed =
-                            Marketplace.Set.Import.responseSchema.parse(
+                            Marketplace.Collection.Import.responseSchema.parse(
                                 data.body
                             );
                         expect(parsed.importedSet.collection.versionId).toEqual(
@@ -443,19 +445,20 @@ describe('Collection Router', () => {
                             collection2.versionId
                         );
 
-                        //Upgrade to newer version; A_1 -> B_2
+                        // Upgrade to newer version; A_1 -> B_2
                         await environment.collectionService.saveDraftState(
                             collection2_v2.entityId
                         );
                         const data2 = await environment.httpRequest(
                             'post',
-                            ENDPOINT +
-                                `/${collection.entityId}/dependencies/${collection2_v2.versionId}`,
+                            `${
+                                ENDPOINT
+                            }/${collection.entityId}/dependencies/${collection2_v2.versionId}`,
                             session,
                             undefined
                         );
                         const parsed2 =
-                            Marketplace.Set.Import.responseSchema.parse(
+                            Marketplace.Collection.Import.responseSchema.parse(
                                 data2.body
                             );
                         expect(
@@ -515,12 +518,12 @@ describe('Collection Router', () => {
 
                 const saveResult = await environment.httpRequest(
                     'post',
-                    ENDPOINT + `/${collection.entityId}/save`,
+                    `${ENDPOINT}/${collection.entityId}/save`,
                     session,
                     undefined
                 );
                 const parsedSaveResult =
-                    Marketplace.Set.SaveDraftState.responseSchema.parse(
+                    Marketplace.Collection.SaveDraftState.responseSchema.parse(
                         saveResult.body
                     );
 
@@ -564,12 +567,12 @@ describe('Collection Router', () => {
 
                 const saveResult = await environment.httpRequest(
                     'post',
-                    ENDPOINT + `/${collection.entityId}/save`,
+                    `${ENDPOINT}/${collection.entityId}/save`,
                     session,
                     undefined
                 );
                 const parsedSaveResult =
-                    Marketplace.Set.SaveDraftState.responseSchema.parse(
+                    Marketplace.Collection.SaveDraftState.responseSchema.parse(
                         saveResult.body
                     );
 
@@ -580,12 +583,12 @@ describe('Collection Router', () => {
 
                 const saveResult2 = await environment.httpRequest(
                     'post',
-                    ENDPOINT + `/${collection.entityId}/save`,
+                    `${ENDPOINT}/${collection.entityId}/save`,
                     session,
                     undefined
                 );
                 const parsedSaveResult2 =
-                    Marketplace.Set.SaveDraftState.responseSchema.parse(
+                    Marketplace.Collection.SaveDraftState.responseSchema.parse(
                         saveResult2.body
                     );
 
@@ -596,7 +599,7 @@ describe('Collection Router', () => {
         describe('HTTP /version/:collectionVersionId', () => {
             describe.only('POST /duplicate', () => {
                 describe('correctly', () => {
-                    let duplicationResult: typeof Marketplace.Set.Duplicate.Response;
+                    let duplicationResult: typeof Marketplace.Collection.Duplicate.Response;
                     const content = {
                         type: 'alarmGroup',
                         alarmGroupVehicles: {},
@@ -623,14 +626,15 @@ describe('Collection Router', () => {
                         const httpDuplicationResult =
                             await environment.httpRequest(
                                 'post',
-                                ENDPOINT +
-                                    `/${collection.entityId}/version/${elementCreationResult.newSetVersionId}/duplicate`,
+                                `${
+                                    ENDPOINT
+                                }/${collection.entityId}/version/${elementCreationResult.newSetVersionId}/duplicate`,
                                 session,
                                 undefined
                             );
 
                         duplicationResult =
-                            Marketplace.Set.Duplicate.responseSchema.parse(
+                            Marketplace.Collection.Duplicate.responseSchema.parse(
                                 httpDuplicationResult.body
                             );
                     });
@@ -679,7 +683,7 @@ describe('Collection Router', () => {
                                 }
                             );
 
-                        //TODO: @Quixelation, check if deps have been copied over;
+                        // TODO: @Quixelation, check if deps have been copied over;
 
                         expect(duplicatedElements.direct).toHaveLength(1);
                         expect(duplicatedElements.direct[0]?.content).toEqual(
@@ -734,8 +738,9 @@ describe('Collection Router', () => {
                 it('deletes the element and creates a new draft-state', async () => {
                     const deletionResult = await environment.httpRequest(
                         'delete',
-                        ENDPOINT +
-                            `/${collection.entityId}/element/${element.entityId}`,
+                        `${
+                            ENDPOINT
+                        }/${collection.entityId}/element/${element.entityId}`,
                         session,
                         undefined
                     );
@@ -807,8 +812,9 @@ describe('Collection Router', () => {
                     it('blocks deletion of elements which are being depended on', async () => {
                         const deletionResult = await environment.httpRequest(
                             'delete',
-                            ENDPOINT +
-                                `/${collection.entityId}/element/${element.entityId}`,
+                            `${
+                                ENDPOINT
+                            }/${collection.entityId}/element/${element.entityId}`,
                             session,
                             undefined
                         );
@@ -835,8 +841,9 @@ describe('Collection Router', () => {
                     for (let i = 0; i < 5; i++) {
                         const response = await environment.httpRequest(
                             'get',
-                            ENDPOINT +
-                                `/${collection.entityId}/element/${element.entityId}/versions`,
+                            `${
+                                ENDPOINT
+                            }/${collection.entityId}/element/${element.entityId}/versions`,
                             session
                         );
                         const parsedResponse =
@@ -854,9 +861,12 @@ describe('Collection Router', () => {
                             element.content
                         );
 
+                        // eslint-disable-next-line no-await-in-loop
                         await environment.collectionService.saveDraftState(
                             collection.entityId
                         );
+
+                        // eslint-disable-next-line no-await-in-loop
                         await environment.collectionService.updateElement(
                             element.entityId,
                             element.content

@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 
 export const stringToDate = z.codec(
     z.iso.datetime({ offset: true }), // input schema: ISO date string

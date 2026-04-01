@@ -1,4 +1,4 @@
-import {
+import type {
     CollectionDto,
     CollectionEntityId,
     CollectionRelationshipType,
@@ -6,23 +6,22 @@ import {
     ElementDto,
     ElementEntityId,
     ElementVersionId,
-    elementVersionIdSchema,
-    isElementVersionId,
     Marketplace,
     VersionedElementContent,
     VersionedElementPartial,
 } from 'fuesim-digital-shared';
+import { isElementVersionId } from 'fuesim-digital-shared';
 import type { z } from 'zod';
 import { Subject } from 'rxjs';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 
 export class CollectionService {
-    public transaction<T>(
+    public async transaction<T>(
         operation: (tx: CollectionService) => Promise<T>
     ): Promise<T> {
         return this.collectionRepository.transaction(async (tx) => {
             const serviceCopy = new CollectionService(tx, this.eventSubject);
-            return await operation(serviceCopy);
+            return operation(serviceCopy);
         });
     }
 
@@ -33,10 +32,13 @@ export class CollectionService {
     private readonly newDeferredEventBuffer = () => {
         // I opted against a ReplaySubject here to not worry about completing correctly if a functions throws
         // and doesnt complete this subject
-        const subject: (typeof Marketplace.Set.Events.Event.Type)[] = [];
+        const subject: (typeof Marketplace.Collection.Events.SSEvent.Type)[] =
+            [];
 
         return {
-            next: (event: typeof Marketplace.Set.Events.Event.Type) => {
+            next: (
+                event: typeof Marketplace.Collection.Events.SSEvent.Type
+            ) => {
                 subject.push(event);
             },
             flush: () => {
@@ -56,10 +58,10 @@ export class CollectionService {
         return element;
     }
 
-    constructor(
+    public constructor(
         private readonly collectionRepository: CollectionRepository,
         private readonly eventSubject = new Subject<
-            typeof Marketplace.Set.Events.Event.Type
+            typeof Marketplace.Collection.Events.SSEvent.Type
         >()
     ) {}
 
@@ -147,10 +149,10 @@ export class CollectionService {
 
     public async updateCollectionMetadata(
         collectionEntityId: CollectionEntityId,
-        data: Marketplace.Set.EditableCollectionProperties
+        data: Marketplace.Collection.EditableCollectionProperties
     ) {
         return this.collectionRepository.transaction(async (tx) => {
-            const [draftState, createdNewDraftState] =
+            const [draftState, _createdNewDraftState] =
                 await tx.getOrCreateDraftState(collectionEntityId);
 
             const updatedCollection = await tx.updateCollectionData(
@@ -251,9 +253,10 @@ export class CollectionService {
                         old: matchingCurrentElement,
                         new: newElement,
                     };
-                } else return null;
+                }
+                return null;
             })
-            .filter((v) => v != null);
+            .filter((v) => v !== null);
 
         return {
             removed,
@@ -262,6 +265,7 @@ export class CollectionService {
         };
     }
 
+    /*
     public async checkRequiredChangesForDependencyUpgrade(data: {
         dependingCollection: CollectionVersionId;
         currentDependencyVersion: CollectionVersionId;
@@ -276,6 +280,7 @@ export class CollectionService {
                 }
             );
     }
+    */
 
     public async addCollectionDependency(
         data: {
@@ -330,7 +335,7 @@ export class CollectionService {
                 }
             }
 
-            //TODO:
+            // TODO:
             // - Check if dep entityID already exists for this collection version
             //      -> if yes, if not same version, do migration checks
             //      -> if no, just add dependency
@@ -497,7 +502,9 @@ export class CollectionService {
     private async getFullFlatDependencyTree(
         collectionVersionId: CollectionVersionId,
         visited: Set<CollectionVersionId> = new Set()
-    ) {
+    ): ReturnType<
+        typeof this.collectionRepository.getCollectionVersionDirectDependencies
+    > {
         if (visited.has(collectionVersionId)) {
             console.warn(
                 `Circular dependency detected for collection version ${collectionVersionId}`
@@ -512,17 +519,18 @@ export class CollectionService {
                 collectionVersionId
             );
 
-        const allDeps = [...deps];
+        const allDeps = (
+            await Promise.all(
+                deps.map(async (dep) =>
+                    this.getFullFlatDependencyTree(
+                        dep.collectionVersionId,
+                        visited
+                    )
+                )
+            )
+        ).flat();
 
-        for (const dep of deps) {
-            const subDeps = await this.getFullFlatDependencyTree(
-                dep.collectionVersionId,
-                visited
-            );
-            allDeps.push(...subDeps);
-        }
-
-        return allDeps;
+        return [...deps, ...allDeps];
     }
 
     public async getElementsOfCollectionVersion(
@@ -534,10 +542,10 @@ export class CollectionService {
     ): Promise<{
         direct: ElementDto[];
         transitive?: z.infer<
-            typeof Marketplace.Set.transitiveCollectionSchema
+            typeof Marketplace.Collection.transitiveCollectionSchema
         >[];
     }> {
-        const { includeDependencies: Opt_includeDependencies } = opts || {
+        const { includeDependencies } = opts || {
             includeDependencies: false,
         };
 
@@ -558,7 +566,7 @@ export class CollectionService {
                 collectionVersionId
             );
 
-        if (Opt_includeDependencies === false) {
+        if (includeDependencies === false) {
             return { direct: directCollectionElements };
         }
         const dependentCollectionVersions =
@@ -587,7 +595,7 @@ export class CollectionService {
                     collection: collection!,
                     elements,
                 }) satisfies z.infer<
-                    typeof Marketplace.Set.GetLatestElementsBySetVersionId.responseSchema.shape.transitive.element
+                    typeof Marketplace.Collection.GetLatestElementsBySetVersionId.responseSchema.shape.transitive.element
                 >
         );
 
@@ -780,7 +788,7 @@ export class CollectionService {
         const directElementReferences = (
             await Promise.all(
                 this.findEntityVersionsInContent(element.content).map(
-                    (elementVersionId) =>
+                    async (elementVersionId) =>
                         this.collectionRepository.getElementVersionByVersionId(
                             elementVersionId
                         )
@@ -790,7 +798,7 @@ export class CollectionService {
 
         const transitiveElementReferences = (
             await Promise.all(
-                directElementReferences.map((directReference) =>
+                directElementReferences.map(async (directReference) =>
                     this.getDependenciesOfElement(directReference)
                 )
             )
@@ -802,8 +810,7 @@ export class CollectionService {
     public async deleteElementFromCollection(
         elementEntityId: ElementEntityId
     ): Promise<typeof Marketplace.Element.Delete.Response> {
-        let response: typeof Marketplace.Element.Delete.Response | undefined =
-            undefined;
+        let response: typeof Marketplace.Element.Delete.Response | undefined;
         try {
             return await this.transaction(async (tx) => {
                 const eventBuffer = tx.newDeferredEventBuffer();
@@ -934,7 +941,7 @@ export class CollectionService {
         )
             .filter((f) =>
                 f.dependsOn.some(
-                    (dependency) => dependency?.entityId === element.entityId
+                    (dependency) => dependency.entityId === element.entityId
                 )
             )
             .map((m) => m.element);
@@ -1024,7 +1031,6 @@ export class CollectionService {
             await this.collectionRepository.createFirstCollectionVersion(
                 // TODO: Quixelation : also duplicate description (visbility should stay private)
                 `Kopie von ${latestCollectionEntity.title}`,
-                owner,
                 true
             );
 
@@ -1054,11 +1060,13 @@ export class CollectionService {
     ): Promise<ElementDto[]> {
         const elementDependencies =
             await this.getDependenciesOfElement(element);
+
         const relevantDependencies: {
             collection: CollectionVersionId;
             element: ElementDto;
         }[] = [];
-        for (let dependency of elementDependencies) {
+
+        for (const dependency of elementDependencies) {
             const collectionOfDependency =
                 await this.collectionRepository.getLatestCollectionOfElementEntity(
                     dependency.entityId
@@ -1070,7 +1078,7 @@ export class CollectionService {
                 continue;
             }
             if (collectionOfDependency.versionId === collectionVersionId) {
-                console.debug(
+                console.log(
                     `Dependency with element version id ${dependency.versionId} is directly in the same collection version ${collectionVersionId} and is therefore NOT relevant`
                 );
                 continue;
@@ -1080,20 +1088,26 @@ export class CollectionService {
                 element: dependency,
             });
         }
-        for (let relevantDependency of relevantDependencies) {
-            const subDependencies =
-                await this.getRelevantTransitiveDependenciesForElementVersion(
-                    relevantDependency.element,
-                    relevantDependency.collection
-                );
-            relevantDependencies.push(
-                ...subDependencies.map((subDependency) => ({
-                    collection: relevantDependency.collection,
-                    element: subDependency,
-                }))
-            );
-        }
-        return relevantDependencies.map((dep) => dep.element);
+
+        const transitiveRelevantDependencies = (
+            await Promise.all(
+                relevantDependencies.map(async (relevantDependency) =>
+                    this.getRelevantTransitiveDependenciesForElementVersion(
+                        relevantDependency.element,
+                        relevantDependency.collection
+                    ).then((subDependencies) =>
+                        subDependencies.map((subDependency) => ({
+                            collection: relevantDependency.collection,
+                            element: subDependency,
+                        }))
+                    )
+                )
+            )
+        ).flat();
+
+        return [...relevantDependencies, ...transitiveRelevantDependencies].map(
+            (dep) => dep.element
+        );
     }
 
     /**
@@ -1122,7 +1136,7 @@ export class CollectionService {
                         dependencyVersionId
                     );
                 const relevantDependenciesForElements = await Promise.all(
-                    elements.map((element) =>
+                    elements.map(async (element) =>
                         this.getRelevantTransitiveDependenciesForElementVersion(
                             element,
                             dependencyVersionId
@@ -1142,76 +1156,6 @@ export class CollectionService {
             acc[element.entityId]?.push(element);
             return acc;
         }, {});
-
-        return;
-
-        ///////////////////////////////////////////////////////////////////////
-        const importingDependencyTree = await this.getFullFlatDependencyTree(
-            data.dependencyVersionId
-        );
-
-        // Check if the importing dependency *ENTITIY* is already in the dependency tree of the base collection
-        const overlappingDependenciesEntities =
-            baseCollectionDependencies.filter((baseDependency) =>
-                importingDependencyTree.some(
-                    (importingDependency) =>
-                        importingDependency.collectionEntityId ===
-                        baseDependency.collectionEntityId
-                )
-            );
-
-        // TODO: Replace with groupBy once available with new tsconfig target
-        const overlappingDependencyEntities =
-            overlappingDependenciesEntities.reduce<
-                Record<
-                    CollectionEntityId,
-                    Awaited<
-                        ReturnType<
-                            typeof CollectionService.prototype.getFullFlatDependencyTree
-                        >
-                    >
-                >
-            >((acc, dependency) => {
-                if (acc[dependency.collectionEntityId] === undefined) {
-                    acc[dependency.collectionEntityId] = [];
-                }
-                acc[dependency.collectionEntityId]?.push(dependency);
-                return acc;
-            }, {});
-
-        for (const overlappingDependency of Object.entries(
-            overlappingDependencyEntities
-        )) {
-            const [entityId, versions] = overlappingDependency;
-            if (versions.length === 0) {
-                // This should not happen, but i included it for safer assertions
-                continue;
-            }
-            // Alle VersionsIDs sind gleich
-            if (
-                versions.every(
-                    (version) =>
-                        version.collectionVersionId ===
-                        versions[0]!.collectionVersionId
-                )
-            ) {
-                // TODO: Return accepted
-                return;
-            }
-
-            // Schauen, ob es eine gemeinsame kompatible Version gibt
-            const allInterconnctedDependencies = await Promise.all(
-                versions.map((version) => async () => {
-                    const element = this.exists(
-                        await this.collectionRepository.getCollectionByVersionId(
-                            version.collectionVersionId
-                        )
-                    );
-                    const idsInContent =
-                        this.findEntityVersionsInContent(element);
-                })
-            );
-        }
     }
 
     private findEntityVersionsInContent(
@@ -1222,7 +1166,8 @@ export class CollectionService {
         } else if (typeof content === 'string') {
             if (isElementVersionId(content)) {
                 return [content];
-            } else return [];
+            }
+            return [];
         } else if (Array.isArray(content)) {
             const foundDependencies: ElementVersionId[] = [];
             for (const item of content) {

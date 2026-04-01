@@ -1,14 +1,9 @@
 import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
-import {
-    CollectionService,
-    ExerciseElementSetSubscriptionData,
-} from '../../../core/exercise-element.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
     AlarmGroup,
     checkCollectionRole,
     CollectionEntityId,
-    CollectionVersionId,
     isCollectionEntityId,
     VehicleTemplate,
     vehicleTemplateSchema,
@@ -20,13 +15,16 @@ import {
     NgbModal,
     NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import {
     CreatingVersionedElementModalData,
     VersionedElementModalComponent,
 } from '../editor-modals/versioned-element-modal/versioned-element-modal.component';
 import { ElementCardComponent } from '../element-card/element-card.component';
-import { LocaleDatePipe } from '../../../shared/pipes/localeDate.pipe';
-import { AsyncPipe } from '@angular/common';
+import {
+    CollectionService,
+    ExerciseElementSetSubscriptionData,
+} from '../../../core/exercise-element.service';
 import { VersionedElementDisplayNamePipe } from '../../../shared/pipes/versioned-element-type-display-name.pipe';
 import { UsedCollectionsTabComponent } from './used-collections-tab/used-collections-tab.component';
 import { CollectionDetailsTabComponent } from './collection-details-tab/collection-details-tab.component';
@@ -35,7 +33,7 @@ import { CollectionDetailsTabComponent } from './collection-details-tab/collecti
     selector: 'app-marketplace-set-detail',
     imports: [
         ElementCardComponent,
-        LocaleDatePipe,
+        DatePipe,
         NgbDropdownModule,
         VersionedElementDisplayNamePipe,
         NgbNavModule,
@@ -56,11 +54,10 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
 
     private readonly destroy$ = new Subject<void>();
 
-    public selectedSetData = signal<ExerciseElementSetSubscriptionData | null>(
-        null
-    );
+    public readonly selectedSetData =
+        signal<ExerciseElementSetSubscriptionData | null>(null);
 
-    public availableElements = computed(() => {
+    public readonly availableElements = computed(() => {
         const selectedSetData = this.selectedSetData();
         if (!selectedSetData) return [];
 
@@ -106,7 +103,7 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
     }
 
     public createNewAlarmgroup() {
-        const selectedSetData = this.selectedSetData?.();
+        const selectedSetData = this.selectedSetData();
         if (!selectedSetData) {
             throw new Error('selectedSetData is null');
         }
@@ -132,7 +129,7 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
     }
 
     public createNewVehicle() {
-        const selectedSetData = this.selectedSetData?.();
+        const selectedSetData = this.selectedSetData();
         if (!selectedSetData) {
             throw new Error('selectedSetData is null');
         }

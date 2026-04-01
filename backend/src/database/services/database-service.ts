@@ -9,7 +9,6 @@ import { uuid_ossp } from '@electric-sql/pglite/contrib/uuid_ossp';
 import { getTableColumns, sql } from 'drizzle-orm';
 import * as schema from '../schema.js';
 import { Config } from '../../config.js';
-import { NodeFS } from '@electric-sql/pglite/nodefs';
 
 export type DatabaseConnectionMode = 'baseline' | 'default' | 'testing';
 

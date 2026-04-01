@@ -4,13 +4,11 @@ import { NgbDropdownModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import {
     CollectionEntityId,
     Marketplace,
-    VersionedCollectionPartial,
     CollectionVersionId,
 } from 'fuesim-digital-shared';
 import * as z from 'zod';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { ElementCardComponent } from '../../../element-card/element-card.component';
-import { httpResource } from '@angular/common/http';
 
 @Component({
     selector: 'app-used-collection-item',
@@ -31,13 +29,13 @@ export class UsedCollectionItemComponent {
         input.required<CollectionEntityId>();
     public readonly dependency =
         input.required<
-            z.infer<typeof Marketplace.Set.transitiveCollectionSchema>
+            z.infer<typeof Marketplace.Collection.transitiveCollectionSchema>
         >();
 
     public readonly newerVersionAvailable = resource({
         params: () => ({ collection: this.dependency().collection }),
         loader: async ({ params: { collection } }) =>
-            await this.collectionService.checkNewerVersionAvailable(collection),
+            this.collectionService.checkNewerVersionAvailable(collection),
     });
 
     public async upgradeVersion() {

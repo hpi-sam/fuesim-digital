@@ -6,19 +6,23 @@ import {
     Vehicle,
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
+import { Store } from '@ngrx/store';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DragElementService } from '../core/drag-element.service';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../core/exercise.service';
-import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../state/app.state';
 import {
     selectSelectedCollection,
     selectVehicles,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ChangeImpactModalComponent } from '../change-impact-modal/change-impact-modal.component';
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
+import {
+    ChangeImpact,
+    EditableElementChangeImpact,
+} from '../change-impact-modal/change-impact-types';
 
 @Component({
     selector: 'app-marketplace-tab',
@@ -57,8 +61,8 @@ export class MarketplaceTabComponent {
     public selectedCollection = this.store.selectSignal(
         selectSelectedCollection
     );
-    public selectedCollectionData = signal<CollectionDto | null>(null);
-    public elementsOfSelectedCollection = signal<ElementDto[]>([]);
+    public readonly selectedCollectionData = signal<CollectionDto | null>(null);
+    public readonly elementsOfSelectedCollection = signal<ElementDto[]>([]);
     public collectionSubscription: (() => void) | null = null;
 
     private async updateCollectionElementSubscription(
@@ -69,7 +73,7 @@ export class MarketplaceTabComponent {
             this.collectionService.subscribeToCollection(
                 collection.entityId,
                 (elements) => {
-                    //TODO: @Quixelation: direct does not yet include 1st level dependencies, and transiive inclues all (too many levels)
+                    // TODO: @Quixelation: direct does not yet include 1st level dependencies, and transiive inclues all (too many levels)
                     this.elementsOfSelectedCollection.set(
                         elements.objects.direct
                     );
@@ -81,7 +85,7 @@ export class MarketplaceTabComponent {
     }
 
     public async selectCollection(collection: CollectionDto) {
-        const result = await this.exerciseService.proposeAction({
+        await this.exerciseService.proposeAction({
             type: '[Collection] Set Exercise Collection',
             collectionVersion: {
                 versionId: collection.versionId,
@@ -91,20 +95,11 @@ export class MarketplaceTabComponent {
     }
 
     public async upgradeCollectionVersion() {
-        //TODO: @Quixelation: Support more than just vehicles
+        // TODO: @Quixelation: Support more than just vehicles
         const allExerciseVehicles = selectStateSnapshot(
             selectVehicles,
             this.store
         );
-
-        if (allExerciseVehicles === undefined) {
-            console.warn(
-                'No exercise vehicles found, cannot calculate change impacts of upgrading collection version.'
-            );
-            return;
-        }
-
-        const currentCollection = this.elementsOfSelectedCollection();
 
         const selectedCollection = this.selectedCollection();
         if (selectedCollection === null) {
@@ -115,10 +110,7 @@ export class MarketplaceTabComponent {
         }
 
         const newerCollectionVersionAvailable = this.updateAvailable();
-        if (
-            !newerCollectionVersionAvailable ||
-            newerCollectionVersionAvailable.newerVersionAvailable === false
-        ) {
+        if (!newerCollectionVersionAvailable?.newerVersionAvailable) {
             console.warn(
                 'No newer collection version available, cannot calculate change impacts of upgrading collection version.'
             );
@@ -133,7 +125,7 @@ export class MarketplaceTabComponent {
         const changeImpacts = await this.calcChangeImpact({
             inExercise: Object.values(allExerciseVehicles),
             new: newerCollection.direct,
-            //TODO: this is not always correct - actually fetch the data here
+            // TODO: this is not always correct - actually fetch the data here
             previous: this.elementsOfSelectedCollection(),
         });
         console.log(
@@ -155,10 +147,10 @@ export class MarketplaceTabComponent {
         new: ElementDto[];
     }): Promise<ChangeImpact[]> {
         const {
-            addedElements,
+            addedElements: _addedElements,
             editedNewElements,
             removedElements,
-            unchangedElements,
+            unchangedElements: _unchangedElements,
         } = await this.checkForChangesBetweenVersions(data.previous, data.new);
 
         const impacts: ChangeImpact[] = [];
@@ -286,33 +278,4 @@ export class MarketplaceTabComponent {
 
         return impacts;
     }
-}
-
-type InExerciseElement = Vehicle;
-
-export type ChangeImpact =
-    | EditableElementChangeImpact
-    | RemovedElementChangeImpact
-    | AddedElementChangeImpact;
-
-export interface AddedElementChangeImpact {
-    id: string;
-    type: 'added';
-    element: ElementDto;
-}
-
-export interface RemovedElementChangeImpact {
-    id: string;
-    type: 'removed';
-    element: InExerciseElement;
-    entity: ElementDto;
-}
-
-export interface EditableElementChangeImpact {
-    id: string;
-    type: 'editable';
-    element: InExerciseElement;
-    oldValue: string;
-    currentValue: string;
-    newValue: string;
 }

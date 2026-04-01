@@ -1,17 +1,20 @@
-import {
+import crypto from 'node:crypto';
+import type {
     CollectionDto,
     CollectionEntityId,
     CollectionRelationshipType,
-    collectionRelationshipTypeAllowedValues,
     CollectionVersionId,
     CollectionVisibility,
     ElementEntityId,
     ElementVersionId,
-    ExerciseState,
     Marketplace,
     VersionedElementContent,
 } from 'fuesim-digital-shared';
-import crypto from 'node:crypto';
+import {
+    collectionRelationshipTypeAllowedValues,
+    ExerciseState,
+} from 'fuesim-digital-shared';
+import { eq, desc, getTableColumns, sql, and, max, gt } from 'drizzle-orm';
 import {
     collectionDependencyMappingTable,
     elementCollectionMappingTable,
@@ -22,7 +25,6 @@ import {
     userTable,
 } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
-import { eq, desc, getTableColumns, sql, and, max, lt, gt } from 'drizzle-orm';
 
 export class CollectionRepository extends BaseRepository {
     public readonly INVITE_CODE_VALIDITY_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 DAYS
@@ -48,7 +50,7 @@ export class CollectionRepository extends BaseRepository {
             .toString('base64url')
             .replaceAll(' ', '-');
 
-        console.log("CODE :'" + newCode + "'");
+        console.log(`CODE :'${newCode}'`);
 
         return this.onlySingleStrict(
             await this.databaseConnection
@@ -105,7 +107,7 @@ export class CollectionRepository extends BaseRepository {
     }
 
     public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
-        return await this.databaseConnection
+        return this.databaseConnection
             .select({
                 id: userTable.id,
                 displayName: userTable.displayName,
@@ -125,7 +127,7 @@ export class CollectionRepository extends BaseRepository {
         collectionEntityId: CollectionEntityId,
         userId: string
     ) {
-        return await this.databaseConnection
+        return this.databaseConnection
             .delete(collectionUserMappingTable)
             .where(
                 and(
@@ -243,7 +245,7 @@ export class CollectionRepository extends BaseRepository {
                 )
         );
 
-        if (result == null) {
+        if (result === null) {
             const latestVersion = this.strict(
                 await this.getLatestCollectionByEntityId(collectionEntityId)
             );
@@ -297,7 +299,7 @@ export class CollectionRepository extends BaseRepository {
         dependentCollectionVersionId: CollectionVersionId,
         dependencyCollectionVersionId: CollectionVersionId
     ) {
-        return await this.databaseConnection
+        return this.databaseConnection
             .delete(collectionDependencyMappingTable)
             .where(
                 and(
@@ -360,19 +362,19 @@ export class CollectionRepository extends BaseRepository {
         return (
             mappings.length > 0 && // the elements needs to exist to be editable/updateable
             mappings.every(
-                (mapping) => mapping.exercise_element_sets.draftState === true
+                (mapping) => mapping.exercise_element_sets.draftState
             )
         );
     }
 
     public async updateCollectionData(
         collectionVersionId: CollectionVersionId,
-        data: Marketplace.Set.EditableCollectionProperties
+        data: Marketplace.Collection.EditableCollectionProperties
     ) {
         const collection = this.strict(
             await this.getCollectionByVersionId(collectionVersionId)
         );
-        if (collection.draftState === false) {
+        if (!collection.draftState) {
             throw new Error(
                 'Cannot edit collection that is not in draft state'
             );
@@ -394,7 +396,7 @@ export class CollectionRepository extends BaseRepository {
         elementVersionId: ElementVersionId,
         data: VersionedElementContent
     ) {
-        return await this.databaseConnection.transaction(async (tx) => {
+        return this.databaseConnection.transaction(async (tx) => {
             const isEditable =
                 await this.checkElementVersionEditable(elementVersionId);
             if (!isEditable) {
@@ -454,9 +456,9 @@ export class CollectionRepository extends BaseRepository {
 
         if (existingRelationship) {
             const existingIndex =
-                collectionRelationshipTypeAllowedValues.findIndex(
-                    (value) => value === existingRelationship.role
-                ) ?? -1;
+                collectionRelationshipTypeAllowedValues.indexOf(
+                    existingRelationship.role
+                );
             if (existingIndex === -1) {
                 throw new Error(
                     `Invalid existing relationship role ${existingRelationship.role}`
@@ -464,9 +466,7 @@ export class CollectionRepository extends BaseRepository {
             }
 
             const newIndex =
-                collectionRelationshipTypeAllowedValues.findIndex(
-                    (value) => value === relationship
-                ) ?? -1;
+                collectionRelationshipTypeAllowedValues.indexOf(relationship);
             if (newIndex === -1) {
                 throw new Error(
                     `Invalid new relationship role ${relationship}`
@@ -515,7 +515,7 @@ export class CollectionRepository extends BaseRepository {
                 stateVersion: ExerciseState.currentStateVersion,
                 version: 1,
                 visibility: 'private',
-                draftState: draftState,
+                draftState,
             })
             .returning();
 
@@ -536,7 +536,7 @@ export class CollectionRepository extends BaseRepository {
                 description: '',
                 content: data.content,
                 entityId: data.entityId,
-                createdBy: 'test-owner', //TODO: @Quixelation
+                createdBy: 'test-owner', // TODO: @Quixelation
             })
             .returning();
 
@@ -578,7 +578,7 @@ export class CollectionRepository extends BaseRepository {
                 .where(eq(collectionTable.versionId, setVersionId))
         );
 
-        if (set.draftState === false) {
+        if (!set.draftState) {
             throw new Error(
                 'Can only add exercise objects to sets in draft state'
             );
@@ -681,10 +681,9 @@ export class CollectionRepository extends BaseRepository {
                         isBaseReference: sql<boolean>`FALSE`.as(
                             'isBaseReference'
                         ),
-                    } satisfies Record<
-                        keyof typeof elementCollectionMappingTable.$inferInsert,
-                        any
-                    >)
+                    } satisfies {
+                        [key in keyof typeof elementCollectionMappingTable.$inferInsert]: any;
+                    })
                     .from(elementCollectionMappingTable)
                     .where(
                         eq(
@@ -714,7 +713,7 @@ export class CollectionRepository extends BaseRepository {
                     .where(eq(collectionTable.versionId, target.versionId))
             );
 
-            if (targetSet.draftState === false) {
+            if (!targetSet.draftState) {
                 throw new Error(
                     'Can only copy exercise objects to sets in draft state'
                 );
@@ -794,7 +793,7 @@ export class CollectionRepository extends BaseRepository {
     }
 
     public async deleteElementVersion(elementVersionId: ElementVersionId) {
-        return await this.databaseConnection
+        return this.databaseConnection
             .delete(elementTable)
             .where(eq(elementTable.versionId, elementVersionId));
     }
@@ -839,7 +838,7 @@ export class CollectionRepository extends BaseRepository {
     public async getElementsOfCollectionVersion(
         setVersionId: CollectionVersionId
     ) {
-        return await this.databaseConnection
+        return this.databaseConnection
             .select(getTableColumns(elementTable))
             .from(elementTable)
             .leftJoin(

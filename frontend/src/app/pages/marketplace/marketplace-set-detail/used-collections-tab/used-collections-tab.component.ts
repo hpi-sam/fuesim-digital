@@ -1,19 +1,15 @@
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import { NgbDropdownModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-import { ElementCardComponent } from '../../element-card/element-card.component';
 import {
     checkCollectionRole,
-    CollectionEntityId,
     CollectionVersionId,
-    Marketplace,
-    VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
+import { ElementCardComponent } from '../../element-card/element-card.component';
 import {
     CollectionService,
     ExerciseElementSetSubscriptionData,
 } from '../../../../core/exercise-element.service';
-import * as z from 'zod';
 import { UsedCollectionItemComponent } from './used-collection-item/used-collection-item.component';
 
 @Component({
@@ -35,7 +31,7 @@ export class UsedCollectionsTabComponent {
     public readonly collectionData =
         input.required<ExerciseElementSetSubscriptionData>();
 
-    public availableCollections = this.collectionService.elementSets;
+    public availableCollections = this.collectionService.collections;
 
     public readonly checkRole = checkCollectionRole.bind(this);
 

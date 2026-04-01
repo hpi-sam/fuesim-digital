@@ -1,9 +1,5 @@
-import type { OnChanges, OnInit } from '@angular/core';
 import {
     Component,
-    EventEmitter,
-    Input,
-    Output,
     effect,
     inject,
     input,
@@ -16,11 +12,12 @@ import {
     uuid,
     type MaterialTemplate,
     type PersonnelTemplate,
-    type UUID,
     type VehicleTemplate,
 } from 'fuesim-digital-shared';
 import { cloneDeep } from 'lodash-es';
-import { VersionedElementModalData } from '../versioned-element-modal/versioned-element-modal.component';
+import { WritableDraft } from 'immer';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { MessageService } from '../../../../core/messages/message.service';
 import { getImageAspectRatio } from '../../../../shared/functions/get-image-aspect-ratio';
 import { AppState } from '../../../../state/app.state';
@@ -28,13 +25,13 @@ import {
     selectMaterialTemplates,
     selectPersonnelTemplates,
 } from '../../../../state/application/selectors/exercise.selectors';
-import { WritableDraft } from 'immer';
 import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
-import { FormsModule } from '@angular/forms';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
-import { AsyncPipe } from '@angular/common';
 import { ValuesPipe } from '../../../../shared/pipes/values.pipe';
-import { BaseVersionedElementSubmodal } from '../base-versioned-element-submodal';
+import {
+    BaseVersionedElementSubmodal,
+    VersionedElementModalData,
+} from '../base-versioned-element-submodal';
 
 @Component({
     selector: 'app-vehicle-template-form-marketplace',
@@ -54,8 +51,9 @@ export class VehicleTemplateFormMarketplaceComponent
     private readonly messageService = inject(MessageService);
     private readonly store = inject<Store<AppState>>(Store);
 
-    public data = input.required<VersionedElementModalData<VehicleTemplate>>();
-    public values = signal<WritableDraft<VehicleTemplate>>({
+    public readonly data =
+        input.required<VersionedElementModalData<VehicleTemplate>>();
+    public readonly values = signal<WritableDraft<VehicleTemplate>>({
         type: 'vehicleTemplate',
         id: uuid(),
         image: {
@@ -69,10 +67,10 @@ export class VehicleTemplateFormMarketplaceComponent
         patientCapacity: 0,
         vehicleType: '',
     });
-    public btnText = input<string>('Änderungen speichern');
-    public disabled = input<boolean>(false);
+    public readonly btnText = input<string>('Änderungen speichern');
+    public readonly disabled = input<boolean>(false);
 
-    public readonly submit = output<VehicleTemplate>();
+    public readonly dataSubmit = output<VehicleTemplate>();
 
     public materialTemplates$ = this.store.select(selectMaterialTemplates);
     public personnelTemplates$ = this.store.select(selectPersonnelTemplates);
@@ -93,54 +91,40 @@ export class VehicleTemplateFormMarketplaceComponent
      * This method must only be called if all values are valid
      */
     public async submitData() {
-        if (!this.values) {
-            return;
-        }
         const valuesOnSubmit = cloneDeep(this.values());
         const aspectRatio = await getImageAspectRatio(
-            this.values()?.image.url!
+            this.values().image.url
         ).catch((error) => {
             this.messageService.postError({
                 title: 'Ungültige URL',
                 body: 'Bitte überprüfen Sie die Bildadresse.',
                 error,
             });
+            return valuesOnSubmit.image.aspectRatio;
         });
 
-        this.submit.emit({
+        this.dataSubmit.emit({
             ...valuesOnSubmit,
             image: {
                 ...valuesOnSubmit.image,
-                aspectRatio: aspectRatio ?? valuesOnSubmit.image.aspectRatio,
+                aspectRatio,
             },
         });
     }
 
     public addPersonnel(personnelTemplate: PersonnelTemplate) {
-        if (!this.values) {
-            return;
-        }
         this.values().personnelTemplateIds.push(personnelTemplate.id);
     }
 
     public removePersonnel(index: number) {
-        if (!this.values) {
-            return;
-        }
         this.values().personnelTemplateIds.splice(index, 1);
     }
 
     public addMaterial(materialTemplate: MaterialTemplate) {
-        if (!this.values) {
-            return;
-        }
         this.values().materialTemplateIds.push(materialTemplate.id);
     }
 
     public removeMaterial(index: number) {
-        if (!this.values) {
-            return;
-        }
         this.values().materialTemplateIds.splice(index, 1);
     }
 }

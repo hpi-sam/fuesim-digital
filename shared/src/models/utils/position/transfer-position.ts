@@ -9,9 +9,9 @@ export const transferPositionSchema = z.strictObject({
 
 export type TransferPosition = z.infer<typeof transferPositionSchema>;
 
-export const newTransferPositionFor = (
-    transfer: Transfer
-): TransferPosition => ({
-    type: 'transfer',
-    transfer,
-});
+export function newTransferPositionFor(transfer: Transfer): TransferPosition {
+    return {
+        type: 'transfer',
+        transfer,
+    };
+}

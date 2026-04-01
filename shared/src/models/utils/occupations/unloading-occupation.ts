@@ -6,6 +6,8 @@ export const unloadingOccupationSchema = z.strictObject({
 
 export type UnloadingOccupation = z.infer<typeof unloadingOccupationSchema>;
 
-export const newUnloadingOccupation = (): UnloadingOccupation => ({
-    type: 'unloadingOccupation',
-});
+export function newUnloadingOccupation(): UnloadingOccupation {
+    return {
+        type: 'unloadingOccupation',
+    };
+}

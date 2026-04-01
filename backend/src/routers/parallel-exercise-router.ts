@@ -19,9 +19,10 @@ export const areParallelExercisesEnabled: RequestHandler = (req, res, next) => {
     }
     next();
 };
-export const createParallelExerciseRouter = (
+
+export function createParallelExerciseRouter(
     parallelExerciseService: ParallelExerciseService
-): Router => {
+): Router {
     const router = Router();
 
     router
@@ -118,4 +119,4 @@ export const createParallelExerciseRouter = (
         });
 
     return router;
-};
+}

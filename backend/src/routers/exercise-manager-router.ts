@@ -11,9 +11,9 @@ import { Router } from 'express';
 import type { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 
-export const createExerciseManagerRouter = (
+export function createExerciseManagerRouter(
     exerciseManagerService: ExerciseManagerService
-): Router => {
+): Router {
     const router = Router();
 
     router.get('/exercises/', isAuthenticatedMiddleware, async (req, res) => {
@@ -110,4 +110,4 @@ export const createExerciseManagerRouter = (
             res.status(204).send();
         });
     return router;
-};
+}

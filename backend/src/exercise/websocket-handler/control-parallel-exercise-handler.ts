@@ -3,10 +3,10 @@ import { clientMap } from '../client-map.js';
 import { ParallelExerciseClientWrapper } from '../client-wrapper.js';
 import { secureOn } from './secure-on.js';
 
-export const registerControlParallelExerciseHandler = (
+export function registerControlParallelExerciseHandler(
     io: ExerciseServer,
     socket: ExerciseSocket
-) => {
+) {
     secureOn(socket, 'controlParallelExercise', async (action, callback) => {
         const clientWrapper = clientMap.get(socket);
         if (!(clientWrapper instanceof ParallelExerciseClientWrapper)) {
@@ -32,4 +32,4 @@ export const registerControlParallelExerciseHandler = (
             success: true,
         });
     });
-};
+}

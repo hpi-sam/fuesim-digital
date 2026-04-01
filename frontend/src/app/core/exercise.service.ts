@@ -184,17 +184,23 @@ export class ExerciseService {
                     }
                 );
                 if (!response.success) {
+                    const errorMessage = `Action failed: ${response.message}`;
                     if (!response.expected) {
                         this.messageService.postError({
                             title: 'Fehler beim Senden der Aktion',
-                            error: response.message,
+                            error: errorMessage,
                         });
                     } else {
-                        this.messageService.postError({
-                            title: 'Diese Aktion ist nicht gestattet!',
-                            error: response.message,
-                        });
+                        this.messageService.postError(
+                            {
+                                title: 'Diese Aktion ist nicht gestattet!',
+                                body: response.message,
+                                error: errorMessage,
+                            },
+                            null
+                        );
                     }
+                    console.error(action);
                 }
                 return response;
             }

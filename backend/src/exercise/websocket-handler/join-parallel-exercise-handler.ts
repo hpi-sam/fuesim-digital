@@ -9,11 +9,11 @@ import type { Services } from '../../database/services/index.js';
 import { Config } from '../../config.js';
 import { secureOn } from './secure-on.js';
 
-export const registerJoinParallelExerciseHandler = (
+export function registerJoinParallelExerciseHandler(
     io: ExerciseServer,
     socket: ExerciseSocket,
     services: Services
-) => {
+) {
     secureOn(socket, 'joinParallelExercise', async (id: UUID, callback) => {
         if (!Config.parallelExercisesEnabled) {
             callback({
@@ -75,4 +75,4 @@ export const registerJoinParallelExerciseHandler = (
                 });
         });
     });
-};
+}

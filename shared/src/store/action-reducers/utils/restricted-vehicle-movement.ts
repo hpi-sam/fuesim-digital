@@ -12,7 +12,7 @@ import {
 import type { NoPosition } from '../../../models/utils/position/no-position.js';
 import type { Vehicle } from '../../../models/vehicle.js';
 import type { ExerciseState } from '../../../state.js';
-import { ReducerError } from '../../reducer-error.js';
+import { ExpectedReducerError } from '../../reducer-error.js';
 
 /**
  * Checks whether moving the vehicle from the old to the new position is allowed under the constraints of all restricted zones.
@@ -95,7 +95,7 @@ export function checkRestrictedVehicleMovementOrThrow(
             newPosition
         )
     )
-        throw new ReducerError(
+        throw new ExpectedReducerError(
             'Eine eingeschränkte Zone verbietet es, das Fahrzeug an diese Stelle zu bewegen.'
         );
 }

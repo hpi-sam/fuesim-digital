@@ -9,9 +9,11 @@ export type IntermediateOccupation = z.infer<
     typeof intermediateOccupationSchema
 >;
 
-export const newIntermediateOccupation = (
+export function newIntermediateOccupation(
     unoccupiedUntil: number
-): IntermediateOccupation => ({
-    type: 'intermediateOccupation',
-    unoccupiedUntil,
-});
+): IntermediateOccupation {
+    return {
+        type: 'intermediateOccupation',
+        unoccupiedUntil,
+    };
+}

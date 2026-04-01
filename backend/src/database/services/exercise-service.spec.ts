@@ -1,7 +1,12 @@
 import { jest } from '@jest/globals';
 import { uuid } from 'fuesim-digital-shared';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
-import { createExercise, createTestEnvironment } from '../../test/utils.js';
+import {
+    createExercise,
+    createExerciseTemplate,
+    createTestEnvironment,
+    createTestUserSession,
+} from '../../test/utils.js';
 
 describe('Exercise-Service', () => {
     const environment = createTestEnvironment();
@@ -58,5 +63,77 @@ describe('Exercise-Service', () => {
         await saveTick();
         expect(markAsAboutToBeSavedMock).toHaveBeenCalledTimes(2);
         expect(exercise.temporaryActionHistory.length).toBe(0);
+    });
+    it('does correctly update lastUsedAt', async () => {
+        const exerciseKeys = await createExercise(environment);
+        const exercise = environment.services.exerciseService.getExerciseByKey(
+            exerciseKeys.trainerKey
+        );
+        const beforeAction = Date.now();
+        exercise.applyAction(
+            {
+                type: '[AlarmGroup] Add AlarmGroup',
+                alarmGroup: {
+                    alarmGroupVehicles: {},
+                    id: uuid(),
+                    type: 'alarmGroup',
+                    name: 'Alarm Group',
+                    triggerCount: 0,
+                    triggerLimit: null,
+                },
+            },
+            null
+        );
+
+        await environment.server.saveTick();
+
+        const exerciseEntry =
+            await environment.repositories.exerciseRepository.getExerciseById(
+                exercise.exercise.id
+            );
+
+        expect(exerciseEntry!.lastUsedAt.getTime()).toBeGreaterThan(
+            beforeAction
+        );
+        expect(exerciseEntry!.lastUsedAt.getTime()).toBeLessThan(Date.now());
+    });
+    it('does correctly update lastUpdatedAt for exercise templates', async () => {
+        const session = await createTestUserSession(environment);
+        const exerciseTemplate = await createExerciseTemplate(
+            environment,
+            session
+        );
+        const exercise = environment.services.exerciseService
+            .TESTING_getExerciseMap()
+            .get(exerciseTemplate.trainerKey)!;
+        const beforeAction = Date.now();
+        exercise.applyAction(
+            {
+                type: '[AlarmGroup] Add AlarmGroup',
+                alarmGroup: {
+                    alarmGroupVehicles: {},
+                    id: uuid(),
+                    type: 'alarmGroup',
+                    name: 'Alarm Group',
+                    triggerCount: 0,
+                    triggerLimit: null,
+                },
+            },
+            null
+        );
+
+        await environment.server.saveTick();
+
+        const exerciseTemplateEntry =
+            await environment.repositories.exerciseRepository.getExerciseTemplateById(
+                exerciseTemplate.id
+            );
+
+        expect(exerciseTemplateEntry!.lastUpdatedAt.getTime()).toBeGreaterThan(
+            beforeAction
+        );
+        expect(exerciseTemplateEntry!.lastUpdatedAt.getTime()).toBeLessThan(
+            Date.now()
+        );
     });
 });

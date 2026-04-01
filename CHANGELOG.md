@@ -34,6 +34,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Add modal for inviting participants and trainers via QR codes.
 - Participants and trainers are now consistently called "Teilnehmende" and "Übungsleitende", respectively, in the frontend.
 - Exercise keys are now consistently called "Übungs-PIN", "Teilnehmenden-PIN" and "Übungsleitungs-PIN" in the frontend.
+- Use PostgreSQL 18 as default database. Please ensure to update your production database.
 
 ### Fixed
 

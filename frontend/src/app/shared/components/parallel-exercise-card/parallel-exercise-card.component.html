@@ -5,6 +5,7 @@
                 class="flex-grow-1"
                 [required]="true"
                 [value]="parallelExercise().name"
+                name="Name der Parallelübung"
                 (update)="
                     patchParallelExercise({
                         name: $event,

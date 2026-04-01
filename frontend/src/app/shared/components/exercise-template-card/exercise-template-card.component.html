@@ -6,6 +6,7 @@
                     class="flex-grow-1"
                     [required]="true"
                     [value]="exerciseTemplate.name"
+                    name="Name der Übungsvorlage"
                     (update)="
                         patchExerciseTemplate({
                             name: $event,
@@ -19,6 +20,11 @@
             <li class="list-group-item">
                 <i class="bi bi-clock me-2"></i>
                 erstellt am {{ exerciseTemplate.createdAt | date: 'medium' }}
+            </li>
+            <li class="list-group-item">
+                <i class="bi bi-clock me-2"></i>
+                zuletzt geändert am
+                {{ exerciseTemplate.lastUpdatedAt | date: 'medium' }}
             </li>
             <li class="list-group-item">
                 <i class="bi bi-rocket me-2"></i>
@@ -35,6 +41,7 @@
                 <app-inline-text-editor
                     class="flex-grow-1"
                     [value]="exerciseTemplate.description"
+                    name="Beschreibung der Übungsvorlage"
                     (update)="
                         patchExerciseTemplate({
                             description: $event,

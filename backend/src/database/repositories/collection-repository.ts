@@ -1,6 +1,8 @@
 import {
     CollectionDto,
     CollectionEntityId,
+    CollectionRelationshipType,
+    collectionRelationshipTypeAllowedValues,
     CollectionVersionId,
     CollectionVisibility,
     ElementEntityId,
@@ -9,16 +11,133 @@ import {
     Marketplace,
     VersionedElementContent,
 } from 'fuesim-digital-shared';
+import crypto from 'node:crypto';
 import {
     collectionDependencyMappingTable,
     elementCollectionMappingTable,
     collectionTable,
     elementTable,
+    collectionJoinCodesTable,
+    collectionUserMappingTable,
+    userTable,
 } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
-import { eq, desc, getTableColumns, sql, and, max } from 'drizzle-orm';
+import { eq, desc, getTableColumns, sql, and, max, lt, gt } from 'drizzle-orm';
 
 export class CollectionRepository extends BaseRepository {
+    public readonly INVITE_CODE_VALIDITY_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 DAYS
+
+    public async getJoinCode(collectionEntitiyId: CollectionEntityId) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .select()
+                .from(collectionJoinCodesTable)
+                .where(
+                    eq(collectionJoinCodesTable.collection, collectionEntitiyId)
+                )
+        );
+    }
+
+    public async getOrCreateJoinCode(collectionEntitiyId: CollectionEntityId) {
+        const existingCode = await this.getJoinCode(collectionEntitiyId);
+        if (existingCode && existingCode.expiresAt > new Date()) {
+            return existingCode;
+        }
+        const newCode = crypto
+            .randomBytes(8)
+            .toString('base64url')
+            .replaceAll(' ', '-');
+
+        console.log("CODE :'" + newCode + "'");
+
+        return this.onlySingleStrict(
+            await this.databaseConnection
+                .insert(collectionJoinCodesTable)
+                .values({
+                    expiresAt: new Date(
+                        Date.now() + this.INVITE_CODE_VALIDITY_DURATION_MS
+                    ),
+                    code: newCode,
+                    collection: collectionEntitiyId,
+                })
+                .returning()
+        );
+    }
+
+    public async getCollectionByJoinCode(
+        code: string
+    ): Promise<CollectionEntityId | null> {
+        return (
+            this.onlySingle(
+                await this.databaseConnection
+                    .select()
+                    .from(collectionJoinCodesTable)
+                    .where(
+                        and(
+                            eq(collectionJoinCodesTable.code, code),
+                            gt(collectionJoinCodesTable.expiresAt, new Date())
+                        )
+                    )
+            )?.collection ?? null
+        );
+    }
+
+    public async getUserRoleInCollection(
+        collectionEntityId: CollectionEntityId,
+        userId: string
+    ): Promise<CollectionRelationshipType | null> {
+        const data = this.onlySingle(
+            await this.databaseConnection
+                .select({ role: collectionUserMappingTable.role })
+                .from(collectionUserMappingTable)
+                .where(
+                    and(
+                        eq(collectionUserMappingTable.userId, userId),
+                        eq(
+                            collectionUserMappingTable.collection,
+                            collectionEntityId
+                        )
+                    )
+                )
+        );
+        if (data) return data.role;
+        return null;
+    }
+
+    public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
+        return await this.databaseConnection
+            .select({
+                id: userTable.id,
+                displayName: userTable.displayName,
+                role: collectionUserMappingTable.role,
+            })
+            .from(collectionUserMappingTable)
+            .innerJoin(
+                userTable,
+                eq(collectionUserMappingTable.userId, userTable.id)
+            )
+            .where(
+                eq(collectionUserMappingTable.collection, collectionEntityId)
+            );
+    }
+
+    public async removeCollectionMember(
+        collectionEntityId: CollectionEntityId,
+        userId: string
+    ) {
+        return await this.databaseConnection
+            .delete(collectionUserMappingTable)
+            .where(
+                and(
+                    eq(
+                        collectionUserMappingTable.collection,
+                        collectionEntityId
+                    ),
+                    eq(collectionUserMappingTable.userId, userId)
+                )
+            );
+    }
+
     private latestCollectionVersionNumbers(opts: {
         allowDraftState?: boolean;
     }) {
@@ -312,9 +431,80 @@ export class CollectionRepository extends BaseRepository {
         return this.onlySingleStrict(result);
     }
 
+    public async setUserCollectionRelationship(
+        userId: string,
+        collectionEntityId: CollectionEntityId,
+        relationship: CollectionRelationshipType,
+        opts?: { allowDowngrade?: boolean }
+    ) {
+        const existingRelationship = this.onlySingle(
+            await this.databaseConnection
+                .select()
+                .from(collectionUserMappingTable)
+                .where(
+                    and(
+                        eq(
+                            collectionUserMappingTable.collection,
+                            collectionEntityId
+                        ),
+                        eq(collectionUserMappingTable.userId, userId)
+                    )
+                )
+        );
+
+        if (existingRelationship) {
+            const existingIndex =
+                collectionRelationshipTypeAllowedValues.findIndex(
+                    (value) => value === existingRelationship.role
+                ) ?? -1;
+            if (existingIndex === -1) {
+                throw new Error(
+                    `Invalid existing relationship role ${existingRelationship.role}`
+                );
+            }
+
+            const newIndex =
+                collectionRelationshipTypeAllowedValues.findIndex(
+                    (value) => value === relationship
+                ) ?? -1;
+            if (newIndex === -1) {
+                throw new Error(
+                    `Invalid new relationship role ${relationship}`
+                );
+            }
+
+            if (newIndex < existingIndex && opts?.allowDowngrade !== true) {
+                throw new Error(
+                    `Cannot downgrade relationship from ${existingRelationship.role} to ${relationship} without allowDowngrade flag`
+                );
+            }
+
+            return this.databaseConnection
+                .update(collectionUserMappingTable)
+                .set({
+                    role: relationship,
+                })
+                .where(
+                    and(
+                        eq(
+                            collectionUserMappingTable.id,
+                            existingRelationship.id
+                        )
+                    )
+                );
+        }
+
+        return this.databaseConnection
+            .insert(collectionUserMappingTable)
+            .values({
+                collection: collectionEntityId,
+                userId,
+                role: relationship,
+            });
+    }
+
     public async createFirstCollectionVersion(
         title: string,
-        owner: string,
         draftState: boolean = false
     ) {
         const result = await this.databaseConnection
@@ -324,13 +514,12 @@ export class CollectionRepository extends BaseRepository {
                 description: '',
                 stateVersion: ExerciseState.currentStateVersion,
                 version: 1,
-                owner,
                 visibility: 'private',
                 draftState: draftState,
             })
             .returning();
 
-        return this.onlySingle(result);
+        return this.onlySingleStrict(result);
     }
 
     public async createElementVersion(data: {
@@ -629,9 +818,20 @@ export class CollectionRepository extends BaseRepository {
 
         const result = this.databaseConnection
             .with(latestCollections)
-            .select()
-            .from(latestCollections)
-            .where(eq(latestCollections.owner, userId));
+            .select(getTableColumns(collectionTable))
+            .from(collectionUserMappingTable)
+            .innerJoin(
+                latestCollections,
+                eq(
+                    latestCollections.entityId,
+                    collectionUserMappingTable.collection
+                )
+            )
+            .innerJoin(
+                collectionTable,
+                eq(collectionTable.versionId, latestCollections.versionId)
+            )
+            .where(eq(collectionUserMappingTable.userId, userId));
 
         return result;
     }

@@ -23,14 +23,10 @@ export class CollectionEventSender {
         req: Request,
         res: Response,
         public readonly collectionEntityId: CollectionEntityId,
-        private readonly collectionService: CollectionService
+        private readonly collectionService: CollectionService,
+        private readonly userId: string
     ) {
-        console.log(
-            'Initializing CollectionEventSender for collectionEntityId:',
-            collectionEntityId
-        );
         this.sse = new SSE(req, res);
-        console.log('SSE initialized, starting event sender...');
         this.init();
     }
 
@@ -53,11 +49,6 @@ export class CollectionEventSender {
     }
 
     private async listen() {
-        console.log(
-            'Listening for collection updates for collectionEntityId:',
-            this.collectionEntityId,
-            this.dependencies
-        );
         this.collectionService.events
             .pipe(
                 filter(
@@ -69,7 +60,6 @@ export class CollectionEventSender {
             )
             .subscribe(async (update) => {
                 if (!update) return;
-                console.log('Update received in event sender:', update);
                 switch (update.event) {
                     case 'dependency:add':
                         await this.loadDependencies();
@@ -135,12 +125,20 @@ export class CollectionEventSender {
                 { includeDependencies: true, allowDraftState: true }
             );
 
+        const userRelationship =
+            await this.collectionService.getUserRoleInCollection(
+                latestCollection.entityId,
+                this.userId
+            );
+        if (!userRelationship) {
+            this.abort('User has no relationship to collection');
+            return;
+        }
+
         if (!data) {
             this.abort('No elements found for collection');
             return;
         }
-
-        console.log(data);
 
         this.notifyChange(
             Marketplace.Set.Events.InitialData.schema.encode({
@@ -152,6 +150,7 @@ export class CollectionEventSender {
                         transitive: data.transitive ?? [],
                         direct: data.direct,
                     },
+                    userRelationship,
                 },
             }) as typeof Marketplace.Set.Events.InitialData.Type
         );

@@ -23,7 +23,10 @@ import { EditConflictResolutionComponent } from '../edit-conflict-resolution/edi
 import { MessageService } from '../../../../core/messages/message.service';
 
 export interface SharedVersionedElementModalData<T> {
-    onSubmit: (values: T, conflictResolution?: Marketplace.Element.EditConflictResolution) => void;
+    onSubmit: (
+        values: T,
+        conflictResolution?: Marketplace.Element.EditConflictResolution
+    ) => void;
     type: VersionedElementContent['type'];
     collection: VersionedCollectionPartial;
     isEditMode: boolean;
@@ -108,7 +111,6 @@ export class VersionedElementModalComponent {
     }
 
     public findVersionData(version: number) {
-        console.log('Finding version data for version:', version);
         const versionData = this.versionHistory()
             ? this.versionHistory()!.find((v) => v.version === version)
             : null;
@@ -116,7 +118,6 @@ export class VersionedElementModalComponent {
         if (!versionData) {
             throw new Error('Version data not found for version ' + version);
         }
-        console.log('Found version data:', versionData);
 
         return versionData;
     }
@@ -139,33 +140,45 @@ export class VersionedElementModalComponent {
     }
 
     public async submit(data: any) {
-
-        if(!this.dependentElements.hasValue() || this.dependentElements.error()) {
+        if (
+            !this.dependentElements.hasValue() ||
+            this.dependentElements.error()
+        ) {
             this.messageService.postMessage({
                 color: 'danger',
                 title: 'Abhängigkeiten konnten nicht geladen werden',
                 body: 'Die Abhängigkeiten des Elements konnten nicht geladen werden. Bitte versuchen Sie es erneut.',
-            })
+            });
         }
-        if((this.dependentElements.value()?.length ?? 0) > 0) {
-            this.openConflictResolution(data, this.dependentElements.value() ?? []);
+        if ((this.dependentElements.value()?.length ?? 0) > 0) {
+            this.openConflictResolution(
+                data,
+                this.dependentElements.value() ?? []
+            );
             return;
         }
         this.data.onSubmit(data);
         this.close();
     }
 
-    public openConflictResolution(content: any,affectedElementVersions: ElementDto[]) {
-        const modal = this.ngbModalService.open(EditConflictResolutionComponent, {
-            size: 'xl',
-        });
+    public openConflictResolution(
+        content: any,
+        affectedElementVersions: ElementDto[]
+    ) {
+        const modal = this.ngbModalService.open(
+            EditConflictResolutionComponent,
+            {
+                size: 'xl',
+            }
+        );
 
         modal.componentInstance.data = this.data;
-        modal.componentInstance.affectedElementVersions = affectedElementVersions;
+        modal.componentInstance.affectedElementVersions =
+            affectedElementVersions;
         modal.componentInstance.contentToBeSubmitted = content;
         modal.componentInstance.onDone = () => {
             this.close();
-        }
+        };
     }
 
     private close() {

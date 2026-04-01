@@ -6,7 +6,11 @@ import { AsyncPipe, JsonPipe } from '@angular/common';
 import { ValuesPipe } from '../../../../shared/pipes/values.pipe';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { VersionedElementModalData } from '../versioned-element-modal/versioned-element-modal.component';
-import { ElementDto, ElementVersionId, Marketplace } from 'fuesim-digital-shared';
+import {
+    ElementDto,
+    ElementVersionId,
+    Marketplace,
+} from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-edit-conflict-resolution',
@@ -16,7 +20,7 @@ import { ElementDto, ElementVersionId, Marketplace } from 'fuesim-digital-shared
         AutofocusDirective,
         AsyncPipe,
         ValuesPipe,
-        JsonPipe
+        JsonPipe,
     ],
     templateUrl: './edit-conflict-resolution.component.html',
     styleUrls: ['./edit-conflict-resolution.component.html'],
@@ -30,13 +34,22 @@ export class EditConflictResolutionComponent {
     public readonly contentToBeSubmitted!: any;
     public readonly onDone!: () => void;
 
-    constructor() { }
+    constructor() {}
 
-    public resolveConflict(resolution: Marketplace.Element.EditConflictResolution["strategy"]) {
-        console.log('Resolving conflict with strategy', resolution, this.data, this.affectedElementVersions);
+    public resolveConflict(
+        resolution: Marketplace.Element.EditConflictResolution['strategy']
+    ) {
+        console.log(
+            'Resolving conflict with strategy',
+            resolution,
+            this.data,
+            this.affectedElementVersions
+        );
         this.data.onSubmit(this.contentToBeSubmitted, {
             strategy: resolution,
-            affectingElementIds: this.affectedElementVersions.map((element) => element.versionId),
+            affectingElementIds: this.affectedElementVersions.map(
+                (element) => element.versionId
+            ),
         });
         this.close();
         this.onDone?.();

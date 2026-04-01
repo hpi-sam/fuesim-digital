@@ -438,7 +438,6 @@ describe('Collection Router', () => {
                             await environment.collectionService.getCollectionDependencies(
                                 parsed.newCollectionVersionId
                             );
-                        console.log(collection2_deps);
                         expect(collection2_deps).toHaveLength(1);
                         expect(collection2_deps[0]?.versionId).toBe(
                             collection2.versionId
@@ -459,7 +458,6 @@ describe('Collection Router', () => {
                             Marketplace.Set.Import.responseSchema.parse(
                                 data2.body
                             );
-                        console.log({ parsed2 });
                         expect(
                             parsed2.importedSet.collection.versionId
                         ).toEqual(collection2_v2.versionId);
@@ -473,7 +471,6 @@ describe('Collection Router', () => {
                             await environment.collectionService.getCollectionDependencies(
                                 parsed2.newCollectionVersionId
                             );
-                        console.log({ collection_deps_after });
                         expect(collection_deps_after).toHaveLength(1);
                         expect(collection_deps_after[0]?.versionId).toBe(
                             collection2_v2.versionId

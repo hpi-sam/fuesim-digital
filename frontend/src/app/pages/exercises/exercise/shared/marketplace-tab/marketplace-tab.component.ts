@@ -91,9 +91,6 @@ export class MarketplaceTabComponent {
     }
 
     public async upgradeCollectionVersion() {
-        console.log(
-            'Calculating change impacts of upgrading collection version...'
-        );
         //TODO: @Quixelation: Support more than just vehicles
         const allExerciseVehicles = selectStateSnapshot(
             selectVehicles,
@@ -163,14 +160,6 @@ export class MarketplaceTabComponent {
             removedElements,
             unchangedElements,
         } = await this.checkForChangesBetweenVersions(data.previous, data.new);
-
-        console.log({
-            data,
-            addedElements,
-            editedNewElements,
-            removedElements,
-            unchangedElements,
-        });
 
         const impacts: ChangeImpact[] = [];
 

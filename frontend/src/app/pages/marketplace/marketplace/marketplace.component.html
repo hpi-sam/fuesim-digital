@@ -1,24 +1,33 @@
 <div class="container">
-
-@if(userAvailableCollections.hasValue()){
-<div class="row row-cols-3">
-    @for(collection of userAvailableCollections.value(); track collection.versionId) {
-        <div class="col mb-4">
-
-            <a class="card d-block text-decoration-none" [routerLink]="'/elements/' + collection.entityId">
-
-        <div class="card-header">
-    {{ collection.title }}
-</div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Erstellt am: {{collection.createdAt | date }}</li>
-<li class="list-group-item"></li>
-<li class="list-group-item"></li>
-                </ul>
-
-</a>
+    <div class="d-flex flex-row justify-content-end">
+        <button class="btn btn-primary" (click)="createNewCollection()">
+            Neue Sammlung erstellen
+        </button>
+    </div>
+    @if (userAvailableCollections.hasValue()) {
+        <div class="row row-cols-3">
+            @for (
+                collection of userAvailableCollections.value();
+                track collection.versionId
+            ) {
+                <div class="col mb-4">
+                    <a
+                        class="card d-block text-decoration-none"
+                        [routerLink]="'/collections/' + collection.entityId"
+                    >
+                        <div class="card-header">
+                            {{ collection.title }}
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                Erstellt am: {{ collection.createdAt | date }}
+                            </li>
+                            <li class="list-group-item"></li>
+                            <li class="list-group-item"></li>
+                        </ul>
+                    </a>
+                </div>
+            }
         </div>
     }
-</div>
-}
 </div>

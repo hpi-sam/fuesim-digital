@@ -1,6 +1,6 @@
 {
-    "id": "0c6e3431-5bb5-4395-9c37-fc2fb0c8da95",
-    "prevId": "660c7c2a-0006-48f1-a718-870acc0ca017",
+    "id": "6281d306-7fef-4a72-8502-bcbcd5d1d10b",
+    "prevId": "e83a1e67-bd37-4e6c-b711-bc34d1013971",
     "version": "7",
     "dialect": "postgresql",
     "tables": {
@@ -221,12 +221,6 @@
                     "notNull": true,
                     "default": "'private'"
                 },
-                "owner": {
-                    "name": "owner",
-                    "type": "varchar",
-                    "primaryKey": false,
-                    "notNull": true
-                },
                 "draftState": {
                     "name": "draftState",
                     "type": "boolean",
@@ -262,8 +256,15 @@
             "name": "collection_user_mapping",
             "schema": "",
             "columns": {
-                "collectionEntityId": {
-                    "name": "collectionEntityId",
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "collection": {
+                    "name": "collection",
                     "type": "varchar",
                     "primaryKey": false,
                     "notNull": true
@@ -294,7 +295,13 @@
                 }
             },
             "compositePrimaryKeys": {},
-            "uniqueConstraints": {},
+            "uniqueConstraints": {
+                "unique_collection_user": {
+                    "name": "unique_collection_user",
+                    "nullsNotDistinct": false,
+                    "columns": ["userId", "collection"]
+                }
+            },
             "policies": {},
             "checkConstraints": {},
             "isRLSEnabled": false

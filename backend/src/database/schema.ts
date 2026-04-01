@@ -1,6 +1,7 @@
 import type {
     ActionId,
     CollectionEntityId,
+    CollectionRelationshipType,
     CollectionVersionId,
     ElementEntityId,
     ElementVersionId,
@@ -178,19 +179,13 @@ const stateVersionedEntity = <EntityBrand, VersionBrand>(prefix: string) => ({
         .notNull(),
 });
 
-export const setVisibilityEnum = pgEnum('exercise_set_visibility', [
-    'private',
-    'public',
-]);
-
 export const collectionTable = pgTable(
     'exercise_element_sets',
     {
         ...stateVersionedEntity<CollectionEntityId, CollectionVersionId>('set'),
         title: varchar().notNull(),
         description: varchar().notNull(),
-        visibility: setVisibilityEnum().notNull().default('private'),
-        owner: varchar().notNull(),
+        visibility: varchar().notNull().default('private'),
         draftState: boolean().notNull(),
     },
     (table) => [
@@ -271,6 +266,27 @@ export const elementTable = pgTable(
         unique('unique_template_id').on(table.entityId, table.versionId),
     ]
 );
+
+export const collectionUserMappingTable = pgTable(
+    'collection_user_mapping',
+    {
+        id: defaultUUID().primaryKey().notNull(),
+        collection: varchar().notNull().$type<CollectionEntityId>(),
+        userId: varchar()
+            .notNull()
+            .references(() => userTable.id, { onDelete: 'cascade' }),
+        role: varchar().notNull().$type<CollectionRelationshipType>(),
+    },
+    (table) => [
+        unique('unique_collection_user').on(table.userId, table.collection),
+    ]
+);
+
+export const collectionJoinCodesTable = pgTable('collection_join_codes', {
+    code: varchar().primaryKey().notNull(),
+    collection: varchar().notNull().unique().$type<CollectionEntityId>(),
+    expiresAt: timestamp({ withTimezone: true, mode: 'date' }).notNull(),
+});
 
 export const actionEntityRelations = relations(actionTable, ({ one }) => ({
     exerciseWrapperEntity: one(exerciseTable, {

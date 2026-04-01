@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import {
     CollectionDto,
     CollectionEntityId,
+    CollectionRelationshipType,
     CollectionVersionId,
     ElementEntityId,
     Marketplace,
@@ -17,6 +18,7 @@ import z from 'zod';
 export type ExerciseElementSetSubscriptionData = {
     collection: CollectionDto;
     objects: typeof Marketplace.Set.GetLatestElementsBySetVersionId.Response;
+    ownRole: CollectionRelationshipType;
 };
 
 @Injectable({
@@ -51,10 +53,6 @@ export class CollectionService {
             new BehaviorSubject<ExerciseElementSetSubscriptionData | null>(null)
         );
         collectionEventSource.addEventListener('change', (event) => {
-            console.log(
-                `Received change event for setEntityId ${setEntityId}:`,
-                event
-            );
             const changeEvent = Marketplace.Set.Events.Event.schema.parse(
                 JSON.parse(event.data)
             );
@@ -64,6 +62,7 @@ export class CollectionService {
                     this._elementSetSubscriptions.get(setEntityId)?.next({
                         collection: changeEvent.data.collection,
                         objects: changeEvent.data.elements,
+                        ownRole: changeEvent.data.userRelationship,
                     });
                     break;
                 }
@@ -160,10 +159,10 @@ export class CollectionService {
                         val.map((m) =>
                             m.entityId === setEntityId
                                 ? {
-                                    ...m,
-                                    title: changeEvent.data.title,
-                                    description: changeEvent.data.description,
-                                }
+                                      ...m,
+                                      title: changeEvent.data.title,
+                                      description: changeEvent.data.description,
+                                  }
                                 : m
                         )
                     );
@@ -206,10 +205,6 @@ export class CollectionService {
             callback(firstValue);
         }
         this._elementSetSubscriptions.get(setEntityId)!.subscribe((data) => {
-            console.log(
-                `Subscription for setVersionId ${setEntityId} received update:`,
-                data
-            );
             if (!data) return;
             callback(data);
         });
@@ -218,7 +213,6 @@ export class CollectionService {
             collectionEventSource.close();
             this._elementSetSubscriptions.get(setEntityId)?.complete();
             this._elementSetSubscriptions.delete(setEntityId);
-            console.log(`Closing ${setEntityId}`);
         };
     }
 
@@ -235,10 +229,6 @@ export class CollectionService {
     public async getLatestCollectionVersionByEntityId(
         entityId: CollectionEntityId
     ) {
-        console.log(
-            'Fetching latest collection version for entityId',
-            entityId
-        );
         const data = await lastValueFrom(
             this.httpClient.get<typeof Marketplace.Set.GetByEntityId.Response>(
                 `${this.ENDPOINT}/${entityId}`
@@ -276,8 +266,6 @@ export class CollectionService {
                 typeof Marketplace.Set.GetLatestElementsBySetVersionId.Response
             >(`${this.ENDPOINT}/${setId}/latest`)
         );
-
-        console.log('Received latest element set objects:', data);
 
         return data;
     }
@@ -487,7 +475,6 @@ export class CollectionService {
     public async getCollectionByVersionId(
         collection: VersionedCollectionPartial
     ) {
-        console.log('getCollectionByVersionId', collection);
         const data = await lastValueFrom(
             this.httpClient.get<
                 typeof Marketplace.Set.GetCollectionVersion.Response
@@ -527,16 +514,14 @@ export class CollectionService {
     ): Promise<
         | { newerVersionAvailable: false }
         | {
-            newerVersionAvailable: true;
-            latestVersion: VersionedCollectionPartial;
-        }
+              newerVersionAvailable: true;
+              latestVersion: VersionedCollectionPartial;
+          }
     > {
-        console.log('f', collection);
         const latestCollection =
             await this.getLatestCollectionVersionByEntityId(
                 collection.entityId
             );
-        console.log('f', latestCollection);
         const currentCollection =
             await this.getCollectionByVersionId(collection);
 
@@ -586,5 +571,83 @@ export class CollectionService {
         const typedData = Marketplace.Set.LoadMy.responseSchema.parse(data);
 
         return typedData.result;
+    }
+
+    public async getCollectionInviteCode(
+        collectionEntityId: CollectionEntityId
+    ) {
+        const data = await lastValueFrom(
+            this.httpClient.get<typeof Marketplace.Set.GetInviteCode.Response>(
+                `${this.ENDPOINT}/${collectionEntityId}/invitecode`
+            )
+        );
+
+        const typedData =
+            Marketplace.Set.GetInviteCode.responseSchema.parse(data);
+
+        return typedData.result;
+    }
+
+    public async getOrCreateCollectionInviteCode(
+        collectionEntityId: CollectionEntityId
+    ) {
+        const data = await lastValueFrom(
+            this.httpClient.put<typeof Marketplace.Set.PutInviteCode.Response>(
+                `${this.ENDPOINT}/${collectionEntityId}/invitecode`,
+                {}
+            )
+        );
+
+        const typedData =
+            Marketplace.Set.PutInviteCode.responseSchema.parse(data);
+
+        return typedData.result;
+    }
+
+    public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Set.GetCollectionMembers.Response
+            >(`${this.ENDPOINT}/${collectionEntityId}/members`)
+        );
+
+        const typedData =
+            Marketplace.Set.GetCollectionMembers.responseSchema.parse(data);
+
+        return typedData.result;
+    }
+
+    public async removeCollectionMember(
+        collectionEntityId: CollectionEntityId,
+        userId: string
+    ) {
+        const data = await lastValueFrom(
+            this.httpClient.delete(
+                `${this.ENDPOINT}/${collectionEntityId}/members/`,
+                {
+                    body: Marketplace.Set.DeleteCollectionMember.requestSchema.encode(
+                        {
+                            userId,
+                        }
+                    ),
+                }
+            )
+        );
+    }
+
+    public async setCollectionMemberRole(
+        collectionEntityId: CollectionEntityId,
+        userId: string,
+        role: CollectionRelationshipType
+    ) {
+        const data = await lastValueFrom(
+            this.httpClient.patch(
+                `${this.ENDPOINT}/${collectionEntityId}/members/`,
+                Marketplace.Set.PatchCollectionMember.requestSchema.encode({
+                    userId,
+                    role,
+                })
+            )
+        );
     }
 }

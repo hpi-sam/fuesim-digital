@@ -1,8 +1,8 @@
-<div class="w-100 d-flex flex-row justify-content-end mb-3">
+@if (checkRole(collectionData().ownRole).isAtLeast('editor')) {
     <div ngbDropdown>
         <button
             type="button"
-            class="btn btn-outline-primary d-flex flex-row align-items-center"
+            class="btn btn-outline-primary d-flex flex-row align-items-center ms-auto"
             ngbDropdownToggle
         >
             <i class="bi bi-folder-symlink me-2"></i>
@@ -14,7 +14,8 @@
                 track availableCollection.versionId
             ) {
                 @if (
-                    availableCollection.entityId !== currentCollectionEntityId
+                    availableCollection.entityId !==
+                    collectionData().collection.entityId
                 ) {
                     <button
                         ngbDropdownItem
@@ -28,15 +29,14 @@
             }
         </div>
     </div>
-</div>
-
+}
 @for (
-    dependency of importedCollections();
+    dependency of collectionData().objects.transitive;
     track dependency.collection.versionId
 ) {
     <app-used-collection-item
         [dependency]="dependency"
-        [currentCollectionEntityId]="currentCollectionEntityId()"
+        [currentCollectionEntityId]="collectionData().collection.entityId"
     />
     <hr />
 }

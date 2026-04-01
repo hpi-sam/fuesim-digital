@@ -93,17 +93,9 @@ export class VehicleTemplateFormMarketplaceComponent
      * This method must only be called if all values are valid
      */
     public async submitData() {
-        console.log(
-            'Submitting vehicle template form with current values',
-            this.values()
-        );
         if (!this.values) {
             return;
         }
-        console.log(
-            'Submitting vehicle template form with current values',
-            this.values()
-        );
         const valuesOnSubmit = cloneDeep(this.values());
         const aspectRatio = await getImageAspectRatio(
             this.values()?.image.url!
@@ -115,12 +107,6 @@ export class VehicleTemplateFormMarketplaceComponent
             });
         });
 
-        console.log(
-            'Submitting vehicle template with values',
-            valuesOnSubmit,
-            'and aspect ratio',
-            aspectRatio
-        );
         this.submit.emit({
             ...valuesOnSubmit,
             image: {

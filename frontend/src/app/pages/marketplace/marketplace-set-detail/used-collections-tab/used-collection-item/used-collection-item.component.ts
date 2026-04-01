@@ -41,12 +41,9 @@ export class UsedCollectionItemComponent {
     });
 
     public async upgradeVersion() {
-        console.log('ARASCH');
         const value = this.newerVersionAvailable.value();
-        console.log('check newer version', value);
         if (!value) return;
         const newVersion = value.newerVersionAvailable && value.latestVersion;
-        console.log('new version', newVersion);
         await this.collectionService.addCollectionDependency({
             importTo: this.currentCollectionEntityId(),
             importFrom: newVersion.versionId,

@@ -1,6 +1,6 @@
 {
-    "id": "0c6e3431-5bb5-4395-9c37-fc2fb0c8da95",
-    "prevId": "660c7c2a-0006-48f1-a718-870acc0ca017",
+    "id": "da8e584f-efd6-4e4a-805d-5454e60b2706",
+    "prevId": "0c6e3431-5bb5-4395-9c37-fc2fb0c8da95",
     "version": "7",
     "dialect": "postgresql",
     "tables": {
@@ -220,12 +220,6 @@
                     "primaryKey": false,
                     "notNull": true,
                     "default": "'private'"
-                },
-                "owner": {
-                    "name": "owner",
-                    "type": "varchar",
-                    "primaryKey": false,
-                    "notNull": true
                 },
                 "draftState": {
                     "name": "draftState",

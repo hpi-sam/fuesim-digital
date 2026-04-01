@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import {
+    checkCollectionRole,
+    CollectionRelationshipType,
     isCollectionEntityId,
     isCollectionVersionId,
     isElementEntityId,
@@ -10,25 +12,66 @@ import {
 import { NotFoundError } from '../utils/http.js';
 import { CollectionService } from '../database/services/collection-service.js';
 import { CollectionEventSender } from '../collections/collection-event-sender.js';
-
-/**
- * Routes:
- *
- *  /
- *  -> /my
- *  -> /create
- *  -> /:collectionEntityId
- *     -> /
- *        -> GET:
- *        -> PATCH:
- *
- */
+import { Config } from '../config.js';
 
 export function createCollectionsRouter(collectionService: CollectionService) {
     const router = Router();
 
+    const createRoleRouter = (
+        lowestAllowedRole: CollectionRelationshipType
+    ) => {
+        const router = Router({ mergeParams: true });
+        router.use('/:collectionEntityId', async (req, res, next) => {
+            const collectionEntityId = req.params['collectionEntityId'] ?? '';
+            if (!isCollectionEntityId(collectionEntityId)) {
+                res.status(400).send({ error: 'Invalid collection id' });
+                return;
+            }
+
+            const collection = await collectionService.getLatestCollectionById(
+                collectionEntityId,
+                { draftState: true }
+            );
+
+            if (!collection) {
+                res.status(404).send({ error: 'Collection not found' });
+                return;
+            }
+
+            const userId = req.session!.user.id;
+            const relationship =
+                await collectionService.getUserRoleInCollection(
+                    collectionEntityId,
+                    userId
+                );
+
+            if (!relationship) {
+                res.status(403).send({
+                    error: 'You do not have access to this collection',
+                });
+                return;
+            }
+
+            const rolecheck =
+                checkCollectionRole(relationship).isAtLeast(lowestAllowedRole);
+            if (!rolecheck) {
+                res.status(403).send({
+                    error: 'You do not have the required permissions to perform this action',
+                });
+                return;
+            }
+            next();
+        });
+
+        return router;
+    };
+
+    const adminRouter = createRoleRouter('admin');
+    const editorRouter = createRoleRouter('editor');
+    const viewerRouter = createRoleRouter('viewer');
+
     router.use((req, res, next) => {
-        console.log(
+        console.debug(
             '[CollectionsRouter] Request received:',
             req.method,
             req.path,
@@ -54,6 +97,24 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
+    router.get('/join/:joinCode', async (req, res) => {
+        const { joinCode } = req.params;
+        try {
+            const result = await collectionService.joinCollectionByCode(
+                joinCode,
+                req.session!.user.id
+            );
+            res.redirect(Config.httpFrontendUrl + `/collections/${result}`);
+            return;
+        } catch (err) {
+            console.error(
+                `[CollectionsRouter] Failed to join collection with code ${joinCode} for user ${req.session!.user.id}`,
+                err
+            );
+        }
+        res.redirect(Config.httpFrontendUrl + `/collections`);
+    });
+
     /*
      * Creates a new Collection
      */
@@ -76,31 +137,11 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
-    router.use('/:setEntityId', async (req, res, next) => {
-        const exerciseElementSetId = req.params.setEntityId;
-        if (!isCollectionEntityId(exerciseElementSetId)) {
-            return res.status(400).send({ error: 'Invalid collection id' });
-        }
-
-        const collection = await collectionService.getLatestCollectionById(
-            exerciseElementSetId,
-            { draftState: true }
-        );
-        if (!collection) {
-            return res.status(404).send({ error: 'Collection not found' });
-        }
-
-        //@ts-ignore
-        req.collection = collection;
-        next();
-        return;
-    });
-
     /*
      * Get the metadata of the latest version of the collection
      */
-    router.get('/:setEntityId', async (req, res) => {
-        const collectionEntityId = req.params.setEntityId;
+    viewerRouter.get('/:collectionEntityId', async (req, res) => {
+        const collectionEntityId = req.params.collectionEntityId;
         if (!isCollectionEntityId(collectionEntityId)) {
             throw new Error('Invalid exercise element set version id');
         }
@@ -120,16 +161,16 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
-    router.patch('/:setEntityId', async (req, res) => {
-        const { setEntityId } = req.params;
-        if (!isCollectionEntityId(setEntityId)) {
+    adminRouter.patch('/:collectionEntityId', async (req, res) => {
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
             throw new Error('Invalid exercise element set version id');
         }
 
         const parsedBody = Marketplace.Set.Edit.requestSchema.parse(req.body);
 
         const result = await collectionService.updateCollectionMetadata(
-            setEntityId,
+            collectionEntityId,
             parsedBody
         );
 
@@ -147,9 +188,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     /*
      * Create a new Collection-Element in the Collection
      */
-    router.post('/:setEntityId/create', async (req, res) => {
-        const { setEntityId } = req.params;
-        if (!isCollectionEntityId(setEntityId)) {
+    editorRouter.post('/:collectionEntityId/create', async (req, res) => {
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
             throw new Error('Invalid exercise element set version id');
         }
 
@@ -158,7 +199,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
 
         const data = await collectionService.createExerciseObject(
-            setEntityId,
+            collectionEntityId,
             parsedBody.data
         );
 
@@ -174,11 +215,99 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
-    router.post(
-        '/:setEntityId/dependencies/:importSetVersionId',
+    adminRouter.get('/:collectionEntityId/invitecode', async (req, res) => {
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
+            throw new Error('Invalid exercise element set version id');
+        }
+
+        const inviteCode =
+            await collectionService.getCollectionInviteCode(collectionEntityId);
+
+        res.send(
+            Marketplace.Set.GetInviteCode.responseSchema.encode({
+                result: inviteCode,
+            })
+        );
+    });
+
+    adminRouter.put('/:collectionEntityId/invitecode', async (req, res) => {
+        //TODO: Restrict this endpoint to only admins
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
+            throw new Error('Invalid exercise element set version id');
+        }
+
+        const inviteCode =
+            await collectionService.getOrCreateCollectionInviteCode(
+                collectionEntityId
+            );
+
+        res.send(
+            Marketplace.Set.PutInviteCode.responseSchema.encode({
+                result: inviteCode,
+            })
+        );
+    });
+
+    adminRouter.get('/:collectionEntityId/members', async (req, res) => {
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
+            throw new Error('Invalid exercise element set version id');
+        }
+
+        const data =
+            await collectionService.getCollectionMembers(collectionEntityId);
+
+        res.send(
+            Marketplace.Set.GetCollectionMembers.responseSchema.encode({
+                result: data,
+            })
+        );
+    });
+
+    adminRouter.patch('/:collectionEntityId/members', async (req, res) => {
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
+            throw new Error('Invalid exercise element set version id');
+        }
+
+        const parsedBody =
+            Marketplace.Set.PatchCollectionMember.requestSchema.parse(req.body);
+
+        await collectionService.setCollectionMemberRole(
+            collectionEntityId,
+            parsedBody.userId,
+            parsedBody.role
+        );
+
+        res.send();
+    });
+
+    adminRouter.delete('/:collectionEntityId/members', async (req, res) => {
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
+            throw new Error('Invalid exercise element set version id');
+        }
+
+        const parsedBody =
+            Marketplace.Set.DeleteCollectionMember.requestSchema.parse(
+                req.body
+            );
+
+        await collectionService.removeCollectionMember(
+            collectionEntityId,
+            parsedBody.userId
+        );
+
+        res.send();
+    });
+
+    editorRouter.post(
+        '/:collectionEntityId/dependencies/:importSetVersionId',
         async (req, res) => {
-            const { setEntityId, importSetVersionId } = req.params;
-            if (!isCollectionEntityId(setEntityId)) {
+            const { collectionEntityId, importSetVersionId } = req.params;
+            if (!isCollectionEntityId(collectionEntityId)) {
                 throw new Error('Invalid exercise element set version id');
             }
             if (!isCollectionVersionId(importSetVersionId)) {
@@ -187,7 +316,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
             const data = await collectionService.addCollectionDependency(
                 {
-                    importTo: setEntityId,
+                    importTo: collectionEntityId,
                     importFrom: importSetVersionId,
                 },
                 { throwOnDraftState: false }
@@ -205,11 +334,11 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    router.delete(
-        '/:setEntityId/dependencies/:importSetVersionId',
+    editorRouter.delete(
+        '/:collectionEntityId/dependencies/:importSetVersionId',
         async (req, res) => {
-            const { setEntityId, importSetVersionId } = req.params;
-            if (!isCollectionEntityId(setEntityId)) {
+            const { collectionEntityId, importSetVersionId } = req.params;
+            if (!isCollectionEntityId(collectionEntityId)) {
                 throw new Error('Invalid exercise element set version id');
             }
             if (!isCollectionVersionId(importSetVersionId)) {
@@ -217,7 +346,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             }
 
             await collectionService.removeCollectionDependency({
-                removeFrom: setEntityId,
+                removeFrom: collectionEntityId,
                 dependencyEntityId: importSetVersionId,
             });
 
@@ -225,14 +354,14 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    router.get('/:setEntityId/latest', async (req, res) => {
-        const { setEntityId } = req.params;
-        if (!isCollectionEntityId(setEntityId)) {
+    viewerRouter.get('/:collectionEntityId/latest', async (req, res) => {
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
             throw new Error('Invalid exercise element set entity id');
         }
 
         const data = await collectionService.getLatestDraftElementsOfCollection(
-            setEntityId,
+            collectionEntityId,
             { includeDependencies: true }
         );
 
@@ -246,18 +375,24 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
-    router.get('/:setEntityId/events', async (req, res) => {
-        const { setEntityId } = req.params;
-        if (!isCollectionEntityId(setEntityId)) {
+    viewerRouter.get('/:collectionEntityId/events', async (req, res) => {
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
             throw new Error('Invalid exercise element set entity id');
         }
 
-        new CollectionEventSender(req, res, setEntityId, collectionService);
+        new CollectionEventSender(
+            req,
+            res,
+            collectionEntityId,
+            collectionService,
+            req.session!.user.id
+        );
     });
 
-    router.post('/:setEntityId/save', async (req, res) => {
-        const { setEntityId } = req.params;
-        if (!isCollectionEntityId(setEntityId)) {
+    editorRouter.post('/:collectionEntityId/save', async (req, res) => {
+        const { collectionEntityId } = req.params;
+        if (!isCollectionEntityId(collectionEntityId)) {
             throw new Error('Invalid exercise element set version id');
         }
 
@@ -266,7 +401,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             | undefined;
         try {
             newCollectionState =
-                await collectionService.saveDraftState(setEntityId);
+                await collectionService.saveDraftState(collectionEntityId);
         } catch (e) {
             res.send(
                 Marketplace.Set.SaveDraftState.responseSchema.encode({
@@ -288,33 +423,39 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
-    router.post('/:setEntityId/change-visibility', async (req, res) => {
-        const { setEntityId } = req.params;
-
-        if (!isCollectionEntityId(setEntityId)) {
-            throw new Error('Invalid exercise element set entity id');
-        }
-
-        const data = await collectionService.makeCollectionPublic(setEntityId);
-
-        res.send(
-            Marketplace.Set.ChangeVisibility.responseSchema.encode({
-                status: 'success',
-            })
-        );
-    });
-
-    router.post(
-        '/:setEntityId/version/:setVersionId/duplicate',
+    adminRouter.post(
+        '/:collectionEntityId/change-visibility',
         async (req, res) => {
-            const { setVersionId } = req.params;
-            if (!isCollectionVersionId(setVersionId)) {
+            const { collectionEntityId } = req.params;
+
+            if (!isCollectionEntityId(collectionEntityId)) {
+                throw new Error('Invalid exercise element set entity id');
+            }
+
+            const data =
+                await collectionService.makeCollectionPublic(
+                    collectionEntityId
+                );
+
+            res.send(
+                Marketplace.Set.ChangeVisibility.responseSchema.encode({
+                    status: 'success',
+                })
+            );
+        }
+    );
+
+    viewerRouter.post(
+        '/:collectionEntityId/version/:collectionVersionId/duplicate',
+        async (req, res) => {
+            const { collectionVersionId } = req.params;
+            if (!isCollectionVersionId(collectionVersionId)) {
                 throw new Error('Invalid exercise element set version id');
             }
 
             const createdSet =
                 await collectionService.duplicateCollectionVersion(
-                    setVersionId,
+                    collectionVersionId,
                     req.session!.user.id
                 );
 
@@ -326,41 +467,46 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    router.get('/:setEntityId/version/:setVersionId', async (req, res) => {
-        const { setEntityId, setVersionId } = req.params;
-        if (!isCollectionEntityId(setEntityId)) {
-            throw new Error('Invalid exercise element set entity id');
-        }
-        if (!isCollectionVersionId(setVersionId)) {
-            throw new Error('Invalid exercise element set version id');
-        }
-
-        const collection =
-            await collectionService.getCollectionVersionById(setVersionId);
-        if (!collection) {
-            throw new NotFoundError();
-        }
-
-        res.send(
-            Marketplace.Set.GetCollectionVersion.responseSchema.encode({
-                result: collection,
-            })
-        );
-    });
-
-    router.get(
-        '/:setEntityId/version/:setVersionId/elements',
+    viewerRouter.get(
+        '/:collectionEntityId/version/:collectionVersionId',
         async (req, res) => {
-            const { setEntityId, setVersionId } = req.params;
-            if (!isCollectionEntityId(setEntityId)) {
+            const { collectionEntityId, collectionVersionId } = req.params;
+            if (!isCollectionEntityId(collectionEntityId)) {
                 throw new Error('Invalid exercise element set entity id');
             }
-            if (!isCollectionVersionId(setVersionId)) {
+            if (!isCollectionVersionId(collectionVersionId)) {
+                throw new Error('Invalid exercise element set version id');
+            }
+
+            const collection =
+                await collectionService.getCollectionVersionById(
+                    collectionVersionId
+                );
+            if (!collection) {
+                throw new NotFoundError();
+            }
+
+            res.send(
+                Marketplace.Set.GetCollectionVersion.responseSchema.encode({
+                    result: collection,
+                })
+            );
+        }
+    );
+
+    viewerRouter.get(
+        '/:collectionEntityId/version/:collectionVersionId/elements',
+        async (req, res) => {
+            const { collectionEntityId, collectionVersionId } = req.params;
+            if (!isCollectionEntityId(collectionEntityId)) {
+                throw new Error('Invalid exercise element set entity id');
+            }
+            if (!isCollectionVersionId(collectionVersionId)) {
                 throw new Error('Invalid exercise element set version id');
             }
 
             const data = await collectionService.getElementsOfCollectionVersion(
-                setVersionId,
+                collectionVersionId,
                 { includeDependencies: true, allowDraftState: false }
             );
             if (!data) {
@@ -378,44 +524,47 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    router.delete('/:setEntityId/entity', async (req, res) => {
-        const setEntityId = req.params.setEntityId;
-        if (!isCollectionEntityId(setEntityId)) {
+    adminRouter.delete('/:collectionEntityId/entity', async (req, res) => {
+        const collectionEntityId = req.params.collectionEntityId;
+        if (!isCollectionEntityId(collectionEntityId)) {
             throw new Error('Invalid exercise element set version id');
         }
-        await collectionService.deleteCollection(setEntityId);
+        await collectionService.deleteCollection(collectionEntityId);
         res.sendStatus(204);
     });
 
-    router.put('/:setEntityId/element/:elementEntityId', async (req, res) => {
-        const { elementEntityId } = req.params;
-        if (!isElementEntityId(elementEntityId)) {
-            throw new Error('Invalid exercise element object entity id');
+    editorRouter.put(
+        '/:collectionEntityId/element/:elementEntityId',
+        async (req, res) => {
+            const { elementEntityId } = req.params;
+            if (!isElementEntityId(elementEntityId)) {
+                throw new Error('Invalid exercise element object entity id');
+            }
+
+            const parsedBody = Marketplace.Element.Edit.requestSchema.parse(
+                req.body
+            );
+
+            const data = await collectionService.updateElement(
+                elementEntityId,
+                parsedBody.data,
+                parsedBody.conflictResolution
+            );
+
+            if (!data) {
+                throw new Error('Failed to update exercise element object');
+            }
+
+            res.send(
+                Marketplace.Element.Edit.responseSchema.encode({
+                    newSetVersionId: data.newSetVersionId,
+                    result: data.newElement,
+                })
+            );
         }
+    );
 
-        const parsedBody = Marketplace.Element.Edit.requestSchema.parse(
-            req.body
-        );
-
-        const data = await collectionService.updateElement(
-            elementEntityId,
-            parsedBody.data,
-            parsedBody.conflictResolution
-        );
-
-        if (!data) {
-            throw new Error('Failed to update exercise element object');
-        }
-
-        res.send(
-            Marketplace.Element.Edit.responseSchema.encode({
-                newSetVersionId: data.newSetVersionId,
-                result: data.newElement,
-            })
-        );
-    });
-
-    router.post(
+    editorRouter.post(
         '/:collectionEntityId/element/:elementEntityId/version/:elementVersionId/duplicate',
         async (req, res) => {
             const { elementVersionId, collectionEntityId } = req.params;
@@ -444,7 +593,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    router.get(
+    viewerRouter.get(
         '/:collectionEntityId/version/:collectionVersionId/element/:elementEntityId/version/:elementVersionId/internaldependencies',
         async (req, res) => {
             const { elementVersionId, elementEntityId, collectionVersionId } =
@@ -481,14 +630,14 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    router.delete(
-        '/:setEntityId/element/:elementEntityId',
+    editorRouter.delete(
+        '/:collectionEntityId/element/:elementEntityId',
         async (req, res) => {
-            const { setEntityId, elementEntityId } = req.params;
+            const { collectionEntityId, elementEntityId } = req.params;
             if (!isElementEntityId(elementEntityId)) {
                 throw new Error('Invalid exercise element object entity id');
             }
-            if (!isCollectionEntityId(setEntityId)) {
+            if (!isCollectionEntityId(collectionEntityId)) {
                 throw new Error('Invalid exercise element set entity id');
             }
 
@@ -505,7 +654,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    router.get(
+    viewerRouter.get(
         '/:collectionEntityId/element/:elementEntityId/versions',
         async (req, res) => {
             const { collectionEntityId, elementEntityId } = req.params;
@@ -517,10 +666,6 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             if (!isElementEntityId(elementEntityId)) {
                 throw new Error('Invalid element entity id');
             }
-
-            console.log(
-                `Getting versions for element ${elementEntityId} in collection ${collectionEntityId}`
-            );
 
             const data =
                 await collectionService.getExerciseElementObjectVersions(
@@ -534,6 +679,10 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             );
         }
     );
+
+    router.use(viewerRouter);
+    router.use(editorRouter);
+    router.use(adminRouter);
 
     return router;
 }

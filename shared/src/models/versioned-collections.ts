@@ -1,7 +1,8 @@
 import z from 'zod';
 import { stateVersionedEntitySchema } from './state-versioned-entity.js';
 
-export const collectionVisibilitySchema = z.enum(['private', 'public']);
+// This is typed separately in case we ever want to have a more complex visibility type
+export const collectionVisibilitySchema = z.string();
 
 export type CollectionVisibility = z.infer<typeof collectionVisibilitySchema>;
 
@@ -32,11 +33,64 @@ export const collectionDtoSchema = z.object({
     title: z.string(),
     description: z.string(),
     visibility: collectionVisibilitySchema,
-    owner: z.string(),
     draftState: z.boolean(),
 });
 
 export type CollectionDto = z.infer<typeof collectionDtoSchema>;
+
+// This is sorted by permission level, so the order matters
+export const collectionRelationshipTypeAllowedValues = [
+    'viewer',
+    'editor',
+    'admin',
+] as const;
+export const collectionRelationshipTypeSchema = z.enum(
+    collectionRelationshipTypeAllowedValues
+);
+export type CollectionRelationshipType = z.infer<
+    typeof collectionRelationshipTypeSchema
+>;
+
+export const collectionRelationshipTypesDisplayNames: Record<
+    CollectionRelationshipType,
+    string
+> = {
+    admin: 'Admin',
+    editor: 'Bearbeiter',
+    viewer: 'Betrachter',
+};
+
+export function checkCollectionRole(currentRole: CollectionRelationshipType) {
+    const roleCompare = (desiredRole: CollectionRelationshipType): number => {
+        const desiredRoleIndex =
+            collectionRelationshipTypeAllowedValues.indexOf(desiredRole);
+        const currentRoleIndex =
+            collectionRelationshipTypeAllowedValues.indexOf(currentRole);
+        return currentRoleIndex - desiredRoleIndex;
+    };
+
+    return {
+        isStrictly: (desiredRole: CollectionRelationshipType) => {
+            return roleCompare(desiredRole) === 0;
+        },
+        isAtLeast: (desiredRole: CollectionRelationshipType) => {
+            return roleCompare(desiredRole) >= 0;
+        },
+        indexOf: () => {
+            return collectionRelationshipTypeAllowedValues.indexOf(currentRole);
+        },
+    };
+}
+
+export const collectionRelationshipDtoSchema = z.strictObject({
+    id: z.string(),
+    collection: collectionEntityIdSchema,
+    userId: z.string(),
+    role: collectionRelationshipTypeSchema,
+});
+export type CollectionRelationshipDto = z.infer<
+    typeof collectionRelationshipDtoSchema
+>;
 
 export const versionedCollectionPartialSchema = z.strictObject({
     entityId: collectionEntityIdSchema,

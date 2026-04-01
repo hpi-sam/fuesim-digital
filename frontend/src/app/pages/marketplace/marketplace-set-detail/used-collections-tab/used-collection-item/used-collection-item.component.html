@@ -11,24 +11,26 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     }
-<div class="d-flex flex-row gap-2 align-items-center">
+    <div class="d-flex flex-row gap-2 align-items-center">
         <button
             class="btn btn-outline-danger btn-sm"
-            (click)="removeCollectionDependency(dependency().collection.versionId)"
+            (click)="
+                removeCollectionDependency(dependency().collection.versionId)
+            "
         >
             <i class="bi bi-x-square"></i>
         </button>
-    @if (
-        newerVersionAvailable.hasValue() &&
-        newerVersionAvailable.value().newerVersionAvailable
-    ) {
-        <button
-            class="btn btn-outline-primary btn-sm"
-            (click)="upgradeVersion()"
-        >
-            Version aktualisieren
-        </button>
-    }
+        @if (
+            newerVersionAvailable.hasValue() &&
+            newerVersionAvailable.value().newerVersionAvailable
+        ) {
+            <button
+                class="btn btn-outline-primary btn-sm"
+                (click)="upgradeVersion()"
+            >
+                Version aktualisieren
+            </button>
+        }
     </div>
 </div>
 <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-2">

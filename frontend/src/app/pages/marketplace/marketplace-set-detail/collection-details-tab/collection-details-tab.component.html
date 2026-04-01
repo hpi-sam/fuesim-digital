@@ -19,6 +19,75 @@
     </button>
 </div>
 
+<h4 class="h4 mt-4">
+    Mitglieder
+    @if (inviteCode.isLoading() || members.isLoading()) {
+        <div
+            class="spinner-border spinner-border-sm text-primary"
+            role="status"
+        >
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+</h4>
+<hr class="my-2" />
+<button
+    class="btn btn-outline-primary w-"
+    type="button"
+    (click)="createInviteCode()"
+>
+    Einladungslink erstellen
+</button>
+@if (inviteCode.hasValue()) {
+    <div class="d-flex flex-row align-items-center gap-2 mt-2">
+        <div
+            class="bg-light p-2 border rounded w-100 font-monospace user-select-all"
+        >
+            {{ inviteJoinLink() }}
+        </div>
+        <app-copy-button [value]="inviteJoinLink()" />
+    </div>
+}
+
+@if (members.hasValue()) {
+    <ul class="list-group mt-3">
+        @for (member of members.value(); track member.id) {
+            <li
+                class="list-group-item d-flex flex-row align-items-center gap-3"
+            >
+                <select
+                    [disabled]="member.id === ownUserId()"
+                    (change)="updateCollectionMemberRole(member.id, $event)"
+                    class="form-select form-select-sm w-auto"
+                >
+                    @for (role of allowedRoleValues; track role) {
+                        <option
+                            [selected]="role === member.role"
+                            [value]="role"
+                        >
+                            {{ role | collectionRelationshipType }}
+                        </option>
+                    }
+                </select>
+                <span>
+                    {{ member.displayName }}
+                    @if (member.id === ownUserId()) {
+                        <span class="badge text-bg-secondary ms-1">Sie</span>
+                    }
+                </span>
+                @if (member.id !== ownUserId()) {
+                    <button
+                        class="btn btn-outline-danger btn-sm ms-auto"
+                        (click)="removeCollectionMember(member.id)"
+                    >
+                        <i class="bi bi-x-square"></i>
+                    </button>
+                }
+            </li>
+        }
+    </ul>
+}
+
 <h4 class="h4 mt-5">Gefahrenzone</h4>
 <hr class="my-2" />
 <ul class="list-group">

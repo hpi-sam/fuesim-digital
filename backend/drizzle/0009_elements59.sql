@@ -1,0 +1,1 @@
+ALTER TABLE "exercise_element_sets" DROP COLUMN "owner";

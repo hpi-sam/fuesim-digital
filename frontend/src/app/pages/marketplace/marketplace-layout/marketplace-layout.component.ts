@@ -22,5 +22,4 @@ import { NgbNav } from '@ng-bootstrap/ng-bootstrap';
     templateUrl: './marketplace-layout.component.html',
     styleUrl: './marketplace-layout.component.scss',
 })
-export class MarketplaceLayoutComponent {
-}
+export class MarketplaceLayoutComponent {}

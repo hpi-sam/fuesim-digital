@@ -6,6 +6,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import {
     AlarmGroup,
+    checkCollectionRole,
     CollectionEntityId,
     CollectionVersionId,
     isCollectionEntityId,
@@ -69,6 +70,8 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
         ];
     });
 
+    public readonly checkRole = checkCollectionRole.bind(this);
+
     // This array defined the order in which the element types are displayed in the UI.
     // Types not included in this array will NOT be displayed in the UI
     public visibleElementTypesOrder: VersionedElementContent['type'][] = [
@@ -79,7 +82,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
     private subscription: (() => void) | null = null;
 
     constructor() {
-        console.log("FUCUCUCU")
         this.activatedRoute.paramMap
             .pipe(takeUntil(this.destroy$))
             .subscribe((params) => {
@@ -97,11 +99,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
                     this.collectionService.subscribeToCollection(
                         setEntityId,
                         (data) => {
-                            console.log(
-                                'Received data for set',
-                                setEntityId,
-                                data
-                            );
                             this.selectedSetData.set(data);
                         }
                     );
@@ -124,7 +121,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
             type: 'alarmGroup',
             isEditMode: false,
             onSubmit: async (data: any) => {
-                console.log('Creating new alarm group with data', data);
                 await this.collectionService.createElement(
                     this._setEntityId,
                     data
@@ -151,10 +147,6 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
             type: 'vehicleTemplate',
             isEditMode: false,
             onSubmit: async (vehicleTemplate) => {
-                console.log(
-                    'Creating new vehicle template with data',
-                    vehicleTemplate
-                );
                 this.collectionService.createElement(
                     this._setEntityId,
                     vehicleTemplateSchema.parse(vehicleTemplate)
@@ -168,14 +160,12 @@ export class MarketplaceSetDetailComponent implements OnDestroy {
     public async duplicateSet() {
         const selectedVersion = this.selectedSetData()?.collection.versionId;
         if (!selectedVersion) return;
-        console.log('duplicateSet', this._setEntityId);
 
         await this.collectionService.duplicateCollection(
             this._setEntityId,
             selectedVersion
         );
     }
-
 
     public async saveDraftState() {
         await this.collectionService.saveDraftState(this._setEntityId);

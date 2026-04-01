@@ -137,6 +137,9 @@ export const createSelectScoutable =
     createSelectElementFromMapFactory(selectScoutables);
 export const createSelectUserGeneratedContent =
     createSelectElementFromMapFactory(selectUserGeneratedContent);
+export const createSelectMeasureTemplate = createSelectElementFromMapFactory(
+    selectMeasureTemplates
+);
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,

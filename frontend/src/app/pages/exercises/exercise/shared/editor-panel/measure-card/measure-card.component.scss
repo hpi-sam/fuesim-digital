@@ -1,0 +1,18 @@
+.card-body-wrapper {
+    // Match the height of map-editor-card (70px image + ~30px title)
+    height: 105px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-text {
+    display: -webkit-box;
+    line-clamp: 4;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    font-weight: 500;
+}

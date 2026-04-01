@@ -451,6 +451,62 @@
                         </div>
                     </div>
                 </div>
+                <div ngbAccordionItem="measures">
+                    <h5 ngbAccordionHeader>
+                        <button
+                            ngbAccordionButton
+                            data-cy="measuresAccordionButton"
+                        >
+                            Maßnahmen
+                        </button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="mb-2">
+                                    <button
+                                        class="btn btn-sm btn-outline-primary"
+                                        (click)="addMeasureTemplate()"
+                                    >
+                                        <i class="bi bi-plus"></i>
+                                        Hinzufügen
+                                    </button>
+                                </div>
+                                <div class="cards measure-cards">
+                                    @for (
+                                        measureTemplate of measureTemplates()
+                                            | values;
+                                        track measureTemplate.id
+                                    ) {
+                                        <app-measure-card
+                                            [name]="
+                                                measureTemplate.name
+                                            "
+                                            [enableEditButton]="false"
+                                            [enableDeleteButton]="true"
+                                            (elementDelete)="
+                                                deleteMeasureTemplate(
+                                                    measureTemplate.id
+                                                )
+                                            "
+
+                                            dataCy="measureTemplateCard"
+                                        >
+                                        </app-measure-card>
+                                    }
+                                </div>
+                                @if (
+                                    (measureTemplates() | keyvalue)?.length ===
+                                    0
+                                ) {
+                                    <span class="text-muted">
+                                        Keine Maßnahmen vorhanden
+                                    </span>
+                                }
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

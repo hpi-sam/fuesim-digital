@@ -40,15 +40,21 @@ import {
     selectVehicleTemplates,
     selectMapImagesTemplates,
     selectExerciseState,
+    selectMeasureTemplates,
+    createSelectVehicleTemplate,
+    createSelectMeasureTemplate,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { FileInputDirective } from '../../../../../shared/directives/file-input.directive';
 import { MapEditorCardComponent } from '../editor-panel/map-editor-card/map-editor-card.component';
+import { MeasureCardComponent } from '../editor-panel/measure-card/measure-card.component';
 import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
+import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
+import { openCreateMeasureTemplateModal } from '../editor-panel/create-measure-template-modal/open-create-measure-template-modal';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -76,6 +82,7 @@ type FilterCategory =
         NgbAccordionCollapse,
         NgbAccordionBody,
         MapEditorCardComponent,
+        MeasureCardComponent,
         FormsModule,
         PatientStatusBadgeComponent,
         NgbTooltip,
@@ -96,6 +103,9 @@ export class TrainerMapEditorComponent implements OnInit {
     private readonly ngbModalService = inject(NgbModal);
     private readonly messageService = inject(MessageService);
     private readonly exerciseService = inject(ExerciseService);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
 
     public selectedCategories$: BehaviorSubject<{
         [key in FilterCategory]: boolean;
@@ -121,6 +131,10 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public readonly mapImageTemplates$ = this.store.select(
         selectMapImagesTemplates
+    );
+
+    public readonly measureTemplates = this.store.selectSignal(
+        selectMeasureTemplates
     );
 
     public patientCategories$?: Observable<{
@@ -176,12 +190,34 @@ export class TrainerMapEditorComponent implements OnInit {
         openCreateVehicleTemplateModal(this.ngbModalService);
     }
 
+    public addMeasureTemplate() {
+        openCreateMeasureTemplateModal(this.ngbModalService);
+    }
+
     public editMapImageTemplate(mapImageTemplateId: UUID) {
         openEditImageTemplateModal(this.ngbModalService, mapImageTemplateId);
     }
 
     public editVehicleTemplate(mapImageTemplateId: UUID) {
         openEditVehicleTemplateModal(this.ngbModalService, mapImageTemplateId);
+    }
+
+    public async deleteMeasureTemplate(measureTemplateId: UUID): Promise<void> {
+        const measure = selectStateSnapshot(
+            createSelectMeasureTemplate(measureTemplateId),
+            this.store
+        );
+        const confirmDelete = await this.confirmationModalService.confirm({
+            title: 'Maßnahme löschen',
+            description: `Möchten Sie die Maßnahme "${measure.name}" wirklich löschen?`,
+        });
+        if (!confirmDelete) {
+            return;
+        }
+        this.exerciseService.proposeAction({
+            type: '[MeasureTemplate] Delete measureTemplate',
+            id: measureTemplateId,
+        });
     }
 
     public setCurrentCategory(

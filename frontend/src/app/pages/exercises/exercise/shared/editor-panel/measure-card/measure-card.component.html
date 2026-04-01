@@ -1,0 +1,34 @@
+<div
+    class="card text-center me-1 mb-1"
+    [attr.data-cy]="dataCy()"
+>
+    <div class="card-body-wrapper">
+        <div class="card-body px-1 py-1">
+            <span
+                class="card-text"
+                [ngbTooltip]="name()"
+                placement="bottom"
+            >
+                {{ name() }}
+            </span>
+        </div>
+    </div>
+    <div style="top: 0; right: 0" class="position-absolute">
+        @if (enableEditButton()) {
+            <button
+                (mousedown)="elementEdit.emit(); $event.stopPropagation()"
+                class="btn btn-outline-warning btn-sm"
+            >
+                <i class="bi bi-pencil-fill"></i>
+            </button>
+        }
+        @if (enableDeleteButton()) {
+            <button
+                (mousedown)="elementDelete.emit(); $event.stopPropagation()"
+                class="btn btn-outline-danger btn-sm"
+            >
+                <i class="bi bi-trash"></i>
+            </button>
+        }
+    </div>
+</div>

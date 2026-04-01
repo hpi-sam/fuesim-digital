@@ -1,0 +1,58 @@
+<div class="modal-header">
+    <h4 class="modal-title">Nachalarmierung</h4>
+    <button type="button" class="btn-close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+    <div class="p-3">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Alarmgruppe</label>
+            @if (alarmGroupNames.length === 1) {
+                <div class="form-control-plaintext">
+                    {{ alarmGroupNames[0]!.name }}
+                </div>
+            } @else {
+                <select
+                    class="form-select"
+                    [ngModel]="selectedAlarmGroupId()"
+                    (ngModelChange)="selectedAlarmGroupId.set($event)"
+                    name="alarmGroup"
+                >
+                    <option [ngValue]="null" disabled>
+                        Alarmgruppe auswählen
+                    </option>
+                    @for (ag of alarmGroupNames; track ag.id) {
+                        <option [ngValue]="ag.id">{{ ag.name }}</option>
+                    }
+                </select>
+            }
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Ziel</label>
+            @if (transferPointNames.length === 1) {
+                <div class="form-control-plaintext">
+                    {{ transferPointNames[0]!.name }}
+                </div>
+            } @else {
+                <select
+                    class="form-select"
+                    [ngModel]="selectedTargetTransferPointId()"
+                    (ngModelChange)="selectedTargetTransferPointId.set($event)"
+                    name="targetTransferPoint"
+                >
+                    <option [ngValue]="null" disabled>Ziel auswählen</option>
+                    @for (tp of transferPointNames; track tp.id) {
+                        <option [ngValue]="tp.id">{{ tp.name }}</option>
+                    }
+                </select>
+            }
+        </div>
+        <button
+            type="button"
+            class="btn btn-primary w-100"
+            [disabled]="!canSubmit"
+            (click)="confirm()"
+        >
+            Nachalarmierung bestätigen
+        </button>
+    </div>
+</div>

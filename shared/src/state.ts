@@ -10,7 +10,10 @@ import {
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
 import { IsZodSchema } from './utils/validators/is-zod-object.js';
 import { Vehicle, vehicleSchema } from './models/vehicle.js';
-import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
+import {
+    defaultAlarmGroupsById,
+    defaultVehicleTemplatesById,
+} from './data/default-state/vehicle-templates.js';
 import {
     RestrictedZone,
     restrictedZoneSchema,
@@ -90,7 +93,7 @@ import {
     measureSchema,
     MeasureTemplate,
     measureTemplateSchema,
-} from './models/measure/index.js';
+} from './models/measure/measures.js';
 import { defaultMeasureTemplatesById } from './data/default-state/measure-templates.js';
 
 export class ExerciseState {
@@ -166,7 +169,8 @@ export class ExerciseState {
     } = {};
 
     @IsZodSchema(z.record(uuidSchema, alarmGroupSchema))
-    public readonly alarmGroups: { readonly [key: UUID]: AlarmGroup } = {};
+    public readonly alarmGroups: { readonly [key: UUID]: AlarmGroup } =
+        defaultAlarmGroupsById;
 
     @IsZodSchema(z.record(uuidSchema, clientSchema))
     public readonly clients: { readonly [key: UUID]: Client } = {};

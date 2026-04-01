@@ -1,5 +1,6 @@
 import type { VehicleTemplate } from '../../models/vehicle-template.js';
 import type { ImageProperties } from '../../models/utils/image-properties.js';
+import type { AlarmGroup } from '../../models/alarm-group.js';
 import { defaultMaterialTemplates } from './material-templates.js';
 import { defaultPersonnelTemplates } from './personnel-templates.js';
 
@@ -180,4 +181,149 @@ export const defaultVehicleTemplatesById = Object.fromEntries(
         template.id,
         template,
     ])
+);
+
+// ==================================================
+
+const rtwAlarmGroup: AlarmGroup = {
+    id: 'd3e7fff2-dd7c-40a5-803f-214469a1d752',
+    type: 'alarmGroup',
+    name: 'RTW ???',
+    alarmGroupVehicles: {
+        '07515357-3bf1-4b63-a46b-299c97dadf20': {
+            id: '07515357-3bf1-4b63-a46b-299c97dadf20',
+            name: 'RTW ???',
+            vehicleTemplateId: rtwVehicleTemplate.id,
+            time: 300000,
+        },
+    },
+    triggerCount: 0,
+    triggerLimit: null,
+};
+
+const nawAlarmGroup: AlarmGroup = {
+    id: 'a313ebfd-f28b-4185-831a-59ebb924c43d',
+    type: 'alarmGroup',
+    name: 'NAW ???',
+    alarmGroupVehicles: {
+        'b253221c-a3ed-4770-8653-d96c84662132': {
+            id: 'b253221c-a3ed-4770-8653-d96c84662132',
+            name: 'NAW ???',
+            vehicleTemplateId: nawVehicleTemplate.id,
+            time: 300000,
+        },
+    },
+    triggerCount: 0,
+    triggerLimit: null,
+};
+
+const ktwAlarmGroup: AlarmGroup = {
+    id: '6ddbb14e-c135-4204-9223-224e6bc3bb0c',
+    type: 'alarmGroup',
+    name: 'KTW ???',
+    alarmGroupVehicles: {
+        'd957a886-403c-4036-9867-439ea2424646': {
+            id: 'd957a886-403c-4036-9867-439ea2424646',
+            name: 'KTW ???',
+            vehicleTemplateId: ktwVehicleTemplate.id,
+            time: 300000,
+        },
+    },
+    triggerCount: 0,
+    triggerLimit: null,
+};
+
+const carryingUnitAlarmGroup: AlarmGroup = {
+    id: '785c0104-c35e-4f77-a86e-acba2f6f973d',
+    type: 'alarmGroup',
+    name: 'Tragetrupp ???',
+    alarmGroupVehicles: {
+        '189101a0-017a-465e-8038-20883ed09a4c': {
+            id: '189101a0-017a-465e-8038-20883ed09a4c',
+            name: 'Tragetrupp ???',
+            vehicleTemplateId: carryingUnitVehicleTemplate.id,
+            time: 300000,
+        },
+    },
+    triggerCount: 0,
+    triggerLimit: null,
+};
+
+const ktwKatSchutzAlarmGroup: AlarmGroup = {
+    id: '5e4e1cb9-b101-488e-8bd6-88d82127beda',
+    type: 'alarmGroup',
+    name: 'KTW (KatSchutz) ???',
+    alarmGroupVehicles: {
+        '096fc948-f629-4f27-828d-62f6f06f184f': {
+            id: '096fc948-f629-4f27-828d-62f6f06f184f',
+            name: 'KTW (KatSchutz) ???',
+            vehicleTemplateId: ktwKatSchutzVehicleTemplate.id,
+            time: 300000,
+        },
+    },
+    triggerCount: 0,
+    triggerLimit: null,
+};
+
+const gwSanAlarmGroup: AlarmGroup = {
+    id: '91c1180e-3060-4793-adb2-d200d1c1f879',
+    type: 'alarmGroup',
+    name: 'GW-San ???',
+    alarmGroupVehicles: {
+        'ebb43402-85e5-42b9-ba1f-e331fca7ab58': {
+            id: 'ebb43402-85e5-42b9-ba1f-e331fca7ab58',
+            name: 'GW-San ???',
+            vehicleTemplateId: gwSanVehicleTemplate.id,
+            time: 300000,
+        },
+    },
+    triggerCount: 0,
+    triggerLimit: null,
+};
+
+const nefAlarmGroup: AlarmGroup = {
+    id: 'c44dbf7b-6d61-4ab6-9b9a-704a9265544a',
+    type: 'alarmGroup',
+    name: 'NEF ???',
+    alarmGroupVehicles: {
+        'c64b89f5-ea24-4b98-9033-db259b8590d4': {
+            id: 'c64b89f5-ea24-4b98-9033-db259b8590d4',
+            name: 'NEF ???',
+            vehicleTemplateId: nefVehicleTemplate.id,
+            time: 300000,
+        },
+    },
+    triggerCount: 0,
+    triggerLimit: null,
+};
+
+const rthAlarmGroup: AlarmGroup = {
+    id: 'd7342c44-7c5e-4dcd-909c-75afff9dd557',
+    type: 'alarmGroup',
+    name: 'RTH ???',
+    alarmGroupVehicles: {
+        '4b2330f8-51e1-4d13-9325-60ac746facab': {
+            id: '4b2330f8-51e1-4d13-9325-60ac746facab',
+            name: 'RTH ???',
+            vehicleTemplateId: rthVehicleTemplate.id,
+            time: 300000,
+        },
+    },
+    triggerCount: 0,
+    triggerLimit: null,
+};
+
+export const defaultAlarmGroups = {
+    rtw: rtwAlarmGroup,
+    naw: nawAlarmGroup,
+    ktw: ktwAlarmGroup,
+    carryingUnit: carryingUnitAlarmGroup,
+    ktwKatSchutz: ktwKatSchutzAlarmGroup,
+    gwSan: gwSanAlarmGroup,
+    nef: nefAlarmGroup,
+    rth: rthAlarmGroup,
+};
+
+export const defaultAlarmGroupsById = Object.fromEntries(
+    Object.values(defaultAlarmGroups).map((group) => [group.id, group])
 );

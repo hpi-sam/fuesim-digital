@@ -1,31 +1,31 @@
-import type { Immutable } from 'immer';
 import { z } from 'zod';
+import { uuidSchema } from '../../utils/uuid.js';
 
-// ========== General ==========
 export const measurePropertyTypeSchema = z.literal([
     'manualConfirm',
     'response',
     'delay',
+    'alarm',
+    'eocLog',
 ]);
 
-export type MeasurePropertyType = Immutable<
-    z.infer<typeof measurePropertyTypeSchema>
->;
+export type MeasurePropertyType = z.infer<typeof measurePropertyTypeSchema>;
 
-// ========== Dependencies ==========
+// ==================================================
+
 export const requiresAnyOfSchema = z.strictObject({
     anyOf: z.array(measurePropertyTypeSchema),
 });
 
-export type RequiresAnyOf = Immutable<z.infer<typeof requiresAnyOfSchema>>;
+export type RequiresAnyOf = z.infer<typeof requiresAnyOfSchema>;
 
 export const measurePropertyDefinitionSchema = z.strictObject({
     blockedBy: z.array(measurePropertyTypeSchema),
     requires: z.array(requiresAnyOfSchema),
 });
 
-export type MeasurePropertyDefinition = Immutable<
-    z.infer<typeof measurePropertyDefinitionSchema>
+export type MeasurePropertyDefinition = z.infer<
+    typeof measurePropertyDefinitionSchema
 >;
 
 export const measurePropertyDefinitions: {
@@ -33,41 +33,61 @@ export const measurePropertyDefinitions: {
 } = {
     manualConfirm: { blockedBy: [], requires: [] },
     response: { blockedBy: [], requires: [] },
-    delay: { blockedBy: [], requires: [] },
+    delay: {
+        blockedBy: [],
+        requires: [{ anyOf: [...measurePropertyTypeSchema.values] }],
+    },
+    alarm: { blockedBy: [], requires: [{ anyOf: ['manualConfirm'] }] },
+    eocLog: { blockedBy: [], requires: [] },
 };
 
-// ========== Properties ==========
+// ==================================================
+
 export const manualConfirmPropertySchema = z.strictObject({
     type: z.literal('manualConfirm'),
     prompt: z.string(),
     confirmationString: z.string().optional(),
 });
 
-export type ManualConfirmProperty = Immutable<
-    z.infer<typeof manualConfirmPropertySchema>
->;
+export type ManualConfirmProperty = z.infer<typeof manualConfirmPropertySchema>;
 
 export const responsePropertySchema = z.strictObject({
     type: z.literal('response'),
     response: z.string(),
 });
 
-export type ResponseProperty = Immutable<
-    z.infer<typeof responsePropertySchema>
->;
+export type ResponseProperty = z.infer<typeof responsePropertySchema>;
 
 export const delayPropertySchema = z.strictObject({
     type: z.literal('delay'),
     delay: z.number().positive(),
 });
 
-export type DelayProperty = Immutable<z.infer<typeof delayPropertySchema>>;
+export type DelayProperty = z.infer<typeof delayPropertySchema>;
 
-// ========== Final ==========
+export const alarmPropertySchema = z.strictObject({
+    type: z.literal('alarm'),
+    alarmGroups: z.array(uuidSchema),
+    targetTransferPointIds: z.array(uuidSchema),
+});
+
+export type AlarmProperty = z.infer<typeof alarmPropertySchema>;
+
+export const eocLogPropertySchema = z.strictObject({
+    type: z.literal('eocLog'),
+    message: z.string().optional(),
+});
+
+export type EocLogProperty = z.infer<typeof eocLogPropertySchema>;
+
+// ==================================================
+
 export const measurePropertySchema = z.union([
     manualConfirmPropertySchema,
     responsePropertySchema,
     delayPropertySchema,
+    alarmPropertySchema,
+    eocLogPropertySchema,
 ]);
 
-export type MeasureProperty = Immutable<z.infer<typeof measurePropertySchema>>;
+export type MeasureProperty = z.infer<typeof measurePropertySchema>;

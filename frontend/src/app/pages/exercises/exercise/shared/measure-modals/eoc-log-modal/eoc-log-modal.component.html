@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h4 class="modal-title">Einsatztagebucheintrag erstellen</h4>
+    <button type="button" class="btn-close" (click)="cancel()"></button>
+</div>
+<div class="modal-body">
+    <div class="p-3">
+        <textarea
+            [(ngModel)]="message"
+            [appAutofocus]="true"
+            maxlength="65535"
+            placeholder="Schreiben Sie den neuen Eintrag in dieses Feld..."
+            class="form-control no-validation mb-3"
+        ></textarea>
+        <button
+            type="button"
+            class="btn btn-primary w-100"
+            [disabled]="message() === ''"
+            (click)="confirm()"
+        >
+            Eintrag speichern
+        </button>
+    </div>
+</div>

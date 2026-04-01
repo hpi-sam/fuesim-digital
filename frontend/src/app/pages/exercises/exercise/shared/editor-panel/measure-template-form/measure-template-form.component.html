@@ -1,0 +1,65 @@
+@if (values) {
+    <div class="form-group mb-3">
+        <label class="form-label">Name</label>
+        <input
+            #nameInput="ngModel"
+            [(ngModel)]="values.name"
+            required
+            type="text"
+            class="form-control"
+            placeholder="Maßnahmenname"
+        />
+        <app-display-validation
+            [ngModelInput]="nameInput"
+        ></app-display-validation>
+    </div>
+    <div class="form-group mb-3">
+        <label class="form-label"
+            >Eigenschaften
+            <div ngbDropdown autoClose="outside" class="d-inline-block">
+                <button
+                    ngbDropdownToggle
+                    type="button"
+                    class="btn btn-outline-primary ms-3"
+                >
+                    Eigenschaft hinzufügen
+                </button>
+                <div ngbDropdownMenu>
+                    <button
+                        ngbDropdownItem
+                        (click)="(null)"
+                        type="button"
+                        class="btn"
+                    >
+                        <i class="bi bi-plus"></i>
+                        Test
+                    </button>
+                </div>
+            </div></label
+        >
+        @if (values.properties.length > 0) {
+            <div class="d-flex flex-wrap">
+                @for (
+                    property of values.properties;
+                    track property;
+                    let index = $index
+                ) {
+                    property.name
+                }
+            </div>
+        } @else {
+            <div class="text-muted mt-3 mb-3">
+                Keine Maßnahmeneigenschaften zugewiesen
+            </div>
+        }
+    </div>
+
+    <!-- If the button is not disabled the measureTemplate is correct -->
+    <button
+        (click)="submit()"
+        [disabled]="nameInput.invalid"
+        class="btn btn-primary"
+    >
+        {{ btnText() }}
+    </button>
+}

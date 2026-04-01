@@ -12,7 +12,7 @@ import { Store } from '@ngrx/store';
 import maplibregl from 'maplibre-gl';
 // eslint-disable-next-line no-restricted-imports
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { upperLeftCornerOf, lowerRightCornerOf } from 'fuesim-digital-shared';
+import { getBoundingBox } from 'fuesim-digital-shared';
 import { startingPosition } from '../../../starting-position';
 import { AppState } from '../../../../../../../state/app.state';
 import {
@@ -88,23 +88,13 @@ export class OperationsMapComponent implements OnDestroy {
             });
             return;
         }
-        const minX = Math.min(
-            ...elements.map((element) => upperLeftCornerOf(element).x)
-        );
-        const minY = Math.min(
-            ...elements.map((element) => lowerRightCornerOf(element).y)
-        );
-        const maxX = Math.max(
-            ...elements.map((element) => lowerRightCornerOf(element).x)
-        );
-        const maxY = Math.max(
-            ...elements.map((element) => upperLeftCornerOf(element).y)
-        );
+
+        const boundingBox = getBoundingBox(elements);
 
         this.map.fitBounds(
             [
-                this.metersToLngLat([minX, minY]),
-                this.metersToLngLat([maxX, maxY]),
+                this.metersToLngLat([boundingBox.minX, boundingBox.minY]),
+                this.metersToLngLat([boundingBox.maxX, boundingBox.maxY]),
             ],
             { padding: 25, animate }
         );

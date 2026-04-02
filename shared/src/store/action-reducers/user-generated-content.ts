@@ -24,7 +24,6 @@ export namespace UserGeneratedContentActionReducers {
                 contentId
             );
             element.content = newContentString;
-            console.log('updated contemt: ' + element.content);
             return draftState;
         },
         rights: 'trainer',

@@ -47,6 +47,7 @@ import { limitedAlarmgroups46 } from './46-limited-alarm-groups.js';
 import { participantIdToKey47 } from './47-participant-id-to-key.js';
 import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
+import { addScoutables50 } from './50-add-scoutables.js';
 
 /**
  * Migrate a single action
@@ -122,4 +123,5 @@ export const migrations: {
     47: participantIdToKey47,
     48: addAutojoinViewport48,
     49: addOperationsTabletView49,
+    50: addScoutables50,
 };

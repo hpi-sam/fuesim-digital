@@ -95,12 +95,12 @@ export class PatientsDetailsComponent implements OnChanges {
         );
     readonly isScoutableTabVisible = computed(() => {
         const patient = this.patient();
-        if (!patient.scoutableId) return false;
         return (
             this.currentRole() === 'trainer' ||
-            this.store.selectSignal(
-                createSelectScoutable(patient.scoutableId)
-            )().isVisibleForParticipants
+            (patient.scoutableId &&
+                this.store.selectSignal(
+                    createSelectScoutable(patient.scoutableId)
+                )().isVisibleForParticipants)
         );
     });
 

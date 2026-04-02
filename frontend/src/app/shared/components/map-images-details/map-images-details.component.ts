@@ -4,12 +4,19 @@ import {
     inject,
     input,
     OnInit,
-    Signal,
     signal,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { ChangeZIndexMapImageAction, UUID } from 'fuesim-digital-shared';
-import { MapImage, Scoutable } from 'fuesim-digital-shared';
+import { FormsModule } from '@angular/forms';
+import {
+    NgbNav,
+    NgbNavContent,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
 import { AppState } from '../../../state/app.state';
 import { ExerciseService } from '../../../core/exercise.service';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
@@ -19,18 +26,9 @@ import {
 } from '../../../state/application/selectors/exercise.selectors';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
 import { ScoutableElementNavItemComponent } from '../scoutable-element-nav-item/scoutable-element-nav-item.component';
-import { FormsModule } from '@angular/forms';
 import { ImageExistsValidatorDirective } from '../../validation/image-exists-validator.directive';
 import { IntegerValidatorDirective } from '../../validation/integer-validator.directive';
 import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.directive';
-import {
-    NgbNav,
-    NgbNavContent,
-    NgbNavItem,
-    NgbNavLink,
-    NgbNavLinkBase,
-    NgbNavOutlet,
-} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'app-map-images-details',
@@ -57,17 +55,27 @@ export class MapImagesDetailsComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
 
     readonly mapImageId = input.required<UUID>();
-    public readonly mapImage = computed(() => {
-        return this.store.selectSignal(
+    public readonly mapImage = computed(() => this.store.selectSignal(
             createSelectMapImage(this.mapImageId())
-        )();
-    });
+        )());
     public readonly openScoutInfo = input<boolean>(false);
-    activeId = signal<string>('properties');
+    readonly activeId = signal<string>('properties');
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
     public url?: string;
+
+    readonly isScoutableTabVisible = computed(() => {
+        const mapImage = this.mapImage();
+        if (!mapImage.scoutableId) return false;
+        return (
+            this.currentRole() === 'trainer' ||
+            this.store.selectSignal(
+                createSelectScoutable(mapImage.scoutableId)
+            )().isVisibleForParticipants
+        );
+    });
+
     ngOnInit(): void {
-        this.url = this.mapImage()!.image.url;
+        this.url = this.mapImage().image.url;
         if (this.openScoutInfo()) {
             this.activeId.set('scoutInfo');
         }

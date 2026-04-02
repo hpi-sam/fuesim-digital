@@ -1,9 +1,11 @@
 import { Component, inject } from '@angular/core';
+import { UUID } from 'fuesim-digital-shared';
+import { Store } from '@ngrx/store';
 import { PopupService } from '../../utility/popup.service';
 import { MapImagesDetailsComponent } from '../../../../../../../shared/components/map-images-details/map-images-details.component';
-import { UUID } from 'fuesim-digital-shared';
+import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
+import { AppState } from '../../../../../../../state/app.state';
 
-/* TODO @JohannesPotzi : correct imports. */
 @Component({
     selector: 'app-map-image-popup',
     templateUrl: './map-image-popup.component.html',
@@ -12,10 +14,13 @@ import { UUID } from 'fuesim-digital-shared';
 })
 export class MapImagePopupComponent {
     private readonly popupService = inject(PopupService);
+    private readonly store = inject<Store<AppState>>(Store);
 
     public mapImageId!: UUID;
 
     public openScoutInfo!: boolean;
+
+    readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
     public closePopup() {
         this.popupService.closePopup();

@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import { uuid, uuidSchema } from '../utils/uuid.js';
-import { scoutableSchema, type Scoutable } from './index.js';
+import { scoutableSchema } from './index.js';
 
 export const userGeneratedContentSchema = z.strictObject({
     id: uuidSchema,
@@ -10,11 +10,11 @@ export const userGeneratedContentSchema = z.strictObject({
 
 export type UserGeneratedContent = z.infer<typeof userGeneratedContentSchema>;
 
-export const UserGeneratedContentAssignableElementSchema = z.union([
+export const userGeneratedContentAssignableElementSchema = z.union([
     scoutableSchema,
 ]);
 export type UserGeneratedContentAssignableElement = z.infer<
-    typeof UserGeneratedContentAssignableElementSchema
+    typeof userGeneratedContentAssignableElementSchema
 >;
 
 export type UserGeneratedContentAssignableElementType =

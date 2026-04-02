@@ -1,5 +1,5 @@
 import { createSelector } from '@ngrx/store';
-import {
+import type {
     MapImage,
     Material,
     Patient,
@@ -10,7 +10,8 @@ import {
     Vehicle,
     WithPosition,
     RestrictedZone,
-    Viewport,
+    Viewport} from 'fuesim-digital-shared';
+import {
     newMapCoordinatesAt,
     StrictObject,
     currentCoordinatesOf,

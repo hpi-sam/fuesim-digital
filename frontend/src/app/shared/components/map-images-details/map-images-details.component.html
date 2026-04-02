@@ -1,9 +1,9 @@
-<nav #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="1">
-    @if (this.mapImage(); as mapImage) {
-        <ng-container ngbNavItem [ngbNavItem]="'properties'">
+@if (this.currentRole() === 'trainer') {
+    <nav #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="activeId()">
+        <ng-container ngbNavItem ngbNavItem="properties">
             <a ngbNavLink data-cy="mapImagePopUpPropertiesNav">Eigenschaften</a>
             <ng-template ngbNavContent>
-                @if (this.currentRole() === 'trainer') {
+                <div class="m-2">
                     <!-- TODO: This is a workaround to make it possible to add images. In the future these things should not be done via the popup. -->
                     <label class="form-label">URL</label>
                     <div class="input-group mb-3">
@@ -32,7 +32,7 @@
                         <label class="form-label">Höhe</label>
                         <input
                             #heightInput="ngModel"
-                            [ngModel]="mapImage.image.height"
+                            [ngModel]="mapImage().image.height"
                             (appSaveOnTyping)="resizeImage($event)"
                             required
                             min="1"
@@ -49,7 +49,7 @@
                         <input
                             type="checkbox"
                             class="form-check-input"
-                            [ngModel]="mapImage.isLocked"
+                            [ngModel]="mapImage().isLocked"
                             (ngModelChange)="setLocked($event)"
                         />
                         <label class="form-check-label">Position sperren</label>
@@ -60,7 +60,7 @@
                             <span
                                 class="text-muted"
                                 title="Die aktuelle Position des Bildes in der Reihenfolge"
-                                >({{ mapImage.zIndex }})</span
+                                >({{ mapImage().zIndex }})</span
                             >
                         </h6>
                         <div class="btn-group btn-group-sm">
@@ -94,15 +94,17 @@
                             </button>
                         </div>
                     </div>
-                }
+                </div>
             </ng-template>
         </ng-container>
-        <ng-container ngbNavItem [ngbNavItem]="'scoutInfo'">
+        <ng-container ngbNavItem ngbNavItem="scoutable">
             <a ngbNavLink data-cy="mapImagePopUpScoutNav">Erkundung</a>
             <ng-template ngbNavContent>
-                <app-scoutable-element-nav-item [element]="mapImage" />
+                <app-scoutable-element-nav-item [element]="mapImage()" />
             </ng-template>
         </ng-container>
-    }
-</nav>
-<div [ngbNavOutlet]="nav" class="mt-2"></div>
+    </nav>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+} @else {
+    <app-scoutable-element-nav-item [element]="mapImage()" />
+}

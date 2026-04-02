@@ -1,6 +1,10 @@
 @if (mapImageId) {
     <h5 class="popover-header">
-        Bildinformationen
+        @if (currentRole() === 'trainer') {
+            Bildinformationen
+        } @else {
+            Erkundung
+        }
         <button
             (click)="closePopup()"
             type="button"

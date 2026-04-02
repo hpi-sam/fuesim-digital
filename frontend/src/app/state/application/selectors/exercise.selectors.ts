@@ -11,7 +11,6 @@ import type {
     UUID,
     Vehicle,
     WithPosition,
-    Element,
 } from 'fuesim-digital-shared';
 import {
     scoutableElementKeys,
@@ -143,13 +142,13 @@ export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     );
 }
 
-export const scoutableElementTypeSelectorMap = {
-    patient: createSelectPatient,
-    mapImage: createSelectMapImage,
-} as {
+export const scoutableElementTypeSelectorMap: {
     [key in ScoutableElementType]: (
         id: string
     ) => MemoizedSelector<AppState, any, any>;
+} = {
+    patient: createSelectPatient,
+    mapImage: createSelectMapImage,
 };
 
 // Misc selectors

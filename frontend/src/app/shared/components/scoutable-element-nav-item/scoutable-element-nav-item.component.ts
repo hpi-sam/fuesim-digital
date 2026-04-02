@@ -1,16 +1,14 @@
 import {
     Component,
-    effect,
+    computed,
     inject,
     input,
     OnInit,
-    signal,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     newScoutable,
     newUserGeneratedContent,
-    Scoutable,
     ScoutableElement,
 } from 'fuesim-digital-shared';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
@@ -29,37 +27,26 @@ export class ScoutableElementNavItemComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     readonly element = input.required<ScoutableElement>();
-    readonly scoutable = signal<Scoutable | null>(null);
-
+    readonly scoutable = computed(() => {
+        const element = this.element();
+        if (!element.scoutableId) return null;
+        return this.store.selectSignal(
+            createSelectScoutable(element.scoutableId)
+        )();
+    });
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
-    constructor() {
-        effect(() => {
-            if (this.element().scoutableId) {
-                this.scoutable.set(
-                    this.store.selectSignal(
-                        createSelectScoutable(this.element().scoutableId!)
-                    )()
-                );
-            }
-        });
-    }
-    async ngOnInit(): Promise<void> {
+    ngOnInit() {
         if (this.element().scoutableId === null) {
-            await this.makeScoutable(this.element());
+            this.makeScoutable(this.element());
         }
-        this.scoutable.set(
-            this.store.selectSignal(
-                createSelectScoutable(this.element().scoutableId!)
-            )()
-        );
     }
 
-    async makeScoutable(element: ScoutableElement) {
-        await this.exerciseService.proposeAction(
+    makeScoutable(element: ScoutableElement) {
+        this.exerciseService.proposeAction(
             {
                 type: '[Scoutable] Make scoutable',
-                element: element,
+                element,
                 scoutable: newScoutable(),
                 content: newUserGeneratedContent(),
             },

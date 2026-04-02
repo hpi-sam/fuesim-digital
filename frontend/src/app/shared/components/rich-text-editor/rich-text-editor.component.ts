@@ -10,8 +10,8 @@ import {
 import { form, FormField } from '@angular/forms/signals';
 import { Store } from '@ngrx/store';
 import {
-    newUserGeneratedContent,
-    UserGeneratedContent,
+    
+    
     UUID,
 } from 'fuesim-digital-shared';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
@@ -29,11 +29,9 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     readonly userGeneratedContentId = input.required<UUID>();
-    readonly userGeneratedContentElement = computed(() => {
-        return this.store.selectSignal(
+    readonly userGeneratedContentElement = computed(() => this.store.selectSignal(
             createSelectUserGeneratedContent(this.userGeneratedContentId())
-        )();
-    });
+        )());
 
     public readonly currentRole = this.store.selectSignal(
         selectCurrentMainRole
@@ -57,7 +55,7 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
         this.editor = new Editor();
         this.editorForm
             .editorContent()
-            .value.set(this.userGeneratedContentElement()!.content);
+            .value.set(this.userGeneratedContentElement().content);
     }
     onSubmit() {
         this.exerciseService.proposeAction({

@@ -1,10 +1,9 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import {
     getPatientVisibleStatus,
-    Patient,
     isPretriageStatusLocked,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -75,13 +74,13 @@ export class PatientsDetailsComponent implements OnChanges {
 
     readonly patientId = input.required<UUID>();
     readonly openScoutInfo = input<boolean>(false);
-    activeId = signal<string>('general');
+    readonly activeId = signal<string>('general');
 
-    readonly currentRole$ = this.store.select(selectCurrentMainRole);
+    readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
     configuration$ = this.store.select(selectConfiguration);
-    patient$!: Observable<Patient>;
+    readonly patient = computed(() => this.store.selectSignal(createSelectPatient(this.patientId()))());
     visibleStatus$!: Observable<PatientStatus>;
-    pretriageStatusIsLocked$?: Observable<boolean>;
+    readonly pretriageStatusIsLocked = computed(() => isPretriageStatusLocked(this.patient()));
     readonly pretriageOptions$: Observable<PatientStatus[]> =
         this.configuration$.pipe(
             map((configuration) =>
@@ -90,23 +89,18 @@ export class PatientsDetailsComponent implements OnChanges {
                     : ['white', 'black', 'red', 'yellow', 'green']
             )
         );
-    IsScoutableInfoParticipantVisible$?: Observable<boolean>;
+    readonly isScoutableTabVisible = computed(() => {
+        const patient = this.patient();
+        if (!patient.scoutableId) return false;
+        return (
+            this.currentRole() === 'trainer' ||
+            this.store.selectSignal(
+                createSelectScoutable(patient.scoutableId)
+            )().isVisibleForParticipants
+        );
+    });
 
     ngOnChanges(): void {
-        this.patient$ = this.store.select(
-            createSelectPatient(this.patientId())
-        );
-        this.IsScoutableInfoParticipantVisible$ = this.patient$.pipe(
-            map((patient) => {
-                if (patient.scoutableId) {
-                    const scoutable = this.store.selectSignal(
-                        createSelectScoutable(patient.scoutableId)
-                    );
-                    return scoutable().isVisibleForParticipants;
-                }
-                return false;
-            })
-        );
         if (this.openScoutInfo()) {
             this.activeId.set('scout-Info');
         }
@@ -121,9 +115,6 @@ export class PatientsDetailsComponent implements OnChanges {
                         configuration.bluePatientsEnabled
                     )
             )
-        );
-        this.pretriageStatusIsLocked$ = this.patient$.pipe(
-            map(isPretriageStatusLocked)
         );
     }
 

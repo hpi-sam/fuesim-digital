@@ -11,14 +11,12 @@ import {
 import {
     cloneDeepMutable,
     getElement,
-    ReducerError,
     type UserGeneratedContent,
     userGeneratedContentSchema,
     type UUID,
     uuidValidationOptions,
 } from '../../index.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
 
 export class MakeElementScoutableAction implements Action {
     @IsValue('[Scoutable] Make scoutable' as const)

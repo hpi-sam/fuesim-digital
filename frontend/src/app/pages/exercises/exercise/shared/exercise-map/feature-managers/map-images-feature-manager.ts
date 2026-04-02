@@ -17,6 +17,7 @@ import {
     selectCurrentMainRole,
 } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { createSelectScoutable } from '../../../../../../state/application/selectors/exercise.selectors';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
@@ -74,8 +75,17 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
         openScoutInfo?: boolean
     ): void {
         super.onFeatureClicked(event, feature);
+        const element = this.getElementFromFeature(feature) as MapImage;
+        const scoutableVisible =
+            element.scoutableId &&
+            selectStateSnapshot(
+                createSelectScoutable(element.scoutableId),
+                this.store
+            ).isVisibleForParticipants;
         if (
-            selectStateSnapshot(selectCurrentMainRole, this.store) !== 'trainer'
+            selectStateSnapshot(selectCurrentMainRole, this.store) !==
+                'trainer' &&
+            !scoutableVisible
         ) {
             return;
         }

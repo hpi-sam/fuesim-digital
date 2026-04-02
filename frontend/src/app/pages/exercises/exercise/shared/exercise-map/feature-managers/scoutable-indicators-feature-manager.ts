@@ -1,12 +1,13 @@
 import type { Subject } from 'rxjs';
 import type OlMap from 'ol/Map';
-import type { MemoizedSelector, Store } from '@ngrx/store';
+import type { Store } from '@ngrx/store';
 import type { MapBrowserEvent } from 'ol';
 import { Feature } from 'ol';
 import { Point } from 'ol/geom';
 import type VectorLayer from 'ol/layer/Vector';
-// eslint-disable-next-line @typescript-eslint/no-shadow
+
 import type {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     Element,
     ScoutableElement,
     ScoutableElementType,
@@ -143,7 +144,7 @@ export class ScoutableIndicatorsFeatureManager
     onFeatureDrop(
         droppedElement: Element,
         droppedOnFeature: Feature<Point>,
-        dropEvent?: TranslateEvent | MouseEvent
+        dropEvent?: MouseEvent | TranslateEvent
     ) {
         return false;
     }

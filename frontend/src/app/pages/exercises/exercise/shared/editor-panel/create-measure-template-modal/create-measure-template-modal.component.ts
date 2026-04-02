@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { uuid } from 'fuesim-digital-shared';
-import {
-    ChangedMeasureTemplateValues,
-    EditableMeasureTemplateValues,
-    MeasureTemplateFormComponent,
-} from '../measure-template-form/measure-template-form.component';
+import { MeasureTemplateFormComponent } from '../measure-template-form/measure-template-form.component';
 import { ExerciseService } from '../../../../../../core/exercise.service';
+import {
+    EditableMeasureTemplateValues,
+    MeasureTemplateValues,
+} from '../measure-template-form/measure-template-form-utils';
 
 @Component({
     selector: 'app-create-measure-template-modal',
@@ -20,14 +20,11 @@ export class CreateMeasureTemplateModalComponent {
 
     public readonly editableMeasureTemplateValues: EditableMeasureTemplateValues =
         {
-            name: null,
+            name: '',
             properties: [],
         };
 
-    public createMeasureTemplate({
-        name,
-        properties,
-    }: ChangedMeasureTemplateValues) {
+    public createMeasureTemplate({ name, properties }: MeasureTemplateValues) {
         this.exerciseService
             .proposeAction({
                 type: '[MeasureTemplate] Add measureTemplate',

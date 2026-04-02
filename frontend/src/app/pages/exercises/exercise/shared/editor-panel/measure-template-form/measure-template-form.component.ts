@@ -1,8 +1,11 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input, output } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Component, inject, input, output, signal } from '@angular/core';
 import {
+    measurePropertyDefinitions,
+    measurePropertySchema,
     measurePropertyTypeSchema,
+    measurePropertyTypeToGermanNameDictionary,
+    measureTemplateSchema,
     type MeasureProperty,
     type MeasurePropertyType,
 } from 'fuesim-digital-shared';
@@ -12,41 +15,49 @@ import {
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    NgbDropdownButtonItem,
     NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
-import { AsyncPipe } from '@angular/common';
+import { ZodError } from 'zod';
+import {
+    form,
+    validate,
+    FormField,
+    applyEach,
+    FieldTree,
+    validateStandardSchema,
+} from '@angular/forms/signals';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
-import type { AppState } from '../../../../../../state/app.state';
+import { DisplayModelValidationComponent } from '../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 import {
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
-} from '../../../../../../state/application/selectors/exercise.selectors';
-import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
-import { ImageExistsValidatorDirective } from '../../../../../../shared/validation/image-exists-validator.directive';
-import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
-import { IntegerValidatorDirective } from '../../../../../../shared/validation/integer-validator.directive';
-import { MapEditorCardComponent } from '../map-editor-card/map-editor-card.component';
-import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
+    EditableAlarmProperty,
+    EditableDelayProperty,
+    EditableEocLogProperty,
+    EditableManualConfirmProperty,
+    EditableMeasureProperty,
+    EditableMeasureTemplateValues,
+    EditableResponseProperty,
+    emptyPropertyDefaults,
+    MeasureTemplateValues,
+    preprocessProperty,
+} from './measure-template-form-utils';
 
 @Component({
     selector: 'app-measure-template-form',
     templateUrl: './measure-template-form.component.html',
     styleUrl: './measure-template-form.component.scss',
     imports: [
-    FormsModule,
-    DisplayValidationComponent,
-    NgbDropdown,
-    NgbDropdownToggle,
-    NgbDropdownMenu,
-    NgbDropdownButtonItem,
-    NgbDropdownItem
-],
+        FormsModule,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownItem,
+        DisplayModelValidationComponent,
+        FormField,
+    ],
 })
 export class MeasureTemplateFormComponent implements OnChanges {
     private readonly messageService = inject(MessageService);
-    private readonly store = inject<Store<AppState>>(Store);
 
     readonly initialValues = input.required<EditableMeasureTemplateValues>();
     readonly btnText = input.required<string>();
@@ -54,20 +65,29 @@ export class MeasureTemplateFormComponent implements OnChanges {
     /**
      * Emits the changed values
      */
-    readonly submitMeasureTemplate = output<ChangedMeasureTemplateValues>();
+    readonly submitMeasureTemplate = output<MeasureTemplateValues>();
 
-    public values?: EditableMeasureTemplateValues;
+    public readonly values = signal<EditableMeasureTemplateValues>({
+        name: '',
+        properties: [],
+    });
+    public readonly measureTemplateForm = form(this.values, (schemaPath) =>
+        validateStandardSchema(schemaPath, () =>
+            measureTemplateSchema.omit({ id: true })
+        )
+    );
 
-    public materialTemplates$ = this.store.select(selectMaterialTemplates);
-    public personnelTemplates$ = this.store.select(selectPersonnelTemplates);
+    public readonly measurePropertyTypes = measurePropertyTypeSchema.values;
 
-    public readonly measureProperties = measurePropertyTypeSchema;
+    public humanReadablePropertyName(property: MeasurePropertyType) {
+        return measurePropertyTypeToGermanNameDictionary[property];
+    }
 
     ngOnChanges(_changes: SimpleChangesGeneric<this>): void {
-        this.values = {
+        this.values.set({
             ...this.initialValues(),
-            ...this.values,
-        };
+            ...this.values(),
+        });
     }
 
     /**
@@ -75,38 +95,62 @@ export class MeasureTemplateFormComponent implements OnChanges {
      * This method must only be called if all values are valid
      */
     public async submit() {
-        if (!this.values) {
-            return;
+        const valuesOnSubmit = cloneDeep(this.values());
+        try {
+            this.submitMeasureTemplate.emit({
+                name: valuesOnSubmit.name,
+                properties: valuesOnSubmit.properties.map((p) =>
+                    this.parseProperty(p)
+                ),
+            });
+        } catch (e: unknown) {
+            if (!(e instanceof ZodError)) throw e;
+            this.messageService.postError({
+                title: 'Ungültige Maßnahmeneigenschaften',
+                body: e.message,
+            });
         }
-        const valuesOnSubmit = cloneDeep(this.values);
-        this.submitMeasureTemplate.emit({
-            name: valuesOnSubmit.name!,
-            properties: valuesOnSubmit.properties,
-        });
     }
 
     public addProperty(propertyType: MeasurePropertyType) {
-        if (!this.values) {
-            return;
-        }
-        console.log('Adding property ', propertyType);
-        // this.values.properties.push({type: propertyType, });
+        this.values.update((v) => ({
+            ...v,
+            properties: [
+                ...v.properties,
+                cloneDeep(emptyPropertyDefaults[propertyType]),
+            ],
+        }));
     }
 
     public removeProperty(index: number) {
-        if (!this.values) {
-            return;
-        }
-        this.values.properties.splice(index, 1);
+        this.values.update((v) => ({
+            ...v,
+            properties: v.properties.filter((_, i) => i !== index),
+        }));
     }
-}
 
-export interface EditableMeasureTemplateValues {
-    name: string | null;
-    properties: MeasureProperty[];
-}
+    private parseProperty(property: EditableMeasureProperty): MeasureProperty {
+        return measurePropertySchema.parse(preprocessProperty(property));
+    }
 
-export interface ChangedMeasureTemplateValues {
-    name: string;
-    properties: MeasureProperty[];
+    // Type helpers
+    private createPropertyCastFunction<T extends EditableMeasureProperty>() {
+        return (property: FieldTree<EditableMeasureProperty>): FieldTree<T> =>
+            property as FieldTree<T>;
+    }
+
+    public asManualConfirmProperty =
+        this.createPropertyCastFunction<EditableManualConfirmProperty>();
+
+    public asResponseProperty =
+        this.createPropertyCastFunction<EditableResponseProperty>();
+
+    public asDelayProperty =
+        this.createPropertyCastFunction<EditableDelayProperty>();
+
+    public asAlarmProperty =
+        this.createPropertyCastFunction<EditableAlarmProperty>();
+
+    public asEocLogProperty =
+        this.createPropertyCastFunction<EditableEocLogProperty>();
 }

@@ -1,65 +1,211 @@
-@if (values) {
-    <div class="form-group mb-3">
-        <label class="form-label">Name</label>
-        <input
-            #nameInput="ngModel"
-            [(ngModel)]="values.name"
-            required
-            type="text"
-            class="form-control"
-            placeholder="Maßnahmenname"
-        />
-        <app-display-validation
-            [ngModelInput]="nameInput"
-        ></app-display-validation>
-    </div>
-    <div class="form-group mb-3">
-        <label class="form-label"
-            >Eigenschaften
-            <div ngbDropdown autoClose="outside" class="d-inline-block">
-                <button
-                    ngbDropdownToggle
-                    type="button"
-                    class="btn btn-outline-primary ms-3"
-                >
-                    Eigenschaft hinzufügen
-                </button>
-                <div ngbDropdownMenu>
+<div class="form-group mb-3">
+    <label class="form-label">Name</label>
+    <input
+        [formField]="measureTemplateForm.name"
+        type="text"
+        class="form-control"
+        placeholder="Maßnahmenname"
+    />
+    <app-display-model-validation
+        [field]="measureTemplateForm.name()"
+        [hide]="true"
+    />
+</div>
+<div class="form-group mb-3">
+    <label class="form-label"
+        >Eigenschaften
+        <div ngbDropdown autoClose="outside" class="d-inline-block">
+            <button
+                ngbDropdownToggle
+                type="button"
+                class="btn btn-outline-primary ms-3"
+            >
+                Eigenschaft hinzufügen
+            </button>
+            <div ngbDropdownMenu>
+                @for (property of measurePropertyTypes; track property) {
                     <button
                         ngbDropdownItem
-                        (click)="(null)"
+                        (click)="addProperty(property)"
                         type="button"
                         class="btn"
                     >
                         <i class="bi bi-plus"></i>
-                        Test
+                        {{ humanReadablePropertyName(property) }}
                     </button>
-                </div>
-            </div></label
-        >
-        @if (values.properties.length > 0) {
-            <div class="d-flex flex-wrap">
-                @for (
-                    property of values.properties;
-                    track property;
-                    let index = $index
-                ) {
-                    property.name
                 }
             </div>
-        } @else {
-            <div class="text-muted mt-3 mb-3">
-                Keine Maßnahmeneigenschaften zugewiesen
-            </div>
-        }
-    </div>
-
-    <!-- If the button is not disabled the measureTemplate is correct -->
-    <button
-        (click)="submit()"
-        [disabled]="nameInput.invalid"
-        class="btn btn-primary"
+        </div></label
     >
-        {{ btnText() }}
-    </button>
-}
+    @if (values().properties.length > 0) {
+        <div class="d-flex flex-column gap-3 mt-3">
+            @for (
+                formProperty of measureTemplateForm.properties;
+                let index = $index;
+                track index
+            ) {
+                @let property = values().properties[index]!;
+                <div class="card">
+                    <div class="card-body">
+                        <div
+                            class="d-flex align-items-center justify-content-between mb-3"
+                        >
+                            <h6 class="mb-0">
+                                {{ humanReadablePropertyName(property.type) }}
+                            </h6>
+                            <button
+                                type="button"
+                                class="btn btn-outline-danger btn-sm"
+                                (click)="removeProperty(index)"
+                            >
+                                Entfernen
+                            </button>
+                        </div>
+                        @switch (property.type) {
+                            @case ('manualConfirm') {
+                                @let manualConfirmProperty =
+                                    asManualConfirmProperty(formProperty);
+                                <div class="mb-3">
+                                    <label class="form-label"
+                                        >Bestätigungstext</label
+                                    >
+                                    <textarea
+                                        [formField]="
+                                            manualConfirmProperty.prompt
+                                        "
+                                        class="form-control"
+                                        rows="3"
+                                    ></textarea>
+                                    <app-display-model-validation
+                                        [field]="manualConfirmProperty.prompt()"
+                                        [hide]="true"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="form-label"
+                                        >Bestätigungs-Code (optional)</label
+                                    >
+                                    <input
+                                        [formField]="
+                                            manualConfirmProperty.confirmationString
+                                        "
+                                        type="text"
+                                        class="form-control"
+                                    />
+                                    <app-display-model-validation
+                                        [field]="
+                                            manualConfirmProperty.confirmationString()
+                                        "
+                                        [hide]="true"
+                                    />
+                                </div>
+                            }
+                            @case ('response') {
+                                @let responseProperty =
+                                    asResponseProperty(formProperty);
+                                <label class="form-label">Rückmeldung</label>
+                                <textarea
+                                    [formField]="responseProperty.response"
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Text für die Rückmeldung"
+                                ></textarea>
+                                <app-display-model-validation
+                                    [field]="responseProperty.response()"
+                                    [hide]="true"
+                                />
+                            }
+                            @case ('delay') {
+                                @let delayProperty =
+                                    asDelayProperty(formProperty);
+                                <label class="form-label"
+                                    >Dauer in Sekunden</label
+                                >
+                                <input
+                                    [formField]="delayProperty.delay"
+                                    type="number"
+                                    class="form-control"
+                                    step="1"
+                                    placeholder="z. B. 30"
+                                />
+                                <app-display-model-validation
+                                    [field]="delayProperty.delay()"
+                                    [hide]="true"
+                                />
+                            }
+                            @case ('alarm') {
+                                @let alarmProperty =
+                                    asAlarmProperty(formProperty);
+                                <div class="mb-3">
+                                    <label class="form-label"
+                                        >Alarmgruppen</label
+                                    >
+                                    @for (
+                                        alarmGroup of alarmProperty.alarmGroups;
+                                        track $index
+                                    ) {
+                                        <span>{{ alarmGroup() }}</span>
+                                    }
+                                    <app-display-model-validation
+                                        [field]="alarmProperty.alarmGroups()"
+                                        [hide]="true"
+                                    />
+                                </div>
+                                <div>
+                                    <label class="form-label"
+                                        >Ziel-Transferpunkte</label
+                                    >
+                                    @for (
+                                        transferPoint of alarmProperty.targetTransferPointIds;
+                                        track $index
+                                    ) {
+                                        <span>{{ transferPoint() }}</span>
+                                    }
+
+                                    <app-display-model-validation
+                                        [field]="
+                                            alarmProperty.targetTransferPointIds()
+                                        "
+                                        [hide]="true"
+                                    />
+                                </div>
+                            }
+                            @case ('eocLog') {
+                                @let eocLogProperty =
+                                    asEocLogProperty(formProperty);
+                                <label class="form-label"
+                                    >Einsatztagebuch-Nachricht (optional)</label
+                                >
+                                <textarea
+                                    [formField]="eocLogProperty.message"
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Text für den Eintrag"
+                                ></textarea>
+                                <app-display-model-validation
+                                    [field]="eocLogProperty.message()"
+                                    [hide]="true"
+                                />
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    } @else {
+        <div class="text-muted mt-3 mb-3">
+            Keine Maßnahmeneigenschaften zugewiesen
+        </div>
+    }
+    <app-display-model-validation [field]="measureTemplateForm.properties()" />
+</div>
+
+<button
+    (click)="submit()"
+    [disabled]="measureTemplateForm().invalid()"
+    class="btn btn-primary"
+>
+    {{ btnText() }}
+</button>
+
+<app-display-model-validation [field]="measureTemplateForm()" />

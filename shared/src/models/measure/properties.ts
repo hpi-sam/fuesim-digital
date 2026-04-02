@@ -11,6 +11,16 @@ export const measurePropertyTypeSchema = z.literal([
 
 export type MeasurePropertyType = z.infer<typeof measurePropertyTypeSchema>;
 
+export const measurePropertyTypeToGermanNameDictionary: {
+    [Key in MeasurePropertyType]: string;
+} = {
+    manualConfirm: 'Manuelle Bestätigung',
+    response: 'Rückmeldung',
+    delay: 'Verzögerung',
+    alarm: 'Alarmierung',
+    eocLog: 'Einsatztagebucheintrag',
+};
+
 // ==================================================
 
 export const requiresAnyOfSchema = z.strictObject({
@@ -37,7 +47,7 @@ export const measurePropertyDefinitions: {
         blockedBy: [],
         requires: [{ anyOf: [...measurePropertyTypeSchema.values] }],
     },
-    alarm: { blockedBy: [], requires: [{ anyOf: ['manualConfirm'] }] },
+    alarm: { blockedBy: [], requires: [] },
     eocLog: { blockedBy: [], requires: [] },
 };
 
@@ -45,7 +55,11 @@ export const measurePropertyDefinitions: {
 
 export const manualConfirmPropertySchema = z.strictObject({
     type: z.literal('manualConfirm'),
-    prompt: z.string(),
+    prompt: z
+        .string()
+        .min(1, {
+            error: 'Der Bestätigungstext muss mindestens 1 Zeichen lang sein.',
+        }),
     confirmationString: z.string().optional(),
 });
 
@@ -53,14 +67,20 @@ export type ManualConfirmProperty = z.infer<typeof manualConfirmPropertySchema>;
 
 export const responsePropertySchema = z.strictObject({
     type: z.literal('response'),
-    response: z.string(),
+    response: z
+        .string()
+        .min(1, {
+            error: 'Die Rückmeldung muss mindestens 1 Zeichen lang sein',
+        }),
 });
 
 export type ResponseProperty = z.infer<typeof responsePropertySchema>;
 
 export const delayPropertySchema = z.strictObject({
     type: z.literal('delay'),
-    delay: z.number().positive(),
+    delay: z
+        .number({ error: 'Die Dauer der Verzögerung muss eine Zahl sein' })
+        .positive({ error: 'Die Dauer der Verzögerung muss positiv sein' }),
 });
 
 export type DelayProperty = z.infer<typeof delayPropertySchema>;

@@ -8,4 +8,5 @@ import { FieldState } from '@angular/forms/signals';
 })
 export class DisplayModelValidationComponent {
     readonly field = input.required<FieldState<any>>();
+    readonly hide = input<boolean>(false);
 }

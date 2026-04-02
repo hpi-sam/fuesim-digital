@@ -78,9 +78,13 @@ export class PatientsDetailsComponent implements OnChanges {
 
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
     configuration$ = this.store.select(selectConfiguration);
-    readonly patient = computed(() => this.store.selectSignal(createSelectPatient(this.patientId()))());
+    readonly patient = computed(() =>
+        this.store.selectSignal(createSelectPatient(this.patientId()))()
+    );
     visibleStatus$!: Observable<PatientStatus>;
-    readonly pretriageStatusIsLocked = computed(() => isPretriageStatusLocked(this.patient()));
+    readonly pretriageStatusIsLocked = computed(() =>
+        isPretriageStatusLocked(this.patient())
+    );
     readonly pretriageOptions$: Observable<PatientStatus[]> =
         this.configuration$.pipe(
             map((configuration) =>

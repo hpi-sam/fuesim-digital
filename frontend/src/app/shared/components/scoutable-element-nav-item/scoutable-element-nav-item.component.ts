@@ -1,10 +1,4 @@
-import {
-    Component,
-    computed,
-    inject,
-    input,
-    OnInit,
-} from '@angular/core';
+import { Component, computed, inject, input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     newScoutable,

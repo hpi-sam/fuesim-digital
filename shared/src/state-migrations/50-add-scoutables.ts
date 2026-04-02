@@ -1,5 +1,5 @@
-import { MapImage } from '../models/map-image.js';
-import { Patient } from '../models/patient.js';
+import type { MapImage } from '../models/map-image.js';
+import type { Patient } from '../models/patient.js';
 import type { UUID } from '../utils/index.js';
 import type { Migration } from './migration-functions.js';
 

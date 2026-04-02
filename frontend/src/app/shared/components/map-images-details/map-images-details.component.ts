@@ -55,9 +55,9 @@ export class MapImagesDetailsComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
 
     readonly mapImageId = input.required<UUID>();
-    public readonly mapImage = computed(() => this.store.selectSignal(
-            createSelectMapImage(this.mapImageId())
-        )());
+    public readonly mapImage = computed(() =>
+        this.store.selectSignal(createSelectMapImage(this.mapImageId()))()
+    );
     public readonly openScoutInfo = input<boolean>(false);
     readonly activeId = signal<string>('properties');
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);

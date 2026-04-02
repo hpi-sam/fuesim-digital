@@ -10,7 +10,8 @@ import type {
     Vehicle,
     WithPosition,
     RestrictedZone,
-    Viewport} from 'fuesim-digital-shared';
+    Viewport,
+} from 'fuesim-digital-shared';
 import {
     newMapCoordinatesAt,
     StrictObject,

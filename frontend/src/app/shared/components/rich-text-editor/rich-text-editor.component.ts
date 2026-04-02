@@ -9,11 +9,7 @@ import {
 } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { Store } from '@ngrx/store';
-import {
-    
-    
-    UUID,
-} from 'fuesim-digital-shared';
+import { UUID } from 'fuesim-digital-shared';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 import { ExerciseService } from '../../../core/exercise.service';
 import { AppState } from '../../../state/app.state';
@@ -29,9 +25,11 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     readonly userGeneratedContentId = input.required<UUID>();
-    readonly userGeneratedContentElement = computed(() => this.store.selectSignal(
+    readonly userGeneratedContentElement = computed(() =>
+        this.store.selectSignal(
             createSelectUserGeneratedContent(this.userGeneratedContentId())
-        )());
+        )()
+    );
 
     public readonly currentRole = this.store.selectSignal(
         selectCurrentMainRole

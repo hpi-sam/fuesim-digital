@@ -68,7 +68,11 @@ export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
         );
 
         const ownVehicleTemplateIds$ = behaviorState$.pipe(
-            map((behaviorState) => behaviorState.vehicleTemplatePriorities)
+            map((behaviorState) =>
+                normalizeVehicleTemplatePriorities(
+                    behaviorState.vehicleTemplatePriorities
+                )
+            )
         );
         const availableVehicleTemplates$ = this.store.select(
             selectVehicleTemplates
@@ -126,4 +130,15 @@ export class SimulatedRegionOverviewBehaviorProvidePersonnelComponent
             true
         );
     }
+}
+
+
+function normalizeVehicleTemplatePriorities(
+    vehicleTemplatePriorities: unknown
+): readonly UUID[] {
+    if (Array.isArray(vehicleTemplatePriorities)) {
+        return vehicleTemplatePriorities;
+    }
+
+    return [];
 }

@@ -7,10 +7,10 @@ import {
     OnInit,
     signal,
 } from '@angular/core';
-import { form, FormField } from '@angular/forms/signals';
 import { Store } from '@ngrx/store';
 import { UUID } from 'fuesim-digital-shared';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
+import { FormsModule } from '@angular/forms';
 import { ExerciseService } from '../../../core/exercise.service';
 import { AppState } from '../../../state/app.state';
 import { createSelectUserGeneratedContent } from '../../../state/application/selectors/exercise.selectors';
@@ -19,7 +19,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-rich-text-editor',
     templateUrl: './rich-text-editor.component.html',
     styleUrls: ['./rich-text-editor.component.scss'],
-    imports: [NgxEditorModule, FormField],
+    imports: [NgxEditorModule, FormsModule],
 })
 export class RichTextEditorComponent implements OnInit, OnDestroy {
     private readonly exerciseService = inject(ExerciseService);
@@ -44,24 +44,21 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
         ['text_color', 'background_color'],
         ['align_left', 'align_center', 'align_right', 'align_justify'],
     ];
-    readonly editorModel = signal({
-        editorContent: '',
-    });
-    editorForm = form(this.editorModel);
+    readonly editorContent = signal<string>('');
 
     ngOnInit(): void {
         this.editor = new Editor();
-        this.editorForm
-            .editorContent()
-            .value.set(this.userGeneratedContentElement().content);
+        this.editorContent.set(this.userGeneratedContentElement().content);
     }
+
     onSubmit() {
         this.exerciseService.proposeAction({
             type: '[UserGeneratedContent] Update content',
             contentId: this.userGeneratedContentId(),
-            newContentString: this.editorForm.editorContent().value(),
+            newContentString: this.editorContent(),
         });
     }
+
     ngOnDestroy(): void {
         this.editor.destroy();
     }

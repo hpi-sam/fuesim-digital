@@ -1,29 +1,26 @@
 @if (this.currentRole() === 'trainer') {
-    <form class="m-2">
+    <div class="m-2">
         <div class="NgxEditor__Wrapper mb-2">
             <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
             </ngx-editor-menu>
             <ngx-editor
                 [editor]="editor"
-                [formField]="editorForm.editorContent"
+                [(ngModel)]="editorContent"
                 [placeholder]="'Hier Erkundungsinformationen eingeben ...'"
             >
             </ngx-editor>
         </div>
-        @if (
-            editorForm.editorContent().value() ===
-            this.userGeneratedContentElement().content
-        ) {
+        @if (editorContent() === this.userGeneratedContentElement().content) {
             <button class="btn btn-outline-success" disabled>
                 Gespeichert
                 <i class="bi bi-check"></i>
             </button>
         } @else {
-            <button class="btn btn-primary" (click)="onSubmit()" type="button">
+            <button class="btn btn-primary" (click)="onSubmit()">
                 Speichern
             </button>
         }
-    </form>
+    </div>
 } @else {
-    <div class="m-2" [innerHTML]="editorForm.editorContent().value()"></div>
+    <div class="m-2" [innerHTML]="editorContent()"></div>
 }

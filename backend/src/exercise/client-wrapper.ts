@@ -11,9 +11,10 @@ import { ReducerError, newClient, newClientRole } from 'fuesim-digital-shared';
 import { filter, type Subscription } from 'rxjs';
 import cookie from 'cookie';
 import type { ExerciseSocket } from '../exercise-server.js';
+import { Config, isDevelopment } from '../config.js';
+import type { SessionInformation } from '../auth/auth-service.js';
 import type { ParallelExercise } from '../database/schema.js';
 import { PermissionDeniedError } from '../utils/http.js';
-import type { SessionInformation } from '../auth/auth-service.js';
 import type { Services } from '../database/services/index.js';
 import type { ActiveExercise } from './active-exercise.js';
 import { clientMap } from './client-map.js';
@@ -81,7 +82,9 @@ export class ExerciseClientWrapper extends ClientWrapper {
         this.relatedExerciseClient = newClient(
             clientName,
             newClientRole(role, role === 'trainer' ? 'trainer' : 'mapOperator'),
-            role !== 'trainer'
+            Config.devNoWaitingRoom && isDevelopment()
+                ? false
+                : role !== 'trainer'
         );
         this.chosenExercise.addClient(this);
         return this.relatedExerciseClient.id;

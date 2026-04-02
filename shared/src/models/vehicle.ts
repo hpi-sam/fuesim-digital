@@ -12,6 +12,7 @@ import type {
     ImageProperties,
     ExerciseOccupation,
 } from './utils/index.js';
+import { operationalAssignmentSchema } from './operational-section.js';
 
 export const vehicleSchema = z.strictObject({
     id: uuidSchema,
@@ -26,6 +27,7 @@ export const vehicleSchema = z.strictObject({
     personnelIds: uuidSetSchema,
     patientIds: uuidSetSchema,
     occupation: exerciseOccupationSchema,
+    operationalAssignment: operationalAssignmentSchema.nullable(),
 });
 
 export type Vehicle = Immutable<z.infer<typeof vehicleSchema>>;
@@ -53,5 +55,6 @@ export function newVehicle(
         personnelIds: {},
         patientIds: {},
         occupation,
+        operationalAssignment: null,
     };
 }

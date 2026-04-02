@@ -5,10 +5,7 @@ import type {
     ReservedOrUserListener,
 } from '../../../node_modules/socket.io/dist/typed-events.js';
 import type { ExerciseSocket } from '../../exercise-server.js';
-
-function isDevelopment() {
-    return process.env['NODE_ENV'] !== 'production';
-}
+import { isDevelopment } from '../../config.js';
 
 export function secureOn<
     Ev extends ReservedOrUserEventNames<

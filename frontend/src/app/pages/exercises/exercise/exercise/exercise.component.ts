@@ -43,6 +43,7 @@ import { ExerciseMapComponent } from '../shared/exercise-map/exercise-map.compon
 import { TrainerMapEditorComponent } from '../shared/trainer-map-editor/trainer-map-editor.component';
 import { EmergencyOperationsCenterFullComponent } from '../shared/emergency-operations-center/emergency-operations-center-full/emergency-operations-center-full.component';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
+import { OperationsTabletViewComponent } from '../shared/operations-tablet-view/operations-tablet-view.component';
 import { ExerciseStateBadgeComponent } from '../../../../shared/components/exercise-state-badge/exercise-state-badge.component';
 import { ParallelExerciseStatusBarComponent } from '../../../../shared/components/parallel-exercise-status-bar/parallel-exercise-status-bar.component';
 import { CopyButtonComponent } from '../../../../shared/components/copy-button/copy-button.component';
@@ -71,6 +72,7 @@ import {
         EmergencyOperationsCenterFullComponent,
         AsyncPipe,
         FormatDurationPipe,
+        OperationsTabletViewComponent,
         ParallelExerciseStatusBarComponent,
         CopyButtonComponent,
     ],

@@ -1,0 +1,15 @@
+@use './../_variables.scss' as vars;
+
+.panel-surface {
+    padding: vars.$outerBoxPadding;
+    border-radius: vars.$borderRadius;
+}
+
+.side-title {
+    margin-top: vars.$innerBoxPadding;
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: vars.$outerBoxPadding;
+    writing-mode: sideways-lr;
+    align-self: center;
+}

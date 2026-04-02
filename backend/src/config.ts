@@ -37,6 +37,8 @@ export class Config {
 
     private static _authSelfServiceUrl?: string;
 
+    private static _devNoWaitingRoom?: boolean;
+
     private static _parallelExercisesEnabled?: boolean;
 
     public static get websocketPort(): number {
@@ -124,6 +126,11 @@ export class Config {
         return this._authSelfServiceUrl!;
     }
 
+    public static get devNoWaitingRoom(): boolean {
+        this.throwIfNotInitialized();
+        return this._devNoWaitingRoom!;
+    }
+
     public static get parallelExercisesEnabled(): boolean {
         this.throwIfNotInitialized();
         return this._parallelExercisesEnabled!;
@@ -206,6 +213,7 @@ export class Config {
             }),
             DFM_AUTH_SELF_SERVICE_URL: url({ default: '' }),
             DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
+            DFM_DEV_NO_WAITING_ROOM: bool({ default: false }),
             DFM_PARALLEL_EXERCISES_ENABLED: bool({ default: true }),
         });
     }
@@ -289,9 +297,14 @@ export class Config {
             testing && env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
                 : env.DFM_AUTH_SELF_SERVICE_URL;
+        this._devNoWaitingRoom = env.DFM_DEV_NO_WAITING_ROOM;
         this._parallelExercisesEnabled = testing
             ? true
             : env.DFM_PARALLEL_EXERCISES_ENABLED;
         this.isInitialized = true;
     }
+}
+
+export function isDevelopment() {
+    return process.env['NODE_ENV'] !== 'production';
 }

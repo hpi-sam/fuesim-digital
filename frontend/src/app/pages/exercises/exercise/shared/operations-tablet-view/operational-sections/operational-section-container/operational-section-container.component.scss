@@ -1,0 +1,10 @@
+@use 'bootstrap/scss/bootstrap' as bootstrap;
+@use './../_variables.scss' as vars;
+
+.operationalSectionContainer {
+    background-color: bootstrap.$white;
+    padding: vars.$outerBoxPadding;
+    width: vars.$containerWidth;
+
+    border-radius: vars.$borderRadius;
+}

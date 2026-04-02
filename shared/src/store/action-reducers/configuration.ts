@@ -2,6 +2,8 @@ import { IsBoolean, IsString } from 'class-validator';
 import {
     type TileMapProperties,
     tileMapPropertiesSchema,
+    type OperationsMapProperties,
+    operationsMapPropertiesSchema,
 } from '../../models/index.js';
 import { cloneDeepMutable } from '../../utils/index.js';
 import { IsValue } from '../../utils/validators/index.js';
@@ -14,6 +16,14 @@ export class SetTileMapPropertiesAction implements Action {
 
     @IsZodSchema(tileMapPropertiesSchema)
     public readonly tileMapProperties!: TileMapProperties;
+}
+
+export class SetOperationsMapPropertiesAction implements Action {
+    @IsValue('[Configuration] Set operationsMapProperties' as const)
+    public readonly type = '[Configuration] Set operationsMapProperties';
+
+    @IsZodSchema(operationsMapPropertiesSchema)
+    public readonly operationsMapProperties!: OperationsMapProperties;
 }
 
 export class SetPretriageEnabledAction implements Action {
@@ -66,6 +76,17 @@ export namespace ConfigurationActionReducers {
             reducer: (draftState, { tileMapProperties }) => {
                 draftState.configuration.tileMapProperties =
                     cloneDeepMutable(tileMapProperties);
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setOperationsMapProperties: ActionReducer<SetOperationsMapPropertiesAction> =
+        {
+            action: SetOperationsMapPropertiesAction,
+            reducer: (draftState, { operationsMapProperties }) => {
+                draftState.configuration.operationsMapProperties =
+                    operationsMapProperties;
                 return draftState;
             },
             rights: 'trainer',

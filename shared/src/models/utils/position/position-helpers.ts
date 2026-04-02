@@ -183,6 +183,34 @@ export function lowerRightCornerOf(element: WithExtent): MapCoordinates {
     return corner;
 }
 
+export interface BoundingBox {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+}
+
+export function getBoundingBox(elements: WithExtent[]): BoundingBox {
+    const minX = Math.min(
+        ...elements.map((element) => upperLeftCornerOf(element).x)
+    );
+    const minY = Math.min(
+        ...elements.map((element) => lowerRightCornerOf(element).y)
+    );
+    const maxX = Math.max(
+        ...elements.map((element) => lowerRightCornerOf(element).x)
+    );
+    const maxY = Math.max(
+        ...elements.map((element) => upperLeftCornerOf(element).y)
+    );
+    return {
+        minX,
+        maxX,
+        minY,
+        maxY,
+    };
+}
+
 export function nestedCoordinatesOf(
     withPosition: WithPosition,
     state: ExerciseState

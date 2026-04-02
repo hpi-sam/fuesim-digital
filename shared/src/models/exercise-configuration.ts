@@ -1,6 +1,12 @@
 import { z } from 'zod';
-import { defaultTileMapProperties } from '../data/index.js';
-import { tileMapPropertiesSchema } from './utils/index.js';
+import {
+    defaultTileMapProperties,
+    defaultOperationsMapProperties,
+} from '../data/index.js';
+import {
+    tileMapPropertiesSchema,
+    operationsMapPropertiesSchema,
+} from './utils/index.js';
 
 export const exerciseConfigurationSchema = z.strictObject({
     type: z.literal('exerciseConfiguration'),
@@ -10,6 +16,7 @@ export const exerciseConfigurationSchema = z.strictObject({
     vehicleStatusHighlight: z.boolean(),
     vehicleStatusInPatientStatusColor: z.boolean(),
     tileMapProperties: tileMapPropertiesSchema,
+    operationsMapProperties: operationsMapPropertiesSchema,
 });
 export type ExerciseConfiguration = z.infer<typeof exerciseConfigurationSchema>;
 export function newExerciseConfiguration(): ExerciseConfiguration {
@@ -21,5 +28,6 @@ export function newExerciseConfiguration(): ExerciseConfiguration {
         vehicleStatusHighlight: false,
         vehicleStatusInPatientStatusColor: false,
         tileMapProperties: defaultTileMapProperties,
+        operationsMapProperties: defaultOperationsMapProperties,
     };
 }

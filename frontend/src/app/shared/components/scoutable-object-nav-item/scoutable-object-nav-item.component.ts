@@ -17,12 +17,13 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
 import { AppState } from '../../../state/app.state';
 import { ExerciseService } from '../../../core/exercise.service';
 import { createSelectScoutable } from '../../../state/application/selectors/exercise.selectors';
+import { RichTextEditorComponent } from '../rich-text-editor/rich-text-editor.component';
 
 @Component({
     selector: 'app-scoutable-object-nav-item',
     templateUrl: './scoutable-object-nav-item.component.html',
     styleUrls: ['./scoutable-object-nav-item.component.scss'],
-    standalone: false,
+    imports: [RichTextEditorComponent],
 })
 export class ScoutableObjectNavItemComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
@@ -52,24 +53,14 @@ export class ScoutableObjectNavItemComponent implements OnInit {
                 createSelectScoutable(this.element().scoutableId!)
             )()
         );
-        if (!this.scoutable()?.userGeneratedContentId) {
-            await this.assignContent();
-        }
     }
-    public async assignContent() {
-        const content = newUserGeneratedContent();
-        this.exerciseService.proposeAction({
-            type: '[UserGeneratedContent] Assign new content to element',
-            elementId: this.scoutable()!.id,
-            content,
-        });
-    }
+
     async makeScoutable(element: ScoutableElement) {
         await this.exerciseService.proposeAction(
             {
                 type: '[Scoutable] Make scoutable',
-                element,
-                scoutable: newScoutable(),
+                element_input: element,
+                scoutable_input: newScoutable(),
                 content: newUserGeneratedContent(),
             },
             true

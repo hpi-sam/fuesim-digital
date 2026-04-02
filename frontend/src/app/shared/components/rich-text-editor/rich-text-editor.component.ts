@@ -1,12 +1,13 @@
 import {
     Component,
+    computed,
     inject,
     input,
     OnDestroy,
     OnInit,
     signal,
 } from '@angular/core';
-import { form } from '@angular/forms/signals';
+import { form, FormField } from '@angular/forms/signals';
 import { Store } from '@ngrx/store';
 import {
     ContentAssignableElement,
@@ -14,7 +15,7 @@ import {
     UserGeneratedContent,
     UUID,
 } from 'fuesim-digital-shared';
-import { Editor, Toolbar } from 'ngx-editor';
+import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 import { ExerciseService } from '../../../core/exercise.service';
 import { AppState } from '../../../state/app.state';
 import { createSelectUserGeneratedContent } from '../../../state/application/selectors/exercise.selectors';
@@ -23,15 +24,18 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-rich-text-editor',
     templateUrl: './rich-text-editor.component.html',
     styleUrls: ['./rich-text-editor.component.scss'],
-    standalone: false,
+    imports: [NgxEditorModule, FormField],
 })
 export class RichTextEditorComponent implements OnInit, OnDestroy {
-    readonly userGeneratedContentId = input.required<UUID>();
-    readonly userGeneratedContentElement = signal<UserGeneratedContent | null>(
-        null
-    );
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
+    readonly userGeneratedContentId = input.required<UUID>();
+    readonly userGeneratedContentElement = computed(() => {
+        return this.store.selectSignal(
+            createSelectUserGeneratedContent(this.userGeneratedContentId())
+        )();
+    });
+
     public readonly currentRole = this.store.selectSignal(
         selectCurrentMainRole
     );
@@ -50,13 +54,8 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
     });
     editorForm = form(this.editorModel);
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit(): void {
         this.editor = new Editor();
-        await this.userGeneratedContentElement.set(
-            this.store.selectSignal(
-                createSelectUserGeneratedContent(this.userGeneratedContentId())
-            )()
-        );
         this.editorForm
             .editorContent()
             .value.set(this.userGeneratedContentElement()!.content);
@@ -69,7 +68,7 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
         });
         console.log(
             'content updated! New value: ' +
-                this.userGeneratedContentElement()?.content
+                this.userGeneratedContentElement().content
         );
     }
     ngOnDestroy(): void {

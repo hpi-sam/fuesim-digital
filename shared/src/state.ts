@@ -37,10 +37,6 @@ import {
     logEntrySchema,
     scoutableSchema,
     userGeneratedContentSchema,
-} from './models/index.js';
-import type {
-    ExerciseStatus,
-    LogEntry,
     Scoutable,
     UserGeneratedContent,
 } from './models/index.js';

@@ -13,10 +13,11 @@
             </div>
             @if (
                 editorForm.editorContent().value() ===
-                this.userGeneratedContentElement()?.content
+                this.userGeneratedContentElement().content
             ) {
                 <button class="btn btn-outline-success" disabled>
                     Gespeichert
+                    <i class="bi bi-check"></i>
                 </button>
             } @else {
                 <button type="submit" class="btn btn-primary">Speichern</button>
@@ -29,7 +30,16 @@
         <div [innerHTML]="editorForm.editorContent().value()"></div>
     </ng-container>
 }
+<!-- TODO @JohannesPotzi : Drop this -->
 <!-- debugging info -->
 <hr />
-<span> contentId: {{ this.userGeneratedContentId() }}</span>
-<span> editor content: {{ this.editorForm.editorContent().value() }}</span>
+<span>
+    editor content: {{ this.editorForm.editorContent().value() + '\n' }}</span
+>
+<hr />
+<span> contentId: {{ this.userGeneratedContentElement().id + '\n' }}</span>
+<hr />
+<span>
+    saved content: {{ this.userGeneratedContentElement().content + '\n' }}</span
+>
+<hr />

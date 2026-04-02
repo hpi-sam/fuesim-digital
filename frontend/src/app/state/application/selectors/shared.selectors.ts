@@ -15,6 +15,7 @@ import {
     StrictObject,
     currentCoordinatesOf,
     isOnMap,
+    isInViewport,
 } from 'fuesim-digital-shared';
 
 import { pickBy } from 'lodash-es';
@@ -210,10 +211,7 @@ export const selectVisibleScoutableIndicators = createSelector(
             .filter(
                 (scoutableIndicator) =>
                     (!viewport ||
-                        Viewport.isInViewport(
-                            viewport,
-                            scoutableIndicator.position
-                        )) &&
+                        isInViewport(viewport, scoutableIndicator.position)) &&
                     (scoutableIndicator.isVisibleForParticipants ||
                         currentRole === 'trainer')
             )

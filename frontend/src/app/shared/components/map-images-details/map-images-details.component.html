@@ -1,6 +1,6 @@
 <nav #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="1">
     @if (this.mapImage(); as mapImage) {
-        <ng-container ngbNavItem [ngbNavItem]="'Properties'">
+        <ng-container ngbNavItem [ngbNavItem]="'properties'">
             <a ngbNavLink data-cy="mapImagePopUpPropertiesNav">Eigenschaften</a>
             <ng-template ngbNavContent>
                 @if (this.currentRole() === 'trainer') {
@@ -97,11 +97,8 @@
                 }
             </ng-template>
         </ng-container>
-    }
-
-    @if (this.mapImage(); as mapImage) {
         <ng-container ngbNavItem [ngbNavItem]="'scoutInfo'">
-            <a ngbNavLink data-cy="mapImagePopUpScoutNav">Scout-Info</a>
+            <a ngbNavLink data-cy="mapImagePopUpScoutNav">Erkundung</a>
             <ng-template ngbNavContent>
                 <app-scoutable-object-nav-item [element]="mapImage" />
             </ng-template>

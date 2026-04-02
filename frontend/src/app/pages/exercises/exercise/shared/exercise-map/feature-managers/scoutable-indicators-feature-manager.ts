@@ -16,10 +16,7 @@ import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-ma
 import type { FeatureManager } from '../utility/feature-manager';
 import type { ScoutableIndicator } from '../../../../../../shared/types/scoutable-indicator';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
-import {
-    elementTypeNameCreateSelectorDectionary,
-    scoutableElementTypeSelectorMap,
-} from '../../../../../../state/application/selectors/exercise.selectors';
+import { elementTypeNameCreateSelectorDectionary } from '../../../../../../state/application/selectors/exercise.selectors';
 import type { OlMapManager } from '../utility/ol-map-manager';
 import type { MoveableFeatureManager } from './moveable-feature-manager';
 import { ElementManager } from './element-manager';
@@ -134,7 +131,7 @@ export class ScoutableIndicatorsFeatureManager
     onFeatureDrop(
         droppedElement: Element,
         droppedOnFeature: Feature<Point>,
-        dropEvent?: TranslateEvent
+        dropEvent?: TranslateEvent | MouseEvent
     ) {
         return false;
     }

@@ -1,30 +1,14 @@
-import type { OnInit } from '@angular/core';
-import { Component, inject, signal } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { FormsModule } from '@angular/forms';
-import { AsyncPipe } from '@angular/common';
-import type { MapImage, UUID } from 'fuesim-digital-shared';
+import { Component, inject } from '@angular/core';
 import { PopupService } from '../../utility/popup.service';
-import type { AppState } from '../../../../../../../state/app.state';
-import { createSelectMapImage } from '../../../../../../../state/application/selectors/exercise.selectors';
-import { ImageExistsValidatorDirective } from '../../../../../../../shared/validation/image-exists-validator.directive';
-import { DisplayValidationComponent } from '../../../../../../../shared/validation/display-validation/display-validation.component';
-import { IntegerValidatorDirective } from '../../../../../../../shared/validation/integer-validator.directive';
-import { AppSaveOnTypingDirective } from '../../../../../../../shared/directives/app-save-on-typing.directive';
+import { MapImagesDetailsComponent } from '../../../../../../../shared/components/map-images-details/map-images-details.component';
+import { UUID } from 'fuesim-digital-shared';
 
 /* TODO @JohannesPotzi : correct imports. */
 @Component({
     selector: 'app-map-image-popup',
     templateUrl: './map-image-popup.component.html',
     styleUrls: ['./map-image-popup.component.scss'],
-    imports: [
-        FormsModule,
-        ImageExistsValidatorDirective,
-        DisplayValidationComponent,
-        IntegerValidatorDirective,
-        AppSaveOnTypingDirective,
-        AsyncPipe,
-    ],
+    imports: [MapImagesDetailsComponent],
 })
 export class MapImagePopupComponent {
     private readonly popupService = inject(PopupService);

@@ -1,5 +1,5 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import {
@@ -39,6 +39,7 @@ import { AutofocusDirective } from '../../directives/autofocus.directive';
 import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.directive';
 import { PatientStatusBadgeComponent } from '../patient-status-badge/patient-status-badge.component';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
+import { ScoutableObjectNavItemComponent } from '../scoutable-object-nav-item/scoutable-object-nav-item.component';
 
 @Component({
     selector: 'app-patients-details',
@@ -65,6 +66,7 @@ import { DisplayValidationComponent } from '../../validation/display-validation/
         QrCodeComponent,
         NgbNavOutlet,
         AsyncPipe,
+        ScoutableObjectNavItemComponent,
     ],
 })
 export class PatientsDetailsComponent implements OnChanges {
@@ -72,8 +74,8 @@ export class PatientsDetailsComponent implements OnChanges {
     private readonly exerciseService = inject(ExerciseService);
 
     readonly patientId = input.required<UUID>();
-    readonly openScoutInfo = input<boolean>();
-    activeId!: number;
+    readonly openScoutInfo = input<boolean>(false);
+    activeId = signal<string>('general');
 
     readonly currentRole$ = this.store.select(selectCurrentMainRole);
     configuration$ = this.store.select(selectConfiguration);
@@ -106,9 +108,7 @@ export class PatientsDetailsComponent implements OnChanges {
             })
         );
         if (this.openScoutInfo()) {
-            this.activeId = 1;
-        } else {
-            this.activeId = 0;
+            this.activeId.set('scout-Info');
         }
         this.visibleStatus$ = this.store.select(
             createSelector(

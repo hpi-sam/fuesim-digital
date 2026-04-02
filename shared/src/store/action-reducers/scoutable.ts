@@ -1,4 +1,4 @@
-import { IsBoolean, IsDefined, IsUUID } from 'class-validator';
+import { IsBoolean, IsUUID } from 'class-validator';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { Action, ActionReducer } from '../action-reducer.js';
 
@@ -6,6 +6,7 @@ import {
     type Scoutable,
     scoutableSchema,
     type ScoutableElement,
+    scoutableElementSchema,
 } from '../../models/scoutable.js';
 import {
     cloneDeepMutable,
@@ -23,11 +24,11 @@ export class MakeElementScoutableAction implements Action {
     @IsValue('[Scoutable] Make scoutable' as const)
     public readonly type = '[Scoutable] Make scoutable';
 
-    @IsDefined()
-    public readonly element!: ScoutableElement;
+    @IsZodSchema(scoutableElementSchema)
+    public readonly element_input!: ScoutableElement;
 
     @IsZodSchema(scoutableSchema)
-    public readonly scoutable!: Scoutable;
+    public readonly scoutable_input!: Scoutable;
 
     @IsZodSchema(userGeneratedContentSchema)
     public readonly content!: UserGeneratedContent;
@@ -47,12 +48,36 @@ export namespace ScoutableActionReducers {
     export const makeElementScoutable: ActionReducer<MakeElementScoutableAction> =
         {
             action: MakeElementScoutableAction,
-            reducer: (draftState, { element, scoutable, content }) => {
+            reducer: (
+                draftState,
+                { element_input, scoutable_input, content }
+            ) => {
+                const element = getElement(
+                    draftState,
+                    element_input.type,
+                    element_input.id
+                );
+                element.scoutableId = scoutable_input.id;
+                draftState.userGeneratedContents[content.id] =
+                    cloneDeepMutable(content);
+                draftState.scoutables[scoutable_input.id] =
+                    cloneDeepMutable(scoutable_input);
+
+                const scoutable = getElement(
+                    draftState,
+                    'scoutable',
+                    scoutable_input.id
+                );
+                scoutable.userGeneratedContentId = content.id;
+
+                /* TODO @JohannesPotzi : remove commentated section */
                 /* const scout = cloneDeepMutable(scoutable);
                 scout.userGeneratedContentId = content.id;
                 draftState.userGeneratedContents[content.id] =
                     cloneDeepMutable(content);
                 draftState.scoutables[scoutable.id] = cloneDeepMutable(scout); */
+
+                /*
                 draftState.scoutables[scoutable.id] =
                     cloneDeepMutable(scoutable);
                 if (
@@ -64,7 +89,7 @@ export namespace ScoutableActionReducers {
                 }
                 draftState[elementTypePluralMap[element.type]][
                     element.id
-                ]!.scoutableId = scoutable.id;
+                ]!.scoutableId = scoutable.id; */
                 return draftState;
             },
             rights: 'trainer',

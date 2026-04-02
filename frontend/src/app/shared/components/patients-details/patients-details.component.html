@@ -1,6 +1,6 @@
-<nav #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="activeId">
+<nav #nav="ngbNav" ngbNav class="nav-tabs" [activeId]="activeId()">
     @if (patient$ | async; as patient) {
-        <ng-container ngbNavItem [ngbNavItem]="0">
+        <ng-container ngbNavItem [ngbNavItem]="'general'">
             <a ngbNavLink data-cy="patientPopupGeneralNav">Allgemein</a>
             <ng-template ngbNavContent>
                 <table class="table table-sm small mb-0">
@@ -93,9 +93,7 @@
                 </div>
             </ng-template>
         </ng-container>
-    }
-    @if (patient$ | async; as patient) {
-        <ng-container ngbNavItem>
+        <ng-container ngbNavItem [ngbNavItem]="'triage'">
             <a ngbNavLink data-cy="patientPopupTriageNav">{{
                 (configuration$ | async)?.pretriageEnabled
                     ? 'Vorsichtung'
@@ -245,10 +243,8 @@
                 </table>
             </ng-template>
         </ng-container>
-    }
-    @if (patient$ | async; as patient) {
-        <ng-container ngbNavItem>
-            <a ngbNavLink data-cy="patientPopupGeneralNav">QR-Code</a>
+        <ng-container ngbNavItem [ngbNavItem]="'qr-code'">
+            <a ngbNavLink data-cy="patientPopupQRCodeNav">QR-Code</a>
             <ng-template ngbNavContent>
                 <div class="form-group p-1">
                     <label class="form-label small fw-bold">
@@ -274,15 +270,13 @@
                 />
             </ng-template>
         </ng-container>
-    }
-    @if (patient$ | async; as patient) {
         @if (
             (currentRole$ | async) !== 'participant' ||
             (IsScoutableInfoPaticipantVisible$ | async)
         ) {
-            <ng-container ngbNavItem [ngbNavItem]="1">
+            <ng-container ngbNavItem [ngbNavItem]="'scout-Info'">
                 <!-- TODO @JohannesPotzi : Besserer Name-->
-                <a ngbNavLink data-cy="patientPopupScoutNav">Scout-Info</a>
+                <a ngbNavLink data-cy="patientPopupScoutNav">Erkundung</a>
                 <ng-template ngbNavContent>
                     <app-scoutable-object-nav-item [element]="patient" />
                 </ng-template>

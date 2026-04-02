@@ -82,9 +82,16 @@ export class ScoutableIndicatorsFeatureManager
                 this.onElementChanged(oldElement, newElement)
         );
     }
-    private readonly imageStyleHelper = new ImageStyleHelper((feature) =>
-        newImageProperties('/assets/magnifying-glass.svg', 40, 313 / 427)
-    );
+    private readonly imageStyleHelper = new ImageStyleHelper((feature) => {
+        const indicatorElement = this.getElementFromFeature(
+            feature
+        ) as ScoutableIndicator;
+        return newImageProperties(
+            '/assets/magnifying-glass.svg',
+            indicatorElement.height,
+            313 / 427
+        );
+    });
     public readonly layer: VectorLayer;
 
     constructor(

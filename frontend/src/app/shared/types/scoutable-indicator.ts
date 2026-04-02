@@ -10,4 +10,5 @@ export interface ScoutableIndicator {
     readonly scoutableElementType: ScoutableElementType;
     readonly scoutableElementId: UUID;
     readonly isVisibleForParticipants: boolean;
+    readonly height: number;
 }

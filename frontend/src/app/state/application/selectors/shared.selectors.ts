@@ -39,6 +39,7 @@ import {
     selectScoutables,
     scoutableElementSelectors,
 } from './exercise.selectors';
+import { min } from 'rxjs';
 
 /**
  * All selectors in here use exercise- as well as application-selectors
@@ -192,7 +193,7 @@ export const selectVisibleScoutableIndicators = createSelector(
                             element.image.height *
                                 element.image.aspectRatio *
                                 coefficient *
-                                0.25,
+                                0.5,
                             element.image.height * coefficient * -0.5
                         );
                         const indicatorPos = newMapCoordinatesAt(
@@ -206,6 +207,7 @@ export const selectVisibleScoutableIndicators = createSelector(
                             scoutableElementId: element.id,
                             isVisibleForParticipants:
                                 scoutable.isVisibleForParticipants,
+                            height: Math.max(45, element.image.height / 10),
                         };
                     })
             )

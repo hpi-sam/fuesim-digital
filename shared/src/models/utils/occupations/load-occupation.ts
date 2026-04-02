@@ -8,9 +8,9 @@ export const loadOccupationSchema = z.strictObject({
 
 export type LoadOccupation = z.infer<typeof loadOccupationSchema>;
 
-export const newLoadOccupation = (
-    loadingActivityId: string
-): LoadOccupation => ({
-    type: 'loadOccupation',
-    loadingActivityId,
-});
+export function newLoadOccupation(loadingActivityId: string): LoadOccupation {
+    return {
+        type: 'loadOccupation',
+        loadingActivityId,
+    };
+}

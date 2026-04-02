@@ -9,6 +9,7 @@ import type {
     ExerciseState,
     ScoutableElementType,
     UUID,
+    Vehicle,
     WithPosition,
     Element,
 } from 'fuesim-digital-shared';
@@ -27,9 +28,10 @@ import { elementTypePluralMap } from '../../../../../../shared/dist/utils/elemen
 /**
  * Check before via selectExerciseStateMode whether the exerciseState is defined
  */
-export const selectExerciseState = (state: AppState) =>
+export function selectExerciseState(state: AppState) {
     // TODO: we currently expect this to only be used of the exerciseStateMode is not undefined
-    state.application.exerciseState!;
+    return state.application.exerciseState!;
+}
 
 function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
@@ -54,6 +56,9 @@ export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
 export const selectRadiograms = selectPropertyFactory('radiograms');
 export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
+export const selectOperationalSections = selectPropertyFactory(
+    'operationalSections'
+);
 export const selectVehicleTemplates = selectPropertyFactory('vehicleTemplates');
 export const selectPersonnelTemplates =
     selectPropertyFactory('personnelTemplates');
@@ -154,6 +159,11 @@ export const selectTileMapProperties = createSelector(
     (configuration) => configuration.tileMapProperties
 );
 
+export const selectOperationsMapProperties = createSelector(
+    selectConfiguration,
+    (configuration) => configuration.operationsMapProperties
+);
+
 export const selectTransferLines = createSelector(
     selectExerciseState,
     selectTransferPoints,
@@ -206,6 +216,18 @@ export function createSelectReachableHospitals(transferPointId: UUID) {
     );
 }
 
+export function createSelectVehiclesInOperationalSection(
+    operationalSectionId: UUID
+) {
+    return createSelector(selectVehicles, (vehicles) =>
+        Object.values(vehicles).filter(
+            (vehicle) =>
+                vehicle.operationalAssignment?.type === 'operationalSection' &&
+                vehicle.operationalAssignment.sectionId === operationalSectionId
+        )
+    );
+}
+
 export const selectVehiclesInTransfer = createSelector(
     selectVehicles,
     (vehicles) =>
@@ -217,6 +239,77 @@ export const selectPersonnelInTransfer = createSelector(
     (personnel) =>
         Object.values(personnel).filter((_personnel) =>
             isInTransfer(_personnel)
+        )
+);
+
+export const selectLocalOperationsCommand = createSelector(
+    selectVehicles,
+    (vehicles) =>
+        Object.values(vehicles).find(
+            (v) => v.operationalAssignment?.type === 'localOperationsCommand'
+        )
+);
+
+export function createSelectOperationalSectionLeader(sectionId: string) {
+    return createSelector(
+        createSelectVehiclesInOperationalSection(sectionId),
+        (vehicles) =>
+            Object.values(vehicles)
+                .filter(
+                    (vehicle) =>
+                        vehicle.operationalAssignment?.type ===
+                            'operationalSection' &&
+                        vehicle.operationalAssignment.role ===
+                            'operationalSectionLeader'
+                )
+                .at(0)
+    );
+}
+
+export function createSelectOperationalSectionMembers(sectionId: string) {
+    return createSelector(
+        createSelectVehiclesInOperationalSection(sectionId),
+        (vehicles) =>
+            Object.values(vehicles).filter(
+                // This type annotation is necessary to not have to repeat the same conditions later
+                (
+                    vehicle
+                ): vehicle is Vehicle & {
+                    operationalAssignment: NonNullable<
+                        Vehicle['operationalAssignment']
+                    > & {
+                        role: 'operationalSectionMember';
+                        position: number;
+                    };
+                } =>
+                    vehicle.operationalAssignment?.type ===
+                        'operationalSection' &&
+                    vehicle.operationalAssignment.role ===
+                        'operationalSectionMember'
+            )
+    );
+}
+
+export function createSelectSortedOperationalSectionMembers(sectionId: string) {
+    return createSelector(
+        createSelectOperationalSectionMembers(sectionId),
+        (vehicles) =>
+            vehicles.sort(
+                (a, b) =>
+                    a.operationalAssignment.position -
+                    b.operationalAssignment.position
+            )
+    );
+}
+
+export const selectVehiclesInTransferFromAlarmgroup = createSelector(
+    selectVehiclesInTransfer,
+    (vehicles) =>
+        Object.values(vehicles).filter(
+            (vehicle) =>
+                vehicle.position.type === 'transfer' &&
+                vehicle.position.transfer.startPoint.type ===
+                    'alarmGroupStartPoint'
         )
 );
 

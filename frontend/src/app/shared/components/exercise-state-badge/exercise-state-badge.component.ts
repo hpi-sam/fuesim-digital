@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import {
     selectExerciseStatus,

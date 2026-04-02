@@ -17,4 +17,6 @@ export const positionSchema = z.union([
 ]);
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const IsPosition = () => IsZodSchema(positionSchema);
+export function IsPosition() {
+    return IsZodSchema(positionSchema);
+}

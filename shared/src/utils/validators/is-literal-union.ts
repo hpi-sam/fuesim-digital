@@ -59,17 +59,18 @@ export function IsLiteralUnion<
     );
 }
 
-export const isLiteralUnionMap = <T extends number | string | symbol, V>(
+export function isLiteralUnionMap<T extends number | string | symbol, V>(
     allowedValues: AllowedValues<T>,
     valueValidator: (value: unknown) => value is V,
     valueToBeValidated: unknown
-): valueToBeValidated is { [key in T]?: UUID } =>
-    createMapValidator({
+): valueToBeValidated is { [key in T]?: UUID } {
+    return createMapValidator({
         keyValidator: ((key) => isLiteralUnion(allowedValues, key)) as (
             key: unknown
         ) => key is T,
         valueValidator,
     })(valueToBeValidated);
+}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export function IsLiteralUnionMap<

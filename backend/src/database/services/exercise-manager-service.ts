@@ -59,12 +59,12 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.exercise_template.user !== session.user.id) {
+        if (exerciseTemplate.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
         const updatedTemplate =
             await this.exerciseRepository.updateExerciseTemplate(
-                exerciseTemplate.exercise_template.id,
+                exerciseTemplate.id,
                 data
             );
         if (!updatedTemplate) {
@@ -72,7 +72,7 @@ export class ExerciseManagerService {
         }
         return {
             ...updatedTemplate,
-            trainerKey: exerciseTemplate.exercise_entity.trainerKey,
+            trainerKey: exerciseTemplate.trainerKey,
         };
     }
 
@@ -89,23 +89,20 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (
-            session &&
-            exerciseTemplate.exercise_template.user !== session.user.id
-        ) {
+        if (session && exerciseTemplate.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
 
         const newExercise =
             await this.exerciseService.exerciseFactory.fromExerciseTemplate(
-                exerciseTemplate.exercise_template,
-                exerciseTemplate.exercise_entity,
+                exerciseTemplate,
+                exerciseTemplate.exercise,
                 type,
                 { ...optionalData, user: session ? session.user.id : null }
             );
         await this.exerciseService.loadExercise(newExercise);
         await this.exerciseRepository.updateExerciseTemplate(
-            exerciseTemplate.exercise_template.id,
+            exerciseTemplate.id,
             { lastExerciseCreatedAt: new Date() }
         );
         return newExercise;
@@ -120,17 +117,17 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.exercise_template.user !== session.user.id) {
+        if (exerciseTemplate.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
         const activeExercise = this.exerciseService.getExerciseByKey(
-            exerciseTemplate.exercise_entity.trainerKey,
+            exerciseTemplate.trainerKey,
             session
         );
         this.exerciseService.unloadExercise(activeExercise);
 
         await this.exerciseRepository.deleteExerciseTemplateById(
-            exerciseTemplate.exercise_template.id
+            exerciseTemplate.id
         );
         await this.exerciseService.freeExerciseKeys(activeExercise);
     }
@@ -144,11 +141,11 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.exercise_template.user !== session.user.id) {
+        if (exerciseTemplate.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
         return this.exerciseService.getExercisesViewportsById(
-            exerciseTemplate.exercise_entity.id
+            exerciseTemplate.exercise.id
         );
     }
 }

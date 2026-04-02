@@ -68,6 +68,10 @@ import { personnelTemplateSchema } from './models/personnel-template.js';
 import { personnelSchema } from './models/personnel.js';
 import { vehicleTemplateSchema } from './models/vehicle-template.js';
 import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
+import {
+    operationalSectionSchema,
+    OperationalSection,
+} from './models/operational-section.js';
 import { hospitalSchema } from './models/hospital.js';
 import { mapImageTemplateSchema } from './models/map-image-template.js';
 import { mapImageSchema } from './models/map-image.js';
@@ -165,6 +169,10 @@ export class ExerciseState {
     @ValidateNested()
     public readonly radiograms: { readonly [key: UUID]: ExerciseRadiogram } =
         {};
+    @IsZodSchema(z.record(uuidSchema, operationalSectionSchema))
+    public readonly operationalSections: {
+        readonly [key: UUID]: OperationalSection;
+    } = {};
 
     @IsZodSchema(z.array(patientCategorySchema))
     public readonly patientCategories = defaultPatientCategories;
@@ -252,5 +260,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 48;
+    static readonly currentStateVersion = 49;
 }

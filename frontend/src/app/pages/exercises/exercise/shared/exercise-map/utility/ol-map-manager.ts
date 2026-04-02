@@ -4,6 +4,7 @@ import {
     upperLeftCornerOf,
     lowerRightCornerOf,
     isInViewport,
+    getBoundingBox,
 } from 'fuesim-digital-shared';
 import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
@@ -217,23 +218,20 @@ export class OlMapManager {
             view.setCenter([startingPosition.x, startingPosition.y]);
             return;
         }
-        const minX = Math.min(
-            ...elements.map((element) => upperLeftCornerOf(element).x)
-        );
-        const minY = Math.min(
-            ...elements.map((element) => lowerRightCornerOf(element).y)
-        );
-        const maxX = Math.max(
-            ...elements.map((element) => lowerRightCornerOf(element).x)
-        );
-        const maxY = Math.max(
-            ...elements.map((element) => upperLeftCornerOf(element).y)
-        );
+        const boundingBox = getBoundingBox(elements);
         const padding = 25;
-        view.fit([minX, minY, maxX, maxY], {
-            padding: [padding, padding, padding, padding],
-            duration: animate ? 1000 : undefined,
-        });
+        view.fit(
+            [
+                boundingBox.minX,
+                boundingBox.minY,
+                boundingBox.maxX,
+                boundingBox.maxY,
+            ],
+            {
+                padding: [padding, padding, padding, padding],
+                duration: animate ? 1000 : undefined,
+            }
+        );
     }
 
     public getCoordinates() {

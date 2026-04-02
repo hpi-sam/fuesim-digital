@@ -1,0 +1,19 @@
+<div
+    class="panel-surface panel-fixed-width d-flex flex-column bg-white border h-100"
+>
+    <span class="panel-title">Leitung</span>
+    <div class="mt-2 flex-shrink-0">
+        <app-section-leader-slot
+            innerTitle="Einsatzleitung"
+            [vehicle]="localSectionLeader() ?? null"
+            (vehicleAssigned)="onVehicleAssigned($event)"
+        ></app-section-leader-slot>
+    </div>
+
+    <span class="panel-title mb-2">Alarmiert</span>
+    <div class="flex-grow-1 overflow-auto">
+        @for (vehicle of vehiclesFromAlarmgroups(); track vehicle.id) {
+            <app-operations-vehicle-item [vehicle]="vehicle" />
+        }
+    </div>
+</div>

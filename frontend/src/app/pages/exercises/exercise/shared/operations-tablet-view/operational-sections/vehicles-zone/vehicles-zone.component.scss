@@ -1,0 +1,83 @@
+@use 'bootstrap/scss/bootstrap' as bootstrap;
+@use './../_variables.scss' as vars;
+
+.scroll-wrapper {
+    position: relative;
+}
+
+.scroll-btn {
+    position: absolute;
+    z-index: 10;
+
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.scroll-btn.left,
+.scroll-btn.right {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 3rem;
+}
+
+.scroll-btn.top,
+.scroll-btn.bottom {
+    transform: translateX(-50%);
+    left: 50%;
+    width: 3rem;
+    height: 2rem;
+}
+
+.scroll-btn.left {
+    left: 0.5rem;
+}
+.scroll-btn.right {
+    right: 0.5rem;
+}
+
+.scroll-btn.top {
+    top: 0.5rem;
+}
+.scroll-btn.bottom {
+    bottom: 0.5rem;
+}
+
+.vehicle-zone {
+    row-gap: vars.$vehicleTagGap;
+    column-gap: vars.$vehicleTagGap;
+    padding: vars.$innerBoxPadding;
+
+    border-radius: vars.$borderRadius;
+
+    border: vars.$borderSize vars.$dashedBorderColor dashed;
+}
+
+.layout-two-columns {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: space-between;
+
+    height: 100%;
+    width: vars.$innerContainerWidth;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.layout-two-rows {
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: space-between;
+
+    height: (2 * vars.$vehicleTagHeight) + (3 * vars.$innerBoxPadding);
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}

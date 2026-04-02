@@ -57,6 +57,13 @@
             "when": 1774021969603,
             "tag": "0007_parallel_exercise",
             "breakpoints": true
+        },
+        {
+            "idx": 8,
+            "version": "7",
+            "when": 1774282890531,
+            "tag": "0008_exercise_template_last_used_at",
+            "breakpoints": true
         }
     ]
 }

@@ -1,0 +1,13 @@
+@let position = vehicle().position;
+
+<div class="border p-2 d-flex flex-row justify-content-between gap-1">
+    <span class="h5 m-0">
+        {{ vehicle().name }}
+    </span>
+    @if (position.type === 'transfer' && showTransfer()) {
+        <span class="text-muted">
+            {{ ceil((position.transfer.endTimeStamp - time()) / (1000 * 60)) }}
+            min
+        </span>
+    }
+</div>

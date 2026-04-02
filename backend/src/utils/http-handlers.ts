@@ -16,9 +16,10 @@ export type HttpMethod =
     | 'post'
     | 'put';
 
-export const createSessionMiddleware =
-    (authService: AuthService): RequestHandler =>
-    async (req, res, next) => {
+export function createSessionMiddleware(
+    authService: AuthService
+): RequestHandler {
+    return async (req, res, next) => {
         const sessionToken = req.cookies[authService.SESSION_COOKIE_NAME];
         if (sessionToken) {
             // eslint-disable-next-line require-atomic-updates
@@ -30,6 +31,7 @@ export const createSessionMiddleware =
 
         next();
     };
+}
 
 export const isAuthenticatedMiddleware: RequestHandler = (req, res, next) => {
     if (!req.session) {

@@ -272,13 +272,12 @@
         </ng-container>
         @if (
             (currentRole$ | async) !== 'participant' ||
-            (IsScoutableInfoPaticipantVisible$ | async)
+            (IsScoutableInfoParticipantVisible$ | async)
         ) {
             <ng-container ngbNavItem [ngbNavItem]="'scout-Info'">
-                <!-- TODO @JohannesPotzi : Besserer Name-->
                 <a ngbNavLink data-cy="patientPopupScoutNav">Erkundung</a>
                 <ng-template ngbNavContent>
-                    <app-scoutable-object-nav-item [element]="patient" />
+                    <app-scoutable-element-nav-item [element]="patient" />
                 </ng-template>
             </ng-container>
         }

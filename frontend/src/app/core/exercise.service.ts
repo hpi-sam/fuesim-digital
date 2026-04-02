@@ -13,7 +13,7 @@ import {
     joinExerciseResponseDataSchema,
     socketIoTransports,
 } from 'fuesim-digital-shared';
-import { freeze } from 'immer';
+import { freeze, WritableDraft } from 'immer';
 import {
     debounceTime,
     filter,
@@ -162,19 +162,23 @@ export class ExerciseService {
         >(
             (exercise) =>
                 this.store.dispatch(
-                    createSetExerciseStateAction(exercise as ExerciseState)
+                    createSetExerciseStateAction(
+                        exercise as WritableDraft<ExerciseState>
+                    )
                 ),
             () => selectStateSnapshot(selectExerciseState, this.store),
             (action) =>
                 this.store.dispatch(
-                    createApplyServerActionAction(action as ExerciseAction)
+                    createApplyServerActionAction(
+                        action as WritableDraft<ExerciseAction>
+                    )
                 ),
             async (action) => {
                 const response = await new Promise<SocketResponse>(
                     (resolve) => {
                         this.socket.emit(
                             'proposeAction',
-                            action as ExerciseAction,
+                            action as WritableDraft<ExerciseAction>,
                             resolve
                         );
                     }

@@ -7,8 +7,10 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
+    ScoutableElementType,
     UUID,
     WithPosition,
+    Element,
 } from 'fuesim-digital-shared';
 import {
     scoutableElementKeys,
@@ -136,12 +138,14 @@ export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     );
 }
 
-export const elementTypeNameCreateSelectorDectionary = new Map<
-    string,
-    (id: string) => MemoizedSelector<AppState, any, any>
->()
-    .set('patient', createSelectPatient)
-    .set('mapImage', createSelectMapImage);
+export const scoutableElementTypeSelectorMap = {
+    patient: createSelectPatient,
+    mapImage: createSelectMapImage,
+} as {
+    [key in ScoutableElementType]: (
+        id: string
+    ) => MemoizedSelector<AppState, any, any>;
+};
 
 // Misc selectors
 

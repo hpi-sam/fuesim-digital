@@ -225,10 +225,15 @@ export class ExerciseState {
     @Equals(undefined)
     public previousTreatmentAssignment?: TreatmentAssignment;
 
-    @IsZodSchema(z.record(z.uuidv4(), scoutableSchema))
+    @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
 
-    @IsZodSchema(z.record(z.uuidv4(), userGeneratedContentSchema))
+    @IsZodSchema(
+        z.record(
+            userGeneratedContentSchema.shape.id,
+            userGeneratedContentSchema
+        )
+    )
     public readonly userGeneratedContents: {
         readonly [key: UUID]: UserGeneratedContent;
     } = {};

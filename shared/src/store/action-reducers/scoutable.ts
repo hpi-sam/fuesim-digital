@@ -25,15 +25,15 @@ export class MakeElementScoutableAction implements Action {
     public readonly type = '[Scoutable] Make scoutable';
 
     @IsZodSchema(scoutableElementSchema)
-    public readonly element_input!: ScoutableElement;
+    public readonly element!: ScoutableElement;
 
     @IsZodSchema(scoutableSchema)
-    public readonly scoutable_input!: Scoutable;
+    public readonly scoutable!: Scoutable;
 
     @IsZodSchema(userGeneratedContentSchema)
     public readonly content!: UserGeneratedContent;
 }
-export class SetisVisibleForParticipants implements Action {
+export class SetIsVisibleForParticipants implements Action {
     @IsValue('[Scoutable] Set isVisibleForParticipants' as const)
     public readonly type = '[Scoutable] Set isVisibleForParticipants';
 
@@ -48,55 +48,31 @@ export namespace ScoutableActionReducers {
     export const makeElementScoutable: ActionReducer<MakeElementScoutableAction> =
         {
             action: MakeElementScoutableAction,
-            reducer: (
-                draftState,
-                { element_input, scoutable_input, content }
-            ) => {
-                const element = getElement(
+            reducer: (draftState, { element, scoutable, content }) => {
+                const stateElement = getElement(
                     draftState,
-                    element_input.type,
-                    element_input.id
+                    element.type,
+                    element.id
                 );
-                element.scoutableId = scoutable_input.id;
+                stateElement.scoutableId = scoutable.id;
                 draftState.userGeneratedContents[content.id] =
                     cloneDeepMutable(content);
-                draftState.scoutables[scoutable_input.id] =
-                    cloneDeepMutable(scoutable_input);
-
-                const scoutable = getElement(
-                    draftState,
-                    'scoutable',
-                    scoutable_input.id
-                );
-                scoutable.userGeneratedContentId = content.id;
-
-                /* TODO @JohannesPotzi : remove commentated section */
-                /* const scout = cloneDeepMutable(scoutable);
-                scout.userGeneratedContentId = content.id;
-                draftState.userGeneratedContents[content.id] =
-                    cloneDeepMutable(content);
-                draftState.scoutables[scoutable.id] = cloneDeepMutable(scout); */
-
-                /*
                 draftState.scoutables[scoutable.id] =
                     cloneDeepMutable(scoutable);
-                if (
-                    !draftState[elementTypePluralMap[element.type]][element.id]
-                ) {
-                    throw new ReducerError(
-                        'dieses element steht nicht im state'
-                    );
-                }
-                draftState[elementTypePluralMap[element.type]][
-                    element.id
-                ]!.scoutableId = scoutable.id; */
+
+                const stateScoutable = getElement(
+                    draftState,
+                    'scoutable',
+                    scoutable.id
+                );
+                stateScoutable.userGeneratedContentId = content.id;
                 return draftState;
             },
             rights: 'trainer',
         };
-    export const setisVisibleForParticipants: ActionReducer<SetisVisibleForParticipants> =
+    export const setIsVisibleForParticipants: ActionReducer<SetIsVisibleForParticipants> =
         {
-            action: SetisVisibleForParticipants,
+            action: SetIsVisibleForParticipants,
             reducer: (draftState, { scoutableId, value }) => {
                 const scoutable = getElement(
                     draftState,

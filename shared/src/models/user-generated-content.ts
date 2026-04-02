@@ -10,12 +10,15 @@ export const userGeneratedContentSchema = z.strictObject({
 
 export type UserGeneratedContent = z.infer<typeof userGeneratedContentSchema>;
 
-export const contentAssignableElementSchema = z.union([scoutableSchema]);
-export type ContentAssignableElement = z.infer<
-    typeof contentAssignableElementSchema
+export const UserGeneratedContentAssignableElementSchema = z.union([
+    scoutableSchema,
+]);
+export type UserGeneratedContentAssignableElement = z.infer<
+    typeof UserGeneratedContentAssignableElementSchema
 >;
 
-export type ContentAssignableElementType = ContentAssignableElement['type'];
+export type UserGeneratedContentAssignableElementType =
+    UserGeneratedContentAssignableElement['type'];
 
 export function newUserGeneratedContent(): UserGeneratedContent {
     return {

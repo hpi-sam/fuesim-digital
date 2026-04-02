@@ -20,12 +20,12 @@ import { createSelectScoutable } from '../../../state/application/selectors/exer
 import { RichTextEditorComponent } from '../rich-text-editor/rich-text-editor.component';
 
 @Component({
-    selector: 'app-scoutable-object-nav-item',
-    templateUrl: './scoutable-object-nav-item.component.html',
-    styleUrls: ['./scoutable-object-nav-item.component.scss'],
+    selector: 'app-scoutable-element-nav-item',
+    templateUrl: './scoutable-element-nav-item.component.html',
+    styleUrls: ['./scoutable-element-nav-item.component.scss'],
     imports: [RichTextEditorComponent],
 })
-export class ScoutableObjectNavItemComponent implements OnInit {
+export class ScoutableElementNavItemComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     readonly element = input.required<ScoutableElement>();
@@ -59,8 +59,8 @@ export class ScoutableObjectNavItemComponent implements OnInit {
         await this.exerciseService.proposeAction(
             {
                 type: '[Scoutable] Make scoutable',
-                element_input: element,
-                scoutable_input: newScoutable(),
+                element: element,
+                scoutable: newScoutable(),
                 content: newUserGeneratedContent(),
             },
             true

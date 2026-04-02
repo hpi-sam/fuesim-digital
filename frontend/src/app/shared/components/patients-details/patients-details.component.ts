@@ -39,7 +39,7 @@ import { AutofocusDirective } from '../../directives/autofocus.directive';
 import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.directive';
 import { PatientStatusBadgeComponent } from '../patient-status-badge/patient-status-badge.component';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
-import { ScoutableObjectNavItemComponent } from '../scoutable-object-nav-item/scoutable-object-nav-item.component';
+import { ScoutableElementNavItemComponent } from '../scoutable-element-nav-item/scoutable-element-nav-item.component';
 
 @Component({
     selector: 'app-patients-details',
@@ -66,7 +66,7 @@ import { ScoutableObjectNavItemComponent } from '../scoutable-object-nav-item/sc
         QrCodeComponent,
         NgbNavOutlet,
         AsyncPipe,
-        ScoutableObjectNavItemComponent,
+        ScoutableElementNavItemComponent,
     ],
 })
 export class PatientsDetailsComponent implements OnChanges {
@@ -90,13 +90,13 @@ export class PatientsDetailsComponent implements OnChanges {
                     : ['white', 'black', 'red', 'yellow', 'green']
             )
         );
-    IsScoutableInfoPaticipantVisible$?: Observable<boolean>;
+    IsScoutableInfoParticipantVisible$?: Observable<boolean>;
 
     ngOnChanges(): void {
         this.patient$ = this.store.select(
             createSelectPatient(this.patientId())
         );
-        this.IsScoutableInfoPaticipantVisible$ = this.patient$.pipe(
+        this.IsScoutableInfoParticipantVisible$ = this.patient$.pipe(
             map((patient) => {
                 if (patient.scoutableId) {
                     const scoutable = this.store.selectSignal(

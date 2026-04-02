@@ -18,7 +18,7 @@ import {
     createSelectScoutable,
 } from '../../../state/application/selectors/exercise.selectors';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
-import { ScoutableObjectNavItemComponent } from '../scoutable-object-nav-item/scoutable-object-nav-item.component';
+import { ScoutableElementNavItemComponent } from '../scoutable-element-nav-item/scoutable-element-nav-item.component';
 import { FormsModule } from '@angular/forms';
 import { ImageExistsValidatorDirective } from '../../validation/image-exists-validator.directive';
 import { IntegerValidatorDirective } from '../../validation/integer-validator.directive';
@@ -38,7 +38,7 @@ import {
     styleUrls: ['./map-images-details.component.scss'],
     imports: [
         DisplayValidationComponent,
-        ScoutableObjectNavItemComponent,
+        ScoutableElementNavItemComponent,
         FormsModule,
         ImageExistsValidatorDirective,
         DisplayValidationComponent,

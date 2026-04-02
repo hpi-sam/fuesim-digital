@@ -5,7 +5,7 @@ import { patientSchema } from './patient.js';
 import { mapImageSchema } from './map-image.js';
 
 export const scoutableSchema = z.strictObject({
-    id: z.uuidv4(),
+    id: uuidSchema,
     type: z.literal('scoutable'),
     userGeneratedContentId: uuidSchema.nullable(),
     isVisibleForParticipants: z.boolean(),
@@ -26,7 +26,7 @@ export type ScoutableElement = z.infer<typeof scoutableElementSchema>;
 export const scoutableElementKeys = [
     'patient',
     'mapImage',
-] as Array<ScoutableElementType>;
+] satisfies Array<ScoutableElementType>;
 
 export type ScoutableElementType = ScoutableElement['type'];
 

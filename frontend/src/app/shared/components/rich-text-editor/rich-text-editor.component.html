@@ -1,45 +1,31 @@
 @if (this.currentRole() === 'trainer') {
-    <ng-container>
-        <form (ngSubmit)="onSubmit()">
-            <div class="NgxEditor__Wrapper">
-                <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
-                </ngx-editor-menu>
-                <ngx-editor
-                    [editor]="editor"
-                    [formField]="editorForm.editorContent"
-                    [placeholder]="'Hier erkundbare Infos eingeben...'"
-                >
-                </ngx-editor>
-            </div>
-            @if (
-                editorForm.editorContent().value() ===
-                this.userGeneratedContentElement().content
-            ) {
-                <button class="btn btn-outline-success" disabled>
-                    Gespeichert
-                    <i class="bi bi-check"></i>
-                </button>
-            } @else {
-                <button type="submit" class="btn btn-primary">Speichern</button>
-            }
-        </form>
-    </ng-container>
+    <form class="m-2">
+        <div class="NgxEditor__Wrapper mb-2">
+            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
+            </ngx-editor-menu>
+            <ngx-editor
+                [editor]="editor"
+                [formField]="editorForm.editorContent"
+                [placeholder]="'Hier Erkundungsinformationen eingeben ...'"
+            >
+            </ngx-editor>
+        </div>
+        @if (
+            editorForm.editorContent().value() ===
+            this.userGeneratedContentElement().content
+        ) {
+            <button class="btn btn-outline-success" disabled>
+                Gespeichert
+                <i class="bi bi-check"></i>
+            </button>
+        } @else {
+            <button class="btn btn-primary" (click)="onSubmit()">
+                Speichern
+            </button>
+        }
+    </form>
 } @else {
     <hr />
-    <ng-container>
-        <div [innerHTML]="editorForm.editorContent().value()"></div>
-    </ng-container>
+
+    <div [innerHTML]="editorForm.editorContent().value()"></div>
 }
-<!-- TODO @JohannesPotzi : Drop this -->
-<!-- debugging info -->
-<hr />
-<span>
-    editor content: {{ this.editorForm.editorContent().value() + '\n' }}</span
->
-<hr />
-<span> contentId: {{ this.userGeneratedContentElement().id + '\n' }}</span>
-<hr />
-<span>
-    saved content: {{ this.userGeneratedContentElement().content + '\n' }}</span
->
-<hr />

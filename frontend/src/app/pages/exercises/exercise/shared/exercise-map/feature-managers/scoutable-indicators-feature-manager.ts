@@ -1,12 +1,16 @@
 import type { Subject } from 'rxjs';
 import type OlMap from 'ol/Map';
-import type { Store } from '@ngrx/store';
+import type { MemoizedSelector, Store } from '@ngrx/store';
 import type { MapBrowserEvent } from 'ol';
 import { Feature } from 'ol';
 import { Point } from 'ol/geom';
 import type VectorLayer from 'ol/layer/Vector';
 // eslint-disable-next-line @typescript-eslint/no-shadow
-import type { Element, ScoutableElement } from 'fuesim-digital-shared';
+import type {
+    Element,
+    ScoutableElement,
+    ScoutableElementType,
+} from 'fuesim-digital-shared';
 import { newImageProperties } from 'fuesim-digital-shared';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
@@ -16,7 +20,7 @@ import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-ma
 import type { FeatureManager } from '../utility/feature-manager';
 import type { ScoutableIndicator } from '../../../../../../shared/types/scoutable-indicator';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
-import { elementTypeNameCreateSelectorDectionary } from '../../../../../../state/application/selectors/exercise.selectors';
+import { scoutableElementTypeSelectorMap } from '../../../../../../state/application/selectors/exercise.selectors';
 import type { OlMapManager } from '../utility/ol-map-manager';
 import type { MoveableFeatureManager } from './moveable-feature-manager';
 import { ElementManager } from './element-manager';
@@ -99,6 +103,17 @@ export class ScoutableIndicatorsFeatureManager
         });
     }
 
+    getScoutableElementFromIndicator<T extends ScoutableElementType>(
+        indicator: ScoutableIndicator & { scoutableElementType: T }
+    ): ScoutableElement & { type: T } {
+        return selectStateSnapshot(
+            scoutableElementTypeSelectorMap[indicator.scoutableElementType](
+                indicator.scoutableElementId
+            ),
+            this.store
+        ) as ScoutableElement & { type: T };
+    }
+
     onFeatureClicked(
         event: MapBrowserEvent<any>,
         feature: Feature<Point>
@@ -111,12 +126,9 @@ export class ScoutableIndicatorsFeatureManager
             this.olMapManager.featureNameFeatureManagerDictionary.get(
                 type
             ) as MoveableFeatureManager<ScoutableElement>;
-        const scoutableElement = selectStateSnapshot(
-            elementTypeNameCreateSelectorDectionary.get(type)!(
-                indicatorElement.scoutableElementId
-            ),
-            this.store
-        ) as ScoutableElement;
+
+        const scoutableElement =
+            this.getScoutableElementFromIndicator(indicatorElement);
 
         const popupFeature =
             popupFeatureManager.getFeatureFromElement(scoutableElement)!;

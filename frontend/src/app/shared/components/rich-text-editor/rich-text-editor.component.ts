@@ -10,7 +10,6 @@ import {
 import { form, FormField } from '@angular/forms/signals';
 import { Store } from '@ngrx/store';
 import {
-    ContentAssignableElement,
     newUserGeneratedContent,
     UserGeneratedContent,
     UUID,
@@ -66,10 +65,6 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
             contentId: this.userGeneratedContentId(),
             newContentString: this.editorForm.editorContent().value(),
         });
-        console.log(
-            'content updated! New value: ' +
-                this.userGeneratedContentElement().content
-        );
     }
     ngOnDestroy(): void {
         this.editor.destroy();

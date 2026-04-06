@@ -7,13 +7,22 @@ import { Pool } from 'pg';
 import { PGlite } from '@electric-sql/pglite';
 import { uuid_ossp } from '@electric-sql/pglite/contrib/uuid_ossp';
 import { getTableColumns, sql } from 'drizzle-orm';
-import * as schema from '../schema.js';
 import { Config } from '../../config.js';
+import { relations } from '../schema.js';
 
 export type DatabaseConnectionMode = 'baseline' | 'default' | 'testing';
 
 export let testingDatabaseName: string;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const pgLiteConnection = pgliteDrizzle({
+    relations,
+});
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const postgresConnection = postgresDrizzle({
+    connection: {},
+    relations,
+});
 export class DatabaseService {
     public readonly databaseConnection: DatabaseConnection;
     private _initialized = false;
@@ -29,7 +38,7 @@ export class DatabaseService {
 
     private static async createPostgresConnection(
         mode: DatabaseConnectionMode
-    ): Promise<ReturnType<typeof postgresDrizzle>> {
+    ): Promise<DatabaseConnection> {
         const defaultDatabaseName = `${Config.dbName}`;
         testingDatabaseName = `${Config.dbName}_TESTING`;
         const connection = postgresDrizzle({
@@ -48,20 +57,18 @@ export class DatabaseService {
                 ssl: false,
             },
             logger: Config.dbLogging,
-            schema,
+            relations,
         });
         await this.testConnection(connection);
         return connection;
     }
 
-    private static async createPgliteConnection(): Promise<
-        ReturnType<typeof pgliteDrizzle>
-    > {
+    private static async createPgliteConnection(): Promise<DatabaseConnection> {
         const connection = pgliteDrizzle({
             client: new PGlite({
                 extensions: { uuid_ossp },
             }),
-            schema,
+            relations,
             logger: Config.dbLogging,
         });
         await this.testConnection(connection);
@@ -72,7 +79,7 @@ export class DatabaseService {
 
     public static async createNewDatabaseConnection(
         mode: DatabaseConnectionMode = 'default'
-    ): Promise<DatabaseService> {
+    ) {
         Config.initialize();
         let connection: DatabaseConnection;
 
@@ -123,7 +130,7 @@ export class DatabaseService {
 }
 
 export type DatabaseConnection = Awaited<
-    ReturnType<typeof pgliteDrizzle | typeof postgresDrizzle>
+    typeof pgLiteConnection | typeof postgresConnection
 >;
 export type DatabaseTable = AnyPgTable;
 export type DatabaseTransaction = Parameters<

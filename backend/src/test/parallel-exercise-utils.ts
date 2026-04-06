@@ -40,7 +40,7 @@ export async function createParallelExercise(
     const viewport = createViewport(
         environment.services.exerciseService
             .TESTING_getExerciseMap()
-            .get(exerciseTemplate.trainerKey)!
+            .get(exerciseTemplate.exercise.trainerKey)!
     );
     const response = await environment
         .httpRequest('post', '/api/parallel_exercises/', session)

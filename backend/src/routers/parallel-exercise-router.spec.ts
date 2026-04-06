@@ -154,7 +154,7 @@ describe('parallel exercise router', () => {
             const viewport = createViewport(
                 environment.services.exerciseService
                     .TESTING_getExerciseMap()
-                    .get(template.trainerKey)!
+                    .get(template.exercise.trainerKey)!
             );
             const testData = {
                 name: 'Test Parallel Exercise',

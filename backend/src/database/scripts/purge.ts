@@ -1,5 +1,6 @@
+import { reset } from 'drizzle-seed';
 import { DatabaseService } from '../services/database-service.js';
-import { exerciseTable } from './../schema.js';
+import * as schema from '../schema.js';
 
 const databaseService = await DatabaseService.createNewDatabaseConnection();
 
@@ -12,12 +13,9 @@ databaseService.databaseConnection.transaction(async (manager) => {
         );
     }
     try {
-        const deleteResult = await manager.delete(exerciseTable).returning();
+        await reset(databaseService.databaseConnection, schema);
 
-        console.log(`Successfully deleted ${deleteResult.length} exercises.`);
-
-        const remaining = await manager.select().from(exerciseTable);
-        console.log(`${remaining.length} exercises remaining in database.`);
+        console.log(`Successfully purged the database.`);
     } catch (error) {
         console.error('Error during purge operation:', error);
     }

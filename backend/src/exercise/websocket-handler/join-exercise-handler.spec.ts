@@ -71,7 +71,7 @@ describe('join exercise', () => {
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',
-                    exerciseTemplate.trainerKey,
+                    exerciseTemplate.exercise.trainerKey,
                     'Test Client'
                 );
 
@@ -83,7 +83,7 @@ describe('join exercise', () => {
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',
-                    exerciseTemplate.trainerKey,
+                    exerciseTemplate.exercise.trainerKey,
                     'Test Client'
                 );
 
@@ -98,7 +98,7 @@ describe('join exercise', () => {
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',
-                    exerciseTemplate.trainerKey,
+                    exerciseTemplate.exercise.trainerKey,
                     'Test Client'
                 );
 
@@ -109,7 +109,7 @@ describe('join exercise', () => {
         it('fails joining with participant key if not logged in', async () => {
             const exercise = environment.services.exerciseService
                 .TESTING_getExerciseMap()
-                .get(exerciseTemplate.trainerKey)!;
+                .get(exerciseTemplate.exercise.trainerKey)!;
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',
@@ -123,7 +123,7 @@ describe('join exercise', () => {
         it('fails joining with participant key if logged in', async () => {
             const exercise = environment.services.exerciseService
                 .TESTING_getExerciseMap()
-                .get(exerciseTemplate.trainerKey)!;
+                .get(exerciseTemplate.exercise.trainerKey)!;
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',

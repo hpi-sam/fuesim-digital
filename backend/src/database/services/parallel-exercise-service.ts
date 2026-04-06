@@ -52,7 +52,7 @@ export class ParallelExerciseService {
         if (!parallelExercise) {
             throw new NotFoundError();
         }
-        if (parallelExercise.user !== session.user.id) {
+        if (parallelExercise.userId !== session.user.id) {
             throw new PermissionDeniedError();
         }
         return parallelExercise;
@@ -107,7 +107,7 @@ export class ParallelExerciseService {
             await this.parallelExerciseRepository.createParallelExercise({
                 ...data,
                 participantKey: await this.generateParticipantKey(),
-                user: session.user.id,
+                userId: session.user.id,
             });
         if (!created) {
             throw new ApiError();
@@ -129,7 +129,7 @@ export class ParallelExerciseService {
         if (!parallelExercise) {
             throw new NotFoundError();
         }
-        if (parallelExercise.user !== session.user.id) {
+        if (parallelExercise.userId !== session.user.id) {
             throw new PermissionDeniedError();
         }
         await this.parallelExerciseRepository.updateParallelExercise(
@@ -155,7 +155,7 @@ export class ParallelExerciseService {
         if (!parallelExercise) {
             throw new NotFoundError();
         }
-        if (parallelExercise.user !== session.user.id) {
+        if (parallelExercise.userId !== session.user.id) {
             throw new PermissionDeniedError();
         }
 

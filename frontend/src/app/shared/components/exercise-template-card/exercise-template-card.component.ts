@@ -81,7 +81,7 @@ export class ExerciseTemplateCardComponent {
             title: 'Übungsvorlage löschen',
             description:
                 'Möchten Sie die Übungsvorlage wirklich unwiederbringlich löschen?',
-            confirmationString: exerciseTemplate.trainerKey,
+            confirmationString: exerciseTemplate.exercise.trainerKey,
         });
         if (!deletionConfirmed) {
             return;

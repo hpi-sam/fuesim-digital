@@ -43,7 +43,7 @@ export class ExerciseService {
 
         if (
             exercise.template &&
-            (exercise.template.user !== session?.user.id ||
+            (exercise.template.userId !== session?.user.id ||
                 !isTrainerKey(exerciseKey))
         ) {
             throw new PermissionDeniedError();
@@ -190,7 +190,7 @@ export class ExerciseService {
         if (exerciseEntry.template) {
             throw new PermissionDeniedError();
         }
-        if (exerciseEntry.user && exerciseEntry.user !== session?.user.id) {
+        if (exerciseEntry.userId && exerciseEntry.userId !== session?.user.id) {
             throw new PermissionDeniedError();
         }
 

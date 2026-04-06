@@ -11,7 +11,7 @@ import type {
     ParallelExerciseId,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { relations, sql } from 'drizzle-orm';
+import { defineRelations, sql } from 'drizzle-orm';
 import {
     char,
     integer,
@@ -71,7 +71,7 @@ export type SessionEntry = InferSelectModel<typeof sessionTable>;
 
 export const exerciseTemplateTable = pgTable('exercise_template', {
     ...baseTable<ExerciseTemplateId>(),
-    user: varchar()
+    userId: varchar()
         .references(() => userTable.id, { onDelete: 'cascade' })
         .notNull(),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
@@ -102,7 +102,7 @@ export const exerciseTable = pgTable('exercise_entity', {
     trainerKey: char({ length: 8 }).$type<TrainerKey>().notNull(),
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
-    user: varchar().references(() => userTable.id, { onDelete: 'cascade' }),
+    userId: varchar().references(() => userTable.id, { onDelete: 'cascade' }),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()
         .defaultNow(),
@@ -151,20 +151,9 @@ export const actionTable = pgTable(
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
 
-export const actionEntityRelations = relations(actionTable, ({ one }) => ({
-    exerciseWrapperEntity: one(exerciseTable, {
-        fields: [actionTable.exerciseId],
-        references: [exerciseTable.id],
-    }),
-}));
-
-export const exerciseEntityRelations = relations(exerciseTable, ({ many }) => ({
-    actionWrapperEntities: many(actionTable),
-}));
-
 export const parallelExerciseTable = pgTable('parallel_exercise', {
     ...baseTable<ParallelExerciseId>(),
-    user: varchar()
+    userId: varchar()
         .references(() => userTable.id, { onDelete: 'cascade' })
         .notNull(),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
@@ -188,3 +177,78 @@ export type ParallelExerciseInsert = InferInsertModel<
 export interface ParallelExercise extends ParallelExerciseEntry {
     template: ExerciseTemplateEntry;
 }
+
+export const relations = defineRelations(
+    {
+        actionTable,
+        exerciseTable,
+        exerciseTemplateTable,
+        parallelExerciseTable,
+        userTable,
+        sessionTable,
+        accessKeyTable,
+    },
+    (r) => ({
+        actionTable: {
+            exercise: r.one.exerciseTable({
+                from: r.actionTable.exerciseId,
+                to: r.exerciseTable.id,
+                optional: false,
+            }),
+        },
+        exerciseTable: {
+            actions: r.many.actionTable(),
+            baseTemplate: r.one.exerciseTemplateTable({
+                from: r.exerciseTable.baseTemplateId,
+                to: r.exerciseTemplateTable.id,
+                alias: 'baseTemplate',
+            }),
+            parallelExercise: r.one.parallelExerciseTable({
+                from: r.exerciseTable.parallelExerciseId,
+                to: r.parallelExerciseTable.id,
+            }),
+            template: r.one.exerciseTemplateTable({
+                from: r.exerciseTable.templateId,
+                to: r.exerciseTemplateTable.id,
+                alias: 'template',
+            }),
+            user: r.one.userTable({
+                from: r.exerciseTable.userId,
+                to: r.userTable.id,
+            }),
+        },
+        exerciseTemplateTable: {
+            exercisesCreated: r.many.exerciseTable({
+                to: r.exerciseTable.baseTemplateId,
+                from: r.exerciseTemplateTable.id,
+                alias: 'exercisesCreated',
+            }),
+            exercise: r.one.exerciseTable({
+                to: r.exerciseTable.templateId,
+                from: r.exerciseTemplateTable.id,
+                alias: 'exercise',
+                optional: false,
+            }),
+            user: r.one.userTable({
+                from: r.exerciseTemplateTable.userId,
+                to: r.userTable.id,
+                optional: false,
+            }),
+        },
+        parallelExercise: {
+            exerciseInstances: r.many.exerciseTable(),
+        },
+        users: {
+            exercises: r.many.exerciseTable(),
+            exerciseTemplates: r.many.exerciseTemplateTable(),
+            sessions: r.many.sessionTable(),
+        },
+        sessions: {
+            user: r.one.userTable({
+                from: r.sessionTable.userId,
+                to: r.userTable.id,
+                optional: false,
+            }),
+        },
+    })
+);

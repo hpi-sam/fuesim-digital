@@ -1,4 +1,4 @@
-import { eq, asc, and, inArray } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 import type { ExerciseAction, ExerciseId } from 'fuesim-digital-shared';
 import { actionTable } from '../schema.js';
 import type { ActionWrapper } from '../../exercise/action-wrapper.js';
@@ -7,11 +7,12 @@ import { DatabaseService } from './../services/database-service.js';
 
 export class ActionRepository extends BaseRepository {
     public async getActionsForExerciseId(exerciseId: ExerciseId) {
-        return this.databaseConnection
-            .select()
-            .from(actionTable)
-            .where(eq(actionTable.exerciseId, exerciseId))
-            .orderBy(asc(actionTable.index));
+        return this.databaseConnection.query.actionTable.findMany({
+            where: {
+                exerciseId: { eq: exerciseId },
+            },
+            orderBy: { index: 'asc' },
+        });
     }
 
     public async deleteAllForExercise(exerciseId: ExerciseId) {

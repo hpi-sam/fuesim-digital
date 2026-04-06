@@ -22,7 +22,7 @@ describe('exercise manager service', () => {
             session
         );
         const exercise = environment.services.exerciseService.getExerciseByKey(
-            exerciseTemplate.trainerKey,
+            exerciseTemplate.exercise.trainerKey,
             sessionInformation
         );
         const action: ExerciseAction = {

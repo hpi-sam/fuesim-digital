@@ -53,7 +53,7 @@ export class ParallelExerciseRepository extends BaseRepository {
         userId: string
     ): Promise<ParallelExercise[]> {
         return this.parallelExerciseQuery
-            .where(eq(parallelExerciseTable.user, userId))
+            .where(eq(parallelExerciseTable.userId, userId))
             .orderBy(desc(parallelExerciseTable.createdAt));
     }
 

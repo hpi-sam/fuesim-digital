@@ -83,10 +83,12 @@ export const getExerciseTemplateResponseDataWithoutTrainerKeySchema = z.object({
     name: z.string(),
     description: z.string(),
 });
-export const getExerciseTemplateResponseDataSchema =
-    getExerciseTemplateResponseDataWithoutTrainerKeySchema.extend({
+export const getExerciseTemplateResponseDataSchema = z.object({
+    ...getExerciseTemplateResponseDataWithoutTrainerKeySchema.shape,
+    exercise: z.object({
         trainerKey: trainerKeySchema,
-    });
+    }),
+});
 export type GetExerciseTemplateResponseData = z.infer<
     typeof getExerciseTemplateResponseDataSchema
 >;

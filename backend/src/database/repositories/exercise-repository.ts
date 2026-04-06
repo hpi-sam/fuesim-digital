@@ -1,89 +1,68 @@
 import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
 import { ExerciseState } from 'fuesim-digital-shared';
-import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
+import { sql, eq } from 'drizzle-orm';
 import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
 
 export class ExerciseRepository extends BaseRepository {
-    private get exerciseTemplateQuery() {
-        return this.databaseConnection
-            .select({
-                ...getTableColumns(exerciseTemplateTable),
-                trainerKey: exerciseTable.trainerKey,
-                exercise: { ...getTableColumns(exerciseTable) },
-            })
-            .from(exerciseTemplateTable)
-            .innerJoin(
-                exerciseTable,
-                eq(exerciseTemplateTable.id, exerciseTable.templateId)
-            );
-    }
-
-    private get exerciseQuery() {
-        return this.databaseConnection
-            .select({
-                ...getTableColumns(exerciseTable),
-                template: {
-                    ...getTableColumns(exerciseTemplateTable),
-                },
-            })
-            .from(exerciseTable)
-            .leftJoin(
-                exerciseTemplateTable,
-                eq(exerciseTemplateTable.id, exerciseTable.templateId)
-            );
-    }
-
     public async getExerciseById(id: ExerciseId) {
-        return this.onlySingle(
-            await this.exerciseQuery.where(eq(exerciseTable.id, id))
-        );
+        return this.databaseConnection.query.exerciseTable.findFirst({
+            with: { template: true },
+            where: { id: { eq: id } },
+        });
     }
 
     public getAllExercises() {
-        return this.exerciseQuery;
+        return this.databaseConnection.query.exerciseTable.findMany({
+            with: { template: true },
+        });
     }
 
     public getAllExercisesOfOwner(userId: string) {
-        return this.databaseConnection
-            .select({
-                ...getTableColumns(exerciseTable),
+        return this.databaseConnection.query.exerciseTable.findMany({
+            with: {
                 baseTemplate: {
-                    id: exerciseTemplateTable.id,
-                    name: exerciseTemplateTable.name,
+                    columns: {
+                        id: true,
+                        name: true,
+                    },
                 },
-            })
-            .from(exerciseTable)
-            .leftJoin(
-                exerciseTemplateTable,
-                eq(exerciseTemplateTable.id, exerciseTable.baseTemplateId)
-            )
-            .where(
-                and(
-                    isNull(exerciseTable.templateId),
-                    eq(exerciseTable.user, userId)
-                )
-            )
-            .orderBy(desc(exerciseTable.lastUsedAt));
+            },
+            where: {
+                templateId: { isNull: true },
+                userId,
+            },
+            orderBy: {
+                lastUsedAt: 'desc',
+            },
+        });
     }
 
     public getAllExerciseTemplatesOfOwner(userId: string) {
-        return this.exerciseTemplateQuery
-            .where(eq(exerciseTemplateTable.user, userId))
-            .orderBy(
+        return this.databaseConnection.query.exerciseTemplateTable.findMany({
+            with: {
+                exercise: true,
+            },
+            where: {
+                userId,
+            },
+            orderBy: (t, { desc }) =>
                 desc(
-                    sql<Date>`COALESCE("exercise_template"."lastExerciseCreatedAt", "exercise_template"."lastUpdatedAt")`
-                )
-            );
+                    sql<Date>`COALESCE("lastExerciseCreatedAt", "lastUpdatedAt")`
+                ),
+        });
     }
 
     public async getExerciseTemplateById(id: ExerciseTemplateId) {
-        return this.onlySingle(
-            await this.exerciseTemplateQuery.where(
-                eq(exerciseTemplateTable.id, id)
-            )
-        );
+        return this.databaseConnection.query.exerciseTemplateTable.findFirst({
+            with: {
+                exercise: true,
+            },
+            where: {
+                id: { eq: id },
+            },
+        });
     }
 
     public async createExerciseTemplate(data: ExerciseTemplateInsert) {
@@ -125,15 +104,11 @@ export class ExerciseRepository extends BaseRepository {
      * get exercises with outdated state versions
      */
     public async getOutdatedExercises() {
-        return this.databaseConnection
-            .select()
-            .from(exerciseTable)
-            .where(
-                lt(
-                    exerciseTable.stateVersion,
-                    ExerciseState.currentStateVersion
-                )
-            );
+        return this.databaseConnection.query.exerciseTable.findMany({
+            where: {
+                stateVersion: { lt: ExerciseState.currentStateVersion },
+            },
+        });
     }
 
     public async saveExerciseState(exercise: ExerciseInsert) {

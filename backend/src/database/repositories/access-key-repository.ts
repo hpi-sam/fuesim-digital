@@ -8,7 +8,8 @@ export class AccessKeyRepository extends BaseRepository {
      * Get all allocated keys
      */
     public async getAll() {
-        const res = await this.databaseConnection.select().from(accessKeyTable);
+        const res =
+            await this.databaseConnection.query.accessKeyTable.findMany();
         return new Set(res.map((x) => x.key));
     }
 
@@ -17,10 +18,13 @@ export class AccessKeyRepository extends BaseRepository {
      * @param key to check
      */
     public async exists(key: AccessKey) {
-        const res = await this.databaseConnection
-            .select()
-            .from(accessKeyTable)
-            .where(eq(accessKeyTable.key, key));
+        const res = await this.databaseConnection.query.accessKeyTable.findMany(
+            {
+                where: {
+                    key: { eq: key },
+                },
+            }
+        );
         return res.length === 1;
     }
 

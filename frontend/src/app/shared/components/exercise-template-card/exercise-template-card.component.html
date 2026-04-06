@@ -52,7 +52,9 @@
         </ul>
         <div class="card-body d-flex">
             <a
-                [routerLink]="`/exercises/${exerciseTemplate.trainerKey}`"
+                [routerLink]="
+                    `/exercises/${exerciseTemplate.exercise.trainerKey}`
+                "
                 class="btn btn-primary me-2"
             >
                 Öffnen

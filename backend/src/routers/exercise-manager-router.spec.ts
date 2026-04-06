@@ -303,7 +303,7 @@ describe('exercise manager router', () => {
                 await environment.repositories.exerciseRepository.getExerciseTemplateById(
                     exerciseTemplate.id
                 );
-            expect(exerciseTemplateEntry).toBe(null);
+            expect(exerciseTemplateEntry).toBe(undefined);
 
             // Related exercise also has to be deleted
             expect(
@@ -356,7 +356,9 @@ describe('exercise manager router', () => {
             const parsed = exerciseKeysSchema.parse(response.body);
 
             // Ensure different trainer key
-            expect(parsed.trainerKey).not.toBe(exerciseTemplate.trainerKey);
+            expect(parsed.trainerKey).not.toBe(
+                exerciseTemplate.exercise.trainerKey
+            );
 
             // Ensure existence of exercise
             await environment

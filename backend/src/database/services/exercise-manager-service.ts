@@ -26,13 +26,13 @@ export class ExerciseManagerService {
     }
 
     public async createExerciseTemplate(
-        data: Omit<ExerciseTemplateInsert, 'user'>,
+        data: Omit<ExerciseTemplateInsert, 'userId'>,
         session: SessionInformation
     ) {
         const exerciseTemplate =
             await this.exerciseRepository.createExerciseTemplate({
                 ...data,
-                user: session.user.id,
+                userId: session.user.id,
             });
         if (!exerciseTemplate) {
             throw new ApiError();
@@ -45,7 +45,7 @@ export class ExerciseManagerService {
         await this.exerciseService.loadExercise(newExercise);
         return {
             ...exerciseTemplate,
-            trainerKey: newExercise.trainerKey,
+            exercise: { trainerKey: newExercise.exercise.trainerKey },
         };
     }
 
@@ -59,7 +59,7 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.user !== session.user.id) {
+        if (exerciseTemplate.userId !== session.user.id) {
             throw new PermissionDeniedError();
         }
         const updatedTemplate =
@@ -72,7 +72,7 @@ export class ExerciseManagerService {
         }
         return {
             ...updatedTemplate,
-            trainerKey: exerciseTemplate.trainerKey,
+            exercise: exerciseTemplate.exercise,
         };
     }
 
@@ -89,7 +89,7 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (session && exerciseTemplate.user !== session.user.id) {
+        if (session && exerciseTemplate.userId !== session.user.id) {
             throw new PermissionDeniedError();
         }
 
@@ -98,7 +98,7 @@ export class ExerciseManagerService {
                 exerciseTemplate,
                 exerciseTemplate.exercise,
                 type,
-                { ...optionalData, user: session ? session.user.id : null }
+                { ...optionalData, userId: session ? session.user.id : null }
             );
         await this.exerciseService.loadExercise(newExercise);
         await this.exerciseRepository.updateExerciseTemplate(
@@ -117,11 +117,11 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.user !== session.user.id) {
+        if (exerciseTemplate.userId !== session.user.id) {
             throw new PermissionDeniedError();
         }
         const activeExercise = this.exerciseService.getExerciseByKey(
-            exerciseTemplate.trainerKey,
+            exerciseTemplate.exercise.trainerKey,
             session
         );
         this.exerciseService.unloadExercise(activeExercise);
@@ -141,7 +141,7 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.user !== session.user.id) {
+        if (exerciseTemplate.userId !== session.user.id) {
             throw new PermissionDeniedError();
         }
         return this.exerciseService.getExercisesViewportsById(

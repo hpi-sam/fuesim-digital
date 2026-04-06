@@ -129,7 +129,7 @@ describe('exercise router', () => {
                 await environment
                     .httpRequest(
                         'get',
-                        `/api/exercise/${exerciseTemplate.trainerKey}`
+                        `/api/exercise/${exerciseTemplate.exercise.trainerKey}`
                     )
                     .expect(403);
             });
@@ -138,7 +138,7 @@ describe('exercise router', () => {
                 const response = await environment
                     .httpRequest(
                         'get',
-                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        `/api/exercise/${exerciseTemplate.exercise.trainerKey}`,
                         session
                     )
                     .expect(200);
@@ -156,7 +156,7 @@ describe('exercise router', () => {
                 await environment
                     .httpRequest(
                         'get',
-                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        `/api/exercise/${exerciseTemplate.exercise.trainerKey}`,
                         session2
                     )
                     .expect(403);
@@ -165,7 +165,7 @@ describe('exercise router', () => {
             it('fails with participant key if not logged in', async () => {
                 const exercise = environment.services.exerciseService
                     .TESTING_getExerciseMap()
-                    .get(exerciseTemplate.trainerKey)!;
+                    .get(exerciseTemplate.exercise.trainerKey)!;
                 await environment
                     .httpRequest(
                         'get',
@@ -177,7 +177,7 @@ describe('exercise router', () => {
             it('fails with participant key if logged in', async () => {
                 const exercise = environment.services.exerciseService
                     .TESTING_getExerciseMap()
-                    .get(exerciseTemplate.trainerKey)!;
+                    .get(exerciseTemplate.exercise.trainerKey)!;
                 await environment
                     .httpRequest(
                         'get',
@@ -299,7 +299,7 @@ describe('exercise router', () => {
                 await environment
                     .httpRequest(
                         'delete',
-                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        `/api/exercise/${exerciseTemplate.exercise.trainerKey}`,
                         session
                     )
                     .expect(403);
@@ -307,7 +307,7 @@ describe('exercise router', () => {
                 await environment
                     .httpRequest(
                         'get',
-                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        `/api/exercise/${exerciseTemplate.exercise.trainerKey}`,
                         session
                     )
                     .expect(200);
@@ -316,14 +316,14 @@ describe('exercise router', () => {
                 await environment
                     .httpRequest(
                         'delete',
-                        `/api/exercise/${exerciseTemplate.trainerKey}`
+                        `/api/exercise/${exerciseTemplate.exercise.trainerKey}`
                     )
                     .expect(403);
 
                 await environment
                     .httpRequest(
                         'get',
-                        `/api/exercise/${exerciseTemplate.trainerKey}`,
+                        `/api/exercise/${exerciseTemplate.exercise.trainerKey}`,
                         session
                     )
                     .expect(200);

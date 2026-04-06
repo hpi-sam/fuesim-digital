@@ -77,8 +77,7 @@ export function registerJoinExerciseHandler(
                         exerciseTemplate: clientWrapper.exercise!.template
                             ? {
                                   ...clientWrapper.exercise!.template,
-                                  trainerKey:
-                                      clientWrapper.exercise!.trainerKey,
+                                  exercise: clientWrapper.exercise!,
                               }
                             : null,
                         parallelExerciseId:

@@ -14,7 +14,7 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
 
     router.post('/exercise', async (req, res) => {
         const optionalData = req.session
-            ? { user: req.session.user.id }
+            ? { userId: req.session.user.id }
             : undefined;
         const exercise = isEmpty(req.body)
             ? await exerciseService.exerciseFactory.fromBlank(optionalData)

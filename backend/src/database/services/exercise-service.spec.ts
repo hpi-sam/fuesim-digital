@@ -105,7 +105,7 @@ describe('Exercise-Service', () => {
         );
         const exercise = environment.services.exerciseService
             .TESTING_getExerciseMap()
-            .get(exerciseTemplate.trainerKey)!;
+            .get(exerciseTemplate.exercise.trainerKey)!;
         const beforeAction = Date.now();
         exercise.applyAction(
             {

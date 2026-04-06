@@ -1,0 +1,27 @@
+<div class="scroll-wrapper">
+    @if (isXScrollable()) {
+        <button class="scroll-btn left" (click)="scrollX(-xScrollAmount())">
+            <i class="bi bi-arrow-left-circle"></i>
+        </button>
+    }
+
+    @if (isYScrollable()) {
+        <button class="scroll-btn top" (click)="scrollY(-yScrollAmount())">
+            <i class="bi bi-arrow-up-circle"></i>
+        </button>
+    }
+
+    <ng-content />
+
+    @if (isYScrollable()) {
+        <button class="scroll-btn bottom" (click)="scrollY(yScrollAmount())">
+            <i class="bi bi-arrow-down-circle"></i>
+        </button>
+    }
+
+    @if (isXScrollable()) {
+        <button class="scroll-btn right" (click)="scrollX(xScrollAmount())">
+            <i class="bi bi-arrow-right-circle"></i>
+        </button>
+    }
+</div>

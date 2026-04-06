@@ -54,7 +54,10 @@ export class MapOperatorMapComponent {
         if (!target) {
             return;
         }
-        if (target.closest('.map-toolbar-toggle')) {
+        if (
+            target.closest('.map-toolbar-toggle') ||
+            target.closest('.scroll-btn')
+        ) {
             return;
         }
         this.isToolbarVisible.set(false);

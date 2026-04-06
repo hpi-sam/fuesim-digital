@@ -1,14 +1,20 @@
 <div class="bg-body bg-opacity-50 rounded shadow p-2">
-    <div
-        class="d-flex flex-row align-items-stretch overflow-y-hidden overflow-x-auto"
-    >
-        @for (measureTemplate of measureTemplates(); track measureTemplate.id) {
-            <button
-                class="btn btn-light mx-1 col-sm-3 col-md-2 col-lg-2 col-xl-2"
-                (click)="onMeasureTemplateSelect(measureTemplate)"
-            >
-                {{ measureTemplate.name }}
-            </button>
-        }
-    </div>
+    <app-scroll-buttons>
+        <div
+            #scrollContainer
+            class="d-flex flex-row align-items-stretch overflow-y-hidden overflow-x-auto"
+        >
+            @for (
+                measureTemplate of measureTemplates();
+                track measureTemplate.id
+            ) {
+                <button
+                    class="btn btn-light mx-1 col-sm-3 col-md-2 col-lg-2 col-xl-2"
+                    (click)="onMeasureTemplateSelect(measureTemplate)"
+                >
+                    {{ measureTemplate.name }}
+                </button>
+            }
+        </div>
+    </app-scroll-buttons>
 </div>

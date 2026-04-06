@@ -1,21 +1,6 @@
-<div class="scroll-wrapper overflow-hidden h-100">
-    @if (isScrollable()) {
-        <button
-            class="scroll-btn"
-            [class.left]="isX()"
-            [class.top]="isY()"
-            (click)="scroll(-scrollAmount())"
-        >
-            <i
-                class="bi"
-                [class.bi-arrow-left-circle]="isX()"
-                [class.bi-arrow-up-circle]="isY()"
-            ></i>
-        </button>
-    }
-
+<app-scroll-buttons>
     <div
-        #vehicleZone
+        #scrollContainer
         class="vehicle-zone d-flex flex-grow-1"
         [class.layout-two-columns]="isY()"
         [class.layout-two-rows]="isX()"
@@ -32,19 +17,4 @@
             <app-vehicle-tag [vehicle]="vehicle"></app-vehicle-tag>
         }
     </div>
-
-    @if (isScrollable()) {
-        <button
-            class="scroll-btn"
-            [class.right]="isX()"
-            [class.bottom]="isY()"
-            (click)="scroll(scrollAmount())"
-        >
-            <i
-                class="bi"
-                [class.bi-arrow-right-circle]="isX()"
-                [class.bi-arrow-down-circle]="isY()"
-            ></i>
-        </button>
-    }
-</div>
+</app-scroll-buttons>

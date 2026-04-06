@@ -45,7 +45,13 @@ export const measurePropertyDefinitions: {
     response: { blockedBy: [], requires: [] },
     delay: {
         blockedBy: [],
-        requires: [{ anyOf: [...measurePropertyTypeSchema.values] }],
+        requires: [
+            {
+                anyOf: [...measurePropertyTypeSchema.values].filter(
+                    (pt) => pt !== 'delay'
+                ),
+            },
+        ],
     },
     alarm: { blockedBy: [], requires: [] },
     eocLog: { blockedBy: [], requires: [] },

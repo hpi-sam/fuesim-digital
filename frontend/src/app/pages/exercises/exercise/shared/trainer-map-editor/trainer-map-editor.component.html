@@ -480,8 +480,13 @@
                                     ) {
                                         <app-measure-card
                                             [name]="measureTemplate.name"
-                                            [enableEditButton]="false"
+                                            [enableEditButton]="true"
                                             [enableDeleteButton]="true"
+                                            (elementEdit)="
+                                                editMeasureTemplate(
+                                                    measureTemplate.id
+                                                )
+                                            "
                                             (elementDelete)="
                                                 deleteMeasureTemplate(
                                                     measureTemplate.id

@@ -1,0 +1,28 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        {{ isEditMode ? 'Maßnahme bearbeiten' : 'Maßnahme hinzufügen' }}
+    </h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+@if (editableMeasureTemplateValues) {
+    <div class="modal-body">
+        <app-measure-template-form
+            [initialValues]="{
+                name: editableMeasureTemplateValues.name,
+                properties: editableMeasureTemplateValues.properties,
+            }"
+            [btnText]="isEditMode ? 'Speichern' : 'Maßnahme hinzufügen'"
+            (submitMeasureTemplate)="submitMeasureTemplate($event)"
+        />
+
+        @if (isEditMode) {
+            <button
+                class="btn btn-danger float-end"
+                (click)="deleteMeasureTemplate()"
+            >
+                <i class="bi bi-trash-fill"></i>
+                Löschen
+            </button>
+        }
+    </div>
+}

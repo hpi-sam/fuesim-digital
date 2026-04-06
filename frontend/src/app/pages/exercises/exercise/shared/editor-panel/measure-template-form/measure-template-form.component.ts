@@ -94,11 +94,10 @@ export class MeasureTemplateFormComponent implements OnChanges {
         return measurePropertyTypeToGermanNameDictionary[property];
     }
 
-    ngOnChanges(_changes: SimpleChangesGeneric<this>): void {
-        this.values.set({
-            ...this.initialValues(),
-            ...this.values(),
-        });
+    ngOnChanges(changes: SimpleChangesGeneric<this>): void {
+        if (changes.initialValues.firstChange) {
+            this.values.set({ ...this.initialValues() });
+        }
     }
 
     public drop(event: CdkDragDrop<EditableMeasureProperty>) {

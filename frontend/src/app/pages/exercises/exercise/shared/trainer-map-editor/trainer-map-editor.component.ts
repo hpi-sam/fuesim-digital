@@ -53,7 +53,10 @@ import { PatientStatusDisplayComponent } from '../../../../../shared/components/
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
-import { openCreateMeasureTemplateModal } from '../editor-panel/create-measure-template-modal/open-create-measure-template-modal';
+import {
+    openCreateMeasureTemplateModal,
+    openEditMeasureTemplateModal,
+} from '../editor-panel/measure-template-modal/open-measure-template-modal';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -199,6 +202,10 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public editVehicleTemplate(mapImageTemplateId: UUID) {
         openEditVehicleTemplateModal(this.ngbModalService, mapImageTemplateId);
+    }
+
+    public editMeasureTemplate(measureTemplateId: UUID) {
+        openEditMeasureTemplateModal(this.ngbModalService, measureTemplateId);
     }
 
     public async deleteMeasureTemplate(measureTemplateId: UUID): Promise<void> {

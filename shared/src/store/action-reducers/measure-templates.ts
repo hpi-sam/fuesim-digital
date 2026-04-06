@@ -1,11 +1,14 @@
 import { IsUUID } from 'class-validator';
+import { z } from 'zod';
 import { WritableDraft } from 'immer';
 import {
+    type MeasureProperty,
     type MeasureTemplate,
+    measurePropertySchema,
     measureTemplateSchema,
 } from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
+import { uuidSchema, type UUID } from '../../utils/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsValue } from '../../utils/validators/is-value.js';
@@ -18,6 +21,20 @@ export class AddMeasureTemplateAction implements Action {
 
     @IsZodSchema(measureTemplateSchema)
     public readonly measureTemplate!: MeasureTemplate;
+}
+
+export class EditMeasureTemplateAction implements Action {
+    @IsValue('[MeasureTemplate] Edit measureTemplate')
+    public readonly type = '[MeasureTemplate] Edit measureTemplate';
+
+    @IsZodSchema(uuidSchema)
+    public readonly id!: UUID;
+
+    @IsZodSchema(z.string().min(1))
+    public readonly name!: string;
+
+    @IsZodSchema(z.array(measurePropertySchema))
+    public readonly properties!: readonly MeasureProperty[];
 }
 
 export class DeleteMeasureTemplateAction implements Action {
@@ -43,6 +60,18 @@ export namespace MeasureTemplateActionReducers {
         },
         rights: 'trainer',
     };
+
+    export const editMeasureTemplate: ActionReducer<EditMeasureTemplateAction> =
+        {
+            action: EditMeasureTemplateAction,
+            reducer: (draftState, { id, name, properties }) => {
+                const measureTemplate = getMeasureTemplate(draftState, id);
+                measureTemplate.name = name;
+                measureTemplate.properties = cloneDeepMutable(properties);
+                return draftState;
+            },
+            rights: 'trainer',
+        };
 
     export const deleteMeasureTemplate: ActionReducer<DeleteMeasureTemplateAction> =
         {

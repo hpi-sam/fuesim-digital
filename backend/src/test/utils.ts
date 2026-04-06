@@ -33,6 +33,8 @@ import { ParallelExerciseService } from '../database/services/parallel-exercise-
 import { ParallelExerciseRepository } from '../database/repositories/parallel-exercise-repository.js';
 import type { Repositories } from '../database/repositories/index.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
+import { OrganisationService } from '../database/services/organisation-service.js';
+import { OrganisationRepository } from '../database/repositories/organisation-repository.js';
 
 // Some helper types
 /**
@@ -211,6 +213,8 @@ export function createTestEnvironment(): TestEnvironment {
     let accessKeyRepository: AccessKeyRepository;
     let parallelExerciseService: ParallelExerciseService;
     let parallelExerciseRepository: ParallelExerciseRepository;
+    let organisationService: OrganisationService;
+    let organisationRepository: OrganisationRepository;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
@@ -225,6 +229,9 @@ export function createTestEnvironment(): TestEnvironment {
             databaseService.databaseConnection
         );
         parallelExerciseRepository = new ParallelExerciseRepository(
+            databaseService.databaseConnection
+        );
+        organisationRepository = new OrganisationRepository(
             databaseService.databaseConnection
         );
 
@@ -250,6 +257,7 @@ export function createTestEnvironment(): TestEnvironment {
             exerciseManagerService,
             exerciseService
         );
+        organisationService = new OrganisationService(organisationRepository);
 
         const repositories: Repositories = {
             exerciseRepository,
@@ -258,6 +266,7 @@ export function createTestEnvironment(): TestEnvironment {
             parallelExerciseRepository,
             sessionRepository,
             userRepository,
+            organisationRepository,
         };
         const services: Services = {
             authService,
@@ -265,6 +274,7 @@ export function createTestEnvironment(): TestEnvironment {
             exerciseService,
             parallelExerciseService,
             databaseService,
+            organisationService,
         };
         environment.init(repositories, services);
     });

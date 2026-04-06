@@ -17,6 +17,8 @@ import type { Repositories } from './database/repositories/index.js';
 import { ParallelExerciseRepository } from './database/repositories/parallel-exercise-repository.js';
 import type { Services } from './database/services/index.js';
 import { ParallelExerciseService } from './database/services/parallel-exercise-service.js';
+import { OrganisationService } from './database/services/organisation-service.js';
+import { OrganisationRepository } from './database/repositories/organisation-repository.js';
 
 async function main() {
     Config.initialize();
@@ -53,6 +55,9 @@ async function main() {
         parallelExerciseRepository: new ParallelExerciseRepository(
             databaseService.databaseConnection
         ),
+        organisationRepository: new OrganisationRepository(
+            databaseService.databaseConnection
+        ),
     };
 
     const exerciseService = new ExerciseService(
@@ -67,6 +72,9 @@ async function main() {
         repositories.parallelExerciseRepository,
         exerciseManagerService,
         exerciseService
+    );
+    const organisationService = new OrganisationService(
+        repositories.organisationRepository
     );
 
     let authService: AuthService;
@@ -86,6 +94,7 @@ async function main() {
         exerciseService,
         parallelExerciseService,
         databaseService,
+        organisationService,
     };
 
     if (Config.useDb) {

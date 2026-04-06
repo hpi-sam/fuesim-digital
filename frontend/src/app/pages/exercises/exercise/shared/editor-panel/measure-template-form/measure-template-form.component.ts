@@ -1,7 +1,15 @@
 import type { OnChanges } from '@angular/core';
 import { Component, inject, input, output, signal } from '@angular/core';
 import {
-    measurePropertyDefinitions,
+    CdkDrag,
+    CdkDragDrop,
+    CdkDropList,
+    moveItemInArray,
+    CdkDragHandle,
+    CdkDragPlaceholder,
+    CdkDragPreview,
+} from '@angular/cdk/drag-drop';
+import {
     measurePropertySchema,
     measurePropertyTypeSchema,
     measurePropertyTypeToGermanNameDictionary,
@@ -20,9 +28,7 @@ import {
 import { ZodError } from 'zod';
 import {
     form,
-    validate,
     FormField,
-    applyEach,
     FieldTree,
     validateStandardSchema,
 } from '@angular/forms/signals';
@@ -54,6 +60,11 @@ import {
         NgbDropdownItem,
         DisplayModelValidationComponent,
         FormField,
+        CdkDrag,
+        CdkDropList,
+        CdkDragHandle,
+        CdkDragPlaceholder,
+        CdkDragPreview,
     ],
 })
 export class MeasureTemplateFormComponent implements OnChanges {
@@ -87,6 +98,14 @@ export class MeasureTemplateFormComponent implements OnChanges {
         this.values.set({
             ...this.initialValues(),
             ...this.values(),
+        });
+    }
+
+    public drop(event: CdkDragDrop<EditableMeasureProperty>) {
+        this.values.update((v) => {
+            const properties = [...v.properties];
+            moveItemInArray(properties, event.previousIndex, event.currentIndex);
+            return { ...v, properties };
         });
     }
 

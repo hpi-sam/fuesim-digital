@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { uuid } from 'fuesim-digital-shared';
 import { MeasureTemplateFormComponent } from '../measure-template-form/measure-template-form.component';
@@ -10,7 +11,7 @@ import {
 
 @Component({
     selector: 'app-create-measure-template-modal',
-    imports: [MeasureTemplateFormComponent],
+    imports: [CdkScrollable, MeasureTemplateFormComponent],
     templateUrl: './create-measure-template-modal.component.html',
     styleUrl: './create-measure-template-modal.component.scss',
 })

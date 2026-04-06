@@ -4,5 +4,8 @@ import { CreateMeasureTemplateModalComponent } from './create-measure-template-m
 export async function openCreateMeasureTemplateModal(
     ngbModalService: NgbModal
 ) {
-    ngbModalService.open(CreateMeasureTemplateModalComponent, { size: 'lg' });
+    ngbModalService.open(CreateMeasureTemplateModalComponent, {
+        size: 'lg',
+        scrollable: true,
+    });
 }

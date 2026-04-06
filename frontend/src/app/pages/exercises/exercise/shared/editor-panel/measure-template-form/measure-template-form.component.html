@@ -38,29 +38,48 @@
         </div></label
     >
     @if (values().properties.length > 0) {
-        <div class="d-flex flex-column gap-3 mt-3">
+        <div
+            class="d-flex flex-column gap-3 mt-3"
+            cdkDropList
+            (cdkDropListDropped)="drop($event)"
+        >
             @for (
                 formProperty of measureTemplateForm.properties;
                 let index = $index;
                 track index
             ) {
                 @let property = values().properties[index]!;
-                <div class="card">
+                <div class="card" cdkDrag>
+                    <div class="drag-placeholder" *cdkDragPlaceholder></div>
+                    <div class="card drag-preview" *cdkDragPreview>
+                        <div class="card-body py-2 px-3">
+                            <h6 class="mb-0">
+                                {{ humanReadablePropertyName(property.type) }}
+                            </h6>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <div
-                            class="d-flex align-items-center justify-content-between mb-3"
+                            class="d-flex align-items-center justify-content-between property-header"
                         >
                             <h6 class="mb-0">
                                 {{ humanReadablePropertyName(property.type) }}
                             </h6>
-                            <button
-                                type="button"
-                                class="btn btn-outline-danger btn-sm"
-                                (click)="removeProperty(index)"
-                            >
-                                Entfernen
-                            </button>
+                            <div class="d-flex align-items-center gap-1">
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-sm"
+                                    (click)="removeProperty(index)"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <i
+                                    class="bi bi-list fs-3 drag-handle"
+                                    cdkDragHandle
+                                ></i>
+                            </div>
                         </div>
+                        <div class="property-fields">
                         @switch (property.type) {
                             @case ('manualConfirm') {
                                 @let manualConfirmProperty =
@@ -188,6 +207,7 @@
                                 />
                             }
                         }
+                    </div>
                     </div>
                 </div>
             }

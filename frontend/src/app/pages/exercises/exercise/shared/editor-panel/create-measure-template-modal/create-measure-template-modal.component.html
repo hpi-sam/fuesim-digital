@@ -2,7 +2,7 @@
     <h4 class="modal-title">Maßnahme hinzufügen</h4>
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
-<div class="modal-body">
+<div class="modal-body" cdkScrollable>
     <app-measure-template-form
         [initialValues]="{
             name: editableMeasureTemplateValues.name,

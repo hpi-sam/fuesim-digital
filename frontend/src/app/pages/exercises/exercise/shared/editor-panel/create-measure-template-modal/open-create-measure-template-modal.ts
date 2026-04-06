@@ -6,6 +6,5 @@ export async function openCreateMeasureTemplateModal(
 ) {
     ngbModalService.open(CreateMeasureTemplateModalComponent, {
         size: 'lg',
-        scrollable: true,
     });
 }

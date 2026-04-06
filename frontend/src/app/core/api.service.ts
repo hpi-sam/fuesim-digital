@@ -22,6 +22,11 @@ import {
     ParallelExerciseId,
     PatchParallelExerciseRequestData,
     GroupParticipantKey,
+    getOrganisationsResponseDataSchema,
+    PostOrganisationRequestDataSchema,
+    getOrganisationResponseDataSchema,
+    OrganisationId,
+    PatchOrganisationRequestData,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -135,6 +140,12 @@ export class ApiService {
         ).then(getExerciseTemplateViewportsResponseDataSchema.parse);
     }
 
+    public getOrganisationsResource() {
+        return httpResource(() => `${httpOrigin}/api/organisations/`, {
+            parse: getOrganisationsResponseDataSchema.parse,
+        });
+    }
+
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
             this.httpClient.post(`${httpOrigin}/api/exercise_templates`, data)
@@ -221,5 +232,22 @@ export class ApiService {
                 undefined
             )
         ).then(postJoinParallelExerciseResponseDataSchema.parse);
+    }
+
+    public async createOrganisation(data: PostOrganisationRequestDataSchema) {
+        return lastValueFrom(
+            this.httpClient.post(`${httpOrigin}/api/organisations/`, data)
+        ).then(getOrganisationResponseDataSchema.parse);
+    }
+
+    public async patchOrganisation(
+        id: OrganisationId,
+        data: PatchOrganisationRequestData
+    ) {
+        return lastValueFrom(
+            this.httpClient
+                .patch(`${httpOrigin}/api/organisations/${id}`, data)
+                .pipe(map((v) => getOrganisationResponseDataSchema.parse(v)))
+        );
     }
 }

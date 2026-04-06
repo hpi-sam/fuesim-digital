@@ -1,14 +1,17 @@
-import type {
-    ActionId,
-    ExerciseAction,
-    ExerciseId,
-    ExerciseState,
-    ExerciseTemplateId,
-    ParticipantKey,
-    AccessKey,
-    TrainerKey,
-    GroupParticipantKey,
-    ParallelExerciseId,
+import {
+    type ActionId,
+    type ExerciseAction,
+    type ExerciseId,
+    type ExerciseState,
+    type ExerciseTemplateId,
+    type ParticipantKey,
+    type AccessKey,
+    type TrainerKey,
+    type GroupParticipantKey,
+    type ParallelExerciseId,
+    type OrganisationId,
+    type OrganisationMembershipId,
+    type OrganisationMembershipRole,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
@@ -23,6 +26,9 @@ import {
     varchar,
     timestamp,
     text,
+    pgEnum,
+    unique,
+    index,
 } from 'drizzle-orm/pg-core';
 
 function typedUUID<T>() {
@@ -68,6 +74,50 @@ export const sessionTable = pgTable('sessions', {
     accessToken: varchar().notNull(),
 });
 export type SessionEntry = InferSelectModel<typeof sessionTable>;
+
+export const organisationTable = pgTable('organisation', {
+    ...baseTable<OrganisationId>(),
+    name: varchar().notNull(),
+    description: text().notNull().default(''),
+    createdAt: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .defaultNow(),
+});
+export type OrganisationEntry = InferSelectModel<typeof organisationTable>;
+export type OrganisationInsert = InferInsertModel<typeof organisationTable>;
+
+const organisationMembershipRoleEnum = pgEnum('organisation_membership_role', [
+    'viewer',
+    'editor',
+    'admin',
+]);
+export const organisationMembershipTable = pgTable(
+    'organisation_membership',
+    {
+        ...baseTable<OrganisationMembershipId>(),
+        userId: varchar()
+            .references(() => userTable.id, { onDelete: 'cascade' })
+            .notNull(),
+        organisationId: uuid()
+            .$type<OrganisationId>()
+            .references(() => organisationTable.id, { onDelete: 'cascade' })
+            .notNull(),
+        role: organisationMembershipRoleEnum().$type<OrganisationMembershipRole>(),
+        joinedAt: timestamp({ withTimezone: true, mode: 'date' })
+            .notNull()
+            .defaultNow(),
+    },
+    (t) => [
+        unique().on(t.userId, t.organisationId),
+        index().on(t.organisationId, t.role),
+    ]
+);
+export type OrganisationMembershipEntry = InferSelectModel<
+    typeof organisationMembershipTable
+>;
+export type OrganisationMembershipInsert = InferInsertModel<
+    typeof organisationMembershipTable
+>;
 
 export const exerciseTemplateTable = pgTable('exercise_template', {
     ...baseTable<ExerciseTemplateId>(),

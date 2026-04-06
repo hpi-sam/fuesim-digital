@@ -16,3 +16,13 @@ export const parallelExerciseIdSchema = z
     .uuidv4()
     .brand<'ParallelExerciseId'>();
 export type ParallelExerciseId = z.infer<typeof parallelExerciseIdSchema>;
+
+export const organisationIdSchema = z.uuidv4().brand<'OrganisationId'>();
+export type OrganisationId = z.infer<typeof organisationIdSchema>;
+
+export const organisationMembershipIdSchema = z
+    .uuidv4()
+    .brand<'OrganisationMembershipId'>();
+export type OrganisationMembershipId = z.infer<
+    typeof organisationMembershipIdSchema
+>;

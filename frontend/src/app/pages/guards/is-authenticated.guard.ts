@@ -3,7 +3,7 @@ import type {
     ActivatedRouteSnapshot,
     RouterStateSnapshot,
 } from '@angular/router';
-import { AuthService } from '../../../core/auth.service';
+import { AuthService } from '../../core/auth.service';
 
 @Injectable({
     providedIn: 'root',

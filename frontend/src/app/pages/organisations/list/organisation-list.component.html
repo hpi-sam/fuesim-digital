@@ -1,0 +1,47 @@
+<app-header />
+<main class="container">
+    <h1>
+        Organisationen
+        <button class="btn btn-primary float-end" (click)="create()">
+            Neue Organisation erstellen
+        </button>
+    </h1>
+    @if (organisations.hasValue()) {
+        <div class="row row-cols-3">
+            @for (
+                organisation of organisations.value();
+                track organisation.id
+            ) {
+                <div class="col mb-4">
+                    <app-organisation-card
+                        [organisation]="organisation"
+                        (updated)="organisations.reload()"
+                    />
+                </div>
+            }
+        </div>
+    } @else if (organisations.isLoading()) {
+        <div class="row row-cols-3">
+            @for (_ of [1, 2, 3]; track $index) {
+                <div class="col">
+                    <div class="card" aria-hidden="true">
+                        <div class="card-body">
+                            <h2 class="card-title h4 placeholder-glow">
+                                <span class="placeholder col-6"></span>
+                            </h2>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-4"></span>
+                                <span class="placeholder col-4"></span>
+                            </p>
+                            <a
+                                class="btn btn-primary disabled placeholder col-6"
+                                aria-disabled="true"
+                            ></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</main>
+<app-footer />

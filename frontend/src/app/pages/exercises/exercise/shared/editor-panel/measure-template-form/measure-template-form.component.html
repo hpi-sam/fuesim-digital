@@ -80,134 +80,141 @@
                             </div>
                         </div>
                         <div class="property-fields">
-                        @switch (property.type) {
-                            @case ('manualConfirm') {
-                                @let manualConfirmProperty =
-                                    asManualConfirmProperty(formProperty);
-                                <div class="mb-3">
+                            @switch (property.type) {
+                                @case ('manualConfirm') {
+                                    @let manualConfirmProperty =
+                                        asManualConfirmProperty(formProperty);
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                            >Bestätigungstext</label
+                                        >
+                                        <textarea
+                                            [formField]="
+                                                manualConfirmProperty.prompt
+                                            "
+                                            class="form-control"
+                                            rows="3"
+                                        ></textarea>
+                                        <app-display-model-validation
+                                            [field]="
+                                                manualConfirmProperty.prompt()
+                                            "
+                                            [hide]="true"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="form-label"
+                                            >Bestätigungs-Code (optional)</label
+                                        >
+                                        <input
+                                            [formField]="
+                                                manualConfirmProperty.confirmationString
+                                            "
+                                            type="text"
+                                            class="form-control"
+                                        />
+                                        <app-display-model-validation
+                                            [field]="
+                                                manualConfirmProperty.confirmationString()
+                                            "
+                                            [hide]="true"
+                                        />
+                                    </div>
+                                }
+                                @case ('response') {
+                                    @let responseProperty =
+                                        asResponseProperty(formProperty);
                                     <label class="form-label"
-                                        >Bestätigungstext</label
+                                        >Rückmeldung</label
                                     >
                                     <textarea
-                                        [formField]="
-                                            manualConfirmProperty.prompt
-                                        "
+                                        [formField]="responseProperty.response"
                                         class="form-control"
                                         rows="3"
+                                        placeholder="Text für die Rückmeldung"
                                     ></textarea>
                                     <app-display-model-validation
-                                        [field]="manualConfirmProperty.prompt()"
+                                        [field]="responseProperty.response()"
                                         [hide]="true"
                                     />
-                                </div>
-                                <div>
+                                }
+                                @case ('delay') {
+                                    @let delayProperty =
+                                        asDelayProperty(formProperty);
                                     <label class="form-label"
-                                        >Bestätigungs-Code (optional)</label
+                                        >Dauer in Sekunden</label
                                     >
                                     <input
-                                        [formField]="
-                                            manualConfirmProperty.confirmationString
-                                        "
-                                        type="text"
+                                        [formField]="delayProperty.delay"
+                                        type="number"
                                         class="form-control"
+                                        step="1"
+                                        placeholder="z. B. 30"
                                     />
                                     <app-display-model-validation
-                                        [field]="
-                                            manualConfirmProperty.confirmationString()
-                                        "
+                                        [field]="delayProperty.delay()"
                                         [hide]="true"
                                     />
-                                </div>
-                            }
-                            @case ('response') {
-                                @let responseProperty =
-                                    asResponseProperty(formProperty);
-                                <label class="form-label">Rückmeldung</label>
-                                <textarea
-                                    [formField]="responseProperty.response"
-                                    class="form-control"
-                                    rows="3"
-                                    placeholder="Text für die Rückmeldung"
-                                ></textarea>
-                                <app-display-model-validation
-                                    [field]="responseProperty.response()"
-                                    [hide]="true"
-                                />
-                            }
-                            @case ('delay') {
-                                @let delayProperty =
-                                    asDelayProperty(formProperty);
-                                <label class="form-label"
-                                    >Dauer in Sekunden</label
-                                >
-                                <input
-                                    [formField]="delayProperty.delay"
-                                    type="number"
-                                    class="form-control"
-                                    step="1"
-                                    placeholder="z. B. 30"
-                                />
-                                <app-display-model-validation
-                                    [field]="delayProperty.delay()"
-                                    [hide]="true"
-                                />
-                            }
-                            @case ('alarm') {
-                                @let alarmProperty =
-                                    asAlarmProperty(formProperty);
-                                <div class="mb-3">
-                                    <label class="form-label"
-                                        >Alarmgruppen</label
-                                    >
-                                    @for (
-                                        alarmGroup of alarmProperty.alarmGroups;
-                                        track $index
-                                    ) {
-                                        <span>{{ alarmGroup() }}</span>
-                                    }
-                                    <app-display-model-validation
-                                        [field]="alarmProperty.alarmGroups()"
-                                        [hide]="true"
-                                    />
-                                </div>
-                                <div>
-                                    <label class="form-label"
-                                        >Ziel-Transferpunkte</label
-                                    >
-                                    @for (
-                                        transferPoint of alarmProperty.targetTransferPointIds;
-                                        track $index
-                                    ) {
-                                        <span>{{ transferPoint() }}</span>
-                                    }
+                                }
+                                @case ('alarm') {
+                                    @let alarmProperty =
+                                        asAlarmProperty(formProperty);
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                            >Alarmgruppen</label
+                                        >
+                                        @for (
+                                            alarmGroup of alarmProperty.alarmGroups;
+                                            track $index
+                                        ) {
+                                            <span>{{ alarmGroup() }}</span>
+                                        }
+                                        <app-display-model-validation
+                                            [field]="
+                                                alarmProperty.alarmGroups()
+                                            "
+                                            [hide]="true"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="form-label"
+                                            >Ziel-Transferpunkte</label
+                                        >
+                                        @for (
+                                            transferPoint of alarmProperty.targetTransferPointIds;
+                                            track $index
+                                        ) {
+                                            <span>{{ transferPoint() }}</span>
+                                        }
 
+                                        <app-display-model-validation
+                                            [field]="
+                                                alarmProperty.targetTransferPointIds()
+                                            "
+                                            [hide]="true"
+                                        />
+                                    </div>
+                                }
+                                @case ('eocLog') {
+                                    @let eocLogProperty =
+                                        asEocLogProperty(formProperty);
+                                    <label class="form-label"
+                                        >Einsatztagebuch-Nachricht
+                                        (optional)</label
+                                    >
+                                    <textarea
+                                        [formField]="eocLogProperty.message"
+                                        class="form-control"
+                                        rows="3"
+                                        placeholder="Text für den Eintrag"
+                                    ></textarea>
                                     <app-display-model-validation
-                                        [field]="
-                                            alarmProperty.targetTransferPointIds()
-                                        "
+                                        [field]="eocLogProperty.message()"
                                         [hide]="true"
                                     />
-                                </div>
+                                }
                             }
-                            @case ('eocLog') {
-                                @let eocLogProperty =
-                                    asEocLogProperty(formProperty);
-                                <label class="form-label"
-                                    >Einsatztagebuch-Nachricht (optional)</label
-                                >
-                                <textarea
-                                    [formField]="eocLogProperty.message"
-                                    class="form-control"
-                                    rows="3"
-                                    placeholder="Text für den Eintrag"
-                                ></textarea>
-                                <app-display-model-validation
-                                    [field]="eocLogProperty.message()"
-                                    [hide]="true"
-                                />
-                            }
-                        }
-                    </div>
+                        </div>
                     </div>
                 </div>
             }

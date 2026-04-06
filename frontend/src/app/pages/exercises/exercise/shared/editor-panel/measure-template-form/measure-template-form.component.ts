@@ -104,7 +104,11 @@ export class MeasureTemplateFormComponent implements OnChanges {
     public drop(event: CdkDragDrop<EditableMeasureProperty>) {
         this.values.update((v) => {
             const properties = [...v.properties];
-            moveItemInArray(properties, event.previousIndex, event.currentIndex);
+            moveItemInArray(
+                properties,
+                event.previousIndex,
+                event.currentIndex
+            );
             return { ...v, properties };
         });
     }

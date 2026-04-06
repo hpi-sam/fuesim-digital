@@ -1,4 +1,3 @@
-import type { WritableSignal } from '@angular/core';
 import type {
     MeasureProperty,
     MeasurePropertyType,

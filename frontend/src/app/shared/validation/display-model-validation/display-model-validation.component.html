@@ -1,4 +1,6 @@
-@if (field().errors().length && (!hide() || field().dirty() || field().touched())) {
+@if (
+    field().errors().length && (!hide() || field().dirty() || field().touched())
+) {
     <div class="mt-2 text-danger validation-text">
         @for (error of field().errors(); track error) {
             <div>{{ error.message }}</div>

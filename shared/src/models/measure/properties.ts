@@ -55,11 +55,9 @@ export const measurePropertyDefinitions: {
 
 export const manualConfirmPropertySchema = z.strictObject({
     type: z.literal('manualConfirm'),
-    prompt: z
-        .string()
-        .min(1, {
-            error: 'Der Bestätigungstext muss mindestens 1 Zeichen lang sein.',
-        }),
+    prompt: z.string().min(1, {
+        error: 'Der Bestätigungstext muss mindestens 1 Zeichen lang sein.',
+    }),
     confirmationString: z.string().optional(),
 });
 
@@ -67,11 +65,9 @@ export type ManualConfirmProperty = z.infer<typeof manualConfirmPropertySchema>;
 
 export const responsePropertySchema = z.strictObject({
     type: z.literal('response'),
-    response: z
-        .string()
-        .min(1, {
-            error: 'Die Rückmeldung muss mindestens 1 Zeichen lang sein',
-        }),
+    response: z.string().min(1, {
+        error: 'Die Rückmeldung muss mindestens 1 Zeichen lang sein',
+    }),
 });
 
 export type ResponseProperty = z.infer<typeof responsePropertySchema>;

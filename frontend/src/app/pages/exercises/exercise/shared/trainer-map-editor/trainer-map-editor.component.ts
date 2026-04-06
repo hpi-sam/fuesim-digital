@@ -41,7 +41,6 @@ import {
     selectMapImagesTemplates,
     selectExerciseState,
     selectMeasureTemplates,
-    createSelectVehicleTemplate,
     createSelectMeasureTemplate,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';

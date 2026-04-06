@@ -1,4 +1,4 @@
-import {  IsUUID } from 'class-validator';
+import { IsUUID } from 'class-validator';
 import { WritableDraft } from 'immer';
 import {
     type MeasureTemplate,
@@ -10,11 +10,7 @@ import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import {
-
-    uuidValidationOptions,
-    cloneDeepMutable,
-} from '../../utils/index.js';
+import { uuidValidationOptions, cloneDeepMutable } from '../../utils/index.js';
 
 export class AddMeasureTemplateAction implements Action {
     @IsValue('[MeasureTemplate] Add measureTemplate')

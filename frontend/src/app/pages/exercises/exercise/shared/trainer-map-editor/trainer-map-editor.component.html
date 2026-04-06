@@ -479,9 +479,7 @@
                                         track measureTemplate.id
                                     ) {
                                         <app-measure-card
-                                            [name]="
-                                                measureTemplate.name
-                                            "
+                                            [name]="measureTemplate.name"
                                             [enableEditButton]="false"
                                             [enableDeleteButton]="true"
                                             (elementDelete)="
@@ -489,7 +487,6 @@
                                                     measureTemplate.id
                                                 )
                                             "
-
                                             dataCy="measureTemplateCard"
                                         >
                                         </app-measure-card>

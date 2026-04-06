@@ -47,6 +47,7 @@ import {
     MeasureTemplateValues,
     preprocessProperty,
 } from './measure-template-form-utils';
+import { AlarmPropertyEditorComponent } from './alarm-property-editor/alarm-property-editor.component';
 
 @Component({
     selector: 'app-measure-template-form',
@@ -60,6 +61,7 @@ import {
         NgbDropdownItem,
         DisplayModelValidationComponent,
         FormField,
+        AlarmPropertyEditorComponent,
         CdkDrag,
         CdkDropList,
         CdkDragHandle,
@@ -175,4 +177,25 @@ export class MeasureTemplateFormComponent implements OnChanges {
 
     public asEocLogProperty =
         this.createPropertyCastFunction<EditableEocLogProperty>();
+
+    public updateAlarmGroups(index: number, alarmGroups: string[]) {
+        this.values.update((v) => {
+            if (v.properties[index] === undefined) return v;
+            if (v.properties[index].type !== 'alarm') return v;
+            v.properties[index].alarmGroups = alarmGroups;
+            return v;
+        });
+    }
+
+    public updateTargetTransferPoints(
+        index: number,
+        targetTransferPoints: string[]
+    ) {
+        this.values.update((v) => {
+            if (v.properties[index] === undefined) return v;
+            if (v.properties[index].type !== 'alarm') return v;
+            v.properties[index].targetTransferPointIds = targetTransferPoints;
+            return v;
+        });
+    }
 }

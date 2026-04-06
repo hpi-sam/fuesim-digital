@@ -157,43 +157,21 @@
                                     />
                                 }
                                 @case ('alarm') {
-                                    @let alarmProperty =
-                                        asAlarmProperty(formProperty);
-                                    <div class="mb-3">
-                                        <label class="form-label"
-                                            >Alarmgruppen</label
-                                        >
-                                        @for (
-                                            alarmGroup of alarmProperty.alarmGroups;
-                                            track $index
-                                        ) {
-                                            <span>{{ alarmGroup() }}</span>
-                                        }
-                                        <app-display-model-validation
-                                            [field]="
-                                                alarmProperty.alarmGroups()
-                                            "
-                                            [hide]="true"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label class="form-label"
-                                            >Ziel-Transferpunkte</label
-                                        >
-                                        @for (
-                                            transferPoint of alarmProperty.targetTransferPointIds;
-                                            track $index
-                                        ) {
-                                            <span>{{ transferPoint() }}</span>
-                                        }
-
-                                        <app-display-model-validation
-                                            [field]="
-                                                alarmProperty.targetTransferPointIds()
-                                            "
-                                            [hide]="true"
-                                        />
-                                    </div>
+                                    <app-alarm-property-editor
+                                        [alarmGroupIds]="property.alarmGroups"
+                                        [targetTransferPointIds]="
+                                            property.targetTransferPointIds
+                                        "
+                                        (alarmGroupIdsChange)="
+                                            updateAlarmGroups(index, $event)
+                                        "
+                                        (targetTransferPointIdsChange)="
+                                            updateTargetTransferPoints(
+                                                index,
+                                                $event
+                                            )
+                                        "
+                                    />
                                 }
                                 @case ('eocLog') {
                                     @let eocLogProperty =

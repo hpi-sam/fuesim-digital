@@ -1,5 +1,4 @@
 <h4 class="h4 mt-4">Eigenschaften</h4>
-<hr class="my-2" />
 <div class="form-group mb-3">
     <label class="form-label">Name der Sammlung</label>
     <input
@@ -19,7 +18,7 @@
     </button>
 </div>
 
-<h4 class="h4 mt-4">
+<h4 class="h4 mt-5">
     Mitglieder
     @if (inviteCode.isLoading() || members.isLoading()) {
         <div
@@ -30,23 +29,34 @@
         </div>
     }
 </h4>
-<hr class="my-2" />
-<button
-    class="btn btn-outline-primary w-"
-    type="button"
-    (click)="createInviteCode()"
->
-    Einladungslink erstellen
-</button>
-@if (inviteCode.hasValue()) {
-    <div class="d-flex flex-row align-items-center gap-2 mt-2">
-        <div
-            class="bg-light p-2 border rounded w-100 font-monospace user-select-all"
-        >
-            {{ inviteJoinLink() }}
+@if (inviteCode.hasValue() && inviteCode.value() !== null) {
+    <span class="text-muted">Einladungslink zum Beitreten der Sammlung:</span>
+    <div
+        class="bg-light p-1 border rounded w-100 d-flex flex-row align-items-center justify-content-between ps-3"
+    >
+        <span class="user-select-all font-monospace">{{
+            inviteJoinLink()
+        }}</span>
+        <div>
+            <app-copy-button [value]="inviteJoinLink()" />
+            <button
+                class="btn text-danger"
+                type="button"
+                (click)="revokeInviteCode()"
+                ngbTooltip="Einladungslink ungültig machen"
+            >
+                <i class="bi bi-x-square"></i>
+            </button>
         </div>
-        <app-copy-button [value]="inviteJoinLink()" />
     </div>
+} @else {
+    <button
+        class="btn btn-outline-primary w-"
+        type="button"
+        (click)="createInviteCode()"
+    >
+        Einladungslink erstellen
+    </button>
 }
 
 @if (members.hasValue()) {
@@ -78,7 +88,12 @@
                 @if (member.id !== ownUserId()) {
                     <button
                         class="btn btn-outline-danger btn-sm ms-auto"
-                        (click)="removeCollectionMember(member.id)"
+                        (click)="
+                            removeCollectionMember(
+                                member.id,
+                                member.displayName
+                            )
+                        "
                     >
                         <i class="bi bi-x-square"></i>
                     </button>
@@ -88,55 +103,56 @@
     </ul>
 }
 
-<h4 class="h4 mt-5">Gefahrenzone</h4>
-<hr class="my-2" />
-<ul class="list-group">
-    <li
-        class="list-group-item border-danger d-flex flex-row align-items-center justify-content-between gap-2"
-    >
-        <div class="d-flex flex-column">
-            <b> Sammlung veröffentlichen </b>
-            <small class="text-muted">
-                Diese Sammlung wird in der Übersicht für alle Benutzer sichtbar
-                und in Übungsszenarien verwendbar sein. Diese Aktion kann nicht
-                rückgängig gemacht werden.
-            </small>
-        </div>
-        @if (collection().visibility === 'private') {
+@if (!collection().archived) {
+    <h4 class="h4 mt-5">Gefahrenzone</h4>
+    <ul class="list-group">
+        <li
+            class="list-group-item d-flex flex-row align-items-center justify-content-between gap-2"
+        >
+            <div class="d-flex flex-column">
+                <b> Sammlung veröffentlichen </b>
+                <small class="text-muted">
+                    Diese Sammlung wird in der Übersicht für alle Benutzer
+                    sichtbar und in Übungsszenarien verwendbar sein. Diese
+                    Aktion kann nicht rückgängig gemacht werden.
+                </small>
+            </div>
+            @if (collection().visibility === 'private') {
+                <button
+                    class="btn btn-outline-danger text-nowrap"
+                    type="button"
+                    (click)="makeCollectionPublic()"
+                >
+                    Sammlung veröffentlichen
+                </button>
+            } @else {
+                <span
+                    class="badge text-bg-success d-flex flex-row align-items-center gap-1 p-2"
+                >
+                    <i class="bi bi-check-circle"></i>
+                    <span> Bereits öffentlich </span>
+                </span>
+            }
+        </li>
+        <li
+            class="list-group-item d-flex flex-row align-items-center justify-content-between gap-2"
+        >
+            <div class="d-flex flex-column">
+                <b> Sammlung archivieren </b>
+                <small class="text-muted">
+                    Wenn eine Sammlung archiviert wird, wird diese nicht mehr in
+                    der Übersicht angezeigt. Bereits bestehende Übungsszenarien,
+                    die Elemente aus dieser Sammlung verwenden, können weiterhin
+                    auf diese Elemente zugreifen.
+                </small>
+            </div>
             <button
                 class="btn btn-outline-danger text-nowrap"
                 type="button"
-                (click)="makeSetPublic()"
+                (click)="archiveCollection()"
             >
-                Sammlung veröffentlichen
+                Sammlung archivieren
             </button>
-        } @else {
-            <span
-                class="badge text-bg-success d-flex flex-row align-items-center gap-1 p-2"
-            >
-                <i class="bi bi-check-circle"></i>
-                <span> Bereits öffentlich </span>
-            </span>
-        }
-    </li>
-    <li
-        class="list-group-item border-danger d-flex flex-row align-items-center justify-content-between gap-2"
-    >
-        <div class="d-flex flex-column">
-            <b> Sammlung löschen </b>
-            <small class="text-muted">
-                Wenn eine Sammlung gelöscht wird, wird diese nicht mehr in der
-                Übersicht angezeigt. Bereits bestehende Übungsszenarien, die
-                Elemente aus dieser Sammlung verwenden, können weiterhin auf
-                diese Elemente zugreifen.
-            </small>
-        </div>
-        <button
-            class="btn btn-outline-danger text-nowrap"
-            type="button"
-            (click)="deleteSet()"
-        >
-            Sammlung löschen
-        </button>
-    </li>
-</ul>
+        </li>
+    </ul>
+}

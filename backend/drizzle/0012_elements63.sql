@@ -1,1 +1,0 @@
-ALTER TABLE "collection_join_codes" ALTER COLUMN "code" SET DATA TYPE varchar;

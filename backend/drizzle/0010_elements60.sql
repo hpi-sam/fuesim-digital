@@ -1,2 +1,0 @@
-ALTER TABLE "collection_user_mapping" ADD COLUMN "id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL;--> statement-breakpoint
-ALTER TABLE "collection_user_mapping" ADD CONSTRAINT "unique_collection_user" UNIQUE("userId","collectionEntityId");

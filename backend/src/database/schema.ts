@@ -169,20 +169,24 @@ const stateVersionedEntity = <EntityBrand, VersionBrand>(prefix: string) => ({
         .$type<EntityBrand>(),
     version: integer().notNull(),
     stateVersion: integer().notNull(),
-    createdBy: varchar().notNull().default('unknown'), // TODO: @Quixelation - replace with actual user id when creating sets and elements
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
+        .defaultNow()
+        .notNull(),
+    editedAt: timestamp({ withTimezone: true, mode: 'date' })
+        .$onUpdateFn(() => new Date())
         .defaultNow()
         .notNull(),
 });
 
 export const collectionTable = pgTable(
-    'exercise_element_sets',
+    'collections',
     {
         ...stateVersionedEntity<CollectionEntityId, CollectionVersionId>('set'),
         title: varchar().notNull(),
         description: varchar().notNull(),
         visibility: varchar().notNull().default('private'),
         draftState: boolean().notNull(),
+        archived: boolean().notNull().default(false),
     },
     (table) => [
         unique('unique_set_version').on(table.entityId, table.version),
@@ -191,7 +195,7 @@ export const collectionTable = pgTable(
 );
 
 export const elementCollectionMappingTable = pgTable(
-    'exercise_element_to_set_mapping',
+    'element_to_collection_mapping',
     {
         setEntityId: varchar().notNull().$type<CollectionEntityId>(),
         setVersionId: varchar()
@@ -250,7 +254,7 @@ export const collectionDependencyMappingTable = pgTable(
 );
 
 export const elementTable = pgTable(
-    'exercise_element_templates',
+    'elements',
     {
         ...stateVersionedEntity<ElementEntityId, ElementVersionId>('element'),
         title: varchar().notNull(),

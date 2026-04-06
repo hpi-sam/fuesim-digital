@@ -7,11 +7,9 @@ import {
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ValuesPipe } from '../../../shared/pipes/values.pipe';
 import { GenericElementCardComponent } from '../generic-element-card/generic-element-card.component';
-import {
-    VersionedElementModalComponent,
-    EditingVersionedElementModalData,
-} from '../editor-modals/versioned-element-modal/versioned-element-modal.component';
+import { VersionedElementModalComponent } from '../editor-modals/versioned-element-modal/versioned-element-modal.component';
 import { CollectionService } from '../../../core/exercise-element.service';
+import { EditingVersionedElementModalData } from '../editor-modals/base-versioned-element-submodal';
 
 @Component({
     selector: 'app-element-card',

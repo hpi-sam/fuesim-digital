@@ -1,5 +1,5 @@
 import { AsyncPipe, JsonPipe } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, resource } from '@angular/core';
 import { NgbDropdownModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import {
     checkCollectionRole,
@@ -31,7 +31,13 @@ export class UsedCollectionsTabComponent {
     public readonly collectionData =
         input.required<ExerciseElementSetSubscriptionData>();
 
-    public availableCollections = this.collectionService.collections;
+    public availableCollections = resource({
+        loader: async () =>
+            this.collectionService.getMyCollections({
+                includeDraftState: false,
+                archived: false,
+            }),
+    });
 
     public readonly checkRole = checkCollectionRole.bind(this);
 

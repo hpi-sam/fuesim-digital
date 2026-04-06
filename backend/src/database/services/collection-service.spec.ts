@@ -29,7 +29,6 @@ describe('Collection Service', () => {
                 triggerLimit: null,
             } as AlarmGroup,
             createdAt: new Date(),
-            createdBy: 'test_user',
             description: 'Test element',
             stateVersion: 1,
         });

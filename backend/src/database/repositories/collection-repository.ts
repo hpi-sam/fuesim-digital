@@ -66,6 +66,14 @@ export class CollectionRepository extends BaseRepository {
         );
     }
 
+    public async revokeJoinCode(collectionEntitiyId: CollectionEntityId) {
+        return this.databaseConnection
+            .delete(collectionJoinCodesTable)
+            .where(
+                eq(collectionJoinCodesTable.collection, collectionEntitiyId)
+            );
+    }
+
     public async getCollectionByJoinCode(
         code: string
     ): Promise<CollectionEntityId | null> {
@@ -536,7 +544,6 @@ export class CollectionRepository extends BaseRepository {
                 description: '',
                 content: data.content,
                 entityId: data.entityId,
-                createdBy: 'test-owner', // TODO: @Quixelation
             })
             .returning();
 
@@ -739,9 +746,6 @@ export class CollectionRepository extends BaseRepository {
                                 ),
                             version: sql<number>`1`.as('version'),
                             stateVersion: latestElements.stateVersion,
-                            createdBy: sql<string>`${targetSet.owner}`.as(
-                                'createdBy'
-                            ),
                             createdAt: sql`now()`.as('createdAt'),
                             title: latestElements.title,
                             description: latestElements.description,
@@ -809,7 +813,7 @@ export class CollectionRepository extends BaseRepository {
 
     public async getLatestCollectionForUser(
         userId: string,
-        opts?: { allowDraftState?: boolean }
+        opts?: { allowDraftState?: boolean; archived?: boolean }
     ) {
         const latestCollections = this.latestCollections({
             allowDraftState: opts?.allowDraftState ?? true,
@@ -830,7 +834,12 @@ export class CollectionRepository extends BaseRepository {
                 collectionTable,
                 eq(collectionTable.versionId, latestCollections.versionId)
             )
-            .where(eq(collectionUserMappingTable.userId, userId));
+            .where(
+                and(
+                    eq(collectionUserMappingTable.userId, userId),
+                    eq(collectionTable.archived, opts?.archived ?? false)
+                )
+            );
 
         return result;
     }
@@ -951,6 +960,21 @@ export class CollectionRepository extends BaseRepository {
                 )
                 .orderBy(desc(collectionTable.version))
                 .limit(1)
+        );
+    }
+
+    public async archiveCollection(
+        collectionEntityId: CollectionEntityId,
+        unarchive = false
+    ) {
+        return this.onlySingleStrict(
+            await this.databaseConnection
+                .update(collectionTable)
+                .set({
+                    archived: !unarchive,
+                })
+                .where(eq(collectionTable.entityId, collectionEntityId))
+                .returning()
         );
     }
 }

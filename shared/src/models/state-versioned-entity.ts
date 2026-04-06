@@ -6,5 +6,5 @@ export const stateVersionedEntitySchema = z.object({
     version: z.number(),
     stateVersion: z.number(),
     createdAt: stringToDate,
-    createdBy: z.string(),
+    editedAt: stringToDate,
 });

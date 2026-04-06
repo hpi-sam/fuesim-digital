@@ -22,6 +22,7 @@ import { MapEditorCardComponent } from '../../../../../shared/components/map-edi
 import {
     ChangeImpact,
     EditableElementChangeImpact,
+    InExerciseElement,
 } from '../change-impact-modal/change-impact-types';
 
 @Component({
@@ -42,9 +43,11 @@ export class MarketplaceTabComponent {
     > | null>(null);
 
     constructor() {
-        this.collectionService.getMyCollections(false).then((collections) => {
-            this.availableCollections.set(collections);
-        });
+        this.collectionService
+            .getMyCollections({ includeDraftState: false })
+            .then((collections) => {
+                this.availableCollections.set(collections);
+            });
         effect(() => {
             const selectedCollection = this.selectedCollection();
             if (selectedCollection) {

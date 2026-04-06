@@ -1,6 +1,6 @@
 import type { Vehicle, ElementDto } from 'fuesim-digital-shared';
 
-type InExerciseElement = Vehicle;
+export type InExerciseElement = Vehicle;
 
 export type ChangeImpact =
     | AddedElementChangeImpact

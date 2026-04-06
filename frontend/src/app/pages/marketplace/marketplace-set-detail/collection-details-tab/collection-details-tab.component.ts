@@ -15,12 +15,13 @@ import {
 } from 'fuesim-digital-shared';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../../core/exercise-element.service';
 import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 import { CopyButtonComponent } from '../../../../shared/components/copy-button/copy-button.component';
 import { CollectionRelationshipTypeDisplayNamePipe } from '../../../../shared/pipes/collection-relationship-type-display-name.pipe';
 import { AuthService } from '../../../../core/auth.service';
+import { ConfirmationModalService } from '../../../../core/confirmation-modal/confirmation-modal.service';
 
 @Component({
     selector: 'app-collection-details-tab',
@@ -28,6 +29,7 @@ import { AuthService } from '../../../../core/auth.service';
         FormsModule,
         DisplayValidationComponent,
         CopyButtonComponent,
+        NgbTooltip,
         JsonPipe,
         NgbDropdownModule,
         CollectionRelationshipTypeDisplayNamePipe,
@@ -39,6 +41,9 @@ export class CollectionDetailsTabComponent {
     private readonly collectionService = inject(CollectionService);
     private readonly authService = inject(AuthService);
     private readonly router = inject(Router);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
 
     public readonly allowedRoleValues = collectionRelationshipTypeAllowedValues;
 
@@ -66,7 +71,7 @@ export class CollectionDetailsTabComponent {
     public readonly inviteJoinLink = computed(() => {
         const inviteCode = this.inviteCode.value();
         return inviteCode
-            ? `${location.protocol}//${location.host}/api/collections/join/${inviteCode.code}`
+            ? `${location.protocol}//${location.host}/collections/${this.collection().entityId}?join=${inviteCode.code}`
             : '';
     });
 
@@ -79,14 +84,32 @@ export class CollectionDetailsTabComponent {
     }
 
     public async createInviteCode() {
-        const result =
-            await this.collectionService.getOrCreateCollectionInviteCode(
-                this.collection().entityId
-            );
+        const result = await this.collectionService.createCollectionInviteCode(
+            this.collection().entityId
+        );
         this.inviteCode.set(result);
     }
 
-    public async removeCollectionMember(userId: string) {
+    public async revokeInviteCode() {
+        const confirmationResult = await this.confirmationModalService.confirm({
+            title: 'Einladungslink widerrufen',
+            description:
+                'Möchten Sie den Einladungslink wirklich widerrufen? Dadurch verlieren alle Personen, die den Link haben, den Zugriff auf die Sammlung. Bereits eingeladene Personen können die Sammlung weiterhin nutzen, verlieren jedoch den Zugriff auf neue Versionen der Sammlung.',
+            confirmationButtonText: 'Einladungslink widerrufen',
+        });
+        if (!confirmationResult) return;
+        await this.collectionService.revokeCollectionInviteCode(
+            this.collection().entityId
+        );
+        this.inviteCode.set(undefined);
+    }
+
+    public async removeCollectionMember(userId: string, userName: string) {
+        const confirmationResult = await this.confirmationModalService.confirm({
+            title: 'Mitglied entfernen',
+            description: `Möchten Sie ${userName} wirklich entfernen? Dadurch verliert die Person den Zugriff auf die Sammlung. Die Person kann die Sammlung erneut betreten, wenn sie einen gültigen Einladungslink hat.`,
+        });
+        if (!confirmationResult) return;
         await this.collectionService.removeCollectionMember(
             this.collection().entityId,
             userId
@@ -114,16 +137,30 @@ export class CollectionDetailsTabComponent {
         );
     }
 
-    public async makeSetPublic() {
+    public async makeCollectionPublic() {
+        const confirmationResult = await this.confirmationModalService.confirm({
+            title: 'Sammlung veröffentlichen',
+            description:
+                'Möchten Sie diese Sammlung wirklich veröffentlichen? Dadurch wird sie für alle Nutzer sichtbar und nutzbar. Diese Aktion kann nicht rückgängig gemacht werden.',
+            confirmationString: 'veröffentlichen',
+            confirmationButtonText: 'Sammlung veröffentlichen',
+        });
+        if (!confirmationResult) return;
         await this.collectionService.makeCollectionPublic(
             this.collection().entityId
         );
     }
 
-    public async deleteSet() {
-        await this.collectionService.deleteCollection(
+    public async archiveCollection() {
+        const confirmationResult = await this.confirmationModalService.confirm({
+            title: 'Sammlung archivieren',
+            description: 'Möchten Sie diese Sammlung wirklich archivieren?',
+            confirmationButtonText: 'Sammlung archivieren',
+        });
+        if (!confirmationResult) return;
+        await this.collectionService.archiveCollection(
             this.collection().entityId
         );
-        this.router.navigate(['/marketplace']);
+        this.router.navigate(['/collections']);
     }
 }

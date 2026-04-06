@@ -7,10 +7,18 @@
         >
             <i class="bi bi-folder-symlink me-2"></i>
             <span>Weitere Sammlung verwenden</span>
+            @if (availableCollections.isLoading()) {
+                <div
+                    class="spinner-border spinner-border-sm text-primary"
+                    role="status"
+                >
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            }
         </button>
         <div ngbDropdownMenu>
             @for (
-                availableCollection of availableCollections();
+                availableCollection of availableCollections.value();
                 track availableCollection.versionId
             ) {
                 @if (
@@ -25,7 +33,17 @@
                     >
                         {{ availableCollection.title }}
                     </button>
+                } @else {
+                    <span class="dropdown-item-text text-muted">
+                        {{ availableCollection.title }} (aktuelle Sammlung -
+                        nicht auswählbar)
+                    </span>
                 }
+            }
+            @if ((availableCollections.value()?.length ?? 0) === 0) {
+                <span class="dropdown-item-text text-muted">
+                    Keine weiteren Sammlungen verfügbar
+                </span>
             }
         </div>
     </div>

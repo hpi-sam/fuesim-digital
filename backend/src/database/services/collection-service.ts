@@ -79,6 +79,12 @@ export class CollectionService {
         );
     }
 
+    public async revokeCollectionInviteCode(
+        collectionEntityId: CollectionEntityId
+    ) {
+        return this.collectionRepository.revokeJoinCode(collectionEntityId);
+    }
+
     public async getUserRoleInCollection(
         collectionEntityId: CollectionEntityId,
         userId: string
@@ -127,6 +133,18 @@ export class CollectionService {
                 'admin'
             );
             return createdCollection;
+        });
+    }
+
+    public async getCollectionByJoinCode(joinCode: string) {
+        return this.collectionRepository.transaction(async (tx) => {
+            const collectionId = this.exists(
+                await tx.getCollectionByJoinCode(joinCode)
+            );
+            const collection = this.exists(
+                await tx.getLatestCollectionByEntityId(collectionId)
+            );
+            return collection;
         });
     }
 
@@ -390,7 +408,7 @@ export class CollectionService {
     }
 
     public async createExerciseObject(
-        setEntityId: CollectionEntityId,
+        collectionEntityId: CollectionEntityId,
         content: VersionedElementContent
     ) {
         return this.collectionRepository.transaction(async (tx) => {
@@ -406,7 +424,7 @@ export class CollectionService {
             eventBuffer.next({
                 event: 'element:create',
                 data: result,
-                collectionEntityId: setEntityId,
+                collectionEntityId: collectionEntityId,
             });
 
             if (!result) {
@@ -414,12 +432,12 @@ export class CollectionService {
             }
 
             const [draftState, createdNewDraftState] =
-                await tx.getOrCreateDraftState(setEntityId);
+                await tx.getOrCreateDraftState(collectionEntityId);
             if (createdNewDraftState) {
                 eventBuffer.next({
                     event: 'collection:update',
                     data: draftState,
-                    collectionEntityId: setEntityId,
+                    collectionEntityId: collectionEntityId,
                 });
             }
 
@@ -439,19 +457,20 @@ export class CollectionService {
 
     public async getLatestCollectionsForUser(
         userId: string,
-        opts: { includeDraftState: boolean }
+        opts: { includeDraftState: boolean; archived?: boolean }
     ) {
         return this.collectionRepository.getLatestCollectionForUser(userId, {
             allowDraftState: opts.includeDraftState,
+            archived: opts.archived,
         });
     }
 
     public async getLatestCollectionById(
-        setEntityId: CollectionEntityId,
+        collectionEntityId: CollectionEntityId,
         opts: { draftState: boolean }
     ): Promise<CollectionDto | null> {
         return this.collectionRepository.getLatestCollectionByEntityId(
-            setEntityId,
+            collectionEntityId,
             { allowDraftState: opts.draftState }
         );
     }
@@ -605,8 +624,20 @@ export class CollectionService {
         };
     }
 
-    public async deleteCollection(setEntityId: CollectionEntityId) {
-        // TODO: @Quixelation - forbid, if set is public, and do some other checks
+    public async archiveCollection(
+        collectionEntityId: CollectionEntityId,
+        unarchive = false
+    ) {
+        const result = await this.collectionRepository.archiveCollection(
+            collectionEntityId,
+            unarchive
+        );
+        this.eventSubject.next({
+            event: 'collection:update',
+            data: result,
+            collectionEntityId,
+        });
+        return result;
     }
 
     public async getExerciseElementObjectVersions(entityId: ElementEntityId) {
@@ -949,16 +980,16 @@ export class CollectionService {
         return dependingElements;
     }
 
-    public async makeCollectionPublic(setEntityId: CollectionEntityId) {
+    public async makeCollectionPublic(collectionEntityId: CollectionEntityId) {
         const data = await this.collectionRepository.setCollectionVisibility(
-            setEntityId,
+            collectionEntityId,
             'public'
         );
 
         this.eventSubject.next({
             event: 'collection:update',
             data,
-            collectionEntityId: setEntityId,
+            collectionEntityId: collectionEntityId,
         });
 
         return data;

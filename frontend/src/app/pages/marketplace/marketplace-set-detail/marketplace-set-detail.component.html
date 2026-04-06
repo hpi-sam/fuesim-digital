@@ -1,16 +1,33 @@
 <div class="container">
-    @if (selectedSetData(); as setData) {
+    <a
+        class="btn btn-outline-secondary btn-sm mb-4"
+        [routerLink]="routerBackLink.link"
+    >
+        <i class="bi bi-arrow-left"></i
+        ><span> Zurück zu {{ routerBackLink.title }}</span>
+    </a>
+    @if (selectedCollectionData(); as collectionData) {
         <div class="d-flex flex-row justify-content-between container w-100">
-            <h2>{{ setData.collection.title }}</h2>
+            <h2>{{ collectionData.collection.title }}</h2>
 
             <div class="d-flex flex-row gap-2 align-items-center">
                 <button
                     type="button"
                     class="btn btn-outline-primary"
-                    (click)="duplicateSet()"
+                    (click)="duplicateCollection()"
                 >
                     <i class="bi bi-copy"></i>
                 </button>
+                @if (checkRole(collectionData.ownRole).isAtMost('editor')) {
+                    <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        (click)="leaveCollection()"
+                        ngbTooltip="Diese Sammlung verlassen"
+                    >
+                        <i class="bi bi-person-dash-fill"></i>
+                    </button>
+                }
             </div>
         </div>
 
@@ -19,19 +36,19 @@
         >
             <div class="d-flex flex-column gap-1">
                 <span class="text-muted">
-                    Version {{ setData.collection.version }} &middot;
+                    Version {{ collectionData.collection.version }} &middot;
                     Erstellungsdatum:
-                    {{ setData.collection.createdAt | date }} &middot;
-                    {{ setData.objects.direct.length }}
+                    {{ collectionData.collection.createdAt | date }} &middot;
+                    {{ collectionData.objects.direct.length }}
                     Einträge
                 </span>
                 <span
                     class="text-muted d-flex flex-row gap-1 align-items-center"
                 >
-                    @if (setData.objects.transitive.length > 0) {
+                    @if (collectionData.objects.transitive.length > 0) {
                         Verwendet Sammlungen:
                         @for (
-                            dependency of setData.objects.transitive;
+                            dependency of collectionData.objects.transitive;
                             track dependency.collection.versionId
                         ) {
                             <span
@@ -47,7 +64,32 @@
             <div class="d-flex flex-row gap-2 align-items-center"></div>
         </div>
 
-        @if (setData.collection.draftState) {
+        @if (collectionData.collection.archived) {
+            <div
+                class="alert alert-warning d-flex flex-row justify-content-between align-items-center gap-3"
+                role="alert"
+            >
+                <span class="d-flex flex-row align-items-center gap-3">
+                    <i class="bi bi-info-circle"></i>
+                    <span>
+                        Diese Sammlung ist archiviert und wird nicht mehr in
+                        Übungsszenarien angezeigt. Einige Funktionen sind
+                        eingeschränkt.<br />
+                        Stellen Sie diese Sammlung wieder her, um sie in
+                        Übungsszenarien verwenden zu können.
+                    </span>
+                </span>
+                @if (checkRole(collectionData.ownRole).isAtLeast('editor')) {
+                    <button
+                        class="btn btn-warning"
+                        (click)="unarchiveCollection()"
+                    >
+                        Sammlung wiederherstellen
+                    </button>
+                }
+            </div>
+        }
+        @if (collectionData.collection.draftState) {
             <div
                 class="alert alert-primary d-flex flex-row justify-content-between align-items-center gap-3"
                 role="alert"
@@ -60,7 +102,7 @@
                         Übungsszenarien verwenden zu können.
                     </span>
                 </span>
-                @if (checkRole(setData.ownRole).isAtLeast('editor')) {
+                @if (checkRole(collectionData.ownRole).isAtLeast('editor')) {
                     <button
                         class="btn btn-primary btn-sm"
                         (click)="saveDraftState()"
@@ -75,7 +117,11 @@
                 <button ngbNavLink>Elemente</button>
                 <ng-template ngbNavContent>
                     <div class="w-100 d-flex flex-row justify-content-end mb-3">
-                        @if (checkRole(setData.ownRole).isAtLeast('editor')) {
+                        @if (
+                            checkRole(collectionData.ownRole).isAtLeast(
+                                'editor'
+                            )
+                        ) {
                             <div ngbDropdown>
                                 <button
                                     type="button"
@@ -111,7 +157,8 @@
                                 class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-2"
                             >
                                 @for (
-                                    exerciseObject of setData.objects.direct;
+                                    exerciseObject of collectionData.objects
+                                        .direct;
                                     track exerciseObject.versionId
                                 ) {
                                     @if (exerciseObject.content.type === type) {
@@ -120,7 +167,9 @@
                                             [availableElements]="
                                                 availableElements()
                                             "
-                                            [collection]="setData.collection"
+                                            [collection]="
+                                                collectionData.collection
+                                            "
                                         />
                                     }
                                 }
@@ -132,15 +181,17 @@
             <li [ngbNavItem]="2">
                 <button ngbNavLink>Verwendete Sammlungen</button>
                 <ng-template ngbNavContent>
-                    <app-used-collections-tab [collectionData]="setData" />
+                    <app-used-collections-tab
+                        [collectionData]="collectionData"
+                    />
                 </ng-template>
             </li>
-            @if (checkRole(setData.ownRole).isAtLeast('admin')) {
+            @if (checkRole(collectionData.ownRole).isAtLeast('admin')) {
                 <li [ngbNavItem]="3">
                     <button ngbNavLink>Eigenschaften</button>
                     <ng-template ngbNavContent>
                         <app-collection-details-tab
-                            [collection]="setData.collection"
+                            [collection]="collectionData.collection"
                         />
                     </ng-template>
                 </li>

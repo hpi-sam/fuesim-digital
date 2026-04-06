@@ -28,15 +28,10 @@ export class CollectionService {
     private readonly messageService = inject(MessageService);
 
     public readonly ENDPOINT = `${httpOrigin}/api/collections`;
-    private readonly _collections = signal<CollectionDto[]>([]);
     private readonly _collectionSubscriptions = new Map<
         CollectionEntityId,
         BehaviorSubject<ExerciseElementSetSubscriptionData | null>
     >();
-
-    public get collections() {
-        return this._collections.asReadonly();
-    }
 
     public subscribeToCollection(
         setEntityId: CollectionEntityId,
@@ -155,18 +150,6 @@ export class CollectionService {
                 }
 
                 case 'collection:update': {
-                    this._collections.update((collections) =>
-                        collections.map((collection) =>
-                            collection.entityId === setEntityId
-                                ? {
-                                      ...collection,
-                                      title: changeEvent.data.title,
-                                      description: changeEvent.data.description,
-                                  }
-                                : collection
-                        )
-                    );
-
                     const currentValue = this._collectionSubscriptions
                         .get(setEntityId)
                         ?.getValue();
@@ -214,16 +197,6 @@ export class CollectionService {
             this._collectionSubscriptions.get(setEntityId)?.complete();
             this._collectionSubscriptions.delete(setEntityId);
         };
-    }
-
-    public async loadCollections() {
-        const data = await lastValueFrom(
-            this.httpClient.get<typeof Marketplace.Collection.LoadMy.Response>(
-                `${this.ENDPOINT}/my`
-            )
-        );
-
-        this._collections.set(data.result);
     }
 
     public async getLatestCollectionVersionByEntityId(
@@ -299,10 +272,10 @@ export class CollectionService {
             )
         );
 
-        this._collections.update((elementSets) => [
-            ...elementSets,
-            data.result,
-        ]);
+        const parsedData =
+            Marketplace.Collection.Create.responseSchema.parse(data);
+
+        return parsedData.result;
     }
 
     public async createElement(
@@ -365,14 +338,6 @@ export class CollectionService {
             )
         );
 
-        this._collections.update((elementSets) =>
-            elementSets.map((set) =>
-                set.entityId === setEntityId
-                    ? { ...set, visibility: 'public' }
-                    : set
-            )
-        );
-
         const parsedData =
             Marketplace.Collection.ChangeVisibility.responseSchema.parse(data);
 
@@ -395,19 +360,33 @@ export class CollectionService {
         const parsedData =
             Marketplace.Collection.Duplicate.responseSchema.parse(data);
 
-        this._collections.update((elementSets) => [
-            ...elementSets,
-            parsedData.createdSet,
-        ]);
+        return parsedData.createdSet;
     }
-    public async deleteCollection(setEntityId: CollectionEntityId) {
+    public async archiveCollection(setEntityId: CollectionEntityId) {
         await lastValueFrom(
-            this.httpClient.delete(`${this.ENDPOINT}/${setEntityId}/entity`)
+            this.httpClient.post(`${this.ENDPOINT}/${setEntityId}/archive`, {})
         );
 
-        this._collections.update((val) =>
-            val.filter((f) => f.entityId !== setEntityId)
+        this.messageService.postMessage({
+            title: 'Sammlung archiviert',
+            body: 'Die Sammlung wurde archiviert und ist nicht mehr in Ihrer Sammlungsliste sichtbar.',
+            color: 'success',
+        });
+    }
+
+    public async unarchiveCollection(setEntityId: CollectionEntityId) {
+        const data = await lastValueFrom(
+            this.httpClient.post(
+                `${this.ENDPOINT}/${setEntityId}/unarchive`,
+                {}
+            )
         );
+
+        this.messageService.postMessage({
+            title: 'Sammlung wiederhergestellt',
+            body: 'Die Sammlung wurde wiederhergestellt und ist nun in Ihrer Sammlungsliste sichtbar.',
+            color: 'success',
+        });
     }
 
     public async addCollectionDependency(opts: {
@@ -450,14 +429,6 @@ export class CollectionService {
             });
             return;
         }
-
-        this._collections.update((elementSets) =>
-            elementSets.map((set) =>
-                set.entityId === collectionEntityId
-                    ? { ...set, draftState: data.result!.draftState }
-                    : set
-            )
-        );
     }
 
     public async getElementsOfCollectionVersion(
@@ -569,10 +540,13 @@ export class CollectionService {
         return typedData.result;
     }
 
-    public async getMyCollections(includeDraftState: boolean = true) {
+    public async getMyCollections(opts?: {
+        includeDraftState?: boolean;
+        archived?: boolean;
+    }) {
         const data = await lastValueFrom(
             this.httpClient.get<typeof Marketplace.Collection.LoadMy.Response>(
-                `${this.ENDPOINT}/my?includeDraftState=${includeDraftState}`
+                `${this.ENDPOINT}/my?includeDraftState=${opts?.includeDraftState ?? true}&archived=${opts?.archived ?? false}`
             )
         );
 
@@ -597,7 +571,23 @@ export class CollectionService {
         return typedData.result;
     }
 
-    public async getOrCreateCollectionInviteCode(
+    public async revokeCollectionInviteCode(
+        collectionEntityId: CollectionEntityId
+    ) {
+        await lastValueFrom(
+            this.httpClient.delete(
+                `${this.ENDPOINT}/${collectionEntityId}/invitecode`
+            )
+        );
+
+        this.messageService.postMessage({
+            title: 'Einladungslink widerrufen',
+            body: 'Der Einladungslink wurde widerrufen und ist nun ungültig.',
+            color: 'success',
+        });
+    }
+
+    public async createCollectionInviteCode(
         collectionEntityId: CollectionEntityId
     ) {
         const data = await lastValueFrom(
@@ -608,6 +598,63 @@ export class CollectionService {
 
         const typedData =
             Marketplace.Collection.PutInviteCode.responseSchema.parse(data);
+
+        this.messageService.postMessage({
+            title: 'Einladungslink erstellt',
+            body: 'Alle Nutzer mit diesem Link können der Sammlung beitreten. Teilen Sie den Link mit den Personen, die Zugriff auf die Sammlung haben sollen.',
+            color: 'success',
+        });
+
+        return typedData.result;
+    }
+
+    public async getJoinCodePreview(joinCode: string) {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Collection.GetPreviewByJoinCode.Response
+            >(`${this.ENDPOINT}/join/${joinCode}/preview`)
+        );
+
+        const typedData =
+            Marketplace.Collection.GetPreviewByJoinCode.responseSchema.parse(
+                data
+            );
+
+        return typedData.result;
+    }
+
+    public async joinCollectionByJoinCode(joinCode: string) {
+        const data = await lastValueFrom(
+            this.httpClient.post<
+                typeof Marketplace.Collection.JoinByJoinCode.Response
+            >(`${this.ENDPOINT}/join/${joinCode}`, {})
+        );
+
+        const typedData =
+            Marketplace.Collection.JoinByJoinCode.responseSchema.parse(data);
+
+        if (typedData.result) {
+            this.messageService.postMessage({
+                title: 'Erfolgreich beigetreten',
+                body: 'Sie sind der Sammlung erfolgreich beigetreten und können nun die Inhalte sehen und bearbeiten.',
+                color: 'success',
+            });
+        }
+
+        return typedData.result;
+    }
+
+    public async checkIsCollectionMember(
+        collectionEntityId: CollectionEntityId
+    ) {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Collection.GetIsMember.Response
+            >(`${this.ENDPOINT}/${collectionEntityId}/isMember`)
+        );
+
+        const typedData =
+            Marketplace.Collection.GetIsMember.responseSchema.parse(data);
 
         return typedData.result;
     }
@@ -643,6 +690,21 @@ export class CollectionService {
                 }
             )
         );
+    }
+
+    public async leaveCollection(collectionEntityId: CollectionEntityId) {
+        await lastValueFrom(
+            this.httpClient.post(
+                `${this.ENDPOINT}/${collectionEntityId}/members/leave`,
+                {}
+            )
+        );
+
+        this.messageService.postMessage({
+            title: 'Sammlung verlassen',
+            body: 'Sie haben die Sammlung verlassen und können nun nicht mehr auf die Inhalte zugreifen.',
+            color: 'success',
+        });
     }
 
     public async setCollectionMemberRole(

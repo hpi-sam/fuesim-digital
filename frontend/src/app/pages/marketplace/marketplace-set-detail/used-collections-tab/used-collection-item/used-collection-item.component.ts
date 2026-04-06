@@ -41,7 +41,10 @@ export class UsedCollectionItemComponent {
     public async upgradeVersion() {
         const value = this.newerVersionAvailable.value();
         if (!value) return;
-        const newVersion = value.newerVersionAvailable && value.latestVersion;
+        if (!value.newerVersionAvailable) {
+            return;
+        }
+        const newVersion = value.latestVersion;
         await this.collectionService.addCollectionDependency({
             importTo: this.currentCollectionEntityId(),
             importFrom: newVersion.versionId,

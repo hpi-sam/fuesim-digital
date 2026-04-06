@@ -34,6 +34,7 @@ export const collectionDtoSchema = z.object({
     description: z.string(),
     visibility: collectionVisibilitySchema,
     draftState: z.boolean(),
+    archived: z.boolean(),
 });
 
 export type CollectionDto = z.infer<typeof collectionDtoSchema>;
@@ -73,6 +74,8 @@ export function checkCollectionRole(currentRole: CollectionRelationshipType) {
             roleCompare(desiredRole) === 0,
         isAtLeast: (desiredRole: CollectionRelationshipType) =>
             roleCompare(desiredRole) >= 0,
+        isAtMost: (desiredRole: CollectionRelationshipType) =>
+            roleCompare(desiredRole) <= 0,
         indexOf: () =>
             collectionRelationshipTypeAllowedValues.indexOf(currentRole),
     };

@@ -1,5 +1,17 @@
 <div class="container">
-    <div class="d-flex flex-row justify-content-end">
+    <h1>Meine Übungselemente</h1>
+    <p class="text-muted">
+        Verwalten Sie hier Ihre Sammlungen von Übungselementen, die Sie in Ihren
+        Übungsszenarien verwenden können.
+    </p>
+    <div class="d-flex flex-row justify-content-end gap-2">
+        <a
+            class="btn btn-outline-secondary"
+            routerLink="/collections/archive"
+            ngbTooltip="Archivierte Sammlungen"
+        >
+            <i class="bi bi-archive"></i>
+        </a>
         <button class="btn btn-primary" (click)="createNewCollection()">
             Neue Sammlung erstellen
         </button>
@@ -11,21 +23,10 @@
                 track collection.versionId
             ) {
                 <div class="col mb-4">
-                    <a
-                        class="card d-block text-decoration-none"
-                        [routerLink]="'/collections/' + collection.entityId"
-                    >
-                        <div class="card-header">
-                            {{ collection.title }}
-                        </div>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                                Erstellt am: {{ collection.createdAt | date }}
-                            </li>
-                            <li class="list-group-item"></li>
-                            <li class="list-group-item"></li>
-                        </ul>
-                    </a>
+                    <app-collection-card
+                        [collection]="collection"
+                        fromLocation="mycollections"
+                    />
                 </div>
             }
         </div>

@@ -1,0 +1,1 @@
+ALTER TABLE "collections" ADD COLUMN "archived" boolean DEFAULT false NOT NULL;

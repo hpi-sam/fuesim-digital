@@ -317,6 +317,24 @@ export namespace Marketplace {
             }),
         });
 
+        export const GetIsMember = new Route({
+            response: z.object({
+                result: z.boolean(),
+            }),
+        });
+
+        export const JoinByJoinCode = new Route({
+            response: z.object({
+                result: collectionEntityIdSchema,
+            }),
+        });
+
+        export const GetPreviewByJoinCode = new Route({
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
         export const GetCollectionMembers = new Route({
             response: z.object({
                 result: z.array(
@@ -351,6 +369,12 @@ export namespace Marketplace {
         export const PutInviteCode = new Route({
             response: z.object({
                 result: inviteCodeDtoSchema,
+            }),
+        });
+
+        export const DeleteInviteCode = new Route({
+            response: z.object({
+                status: z.literal(['success']),
             }),
         });
 

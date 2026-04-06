@@ -1,5 +1,5 @@
 {
-    "id": "660c7c2a-0006-48f1-a718-870acc0ca017",
+    "id": "18eb038e-860a-442d-becf-21def4982ae9",
     "prevId": "c18a95bf-3849-46e9-b391-d66b5f6c2f14",
     "version": "7",
     "dialect": "postgresql",
@@ -89,19 +89,19 @@
             },
             "indexes": {},
             "foreignKeys": {
-                "collection_dependency_mapping_collectionVersionId_exercise_element_sets_versionId_fk": {
-                    "name": "collection_dependency_mapping_collectionVersionId_exercise_element_sets_versionId_fk",
+                "collection_dependency_mapping_collectionVersionId_collections_versionId_fk": {
+                    "name": "collection_dependency_mapping_collectionVersionId_collections_versionId_fk",
                     "tableFrom": "collection_dependency_mapping",
-                    "tableTo": "exercise_element_sets",
+                    "tableTo": "collections",
                     "columnsFrom": ["collectionVersionId"],
                     "columnsTo": ["versionId"],
                     "onDelete": "cascade",
                     "onUpdate": "no action"
                 },
-                "collection_dependency_mapping_dependentCollectionVersionId_exercise_element_sets_versionId_fk": {
-                    "name": "collection_dependency_mapping_dependentCollectionVersionId_exercise_element_sets_versionId_fk",
+                "collection_dependency_mapping_dependentCollectionVersionId_collections_versionId_fk": {
+                    "name": "collection_dependency_mapping_dependentCollectionVersionId_collections_versionId_fk",
                     "tableFrom": "collection_dependency_mapping",
-                    "tableTo": "exercise_element_sets",
+                    "tableTo": "collections",
                     "columnsFrom": ["dependentCollectionVersionId"],
                     "columnsTo": ["versionId"],
                     "onDelete": "cascade",
@@ -129,7 +129,7 @@
             "columns": {
                 "code": {
                     "name": "code",
-                    "type": "char(12)",
+                    "type": "varchar",
                     "primaryKey": true,
                     "notNull": true
                 },
@@ -160,8 +160,8 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "public.exercise_element_sets": {
-            "name": "exercise_element_sets",
+        "public.collections": {
+            "name": "collections",
             "schema": "",
             "columns": {
                 "versionId": {
@@ -221,12 +221,6 @@
                     "notNull": true,
                     "default": "'private'"
                 },
-                "owner": {
-                    "name": "owner",
-                    "type": "varchar",
-                    "primaryKey": false,
-                    "notNull": true
-                },
                 "draftState": {
                     "name": "draftState",
                     "type": "boolean",
@@ -238,8 +232,8 @@
             "foreignKeys": {},
             "compositePrimaryKeys": {},
             "uniqueConstraints": {
-                "exercise_element_sets_versionId_unique": {
-                    "name": "exercise_element_sets_versionId_unique",
+                "collections_versionId_unique": {
+                    "name": "collections_versionId_unique",
                     "nullsNotDistinct": false,
                     "columns": ["versionId"]
                 },
@@ -258,8 +252,62 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "public.exercise_element_to_set_mapping": {
-            "name": "exercise_element_to_set_mapping",
+        "public.collection_user_mapping": {
+            "name": "collection_user_mapping",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "collection": {
+                    "name": "collection",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "role": {
+                    "name": "role",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "collection_user_mapping_userId_users_id_fk": {
+                    "name": "collection_user_mapping_userId_users_id_fk",
+                    "tableFrom": "collection_user_mapping",
+                    "tableTo": "users",
+                    "columnsFrom": ["userId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "unique_collection_user": {
+                    "name": "unique_collection_user",
+                    "nullsNotDistinct": false,
+                    "columns": ["userId", "collection"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.element_to_collection_mapping": {
+            "name": "element_to_collection_mapping",
             "schema": "",
             "columns": {
                 "setEntityId": {
@@ -296,19 +344,19 @@
             },
             "indexes": {},
             "foreignKeys": {
-                "exercise_element_to_set_mapping_setVersionId_exercise_element_sets_versionId_fk": {
-                    "name": "exercise_element_to_set_mapping_setVersionId_exercise_element_sets_versionId_fk",
-                    "tableFrom": "exercise_element_to_set_mapping",
-                    "tableTo": "exercise_element_sets",
+                "element_to_collection_mapping_setVersionId_collections_versionId_fk": {
+                    "name": "element_to_collection_mapping_setVersionId_collections_versionId_fk",
+                    "tableFrom": "element_to_collection_mapping",
+                    "tableTo": "collections",
                     "columnsFrom": ["setVersionId"],
                     "columnsTo": ["versionId"],
                     "onDelete": "cascade",
                     "onUpdate": "no action"
                 },
-                "exercise_element_to_set_mapping_elementVersionId_exercise_element_templates_versionId_fk": {
-                    "name": "exercise_element_to_set_mapping_elementVersionId_exercise_element_templates_versionId_fk",
-                    "tableFrom": "exercise_element_to_set_mapping",
-                    "tableTo": "exercise_element_templates",
+                "element_to_collection_mapping_elementVersionId_elements_versionId_fk": {
+                    "name": "element_to_collection_mapping_elementVersionId_elements_versionId_fk",
+                    "tableFrom": "element_to_collection_mapping",
+                    "tableTo": "elements",
                     "columnsFrom": ["elementVersionId"],
                     "columnsTo": ["versionId"],
                     "onDelete": "cascade",
@@ -332,8 +380,8 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "public.exercise_element_templates": {
-            "name": "exercise_element_templates",
+        "public.elements": {
+            "name": "elements",
             "schema": "",
             "columns": {
                 "versionId": {
@@ -397,8 +445,8 @@
             "foreignKeys": {},
             "compositePrimaryKeys": {},
             "uniqueConstraints": {
-                "exercise_element_templates_versionId_unique": {
-                    "name": "exercise_element_templates_versionId_unique",
+                "elements_versionId_unique": {
+                    "name": "elements_versionId_unique",
                     "nullsNotDistinct": false,
                     "columns": ["versionId"]
                 },

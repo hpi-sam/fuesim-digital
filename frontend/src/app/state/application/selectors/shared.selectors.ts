@@ -39,7 +39,6 @@ import {
     selectScoutables,
     scoutableElementSelectors,
 } from './exercise.selectors';
-import { min } from 'rxjs';
 
 /**
  * All selectors in here use exercise- as well as application-selectors

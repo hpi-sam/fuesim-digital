@@ -237,11 +237,21 @@ export namespace Marketplace {
     export namespace Element {
         export const Create = new Route({
             request: z.object({
-                data: versionedElementContentSchema,
+                data: z.array(versionedElementContentSchema),
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
-                result: elementDtoSchema,
+                result: z.array(elementDtoSchema),
+            }),
+        });
+
+        export const Import = new Route({
+            request: z.object({
+                objects: z.array(elementDtoSchema),
+            }),
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema,
+                result: z.array(elementDtoSchema),
             }),
         });
 

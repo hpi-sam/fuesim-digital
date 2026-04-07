@@ -5,6 +5,7 @@ import { MarketplaceSetDetailComponent } from './marketplace-set-detail/marketpl
 import { JoinCollectionGuard } from './join-collection.guard';
 import { MarketplaceArchiveComponent } from './marketplace-archive/marketplace-archive.component';
 import { IsAuthenticatedGuard } from '../exercises/guards/is-authenticated.guard';
+import { collectionDataResolver } from './collection-data.resolver';
 
 export const routes: Routes = [
     {
@@ -23,6 +24,9 @@ export const routes: Routes = [
                 path: ':collectionEntityId',
                 component: MarketplaceSetDetailComponent,
                 canActivate: [JoinCollectionGuard],
+                resolve: {
+                    collectionSubscription: collectionDataResolver,
+                },
             },
         ],
     },

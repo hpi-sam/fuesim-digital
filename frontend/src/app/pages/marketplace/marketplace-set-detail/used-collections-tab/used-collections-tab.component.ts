@@ -8,7 +8,7 @@ import {
 import { ElementCardComponent } from '../../element-card/element-card.component';
 import {
     CollectionService,
-    ExerciseElementSetSubscriptionData,
+    CollectionSubscriptionData,
 } from '../../../../core/exercise-element.service';
 import { UsedCollectionItemComponent } from './used-collection-item/used-collection-item.component';
 
@@ -29,7 +29,7 @@ export class UsedCollectionsTabComponent {
     private readonly collectionService = inject(CollectionService);
 
     public readonly collectionData =
-        input.required<ExerciseElementSetSubscriptionData>();
+        input.required<CollectionSubscriptionData>();
 
     public availableCollections = resource({
         loader: async () =>

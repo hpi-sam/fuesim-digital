@@ -116,66 +116,9 @@
             <li [ngbNavItem]="1">
                 <button ngbNavLink>Elemente</button>
                 <ng-template ngbNavContent>
-                    <div class="w-100 d-flex flex-row justify-content-end mb-3">
-                        @if (
-                            checkRole(collectionData.ownRole).isAtLeast(
-                                'editor'
-                            )
-                        ) {
-                            <div ngbDropdown>
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-primary"
-                                    ngbDropdownToggle
-                                >
-                                    Neues Übungselement
-                                </button>
-                                <div ngbDropdownMenu>
-                                    <button
-                                        ngbDropdownItem
-                                        (click)="createNewVehicle()"
-                                    >
-                                        Fahrzeug
-                                    </button>
-                                    <button
-                                        ngbDropdownItem
-                                        (click)="createNewAlarmgroup()"
-                                    >
-                                        Alarmgruppe
-                                    </button>
-                                    <button ngbDropdownItem>Kartenbild</button>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                    @for (type of visibleElementTypesOrder; track type) {
-                        <h4>
-                            {{ (type | versionedElementDisplayName).plural }}
-                        </h4>
-                        <div class="container mb-3">
-                            <div
-                                class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-2"
-                            >
-                                @for (
-                                    exerciseObject of collectionData.objects
-                                        .direct;
-                                    track exerciseObject.versionId
-                                ) {
-                                    @if (exerciseObject.content.type === type) {
-                                        <app-element-card
-                                            [element]="exerciseObject"
-                                            [availableElements]="
-                                                availableElements()
-                                            "
-                                            [collection]="
-                                                collectionData.collection
-                                            "
-                                        />
-                                    }
-                                }
-                            </div>
-                        </div>
-                    }
+                    <app-collection-elements-tab
+                        [collectionData]="collectionData"
+                    />
                 </ng-template>
             </li>
             <li [ngbNavItem]="2">

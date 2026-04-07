@@ -407,29 +407,13 @@ export class CollectionService {
         });
     }
 
-    public async createExerciseObject(
+    public async createExerciseObjects(
         collectionEntityId: CollectionEntityId,
-        content: VersionedElementContent
+        contents: VersionedElementContent[]
     ) {
         return this.collectionRepository.transaction(async (tx) => {
             const eventBuffer = this.newDeferredEventBuffer();
-
-            const result = this.exists(
-                await tx.createElementVersion({
-                    version: 1,
-                    content,
-                })
-            );
-
-            eventBuffer.next({
-                event: 'element:create',
-                data: result,
-                collectionEntityId: collectionEntityId,
-            });
-
-            if (!result) {
-                throw new Error('Failed to create exercise element object');
-            }
+            const results: ElementDto[] = [];
 
             const [draftState, createdNewDraftState] =
                 await tx.getOrCreateDraftState(collectionEntityId);
@@ -441,16 +425,35 @@ export class CollectionService {
                 });
             }
 
-            await tx.addElementToCollection(
-                result.versionId,
-                draftState.versionId
-            );
+            for (const content of contents) {
+                const result = this.exists(
+                    await tx.createElementVersion({
+                        version: 1,
+                        content,
+                    })
+                );
+                if (!result) {
+                    throw new Error('Failed to create exercise element object');
+                }
+
+                await tx.addElementToCollection(
+                    result.versionId,
+                    draftState.versionId
+                );
+
+                eventBuffer.next({
+                    event: 'element:create',
+                    data: result,
+                    collectionEntityId: collectionEntityId,
+                });
+                results.push(result);
+            }
 
             eventBuffer.flush();
 
             return {
                 newSetVersionId: draftState.versionId,
-                result,
+                results,
             };
         });
     }
@@ -740,11 +743,11 @@ export class CollectionService {
                 );
 
             if (resolutionStrategy?.strategy === 'createCopy') {
-                const duplicatedElement = await tx.createExerciseObject(
+                const duplicatedElement = await tx.createExerciseObjects(
                     latestContainingCollection.entityId,
-                    content
+                    [content]
                 );
-                newElementVersion = tx.exists(duplicatedElement.result);
+                newElementVersion = tx.exists(duplicatedElement.results[0]);
             } else if (elementMapping.isBaseReference === true) {
                 // just overwrite the already mapped element
                 // if it is the base reference in the current draftstate

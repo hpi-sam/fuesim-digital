@@ -213,6 +213,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
+    /*
+     * Edit Collection Metadata (e.g. title)
+     */
     adminRouter.patch('/:collectionEntityId', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 
@@ -246,7 +249,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             req.body
         );
 
-        const data = await collectionService.createExerciseObject(
+        const data = await collectionService.createExerciseObjects(
             collectionEntityId,
             parsedBody.data
         );
@@ -258,7 +261,34 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         res.send(
             Marketplace.Element.Create.responseSchema.encode({
                 newSetVersionId: data.newSetVersionId,
-                result: data.result,
+                result: data.results,
+            })
+        );
+    });
+
+    /*
+     * Import elements from file
+     */
+    editorRouter.post('/:collectionEntityId/import', async (req, res) => {
+        const collectionEntityId = getCollectionEntityId(req);
+
+        const parsedBody = Marketplace.Element.Create.requestSchema.parse(
+            req.body
+        );
+
+        const data = await collectionService.createExerciseObjects(
+            collectionEntityId,
+            parsedBody.data
+        );
+
+        if (!data) {
+            throw new Error('Failed to create exercise element object');
+        }
+
+        res.send(
+            Marketplace.Element.Create.responseSchema.encode({
+                newSetVersionId: data.newSetVersionId,
+                result: data.results,
             })
         );
     });

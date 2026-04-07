@@ -71,17 +71,7 @@ export class MarketplaceTabComponent {
     private async updateCollectionElementSubscription(
         collection: VersionedCollectionPartial
     ) {
-        this.collectionSubscription?.();
-        this.collectionSubscription =
-            this.collectionService.subscribeToCollection(
-                collection.entityId,
-                (elements) => {
-                    // TODO: @Quixelation: direct does not yet include 1st level dependencies, and transiive inclues all (too many levels)
-                    this.elementsOfSelectedCollection.set(
-                        elements.objects.direct
-                    );
-                }
-            );
+        //TODO: @Quixelation: i stripped the collectiondata fectching logic here - put it back, but the new one without the callback
         const collectionUpdateAvailable =
             await this.collectionService.checkNewerVersionAvailable(collection);
         this.updateAvailable.set(collectionUpdateAvailable);

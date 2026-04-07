@@ -31,6 +31,7 @@ describe('Collection Service', () => {
             createdAt: new Date(),
             description: 'Test element',
             stateVersion: 1,
+            editedAt: new Date(),
         });
 
         beforeEach(() => {

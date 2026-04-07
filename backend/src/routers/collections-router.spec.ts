@@ -144,7 +144,7 @@ describe('Collection Router', () => {
                     `${ENDPOINT}/${collection.entityId}/create`,
                     session,
                     Marketplace.Element.Create.requestSchema.encode({
-                        data: content,
+                        data: [content],
                     })
                 );
 
@@ -179,9 +179,9 @@ describe('Collection Router', () => {
                 expect(collection.draftState).toBe(false);
 
                 const firstElement =
-                    await environment.collectionService.createExerciseObject(
+                    await environment.collectionService.createExerciseObjects(
                         collection.entityId,
-                        content
+                        [content]
                     );
                 expect(firstElement.result).toBeDefined();
                 expect(firstElement.newSetVersionId).not.toBe(
@@ -202,7 +202,7 @@ describe('Collection Router', () => {
                     `${ENDPOINT}/${collection.entityId}/create`,
                     session,
                     Marketplace.Element.Create.requestSchema.encode({
-                        data: content,
+                        data: [content],
                     })
                 );
 
@@ -237,11 +237,11 @@ describe('Collection Router', () => {
                 expect(collection.draftState).toBe(false);
 
                 const firstElement =
-                    await environment.collectionService.createExerciseObject(
+                    await environment.collectionService.createExerciseObjects(
                         collection.entityId,
-                        content
+                        [content]
                     );
-                expect(firstElement.result).toBeDefined();
+                expect(firstElement.results).toBeDefined();
                 expect(firstElement.newSetVersionId).not.toBe(
                     collection.versionId
                 );
@@ -255,11 +255,11 @@ describe('Collection Router', () => {
                 );
 
                 const secondElement =
-                    await environment.collectionService.createExerciseObject(
+                    await environment.collectionService.createExerciseObjects(
                         collection.entityId,
-                        content
+                        [content]
                     );
-                expect(secondElement.result).toBeDefined();
+                expect(secondElement.results).toBeDefined();
                 expect(secondElement.newSetVersionId).not.toBe(
                     firstElement.newSetVersionId
                 );
@@ -277,12 +277,12 @@ describe('Collection Router', () => {
                 ).toHaveLength(2);
                 expect(
                     secondCollectionElements_includeDraft.direct.findIndex(
-                        (f) => f.entityId === firstElement.result.entityId
+                        (f) => f.entityId === firstElement.results[0]?.entityId
                     )
                 ).not.toBe(-1);
                 expect(
                     secondCollectionElements_includeDraft.direct.findIndex(
-                        (f) => f.entityId === secondElement.result.entityId
+                        (f) => f.entityId === secondElement.results[0]?.entityId
                     )
                 ).not.toBe(-1);
 
@@ -317,7 +317,7 @@ describe('Collection Router', () => {
                         `${ENDPOINT}/${id}/create`,
                         session,
                         Marketplace.Element.Create.requestSchema.encode({
-                            data: content,
+                            data: [content],
                         })
                     );
                     expect(response.status).toBe(expectedStatus);
@@ -341,11 +341,11 @@ describe('Collection Router', () => {
                             alarmGroupVehicles: {},
                         } satisfies AlarmGroup;
                         const data =
-                            await environment.collectionService.createExerciseObject(
+                            await environment.collectionService.createExerciseObjects(
                                 collection2.entityId,
-                                content
+                                [content]
                             );
-                        createdElementCollection2 = data.result;
+                        createdElementCollection2 = data.results;
                         const data_collection =
                             await environment.collectionService.getCollectionVersionById(
                                 data.newSetVersionId
@@ -494,7 +494,7 @@ describe('Collection Router', () => {
                 expect(currentCollectionState?.draftState).toBe(false);
 
                 const createdElement =
-                    await environment.collectionService.createExerciseObject(
+                    await environment.collectionService.createExerciseObjects(
                         collection.entityId,
                         {
                             type: 'alarmGroup',
@@ -543,7 +543,7 @@ describe('Collection Router', () => {
                 expect(currentCollectionState?.draftState).toBe(false);
 
                 const createdElement =
-                    await environment.collectionService.createExerciseObject(
+                    await environment.collectionService.createExerciseObjects(
                         collection.entityId,
                         {
                             type: 'alarmGroup',
@@ -611,9 +611,9 @@ describe('Collection Router', () => {
 
                     beforeEach(async () => {
                         const elementCreationResult =
-                            await environment.collectionService.createExerciseObject(
+                            await environment.collectionService.createExerciseObjects(
                                 collection.entityId,
-                                content
+                                [content]
                             );
 
                         await environment.collectionService.addCollectionDependency(
@@ -726,9 +726,9 @@ describe('Collection Router', () => {
                 } satisfies VehicleTemplate;
 
                 const elementCreationResult =
-                    await environment.collectionService.createExerciseObject(
+                    await environment.collectionService.createExerciseObjects(
                         collection.entityId,
-                        content
+                        [content]
                     );
 
                 element = elementCreationResult.result;
@@ -801,9 +801,9 @@ describe('Collection Router', () => {
                         } satisfies AlarmGroup;
 
                         const elementCreationResult =
-                            await environment.collectionService.createExerciseObject(
+                            await environment.collectionService.createExerciseObjects(
                                 collection.entityId,
-                                content
+                                [content]
                             );
 
                         alarmGroupElement = elementCreationResult.result;
@@ -890,9 +890,9 @@ describe('Collection Router', () => {
                 } satisfies AlarmGroup;
 
                 const element =
-                    await environment.collectionService.createExerciseObject(
+                    await environment.collectionService.createExerciseObjects(
                         collection.entityId,
-                        content
+                        [content]
                     );
 
                 const content2 = {
@@ -902,9 +902,9 @@ describe('Collection Router', () => {
                 };
 
                 const element2 =
-                    await environment.collectionService.createExerciseObject(
+                    await environment.collectionService.createExerciseObjects(
                         collection.entityId,
-                        content2
+                        [content2]
                     );
 
                 const deletionResult =

@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
 import {
     ElementDto,
     VersionedCollectionPartial,
@@ -17,7 +17,7 @@ import { EditingVersionedElementModalData } from '../editor-modals/base-versione
     templateUrl: './element-card.component.html',
     styleUrl: './element-card.component.scss',
 })
-export class ElementCardComponent {
+export class ElementCardComponent implements OnInit {
     private readonly ngbModalService = inject(NgbModal);
     private readonly collectionService = inject(CollectionService);
 
@@ -27,7 +27,7 @@ export class ElementCardComponent {
     public readonly element = input.required<ElementDto>();
     public readonly editable = input(true);
 
-    constructor() {
+    ngOnInit() {
         if (this.editable() && this.collection() === undefined) {
             throw new Error(
                 'ElementCardComponent is editable but no collection was provided.'

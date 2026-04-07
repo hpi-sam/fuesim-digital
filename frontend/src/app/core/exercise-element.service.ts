@@ -8,13 +8,14 @@ import {
     ElementEntityId,
     Marketplace,
     VersionedCollectionPartial,
+    versionedElementContentSchema,
     VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 
-export interface ExerciseElementSetSubscriptionData {
+export interface CollectionSubscriptionData {
     collection: CollectionDto;
     objects: typeof Marketplace.Collection.GetLatestElementsBySetVersionId.Response;
     ownRole: CollectionRelationshipType;
@@ -30,22 +31,21 @@ export class CollectionService {
     public readonly ENDPOINT = `${httpOrigin}/api/collections`;
     private readonly _collectionSubscriptions = new Map<
         CollectionEntityId,
-        BehaviorSubject<ExerciseElementSetSubscriptionData | null>
+        BehaviorSubject<CollectionSubscriptionData | null>
     >();
 
     public subscribeToCollection(
-        setEntityId: CollectionEntityId,
-        callback: (data: ExerciseElementSetSubscriptionData) => void
-    ): () => void {
+        setEntityId: CollectionEntityId
+    ): BehaviorSubject<CollectionSubscriptionData | null> {
         const collectionEventSource = new EventSource(
             `${this.ENDPOINT}/${setEntityId}/events`,
             { withCredentials: true }
         );
 
-        this._collectionSubscriptions.set(
-            setEntityId,
-            new BehaviorSubject<ExerciseElementSetSubscriptionData | null>(null)
+        const subject = new BehaviorSubject<CollectionSubscriptionData | null>(
+            null
         );
+        this._collectionSubscriptions.set(setEntityId, subject);
         collectionEventSource.addEventListener('change', (event) => {
             const changeEvent =
                 Marketplace.Collection.Events.SSEvent.schema.parse(
@@ -54,7 +54,7 @@ export class CollectionService {
 
             switch (changeEvent.event) {
                 case 'initialdata': {
-                    this._collectionSubscriptions.get(setEntityId)?.next({
+                    subject.next({
                         collection: changeEvent.data.collection,
                         objects: changeEvent.data.elements,
                         ownRole: changeEvent.data.userRelationship,
@@ -62,9 +62,7 @@ export class CollectionService {
                     break;
                 }
                 case 'element:create': {
-                    const currentValue = this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.getValue();
+                    const currentValue = subject.getValue();
                     if (!currentValue) return;
                     const newValue = {
                         ...currentValue,
@@ -76,15 +74,11 @@ export class CollectionService {
                             ],
                         },
                     };
-                    this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.next(newValue);
+                    subject.next(newValue);
                     break;
                 }
                 case 'element:update': {
-                    const currentValue = this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.getValue();
+                    const currentValue = subject.getValue();
                     if (!currentValue) return;
                     const newValue = {
                         ...currentValue,
@@ -97,16 +91,12 @@ export class CollectionService {
                             ),
                         },
                     };
-                    this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.next(newValue);
+                    subject.next(newValue);
                     break;
                 }
 
                 case 'element:delete': {
-                    const currentValue = this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.getValue();
+                    const currentValue = subject.getValue();
                     if (!currentValue) return;
                     const newValue = {
                         ...currentValue,
@@ -119,9 +109,7 @@ export class CollectionService {
                             ),
                         },
                     };
-                    this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.next(newValue);
+                    subject.next(newValue);
                     break;
                 }
 
@@ -132,9 +120,7 @@ export class CollectionService {
                 }
 
                 case 'dependency:replace-data': {
-                    const currentValue = this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.getValue();
+                    const currentValue = subject.getValue();
                     if (!currentValue) return;
                     const newValue = {
                         ...currentValue,
@@ -143,24 +129,18 @@ export class CollectionService {
                             transitive: changeEvent.data,
                         },
                     };
-                    this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.next(newValue);
+                    subject.next(newValue);
                     break;
                 }
 
                 case 'collection:update': {
-                    const currentValue = this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.getValue();
+                    const currentValue = subject.getValue();
                     if (!currentValue) return;
                     const newValue = {
                         ...currentValue,
                         collection: changeEvent.data,
                     };
-                    this._collectionSubscriptions
-                        .get(setEntityId)
-                        ?.next(newValue);
+                    subject.next(newValue);
                     break;
                 }
                 default: {
@@ -181,22 +161,15 @@ export class CollectionService {
                 body: 'Die Verbindung zum Server wurde unterbrochen. Bitte überprüfen Sie Ihre Internetverbindung und laden Sie die Seite neu.',
             });
         };
-        const firstValue = this._collectionSubscriptions
-            .get(setEntityId)
-            ?.getValue();
-        if (firstValue) {
-            callback(firstValue);
-        }
-        this._collectionSubscriptions.get(setEntityId)!.subscribe((data) => {
-            if (!data) return;
-            callback(data);
+
+        this._collectionSubscriptions.get(setEntityId)?.subscribe({
+            complete: () => {
+                collectionEventSource.close();
+                this._collectionSubscriptions.delete(setEntityId);
+            },
         });
 
-        return () => {
-            collectionEventSource.close();
-            this._collectionSubscriptions.get(setEntityId)?.complete();
-            this._collectionSubscriptions.delete(setEntityId);
-        };
+        return subject;
     }
 
     public async getLatestCollectionVersionByEntityId(
@@ -286,7 +259,7 @@ export class CollectionService {
             this.httpClient.post<typeof Marketplace.Element.Create.Response>(
                 `${this.ENDPOINT}/${setEntityId}/create`,
                 Marketplace.Element.Create.requestSchema.parse({
-                    data: content,
+                    data: [content],
                 })
             )
         );
@@ -346,13 +319,13 @@ export class CollectionService {
 
     public async duplicateCollection(
         setVersionId: CollectionEntityId,
-        specificSetVersionId: CollectionVersionId
+        specificCollectionVersionId: CollectionVersionId
     ) {
         const data = await lastValueFrom(
             this.httpClient.post<
                 typeof Marketplace.Collection.Duplicate.Response
             >(
-                `${this.ENDPOINT}/${setVersionId}/version/${specificSetVersionId}/duplicate`,
+                `${this.ENDPOINT}/${setVersionId}/version/${specificCollectionVersionId}/duplicate`,
                 {}
             )
         );
@@ -723,5 +696,47 @@ export class CollectionService {
                 )
             )
         );
+    }
+
+    public async importElements(
+        collectionEntityId: CollectionEntityId,
+        elements: { type: string }[]
+    ) {
+        const nonParsedElements: { type: string }[] = [];
+        for (const element of elements) {
+            const result = versionedElementContentSchema.safeParse(element);
+            if (!result.success) {
+                nonParsedElements.push(element);
+            }
+        }
+
+        this.messageService.postMessage({
+            title: 'Nicht unterstützte Elemente',
+            body: `Es werden ${nonParsedElements.length} von ${elements.length} Elementen übersprungen.`,
+            color: 'info',
+        });
+
+        const data = await lastValueFrom(
+            this.httpClient.post<typeof Marketplace.Element.Import.Response>(
+                `${this.ENDPOINT}/${collectionEntityId}/import`,
+                Marketplace.Element.Import.requestSchema.parse({
+                    elements: elements.filter((element) =>
+                        nonParsedElements.some(
+                            (nonParsed) => nonParsed === element
+                        )
+                    ),
+                })
+            )
+        );
+
+        const typedData = Marketplace.Element.Import.responseSchema.parse(data);
+
+        this.messageService.postMessage({
+            title: 'Import abgeschlossen',
+            body: `Es wurden ${typedData.result.length} Elemente erfolgreich importiert.`,
+            color: 'success',
+        });
+
+        return typedData.result;
     }
 }

@@ -32,12 +32,14 @@ import {
     BaseVersionedElementSubmodal,
     VersionedElementModalData,
 } from '../base-versioned-element-submodal';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'app-vehicle-template-form-marketplace',
     imports: [
         DisplayValidationComponent,
         FormsModule,
+        NgbDropdownModule,
         AutofocusDirective,
         AsyncPipe,
         ValuesPipe,

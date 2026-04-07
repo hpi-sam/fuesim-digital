@@ -7,6 +7,8 @@ export const measurePropertyTypeSchema = z.literal([
     'delay',
     'alarm',
     'eocLog',
+    'drawFreehand',
+    'drawLine',
 ]);
 
 export type MeasurePropertyType = z.infer<typeof measurePropertyTypeSchema>;
@@ -19,6 +21,8 @@ export const measurePropertyTypeToGermanNameDictionary: {
     delay: 'Verzögerung',
     alarm: 'Alarmierung',
     eocLog: 'Einsatztagebucheintrag',
+    drawFreehand: 'Freihandzeichnung',
+    drawLine: 'Linienzeichnung',
 };
 
 // ==================================================
@@ -55,6 +59,8 @@ export const measurePropertyDefinitions: {
     },
     alarm: { blockedBy: [], requires: [] },
     eocLog: { blockedBy: [], requires: [] },
+    drawFreehand: { blockedBy: [], requires: [{ anyOf: ['manualConfirm'] }] },
+    drawLine: { blockedBy: [], requires: [{ anyOf: ['manualConfirm'] }] },
 };
 
 // ==================================================
@@ -102,6 +108,21 @@ export const eocLogPropertySchema = z.strictObject({
 
 export type EocLogProperty = z.infer<typeof eocLogPropertySchema>;
 
+export const drawFreehandPropertySchema = z.strictObject({
+    type: z.literal('drawFreehand'),
+    strokeColor: z.string(),
+    fillColor: z.string(),
+});
+
+export type DrawFreehandProperty = z.infer<typeof drawFreehandPropertySchema>;
+
+export const drawLinePropertySchema = z.strictObject({
+    type: z.literal('drawLine'),
+    strokeColor: z.string(),
+});
+
+export type DrawLineProperty = z.infer<typeof drawLinePropertySchema>;
+
 // ==================================================
 
 export const measurePropertySchema = z.union([
@@ -110,6 +131,8 @@ export const measurePropertySchema = z.union([
     delayPropertySchema,
     alarmPropertySchema,
     eocLogPropertySchema,
+    drawFreehandPropertySchema,
+    drawLinePropertySchema,
 ]);
 
 export type MeasureProperty = z.infer<typeof measurePropertySchema>;

@@ -6,5 +6,6 @@ export const addMeasures51: Migration = {
     state: (state: any) => {
         state.measures = {};
         state.measureTemplates = {};
+        state.drawings = {};
     },
 };

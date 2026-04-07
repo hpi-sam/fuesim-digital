@@ -1,5 +1,6 @@
 import { createSelector } from '@ngrx/store';
 import type {
+    Drawing,
     MapImage,
     Material,
     Patient,
@@ -26,6 +27,7 @@ import type { ScoutableIndicator } from '../../../shared/types/scoutable-indicat
 import { selectOwnClientId } from './application.selectors';
 import {
     selectClients,
+    selectDrawings,
     selectRestrictedZones,
     selectMapImages,
     selectMaterials,
@@ -127,6 +129,8 @@ export const selectVisibleSimulatedRegions =
     selectVisibleElementsFactory<SimulatedRegion>(selectSimulatedRegions);
 export const selectVisibleRestrictedZones =
     selectVisibleElementsFactory<RestrictedZone>(selectRestrictedZones);
+export const selectVisibleDrawings =
+    selectVisibleElementsFactory<Drawing>(selectDrawings);
 
 export const selectVisibleCateringLines = createSelector(
     selectRestrictedViewport,

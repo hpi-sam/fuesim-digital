@@ -14,5 +14,6 @@ export * from './scoutable.js';
 export * from './user-generated-content.js';
 export * from './measure.js';
 export * from './measure-templates.js';
+export * from './drawing.js';
 
 // Don't forget to register the actionReducer in `action-reducers.ts`

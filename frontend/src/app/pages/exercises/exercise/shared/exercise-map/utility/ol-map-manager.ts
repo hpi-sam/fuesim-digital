@@ -40,10 +40,13 @@ import {
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import { ScoutableIndicatorsFeatureManager } from '../feature-managers/scoutable-indicators-feature-manager';
+import type { DrawingInteractionService } from '../../../../../../core/drawing-interaction.service';
+import { DrawingFeatureManager } from '../feature-managers/drawing-feature-manager';
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
 import { SatelliteLayerManager } from './satellite-layer-manager';
+import { DrawingInteractionHandler } from './drawing-interaction-handler';
 import type { PopupService } from './popup.service';
 
 export const coordinateStringSchema = z
@@ -93,7 +96,8 @@ export class OlMapManager {
         private readonly openLayersContainer: HTMLDivElement,
         private readonly transferLinesService: TransferLinesService,
         private readonly popupManager: PopupManager,
-        private readonly popupService: PopupService
+        private readonly popupService: PopupService,
+        private readonly drawingInteractionService: DrawingInteractionService
     ) {
         this._olMap = new OlMap({
             interactions: new Collection<Interaction>(),
@@ -136,6 +140,13 @@ export class OlMapManager {
 
         // the mapInteractionsManager needs to be set and the satelliteLayer needs to be added before this is possible
         this.registerFeatureManagers();
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const _drawingInteractionHandler = new DrawingInteractionHandler(
+            this._olMap,
+            this.drawingInteractionService,
+            this.destroy$
+        );
 
         this.registerViewportRestriction();
 
@@ -348,6 +359,12 @@ export class OlMapManager {
         const scoutableIndicatorsFeatureManger =
             new ScoutableIndicatorsFeatureManager(this.store, this.olMap, this);
 
+        const drawingFeatureManager = new DrawingFeatureManager(
+            this.olMap,
+            this.exerciseService,
+            this.store
+        );
+
         const restrictedZoneFeatureManager = new RestrictedZoneFeatureManager(
             this.olMap,
             this.exerciseService,
@@ -379,6 +396,7 @@ export class OlMapManager {
 
         this.featureManagers = [
             deleteFeatureManager,
+            drawingFeatureManager,
             restrictedZoneFeatureManager,
             transferLinesFeatureManager,
             simulatedRegionFeatureManager,
@@ -436,6 +454,10 @@ export class OlMapManager {
         this.featureNameFeatureManagerDictionary.set(
             'restrictedZone',
             restrictedZoneFeatureManager
+        );
+        this.featureNameFeatureManagerDictionary.set(
+            'drawing',
+            drawingFeatureManager
         );
         this.featureNameFeatureManagerDictionary.set(
             'delete',

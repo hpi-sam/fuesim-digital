@@ -94,6 +94,8 @@ import {
     MeasureTemplate,
     measureTemplateSchema,
 } from './models/measure/measures.js';
+import type { Drawing } from './models/drawing.js';
+import { drawingSchema } from './models/drawing.js';
 import { defaultMeasureTemplatesById } from './data/default-state/measure-templates.js';
 
 export class ExerciseState {
@@ -150,6 +152,9 @@ export class ExerciseState {
     public readonly measures: {
         readonly [key: UUID]: Measure;
     } = {};
+
+    @IsZodSchema(z.record(uuidSchema, drawingSchema))
+    public readonly drawings: { readonly [key: UUID]: Drawing } = {};
 
     @IsZodSchema(z.record(uuidSchema, mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};

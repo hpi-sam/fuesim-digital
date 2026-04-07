@@ -140,6 +140,13 @@ export class DeleteFeatureManager implements FeatureManager<Point> {
                 });
                 return true;
             }
+            case 'drawing': {
+                this.exerciseService.proposeAction({
+                    type: '[Drawing] Remove drawing',
+                    drawingId: id,
+                });
+                return true;
+            }
             default: {
                 return false;
             }

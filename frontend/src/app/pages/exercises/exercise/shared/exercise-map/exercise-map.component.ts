@@ -16,6 +16,7 @@ import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCoordinatePickerModal } from '../coordinate-picker/open-coordinate-picker-modal';
 import { ExerciseService } from '../../../../../core/exercise.service';
+import { DrawingInteractionService } from '../../../../../core/drawing-interaction.service';
 import type { AppState } from '../../../../../state/app.state';
 import {
     selectRestrictedViewport,
@@ -42,6 +43,9 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     private readonly modalService = inject(NgbModal);
     private readonly route = inject(ActivatedRoute);
     readonly olMapManagerService = inject(OlMapManagerService);
+    private readonly drawingInteractionService = inject(
+        DrawingInteractionService
+    );
 
     readonly openLayersContainer = viewChild.required<
         ElementRef<HTMLDivElement>
@@ -71,7 +75,8 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
             this.openLayersContainer().nativeElement,
             this.transferLinesService,
             this.popupManager,
-            this.popupService
+            this.popupService,
+            this.drawingInteractionService
         );
         this.dragElementService.registerMap(
             this.olMapManagerService.olMapManager.olMap

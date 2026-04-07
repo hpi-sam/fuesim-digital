@@ -23,6 +23,7 @@ import { ScoutableActionReducers } from './scoutable.js';
 import { UserGeneratedContentActionReducers } from './user-generated-content.js';
 import { MeasureActionReducers } from './measure.js';
 import { MeasureTemplateActionReducers } from './measure-templates.js';
+import { DrawingActionReducers } from './drawing.js';
 
 /**
  * All action reducers of the exercise must be registered here
@@ -53,6 +54,7 @@ const actionReducers = {
     ...UserGeneratedContentActionReducers,
     ...MeasureActionReducers,
     ...MeasureTemplateActionReducers,
+    ...DrawingActionReducers,
 };
 
 type ExerciseActionReducer =

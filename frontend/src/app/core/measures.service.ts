@@ -6,6 +6,7 @@ import {
     MeasureProperty,
     MeasurePropertyInstance,
     MeasureTemplate,
+    newDrawing,
     newMapCoordinatesAt,
     StrictObject,
     uuid,
@@ -26,6 +27,7 @@ import {
 import { MessageService } from './messages/message.service';
 import { ConfirmationModalService } from './confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from './exercise.service';
+import { DrawingInteractionService } from './drawing-interaction.service';
 
 @Injectable({
     providedIn: 'root',
@@ -37,6 +39,9 @@ export class MeasureService {
     private readonly ngbModalService = inject(NgbModal);
     private readonly confirmationModalService = inject(
         ConfirmationModalService
+    );
+    private readonly drawingInteractionService = inject(
+        DrawingInteractionService
     );
 
     private readonly clientName = this.store.selectSignal(selectLastClientName);
@@ -55,11 +60,6 @@ export class MeasureService {
     ): Promise<MeasurePropertyInstance | boolean> {
         switch (property.type) {
             case 'delay':
-                this.messageService.postMessage({
-                    color: 'info',
-                    title: template.name,
-                    body: `Bitte warten Sie ${property.delay}s`,
-                });
                 await new Promise((resolve) => {
                     setTimeout(() => resolve(null), property.delay * 1000);
                 });
@@ -114,17 +114,58 @@ export class MeasureService {
                     message,
                 };
             }
+            case 'drawFreehand': {
+                const result =
+                    await this.drawingInteractionService.requestDrawing({
+                        drawingType: 'freehand',
+                        strokeColor: property.strokeColor,
+                        fillColor: property.fillColor,
+                    });
+                if (!result) return false;
+                return {
+                    type: 'drawingInstance',
+                    drawingType: 'freehand',
+                    points: result.points,
+                    strokeColor: property.strokeColor,
+                    fillColor: property.fillColor,
+                };
+            }
+            case 'drawLine': {
+                const result =
+                    await this.drawingInteractionService.requestDrawing({
+                        drawingType: 'line',
+                        strokeColor: property.strokeColor,
+                    });
+                if (!result) return false;
+                return {
+                    type: 'drawingInstance',
+                    drawingType: 'line',
+                    points: result.points,
+                    strokeColor: property.strokeColor,
+                };
+            }
         }
     }
 
     public async executeMeasure(template: MeasureTemplate) {
         const instances = [];
+        this.messageService.postMessage({
+            color: 'info',
+            title: template.name,
+            body: 'Maßnahme wird ausgeführt.',
+        });
         for (const property of template.properties) {
             // eslint-disable-next-line no-await-in-loop
             const result = await this.handle(template, property);
 
-            if (result === false) return;
-            else if (result === true) continue;
+            if (result === false) {
+                this.messageService.postMessage({
+                    color: 'warning',
+                    title: template.name,
+                    body: 'Maßnahme wurde abgebrochen.',
+                });
+                return;
+            } else if (result === true) continue;
 
             instances.push(result);
         }
@@ -191,6 +232,19 @@ export class MeasureService {
                         name: this.clientName() ?? 'Unknown',
                         isPrivate: false,
                         message: instance.message,
+                    });
+                    break;
+                }
+                case 'drawingInstance': {
+                    const drawing = newDrawing(
+                        instance.drawingType,
+                        instance.points,
+                        instance.strokeColor,
+                        instance.fillColor
+                    );
+                    this.exerciseService.proposeAction({
+                        type: '[Drawing] Add drawing',
+                        drawing,
                     });
                     break;
                 }

@@ -56,6 +56,7 @@ export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
 export const selectRadiograms = selectPropertyFactory('radiograms');
 export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
+export const selectDrawings = selectPropertyFactory('drawings');
 export const selectOperationalSections = selectPropertyFactory(
     'operationalSections'
 );

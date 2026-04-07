@@ -40,9 +40,22 @@ export interface EditableManualConfirmProperty {
     confirmationString: string;
 }
 
+export interface EditableDrawFreehandProperty {
+    type: 'drawFreehand';
+    strokeColor: string;
+    fillColor: string;
+}
+
+export interface EditableDrawLineProperty {
+    type: 'drawLine';
+    strokeColor: string;
+}
+
 export type EditableMeasureProperty =
     | EditableAlarmProperty
     | EditableDelayProperty
+    | EditableDrawFreehandProperty
+    | EditableDrawLineProperty
     | EditableEocLogProperty
     | EditableManualConfirmProperty
     | EditableResponseProperty;
@@ -59,6 +72,12 @@ export const emptyPropertyDefaults: {
     delay: { type: 'delay', delay: null },
     alarm: { type: 'alarm', alarmGroups: [], targetTransferPointIds: [] },
     eocLog: { type: 'eocLog', message: '' },
+    drawFreehand: {
+        type: 'drawFreehand',
+        strokeColor: '#000000',
+        fillColor: '#ff0000',
+    },
+    drawLine: { type: 'drawLine', strokeColor: '#000000' },
 };
 
 export function preprocessProperty(property: EditableMeasureProperty): unknown {

@@ -38,6 +38,8 @@ import { DisplayModelValidationComponent } from '../../../../../../shared/valida
 import {
     EditableAlarmProperty,
     EditableDelayProperty,
+    EditableDrawFreehandProperty,
+    EditableDrawLineProperty,
     EditableEocLogProperty,
     EditableManualConfirmProperty,
     EditableMeasureProperty,
@@ -177,6 +179,12 @@ export class MeasureTemplateFormComponent implements OnChanges {
 
     public asEocLogProperty =
         this.createPropertyCastFunction<EditableEocLogProperty>();
+
+    public asDrawFreehandProperty =
+        this.createPropertyCastFunction<EditableDrawFreehandProperty>();
+
+    public asDrawLineProperty =
+        this.createPropertyCastFunction<EditableDrawLineProperty>();
 
     public updateAlarmGroups(index: number, alarmGroups: string[]) {
         this.values.update((v) => {

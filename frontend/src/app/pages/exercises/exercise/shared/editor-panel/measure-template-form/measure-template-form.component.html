@@ -191,6 +191,48 @@
                                         [hide]="true"
                                     />
                                 }
+                                @case ('drawFreehand') {
+                                    @let drawFreehandProperty =
+                                        asDrawFreehandProperty(formProperty);
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                            >Strichfarbe</label
+                                        >
+                                        <input
+                                            [formField]="
+                                                drawFreehandProperty.strokeColor
+                                            "
+                                            type="color"
+                                            class="form-control form-control-color"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="form-label"
+                                            >Füllfarbe</label
+                                        >
+                                        <input
+                                            [formField]="
+                                                drawFreehandProperty.fillColor
+                                            "
+                                            type="color"
+                                            class="form-control form-control-color"
+                                        />
+                                    </div>
+                                }
+                                @case ('drawLine') {
+                                    @let drawLineProperty =
+                                        asDrawLineProperty(formProperty);
+                                    <label class="form-label"
+                                        >Strichfarbe</label
+                                    >
+                                    <input
+                                        [formField]="
+                                            drawLineProperty.strokeColor
+                                        "
+                                        type="color"
+                                        class="form-control form-control-color"
+                                    />
+                                }
                             }
                         </div>
                     </div>

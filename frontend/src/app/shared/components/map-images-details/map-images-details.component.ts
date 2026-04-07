@@ -77,7 +77,7 @@ export class MapImagesDetailsComponent implements OnInit {
     ngOnInit(): void {
         this.url = this.mapImage().image.url;
         if (this.openScoutInfo()) {
-            this.activeId.set('scoutInfo');
+            this.activeId.set('scout-Info');
         }
     }
     public saveUrl() {

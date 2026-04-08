@@ -71,32 +71,44 @@ export class OrganisationRepository extends BaseRepository {
     }
 
     public async getOrganisationMembersById(id: OrganisationId) {
-        return this.onlySingle(
-            await this.databaseConnection
-                .select()
-                .from(organisationMembershipTable)
-                .where(eq(organisationMembershipTable.organisationId, id))
-        );
+        return this.databaseConnection
+            .select({
+                id: organisationMembershipTable.id,
+                role: organisationMembershipTable.role,
+                user: {
+                    id: userTable.id,
+                    displayName: userTable.displayName,
+                },
+            })
+            .from(organisationMembershipTable)
+            .innerJoin(
+                userTable,
+                eq(organisationMembershipTable.userId, userTable.id)
+            )
+            .where(eq(organisationMembershipTable.organisationId, id))
+            .orderBy(userTable.displayName);
     }
 
     public async getOrganisationMembershipRoleForUserById(
         organisationId: OrganisationId,
         userId: string
     ) {
-        return this.onlySingle(
-            await this.databaseConnection
-                .select()
-                .from(organisationMembershipTable)
-                .where(
-                    and(
-                        eq(
-                            organisationMembershipTable.organisationId,
-                            organisationId
-                        ),
-                        eq(organisationMembershipTable.userId, userId)
+        return (
+            this.onlySingle(
+                await this.databaseConnection
+                    .select()
+                    .from(organisationMembershipTable)
+                    .where(
+                        and(
+                            eq(
+                                organisationMembershipTable.organisationId,
+                                organisationId
+                            ),
+                            eq(organisationMembershipTable.userId, userId)
+                        )
                     )
-                )
-        )?.role;
+            )?.role ?? null
+        );
     }
 
     public async isMemberOfOrganisationById(

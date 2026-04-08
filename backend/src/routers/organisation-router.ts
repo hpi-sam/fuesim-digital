@@ -1,4 +1,5 @@
 import {
+    getOrganisationDetailsResponseDataSchema,
     getOrganisationResponseDataSchema,
     getOrganisationsResponseDataSchema,
     organisationIdSchema,
@@ -44,11 +45,14 @@ export function createOrganisationRouter(
             const id = organisationIdSchema.safeParse(req.params.id).data;
             if (!id) throw new ApiError();
 
-            const organisation = await organisationService.getOrganisationById(
-                id,
-                req.session!
+            const organisation =
+                await organisationService.getOrganisationDetailsById(
+                    id,
+                    req.session!
+                );
+            res.send(
+                getOrganisationDetailsResponseDataSchema.encode(organisation)
             );
-            res.send(getOrganisationResponseDataSchema.encode(organisation));
         })
         .patch(async (req, res) => {
             const id = organisationIdSchema.parse(req.params.id);

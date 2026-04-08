@@ -1,0 +1,128 @@
+<app-header />
+<main class="container">
+    @if (organisation.hasValue()) {
+        @let org = organisation.value();
+        <div class="mb-4 card">
+            <div class="card-body pb-0">
+                <h1 class="d-flex align-items-center">
+                    <app-inline-text-editor
+                        class="flex-grow-1"
+                        [required]="true"
+                        [value]="org.name"
+                        name="Name der Organisation"
+                        (update)="
+                            patchOrganisation({
+                                name: $event,
+                            })
+                        "
+                        [singleLine]="true"
+                    />
+                </h1>
+            </div>
+            <hr />
+            <div class="card-body pt-0">
+                <app-inline-text-editor
+                    class="flex-grow-1"
+                    [required]="true"
+                    [value]="org.description"
+                    name="Beschreibung der Organisation"
+                    (update)="
+                        patchOrganisation({
+                            description: $event,
+                        })
+                    "
+                    [singleLine]="true"
+                />
+            </div>
+        </div>
+
+        <nav ngbNav #nav="ngbNav" class="nav-tabs">
+            <ng-container ngbNavItem="content">
+                <a ngbNavLink>
+                    <i class="bi bi-box-seam me-1"></i>
+                    Inhalte
+                    <span class="badge text-bg-secondary">4</span>
+                </a>
+                <ng-template ngbNavContent>First content</ng-template>
+            </ng-container>
+            <ng-container ngbNavItem="members">
+                <a ngbNavLink>
+                    <i class="bi bi-people me-1"></i>
+                    Mitglieder
+                    <span class="badge text-bg-secondary">
+                        {{ org.members.length }}
+                    </span>
+                </a>
+                <ng-template ngbNavContent>
+                    <ul class="list-group mt-2">
+                        @for (member of org.members; track member) {
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col d-flex align-items-center">
+                                        {{ member.user.displayName }}
+                                    </div>
+                                    <div class="col d-flex align-items-center">
+                                        <span class="me-2">Rolle:</span>
+                                        @if (org.userRole === 'admin') {
+                                            <select
+                                                class="form-select form-select-sm"
+                                            >
+                                                @for (
+                                                    role of organisationMembershipRoleAllowedValues;
+                                                    track role
+                                                ) {
+                                                    <option
+                                                        [value]="role"
+                                                        [selected]="
+                                                            member.role === role
+                                                        "
+                                                    >
+                                                        {{
+                                                            organisationMembershipRoleToGermanNameDictionary[
+                                                                role
+                                                            ]
+                                                        }}
+                                                    </option>
+                                                }
+                                            </select>
+                                        } @else {
+                                            <span
+                                                class="badge badge-pill text-bg-secondary"
+                                            >
+                                                {{
+                                                    organisationMembershipRoleToGermanNameDictionary[
+                                                        member.role
+                                                    ]
+                                                }}
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <div class="col">
+                                        @if (org.userRole === 'admin') {
+                                            <button
+                                                class="btn btn-sm btn-danger float-end"
+                                            >
+                                                Entfernen
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </ng-template>
+            </ng-container>
+            <div class="flex-grow-1"></div>
+            <ng-container ngbNavItem="settings">
+                <a ngbNavLink>
+                    <i class="bi bi-gear me-1"></i>
+                    Einstellungen
+                </a>
+                <ng-template ngbNavContent>Second content</ng-template>
+            </ng-container>
+        </nav>
+        <div [ngbNavOutlet]="nav"></div>
+    }
+</main>
+<app-footer />

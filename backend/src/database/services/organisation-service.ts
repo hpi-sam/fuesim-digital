@@ -36,7 +36,7 @@ export class OrganisationService {
         return organisation;
     }
 
-    public async getOrganisationById(
+    public async getOrganisationDetailsById(
         id: OrganisationId,
         session: SessionInformation
     ) {
@@ -46,19 +46,21 @@ export class OrganisationService {
             throw new NotFoundError();
         }
         if (
-            await this.organisationRepository.isMemberOfOrganisationById(
+            !(await this.organisationRepository.isMemberOfOrganisationById(
                 id,
                 session.user.id
-            )
+            ))
         ) {
             throw new PermissionDeniedError();
         }
+        const members =
+            await this.organisationRepository.getOrganisationMembersById(id);
         const userRole =
             await this.organisationRepository.getOrganisationMembershipRoleForUserById(
                 id,
                 session.user.id
             );
-        return { ...organisation, userRole };
+        return { ...organisation, userRole, members };
     }
 
     public async updateOrganisation(

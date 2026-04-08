@@ -8,6 +8,7 @@ import {
     getExercisesResponseDataSchema,
     getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
+    getOrganisationDetailsResponseDataSchema,
     getExerciseTemplateViewportsResponseDataSchema,
     getParallelExerciseResponseDataSchema,
     getParallelExercisesResponseDataSchema,
@@ -143,6 +144,11 @@ export class ApiService {
     public getOrganisationsResource() {
         return httpResource(() => `${httpOrigin}/api/organisations/`, {
             parse: getOrganisationsResponseDataSchema.parse,
+        });
+    }
+    public getOrganisationResource(id: OrganisationId) {
+        return httpResource(() => `${httpOrigin}/api/organisations/${id}`, {
+            parse: getOrganisationDetailsResponseDataSchema.parse,
         });
     }
 

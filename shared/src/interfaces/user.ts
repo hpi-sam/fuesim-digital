@@ -1,12 +1,4 @@
 import { z } from 'zod';
-import { exerciseTemplateIdSchema, parallelExerciseIdSchema } from '../ids.js';
-import {
-    groupParticipantKeySchema,
-    participantKeySchema,
-    trainerKeySchema,
-} from '../exercise-keys.js';
-import { exerciseStatusSchema, logEntrySchema } from '../models/index.js';
-import { validationMessages } from '../validation-messages.js';
 
 export const userDataSchema = z.object({
     id: z.string(),

@@ -39,7 +39,7 @@
             </ul>
         }
         <div class="modal-body">
-            @if (timeTravelMode()) {
+            @if (timeTravelMode() && data.mode !== 'view') {
                 <div class="alert alert-info" role="alert">
                     Sie betrachten eine frühere Version der Fahrzeugvorlage.
                     <br />
@@ -47,6 +47,7 @@
                     Änderungen vorzunehmen.
                 </div>
             }
+            @let editingDisabled = timeTravelMode() || data.mode === 'view';
             @switch (data.type) {
                 @case ('vehicleTemplate') {
                     <app-vehicle-template-form-marketplace
@@ -57,7 +58,7 @@
                                 ? 'Fahrzeugvorlage hinzufügen'
                                 : 'Änderungen speichern'
                         "
-                        [disabled]="timeTravelMode()"
+                        [disabled]="editingDisabled"
                     ></app-vehicle-template-form-marketplace>
                 }
                 @case ('alarmGroup') {
@@ -69,12 +70,12 @@
                                 : 'Änderungen speichern'
                         "
                         (dataSubmit)="submit($event)"
-                        [disabled]="timeTravelMode()"
+                        [disabled]="editingDisabled"
                     />
                 }
             }
             @if (
-                !timeTravelMode() &&
+                !editingDisabled &&
                 dependentElements.hasValue() &&
                 dependentElements.value().length > 0
             ) {

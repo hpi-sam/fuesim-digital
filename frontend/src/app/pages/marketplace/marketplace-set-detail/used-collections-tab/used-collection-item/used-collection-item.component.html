@@ -40,6 +40,6 @@
         exerciseObject of dependency().elements;
         track exerciseObject.versionId
     ) {
-        <app-element-card [element]="exerciseObject" [editable]="false" />
+        <app-element-card [element]="exerciseObject" mode="view" [collection]="dependency().collection" />
     }
 </div>

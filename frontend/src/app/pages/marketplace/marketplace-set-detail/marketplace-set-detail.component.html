@@ -97,8 +97,10 @@
                     <i class="bi bi-info-circle"></i>
                     <span>
                         Diese Sammlung enthält unveröffentlichte Änderungen.<br />
-                        Veröffentlichen Sie diese Version, um die Änderungen in
-                        Übungsszenarien verwenden zu können.
+                        @if(checkRole(collectionData.ownRole).isAtLeast('editor')) {
+                            Veröffentlichen Sie diese Version, um die Änderungen in
+                            Übungsszenarien verwenden zu können.
+                        }
                     </span>
                 </span>
                 @if (checkRole(collectionData.ownRole).isAtLeast('editor')) {

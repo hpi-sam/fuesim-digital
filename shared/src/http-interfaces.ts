@@ -503,8 +503,8 @@ export namespace Marketplace {
                 >(schema);
             };
 
-            export const DependencyAdd = defineEvent(
-                'dependency:add',
+            export const DependencyChange = defineEvent(
+                'dependency:change',
                 collectionVersionIdSchema
             );
 
@@ -550,7 +550,7 @@ export namespace Marketplace {
             export const SSEvent = new TypedSchema(
                 z.union([
                     CollectionUpdate.schema,
-                    DependencyAdd.schema,
+                    DependencyChange.schema,
                     DependencyReplaceData.schema,
                     ElementCreate.schema,
                     ElementDelete.schema,

@@ -1,4 +1,4 @@
-<div class="card h-100">
+<div class="card h-100" style="cursor: pointer">
     <div style="height: 100px" class="d-flex">
         <img
             [src]="image()"
@@ -20,20 +20,14 @@
         @if (editable()) {
             <div class="d-flex flex-row flex-wrap gap-2">
                 <button
-                    class="btn btn-outline-warning btn-sm"
-                    (click)="edit.emit()"
-                >
-                    <i class="bi bi-pen"></i>
-                </button>
-                <button
                     class="btn btn-outline-primary btn-sm"
-                    (click)="duplicate.emit()"
+                    (click)="$event.stopPropagation(); duplicate.emit()"
                 >
                     <i class="bi bi-copy"></i>
                 </button>
                 <button
                     class="btn btn-outline-danger btn-sm"
-                    (click)="delete.emit()"
+                    (click)="$event.stopPropagation(); delete.emit()"
                 >
                     <i class="bi bi-trash"></i>
                 </button>

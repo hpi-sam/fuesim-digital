@@ -64,7 +64,7 @@ export class CollectionEventSender {
             )
             .subscribe(async (update) => {
                 switch (update.event) {
-                    case 'dependency:add':
+                    case 'dependency:change':
                         await this.loadDependencies();
                         this.notifyChange(update);
                         this.notifyChange(

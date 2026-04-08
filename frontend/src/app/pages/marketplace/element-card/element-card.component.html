@@ -7,8 +7,8 @@
             [subtitle]="
                 (content.alarmGroupVehicles | values).length + ' Fahrzeuge'
             "
-            [editable]="editable()"
-            (edit)="openEditor()"
+            [editable]="mode() === 'edit'"
+            (click)="openEditor()"
             (delete)="deleteElement()"
             (duplicate)="duplicateElement()"
         />
@@ -18,8 +18,8 @@
             [image]="content.image.url"
             [title]="content.vehicleType"
             [subtitle]="content.name"
-            [editable]="editable()"
-            (edit)="openEditor()"
+            [editable]="mode() === 'edit'"
+            (click)="openEditor()"
             (delete)="deleteElement()"
             (duplicate)="duplicateElement()"
         />

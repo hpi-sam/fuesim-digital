@@ -197,14 +197,10 @@ export class CollectionService {
         dependencyEntityId: CollectionVersionId;
     }) {
         return this.collectionRepository.transaction(async (tx) => {
+            const eventBuffer = this.newDeferredEventBuffer();
+
             const [draftState, createdNewDraftState] =
                 await tx.getOrCreateDraftState(data.removeFrom);
-
-            await tx.removeCollectionVersionDependency(
-                draftState.versionId,
-                data.dependencyEntityId
-            );
-
             if (createdNewDraftState) {
                 this.eventSubject.next({
                     event: 'collection:update',
@@ -212,6 +208,19 @@ export class CollectionService {
                     collectionEntityId: data.removeFrom,
                 });
             }
+
+            await tx.removeCollectionVersionDependency(
+                draftState.versionId,
+                data.dependencyEntityId
+            );
+
+            eventBuffer.next({
+                collectionEntityId: data.removeFrom,
+                event: "dependency:change",
+                data: data.dependencyEntityId,
+            })
+
+            eventBuffer.flush();
 
             return draftState;
         });
@@ -374,22 +383,18 @@ export class CollectionService {
                     importFromCollection.versionId
                 );
 
-                eventBuffer.next({
-                    event: 'dependency:add',
-                    collectionEntityId: data.importTo,
-                    data: importFromCollection.versionId,
-                });
             } else {
                 await tx.collectionRepository.addCollectionVersionDependency(
                     draftState.versionId,
                     importFromCollection.versionId
                 );
-                eventBuffer.next({
-                    event: 'dependency:add',
-                    data: importFromCollection.versionId,
-                    collectionEntityId: data.importTo,
-                });
             }
+
+            eventBuffer.next({
+                event: 'dependency:change',
+                data: importFromCollection.versionId,
+                collectionEntityId: data.importTo,
+            });
 
             const newlyImportedElements = tx.exists(
                 await tx.collectionRepository.getElementsOfCollectionVersion(
@@ -916,7 +921,7 @@ export class CollectionService {
                     // just delete the element, when it's the only reference in the current draftstate
                     // (no other collection version references this element version)
                     await tx.collectionRepository.deleteElementVersion(
-                        latestElementVersion.versionId
+                        latestElementVersion
                     );
                 } else {
                     // unmap the reference to the element since it is not the base reference
@@ -1019,9 +1024,12 @@ export class CollectionService {
                 await tx.getElementVersionByVersionId(elementVersionId)
             );
 
+            const content = sourceElement.content;
+            content.name = `Kopie von ${content.name}`;
+
             const duplicatedElement = this.exists(
                 await tx.createElementVersion({
-                    content: sourceElement.content,
+                    content,
                     version: 1,
                 })
             );
@@ -1048,7 +1056,6 @@ export class CollectionService {
 
     public async duplicateCollectionVersion(
         collectionVersionId: CollectionVersionId,
-        owner: string
     ) {
         const latestCollectionEntity =
             await this.collectionRepository.getCollectionByVersionId(

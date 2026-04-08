@@ -113,7 +113,7 @@ export class CollectionService {
                     break;
                 }
 
-                case 'dependency:add': {
+                case 'dependency:change': {
                     // THIS EVENT DOES NOT NEED TO BE HANDLED BY FRONTEND
                     // dependency:replace-data is the important event here
                     break;
@@ -226,11 +226,17 @@ export class CollectionService {
                 `${this.ENDPOINT}/${setEntityId}/element/${elementEntityId}`
             )
         );
-        // TODO: Make this interface nicer / with confirm button
+
         if (result.requiresConfirmation.length > 0) {
             this.messageService.postError({
                 title: 'Entfernen nicht möglich',
                 body: `Zu löschendes Element muss zuerst aus folgenden anderen Elementen entfernt werden: ${result.requiresConfirmation.map((e) => e.element.title).join(', ')}.`,
+            });
+        } else {
+            this.messageService.postMessage({
+                title: 'Element gelöscht',
+                body: 'Das Element wurde erfolgreich gelöscht.',
+                color: 'success',
             });
         }
     }
@@ -295,6 +301,12 @@ export class CollectionService {
                 })
             )
         );
+
+        this.messageService.postMessage({
+            title: 'Element aktualisiert',
+            body: 'Das Element wurde erfolgreich aktualisiert.',
+            color: 'success',
+        });
 
         return data.result;
     }
@@ -466,9 +478,9 @@ export class CollectionService {
         collection: VersionedCollectionPartial
     ): Promise<
         | {
-              newerVersionAvailable: true;
-              latestVersion: VersionedCollectionPartial;
-          }
+            newerVersionAvailable: true;
+            latestVersion: VersionedCollectionPartial;
+        }
         | { newerVersionAvailable: false }
     > {
         const latestCollection =
@@ -509,6 +521,12 @@ export class CollectionService {
 
         const typedData =
             Marketplace.Element.Duplicate.responseSchema.parse(data);
+
+        this.messageService.postMessage({
+            title: 'Element dupliziert',
+            body: 'Das Element wurde erfolgreich dupliziert und zur Sammlung hinzugefügt.',
+            color: 'success',
+        });
 
         return typedData.result;
     }

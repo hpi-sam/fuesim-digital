@@ -372,7 +372,7 @@ export class CollectionRepository extends BaseRepository {
         return (
             mappings.length > 0 && // the elements needs to exist to be editable/updateable
             mappings.every(
-                (mapping) => mapping.exercise_element_sets.draftState
+                (mapping) => mapping.collections.draftState
             )
         );
     }
@@ -753,6 +753,7 @@ export class CollectionRepository extends BaseRepository {
                             version: sql<number>`1`.as('version'),
                             stateVersion: latestElements.stateVersion,
                             createdAt: sql`now()`.as('createdAt'),
+                            editedAt: sql`now()`.as('editedAt'),
                             title: latestElements.title,
                             description: latestElements.description,
                             content: latestElements.content,

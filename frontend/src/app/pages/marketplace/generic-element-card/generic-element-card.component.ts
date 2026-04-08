@@ -13,7 +13,6 @@ export class GenericElementCardComponent {
 
     public readonly editable = input<boolean>(true);
 
-    public readonly edit = output();
     public readonly delete = output();
     public readonly duplicate = output();
 }

@@ -1,6 +1,6 @@
 import type { MapImage } from '../models/map-image.js';
 import type { Patient } from '../models/patient.js';
-import type { UUID } from '../utils/index.js';
+import type { UUID } from '../utils/uuid.js';
 import type { Migration } from './migration-functions.js';
 
 export const addScoutables50: Migration = {

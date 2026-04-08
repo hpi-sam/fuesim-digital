@@ -5,8 +5,9 @@ import {
     participantKeySchema,
     trainerKeySchema,
 } from './exercise-keys.js';
-import { exerciseStatusSchema, logEntrySchema } from './models/index.js';
 import { validationMessages } from './validation-messages.js';
+import { exerciseStatusSchema } from './models/utils/exercise-status.js';
+import { logEntrySchema } from './models/log-entry.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,

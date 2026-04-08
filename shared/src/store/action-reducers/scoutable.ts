@@ -8,15 +8,14 @@ import {
     type ScoutableElement,
     scoutableElementSchema,
 } from '../../models/scoutable.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
-    cloneDeepMutable,
-    getElement,
     type UserGeneratedContent,
     userGeneratedContentSchema,
-    type UUID,
-    uuidValidationOptions,
-} from '../../index.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+} from '../../models/user-generated-content.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getElement } from './utils/get-element.js';
 
 export class MakeElementScoutableAction implements Action {
     @IsValue('[Scoutable] Make scoutable' as const)

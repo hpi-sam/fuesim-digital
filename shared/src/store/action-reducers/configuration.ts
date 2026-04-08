@@ -7,7 +7,7 @@ import {
     tileMapPropertiesSchema,
     type OperationsMapProperties,
     operationsMapPropertiesSchema,
-} from '../../models/utils/tile-map-properties.js';
+} from '../../models/utils/map-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 
 export class SetTileMapPropertiesAction implements Action {

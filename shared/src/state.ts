@@ -1,10 +1,5 @@
 import { z } from 'zod';
-import {
-    Equals,
-    IsObject,
-    IsOptional,
-    IsUUID,
-} from 'class-validator';
+import { Equals, IsObject, IsOptional, IsUUID } from 'class-validator';
 import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
 import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
 import {
@@ -60,7 +55,7 @@ import {
     hospitalPatientSchema,
 } from './models/hospital-patient.js';
 import { patientCategorySchema } from './models/patient-category.js';
-import { UUID, uuid, uuidSchema } from './utils/uuid.js';
+import { UUID, uuid, uuidSchema, uuidValidationOptions } from './utils/uuid.js';
 import {
     catchAllHospitalId,
     createCatchAllHospital,
@@ -68,12 +63,14 @@ import {
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
 import { defaultMapImagesTemplatesById } from './data/default-state/map-images-templates.js';
 import { SpatialTree } from './models/utils/spatial-tree.js';
-import type { LogEntry } from './models/log-entry.js';
+import { type LogEntry, logEntrySchema } from './models/log-entry.js';
 import type { TreatmentAssignment } from './store/action-reducers/exercise.js';
 import { getCreate } from './models/utils/get-create.js';
 import {
     type ExerciseStatus,
     exerciseStatusSchema,
+    type ExerciseType,
+    exerciseTypeSchema,
 } from './models/utils/exercise-status.js';
 import {
     type SimulatedRegion,
@@ -83,6 +80,11 @@ import {
     type ExerciseRadiogram,
     exerciseRadiogramSchema,
 } from './models/radiogram/exercise-radiogram.js';
+import {
+    type UserGeneratedContent,
+    userGeneratedContentSchema,
+} from './models/user-generated-content.js';
+import { type Scoutable, scoutableSchema } from './models/scoutable.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)

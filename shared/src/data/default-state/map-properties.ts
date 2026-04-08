@@ -1,7 +1,7 @@
 import type {
     OperationsMapProperties,
     TileMapProperties,
-} from '../../models/index.js';
+} from '../../models/utils/map-properties.js';
 
 export const defaultTileMapProperties: TileMapProperties = {
     tileUrl:

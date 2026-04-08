@@ -29,7 +29,7 @@ import {
     currentTransferOf,
     isInTransfer,
 } from '../../models/utils/position/position-helpers.js';
-import { UUID, uuid } from '../../utils/uuid.js';
+import { type UUID, uuid, uuidValidationOptions } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import { PatientUpdate } from './utils/patient-updates.js';

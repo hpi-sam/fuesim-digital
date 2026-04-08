@@ -2,11 +2,11 @@ import { z } from 'zod';
 import {
     defaultTileMapProperties,
     defaultOperationsMapProperties,
-} from '../data/default-state/tile-map-properties.js';
+} from '../data/default-state/map-properties.js';
 import {
     tileMapPropertiesSchema,
     operationsMapPropertiesSchema,
-} from './utils/tile-map-properties.js';
+} from './utils/map-properties.js';
 
 export const exerciseConfigurationSchema = z.strictObject({
     type: z.literal('exerciseConfiguration'),

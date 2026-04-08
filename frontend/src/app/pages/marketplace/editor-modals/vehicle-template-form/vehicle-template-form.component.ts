@@ -80,7 +80,7 @@ export class VehicleTemplateFormMarketplaceComponent
     constructor() {
         effect(() => {
             const data = this.data();
-            if (data.isEditMode) {
+            if (data.mode !== "create") {
                 this.values.set(
                     cloneDeepMutable(data.element.content as VehicleTemplate)
                 );

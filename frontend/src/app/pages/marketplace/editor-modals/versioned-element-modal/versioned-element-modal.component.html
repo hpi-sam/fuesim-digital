@@ -3,7 +3,7 @@
 </div>
 <div class="">
     <div class="d-flex flex-row">
-        @if (data.isEditMode) {
+        @if (data.mode !== "create") {
             <ul class="list-group rounded-0">
                 @if (versionHistory() !== null) {
                     @for (
@@ -53,9 +53,9 @@
                         [data]="selectedVersionData()"
                         (dataSubmit)="submit($event)"
                         [btnText]="
-                            data.isEditMode
-                                ? 'Änderungen speichern'
-                                : 'Fahrzeugvorlage hinzufügen'
+                            data.mode === 'create'
+                                ? 'Fahrzeugvorlage hinzufügen'
+                                : 'Änderungen speichern'
                         "
                         [disabled]="timeTravelMode()"
                     ></app-vehicle-template-form-marketplace>
@@ -64,9 +64,9 @@
                     <app-alarmgroup-element-modal
                         [data]="selectedVersionData()"
                         [btnText]="
-                            data.isEditMode
-                                ? 'Änderungen speichern'
-                                : 'Alarmgruppe hinzufügen'
+                            data.mode === 'create'
+                                ? 'Alarmgruppe hinzufügen'
+                                : 'Änderungen speichern'
                         "
                         (dataSubmit)="submit($event)"
                         [disabled]="timeTravelMode()"

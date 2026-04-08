@@ -21,18 +21,17 @@ export interface SharedVersionedElementModalData<T> {
     ) => void;
     type: VersionedElementContent['type'];
     collection: VersionedCollectionPartial;
-    isEditMode: boolean;
     availableCollectionElements: ElementDto[];
 }
 
 export interface CreatingVersionedElementModalData<T>
     extends SharedVersionedElementModalData<T> {
-    isEditMode: false;
+    mode: "create";
 }
 
 export interface EditingVersionedElementModalData<T>
     extends SharedVersionedElementModalData<T> {
-    isEditMode: true;
+    mode: "edit" | "view";
     element: ElementDto;
 }
 

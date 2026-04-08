@@ -49,7 +49,7 @@ export class VersionedElementModalComponent implements OnInit {
     });
 
     public readonly timeTravelMode = computed<boolean>(() => {
-        if (!this.data.isEditMode) return false;
+        if (this.data.mode === "create") return false;
         if (this.selectedVersion() === null) return false;
 
         return this.selectedVersion() !== this.data.element.version;
@@ -60,7 +60,7 @@ export class VersionedElementModalComponent implements OnInit {
     public readonly dependentElements = resource({
         params: () => ({ data: this.data }),
         loader: async ({ params: { data } }) => {
-            if (!data.isEditMode) return [] as ElementDto[];
+            if (data.mode === "create") return [] as ElementDto[];
 
             const dependentElements =
                 await this.collectionService.getDependentElements(
@@ -89,7 +89,7 @@ export class VersionedElementModalComponent implements OnInit {
     }
 
     public async ngOnInit() {
-        if (this.data.isEditMode) {
+        if (this.data.mode !== "create") {
             const versionData = await this.collectionService.getElementVersions(
                 this.data.collection.entityId,
                 this.data.element.entityId

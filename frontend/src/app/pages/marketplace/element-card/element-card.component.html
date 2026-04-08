@@ -16,8 +16,8 @@
     @case ('vehicleTemplate') {
         <app-generic-element-card
             [image]="content.image.url"
-            [title]="content.name"
-            [subtitle]="content.vehicleType"
+            [title]="content.vehicleType"
+            [subtitle]="content.name"
             [editable]="editable()"
             (edit)="openEditor()"
             (delete)="deleteElement()"

@@ -16,6 +16,7 @@ import {
     collectionRelationshipTypeSchema,
     collectionVersionIdSchema,
     collectionVisibilitySchema,
+    countedCollectionDtoSchema,
     elementDtoSchema,
     elementEntityIdSchema,
     elementVersionIdSchema,
@@ -406,7 +407,7 @@ export namespace Marketplace {
 
         export const LoadMy = new Route({
             response: z.object({
-                result: z.array(collectionDtoSchema),
+                result: z.array(countedCollectionDtoSchema),
             }),
         });
 

@@ -106,7 +106,7 @@ export class CollectionElementsTabComponent {
         );
         modal.componentInstance.data = {
             type: type,
-            isEditMode: false,
+            mode: "create",
             onSubmit: async (data: any) => {
                 await this.collectionService.createElement(
                     this.collectionData().collection.entityId,

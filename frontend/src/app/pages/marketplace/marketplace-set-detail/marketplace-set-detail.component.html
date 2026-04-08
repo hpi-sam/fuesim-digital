@@ -46,14 +46,13 @@
                     class="text-muted d-flex flex-row gap-1 align-items-center"
                 >
                     @if (collectionData.objects.transitive.length > 0) {
-                        Verwendet Sammlungen:
+                        Verwendete Sammlungen:
                         @for (
                             dependency of collectionData.objects.transitive;
                             track dependency.collection.versionId
                         ) {
                             <span
                                 class="badge bg-secondary"
-                                style="cursor: pointer"
                             >
                                 {{ dependency.collection.title }}
                             </span>

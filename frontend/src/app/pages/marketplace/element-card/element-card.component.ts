@@ -43,7 +43,7 @@ export class ElementCardComponent implements OnInit {
             }
         );
         modal.componentInstance.data = {
-            isEditMode: true,
+            mode: "edit",
             type: this.element().content.type,
             onSubmit: async (data, conflictResolution) => {
                 this.collectionService.updateElement(

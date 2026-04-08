@@ -10,7 +10,11 @@
         <li class="list-group-item">
             Erstellt am: {{ collection().createdAt | date }}
         </li>
-        <li class="list-group-item"></li>
-        <li class="list-group-item"></li>
+        <li class="list-group-item">Zuletzt bearbeitet: {{ collection().editedAt | date}}</li>
+        <li class="list-group-item">{{collection().elementCount }} Einträge
+            @if(collection().draftState){
+                <br/><div class="badge text-bg-secondary">enthält nicht aktualisierte Änderungen</div>
+            }
+        </li>
     </ul>
 </a>

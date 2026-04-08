@@ -187,6 +187,8 @@ export const collectionTable = pgTable(
         visibility: varchar().notNull().default('private'),
         draftState: boolean().notNull(),
         archived: boolean().notNull().default(false),
+        // This is just easier for everybody
+        elementCount: integer().notNull().default(0)
     },
     (table) => [
         unique('unique_set_version').on(table.entityId, table.version),

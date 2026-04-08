@@ -39,6 +39,13 @@ export const collectionDtoSchema = z.object({
 
 export type CollectionDto = z.infer<typeof collectionDtoSchema>;
 
+export const countedCollectionDtoSchema = z.object({
+    ...collectionDtoSchema.shape,
+    elementCount: z.number()
+})
+
+export type CountedCollectionDto = z.infer<typeof countedCollectionDtoSchema>;
+
 // This is sorted by permission level, so the order matters
 export const collectionRelationshipTypeAllowedValues = [
     'viewer',

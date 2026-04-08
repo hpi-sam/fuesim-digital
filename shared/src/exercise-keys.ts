@@ -18,7 +18,12 @@ export type ParticipantKey = z.infer<typeof participantKeySchema>;
 export type TrainerKey = z.infer<typeof trainerKeySchema>;
 // z.union doesn't work well with branded types
 export type ExerciseKey = ParticipantKey | TrainerKey;
-export type AccessKey = ExerciseKey | GroupParticipantKey;
+export const accessKeySchema = z.union([
+    participantKeySchema,
+    trainerKeySchema,
+    groupParticipantKeySchema,
+]);
+export type AccessKey = z.infer<typeof accessKeySchema>;
 
 export function isParticipantKey(key: string): key is ParticipantKey {
     return participantKeySchema.safeParse(key).success;

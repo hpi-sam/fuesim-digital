@@ -44,9 +44,14 @@ describe('exercise router', () => {
         it('succeeds with 200 with a valid participant key', async () => {
             const participantKey = (await createExercise(environment))
                 .participantKey;
-            await environment
+            const response = await environment
                 .httpRequest('get', `/api/exercise/${participantKey}`)
                 .expect(200);
+            const parsed = exerciseExistsResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed.exists).toBe(true);
+            expect(parsed.autojoin).toBe(false);
         });
 
         it('succeeds with 200 with a valid trainer key', async () => {
@@ -57,10 +62,24 @@ describe('exercise router', () => {
             const parsed = exerciseExistsResponseDataSchema.parse(
                 response.body
             );
+            expect(parsed.exists).toBe(true);
             expect(parsed.autojoin).toBe(false);
         });
 
-        it('fails with 400 for arbitrary keys', async () => {
+        it('fails  for non-existing keys', async () => {
+            await Promise.all(
+                ['123456', '12345678'].map(async (invalidKey) => {
+                    const response = await environment
+                        .httpRequest('get', `/api/exercise/${invalidKey}`)
+                        .expect(200);
+                    const parsed = exerciseExistsResponseDataSchema.parse(
+                        response.body
+                    );
+                    expect(parsed.exists).toBe(false);
+                })
+            );
+        });
+        it('fails for arbitrary keys', async () => {
             await Promise.all(
                 ['12345', '1234567', '123456789'].map((invalidKey) =>
                     environment
@@ -146,6 +165,7 @@ describe('exercise router', () => {
                 const parsed = exerciseExistsResponseDataSchema.parse(
                     response.body
                 );
+                expect(parsed.exists).toBe(true);
                 expect(parsed.autojoin).toBe(true);
             });
 
@@ -188,13 +208,17 @@ describe('exercise router', () => {
             });
         });
 
-        it('fails with 404 for non-existing key', async () => {
-            await environment
+        it('fails for non-existing key', async () => {
+            const response = await environment
                 .httpRequest(
                     'get',
                     `/api/exercise/${await environment.services.accessKeyService.generateKey(6)}`
                 )
-                .expect(404);
+                .expect(200);
+            const parsed = exerciseExistsResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed.exists).toBe(false);
         });
     });
 
@@ -278,9 +302,13 @@ describe('exercise router', () => {
                     )
                     .expect(204);
 
-                await environment
+                const response = await environment
                     .httpRequest('get', `/api/exercise/${exercise.trainerKey}`)
-                    .expect(404);
+                    .expect(200);
+                const parsed = exerciseExistsResponseDataSchema.parse(
+                    response.body
+                );
+                expect(parsed.exists).toBe(false);
             });
         });
 

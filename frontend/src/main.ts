@@ -13,6 +13,8 @@ import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule } from '@ngrx/store';
 import { provideRouter } from '@angular/router';
+import { provideSignalFormsConfig } from '@angular/forms/signals';
+import { NG_STATUS_CLASSES } from '@angular/forms/signals/compat';
 import {
     withCredentialsInterceptor,
     errorHandlingInterceptor,
@@ -52,6 +54,9 @@ bootstrapApplication(AppComponent, {
                 errorHandlingInterceptor,
             ])
         ),
+        provideSignalFormsConfig({
+            classes: NG_STATUS_CLASSES,
+        }),
         // Returns promise to block application loading until AuthService is initialized
         provideAppInitializer(
             async (): Promise<void> => inject(AuthService).initialize()

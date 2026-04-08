@@ -56,13 +56,6 @@
                 >.
             </div>
         }
-        @if (errors['exerciseDoesNotExist']; as exerciseExistsError) {
-            <div>
-                Es existiert keine Übung mit der Id
-                <span class="font-monospace">{{ exerciseExistsError.id }}</span
-                >.
-            </div>
-        }
         @if (errors['imageExists']; as imageExistsError) {
             <div>
                 Kein Bild gefunden
@@ -73,12 +66,6 @@
                     >)
                 }
                 .
-            </div>
-        }
-        @if (errors['joinId']) {
-            <div>
-                Die Eingabe muss eine gültige Übungs-PIN (6 oder 8 Ziffern)
-                sein.
             </div>
         }
     </div>

@@ -47,7 +47,7 @@
             @if (value()) {
                 {{ value() }}
             } @else {
-                –
+                {{ noValueText() }}
             }
         </div>
         <button class="btn btn-sm" (click)="startEdit()" title="Bearbeiten">

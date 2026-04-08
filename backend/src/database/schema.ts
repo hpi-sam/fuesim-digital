@@ -102,7 +102,9 @@ export const organisationMembershipTable = pgTable(
             .$type<OrganisationId>()
             .references(() => organisationTable.id, { onDelete: 'cascade' })
             .notNull(),
-        role: organisationMembershipRoleEnum().$type<OrganisationMembershipRole>(),
+        role: organisationMembershipRoleEnum()
+            .$type<OrganisationMembershipRole>()
+            .notNull(),
         joinedAt: timestamp({ withTimezone: true, mode: 'date' })
             .notNull()
             .defaultNow(),

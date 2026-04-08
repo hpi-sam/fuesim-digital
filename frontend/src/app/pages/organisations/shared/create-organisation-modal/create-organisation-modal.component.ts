@@ -29,7 +29,7 @@ export class CreateOrganisationModalComponent {
     private readonly apiService = inject(ApiService);
     private readonly activeModal = inject(NgbActiveModal);
 
-    public created = output<boolean>();
+    public readonly created = output<boolean>();
     readonly model = signal<PostOrganisationRequestDataSchema>({
         name: '',
         description: '',

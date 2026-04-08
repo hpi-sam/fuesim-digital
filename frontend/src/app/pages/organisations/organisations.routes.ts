@@ -1,6 +1,7 @@
 import type { Routes } from '@angular/router';
 import { IsAuthenticatedGuard } from '../guards/is-authenticated.guard';
 import { OrganisationListComponent } from './list/organisation-list.component';
+import { OrganisationComponent } from './organisation/organisation.component';
 
 export const routes: Routes = [
     {
@@ -8,15 +9,9 @@ export const routes: Routes = [
         component: OrganisationListComponent,
         canActivate: [IsAuthenticatedGuard],
     },
-    // {
-    //     path: ':id',
-    //     canActivate: [JoinExerciseGuard],
-    //     canDeactivate: [LeaveExerciseGuard],
-    //     children: [
-    //         {
-    //             path: '',
-    //             component: ExerciseComponent,
-    //         },
-    //     ],
-    // },
+    {
+        path: ':id',
+        canActivate: [IsAuthenticatedGuard],
+        component: OrganisationComponent,
+    },
 ];

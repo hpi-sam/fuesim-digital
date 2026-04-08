@@ -33,9 +33,9 @@ import type { Services } from '../database/services/index.js';
 import { ParallelExerciseService } from '../database/services/parallel-exercise-service.js';
 import { ParallelExerciseRepository } from '../database/repositories/parallel-exercise-repository.js';
 import type { Repositories } from '../database/repositories/index.js';
-import type { SocketReservedEvents } from './socket-reserved-events.js';
 import { OrganisationService } from '../database/services/organisation-service.js';
 import { OrganisationRepository } from '../database/repositories/organisation-repository.js';
+import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
 /**

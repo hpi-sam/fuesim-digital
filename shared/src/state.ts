@@ -35,6 +35,10 @@ import {
     type ExerciseType,
     type ExerciseStatus,
     logEntrySchema,
+    scoutableSchema,
+    userGeneratedContentSchema,
+    Scoutable,
+    UserGeneratedContent,
 } from './models/index.js';
 import type { ExerciseRadiogram } from './models/radiogram/index.js';
 import { getRadiogramConstructor } from './models/radiogram/index.js';
@@ -229,6 +233,19 @@ export class ExerciseState {
     @Equals(undefined)
     public previousTreatmentAssignment?: TreatmentAssignment;
 
+    @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
+    public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
+
+    @IsZodSchema(
+        z.record(
+            userGeneratedContentSchema.shape.id,
+            userGeneratedContentSchema
+        )
+    )
+    public readonly userGeneratedContents: {
+        readonly [key: UUID]: UserGeneratedContent;
+    } = {};
+
     /**
      * @deprecated Use {@link create} instead.
      */
@@ -243,5 +260,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 49;
+    static readonly currentStateVersion = 50;
 }

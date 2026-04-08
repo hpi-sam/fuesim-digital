@@ -19,6 +19,8 @@ import { RadiogramActionReducers } from './radiogram.js';
 import { VehicleTemplateActionReducers } from './vehicle-templates.js';
 import { RestrictedZoneActionReducers } from './restricted-zone.js';
 import { OperationalSectionActionReducers } from './operational-section.js';
+import { ScoutableActionReducers } from './scoutable.js';
+import { UserGeneratedContentActionReducers } from './user-generated-content.js';
 
 /**
  * All action reducers of the exercise must be registered here
@@ -45,6 +47,8 @@ const actionReducers = {
     ...VehicleTemplateActionReducers,
     ...RestrictedZoneActionReducers,
     ...OperationalSectionActionReducers,
+    ...ScoutableActionReducers,
+    ...UserGeneratedContentActionReducers,
 };
 
 type ExerciseActionReducer =

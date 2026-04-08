@@ -75,3 +75,8 @@ Lukas Radermacher, based on <https://commons.wikimedia.org/wiki/File:RTW_Altenbu
 License: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 [favicon.png](favicon.png): created by Freepik - Flaticon <https://www.flaticon.com/de/kostenlose-icons/alarm>
+
+[Magnifying-glass.svg](Magnifying-glass.svg):
+<https://commons.wikimedia.org/wiki/File:Magnifying-glass.svg#/media/File:Magnifying-glass.svg>
+RRZEicons
+License: [CC-BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/deed.en)

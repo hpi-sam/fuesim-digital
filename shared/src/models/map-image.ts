@@ -25,6 +25,7 @@ export const mapImageSchema = z.strictObject({
      * Whether the UI should prevent position changes of the map image by drag&drop
      */
     isLocked: z.boolean(),
+    scoutableId: uuidSchema.nullable(),
 });
 
 export type MapImage = z.infer<typeof mapImageSchema>;
@@ -43,6 +44,7 @@ export function newMapImage(
         image,
         isLocked,
         zIndex,
+        scoutableId: null,
     };
 }
 

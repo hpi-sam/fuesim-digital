@@ -136,7 +136,8 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
 
     public override onFeatureClicked(
         event: MapBrowserEvent<any>,
-        feature: Feature<any>
+        feature: Feature<any>,
+        openScoutInfo?: boolean
     ): void {
         super.onFeatureClicked(event, feature);
 
@@ -150,6 +151,7 @@ export class PatientFeatureManager extends MoveableFeatureManager<Patient> {
                 ['patient'],
                 {
                     patientId: feature.getId() as UUID,
+                    openScoutInfo: openScoutInfo ?? false,
                 }
             )
         );

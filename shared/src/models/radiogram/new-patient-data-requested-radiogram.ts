@@ -22,6 +22,6 @@ export function newNewPatientDataRequestedRadiogram(
         simulatedRegionId,
         status,
         informationRequestKey: null,
-        informationAvailable: false,
+        informationAvailable: true,
     };
 }

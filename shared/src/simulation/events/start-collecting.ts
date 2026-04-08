@@ -1,6 +1,8 @@
 import { z } from 'zod';
-import type { ReportableInformation } from '../behaviors/reportable-information.js';
-import { reportableInformationSchema } from '../behaviors/reportable-information.js';
+import {
+    type ReportableInformation,
+    reportableInformationSchema,
+} from '../behaviors/utils.js';
 import { simulationEventSchema } from './simulation-event.js';
 
 export const startCollectingInformationSchema = z.strictObject({

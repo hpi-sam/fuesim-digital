@@ -12,8 +12,7 @@ import { newTreatmentStatusRadiogram } from '../../models/radiogram/treatment-st
 import { newTransferCategoryCompletedRadiogram } from '../../models/radiogram/transfer-category-completed-radiogram.js';
 import type { SimulationBehavior } from './simulation-behavior.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
-import { createRadiogramMap } from './utils.js';
-import { reportableInformationSchema } from './reportable-information.js';
+import { createRadiogramMap, reportableInformationSchema } from './utils.js';
 
 export const reportBehaviorStateSchema = z.strictObject({
     ...simulationBehaviorStateSchema.shape,

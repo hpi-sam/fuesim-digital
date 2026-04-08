@@ -6,13 +6,8 @@ import { z } from 'zod';
  * * `transportManagement`: The information is about all simulated regions that are managed
  *   by the transport management behavior of the simulated region that sent the radiogram
  */
-
-export const transferProgressScopeAllowedValues = [
+export const transferProgressScopeSchema = z.literal([
     'singleRegion',
     'transportManagement',
-] as const;
-
-export const transferProgressScopeSchema = z.literal(
-    transferProgressScopeAllowedValues
-);
+]);
 export type TransferProgressScope = z.infer<typeof transferProgressScopeSchema>;

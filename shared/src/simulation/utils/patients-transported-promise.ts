@@ -3,8 +3,8 @@ import { type UUID, uuidSchema } from '../../utils/uuid.js';
 
 export const patientsTransportPromiseSchema = z.strictObject({
     type: z.literal('patientsTransportPromise'),
-    promisedTime: z.number().int().nonnegative(),
-    patientCount: z.number().int().nonnegative(),
+    promisedTime: z.int().nonnegative(),
+    patientCount: z.int().nonnegative(),
     targetSimulatedRegionId: uuidSchema,
 });
 

@@ -9,7 +9,7 @@ import { simulationEventSchema } from './simulation-event.js';
 export const patientsCountedEventSchema = z.strictObject({
     ...simulationEventSchema.shape,
     type: z.literal('patientsCountedEvent'),
-    patientCount: z.record(patientStatusSchema, z.number()),
+    patientCount: z.record(patientStatusSchema, z.int().nonnegative()),
 });
 export type PatientsCountedEvent = z.infer<typeof patientsCountedEventSchema>;
 

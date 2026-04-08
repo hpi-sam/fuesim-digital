@@ -45,8 +45,8 @@ export const requestBehaviorStateSchema = z.strictObject({
     /**
      * @deprecated Use {@link updateBehaviorsRequestInterval} instead
      */
-    requestInterval: z.number().int().nonnegative(),
-    invalidatePromiseInterval: z.number().int().nonnegative(),
+    requestInterval: z.int().nonnegative(),
+    invalidatePromiseInterval: z.int().nonnegative(),
     requestTarget: exerciseRequestTargetConfigurationSchema,
 });
 

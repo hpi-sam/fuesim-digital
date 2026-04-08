@@ -12,6 +12,11 @@ import { newMapPositionAt } from './utils/position/map-position.js';
 export const simulatedRegionSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('simulatedRegion'),
+    /**
+     * top-left position
+     *
+     * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
+     */
     position: positionSchema,
     size: sizeSchema,
     name: z.string(),

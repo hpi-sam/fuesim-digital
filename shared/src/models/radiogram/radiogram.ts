@@ -4,7 +4,7 @@ import { exerciseRadiogramStatusSchema } from './status/exercise-radiogram-statu
 
 export const radiogramSchema = z.strictObject({
     id: uuidSchema,
-    type: z.literal('radiogram'),
+    type: z.templateLiteral([z.string(), 'Radiogram']),
     simulatedRegionId: uuidSchema,
     status: exerciseRadiogramStatusSchema,
     informationAvailable: z.boolean(),

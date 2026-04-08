@@ -20,7 +20,7 @@ import {
     generateReportActivityStateSchema,
 } from './generate-report.js';
 import {
-    providePersonnelFromVehiclesActivity,
+    providePersonnelFromVehicleActivity,
     providePersonnelFromVehiclesActivitySchema,
 } from './provide-personnel-from-vehicles.js';
 import {
@@ -84,7 +84,7 @@ export const simulationActivityDictionary = {
     delayEventActivity,
     recurringEventActivity,
     generateReportActivity,
-    providePersonnelFromVehiclesActivity,
+    providePersonnelFromVehicleActivity,
     createRequestActivity,
     loadVehicleActivity,
     sendRemoteEventActivity,

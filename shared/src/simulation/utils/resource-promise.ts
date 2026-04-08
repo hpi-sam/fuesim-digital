@@ -6,7 +6,7 @@ import {
 
 export const resourcePromiseSchema = z.strictObject({
     type: z.literal('resourcePromise'),
-    promisedTime: z.number().int().nonnegative(),
+    promisedTime: z.int().nonnegative(),
     resource: vehicleResourceSchema,
 });
 

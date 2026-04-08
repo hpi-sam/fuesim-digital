@@ -54,11 +54,11 @@ interface PatientsPerRegion {
 const vehiclesForPatientsSchema = z.strictObject({
     type: z.literal('vehiclesForPatients'),
     red: z.array(z.string()),
-    redIndex: z.number().int().nonnegative(),
+    redIndex: z.int().nonnegative(),
     yellow: z.array(z.string()),
-    yellowIndex: z.number().int().nonnegative(),
+    yellowIndex: z.int().nonnegative(),
     green: z.array(z.string()),
-    greenIndex: z.number().int().nonnegative(),
+    greenIndex: z.int().nonnegative(),
 });
 
 type VehiclesForPatients = z.infer<typeof vehiclesForPatientsSchema>;
@@ -91,22 +91,25 @@ export const managePatientTransportToHospitalBehaviorStateSchema =
          */
         patientsExpectedInRegions: z.record(
             uuidSchema,
-            z.record(patientStatusSchema, z.number())
+            z.record(patientStatusSchema, z.int().nonnegative())
         ),
         patientsExpectedToStillBeTransportedByRegion: z.array(
-            z.lazy(() => patientsTransportPromiseSchema)
+            patientsTransportPromiseSchema
         ),
-        transferredPatientCounts: z.record(patientStatusSchema, z.number()),
+        transferredPatientCounts: z.record(
+            patientStatusSchema,
+            z.int().nonnegative()
+        ),
         vehiclesForPatients: vehiclesForPatientsSchema,
         /**
          * @deprecated Use {@link updateRequestVehiclesDelay} instead
          */
-        requestVehiclesDelay: z.number().int().nonnegative(),
+        requestVehiclesDelay: z.int().nonnegative(),
         /**
          * @deprecated Use {@link updateRequestPatientCountsDelay} instead
          */
-        requestPatientCountsDelay: z.number().int().nonnegative(),
-        promiseInvalidationInterval: z.number().int().nonnegative(),
+        requestPatientCountsDelay: z.int().nonnegative(),
+        promiseInvalidationInterval: z.int().nonnegative(),
         maximumCategoryToTransport: patientStatusForTransportSchema,
         transportStarted: z.boolean(),
         recurringPatientDataRequestActivityId: uuidSchema.optional(),

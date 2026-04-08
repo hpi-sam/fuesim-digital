@@ -24,7 +24,7 @@ export function newMissingTransferConnectionRadiogram(
         simulatedRegionId,
         status,
         targetTransferPointId,
-        informationAvailable: false,
+        informationAvailable: true,
         informationRequestKey: null,
     };
 }

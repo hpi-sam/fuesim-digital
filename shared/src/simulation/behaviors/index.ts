@@ -12,4 +12,3 @@ export * from './transfer.js';
 export * from './transfer-to-hospital.js';
 export * from './manage-patient-transport-to-hospital.js';
 export * from './simulation-behavior.js';
-export * from './reportable-information.js';

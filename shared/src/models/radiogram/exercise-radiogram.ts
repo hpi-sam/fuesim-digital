@@ -17,7 +17,6 @@ export const exerciseRadiogramSchema = z.discriminatedUnion('type', [
     missingTransferConnectionRadiogramSchema,
     patientCountRadiogramSchema,
     personnelCountRadiogramSchema,
-    personnelCountRadiogramSchema,
     resourceRequestRadiogramSchema,
     transferCategoryCompletedRadiogramSchema,
     transferConnectionsRadiogramSchema,

@@ -19,7 +19,7 @@ import type { SimulationActivity } from './simulation-activity.js';
 
 export const providePersonnelFromVehiclesActivitySchema = z.strictObject({
     ...simulationActivityStateSchema.shape,
-    type: z.literal('providePersonnelFromVehiclesActivity'),
+    type: z.literal('providePersonnelFromVehicleActivity'),
     requiredPersonnelCounts: resourceDescriptionSchema,
     vehiclePriorities: z.array(uuidSchema),
     key: z.string(),
@@ -36,14 +36,14 @@ export function newProvidePersonnelFromVehiclesActivityState(
 ): ProvidePersonnelFromVehiclesActivityState {
     return {
         id,
-        type: 'providePersonnelFromVehiclesActivity',
+        type: 'providePersonnelFromVehicleActivity',
         requiredPersonnelCounts,
         vehiclePriorities,
         key,
     };
 }
 
-export const providePersonnelFromVehiclesActivity: SimulationActivity<ProvidePersonnelFromVehiclesActivityState> =
+export const providePersonnelFromVehicleActivity: SimulationActivity<ProvidePersonnelFromVehiclesActivityState> =
     {
         activityStateSchema: providePersonnelFromVehiclesActivitySchema,
         tick(

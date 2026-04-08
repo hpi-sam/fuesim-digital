@@ -30,11 +30,6 @@ import {
     uuidValidationOptions,
 } from '../../utils/uuid.js';
 import {
-    type ReportableInformation,
-    reportableInformationSchema,
-    reportableInformationTypeToGermanNameDictionary,
-} from '../../simulation/behaviors/reportable-information.js';
-import {
     type ExerciseRequestTargetConfiguration,
     exerciseRequestTargetConfigurationSchema,
 } from '../../models/utils/request-target/exercise-request-target.js';
@@ -48,7 +43,12 @@ import {
     statusNames,
 } from '../../models/utils/patient-status.js';
 import type { TreatPatientsBehaviorState } from '../../simulation/behaviors/treat-patients.js';
-import { behaviorTypeToGermanNameDictionary } from '../../simulation/behaviors/utils.js';
+import {
+    behaviorTypeToGermanNameDictionary,
+    type ReportableInformation,
+    reportableInformationSchema,
+    reportableInformationTypeToGermanNameDictionary,
+} from '../../simulation/behaviors/utils.js';
 import { formatDuration } from '../../utils/format-duration.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { newRecurringEventActivityState } from '../../simulation/activities/recurring-event.js';

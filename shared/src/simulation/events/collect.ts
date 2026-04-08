@@ -1,14 +1,16 @@
 import { z } from 'zod';
-import type { ReportableInformation } from '../behaviors/reportable-information.js';
-import { reportableInformationAllowedValues } from '../behaviors/reportable-information.js';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import {
+    type ReportableInformation,
+    reportableInformationSchema,
+} from '../behaviors/utils.js';
 import { simulationEventSchema } from './simulation-event.js';
 
 export const collectInformationEventSchema = z.strictObject({
     ...simulationEventSchema.shape,
     type: z.literal('collectInformationEvent'),
     generateReportActivityId: uuidSchema,
-    informationType: reportableInformationAllowedValues,
+    informationType: reportableInformationSchema,
 });
 export type CollectInformationEvent = z.infer<
     typeof collectInformationEventSchema

@@ -33,7 +33,7 @@ export class ParallelExerciseCardComponent {
         input.required<GetParallelExerciseResponseData>();
     readonly participantUrl = computed(
         () =>
-            `${location.origin}/exercises/${this.parallelExercise().participantKey}`
+            `${location.origin}/exercises/parallel/join/${this.parallelExercise().participantKey}`
     );
     readonly updated = output();
 

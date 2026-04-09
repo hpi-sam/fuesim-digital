@@ -19,6 +19,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Add a new role "Einsatzübersicht" ("operations detail view") that simulates the view of a tablet device used by operation commanders on site
     - Add view to manage on-location vehicles in operational sections
     - Add overview map with 3D view and on-location-vehicles as well as in-transfer-vehicles list
+- Add scoutable elements: Patients and map images now have a new tab "Erkundung" for scouting information. Trainers can edit rich text for scoutables and toggle visibility for participants.
+    - Add a magnifying glass indicator to scoutable elements on the map, which leads directly to the scouting tab.
 
 ### Changed
 

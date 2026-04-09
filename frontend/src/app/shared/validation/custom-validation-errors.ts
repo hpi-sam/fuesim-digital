@@ -1,5 +1,4 @@
 import type { CustomValidators } from './custom-validators';
-import type { ExerciseExistsValidatorError } from './exercise-exists-validator.directive';
 import type { ImageExistsValidatorError } from './image-exists-validator.directive';
 
 /**
@@ -10,7 +9,6 @@ export type CustomValidationErrors = Partial<
         | AngularValidationErrors
         | Exclude<CustomValidationError, null>
         // These errors are not saved in CustomValidators
-        | ExerciseExistsValidatorError
         | ImageExistsValidatorError
     >
 >;

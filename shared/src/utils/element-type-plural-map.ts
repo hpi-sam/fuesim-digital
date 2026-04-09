@@ -18,6 +18,8 @@ export const elementTypePluralMap = {
     transferPoint: 'transferPoints',
     vehicle: 'vehicles',
     viewport: 'viewports',
+    scoutable: 'scoutables',
+    userGeneratedContent: 'userGeneratedContents',
 } as const satisfies { [Key in ElementType]: keyof ExerciseState };
 
 export type ElementTypePluralMap = typeof elementTypePluralMap;

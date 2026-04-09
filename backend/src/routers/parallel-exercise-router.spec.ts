@@ -5,6 +5,7 @@ import type {
     SetAutojoinViewportAction,
 } from 'fuesim-digital-shared';
 import {
+    exerciseExistsResponseDataSchema,
     getParallelExerciseResponseDataSchema,
     getParallelExercisesResponseDataSchema,
     postJoinParallelExerciseResponseDataSchema,
@@ -311,6 +312,48 @@ describe('parallel exercise router', () => {
         });
     });
 
+    describe('GET /api/parallel_exercises/join/:key', () => {
+        it('succeeds with 200 with a valid participant key', async () => {
+            const parallelExercise = await createParallelExercise(
+                environment,
+                session
+            );
+            const response = await environment
+                .httpRequest(
+                    'get',
+                    `/api/parallel_exercises/join/${parallelExercise.participantKey}`
+                )
+                .expect(200);
+            const parsed = exerciseExistsResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed.exists).toBe(true);
+        });
+
+        it('fails for non-existing keys', async () => {
+            const response = await environment
+                .httpRequest('get', `/api/parallel_exercises/join/1234567`)
+                .expect(200);
+            const parsed = exerciseExistsResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed.exists).toBe(false);
+        });
+
+        it('fails for arbitrary keys', async () => {
+            await Promise.all(
+                ['12345', '123456', '12345678'].map((invalidKey) =>
+                    environment
+                        .httpRequest(
+                            'get',
+                            `/api/parallel_exercises/join/${invalidKey}`
+                        )
+                        .expect(400)
+                )
+            );
+        });
+    });
+
     describe('POST /api/parallel_exercises/join/:key', () => {
         let parallelExercise: GetParallelExerciseResponseData;
         beforeEach(async () => {
@@ -325,7 +368,7 @@ describe('parallel exercise router', () => {
                 await environment.services.accessKeyService.generateKey(7);
             await environment
                 .httpRequest(
-                    'get',
+                    'post',
                     `/api/parallel_exercises/join/${invalidKey}`
                 )
                 .expect(404);

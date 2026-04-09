@@ -27,6 +27,7 @@ export class PatientPopupComponent implements OnInit {
     // These properties are only set after OnInit
     public patientId!: UUID;
     patient$!: Observable<Patient>;
+    public openScoutInfo!: boolean;
 
     ngOnInit() {
         this.patient$ = this.store.select(createSelectPatient(this.patientId));

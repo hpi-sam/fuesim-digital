@@ -40,6 +40,7 @@ import {
 } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
+import { ScoutableIndicatorsFeatureManager } from '../feature-managers/scoutable-indicators-feature-manager';
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
@@ -346,6 +347,8 @@ export class OlMapManager {
             this.store,
             this.olMap
         );
+        const scoutableIndicatorsFeatureManger =
+            new ScoutableIndicatorsFeatureManager(this.store, this.olMap, this);
 
         const restrictedZoneFeatureManager = new RestrictedZoneFeatureManager(
             this.olMap,
@@ -396,6 +399,7 @@ export class OlMapManager {
             vehicleFeatureManager,
             cateringLinesFeatureManager,
             patientFeatureManager,
+            scoutableIndicatorsFeatureManger,
             personnelFeatureManager,
             materialFeatureManager,
             viewportFeatureManager,
@@ -420,6 +424,10 @@ export class OlMapManager {
         this.featureNameFeatureManagerDictionary.set(
             'transferLine',
             transferLinesFeatureManager
+        );
+        this.featureNameFeatureManagerDictionary.set(
+            'scoutableIndicator',
+            scoutableIndicatorsFeatureManger
         );
         this.featureNameFeatureManagerDictionary.set(
             'transferPoint',

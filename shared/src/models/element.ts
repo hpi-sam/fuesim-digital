@@ -11,6 +11,8 @@ import type {
     TransferPoint,
     Vehicle,
     Viewport,
+    Scoutable,
+    UserGeneratedContent,
     TechnicalChallenge,
 } from './index.js';
 
@@ -23,8 +25,10 @@ export type Element =
     | Patient
     | Personnel
     | RestrictedZone
+    | Scoutable
     | SimulatedRegion
     | TechnicalChallenge
     | TransferPoint
+    | UserGeneratedContent
     | Vehicle
     | Viewport;

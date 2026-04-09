@@ -14,13 +14,17 @@ import type {
     TechnicalChallenge,
 } from 'fuesim-digital-shared';
 import {
+    newMapCoordinatesAt,
+    StrictObject,
     currentCoordinatesOf,
-    isInViewport,
     isOnMap,
+    isInViewport,
 } from 'fuesim-digital-shared';
+
 import { pickBy } from 'lodash-es';
 import type { AppState } from '../../app.state';
 import type { CateringLine } from '../../../shared/types/catering-line';
+import type { ScoutableIndicator } from '../../../shared/types/scoutable-indicator';
 import { selectOwnClientId } from './application.selectors';
 import {
     selectClients,
@@ -33,6 +37,8 @@ import {
     selectTransferPoints,
     selectVehicles,
     selectViewports,
+    selectScoutables,
+    scoutableElementSelectors,
     selectTechnicalChallenges,
 } from './exercise.selectors';
 
@@ -163,6 +169,64 @@ export const selectVisibleCateringLines = createSelector(
                 (cateringLinesObject, cateringLine) => {
                     cateringLinesObject[cateringLine.id] = cateringLine;
                     return cateringLinesObject;
+                },
+                {}
+            )
+);
+
+export const selectVisibleScoutableIndicators = createSelector(
+    selectCurrentMainRole,
+    selectScoutables,
+    selectRestrictedViewport,
+    ...scoutableElementSelectors,
+    (currentRole, scoutables, viewport, ...elementSelectors) =>
+        elementSelectors
+            .flatMap((selector) =>
+                StrictObject.values(selector)
+                    .filter(
+                        (element) =>
+                            isOnMap(element) && element.scoutableId !== null
+                    )
+                    .map((element): ScoutableIndicator => {
+                        const scoutable = scoutables[element.scoutableId!]!;
+                        const elementPos = currentCoordinatesOf(element);
+                        /* 23 height units make one coordinate unit */
+                        const coefficient = 1 / 23;
+                        const offset = newMapCoordinatesAt(
+                            element.image.height *
+                                element.image.aspectRatio *
+                                coefficient *
+                                0.5,
+                            element.image.height * coefficient * -0.5
+                        );
+                        const indicatorPos = newMapCoordinatesAt(
+                            elementPos.x + offset.x,
+                            elementPos.y + offset.y
+                        );
+                        return {
+                            id: `${scoutable.id}:${element.id}`,
+                            position: indicatorPos,
+                            scoutableElementType: element.type,
+                            scoutableElementId: element.id,
+                            isVisibleForParticipants:
+                                scoutable.isVisibleForParticipants,
+                            height: Math.max(45, element.image.height / 10),
+                        };
+                    })
+            )
+            /* for performance, we dont select indicators out of view. */
+            .filter(
+                (scoutableIndicator) =>
+                    (!viewport ||
+                        isInViewport(viewport, scoutableIndicator.position)) &&
+                    (scoutableIndicator.isVisibleForParticipants ||
+                        currentRole === 'trainer')
+            )
+            .reduce<{ [id: `${UUID}:${UUID}`]: ScoutableIndicator }>(
+                (scoutableIndicatorsObject, scoutableIndicator) => {
+                    scoutableIndicatorsObject[scoutableIndicator.id] =
+                        scoutableIndicator;
+                    return scoutableIndicatorsObject;
                 },
                 {}
             )

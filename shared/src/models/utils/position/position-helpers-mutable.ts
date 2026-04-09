@@ -18,6 +18,8 @@ import type { Element } from '../../element.js';
 import type { AlarmGroup } from '../../alarm-group.js';
 import type { Client } from '../../client.js';
 import type { Hospital } from '../../hospital.js';
+import type { Scoutable } from '../../scoutable.js';
+import type { UserGeneratedContent } from '../../user-generated-content.js';
 import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
 import { newMapPositionAt } from './map-position.js';
@@ -31,7 +33,10 @@ import {
 } from './position-helpers.js';
 import type { WithPosition } from './with-position.js';
 
-type MovableElement = Exclude<Element, AlarmGroup | Client | Hospital>;
+type MovableElement = Exclude<
+    Element,
+    AlarmGroup | Client | Hospital | Scoutable | UserGeneratedContent
+>;
 type MovableType = MovableElement['type'];
 
 export function changePositionWithId(

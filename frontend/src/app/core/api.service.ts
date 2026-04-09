@@ -21,6 +21,7 @@ import {
     ExerciseTemplateId,
     ParallelExerciseId,
     PatchParallelExerciseRequestData,
+    GroupParticipantKey,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -193,6 +194,14 @@ export class ApiService {
     public async deleteParallelExercise(id: ParallelExerciseId) {
         return lastValueFrom(
             this.httpClient.delete(`${httpOrigin}/api/parallel_exercises/${id}`)
+        );
+    }
+
+    public async parallelExerciseExists(key: GroupParticipantKey) {
+        return lastValueFrom(
+            this.httpClient
+                .get(`${httpOrigin}/api/parallel_exercises/join/${key}`)
+                .pipe(map((v) => exerciseExistsResponseDataSchema.parse(v)))
         );
     }
 

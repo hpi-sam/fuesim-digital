@@ -1,0 +1,26 @@
+@if (this.currentRole() === 'trainer') {
+    <div class="m-2">
+        <div class="NgxEditor__Wrapper mb-2">
+            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
+            </ngx-editor-menu>
+            <ngx-editor
+                [editor]="editor"
+                [(ngModel)]="editorContent"
+                [placeholder]="'Hier Erkundungsinformationen eingeben ...'"
+            >
+            </ngx-editor>
+        </div>
+        @if (editorContent() === this.userGeneratedContentElement().content) {
+            <button class="btn btn-outline-success" disabled>
+                Gespeichert
+                <i class="bi bi-check"></i>
+            </button>
+        } @else {
+            <button class="btn btn-primary" (click)="onSubmit()">
+                Speichern
+            </button>
+        }
+    </div>
+} @else {
+    <div class="m-2" [innerHTML]="editorContent()"></div>
+}

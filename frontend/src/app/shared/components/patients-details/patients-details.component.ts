@@ -1,10 +1,9 @@
 import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import {
     getPatientVisibleStatus,
-    Patient,
     isPretriageStatusLocked,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -30,6 +29,7 @@ import type { AppState } from '../../../state/app.state';
 import {
     selectConfiguration,
     createSelectPatient,
+    createSelectScoutable,
 } from '../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 import { PatientIdentifierComponent } from '../patient-identifier/patient-identifier.component';
@@ -38,6 +38,7 @@ import { AutofocusDirective } from '../../directives/autofocus.directive';
 import { AppSaveOnTypingDirective } from '../../directives/app-save-on-typing.directive';
 import { PatientStatusBadgeComponent } from '../patient-status-badge/patient-status-badge.component';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
+import { ScoutableElementNavItemComponent } from '../scoutable-element-nav-item/scoutable-element-nav-item.component';
 
 @Component({
     selector: 'app-patients-details',
@@ -64,6 +65,7 @@ import { DisplayValidationComponent } from '../../validation/display-validation/
         QrCodeComponent,
         NgbNavOutlet,
         AsyncPipe,
+        ScoutableElementNavItemComponent,
     ],
 })
 export class PatientsDetailsComponent implements OnChanges {
@@ -71,12 +73,18 @@ export class PatientsDetailsComponent implements OnChanges {
     private readonly exerciseService = inject(ExerciseService);
 
     readonly patientId = input.required<UUID>();
+    readonly openScoutInfo = input<boolean>(false);
+    readonly activeId = signal<string>('general');
 
-    readonly currentRole$ = this.store.select(selectCurrentMainRole);
+    readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
     configuration$ = this.store.select(selectConfiguration);
-    patient$!: Observable<Patient>;
+    readonly patient = computed(() =>
+        this.store.selectSignal(createSelectPatient(this.patientId()))()
+    );
     visibleStatus$!: Observable<PatientStatus>;
-    pretriageStatusIsLocked$?: Observable<boolean>;
+    readonly pretriageStatusIsLocked = computed(() =>
+        isPretriageStatusLocked(this.patient())
+    );
     readonly pretriageOptions$: Observable<PatientStatus[]> =
         this.configuration$.pipe(
             map((configuration) =>
@@ -85,11 +93,21 @@ export class PatientsDetailsComponent implements OnChanges {
                     : ['white', 'black', 'red', 'yellow', 'green']
             )
         );
+    readonly isScoutableTabVisible = computed(() => {
+        const patient = this.patient();
+        return (
+            this.currentRole() === 'trainer' ||
+            (patient.scoutableId &&
+                this.store.selectSignal(
+                    createSelectScoutable(patient.scoutableId)
+                )().isVisibleForParticipants)
+        );
+    });
 
     ngOnChanges(): void {
-        this.patient$ = this.store.select(
-            createSelectPatient(this.patientId())
-        );
+        if (this.openScoutInfo()) {
+            this.activeId.set('scout-Info');
+        }
         this.visibleStatus$ = this.store.select(
             createSelector(
                 createSelectPatient(this.patientId()),
@@ -101,9 +119,6 @@ export class PatientsDetailsComponent implements OnChanges {
                         configuration.bluePatientsEnabled
                     )
             )
-        );
-        this.pretriageStatusIsLocked$ = this.patient$.pipe(
-            map(isPretriageStatusLocked)
         );
     }
 

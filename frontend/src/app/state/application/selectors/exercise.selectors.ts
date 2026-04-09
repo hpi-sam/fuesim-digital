@@ -7,12 +7,14 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
+    ScoutableElementType,
     TechnicalChallengeId,
     UUID,
     Vehicle,
     WithPosition,
 } from 'fuesim-digital-shared';
 import {
+    scoutableElementKeys,
     currentStateOf,
     isInSpecificSimulatedRegion,
     isInTransfer,
@@ -20,6 +22,7 @@ import {
 } from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
+import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
 
 // Properties
 
@@ -34,6 +37,10 @@ export function selectExerciseState(state: AppState) {
 function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
 }
+
+export const scoutableElementSelectors = scoutableElementKeys.map((key) =>
+    selectPropertyFactory(elementTypePluralMap[key])
+);
 
 // UUIDMap properties
 export const selectViewports = selectPropertyFactory('viewports');
@@ -76,6 +83,10 @@ export const selectCurrentTime = selectPropertyFactory('currentTime');
 export const selectExerciseType = selectPropertyFactory('type');
 export const selectCollectedClientNames = selectPropertyFactory(
     'collectedClientNames'
+);
+export const selectScoutables = selectPropertyFactory('scoutables');
+export const selectUserGeneratedContent = selectPropertyFactory(
+    'userGeneratedContents'
 );
 
 // Elements
@@ -130,12 +141,25 @@ export const createSelectPersonnelTemplate = createSelectElementFromMapFactory(
 export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
     selectMapImagesTemplates
 );
+export const createSelectScoutable =
+    createSelectElementFromMapFactory(selectScoutables);
+export const createSelectUserGeneratedContent =
+    createSelectElementFromMapFactory(selectUserGeneratedContent);
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,
         (radiograms) => radiograms[id] as R
     );
 }
+
+export const scoutableElementTypeSelectorMap: {
+    [key in ScoutableElementType]: (
+        id: string
+    ) => MemoizedSelector<AppState, any, any>;
+} = {
+    patient: createSelectPatient,
+    mapImage: createSelectMapImage,
+};
 
 // Misc selectors
 

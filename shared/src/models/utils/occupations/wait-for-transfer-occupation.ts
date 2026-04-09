@@ -8,6 +8,8 @@ export type WaitForTransferOccupation = z.infer<
     typeof waitForTransferOccupationSchema
 >;
 
-export const newWaitForTransferOccupation = (): WaitForTransferOccupation => ({
-    type: 'waitForTransferOccupation',
-});
+export function newWaitForTransferOccupation(): WaitForTransferOccupation {
+    return {
+        type: 'waitForTransferOccupation',
+    };
+}

@@ -78,6 +78,7 @@ export type ExerciseExistsResponseDataInput = z.input<
 export const getExerciseTemplateResponseDataWithoutTrainerKeySchema = z.object({
     id: exerciseTemplateIdSchema,
     createdAt: stringToDate,
+    lastUpdatedAt: stringToDate,
     lastExerciseCreatedAt: z.nullable(stringToDate),
     name: z.string(),
     description: z.string(),

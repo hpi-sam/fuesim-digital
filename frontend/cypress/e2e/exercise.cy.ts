@@ -809,6 +809,23 @@ describe('A trainer on the exercise page', () => {
             .its('tileMapProperties')
             .should('have.property', 'maxZoom', 30);
 
+        cy.get('[data-cy=settingsOperationsMap3dBuildingsCheckbox]').uncheck();
+        cy.get('[data-cy=settingsSaveOperationsMapPropertiesButton]').click();
+
+        cy.get('@trainerSocketPerformedActions')
+            .lastElement()
+            .should(
+                'have.property',
+                'type',
+                '[Configuration] Set operationsMapProperties'
+            );
+
+        cy.getState()
+            .its('exerciseState')
+            .its('configuration')
+            .its('operationsMapProperties')
+            .should('have.property', 'enable3dBuildings', false);
+
         cy.get('[data-cy=settingsPretriageCheckbox]').uncheck();
 
         cy.get('@trainerSocketPerformedActions')

@@ -16,6 +16,9 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Add exercise manager to allow logged-in users to manage their own exercises and exercise templates.
 - Alarm groups can now be limited to a maximum number of activations. When the limit is reached, the alarm group cannot be sent anymore.
 - Docker images are now also available on GHCR.
+- Add a new role "Einsatzübersicht" ("operations detail view") that simulates the view of a tablet device used by operation commanders on site
+    - Add view to manage on-location vehicles in operational sections
+    - Add overview map with 3D view and on-location-vehicles as well as in-transfer-vehicles list
 
 ### Changed
 
@@ -31,6 +34,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Add modal for inviting participants and trainers via QR codes.
 - Participants and trainers are now consistently called "Teilnehmende" and "Übungsleitende", respectively, in the frontend.
 - Exercise keys are now consistently called "Übungs-PIN", "Teilnehmenden-PIN" and "Übungsleitungs-PIN" in the frontend.
+- Use PostgreSQL 18 as default database. Please ensure to update your production database.
 
 ### Fixed
 

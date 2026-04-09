@@ -18,7 +18,7 @@ export type { CanCaterFor } from './cater-for.js';
 export * from './exercise-status.js';
 export type * from './transfer.js';
 export * from './image-properties.js';
-export * from './tile-map-properties.js';
+export * from './map-properties.js';
 export * from './biometric-information.js';
 export * from './health-points.js';
 export * from './get-create.js';

@@ -5,6 +5,7 @@
                 class="flex-grow-1"
                 [required]="true"
                 [value]="parallelExercise().name"
+                name="Name der Parallelübung"
                 (update)="
                     patchParallelExercise({
                         name: $event,
@@ -15,7 +16,11 @@
         </h2>
         <p class="card-text">
             Teilnehmenden-PIN: {{ parallelExercise().participantKey }}
-            <button app-copy-button [value]="participantUrl()"></button>
+            <button
+                app-copy-button
+                class="btn btn-light btn-sm"
+                [value]="participantUrl()"
+            ></button>
         </p>
     </div>
     <ul class="list-group list-group-flush">

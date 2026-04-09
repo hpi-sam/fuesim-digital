@@ -1,0 +1,11 @@
+<div
+    class="sectionLeaderSlot"
+    cdkDropList
+    [cdkDropListEnterPredicate]="onlySingleItemDropPredicate.bind(this)"
+    (cdkDropListDropped)="onVehicleDropped($event)"
+    [style]="{ '--innerTitle': `'${innerTitle()}'` }"
+>
+    @if (vehicle(); as vehicle) {
+        <app-vehicle-tag [vehicle]="vehicle"></app-vehicle-tag>
+    }
+</div>

@@ -150,7 +150,7 @@ jobs:
 
         services:
             postgres:
-                image: postgres:14
+                image: postgres:18
                 env:
                     POSTGRES_DB: ${{ env.POSTGRES_DB }}
                     POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
@@ -164,7 +164,7 @@ jobs:
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
-                    --tmpfs /var/lib/postgresql/data
+                    --tmpfs /var/lib/postgresql
 
         steps:
             - uses: actions/checkout@v6
@@ -210,7 +210,7 @@ jobs:
 
         services:
             postgres:
-                image: postgres:14
+                image: postgres:18
                 env:
                     POSTGRES_DB: ${{ env.POSTGRES_DB }}
                     POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
@@ -224,7 +224,7 @@ jobs:
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
-                    --tmpfs /var/lib/postgresql/data
+                    --tmpfs /var/lib/postgresql
 
         steps:
             - uses: actions/checkout@v6
@@ -256,7 +256,7 @@ jobs:
 
         services:
             postgres:
-                image: postgres:14
+                image: postgres:18
                 env:
                     POSTGRES_DB: ${{ env.POSTGRES_DB }}
                     POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
@@ -270,7 +270,7 @@ jobs:
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
-                    --tmpfs /var/lib/postgresql/data
+                    --tmpfs /var/lib/postgresql
 
         strategy:
             matrix:

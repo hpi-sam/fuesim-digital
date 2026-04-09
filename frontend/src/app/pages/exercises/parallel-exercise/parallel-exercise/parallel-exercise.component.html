@@ -1,5 +1,5 @@
 <app-header />
-<div class="container">
+<main class="container">
     @if (parallelExercise.hasValue()) {
         @let exercise = parallelExercise.value();
         <h1 class="mb-4 d-flex align-items-center">
@@ -8,6 +8,7 @@
                 class="flex-grow-1"
                 [required]="true"
                 [value]="exercise.name"
+                name="Name der Paralellübung"
                 (update)="
                     patchParallelExercise({
                         name: $event,
@@ -163,5 +164,5 @@
             }
         </div>
     }
-</div>
+</main>
 <app-footer />

@@ -105,6 +105,10 @@ describe('exercise manager router', () => {
                 beforeCreation.getTime()
             );
             expect(parsed.createdAt.getTime()).toBeLessThan(Date.now());
+            expect(parsed.lastUpdatedAt.getTime()).toBeGreaterThan(
+                beforeCreation.getTime()
+            );
+            expect(parsed.lastUpdatedAt.getTime()).toBeLessThan(Date.now());
             expect(parsed.lastExerciseCreatedAt).toBe(null);
         });
         it('fails creating an exercise template with invalid data', async () => {
@@ -210,6 +214,7 @@ describe('exercise manager router', () => {
         });
 
         it('succeeds updating', async () => {
+            const beforeUpdate = Date.now();
             const newData = { name: 'Other name', description: 'Other name' };
             await environment
                 .httpRequest(
@@ -223,11 +228,13 @@ describe('exercise manager router', () => {
                 (await environment.repositories.exerciseRepository.getExerciseTemplateById(
                     exerciseTemplate.id
                 ))!;
-            expect(exerciseTemplateEntry.exercise_template.name).toBe(
-                newData.name
-            );
-            expect(exerciseTemplateEntry.exercise_template.description).toBe(
-                newData.description
+            expect(exerciseTemplateEntry.name).toBe(newData.name);
+            expect(exerciseTemplateEntry.description).toBe(newData.description);
+            expect(
+                exerciseTemplateEntry.lastUpdatedAt.getTime()
+            ).toBeGreaterThan(beforeUpdate);
+            expect(exerciseTemplateEntry.lastUpdatedAt.getTime()).toBeLessThan(
+                Date.now()
             );
         });
 
@@ -245,10 +252,8 @@ describe('exercise manager router', () => {
                 (await environment.repositories.exerciseRepository.getExerciseTemplateById(
                     exerciseTemplate.id
                 ))!;
-            expect(exerciseTemplateEntry.exercise_template.name).toBe(
-                newData.name
-            );
-            expect(exerciseTemplateEntry.exercise_template.description).toBe(
+            expect(exerciseTemplateEntry.name).toBe(newData.name);
+            expect(exerciseTemplateEntry.description).toBe(
                 exerciseTemplate.description
             );
         });
@@ -378,10 +383,10 @@ describe('exercise manager router', () => {
                     exerciseTemplate.id
                 ))!;
             expect(
-                exerciseTemplateEntry.exercise_template.lastExerciseCreatedAt!.getTime()
+                exerciseTemplateEntry.lastExerciseCreatedAt!.getTime()
             ).toBeGreaterThan(beforeCreation);
             expect(
-                exerciseTemplateEntry.exercise_template.lastExerciseCreatedAt!.getTime()
+                exerciseTemplateEntry.lastExerciseCreatedAt!.getTime()
             ).toBeLessThan(Date.now());
         });
     });

@@ -52,6 +52,17 @@
                             >
                                 <span>Leitstelle</span>
                             </button>
+                            <button
+                                ngbDropdownItem
+                                (click)="
+                                    changeToSpecificRole(
+                                        client.id,
+                                        'operationsTablet'
+                                    )
+                                "
+                            >
+                                <span>Einsatzübersicht</span>
+                            </button>
                         </div>
                     </td>
                 }

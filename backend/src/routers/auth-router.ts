@@ -2,14 +2,16 @@ import { userDataResponseSchema } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import type { AuthService } from '../auth/auth-service.js';
 import { toFrontend } from '../utils/frontend-http-helper.js';
+import { warnError } from '../utils/http-handlers.js';
 
-export const createAuthRouter = (authService: AuthService) => {
+export function createAuthRouter(authService: AuthService) {
     const router = Router();
 
     router.get('/register', (req, res) => {
         try {
             authService.oidcService.handleRegistrationRedirect(req, res);
-        } catch {
+        } catch (err) {
+            warnError(req, err);
             res.redirect(
                 toFrontend(undefined, {
                     loginFailure: 'Anmeldung fehlgeschlagen',
@@ -21,7 +23,8 @@ export const createAuthRouter = (authService: AuthService) => {
     router.get('/oidc-redirect', async (req, res) => {
         try {
             await authService.oidcService.handleLoginRedirect(req, res);
-        } catch {
+        } catch (err) {
+            warnError(req, err);
             res.redirect(
                 toFrontend(undefined, {
                     loginFailure: 'Anmeldung fehlgeschlagen',
@@ -33,7 +36,8 @@ export const createAuthRouter = (authService: AuthService) => {
     router.get('/oidc-callback', async (req, res) => {
         try {
             await authService.oidcService.handleCallback(req, res);
-        } catch {
+        } catch (err) {
+            warnError(req, err);
             res.redirect(
                 toFrontend(undefined, {
                     loginFailure: 'Anmeldung fehlgeschlagen',
@@ -83,7 +87,8 @@ export const createAuthRouter = (authService: AuthService) => {
             });
 
             res.status(200).send({ message: 'Session refreshed' });
-        } catch {
+        } catch (err) {
+            warnError(req, err);
             res.status(400).send({ error: 'Failed to refresh session' });
         }
     });
@@ -110,4 +115,4 @@ export const createAuthRouter = (authService: AuthService) => {
     });
 
     return router;
-};
+}

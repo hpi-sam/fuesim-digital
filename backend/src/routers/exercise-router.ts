@@ -9,9 +9,7 @@ import { importExercise } from '../utils/import-exercise.js';
 import type { ExerciseService } from '../database/services/exercise-service.js';
 import { ApiError } from '../utils/http.js';
 
-export const createExerciseRouter = (
-    exerciseService: ExerciseService
-): Router => {
+export function createExerciseRouter(exerciseService: ExerciseService): Router {
     const router = Router();
 
     router.post('/exercise', async (req, res) => {
@@ -74,4 +72,4 @@ export const createExerciseRouter = (
     });
 
     return router;
-};
+}

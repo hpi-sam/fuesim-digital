@@ -19,6 +19,7 @@ import { SimulationActionReducers } from './simulation.js';
 import { RadiogramActionReducers } from './radiogram.js';
 import { VehicleTemplateActionReducers } from './vehicle-templates.js';
 import { RestrictedZoneActionReducers } from './restricted-zone.js';
+import { OperationalSectionActionReducers } from './operational-section.js';
 import { TechnicalChallengeActionReducers } from './technical-challenge.js';
 
 /**
@@ -45,6 +46,7 @@ const actionReducers = {
     ...RadiogramActionReducers,
     ...VehicleTemplateActionReducers,
     ...RestrictedZoneActionReducers,
+    ...OperationalSectionActionReducers,
     ...TechnicalChallengeActionReducers,
 } as const;
 

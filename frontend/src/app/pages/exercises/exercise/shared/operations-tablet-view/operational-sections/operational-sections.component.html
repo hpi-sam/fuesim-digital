@@ -1,0 +1,21 @@
+<div
+    cdkDropListGroup
+    class="operational-sections-stack d-flex flex-column h-100"
+>
+    <div class="section-gap d-flex">
+        <app-local-operational-leader />
+        @for (section of operationalSections(); track section.id) {
+            <app-operational-section-container
+                [operationalSection]="section"
+            ></app-operational-section-container>
+        }
+        <button
+            (click)="addOperationalSection()"
+            class="btn btn-outline-dark fixed-panel-width border-dashed-style flex-shrink-0"
+        >
+            Einsatzabschnitt hinzufügen
+        </button>
+    </div>
+
+    <app-vehicles-on-location class="w-100" />
+</div>

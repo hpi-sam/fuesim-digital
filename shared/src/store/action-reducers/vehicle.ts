@@ -52,6 +52,7 @@ import { getElement } from './utils/index.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
 import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
 import { checkRestrictedVehicleMovementOrThrow } from './utils/restricted-vehicle-movement.js';
+import { fillPositionAt } from './utils/operational-assignment-positions.js';
 
 /**
  * Performs all necessary actions to remove a vehicle from the state.
@@ -105,6 +106,17 @@ export function deleteVehicle(
         // The PatientRemovedEvent will be sent by the function below, so we don't have to do it here
         deletePatient(draftState, patientId);
     });
+
+    if (
+        vehicle.operationalAssignment?.type === 'operationalSection' &&
+        vehicle.operationalAssignment.role === 'operationalSectionMember'
+    ) {
+        fillPositionAt(
+            draftState,
+            vehicle.operationalAssignment.sectionId,
+            vehicle.operationalAssignment.position
+        );
+    }
 
     if (isInSimulatedRegion(vehicle)) {
         const simulatedRegion = currentSimulatedRegionOf(draftState, vehicle);

@@ -8,6 +8,7 @@
                     class="form-control"
                     [(ngModel)]="newValue"
                     [required]="required()"
+                    [title]="name()"
                     name="inline"
                     [appAutofocus]="true"
                 />
@@ -21,6 +22,7 @@
                     rows="3"
                     [(ngModel)]="newValue"
                     [required]="required()"
+                    [title]="name()"
                     name="inline"
                     [appAutofocus]="true"
                 ></textarea>
@@ -34,20 +36,21 @@
             class="btn btn-primary ms-2"
             type="submit"
             [disabled]="!f.form.valid"
+            title="Speichern"
         >
-            <i class="bi bi-save"></i>
+            <i class="bi bi-floppy" aria-hidden="true"></i>
         </button>
     </form>
 } @else {
     <div class="d-flex">
-        <div class="flex-grow-1">
+        <div class="flex-grow-1" [title]="name()">
             @if (value()) {
                 {{ value() }}
             } @else {
                 –
             }
         </div>
-        <button class="btn btn-sm" (click)="startEdit()">
+        <button class="btn btn-sm" (click)="startEdit()" title="Bearbeiten">
             <i class="bi bi-pencil"></i>
         </button>
     </div>

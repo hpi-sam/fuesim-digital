@@ -26,12 +26,12 @@ export interface SharedVersionedElementModalData<T> {
 
 export interface CreatingVersionedElementModalData<T>
     extends SharedVersionedElementModalData<T> {
-    mode: "create";
+    mode: 'create';
 }
 
 export interface EditingVersionedElementModalData<T>
     extends SharedVersionedElementModalData<T> {
-    mode: "edit" | "view";
+    mode: 'edit' | 'view';
     element: ElementDto;
 }
 

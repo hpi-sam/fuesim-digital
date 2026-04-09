@@ -88,7 +88,7 @@ export class CollectionElementsTabComponent {
         'alarmGroup',
     ];
 
-    private createElementHelper(type: VersionedElementContent["type"]) {
+    private createElementHelper(type: VersionedElementContent['type']) {
         const selectedCollectionData = this.collectionData();
         if (!selectedCollectionData) {
             this.messageService.postError({
@@ -106,7 +106,7 @@ export class CollectionElementsTabComponent {
         );
         modal.componentInstance.data = {
             type: type,
-            mode: "create",
+            mode: 'create',
             onSubmit: async (data: any) => {
                 await this.collectionService.createElement(
                     this.collectionData().collection.entityId,
@@ -118,8 +118,14 @@ export class CollectionElementsTabComponent {
         } satisfies CreatingVersionedElementModalData<any>;
     }
 
-    public readonly createNewAlarmgroup = this.createElementHelper.bind(this, 'alarmGroup');
-    public readonly createNewVehicle = this.createElementHelper.bind(this, 'vehicleTemplate');
+    public readonly createNewAlarmgroup = this.createElementHelper.bind(
+        this,
+        'alarmGroup'
+    );
+    public readonly createNewVehicle = this.createElementHelper.bind(
+        this,
+        'vehicleTemplate'
+    );
 
     public async importElementFile(fileList: FileList) {
         try {

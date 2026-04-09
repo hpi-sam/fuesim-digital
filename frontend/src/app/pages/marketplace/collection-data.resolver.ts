@@ -5,7 +5,10 @@ import {
     ResolveFn,
     Router,
 } from '@angular/router';
-import { CollectionEntityId, isCollectionEntityId } from 'fuesim-digital-shared';
+import {
+    CollectionEntityId,
+    isCollectionEntityId,
+} from 'fuesim-digital-shared';
 import {
     CollectionService,
     CollectionSubscriptionData,
@@ -13,11 +16,13 @@ import {
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export type CollectionDataResolverResult = {
-    subject: BehaviorSubject<CollectionSubscriptionData | null>,
-    collectionEntityId: CollectionEntityId
-}
+    subject: BehaviorSubject<CollectionSubscriptionData | null>;
+    collectionEntityId: CollectionEntityId;
+};
 
-export const collectionDataResolver: ResolveFn<CollectionDataResolverResult> = (route: ActivatedRouteSnapshot) => {
+export const collectionDataResolver: ResolveFn<CollectionDataResolverResult> = (
+    route: ActivatedRouteSnapshot
+) => {
     const router = inject(Router);
     const collectionService = inject(CollectionService);
 
@@ -26,7 +31,6 @@ export const collectionDataResolver: ResolveFn<CollectionDataResolverResult> = (
 
     if (!isCollectionEntityId(collectionEntityId)) {
         router.navigate(['/collections']);
-        console.log('FUCK');
         throw new Error('Invalid collection entity id');
     }
 
@@ -36,6 +40,6 @@ export const collectionDataResolver: ResolveFn<CollectionDataResolverResult> = (
 
     return {
         subject: collectionSubject,
-        collectionEntityId
+        collectionEntityId,
     };
 };

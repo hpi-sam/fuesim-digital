@@ -51,9 +51,7 @@
                             dependency of collectionData.objects.transitive;
                             track dependency.collection.versionId
                         ) {
-                            <span
-                                class="badge bg-secondary"
-                            >
+                            <span class="badge bg-secondary">
                                 {{ dependency.collection.title }}
                             </span>
                         }
@@ -97,9 +95,13 @@
                     <i class="bi bi-info-circle"></i>
                     <span>
                         Diese Sammlung enthält unveröffentlichte Änderungen.<br />
-                        @if(checkRole(collectionData.ownRole).isAtLeast('editor')) {
-                            Veröffentlichen Sie diese Version, um die Änderungen in
-                            Übungsszenarien verwenden zu können.
+                        @if (
+                            checkRole(collectionData.ownRole).isAtLeast(
+                                'editor'
+                            )
+                        ) {
+                            Veröffentlichen Sie diese Version, um die Änderungen
+                            in Übungsszenarien verwenden zu können.
                         }
                     </span>
                 </span>

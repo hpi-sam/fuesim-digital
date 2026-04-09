@@ -53,7 +53,7 @@ export class MarketplaceTabComponent {
             if (selectedCollection) {
                 this.updateCollectionElementSubscription(selectedCollection);
                 this.collectionService
-                    .getCollectionByVersionId(selectedCollection)
+                    .getCollectionVersion(selectedCollection)
                     .then((collection) => {
                         this.selectedCollectionData.set(collection);
                     });

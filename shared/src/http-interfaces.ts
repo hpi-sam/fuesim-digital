@@ -286,14 +286,18 @@ export namespace Marketplace {
         });
 
         export const Delete = new Route({
+            request: z.object({
+                conflictResolution: z
+                    .object({
+                        acceptedCascadingDeletions: z
+                            .array(elementVersionIdSchema)
+                            .optional(),
+                    })
+                    .optional(),
+            }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema.nullable(),
-                requiresConfirmation: z.array(
-                    z.object({
-                        element: elementDtoSchema,
-                        blocking: z.boolean(),
-                    })
-                ),
+                requiresConfirmation: z.array(elementDtoSchema),
             }),
         });
 
@@ -432,6 +436,18 @@ export namespace Marketplace {
         export const GetCollectionVersion = new Route({
             response: z.object({
                 result: collectionDtoSchema,
+            }),
+        });
+
+        export const RemoveDependency = new Route({
+            response: z.object({
+                result: z.union([
+                    z.object({
+                        newCollectionVersionId:
+                            collectionVersionIdSchema.nullable(),
+                        blockingElements: z.array(elementDtoSchema),
+                    }),
+                ]),
             }),
         });
 

@@ -1,0 +1,26 @@
+@switch (data().type) {
+    @case ('vehicleTemplate') {
+        <app-vehicle-template-form-marketplace
+            [data]="data()"
+            (dataSubmit)="dataSubmit.emit($event)"
+            [btnText]="
+                data().mode === 'create'
+                    ? 'Fahrzeugvorlage hinzufügen'
+                    : 'Änderungen speichern'
+            "
+            [disabled]="disabled()"
+        ></app-vehicle-template-form-marketplace>
+    }
+    @case ('alarmGroup') {
+        <app-alarmgroup-element-modal
+            [data]="data()"
+            [btnText]="
+                data().mode === 'create'
+                    ? 'Alarmgruppe hinzufügen'
+                    : 'Änderungen speichern'
+            "
+            (dataSubmit)="dataSubmit.emit($event)"
+            [disabled]="disabled()"
+        />
+    }
+}

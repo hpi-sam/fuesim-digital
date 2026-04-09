@@ -8,6 +8,17 @@
     ></button>
 </div>
 <div class="modal-body">
+    <div class="mb-4">
+        Das Element, welches Sie bearbeiten wollen wird in den folgenden anderen
+        Elementen verwendet:
+        <ul>
+            @for (element of affectedElementVersions; track element.versionId) {
+                <li>{{ element.title }}</li>
+            }
+        </ul>
+        Sie können die Änderungen somit entweder auch auf diese Elemente
+        übertragen oder die Änderungen in einer Kopie speichern.
+    </div>
     <div class="row mt-2">
         <div class="col-sm-6">
             <div class="card h-100">
@@ -33,7 +44,7 @@
         </div>
         <div class="col-sm-6">
             <div class="card h-100">
-                <div class="card-header">Änderungen kaskadieren</div>
+                <div class="card-header">Änderungen übernehmen</div>
                 <div
                     class="card-body d-flex flex-column justify-content-between"
                 >

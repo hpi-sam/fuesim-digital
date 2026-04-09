@@ -438,6 +438,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
+    /*
+     * Remove a collection dependency from the collection.
+     */
     editorRouter.delete(
         '/:collectionEntityId/dependencies/:importSetVersionId',
         async (req, res) => {
@@ -447,12 +450,20 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                 'importSetVersionId'
             );
 
-            await collectionService.removeCollectionDependency({
+            const result = await collectionService.removeCollectionDependency({
                 removeFrom: collectionEntityId,
                 dependencyEntityId: importSetVersionId,
             });
 
-            res.send({ status: 'success' });
+            res.send(
+                Marketplace.Collection.RemoveDependency.responseSchema.encode({
+                    result: {
+                        blockingElements: result.blockingElements,
+                        newCollectionVersionId:
+                            result.newCollection?.versionId ?? null,
+                    },
+                })
+            );
         }
     );
 
@@ -697,10 +708,14 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         '/:collectionEntityId/element/:elementEntityId',
         async (req, res) => {
             const elementEntityId = getElementEntityId(req);
+            const body = Marketplace.Element.Delete.requestSchema.parse(
+                req.body
+            );
 
             const deletionResult =
                 await collectionService.deleteElementFromCollection(
-                    elementEntityId
+                    elementEntityId,
+                    body.conflictResolution?.acceptedCascadingDeletions ?? []
                 );
             return res.send(
                 Marketplace.Element.Delete.responseSchema.encode({

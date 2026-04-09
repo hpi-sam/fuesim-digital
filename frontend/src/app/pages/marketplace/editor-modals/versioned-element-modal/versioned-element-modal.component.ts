@@ -15,6 +15,7 @@ import { AlarmgroupElementModalComponent } from '../alarmgroup-element-modal/ala
 import { EditConflictResolutionComponent } from '../edit-conflict-resolution/edit-conflict-resolution.component';
 import { MessageService } from '../../../../core/messages/message.service';
 import { VersionedElementModalData } from '../base-versioned-element-submodal';
+import { VersionedElementFormComponent } from '../versioned-element-form/versioned-element-form.component';
 
 @Component({
     selector: 'app-versioned-element-modal',
@@ -22,6 +23,7 @@ import { VersionedElementModalData } from '../base-versioned-element-submodal';
         VehicleTemplateFormMarketplaceComponent,
         AlarmgroupElementModalComponent,
         DatePipe,
+        VersionedElementFormComponent,
     ],
     templateUrl: './versioned-element-modal.component.html',
     styleUrl: './versioned-element-modal.component.scss',
@@ -49,7 +51,7 @@ export class VersionedElementModalComponent implements OnInit {
     });
 
     public readonly timeTravelMode = computed<boolean>(() => {
-        if (this.data.mode === "create") return false;
+        if (this.data.mode === 'create') return false;
         if (this.selectedVersion() === null) return false;
 
         return this.selectedVersion() !== this.data.element.version;
@@ -60,7 +62,7 @@ export class VersionedElementModalComponent implements OnInit {
     public readonly dependentElements = resource({
         params: () => ({ data: this.data }),
         loader: async ({ params: { data } }) => {
-            if (data.mode === "create") return [] as ElementDto[];
+            if (data.mode === 'create') return [] as ElementDto[];
 
             const dependentElements =
                 await this.collectionService.getDependentElements(
@@ -89,7 +91,7 @@ export class VersionedElementModalComponent implements OnInit {
     }
 
     public async ngOnInit() {
-        if (this.data.mode !== "create") {
+        if (this.data.mode !== 'create') {
             const versionData = await this.collectionService.getElementVersions(
                 this.data.collection.entityId,
                 this.data.element.entityId

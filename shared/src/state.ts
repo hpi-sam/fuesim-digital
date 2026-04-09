@@ -262,6 +262,10 @@ export class ExerciseState {
      * **Important**
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
+     *
+     * WARNING: Before incresing this number, make sure to check:
+     * - If you made any changes to where/how references are stored in a model, please check
+     *   if collection-service.ts/findEntitiyVersionsInContent() needs to be updated to detect the new references.
      */
     static readonly currentStateVersion = 51;
 }

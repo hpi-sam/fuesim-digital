@@ -3,7 +3,7 @@
 </div>
 <div class="">
     <div class="d-flex flex-row">
-        @if (data.mode !== "create") {
+        @if (data.mode !== 'create') {
             <ul class="list-group rounded-0">
                 @if (versionHistory() !== null) {
                     @for (
@@ -48,32 +48,16 @@
                 </div>
             }
             @let editingDisabled = timeTravelMode() || data.mode === 'view';
-            @switch (data.type) {
-                @case ('vehicleTemplate') {
-                    <app-vehicle-template-form-marketplace
-                        [data]="selectedVersionData()"
-                        (dataSubmit)="submit($event)"
-                        [btnText]="
-                            data.mode === 'create'
-                                ? 'Fahrzeugvorlage hinzufügen'
-                                : 'Änderungen speichern'
-                        "
-                        [disabled]="editingDisabled"
-                    ></app-vehicle-template-form-marketplace>
-                }
-                @case ('alarmGroup') {
-                    <app-alarmgroup-element-modal
-                        [data]="selectedVersionData()"
-                        [btnText]="
-                            data.mode === 'create'
-                                ? 'Alarmgruppe hinzufügen'
-                                : 'Änderungen speichern'
-                        "
-                        (dataSubmit)="submit($event)"
-                        [disabled]="editingDisabled"
-                    />
-                }
-            }
+            <app-versioned-element-form
+                [data]="selectedVersionData()"
+                [btnText]="
+                    data.mode === 'create'
+                        ? 'Element hinzufügen'
+                        : 'Änderungen speichern'
+                "
+                [disabled]="editingDisabled"
+                (dataSubmit)="submit($event)"
+            />
             @if (
                 !editingDisabled &&
                 dependentElements.hasValue() &&

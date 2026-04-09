@@ -1,0 +1,159 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+        Sammlungsänderungen Übersicht
+    </h4>
+    <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="close()"
+    ></button>
+</div>
+<div class="d-flex flex-row">
+    <ul class="list-group">
+        @for (change of changes; track change) {
+            <li
+                class="list-group-item d-flex flex-column"
+                (click)="selectChange(change)"
+                role="button"
+                [class.active]="selectedChange()?.change?.id === change.id"
+            >
+                <span>{{
+                    (
+                        change.old?.content?.type ?? change.new!.content.type
+                        | versionedElementDisplayName
+                    ).singular
+                }}</span>
+                <b class="mb-1">{{
+                    change.old?.title ?? change.new?.title ?? 'Unbekannt'
+                }}</b>
+                @switch (change.type) {
+                    @case ('update') {
+                        <span class="badge bg-warning text-dark">Änderung</span>
+                    }
+                    @case ('create') {
+                        <span class="badge bg-success">Neu</span>
+                    }
+                    @case ('remove') {
+                        <span class="badge bg-danger">Entfernt</span>
+                    }
+                }
+            </li>
+        }
+    </ul>
+
+    <div class="modal-body">
+        @if (selectedChange(); as selected) {
+            @if (selected.change.type === 'update') {
+                <div class="alert alert-info" role="alert">
+                    Das Element "{{ selected.change.old.title }}" wird in der
+                    neuen Version verändert.<br />
+                    <hr class="my-2" />
+                    @if (
+                        changeDependencies[selected.change.old.versionId]
+                            ?.length ?? 0 > 0
+                    ) {
+                        Diese Änderung wird sich auf folgende Elemente Ihrer
+                        Sammlung auswirken:
+                        <ul class="mb-0">
+                            @for (
+                                impact of changeDependencies[
+                                    selected.change.old.versionId
+                                ];
+                                track impact
+                            ) {
+                                <li>{{ impact.title }}</li>
+                            }
+                        </ul>
+                    } @else {
+                        Es gibt keine bekannten Auswirkungen auf die Elemente
+                        Ihrer Sammlung.
+                    }
+                </div>
+            } @else if (selected.change.type === 'create') {
+                <div class="alert alert-success" role="alert">
+                    Das Element "{{ selected.change.new.title }}" wird in der
+                    neuen Version hinzugefügt.
+                </div>
+            } @else if (selected.change.type === 'remove') {
+                <div class="alert alert-warning" role="alert">
+                    Das Element "{{ selected.change.old.title }}" wird in der
+                    neuen Version entfernt.<br />
+                    Sie verlieren somit Zugriff auf dieses Element, wenn Sie die
+                    neue Version übernehmen.<br />
+                    <hr class="my-2" />
+                    @if (
+                        changeDependencies[selected.change.old.versionId]
+                            ?.length ?? 0 > 0
+                    ) {
+                        <b
+                            >Das Element wird aus folgenden Elementen Ihrer
+                            Sammlung entfernt:</b
+                        >
+                        <ul class="mb-0">
+                            @for (
+                                impact of changeDependencies[
+                                    selected.change.old.versionId
+                                ];
+                                track impact
+                            ) {
+                                <li>{{ impact.title }}</li>
+                            }
+                        </ul>
+                    } @else {
+                        Es gibt keine bekannten Auswirkungen auf die Elemente
+                        Ihrer Sammlung.
+                    }
+                </div>
+            }
+
+            @if (selected.oldView && selected.newView) {
+                <div
+                    class="btn-group w-100 mb-3"
+                    role="group"
+                    aria-label="Basic outlined example"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        [class.active]="selectedView() === 'old'"
+                        (click)="selectedView.set('old')"
+                    >
+                        Alte Version
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        [class.active]="selectedView() === 'new'"
+                        (click)="selectedView.set('new')"
+                    >
+                        Neue Version
+                    </button>
+                </div>
+            }
+
+            @if (selectedView() === 'old' && selected.oldView) {
+                <app-versioned-element-form
+                    [data]="selected.oldView"
+                    btnText=""
+                    [disabled]="true"
+                />
+            } @else if (selectedView() === 'new' && selected.newView) {
+                <app-versioned-element-form
+                    [data]="selected.newView"
+                    btnText=""
+                    [disabled]="true"
+                />
+            }
+        } @else {
+            <div class="alert alert-secondary" role="alert">
+                Wählen Sie ein Element aus, um die Änderungen anzuzeigen.
+            </div>
+        }
+    </div>
+</div>
+<div class="modal-footer d-flex justify-content-between">
+    <button type="button" class="btn btn-outline-danger" (click)="close()">
+        Abbrechen
+    </button>
+</div>

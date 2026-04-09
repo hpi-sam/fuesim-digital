@@ -16,7 +16,16 @@ import {
     collectionRelationshipTypeAllowedValues,
     ExerciseState,
 } from 'fuesim-digital-shared';
-import { eq, desc, getTableColumns, sql, and, max, gt, count } from 'drizzle-orm';
+import {
+    eq,
+    desc,
+    getTableColumns,
+    sql,
+    and,
+    max,
+    gt,
+    count,
+} from 'drizzle-orm';
 import {
     collectionDependencyMappingTable,
     elementCollectionMappingTable,
@@ -371,9 +380,7 @@ export class CollectionRepository extends BaseRepository {
 
         return (
             mappings.length > 0 && // the elements needs to exist to be editable/updateable
-            mappings.every(
-                (mapping) => mapping.collections.draftState
-            )
+            mappings.every((mapping) => mapping.collections.draftState)
         );
     }
 
@@ -617,9 +624,12 @@ export class CollectionRepository extends BaseRepository {
                 )
             );
 
-        await this.databaseConnection.update(collectionTable).set({
-            elementCount: sql`${collectionTable.elementCount} + 1`,
-        }).where(eq(collectionTable.versionId, collectionVersionId));
+        await this.databaseConnection
+            .update(collectionTable)
+            .set({
+                elementCount: sql`${collectionTable.elementCount} + 1`,
+            })
+            .where(eq(collectionTable.versionId, collectionVersionId));
 
         return this.databaseConnection
             .insert(elementCollectionMappingTable)
@@ -805,21 +815,27 @@ export class CollectionRepository extends BaseRepository {
 
     public async deleteElementVersion(element: VersionedElementPartial) {
         return this.transaction(async (tx) => {
-            const containingCollection = await tx.getLatestCollectionOfElementEntity(element.entityId)
+            const containingCollection =
+                await tx.getLatestCollectionOfElementEntity(element.entityId);
 
             if (containingCollection) {
-                await tx.databaseConnection.update(collectionTable).set({
-                    elementCount: sql`${collectionTable.elementCount} - 1`,
-                }).where(
-                    eq(collectionTable.versionId, containingCollection.versionId),
-                );
+                await tx.databaseConnection
+                    .update(collectionTable)
+                    .set({
+                        elementCount: sql`${collectionTable.elementCount} - 1`,
+                    })
+                    .where(
+                        eq(
+                            collectionTable.versionId,
+                            containingCollection.versionId
+                        )
+                    );
             }
 
             return tx.databaseConnection
                 .delete(elementTable)
                 .where(eq(elementTable.versionId, element.versionId));
-        })
-
+        });
     }
 
     public async getCollectionByVersionId(versionId: CollectionVersionId) {
@@ -862,9 +878,8 @@ export class CollectionRepository extends BaseRepository {
                     )
                 );
 
-
             return result;
-        })
+        });
     }
 
     public async getElementsOfCollectionVersion(
@@ -909,14 +924,20 @@ export class CollectionRepository extends BaseRepository {
                             elementCollectionMappingTable.elementEntityId,
                             elementEntityId
                         ),
-                        eq(elementCollectionMappingTable.setVersionId, collectionVersionId)
+                        eq(
+                            elementCollectionMappingTable.setVersionId,
+                            collectionVersionId
+                        )
                     )
                 );
 
-            await tx.update(collectionTable).set({
-                elementCount: sql`${collectionTable.elementCount} - 1`,
-            }).where(eq(collectionTable.versionId, collectionVersionId));
-        })
+            await tx
+                .update(collectionTable)
+                .set({
+                    elementCount: sql`${collectionTable.elementCount} - 1`,
+                })
+                .where(eq(collectionTable.versionId, collectionVersionId));
+        });
     }
 
     public async deleteCollection(entityId: CollectionEntityId) {
@@ -996,14 +1017,12 @@ export class CollectionRepository extends BaseRepository {
         collectionEntityId: CollectionEntityId,
         unarchive = false
     ) {
-        return this.onlySingleStrict(
-            await this.databaseConnection
-                .update(collectionTable)
-                .set({
-                    archived: !unarchive,
-                })
-                .where(eq(collectionTable.entityId, collectionEntityId))
-                .returning()
-        );
+        return await this.databaseConnection
+            .update(collectionTable)
+            .set({
+                archived: !unarchive,
+            })
+            .where(eq(collectionTable.entityId, collectionEntityId))
+            .returning();
     }
 }

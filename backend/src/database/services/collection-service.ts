@@ -10,10 +10,18 @@ import type {
     VersionedElementContent,
     VersionedElementPartial,
 } from 'fuesim-digital-shared';
-import { isElementVersionId } from 'fuesim-digital-shared';
+import {
+    findElementVersionsInContent,
+    isElementVersionId,
+} from 'fuesim-digital-shared';
 import type { z } from 'zod';
 import { Subject } from 'rxjs';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
+
+type EventBuffer = {
+    next: (event: typeof Marketplace.Collection.Events.SSEvent.Type) => void;
+    flush: () => void;
+};
 
 export class CollectionService {
     public async transaction<T>(
@@ -25,11 +33,42 @@ export class CollectionService {
         });
     }
 
+    private async reduce<T>(
+        collectionEntityId: CollectionEntityId,
+        operation: (
+            tx: CollectionService,
+            draftState: CollectionDto,
+            eventBuffer: EventBuffer
+        ) => Promise<T>
+    ): Promise<T> {
+        return this.transaction(async (tx) => {
+            const eventBuffer = tx.newDeferredEventBuffer();
+
+            const [draftState, createdNewDraftState] =
+                await tx.collectionRepository.getOrCreateDraftState(
+                    collectionEntityId
+                );
+            if (createdNewDraftState) {
+                eventBuffer.next({
+                    event: 'collection:update',
+                    data: draftState,
+                    collectionEntityId,
+                });
+            }
+
+            const result = await operation(tx, draftState, eventBuffer);
+
+            eventBuffer.flush();
+
+            return result;
+        });
+    }
+
     public get events() {
         return this.eventSubject.asObservable();
     }
 
-    private readonly newDeferredEventBuffer = () => {
+    private readonly newDeferredEventBuffer = (): EventBuffer => {
         // I opted against a ReplaySubject here to not worry about completing correctly if a functions throws
         // and doesnt complete this subject
         const subject: (typeof Marketplace.Collection.Events.SSEvent.Type)[] =
@@ -169,61 +208,73 @@ export class CollectionService {
         collectionEntityId: CollectionEntityId,
         data: Marketplace.Collection.EditableCollectionProperties
     ) {
-        return this.collectionRepository.transaction(async (tx) => {
-            const [draftState, _createdNewDraftState] =
-                await tx.getOrCreateDraftState(collectionEntityId);
+        return this.reduce(
+            collectionEntityId,
+            async (tx, draftState, eventBuffer) => {
+                const updatedCollection =
+                    await tx.collectionRepository.updateCollectionData(
+                        draftState.versionId,
+                        data
+                    );
 
-            const updatedCollection = await tx.updateCollectionData(
-                draftState.versionId,
-                data
-            );
+                if (updatedCollection === null) {
+                    throw new Error('Failed to update collection metadata');
+                }
 
-            if (updatedCollection === null) {
-                throw new Error('Failed to update collection metadata');
+                eventBuffer.next({
+                    event: 'collection:update',
+                    data: updatedCollection,
+                    collectionEntityId,
+                });
+
+                return updatedCollection;
             }
-
-            this.eventSubject.next({
-                event: 'collection:update',
-                data: updatedCollection,
-                collectionEntityId,
-            });
-
-            return updatedCollection;
-        });
+        );
     }
 
     public async removeCollectionDependency(data: {
         removeFrom: CollectionEntityId;
         dependencyEntityId: CollectionVersionId;
-    }) {
-        return this.collectionRepository.transaction(async (tx) => {
-            const eventBuffer = this.newDeferredEventBuffer();
+    }): Promise<{
+        newCollection: CollectionDto | null;
+        blockingElements: ElementDto[];
+    }> {
+        return this.reduce(
+            data.removeFrom,
+            async (tx, draftState, eventBuffer) => {
+                const dependingElements =
+                    await tx.getDependingElementsForCollection({
+                        depender: draftState.versionId,
+                        dependency: data.dependencyEntityId,
+                    });
 
-            const [draftState, createdNewDraftState] =
-                await tx.getOrCreateDraftState(data.removeFrom);
-            if (createdNewDraftState) {
-                this.eventSubject.next({
-                    event: 'collection:update',
-                    data: draftState,
+                if (dependingElements.length > 0) {
+                    console.warn(
+                        `Trying to remove dependency ${data.dependencyEntityId} from collection ${data.removeFrom}, but there are still elements depending on this dependency. Depending elements: ${dependingElements.map((de) => de.entityId).join(', ')}`
+                    );
+                    return {
+                        blockingElements: dependingElements,
+                        newCollection: null,
+                    };
+                }
+
+                await tx.collectionRepository.removeCollectionVersionDependency(
+                    draftState.versionId,
+                    data.dependencyEntityId
+                );
+
+                eventBuffer.next({
                     collectionEntityId: data.removeFrom,
+                    event: 'dependency:change',
+                    data: data.dependencyEntityId,
                 });
+
+                return {
+                    newCollection: draftState,
+                    blockingElements: [],
+                };
             }
-
-            await tx.removeCollectionVersionDependency(
-                draftState.versionId,
-                data.dependencyEntityId
-            );
-
-            eventBuffer.next({
-                collectionEntityId: data.removeFrom,
-                event: "dependency:change",
-                data: data.dependencyEntityId,
-            })
-
-            eventBuffer.flush();
-
-            return draftState;
-        });
+        );
     }
 
     public async saveDraftState(collectionEntityId: CollectionEntityId) {
@@ -237,59 +288,6 @@ export class CollectionService {
         });
 
         return data;
-    }
-
-    public getCollectionElementDiff(
-        currentDependencyElements: ElementDto[],
-        newDependencyElements: ElementDto[]
-    ) {
-        console.log(currentDependencyElements);
-        console.log(newDependencyElements);
-        const currentElementEntityIds = new Set(
-            currentDependencyElements.map((element) => element.entityId)
-        );
-        const newElementEntityIds = new Set(
-            newDependencyElements.map((element) => element.entityId)
-        );
-
-        const removed = currentDependencyElements.filter(
-            (element) => !newElementEntityIds.has(element.entityId)
-        );
-        const added = newDependencyElements.filter(
-            (element) => !currentElementEntityIds.has(element.entityId)
-        );
-
-        const overlappingNew = newDependencyElements.filter((element) =>
-            currentElementEntityIds.has(element.entityId)
-        );
-
-        // TODO: @Quixelation -> we should also do a content diff, to see if the content was actually significantly changed
-        // But this is something for a later point (ba-thesis?)
-        const potentiallyUpdated = overlappingNew
-            .map((newElement) => {
-                const matchingCurrentElement = currentDependencyElements.find(
-                    (element) => element.entityId === newElement.entityId
-                );
-                if (!matchingCurrentElement) {
-                    throw new Error(
-                        'This should not happen, since we are filtering for overlapping elements'
-                    );
-                }
-                if (newElement.versionId !== matchingCurrentElement.versionId) {
-                    return {
-                        old: matchingCurrentElement,
-                        new: newElement,
-                    };
-                }
-                return null;
-            })
-            .filter((v) => v !== null);
-
-        return {
-            removed,
-            updated: potentiallyUpdated,
-            added,
-        };
     }
 
     /*
@@ -317,150 +315,124 @@ export class CollectionService {
         opts: { throwOnDraftState: boolean } = { throwOnDraftState: true }
     ) {
         const { throwOnDraftState } = opts;
-        return this.transaction(async (tx) => {
-            const eventBuffer = tx.newDeferredEventBuffer();
-            const [draftState, createdNewDraftState] = tx.exists(
-                await tx.collectionRepository.getOrCreateDraftState(
-                    data.importTo
-                )
-            );
 
-            eventBuffer.next({
-                event: 'collection:update',
-                data: draftState,
-                collectionEntityId: data.importTo,
-            });
+        return this.reduce(
+            data.importTo,
+            async (tx, draftState, eventBuffer) => {
+                let importFromCollection = tx.exists(
+                    await tx.collectionRepository.getCollectionByVersionId(
+                        data.importFrom
+                    )
+                );
 
-            let importFromCollection = tx.exists(
-                await tx.collectionRepository.getCollectionByVersionId(
-                    data.importFrom
-                )
-            );
+                await tx.checkIfDependencyCanBeAdded({
+                    importTo: draftState.versionId,
+                    dependencyVersionId: importFromCollection.versionId,
+                });
 
-            await tx.checkIfDependencyCanBeAdded({
-                importTo: draftState.versionId,
-                dependencyVersionId: importFromCollection.versionId,
-            });
+                if (importFromCollection.draftState) {
+                    if (throwOnDraftState) {
+                        throw new Error(
+                            `Collection version with id ${data.importFrom} is in draft state and can not be imported`
+                        );
+                    } else {
+                        const nonDraftStateCollection =
+                            await tx.collectionRepository.getLatestCollectionByEntityId(
+                                importFromCollection.entityId,
+                                { allowDraftState: false }
+                            );
+                        if (nonDraftStateCollection === null) {
+                            throw new Error(
+                                `Collection with id ${importFromCollection.entityId} has no non-draft version and can not be imported`
+                            );
+                        }
+                        importFromCollection = nonDraftStateCollection;
+                    }
+                }
 
-            if (importFromCollection.draftState) {
-                if (throwOnDraftState) {
-                    throw new Error(
-                        `Collection version with id ${data.importFrom} is in draft state and can not be imported`
+                const existingDependencies = await tx.getCollectionDependencies(
+                    draftState.versionId
+                );
+                const existingCollectionDependency = existingDependencies.find(
+                    (dep) => dep.entityId === importFromCollection.entityId
+                );
+                if (existingCollectionDependency !== undefined) {
+                    await tx.collectionRepository.removeCollectionVersionDependency(
+                        draftState.versionId,
+                        existingCollectionDependency.versionId
+                    );
+                    await tx.collectionRepository.addCollectionVersionDependency(
+                        draftState.versionId,
+                        importFromCollection.versionId
                     );
                 } else {
-                    const nonDraftStateCollection =
-                        await tx.collectionRepository.getLatestCollectionByEntityId(
-                            importFromCollection.entityId,
-                            { allowDraftState: false }
-                        );
-                    if (nonDraftStateCollection === null) {
-                        throw new Error(
-                            `Collection with id ${importFromCollection.entityId} has no non-draft version and can not be imported`
-                        );
-                    }
-                    importFromCollection = nonDraftStateCollection;
+                    await tx.collectionRepository.addCollectionVersionDependency(
+                        draftState.versionId,
+                        importFromCollection.versionId
+                    );
                 }
+
+                eventBuffer.next({
+                    event: 'dependency:change',
+                    data: importFromCollection.versionId,
+                    collectionEntityId: data.importTo,
+                });
+
+                const newlyImportedElements = tx.exists(
+                    await tx.collectionRepository.getElementsOfCollectionVersion(
+                        importFromCollection.versionId
+                    )
+                );
+
+                return {
+                    collection: importFromCollection,
+                    elements: newlyImportedElements,
+                    newCollectionVersion: draftState,
+                };
             }
-
-            // TODO:
-            // - Check if dep entityID already exists for this collection version
-            //      -> if yes, if not same version, do migration checks
-            //      -> if no, just add dependency
-
-            const existingDependencies = await tx.getCollectionDependencies(
-                draftState.versionId
-            );
-            const isAlreadyDependent = existingDependencies.find(
-                (dep) => dep.entityId === importFromCollection.entityId
-            );
-            if (isAlreadyDependent !== undefined) {
-                await tx.collectionRepository.removeCollectionVersionDependency(
-                    draftState.versionId,
-                    isAlreadyDependent.versionId
-                );
-                await tx.collectionRepository.addCollectionVersionDependency(
-                    draftState.versionId,
-                    importFromCollection.versionId
-                );
-
-            } else {
-                await tx.collectionRepository.addCollectionVersionDependency(
-                    draftState.versionId,
-                    importFromCollection.versionId
-                );
-            }
-
-            eventBuffer.next({
-                event: 'dependency:change',
-                data: importFromCollection.versionId,
-                collectionEntityId: data.importTo,
-            });
-
-            const newlyImportedElements = tx.exists(
-                await tx.collectionRepository.getElementsOfCollectionVersion(
-                    importFromCollection.versionId
-                )
-            );
-
-            eventBuffer.flush();
-
-            return {
-                collection: importFromCollection,
-                elements: newlyImportedElements,
-                newCollectionVersion: draftState,
-            };
-        });
+        );
     }
 
     public async createExerciseObjects(
         collectionEntityId: CollectionEntityId,
         contents: VersionedElementContent[]
     ) {
-        return this.collectionRepository.transaction(async (tx) => {
-            const eventBuffer = this.newDeferredEventBuffer();
-            const results: ElementDto[] = [];
+        return this.reduce(
+            collectionEntityId,
+            async (tx, draftState, eventBuffer) => {
+                const results: ElementDto[] = [];
+                for (const content of contents) {
+                    const result = this.exists(
+                        await tx.collectionRepository.createElementVersion({
+                            version: 1,
+                            content,
+                        })
+                    );
+                    if (!result) {
+                        throw new Error(
+                            'Failed to create exercise element object'
+                        );
+                    }
 
-            const [draftState, createdNewDraftState] =
-                await tx.getOrCreateDraftState(collectionEntityId);
-            if (createdNewDraftState) {
-                eventBuffer.next({
-                    event: 'collection:update',
-                    data: draftState,
-                    collectionEntityId: collectionEntityId,
-                });
-            }
+                    await tx.collectionRepository.addElementToCollection(
+                        result.versionId,
+                        draftState.versionId
+                    );
 
-            for (const content of contents) {
-                const result = this.exists(
-                    await tx.createElementVersion({
-                        version: 1,
-                        content,
-                    })
-                );
-                if (!result) {
-                    throw new Error('Failed to create exercise element object');
+                    eventBuffer.next({
+                        event: 'element:create',
+                        data: result,
+                        collectionEntityId: collectionEntityId,
+                    });
+                    results.push(result);
                 }
 
-                await tx.addElementToCollection(
-                    result.versionId,
-                    draftState.versionId
-                );
-
-                eventBuffer.next({
-                    event: 'element:create',
-                    data: result,
-                    collectionEntityId: collectionEntityId,
-                });
-                results.push(result);
+                return {
+                    newSetVersionId: draftState.versionId,
+                    results,
+                };
             }
-
-            eventBuffer.flush();
-
-            return {
-                newSetVersionId: draftState.versionId,
-                results,
-            };
-        });
+        );
     }
 
     public async getLatestCollectionsForUser(
@@ -640,11 +612,26 @@ export class CollectionService {
             collectionEntityId,
             unarchive
         );
+        const latestCollectionVersion = result.reduce((latest, current) => {
+            if (!latest) {
+                return current;
+            }
+            if (current.version > latest.version) {
+                return current;
+            }
+            return latest;
+        }, result[0]);
+
+        if (!latestCollectionVersion) {
+            throw new Error('Failed to archive/unarchive collection');
+        }
+
         this.eventSubject.next({
             event: 'collection:update',
-            data: result,
+            data: latestCollectionVersion,
             collectionEntityId,
         });
+
         return result;
     }
 
@@ -822,11 +809,12 @@ export class CollectionService {
      * Finds all directly AND TRANSITIVELY referenced element versions in the content of an element
      */
     private async getDependenciesOfElement(
-        element: ElementDto
+        element: ElementDto,
+        opts: { transitive?: boolean } = { transitive: true }
     ): Promise<ElementDto[]> {
         const directElementReferences = (
             await Promise.all(
-                this.findEntityVersionsInContent(element.content).map(
+                findElementVersionsInContent(element.content).ids.map(
                     async (elementVersionId) =>
                         this.collectionRepository.getElementVersionByVersionId(
                             elementVersionId
@@ -836,133 +824,157 @@ export class CollectionService {
         ).filter((elem) => elem !== null);
 
         const transitiveElementReferences = (
-            await Promise.all(
-                directElementReferences.map(async (directReference) =>
-                    this.getDependenciesOfElement(directReference)
-                )
-            )
+            opts.transitive === true
+                ? await Promise.all(
+                      directElementReferences.map(async (directReference) =>
+                          this.getDependenciesOfElement(directReference)
+                      )
+                  )
+                : []
         ).flat();
 
         return [...directElementReferences, ...transitiveElementReferences];
     }
 
     public async deleteElementFromCollection(
-        elementEntityId: ElementEntityId
+        elementEntityId: ElementEntityId,
+        acceptedCascadingDeletions: ElementVersionId[] = []
     ): Promise<typeof Marketplace.Element.Delete.Response> {
-        let response: typeof Marketplace.Element.Delete.Response | undefined;
-        try {
-            return await this.transaction(async (tx) => {
-                const eventBuffer = tx.newDeferredEventBuffer();
+        return await this.transaction(async (tx) => {
+            const eventBuffer = tx.newDeferredEventBuffer();
 
-                const containingSet = tx.exists(
-                    await tx.collectionRepository.getLatestCollectionOfElementEntity(
-                        elementEntityId
-                    )
+            const containingSet = tx.exists(
+                await tx.collectionRepository.getLatestCollectionOfElementEntity(
+                    elementEntityId
+                )
+            );
+
+            const [elementIsInLatestCollectionVersion, _latestContainingSet] =
+                await this.isElementInLatestCollectionVersion(elementEntityId);
+
+            if (!elementIsInLatestCollectionVersion) {
+                throw new Error(
+                    `Element with id ${elementEntityId} does not exist in the latest version of the containing collection and can therefore not be deleted.`
                 );
+            }
 
-                const [
-                    elementIsInLatestCollectionVersion,
-                    _latestContainingSet,
-                ] =
-                    await this.isElementInLatestCollectionVersion(
-                        elementEntityId
-                    );
-
-                if (!elementIsInLatestCollectionVersion) {
-                    throw new Error(
-                        `Element with id ${elementEntityId} does not exist in the latest version of the containing collection and can therefore not be deleted.`
-                    );
-                }
-
-                const [draftState, createdNewDraftState] =
-                    await tx.collectionRepository.getOrCreateDraftState(
-                        containingSet.entityId
-                    );
-                if (createdNewDraftState) {
-                    eventBuffer.next({
-                        event: 'collection:update',
-                        data: draftState,
-                        collectionEntityId: containingSet.entityId,
-                    });
-                }
-
-                const latestElementVersion = tx.exists(
-                    await tx.collectionRepository.getLatestElementVersion(
-                        elementEntityId
-                    )
+            const [draftState, createdNewDraftState] =
+                await tx.collectionRepository.getOrCreateDraftState(
+                    containingSet.entityId
                 );
-
-                const dependingElements = await tx.getDependingElements(
-                    latestElementVersion,
-                    draftState.versionId
-                );
-                if (dependingElements.length > 0) {
-                    response = {
-                        newSetVersionId: null,
-                        requiresConfirmation: dependingElements.map(
-                            (dependingElement) => ({
-                                element: dependingElement,
-                                blocking: true,
-                            })
-                        ),
-                    };
-                    throw new Error(
-                        `Element with id ${elementEntityId} is still referenced by other elements in the collection and can therefore not be deleted without confirmation.`
-                    );
-                }
-
-                const elementMapping =
-                    await tx.collectionRepository.getElementCollectionMapping(
-                        latestElementVersion.versionId,
-                        draftState.versionId
-                    );
-
-                if (elementMapping.isBaseReference === true) {
-                    // just delete the element, when it's the only reference in the current draftstate
-                    // (no other collection version references this element version)
-                    await tx.collectionRepository.deleteElementVersion(
-                        latestElementVersion
-                    );
-                } else {
-                    // unmap the reference to the element since it is not the base reference
-                    // and therefore belongs to a different collection version
-                    await tx.collectionRepository.unmapElementFromCollection(
-                        elementEntityId,
-                        draftState.versionId
-                    );
-                }
-
+            if (createdNewDraftState) {
                 eventBuffer.next({
-                    event: 'element:delete',
-                    data: {
-                        entityId: elementEntityId,
-                    },
+                    event: 'collection:update',
+                    data: draftState,
                     collectionEntityId: containingSet.entityId,
                 });
-
-                eventBuffer.flush();
-
-                return {
-                    newSetVersionId: draftState.versionId,
-                    requiresConfirmation: [],
-                };
-            });
-        } catch (err) {
-            if (response !== undefined) {
-                return response;
             }
-            throw err;
-        }
+
+            const latestElementVersion = tx.exists(
+                await tx.collectionRepository.getLatestElementVersion(
+                    elementEntityId
+                )
+            );
+
+            const dependingElements = await tx.getDependingElements(
+                latestElementVersion,
+                draftState.versionId
+            );
+            if (
+                dependingElements.some(
+                    (de) => !acceptedCascadingDeletions.includes(de.versionId)
+                )
+            ) {
+                return {
+                    newSetVersionId: null,
+                    requiresConfirmation: dependingElements,
+                };
+            }
+
+            const elementMapping =
+                await tx.collectionRepository.getElementCollectionMapping(
+                    latestElementVersion.versionId,
+                    draftState.versionId
+                );
+
+            if (elementMapping.isBaseReference === true) {
+                // just delete the element, when it's the only reference in the current draftstate
+                // (no other collection version references this element version)
+                await tx.collectionRepository.deleteElementVersion(
+                    latestElementVersion
+                );
+            } else {
+                // unmap the reference to the element since it is not the base reference
+                // and therefore belongs to a different collection version
+                await tx.collectionRepository.unmapElementFromCollection(
+                    elementEntityId,
+                    draftState.versionId
+                );
+            }
+
+            if (dependingElements.length > 0) {
+                await tx.removeReferenceFromElements(
+                    // We are able to use the latest version here,
+                    // bc we are only working inside the same collection
+                    // and all elements should always be using the same,
+                    // latest version of the referenced element
+                    latestElementVersion.versionId,
+                    dependingElements.map((de) => de.versionId)
+                );
+            }
+
+            eventBuffer.next({
+                event: 'element:delete',
+                data: {
+                    entityId: elementEntityId,
+                },
+                collectionEntityId: containingSet.entityId,
+            });
+
+            eventBuffer.flush();
+
+            return {
+                newSetVersionId: draftState.versionId,
+                requiresConfirmation: [],
+            };
+        });
+    }
+
+    /**
+     * INFO: Should only be used for deleting references inside the same collection
+     */
+    private async removeReferenceFromElements(
+        removeElementVersionId: ElementVersionId,
+        containingElements: ElementVersionId[]
+    ) {
+        return this.transaction(async (tx) => {
+            for (const containingElement of containingElements) {
+                const containingElementData = this.exists(
+                    await tx.collectionRepository.getElementVersionByVersionId(
+                        containingElement
+                    )
+                );
+                const newContent = findElementVersionsInContent(
+                    containingElementData.content,
+                    [removeElementVersionId]
+                ).newContent;
+                await tx.updateElement(
+                    containingElementData.entityId,
+                    newContent
+                );
+            }
+        });
     }
 
     /**
      * Fetches all elements inside a collection which depend on the given element
      *
-     * INCLUDES TRANSITIVE
+     * CAN INCLUDES TRANSITIVE (OPTION)
      */
     public async getDependingElements(
         element: VersionedElementPartial,
-        collectionVersionId: CollectionVersionId
+        collectionVersionId: CollectionVersionId,
+        opts: { includeTransitive?: boolean } = { includeTransitive: true }
     ) {
         const elementsInCollection =
             await this.collectionRepository.getElementsOfCollectionVersion(
@@ -974,7 +986,9 @@ export class CollectionService {
             await Promise.all(
                 elementsInCollection.map(async (element) => ({
                     element,
-                    dependsOn: await this.getDependenciesOfElement(element),
+                    dependsOn: await this.getDependenciesOfElement(element, {
+                        transitive: opts.includeTransitive,
+                    }),
                 }))
             )
         )
@@ -984,6 +998,40 @@ export class CollectionService {
                 )
             )
             .map((m) => m.element);
+
+        return dependingElements;
+    }
+
+    /**
+     * Fetches all elements inside a collection which depend on any of the elements of a given collection
+     *
+     * This is useful for finding elements which depend on an imported collection.
+     *
+     * does NOT include transitive dependencies - only the main depending element
+     */
+    public async getDependingElementsForCollection(data: {
+        depender: CollectionVersionId;
+        dependency: CollectionVersionId;
+    }) {
+        const elementsInDependency = await this.getElementsOfCollectionVersion(
+            data.dependency,
+            {
+                // dependencies should never be draft states
+                allowDraftState: false,
+                // we do not allow 2nd level dependencies
+                includeDependencies: false,
+            }
+        );
+
+        const dependingElements: ElementDto[] = [];
+        for (const dependencyElement of elementsInDependency.direct) {
+            const dependencies = await this.getDependingElements(
+                dependencyElement,
+                data.depender,
+                { includeTransitive: false }
+            );
+            dependingElements.push(...dependencies);
+        }
 
         return dependingElements;
     }
@@ -1007,55 +1055,46 @@ export class CollectionService {
         elementVersionId: ElementVersionId,
         targetCollectionEntity: CollectionEntityId
     ) {
-        return this.collectionRepository.transaction(async (tx) => {
-            const eventBuffer = this.newDeferredEventBuffer();
-            const [draftState, createdNewDraftState] =
-                await tx.getOrCreateDraftState(targetCollectionEntity);
+        return this.reduce(
+            targetCollectionEntity,
+            async (tx, draftState, eventBuffer) => {
+                const sourceElement = this.exists(
+                    await tx.collectionRepository.getElementVersionByVersionId(
+                        elementVersionId
+                    )
+                );
 
-            if (createdNewDraftState) {
+                const content = sourceElement.content;
+                content.name = `Kopie von ${content.name}`;
+
+                const duplicatedElement = this.exists(
+                    await tx.collectionRepository.createElementVersion({
+                        content,
+                        version: 1,
+                    })
+                );
+
+                await tx.collectionRepository.addElementToCollection(
+                    duplicatedElement.versionId,
+                    draftState.versionId
+                );
+
                 eventBuffer.next({
-                    event: 'collection:update',
-                    data: draftState,
+                    event: 'element:create',
+                    data: duplicatedElement,
                     collectionEntityId: targetCollectionEntity,
                 });
+
+                return {
+                    duplicatedElement,
+                    draftState,
+                };
             }
-
-            const sourceElement = this.exists(
-                await tx.getElementVersionByVersionId(elementVersionId)
-            );
-
-            const content = sourceElement.content;
-            content.name = `Kopie von ${content.name}`;
-
-            const duplicatedElement = this.exists(
-                await tx.createElementVersion({
-                    content,
-                    version: 1,
-                })
-            );
-
-            await tx.addElementToCollection(
-                duplicatedElement.versionId,
-                draftState.versionId
-            );
-
-            eventBuffer.next({
-                event: 'element:create',
-                data: duplicatedElement,
-                collectionEntityId: targetCollectionEntity,
-            });
-
-            eventBuffer.flush();
-
-            return {
-                duplicatedElement,
-                draftState,
-            };
-        });
+        );
     }
 
     public async duplicateCollectionVersion(
-        collectionVersionId: CollectionVersionId,
+        collectionVersionId: CollectionVersionId
     ) {
         const latestCollectionEntity =
             await this.collectionRepository.getCollectionByVersionId(
@@ -1197,34 +1236,5 @@ export class CollectionService {
             acc[element.entityId]?.push(element);
             return acc;
         }, {});
-    }
-
-    private findEntityVersionsInContent(
-        content: any[] | object | string | null | undefined
-    ): ElementVersionId[] {
-        if (content === null || content === undefined) {
-            return [];
-        } else if (typeof content === 'string') {
-            if (isElementVersionId(content)) {
-                return [content];
-            }
-            return [];
-        } else if (Array.isArray(content)) {
-            const foundDependencies: ElementVersionId[] = [];
-            for (const item of content) {
-                const subDependencies = this.findEntityVersionsInContent(item);
-                foundDependencies.push(...subDependencies);
-            }
-            return foundDependencies;
-        } else if (typeof content === 'object') {
-            const foundDependencies: ElementVersionId[] = [];
-            for (const value of Object.values(content)) {
-                const subDependencies = this.findEntityVersionsInContent(value);
-                foundDependencies.push(...subDependencies);
-            }
-            return foundDependencies;
-        }
-
-        return [];
     }
 }

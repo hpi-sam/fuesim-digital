@@ -65,7 +65,7 @@ export class AlarmgroupElementModalComponent
     constructor() {
         effect(() => {
             const data = this.data();
-            if (data.mode !== "create") {
+            if (data.mode !== 'create') {
                 this.values.set(
                     cloneDeepMutable(data.element.content as AlarmGroup)
                 );

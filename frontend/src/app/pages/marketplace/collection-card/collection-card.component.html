@@ -4,16 +4,22 @@
     [queryParams]="{ from: fromLocation() }"
 >
     <div class="card-header">
-        <h5 class="mb-0 my-1 card-title"> {{ collection().title }}</h5>
+        <h5 class="mb-0 my-1 card-title">{{ collection().title }}</h5>
     </div>
     <ul class="list-group list-group-flush">
         <li class="list-group-item">
             Erstellt am: {{ collection().createdAt | date }}
         </li>
-        <li class="list-group-item">Zuletzt bearbeitet: {{ collection().editedAt | date}}</li>
-        <li class="list-group-item">{{collection().elementCount }} Einträge
-            @if(collection().draftState){
-                <br/><div class="badge text-bg-secondary">enthält nicht aktualisierte Änderungen</div>
+        <li class="list-group-item">
+            Zuletzt bearbeitet: {{ collection().editedAt | date }}
+        </li>
+        <li class="list-group-item">
+            {{ collection().elementCount }} Einträge
+            @if (collection().draftState) {
+                <br />
+                <div class="badge text-bg-secondary">
+                    enthält nicht aktualisierte Änderungen
+                </div>
             }
         </li>
     </ul>

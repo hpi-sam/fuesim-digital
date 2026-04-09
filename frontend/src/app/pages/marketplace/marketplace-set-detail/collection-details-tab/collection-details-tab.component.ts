@@ -94,7 +94,7 @@ export class CollectionDetailsTabComponent {
         const confirmationResult = await this.confirmationModalService.confirm({
             title: 'Einladungslink widerrufen',
             description:
-                'Möchten Sie den Einladungslink wirklich widerrufen? Dadurch verlieren alle Personen, die den Link haben, den Zugriff auf die Sammlung. Bereits eingeladene Personen können die Sammlung weiterhin nutzen, verlieren jedoch den Zugriff auf neue Versionen der Sammlung.',
+                'Möchten Sie den Einladungslink wirklich widerrufen? Dadurch verlieren alle Personen, die den Link haben, den Zugriff auf die Sammlung. Bereits eingeladene Personen können die Sammlung weiterhin nutzen.',
             confirmationButtonText: 'Einladungslink widerrufen',
         });
         if (!confirmationResult) return;

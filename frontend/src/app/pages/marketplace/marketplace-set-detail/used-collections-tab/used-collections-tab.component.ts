@@ -1,5 +1,5 @@
 import { AsyncPipe, JsonPipe } from '@angular/common';
-import { Component, inject, input, resource } from '@angular/core';
+import { Component, computed, inject, input, resource } from '@angular/core';
 import { NgbDropdownModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import {
     checkCollectionRole,
@@ -38,6 +38,12 @@ export class UsedCollectionsTabComponent {
                 archived: false,
             }),
     });
+
+    public readonly alreadyImportedCollectionVersions = computed(() =>
+        this.collectionData().objects.transitive.map(
+            (transitiveData) => transitiveData.collection.versionId
+        )
+    );
 
     public readonly checkRole = checkCollectionRole.bind(this);
 

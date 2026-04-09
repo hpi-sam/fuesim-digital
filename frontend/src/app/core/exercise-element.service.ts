@@ -6,6 +6,7 @@ import {
     CollectionRelationshipType,
     CollectionVersionId,
     ElementEntityId,
+    ElementVersionId,
     Marketplace,
     VersionedCollectionPartial,
     versionedElementContentSchema,
@@ -207,11 +208,13 @@ export class CollectionService {
         return parsedData.result;
     }
 
-    public async getLatestElementsByCollectionId(setId: CollectionEntityId) {
+    public async getLatestElementsByCollectionId(
+        collectionId: CollectionEntityId
+    ) {
         const data = await lastValueFrom(
             this.httpClient.get<
                 typeof Marketplace.Collection.GetLatestElementsBySetVersionId.Response
-            >(`${this.ENDPOINT}/${setId}/latest`)
+            >(`${this.ENDPOINT}/${collectionId}/latest`)
         );
 
         return data;
@@ -219,26 +222,31 @@ export class CollectionService {
 
     public async deleteElement(
         elementEntityId: ElementEntityId,
-        setEntityId: CollectionEntityId
+        setEntityId: CollectionEntityId,
+        acceptedCascadingDeletions: ElementVersionId[] = []
     ) {
         const result = await lastValueFrom(
             this.httpClient.delete<typeof Marketplace.Element.Delete.Response>(
-                `${this.ENDPOINT}/${setEntityId}/element/${elementEntityId}`
+                `${this.ENDPOINT}/${setEntityId}/element/${elementEntityId}`,
+                {
+                    body: Marketplace.Element.Delete.requestSchema.encode({
+                        conflictResolution: {
+                            acceptedCascadingDeletions,
+                        },
+                    }),
+                }
             )
         );
 
-        if (result.requiresConfirmation.length > 0) {
-            this.messageService.postError({
-                title: 'Entfernen nicht möglich',
-                body: `Zu löschendes Element muss zuerst aus folgenden anderen Elementen entfernt werden: ${result.requiresConfirmation.map((e) => e.element.title).join(', ')}.`,
-            });
-        } else {
+        if (result.requiresConfirmation.length === 0) {
             this.messageService.postMessage({
                 title: 'Element gelöscht',
                 body: 'Das Element wurde erfolgreich gelöscht.',
                 color: 'success',
             });
         }
+
+        return result;
     }
 
     public async createColletion(title: string) {
@@ -390,11 +398,32 @@ export class CollectionService {
         removeFrom: CollectionEntityId;
         removeVersionId: CollectionVersionId;
     }) {
-        await lastValueFrom(
-            this.httpClient.delete(
+        const data = await lastValueFrom(
+            this.httpClient.delete<
+                typeof Marketplace.Collection.RemoveDependency.Response
+            >(
                 `${this.ENDPOINT}/${opts.removeFrom}/dependencies/${opts.removeVersionId}`
             )
         );
+
+        const typedData =
+            Marketplace.Collection.RemoveDependency.responseSchema.parse(data);
+
+        if (typedData.result.blockingElements.length > 0) {
+            this.messageService.postError({
+                title: 'Sammlung kann nicht entfernt werden',
+                body: `Die Sammlung kann nicht entfernt werden, da folgende Elemente davon abhängen: ${typedData.result.blockingElements.map((e) => e.title).join(', ')}.`,
+            });
+            return;
+        }
+
+        this.messageService.postMessage({
+            title: 'Sammlung entfernt',
+            body: 'Die Sammlung wurde erfolgreich entfernt.',
+            color: 'success',
+        });
+
+        return typedData.result;
     }
 
     public async saveDraftState(collectionEntityId: CollectionEntityId) {
@@ -435,9 +464,7 @@ export class CollectionService {
         return typedData;
     }
 
-    public async getCollectionByVersionId(
-        collection: VersionedCollectionPartial
-    ) {
+    public async getCollectionVersion(collection: VersionedCollectionPartial) {
         const data = await lastValueFrom(
             this.httpClient.get<
                 typeof Marketplace.Collection.GetCollectionVersion.Response
@@ -478,17 +505,16 @@ export class CollectionService {
         collection: VersionedCollectionPartial
     ): Promise<
         | {
-            newerVersionAvailable: true;
-            latestVersion: VersionedCollectionPartial;
-        }
+              newerVersionAvailable: true;
+              latestVersion: VersionedCollectionPartial;
+          }
         | { newerVersionAvailable: false }
     > {
         const latestCollection =
             await this.getLatestCollectionVersionByEntityId(
                 collection.entityId
             );
-        const currentCollection =
-            await this.getCollectionByVersionId(collection);
+        const currentCollection = await this.getCollectionVersion(collection);
 
         if (latestCollection.version < currentCollection.version) {
             console.error(

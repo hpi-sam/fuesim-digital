@@ -30,7 +30,10 @@ import { VersionedElementDisplayNamePipe } from '../../../shared/pipes/versioned
 import { UsedCollectionsTabComponent } from './used-collections-tab/used-collections-tab.component';
 import { CollectionDetailsTabComponent } from './collection-details-tab/collection-details-tab.component';
 import { CollectionElementsTabComponent } from './collection-elements-tab/collection-elements-tab.component';
-import { collectionDataResolver, CollectionDataResolverResult } from '../collection-data.resolver';
+import {
+    collectionDataResolver,
+    CollectionDataResolverResult,
+} from '../collection-data.resolver';
 
 @Component({
     selector: 'app-marketplace-set-detail',
@@ -71,8 +74,8 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
     public readonly checkRole = checkCollectionRole.bind(this);
 
     private collection = this.activatedRoute.snapshot.data[
-            'collectionSubscription'
-        ] as CollectionDataResolverResult;
+        'collectionSubscription'
+    ] as CollectionDataResolverResult;
 
     ngOnInit() {
         this.collection.subject.subscribe((data) =>
@@ -108,12 +111,16 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
     }
 
     public async leaveCollection() {
-        await this.collectionService.leaveCollection(this.collection.collectionEntityId);
+        await this.collectionService.leaveCollection(
+            this.collection.collectionEntityId
+        );
         this.router.navigate(['/collections']);
     }
 
     public async saveDraftState() {
-        await this.collectionService.saveDraftState(this.collection.collectionEntityId);
+        await this.collectionService.saveDraftState(
+            this.collection.collectionEntityId
+        );
     }
 
     public async unarchiveCollection() {

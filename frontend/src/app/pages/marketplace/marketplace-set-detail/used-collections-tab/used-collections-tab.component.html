@@ -22,9 +22,23 @@
                 track availableCollection.versionId
             ) {
                 @if (
-                    availableCollection.entityId !==
+                    availableCollection.entityId ===
                     collectionData().collection.entityId
                 ) {
+                    <span class="dropdown-item-text text-muted">
+                        {{ availableCollection.title }} (aktuelle Sammlung -
+                        nicht auswählbar)
+                    </span>
+                } @else if (
+                    alreadyImportedCollectionVersions().includes(
+                        availableCollection.versionId
+                    )
+                ) {
+                    <span class="dropdown-item-text text-muted">
+                        {{ availableCollection.title }} (bereits verwendet -
+                        nicht auswählbar)
+                    </span>
+                } @else {
                     <button
                         ngbDropdownItem
                         (click)="
@@ -33,11 +47,6 @@
                     >
                         {{ availableCollection.title }}
                     </button>
-                } @else {
-                    <span class="dropdown-item-text text-muted">
-                        {{ availableCollection.title }} (aktuelle Sammlung -
-                        nicht auswählbar)
-                    </span>
                 }
             }
             @if ((availableCollections.value()?.length ?? 0) === 0) {

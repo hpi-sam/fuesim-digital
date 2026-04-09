@@ -62,7 +62,7 @@ export type CollectionRelationshipType = z.infer<
 export const collectionRelationshipTypesDisplayNames: {
     [key in (typeof collectionRelationshipTypeAllowedValues)[number]]: string;
 } = {
-    admin: 'Admin',
+    admin: 'Besitzer',
     editor: 'Bearbeiter',
     viewer: 'Betrachter',
 };

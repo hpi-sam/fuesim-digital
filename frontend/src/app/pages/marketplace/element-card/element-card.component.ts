@@ -30,6 +30,7 @@ export class ElementCardComponent {
     public readonly mode = input<
         EditingVersionedElementModalData<any>['mode'] | 'static'
     >('static');
+    public readonly hideVersionHistory = input<boolean>(false);
 
     openEditor() {
         const mode = this.mode();
@@ -37,7 +38,7 @@ export class ElementCardComponent {
         const modal = this.ngbModalService.open(
             VersionedElementModalComponent,
             {
-                size: 'xl',
+                size: this.hideVersionHistory() ? 'lg' : 'xl',
             }
         );
         modal.componentInstance.data = {
@@ -54,6 +55,7 @@ export class ElementCardComponent {
             collection: this.collection()!,
             element: this.element(),
             availableCollectionElements: this.availableElements(),
+            hideVersionHistory: this.hideVersionHistory(),
         } satisfies EditingVersionedElementModalData<VersionedElementContent>;
     }
 

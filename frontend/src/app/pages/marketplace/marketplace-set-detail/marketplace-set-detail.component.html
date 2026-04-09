@@ -96,16 +96,17 @@
                     <span>
                         Diese Sammlung enthält unveröffentlichte Änderungen.<br />
                         @if (
-                            checkRole(collectionData.ownRole).isAtLeast(
-                                'editor'
-                            )
+                            checkRole(collectionData.ownRole).isAtLeast('admin')
                         ) {
-                            Veröffentlichen Sie diese Version, um die Änderungen
-                            in Übungsszenarien verwenden zu können.
+                            Speichern Sie diese Version, um die Änderungen in
+                            Übungsszenarien verwenden zu können.
+                        } @else {
+                            Wenden Sie sich an einen Administrator, um diese
+                            Version zu speichern.
                         }
                     </span>
                 </span>
-                @if (checkRole(collectionData.ownRole).isAtLeast('editor')) {
+                @if (checkRole(collectionData.ownRole).isAtLeast('admin')) {
                     <button
                         class="btn btn-primary btn-sm"
                         (click)="saveDraftState()"

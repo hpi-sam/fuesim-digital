@@ -91,7 +91,10 @@ export class VersionedElementModalComponent implements OnInit {
     }
 
     public async ngOnInit() {
-        if (this.data.mode !== 'create') {
+        if (
+            this.data.mode !== 'create' &&
+            this.data.hideVersionHistory !== true
+        ) {
             const versionData = await this.collectionService.getElementVersions(
                 this.data.collection.entityId,
                 this.data.element.entityId

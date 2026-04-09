@@ -33,8 +33,13 @@
                             <span>{{ version.createdAt | date }}</span>
                         </li>
                     }
-                } @else {
-                    <span>Versionen laden</span>
+                } @else if (data.hideVersionHistory !== true) {
+                    <div
+                        class="d-flex flex-column gap-2 align-items-center p-2"
+                    >
+                        <span>Versionen laden</span>
+                        <div class="spinner-border text-primary"></div>
+                    </div>
                 }
             </ul>
         }

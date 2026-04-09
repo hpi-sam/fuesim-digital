@@ -33,6 +33,7 @@ export interface EditingVersionedElementModalData<T>
     extends SharedVersionedElementModalData<T> {
     mode: 'edit' | 'view';
     element: ElementDto;
+    hideVersionHistory?: boolean;
 }
 
 export type VersionedElementModalData<T> =

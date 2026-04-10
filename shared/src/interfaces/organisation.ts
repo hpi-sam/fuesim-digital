@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import {
     organisationIdSchema,
+    organisationInviteLinkIdSchema,
+    organisationMembershipIdSchema,
 } from '../ids.js';
 import { validationMessages } from '../validation-messages.js';
 import { stringToDate } from './utils.js';
@@ -25,7 +27,7 @@ export const organisationMembershipRoleToGermanNameDictionary: {
     admin: 'Administrator',
 } as const;
 
-export const getOrganisationResponseDataSchema = z.strictObject({
+export const getOrganisationResponseDataSchema = z.object({
     id: organisationIdSchema,
     name: z.string(),
     description: z.string(),
@@ -36,7 +38,7 @@ export type GetOrganisationResponseDataSchema = z.infer<
     typeof getOrganisationResponseDataSchema
 >;
 
-export const getOrganisationDetailsResponseDataSchema = z.strictObject({
+export const getOrganisationDetailsResponseDataSchema = z.object({
     ...getOrganisationResponseDataSchema.shape,
     userRole: organisationMembershipRoleSchema.nullable(),
     members: z.array(
@@ -65,7 +67,7 @@ export type GetOrganisationsResponseDataSchema = z.infer<
     typeof getOrganisationsResponseDataSchema
 >;
 
-export const postOrganisationRequestDataSchema = z.strictObject({
+export const postOrganisationRequestDataSchema = z.object({
     name: z
         .string()
         .nonempty(validationMessages.required)
@@ -81,4 +83,13 @@ export const patchOrganisationRequestDataSchema =
     postOrganisationRequestDataSchema.partial();
 export type PatchOrganisationRequestData = z.infer<
     typeof patchOrganisationRequestDataSchema
+>;
+
+export const postOrganisationInviteLinkResponseDataSchema = z.object({
+    id: organisationInviteLinkIdSchema,
+    inviteLink: z.url(),
+    expirationDate: stringToDate,
+});
+export type PostOrganisationInviteLinkResponseData = z.infer<
+    typeof postOrganisationInviteLinkResponseDataSchema
 >;

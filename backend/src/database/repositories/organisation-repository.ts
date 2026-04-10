@@ -3,8 +3,12 @@ import type {
     OrganisationId,
     OrganisationMembershipRole,
 } from 'fuesim-digital-shared';
-import type { OrganisationInsert } from '../schema.js';
+import type {
+    OrganisationInsert,
+    OrganisationInviteLinkInsert,
+} from '../schema.js';
 import {
+    organisationInviteLinkTable,
     organisationMembershipTable,
     organisationTable,
     userTable,
@@ -158,6 +162,17 @@ export class OrganisationRepository extends BaseRepository {
                 .update(organisationTable)
                 .set(data)
                 .where(eq(organisationTable.id, id))
+                .returning()
+        );
+    }
+
+    public async createOrganisationInviteLink(
+        data: OrganisationInviteLinkInsert
+    ) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .insert(organisationInviteLinkTable)
+                .values(data)
                 .returning()
         );
     }

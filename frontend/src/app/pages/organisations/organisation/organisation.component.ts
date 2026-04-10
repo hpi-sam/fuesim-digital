@@ -23,6 +23,7 @@ import { HeaderComponent } from '../../../shared/components/header/header.compon
 import { ExerciseStateBadgeInnerComponent } from '../../../shared/components/exercise-state-badge-inner/exercise-state-badge-inner.component';
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { InlineTextEditorComponent } from '../../../shared/components/inline-text-editor/inline-text-editor.component';
+import { InviteMemberModalComponent } from '../shared/invite-member-modal/invite-member-modal.component';
 
 @Component({
     selector: 'app-organisation',
@@ -64,6 +65,13 @@ export class OrganisationComponent {
         if (!organisation) return;
         await this.apiService.patchOrganisation(organisation.id, data);
         this.organisation.reload();
+    }
+
+    async invite() {
+        const modalRef = this.ngbModalService.open(InviteMemberModalComponent);
+        const componentInstance =
+            modalRef.componentInstance as InviteMemberModalComponent;
+        componentInstance.organisation.set(this.organisation.value()!);
     }
 
     constructor() {

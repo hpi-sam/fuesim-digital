@@ -1,0 +1,18 @@
+<div class="modal-header">
+    <h4 class="modal-title">Mitglied einladen</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    @if (organisation(); as org) {
+        <p>
+            Sie können an dieser Stelle einen Link erstellen, den sie an andere
+            Personen weitergeben können und welcher sieben Tage lang gültig ist.
+            Diese treten dann der Organisation <em>{{ org.name }}</em> als
+            Betrachter bei.
+        </p>
+        <button class="btn btn-primary" (click)="invite()">
+            <i class="bi bi-link-45deg me-1"></i>
+            Link erstellen und kopieren
+        </button>
+    }
+</div>

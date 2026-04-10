@@ -1,6 +1,5 @@
 import { Component, input, output, inject } from '@angular/core';
 import type {
-    
     GetOrganisationsResponseDataSchema,
     PatchOrganisationRequestData,
 } from 'fuesim-digital-shared';

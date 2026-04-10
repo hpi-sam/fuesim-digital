@@ -7,6 +7,7 @@ import {
 } from '../../utils/http.js';
 import type { OrganisationRepository } from '../repositories/organisation-repository.js';
 import type { OrganisationInsert } from '../schema.js';
+import { Config } from '../../config.js';
 
 export class OrganisationService {
     public constructor(
@@ -90,5 +91,36 @@ export class OrganisationService {
             throw new NotFoundError();
         }
         return organisation;
+    }
+
+    public async createOrganisationInviteLink(
+        id: OrganisationId,
+        session: SessionInformation
+    ) {
+        const organisation =
+            await this.organisationRepository.getOrganisationById(id);
+        if (!organisation) {
+            throw new NotFoundError();
+        }
+        if (
+            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                id,
+                session.user.id,
+                ['admin']
+            ))
+        ) {
+            throw new PermissionDeniedError();
+        }
+        const inviteLink =
+            await this.organisationRepository.createOrganisationInviteLink({
+                organisationId: organisation.id,
+            });
+        if (!inviteLink) {
+            throw new NotFoundError();
+        }
+        return {
+            ...inviteLink,
+            inviteLink: `${Config.httpFrontendUrl}/organisations/invite/${inviteLink.token}`,
+        };
     }
 }

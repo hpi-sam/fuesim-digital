@@ -54,6 +54,12 @@
                     </span>
                 </a>
                 <ng-template ngbNavContent>
+                    @if (org.userRole === 'admin') {
+                        <button class="btn btn-primary mt-2" (click)="invite()">
+                            <i class="bi bi-person-plus me-1"></i>
+                            Mitglied einladen
+                        </button>
+                    }
                     <ul class="list-group mt-2">
                         @for (member of org.members; track member) {
                             <li class="list-group-item">

@@ -26,3 +26,10 @@ export const organisationMembershipIdSchema = z
 export type OrganisationMembershipId = z.infer<
     typeof organisationMembershipIdSchema
 >;
+
+export const organisationInviteLinkIdSchema = z
+    .uuidv4()
+    .brand<'OrganisationInviteLinkId'>();
+export type OrganisationInviteLinkId = z.infer<
+    typeof organisationInviteLinkIdSchema
+>;

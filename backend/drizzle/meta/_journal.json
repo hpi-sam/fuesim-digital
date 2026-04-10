@@ -71,6 +71,13 @@
             "when": 1775201112956,
             "tag": "0009_organisations",
             "breakpoints": true
+        },
+        {
+            "idx": 10,
+            "version": "7",
+            "when": 1775813268385,
+            "tag": "0010_invite_link",
+            "breakpoints": true
         }
     ]
 }

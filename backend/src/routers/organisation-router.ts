@@ -5,11 +5,11 @@ import {
     organisationIdSchema,
     patchOrganisationRequestDataSchema,
     postOrganisationRequestDataSchema,
+    postOrganisationInviteLinkResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import type { OrganisationService } from '../database/services/organisation-service.js';
-import { ApiError } from '../utils/http.js';
 
 export function createOrganisationRouter(
     organisationService: OrganisationService
@@ -42,8 +42,7 @@ export function createOrganisationRouter(
         .route('/:id')
         .all(isAuthenticatedMiddleware)
         .get(async (req, res) => {
-            const id = organisationIdSchema.safeParse(req.params.id).data;
-            if (!id) throw new ApiError();
+            const id = organisationIdSchema.parse(req.params.id);
 
             const organisation =
                 await organisationService.getOrganisationDetailsById(
@@ -67,6 +66,25 @@ export function createOrganisationRouter(
                 parsedData
             );
             res.send(getOrganisationResponseDataSchema.encode(organisation));
+        });
+
+    router
+        .route('/:id/invite_links')
+        .all(isAuthenticatedMiddleware)
+        .post(async (req, res) => {
+            const id = organisationIdSchema.parse(req.params.id);
+
+            const inviteLink =
+                await organisationService.createOrganisationInviteLink(
+                    id,
+                    req.session!
+                );
+
+            console.log(inviteLink);
+
+            res.status(201).send(
+                postOrganisationInviteLinkResponseDataSchema.encode(inviteLink)
+            );
         });
 
     return router;

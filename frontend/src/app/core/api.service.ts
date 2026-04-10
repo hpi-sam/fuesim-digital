@@ -28,6 +28,7 @@ import {
     getOrganisationResponseDataSchema,
     OrganisationId,
     PatchOrganisationRequestData,
+    postOrganisationInviteLinkResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -255,5 +256,14 @@ export class ApiService {
                 .patch(`${httpOrigin}/api/organisations/${id}`, data)
                 .pipe(map((v) => getOrganisationResponseDataSchema.parse(v)))
         );
+    }
+
+    public async createOrganisationInviteLink(id: OrganisationId) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/organisations/${id}/invite_links`,
+                {}
+            )
+        ).then(postOrganisationInviteLinkResponseDataSchema.parse);
     }
 }

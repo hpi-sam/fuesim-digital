@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import {
     type ActionId,
     type ExerciseAction,
@@ -12,6 +13,7 @@ import {
     type OrganisationId,
     type OrganisationMembershipId,
     type OrganisationMembershipRole,
+    type OrganisationInviteLinkId,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
@@ -119,6 +121,30 @@ export type OrganisationMembershipEntry = InferSelectModel<
 >;
 export type OrganisationMembershipInsert = InferInsertModel<
     typeof organisationMembershipTable
+>;
+
+export const organisationInviteLinkTable = pgTable('organisation_invite_link', {
+    ...baseTable<OrganisationInviteLinkId>(),
+    token: varchar()
+        .notNull()
+        .$defaultFn(() => crypto.randomBytes(32).toString('hex')),
+    organisationId: uuid()
+        .$type<OrganisationId>()
+        .references(() => organisationTable.id, { onDelete: 'cascade' })
+        .notNull(),
+    expirationDate: timestamp({ withTimezone: true, mode: 'date' })
+        .notNull()
+        .$defaultFn(() => {
+            const newDate = new Date();
+            newDate.setDate(newDate.getDate() + 7);
+            return newDate;
+        }),
+});
+export type OrganisationInviteLinkEntry = InferSelectModel<
+    typeof organisationInviteLinkTable
+>;
+export type OrganisationInviteLinkInsert = InferInsertModel<
+    typeof organisationInviteLinkTable
 >;
 
 export const exerciseTemplateTable = pgTable('exercise_template', {

@@ -31,7 +31,7 @@ services:
             - POSTGRES_DB=${DFM_DB_NAME}
     # THIS IS ONLY FOR DEVELOPMENT - for production, please use a proper configured OIDC provider
     authelia:
-        image: docker.io/authelia/authelia:latest
+        image: docker.io/authelia/authelia:4.39.16
         restart: unless-stopped
         ports:
             - 127.0.0.1:9091:9091

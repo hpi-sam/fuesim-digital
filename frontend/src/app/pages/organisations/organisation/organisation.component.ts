@@ -11,12 +11,15 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {
     GetOrganisationDetailsResponseDataSchema,
+    OrganisationMembershipId,
+    OrganisationMembershipRole,
     organisationMembershipRoleAllowedValues,
     organisationMembershipRoleToGermanNameDictionary,
     PatchOrganisationRequestData,
 } from 'fuesim-digital-shared';
 import { ActivatedRoute } from '@angular/router';
 import { QrCodeComponent } from 'ng-qrcode';
+import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
@@ -43,6 +46,7 @@ import { InviteMemberModalComponent } from '../shared/invite-member-modal/invite
         NgbNavItem,
         NgbNavLink,
         NgbNavContent,
+        FormsModule,
     ],
 })
 export class OrganisationComponent {
@@ -72,6 +76,17 @@ export class OrganisationComponent {
         const componentInstance =
             modalRef.componentInstance as InviteMemberModalComponent;
         componentInstance.organisation.set(this.organisation.value()!);
+    }
+
+    async updateMembershipRole(
+        id: OrganisationMembershipId,
+        role: OrganisationMembershipRole
+    ) {
+        try {
+            await this.apiService.updateOrganisationMembershipRole(id, role);
+        } finally {
+            this.organisation.reload();
+        }
     }
 
     constructor() {

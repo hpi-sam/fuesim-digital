@@ -1,6 +1,7 @@
-import { and, asc, getTableColumns, eq, inArray } from 'drizzle-orm';
+import { and, asc, getTableColumns, eq, inArray, not } from 'drizzle-orm';
 import type {
     OrganisationId,
+    OrganisationMembershipId,
     OrganisationMembershipRole,
 } from 'fuesim-digital-shared';
 import type {
@@ -91,6 +92,17 @@ export class OrganisationRepository extends BaseRepository {
             )
             .where(eq(organisationMembershipTable.organisationId, id))
             .orderBy(userTable.displayName);
+    }
+
+    public async getAdminCountWithout(id: OrganisationId, withoutUser: string) {
+        return this.databaseConnection.$count(
+            organisationMembershipTable,
+            and(
+                eq(organisationMembershipTable.organisationId, id),
+                eq(organisationMembershipTable.role, 'admin'),
+                not(eq(organisationMembershipTable.userId, withoutUser))
+            )
+        );
     }
 
     public async getOrganisationMembershipRoleForUserById(
@@ -190,6 +202,39 @@ export class OrganisationRepository extends BaseRepository {
                     )
                 )
                 .where(eq(organisationInviteLinkTable.token, token))
+        );
+    }
+
+    public async updateMembershipRole(
+        id: OrganisationMembershipId,
+        role: OrganisationMembershipRole
+    ) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .update(organisationMembershipTable)
+                .set({ role })
+                .where(eq(organisationMembershipTable.id, id))
+                .returning()
+        );
+    }
+
+    public async getOrganisationMembershipById(id: OrganisationMembershipId) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .select()
+                .from(organisationMembershipTable)
+                .innerJoin(
+                    organisationTable,
+                    eq(
+                        organisationMembershipTable.organisationId,
+                        organisationTable.id
+                    )
+                )
+                .innerJoin(
+                    userTable,
+                    eq(organisationMembershipTable.userId, userTable.id)
+                )
+                .where(eq(organisationMembershipTable.id, id))
         );
     }
 }

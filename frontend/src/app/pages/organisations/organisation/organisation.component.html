@@ -72,6 +72,13 @@
                                         @if (org.userRole === 'admin') {
                                             <select
                                                 class="form-select form-select-sm"
+                                                [ngModel]="member.role"
+                                                (ngModelChange)="
+                                                    updateMembershipRole(
+                                                        member.id,
+                                                        $event
+                                                    )
+                                                "
                                             >
                                                 @for (
                                                     role of organisationMembershipRoleAllowedValues;

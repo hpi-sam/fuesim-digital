@@ -6,6 +6,8 @@ import {
     patchOrganisationRequestDataSchema,
     postOrganisationRequestDataSchema,
     postOrganisationInviteLinkResponseDataSchema,
+    organisationMembershipIdSchema,
+    patchOrganisationMembershipRequestDataSchema,
 } from 'fuesim-digital-shared';
 import { Router } from 'express';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
@@ -80,11 +82,27 @@ export function createOrganisationRouter(
                     req.session!
                 );
 
-            console.log(inviteLink);
-
             res.status(201).send(
                 postOrganisationInviteLinkResponseDataSchema.encode(inviteLink)
             );
+        });
+
+    router
+        .route('/memberships/:id')
+        .all(isAuthenticatedMiddleware)
+        .patch(async (req, res) => {
+            const id = organisationMembershipIdSchema.parse(req.params.id);
+            const { role } = patchOrganisationMembershipRequestDataSchema.parse(
+                req.body
+            );
+
+            await organisationService.updateOrganisationMembershipRole(
+                id,
+                req.session!,
+                role
+            );
+
+            res.send();
         });
 
     router

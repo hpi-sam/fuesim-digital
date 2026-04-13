@@ -120,7 +120,38 @@ export class OrganisationService {
         }
         return {
             ...inviteLink,
-            inviteLink: `${Config.httpFrontendUrl}/organisations/invite/${inviteLink.token}`,
+            inviteLink: `${Config.httpFrontendUrl}/organisations/join/${inviteLink.token}`,
         };
+    }
+
+    public async joinOrganisationWithInviteLink(
+        token: string,
+        session: SessionInformation
+    ) {
+        const data =
+            await this.organisationRepository.getOrganisationByInviteLink(
+                token
+            );
+        if (!data) {
+            throw new NotFoundError();
+        }
+        if (data.organisation_invite_link.expirationDate < new Date()) {
+            throw new ApiError('Dieser Einladungslink ist leider abgelaufen.');
+        }
+        if (
+            await this.organisationRepository.isMemberOfOrganisationById(
+                data.organisation.id,
+                session.user.id
+            )
+        ) {
+            throw new ApiError(
+                'Sie sind bereits Mitglied dieser Organisation.'
+            );
+        }
+        await this.organisationRepository.addMemberToOrganisation(
+            data.organisation.id,
+            session.user.id
+        );
+        return data.organisation;
     }
 }

@@ -176,4 +176,20 @@ export class OrganisationRepository extends BaseRepository {
                 .returning()
         );
     }
+
+    public async getOrganisationByInviteLink(token: string) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .select()
+                .from(organisationInviteLinkTable)
+                .innerJoin(
+                    organisationTable,
+                    eq(
+                        organisationInviteLinkTable.organisationId,
+                        organisationTable.id
+                    )
+                )
+                .where(eq(organisationInviteLinkTable.token, token))
+        );
+    }
 }

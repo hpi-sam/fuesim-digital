@@ -174,14 +174,13 @@ export class OrganisationService {
         }
     }
 
-    public async updateOrganisationMembershipRole(
+    public async updateMembershipRole(
         id: OrganisationMembershipId,
         session: SessionInformation,
         newRole: OrganisationMembershipRole
     ) {
         const membership =
             await this.organisationRepository.getOrganisationMembershipById(id);
-        console.log(membership);
         if (!membership) {
             throw new NotFoundError();
         }
@@ -202,5 +201,34 @@ export class OrganisationService {
             );
         }
         await this.organisationRepository.updateMembershipRole(id, newRole);
+    }
+
+    public async deleteMembership(
+        id: OrganisationMembershipId,
+        session: SessionInformation
+    ) {
+        const membership =
+            await this.organisationRepository.getOrganisationMembershipById(id);
+        if (!membership) {
+            throw new NotFoundError();
+        }
+        if (
+            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                membership.organisation.id,
+                session.user.id,
+                ['admin']
+            ))
+        ) {
+            throw new PermissionDeniedError();
+        }
+
+        if (membership.organisation_membership.role === 'admin') {
+            await this.ensureAtLeastOneAdmin(
+                membership.organisation.id,
+                membership.users.id
+            );
+        }
+
+        await this.organisationRepository.deleteMembership(id);
     }
 }

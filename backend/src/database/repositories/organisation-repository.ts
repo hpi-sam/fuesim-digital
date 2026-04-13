@@ -237,4 +237,10 @@ export class OrganisationRepository extends BaseRepository {
                 .where(eq(organisationMembershipTable.id, id))
         );
     }
+
+    public async deleteMembership(id: OrganisationMembershipId) {
+        return this.databaseConnection
+            .delete(organisationMembershipTable)
+            .where(eq(organisationMembershipTable.id, id));
+    }
 }

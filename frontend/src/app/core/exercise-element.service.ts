@@ -15,6 +15,8 @@ import {
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MarketplaceSelectCollectionModalComponent } from '../pages/exercises/exercise/shared/marketplace-tab/marketplace-select-collection-modal/marketplace-select-collection-modal.component';
 
 export interface CollectionSubscriptionData {
     collection: CollectionDto;
@@ -28,6 +30,7 @@ export interface CollectionSubscriptionData {
 export class CollectionService {
     private readonly httpClient = inject(HttpClient);
     private readonly messageService = inject(MessageService);
+    private readonly ngbModalService = inject(NgbModal);
 
     public readonly ENDPOINT = `${httpOrigin}/api/collections`;
     private readonly _collectionSubscriptions = new Map<
@@ -174,12 +177,16 @@ export class CollectionService {
     }
 
     public async getLatestCollectionVersionByEntityId(
-        entityId: CollectionEntityId
+        entityId: CollectionEntityId,
+        opts: { allowDraftState: boolean }
     ) {
         const data = await lastValueFrom(
             this.httpClient.get<
                 typeof Marketplace.Collection.GetByEntityId.Response
-            >(`${this.ENDPOINT}/${entityId}`)
+            >(
+                `${this.ENDPOINT}/${entityId}?allowdraftstate=` +
+                    opts.allowDraftState
+            )
         );
 
         return data.result;
@@ -512,7 +519,8 @@ export class CollectionService {
     > {
         const latestCollection =
             await this.getLatestCollectionVersionByEntityId(
-                collection.entityId
+                collection.entityId,
+                { allowDraftState: false }
             );
         const currentCollection = await this.getCollectionVersion(collection);
 

@@ -35,6 +35,7 @@ export const collectionDtoSchema = z.object({
     visibility: collectionVisibilitySchema,
     draftState: z.boolean(),
     archived: z.boolean(),
+    elementCount: z.number(),
 });
 
 export type CollectionDto = z.infer<typeof collectionDtoSchema>;

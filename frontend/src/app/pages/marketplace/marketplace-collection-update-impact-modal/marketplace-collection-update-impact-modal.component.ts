@@ -18,6 +18,7 @@ import {
 import { VersionedElementFormComponent } from '../editor-modals/versioned-element-form/versioned-element-form.component';
 import { VersionedElementModalData } from '../editor-modals/base-versioned-element-submodal';
 import { VersionedElementDisplayNamePipe } from '../../../shared/pipes/versioned-element-type-display-name.pipe';
+import { Subject } from 'rxjs';
 
 @Component({
     styleUrl: './marketplace-collection-update-impact-modal.component.scss',
@@ -31,6 +32,7 @@ export class CollectionUpgradeImpactModalComponent {
     public changes!: ChangedElementDto[];
     public collectionElements!: ElementDto[];
     public changeDependencies!: ChangeDependencies;
+    public readonly confirmationResult$ = new Subject<boolean | null>();
 
     public readonly selectedChange = signal<{
         change: ChangedElementDto;
@@ -80,7 +82,9 @@ export class CollectionUpgradeImpactModalComponent {
         this.selectedView.set(newView ? 'new' : 'old');
     }
 
-    public close() {
+    public close(confirmed: boolean | null = null) {
+        this.confirmationResult$.next(confirmed);
+        this.confirmationResult$.complete();
         this.activeModal.close();
     }
 }

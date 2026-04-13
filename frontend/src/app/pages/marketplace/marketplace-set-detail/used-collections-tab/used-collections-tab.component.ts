@@ -1,43 +1,30 @@
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { Component, computed, inject, input, resource } from '@angular/core';
-import { NgbDropdownModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import {
-    checkCollectionRole,
-    CollectionVersionId,
-} from 'fuesim-digital-shared';
-import { ElementCardComponent } from '../../element-card/element-card.component';
+    NgbDropdownModule,
+    NgbModal,
+    NgbNavModule,
+} from '@ng-bootstrap/ng-bootstrap';
+import { checkCollectionRole } from 'fuesim-digital-shared';
 import {
     CollectionService,
     CollectionSubscriptionData,
 } from '../../../../core/exercise-element.service';
 import { UsedCollectionItemComponent } from './used-collection-item/used-collection-item.component';
+import { openSelectCollectionModal } from '../../../exercises/exercise/shared/marketplace-tab/marketplace-select-collection-modal/select-collection-modal';
 
 @Component({
     selector: 'app-used-collections-tab',
-    imports: [
-        ElementCardComponent,
-        UsedCollectionItemComponent,
-        NgbDropdownModule,
-        NgbNavModule,
-        AsyncPipe,
-        JsonPipe,
-    ],
+    imports: [UsedCollectionItemComponent],
     templateUrl: './used-collections-tab.component.html',
     styleUrl: './used-collections-tab.component.scss',
 })
 export class UsedCollectionsTabComponent {
     private readonly collectionService = inject(CollectionService);
+    private readonly ngbModalService = inject(NgbModal);
 
     public readonly collectionData =
         input.required<CollectionSubscriptionData>();
-
-    public availableCollections = resource({
-        loader: async () =>
-            this.collectionService.getMyCollections({
-                includeDraftState: false,
-                archived: false,
-            }),
-    });
 
     public readonly alreadyImportedCollectionVersions = computed(() =>
         this.collectionData().objects.transitive.map(
@@ -47,12 +34,20 @@ export class UsedCollectionsTabComponent {
 
     public readonly checkRole = checkCollectionRole.bind(this);
 
-    public async importFromCollection(
-        collectionVersionId: CollectionVersionId
-    ) {
+    public async openCollectionSelectionModal() {
+        const result = await openSelectCollectionModal(this.ngbModalService, {
+            disallowedCollections: [
+                this.collectionData().collection.entityId,
+                ...this.collectionData().objects.transitive.map(
+                    (m) => m.collection.entityId
+                ),
+            ],
+            showDependencyElements: false,
+        });
+        if (!result) return;
         await this.collectionService.addCollectionDependency({
             importTo: this.collectionData().collection.entityId,
-            importFrom: collectionVersionId,
+            importFrom: result.versionId,
         });
     }
 }

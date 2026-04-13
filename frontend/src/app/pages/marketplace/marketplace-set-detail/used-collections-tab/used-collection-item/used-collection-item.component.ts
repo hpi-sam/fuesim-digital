@@ -20,6 +20,10 @@ import { CollectionService } from '../../../../../core/exercise-element.service'
 import { ElementCardComponent } from '../../../element-card/element-card.component';
 import { CollectionUpgradeImpactModalComponent } from '../../../marketplace-collection-update-impact-modal/marketplace-collection-update-impact-modal.component';
 import { LoadingModalService } from '../../../../../core/loading-modal/loading-modal.service';
+import { CollectionElementsListComponent } from '../../collection-elements-list/collection-elements-list.component';
+import { RouterLink } from '@angular/router';
+import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-used-collection-item',
@@ -29,6 +33,8 @@ import { LoadingModalService } from '../../../../../core/loading-modal/loading-m
         NgbNavModule,
         AsyncPipe,
         JsonPipe,
+        CollectionElementsListComponent,
+        RouterLink,
     ],
     templateUrl: './used-collection-item.component.html',
     styleUrl: './used-collection-item.component.scss',
@@ -37,6 +43,7 @@ export class UsedCollectionItemComponent {
     private readonly collectionService = inject(CollectionService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly loadingModalService = inject(LoadingModalService);
+    private readonly confirmationService = inject(ConfirmationModalService);
 
     public readonly currentCollectionEntityId =
         input.required<CollectionEntityId>();
@@ -127,16 +134,27 @@ export class UsedCollectionItemComponent {
         ];
         modalInstance.changeDependencies = changeDependencies;
 
-        /*const newVersion = value.latestVersion;
+        const result = await firstValueFrom(modalInstance.confirmationResult$);
+        if (!result) return;
+
+        const newVersion = value.latestVersion;
         await this.collectionService.addCollectionDependency({
             importTo: this.currentCollectionEntityId(),
             importFrom: newVersion.versionId,
-        });*/
+        });
     }
 
     public async removeCollectionDependency(
         collectionVersionId: CollectionVersionId
     ) {
+        const confirmation = await this.confirmationService.confirm({
+            title: 'Sammlung als Abhängigkeit entfernen',
+            description: `Möchten Sie die Sammlung "${this.dependency().collection.title}" wirklich als Abhängigkeit entfernen? Sie verlieren dadurch innerhalb der aktuellen Sammlung, Zugriff auf diese Inhalte.`,
+            confirmationButtonText: 'Abhängigkeit entfernen',
+        });
+
+        if (!confirmation) return;
+
         await this.collectionService.removeCollectionDependency({
             removeFrom: this.currentCollectionEntityId(),
             removeVersionId: collectionVersionId,

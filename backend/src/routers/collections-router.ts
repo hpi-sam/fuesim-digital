@@ -12,6 +12,7 @@ import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { NotFoundError } from '../utils/http.js';
 import type { CollectionService } from '../database/services/collection-service.js';
 import { CollectionEventSender } from '../collections/collection-event-sender.js';
+import { z } from 'zod';
 
 export function createCollectionsRouter(collectionService: CollectionService) {
     const router = Router();
@@ -198,9 +199,15 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     viewerRouter.get('/:collectionEntityId', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 
+        const allowDraftState = z.coerce
+            .boolean()
+            .optional()
+            .default(false)
+            .parse(req.query['allowdraftstate']);
+
         const result = await collectionService.getLatestCollectionById(
             collectionEntityId,
-            { draftState: true }
+            { draftState: allowDraftState }
         );
         if (!result) {
             throw new NotFoundError();

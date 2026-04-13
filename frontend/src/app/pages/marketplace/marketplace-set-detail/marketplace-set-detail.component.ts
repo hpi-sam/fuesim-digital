@@ -84,6 +84,8 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
     }
 
     constructor() {
+        //TODO: @Quixelation remove this before prod
+        this.router.routeReuseStrategy.shouldReuseRoute = () => false;
         this.activatedRoute.queryParamMap
             .pipe(takeUntil(this.destroy$))
             .subscribe((params) => {

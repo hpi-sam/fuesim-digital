@@ -155,7 +155,10 @@
     </div>
 </div>
 <div class="modal-footer d-flex justify-content-between">
-    <button type="button" class="btn btn-outline-danger" (click)="close()">
+    <button type="button" class="btn btn-outline-danger" (click)="close(false)">
         Abbrechen
+    </button>
+    <button type="button" class="btn btn-primary" (click)="close(true)">
+        Änderungen annehmen und Sammlung aktualisieren
     </button>
 </div>

@@ -4,6 +4,8 @@ import type { ExerciseState } from '../state.js';
 import type { UUID } from '../utils/uuid.js';
 import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { Migration } from './migration-functions.js';
+import { Writeable } from 'zod/v3';
+import { Vehicle } from '../models/vehicle.js';
 
 /**
  * We prevent users to perform some actions on vehicles to enforce the connection between personnel, material and vehicles.
@@ -19,7 +21,7 @@ export const removeIllegalVehicleMovementActions22: Migration = {
                     intermediaryState,
                     'vehicle',
                     vehicleId
-                );
+                ) as WritableDraft<Vehicle>;
                 return isCompletelyLoaded(
                     intermediaryState as WritableDraft<ExerciseState>,
                     vehicle
@@ -35,7 +37,7 @@ export const removeIllegalVehicleMovementActions22: Migration = {
                         intermediaryState,
                         'vehicle',
                         elementToBeAddedId
-                    );
+                    ) as WritableDraft<Vehicle>;
                     return isCompletelyLoaded(
                         intermediaryState as WritableDraft<ExerciseState>,
                         vehicle

@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import type { VersionedElementContent } from './utils/versioned-element-content.js';
+import { collectionEntityIdSchema } from './index.js';
 
 export const elementEntityIdSchema = z
     .string()

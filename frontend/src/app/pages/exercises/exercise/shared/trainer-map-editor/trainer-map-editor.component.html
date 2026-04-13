@@ -7,7 +7,7 @@
             class="card col-3 p-0 rounded-0 rounded-end"
             style="min-width: 400px"
         >
-            <div class="card-header text-center">
+            <div class="card-header">
                 <h5 class="mb-0 d-flex align-items-center">
                     Editor
                     <span class="ms-auto">
@@ -322,6 +322,17 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card-header">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        Eigene Übungselemente
+                    </h5>
+                </div>
+
+                <div ngbAccordionItem="marketplace">
+                    <app-marketplace-tab />
+                </div>
+
                 <div ngbAccordionItem="vehicles">
                     <h5
                         ngbAccordionHeader
@@ -359,7 +370,6 @@
                                             [imageUrl]="
                                                 vehicleTemplate.image.url
                                             "
-                                            [enableEditButton]="true"
                                             [title]="
                                                 vehicleTemplate.vehicleType
                                             "

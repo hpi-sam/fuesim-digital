@@ -1,27 +1,10 @@
-<div ngbDropdown placement="top-end" class="d-inline-block">
-    <button type="button" class="btn btn-outline-primary" ngbDropdownToggle>
-        @if (selectedCollection(); as selectedCollection) {
-            {{
-                selectedCollectionData()?.title ?? selectedCollection.versionId
-            }}
-        } @else {
-            Sammlung auswählen
-        }
+<div ngbDropdown placement="top-end" class="d-inline-block w-100 px-2 mb-2">
+    <button
+        (click)="openCollectionSelectDialog()"
+        class="btn btn-outline-primary btn-sm my-2"
+    >
+        Neue Sammlung hinzufügen
     </button>
-    <div ngbDropdownMenu aria-labelledby="dropdownBasic2">
-        @for (
-            availableCollection of availableCollections();
-            track availableCollection.versionId
-        ) {
-            <button
-                ngbDropdownItem
-                (click)="selectCollection(availableCollection)"
-            >
-                {{ availableCollection.title }} (Version
-                {{ availableCollection.version }})
-            </button>
-        }
-    </div>
     @if (updateAvailable()?.newerVersionAvailable) {
         <div class="alert alert-primary d-flex flex-column gap-2 mt-2">
             <small>
@@ -37,28 +20,13 @@
             </button>
         </div>
     }
-
-    @for (element of elementsOfSelectedCollection(); track element.versionId) {
-        @if (element.content.type === 'vehicleTemplate') {
-            <app-map-editor-card
-                (elementMousedown)="
-                    dragElementService.onMouseDown(
-                        $event,
-                        {
-                            type: 'vehicle',
-                            template: element.content,
-                        },
-                        {
-                            versionId: element.versionId,
-                            entityId: element.entityId,
-                        }
-                    )
-                "
-                [title]="element.content.name"
-                [imageUrl]="element.content.image.url"
-            />
-        } @else {
-            <app-map-editor-card [title]="element.content.name" />
+    <ul class="list-group">
+        @for (collection of selectedCollections(); track collection) {
+            <li class="list-group-item">
+                <app-marketplace-collection-item-component
+                    [collection]="collection"
+                />
+            </li>
         }
-    }
+    </ul>
 </div>

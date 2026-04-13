@@ -19,6 +19,10 @@ import {
     imagePropertiesSchema,
 } from '../../models/utils/image-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import {
+    type ElementEntityId,
+    elementEntityIdSchema,
+} from '../../models/versioned-elements.js';
 
 export class AddVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Add vehicleTemplate')
@@ -56,12 +60,27 @@ export class EditVehicleTemplateAction implements Action {
     public readonly personnelTemplateIds!: readonly UUID[];
 }
 
+/**
+ * @deprectated Use `[VehicleTemplate] Delete vehicleTemplate by entityId`
+ *
+ * We are keeping this version to stay backwards compatible
+ * with old migrations etc
+ */
 export class DeleteVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Delete vehicleTemplate')
     public readonly type = '[VehicleTemplate] Delete vehicleTemplate';
 
     @IsUUID(4, uuidValidationOptions)
     public readonly id!: UUID;
+}
+
+export class DeleteVehicleTemplateByEntityIdAction implements Action {
+    @IsValue('[VehicleTemplate] Delete vehicleTemplate by entityId')
+    public readonly type =
+        '[VehicleTemplate] Delete vehicleTemplate by entityId';
+
+    @IsZodSchema(elementEntityIdSchema)
+    public readonly entityId!: ElementEntityId;
 }
 
 export namespace VehicleTemplateActionReducers {
@@ -110,6 +129,12 @@ export namespace VehicleTemplateActionReducers {
             rights: 'trainer',
         };
 
+    /**
+     * @deprectated Use `[VehicleTemplate] Delete vehicleTemplate by entityId`
+     *
+     * We are keeping this version to stay backwards compatible
+     * with old migrations etc
+     */
     export const deleteVehicleTemplate: ActionReducer<DeleteVehicleTemplateAction> =
         {
             action: DeleteVehicleTemplateAction,
@@ -123,6 +148,35 @@ export namespace VehicleTemplateActionReducers {
                     alarmGroup.alarmGroupVehicles = Object.fromEntries(
                         Object.entries(alarmGroup.alarmGroupVehicles).filter(
                             ([_, vehicle]) => vehicle.vehicleTemplateId !== id
+                        )
+                    );
+                }
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const deleteVehicleTemplateByEntityId: ActionReducer<DeleteVehicleTemplateByEntityIdAction> =
+        {
+            action: DeleteVehicleTemplateByEntityIdAction,
+            reducer: (draftState, { entityId }) => {
+                const vehicleTemplate = Object.values(
+                    draftState.vehicleTemplates
+                ).find((template) => template.entityId === entityId);
+                if (!vehicleTemplate) {
+                    throw new ReducerError(
+                        `VehicleTemplate with entityId ${entityId} does not exist`
+                    );
+                }
+                delete draftState.vehicleTemplates[vehicleTemplate.id];
+                // Delete this template from every alarm group
+                for (const alarmGroup of Object.values(
+                    draftState.alarmGroups
+                )) {
+                    alarmGroup.alarmGroupVehicles = Object.fromEntries(
+                        Object.entries(alarmGroup.alarmGroupVehicles).filter(
+                            ([_, vehicle]) =>
+                                vehicle.vehicleTemplateId !== vehicleTemplate.id
                         )
                     );
                 }

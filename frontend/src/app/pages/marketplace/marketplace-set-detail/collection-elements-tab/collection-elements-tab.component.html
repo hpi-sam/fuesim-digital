@@ -36,26 +36,7 @@
         </div>
     }
 </div>
-@for (type of visibleElementTypesOrder; track type) {
-    @let elementsOfType = elementsGroupedByType()[type] ?? [];
-    @if (elementsOfType.length > 0) {
-        <h4>
-            {{ (type | versionedElementDisplayName).plural }}
-        </h4>
-        <div class="container mb-3">
-            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-2">
-                @for (
-                    exerciseObject of elementsOfType;
-                    track exerciseObject.versionId
-                ) {
-                    <app-element-card
-                        [element]="exerciseObject"
-                        [availableElements]="availableElements()"
-                        [collection]="collectionData().collection"
-                        mode="edit"
-                    />
-                }
-            </div>
-        </div>
-    }
-}
+<app-collection-elements-list
+    [collection]="collectionData().collection"
+    [collectionElements]="collectionData().objects.direct"
+/>

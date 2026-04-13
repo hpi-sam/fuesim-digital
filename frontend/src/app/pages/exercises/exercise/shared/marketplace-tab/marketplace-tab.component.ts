@@ -7,13 +7,13 @@ import {
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DragElementService } from '../core/drag-element.service';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../core/exercise.service';
 import { AppState } from '../../../../../state/app.state';
 import {
-    selectSelectedCollection,
+    selectSelectedCollections,
     selectVehicles,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
@@ -24,10 +24,18 @@ import {
     EditableElementChangeImpact,
     InExerciseElement,
 } from '../change-impact-modal/change-impact-types';
+import { MarketplaceColletionItemComponent } from './marketplace-collection-item/marketplace-collection-item.component';
+import { MarketplaceSelectCollectionModalComponent } from './marketplace-select-collection-modal/marketplace-select-collection-modal.component';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { openSelectCollectionModal } from './marketplace-select-collection-modal/select-collection-modal';
 
 @Component({
     selector: 'app-marketplace-tab',
-    imports: [MapEditorCardComponent],
+    imports: [
+        MapEditorCardComponent,
+        NgbDropdownModule,
+        MarketplaceColletionItemComponent,
+    ],
     templateUrl: './marketplace-tab.component.html',
     styleUrl: './marketplace-tab.component.scss',
 })
@@ -42,47 +50,30 @@ export class MarketplaceTabComponent {
         ReturnType<typeof this.collectionService.checkNewerVersionAvailable>
     > | null>(null);
 
-    constructor() {
-        this.collectionService
-            .getMyCollections({ includeDraftState: false })
-            .then((collections) => {
-                this.availableCollections.set(collections);
-            });
-        effect(() => {
-            const selectedCollection = this.selectedCollection();
-            if (selectedCollection) {
-                this.updateCollectionElementSubscription(selectedCollection);
-                this.collectionService
-                    .getCollectionVersion(selectedCollection)
-                    .then((collection) => {
-                        this.selectedCollectionData.set(collection);
-                    });
-            }
-        });
-    }
-
-    public selectedCollection = this.store.selectSignal(
-        selectSelectedCollection
+    public selectedCollections = this.store.selectSignal(
+        selectSelectedCollections
     );
-    public readonly selectedCollectionData = signal<CollectionDto | null>(null);
-    public readonly elementsOfSelectedCollection = signal<ElementDto[]>([]);
-    public collectionSubscription: (() => void) | null = null;
 
-    private async updateCollectionElementSubscription(
-        collection: VersionedCollectionPartial
-    ) {
-        //TODO: @Quixelation: i stripped the collectiondata fectching logic here - put it back, but the new one without the callback
-        const collectionUpdateAvailable =
-            await this.collectionService.checkNewerVersionAvailable(collection);
-        this.updateAvailable.set(collectionUpdateAvailable);
-    }
+    public async openCollectionSelectDialog() {
+        const result = await openSelectCollectionModal(this.ngbModalService, {
+            showDependencyElements: true,
+            disallowedCollections: this.selectedCollections().map(
+                (e) => e.entityId
+            ),
+        });
+        if (result === null) return;
 
-    public async selectCollection(collection: CollectionDto) {
+        const elements =
+            await this.collectionService.getElementsOfCollectionVersion(result);
         await this.exerciseService.proposeAction({
-            type: '[Collection] Set Exercise Collection',
+            type: '[Collection] Add Collection',
+            elements: [
+                ...elements.direct,
+                ...elements.transitive.map((t) => t.elements).flat(),
+            ],
             collectionVersion: {
-                versionId: collection.versionId,
-                entityId: collection.entityId,
+                versionId: result.versionId,
+                entityId: result.entityId,
             },
         });
     }
@@ -94,7 +85,7 @@ export class MarketplaceTabComponent {
             this.store
         );
 
-        const selectedCollection = this.selectedCollection();
+        const selectedCollection = this.selectedCollections();
         if (selectedCollection === null) {
             console.warn(
                 'No collection selected, cannot calculate change impacts of upgrading collection version.'
@@ -115,7 +106,7 @@ export class MarketplaceTabComponent {
                 newerCollectionVersionAvailable.latestVersion
             );
 
-        const changeImpacts = await this.calcChangeImpact({
+        /*const changeImpacts = await this.calcChangeImpact({
             inExercise: Object.values(allExerciseVehicles),
             new: newerCollection.direct,
             // TODO: this is not always correct - actually fetch the data here
@@ -132,6 +123,7 @@ export class MarketplaceTabComponent {
         modal.componentInstance.changes =
             changeImpacts satisfies ChangeImpact[];
         modal.componentInstance.newCollectionElements = newerCollection.direct;
+        */
     }
 
     private async calcChangeImpact(data: {

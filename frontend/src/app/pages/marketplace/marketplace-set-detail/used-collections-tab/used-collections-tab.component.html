@@ -1,69 +1,21 @@
 @if (checkRole(collectionData().ownRole).isAtLeast('editor')) {
-    <div ngbDropdown class="mb-3">
-        <button
-            type="button"
-            class="btn btn-outline-primary d-flex flex-row align-items-center ms-auto"
-            ngbDropdownToggle
-        >
-            <i class="bi bi-folder-symlink me-2"></i>
-            <span>Weitere Sammlung verwenden</span>
-            @if (availableCollections.isLoading()) {
-                <div
-                    class="spinner-border spinner-border-sm text-primary"
-                    role="status"
-                >
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            }
-        </button>
-        <div ngbDropdownMenu>
-            @for (
-                availableCollection of availableCollections.value();
-                track availableCollection.versionId
-            ) {
-                @if (
-                    availableCollection.entityId ===
-                    collectionData().collection.entityId
-                ) {
-                    <span class="dropdown-item-text text-muted">
-                        {{ availableCollection.title }} (aktuelle Sammlung -
-                        nicht auswählbar)
-                    </span>
-                } @else if (
-                    alreadyImportedCollectionVersions().includes(
-                        availableCollection.versionId
-                    )
-                ) {
-                    <span class="dropdown-item-text text-muted">
-                        {{ availableCollection.title }} (bereits verwendet -
-                        nicht auswählbar)
-                    </span>
-                } @else {
-                    <button
-                        ngbDropdownItem
-                        (click)="
-                            importFromCollection(availableCollection.versionId)
-                        "
-                    >
-                        {{ availableCollection.title }}
-                    </button>
-                }
-            }
-            @if ((availableCollections.value()?.length ?? 0) === 0) {
-                <span class="dropdown-item-text text-muted">
-                    Keine weiteren Sammlungen verfügbar
-                </span>
-            }
-        </div>
-    </div>
+    <button
+        type="button"
+        class="btn btn-outline-primary d-flex flex-row align-items-center ms-auto mb-3"
+        (click)="openCollectionSelectionModal()"
+    >
+        <i class="bi bi-folder-symlink me-2"></i>
+        <span>Weitere Sammlung verwenden</span>
+    </button>
 }
-@for (
-    dependency of collectionData().objects.transitive;
-    track dependency.collection.versionId
-) {
-    <app-used-collection-item
-        [dependency]="dependency"
-        [currentCollectionEntityId]="collectionData().collection.entityId"
-    />
-    <hr />
-}
+<div class="d-flex flex-column gap-3">
+    @for (
+        dependency of collectionData().objects.transitive;
+        track dependency.collection.versionId
+    ) {
+        <app-used-collection-item
+            [dependency]="dependency"
+            [currentCollectionEntityId]="collectionData().collection.entityId"
+        />
+    }
+</div>

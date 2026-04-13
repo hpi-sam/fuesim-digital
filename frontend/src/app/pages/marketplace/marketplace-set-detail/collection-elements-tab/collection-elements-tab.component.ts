@@ -4,42 +4,28 @@ import {
     CollectionSubscriptionData,
 } from '../../../../core/exercise-element.service';
 import {
-    AlarmGroup,
     checkCollectionRole,
-    ElementDto,
     ExerciseState,
-    isParticipantKey,
     migratePartialExport,
     PartialExport,
     ParticipantKey,
     StateExport,
     validateExerciseExport,
-    VehicleTemplate,
-    vehicleTemplateSchema,
     VersionedElementContent,
-    versionedElementContentSchema,
 } from 'fuesim-digital-shared';
-import { VersionedElementDisplayNamePipe } from '../../../../shared/pipes/versioned-element-type-display-name.pipe';
 import { CreatingVersionedElementModalData } from '../../editor-modals/base-versioned-element-submodal';
 import { VersionedElementModalComponent } from '../../editor-modals/versioned-element-modal/versioned-element-modal.component';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ElementCardComponent } from '../../element-card/element-card.component';
 import { FileInputDirective } from '../../../../shared/directives/file-input.directive';
-import { selectExerciseState } from '../../../../state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
-import { openPartialImportOverwriteModal } from '../../../exercises/exercise/shared/partial-import/open-partial-import-overwrite-modal';
 import { MessageService } from '../../../../core/messages/message.service';
-import z, { ZodType } from 'zod';
-import { JsonPipe } from '@angular/common';
+import { CollectionElementsListComponent } from '../collection-elements-list/collection-elements-list.component';
 
 @Component({
     selector: 'app-collection-elements-tab',
     imports: [
-        VersionedElementDisplayNamePipe,
-        ElementCardComponent,
-        JsonPipe,
         NgbDropdownModule,
         FileInputDirective,
+        CollectionElementsListComponent,
     ],
     styleUrl: './collection-elements-tab.component.scss',
     templateUrl: './collection-elements-tab.component.html',
@@ -51,19 +37,6 @@ export class CollectionElementsTabComponent {
 
     public readonly collectionData =
         input.required<CollectionSubscriptionData>();
-
-    public readonly elementsGroupedByType = computed(() => {
-        return this.collectionData().objects.direct.reduce<{
-            [type: string]: ElementDto[];
-        }>((acc, element) => {
-            const type = element.content.type;
-            if (!acc[type]) {
-                acc[type] = [];
-            }
-            acc[type].push(element);
-            return acc;
-        }, {});
-    });
 
     public readonly availableElements = computed(() => {
         const selectedCollectionData = this.collectionData();
@@ -80,13 +53,6 @@ export class CollectionElementsTabComponent {
     public readonly importingElements = signal<boolean>(false);
 
     public readonly checkRole = checkCollectionRole.bind(this);
-
-    // This array defined the order in which the element types are displayed in the UI.
-    // Types not included in this array will NOT be displayed in the UI
-    public visibleElementTypesOrder: VersionedElementContent['type'][] = [
-        'vehicleTemplate',
-        'alarmGroup',
-    ];
 
     private createElementHelper(type: VersionedElementContent['type']) {
         const selectedCollectionData = this.collectionData();

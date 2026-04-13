@@ -13,9 +13,10 @@ import {
 } from './utils/occupations/exercise-occupation.js';
 import { operationalAssignmentSchema } from './operational-section.js';
 import { versionedElementPartialSchema } from './index.js';
+import { versionedElementModel } from './versioned-element-model.js';
 
 export const vehicleSchema = z.strictObject({
-    ...versionedElementPartialSchema.partial().shape,
+    ...versionedElementModel.partial().shape,
     id: uuidSchema,
     type: z.literal('vehicle'),
     vehicleType: z.string(),

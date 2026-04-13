@@ -266,4 +266,13 @@ export class ApiService {
             )
         ).then(postOrganisationInviteLinkResponseDataSchema.parse);
     }
+
+    public async joinOrganisation(token: string) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/organisations/join/${token}`,
+                {}
+            )
+        ).then(getOrganisationResponseDataSchema.parse);
+    }
 }

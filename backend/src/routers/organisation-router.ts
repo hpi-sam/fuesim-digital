@@ -87,5 +87,20 @@ export function createOrganisationRouter(
             );
         });
 
+    router
+        .route('/join/:token')
+        .all(isAuthenticatedMiddleware)
+        .post(async (req, res) => {
+            const organisation =
+                await organisationService.joinOrganisationWithInviteLink(
+                    req.params.token,
+                    req.session!
+                );
+
+            res.status(200).send(
+                getOrganisationResponseDataSchema.encode(organisation)
+            );
+        });
+
     return router;
 }

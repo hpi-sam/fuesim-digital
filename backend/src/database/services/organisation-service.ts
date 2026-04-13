@@ -1,4 +1,8 @@
-import type { OrganisationId } from 'fuesim-digital-shared';
+import type {
+    OrganisationId,
+    OrganisationMembershipId,
+    OrganisationMembershipRole,
+} from 'fuesim-digital-shared';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
     ApiError,
@@ -153,5 +157,50 @@ export class OrganisationService {
             session.user.id
         );
         return data.organisation;
+    }
+
+    public async ensureAtLeastOneAdmin(
+        id: OrganisationId,
+        removedMember: string
+    ) {
+        const count = await this.organisationRepository.getAdminCountWithout(
+            id,
+            removedMember
+        );
+        if (!(count > 0)) {
+            throw new ApiError(
+                'Die Organisation braucht mindestens einen Administrator.'
+            );
+        }
+    }
+
+    public async updateOrganisationMembershipRole(
+        id: OrganisationMembershipId,
+        session: SessionInformation,
+        newRole: OrganisationMembershipRole
+    ) {
+        const membership =
+            await this.organisationRepository.getOrganisationMembershipById(id);
+        console.log(membership);
+        if (!membership) {
+            throw new NotFoundError();
+        }
+        if (
+            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                membership.organisation.id,
+                session.user.id,
+                ['admin']
+            ))
+        ) {
+            throw new PermissionDeniedError();
+        }
+
+        if (newRole !== 'admin') {
+            await this.ensureAtLeastOneAdmin(
+                membership.organisation.id,
+                membership.users.id
+            );
+        }
+        await this.organisationRepository.updateMembershipRole(id, newRole);
     }
 }

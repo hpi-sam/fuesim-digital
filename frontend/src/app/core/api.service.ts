@@ -29,6 +29,8 @@ import {
     OrganisationId,
     PatchOrganisationRequestData,
     postOrganisationInviteLinkResponseDataSchema,
+    OrganisationMembershipId,
+    OrganisationMembershipRole,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -274,5 +276,17 @@ export class ApiService {
                 {}
             )
         ).then(getOrganisationResponseDataSchema.parse);
+    }
+
+    public async updateOrganisationMembershipRole(
+        id: OrganisationMembershipId,
+        role: OrganisationMembershipRole
+    ) {
+        return lastValueFrom(
+            this.httpClient.patch(
+                `${httpOrigin}/api/organisations/memberships/${id}`,
+                { role }
+            )
+        );
     }
 }

@@ -93,3 +93,10 @@ export const postOrganisationInviteLinkResponseDataSchema = z.object({
 export type PostOrganisationInviteLinkResponseData = z.infer<
     typeof postOrganisationInviteLinkResponseDataSchema
 >;
+
+export const patchOrganisationMembershipRequestDataSchema = z.object({
+    role: organisationMembershipRoleSchema,
+});
+export type PatchOrganisationMembershipRequestData = z.infer<
+    typeof patchOrganisationMembershipRequestDataSchema
+>;

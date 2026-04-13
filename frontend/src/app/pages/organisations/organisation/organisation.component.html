@@ -112,9 +112,16 @@
                                     </div>
 
                                     <div class="col">
-                                        @if (org.userRole === 'admin') {
+                                        @if (
+                                            org.userRole === 'admin' &&
+                                            member.user.id !==
+                                                authService.authData().user!.id
+                                        ) {
                                             <button
                                                 class="btn btn-sm btn-danger float-end"
+                                                (click)="
+                                                    deleteMembership(member)
+                                                "
                                             >
                                                 Entfernen
                                             </button>

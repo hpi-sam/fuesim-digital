@@ -96,13 +96,18 @@ export function createOrganisationRouter(
                 req.body
             );
 
-            await organisationService.updateOrganisationMembershipRole(
+            await organisationService.updateMembershipRole(
                 id,
                 req.session!,
                 role
             );
 
             res.send();
+        })
+        .delete(async (req, res) => {
+            const id = organisationMembershipIdSchema.parse(req.params.id);
+            await organisationService.deleteMembership(id, req.session!);
+            res.status(204).send();
         });
 
     router

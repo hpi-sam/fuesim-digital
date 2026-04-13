@@ -71,6 +71,17 @@ export function createOrganisationRouter(
         });
 
     router
+        .route('/:id/leave')
+        .all(isAuthenticatedMiddleware)
+        .post(async (req, res) => {
+            const id = organisationIdSchema.parse(req.params.id);
+
+            await organisationService.leaveOrganisation(id, req.session!);
+
+            res.send();
+        });
+
+    router
         .route('/:id/invite_links')
         .all(isAuthenticatedMiddleware)
         .post(async (req, res) => {

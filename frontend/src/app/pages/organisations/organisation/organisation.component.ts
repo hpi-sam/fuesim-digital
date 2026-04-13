@@ -17,7 +17,7 @@ import {
     organisationMembershipRoleToGermanNameDictionary,
     PatchOrganisationRequestData,
 } from 'fuesim-digital-shared';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { QrCodeComponent } from 'ng-qrcode';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/api.service';
@@ -60,6 +60,7 @@ export class OrganisationComponent {
         ConfirmationModalService
     );
     readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
 
     organisationMembershipRoleToGermanNameDictionary =
         organisationMembershipRoleToGermanNameDictionary;
@@ -115,6 +116,22 @@ export class OrganisationComponent {
             color: 'success',
         });
         this.organisation.reload();
+    }
+
+    async leave() {
+        const deletionConfirmed = await this.confirmationModalService.confirm({
+            title: 'Organisation verlassen',
+            description: `Möchten Sie die Organisation ${this.organisation.value()!.name} wirklich verlassen? Sie haben danach keinen Zugriff mehr auf die dort gespeicherten Daten.`,
+        });
+        if (!deletionConfirmed) {
+            return;
+        }
+        await this.apiService.leaveOrganisation(this.organisation.value()!.id);
+        this.messageService.postMessage({
+            title: `Organisation ${this.organisation.value()!.name} erfolgreich verlassen`,
+            color: 'success',
+        });
+        this.router.navigate(['/organisations']);
     }
 
     constructor() {

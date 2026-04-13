@@ -297,4 +297,13 @@ export class ApiService {
             )
         );
     }
+
+    public async leaveOrganisation(id: OrganisationId) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/organisations/${id}/leave`,
+                {}
+            )
+        );
+    }
 }

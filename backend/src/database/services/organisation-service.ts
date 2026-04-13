@@ -231,4 +231,29 @@ export class OrganisationService {
 
         await this.organisationRepository.deleteMembership(id);
     }
+
+    public async leaveOrganisation(
+        id: OrganisationId,
+        session: SessionInformation
+    ) {
+        const membership =
+            await this.organisationRepository.getOrganisationMembershipByUser(
+                id,
+                session.user.id
+            );
+        if (!membership) {
+            throw new NotFoundError();
+        }
+
+        if (membership.organisation_membership.role === 'admin') {
+            await this.ensureAtLeastOneAdmin(
+                membership.organisation.id,
+                membership.users.id
+            );
+        }
+
+        await this.organisationRepository.deleteMembership(
+            membership.organisation_membership.id
+        );
+    }
 }

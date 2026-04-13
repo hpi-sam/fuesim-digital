@@ -125,6 +125,16 @@
                                             >
                                                 Entfernen
                                             </button>
+                                        } @else if (
+                                            member.user.id ===
+                                            authService.authData().user!.id
+                                        ) {
+                                            <button
+                                                class="btn btn-sm btn-danger float-end"
+                                                (click)="leave()"
+                                            >
+                                                Verlassen
+                                            </button>
                                         }
                                     </div>
                                 </div>
@@ -139,7 +149,23 @@
                     <i class="bi bi-gear me-1"></i>
                     Einstellungen
                 </a>
-                <ng-template ngbNavContent>Second content</ng-template>
+                <ng-template ngbNavContent>
+                    <div class="card border-danger mt-2">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title text-danger">
+                                    Organisation verlassen
+                                </h5>
+                                Wenn Sie die Organisation verlassen, haben Sie
+                                keinen Zugriff mehr auf die dort gespeicherten
+                                Daten.
+                            </div>
+                            <button class="btn btn-danger" (click)="leave()">
+                                Verlassen
+                            </button>
+                        </div>
+                    </div>
+                </ng-template>
             </ng-container>
         </nav>
         <div [ngbNavOutlet]="nav"></div>

@@ -17,7 +17,6 @@ import {
     newMapPositionAt,
     newNoPosition,
 } from '../utils/index.js';
-import { simulateAllTechnicalChallenges } from './state-machine.js';
 import { newTechnicalChallengeFromTemplate } from './technical-challenge-template.js';
 import assignPersonnelToTechnicalChallenge = TechnicalChallengeActionReducers.assignPersonnelToTechnicalChallenge;
 

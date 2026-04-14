@@ -1,7 +1,10 @@
 <div class="card">
     <div class="card-body">
         <h2 class="card-title h4 d-flex">
-            @if (organisation().userRole === 'admin') {
+            @if (
+                organisation().userRole === 'admin' &&
+                !organisation().personalOrganisationOf
+            ) {
                 <app-inline-text-editor
                     class="flex-grow-1"
                     [required]="true"
@@ -21,7 +24,11 @@
     </div>
     <ul class="list-group list-group-flush">
         <li class="list-group-item d-flex">
-            @if (organisation().userRole === 'admin') {
+            @if (organisation().personalOrganisationOf) {
+                <span class="badge bg-primary"
+                    ><i class="bi bi-house"></i> Persönliche Organisation</span
+                >
+            } @else if (organisation().userRole === 'admin') {
                 <app-inline-text-editor
                     class="flex-grow-1"
                     [value]="organisation().description"

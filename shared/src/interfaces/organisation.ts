@@ -32,6 +32,7 @@ export const getOrganisationResponseDataSchema = z.object({
     name: z.string(),
     description: z.string(),
     createdAt: stringToDate,
+    personalOrganisationOf: z.string().nullable(),
 });
 
 export type GetOrganisationResponseDataSchema = z.infer<

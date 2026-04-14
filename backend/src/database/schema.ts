@@ -77,14 +77,21 @@ export const sessionTable = pgTable('sessions', {
 });
 export type SessionEntry = InferSelectModel<typeof sessionTable>;
 
-export const organisationTable = pgTable('organisation', {
-    ...baseTable<OrganisationId>(),
-    name: varchar().notNull(),
-    description: text().notNull().default(''),
-    createdAt: timestamp({ withTimezone: true, mode: 'date' })
-        .notNull()
-        .defaultNow(),
-});
+export const organisationTable = pgTable(
+    'organisation',
+    {
+        ...baseTable<OrganisationId>(),
+        name: varchar().notNull(),
+        description: text().notNull().default(''),
+        createdAt: timestamp({ withTimezone: true, mode: 'date' })
+            .notNull()
+            .defaultNow(),
+        personalOrganisationOf: varchar().references(() => userTable.id, {
+            onDelete: 'cascade',
+        }),
+    },
+    (t) => [unique().on(t.personalOrganisationOf)]
+);
 export type OrganisationEntry = InferSelectModel<typeof organisationTable>;
 export type OrganisationInsert = InferInsertModel<typeof organisationTable>;
 

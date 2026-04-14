@@ -244,9 +244,11 @@ export function createTestEnvironment(): TestEnvironment {
             databaseService.databaseConnection
         );
 
+        organisationService = new OrganisationService(organisationRepository);
         authService = await new AuthService(
             userRepository,
-            sessionRepository
+            sessionRepository,
+            organisationService
         ).initialize({ skipOidcDiscovery: true });
         exerciseManagerService = new ExerciseManagerService(
             exerciseRepository,
@@ -257,7 +259,6 @@ export function createTestEnvironment(): TestEnvironment {
             exerciseManagerService,
             exerciseService
         );
-        organisationService = new OrganisationService(organisationRepository);
 
         const repositories: Repositories = {
             exerciseRepository,

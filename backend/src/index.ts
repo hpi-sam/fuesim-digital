@@ -81,7 +81,8 @@ async function main() {
     try {
         authService = await new AuthService(
             repositories.userRepository,
-            repositories.sessionRepository
+            repositories.sessionRepository,
+            organisationService
         ).initialize();
     } catch (e: unknown) {
         console.error('Error initializing AuthService:');
@@ -130,6 +131,8 @@ async function main() {
             }
             throw e;
         }
+
+        await authService.ensureAllUsers();
     }
 
     // eslint-disable-next-line no-new

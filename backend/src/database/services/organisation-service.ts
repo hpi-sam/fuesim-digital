@@ -12,6 +12,7 @@ import {
 import type { OrganisationRepository } from '../repositories/organisation-repository.js';
 import type { OrganisationInsert } from '../schema.js';
 import { Config } from '../../config.js';
+import type { OidcService } from '../../auth/oidc-service.js';
 
 export class OrganisationService {
     public constructor(
@@ -25,7 +26,7 @@ export class OrganisationService {
     }
 
     public async createOrganisation(
-        data: OrganisationInsert,
+        data: Omit<OrganisationInsert, 'personalOrganisationOf'>,
         session: SessionInformation
     ) {
         const organisation =
@@ -83,7 +84,8 @@ export class OrganisationService {
                 id,
                 session.user.id,
                 ['admin']
-            ))
+            )) ||
+            organisation.personalOrganisationOf
         ) {
             throw new PermissionDeniedError();
         }
@@ -111,7 +113,8 @@ export class OrganisationService {
                 id,
                 session.user.id,
                 ['admin']
-            ))
+            )) ||
+            organisation.personalOrganisationOf
         ) {
             throw new PermissionDeniedError();
         }
@@ -189,7 +192,8 @@ export class OrganisationService {
                 membership.organisation.id,
                 session.user.id,
                 ['admin']
-            ))
+            )) ||
+            membership.organisation.personalOrganisationOf
         ) {
             throw new PermissionDeniedError();
         }
@@ -217,7 +221,8 @@ export class OrganisationService {
                 membership.organisation.id,
                 session.user.id,
                 ['admin']
-            ))
+            )) ||
+            membership.organisation.personalOrganisationOf
         ) {
             throw new PermissionDeniedError();
         }
@@ -243,6 +248,10 @@ export class OrganisationService {
             );
         if (!membership) {
             throw new NotFoundError();
+        }
+
+        if (membership.organisation.personalOrganisationOf) {
+            throw new PermissionDeniedError();
         }
 
         if (membership.organisation_membership.role === 'admin') {
@@ -271,12 +280,33 @@ export class OrganisationService {
                 id,
                 session.user.id,
                 ['admin']
-            ))
+            )) ||
+            organisation.personalOrganisationOf
         ) {
             throw new PermissionDeniedError();
         }
         await this.organisationRepository.deleteOrganisationById(
             organisation.id
         );
+    }
+
+    public async ensurePersonalOrganisation(user: OidcService.UserInfo) {
+        let organisation =
+            await this.organisationRepository.getPersonalOrganisationByUser(
+                user.id
+            );
+        if (!organisation) {
+            organisation =
+                (await this.organisationRepository.createOrganisation({
+                    name: `Organisation von ${user.displayName}`,
+                    personalOrganisationOf: user.id,
+                }))!;
+            await this.organisationRepository.addMemberToOrganisation(
+                organisation.id,
+                user.id,
+                'admin'
+            );
+        }
+        return organisation;
     }
 }

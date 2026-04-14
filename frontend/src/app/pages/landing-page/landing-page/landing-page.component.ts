@@ -32,7 +32,6 @@ import { DisplayModelValidationComponent } from '../../../shared/validation/disp
         HeaderComponent,
         FormsModule,
         AutofocusDirective,
-        DisplayValidationComponent,
         RouterLink,
         FileInputDirective,
         FooterComponent,

@@ -10,7 +10,7 @@
             >
             </ngx-editor>
         </div>
-        @if (editorContent() === this.userGeneratedContentElement().content) {
+        @if (editorContent() === this.userGeneratedContentElement()!.content) {
             <button class="btn btn-outline-success" disabled>
                 Gespeichert
                 <i class="bi bi-check"></i>

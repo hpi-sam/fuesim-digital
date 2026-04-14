@@ -11,6 +11,7 @@ import {
     stateMachineSchema,
     technicalChallengeStateIdSchema,
 } from './state-machine.js';
+import { userGeneratedContentSchema } from '../user-generated-content.js';
 
 export const technicalChallengeIdSchema = uuidSchema.brand(
     'TechnicalChallengeId'
@@ -23,6 +24,7 @@ export const technicalChallengeSchema = z.strictObject({
     name: z.string(),
     templateId: uuidSchema,
     image: imagePropertiesSchema,
+    userGeneratedContent: userGeneratedContentSchema,
     position: positionSchema,
     size: sizeSchema,
     taskProgress: z.record(taskSchema.shape.id, z.number()),

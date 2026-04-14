@@ -1,4 +1,11 @@
-import { computed, OnInit, Signal, Component, inject } from '@angular/core';
+import {
+    computed,
+    OnInit,
+    Signal,
+    Component,
+    inject,
+    input,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     Personnel,
@@ -9,29 +16,46 @@ import type {
     Guard,
 } from 'fuesim-digital-shared';
 import { currentStateOf } from 'fuesim-digital-shared';
+import type { AppState } from '../../../state/app.state';
+import { ValuesPipe } from '../../pipes/values.pipe';
 import {
     createSelectPersonnel,
     createSelectTask,
     createSelectTechnicalChallenge,
     selectCurrentTime,
-} from '../../../../../../../state/application/selectors/exercise.selectors';
-import type { AppState } from '../../../../../../../state/app.state';
-import { PopupService } from '../../utility/popup.service';
-import { ValuesPipe } from '../../../../../../../shared/pipes/values.pipe';
-import { TechnicalChallengeDetailsComponent } from '../../../../../../../shared/components/technical-challenge-details/technical-challenge-details.component';
+} from '../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
+import {
+    NgbNav,
+    NgbNavContent,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
+import { RichTextEditorComponent } from '../rich-text-editor/rich-text-editor.component';
 
 @Component({
-    selector: 'app-technical-challenge-popup',
-    templateUrl: './technical-challenge-popup.component.html',
-    styleUrls: ['./technical-challenge-popup.component.scss'],
-    imports: [TechnicalChallengeDetailsComponent],
+    selector: 'app-technical-challenge-details',
+    templateUrl: './technical-challenge-details.component.html',
+    styleUrls: ['./technical-challenge-details.component.scss'],
+    imports: [
+        ValuesPipe,
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbNavContent,
+        NgbNavOutlet,
+        RichTextEditorComponent,
+    ],
 })
-export class TechnicalChallengePopupComponent implements OnInit {
+export class TechnicalChallengeDetailsComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly popupService = inject(PopupService);
 
-    // Set via popup context before OnInit
-    public technicalChallengeId!: UUID;
+    technicalChallengeId = input.required<UUID>();
+
+    readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
     // eslint-disable-next-line
     public technicalChallenge!: Signal<TechnicalChallenge>;
@@ -65,11 +89,7 @@ export class TechnicalChallengePopupComponent implements OnInit {
 
     ngOnInit(): void {
         this.technicalChallenge = this.store.selectSignal(
-            createSelectTechnicalChallenge(this.technicalChallengeId)
+            createSelectTechnicalChallenge(this.technicalChallengeId())
         );
-    }
-
-    public closePopup() {
-        this.popupService.dismissPopup();
     }
 }

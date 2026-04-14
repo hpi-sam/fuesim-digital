@@ -5,7 +5,10 @@ import type {
     UUID,
 } from '../../index.js';
 import { newImageProperties } from '../../index.js';
-import { newTechnicalChallengeState } from '../../models/index.js';
+import {
+    newTechnicalChallengeState,
+    newUserGeneratedContent,
+} from '../../models/index.js';
 import type { Task } from '../../models/task.js';
 
 // TODO@Felix: remove this file
@@ -31,43 +34,56 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     const initialState = newTechnicalChallengeState(
         'Ausgangslage',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
-        [extinguishFireTask.id, rescuePatientTask.id]
+        [extinguishFireTask.id, rescuePatientTask.id],
+        'Was eine Schweinerei, jetzt mach mal was draus.'
     );
     const onlyExtinguished = newTechnicalChallengeState(
         'Feuer geloescht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
-        [rescuePatientTask.id]
+        [rescuePatientTask.id],
+        'Feuer is nun weg, aber pass auf! Da is noch wer drin.'
     );
     const onlyDead = newTechnicalChallengeState(
         'Patient verstorben',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
-        [extinguishFireTask.id]
+        [extinguishFireTask.id],
+        'Der hat schon seinen Körper verlassen.'
     );
     const onlyTreated = newTechnicalChallengeState(
         'Patient gerettet',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
-        [extinguishFireTask.id]
+        [extinguishFireTask.id],
+        'Da is noch Feuer. Zum glück steckt keiner mehr drin.'
     );
     const onlyBurnedOut = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
-        [rescuePatientTask.id]
+        [rescuePatientTask.id],
+        'Ein Wunder.'
     );
     const patientDeadButExtinguished = newTechnicalChallengeState(
         'Patient verstorben, Feuer geloescht',
-        newImageProperties('/assets/blue_car_broken.png', 100, 1)
+        newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [],
+        'Feuer is weg, aber zu spät.'
     );
     const treatedAndExtinguished = newTechnicalChallengeState(
         'Patient gerettet und Feuer geloescht',
-        newImageProperties('/assets/blue_car_broken.png', 100, 1)
+        newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [],
+        'Sehr vorbildlich, besser gehts kaum.'
     );
     const burnedOutAndPatientDead = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt und Patient verstorben',
-        newImageProperties('/assets/blue_car_burned_out.png', 100, 1)
+        newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
+        [],
+        'Wo waren eingentlich das Personal?'
     );
     const burnedOutButRescued = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt, Patient gerettet',
-        newImageProperties('/assets/blue_car_burned_out.png', 100, 1)
+        newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
+        [],
+        'Grad noch mal glück gehabt. Hätte schlimmer kommen können.'
     );
 
     const states = Object.fromEntries(
@@ -182,6 +198,7 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
             100,
             1
         ),
+        userGeneratedContent: newUserGeneratedContent('default content'),
         name: 'Brennendes Fahrzeug mit eingeklemmter Person',
         states,
         relevantTasks,

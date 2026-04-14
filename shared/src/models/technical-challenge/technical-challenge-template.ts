@@ -14,11 +14,13 @@ import {
     stateMachineSchema,
     technicalChallengeStateIdSchema,
 } from './state-machine.js';
+import { userGeneratedContentSchema } from '../user-generated-content.js';
 
 export const technicalChallengeTemplateSchema = z.strictObject({
     ...stateMachineSchema.shape,
     id: uuidSchema,
     image: imagePropertiesSchema,
+    userGeneratedContent: userGeneratedContentSchema,
     name: z.string(),
     initialStateId: technicalChallengeStateIdSchema,
 });
@@ -30,8 +32,14 @@ export type TechnicalChallengeTemplate = z.infer<
 export function newTechnicalChallengeFromTemplate(
     template: TechnicalChallengeTemplate
 ): TechnicalChallenge {
-    const { states, relevantTasks, transitions, name, image } =
-        cloneDeep(template);
+    const {
+        states,
+        relevantTasks,
+        transitions,
+        name,
+        image,
+        userGeneratedContent,
+    } = cloneDeep(template);
 
     return {
         id: uuid() as TechnicalChallengeId,
@@ -49,5 +57,6 @@ export function newTechnicalChallengeFromTemplate(
         transitions,
         name,
         image,
+        userGeneratedContent,
     };
 }

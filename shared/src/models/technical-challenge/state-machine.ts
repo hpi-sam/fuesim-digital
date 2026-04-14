@@ -11,6 +11,10 @@ import type {
     TechnicalChallenge,
     TechnicalChallengeId,
 } from './technical-challenge.js';
+import {
+    newUserGeneratedContent,
+    userGeneratedContentSchema,
+} from '../user-generated-content.js';
 
 export const technicalChallengeStateIdSchema = uuidSchema.brand(
     'TechnicalChallengeStateId'
@@ -23,6 +27,7 @@ export const technicalChallengeStateSchema = z.object({
     id: technicalChallengeStateIdSchema,
     title: z.string(),
     image: imagePropertiesSchema,
+    userGeneratedContent: userGeneratedContentSchema.nullable(),
     possibleTasks: z.record(taskSchema.shape.id, z.number()),
 });
 export type TechnicalChallengeState = z.infer<
@@ -32,7 +37,8 @@ export type TechnicalChallengeState = z.infer<
 export function newTechnicalChallengeState(
     title: string,
     image: ImageProperties,
-    possibleTasks: UUID[] | { [key: UUID]: number } = {}
+    possibleTasks: UUID[] | { [key: UUID]: number } = {},
+    userGeneratedContent?: string
 ): TechnicalChallengeState {
     if (possibleTasks instanceof Array) {
         // eslint-disable-next-line no-param-reassign
@@ -42,6 +48,9 @@ export function newTechnicalChallengeState(
         id: uuid() as TechnicalChallengeStateId,
         title,
         image,
+        userGeneratedContent: newUserGeneratedContent(
+            userGeneratedContent ?? undefined
+        ),
         possibleTasks,
     };
 }

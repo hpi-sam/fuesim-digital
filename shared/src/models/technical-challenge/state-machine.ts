@@ -76,7 +76,7 @@ function isProgressGuardFulfilled(
     const progress = challenge.taskProgress[progressGuard.taskId] ?? 0;
     return (
         progress < (progressGuard.maxProgress ?? Number.MAX_VALUE) &&
-        progress > (progressGuard.minProgress ?? 0)
+        progress >= (progressGuard.minProgress ?? 0)
     );
 }
 

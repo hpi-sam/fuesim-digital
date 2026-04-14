@@ -134,6 +134,26 @@ export class OrganisationComponent {
         this.router.navigate(['/organisations']);
     }
 
+    async delete() {
+        const deletionConfirmed = await this.confirmationModalService.confirm({
+            title: 'Organisation löschen',
+            description: `Möchten Sie die Organisation ${this.organisation.value()!.name} wirklich löschen? Alle in dieser Organisation gespeicherten Daten werden dann ebenfalls unwiderruflich gelöscht.`,
+            confirmationString: this.organisation
+                .value()!
+                .name.toLowerCase()
+                .replace(' ', ''),
+        });
+        if (!deletionConfirmed) {
+            return;
+        }
+        await this.apiService.deleteOrganisation(this.organisation.value()!.id);
+        this.messageService.postMessage({
+            title: `Organisation ${this.organisation.value()!.name} erfolgreich gelöscht`,
+            color: 'success',
+        });
+        this.router.navigate(['/organisations']);
+    }
+
     constructor() {
         this.organisation = this.apiService.getOrganisationResource(
             this.route.snapshot.params['id']

@@ -4,9 +4,9 @@ import type {
     OrganisationMembershipId,
     OrganisationMembershipRole,
 } from 'fuesim-digital-shared';
-import type {
-    OrganisationInsert,
-    OrganisationInviteLinkInsert,
+import {
+    type OrganisationInsert,
+    type OrganisationInviteLinkInsert,
 } from '../schema.js';
 import {
     organisationInviteLinkTable,
@@ -273,5 +273,11 @@ export class OrganisationRepository extends BaseRepository {
                     )
                 )
         );
+    }
+
+    public deleteOrganisationById(id: OrganisationId) {
+        return this.databaseConnection
+            .delete(organisationTable)
+            .where(eq(organisationTable.id, id));
     }
 }

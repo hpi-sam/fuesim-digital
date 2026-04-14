@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import type {
-    ActivatedRouteSnapshot,
-    RouterStateSnapshot,
+import {
+    type ActivatedRouteSnapshot,
+    type RouterStateSnapshot,
 } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 
@@ -15,6 +15,10 @@ export class IsAuthenticatedGuard {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ) {
-        return !!this.auth.authData().user;
+        if (!this.auth.authData().user) {
+            window.location.href = `${this.auth.loginUrl}?returnto=${window.location.pathname}`;
+            return false;
+        }
+        return true;
     }
 }

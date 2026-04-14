@@ -62,11 +62,13 @@ async function main() {
 
     const exerciseService = new ExerciseService(
         repositories.exerciseRepository,
-        repositories.actionRepository
+        repositories.actionRepository,
+        repositories.organisationRepository
     );
     const exerciseManagerService = new ExerciseManagerService(
         repositories.exerciseRepository,
-        exerciseService
+        exerciseService,
+        repositories.organisationRepository
     );
     const parallelExerciseService = new ParallelExerciseService(
         repositories.parallelExerciseRepository,

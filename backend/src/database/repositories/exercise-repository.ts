@@ -1,7 +1,12 @@
 import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
 import { ExerciseState } from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
-import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
+import {
+    type ExerciseInsert,
+    type ExerciseTemplateInsert,
+    organisationMembershipTable,
+    organisationTable,
+} from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
 
@@ -12,11 +17,16 @@ export class ExerciseRepository extends BaseRepository {
                 ...getTableColumns(exerciseTemplateTable),
                 trainerKey: exerciseTable.trainerKey,
                 exercise: { ...getTableColumns(exerciseTable) },
+                organisation: { ...getTableColumns(organisationTable) },
             })
             .from(exerciseTemplateTable)
             .innerJoin(
                 exerciseTable,
                 eq(exerciseTemplateTable.id, exerciseTable.templateId)
+            )
+            .innerJoin(
+                organisationTable,
+                eq(exerciseTemplateTable.organisationId, organisationTable.id)
             );
     }
 
@@ -68,9 +78,20 @@ export class ExerciseRepository extends BaseRepository {
             .orderBy(desc(exerciseTable.lastUsedAt));
     }
 
-    public getAllExerciseTemplatesOfOwner(userId: string) {
+    public getAllExerciseTemplatesForUser(userId: string) {
+        const subquery = this.databaseConnection
+            .select()
+            .from(organisationMembershipTable)
+            .where(eq(organisationMembershipTable.userId, userId))
+            .as('memberships');
         return this.exerciseTemplateQuery
-            .where(eq(exerciseTemplateTable.user, userId))
+            .innerJoin(
+                subquery,
+                eq(
+                    subquery.organisationId,
+                    exerciseTemplateTable.organisationId
+                )
+            )
             .orderBy(
                 desc(
                     sql<Date>`COALESCE("exercise_template"."lastExerciseCreatedAt", "exercise_template"."lastUpdatedAt")`

@@ -44,7 +44,9 @@ export type ExerciseExistsResponseDataInput = z.input<
 
 export const joinExerciseResponseDataSchema = z.object({
     clientId: z.string(),
-    exerciseTemplate: z.nullable(getExerciseTemplateResponseDataSchema),
+    exerciseTemplate: z.nullable(
+        getExerciseTemplateResponseDataSchema.omit({ organisation: true })
+    ),
     parallelExerciseId: parallelExerciseIdSchema.nullable(),
 });
 export type JoinExerciseResponseData = z.infer<

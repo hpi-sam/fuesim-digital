@@ -70,11 +70,15 @@ export class ExerciseClientWrapper extends ClientWrapper {
      * @param clientName The public name of the client.
      * @returns The joined client's id, or undefined when the exercise doesn't exist.
      */
-    public joinExercise(exerciseKey: ExerciseKey, clientName: string): UUID {
-        this.chosenExercise = this.services.exerciseService.getExerciseByKey(
-            exerciseKey,
-            this.session
-        );
+    public async joinExercise(
+        exerciseKey: ExerciseKey,
+        clientName: string
+    ): Promise<UUID> {
+        this.chosenExercise =
+            await this.services.exerciseService.getExerciseByKey(
+                exerciseKey,
+                this.session
+            );
         // Although getRoleFromUsedId may throw an error, this should never happen here
         // as the provided id is guaranteed to be one of the ids of the exercise as the exercise
         // was fetched with this exact id from the exercise map.

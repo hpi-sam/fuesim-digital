@@ -21,10 +21,11 @@ describe('exercise manager service', () => {
             environment,
             session
         );
-        const exercise = environment.services.exerciseService.getExerciseByKey(
-            exerciseTemplate.trainerKey,
-            sessionInformation
-        );
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseTemplate.trainerKey,
+                sessionInformation
+            );
         const action: ExerciseAction = {
             type: '[AlarmGroup] Add AlarmGroup',
             alarmGroup: {

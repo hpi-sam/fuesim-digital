@@ -156,8 +156,9 @@ export type OrganisationInviteLinkInsert = InferInsertModel<
 
 export const exerciseTemplateTable = pgTable('exercise_template', {
     ...baseTable<ExerciseTemplateId>(),
-    user: varchar()
-        .references(() => userTable.id, { onDelete: 'cascade' })
+    organisationId: uuid()
+        .$type<OrganisationId>()
+        .references(() => organisationTable.id, { onDelete: 'cascade' })
         .notNull(),
     createdAt: timestamp({ withTimezone: true, mode: 'date' })
         .notNull()

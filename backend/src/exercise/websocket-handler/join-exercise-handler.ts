@@ -72,7 +72,7 @@ export function registerJoinExerciseHandler(
                 return;
             }
 
-            clientWrapper.getSessionInformation().then(() => {
+            clientWrapper.getSessionInformation().then(async () => {
                 let joinedClientId: UUID | null = null;
                 try {
                     if (clientId !== undefined) {
@@ -90,7 +90,7 @@ export function registerJoinExerciseHandler(
                             return;
                         }
                     } else {
-                        joinedClientId = clientWrapper.joinExercise(
+                        joinedClientId = await clientWrapper.joinExercise(
                             exerciseKey,
                             clientName!
                         );

@@ -241,7 +241,8 @@ export function createTestEnvironment(): TestEnvironment {
         exerciseService = new ExerciseService(
             exerciseRepository,
             actionRepository,
-            accessKeyService
+            accessKeyService,
+            organisationRepository
         );
         userRepository = new UserRepository(databaseService.databaseConnection);
         sessionRepository = new SessionRepository(
@@ -256,7 +257,8 @@ export function createTestEnvironment(): TestEnvironment {
         ).initialize({ skipOidcDiscovery: true });
         exerciseManagerService = new ExerciseManagerService(
             exerciseRepository,
-            exerciseService
+            exerciseService,
+            organisationRepository
         );
         parallelExerciseService = new ParallelExerciseService(
             parallelExerciseRepository,

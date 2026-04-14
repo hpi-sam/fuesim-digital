@@ -1,7 +1,8 @@
-import type {
-    OrganisationId,
-    OrganisationMembershipId,
-    OrganisationMembershipRole,
+import {
+    type OrganisationId,
+    type OrganisationMembershipId,
+    type OrganisationMembershipRole,
+    organisationMembershipRoleAllowedValues,
 } from 'fuesim-digital-shared';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
@@ -19,9 +20,13 @@ export class OrganisationService {
         private readonly organisationRepository: OrganisationRepository
     ) {}
 
-    public async getOrganisationsForUser(session: SessionInformation) {
+    public async getOrganisationsForUser(
+        session: SessionInformation,
+        allowedRoles: readonly OrganisationMembershipRole[] = organisationMembershipRoleAllowedValues
+    ) {
         return this.organisationRepository.getOrganisationsForUser(
-            session.user.id
+            session.user.id,
+            allowedRoles
         );
     }
 

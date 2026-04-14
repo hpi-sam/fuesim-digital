@@ -5,7 +5,6 @@ import type {
 } from 'fuesim-digital-shared';
 import { HttpResourceRef } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { firstValueFrom } from 'rxjs';
 import { CreateExerciseTemplateModalComponent } from '../shared/create-exercise-template-modal/create-exercise-template-modal.component';
 import { ApiService } from '../../../core/api.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
@@ -47,10 +46,10 @@ export class ExerciseTemplateListComponent {
         );
         const componentInstance =
             modalRef.componentInstance as CreateExerciseTemplateModalComponent;
-        await firstValueFrom(componentInstance.exerciseTemplateCreated$, {
-            defaultValue: false,
+        componentInstance.created.subscribe((val) => {
+            if (!val) return;
+            this.exerciseTemplates.reload();
         });
-        this.exerciseTemplates.reload();
     }
 
     public async importExerciseTemplate(fileList: FileList) {

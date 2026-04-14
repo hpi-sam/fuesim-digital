@@ -44,10 +44,10 @@ export function registerJoinExerciseHandler(
                 return;
             }
 
-            clientWrapper.getSessionInformation().then(() => {
+            clientWrapper.getSessionInformation().then(async () => {
                 let clientId: UUID | undefined;
                 try {
-                    clientId = clientWrapper.joinExercise(
+                    clientId = await clientWrapper.joinExercise(
                         exerciseKey,
                         clientName
                     );

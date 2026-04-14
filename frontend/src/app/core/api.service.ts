@@ -6,7 +6,6 @@ import {
     ExerciseKey,
     exerciseKeysSchema,
     getExercisesResponseDataSchema,
-    getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
     getOrganisationDetailsResponseDataSchema,
     getExerciseTemplateViewportsResponseDataSchema,
@@ -31,6 +30,7 @@ import {
     postOrganisationInviteLinkResponseDataSchema,
     OrganisationMembershipId,
     OrganisationMembershipRole,
+    getExerciseTemplateResponseDataWithoutTrainerKeySchema,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -149,6 +149,11 @@ export class ApiService {
             parse: getOrganisationsResponseDataSchema.parse,
         });
     }
+    public getOrganisationsAsEditorResource() {
+        return httpResource(() => `${httpOrigin}/api/organisations/editor/`, {
+            parse: getOrganisationsResponseDataSchema.parse,
+        });
+    }
     public getOrganisationResource(id: OrganisationId) {
         return httpResource(() => `${httpOrigin}/api/organisations/${id}`, {
             parse: getOrganisationDetailsResponseDataSchema.parse,
@@ -158,7 +163,7 @@ export class ApiService {
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
             this.httpClient.post(`${httpOrigin}/api/exercise_templates`, data)
-        ).then(getExerciseTemplateResponseDataSchema.parse);
+        ).then(getExerciseTemplateResponseDataWithoutTrainerKeySchema.parse);
     }
 
     public async importExerciseTemplate(exportedState: StateExport) {
@@ -175,12 +180,11 @@ export class ApiService {
         data: PatchExerciseTemplateRequestData
     ) {
         return lastValueFrom(
-            this.httpClient
-                .patch(`${httpOrigin}/api/exercise_templates/${id}`, data)
-                .pipe(
-                    map((v) => getExerciseTemplateResponseDataSchema.parse(v))
-                )
-        );
+            this.httpClient.patch(
+                `${httpOrigin}/api/exercise_templates/${id}`,
+                data
+            )
+        ).then(getExerciseTemplateResponseDataWithoutTrainerKeySchema.parse);
     }
 
     public async createExerciseFromTemplate(templateId: ExerciseTemplateId) {

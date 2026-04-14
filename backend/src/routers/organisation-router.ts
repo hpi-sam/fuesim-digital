@@ -41,6 +41,18 @@ export function createOrganisationRouter(
         });
 
     router
+        .route('/editor')
+        .all(isAuthenticatedMiddleware)
+        .get(async (req, res) => {
+            const organisations =
+                await organisationService.getOrganisationsForUser(
+                    req.session!,
+                    ['editor', 'admin']
+                );
+            res.send(getOrganisationsResponseDataSchema.encode(organisations));
+        });
+
+    router
         .route('/:id')
         .all(isAuthenticatedMiddleware)
         .get(async (req, res) => {

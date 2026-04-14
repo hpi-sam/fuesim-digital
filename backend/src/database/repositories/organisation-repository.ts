@@ -17,11 +17,19 @@ import {
 import { BaseRepository } from './base-repository.js';
 
 export class OrganisationRepository extends BaseRepository {
-    public async getOrganisationsForUser(userId: string) {
+    public async getOrganisationsForUser(
+        userId: string,
+        allowedRoles: readonly OrganisationMembershipRole[]
+    ) {
         const subquery = this.databaseConnection
             .select()
             .from(organisationMembershipTable)
-            .where(eq(organisationMembershipTable.userId, userId))
+            .where(
+                and(
+                    eq(organisationMembershipTable.userId, userId),
+                    inArray(organisationMembershipTable.role, allowedRoles)
+                )
+            )
             .as('memberships');
         return this.databaseConnection
             .select({

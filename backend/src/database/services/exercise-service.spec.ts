@@ -20,9 +20,10 @@ describe('Exercise-Service', () => {
     // In a naive implementation it can happen that such actions get removed from memory without being saved to the database.
     it('does not throw away actions while saving', async () => {
         const exerciseKeys = await createExercise(environment);
-        const exercise = environment.services.exerciseService.getExerciseByKey(
-            exerciseKeys.trainerKey
-        );
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseKeys.trainerKey
+            );
         const markAsAboutToBeSaved =
             exercise.markAsAboutToBeSaved.bind(exercise);
 
@@ -66,9 +67,10 @@ describe('Exercise-Service', () => {
     });
     it('does correctly update lastUsedAt', async () => {
         const exerciseKeys = await createExercise(environment);
-        const exercise = environment.services.exerciseService.getExerciseByKey(
-            exerciseKeys.trainerKey
-        );
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseKeys.trainerKey
+            );
         const beforeAction = Date.now();
         exercise.applyAction(
             {

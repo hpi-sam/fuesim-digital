@@ -280,4 +280,13 @@ export class OrganisationRepository extends BaseRepository {
             .delete(organisationTable)
             .where(eq(organisationTable.id, id));
     }
+
+    public async getPersonalOrganisationByUser(userId: string) {
+        return this.onlySingle(
+            await this.databaseConnection
+                .select(getTableColumns(organisationTable))
+                .from(organisationTable)
+                .where(eq(organisationTable.personalOrganisationOf, userId))
+        );
+    }
 }

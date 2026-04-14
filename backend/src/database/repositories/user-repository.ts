@@ -14,6 +14,10 @@ export class UserRepository extends BaseRepository {
         return this.onlySingle(user);
     }
 
+    public async getAllUsers() {
+        return this.databaseConnection.select().from(userTable);
+    }
+
     public async upsertUser(userData: InferInsertModel<typeof userTable>) {
         return this.databaseConnection
             .insert(userTable)

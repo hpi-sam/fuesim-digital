@@ -5,4 +5,7 @@ export * from './default-state/map-properties.js';
 export * from './default-state/catch-all-hospital.js';
 export * from './dummy-objects/patient.js';
 
-export { getDefaultTechnicalChallengeTemplate } from './default-state/tmp-default-technical-challenge.js';
+export {
+    getDefaultTechnicalChallengeTemplate,
+    getDefaultUserGeneratedContents,
+} from './default-state/tmp-default-technical-challenge.js';

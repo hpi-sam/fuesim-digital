@@ -306,4 +306,10 @@ export class ApiService {
             )
         );
     }
+
+    public async deleteOrganisation(id: OrganisationId) {
+        return lastValueFrom(
+            this.httpClient.delete(`${httpOrigin}/api/organisations/${id}`)
+        );
+    }
 }

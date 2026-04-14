@@ -256,4 +256,27 @@ export class OrganisationService {
             membership.organisation_membership.id
         );
     }
+
+    public async deleteOrganisation(
+        id: OrganisationId,
+        session: SessionInformation
+    ) {
+        const organisation =
+            await this.organisationRepository.getOrganisationById(id);
+        if (!organisation) {
+            throw new NotFoundError();
+        }
+        if (
+            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                id,
+                session.user.id,
+                ['admin']
+            ))
+        ) {
+            throw new PermissionDeniedError();
+        }
+        await this.organisationRepository.deleteOrganisationById(
+            organisation.id
+        );
+    }
 }

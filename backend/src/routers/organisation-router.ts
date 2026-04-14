@@ -68,8 +68,13 @@ export function createOrganisationRouter(
                 parsedData
             );
             res.send(getOrganisationResponseDataSchema.encode(organisation));
-        });
+        })
+        .delete(async (req, res) => {
+            const id = organisationIdSchema.parse(req.params.id);
 
+            await organisationService.deleteOrganisation(id, req.session!);
+            res.status(204).send();
+        });
     router
         .route('/:id/leave')
         .all(isAuthenticatedMiddleware)

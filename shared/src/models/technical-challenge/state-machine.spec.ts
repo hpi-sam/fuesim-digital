@@ -4,10 +4,7 @@ import type { ParticipantKey } from '../../exercise-keys.js';
 import { ExerciseState } from '../../state.js';
 import { getDefaultTechnicalChallengeTemplate } from '../../data/index.js';
 import { StateMachineTesting } from '../../data/default-state/tmp-default-technical-challenge.js';
-import {
-    lookupReducerFor,
-    TechnicalChallengeActionReducers,
-} from '../../store/index.js';
+import { lookupReducerFor } from '../../store/index.js';
 import { newPersonnelFromTemplate } from '../personnel.js';
 import { defaultPersonnelTemplates } from '../../data/default-state/personnel-templates.js';
 import { uuid } from '../../utils/index.js';
@@ -18,7 +15,6 @@ import {
     newNoPosition,
 } from '../utils/index.js';
 import { newTechnicalChallengeFromTemplate } from './technical-challenge-template.js';
-import assignPersonnelToTechnicalChallenge = TechnicalChallengeActionReducers.assignPersonnelToTechnicalChallenge;
 
 const tickInterval = 1000;
 const simulateOneTick = produce((draftState: WritableDraft<ExerciseState>) => {
@@ -45,7 +41,7 @@ const emptyState: Immutable<ExerciseState> = ExerciseState.create(
 );
 const challengeTemplate = getDefaultTechnicalChallengeTemplate();
 const challenge = {
-    ...newTechnicalChallengeFromTemplate(challengeTemplate),
+    ...newTechnicalChallengeFromTemplate(challengeTemplate, 0),
     position: newMapPositionAt(newMapCoordinatesAt(0, 0)),
 };
 const personnel = newPersonnelFromTemplate(
@@ -90,7 +86,9 @@ describe('TechnicalChallenges', () => {
 
     it('should progress assigned tasks', () => {
         const assignPersonnel = produce(
-            assignPersonnelToTechnicalChallenge.reducer
+            lookupReducerFor(
+                '[TechnicalChallenge] Assign a personnel to technical challenge'
+            ).reducer
         );
         const withPersonnel = assignPersonnel(initialState, {
             type: '[TechnicalChallenge] Assign a personnel to technical challenge',
@@ -145,6 +143,47 @@ describe('TechnicalChallenges', () => {
         const bothFailedChallenge =
             bothFailedState.technicalChallenges[challenge.id];
         expect(bothFailedChallenge?.currentStateId).toBe(
+            StateMachineTesting.burnedOutAndPatientDead.id
+        );
+    });
+
+    it('should check timer guards relative to the time of their creation', () => {
+        const alreadyRunning = simulateNTicks(initialState, 60);
+        const newChallenge = {
+            ...newTechnicalChallengeFromTemplate(
+                challengeTemplate,
+                alreadyRunning.currentTime
+            ),
+            position: newMapPositionAt(newMapCoordinatesAt(0, 0)),
+        };
+        const withNewChallenge = produce(alreadyRunning, (draft) => {
+            lookupReducerFor(
+                '[TechnicalChallenge] Create technical challenge'
+            ).reducer(draft, {
+                type: '[TechnicalChallenge] Create technical challenge',
+                technicalChallenge: newChallenge,
+            });
+        });
+
+        const currentState = (state: Immutable<ExerciseState>) =>
+            state.technicalChallenges[newChallenge.id]?.currentStateId;
+
+        expect(currentState(withNewChallenge)).toBe(
+            StateMachineTesting.initialState.id
+        );
+
+        const withNewChallenge1 = simulateOneTick(withNewChallenge);
+        expect(currentState(withNewChallenge1)).toBe(
+            StateMachineTesting.initialState.id
+        );
+
+        const patientDeadState = simulateNTicks(withNewChallenge1, 29);
+        expect(currentState(patientDeadState)).toBe(
+            StateMachineTesting.onlyDead.id
+        );
+
+        const bothFailedState = simulateNTicks(patientDeadState, 30);
+        expect(currentState(bothFailedState)).toBe(
             StateMachineTesting.burnedOutAndPatientDead.id
         );
     });

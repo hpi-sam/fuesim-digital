@@ -39,6 +39,7 @@ import {
     selectMaterialTemplates,
     selectPersonnelTemplates,
     selectExerciseState,
+    selectCurrentTime,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 
@@ -320,9 +321,14 @@ export class DragElementService {
                 break;
 
             case 'technicalChallenge': {
+                const currentTime = selectStateSnapshot(
+                    selectCurrentTime,
+                    this.store
+                );
                 const technicalChallenge: TechnicalChallenge =
                     newTechnicalChallengeFromTemplate(
-                        this.transferringTemplate.template
+                        this.transferringTemplate.template,
+                        currentTime
                     );
                 technicalChallenge.position = newMapPositionAt(position);
                 this.exerciseService.proposeAction({

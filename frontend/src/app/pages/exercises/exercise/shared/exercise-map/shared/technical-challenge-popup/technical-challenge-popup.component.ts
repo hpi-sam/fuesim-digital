@@ -56,7 +56,14 @@ export class TechnicalChallengePopupComponent implements OnInit {
         this.guards().filter((guard) => guard.type === 'timerGuard')
     );
 
-    public exerciseTime = this.store.selectSignal(selectCurrentTime);
+    public readonly challengeAge = computed(() => {
+        const technicalChallengeStartTime =
+            this.technicalChallenge().simulationStartTime;
+        return (
+            this.store.selectSignal(selectCurrentTime)() -
+            technicalChallengeStartTime
+        );
+    });
 
     public readonly currentState: Signal<TechnicalChallengeState> = computed(
         () => currentStateOf(this.technicalChallenge())

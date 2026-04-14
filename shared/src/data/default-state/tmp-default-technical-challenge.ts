@@ -208,6 +208,7 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
         states,
         relevantTasks,
         transitions,
+        simulationStartTime: 0,
     };
 }
 

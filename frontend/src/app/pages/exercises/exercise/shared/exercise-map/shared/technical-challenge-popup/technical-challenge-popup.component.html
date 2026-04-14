@@ -36,7 +36,7 @@
 
     <div class="mb-3">
         <h6>Timer:</h6>
-        Current ExerciseTime: {{ exerciseTime() }}
+        Time since creation of challenge: {{ challengeAge() }}
         <ul>
             @for (guard of timerGuards(); track $index) {
                 <li>

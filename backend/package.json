@@ -45,7 +45,7 @@
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "drizzle-kit": "^0.31.7",
-        "drizzle-orm": "^0.44.7",
+        "drizzle-orm": "^0.45.2",
         "envalid": "^8.0.0",
         "express": "^5.2.0",
         "fuesim-digital-shared": "file:../shared",

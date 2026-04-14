@@ -1,5 +1,6 @@
-import { SpatialTree } from '../models/utils/index.js';
-import { cloneDeepMutable, StrictObject } from '../utils/index.js';
+import { cloneDeepMutable } from '../utils/clone-deep.js';
+import { SpatialTree } from '../models/utils/spatial-tree.js';
+import { StrictObject } from '../utils/strict-object.js';
 import type { Migration } from './migration-functions.js';
 
 export const treatmentSystemImprovements8: Migration = {

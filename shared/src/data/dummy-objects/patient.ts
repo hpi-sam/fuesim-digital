@@ -1,12 +1,11 @@
-import type { Patient } from '../../models/index.js';
-import {
-    newMapPositionAt,
-    newPatientHealthState,
-    newFunctionParameters,
-    newPatientStatusCode,
-} from '../../models/index.js';
 import { defaultPatientCategories } from '../default-state/patient-templates.js';
-import { newPatient } from '../../models/patient.js';
+import { newPatient, type Patient } from '../../models/patient.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import {
+    newFunctionParameters,
+    newPatientHealthState,
+} from '../../models/patient-health-state.js';
+import { newPatientStatusCode } from '../../models/utils/patient-status-code.js';
 
 export function generateDummyPatient(): Patient {
     const template = defaultPatientCategories[0]!.patientTemplates[0]!;

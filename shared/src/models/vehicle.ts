@@ -1,17 +1,16 @@
 import type { Immutable } from 'immer';
-import * as z from 'zod';
-import type { UUID, UUIDSet } from '../utils/index.js';
-import { uuidSchema, uuid, uuidSetSchema } from '../utils/index.js';
+import { z } from 'zod';
+import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
+import { type UUIDSet, uuidSetSchema } from '../utils/uuid-set.js';
+import { type Position, positionSchema } from './utils/position/position.js';
 import {
-    exerciseOccupationSchema,
+    type ImageProperties,
     imagePropertiesSchema,
-    positionSchema,
-} from './utils/index.js';
-import type {
-    Position,
-    ImageProperties,
-    ExerciseOccupation,
-} from './utils/index.js';
+} from './utils/image-properties.js';
+import {
+    type ExerciseOccupation,
+    exerciseOccupationSchema,
+} from './utils/occupations/exercise-occupation.js';
 import { operationalAssignmentSchema } from './operational-section.js';
 
 export const vehicleSchema = z.strictObject({

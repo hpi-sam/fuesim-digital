@@ -1,6 +1,6 @@
-import type { MapImageTemplate } from '../../models/index.js';
-import { newImageProperties } from '../../models/index.js';
-import type { UUID } from '../../utils/index.js';
+import type { MapImageTemplate } from '../../models/map-image-template.js';
+import { newImageProperties } from '../../models/utils/image-properties.js';
+import type { UUID } from '../../utils/uuid.js';
 
 const fireMapImageTemplate: MapImageTemplate = {
     id: '47df49cf-3769-43c8-bfb2-87c6d3a43baa',

@@ -122,6 +122,11 @@ export default {
                         message:
                             'Please use the abstraction layer from frontend/src/app/shared/services/hotkeys.service.ts instead.',
                     },
+                    {
+                        name: 'zod',
+                        importNames: ['uuid'],
+                        message: 'Please use uuid from shared instead.',
+                    },
                 ],
 
                 patterns: [

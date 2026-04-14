@@ -1,22 +1,22 @@
-import { getCreate } from '../../models/utils/get-create.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
+import { z } from 'zod';
 import type { TreatmentProgress } from '../utils/treatment.js';
-import { treatmentProgressAllowedValues } from '../utils/treatment.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { treatmentProgressSchema } from '../utils/treatment.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class TreatmentProgressChangedEvent implements SimulationEvent {
-    @IsValue('treatmentProgressChangedEvent')
-    readonly type = 'treatmentProgressChangedEvent';
+export const treatmentProgressChangedEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
+    type: z.literal('treatmentProgressChangedEvent'),
+    newProgress: treatmentProgressSchema,
+});
+export type TreatmentProgressChangedEvent = z.infer<
+    typeof treatmentProgressChangedEventSchema
+>;
 
-    @IsLiteralUnion(treatmentProgressAllowedValues)
-    readonly newProgress: TreatmentProgress;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(newProgress: TreatmentProgress) {
-        this.newProgress = newProgress;
-    }
-
-    static readonly create = getCreate(this);
+export function newTreatmentProgressChangedEvent(
+    newProgress: TreatmentProgress
+): TreatmentProgressChangedEvent {
+    return {
+        type: 'treatmentProgressChangedEvent',
+        newProgress,
+    };
 }

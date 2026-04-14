@@ -1,19 +1,17 @@
 import type { WritableDraft } from 'immer';
+import type { ExerciseState } from '../../src/state.js';
+import type { PatientStatus } from '../../src/models/utils/patient-status.js';
+import type { Position } from '../../src/models/utils/position/position.js';
+import type { UUID } from '../../src/utils/uuid.js';
+import type { Patient } from '../../src/models/patient.js';
+import { patientPretriageTimeThreshold } from '../../src/models/patient.js';
+import { cloneDeepMutable } from '../../src/utils/clone-deep.js';
+import { generateDummyPatient } from '../../src/data/dummy-objects/patient.js';
 import {
-    generateDummyPatient,
     currentCoordinatesOf,
     isOnMap,
-    SpatialTree,
-    cloneDeepMutable,
-    patientPretriageTimeThreshold,
-} from '../../src/index.js';
-import type {
-    PatientStatus,
-    Position,
-    UUID,
-    Patient,
-} from '../../src/index.js';
-import type { ExerciseState } from '../../src/state.js';
+} from '../../src/models/utils/position/position-helpers.js';
+import { SpatialTree } from '../../src/models/utils/spatial-tree.js';
 
 export function addPatient(
     state: WritableDraft<ExerciseState>,

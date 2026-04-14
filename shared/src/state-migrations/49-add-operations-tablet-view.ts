@@ -1,5 +1,5 @@
-import { defaultOperationsMapProperties } from '../data/index.js';
-import type { UUID } from '../utils/index.js';
+import type { UUID } from '../utils/uuid.js';
+import { defaultOperationsMapProperties } from '../data/default-state/map-properties.js';
 import type { Migration } from './migration-functions.js';
 
 interface VehicleParameters {

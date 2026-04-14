@@ -1,37 +1,28 @@
-import { IsUUID } from 'class-validator';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
+import { z } from 'zod';
 import {
     type PatientStatus,
     patientStatusSchema,
-    getCreate,
-} from '../../models/index.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import type { SimulationEvent } from './simulation-event.js';
+} from '../../models/utils/patient-status.js';
+import { uuidSchema } from '../../utils/uuid.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class PatientTransferToHospitalSuccessfulEvent
-    implements SimulationEvent
-{
-    @IsValue('patientTransferToHospitalSuccessfulEvent')
-    readonly type = 'patientTransferToHospitalSuccessfulEvent';
+export const patientTransferToHospitalSuccessfulEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
+    type: z.literal('patientTransferToHospitalSuccessfulEvent'),
+    patientCategory: patientStatusSchema,
+    patientOriginSimulatedRegion: uuidSchema,
+});
+export type PatientTransferToHospitalSuccessfulEvent = z.infer<
+    typeof patientTransferToHospitalSuccessfulEventSchema
+>;
 
-    @IsZodSchema(patientStatusSchema)
-    readonly patientCategory: PatientStatus;
-
-    @IsUUID(4, uuidValidationOptions)
-    readonly patientOriginSimulatedRegion: UUID;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        patientCategory: PatientStatus,
-        patienrOriginSimulatedRegion: UUID
-    ) {
-        this.patientCategory = patientCategory;
-        this.patientOriginSimulatedRegion = patienrOriginSimulatedRegion;
-    }
-
-    static readonly create = getCreate(this);
+export function newPatientTransferToHospitalSuccessfulEvent(
+    patientCategory: PatientStatus,
+    patientOriginSimulatedRegion: string
+): PatientTransferToHospitalSuccessfulEvent {
+    return {
+        type: 'patientTransferToHospitalSuccessfulEvent',
+        patientCategory,
+        patientOriginSimulatedRegion,
+    };
 }

@@ -1,21 +1,20 @@
 import type { WritableDraft } from 'immer';
-import type { SimulatedRegion, Vehicle } from '../../models/index.js';
-import {
-    newSimulatedRegionPositionIn,
-    createVehicleActionTag,
-    isInSpecificSimulatedRegion,
-    isInSpecificVehicle,
-} from '../../models/index.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
-import { getElement } from '../../store/action-reducers/utils/index.js';
 import { logVehicle } from '../../store/action-reducers/utils/log.js';
-import {
-    NewPatientEvent,
-    MaterialAvailableEvent,
-    PersonnelAvailableEvent,
-} from '../events/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import type { Vehicle } from '../../models/vehicle.js';
+import {
+    isInSpecificSimulatedRegion,
+    isInSpecificVehicle,
+} from '../../models/utils/position/position-helpers.js';
+import { createVehicleActionTag } from '../../models/utils/tag-helpers.js';
+import { getElement } from '../../store/action-reducers/utils/get-element.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { newMaterialAvailableEvent } from '../events/material-available.js';
+import { newPersonnelAvailableEvent } from '../events/personnel-available.js';
+import { newNewPatientEvent } from '../events/new-patient.js';
 
 export function unloadVehicle(
     draftState: WritableDraft<ExerciseState>,
@@ -57,19 +56,19 @@ export function unloadVehicle(
                     case 'material':
                         sendSimulationEvent(
                             simulatedRegion,
-                            MaterialAvailableEvent.create(element.id)
+                            newMaterialAvailableEvent(element.id)
                         );
                         break;
                     case 'personnel':
                         sendSimulationEvent(
                             simulatedRegion,
-                            PersonnelAvailableEvent.create(element.id)
+                            newPersonnelAvailableEvent(element.id)
                         );
                         break;
                     case 'patient':
                         sendSimulationEvent(
                             simulatedRegion,
-                            NewPatientEvent.create(element.id)
+                            newNewPatientEvent(element.id)
                         );
                         break;
                 }

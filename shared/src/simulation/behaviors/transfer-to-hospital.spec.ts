@@ -1,34 +1,36 @@
 import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
-import type { Patient } from '../../models/index.js';
-import {
-    newTransferPoint,
-    newPatientTransferOccupation,
-    newImageProperties,
-    newWaitForTransferOccupation,
-    newUnloadingOccupation,
-    newLoadOccupation,
-    newIntermediateOccupation,
-    newNoOccupation,
-    newMapCoordinatesAt,
-    SimulatedRegion,
-    newSimulatedRegionPositionIn,
-    newSize,
-} from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
-import type { UUIDSet } from '../../utils/index.js';
-import { cloneDeepMutable, uuid } from '../../utils/index.js';
 import { handleSimulationEvents } from '../utils/simulation.js';
-import type { PatientCategoryTransferToHospitalFinishedEvent } from '../events/index.js';
-import { TickEvent, VehicleArrivedEvent } from '../events/index.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
-import type {
-    DelayEventActivityState,
-    TransferPatientToHospitalActivityState,
-} from '../activities/index.js';
 import { newVehicle } from '../../models/vehicle.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
-import { TransferToHospitalBehaviorState } from './transfer-to-hospital.js';
+import { newImageProperties } from '../../models/utils/image-properties.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newVehicleArrivedEvent } from '../events/vehicle-arrived.js';
+import { newPatientTransferOccupation } from '../../models/utils/occupations/patient-transfer-occupation.js';
+import type { Patient } from '../../models/patient.js';
+import type { TransferPatientToHospitalActivityState } from '../activities/transfer-patient-to-hospital.js';
+import type { UUIDSet } from '../../utils/uuid-set.js';
+import type { DelayEventActivityState } from '../activities/delay-event.js';
+import type { PatientCategoryTransferToHospitalFinishedEvent } from '../events/patient-category-transfer-to-hospital-finished.js';
+import { newTickEvent } from '../events/tick.js';
+import {
+    newSimulatedRegion,
+    type SimulatedRegion,
+} from '../../models/simulated-region.js';
+import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
+import { newSize } from '../../models/utils/size.js';
+import { newTransferPoint } from '../../models/transfer-point.js';
+import { newNoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { newIntermediateOccupation } from '../../models/utils/occupations/intermediate-occupation.js';
+import { newLoadOccupation } from '../../models/utils/occupations/load-occupation.js';
+import { newUnloadingOccupation } from '../../models/utils/occupations/unloading-occupation.js';
+import { uuid } from '../../utils/uuid.js';
+import { newWaitForTransferOccupation } from '../../models/utils/occupations/wait-for-transfer-occupation.js';
+import type { TransferToHospitalBehaviorState } from './transfer-to-hospital.js';
+import { newTransferToHospitalBehaviorState } from './transfer-to-hospital.js';
 
 const emptyState = ExerciseState.create('123456' as ParticipantKey);
 const currentTime = 10_000;
@@ -40,7 +42,7 @@ function setupStateAndInteract(
         behaviorState: WritableDraft<TransferToHospitalBehaviorState>
     ) => void
 ) {
-    const simulatedRegion = SimulatedRegion.create(
+    const simulatedRegion = newSimulatedRegion(
         newMapCoordinatesAt(0, 0),
         newSize(10, 10),
         'test region'
@@ -51,7 +53,7 @@ function setupStateAndInteract(
         `[Simuliert] test region`
     );
 
-    const behavior = TransferToHospitalBehaviorState.create();
+    const behavior = newTransferToHospitalBehaviorState();
     const beforeState = produce(emptyState, (draftState) => {
         draftState.simulatedRegions[simulatedRegion.id] =
             cloneDeepMutable(simulatedRegion);
@@ -138,7 +140,7 @@ describe('transfer to hospital behavior', () => {
 
                         simulatedRegion.inEvents.push(
                             cloneDeepMutable(
-                                VehicleArrivedEvent.create(
+                                newVehicleArrivedEvent(
                                     vehicle.id,
                                     state.currentTime
                                 )
@@ -173,7 +175,7 @@ describe('transfer to hospital behavior', () => {
 
                         simulatedRegion.inEvents.push(
                             cloneDeepMutable(
-                                VehicleArrivedEvent.create(
+                                newVehicleArrivedEvent(
                                     mutableVehicle.id,
                                     state.currentTime
                                 )
@@ -210,7 +212,7 @@ describe('transfer to hospital behavior', () => {
 
                         simulatedRegion.inEvents.push(
                             cloneDeepMutable(
-                                VehicleArrivedEvent.create(
+                                newVehicleArrivedEvent(
                                     mutableVehicle.id,
                                     state.currentTime
                                 )
@@ -242,7 +244,7 @@ describe('transfer to hospital behavior', () => {
 
                         simulatedRegion.inEvents.push(
                             cloneDeepMutable(
-                                VehicleArrivedEvent.create(
+                                newVehicleArrivedEvent(
                                     mutableVehicle.id,
                                     state.currentTime
                                 )
@@ -289,7 +291,7 @@ describe('transfer to hospital behavior', () => {
 
                     simulatedRegion.inEvents.push(
                         cloneDeepMutable(
-                            VehicleArrivedEvent.create(
+                            newVehicleArrivedEvent(
                                 mutableVehicle.id,
                                 state.currentTime
                             )
@@ -346,7 +348,7 @@ describe('transfer to hospital behavior', () => {
 
                     simulatedRegion.inEvents.push(
                         cloneDeepMutable(
-                            VehicleArrivedEvent.create(
+                            newVehicleArrivedEvent(
                                 mutableVehicle.id,
                                 state.currentTime
                             )
@@ -406,7 +408,7 @@ describe('transfer to hospital behavior', () => {
 
                     simulatedRegion.inEvents.push(
                         cloneDeepMutable(
-                            VehicleArrivedEvent.create(
+                            newVehicleArrivedEvent(
                                 mutableVehicle.id,
                                 state.currentTime
                             )
@@ -445,7 +447,7 @@ describe('transfer to hospital behavior', () => {
                     }
 
                     simulatedRegion.inEvents.push(
-                        cloneDeepMutable(TickEvent.create(1_000))
+                        cloneDeepMutable(newTickEvent(1_000))
                     );
                 }
             );
@@ -459,7 +461,7 @@ describe('transfer to hospital behavior', () => {
             const { beforeState, afterState } = setupStateAndInteract(
                 (_, simulatedRegion) => {
                     simulatedRegion.inEvents.push(
-                        cloneDeepMutable(TickEvent.create(1_000))
+                        cloneDeepMutable(newTickEvent(1_000))
                     );
                 }
             );
@@ -486,7 +488,7 @@ describe('transfer to hospital behavior', () => {
                         true;
 
                     simulatedRegion.inEvents.push(
-                        cloneDeepMutable(TickEvent.create(1_000))
+                        cloneDeepMutable(newTickEvent(1_000))
                     );
                 }
             );
@@ -529,7 +531,7 @@ describe('transfer to hospital behavior', () => {
                         true;
 
                     simulatedRegion.inEvents.push(
-                        cloneDeepMutable(TickEvent.create(1_000))
+                        cloneDeepMutable(newTickEvent(1_000))
                     );
                 }
             );
@@ -557,7 +559,7 @@ describe('transfer to hospital behavior', () => {
                         ] = true;
 
                         simulatedRegion.inEvents.push(
-                            cloneDeepMutable(TickEvent.create(1_000))
+                            cloneDeepMutable(newTickEvent(1_000))
                         );
                     }
                 );

@@ -1,9 +1,8 @@
 import type { WritableDraft } from 'immer';
 import type { Client } from '../models/client.js';
-import type { Role } from '../models/utils/index.js';
-import type { SpecificRole } from '../models/utils/role.js';
+import type { Role, SpecificRole } from '../models/utils/role.js';
 import type { ExerciseState } from '../state.js';
-import type { Constructor } from '../utils/index.js';
+import type { Constructor } from '../utils/constructor.js';
 
 export interface ActionReducer<A extends Action = Action> {
     readonly action: Constructor<A>;

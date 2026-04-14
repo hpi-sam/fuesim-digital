@@ -1,10 +1,12 @@
-import { getCreate } from '../../models/utils/get-create.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { z } from 'zod';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class DoTransferEvent implements SimulationEvent {
-    @IsValue('doTransferEvent')
-    readonly type = 'doTransferEvent';
+export const doTransferEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
+    type: z.literal('doTransferEvent'),
+});
+export type DoTransferEvent = z.infer<typeof doTransferEventSchema>;
 
-    static readonly create = getCreate(this);
+export function newDoTransferEvent(): DoTransferEvent {
+    return { type: 'doTransferEvent' };
 }

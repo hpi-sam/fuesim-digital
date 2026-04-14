@@ -1,19 +1,6 @@
 import { z } from 'zod';
-import type { UUID } from '../utils/index.js';
-import { uuidSchema, cloneDeepMutable, uuid } from '../utils/index.js';
-import type {
-    BiometricInformation,
-    HealthPoints,
-    ImageProperties,
-    PatientStatusCode,
-    Position,
-} from './utils/index.js';
-import {
-    imagePropertiesSchema,
-    biometricInformationSchema,
-    getStatus,
-    healthPointsSchema,
-} from './utils/index.js';
+import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
+import { cloneDeepMutable } from '../utils/clone-deep.js';
 import { generatePersonalInformation } from './utils/personal-information.js';
 import type { Patient } from './patient.js';
 import { newPatient } from './patient.js';
@@ -24,6 +11,21 @@ import type {
 import { patientHealthStateSchema } from './patient-health-state.js';
 import type { PretriageInformation } from './utils/pretriage-information.js';
 import { pretriageInformationSchema } from './utils/pretriage-information.js';
+import {
+    type BiometricInformation,
+    biometricInformationSchema,
+} from './utils/biometric-information.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from './utils/image-properties.js';
+import {
+    getStatus,
+    type HealthPoints,
+    healthPointsSchema,
+} from './utils/health-points.js';
+import type { PatientStatusCode } from './utils/patient-status-code.js';
+import type { Position } from './utils/position/position.js';
 
 export const patientTemplateSchema = z.strictObject({
     id: uuidSchema,

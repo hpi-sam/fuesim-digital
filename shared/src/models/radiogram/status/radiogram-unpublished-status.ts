@@ -1,16 +1,16 @@
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../../utils/get-create.js';
-import type { RadiogramStatus } from './radiogram-status.js';
+import { z } from 'zod';
+import { radiogramStatusSchema } from './radiogram-status.js';
 
-export class RadiogramUnpublishedStatus implements RadiogramStatus {
-    @IsValue('unpublishedRadiogramStatus')
-    public readonly type = 'unpublishedRadiogramStatus';
+export const radiogramUnpublishedStatus = z.strictObject({
+    ...radiogramStatusSchema.shape,
+    type: z.literal('unpublishedRadiogramStatus'),
+});
+export type RadiogramUnpublishedStatus = z.infer<
+    typeof radiogramUnpublishedStatus
+>;
 
-    /**
-     * @deprecated Use {@link create} instead.
-     */
-    // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-empty-function
-    constructor() {}
-
-    static readonly create = getCreate(this);
+export function newRadiogramUnpublishedStatus(): RadiogramUnpublishedStatus {
+    return {
+        type: 'unpublishedRadiogramStatus',
+    };
 }

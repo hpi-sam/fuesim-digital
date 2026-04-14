@@ -375,7 +375,9 @@ export function createSelectBehaviorStatesByType<
         createSelectBehaviorStates(simulatedRegionId),
         (behaviors) =>
             behaviors.filter(
-                (behavior): behavior is ExerciseSimulationBehaviorState<T> =>
+                (
+                    behavior
+                ): behavior is ExerciseSimulationBehaviorState & { type: T } =>
                     behavior.type === behaviorType
             )
     );
@@ -388,7 +390,9 @@ export function createSelectActivityStatesByType<
         createSelectActivityStates(simulatedRegionId),
         (activities) =>
             Object.values(activities).filter(
-                (activity): activity is ExerciseSimulationActivityState<T> =>
+                (
+                    activity
+                ): activity is ExerciseSimulationActivityState & { type: T } =>
                     activity.type === activityType
             )
     );

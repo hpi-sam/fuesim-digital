@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import { z } from 'zod';
 
 export const mapCoordinatesSchema = z.strictObject({
     x: z.number(),

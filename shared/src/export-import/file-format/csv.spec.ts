@@ -2,8 +2,8 @@ import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
 import { ExerciseState } from '../../state.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
-import type { Patient } from '../../models/index.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
+import type { Patient } from '../../models/patient.js';
 import {
     exportPatientsToCSV,
     patientsCsvExportColumns,

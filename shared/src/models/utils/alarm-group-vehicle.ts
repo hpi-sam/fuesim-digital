@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import type { UUID } from '../../utils/index.js';
-import { uuidSchema, uuid } from '../../utils/index.js';
+import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
 
 export const alarmGroupVehicleSchema = z.strictObject({
     id: uuidSchema,

@@ -2,9 +2,9 @@ import { Type } from 'class-transformer';
 import { IsArray, IsObject, IsOptional, ValidateNested } from 'class-validator';
 import { type WritableDraft } from 'immer';
 import { ExerciseState } from '../../state.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { ExerciseAction } from '../../store/action-reducers/action-reducers.js';
 import { IsExerciseAction } from '../../store/validate-exercise-action.js';
+import { IsValue } from '../../utils/validators/is-value.js';
 import { BaseExportImportFile } from './base-file.js';
 
 export class StateHistoryCompound {

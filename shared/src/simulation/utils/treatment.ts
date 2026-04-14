@@ -1,20 +1,17 @@
-import type { AllowedValues } from '../../utils/validators/index.js';
+import { z } from 'zod';
 
-export type TreatmentProgress =
-    | 'counted'
-    | 'noTreatment'
-    | 'secured'
-    | 'triaged'
-    | 'unknown';
+export const treatmentProgressAllowedValues = [
+    'counted',
+    'noTreatment',
+    'secured',
+    'triaged',
+    'unknown',
+] as const;
 
-export const treatmentProgressAllowedValues: AllowedValues<TreatmentProgress> =
-    {
-        counted: true,
-        noTreatment: true,
-        secured: true,
-        triaged: true,
-        unknown: true,
-    };
+export const treatmentProgressSchema = z.literal(
+    treatmentProgressAllowedValues
+);
+export type TreatmentProgress = z.infer<typeof treatmentProgressSchema>;
 
 export const treatmentProgressToGermanNameDictionary: {
     [Key in TreatmentProgress]: string;

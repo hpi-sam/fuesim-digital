@@ -1,12 +1,11 @@
 import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
-import { uuid, uuidSchema } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { type CanCaterFor, canCaterForSchema } from './utils/cater-for.js';
 import {
-    type CanCaterFor,
-    imagePropertiesSchema,
     type ImageProperties,
-} from './utils/index.js';
-import { canCaterForSchema } from './utils/cater-for.js';
+    imagePropertiesSchema,
+} from './utils/image-properties.js';
 
 export const personnelTemplateSchema = z.strictObject({
     id: uuidSchema,

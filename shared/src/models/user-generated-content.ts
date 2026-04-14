@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import { uuid, uuidSchema } from '../utils/uuid.js';
-import { scoutableSchema } from './index.js';
+import { scoutableSchema } from './scoutable.js';
 
 export const userGeneratedContentSchema = z.strictObject({
     id: uuidSchema,

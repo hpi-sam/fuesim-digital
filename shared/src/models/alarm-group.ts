@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuid, uuidSchema } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
 import { alarmGroupVehicleSchema } from './utils/alarm-group-vehicle.js';
 
 export const alarmGroupSchema = z.strictObject({

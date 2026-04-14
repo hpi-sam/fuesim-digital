@@ -1,5 +1,5 @@
-import * as z from 'zod';
-import { uuidSchema } from '../../../utils/index.js';
+import { z } from 'zod';
+import { uuidSchema } from '../../../utils/uuid.js';
 
 export const loadOccupationSchema = z.strictObject({
     type: z.literal('loadOccupation'),

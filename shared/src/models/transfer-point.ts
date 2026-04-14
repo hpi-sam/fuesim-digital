@@ -1,7 +1,9 @@
 import { z } from 'zod';
-import { uuid, uuidSchema, uuidSetSchema } from '../utils/index.js';
-import { isInSimulatedRegion, positionSchema } from './utils/index.js';
-import type { ImageProperties, Position } from './utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { uuidSetSchema } from '../utils/uuid-set.js';
+import { type Position, positionSchema } from './utils/position/position.js';
+import type { ImageProperties } from './utils/image-properties.js';
+import { isInSimulatedRegion } from './utils/position/position-helpers.js';
 
 export const reachableTransferPointsSchema = z.record(
     uuidSchema,

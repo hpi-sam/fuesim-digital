@@ -1,3 +1,5 @@
-export class RadiogramStatus {
-    readonly type!: `${string}RadiogramStatus`;
-}
+import { z } from 'zod';
+
+export const radiogramStatusSchema = z.strictObject({
+    type: z.literal('radiogramStatus'),
+});

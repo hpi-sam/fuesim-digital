@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import { z } from 'zod';
 import { IsZodSchema } from '../../../utils/validators/is-zod-object.js';
 import { transferPositionSchema } from './transfer-position.js';
 import { mapPositionSchema } from './map-position.js';

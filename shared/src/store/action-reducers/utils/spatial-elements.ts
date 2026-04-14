@@ -1,17 +1,17 @@
 import type { WritableDraft } from 'immer';
-import {
-    type MapCoordinates,
-    currentCoordinatesOf,
-    isOnMap,
-    SpatialTree,
-} from '../../../models/index.js';
 import type { ExerciseState } from '../../../state.js';
-import { cloneDeepMutable } from '../../../utils/index.js';
 import type { ElementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import type { UUID } from '../../../utils/uuid.js';
-import { removeTreatmentsOfElement } from './calculate-treatments.js';
+import {
+    currentCoordinatesOf,
+    isOnMap,
+} from '../../../models/utils/position/position-helpers.js';
+import { SpatialTree } from '../../../models/utils/spatial-tree.js';
+import type { MapCoordinates } from '../../../models/utils/position/map-coordinates.js';
+import { cloneDeepMutable } from '../../../utils/clone-deep.js';
 import { getElement } from './get-element.js';
+import { removeTreatmentsOfElement } from './calculate-treatments.js';
 
 /**
  * The element types for which a spatial tree exists in the state to improve the performance (see {@link SpatialTree}).

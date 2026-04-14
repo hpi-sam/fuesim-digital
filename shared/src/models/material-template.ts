@@ -1,9 +1,11 @@
 import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
-import { uuid, uuidSchema } from '../utils/index.js';
-import type { CanCaterFor, ImageProperties } from './utils/index.js';
-import { imagePropertiesSchema } from './utils/index.js';
-import { canCaterForSchema } from './utils/cater-for.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { type CanCaterFor, canCaterForSchema } from './utils/cater-for.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from './utils/image-properties.js';
 
 export const materialTemplateSchema = z.strictObject({
     id: uuidSchema,

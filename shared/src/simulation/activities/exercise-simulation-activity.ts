@@ -1,26 +1,90 @@
-import type { Type } from 'class-transformer';
-import { delayEventActivity } from './delay-event.js';
-import { SimulationActivityState } from './simulation-activity.js';
-import { reassignTreatmentsActivity } from './reassign-treatments.js';
-import { unloadVehicleActivity } from './unload-vehicle.js';
-import { recurringEventActivity } from './recurring-event.js';
-import { generateReportActivity } from './generate-report.js';
-import { providePersonnelFromVehiclesActivity } from './provide-personnel-from-vehicles.js';
-import { createRequestActivity } from './create-request.js';
-import { loadVehicleActivity } from './load-vehicle.js';
-import { sendRemoteEventActivity } from './send-remote-event.js';
-import { transferVehicleActivity } from './transfer-vehicle.js';
-import { publishRadiogramActivity } from './publish-radiogram.js';
-import { transferPatientToHospitalActivity } from './transfer-patient-to-hospital.js';
-import { countPatientsActivity } from './count-patients.js';
+import { z } from 'zod';
+import {
+    delayEventActivity,
+    delayEventActivityStateSchema,
+} from './delay-event.js';
+import {
+    reassignTreatmentsActivity,
+    reassignTreatmentsActivityStateSchema,
+} from './reassign-treatments.js';
+import {
+    unloadVehicleActivity,
+    unloadVehicleActivityStateSchema,
+} from './unload-vehicle.js';
+import {
+    recurringEventActivity,
+    recurringEventActivityStateSchema,
+} from './recurring-event.js';
+import {
+    generateReportActivity,
+    generateReportActivityStateSchema,
+} from './generate-report.js';
+import {
+    providePersonnelFromVehicleActivity,
+    providePersonnelFromVehiclesActivitySchema,
+} from './provide-personnel-from-vehicles.js';
+import {
+    createRequestActivity,
+    createRequestActivityStateSchema,
+} from './create-request.js';
+import {
+    loadVehicleActivity,
+    loadVehicleActivityStateSchema,
+} from './load-vehicle.js';
+import {
+    sendRemoteEventActivity,
+    sendRemoteEventActivityStateSchema,
+} from './send-remote-event.js';
+import {
+    transferVehicleActivity,
+    transferVehicleActivityStateSchema,
+} from './transfer-vehicle.js';
+import {
+    publishRadiogramActivity,
+    publishRadiogramActivityStateSchema,
+} from './publish-radiogram.js';
+import {
+    transferPatientToHospitalActivity,
+    transferPatientToHospitalActivityStateSchema,
+} from './transfer-patient-to-hospital.js';
+import {
+    countPatientsActivity,
+    countPatientsActivityStateSchema,
+} from './count-patients.js';
 
-export const simulationActivities = {
+export const exerciseSimulationActivityStateSchema = z.discriminatedUnion(
+    'type',
+    [
+        reassignTreatmentsActivityStateSchema,
+        unloadVehicleActivityStateSchema,
+        delayEventActivityStateSchema,
+        recurringEventActivityStateSchema,
+        generateReportActivityStateSchema,
+        providePersonnelFromVehiclesActivitySchema,
+        createRequestActivityStateSchema,
+        loadVehicleActivityStateSchema,
+        sendRemoteEventActivityStateSchema,
+        transferVehicleActivityStateSchema,
+        publishRadiogramActivityStateSchema,
+        transferPatientToHospitalActivityStateSchema,
+        countPatientsActivityStateSchema,
+    ]
+);
+
+export type ExerciseSimulationActivityState = z.infer<
+    typeof exerciseSimulationActivityStateSchema
+>;
+
+export type ExerciseSimulationActivityType =
+    ExerciseSimulationActivityState['type'];
+
+export const simulationActivityDictionary = {
     reassignTreatmentsActivity,
     unloadVehicleActivity,
     delayEventActivity,
     recurringEventActivity,
     generateReportActivity,
-    providePersonnelFromVehiclesActivity,
+    providePersonnelFromVehicleActivity,
     createRequestActivity,
     loadVehicleActivity,
     sendRemoteEventActivity,
@@ -28,47 +92,4 @@ export const simulationActivities = {
     publishRadiogramActivity,
     transferPatientToHospitalActivity,
     countPatientsActivity,
-};
-
-export type ExerciseSimulationActivity =
-    (typeof simulationActivities)[keyof typeof simulationActivities];
-
-type ExerciseSimulationActivityDictionary = {
-    [Activity in ExerciseSimulationActivity as InstanceType<
-        Activity['activityState']
-    >['type']]: Activity;
-};
-
-export type ExerciseSimulationActivityType = InstanceType<
-    ExerciseSimulationActivity['activityState']
->['type'];
-
-export type ExerciseSimulationActivityState<
-    T extends ExerciseSimulationActivityType = ExerciseSimulationActivityType,
-> = InstanceType<ExerciseSimulationActivityDictionary[T]['activityState']>;
-
-export const simulationActivityDictionary = Object.fromEntries(
-    Object.values(simulationActivities).map((activity) => [
-        new activity.activityState().type,
-        activity,
-    ])
-) as ExerciseSimulationActivityDictionary;
-
-export function getSimulationActivityConstructor(
-    state: ExerciseSimulationActivityState
-) {
-    return simulationActivityDictionary[state.type].activityState;
-}
-
-export const simulationActivityTypeOptions: Parameters<typeof Type> = [
-    () => SimulationActivityState,
-    {
-        keepDiscriminatorProperty: true,
-        discriminator: {
-            property: 'type',
-            subTypes: Object.entries(simulationActivityDictionary).map(
-                ([name, value]) => ({ name, value: value.activityState })
-            ),
-        },
-    },
-];
+} as const;

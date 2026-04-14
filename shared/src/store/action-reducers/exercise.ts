@@ -8,42 +8,39 @@ import {
     IsUUID,
 } from 'class-validator';
 import { WritableDraft } from 'immer';
-import {
-    newTransferPositionFor,
-    Personnel,
-    Vehicle,
-    createPersonnelTypeTag,
-    getStatus,
-    currentTransferOf,
-    isInTransfer,
-    ResourceDescription,
-} from '../../models/index.js';
-import { PartialExport } from '../../export-import/file-format/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import { simulateAllRegions } from '../../simulation/utils/simulation.js';
 import type { ExerciseState } from '../../state.js';
-import {
-    type UUID,
-    uuidValidationOptions,
-    cloneDeepMutable,
-    StrictObject,
-    uuid,
-} from '../../utils/index.js';
 import type { ElementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
-import type { TransferableElementType } from './transfer.js';
-import { letElementArrive } from './transfer.js';
-import { updateTreatments } from './utils/calculate-treatments.js';
-import { PatientUpdate } from './utils/index.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { createPersonnelTypeTag } from '../../models/utils/tag-helpers.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
+import { PartialExport } from '../../export-import/file-format/partial-export.js';
+import { getStatus } from '../../models/utils/health-points.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import type { Personnel } from '../../models/personnel.js';
+import type { Vehicle } from '../../models/vehicle.js';
+import {
+    currentTransferOf,
+    isInTransfer,
+} from '../../models/utils/position/position-helpers.js';
+import { type UUID, uuid, uuidValidationOptions } from '../../utils/uuid.js';
+import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { PatientUpdate } from './utils/patient-updates.js';
 import {
     logPatientVisibleStatusChanged,
     logActive,
     logPatient,
 } from './utils/log.js';
+import { updateTreatments } from './utils/calculate-treatments.js';
+import { letElementArrive } from './transfer.js';
+import type { TransferableElementType } from './transfer.js';
 
 export class PauseExerciseAction implements Action {
     @IsValue('[Exercise] Pause' as const)

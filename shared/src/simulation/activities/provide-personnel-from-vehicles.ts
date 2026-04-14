@@ -1,68 +1,51 @@
-import { IsString, IsUUID } from 'class-validator';
-import type { SimulatedRegion } from '../../models/index.js';
-import { VehicleResource, getCreate } from '../../models/utils/index.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { z } from 'zod';
+import type { ExerciseState } from '../../state.js';
+import { sendSimulationEvent } from '../events/utils.js';
 import {
     addResourceDescription,
     greaterEqualResourceDescription,
+    type ResourceDescription,
+    resourceDescriptionSchema,
 } from '../../models/utils/resource-description.js';
-import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
-import {
-    StrictObject,
-    uuidArrayValidationOptions,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
-import { ResourceRequiredEvent } from '../events/index.js';
-import { sendSimulationEvent } from '../events/utils.js';
-import { tryGetElement } from '../../store/action-reducers/utils/index.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { newResourceRequiredEvent } from '../events/resources-required.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { tryGetElement } from '../../store/action-reducers/utils/get-element.js';
 import type { UnloadVehicleActivityState } from './unload-vehicle.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
-export class ProvidePersonnelFromVehiclesActivityState
-    implements SimulationActivityState
-{
-    @IsValue('providePersonnelFromVehicleActivity' as const)
-    public readonly type = 'providePersonnelFromVehicleActivity';
+export const providePersonnelFromVehiclesActivitySchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('providePersonnelFromVehicleActivity'),
+    requiredPersonnelCounts: resourceDescriptionSchema,
+    vehiclePriorities: z.array(uuidSchema),
+    key: z.string(),
+});
+export type ProvidePersonnelFromVehiclesActivityState = z.infer<
+    typeof providePersonnelFromVehiclesActivitySchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    @IsResourceDescription()
-    public readonly requiredPersonnelCounts: ResourceDescription;
-
-    @IsUUID(4, uuidArrayValidationOptions)
-    public readonly vehiclePriorities: readonly UUID[];
-
-    @IsString()
-    public readonly key: string;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        requiredPersonnelCounts: ResourceDescription,
-        vehiclePriorities: UUID[],
-        key: string
-    ) {
-        this.vehiclePriorities = vehiclePriorities;
-        this.requiredPersonnelCounts = requiredPersonnelCounts;
-        this.id = id;
-        this.key = key;
-    }
-
-    static readonly create = getCreate(this);
+export function newProvidePersonnelFromVehiclesActivityState(
+    id: UUID,
+    requiredPersonnelCounts: ResourceDescription,
+    vehiclePriorities: UUID[],
+    key: string
+): ProvidePersonnelFromVehiclesActivityState {
+    return {
+        id,
+        type: 'providePersonnelFromVehicleActivity',
+        requiredPersonnelCounts,
+        vehiclePriorities,
+        key,
+    };
 }
 
-export const providePersonnelFromVehiclesActivity: SimulationActivity<ProvidePersonnelFromVehiclesActivityState> =
+export const providePersonnelFromVehicleActivity: SimulationActivity<ProvidePersonnelFromVehiclesActivityState> =
     {
-        activityState: ProvidePersonnelFromVehiclesActivityState,
+        activityStateSchema: providePersonnelFromVehiclesActivitySchema,
         tick(
             draftState,
             simulatedRegion,
@@ -130,9 +113,9 @@ export const providePersonnelFromVehiclesActivity: SimulationActivity<ProvidePer
                 );
             }
 
-            const event = ResourceRequiredEvent.create(
+            const event = newResourceRequiredEvent(
                 simulatedRegion.id,
-                VehicleResource.create(missingVehicleCounts),
+                newVehicleResource(missingVehicleCounts),
                 activityState.key
             );
             sendSimulationEvent(simulatedRegion, event);

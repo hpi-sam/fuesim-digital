@@ -1,35 +1,37 @@
 import { produce, type WritableDraft } from 'immer';
-import {
-    newImageProperties,
-    newMapCoordinatesAt,
-    newNoOccupation,
-    newSimulatedRegionPositionIn,
-    newSize,
-    newTransferPoint,
-    SimulatedRegion,
-    SimulatedRegionRequestTargetConfiguration,
-    VehicleResource,
-} from '../../models/index.js';
 import { ExerciseState } from '../../state.js';
-import {
-    ResourceRequiredEvent,
-    VehicleArrivedEvent,
-    VehiclesSentEvent,
-} from '../events/index.js';
-import { cloneDeepMutable, StrictObject, uuid } from '../../utils/index.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { handleSimulationEvents } from '../utils/simulation.js';
-import { RecurringEventActivityState } from '../activities/index.js';
 import { addActivity } from '../activities/utils.js';
-import { SendRequestEvent } from '../events/send-request.js';
-import { ResourcePromise } from '../utils/resource-promise.js';
+import { newSendRequestEvent } from '../events/send-request.js';
+import { newResourcePromise } from '../utils/resource-promise.js';
 import { newVehicle } from '../../models/vehicle.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { newImageProperties } from '../../models/utils/image-properties.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { newNoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newVehicleArrivedEvent } from '../events/vehicle-arrived.js';
 import {
-    RequestBehaviorState,
+    newSimulatedRegion,
+    type SimulatedRegion,
+} from '../../models/simulated-region.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
+import { newSize } from '../../models/utils/size.js';
+import { newTransferPoint } from '../../models/transfer-point.js';
+import { uuid } from '../../utils/uuid.js';
+import { newSimulatedRegionRequestTargetConfiguration } from '../../models/utils/request-target/simulated-region.js';
+import { newResourceRequiredEvent } from '../events/resources-required.js';
+import { newVehiclesSentEvent } from '../events/vehicles-sent.js';
+import type { RequestBehaviorState } from './request.js';
+import {
     getResourcesToRequest,
     updateBehaviorsRequestInterval,
     updateBehaviorsRequestTarget,
+    newRequestBehaviorState,
 } from './request.js';
 
 // constants
@@ -83,7 +85,7 @@ function setupStateAndInteract(
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => void
 ) {
-    const simulatedRegion = SimulatedRegion.create(
+    const simulatedRegion = newSimulatedRegion(
         newMapCoordinatesAt(0, 0),
         newSize(10, 10),
         'test region'
@@ -98,7 +100,7 @@ function setupStateAndInteract(
         draftState.simulatedRegions[simulatedRegion.id] =
             cloneDeepMutable(simulatedRegion);
         draftState.simulatedRegions[simulatedRegion.id]?.behaviors.push(
-            cloneDeepMutable(RequestBehaviorState.create())
+            cloneDeepMutable(newRequestBehaviorState())
         );
         draftState.transferPoints[transferPoint.id] =
             cloneDeepMutable(transferPoint);
@@ -112,9 +114,9 @@ function setupStateAndInteract(
         behaviorState.recurringEventActivityId = uuid();
         addActivity(
             mutableSimulatedRegion,
-            RecurringEventActivityState.create(
+            newRecurringEventActivityState(
                 behaviorState.recurringEventActivityId,
-                SendRequestEvent.create(),
+                newSendRequestEvent(),
                 draftState.currentTime,
                 behaviorState.requestInterval
             )
@@ -175,7 +177,7 @@ function updateRequestTarget(
     behaviorState: WritableDraft<RequestBehaviorState>
 ) {
     const otherSimulatedRegion = cloneDeepMutable(
-        SimulatedRegion.create(
+        newSimulatedRegion(
             newMapCoordinatesAt(0, 0),
             newSize(10, 10),
             'requestable region'
@@ -194,9 +196,7 @@ function updateRequestTarget(
         draftState,
         simulatedRegion,
         behaviorState,
-        SimulatedRegionRequestTargetConfiguration.create(
-            otherSimulatedRegion.id
-        )
+        newSimulatedRegionRequestTargetConfiguration(otherSimulatedRegion.id)
     );
 }
 
@@ -224,7 +224,7 @@ const addRequestsAndPromises = {
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.requestedResources[requestKey] = cloneDeepMutable(
-            VehicleResource.create({
+            newVehicleResource({
                 KTW: 1,
             })
         );
@@ -235,9 +235,9 @@ const addRequestsAndPromises = {
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
         ]);
     },
@@ -247,7 +247,7 @@ const addRequestsAndPromises = {
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(oldTime, VehicleResource.create({ KTW: 1 })),
+            newResourcePromise(oldTime, newVehicleResource({ KTW: 1 })),
         ]);
     },
     withOldAndNewPromises: (
@@ -256,10 +256,10 @@ const addRequestsAndPromises = {
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(oldTime, VehicleResource.create({ KTW: 1 })),
-            ResourcePromise.create(
+            newResourcePromise(oldTime, newVehicleResource({ KTW: 1 })),
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
         ]);
     },
@@ -269,14 +269,14 @@ const addRequestsAndPromises = {
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.requestedResources[requestKey] = cloneDeepMutable(
-            VehicleResource.create({
+            newVehicleResource({
                 KTW: 1,
             })
         );
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
         ]);
     },
@@ -286,14 +286,14 @@ const addRequestsAndPromises = {
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.requestedResources[requestKey] = cloneDeepMutable(
-            VehicleResource.create({
+            newVehicleResource({
                 KTW: 2,
             })
         );
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
         ]);
     },
@@ -303,9 +303,9 @@ const addRequestsAndPromises = {
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ RTW: 1 })
+                newVehicleResource({ RTW: 1 })
             ),
         ]);
     },
@@ -315,13 +315,13 @@ const addRequestsAndPromises = {
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ RTW: 1 })
+                newVehicleResource({ RTW: 1 })
             ),
         ]);
     },
@@ -335,9 +335,9 @@ const sendEvent = {
     ) => {
         sendSimulationEvent(
             simulatedRegion,
-            ResourceRequiredEvent.create(
+            newResourceRequiredEvent(
                 simulatedRegion.id,
-                VehicleResource.create({ KTW: 1 }),
+                newVehicleResource({ KTW: 1 }),
                 'new-request-key'
             )
         );
@@ -349,9 +349,9 @@ const sendEvent = {
     ) => {
         sendSimulationEvent(
             simulatedRegion,
-            ResourceRequiredEvent.create(
+            newResourceRequiredEvent(
                 simulatedRegion.id,
-                VehicleResource.create({ KTW: 1 }),
+                newVehicleResource({ KTW: 1 }),
                 requestKey
             )
         );
@@ -364,8 +364,8 @@ const sendEvent = {
         const transferPoint = Object.values(draftState.transferPoints)[0]!;
         sendSimulationEvent(
             simulatedRegion,
-            VehiclesSentEvent.create(
-                VehicleResource.create({ KTW: 1 }),
+            newVehiclesSentEvent(
+                newVehicleResource({ KTW: 1 }),
                 transferPoint.id
             )
         );
@@ -389,7 +389,7 @@ const sendEvent = {
 
         sendSimulationEvent(
             simulatedRegion,
-            VehicleArrivedEvent.create(vehicle.id, draftState.currentTime)
+            newVehicleArrivedEvent(vehicle.id, draftState.currentTime)
         );
     },
     sendRequestEvent: (
@@ -397,7 +397,7 @@ const sendEvent = {
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
-        sendSimulationEvent(simulatedRegion, SendRequestEvent.create());
+        sendSimulationEvent(simulatedRegion, newSendRequestEvent());
     },
 };
 
@@ -415,7 +415,7 @@ describe('request behavior', () => {
 
                     expect(
                         afterBehaviorState.requestedResources['new-request-key']
-                    ).toEqual(VehicleResource.create({ KTW: 1 }));
+                    ).toEqual(newVehicleResource({ KTW: 1 }));
                 });
             }
         );
@@ -455,7 +455,7 @@ describe('request behavior', () => {
                     expect(promisedResources.length).toBeGreaterThanOrEqual(1);
                     const promise = promisedResources.at(-1)!;
                     expect(promise.resource).toEqual(
-                        VehicleResource.create({ KTW: 1 })
+                        newVehicleResource({ KTW: 1 })
                     );
                 });
             }
@@ -517,7 +517,7 @@ describe('request behavior', () => {
                     afterBehaviorState.requestTarget
                 );
                 expect(typedActivity.requestedResource).toEqual(
-                    VehicleResource.create({ KTW: 1 })
+                    newVehicleResource({ KTW: 1 })
                 );
             });
         });

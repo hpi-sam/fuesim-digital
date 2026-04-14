@@ -1,8 +1,10 @@
 import type { WritableDraft } from 'immer';
 import { newLogEntry } from '../../../models/log-entry.js';
-import type { ExerciseRadiogram } from '../../../models/radiogram/index.js';
 import type { Tag } from '../../../models/tag.js';
-import { statusNames } from '../../../models/utils/patient-status.js';
+import {
+    type PatientStatus,
+    statusNames,
+} from '../../../models/utils/patient-status.js';
 import {
     createAlarmGroupTag,
     createBehaviorTag,
@@ -22,14 +24,7 @@ import {
 import type { TreatmentProgress } from '../../../simulation/utils/treatment.js';
 import { treatmentProgressToGermanNameDictionary } from '../../../simulation/utils/treatment.js';
 import type { ExerciseState } from '../../../state.js';
-import type { UUID } from '../../../utils/index.js';
-import { formatDuration, StrictObject } from '../../../utils/index.js';
 import { getPatientVisibleStatus } from '../../../models/patient.js';
-import type {
-    PatientStatus,
-    Personnel,
-    Vehicle,
-} from '../../../models/index.js';
 import {
     currentSimulatedRegionIdOf,
     currentSimulatedRegionOf,
@@ -39,6 +34,12 @@ import type { WithPosition } from '../../../models/utils/position/with-position.
 import type { TransferPoint } from '../../../models/transfer-point.js';
 import type { Hospital } from '../../../models/hospital.js';
 import { behaviorTypeToGermanNameDictionary } from '../../../simulation/behaviors/utils.js';
+import type { UUID } from '../../../utils/uuid.js';
+import type { Personnel } from '../../../models/personnel.js';
+import type { Vehicle } from '../../../models/vehicle.js';
+import { formatDuration } from '../../../utils/format-duration.js';
+import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
+import { StrictObject } from '../../../utils/strict-object.js';
 import {
     getElement,
     getExerciseBehaviorById,

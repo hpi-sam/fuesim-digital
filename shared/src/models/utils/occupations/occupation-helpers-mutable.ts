@@ -1,9 +1,9 @@
 import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../../state.js';
 import { logVehicle } from '../../../store/action-reducers/utils/log.js';
-import { cloneDeepMutable } from '../../../utils/index.js';
 import type { Vehicle } from '../../vehicle.js';
 import { createOccupationTag } from '../tag-helpers.js';
+import { cloneDeepMutable } from '../../../utils/clone-deep.js';
 import type { ExerciseOccupation } from './exercise-occupation.js';
 import { newNoOccupation } from './no-occupation.js';
 

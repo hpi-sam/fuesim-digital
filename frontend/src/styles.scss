@@ -3,6 +3,8 @@
 /* Importing Bootstrap SCSS file. */
 @use 'bootstrap/scss/bootstrap';
 
+@use 'maplibre-gl/dist/maplibre-gl.css';
+
 .dropdown-menu {
     overflow: auto;
     max-height: 250px;

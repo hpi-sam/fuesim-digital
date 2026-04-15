@@ -10,8 +10,6 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import maplibregl from 'maplibre-gl';
-// eslint-disable-next-line no-restricted-imports
-import 'maplibre-gl/dist/maplibre-gl.css';
 import { getBoundingBox } from 'fuesim-digital-shared';
 import { startingPosition } from '../../../starting-position';
 import { AppState } from '../../../../../../../state/app.state';

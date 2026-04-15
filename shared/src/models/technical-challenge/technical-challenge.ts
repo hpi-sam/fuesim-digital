@@ -32,9 +32,3 @@ export const technicalChallengeSchema = z.strictObject({
 });
 
 export type TechnicalChallenge = z.infer<typeof technicalChallengeSchema>;
-
-export function isTechnicalChallenge(
-    element: object
-): element is TechnicalChallenge {
-    return 'type' in element && element.type === 'technicalChallenge';
-}

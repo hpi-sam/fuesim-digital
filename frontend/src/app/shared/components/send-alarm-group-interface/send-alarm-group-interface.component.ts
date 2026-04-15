@@ -1,4 +1,4 @@
-import type { OnDestroy, OnInit } from '@angular/core';
+import { computed, type OnDestroy, type OnInit } from '@angular/core';
 import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
@@ -25,8 +25,12 @@ import {
     selectVehicleTemplates,
     selectMaterialTemplates,
     selectPersonnelTemplates,
+    selectExerciseStatus,
 } from '../../../state/application/selectors/exercise.selectors';
-import { selectOwnClient } from '../../../state/application/selectors/shared.selectors';
+import {
+    selectCurrentMainRole,
+    selectOwnClient,
+} from '../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../state/get-state-snapshot';
 import type { SearchableDropdownOption } from '../searchable-dropdown/searchable-dropdown.component';
 import { AutofocusDirective } from '../../directives/autofocus.directive';
@@ -94,6 +98,14 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
     public submitHotkey = new Hotkey('Enter', false, () => {
         this.sendAlarmGroup();
     });
+
+    public currentRole = this.store.selectSignal(selectCurrentMainRole);
+    public exerciseStatus = this.store.selectSignal(selectExerciseStatus);
+    public readonly interfaceDisabled = computed(
+        () =>
+            this.currentRole() !== 'trainer' &&
+            this.exerciseStatus() !== 'running'
+    );
 
     public loading = false;
 

@@ -1,7 +1,7 @@
 <div class="card">
     <h5 class="card-header">Einsatztagebuch</h5>
     <div class="card-body">
-        <div class="p-3 border-bottom">
+        <fieldset class="p-3 border-bottom" [disabled]="interfaceDisabled()">
             <textarea
                 [(ngModel)]="newLogEntry"
                 [appAutofocus]="true"
@@ -17,7 +17,7 @@
             >
                 Eintrag speichern
             </button>
-            @if (clientIsTrainer) {
+            @if (currentRole() === 'trainer') {
                 <div class="form-check form-switch mt-2">
                     <input
                         class="form-check-input"
@@ -30,7 +30,7 @@
                     </label>
                 </div>
             }
-        </div>
+        </fieldset>
         @if (eocLogEntries$ | async; as eocLogEntries) {
             @if (eocLogEntries.length === 0) {
                 <div class="text-muted p-3">
@@ -44,7 +44,10 @@
                     class="list-group list-group-flush"
                 >
                     @for (eocLogEntry of eocLogEntries; track eocLogEntry) {
-                        @if (clientIsTrainer || !eocLogEntry.isPrivate) {
+                        @if (
+                            currentRole() === 'trainer' ||
+                            !eocLogEntry.isPrivate
+                        ) {
                             <li
                                 class="list-group-item"
                                 style="border-left-width: 4px"

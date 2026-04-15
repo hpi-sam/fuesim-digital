@@ -1,11 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
-import { selectEocLogEntries } from '../../../../../../state/application/selectors/exercise.selectors';
+import {
+    selectEocLogEntries,
+    selectExerciseStatus,
+} from '../../../../../../state/application/selectors/exercise.selectors';
 import {
     selectCurrentMainRole,
     selectOwnClient,
@@ -32,15 +35,27 @@ export class EocLogInterfaceComponent {
     public newLogEntry = '';
 
     public sendingPrivateLog = true;
-    public readonly clientIsTrainer =
-        selectStateSnapshot(selectCurrentMainRole, this.store) === 'trainer';
+
+    public readonly currentRole = this.store.selectSignal(
+        selectCurrentMainRole
+    );
+    public readonly exerciseStatus =
+        this.store.selectSignal(selectExerciseStatus);
+    public readonly interfaceDisabled = computed(
+        () =>
+            this.currentRole() !== 'trainer' &&
+            this.exerciseStatus() !== 'running'
+    );
 
     public async addEocLogEntry() {
         const response = await this.exerciseService.proposeAction({
             type: '[Emergency Operation Center] Add Log Entry',
             message: this.newLogEntry,
             name: selectStateSnapshot(selectOwnClient, this.store)!.name,
-            isPrivate: this.clientIsTrainer ? this.sendingPrivateLog : false,
+            isPrivate:
+                this.currentRole() === 'trainer'
+                    ? this.sendingPrivateLog
+                    : false,
         });
         if (response.success) {
             this.newLogEntry = '';

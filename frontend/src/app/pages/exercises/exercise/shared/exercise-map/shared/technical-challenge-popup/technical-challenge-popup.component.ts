@@ -32,8 +32,7 @@ export class TechnicalChallengePopupComponent implements OnInit {
     // Set via popup context before OnInit
     public technicalChallengeId!: UUID;
 
-    // eslint-disable-next-line
-    public technicalChallenge!: Signal<TechnicalChallenge>;
+    public readonly technicalChallenge!: Signal<TechnicalChallenge>;
     public readonly assignedPersonnel = computed<[Personnel, Task][]>(() => {
         const assignments = this.technicalChallenge().assignedPersonnel;
         return Object.entries(assignments).map(([personnelId, taskId]) => [
@@ -70,6 +69,7 @@ export class TechnicalChallengePopupComponent implements OnInit {
     );
 
     ngOnInit(): void {
+        // @ts-expect-error deferred initialization
         this.technicalChallenge = this.store.selectSignal(
             createSelectTechnicalChallenge(this.technicalChallengeId)
         );

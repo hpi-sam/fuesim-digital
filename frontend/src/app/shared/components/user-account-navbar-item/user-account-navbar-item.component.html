@@ -6,9 +6,9 @@
         }}</span>
         <div ngbDropdownMenu>
             @if (authData?.userSelfServiceEnabled) {
-                <a ngbDropdownItem [href]="userSelfServiceUrl"
-                    >Account verwalten</a
-                >
+                <a ngbDropdownItem [href]="userSelfServiceUrl">
+                    Konto verwalten
+                </a>
             }
             <a ngbDropdownItem [href]="logoutUrl">Ausloggen</a>
         </div>

@@ -19,7 +19,6 @@ import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { AutofocusDirective } from '../../../shared/directives/autofocus.directive';
-import { DisplayValidationComponent } from '../../../shared/validation/display-validation/display-validation.component';
 import { FileInputDirective } from '../../../shared/directives/file-input.directive';
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { DisplayModelValidationComponent } from '../../../shared/validation/display-model-validation/display-model-validation.component';
@@ -32,7 +31,6 @@ import { DisplayModelValidationComponent } from '../../../shared/validation/disp
         HeaderComponent,
         FormsModule,
         AutofocusDirective,
-        DisplayValidationComponent,
         RouterLink,
         FileInputDirective,
         FooterComponent,

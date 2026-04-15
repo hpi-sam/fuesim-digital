@@ -70,6 +70,19 @@ export function createAuthRouter(authService: AuthService) {
         );
     });
 
+    router.get('/self-service', async (req, res) => {
+        try {
+            await authService.oidcService.handleSelfServiceRedirect(req, res);
+        } catch {
+            res.redirect(
+                toFrontend(undefined, {
+                    loginFailure:
+                        'Weiterleitung zur Kontoverwaltung fehlgeschlagen',
+                })
+            );
+        }
+    });
+
     router.post('/refresh-session', async (req, res) => {
         const sessionToken = req.cookies[authService.SESSION_COOKIE_NAME];
         if (!sessionToken) {

@@ -1,32 +1,26 @@
 import * as z from 'zod';
-import { uuid, uuidSchema } from '../utils/uuid.js';
-import { scoutableSchema, technicalChallengeSchema } from './index.js';
+import { UUID, uuid, uuidSchema } from '../utils/uuid.js';
+
+export const userGeneratedContentIdSchema = uuidSchema.brand(
+    'UserGeneratedContentId'
+);
+export type UserGeneratedContentId = z.infer<
+    typeof userGeneratedContentIdSchema
+>;
 
 export const userGeneratedContentSchema = z.strictObject({
-    id: uuidSchema,
+    id: userGeneratedContentIdSchema,
     type: z.literal('userGeneratedContent'),
     content: z.string(),
 });
-
 export type UserGeneratedContent = z.infer<typeof userGeneratedContentSchema>;
 
-/* TODO @JohannesPotzi : Drop this? */
-export const userGeneratedContentAssignableElementSchema = z.union([
-    scoutableSchema,
-]);
-export type UserGeneratedContentAssignableElement = z.infer<
-    typeof userGeneratedContentAssignableElementSchema
->;
-
-export type UserGeneratedContentAssignableElementType =
-    UserGeneratedContentAssignableElement['type'];
-
-export function newUserGeneratedContent(
-    content?: string
-): UserGeneratedContent {
+export function newUserGeneratedContent(uuidIn?: UUID): UserGeneratedContent {
     return {
-        id: uuid(),
+        id:
+            (uuidIn as UserGeneratedContentId) ??
+            (uuid() as UserGeneratedContentId),
         type: 'userGeneratedContent',
-        content: content ?? '',
+        content: '',
     };
 }

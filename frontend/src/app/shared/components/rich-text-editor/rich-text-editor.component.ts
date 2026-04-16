@@ -1,15 +1,15 @@
 import {
     Component,
     computed,
+    effect,
     inject,
     input,
     OnDestroy,
     OnInit,
-    Signal,
     signal,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { type UserGeneratedContent, UUID } from 'fuesim-digital-shared';
+import { UUID } from 'fuesim-digital-shared';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 import { FormsModule } from '@angular/forms';
 import { ExerciseService } from '../../../core/exercise.service';
@@ -26,34 +26,13 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     readonly userGeneratedContentId = input.required<UUID>();
-    readonly userGeneratedContentToBeAdded = input<UserGeneratedContent | null>(
-        null
-    );
-    /* TODO @JohannesPotzi : fix the action delay. Proposal: Set this during init with async action. */
-    userGeneratedContentElement!: Signal<UserGeneratedContent | null>;
-    /* computed(() => {
-
-        console.log(
-            'computing UserGeneratedContentElement with ContentId: ' +
-                this.userGeneratedContentId()
-        );
-        if (
-            !this.store.selectSignal(
+    userGeneratedContentElement = computed(() => {
+        return (
+            this.store.selectSignal(
                 createSelectUserGeneratedContent(this.userGeneratedContentId())
-            )()
-        ) {
-            this.exerciseService.proposeAction(
-                {
-                    type: '[UserGeneratedContent] Add content',
-                    content: this.userGeneratedContentToBeAdded()!,
-                },
-                true
-            );
-        }
-        return this.store.selectSignal(
-            createSelectUserGeneratedContent(this.userGeneratedContentId())
-        )();
-    }); */
+            )() ?? null
+        );
+    });
 
     public readonly currentRole = this.store.selectSignal(
         selectCurrentMainRole
@@ -70,28 +49,18 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
     ];
     readonly editorContent = signal<string>('');
 
+    constructor() {
+        effect(() => {
+            if (this.userGeneratedContentElement()) {
+                this.editorContent.set(
+                    this.userGeneratedContentElement()!.content
+                );
+            }
+        });
+    }
+
     async ngOnInit(): Promise<void> {
         this.editor = new Editor();
-        if (
-            !this.store.selectSignal(
-                createSelectUserGeneratedContent(this.userGeneratedContentId())
-            )()
-        ) {
-            await this.addUserGeneratedContent();
-        }
-        this.userGeneratedContentElement = this.store.selectSignal(
-            createSelectUserGeneratedContent(this.userGeneratedContentId())
-        );
-        this.editorContent.set(this.userGeneratedContentElement()!.content);
-    }
-    addUserGeneratedContent(): void {
-        this.exerciseService.proposeAction(
-            {
-                type: '[UserGeneratedContent] Add content',
-                content: this.userGeneratedContentToBeAdded()!,
-            },
-            true
-        );
     }
 
     onSubmit() {
@@ -100,6 +69,11 @@ export class RichTextEditorComponent implements OnInit, OnDestroy {
             contentId: this.userGeneratedContentId(),
             newContentString: this.editorContent(),
         });
+        if (!this.userGeneratedContentElement()) {
+            this.userGeneratedContentElement = this.store.selectSignal(
+                createSelectUserGeneratedContent(this.userGeneratedContentId())
+            );
+        }
     }
 
     ngOnDestroy(): void {

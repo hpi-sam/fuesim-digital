@@ -1,7 +1,10 @@
+import { uuid } from '../../index.js';
 import type {
     Guard,
     TechnicalChallengeTemplate,
     Transition,
+    UserGeneratedContent,
+    UserGeneratedContentId,
     UUID,
 } from '../../index.js';
 import { newImageProperties } from '../../index.js';
@@ -10,8 +13,68 @@ import {
     newUserGeneratedContent,
 } from '../../models/index.js';
 import type { Task } from '../../models/task.js';
+import { log } from '../../store/action-reducers/utils/log.js';
 
 // TODO@Felix: remove this file
+
+const initialContent: UserGeneratedContent = {
+    id: '7eac4a83-99cd-406a-a4a3-d61b4d5b72bd' as UserGeneratedContentId,
+    type: 'userGeneratedContent',
+    content: 'Was eine Schweinerei, jetzt mach mal was draus.',
+};
+const onlyExtiguishedContent: UserGeneratedContent = {
+    id: 'bbc61783-aed7-441f-9637-165b39e72b56' as UserGeneratedContentId,
+    type: 'userGeneratedContent',
+    content: 'Feuer is nun weg, aber pass auf! Da is noch wer drin.',
+};
+const onlyDeadContent: UserGeneratedContent = {
+    id: 'a7a821a4-a4bc-44c6-a000-85ffba6b2b86' as UserGeneratedContentId,
+    type: 'userGeneratedContent',
+    content: 'Der hat schon seinen Körper verlassen.',
+};
+const onlyTreatedContent: UserGeneratedContent = {
+    id: '295a0f00-9097-49f8-b236-7dc8070772ff' as UserGeneratedContentId,
+    type: 'userGeneratedContent',
+    content: 'Da is noch Feuer. Zum glück steckt keiner mehr drin.',
+};
+const onlyBurnedOutContent: UserGeneratedContent = {
+    id: '64a92a4b-6860-4296-a06e-18e723ebd96e' as UserGeneratedContentId,
+    type: 'userGeneratedContent',
+    content: 'Ein Wunder.',
+};
+const patientDeadButExtinguishedContent: UserGeneratedContent = {
+    id: 'e6c7e148-0172-4fdc-b4e2-b80f2c28d4df' as UserGeneratedContentId,
+    type: 'userGeneratedContent',
+    content: 'Feuer is weg, aber zu spät.',
+};
+const treatedAndExtinguishedContent: UserGeneratedContent = {
+    id: '489288c0-e32e-4028-8dc5-3c6c76ca2e88' as UserGeneratedContentId,
+    type: 'userGeneratedContent',
+    content: 'Sehr vorbildlich, besser gehts kaum.',
+};
+const burnedOutAndPatientDeadContent: UserGeneratedContent = {
+    id: '0aafeb9d-d934-4951-a3ba-6a2c58be0183' as UserGeneratedContentId,
+    type: 'userGeneratedContent',
+    content: 'Wo waren eingentlich das Personal?',
+};
+const burnedOutButRescuedContent: UserGeneratedContent = {
+    id: 'cc94d311-c8e4-41c0-a23a-b39f97fcb551' as UserGeneratedContentId,
+    type: 'userGeneratedContent',
+    content: 'Grad noch mal glück gehabt. Hätte schlimmer kommen können.',
+};
+const contents = Object.fromEntries(
+    [
+        initialContent,
+        onlyExtiguishedContent,
+        onlyDeadContent,
+        onlyTreatedContent,
+        onlyBurnedOutContent,
+        patientDeadButExtinguishedContent,
+        treatedAndExtinguishedContent,
+        burnedOutAndPatientDeadContent,
+        burnedOutButRescuedContent,
+    ].map((content) => [content.id, content])
+);
 
 function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     // --- Tasks ---
@@ -35,55 +98,55 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
         'Ausgangslage',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
         [extinguishFireTask.id, rescuePatientTask.id],
-        'Was eine Schweinerei, jetzt mach mal was draus.'
+        initialContent.id
     );
     const onlyExtinguished = newTechnicalChallengeState(
         'Feuer geloescht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
         [rescuePatientTask.id],
-        'Feuer is nun weg, aber pass auf! Da is noch wer drin.'
+        onlyExtiguishedContent.id
     );
     const onlyDead = newTechnicalChallengeState(
         'Patient verstorben',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
         [extinguishFireTask.id],
-        'Der hat schon seinen Körper verlassen.'
+        onlyDeadContent.id
     );
     const onlyTreated = newTechnicalChallengeState(
         'Patient gerettet',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
         [extinguishFireTask.id],
-        'Da is noch Feuer. Zum glück steckt keiner mehr drin.'
+        onlyTreatedContent.id
     );
     const onlyBurnedOut = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
         [rescuePatientTask.id],
-        'Ein Wunder.'
+        onlyBurnedOutContent.id
     );
     const patientDeadButExtinguished = newTechnicalChallengeState(
         'Patient verstorben, Feuer geloescht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
         [],
-        'Feuer is weg, aber zu spät.'
+        patientDeadButExtinguishedContent.id
     );
     const treatedAndExtinguished = newTechnicalChallengeState(
         'Patient gerettet und Feuer geloescht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
         [],
-        'Sehr vorbildlich, besser gehts kaum.'
+        treatedAndExtinguishedContent.id
     );
     const burnedOutAndPatientDead = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt und Patient verstorben',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
         [],
-        'Wo waren eingentlich das Personal?'
+        burnedOutAndPatientDeadContent.id
     );
     const burnedOutButRescued = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt, Patient gerettet',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
         [],
-        'Grad noch mal glück gehabt. Hätte schlimmer kommen können.'
+        burnedOutButRescuedContent.id
     );
 
     const states = Object.fromEntries(
@@ -198,7 +261,6 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
             100,
             1
         ),
-        userGeneratedContent: newUserGeneratedContent('default content'),
         name: 'Brennendes Fahrzeug mit eingeklemmter Person',
         states,
         relevantTasks,
@@ -219,4 +281,12 @@ export function getDefaultTechnicalChallengeTemplate(): TechnicalChallengeTempla
 
 export function getDefaultTasks(): { [key: UUID]: Task } {
     return getDefaultTechnicalChallengeTemplate().relevantTasks;
+}
+
+export function getDefaultUserGeneratedContents(): {
+    [key: UUID]: UserGeneratedContent;
+} {
+    console.log('initalContent id: ' + initialContent.id);
+    console.log(contents);
+    return contents;
 }

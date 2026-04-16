@@ -1,24 +1,10 @@
-import { computed, OnInit, Signal, Component, inject } from '@angular/core';
-import { Store } from '@ngrx/store';
-import type {
-    Personnel,
-    TechnicalChallenge,
-    Task,
-    TechnicalChallengeState,
-    UUID,
-    Guard,
-} from 'fuesim-digital-shared';
-import { currentStateOf } from 'fuesim-digital-shared';
-import {
-    createSelectPersonnel,
-    createSelectTask,
-    createSelectTechnicalChallenge,
-    selectCurrentTime,
-} from '../../../../../../../state/application/selectors/exercise.selectors';
-import type { AppState } from '../../../../../../../state/app.state';
+import { OnInit, Component, inject, Signal } from '@angular/core';
+import type { TechnicalChallenge, UUID } from 'fuesim-digital-shared';
 import { PopupService } from '../../utility/popup.service';
-import { ValuesPipe } from '../../../../../../../shared/pipes/values.pipe';
 import { TechnicalChallengeDetailsComponent } from '../../../../../../../shared/components/technical-challenge-details/technical-challenge-details.component';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../../../../../../state/app.state';
+import { createSelectTechnicalChallenge } from '../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-technical-challenge-popup',
@@ -35,33 +21,6 @@ export class TechnicalChallengePopupComponent implements OnInit {
 
     // eslint-disable-next-line
     public technicalChallenge!: Signal<TechnicalChallenge>;
-    public readonly assignedPersonnel = computed<[Personnel, Task][]>(() => {
-        const assignments = this.technicalChallenge().assignedPersonnel;
-        return Object.entries(assignments).map(([personnelId, taskId]) => [
-            this.store.selectSignal(createSelectPersonnel(personnelId))(),
-            this.store.selectSignal(createSelectTask(taskId))(),
-        ]);
-    });
-
-    public readonly guards = computed<Guard[]>(() =>
-        this.technicalChallenge().transitions.map(({ guard }) => guard)
-    );
-    public readonly progressGuards = computed(() =>
-        this.guards().filter((guard) => guard.type === 'progressGuard')
-    );
-    public readonly progressGuardsByTaskId = computed(
-        () =>
-            new Map(this.progressGuards().map((guard) => [guard.taskId, guard]))
-    );
-    public readonly timerGuards = computed(() =>
-        this.guards().filter((guard) => guard.type === 'timerGuard')
-    );
-
-    public exerciseTime = this.store.selectSignal(selectCurrentTime);
-
-    public readonly currentState: Signal<TechnicalChallengeState> = computed(
-        () => currentStateOf(this.technicalChallenge())
-    );
 
     ngOnInit(): void {
         this.technicalChallenge = this.store.selectSignal(

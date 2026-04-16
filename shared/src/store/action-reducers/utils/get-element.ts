@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import { freeze, isDraft, type WritableDraft } from 'immer';
 import type { ExerciseRadiogram } from '../../../models/radiogram/index.js';
 import type {
     ExerciseSimulationActivityState,
@@ -11,6 +11,7 @@ import type { UUID } from '../../../utils/index.js';
 import type { ElementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { ReducerError } from '../../reducer-error.js';
+import { newUserGeneratedContent } from '../../../models/user-generated-content.js';
 
 /**
  * @returns The element with the given id
@@ -19,9 +20,24 @@ import { ReducerError } from '../../reducer-error.js';
 export function getElement<
     ElementType extends keyof ElementTypePluralMap,
     State extends ExerciseState | WritableDraft<ExerciseState>,
->(state: State, elementType: ElementType, elementId: UUID) {
+>(
+    state: State,
+    elementType: ElementType,
+    elementId: UUID
+): State[ElementTypePluralMap[ElementType]][UUID] {
     const element = tryGetElement(state, elementType, elementId);
     if (!element) {
+        // Undefined UserGeneratedContent is always assumed to be an existing empty content.
+        if (elementType === 'userGeneratedContent') {
+            const content = newUserGeneratedContent(elementId);
+            if (isDraft(state)) {
+                return content as State[ElementTypePluralMap[ElementType]][UUID];
+            }
+            return freeze(
+                content,
+                true
+            ) as State[ElementTypePluralMap[ElementType]][UUID];
+        }
         throw new ReducerError(
             `Element of type ${elementType} with id ${elementId} does not exist`
         );

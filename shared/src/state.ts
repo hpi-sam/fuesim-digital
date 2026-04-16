@@ -91,7 +91,10 @@ import {
 import { patientSchema } from './models/patient.js';
 import { hospitalPatientSchema } from './models/hospital-patient.js';
 import { patientCategorySchema } from './models/patient-category.js';
-import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
+import {
+    getDefaultTasks,
+    getDefaultUserGeneratedContents,
+} from './data/default-state/tmp-default-technical-challenge.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -255,9 +258,9 @@ export class ExerciseState {
             userGeneratedContentSchema
         )
     )
-    public readonly userGeneratedContents: {
-        readonly [key: UUID]: UserGeneratedContent;
-    } = {};
+    public userGeneratedContents: {
+        [key: UUID]: UserGeneratedContent;
+    } = getDefaultUserGeneratedContents();
 
     /**
      * @deprecated Use {@link create} instead.

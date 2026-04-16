@@ -72,10 +72,7 @@
             <ng-template ngbNavContent>
                 <app-rich-text-editor
                     [userGeneratedContentId]="
-                        currentState().userGeneratedContent!.id
-                    "
-                    [userGeneratedContentToBeAdded]="
-                        currentState().userGeneratedContent
+                        currentState().userGeneratedContentId
                     "
                 />
             </ng-template>
@@ -84,9 +81,6 @@
     <div [ngbNavOutlet]="nav" class="mt-2"></div>
 } @else {
     <app-rich-text-editor
-        [userGeneratedContentId]="currentState().userGeneratedContent!.id"
-        [userGeneratedContentToBeAdded]="
-            this.currentState().userGeneratedContent
-        "
+        [userGeneratedContentId]="currentState().userGeneratedContentId"
     />
 }

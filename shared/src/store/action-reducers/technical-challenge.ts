@@ -63,19 +63,6 @@ export namespace TechnicalChallengeActionReducers {
             reducer: (draftState, action) => {
                 draftState.technicalChallenges[action.technicalChallenge.id] =
                     action.technicalChallenge;
-                draftState.userGeneratedContents[
-                    action.technicalChallenge.userGeneratedContent.id
-                ] = action.technicalChallenge.userGeneratedContent;
-                /* TODO @JohannesPotzi : drop this. */
-                console.log(
-                    'created Technical challenge with contentId: ' +
-                        action.technicalChallenge.userGeneratedContent.id +
-                        '\n' +
-                        'content: ' +
-                        draftState.userGeneratedContents[
-                            action.technicalChallenge.userGeneratedContent.id
-                        ]?.content
-                );
                 return draftState;
             },
             rights: 'trainer',

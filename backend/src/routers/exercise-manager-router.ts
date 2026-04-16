@@ -39,11 +39,24 @@ export function createExerciseManagerRouter(
                 req.body
             );
             const exerciseTemplate =
-                await exerciseManagerService.createExerciseTemplate(
+                await exerciseManagerService.createExerciseTemplateFromBlank(
                     parsedData,
                     req.session!
                 );
 
+            res.status(201).send(
+                getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
+            );
+        });
+    router
+        .route('/exercise_templates/import')
+        .all(isAuthenticatedMiddleware)
+        .post(async (req, res) => {
+            const exerciseTemplate =
+                await exerciseManagerService.createExerciseTemplateFromFile(
+                    req.body,
+                    req.session!
+                );
             res.status(201).send(
                 getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
             );

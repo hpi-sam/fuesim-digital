@@ -1,4 +1,8 @@
-import type { ExerciseType, ExerciseTemplateId } from 'fuesim-digital-shared';
+import type {
+    ExerciseType,
+    ExerciseTemplateId,
+    StateExport,
+} from 'fuesim-digital-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
@@ -7,6 +11,7 @@ import {
     NotFoundError,
     PermissionDeniedError,
 } from '../../utils/http.js';
+import { ActiveExercise } from '../../exercise/active-exercise.js';
 import type { ExerciseService } from './exercise-service.js';
 
 export class ExerciseManagerService {
@@ -25,7 +30,7 @@ export class ExerciseManagerService {
         );
     }
 
-    public async createExerciseTemplate(
+    public async createExerciseTemplateFromBlank(
         data: Omit<ExerciseTemplateInsert, 'user'>,
         session: SessionInformation
     ) {
@@ -37,12 +42,35 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new ApiError();
         }
-        const newExercise =
-            await this.exerciseService.exerciseFactory.fromBlank({
-                templateId: exerciseTemplate.id,
-            });
+        const newExercise = await this.exerciseService.createExerciseFromBlank({
+            templateId: exerciseTemplate.id,
+        });
         newExercise.template = exerciseTemplate;
-        await this.exerciseService.loadExercise(newExercise);
+        return {
+            ...exerciseTemplate,
+            trainerKey: newExercise.trainerKey,
+        };
+    }
+
+    public async createExerciseTemplateFromFile(
+        importObject: StateExport,
+        session: SessionInformation
+    ) {
+        const exerciseTemplate =
+            await this.exerciseRepository.createExerciseTemplate({
+                name: 'Importierte Datei',
+                user: session.user.id,
+            });
+        if (!exerciseTemplate) {
+            throw new ApiError();
+        }
+        const newExercise = await this.exerciseService.createExerciseFromFile(
+            importObject,
+            {
+                templateId: exerciseTemplate.id,
+            }
+        );
+        newExercise.template = exerciseTemplate;
         return {
             ...exerciseTemplate,
             trainerKey: newExercise.trainerKey,
@@ -93,19 +121,30 @@ export class ExerciseManagerService {
             throw new PermissionDeniedError();
         }
 
+        const exerciseKeys = await this.exerciseService.createKeys();
+        const stateString = {
+            ...exerciseTemplate.exercise.currentStateString,
+            participantKey: exerciseKeys.participantKey,
+            type,
+        };
+        const newExerciseEntry = {
+            ...optionalData,
+            user: session ? session.user.id : null,
+            ...exerciseKeys,
+            stateVersion: exerciseTemplate.exercise.stateVersion,
+            initialStateString: stateString,
+            currentStateString: stateString,
+            baseTemplateId: exerciseTemplate.id,
+        };
         const newExercise =
-            await this.exerciseService.exerciseFactory.fromExerciseTemplate(
-                exerciseTemplate,
-                exerciseTemplate.exercise,
-                type,
-                { ...optionalData, user: session ? session.user.id : null }
-            );
-        await this.exerciseService.loadExercise(newExercise);
+            await this.exerciseService.createExercise(newExerciseEntry);
+        const activeExercise = new ActiveExercise(newExercise, []);
+        await this.exerciseService.loadExercise(activeExercise);
         await this.exerciseRepository.updateExerciseTemplate(
             exerciseTemplate.id,
             { lastExerciseCreatedAt: new Date() }
         );
-        return newExercise;
+        return activeExercise;
     }
 
     public async deleteExerciseTemplate(

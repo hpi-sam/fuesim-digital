@@ -1,4 +1,7 @@
-import type { MeasureTemplate } from '../../models/measure/index.js';
+import type {
+    MeasureTemplate,
+    MeasureTemplateCategory,
+} from '../../models/measure/measures.js';
 import { defaultAlarmGroups } from './vehicle-templates.js';
 
 const askBystanderMeasureTemplate: MeasureTemplate = {
@@ -7,14 +10,17 @@ const askBystanderMeasureTemplate: MeasureTemplate = {
     properties: [
         {
             type: 'manualConfirm',
+            hint: 'Bitte jetzt bestätigen',
             prompt: 'Möchten Sie wirklich den Schaulustigen fragen?',
         },
         {
             type: 'delay',
+            hint: 'Bitte warten Sie 5 Sekunden',
             delay: 5,
         },
         {
             type: 'response',
+            hint: 'Bitte bestätigen Sie die Antwort',
             response: 'Das weiß ich auch nicht so genau.',
         },
     ],
@@ -26,6 +32,7 @@ const responseMeasureTemplate: MeasureTemplate = {
     properties: [
         {
             type: 'response',
+            hint: 'Jetzt Antwort bestätigen',
             response: 'Die bekommst du gerne.',
         },
     ],
@@ -37,10 +44,12 @@ const alarmMeasureTemplate: MeasureTemplate = {
     properties: [
         {
             type: 'delay',
+            hint: 'Bitte warten Sie',
             delay: 1,
         },
         {
             type: 'alarm',
+            hint: 'Jetzt Alarmgruppe und Transferpunkt auswählen',
             alarmGroups: [
                 ...Object.values(defaultAlarmGroups).map((v) => v.id),
             ],
@@ -55,10 +64,12 @@ const alarmRtwMeasureTemplate: MeasureTemplate = {
     properties: [
         {
             type: 'delay',
+            hint: 'Bitte warten Sie',
             delay: 1,
         },
         {
             type: 'alarm',
+            hint: 'Jetzt Transferpunkt auswählen',
             alarmGroups: [defaultAlarmGroups.rtw.id],
             targetTransferPointIds: [],
         },
@@ -71,7 +82,10 @@ const predefinedEocLogMeasureTemplate: MeasureTemplate = {
     properties: [
         {
             type: 'eocLog',
+            hint: 'Bitte Einsatztagebucheintrag bestätigen',
             message: 'Die Patienten sind alle gesund.',
+            editable: false,
+            confirm: true,
         },
     ],
 };
@@ -82,7 +96,10 @@ const customEocLogMeasureTemplate: MeasureTemplate = {
     properties: [
         {
             type: 'eocLog',
+            hint: 'Jetzt eigenen Einsatztagebucheintrag verfassen',
             message: undefined,
+            editable: true,
+            confirm: true,
         },
     ],
 };
@@ -102,3 +119,12 @@ export const defaultMeasureTemplatesById = Object.fromEntries(
         template,
     ])
 );
+
+export const defaultMeasureTemplateCategories: {
+    [key: string]: MeasureTemplateCategory;
+} = {
+    Maßnahmen: {
+        name: 'Maßnahmen',
+        templates: defaultMeasureTemplatesById,
+    },
+};

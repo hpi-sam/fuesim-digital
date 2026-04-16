@@ -1,6 +1,7 @@
 import {
     AfterViewInit,
     Component,
+    computed,
     ElementRef,
     inject,
     Injector,
@@ -16,7 +17,10 @@ import { MeasureTemplateFormComponent } from '../measure-template-form/measure-t
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
-import { createSelectMeasureTemplate } from '../../../../../../state/application/selectors/exercise.selectors';
+import {
+    createSelectMeasureTemplate,
+    selectMeasureTemplateCategories,
+} from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type {
     EditableMeasureTemplateValues,
@@ -51,6 +55,14 @@ export class MeasureTemplateModalComponent
 
     public editableMeasureTemplateValues?: EditableMeasureTemplateValues;
 
+    public categoryName?: string;
+    public readonly categories = this.store.selectSignal(
+        selectMeasureTemplateCategories
+    );
+    public readonly categoryNames = computed(() =>
+        Object.values(this.categories()).map((v) => v.name)
+    );
+
     get isEditMode(): boolean {
         return this.measureTemplateId !== undefined;
     }
@@ -64,14 +76,19 @@ export class MeasureTemplateModalComponent
                 )
             );
 
+            const currentCategory = Object.values(this.categories()).find(
+                (c) => c.templates[this.measureTemplateId!] !== undefined
+            );
             this.editableMeasureTemplateValues = {
                 name: measureTemplate.name,
                 properties: measureTemplate.properties.map(toEditableProperty),
+                categoryName: currentCategory?.name ?? '',
             };
         } else {
             this.editableMeasureTemplateValues = {
                 name: '',
                 properties: [],
+                categoryName: this.categoryName ?? '',
             };
         }
     }
@@ -102,7 +119,11 @@ export class MeasureTemplateModalComponent
         this.modalScrollable?.ngOnDestroy();
     }
 
-    public submitMeasureTemplate({ name, properties }: MeasureTemplateValues) {
+    public submitMeasureTemplate({
+        name,
+        properties,
+        categoryName,
+    }: MeasureTemplateValues) {
         const action = this.isEditMode
             ? {
                   type: '[MeasureTemplate] Edit measureTemplate' as const,
@@ -117,6 +138,7 @@ export class MeasureTemplateModalComponent
                       name,
                       properties,
                   },
+                  categoryName,
               };
 
         this.exerciseService.proposeAction(action).then((response) => {

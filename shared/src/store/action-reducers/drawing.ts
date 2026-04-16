@@ -1,16 +1,15 @@
 import * as z from 'zod';
 import { Action, ActionReducer } from '../action-reducer.js';
-import { IsValue } from '../../utils/validators/index.js';
-import {
-    type Drawing,
-    type MapCoordinates,
-    drawingSchema,
-    mapCoordinatesSchema,
-    newMapPositionAt,
-} from '../../models/index.js';
-import { cloneDeepMutable, uuidSchema } from '../../utils/index.js';
-import type { UUID } from '../../utils/index.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type Drawing, drawingSchema } from '../../models/drawing.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 
 export class AddDrawingAction implements Action {
     @IsValue('[Drawing] Add drawing' as const)

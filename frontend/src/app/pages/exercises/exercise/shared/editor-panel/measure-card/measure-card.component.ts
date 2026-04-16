@@ -1,11 +1,10 @@
 import { Component, input, output } from '@angular/core';
-import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'app-measure-card',
     templateUrl: './measure-card.component.html',
     styleUrl: './measure-card.component.scss',
-    imports: [NgbTooltip],
+    imports: [],
 })
 export class MeasureCardComponent {
     readonly elementEdit = output();

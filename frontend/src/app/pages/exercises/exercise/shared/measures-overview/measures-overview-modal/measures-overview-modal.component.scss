@@ -1,0 +1,24 @@
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 25%);
+    justify-content: start;
+    align-items: start;
+}
+
+.category-drop-list {
+    min-height: 3rem;
+    padding: 0.25rem;
+    border: 1px dashed transparent;
+    border-radius: 0.25rem;
+    transition: border-color 150ms ease;
+
+    &.cdk-drop-list-dragging,
+    &.cdk-drop-list-receiving {
+        border-color: var(--bs-primary);
+    }
+}
+
+.empty-hint {
+    grid-column: 1 / -1;
+    padding: 0.5rem;
+}

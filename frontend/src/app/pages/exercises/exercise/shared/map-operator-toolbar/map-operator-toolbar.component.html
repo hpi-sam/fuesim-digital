@@ -1,20 +1,62 @@
-<div class="bg-body bg-opacity-50 rounded shadow p-2">
-    <app-scroll-buttons>
+<div
+    class="position-absolute start-50 translate-middle-x bottom-0 d-flex w-100 px-4 flex-column align-items-center"
+>
+    <app-measure-details class="mb-2" />
+    @if (measureService.activeMeasure() === null) {
         <div
-            #scrollContainer
-            class="d-flex flex-row align-items-stretch overflow-y-hidden overflow-x-auto"
+            class="d-flex flex-column align-items-center w-100"
+            [class.fade-out]="measureService.activeMeasure() !== null"
         >
-            @for (
-                measureTemplate of measureTemplates();
-                track measureTemplate.id
-            ) {
-                <button
-                    class="btn btn-light mx-1 col-sm-3 col-md-2 col-lg-2 col-xl-2"
-                    (click)="onMeasureTemplateSelect(measureTemplate)"
-                >
-                    {{ measureTemplate.name }}
-                </button>
-            }
+            <div
+                class="category-buttons btn-group"
+                role="group"
+                aria-label="Maßnahmenkategorien"
+            >
+                @for (category of categories(); track category.name) {
+                    <button
+                        type="button"
+                        class="map-toolbar-toggle btn btn-lg bg-body bg-opacity-75"
+                        [class.active]="
+                            isToolbarVisible() &&
+                            selectedCategoryName() === category.name
+                        "
+                        (click)="onCategoryClick(category.name)"
+                    >
+                        {{ category.name }}
+                    </button>
+                }
+            </div>
+
+            <div
+                class="map-toolbar drawer-collapse w-100"
+                [class.open]="isToolbarVisible()"
+            >
+                <div class="drawer-body bg-body bg-opacity-75 rounded p-2">
+                    <app-scroll-buttons
+                        class="scroll-buttons-animate"
+                        [class.scroll-buttons-hidden]="!isToolbarVisible()"
+                    >
+                        <div
+                            #scrollContainer
+                            class="d-flex flex-row align-items-stretch overflow-y-hidden overflow-x-auto"
+                        >
+                            @for (
+                                measureTemplate of selectedCategoryTemplates();
+                                track measureTemplate.id
+                            ) {
+                                <button
+                                    class="btn btn-light mx-1 col-sm-3 col-md-2 col-lg-2 col-xl-2"
+                                    (click)="
+                                        onMeasureTemplateSelect(measureTemplate)
+                                    "
+                                >
+                                    {{ measureTemplate.name }}
+                                </button>
+                            }
+                        </div>
+                    </app-scroll-buttons>
+                </div>
+            </div>
         </div>
-    </app-scroll-buttons>
+    }
 </div>

@@ -1,10 +1,4 @@
-import {
-    Component,
-    computed,
-    HostListener,
-    inject,
-    signal,
-} from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { DragElementService } from '../core/drag-element.service';
@@ -41,25 +35,4 @@ export class MapOperatorMapComponent {
     public readonly doMeasuresExist = computed(
         () => Object.values(this.measureTemplatesMap()).length > 0
     );
-
-    public readonly isToolbarVisible = signal(false);
-
-    public toggleToolbar() {
-        this.isToolbarVisible.update((value) => !value);
-    }
-
-    @HostListener('document:mousedown', ['$event'])
-    public onDocumentMouseDown(event: MouseEvent) {
-        const target = event.target as HTMLElement | null;
-        if (!target) {
-            return;
-        }
-        if (
-            target.closest('.map-toolbar-toggle') ||
-            target.closest('.scroll-btn')
-        ) {
-            return;
-        }
-        this.isToolbarVisible.set(false);
-    }
 }

@@ -9,3 +9,30 @@
     -webkit-box-orient: vertical;
     word-break: break-word;
 }
+.drawer-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 200ms ease;
+
+    &.open {
+        grid-template-rows: 1fr;
+    }
+
+    > * {
+        overflow: hidden;
+        min-height: 0;
+    }
+}
+
+.category-buttons {
+    .map-toolbar-toggle {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+
+        &.active {
+            background-color: var(--bs-secondary) !important;
+            color: var(--bs-white);
+            font-weight: 600;
+        }
+    }
+}

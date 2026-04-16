@@ -4,12 +4,14 @@
 </div>
 <div class="modal-body">
     <div class="p-3">
+        <label class="form-label fw-bold">Nachricht</label>
         <textarea
             [(ngModel)]="message"
             [appAutofocus]="true"
             maxlength="65535"
             placeholder="Schreiben Sie den neuen Eintrag in dieses Feld..."
             class="form-control no-validation mb-3"
+            [readOnly]="!editable()"
         ></textarea>
         <button
             type="button"

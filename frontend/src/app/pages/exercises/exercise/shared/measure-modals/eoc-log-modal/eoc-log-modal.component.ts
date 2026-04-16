@@ -12,7 +12,15 @@ import { AutofocusDirective } from '../../../../../../shared/directives/autofocu
 export class EocLogModalComponent {
     activeModal = inject(NgbActiveModal);
 
+    public readonly editable = signal<boolean>(true);
     public readonly message = signal<string>('');
+
+    public initialize(message: string | null, editable: boolean = true) {
+        if (message) {
+            this.message.set(message);
+        }
+        this.editable.set(editable);
+    }
 
     public confirm() {
         this.activeModal.close({

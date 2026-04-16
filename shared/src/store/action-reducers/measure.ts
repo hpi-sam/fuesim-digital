@@ -1,7 +1,7 @@
-import { measureSchema, type Measure } from '../../models/measure/index.js';
+import { measureSchema, type Measure } from '../../models/measure/measures.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import type { Action, ActionReducer } from '../index.js';
+import type { Action, ActionReducer } from '../action-reducer.js';
 
 export class AddMeasureAction implements Action {
     @IsValue('[Measure] Add Measure' as const)

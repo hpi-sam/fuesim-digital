@@ -23,6 +23,13 @@
         >
             Krankenhäuser
         </button>
+        <button
+            (click)="openMeasureEditor()"
+            class="btn btn-outline-primary ms-3"
+            data-cy="trainerToolbarMeasuresButton"
+        >
+            Maßnahmen
+        </button>
     } @else {
         <div ngbDropdown placement="top-start" class="d-inline-block">
             <button
@@ -49,6 +56,14 @@
                     data-cy="trainerToolbarHospitalsButton"
                 >
                     Krankenhäuser
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="openMeasureEditor()"
+                    class="btn btn-primary"
+                    data-cy="trainerToolbarMeasuresButton"
+                >
+                    Maßnahmen
                 </button>
             </div>
         </div>

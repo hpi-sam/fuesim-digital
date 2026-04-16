@@ -7,6 +7,7 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
+    MeasureTemplate,
     ScoutableElementType,
     UUID,
     Vehicle,
@@ -67,7 +68,20 @@ export const selectMaterialTemplates =
     selectPropertyFactory('materialTemplates');
 export const selectMapImagesTemplates =
     selectPropertyFactory('mapImageTemplates');
-export const selectMeasureTemplates = selectPropertyFactory('measureTemplates');
+export const selectMeasureTemplateCategories =
+    selectPropertyFactory('measureTemplates');
+export const selectMeasureTemplates = createSelector(
+    selectMeasureTemplateCategories,
+    (categories) => {
+        const flat: { [id: UUID]: MeasureTemplate } = {};
+        for (const category of Object.values(categories)) {
+            for (const [id, template] of Object.entries(category.templates)) {
+                flat[id] = template;
+            }
+        }
+        return flat;
+    }
+);
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');

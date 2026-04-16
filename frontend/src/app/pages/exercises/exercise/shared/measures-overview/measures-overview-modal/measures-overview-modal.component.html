@@ -1,0 +1,76 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        Maßnahmen
+        <button
+            class="btn btn-sm btn-outline-primary ms-3"
+            (click)="addCategory()"
+        >
+            <i class="bi bi-plus"></i>
+            Kategorie hinzufügen
+        </button>
+    </h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body" style="min-height: 60vh" cdkDropListGroup>
+    @for (category of categories(); track category.name) {
+        <div class="category mb-4">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <input
+                    #categoryNameInput="ngModel"
+                    [ngModel]="category.name"
+                    (appSaveOnTyping)="renameCategory(category.name, $event)"
+                    required
+                    placeholder="Name"
+                    type="text"
+                    class="form-control d-inline-block fw-bold"
+                    style="width: 240px"
+                />
+                <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="deleteCategory(category.name)"
+                    title="Kategorie löschen"
+                >
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button
+                    class="btn btn-sm btn-outline-primary ms-auto"
+                    (click)="addMeasureTemplate(category.name)"
+                >
+                    <i class="bi bi-plus"></i>
+                    Hinzufügen
+                </button>
+            </div>
+            <div
+                class="cards category-drop-list"
+                cdkDropList
+                [cdkDropListData]="{ categoryName: category.name }"
+                (cdkDropListDropped)="dropTemplate($event, category.name)"
+            >
+                @for (
+                    measureTemplate of category.templates;
+                    track measureTemplate.id
+                ) {
+                    <div cdkDrag [cdkDragData]="measureTemplate.id">
+                        <app-measure-card
+                            [name]="measureTemplate.name"
+                            [enableEditButton]="true"
+                            [enableDeleteButton]="true"
+                            (elementEdit)="
+                                editMeasureTemplate(measureTemplate.id)
+                            "
+                            (elementDelete)="
+                                deleteMeasureTemplate(measureTemplate.id)
+                            "
+                            dataCy="measureTemplateCard"
+                        />
+                    </div>
+                }
+                @if (category.templates.length === 0) {
+                    <span class="text-muted empty-hint">
+                        Keine Maßnahmen in dieser Kategorie
+                    </span>
+                }
+            </div>
+        </div>
+    }
+</div>

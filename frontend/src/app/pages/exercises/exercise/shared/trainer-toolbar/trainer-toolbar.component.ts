@@ -29,6 +29,7 @@ import { selectExerciseKey } from '../../../../../state/application/selectors/ap
 import { selectExerciseStatus } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { StartPauseButtonComponent } from '../../../../../shared/components/start-pause-button/start-pause-button.component';
+import { openMeasuresOverviewModal } from '../measures-overview/open-measures-overview-modal';
 
 @Component({
     selector: 'app-trainer-toolbar',
@@ -71,6 +72,10 @@ export class TrainerToolbarComponent {
 
     public openHospitalEditor() {
         openHospitalEditorModal(this.modalService);
+    }
+
+    public openMeasureEditor() {
+        openMeasuresOverviewModal(this.modalService);
     }
 
     public openEmergencyOperationsCenter() {

@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -46,6 +46,9 @@ export class MeasureService {
 
     private readonly clientName = this.store.selectSignal(selectLastClientName);
 
+    public readonly activeMeasure = signal<MeasureTemplate | null>(null);
+    public readonly activeProperty = signal<MeasureProperty | null>(null);
+
     /**
      * Handles the execution of a single property for a measure.
      * @param template The template this property is being executed for.
@@ -58,6 +61,7 @@ export class MeasureService {
         template: MeasureTemplate,
         property: MeasureProperty
     ): Promise<MeasurePropertyInstance | boolean> {
+        this.activeProperty.set(property);
         switch (property.type) {
             case 'delay':
                 await new Promise((resolve) => {
@@ -98,8 +102,12 @@ export class MeasureService {
             }
             case 'eocLog': {
                 let message: string;
-                if (property.message === undefined) {
-                    const modalRef = openEocLogModal(this.ngbModalService);
+                if (property.confirm) {
+                    const modalRef = openEocLogModal(
+                        this.ngbModalService,
+                        property.message,
+                        property.editable
+                    );
                     try {
                         const result = await modalRef.result;
                         message = result.message;
@@ -107,8 +115,12 @@ export class MeasureService {
                         return false;
                     }
                 } else {
-                    message = property.message;
+                    // The zod schema enforces that the message is editable
+                    // when it is empty, and that it has to be confirmed when
+                    // it is editable. Thus, message must be defined here.
+                    message = property.message!;
                 }
+
                 return {
                     type: 'eocLogInstance',
                     message,
@@ -122,12 +134,19 @@ export class MeasureService {
                         fillColor: property.fillColor,
                     });
                 if (!result) return false;
+                const drawing = newDrawing(
+                    'freehand',
+                    result.points,
+                    property.strokeColor,
+                    property.fillColor
+                );
+                this.exerciseService.proposeAction({
+                    type: '[Drawing] Add drawing',
+                    drawing,
+                });
                 return {
                     type: 'drawingInstance',
-                    drawingType: 'freehand',
-                    points: result.points,
-                    strokeColor: property.strokeColor,
-                    fillColor: property.fillColor,
+                    id: drawing.id,
                 };
             }
             case 'drawLine': {
@@ -137,39 +156,51 @@ export class MeasureService {
                         strokeColor: property.strokeColor,
                     });
                 if (!result) return false;
+                const drawing = newDrawing(
+                    'line',
+                    result.points,
+                    property.strokeColor,
+                    undefined
+                );
+                this.exerciseService.proposeAction({
+                    type: '[Drawing] Add drawing',
+                    drawing,
+                });
                 return {
                     type: 'drawingInstance',
-                    drawingType: 'line',
-                    points: result.points,
-                    strokeColor: property.strokeColor,
+                    id: drawing.id,
                 };
             }
         }
     }
 
+    private resetActive() {
+        this.activeMeasure.set(null);
+        this.activeProperty.set(null);
+    }
+
     public async executeMeasure(template: MeasureTemplate) {
+        this.activeMeasure.set(template);
+
         const instances = [];
-        this.messageService.postMessage({
-            color: 'info',
-            title: template.name,
-            body: 'Maßnahme wird ausgeführt.',
-        });
         for (const property of template.properties) {
             // eslint-disable-next-line no-await-in-loop
             const result = await this.handle(template, property);
 
             if (result === false) {
-                this.messageService.postMessage({
-                    color: 'warning',
-                    title: template.name,
-                    body: 'Maßnahme wurde abgebrochen.',
-                });
+                this.resetActive();
+                this.abort(instances);
                 return;
             } else if (result === true) continue;
 
             instances.push(result);
         }
 
+        this.resetActive();
+        this.confirm(instances);
+    }
+
+    private confirm(instances: MeasurePropertyInstance[]) {
         for (const instance of instances) {
             switch (instance.type) {
                 case 'alarmInstance': {
@@ -236,18 +267,24 @@ export class MeasureService {
                     break;
                 }
                 case 'drawingInstance': {
-                    const drawing = newDrawing(
-                        instance.drawingType,
-                        instance.points,
-                        instance.strokeColor,
-                        instance.fillColor
-                    );
+                    break;
+                }
+            }
+        }
+    }
+
+    private abort(instances: MeasurePropertyInstance[]) {
+        for (const instance of instances) {
+            switch (instance.type) {
+                case 'drawingInstance': {
                     this.exerciseService.proposeAction({
-                        type: '[Drawing] Add drawing',
-                        drawing,
+                        type: '[Drawing] Remove drawing',
+                        drawingId: instance.id,
                     });
                     break;
                 }
+                default:
+                    break;
             }
         }
     }

@@ -1,0 +1,14 @@
+@if (measureService.activeMeasure() !== null) {
+    @let measure = measureService.activeMeasure()!;
+    <div class="card bg-body bg-opacity-75">
+        <div class="card-header text-center">
+            {{ measure.name }}
+        </div>
+        @if (measureService.activeProperty() !== null) {
+            @let property = measureService.activeProperty()!;
+            <div class="card-body">
+                <h5 class="card-title text-center">{{ property.hint }}</h5>
+            </div>
+        }
+    </div>
+}

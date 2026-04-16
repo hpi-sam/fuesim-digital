@@ -50,6 +50,15 @@ export const measureTemplateSchema = z.strictObject({
 
 export type MeasureTemplate = z.infer<typeof measureTemplateSchema>;
 
+export const measureTemplateCategorySchema = z.strictObject({
+    name: z.string().min(1),
+    templates: z.record(uuidSchema, measureTemplateSchema),
+});
+
+export type MeasureTemplateCategory = z.infer<
+    typeof measureTemplateCategorySchema
+>;
+
 export const measureSchema = z.strictObject({
     id: uuidSchema,
     timestamp: z.number(),

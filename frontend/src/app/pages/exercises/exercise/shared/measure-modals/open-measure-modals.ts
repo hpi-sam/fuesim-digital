@@ -3,10 +3,19 @@ import type { UUID } from 'fuesim-digital-shared';
 import { AlarmModalComponent } from './alarm-modal/alarm-modal.component';
 import { EocLogModalComponent } from './eoc-log-modal/eoc-log-modal.component';
 
-export function openEocLogModal(ngbModalService: NgbModal) {
-    return ngbModalService.open(EocLogModalComponent, {
+export function openEocLogModal(
+    ngbModalService: NgbModal,
+    message: string | null = null,
+    editable: boolean = true
+) {
+    const modalRef = ngbModalService.open(EocLogModalComponent, {
         size: 'lg',
     });
+    (modalRef.componentInstance as EocLogModalComponent).initialize(
+        message,
+        editable
+    );
+    return modalRef;
 }
 
 export function openAlarmModal(

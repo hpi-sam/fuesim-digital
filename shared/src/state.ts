@@ -91,12 +91,12 @@ import { type Scoutable, scoutableSchema } from './models/scoutable.js';
 import {
     Measure,
     measureSchema,
-    MeasureTemplate,
-    measureTemplateSchema,
+    MeasureTemplateCategory,
+    measureTemplateCategorySchema,
 } from './models/measure/measures.js';
 import type { Drawing } from './models/drawing.js';
 import { drawingSchema } from './models/drawing.js';
-import { defaultMeasureTemplatesById } from './data/default-state/measure-templates.js';
+import { defaultMeasureTemplateCategories } from './data/default-state/measure-templates.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -210,10 +210,10 @@ export class ExerciseState {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;
 
-    @IsZodSchema(z.record(uuidSchema, measureTemplateSchema))
+    @IsZodSchema(z.record(z.string(), measureTemplateCategorySchema))
     public readonly measureTemplates: {
-        readonly [key: UUID]: MeasureTemplate;
-    } = defaultMeasureTemplatesById;
+        readonly [key: string]: MeasureTemplateCategory;
+    } = defaultMeasureTemplateCategories;
 
     @IsZodSchema(z.record(uuidSchema, mapImageTemplateSchema))
     public readonly mapImageTemplates: {

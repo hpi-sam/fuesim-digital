@@ -7,9 +7,12 @@
         <div class="mb-3">
             <label class="form-label fw-bold">Alarmgruppe</label>
             @if (alarmGroupNames.length === 1) {
-                <div class="form-control-plaintext">
-                    {{ alarmGroupNames[0]!.name }}
-                </div>
+                <input
+                    type="text"
+                    class="form-control"
+                    [value]="alarmGroupNames[0]!.name"
+                    readonly
+                />
             } @else {
                 <select
                     class="form-select"

@@ -4,22 +4,6 @@
     </div>
 
     @if (exerciseStatus() === 'running' && doMeasuresExist()) {
-        <div
-            class="position-absolute start-50 translate-middle-x bottom-0 w-100 px-2 px-md-4 pb-2 d-flex flex-column align-items-center"
-        >
-            <button
-                class="map-toolbar-toggle btn btn-light btn-lg shadow rounded mb-2"
-                (click)="toggleToolbar()"
-            >
-                Maßnahmen
-            </button>
-
-            <div
-                class="toolbar-animated-collapse w-100"
-                [class.show]="isToolbarVisible()"
-            >
-                <app-map-operator-toolbar />
-            </div>
-        </div>
+        <app-map-operator-toolbar />
     }
 </div>

@@ -25,7 +25,7 @@ import {
     NgbDropdownMenu,
     NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
-import { ZodError } from 'zod';
+import { z, ZodError } from 'zod';
 import {
     form,
     FormField,
@@ -85,10 +85,13 @@ export class MeasureTemplateFormComponent implements OnChanges {
     public readonly values = signal<EditableMeasureTemplateValues>({
         name: '',
         properties: [],
+        categoryName: '',
     });
     public readonly measureTemplateForm = form(this.values, (schemaPath) =>
         validateStandardSchema(schemaPath, () =>
-            measureTemplateSchema.omit({ id: true })
+            measureTemplateSchema
+                .omit({ id: true })
+                .extend({ categoryName: z.string() })
         )
     );
 
@@ -116,10 +119,6 @@ export class MeasureTemplateFormComponent implements OnChanges {
         });
     }
 
-    /**
-     * Emits the changed values via submitMeasureTemplate
-     * This method must only be called if all values are valid
-     */
     public async submit() {
         const valuesOnSubmit = cloneDeep(this.values());
         try {
@@ -128,6 +127,7 @@ export class MeasureTemplateFormComponent implements OnChanges {
                 properties: valuesOnSubmit.properties.map((p) =>
                     this.parseProperty(p)
                 ),
+                categoryName: valuesOnSubmit.categoryName,
             });
         } catch (e: unknown) {
             if (!(e instanceof ZodError)) throw e;

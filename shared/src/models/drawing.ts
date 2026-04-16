@@ -1,11 +1,9 @@
 import * as z from 'zod';
-import { uuid, uuidSchema } from '../utils/index.js';
-import type { MapCoordinates } from './utils/index.js';
-import {
-    mapCoordinatesSchema,
-    newMapPositionAt,
-    positionSchema,
-} from './utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import type { MapCoordinates } from './utils/position/map-coordinates.js';
+import { mapCoordinatesSchema } from './utils/position/map-coordinates.js';
+import { newMapPositionAt } from './utils/position/map-position.js';
+import { positionSchema } from './utils/position/position.js';
 
 export const drawingTypeSchema = z.literal(['freehand', 'line']);
 

@@ -1,19 +1,22 @@
 import { IsUUID } from 'class-validator';
-import { z } from 'zod';
-import { WritableDraft } from 'immer';
 import {
-    type MeasureProperty,
     type MeasureTemplate,
-    measurePropertySchema,
+    measureTemplateCategorySchema,
     measureTemplateSchema,
-} from '../../models/index.js';
-import type { ExerciseState } from '../../state.js';
-import { uuidSchema, type UUID } from '../../utils/index.js';
+} from '../../models/measure/measures.js';
+import type { MeasureProperty } from '../../models/measure/properties.js';
+import { uuidSchema, type UUID } from '../../utils/uuid.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { uuidValidationOptions, cloneDeepMutable } from '../../utils/index.js';
+import { uuidValidationOptions } from '../../utils/uuid.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import {
+    getCategory,
+    getCategoryForMeasureTemplateId,
+    getMeasureTemplate,
+} from './utils/measures.js';
 
 export class AddMeasureTemplateAction implements Action {
     @IsValue('[MeasureTemplate] Add measureTemplate')
@@ -21,6 +24,9 @@ export class AddMeasureTemplateAction implements Action {
 
     @IsZodSchema(measureTemplateSchema)
     public readonly measureTemplate!: MeasureTemplate;
+
+    @IsZodSchema(measureTemplateCategorySchema.shape.name)
+    public readonly categoryName!: string;
 }
 
 export class EditMeasureTemplateAction implements Action {
@@ -30,11 +36,22 @@ export class EditMeasureTemplateAction implements Action {
     @IsZodSchema(uuidSchema)
     public readonly id!: UUID;
 
-    @IsZodSchema(z.string().min(1))
+    @IsZodSchema(measureTemplateSchema.shape.name)
     public readonly name!: string;
 
-    @IsZodSchema(z.array(measurePropertySchema))
+    @IsZodSchema(measureTemplateSchema.shape.properties)
     public readonly properties!: readonly MeasureProperty[];
+}
+
+export class MoveMeasureTemplateAction implements Action {
+    @IsValue('[MeasureTemplate] Move measureTemplate')
+    public readonly type = '[MeasureTemplate] Move measureTemplate';
+
+    @IsZodSchema(uuidSchema)
+    public readonly id!: UUID;
+
+    @IsZodSchema(measureTemplateCategorySchema.shape.name)
+    public readonly categoryName!: string;
 }
 
 export class DeleteMeasureTemplateAction implements Action {
@@ -48,13 +65,21 @@ export class DeleteMeasureTemplateAction implements Action {
 export namespace MeasureTemplateActionReducers {
     export const addMeasureTemplate: ActionReducer<AddMeasureTemplateAction> = {
         action: AddMeasureTemplateAction,
-        reducer: (draftState, { measureTemplate }) => {
-            if (draftState.measureTemplates[measureTemplate.id]) {
+        reducer: (draftState, { measureTemplate, categoryName }) => {
+            const category = getCategory(draftState, categoryName);
+            if (
+                Object.values(draftState.measureTemplates).some((c) =>
+                    Object.values(c.templates).some(
+                        (t) => t.id === measureTemplate.id
+                    )
+                )
+            ) {
                 throw new ReducerError(
                     `MeasureTemplate with id ${measureTemplate.id} already exists`
                 );
             }
-            draftState.measureTemplates[measureTemplate.id] =
+
+            category.templates[measureTemplate.id] =
                 cloneDeepMutable(measureTemplate);
             return draftState;
         },
@@ -73,25 +98,40 @@ export namespace MeasureTemplateActionReducers {
             rights: 'trainer',
         };
 
-    export const deleteMeasureTemplate: ActionReducer<DeleteMeasureTemplateAction> =
+    export const moveMeasureTemplate: ActionReducer<MoveMeasureTemplateAction> =
         {
-            action: DeleteMeasureTemplateAction,
-            reducer: (draftState, { id }) => {
-                getMeasureTemplate(draftState, id);
-                delete draftState.measureTemplates[id];
+            action: MoveMeasureTemplateAction,
+            reducer: (draftState, { id, categoryName: category }) => {
+                const previousCategory = getCategoryForMeasureTemplateId(
+                    draftState,
+                    id
+                );
+                const measure = getMeasureTemplate(
+                    draftState,
+                    id,
+                    previousCategory
+                );
+
+                const nextCategory = getCategory(draftState, category);
+                delete previousCategory.templates[id];
+
+                nextCategory.templates[id] = measure;
                 return draftState;
             },
             rights: 'trainer',
         };
-}
 
-function getMeasureTemplate(
-    state: WritableDraft<ExerciseState>,
-    id: UUID
-): WritableDraft<MeasureTemplate> {
-    const measureTemplate = state.measureTemplates[id];
-    if (!measureTemplate) {
-        throw new ReducerError(`MeasureTemplate with id ${id} does not exist`);
-    }
-    return measureTemplate;
+    export const deleteMeasureTemplate: ActionReducer<DeleteMeasureTemplateAction> =
+        {
+            action: DeleteMeasureTemplateAction,
+            reducer: (draftState, { id }) => {
+                const category = getCategoryForMeasureTemplateId(
+                    draftState,
+                    id
+                );
+                delete category.templates[id];
+                return draftState;
+            },
+            rights: 'trainer',
+        };
 }

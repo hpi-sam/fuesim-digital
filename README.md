@@ -33,8 +33,8 @@ This project is currently developed as a [bachelor project](https://hpi.de/en/st
 
 ## Links for collaborators
 
-- [Internal test scenarios](https://github.com/hpi-sam/fuesim-digital-test-scenarios)
-    - Used only for private testing
+- [Internal test scenarios](https://github.com/hpi-sam/fuesim-digital-private-test-scenarios)
+    - Used only for private testing, potentially contains personal data of past users
 - [Public test scenarios](https://github.com/hpi-sam/fuesim-digital-public-test-scenarios)
     - Used for test scenarios in pipelines, Can also be used for private testing
     - For usage see the README.md in that repo

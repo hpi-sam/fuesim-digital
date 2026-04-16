@@ -17,4 +17,12 @@ export class MeasureDetailsComponent {
     public get activeProperty() {
         return this.measureService.activeProperty();
     }
+
+    public abortProperty() {
+        this.measureService.endEvent?.next(false);
+    }
+
+    public completeProperty() {
+        this.measureService.endEvent?.next(true);
+    }
 }

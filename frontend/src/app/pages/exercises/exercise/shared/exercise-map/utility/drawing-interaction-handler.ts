@@ -58,9 +58,29 @@ export class DrawingInteractionHandler {
             }
         };
 
+        const handleEvent = (e: boolean | null) => {
+            switch (e) {
+                case null:
+                    break;
+                case true:
+                    // eslint-disable-next-line no-void
+                    void olDraw.finishDrawing();
+                    break;
+                case false:
+                    olDraw.abortDrawing();
+                    cleanup();
+                    this.drawingInteractionService.completeDrawing(null);
+                    break;
+            }
+        };
+        const endEventSubscription = request.endEvent
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((e) => handleEvent(e));
+
         const cleanup = async () => {
             await this.olMap.removeInteraction(olDraw);
             document.removeEventListener('keydown', escapeHandler);
+            endEventSubscription.unsubscribe();
         };
 
         olDraw.on('drawend', (event) => {

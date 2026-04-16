@@ -6,6 +6,7 @@ export interface DrawRequest {
     drawingType: DrawingType;
     strokeColor: string;
     fillColor?: string;
+    endEvent: Observable<boolean | null>;
 }
 
 export interface DrawingResult {

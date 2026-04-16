@@ -8,6 +8,7 @@ import {
     newDrawing,
     uuid,
 } from 'fuesim-digital-shared';
+import { Subject } from 'rxjs';
 import { AppState } from '../state/app.state';
 import { selectLastClientName } from '../state/application/selectors/application.selectors';
 import {
@@ -44,6 +45,7 @@ export class MeasureService {
 
     public readonly activeMeasure = signal<MeasureTemplate | null>(null);
     public readonly activeProperty = signal<MeasureProperty | null>(null);
+    public endEvent?: Subject<boolean | null>;
 
     /**
      * Handles the execution of a single property for a measure.
@@ -130,11 +132,13 @@ export class MeasureService {
                 };
             }
             case 'drawFreehand': {
+                this.endEvent = new Subject<boolean | null>();
                 const result =
                     await this.drawingInteractionService.requestDrawing({
                         drawingType: 'freehand',
                         strokeColor: property.strokeColor,
                         fillColor: property.fillColor,
+                        endEvent: this.endEvent,
                     });
                 if (!result) return false;
                 const drawing = newDrawing(
@@ -153,10 +157,12 @@ export class MeasureService {
                 };
             }
             case 'drawLine': {
+                this.endEvent = new Subject<boolean | null>();
                 const result =
                     await this.drawingInteractionService.requestDrawing({
                         drawingType: 'line',
                         strokeColor: property.strokeColor,
+                        endEvent: this.endEvent,
                     });
                 if (!result) return false;
                 const drawing = newDrawing(

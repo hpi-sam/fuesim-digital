@@ -6,8 +6,34 @@
         </div>
         @if (measureService.activeProperty() !== null) {
             @let property = measureService.activeProperty()!;
-            <div class="card-body">
+            <div class="card-body d-flex flex-column align-items-center">
                 <h5 class="card-title text-center">{{ property.hint }}</h5>
+                <div>
+                    @switch (property.type) {
+                        @case ('drawFreehand') {
+                            <button
+                                class="btn btn-danger"
+                                (click)="abortProperty()"
+                            >
+                                Abbrechen
+                            </button>
+                        }
+                        @case ('drawLine') {
+                            <button
+                                class="btn btn-danger me-2"
+                                (click)="abortProperty()"
+                            >
+                                Abbrechen
+                            </button>
+                            <button
+                                class="btn btn-success"
+                                (click)="completeProperty()"
+                            >
+                                Fertig
+                            </button>
+                        }
+                    }
+                </div>
             </div>
         }
     </div>

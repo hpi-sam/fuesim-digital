@@ -14,7 +14,7 @@
     style="height: min(80vh, 2000px); max-height: min(80vh, 2000px)"
 >
     <div class="row h-100">
-        <div class="col-9 h-100" style="overflow-y: scroll">
+        <div class="col-lg-8 col-xl-9 h-100" style="overflow-y: scroll">
             @if (patients$ | async; as patients) {
                 <div class="cards">
                     @for (patient of patients; track patient.id) {
@@ -102,7 +102,10 @@
                 </div>
             }
         </div>
-        <div class="col-3 h-100" style="border-left: 1px solid darkgrey">
+        <div
+            class="col-lg-4 col-xl-3 h-100"
+            style="border-left: 1px solid darkgrey"
+        >
             @if (selected(); as selected) {
                 @if (selected.type === 'patient') {
                     <h4>

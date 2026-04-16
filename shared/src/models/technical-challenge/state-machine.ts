@@ -84,15 +84,23 @@ function isProgressGuardFulfilled(
     const progress = challenge.taskProgress[progressGuard.taskId] ?? 0;
     return (
         progress < (progressGuard.maxProgress ?? Number.MAX_VALUE) &&
-        progress > (progressGuard.minProgress ?? 0)
+        progress >= (progressGuard.minProgress ?? 0)
     );
 }
 
 function isTimerGuardFulfilled(
     timerGuard: TimerGuard,
+    technicalChallengeId: TechnicalChallengeId,
     exerciseState: ExerciseState
 ): boolean {
-    return exerciseState.currentTime >= timerGuard.minTimePassed;
+    const challenge = getElement(
+        exerciseState,
+        'technicalChallenge',
+        technicalChallengeId
+    );
+    const relativeTime =
+        exerciseState.currentTime - challenge.simulationStartTime;
+    return relativeTime >= timerGuard.minTimePassed;
 }
 
 export const guardSchema = z.union([progressGuardSchema, timerGuardSchema]);
@@ -119,7 +127,11 @@ export function isGuardFulfilled(
                 exerciseState
             );
         case 'timerGuard':
-            return isTimerGuardFulfilled(guard, exerciseState);
+            return isTimerGuardFulfilled(
+                guard,
+                technicalChallengeId,
+                exerciseState
+            );
     }
 }
 
@@ -130,6 +142,7 @@ export const stateMachineSchema = z.strictObject({
     ),
     relevantTasks: z.record(taskSchema.shape.id, taskSchema),
     transitions: z.array(transitionSchema),
+    simulationStartTime: z.number(),
 });
 
 export function currentStateOf(

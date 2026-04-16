@@ -1,6 +1,6 @@
 import type { Store } from '@ngrx/store';
 import type { Personnel, UUID } from 'fuesim-digital-shared';
-import { isTechnicalChallenge, normalZoom } from 'fuesim-digital-shared';
+import { normalZoom } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
 import { type Observable, type Subject, takeUntil } from 'rxjs';
@@ -179,7 +179,8 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
         ]);
         const features = this.olMap.getFeaturesAtPixel(pixel);
         const isFeatureLikeTechnicalChallenge = (f: FeatureLike) =>
-            isTechnicalChallenge(this.getElementFromFeature(f as Feature));
+            this.getElementFromFeature(f as Feature).type ===
+            'technicalChallenge';
         const challenge = features.find(isFeatureLikeTechnicalChallenge);
         if (challenge) {
             return;

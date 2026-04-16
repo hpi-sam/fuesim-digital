@@ -28,7 +28,8 @@ export type TechnicalChallengeTemplate = z.infer<
 >;
 
 export function newTechnicalChallengeFromTemplate(
-    template: TechnicalChallengeTemplate
+    template: TechnicalChallengeTemplate,
+    creationTime: number
 ): TechnicalChallenge {
     const { states, relevantTasks, transitions, name, image } =
         cloneDeep(template);
@@ -49,5 +50,6 @@ export function newTechnicalChallengeFromTemplate(
         transitions,
         name,
         image,
+        simulationStartTime: creationTime,
     };
 }

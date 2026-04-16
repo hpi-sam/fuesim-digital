@@ -19,35 +19,35 @@ type PopupProposal =
     providedIn: 'root',
 })
 export class PopupService {
-    /**
-     * New popup proposals are emitted via this subject.
-     * @deprecated should only be subscribed by {@link PopupManager} and never
-     *             emitted to.
-     */
-    public readonly nextProposal$ = new BehaviorSubject<PopupProposal>({
+    private readonly _nextProposal$ = new BehaviorSubject<PopupProposal>({
         action: 'dismiss',
     });
+
+    /**
+     * New popup proposals are emitted via this observable.
+     */
+    public readonly nextProposal$ = this._nextProposal$.asObservable();
 
     /**
      * The {@link OpenPopupOptions} of the currently shown popup or `undefined`
      * if there is none.
      */
     get currentPopupOptions() {
-        return this.nextProposal$.getValue().options;
+        return this._nextProposal$.getValue().options;
     }
 
     /**
      * Closes the currently open popup without changes
      */
     public dismissPopup() {
-        this.nextProposal$.next({ action: 'dismiss' });
+        this._nextProposal$.next({ action: 'dismiss' });
     }
 
     /**
      * Closes the currently open popup after submitting new data
      */
     public submitPopup() {
-        this.nextProposal$.next({ action: 'submit' });
+        this._nextProposal$.next({ action: 'submit' });
     }
 
     /**
@@ -56,6 +56,6 @@ export class PopupService {
      * it will be closed instead.
      */
     public togglePopup(options: OpenPopupOptions) {
-        this.nextProposal$.next({ action: 'toggle', options });
+        this._nextProposal$.next({ action: 'toggle', options });
     }
 }

@@ -15,6 +15,7 @@ export class ChooseTaskPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly popupService = inject(PopupService);
 
+    // All are set via popup context before OnInit
     public technicalChallengeId!: TechnicalChallengeId;
     public personnelId!: UUID;
     public assignTaskCallback!: (taskId: UUID) => void;
@@ -27,7 +28,7 @@ export class ChooseTaskPopupComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // @ts-expect-error first assign
+        // @ts-expect-error deferred initialization
         this.availableTasks = this.store.selectSignal(
             createSelectAvailableTasks(this.technicalChallengeId)
         );

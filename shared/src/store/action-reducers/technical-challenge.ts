@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { ActionReducer } from '../../index.js';
 import {
+    cloneDeepMutable,
     lookupReducerFor,
     currentStateOf,
     ReducerError,
@@ -62,7 +63,7 @@ export namespace TechnicalChallengeActionReducers {
             actionSchema: createTechnicalChallengeActionSchema,
             reducer: (draftState, action) => {
                 draftState.technicalChallenges[action.technicalChallenge.id] =
-                    action.technicalChallenge;
+                    cloneDeepMutable(action.technicalChallenge);
                 return draftState;
             },
             rights: 'trainer',

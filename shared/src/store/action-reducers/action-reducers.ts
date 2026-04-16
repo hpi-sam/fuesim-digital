@@ -101,7 +101,6 @@ export function isActionType(
 export function lookupReducerFor(
     actionType: ExerciseAction['type']
 ): ActionReducer<ExerciseAction> {
-    // TODO: This is a fishy cast
     return exerciseActionTypeDictionary[
         actionType
     ] as ActionReducer<ExerciseAction>;

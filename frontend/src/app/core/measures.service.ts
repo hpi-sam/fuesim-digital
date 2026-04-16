@@ -9,6 +9,7 @@ import {
     uuid,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
+
 import { AppState } from '../state/app.state';
 import { selectLastClientName } from '../state/application/selectors/application.selectors';
 import {
@@ -62,10 +63,14 @@ export class MeasureService {
         this.activeProperty.set(property);
         switch (property.type) {
             case 'delay':
-                await new Promise((resolve) => {
-                    setTimeout(() => resolve(null), property.delay * 1000);
+                this.endEvent = new Subject<boolean | null>();
+                return new Promise<boolean>((resolve) => {
+                    this.endEvent?.pipe().subscribe((e) => {
+                        if (e === null) return;
+                        resolve(e);
+                    });
+                    setTimeout(() => resolve(true), property.delay * 1000);
                 });
-                return true;
             case 'response':
                 await this.confirmationModalService.confirm({
                     title: template.name,

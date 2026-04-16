@@ -10,7 +10,8 @@
                 <h5 class="card-title text-center">{{ property.hint }}</h5>
                 <div>
                     @switch (property.type) {
-                        @case ('drawFreehand') {
+                        @case ('drawFreehand')
+                        @case ('delay') {
                             <button
                                 class="btn btn-danger"
                                 (click)="abortProperty()"
@@ -19,7 +20,7 @@
                             </button>
                         }
                         @case ('drawLine') {
-                            <button
+                                                      <button
                                 class="btn btn-danger me-2"
                                 (click)="abortProperty()"
                             >

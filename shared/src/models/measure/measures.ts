@@ -5,6 +5,7 @@ import {
     measurePropertySchema,
     measurePropertyTypeToGermanNameDictionary,
 } from './properties.js';
+import { measurePropertyInstanceSchema } from './instances.js';
 
 export const measureTemplateSchema = z.strictObject({
     id: uuidSchema,
@@ -64,6 +65,7 @@ export const measureSchema = z.strictObject({
     timestamp: z.number(),
     clientName: z.string(),
     template: uuidSchema,
+    instances: z.array(measurePropertyInstanceSchema),
 });
 
 export type Measure = z.infer<typeof measureSchema>;

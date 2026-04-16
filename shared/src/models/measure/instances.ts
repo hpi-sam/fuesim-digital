@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { uuidSchema } from '../../utils/uuid.js';
+import { vehicleParametersSchema } from '../utils/vehicle-parameters.js';
 
 export const alarmPropertyInstanceSchema = z.strictObject({
     type: z.literal('alarmInstance'),
     alarmGroup: uuidSchema,
     targetTransferPointId: uuidSchema,
+    vehicleParameters: z.array(vehicleParametersSchema),
 });
 
 export type AlarmPropertyInstance = z.infer<typeof alarmPropertyInstanceSchema>;

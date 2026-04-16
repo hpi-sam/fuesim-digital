@@ -2,13 +2,10 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
-    createVehicleParameters,
     MeasureProperty,
     MeasurePropertyInstance,
     MeasureTemplate,
     newDrawing,
-    newMapCoordinatesAt,
-    StrictObject,
     uuid,
 } from 'fuesim-digital-shared';
 import { AppState } from '../state/app.state';
@@ -19,11 +16,10 @@ import {
 } from '../pages/exercises/exercise/shared/measure-modals/open-measure-modals';
 import { selectStateSnapshot } from '../state/get-state-snapshot';
 import {
-    selectAlarmGroups,
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
-    selectVehicleTemplates,
+    createSelectAlarmGroup,
+    selectCurrentTime,
 } from '../state/application/selectors/exercise.selectors';
+import { getVehicleParameters } from '../shared/functions/vehicle-parameters';
 import { MessageService } from './messages/message.service';
 import { ConfirmationModalService } from './confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from './exercise.service';
@@ -95,6 +91,13 @@ export class MeasureService {
                         type: 'alarmInstance',
                         alarmGroup: result.alarmGroup,
                         targetTransferPointId: result.targetTransferPointId,
+                        vehicleParameters: getVehicleParameters(
+                            this.store,
+                            selectStateSnapshot(
+                                createSelectAlarmGroup(result.alarmGroup),
+                                this.store
+                            )
+                        ),
                     };
                 } catch {
                     return false;
@@ -197,80 +200,23 @@ export class MeasureService {
         }
 
         this.resetActive();
-        this.confirm(instances);
+        this.confirm(template, instances);
     }
 
-    private confirm(instances: MeasurePropertyInstance[]) {
-        for (const instance of instances) {
-            switch (instance.type) {
-                case 'alarmInstance': {
-                    const vehicleTemplates = selectStateSnapshot(
-                        selectVehicleTemplates,
-                        this.store
-                    );
-
-                    const materialTemplates = selectStateSnapshot(
-                        selectMaterialTemplates,
-                        this.store
-                    );
-
-                    const personnelTemplates = selectStateSnapshot(
-                        selectPersonnelTemplates,
-                        this.store
-                    );
-
-                    const alarmGroup = selectStateSnapshot(
-                        selectAlarmGroups,
-                        this.store
-                    )[instance.alarmGroup]!;
-
-                    const sortedAlarmGroupVehicles = StrictObject.values(
-                        alarmGroup.alarmGroupVehicles
-                    ).sort((a, b) => a.time - b.time);
-
-                    const placeholderPosition = newMapCoordinatesAt(0, 0);
-
-                    const vehicleParameters = sortedAlarmGroupVehicles.map(
-                        (alarmGroupVehicle) =>
-                            createVehicleParameters(
-                                uuid(),
-                                {
-                                    ...vehicleTemplates[
-                                        alarmGroupVehicle.vehicleTemplateId
-                                    ]!,
-                                    name: alarmGroupVehicle.name,
-                                },
-                                materialTemplates,
-                                personnelTemplates,
-                                placeholderPosition
-                            )
-                    );
-
-                    this.exerciseService.proposeAction({
-                        type: '[Emergency Operation Center] Send Alarm Group',
-                        alarmGroupId: instance.alarmGroup,
-                        clientName: this.clientName() ?? 'Unknown',
-                        sortedVehicleParameters: vehicleParameters,
-                        targetTransferPointId: instance.targetTransferPointId,
-                        firstVehiclesCount: 0,
-                        firstVehiclesTargetTransferPointId: undefined,
-                    });
-                    break;
-                }
-                case 'eocLogInstance': {
-                    this.exerciseService.proposeAction({
-                        type: '[Emergency Operation Center] Add Log Entry',
-                        name: this.clientName() ?? 'Unknown',
-                        isPrivate: false,
-                        message: instance.message,
-                    });
-                    break;
-                }
-                case 'drawingInstance': {
-                    break;
-                }
-            }
-        }
+    private confirm(
+        template: MeasureTemplate,
+        instances: MeasurePropertyInstance[]
+    ) {
+        this.exerciseService.proposeAction({
+            type: '[Measure] Add Measure',
+            measure: {
+                clientName: this.clientName() ?? 'Unknown',
+                id: uuid(),
+                instances,
+                template: template.id,
+                timestamp: selectStateSnapshot(selectCurrentTime, this.store),
+            },
+        });
     }
 
     private abort(instances: MeasurePropertyInstance[]) {

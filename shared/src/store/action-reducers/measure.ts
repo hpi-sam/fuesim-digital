@@ -2,6 +2,7 @@ import { measureSchema, type Measure } from '../../models/measure/measures.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
+import { EmergencyOperationCenterActionReducers } from './emergency-operation-center.js';
 
 export class AddMeasureAction implements Action {
     @IsValue('[Measure] Add Measure' as const)
@@ -15,8 +16,45 @@ export namespace MeasureActionReducers {
     export const addMeasure: ActionReducer<AddMeasureAction> = {
         action: AddMeasureAction,
         reducer: (draftState, { measure }) => {
-            draftState.measures[measure.id] = measure;
-            return draftState;
+            let newDraftState = draftState;
+            measure.instances.forEach((instance) => {
+                switch (instance.type) {
+                    case 'alarmInstance':
+                        newDraftState =
+                            EmergencyOperationCenterActionReducers.sendAlarmGroup.reducer(
+                                newDraftState,
+                                {
+                                    type: '[Emergency Operation Center] Send Alarm Group',
+                                    alarmGroupId: instance.alarmGroup,
+                                    clientName: measure.clientName,
+                                    sortedVehicleParameters:
+                                        instance.vehicleParameters,
+                                    targetTransferPointId:
+                                        instance.targetTransferPointId,
+                                    firstVehiclesCount: 0,
+                                    firstVehiclesTargetTransferPointId:
+                                        undefined,
+                                }
+                            );
+                        break;
+                    case 'eocLogInstance':
+                        newDraftState =
+                            EmergencyOperationCenterActionReducers.addLogEntry.reducer(
+                                newDraftState,
+                                {
+                                    type: '[Emergency Operation Center] Add Log Entry',
+                                    name: measure.clientName,
+                                    isPrivate: false,
+                                    message: instance.message,
+                                }
+                            );
+                        break;
+                    case 'drawingInstance':
+                        break;
+                }
+            });
+            newDraftState.measures[measure.id] = measure;
+            return newDraftState;
         },
         rights: 'participant',
     };

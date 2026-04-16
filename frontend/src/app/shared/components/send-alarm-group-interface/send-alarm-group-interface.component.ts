@@ -21,9 +21,6 @@ import {
     selectAlarmGroups,
     selectTransferPoints,
     createSelectAlarmGroup,
-    selectVehicleTemplates,
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
     selectExerciseStatus,
 } from '../../../state/application/selectors/exercise.selectors';
 import {
@@ -37,6 +34,7 @@ import { HotkeyIndicatorComponent } from '../hotkey-indicator/hotkey-indicator.c
 import { SearchableDropdownComponent } from '../searchable-dropdown/searchable-dropdown.component';
 import { IntegerValidatorDirective } from '../../validation/integer-validator.directive';
 import { DisplayValidationComponent } from '../../validation/display-validation/display-validation.component';
+import { getVehicleParameters } from '../../functions/vehicle-parameters';
 
 // We want to remember this
 let selectedAlarmGroup: SearchableDropdownOption | null = null;
@@ -241,45 +239,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
         );
         this.firstVehiclesCount -= firstVehiclesCountReducedBy;
 
-        const vehicleTemplates = selectStateSnapshot(
-            selectVehicleTemplates,
-            this.store
-        );
-
-        const materialTemplates = selectStateSnapshot(
-            selectMaterialTemplates,
-            this.store
-        );
-        const personnelTemplates = selectStateSnapshot(
-            selectPersonnelTemplates,
-            this.store
-        );
-
-        const sortedAlarmGroupVehicles = Object.values(
-            alarmGroup.alarmGroupVehicles
-        ).sort((a, b) => a.time - b.time);
-
-        // We have to provide a map position when creating a vehicle
-        // It will be overwritten directly after by putting the vehicle into transfer
-        const placeholderPosition = newMapCoordinatesAt(0, 0);
-
-        // Create vehicle parameters for the alarm group
-        // This has to be done in the frontend to ensure the UUIDs of the vehicles, material, and personnel are consistent across all clients
-        const vehicleParameters = sortedAlarmGroupVehicles.map(
-            (alarmGroupVehicle) =>
-                createVehicleParameters(
-                    uuid(),
-                    {
-                        ...vehicleTemplates[
-                            alarmGroupVehicle.vehicleTemplateId
-                        ]!,
-                        name: alarmGroupVehicle.name,
-                    },
-                    materialTemplates,
-                    personnelTemplates,
-                    placeholderPosition
-                )
-        );
+        const vehicleParameters = getVehicleParameters(this.store, alarmGroup);
 
         const request = await this.exerciseService.proposeAction({
             type: '[Emergency Operation Center] Send Alarm Group',

@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { Patient, UUID } from 'fuesim-digital-shared';
+import { Patient } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-simulated-region-preview-card',

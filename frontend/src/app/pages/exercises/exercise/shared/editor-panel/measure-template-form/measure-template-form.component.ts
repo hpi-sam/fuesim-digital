@@ -86,6 +86,7 @@ export class MeasureTemplateFormComponent implements OnChanges {
         name: '',
         properties: [],
         categoryName: '',
+        replacePrevious: false,
     });
     public readonly measureTemplateForm = form(this.values, (schemaPath) =>
         validateStandardSchema(schemaPath, () =>
@@ -128,6 +129,7 @@ export class MeasureTemplateFormComponent implements OnChanges {
                     this.parseProperty(p)
                 ),
                 categoryName: valuesOnSubmit.categoryName,
+                replacePrevious: valuesOnSubmit.replacePrevious,
             });
         } catch (e: unknown) {
             if (!(e instanceof ZodError)) throw e;

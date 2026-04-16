@@ -41,6 +41,9 @@ export class EditMeasureTemplateAction implements Action {
 
     @IsZodSchema(measureTemplateSchema.shape.properties)
     public readonly properties!: readonly MeasureProperty[];
+
+    @IsZodSchema(measureTemplateSchema.shape.replacePrevious)
+    public readonly replacePrevious!: boolean;
 }
 
 export class MoveMeasureTemplateAction implements Action {
@@ -89,10 +92,14 @@ export namespace MeasureTemplateActionReducers {
     export const editMeasureTemplate: ActionReducer<EditMeasureTemplateAction> =
         {
             action: EditMeasureTemplateAction,
-            reducer: (draftState, { id, name, properties }) => {
+            reducer: (
+                draftState,
+                { id, name, properties, replacePrevious }
+            ) => {
                 const measureTemplate = getMeasureTemplate(draftState, id);
                 measureTemplate.name = name;
                 measureTemplate.properties = cloneDeepMutable(properties);
+                measureTemplate.replacePrevious = replacePrevious;
                 return draftState;
             },
             rights: 'trainer',

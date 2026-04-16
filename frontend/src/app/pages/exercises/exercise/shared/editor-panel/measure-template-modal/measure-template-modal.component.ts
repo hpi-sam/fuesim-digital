@@ -83,12 +83,14 @@ export class MeasureTemplateModalComponent
                 name: measureTemplate.name,
                 properties: measureTemplate.properties.map(toEditableProperty),
                 categoryName: currentCategory?.name ?? '',
+                replacePrevious: measureTemplate.replacePrevious,
             };
         } else {
             this.editableMeasureTemplateValues = {
                 name: '',
                 properties: [],
                 categoryName: this.categoryName ?? '',
+                replacePrevious: false,
             };
         }
     }
@@ -123,6 +125,7 @@ export class MeasureTemplateModalComponent
         name,
         properties,
         categoryName,
+        replacePrevious,
     }: MeasureTemplateValues) {
         const action = this.isEditMode
             ? {
@@ -130,6 +133,7 @@ export class MeasureTemplateModalComponent
                   id: this.measureTemplateId!,
                   name,
                   properties,
+                  replacePrevious,
               }
             : {
                   type: '[MeasureTemplate] Add measureTemplate' as const,
@@ -137,6 +141,7 @@ export class MeasureTemplateModalComponent
                       id: uuid(),
                       name,
                       properties,
+                      replacePrevious,
                   },
                   categoryName,
               };

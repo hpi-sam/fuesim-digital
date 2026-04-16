@@ -8,12 +8,14 @@ export interface EditableMeasureTemplateValues {
     name: string;
     properties: EditableMeasureProperty[];
     categoryName: string;
+    replacePrevious: boolean;
 }
 
 export interface MeasureTemplateValues {
     name: string;
     properties: MeasureProperty[];
     categoryName: string;
+    replacePrevious: boolean;
 }
 
 export interface EditableAlarmProperty {

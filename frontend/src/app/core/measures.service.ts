@@ -213,7 +213,7 @@ export class MeasureService {
                 clientName: this.clientName() ?? 'Unknown',
                 id: uuid(),
                 instances,
-                template: template.id,
+                templateId: template.id,
                 timestamp: selectStateSnapshot(selectCurrentTime, this.store),
             },
         });

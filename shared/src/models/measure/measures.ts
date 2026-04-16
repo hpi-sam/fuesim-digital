@@ -47,6 +47,7 @@ export const measureTemplateSchema = z.strictObject({
             }
         })
         .min(1, { error: 'Eine Maßnahme braucht mindestens eine Eigenschaft' }),
+    replacePrevious: z.boolean(),
 });
 
 export type MeasureTemplate = z.infer<typeof measureTemplateSchema>;
@@ -64,7 +65,7 @@ export const measureSchema = z.strictObject({
     id: uuidSchema,
     timestamp: z.number(),
     clientName: z.string(),
-    template: uuidSchema,
+    templateId: uuidSchema,
     instances: z.array(measurePropertyInstanceSchema),
 });
 

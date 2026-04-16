@@ -72,8 +72,8 @@ export const measurePropertyDefinitions: {
     },
     alarm: { blockedBy: [], requires: [] },
     eocLog: { blockedBy: [], requires: [] },
-    drawFreehand: { blockedBy: [], requires: [{ anyOf: ['manualConfirm'] }] },
-    drawLine: { blockedBy: [], requires: [{ anyOf: ['manualConfirm'] }] },
+    drawFreehand: { blockedBy: [], requires: [] },
+    drawLine: { blockedBy: [], requires: [] },
 };
 
 // ==================================================

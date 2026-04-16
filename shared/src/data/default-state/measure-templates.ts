@@ -24,6 +24,7 @@ const askBystanderMeasureTemplate: MeasureTemplate = {
             response: 'Das weiß ich auch nicht so genau.',
         },
     ],
+    replacePrevious: false,
 };
 
 const responseMeasureTemplate: MeasureTemplate = {
@@ -36,6 +37,7 @@ const responseMeasureTemplate: MeasureTemplate = {
             response: 'Die bekommst du gerne.',
         },
     ],
+    replacePrevious: false,
 };
 
 const alarmMeasureTemplate: MeasureTemplate = {
@@ -56,6 +58,7 @@ const alarmMeasureTemplate: MeasureTemplate = {
             targetTransferPointIds: [],
         },
     ],
+    replacePrevious: false,
 };
 
 const alarmRtwMeasureTemplate: MeasureTemplate = {
@@ -74,6 +77,7 @@ const alarmRtwMeasureTemplate: MeasureTemplate = {
             targetTransferPointIds: [],
         },
     ],
+    replacePrevious: false,
 };
 
 const predefinedEocLogMeasureTemplate: MeasureTemplate = {
@@ -88,6 +92,7 @@ const predefinedEocLogMeasureTemplate: MeasureTemplate = {
             confirm: true,
         },
     ],
+    replacePrevious: false,
 };
 
 const customEocLogMeasureTemplate: MeasureTemplate = {
@@ -102,6 +107,7 @@ const customEocLogMeasureTemplate: MeasureTemplate = {
             confirm: true,
         },
     ],
+    replacePrevious: false,
 };
 
 export const defaultMeasureTemplates = {

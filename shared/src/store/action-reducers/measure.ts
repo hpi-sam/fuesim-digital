@@ -2,7 +2,9 @@ import { measureSchema, type Measure } from '../../models/measure/measures.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
+import { DrawingActionReducers } from './drawing.js';
 import { EmergencyOperationCenterActionReducers } from './emergency-operation-center.js';
+import { getMeasureTemplate } from './utils/measures.js';
 
 export class AddMeasureAction implements Action {
     @IsValue('[Measure] Add Measure' as const)
@@ -17,6 +19,25 @@ export namespace MeasureActionReducers {
         action: AddMeasureAction,
         reducer: (draftState, { measure }) => {
             let newDraftState = draftState;
+            const template = getMeasureTemplate(draftState, measure.templateId);
+            if (template.replacePrevious) {
+                const previousInstances = Object.values(newDraftState.measures)
+                    .filter((m) => m.templateId === measure.templateId)
+                    .flatMap((m) => m.instances);
+
+                for (const instance of previousInstances) {
+                    if (instance.type === 'drawingInstance') {
+                        newDraftState =
+                            DrawingActionReducers.removeDrawing.reducer(
+                                newDraftState,
+                                {
+                                    type: '[Drawing] Remove drawing',
+                                    drawingId: instance.id,
+                                }
+                            );
+                    }
+                }
+            }
             measure.instances.forEach((instance) => {
                 switch (instance.type) {
                     case 'alarmInstance':

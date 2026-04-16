@@ -42,6 +42,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Viewports are now consistently called "Ansicht" in the frontend and some other incorrect usages of "Einsatzabschnitt" have been corrected.
 - The map is now visible again in replay mode.
+- Participants can now only use the emergency operations center if the exercise is running.
 
 ## [0.10.0] - 2025-12-08
 

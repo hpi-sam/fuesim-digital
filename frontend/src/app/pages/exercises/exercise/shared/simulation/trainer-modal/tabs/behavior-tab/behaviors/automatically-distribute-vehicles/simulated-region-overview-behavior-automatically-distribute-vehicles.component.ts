@@ -54,9 +54,7 @@ import { OrderByPipe } from '../../../../../../../../../../shared/pipes/order-by
         AsyncPipe,
     ],
 })
-export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent
-    implements OnInit
-{
+export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 

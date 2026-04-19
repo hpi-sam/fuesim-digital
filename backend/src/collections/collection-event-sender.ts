@@ -1,6 +1,8 @@
 import type {
+    CollectionDto,
     CollectionEntityId,
     CollectionVersionId,
+    ElementDto,
 } from 'fuesim-digital-shared';
 import { Marketplace } from 'fuesim-digital-shared';
 import type {
@@ -46,9 +48,10 @@ export class CollectionEventSender {
         await this.listen();
     }
 
-    private notifyChange(
-        update: typeof Marketplace.Collection.Events.SSEvent.Type
-    ) {
+    // this needs to be any, bc schema.encode removed the
+    // brand causing typescript errors when an encoded value
+    // (without brand) is passed to notifyChange (expecting a brand)
+    private notifyChange(update: any) {
         this.sse.sendEvent('change', update);
     }
 
@@ -64,25 +67,31 @@ export class CollectionEventSender {
             )
             .subscribe(async (update) => {
                 switch (update.event) {
-                    case 'dependency:change':
+                    case 'dependency:change': {
                         await this.loadDependencies();
                         this.notifyChange(update);
+
+                        const latestDependencyElements =
+                            await this.collectionService.getLatestDraftElementsOfCollection(
+                                this.collectionEntityId
+                            );
+
                         this.notifyChange(
                             Marketplace.Collection.Events.DependencyReplaceData.schema.encode(
                                 {
                                     event: 'dependency:replace-data',
                                     collectionEntityId: this.collectionEntityId,
-                                    data:
-                                        (
-                                            await this.collectionService.getLatestDraftElementsOfCollection(
-                                                this.collectionEntityId,
-                                                { includeDependencies: true }
-                                            )
-                                        ).transitive ?? [],
-                                }
-                            ) as typeof Marketplace.Collection.Events.DependencyReplaceData.Type
+                                    data: {
+                                        imported:
+                                            latestDependencyElements.imported,
+                                        references:
+                                            latestDependencyElements.references,
+                                    },
+                                } satisfies typeof Marketplace.Collection.Events.DependencyReplaceData.Type
+                            )
                         );
                         break;
+                    }
                     default:
                         this.notifyChange(update);
                 }
@@ -125,7 +134,7 @@ export class CollectionEventSender {
         const data =
             await this.collectionService.getElementsOfCollectionVersion(
                 latestCollection.versionId,
-                { includeDependencies: true, allowDraftState: true }
+                { allowDraftState: true }
             );
 
         const userRelationship =
@@ -144,13 +153,11 @@ export class CollectionEventSender {
                 event: 'initialdata',
                 data: {
                     collection: latestCollection,
-                    elements: {
-                        transitive: data.transitive ?? [],
-                        direct: data.direct,
-                    },
+                    elements: data,
                     userRelationship,
+                    publishedElements: [],
                 },
-            }) as typeof Marketplace.Collection.Events.InitialData.Type
+            })
         );
     }
 }

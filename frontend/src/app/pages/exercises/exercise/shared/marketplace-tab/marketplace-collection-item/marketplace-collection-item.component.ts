@@ -1,5 +1,5 @@
 import { Component, inject, input, resource } from '@angular/core';
-import { VersionedCollectionPartial } from 'fuesim-digital-shared';
+import { gatherCollectionElements, VersionedCollectionPartial } from 'fuesim-digital-shared';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 
@@ -39,10 +39,7 @@ export class MarketplaceColletionItemComponent {
         await this.exerciseService.proposeAction({
             type: '[Collection] Remove Collection',
             collectionEntity: collection.entityId,
-            elements: [
-                ...elements.direct,
-                ...elements.transitive.map((m) => m.elements).flat(),
-            ],
+            elements: gatherCollectionElements(elements).allVisibleElements(),
         });
         //TODO: Keep in mind, that some elements may still be transitive dependencies of other collections!
         //WE SHOULD NOT REMOVE THEM IN THIS CASE!

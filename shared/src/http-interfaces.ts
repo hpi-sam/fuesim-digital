@@ -9,19 +9,12 @@ import { validationMessages } from './validation-messages.js';
 import { exerciseStatusSchema } from './models/utils/exercise-status.js';
 import { logEntrySchema } from './models/log-entry.js';
 import { stringToDate } from './models/utils/date.js';
-import type { CollectionEntityId } from './models/index.js';
 import {
     collectionDtoSchema,
-    collectionEntityIdSchema,
-    collectionRelationshipTypeSchema,
-    collectionVersionIdSchema,
-    collectionVisibilitySchema,
     countedCollectionDtoSchema,
     elementDtoSchema,
-    elementEntityIdSchema,
-    elementVersionIdSchema,
-    versionedElementContentSchema,
 } from './models/index.js';
+import { versionedElementContentSchema, collectionVersionIdSchema, elementVersionIdSchema, collectionEntityIdSchema, collectionRelationshipTypeSchema, collectionElementsDtoSchema, collectionVisibilitySchema, CollectionEntityId, elementEntityIdSchema, collectionElementsSingleSchema } from './marketplace/index.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -421,16 +414,8 @@ export namespace Marketplace {
             }),
         });
 
-        export const transitiveCollectionSchema = z.object({
-            collection: collectionDtoSchema,
-            elements: z.array(elementDtoSchema),
-        });
-
         export const GetLatestElementsBySetVersionId = new Route({
-            response: z.object({
-                direct: z.array(elementDtoSchema),
-                transitive: z.array(transitiveCollectionSchema),
-            }),
+            response: collectionElementsDtoSchema,
         });
 
         export const GetCollectionVersion = new Route({
@@ -468,7 +453,7 @@ export namespace Marketplace {
 
         export const Import = new Route({
             response: z.object({
-                importedSet: transitiveCollectionSchema,
+                importedSet: collectionElementsSingleSchema,
                 newCollectionVersionId: collectionVersionIdSchema,
             }),
         });
@@ -481,20 +466,17 @@ export namespace Marketplace {
         });
 
         export const GetElementsOfCollectionVersion = new Route({
-            response: z.object({
-                direct: z.array(elementDtoSchema),
-                transitive: z.array(transitiveCollectionSchema),
-            }),
+            response: collectionElementsDtoSchema
         });
 
         class TypedSchema<D, T> {
-            constructor(public readonly schema: T) {}
+            constructor(public readonly schema: T) { }
 
             public readonly Type!: T extends z.ZodType
                 ? // if D is defined (override type), use D, otherwise infer from T
-                  D extends unknown
-                    ? z.infer<T>
-                    : D
+                D extends unknown
+                ? z.infer<T>
+                : D
                 : never;
         }
 
@@ -526,17 +508,18 @@ export namespace Marketplace {
 
             export const DependencyReplaceData = defineEvent(
                 'dependency:replace-data',
-                z.array(transitiveCollectionSchema)
+                z.object({
+                    imported: z.array(collectionElementsSingleSchema),
+                    references: z.array(collectionElementsSingleSchema)
+                })
             );
 
             export const InitialData = defineEvent(
                 'initialdata',
                 z.object({
                     collection: collectionDtoSchema,
-                    elements: z.object({
-                        direct: z.array(elementDtoSchema),
-                        transitive: z.array(transitiveCollectionSchema),
-                    }),
+                    elements: collectionElementsDtoSchema,
+                    publishedElements: z.array(collectionElementsDtoSchema),
                     userRelationship: collectionRelationshipTypeSchema,
                 })
             );
@@ -561,6 +544,11 @@ export namespace Marketplace {
             export const CollectionUpdate = defineEvent(
                 'collection:update',
                 collectionDtoSchema
+            );
+
+            export const CollectionUpdatePublishedElements = defineEvent(
+                'collection:update-published-elements',
+                collectionElementsDtoSchema
             );
 
             export const SSEvent = new TypedSchema(

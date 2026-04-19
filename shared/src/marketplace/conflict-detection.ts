@@ -1,11 +1,13 @@
 import { z } from 'zod';
+import type { VersionedElementContent } from './models/versioned-element-content.js';
 import {
-    ElementDto,
-    elementDtoSchema,
-    ElementVersionId,
     elementVersionIdSchema,
-    VersionedElementContent,
-} from '../models/index.js';
+    ElementVersionId,
+    CollectionVersionId,
+    VersionedCollectionPartial,
+} from './models/versioned-id-schema.js';
+import { elementDtoSchema } from './models/versioned-elements.js';
+import type { ElementDto } from './models/versioned-elements.js';
 
 const deletedElementDtoSchema = z.object({
     id: elementVersionIdSchema,
@@ -143,4 +145,100 @@ export function findElementVersionsInContent(
             };
         }
     }
+}
+
+export async function dependencyTreeConflictResolution(
+    baseCollection: VersionedCollectionPartial,
+    opts: {
+        // levels of dependencies which are later directly visible to the user
+        // 1 is used for collections in collections
+        // 2 is used for collections in exercises
+        strictLevels: number;
+    } = { strictLevels: 1 },
+    retrievers: {
+        getCollectionDependencies: (
+            collectionVersionId: CollectionVersionId
+        ) => Promise<VersionedCollectionPartial[]>;
+        getCollectionElements: (
+            collectionVersionId: CollectionVersionId
+        ) => Promise<ElementDto[]>;
+    }
+) {
+    // -- STRICT LEVEL --
+    const strictLevelCollections: VersionedCollectionPartial[] = [];
+    const looseLevelCollections: VersionedCollectionPartial[] = [];
+    const strictLevelElements: ElementDto[] = [];
+
+    const loadDeps = async (
+        collection: VersionedCollectionPartial,
+        currentLevel: number
+    ) => {
+        if (currentLevel > opts.strictLevels) {
+            looseLevelCollections.push(collection);
+            return;
+        }
+
+        const elements = await retrievers.getCollectionElements(
+            collection.versionId
+        );
+        strictLevelElements.push(...elements);
+
+        const deps = await retrievers.getCollectionDependencies(
+            collection.versionId
+        );
+        for (const dep of deps) {
+            strictLevelCollections.push(collection);
+            await loadDeps(dep, currentLevel + 1);
+        }
+    };
+
+    await loadDeps(baseCollection, 1);
+
+    const groupedIds = strictLevelCollections.reduce<{
+        [key: string]: CollectionVersionId[];
+    }>((acc, collection) => {
+        if (acc[collection.entityId] === undefined) {
+            acc[collection.entityId] = [];
+        }
+        acc[collection.entityId]!.push(collection.versionId);
+        return acc;
+    }, {});
+
+    if (Object.values(groupedIds).some((versions) => versions.length > 1)) {
+        console.warn(
+            'Conflict detected in dependency tree, multiple versions of the same collection found in strict levels',
+            strictLevelCollections
+        );
+    }
+
+    // -- LOOSE LEVEL --
+    console.log({ looseLevelCollections });
+
+    const looseLevelElements: ElementDto[] = [];
+
+    const loadLooseDeps = async (collection: VersionedCollectionPartial) => {
+        const elements = await retrievers.getCollectionElements(
+            collection.versionId
+        );
+        looseLevelElements.push(...elements);
+
+        const deps = await retrievers.getCollectionDependencies(
+            collection.versionId
+        );
+        for (const dep of deps) {
+            await loadLooseDeps(dep);
+            // We do not check if two versions of the same collection are in the loose level,
+            // since we use mix-n-match resolution for the loose level
+            //
+            // So we only need to check for version conflicts on the elements
+        }
+    };
+
+    for (const collection of looseLevelCollections) {
+        await loadLooseDeps(collection);
+    }
+
+    console.log({ looseLevelElements });
+
+    return { strictLevelCollections, groupedIds };
 }

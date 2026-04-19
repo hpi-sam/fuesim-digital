@@ -11,6 +11,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import {
     checkCollectionRole,
     CollectionEntityId,
+    gatherCollectionElements,
     isCollectionEntityId,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';

@@ -90,7 +90,7 @@ import { getDefaultTasks } from './data/default-state/tmp-default-technical-chal
 import {
     VersionedCollectionPartial,
     versionedCollectionPartialSchema,
-} from './models/versioned-collections.js';
+} from './marketplace/models/versioned-id-schema.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)

@@ -1,5 +1,7 @@
 import type {
     CollectionDto,
+    CollectionElementsDto,
+    CollectionElementsSingle,
     CollectionEntityId,
     CollectionRelationshipType,
     CollectionVersionId,
@@ -102,7 +104,7 @@ export class CollectionService {
         private readonly eventSubject = new Subject<
             typeof Marketplace.Collection.Events.SSEvent.Type
         >()
-    ) {}
+    ) { }
 
     public async getCollectionInviteCode(
         collectionEntityId: CollectionEntityId
@@ -325,10 +327,7 @@ export class CollectionService {
                     )
                 );
 
-                await tx.checkIfDependencyCanBeAdded({
-                    importTo: draftState.versionId,
-                    dependencyVersionId: importFromCollection.versionId,
-                });
+                //TODO: Check if dependency can be added!
 
                 if (importFromCollection.draftState) {
                     if (throwOnDraftState) {
@@ -478,8 +477,7 @@ export class CollectionService {
 
     public async getLatestDraftElementsOfCollection(
         entity: CollectionEntityId,
-        opts: { includeDependencies: boolean }
-    ) {
+    ): Promise<CollectionElementsDto> {
         const latestConnection = this.exists(
             await this.collectionRepository.getLatestCollectionByEntityId(
                 entity,
@@ -490,7 +488,6 @@ export class CollectionService {
         const elements = await this.getElementsOfCollectionVersion(
             latestConnection.versionId,
             {
-                includeDependencies: opts.includeDependencies,
                 allowDraftState: true,
             }
         );
@@ -498,56 +495,79 @@ export class CollectionService {
         return elements;
     }
 
-    private async getFullFlatDependencyTree(
-        collectionVersionId: CollectionVersionId,
-        visited: Set<CollectionVersionId> = new Set()
-    ): ReturnType<
-        typeof this.collectionRepository.getCollectionVersionDirectDependencies
-    > {
-        if (visited.has(collectionVersionId)) {
-            console.warn(
-                `Circular dependency detected for collection version ${collectionVersionId}`
-            );
-            return [];
+    /**
+     * Finds all direct AND TRANSITIVE elements being used inside a collection.
+     *
+     * useful for resolving dependencies of lower-level collections in collections or exercises in collections,
+     * where we do not want to show the user all dependencies, but still need to know about them.
+     */
+    private async getUsedElementsDeep(
+        elements: ElementDto[],
+    ): Promise<CollectionElementsSingle[]> {
+        const foundElements: CollectionElementsSingle[] = [];
+        for (const element of elements) {
+            const elementVersions = findElementVersionsInContent(element.content);
+
+            const foundSubElements: ElementDto[] = (await Promise.all(elementVersions.ids.map(m =>
+                this.collectionRepository.getElementVersionByVersionId(m)
+            ))).filter(f => f != null)
+
+            const elementCollections: CollectionElementsSingle[] = (await Promise.all(
+                foundSubElements.map(async m => (
+                    {
+                        elements: [m],
+                        collection:
+                            this.exists(await this.collectionRepository.getLatestCollectionOfElementEntity(m.entityId))
+                    }
+                ))
+            ))
+
+
+
+
+            foundElements.push(...elementCollections);
+            foundElements.push(...await this.getUsedElementsDeep(foundSubElements));
         }
 
-        visited.add(collectionVersionId);
+        const result: CollectionElementsSingle[] = [];
 
-        const deps =
-            await this.collectionRepository.getCollectionVersionDirectDependencies(
-                collectionVersionId
-            );
+        for(const foundElement of foundElements){
+            const sameCollectionVersion = foundElements.filter(f=>f.collection.versionId);
+            result.push({
+                collection: foundElement.collection,
+                elements: [
+                    ...foundElement.elements,
+                    ...sameCollectionVersion.flatMap(m=>m.elements)
+                ]
+            })
+        }
 
-        const allDeps = (
-            await Promise.all(
-                deps.map(async (dep) =>
-                    this.getFullFlatDependencyTree(
-                        dep.collectionVersionId,
-                        visited
-                    )
-                )
-            )
-        ).flat();
+        return result;
+    }
 
-        return [...deps, ...allDeps];
+    public async getDirectDependencyElements(collectionVersionId: CollectionVersionId): Promise<CollectionElementsSingle[]> {
+        const dependencies = await this.collectionRepository.getCollectionVersionDirectDependencies(collectionVersionId);
+
+        const elements: CollectionElementsSingle[] = []
+
+        for (const dependency of dependencies) {
+            const collection = this.exists(await this.collectionRepository.getCollectionByVersionId(dependency.collectionVersionId));
+            const elementsOfDependency = await this.collectionRepository.getElementsOfCollectionVersion(dependency.collectionVersionId);
+            elements.push({
+                collection,
+                elements: elementsOfDependency,
+            })
+        }
+
+        return elements;
     }
 
     public async getElementsOfCollectionVersion(
         collectionVersionId: CollectionVersionId,
         opts: {
-            includeDependencies?: boolean;
             allowDraftState: boolean;
         }
-    ): Promise<{
-        direct: ElementDto[];
-        transitive?: z.infer<
-            typeof Marketplace.Collection.transitiveCollectionSchema
-        >[];
-    }> {
-        const { includeDependencies } = opts || {
-            includeDependencies: false,
-        };
-
+    ): Promise<CollectionElementsDto> {
         const baseCollection = this.exists(
             await this.collectionRepository.getCollectionByVersionId(
                 collectionVersionId
@@ -565,42 +585,16 @@ export class CollectionService {
                 collectionVersionId
             );
 
-        if (includeDependencies === false) {
-            return { direct: directCollectionElements };
-        }
-        const dependentCollectionVersions =
-            await this.getFullFlatDependencyTree(collectionVersionId);
+        const directDependencyElements = await this.getDirectDependencyElements(collectionVersionId);
 
-        const dependentCollectionElements = await Promise.all(
-            dependentCollectionVersions.map(async (dependency) =>
-                Promise.all([
-                    this.exists(
-                        this.getCollectionVersionById(
-                            dependency.collectionVersionId
-                        )
-                    ),
-                    this.exists(
-                        this.collectionRepository.getElementsOfCollectionVersion(
-                            dependency.collectionVersionId
-                        )
-                    ),
-                ])
-            )
-        );
+        const furtherElementReferences =
+            await this.getUsedElementsDeep(directDependencyElements.flatMap(m => m.elements));
 
-        const dependencies = dependentCollectionElements.map(
-            ([collection, elements]) =>
-                ({
-                    collection: collection!,
-                    elements,
-                }) satisfies z.infer<
-                    typeof Marketplace.Collection.GetLatestElementsBySetVersionId.responseSchema.shape.transitive.element
-                >
-        );
 
         return {
             direct: directCollectionElements,
-            transitive: dependencies,
+            imported: directDependencyElements,
+            references: furtherElementReferences
         };
     }
 
@@ -826,10 +820,10 @@ export class CollectionService {
         const transitiveElementReferences = (
             opts.transitive === true
                 ? await Promise.all(
-                      directElementReferences.map(async (directReference) =>
-                          this.getDependenciesOfElement(directReference)
-                      )
-                  )
+                    directElementReferences.map(async (directReference) =>
+                        this.getDependenciesOfElement(directReference)
+                    )
+                )
                 : []
         ).flat();
 
@@ -1188,53 +1182,5 @@ export class CollectionService {
         return [...relevantDependencies, ...transitiveRelevantDependencies].map(
             (dep) => dep.element
         );
-    }
-
-    /**
-     * @deprecated do not use yet - impl. not finished
-     */
-    public async checkIfDependencyCanBeAdded(data: {
-        importTo: CollectionVersionId;
-        dependencyVersionId: CollectionVersionId;
-    }) {
-        const baseCollectionDependencies =
-            await this.collectionRepository.getCollectionVersionDirectDependencies(
-                data.importTo
-            );
-
-        const updatedCollectionDependencies = [
-            ...baseCollectionDependencies.map(
-                (dependency) => dependency.collectionVersionId
-            ),
-            data.dependencyVersionId,
-        ];
-
-        const relevantTransitiveDependencies = await Promise.all(
-            updatedCollectionDependencies.map(async (dependencyVersionId) => {
-                const elements =
-                    await this.collectionRepository.getElementsOfCollectionVersion(
-                        dependencyVersionId
-                    );
-                const relevantDependenciesForElements = await Promise.all(
-                    elements.map(async (element) =>
-                        this.getRelevantTransitiveDependenciesForElementVersion(
-                            element,
-                            dependencyVersionId
-                        )
-                    )
-                );
-                return relevantDependenciesForElements.flat();
-            })
-        ).then((results) => results.flat());
-
-        const versionIdsPerEntityId = relevantTransitiveDependencies.reduce<
-            Record<ElementEntityId, ElementDto[]>
-        >((acc, element) => {
-            if (acc[element.entityId] === undefined) {
-                acc[element.entityId] = [];
-            }
-            acc[element.entityId]?.push(element);
-            return acc;
-        }, {});
     }
 }

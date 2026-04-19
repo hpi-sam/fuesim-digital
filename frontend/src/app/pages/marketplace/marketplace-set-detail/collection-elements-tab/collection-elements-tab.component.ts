@@ -6,6 +6,7 @@ import {
 import {
     checkCollectionRole,
     ExerciseState,
+    gatherCollectionElements,
     migratePartialExport,
     PartialExport,
     ParticipantKey,
@@ -42,12 +43,8 @@ export class CollectionElementsTabComponent {
         const selectedCollectionData = this.collectionData();
         if (!selectedCollectionData) return [];
 
-        return [
-            ...selectedCollectionData.objects.direct,
-            ...selectedCollectionData.objects.transitive.flatMap(
-                (d) => d.elements
-            ),
-        ];
+        return gatherCollectionElements(selectedCollectionData.objects)
+            .allVisibleElements()
     });
 
     public readonly importingElements = signal<boolean>(false);

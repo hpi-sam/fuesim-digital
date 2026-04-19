@@ -6,6 +6,7 @@ import type {
     CollectionVersionId,
     CollectionVisibility,
     CountedCollectionDto,
+    ElementDto,
     ElementEntityId,
     ElementVersionId,
     Marketplace,
@@ -804,7 +805,7 @@ export class CollectionRepository extends BaseRepository {
 
     public async getElementVersionByVersionId(
         elementVersionId: ElementVersionId
-    ) {
+    ): Promise<ElementDto | null> {
         const result = await this.databaseConnection
             .select()
             .from(elementTable)

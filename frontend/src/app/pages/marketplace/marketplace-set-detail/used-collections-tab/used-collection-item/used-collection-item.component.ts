@@ -14,6 +14,8 @@ import {
     ElementVersionId,
     ElementDto,
     ChangeDependencies,
+    CollectionElementsSingle,
+    gatherCollectionElements,
 } from 'fuesim-digital-shared';
 import * as z from 'zod';
 import { CollectionService } from '../../../../../core/exercise-element.service';
@@ -47,10 +49,7 @@ export class UsedCollectionItemComponent {
 
     public readonly currentCollectionEntityId =
         input.required<CollectionEntityId>();
-    public readonly dependency =
-        input.required<
-            z.infer<typeof Marketplace.Collection.transitiveCollectionSchema>
-        >();
+    public readonly dependency = input.required<CollectionElementsSingle>();
 
     public readonly newerVersionAvailable = resource({
         params: () => ({ collection: this.dependency().collection }),
@@ -128,10 +127,7 @@ export class UsedCollectionItemComponent {
         const modalInstance =
             modal.componentInstance as CollectionUpgradeImpactModalComponent;
         modalInstance.changes = changes;
-        modalInstance.collectionElements = [
-            ...newVersionElements.direct,
-            ...newVersionElements.transitive.map((e) => e.elements).flat(),
-        ];
+        modalInstance.collectionElements = gatherCollectionElements(newVersionElements).allVisibleElements()
         modalInstance.changeDependencies = changeDependencies;
 
         const result = await firstValueFrom(modalInstance.confirmationResult$);

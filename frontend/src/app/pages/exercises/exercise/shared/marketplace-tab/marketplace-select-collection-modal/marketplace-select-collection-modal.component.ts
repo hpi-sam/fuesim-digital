@@ -4,6 +4,7 @@ import {
     CollectionDto,
     CollectionEntityId,
     CollectionVersionId,
+    gatherCollectionElements,
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { CollectionElementsListComponent } from '../../../../../marketplace/marketplace-set-detail/collection-elements-list/collection-elements-list.component';
@@ -55,12 +56,11 @@ export class MarketplaceSelectCollectionModalComponent {
     public readonly selectedCollectionDataElements = computed(() => {
         const data = this.selectedCollectionData.value();
         if (!data) return [];
-        return [
-            ...data[1].direct,
-            ...(this.showDependencyElements
-                ? data[1].transitive.map((m) => m.elements).flat()
-                : []),
-        ];
+        if(this.showDependencyElements) {
+            return gatherCollectionElements(data[1]).allVisibleElements()
+        } else {
+            return data[1].direct
+        }
     });
 
     public readonly selectedCollection =

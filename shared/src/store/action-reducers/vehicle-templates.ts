@@ -22,7 +22,7 @@ import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     type ElementEntityId,
     elementEntityIdSchema,
-} from '../../models/versioned-elements.js';
+} from '../../marketplace/models/versioned-id-schema.js';
 
 export class AddVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Add vehicleTemplate')

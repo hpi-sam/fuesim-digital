@@ -1,10 +1,10 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
     CollectionDto,
     ElementDto,
+    gatherCollectionElements,
     uuid,
     Vehicle,
-    VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -17,7 +17,6 @@ import {
     selectVehicles,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
-import { ChangeImpactModalComponent } from '../change-impact-modal/change-impact-modal.component';
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import {
     ChangeImpact,
@@ -25,8 +24,6 @@ import {
     InExerciseElement,
 } from '../change-impact-modal/change-impact-types';
 import { MarketplaceColletionItemComponent } from './marketplace-collection-item/marketplace-collection-item.component';
-import { MarketplaceSelectCollectionModalComponent } from './marketplace-select-collection-modal/marketplace-select-collection-modal.component';
-import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { openSelectCollectionModal } from './marketplace-select-collection-modal/select-collection-modal';
 
 @Component({
@@ -67,10 +64,7 @@ export class MarketplaceTabComponent {
             await this.collectionService.getElementsOfCollectionVersion(result);
         await this.exerciseService.proposeAction({
             type: '[Collection] Add Collection',
-            elements: [
-                ...elements.direct,
-                ...elements.transitive.map((t) => t.elements).flat(),
-            ],
+            elements: gatherCollectionElements(elements).allVisibleElements(),
             collectionVersion: {
                 versionId: result.versionId,
                 entityId: result.entityId,

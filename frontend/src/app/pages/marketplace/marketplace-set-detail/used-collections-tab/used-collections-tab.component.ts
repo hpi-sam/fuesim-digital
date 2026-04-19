@@ -27,7 +27,7 @@ export class UsedCollectionsTabComponent {
         input.required<CollectionSubscriptionData>();
 
     public readonly alreadyImportedCollectionVersions = computed(() =>
-        this.collectionData().objects.transitive.map(
+        this.collectionData().objects.imported.map(
             (transitiveData) => transitiveData.collection.versionId
         )
     );
@@ -38,7 +38,7 @@ export class UsedCollectionsTabComponent {
         const result = await openSelectCollectionModal(this.ngbModalService, {
             disallowedCollections: [
                 this.collectionData().collection.entityId,
-                ...this.collectionData().objects.transitive.map(
+                ...this.collectionData().objects.imported.map(
                     (m) => m.collection.entityId
                 ),
             ],

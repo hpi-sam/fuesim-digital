@@ -10,7 +10,7 @@
 }
 <div class="d-flex flex-column gap-3">
     @for (
-        dependency of collectionData().objects.transitive;
+        dependency of collectionData().objects.imported;
         track dependency.collection.versionId
     ) {
         <app-used-collection-item

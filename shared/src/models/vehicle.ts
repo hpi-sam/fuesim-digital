@@ -12,8 +12,7 @@ import {
     exerciseOccupationSchema,
 } from './utils/occupations/exercise-occupation.js';
 import { operationalAssignmentSchema } from './operational-section.js';
-import { versionedElementPartialSchema } from './index.js';
-import { versionedElementModel } from './versioned-element-model.js';
+import { versionedElementModel } from '../marketplace/models/versioned-element-model.js';
 
 export const vehicleSchema = z.strictObject({
     ...versionedElementModel.partial().shape,

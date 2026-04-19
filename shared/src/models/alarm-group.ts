@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { uuid, uuidSchema } from '../utils/uuid.js';
+import { versionedElementModel } from '../marketplace/models/versioned-element-model.js';
 import { alarmGroupVehicleSchema } from './utils/alarm-group-vehicle.js';
-import { versionedElementModel } from './versioned-element-model.js';
 
 export const alarmGroupSchema = z.strictObject({
     ...versionedElementModel.partial().shape,

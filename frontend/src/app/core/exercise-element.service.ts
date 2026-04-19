@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import {
     CollectionDto,
+    CollectionElementsDto,
     CollectionEntityId,
     CollectionRelationshipType,
     CollectionVersionId,
@@ -15,12 +16,10 @@ import {
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { httpOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MarketplaceSelectCollectionModalComponent } from '../pages/exercises/exercise/shared/marketplace-tab/marketplace-select-collection-modal/marketplace-select-collection-modal.component';
 
 export interface CollectionSubscriptionData {
     collection: CollectionDto;
-    objects: typeof Marketplace.Collection.GetLatestElementsBySetVersionId.Response;
+    objects: CollectionElementsDto,
     ownRole: CollectionRelationshipType;
 }
 
@@ -30,7 +29,6 @@ export interface CollectionSubscriptionData {
 export class CollectionService {
     private readonly httpClient = inject(HttpClient);
     private readonly messageService = inject(MessageService);
-    private readonly ngbModalService = inject(NgbModal);
 
     public readonly ENDPOINT = `${httpOrigin}/api/collections`;
     private readonly _collectionSubscriptions = new Map<
@@ -130,9 +128,10 @@ export class CollectionService {
                         ...currentValue,
                         objects: {
                             direct: currentValue.objects.direct,
-                            transitive: changeEvent.data,
+                            imported: changeEvent.data.imported,
+                            references: changeEvent.data.references
                         },
-                    };
+                    } satisfies CollectionSubscriptionData;
                     subject.next(newValue);
                     break;
                 }

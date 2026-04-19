@@ -275,6 +275,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
     /*
      * Import elements from file
+     * TODO: @Quixelation : IMPLEMENT
      */
     editorRouter.post('/:collectionEntityId/import', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
@@ -282,6 +283,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         const parsedBody = Marketplace.Element.Create.requestSchema.parse(
             req.body
         );
+        throw new Error('Not implemented yet');
 
         const data = await collectionService.createExerciseObjects(
             collectionEntityId,

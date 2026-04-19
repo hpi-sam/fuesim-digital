@@ -1,19 +1,3 @@
-import type {
-    Vehicle,
-    VehicleTemplate,
-    MaterialTemplate,
-    PersonnelTemplate,
-    MapCoordinates,
-    VehicleParameters,
-    VersionedElementPartial,
-} from '../models/index.js';
-import {
-    newVehicleParameters,
-    newNoOccupation,
-    newVehiclePositionIn,
-    newMapPositionAt,
-} from '../models/index.js';
-
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
 import { newMaterialFromTemplate } from '../models/material.js';
 import { newPersonnelFromTemplate } from '../models/personnel.js';
@@ -30,6 +14,7 @@ import { newMapPositionAt } from '../models/utils/position/map-position.js';
 import { newNoOccupation } from '../models/utils/occupations/no-occupation.js';
 import type { MaterialTemplate } from '../models/material-template.js';
 import type { PersonnelTemplate } from '../models/personnel-template.js';
+import type { VersionedElementPartial } from '../marketplace/models/versioned-id-schema.js';
 
 /**
  * @returns a vehicle with personnel and materials to be added to the map

@@ -10,7 +10,7 @@ export class VersionedElementDisplayNamePipe implements PipeTransform {
     transform(element: VersionedElementContent['type']): {
         singular: string;
         plural: string;
-    } {
+    } | undefined {
         return getVersionedElementTypeDisplayName(element);
     }
 }

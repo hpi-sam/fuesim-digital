@@ -3,24 +3,20 @@
     <div class="d-flex flex-wrap align-items-center justify-content-between">
         <h1>Meine Übungsvorlagen</h1>
         <div class="flex-grow-1"></div>
-        <button class="btn btn-primary my-2" (click)="createExerciseTemplate()">
+        <button
+            class="btn btn-primary my-2 me-2"
+            (click)="createExerciseTemplate()"
+        >
             Neue Übungsvorlage erstellen
         </button>
-        <label
-            class="btn btn-outline-primary my-2"
-            [class.disabled]="importingExercise()"
-        >
+        <label class="btn btn-outline-primary my-2">
             <i class="bi-cloud-upload me-2"> </i>
             Vorlage importieren
-            @if (importingExercise()) {
-                <span class="spinner-border spinner-border-sm"></span>
-            }
             <input
-                (appFileInput)="importExerciseTemplate($event)"
+                (appFileInput)="createExerciseTemplate($event)"
                 type="file"
                 accept="application/json"
                 class="d-none"
-                [disabled]="importingExercise()"
             />
         </label>
     </div>

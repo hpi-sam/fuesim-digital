@@ -33,7 +33,7 @@ export class ExerciseManagerService {
     }
 
     public async createExerciseTemplateFromBlank(
-        data: Omit<ExerciseTemplateInsert, 'user'>,
+        data: ExerciseTemplateInsert,
         session: SessionInformation
     ) {
         if (
@@ -61,14 +61,21 @@ export class ExerciseManagerService {
     }
 
     public async createExerciseTemplateFromFile(
+        data: ExerciseTemplateInsert,
         importObject: StateExport,
         session: SessionInformation
     ) {
+        if (
+            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                data.organisationId,
+                session.user.id,
+                ['editor', 'admin']
+            ))
+        ) {
+            throw new PermissionDeniedError();
+        }
         const exerciseTemplate =
-            await this.exerciseRepository.createExerciseTemplate({
-                name: 'Importierte Datei',
-                user: session.user.id,
-            });
+            await this.exerciseRepository.createExerciseTemplate(data);
         if (!exerciseTemplate) {
             throw new ApiError();
         }

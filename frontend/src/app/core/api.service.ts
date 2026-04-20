@@ -166,15 +166,6 @@ export class ApiService {
         ).then(getExerciseTemplateResponseDataWithoutTrainerKeySchema.parse);
     }
 
-    public async importExerciseTemplate(exportedState: StateExport) {
-        return lastValueFrom(
-            this.httpClient.post(
-                `${httpOrigin}/api/exercise_templates/import`,
-                exportedState
-            )
-        ).then(getExerciseTemplateResponseDataSchema.parse);
-    }
-
     public async patchExerciseTemplate(
         id: ExerciseTemplateId,
         data: PatchExerciseTemplateRequestData

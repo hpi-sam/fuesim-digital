@@ -1,4 +1,4 @@
-import { StrictObject } from '../utils/strict-object.js';
+import { TypeAssertedObject } from '../utils/type-asserted-object.js';
 import type { Migration } from './migration-functions.js';
 
 export const renameIncorrectPatientImages12: Migration = {
@@ -23,7 +23,7 @@ export const renameIncorrectPatientImages12: Migration = {
                 migrateImageProperties(patientTemplate.image);
             })
         );
-        StrictObject.values(
+        TypeAssertedObject.values(
             (
                 state as {
                     patients: {

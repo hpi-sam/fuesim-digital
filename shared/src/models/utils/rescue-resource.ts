@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { StrictObject } from '../../utils/strict-object.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import {
     type ResourceDescription,
     resourceDescriptionSchema,
@@ -50,7 +50,7 @@ export function isEmptyResource(resource: ExerciseRescueResource) {
             resourceDescription = resource.vehicleCounts;
             break;
     }
-    return StrictObject.values(resourceDescription).every(
+    return TypeAssertedObject.values(resourceDescription).every(
         (count) => count === 0
     );
 }

@@ -1,4 +1,4 @@
-import { StrictObject } from './strict-object.js';
+import { TypeAssertedObject } from './type-asserted-object.js';
 
 /**
  *
@@ -20,5 +20,5 @@ export function sortObject<T extends { [key: string]: any }>(
     obj: T,
     compareFn: (a: [keyof T, T[keyof T]], b: [keyof T, T[keyof T]]) => number
 ): T {
-    return Object.fromEntries(StrictObject.entries(obj).sort(compareFn)) as T;
+    return Object.fromEntries(TypeAssertedObject.entries(obj).sort(compareFn)) as T;
 }

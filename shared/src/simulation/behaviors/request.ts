@@ -28,7 +28,7 @@ import {
 } from '../../models/utils/resource-description.js';
 import type { ResourceRequestRadiogram } from '../../models/radiogram/resource-request-radiogram.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
-import { StrictObject } from '../../utils/strict-object.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import {
     getActivityById,
     tryGetElement,
@@ -259,7 +259,7 @@ function getRequiredResources(
     behaviorState: WritableDraft<RequestBehaviorState>
 ) {
     return addPartialResourceDescriptions(
-        StrictObject.values(behaviorState.requestedResources).map(
+        TypeAssertedObject.values(behaviorState.requestedResources).map(
             (resource) => resource.vehicleCounts
         )
     );

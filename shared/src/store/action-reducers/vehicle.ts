@@ -46,7 +46,7 @@ import { newVehicleRemovedEvent } from '../../simulation/events/vehicle-removed.
 import { newNewPatientEvent } from '../../simulation/events/new-patient.js';
 import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
 import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
-import { StrictObject } from '../../utils/strict-object.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getElement } from './utils/get-element.js';
 import { deletePatient } from './patient.js';
@@ -233,7 +233,7 @@ export namespace VehicleActionReducers {
                         material.vehicleId !== vehicle.id ||
                         vehicle.materialIds[material.id] === undefined
                 ) ||
-                StrictObject.keys(vehicle.materialIds).length !==
+                TypeAssertedObject.keys(vehicle.materialIds).length !==
                     materials.length
             ) {
                 throw new ReducerError(
@@ -246,7 +246,7 @@ export namespace VehicleActionReducers {
                         currentPersonnel.vehicleId !== vehicle.id ||
                         vehicle.personnelIds[currentPersonnel.id] === undefined
                 ) ||
-                StrictObject.keys(vehicle.personnelIds).length !==
+                TypeAssertedObject.keys(vehicle.personnelIds).length !==
                     personnel.length
             ) {
                 throw new ReducerError(

@@ -6,7 +6,7 @@ import type {
     UnloadVehicleActivityState,
     UUID,
 } from 'fuesim-digital-shared';
-import { StrictObject } from 'fuesim-digital-shared';
+import { TypeAssertedObject } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -64,7 +64,7 @@ export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent impl
             selectBehavior,
             selectVehicles,
             (activities, behavior, vehicles) =>
-                StrictObject.values(behavior.vehicleActivityMap)
+                TypeAssertedObject.values(behavior.vehicleActivityMap)
                     .map(
                         (activityId) =>
                             activities[activityId] as

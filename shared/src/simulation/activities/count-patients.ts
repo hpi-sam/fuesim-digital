@@ -8,7 +8,7 @@ import type { PatientStatus } from '../../models/utils/patient-status.js';
 import { patientStatusAllowedValues } from '../../models/utils/patient-status.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import { type UUID } from '../../utils/uuid.js';
-import { StrictObject } from '../../utils/strict-object.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import {
     type SimulationActivity,
     simulationActivityStateSchema,
@@ -42,8 +42,8 @@ export const countPatientsActivity: SimulationActivity<CountPatientsActivityStat
                 (patient) =>
                     isInSpecificSimulatedRegion(patient, simulatedRegion.id)
             );
-            const patientCount = StrictObject.fromEntries(
-                StrictObject.entries(
+            const patientCount = TypeAssertedObject.fromEntries(
+                TypeAssertedObject.entries(
                     groupBy(patients, (patient) =>
                         getPatientVisibleStatus(
                             patient,

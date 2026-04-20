@@ -7,7 +7,7 @@ import { nextUUID } from '../../../simulation/utils/randomness.js';
 import type { ResourceRequestRadiogram } from '../../radiogram/resource-request-radiogram.js';
 import { newResourceRequestRadiogram } from '../../radiogram/resource-request-radiogram.js';
 import { isDone, isUnread } from '../../radiogram/radiogram-helpers.js';
-import { StrictObject } from '../../../utils/strict-object.js';
+import { TypeAssertedObject } from '../../../utils/type-asserted-object.js';
 import { isEmptyResource } from '../rescue-resource.js';
 import type { RequestTarget } from './request-target.js';
 import { requestTargetConfigurationSchema } from './request-target.js';
@@ -35,7 +35,7 @@ export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfigura
             requestedResource,
             key
         ) => {
-            const unreadRadiogram = StrictObject.values(
+            const unreadRadiogram = TypeAssertedObject.values(
                 draftState.radiograms
             ).find(
                 (radiogram) =>
@@ -53,7 +53,7 @@ export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfigura
             }
 
             if (
-                StrictObject.values(draftState.radiograms)
+                TypeAssertedObject.values(draftState.radiograms)
                     .filter(
                         (radiogram) =>
                             radiogram.type === 'resourceRequestRadiogram' &&

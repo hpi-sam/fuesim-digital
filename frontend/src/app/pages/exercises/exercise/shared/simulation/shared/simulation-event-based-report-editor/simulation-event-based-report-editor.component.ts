@@ -6,7 +6,7 @@ import type {
     SimulationBehaviorState,
     UUID,
 } from 'fuesim-digital-shared';
-import { StrictObject } from 'fuesim-digital-shared';
+import { TypeAssertedObject } from 'fuesim-digital-shared';
 import {
     map,
     of,
@@ -122,8 +122,8 @@ export class SimulationEventBasedReportEditorComponent
                     : of([])
             ),
             map((behaviors) =>
-                StrictObject.fromEntries(
-                    StrictObject.entries(eventBasedReportData).map(
+                TypeAssertedObject.fromEntries(
+                    TypeAssertedObject.entries(eventBasedReportData).map(
                         ([eventId, eventDetails]) => [
                             eventId,
                             eventDetails.requiredBehaviors.every(
@@ -140,23 +140,21 @@ export class SimulationEventBasedReportEditorComponent
             takeUntil(this.destroy$)
         );
 
-        this.eventBasedReports = StrictObject.entries(eventBasedReportData).map(
-            ([eventId, eventDetails]) => ({
-                eventId,
-                propertyName: eventDetails.propertyName,
-                description: eventDetails.description,
-                changeCallback: (isEnabled) =>
-                    this.updateEventBasedReport(eventId, isEnabled),
-                hotkey: new Hotkey(
-                    eventDetails.hotkeyKeys,
-                    false,
-                    () => this.toggleEventBasedReport(eventId),
-                    this.canReport$.pipe(
-                        map((canReport) => !!canReport[eventId])
-                    )
-                ),
-            })
-        );
+        this.eventBasedReports = TypeAssertedObject.entries(
+            eventBasedReportData
+        ).map(([eventId, eventDetails]) => ({
+            eventId,
+            propertyName: eventDetails.propertyName,
+            description: eventDetails.description,
+            changeCallback: (isEnabled) =>
+                this.updateEventBasedReport(eventId, isEnabled),
+            hotkey: new Hotkey(
+                eventDetails.hotkeyKeys,
+                false,
+                () => this.toggleEventBasedReport(eventId),
+                this.canReport$.pipe(map((canReport) => !!canReport[eventId]))
+            ),
+        }));
 
         this.hotkeyLayer = this.hotkeysService.createLayer(
             false,

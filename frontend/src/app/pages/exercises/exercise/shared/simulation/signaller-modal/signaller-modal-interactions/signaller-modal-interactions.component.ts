@@ -7,7 +7,7 @@ import type {
     UUID,
 } from 'fuesim-digital-shared';
 import {
-    StrictObject,
+    TypeAssertedObject,
     getInformationRequestKeyDetails,
     isAccepted,
     isInterfaceSignallerKeyForClient,
@@ -261,7 +261,7 @@ export class SignallerModalInteractionsComponent
 
         const radiograms$ = this.store
             .select(selectRadiograms)
-            .pipe(map((radiograms) => StrictObject.values(radiograms)));
+            .pipe(map((radiograms) => TypeAssertedObject.values(radiograms)));
 
         // Automatically accept all radiograms that contain reports for requested information
         radiograms$

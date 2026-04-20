@@ -9,7 +9,7 @@ import {
     migrateStateExport,
     reduceExerciseState,
     sortObject,
-    StrictObject,
+    TypeAssertedObject,
     validateExerciseExport,
 } from 'fuesim-digital-shared';
 import { produce, freeze } from 'immer';
@@ -181,7 +181,7 @@ export const steps: Step<StepState>[] = [
             print(
                 // In the object are only entries we explicitly set -> no need to check for undefined
                 (
-                    StrictObject.entries(sortedTotalTimePerAction) as [
+                    TypeAssertedObject.entries(sortedTotalTimePerAction) as [
                         ExerciseAction['type'],
                         number,
                     ][]
@@ -197,14 +197,14 @@ export const steps: Step<StepState>[] = [
     new CalculationStep(
         'mostExpensiveAction',
         ({ benchmarkActions, newImmerDraft }) => {
-            const mostExpensiveAction = StrictObject.entries(
+            const mostExpensiveAction = TypeAssertedObject.entries(
                 benchmarkActions!
             )[0];
             if (!mostExpensiveAction) {
                 return `No actions`;
             }
             const summedUpExerciseTime =
-                StrictObject.values(benchmarkActions!).reduce(
+                TypeAssertedObject.values(benchmarkActions!).reduce(
                     // In the object are only entries we explicitly set
                     (totalTime, timePerAction) => totalTime! + timePerAction!,
                     0
@@ -245,10 +245,9 @@ export const steps: Step<StepState>[] = [
             print(
                 // In the object are only entries we explicitly set -> no need to check for undefined
                 (
-                    StrictObject.entries(sortedNumberOfActionsPerType) as [
-                        ExerciseAction['type'],
-                        number,
-                    ][]
+                    TypeAssertedObject.entries(
+                        sortedNumberOfActionsPerType
+                    ) as [ExerciseAction['type'], number][]
                 )
                     .map(([type, amount]) => `${type}: ${amount}`)
                     .join(', ')

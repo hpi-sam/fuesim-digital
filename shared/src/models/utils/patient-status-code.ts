@@ -1,14 +1,15 @@
 import { z } from 'zod';
 
 /**
- * A letter that defines the color of a patient in a patient status.
+ * A letter that defines the color of a patient in a patient status.#
+ * * `B`: bystander
  * * `V`: ex (black)
  * * `W`: SK IV (blue)
  * * `X`: SK III (green)
  * * `Y`: SK II (yellow)
  * * `Z`: SK I (red)
  */
-const colorCodeAllowedValues = ['V', 'W', 'X', 'Y', 'Z'] as const;
+const colorCodeAllowedValues = ['B', 'V', 'W', 'X', 'Y', 'Z'] as const;
 export const colorCodeSchema = z.literal(colorCodeAllowedValues);
 export type ColorCode = z.infer<typeof colorCodeSchema>;
 

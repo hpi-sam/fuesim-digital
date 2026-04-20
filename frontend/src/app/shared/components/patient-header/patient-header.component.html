@@ -1,8 +1,5 @@
-@if (patient$ | async; as patient) {
-    <app-patient-identifier [patientId]="patientId()" />
-    <span>{{ ' ' }}</span>
-    <app-patient-health-point-display [patientId]="patientId()" />
-    @if (patient.hasTransportPriority) {
-        <div class="badge" style="background-color: red">TP</div>
-    }
+<app-patient-identifier [patientId]="patientId()" class="me-2" />
+<app-patient-health-point-display [patientId]="patientId()" />
+@if (patient().hasTransportPriority) {
+    <div class="badge" style="background-color: red">TP</div>
 }

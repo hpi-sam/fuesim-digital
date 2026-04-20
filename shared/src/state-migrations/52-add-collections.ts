@@ -1,6 +1,6 @@
 import type { Migration } from './migration-functions.js';
 
-export const addCollections48: Migration = {
+export const addCollections52: Migration = {
     action: null,
 
     state: (state) => {

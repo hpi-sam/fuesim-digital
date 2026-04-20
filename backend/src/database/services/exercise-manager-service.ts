@@ -184,7 +184,8 @@ export class ExerciseManagerService {
             throw new PermissionDeniedError();
         }
         return this.exerciseService.getExercisesViewportsById(
-            exerciseTemplate.exercise.id
+            exerciseTemplate.exercise.id,
+            session
         );
     }
 }

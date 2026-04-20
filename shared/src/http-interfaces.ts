@@ -14,7 +14,18 @@ import {
     countedCollectionDtoSchema,
     elementDtoSchema,
 } from './models/index.js';
-import { versionedElementContentSchema, collectionVersionIdSchema, elementVersionIdSchema, collectionEntityIdSchema, collectionRelationshipTypeSchema, collectionElementsDtoSchema, collectionVisibilitySchema, CollectionEntityId, elementEntityIdSchema, collectionElementsSingleSchema } from './marketplace/index.js';
+import {
+    versionedElementContentSchema,
+    collectionVersionIdSchema,
+    elementVersionIdSchema,
+    collectionEntityIdSchema,
+    collectionRelationshipTypeSchema,
+    collectionElementsDtoSchema,
+    collectionVisibilitySchema,
+    CollectionEntityId,
+    elementEntityIdSchema,
+    collectionElementsSingleSchema,
+} from './marketplace/index.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -271,6 +282,13 @@ export namespace Marketplace {
             }),
         });
 
+        export const Restore = new Route({
+            response: z.object({
+                newCollectionVersionId: collectionVersionIdSchema,
+                result: elementDtoSchema,
+            }),
+        });
+
         export const Duplicate = new Route({
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
@@ -465,18 +483,25 @@ export namespace Marketplace {
             }),
         });
 
+        export const DeleteDraftState = new Route({
+            response: z.object({
+                result: collectionDtoSchema.nullable(),
+                reverted: z.boolean().default(true),
+            }),
+        });
+
         export const GetElementsOfCollectionVersion = new Route({
-            response: collectionElementsDtoSchema
+            response: collectionElementsDtoSchema,
         });
 
         class TypedSchema<D, T> {
-            constructor(public readonly schema: T) { }
+            constructor(public readonly schema: T) {}
 
             public readonly Type!: T extends z.ZodType
                 ? // if D is defined (override type), use D, otherwise infer from T
-                D extends unknown
-                ? z.infer<T>
-                : D
+                  D extends unknown
+                    ? z.infer<T>
+                    : D
                 : never;
         }
 
@@ -510,7 +535,7 @@ export namespace Marketplace {
                 'dependency:replace-data',
                 z.object({
                     imported: z.array(collectionElementsSingleSchema),
-                    references: z.array(collectionElementsSingleSchema)
+                    references: z.array(collectionElementsSingleSchema),
                 })
             );
 
@@ -519,7 +544,7 @@ export namespace Marketplace {
                 z.object({
                     collection: collectionDtoSchema,
                     elements: collectionElementsDtoSchema,
-                    publishedElements: z.array(collectionElementsDtoSchema),
+                    publishedElements: collectionElementsDtoSchema,
                     userRelationship: collectionRelationshipTypeSchema,
                 })
             );
@@ -546,13 +571,17 @@ export namespace Marketplace {
                 collectionDtoSchema
             );
 
-            export const CollectionUpdatePublishedElements = defineEvent(
-                'collection:update-published-elements',
-                collectionElementsDtoSchema
+            export const CollectionRefreshElements = defineEvent(
+                'collection:refresh-elements',
+                z.object({
+                    draft: collectionElementsDtoSchema.optional(),
+                    published: collectionElementsDtoSchema.optional(),
+                })
             );
 
             export const SSEvent = new TypedSchema(
                 z.union([
+                    CollectionRefreshElements.schema,
                     CollectionUpdate.schema,
                     DependencyChange.schema,
                     DependencyReplaceData.schema,

@@ -12,7 +12,6 @@ import {
     ChangedElementDto,
     ChangeDependencies,
     ElementDto,
-    getCollectionElementDiff,
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { VersionedElementFormComponent } from '../editor-modals/versioned-element-form/versioned-element-form.component';
@@ -31,7 +30,8 @@ export class CollectionUpgradeImpactModalComponent {
     public collection!: VersionedCollectionPartial;
     public changes!: ChangedElementDto[];
     public collectionElements!: ElementDto[];
-    public changeDependencies!: ChangeDependencies;
+    public changeDependencies!: ChangeDependencies | undefined;
+    public confirmationButtonText = 'OK';
     public readonly confirmationResult$ = new Subject<boolean | null>();
 
     public readonly selectedChange = signal<{

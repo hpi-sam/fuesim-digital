@@ -451,6 +451,75 @@ export class CollectionRepository extends BaseRepository {
         return this.onlySingleStrict(result);
     }
 
+    public async revertDraftState(collectionEntityId: CollectionEntityId) {
+        return this.databaseConnection.transaction(async (tx) => {
+            // we need to fetch this before getting deletedElements
+            // because of the foreign key constraint on elementCollectionMappingTable,
+            // which would delete the mappings before we can get them
+            const draftStateToBeDeleted = this.onlySingle(
+                await tx
+                    .select()
+                    .from(collectionTable)
+                    .where(
+                        and(
+                            eq(collectionTable.entityId, collectionEntityId),
+                            eq(collectionTable.draftState, true)
+                        )
+                    )
+            );
+
+            if (!draftStateToBeDeleted)
+                throw new Error('No draft state found to be deleted');
+
+            const deletedElements = await tx
+                .delete(elementCollectionMappingTable)
+                .where(
+                    eq(
+                        elementCollectionMappingTable.setVersionId,
+                        draftStateToBeDeleted.versionId
+                    )
+                )
+                .returning();
+
+            const result = this.onlySingle(
+                await tx
+                    .delete(collectionTable)
+                    .where(
+                        and(
+                            eq(collectionTable.entityId, collectionEntityId),
+                            eq(collectionTable.draftState, true)
+                        )
+                    )
+                    .returning()
+            );
+
+            if (!result) throw new Error('No draft state found to be deleted');
+
+            await tx
+                .delete(collectionDependencyMappingTable)
+                .where(
+                    eq(
+                        collectionDependencyMappingTable.dependentCollectionVersionId,
+                        result.versionId
+                    )
+                );
+
+            console.log(
+                `Deleted element mappings: ${JSON.stringify(deletedElements)}`
+            );
+
+            await Promise.all(
+                deletedElements.map((m) =>
+                    tx
+                        .delete(elementTable)
+                        .where(eq(elementTable.versionId, m.elementVersionId))
+                )
+            );
+
+            return result;
+        });
+    }
+
     public async setUserCollectionRelationship(
         userId: string,
         collectionEntityId: CollectionEntityId,
@@ -585,7 +654,8 @@ export class CollectionRepository extends BaseRepository {
 
     public async addElementToCollection(
         elementVersionId: ElementVersionId,
-        collectionVersionId: CollectionVersionId
+        collectionVersionId: CollectionVersionId,
+        isBaseReference: boolean = true
     ) {
         // Check if the Set is in draft state, otherwise we cannot add the element to it
         const set = this.onlySingleStrict(
@@ -639,7 +709,7 @@ export class CollectionRepository extends BaseRepository {
                 setVersionId: collectionVersionId,
                 elementEntityId: element.entityId,
                 elementVersionId,
-                isBaseReference: true,
+                isBaseReference,
             })
             .returning();
     }

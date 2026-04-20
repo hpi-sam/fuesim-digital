@@ -1,13 +1,15 @@
-import {z} from "zod";
-import { collectionDtoSchema } from "./collection.js"
-import { elementDtoSchema, ElementDto } from "./versioned-elements.js";
+import { z } from 'zod';
+import { collectionDtoSchema } from './collection.js';
+import { elementDtoSchema, ElementDto } from './versioned-elements.js';
 
 //TODO: Improve this naming
 export const collectionElementsSingleSchema = z.strictObject({
     collection: collectionDtoSchema,
     elements: z.array(elementDtoSchema),
-})
-export type CollectionElementsSingle = z.infer<typeof collectionElementsSingleSchema>;
+});
+export type CollectionElementsSingle = z.infer<
+    typeof collectionElementsSingleSchema
+>;
 
 export const collectionElementsDtoSchema = z.strictObject({
     /**
@@ -28,7 +30,7 @@ export const collectionElementsDtoSchema = z.strictObject({
      * (e.g. elements being used in elements of collections in collections)
      */
     references: z.array(collectionElementsSingleSchema),
-})
+});
 
 export type CollectionElementsDto = z.infer<typeof collectionElementsDtoSchema>;
 
@@ -38,13 +40,15 @@ export function gatherCollectionElements(elements: CollectionElementsDto) {
             return [
                 ...elements.direct,
                 ...elements.imported.flatMap((imported) => imported.elements),
-            ]
+            ];
         },
         allElements(): ElementDto[] {
             return [
                 ...this.allVisibleElements(),
-                ...elements.references.flatMap((reference) => reference.elements),
-            ]
-        }
-    }
+                ...elements.references.flatMap(
+                    (reference) => reference.elements
+                ),
+            ];
+        },
+    };
 }

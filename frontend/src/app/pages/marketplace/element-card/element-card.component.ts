@@ -31,8 +31,10 @@ export class ElementCardComponent {
         EditingVersionedElementModalData<any>['mode'] | 'static'
     >('static');
     public readonly hideVersionHistory = input<boolean>(false);
+    public readonly showChangedIndicator = input<boolean>(false);
+    public readonly showAsGhost = input<boolean>(false);
 
-    openEditor() {
+    public openEditor() {
         const mode = this.mode();
         if (mode === 'static') return;
         const modal = this.ngbModalService.open(
@@ -42,7 +44,7 @@ export class ElementCardComponent {
             }
         );
         modal.componentInstance.data = {
-            mode,
+            mode: this.showAsGhost() ? 'view' : mode,
             type: this.element().content.type,
             onSubmit: async (data, conflictResolution) => {
                 this.collectionService.updateElement(
@@ -59,7 +61,7 @@ export class ElementCardComponent {
         } satisfies EditingVersionedElementModalData<VersionedElementContent>;
     }
 
-    async deleteElement() {
+    public async deleteElement() {
         const confirmation = await this.confirmationService.confirm({
             title: 'Element löschen',
             description: `Möchten Sie das Element "${this.element().title}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`,
@@ -87,7 +89,15 @@ export class ElementCardComponent {
         }
     }
 
-    async duplicateElement() {
+    public async restoreElement() {
+        await this.collectionService.restoreDeletedElement(
+            this.collection()!.entityId,
+            this.element().entityId,
+            this.element().versionId
+        );
+    }
+
+    public async duplicateElement() {
         this.collectionService.duplicateElement({
             collectionEntity: this.collection()!.entityId,
             element: this.element(),

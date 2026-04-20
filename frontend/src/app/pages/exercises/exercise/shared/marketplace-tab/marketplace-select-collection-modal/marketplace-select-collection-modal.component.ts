@@ -56,10 +56,10 @@ export class MarketplaceSelectCollectionModalComponent {
     public readonly selectedCollectionDataElements = computed(() => {
         const data = this.selectedCollectionData.value();
         if (!data) return [];
-        if(this.showDependencyElements) {
-            return gatherCollectionElements(data[1]).allVisibleElements()
+        if (this.showDependencyElements) {
+            return gatherCollectionElements(data[1]).allVisibleElements();
         } else {
-            return data[1].direct
+            return data[1].direct;
         }
     });
 

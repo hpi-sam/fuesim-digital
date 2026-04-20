@@ -506,7 +506,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
-    editorRouter.post('/:collectionEntityId/save', async (req, res) => {
+    /* Saves the current draft state as a new version of the collection.
+     */
+    adminRouter.post('/:collectionEntityId/draft', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 
         let newCollectionState:
@@ -532,6 +534,43 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             Marketplace.Collection.SaveDraftState.responseSchema.encode({
                 result: newCollectionState,
                 saved: true,
+            })
+        );
+    });
+
+    /*
+     * Discards the current draft state and resets it to the latest published version.
+     */
+    adminRouter.delete('/:collectionEntityId/draft', async (req, res) => {
+        const collectionEntityId = getCollectionEntityId(req);
+
+        let newCollectionState:
+            | Awaited<ReturnType<typeof collectionService.revertDraftState>>
+            | undefined;
+
+        try {
+            newCollectionState =
+                await collectionService.revertDraftState(collectionEntityId);
+        } catch (err) {
+            console.error('Error while reverting draft state:', err);
+            res.send(
+                Marketplace.Collection.DeleteDraftState.responseSchema.encode({
+                    result: null,
+                    reverted: false,
+                })
+            );
+        }
+
+        console.log('New collection state after revert:', newCollectionState);
+
+        if (!newCollectionState) {
+            throw new Error('Failed to revert collection draft state');
+        }
+
+        res.send(
+            Marketplace.Collection.DeleteDraftState.responseSchema.encode({
+                result: newCollectionState,
+                reverted: true,
             })
         );
     });
@@ -655,6 +694,36 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                 Marketplace.Element.Edit.responseSchema.encode({
                     newSetVersionId: data.newSetVersionId,
                     result: data.newElement,
+                })
+            );
+        }
+    );
+
+    /*
+     * Restores a deleted element.
+     *
+     * This reinstates the element with the same versionId and/or
+     * reconncects mappings to to containing collection
+     */
+    editorRouter.post(
+        '/:collectionEntityId/element/:elementEntityId/version/:elementVersionId/restore',
+        async (req, res) => {
+            const collectionEntityId = getCollectionEntityId(req);
+            const elementVersionId = getElementVersionId(req);
+
+            const data = await collectionService.restoreDeletedElementVersion(
+                collectionEntityId,
+                elementVersionId
+            );
+
+            if (!data) {
+                throw new Error('Failed to restore exercise element');
+            }
+
+            res.send(
+                Marketplace.Element.Restore.responseSchema.encode({
+                    newCollectionVersionId: data.newCollectionVersion.versionId,
+                    result: data.restoredElement,
                 })
             );
         }

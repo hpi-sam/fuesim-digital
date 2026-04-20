@@ -1,4 +1,9 @@
-<div class="card h-100" style="cursor: pointer">
+<div
+    class="card h-100"
+    style="cursor: pointer"
+    [class.changed-indicator]="showChangedIndicator()"
+    [class.ghost]="showAsGhost()"
+>
     <div style="height: 100px" class="d-flex">
         <img
             [src]="image()"
@@ -18,20 +23,29 @@
             }
         </div>
         @if (editable()) {
-            <div class="d-flex flex-row flex-wrap gap-2">
+            @if (showAsGhost()) {
                 <button
-                    class="btn btn-outline-primary btn-sm"
-                    (click)="$event.stopPropagation(); duplicate.emit()"
+                    class="btn btn-outline-secondary btn-sm"
+                    (click)="$event.stopPropagation(); restore.emit()"
                 >
-                    <i class="bi bi-copy"></i>
+                    Wiederherstellen
                 </button>
-                <button
-                    class="btn btn-outline-danger btn-sm"
-                    (click)="$event.stopPropagation(); delete.emit()"
-                >
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
+            } @else {
+                <div class="d-flex flex-row flex-wrap gap-2">
+                    <button
+                        class="btn btn-outline-primary btn-sm"
+                        (click)="$event.stopPropagation(); duplicate.emit()"
+                    >
+                        <i class="bi bi-copy"></i>
+                    </button>
+                    <button
+                        class="btn btn-outline-danger btn-sm"
+                        (click)="$event.stopPropagation(); delete.emit()"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            }
         }
     </div>
 </div>

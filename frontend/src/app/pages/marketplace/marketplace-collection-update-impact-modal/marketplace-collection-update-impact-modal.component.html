@@ -22,7 +22,7 @@
                     (
                         change.old?.content?.type ?? change.new!.content.type
                         | versionedElementDisplayName
-                    ).singular
+                    )?.singular ?? ''
                 }}</span>
                 <b class="mb-1">{{
                     change.old?.title ?? change.new?.title ?? 'Unbekannt'
@@ -48,26 +48,28 @@
                 <div class="alert alert-info" role="alert">
                     Das Element "{{ selected.change.old.title }}" wird in der
                     neuen Version verändert.<br />
-                    <hr class="my-2" />
-                    @if (
-                        changeDependencies[selected.change.old.versionId]
-                            ?.length ?? 0 > 0
-                    ) {
-                        Diese Änderung wird sich auf folgende Elemente Ihrer
-                        Sammlung auswirken:
-                        <ul class="mb-0">
-                            @for (
-                                impact of changeDependencies[
-                                    selected.change.old.versionId
-                                ];
-                                track impact
-                            ) {
-                                <li>{{ impact.title }}</li>
-                            }
-                        </ul>
-                    } @else {
-                        Es gibt keine bekannten Auswirkungen auf die Elemente
-                        Ihrer Sammlung.
+                    @if (changeDependencies) {
+                        <hr class="my-2" />
+                        @if (
+                            changeDependencies[selected.change.old.versionId]
+                                ?.length ?? 0 > 0
+                        ) {
+                            Diese Änderung wird sich auf folgende Elemente Ihrer
+                            Sammlung auswirken:
+                            <ul class="mb-0">
+                                @for (
+                                    impact of changeDependencies[
+                                        selected.change.old.versionId
+                                    ];
+                                    track impact
+                                ) {
+                                    <li>{{ impact.title }}</li>
+                                }
+                            </ul>
+                        } @else {
+                            Es gibt keine bekannten Auswirkungen auf die
+                            Elemente Ihrer Sammlung.
+                        }
                     }
                 </div>
             } @else if (selected.change.type === 'create') {
@@ -81,28 +83,30 @@
                     neuen Version entfernt.<br />
                     Sie verlieren somit Zugriff auf dieses Element, wenn Sie die
                     neue Version übernehmen.<br />
-                    <hr class="my-2" />
-                    @if (
-                        changeDependencies[selected.change.old.versionId]
-                            ?.length ?? 0 > 0
-                    ) {
-                        <b
-                            >Das Element wird aus folgenden Elementen Ihrer
-                            Sammlung entfernt:</b
-                        >
-                        <ul class="mb-0">
-                            @for (
-                                impact of changeDependencies[
-                                    selected.change.old.versionId
-                                ];
-                                track impact
-                            ) {
-                                <li>{{ impact.title }}</li>
-                            }
-                        </ul>
-                    } @else {
-                        Es gibt keine bekannten Auswirkungen auf die Elemente
-                        Ihrer Sammlung.
+                    @if (changeDependencies) {
+                        <hr class="my-2" />
+                        @if (
+                            changeDependencies[selected.change.old.versionId]
+                                ?.length ?? 0 > 0
+                        ) {
+                            <b
+                                >Das Element wird aus folgenden Elementen Ihrer
+                                Sammlung entfernt:</b
+                            >
+                            <ul class="mb-0">
+                                @for (
+                                    impact of changeDependencies[
+                                        selected.change.old.versionId
+                                    ];
+                                    track impact
+                                ) {
+                                    <li>{{ impact.title }}</li>
+                                }
+                            </ul>
+                        } @else {
+                            Es gibt keine bekannten Auswirkungen auf die
+                            Elemente Ihrer Sammlung.
+                        }
                     }
                 </div>
             }
@@ -146,11 +150,21 @@
                 />
             }
         } @else {
-            <div class="alert alert-secondary" role="alert">
-                Die neue Version der Sammlung enthält Änderungen an den
-                folgenden Elementen.<br />
-                Wählen Sie ein Element aus, um die Änderungen anzuzeigen.
-            </div>
+            @if (changes.length === 0) {
+                <div class="alert alert-success" role="alert">
+                    Es wurden keine Änderungen an den Elementen zwischen Ihrer
+                    aktuellen Version und der neuen Version gefunden.<br />
+                    Gegebenenfalls wurden nur Änderungen an den Metadaten der
+                    Sammlung vorgenommen, die sich nicht auf die Elemente Ihrer
+                    Sammlung auswirken.
+                </div>
+            } @else {
+                <div class="alert alert-secondary" role="alert">
+                    Die neue Version der Sammlung enthält Änderungen an den
+                    folgenden Elementen.<br />
+                    Wählen Sie ein Element aus, um die Änderungen anzuzeigen.
+                </div>
+            }
         }
     </div>
 </div>
@@ -159,6 +173,6 @@
         Abbrechen
     </button>
     <button type="button" class="btn btn-primary" (click)="close(true)">
-        Änderungen annehmen und Sammlung aktualisieren
+        {{ confirmationButtonText }}
     </button>
 </div>

@@ -19,7 +19,8 @@ import { MessageService } from './messages/message.service';
 
 export interface CollectionSubscriptionData {
     collection: CollectionDto;
-    objects: CollectionElementsDto,
+    objects: CollectionElementsDto;
+    publishedElements: CollectionElementsDto;
     ownRole: CollectionRelationshipType;
 }
 
@@ -59,6 +60,7 @@ export class CollectionService {
                     subject.next({
                         collection: changeEvent.data.collection,
                         objects: changeEvent.data.elements,
+                        publishedElements: changeEvent.data.publishedElements,
                         ownRole: changeEvent.data.userRelationship,
                     });
                     break;
@@ -129,7 +131,7 @@ export class CollectionService {
                         objects: {
                             direct: currentValue.objects.direct,
                             imported: changeEvent.data.imported,
-                            references: changeEvent.data.references
+                            references: changeEvent.data.references,
                         },
                     } satisfies CollectionSubscriptionData;
                     subject.next(newValue);
@@ -143,6 +145,19 @@ export class CollectionService {
                         ...currentValue,
                         collection: changeEvent.data,
                     };
+                    subject.next(newValue);
+                    break;
+                }
+                case 'collection:refresh-elements': {
+                    const currentValue = subject.getValue();
+                    if (!currentValue) return;
+                    const newValue = {
+                        ...currentValue,
+                        publishedElements:
+                            changeEvent.data.published ??
+                            currentValue.publishedElements,
+                        objects: changeEvent.data.draft ?? currentValue.objects,
+                    } satisfies CollectionSubscriptionData;
                     subject.next(newValue);
                     break;
                 }
@@ -253,6 +268,30 @@ export class CollectionService {
         }
 
         return result;
+    }
+
+    public async restoreDeletedElement(
+        collectionEntityId: CollectionEntityId,
+        elementEntityId: ElementEntityId,
+        elementVersionId: ElementVersionId
+    ) {
+        const data = await lastValueFrom(
+            this.httpClient.post<typeof Marketplace.Element.Restore.Response>(
+                `${this.ENDPOINT}/${collectionEntityId}/element/${elementEntityId}/version/${elementVersionId}/restore`,
+                {}
+            )
+        );
+
+        const parsedData =
+            Marketplace.Element.Restore.responseSchema.parse(data);
+
+        this.messageService.postMessage({
+            title: 'Element wiederhergestellt',
+            body: 'Das Element wurde erfolgreich wiederhergestellt.',
+            color: 'success',
+        });
+
+        return parsedData.result;
     }
 
     public async createColletion(title: string) {
@@ -436,7 +475,7 @@ export class CollectionService {
         const data = await lastValueFrom(
             this.httpClient.post<
                 typeof Marketplace.Collection.SaveDraftState.Response
-            >(`${this.ENDPOINT}/${collectionEntityId}/save`, {})
+            >(`${this.ENDPOINT}/${collectionEntityId}/draft`, {})
         );
 
         const parsedData =
@@ -445,6 +484,25 @@ export class CollectionService {
         if (!parsedData.saved || parsedData.result === null) {
             this.messageService.postError({
                 title: 'Sammlung konnte nicht gespeichert werden',
+                body: 'Probieren Sie es erneut oder laden Sie die Seite neu.',
+            });
+            return;
+        }
+    }
+
+    public async revertDraftState(collectionEntityId: CollectionEntityId) {
+        const data = await lastValueFrom(
+            this.httpClient.delete<
+                typeof Marketplace.Collection.SaveDraftState.Response
+            >(`${this.ENDPOINT}/${collectionEntityId}/draft`, {})
+        );
+
+        const parsedData =
+            Marketplace.Collection.DeleteDraftState.responseSchema.parse(data);
+
+        if (!parsedData.reverted || parsedData.result === null) {
+            this.messageService.postError({
+                title: 'Sammlung konnte nicht zurückgesetzt werden',
                 body: 'Probieren Sie es erneut oder laden Sie die Seite neu.',
             });
             return;

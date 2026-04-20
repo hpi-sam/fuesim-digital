@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { stateVersionedEntitySchema } from './state-versioned-entity.js';
-import { collectionVersionIdSchema, collectionEntityIdSchema } from './versioned-id-schema.js';
+import {
+    collectionVersionIdSchema,
+    collectionEntityIdSchema,
+} from './versioned-id-schema.js';
 import { collectionVisibilitySchema } from './collection-visibility.js';
 
 export const collectionDtoSchema = z.object({
@@ -23,4 +26,3 @@ export const countedCollectionDtoSchema = z.object({
 });
 
 export type CountedCollectionDto = z.infer<typeof countedCollectionDtoSchema>;
-

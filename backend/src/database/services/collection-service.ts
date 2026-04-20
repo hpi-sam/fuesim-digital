@@ -104,7 +104,7 @@ export class CollectionService {
         private readonly eventSubject = new Subject<
             typeof Marketplace.Collection.Events.SSEvent.Type
         >()
-    ) { }
+    ) {}
 
     public async getCollectionInviteCode(
         collectionEntityId: CollectionEntityId
@@ -280,16 +280,77 @@ export class CollectionService {
     }
 
     public async saveDraftState(collectionEntityId: CollectionEntityId) {
-        const data =
-            await this.collectionRepository.saveDraftState(collectionEntityId);
-
-        this.eventSubject.next({
-            event: 'collection:update',
-            data,
+        return this.reduce(
             collectionEntityId,
-        });
+            async (tx, draftState, eventBuffer) => {
+                const data =
+                    await tx.collectionRepository.saveDraftState(
+                        collectionEntityId
+                    );
 
-        return data;
+                const elements = await tx.getElementsOfCollectionVersion(
+                    data.versionId,
+                    { allowDraftState: false }
+                );
+
+                eventBuffer.next({
+                    event: 'collection:update',
+                    data,
+                    collectionEntityId,
+                });
+
+                eventBuffer.next({
+                    event: 'collection:refresh-elements',
+                    data: {
+                        draft: elements,
+                        published: elements,
+                    },
+                    collectionEntityId,
+                });
+
+                return data;
+            }
+        );
+    }
+
+    public async revertDraftState(collectionEntityId: CollectionEntityId) {
+        return this.reduce(
+            collectionEntityId,
+            async (tx, draftState, eventBuffer) => {
+                await this.collectionRepository.revertDraftState(
+                    collectionEntityId
+                );
+
+                const latestCollectionVersion = tx.exists(
+                    await tx.collectionRepository.getLatestCollectionByEntityId(
+                        collectionEntityId,
+                        { allowDraftState: true }
+                    )
+                );
+
+                const elements = await tx.getElementsOfCollectionVersion(
+                    latestCollectionVersion.versionId,
+                    { allowDraftState: false }
+                );
+
+                eventBuffer.next({
+                    event: 'collection:update',
+                    data: latestCollectionVersion,
+                    collectionEntityId,
+                });
+
+                eventBuffer.next({
+                    event: 'collection:refresh-elements',
+                    data: {
+                        draft: elements,
+                        published: elements,
+                    },
+                    collectionEntityId,
+                });
+
+                return latestCollectionVersion;
+            }
+        );
     }
 
     /*
@@ -476,7 +537,7 @@ export class CollectionService {
     }
 
     public async getLatestDraftElementsOfCollection(
-        entity: CollectionEntityId,
+        entity: CollectionEntityId
     ): Promise<CollectionElementsDto> {
         const latestConnection = this.exists(
             await this.collectionRepository.getLatestCollectionByEntityId(
@@ -502,61 +563,84 @@ export class CollectionService {
      * where we do not want to show the user all dependencies, but still need to know about them.
      */
     private async getUsedElementsDeep(
-        elements: ElementDto[],
+        elements: ElementDto[]
     ): Promise<CollectionElementsSingle[]> {
         const foundElements: CollectionElementsSingle[] = [];
         for (const element of elements) {
-            const elementVersions = findElementVersionsInContent(element.content);
+            const elementVersions = findElementVersionsInContent(
+                element.content
+            );
 
-            const foundSubElements: ElementDto[] = (await Promise.all(elementVersions.ids.map(m =>
-                this.collectionRepository.getElementVersionByVersionId(m)
-            ))).filter(f => f != null)
+            const foundSubElements: ElementDto[] = (
+                await Promise.all(
+                    elementVersions.ids.map((m) =>
+                        this.collectionRepository.getElementVersionByVersionId(
+                            m
+                        )
+                    )
+                )
+            ).filter((f) => f != null);
 
-            const elementCollections: CollectionElementsSingle[] = (await Promise.all(
-                foundSubElements.map(async m => (
-                    {
+            const elementCollections: CollectionElementsSingle[] =
+                await Promise.all(
+                    foundSubElements.map(async (m) => ({
                         elements: [m],
-                        collection:
-                            this.exists(await this.collectionRepository.getLatestCollectionOfElementEntity(m.entityId))
-                    }
-                ))
-            ))
-
-
-
+                        collection: this.exists(
+                            await this.collectionRepository.getLatestCollectionOfElementEntity(
+                                m.entityId
+                            )
+                        ),
+                    }))
+                );
 
             foundElements.push(...elementCollections);
-            foundElements.push(...await this.getUsedElementsDeep(foundSubElements));
+            foundElements.push(
+                ...(await this.getUsedElementsDeep(foundSubElements))
+            );
         }
 
         const result: CollectionElementsSingle[] = [];
 
-        for(const foundElement of foundElements){
-            const sameCollectionVersion = foundElements.filter(f=>f.collection.versionId);
+        for (const foundElement of foundElements) {
+            const sameCollectionVersion = foundElements.filter(
+                (f) => f.collection.versionId
+            );
             result.push({
                 collection: foundElement.collection,
                 elements: [
                     ...foundElement.elements,
-                    ...sameCollectionVersion.flatMap(m=>m.elements)
-                ]
-            })
+                    ...sameCollectionVersion.flatMap((m) => m.elements),
+                ],
+            });
         }
 
         return result;
     }
 
-    public async getDirectDependencyElements(collectionVersionId: CollectionVersionId): Promise<CollectionElementsSingle[]> {
-        const dependencies = await this.collectionRepository.getCollectionVersionDirectDependencies(collectionVersionId);
+    public async getDirectDependencyElements(
+        collectionVersionId: CollectionVersionId
+    ): Promise<CollectionElementsSingle[]> {
+        const dependencies =
+            await this.collectionRepository.getCollectionVersionDirectDependencies(
+                collectionVersionId
+            );
 
-        const elements: CollectionElementsSingle[] = []
+        const elements: CollectionElementsSingle[] = [];
 
         for (const dependency of dependencies) {
-            const collection = this.exists(await this.collectionRepository.getCollectionByVersionId(dependency.collectionVersionId));
-            const elementsOfDependency = await this.collectionRepository.getElementsOfCollectionVersion(dependency.collectionVersionId);
+            const collection = this.exists(
+                await this.collectionRepository.getCollectionByVersionId(
+                    dependency.collectionVersionId
+                )
+            );
+            const elementsOfDependency =
+                await this.collectionRepository.getElementsOfCollectionVersion(
+                    dependency.collectionVersionId
+                );
             elements.push({
                 collection,
                 elements: elementsOfDependency,
-            })
+            });
         }
 
         return elements;
@@ -585,16 +669,17 @@ export class CollectionService {
                 collectionVersionId
             );
 
-        const directDependencyElements = await this.getDirectDependencyElements(collectionVersionId);
+        const directDependencyElements =
+            await this.getDirectDependencyElements(collectionVersionId);
 
-        const furtherElementReferences =
-            await this.getUsedElementsDeep(directDependencyElements.flatMap(m => m.elements));
-
+        const furtherElementReferences = await this.getUsedElementsDeep(
+            directDependencyElements.flatMap((m) => m.elements)
+        );
 
         return {
             direct: directCollectionElements,
             imported: directDependencyElements,
-            references: furtherElementReferences
+            references: furtherElementReferences,
         };
     }
 
@@ -820,10 +905,10 @@ export class CollectionService {
         const transitiveElementReferences = (
             opts.transitive === true
                 ? await Promise.all(
-                    directElementReferences.map(async (directReference) =>
-                        this.getDependenciesOfElement(directReference)
-                    )
-                )
+                      directElementReferences.map(async (directReference) =>
+                          this.getDependenciesOfElement(directReference)
+                      )
+                  )
                 : []
         ).flat();
 
@@ -932,6 +1017,36 @@ export class CollectionService {
                 requiresConfirmation: [],
             };
         });
+    }
+
+    public async restoreDeletedElementVersion(
+        collectionEntityId: CollectionEntityId,
+        elementVersionId: ElementVersionId
+    ) {
+        return this.reduce(
+            collectionEntityId,
+            async (tx, draftState, eventBuffer) => {
+                await tx.collectionRepository.addElementToCollection(
+                    elementVersionId,
+                    draftState.versionId,
+                    false
+                );
+                const element = tx.exists(
+                    await tx.collectionRepository.getElementVersionByVersionId(
+                        elementVersionId
+                    )
+                );
+                eventBuffer.next({
+                    event: 'element:create',
+                    data: element,
+                    collectionEntityId,
+                });
+                return {
+                    newCollectionVersion: draftState,
+                    restoredElement: element,
+                };
+            }
+        );
     }
 
     /**

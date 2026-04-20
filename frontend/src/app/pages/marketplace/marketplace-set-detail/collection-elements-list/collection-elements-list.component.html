@@ -2,7 +2,7 @@
     @let elementsOfType = elementsGroupedByType()[type] ?? [];
     @if (elementsOfType.length > 0) {
         <h4>
-            {{ (type | versionedElementDisplayName).plural }}
+            {{ (type | versionedElementDisplayName)?.plural ?? '' }}
         </h4>
         <div class="container mb-3">
             <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-2">
@@ -16,6 +16,14 @@
                         [collection]="collection()"
                         [mode]="editable() ? 'edit' : 'view'"
                         [hideVersionHistory]="!editable()"
+                        [showChangedIndicator]="
+                            elementHasChanges()[exerciseObject.entityId] ===
+                            'update'
+                        "
+                        [showAsGhost]="
+                            elementHasChanges()[exerciseObject.entityId] ===
+                            'remove'
+                        "
                     />
                 }
             </div>

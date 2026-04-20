@@ -88,7 +88,7 @@
         }
         @if (collectionData.collection.draftState) {
             <div
-                class="alert alert-primary d-flex flex-row justify-content-between align-items-center gap-3"
+                class="alert d-flex flex-row justify-content-between align-items-center gap-3 alert-change"
                 role="alert"
             >
                 <span class="d-flex flex-row align-items-center gap-3">
@@ -106,14 +106,30 @@
                         }
                     </span>
                 </span>
-                @if (checkRole(collectionData.ownRole).isAtLeast('admin')) {
+                <div class="d-flex flex-row gap-2">
                     <button
-                        class="btn btn-primary btn-sm"
-                        (click)="saveDraftState()"
+                        class="btn btn-outline-primary btn-sm"
+                        ngbTooltip="Änderungen anzeigen"
+                        (click)="viewDraftStateChanges()"
                     >
-                        Als neue Version speichern
+                        <i class="bi bi-eye"></i>
                     </button>
-                }
+                    @if (checkRole(collectionData.ownRole).isAtLeast('admin')) {
+                        <button
+                            class="btn btn-outline-danger btn-sm"
+                            ngbTooltip="Änderungen verwerfen"
+                            (click)="revertDraftState()"
+                        >
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        <button
+                            class="btn btn-primary btn-sm"
+                            (click)="saveDraftState()"
+                        >
+                            Als neue Version speichern
+                        </button>
+                    }
+                </div>
             </div>
         }
         <ul ngbNav #nav="ngbNav" class="nav-tabs" [animation]="false">

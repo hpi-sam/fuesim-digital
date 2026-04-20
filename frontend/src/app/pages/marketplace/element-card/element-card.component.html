@@ -8,9 +8,12 @@
                 (content.alarmGroupVehicles | values).length + ' Fahrzeuge'
             "
             [editable]="mode() === 'edit'"
+            [showChangedIndicator]="showChangedIndicator()"
+            [showAsGhost]="showAsGhost()"
             (click)="openEditor()"
             (delete)="deleteElement()"
             (duplicate)="duplicateElement()"
+            (restore)="restoreElement()"
         />
     }
     @case ('vehicleTemplate') {
@@ -19,9 +22,12 @@
             [title]="content.vehicleType"
             [subtitle]="content.name"
             [editable]="mode() === 'edit'"
+            [showChangedIndicator]="showChangedIndicator()"
+            [showAsGhost]="showAsGhost()"
             (click)="openEditor()"
             (delete)="deleteElement()"
             (duplicate)="duplicateElement()"
+            (restore)="restoreElement()"
         />
     }
 
@@ -30,6 +36,8 @@
             [title]="element().title"
             subtitle="Unbekannter Typ"
             [editable]="false"
+            [showChangedIndicator]="showChangedIndicator()"
+            [showAsGhost]="showAsGhost()"
         />
     }
 }

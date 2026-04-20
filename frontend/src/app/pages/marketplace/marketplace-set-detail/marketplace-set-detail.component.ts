@@ -1,55 +1,41 @@
-import {
-    Component,
-    computed,
-    inject,
-    OnDestroy,
-    OnInit,
-    signal,
-} from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
     checkCollectionRole,
-    CollectionEntityId,
     gatherCollectionElements,
-    isCollectionEntityId,
+    getCollectionElementDiff,
 } from 'fuesim-digital-shared';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import {
     NgbDropdownModule,
     NgbModal,
     NgbNavModule,
     NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
-import { DatePipe, JsonPipe } from '@angular/common';
-import { ElementCardComponent } from '../element-card/element-card.component';
+import { DatePipe } from '@angular/common';
 import {
     CollectionService,
     CollectionSubscriptionData,
 } from '../../../core/exercise-element.service';
-import { VersionedElementDisplayNamePipe } from '../../../shared/pipes/versioned-element-type-display-name.pipe';
 import { UsedCollectionsTabComponent } from './used-collections-tab/used-collections-tab.component';
 import { CollectionDetailsTabComponent } from './collection-details-tab/collection-details-tab.component';
 import { CollectionElementsTabComponent } from './collection-elements-tab/collection-elements-tab.component';
-import {
-    collectionDataResolver,
-    CollectionDataResolverResult,
-} from '../collection-data.resolver';
+import { CollectionDataResolverResult } from '../collection-data.resolver';
+import { CollectionUpgradeImpactModalComponent } from '../marketplace-collection-update-impact-modal/marketplace-collection-update-impact-modal.component';
+import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 
 @Component({
     selector: 'app-marketplace-set-detail',
     imports: [
-        ElementCardComponent,
         DatePipe,
         NgbDropdownModule,
         NgbTooltip,
-        VersionedElementDisplayNamePipe,
         CollectionElementsTabComponent,
         NgbNavModule,
         RouterLink,
         UsedCollectionsTabComponent,
         CollectionDetailsTabComponent,
-        JsonPipe,
     ],
     templateUrl: './marketplace-set-detail.component.html',
     styleUrl: './marketplace-set-detail.component.scss',
@@ -59,6 +45,7 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
     private readonly collectionService = inject(CollectionService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly router = inject(Router);
+    private readonly confirmationService = inject(ConfirmationModalService);
 
     public readonly resolved = toSignal(this.activatedRoute.data);
 
@@ -120,8 +107,46 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
         this.router.navigate(['/collections']);
     }
 
+    public async viewDraftStateChanges() {
+        const collectionData = this.selectedCollectionData();
+        if (!collectionData) return;
+
+        const changes = getCollectionElementDiff(
+            collectionData.publishedElements.direct,
+            collectionData.objects.direct
+        );
+
+        const modal = this.ngbModalService.open(
+            CollectionUpgradeImpactModalComponent,
+            {
+                size: 'xl',
+            }
+        );
+
+        const modalInstance =
+            modal.componentInstance as CollectionUpgradeImpactModalComponent;
+        modalInstance.changes = changes;
+        modalInstance.collectionElements = gatherCollectionElements(
+            collectionData.objects
+        ).allVisibleElements();
+    }
+
     public async saveDraftState() {
         await this.collectionService.saveDraftState(
+            this.collection.collectionEntityId
+        );
+    }
+
+    public async revertDraftState() {
+        const result = await this.confirmationService.confirm({
+            title: 'Änderungen verwerfen',
+            description:
+                'Möchten Sie wirklich alle ungespeicherten Änderungen verwerfen und zum zuletzt veröffentlichten Zustand zurückkehren?',
+            confirmationButtonText: 'Änderungen verwerfen',
+        });
+        if (!result) return;
+
+        await this.collectionService.revertDraftState(
             this.collection.collectionEntityId
         );
     }

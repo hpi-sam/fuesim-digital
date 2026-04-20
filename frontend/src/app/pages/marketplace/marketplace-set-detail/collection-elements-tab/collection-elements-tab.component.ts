@@ -43,8 +43,9 @@ export class CollectionElementsTabComponent {
         const selectedCollectionData = this.collectionData();
         if (!selectedCollectionData) return [];
 
-        return gatherCollectionElements(selectedCollectionData.objects)
-            .allVisibleElements()
+        return gatherCollectionElements(
+            selectedCollectionData.objects
+        ).allVisibleElements();
     });
 
     public readonly importingElements = signal<boolean>(false);

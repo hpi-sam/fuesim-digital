@@ -100,6 +100,9 @@ export class UsedCollectionItemComponent {
         }
         console.log({ currentCollectionDependencies });
 
+        // Calculate which elements of the current collection depend
+        // on changed elements of the dependency, to be able to
+        // show the impact of the update
         const changeDependencies: ChangeDependencies = {};
         for (const change of changes) {
             if (change.type === 'create') continue;
@@ -112,10 +115,6 @@ export class UsedCollectionItemComponent {
             changeDependencies[elementId] = dependingElements;
         }
 
-        console.log({ changeDependencies });
-
-        console.log({ newVersionElements, oldVersionElements });
-
         this.loadingModalService.closeLoading();
         const modal = this.ngbModalService.open(
             CollectionUpgradeImpactModalComponent,
@@ -127,8 +126,11 @@ export class UsedCollectionItemComponent {
         const modalInstance =
             modal.componentInstance as CollectionUpgradeImpactModalComponent;
         modalInstance.changes = changes;
-        modalInstance.collectionElements = gatherCollectionElements(newVersionElements).allVisibleElements()
+        modalInstance.collectionElements =
+            gatherCollectionElements(newVersionElements).allVisibleElements();
         modalInstance.changeDependencies = changeDependencies;
+        modalInstance.confirmationButtonText =
+            'Änderungen annehmen und Sammlung aktualisieren';
 
         const result = await firstValueFrom(modalInstance.confirmationResult$);
         if (!result) return;

@@ -1,5 +1,5 @@
-import z from "zod";
-import { collectionEntityIdSchema } from "./versioned-id-schema.js";
+import z from 'zod';
+import { collectionEntityIdSchema } from './versioned-id-schema.js';
 
 // This is sorted by permission level, so the order matters
 export const collectionRelationshipTypeAllowedValues = [
@@ -23,7 +23,6 @@ export const collectionRelationshipDtoSchema = z.strictObject({
 export type CollectionRelationshipDto = z.infer<
     typeof collectionRelationshipDtoSchema
 >;
-
 
 export const collectionRelationshipTypesDisplayNames: {
     [key in (typeof collectionRelationshipTypeAllowedValues)[number]]: string;

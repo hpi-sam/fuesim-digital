@@ -15,4 +15,8 @@ export class GenericElementCardComponent {
 
     public readonly delete = output();
     public readonly duplicate = output();
+    public readonly restore = output();
+
+    public readonly showChangedIndicator = input<boolean>(false);
+    public readonly showAsGhost = input<boolean>(false);
 }

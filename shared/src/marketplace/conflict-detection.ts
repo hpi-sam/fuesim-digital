@@ -36,6 +36,8 @@ export const changedElementDtoSchema = z.union([
     addedElementDtoSchema,
 ]);
 
+export type ChangeElementType = z.infer<typeof changedElementDtoSchema>['type'];
+
 export type ChangedElementDto = z.infer<typeof changedElementDtoSchema>;
 
 export const changeDependenciesSchema = z.record(

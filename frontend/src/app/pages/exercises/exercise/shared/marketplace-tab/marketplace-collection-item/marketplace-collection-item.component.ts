@@ -1,5 +1,8 @@
 import { Component, inject, input, resource } from '@angular/core';
-import { gatherCollectionElements, VersionedCollectionPartial } from 'fuesim-digital-shared';
+import {
+    gatherCollectionElements,
+    VersionedCollectionPartial,
+} from 'fuesim-digital-shared';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 

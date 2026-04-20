@@ -1,0 +1,16 @@
+@use 'sass:map';
+@use 'bootstrap/scss/bootstrap' as bootstrap;
+@use './../_change-indicator-colors' as ci;
+
+.changed-indicator {
+    border-color: ci.$change-primary;
+    border-width: map.get(bootstrap.$border-widths, 2);
+}
+
+.ghost {
+    $opacity: 0.67;
+    opacity: $opacity;
+    border-color: rgba(ci.$change-deleted, $opacity);
+    border-width: map.get(bootstrap.$border-widths, 2);
+    border-style: dashed;
+}

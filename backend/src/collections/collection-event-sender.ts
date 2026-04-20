@@ -120,26 +120,40 @@ export class CollectionEventSender {
     }
 
     private async sendInitialData() {
-        const latestCollection =
+        const latestDraftStateVersion =
             await this.collectionService.getLatestCollectionById(
                 this.collectionEntityId,
                 { draftState: true }
             );
 
-        if (!latestCollection) {
+        const latestPubishedVersion =
+            await this.collectionService.getLatestCollectionById(
+                this.collectionEntityId,
+                { draftState: false }
+            );
+
+        if (!latestDraftStateVersion || !latestPubishedVersion) {
             this.abort('Collection not found');
             return;
         }
 
-        const data =
+        const draftStateElements =
             await this.collectionService.getElementsOfCollectionVersion(
-                latestCollection.versionId,
+                latestDraftStateVersion.versionId,
                 { allowDraftState: true }
+            );
+
+        const publishedElements =
+            await this.collectionService.getElementsOfCollectionVersion(
+                latestPubishedVersion.versionId,
+                {
+                    allowDraftState: false,
+                }
             );
 
         const userRelationship =
             await this.collectionService.getUserRoleInCollection(
-                latestCollection.entityId,
+                latestDraftStateVersion.entityId,
                 this.userId
             );
         if (!userRelationship) {
@@ -152,10 +166,10 @@ export class CollectionEventSender {
                 collectionEntityId: this.collectionEntityId,
                 event: 'initialdata',
                 data: {
-                    collection: latestCollection,
-                    elements: data,
+                    collection: latestDraftStateVersion,
+                    elements: draftStateElements,
                     userRelationship,
-                    publishedElements: [],
+                    publishedElements: publishedElements,
                 },
             })
         );

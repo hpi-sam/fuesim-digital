@@ -30,3 +30,10 @@
         </div>
     }
 }
+@if (visibleElements().length === 0) {
+    <div class="col flex-grow-1">
+        <p class="bg-light p-4 rounded-3 lead mb-0">
+            Sie haben noch keine Elemente in dieser Sammlung.
+        </p>
+    </div>
+}

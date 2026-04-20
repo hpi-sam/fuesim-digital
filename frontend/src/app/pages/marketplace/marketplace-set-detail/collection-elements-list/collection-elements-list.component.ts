@@ -42,14 +42,17 @@ export class CollectionElementsListComponent {
         );
     });
 
-    public readonly elementsGroupedByType = computed(() => {
-        const elements = [
+    public readonly visibleElements = computed(() => {
+        return [
             ...this.collectionElements(),
             ...this.publishedElements().filter(
                 (f) => this.elementHasChanges()[f.entityId] === 'remove'
             ),
         ];
-        return elements.reduce<{
+    });
+
+    public readonly elementsGroupedByType = computed(() => {
+        return this.visibleElements().reduce<{
             [type: string]: ElementDto[];
         }>((acc, element) => {
             const type = element.content.type;

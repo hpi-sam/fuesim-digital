@@ -17,5 +17,18 @@
             [dependency]="dependency"
             [currentCollectionEntityId]="collectionData().collection.entityId"
         />
+    } @empty {
+        <div class="col flex-grow-1">
+            <p class="bg-light p-4 rounded-3 mb-0">
+                <span class="lead">
+                    Es werden keine weiteren Sammlungen verwendet.
+                </span>
+                <br />
+                <small class="text-muted"
+                    >Fügen Sie weitere Sammlungen hinzu, um deren Elemente in
+                    dieser Sammlung zu verwenden.</small
+                >
+            </p>
+        </div>
     }
 </div>

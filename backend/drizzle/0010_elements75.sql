@@ -1,1 +1,0 @@
-ALTER TABLE "collections" ADD COLUMN "elementCount" integer DEFAULT 0 NOT NULL;

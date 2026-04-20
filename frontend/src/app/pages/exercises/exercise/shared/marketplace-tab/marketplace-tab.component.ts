@@ -23,7 +23,7 @@ import {
     InExerciseElement,
 } from '../change-impact-modal/change-impact-types';
 import { MarketplaceColletionItemComponent } from './marketplace-collection-item/marketplace-collection-item.component';
-import { openSelectCollectionModal } from './marketplace-select-collection-modal/select-collection-modal';
+import { openSelectCollectionModal } from '../../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';
 
 @Component({
     selector: 'app-marketplace-tab',

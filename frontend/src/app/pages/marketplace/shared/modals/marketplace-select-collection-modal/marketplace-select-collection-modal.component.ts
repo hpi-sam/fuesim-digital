@@ -8,8 +8,8 @@ import {
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { DatePipe } from '@angular/common';
-import { CollectionElementsListComponent } from '../../../../../marketplace/shared/collection-elements-list/collection-elements-list.component';
-import { CollectionService } from '../../../../../../core/exercise-element.service';
+import { CollectionElementsListComponent } from '../../collection-elements-list/collection-elements-list.component';
+import { CollectionService } from '../../../../../core/exercise-element.service';
 
 @Component({
     templateUrl: './marketplace-select-collection-modal.component.html',
@@ -57,9 +57,8 @@ export class MarketplaceSelectCollectionModalComponent {
         if (!data) return [];
         if (this.showDependencyElements) {
             return gatherCollectionElements(data[1]).allVisibleElements();
-        } 
-            return data[1].direct;
-        
+        }
+        return data[1].direct;
     });
 
     public readonly selectedCollection =

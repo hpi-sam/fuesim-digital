@@ -1,14 +1,11 @@
 import { Component, computed, inject, input } from '@angular/core';
-import {
-    
-    NgbModal,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { checkCollectionRole } from 'fuesim-digital-shared';
 import {
     CollectionService,
     CollectionSubscriptionData,
 } from '../../../../core/exercise-element.service';
-import { openSelectCollectionModal } from '../../../exercises/exercise/shared/marketplace-tab/marketplace-select-collection-modal/select-collection-modal';
+import { openSelectCollectionModal } from '../../shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { UsedCollectionItemComponent } from './used-collection-item/used-collection-item.component';
 
 @Component({

@@ -17,15 +17,7 @@ import {
     collectionRelationshipTypeAllowedValues,
     ExerciseState,
 } from 'fuesim-digital-shared';
-import {
-    eq,
-    desc,
-    getTableColumns,
-    sql,
-    and,
-    max,
-    gt,
-} from 'drizzle-orm';
+import { eq, desc, getTableColumns, sql, and, max, gt } from 'drizzle-orm';
 import {
     collectionDependencyMappingTable,
     elementCollectionMappingTable,

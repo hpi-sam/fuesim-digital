@@ -1,5 +1,4 @@
 import type {
-    
     CollectionEntityId,
     CollectionVersionId,
 } from 'fuesim-digital-shared';

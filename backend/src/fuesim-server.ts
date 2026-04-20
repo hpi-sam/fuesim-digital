@@ -8,12 +8,13 @@ export class FuesimServer {
     private readonly _httpServer: ApiHttpServer;
     private readonly _websocketServer: ExerciseWebsocketServer;
 
-    private readonly saveTickInterval = 10_000;
+    private readonly exerciseUpkeepTickInterval = 10_000;
 
-    private readonly saveHandler: PeriodicEventHandler;
+    private readonly exerciseUpkeepHandler: PeriodicEventHandler;
 
-    public async saveTick() {
+    public async exerciseUpkeepTick() {
         await this.services.exerciseService.saveUnsavedExercises();
+        await this.services.exerciseService.unloadEmptyExercises();
     }
 
     public constructor(private readonly services: Services) {
@@ -21,11 +22,11 @@ export class FuesimServer {
         this._websocketServer = new ExerciseWebsocketServer(app, this.services);
         this._httpServer = new ApiHttpServer(app, services);
 
-        this.saveHandler = new PeriodicEventHandler(
-            this.saveTick.bind(this),
-            this.saveTickInterval
+        this.exerciseUpkeepHandler = new PeriodicEventHandler(
+            this.exerciseUpkeepTick.bind(this),
+            this.exerciseUpkeepTickInterval
         );
-        this.saveHandler.start();
+        this.exerciseUpkeepHandler.start();
     }
 
     public get websocketServer(): ExerciseWebsocketServer {
@@ -39,10 +40,10 @@ export class FuesimServer {
     public async destroy() {
         this.httpServer.close();
         this.websocketServer.close();
-        this.saveHandler.pause();
+        this.exerciseUpkeepHandler.pause();
         // Save all remaining instances, if it's still possible
         if (this.services.databaseService.isInitialized) {
-            await this.saveTick();
+            await this.exerciseUpkeepTick();
         }
     }
 }

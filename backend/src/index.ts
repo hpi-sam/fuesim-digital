@@ -97,17 +97,17 @@ async function main() {
 
     if (Config.useDb) {
         try {
-            console.log('Loading exercises from database…');
+            console.log('Migrate exercises in database…');
             const startTime = performance.now();
-            const exercises = await exerciseService.restoreAllExercises();
+            const amount = await exerciseService.migrateAllExercises();
             const endTime = performance.now();
             console.log(
-                `✅ Successfully loaded ${exercises.length} exercise(s) in ${(
+                `✅ Successfully migrated ${amount} exercise(s) in ${(
                     endTime - startTime
                 ).toFixed(3)} ms.`
             );
         } catch (e: unknown) {
-            console.error('❌ An error occurred while loading exercises.');
+            console.error('❌ An error occurred while migrating exercises.');
             if (e instanceof ValidationErrorWrapper) {
                 console.error(
                     'The validation of the exercises and actions in the database failed:',

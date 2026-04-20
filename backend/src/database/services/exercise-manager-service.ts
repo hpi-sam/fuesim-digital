@@ -159,7 +159,7 @@ export class ExerciseManagerService {
         if (exerciseTemplate.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
-        const activeExercise = this.exerciseService.getExerciseByKey(
+        const activeExercise = await this.exerciseService.getExerciseByKey(
             exerciseTemplate.trainerKey,
             session
         );

@@ -45,11 +45,13 @@ export class ExerciseService {
         ActiveExercise
     >();
 
-    public getExerciseByKey(
+    public async getExerciseByKey(
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ) {
-        const exercise = this.exerciseMap.get(exerciseKey);
+        const exercise =
+            this.exerciseMap.get(exerciseKey) ??
+            (await this.restoreExercise(exerciseKey));
         if (!exercise) {
             throw new NotFoundError();
         }
@@ -223,9 +225,9 @@ export class ExerciseService {
     }
 
     /**
-     * Restore all Exercises from Database; called on startup
+     * Migrate all outdated Exercises in Database; called on startup
      */
-    public async restoreAllExercises(): Promise<ActiveExercise[]> {
+    public async migrateAllExercises(): Promise<number> {
         return this.exerciseRepository.transaction(
             async (exerciseRepoTransaction) => {
                 const outdatedExercises =
@@ -243,47 +245,52 @@ export class ExerciseService {
                     })
                 );
 
-                const exercises = await Promise.all(
-                    (await exerciseRepoTransaction.getAllExercises()).map(
-                        async (exerciseEntity) => {
-                            const exercise = new ActiveExercise(exerciseEntity);
-                            exercise.template = exerciseEntity.template ?? null;
+                return outdatedExercises.length;
+            }
+        );
+    }
 
-                            // Load all actions
-                            pushAll(
-                                exercise.temporaryActionHistory,
-                                (
-                                    await this.actionRepository
-                                        .withConnection(exerciseRepoTransaction)
-                                        .getActionsForExerciseId(
-                                            exerciseEntity.id
-                                        )
-                                ).map(
-                                    (actionEntity) =>
-                                        new ActionWrapper(
-                                            actionEntity.actionString,
-                                            actionEntity.emitterId,
-                                            exercise,
-                                            actionEntity.index,
-                                            actionEntity.id
-                                        )
-                                )
-                            );
-                            return exercise;
-                        }
+    /**
+     * Attempt to restore an Exercise from Database
+     */
+    public async restoreExercise(
+        key: ExerciseKey
+    ): Promise<ActiveExercise | null> {
+        return this.exerciseRepository.transaction(
+            async (exerciseRepoTransaction) => {
+                const exerciseEntity =
+                    await exerciseRepoTransaction.getExerciseByKey(key);
+
+                if (!exerciseEntity) return null;
+
+                const exercise = new ActiveExercise(exerciseEntity);
+                exercise.template = exerciseEntity.template ?? null;
+
+                // Load all actions
+                pushAll(
+                    exercise.temporaryActionHistory,
+                    (
+                        await this.actionRepository
+                            .withConnection(exerciseRepoTransaction)
+                            .getActionsForExerciseId(exerciseEntity.id)
+                    ).map(
+                        (actionEntity) =>
+                            new ActionWrapper(
+                                actionEntity.actionString,
+                                actionEntity.emitterId,
+                                exercise,
+                                actionEntity.index,
+                                actionEntity.id
+                            )
                     )
                 );
-                await Promise.all(
-                    // The actions have already been saved in the database -> do not keep them
-                    exercises.map(async (exercise) => exercise.restore(false))
-                );
-                exercises.forEach((exercise) => {
-                    this.exerciseMap.set(exercise.participantKey, exercise);
-                    this.exerciseMap.set(exercise.trainerKey, exercise);
-                    this.exerciseMap.set(exercise.exercise.id, exercise);
-                    this.loadExercise(exercise);
-                });
-                return exercises;
+
+                // The actions have already been saved in the database -> do not keep them
+                exercise.restore(false);
+
+                this.loadExercise(exercise);
+
+                return exercise;
             }
         );
     }
@@ -303,7 +310,10 @@ export class ExerciseService {
             throw new PermissionDeniedError();
         }
 
-        const activeExercise = this.getExerciseByKey(exerciseKey, session);
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
 
         const exerciseEntry = await this.exerciseRepository.getExerciseById(
             activeExercise.exercise.id
@@ -354,11 +364,20 @@ export class ExerciseService {
         });
     }
 
+    public async unloadEmptyExercises() {
+        new Set(this.exerciseMap.values()).forEach((exercise) => {
+            if (exercise.clients.size === 0) this.unloadExercise(exercise);
+        });
+    }
+
     public async getTimeline(
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ): Promise<ExerciseTimeline> {
-        const activeExercise = this.getExerciseByKey(exerciseKey, session);
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
                 await this.actionRepository.getActionsForExerciseId(

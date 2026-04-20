@@ -1,4 +1,3 @@
-import { TypeAssertedObject } from '../utils/type-asserted-object.js';
 import type { Migration } from './migration-functions.js';
 
 export const renameIncorrectPatientImages12: Migration = {
@@ -23,7 +22,7 @@ export const renameIncorrectPatientImages12: Migration = {
                 migrateImageProperties(patientTemplate.image);
             })
         );
-        TypeAssertedObject.values(
+        Object.values(
             (
                 state as {
                     patients: {

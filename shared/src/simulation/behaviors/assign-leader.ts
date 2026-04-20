@@ -1,7 +1,6 @@
 import { groupBy } from 'lodash-es';
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
-import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import {
     getActivityById,
     getElement,
@@ -195,7 +194,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                         (person) => person.templateId
                                     );
                                     radiogram.personnelCount =
-                                        TypeAssertedObject.fromEntries(
+                                        Object.fromEntries(
                                             Object.entries(
                                                 groupedPersonnel
                                             ).map(([key, value]) => [
@@ -228,7 +227,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
 
                                 const connectedSimulatedRegions =
                                     Object.fromEntries(
-                                        TypeAssertedObject.entries(
+                                        Object.entries(
                                             ownTransferPoint.reachableTransferPoints
                                         )
                                             .map(
@@ -284,12 +283,12 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     (vehicle) => vehicle.vehicleType
                                 );
                                 radiogram.vehicleCount = Object.fromEntries(
-                                    TypeAssertedObject.entries(
-                                        groupedVehicles
-                                    ).map(([vehicleType, vehicleGroup]) => [
-                                        vehicleType,
-                                        vehicleGroup.length,
-                                    ])
+                                    Object.entries(groupedVehicles).map(
+                                        ([vehicleType, vehicleGroup]) => [
+                                            vehicleType,
+                                            vehicleGroup.length,
+                                        ]
+                                    )
                                 );
 
                                 radiogram.informationAvailable = true;
@@ -316,12 +315,12 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     (vehicle) => vehicle.occupation.type
                                 );
                                 radiogram.occupations = Object.fromEntries(
-                                    TypeAssertedObject.entries(
-                                        groupedVehicles
-                                    ).map(([occupationType, vehicleGroup]) => [
-                                        occupationType,
-                                        vehicleGroup.length,
-                                    ])
+                                    Object.entries(groupedVehicles).map(
+                                        ([occupationType, vehicleGroup]) => [
+                                            occupationType,
+                                            vehicleGroup.length,
+                                        ]
+                                    )
                                 );
 
                                 radiogram.informationAvailable = true;

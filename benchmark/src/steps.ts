@@ -181,7 +181,7 @@ export const steps: Step<StepState>[] = [
             print(
                 // In the object are only entries we explicitly set -> no need to check for undefined
                 (
-                    TypeAssertedObject.entries(sortedTotalTimePerAction) as [
+                    Object.entries(sortedTotalTimePerAction) as [
                         ExerciseAction['type'],
                         number,
                     ][]
@@ -245,9 +245,10 @@ export const steps: Step<StepState>[] = [
             print(
                 // In the object are only entries we explicitly set -> no need to check for undefined
                 (
-                    TypeAssertedObject.entries(
-                        sortedNumberOfActionsPerType
-                    ) as [ExerciseAction['type'], number][]
+                    Object.entries(sortedNumberOfActionsPerType) as [
+                        ExerciseAction['type'],
+                        number,
+                    ][]
                 )
                     .map(([type, amount]) => `${type}: ${amount}`)
                     .join(', ')

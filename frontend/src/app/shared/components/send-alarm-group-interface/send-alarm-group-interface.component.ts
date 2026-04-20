@@ -5,7 +5,6 @@ import {
     createVehicleParameters,
     getTransferPointFullName,
     newMapCoordinatesAt,
-    TypeAssertedObject,
     uuid,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -256,7 +255,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
             this.store
         );
 
-        const sortedAlarmGroupVehicles = TypeAssertedObject.values(
+        const sortedAlarmGroupVehicles = Object.values(
             alarmGroup.alarmGroupVehicles
         ).sort((a, b) => a.time - b.time);
 

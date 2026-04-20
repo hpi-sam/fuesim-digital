@@ -299,7 +299,7 @@ const estimatedSkDistribution = { green: 7 / 10, yellow: 2 / 10, red: 1 / 10 };
 
 // We only ever allow two patients to be treated by one personnel, except for notarzt
 const capacities = Object.fromEntries(
-    TypeAssertedObject.entries(defaultPersonnelTemplates).map(
+    Object.entries(defaultPersonnelTemplates).map(
         ([personnelType, { canCaterFor }]) => [
             personnelType,
             {
@@ -354,9 +354,7 @@ const requiresExclusivity: {
 };
 
 // Ascending priority
-const personnelTypePriorityList = TypeAssertedObject.entries(
-    personnelPriorities
-)
+const personnelTypePriorityList = Object.entries(personnelPriorities)
     .sort(([typeA, priorityA], [typeB, priorityB]) => priorityA - priorityB)
     .map(([personnelType]) => personnelType);
 // Descending priority
@@ -939,7 +937,7 @@ function calculateMissingPersonnel(
         patientStatusMissingPersonnel.yellow['notarzt'] ?? 0
     );
 
-    const secured = TypeAssertedObject.values(totalMissingPersonnel).every(
+    const secured = Object.values(totalMissingPersonnel).every(
         (cnt) => cnt <= 0
     );
 
@@ -962,13 +960,13 @@ function calculateSubstitutedMissingPersonnel(
     cateringDict: { [k: string]: CateringPersonnel },
     personnelTreatments: PersonnelToPatientCategoryDict
 ): ResourceDescription {
-    const substitutions = TypeAssertedObject.entries(personnelTreatments)
+    const substitutions = Object.entries(personnelTreatments)
         .map(
             ([persId, roles]) =>
                 [cateringDict[persId]!.personnel.personnelType, roles] as const
         )
         .filter(([realPersonnelType, roles]) =>
-            TypeAssertedObject.keys(roles).some(
+            Object.keys(roles).some(
                 (personnelType) => personnelType !== realPersonnelType
             )
         )

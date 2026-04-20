@@ -122,8 +122,8 @@ export class SimulationEventBasedReportEditorComponent
                     : of([])
             ),
             map((behaviors) =>
-                TypeAssertedObject.fromEntries(
-                    TypeAssertedObject.entries(eventBasedReportData).map(
+                Object.fromEntries(
+                    Object.entries(eventBasedReportData).map(
                         ([eventId, eventDetails]) => [
                             eventId,
                             eventDetails.requiredBehaviors.every(

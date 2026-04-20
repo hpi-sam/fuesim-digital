@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
 import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
-import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import { tryGetElement } from '../../store/action-reducers/utils/get-element.js';
 import {
     changeOccupation,
@@ -42,13 +41,15 @@ export const unloadArrivingVehiclesBehavior: SimulationBehavior<UnloadArrivingVe
         handleEvent(draftState, simulatedRegion, behaviorState, event) {
             switch (event.type) {
                 case 'tickEvent': {
-                    TypeAssertedObject.entries(
-                        behaviorState.vehicleActivityMap
-                    ).forEach(([vehicleId, activityId]) => {
-                        if (!simulatedRegion.activities[activityId]) {
-                            delete behaviorState.vehicleActivityMap[vehicleId];
+                    Object.entries(behaviorState.vehicleActivityMap).forEach(
+                        ([vehicleId, activityId]) => {
+                            if (!simulatedRegion.activities[activityId]) {
+                                delete behaviorState.vehicleActivityMap[
+                                    vehicleId
+                                ];
+                            }
                         }
-                    });
+                    );
                     break;
                 }
                 case 'vehicleArrivedEvent': {

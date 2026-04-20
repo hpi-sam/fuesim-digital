@@ -14,7 +14,6 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     newMapCoordinatesAt,
-    TypeAssertedObject,
     currentCoordinatesOf,
     isOnMap,
     isInViewport,
@@ -178,7 +177,7 @@ export const selectVisibleScoutableIndicators = createSelector(
     (currentRole, scoutables, viewport, ...elementSelectors) =>
         elementSelectors
             .flatMap((selector) =>
-                TypeAssertedObject.values(selector)
+                Object.values(selector)
                     .filter(
                         (element) =>
                             isOnMap(element) && element.scoutableId !== null

@@ -6,7 +6,6 @@ import type {
 } from '@angular/core';
 import { Component, inject, input } from '@angular/core';
 import type { LogEntry, Tag } from 'fuesim-digital-shared';
-import { TypeAssertedObject } from 'fuesim-digital-shared';
 import { difference } from 'lodash-es';
 import { Subject, takeUntil } from 'rxjs';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -55,8 +54,8 @@ export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
     }
 
     public get availableSpecifiersPerCategory() {
-        return TypeAssertedObject.fromEntries(
-            TypeAssertedObject.entries(this.knownCategories).map(
+        return Object.fromEntries(
+            Object.entries(this.knownCategories).map(
                 ([knownCategory, knownSpecifiers]) => [
                     knownCategory,
                     Object.values(knownSpecifiers)

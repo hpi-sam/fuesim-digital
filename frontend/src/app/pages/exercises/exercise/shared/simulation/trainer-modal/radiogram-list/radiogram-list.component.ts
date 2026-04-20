@@ -8,7 +8,6 @@ import {
     isDone,
     publishTimeOf,
     isUnpublished,
-    TypeAssertedObject,
     isUnread,
     isInterfaceSignallerKey,
 } from 'fuesim-digital-shared';
@@ -43,7 +42,7 @@ export class RadiogramListComponent implements OnInit {
         this.ownClientId = selectStateSnapshot(selectOwnClientId, this.store)!;
 
         this.publishedRadiograms$ = this.store.select(selectRadiograms).pipe(
-            map((radiograms) => TypeAssertedObject.values(radiograms)),
+            map((radiograms) => Object.values(radiograms)),
             map((radiograms) =>
                 radiograms.filter((radiogram) => !isUnpublished(radiogram))
             ),

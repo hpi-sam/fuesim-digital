@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import type { UUID } from 'fuesim-digital-shared';
-import { TypeAssertedObject, uuid } from 'fuesim-digital-shared';
+import { uuid } from 'fuesim-digital-shared';
 import {
     BehaviorSubject,
     combineLatest,
@@ -100,7 +100,7 @@ export class Hotkey {
         if (this.keys === '+') return this.keys;
 
         let keys = this.keys.toLowerCase();
-        TypeAssertedObject.entries(hotkeyReplacements).forEach(([from, to]) => {
+        Object.entries(hotkeyReplacements).forEach(([from, to]) => {
             keys = keys.replaceAll(from, to);
         });
 

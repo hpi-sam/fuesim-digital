@@ -1,7 +1,6 @@
 import { WritableDraft } from 'immer';
 import { IsBoolean, IsString, IsUUID, MaxLength } from 'class-validator';
 import type { Action, ActionReducer } from '../action-reducer.js';
-import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import { ReducerError } from '../reducer-error.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
@@ -153,7 +152,7 @@ export namespace PatientActionReducers {
         action: AddPatientAction,
         reducer: (draftState, { patient }) => {
             if (
-                TypeAssertedObject.entries(patient.healthStates).some(
+                Object.entries(patient.healthStates).some(
                     ([id, healthState]) => healthState.id !== id
                 )
             ) {
@@ -161,23 +160,21 @@ export namespace PatientActionReducers {
                     "Not all health state's ids match their key id"
                 );
             }
-            TypeAssertedObject.values(patient.healthStates).forEach(
-                (healthState) => {
-                    healthState.nextStateConditions.forEach(
-                        (nextStateCondition) => {
-                            if (
-                                patient.healthStates[
-                                    nextStateCondition.matchingHealthStateId
-                                ] === undefined
-                            ) {
-                                throw new ReducerError(
-                                    `HealthState with id ${nextStateCondition.matchingHealthStateId} does not exist`
-                                );
-                            }
+            Object.values(patient.healthStates).forEach((healthState) => {
+                healthState.nextStateConditions.forEach(
+                    (nextStateCondition) => {
+                        if (
+                            patient.healthStates[
+                                nextStateCondition.matchingHealthStateId
+                            ] === undefined
+                        ) {
+                            throw new ReducerError(
+                                `HealthState with id ${nextStateCondition.matchingHealthStateId} does not exist`
+                            );
                         }
-                    );
-                }
-            );
+                    }
+                );
+            });
             if (
                 patient.healthStates[patient.currentHealthStateId] === undefined
             ) {

@@ -4,7 +4,7 @@
 </div>
 <div class="modal-body">
     <form (ngSubmit)="createExerciseTemplate()">
-        <div class="form-group mb-4">
+        <div class="form-group mb-2">
             <label class="form-label">Organisation</label>
             <select
                 [formField]="exerciseTemplateForm.organisationId"
@@ -35,7 +35,7 @@
             ></app-display-model-validation>
         </div>
 
-        <div class="form-group mb-4">
+        <div class="form-group mb-2">
             <label class="form-label">Beschreibung</label>
 
             <textarea
@@ -46,6 +46,28 @@
             <app-display-model-validation
                 [field]="exerciseTemplateForm.description()"
             ></app-display-model-validation>
+        </div>
+
+        <div class="mb-3">
+            @if (importFileName(); as importFileName) {
+                <label class="form-label">Importierte Datei</label>
+                <input
+                    class="form-control ng-valid"
+                    [value]="importFileName"
+                    disabled
+                />
+            } @else {
+                <label class="btn btn-outline-primary my-2">
+                    <i class="bi-cloud-upload me-2"> </i>
+                    Vorlage importieren
+                    <input
+                        (appFileInput)="importFile($event)"
+                        type="file"
+                        accept="application/json"
+                        class="d-none"
+                    />
+                </label>
+            }
         </div>
 
         <button

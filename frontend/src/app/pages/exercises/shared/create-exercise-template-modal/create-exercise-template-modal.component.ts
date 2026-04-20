@@ -2,6 +2,7 @@ import { output, signal, Component, inject, effect } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import {
+    ExportImportFile,
     GetOrganisationsResponseDataSchema,
     OrganisationId,
     PostExerciseTemplateRequestData,
@@ -19,6 +20,8 @@ import { AutofocusDirective } from '../../../../shared/directives/autofocus.dire
 import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 import { DisplayModelValidationComponent } from '../../../../shared/validation/display-model-validation/display-model-validation.component.js';
 import { AuthService } from '../../../../core/auth.service.js';
+import { MessageService } from '../../../../core/messages/message.service.js';
+import { FileInputDirective } from '../../../../shared/directives/file-input.directive.js';
 
 @Component({
     selector: 'app-create-exercise-template-modal',
@@ -30,12 +33,14 @@ import { AuthService } from '../../../../core/auth.service.js';
         DisplayValidationComponent,
         DisplayModelValidationComponent,
         FormField,
+        FileInputDirective,
     ],
 })
 export class CreateExerciseTemplateModalComponent {
     private readonly apiService = inject(ApiService);
     private readonly activeModal = inject(NgbActiveModal);
     private readonly authService = inject(AuthService);
+    private readonly messageService = inject(MessageService);
 
     readonly created = output<boolean>();
 
@@ -43,7 +48,9 @@ export class CreateExerciseTemplateModalComponent {
         name: '',
         description: '',
         organisationId: '' as OrganisationId,
+        importObject: undefined,
     });
+    readonly importFileName = signal<string | null>(null);
     readonly exerciseTemplateForm = form(this.model, (schemaPath) => {
         disabled(schemaPath.organisationId, () =>
             this.organisations.isLoading()
@@ -73,6 +80,34 @@ export class CreateExerciseTemplateModalComponent {
                 });
             }
         });
+    }
+
+    public async importFile(fileList: FileList) {
+        try {
+            const file = fileList.item(0);
+            if (!file) return;
+            const importString = await file.text();
+            const importPlain = JSON.parse(importString) as ExportImportFile;
+            const type = importPlain.type;
+            if (type !== 'complete') {
+                this.messageService.postMessage({
+                    color: 'danger',
+                    title: 'Unerlaubter Importtyp',
+                    body: 'Nur vollständige Übungsexporte können als neue Vorlage importiert werden.',
+                });
+                return;
+            }
+            this.importFileName.set(file.name);
+            this.model.set({
+                ...this.model(),
+                importObject: importPlain,
+            });
+        } catch (error: unknown) {
+            this.messageService.postError({
+                title: 'Fehler beim Importieren',
+                error,
+            });
+        }
     }
 
     public async createExerciseTemplate() {

@@ -35,32 +35,28 @@ export function createExerciseManagerRouter(
             res.send(getExerciseTemplatesResponseDataSchema.encode(templates));
         })
         .post(async (req, res) => {
-            const parsedData = postExerciseTemplateRequestDataSchema.parse(
-                req.body
-            );
-            const exerciseTemplate =
-                await exerciseManagerService.createExerciseTemplateFromBlank(
-                    parsedData,
-                    req.session!
-                );
+            const { importObject, ...parsedData } =
+                postExerciseTemplateRequestDataSchema.parse(req.body);
+            let exerciseTemplate;
+            if (!importObject) {
+                exerciseTemplate =
+                    await exerciseManagerService.createExerciseTemplateFromBlank(
+                        parsedData,
+                        req.session!
+                    );
+            } else {
+                exerciseTemplate =
+                    await exerciseManagerService.createExerciseTemplateFromFile(
+                        parsedData,
+                        importObject,
+                        req.session!
+                    );
+            }
 
             res.status(201).send(
                 getExerciseTemplateResponseDataWithoutTrainerKeySchema.encode(
                     exerciseTemplate
                 )
-            );
-        });
-    router
-        .route('/exercise_templates/import')
-        .all(isAuthenticatedMiddleware)
-        .post(async (req, res) => {
-            const exerciseTemplate =
-                await exerciseManagerService.createExerciseTemplateFromFile(
-                    req.body,
-                    req.session!
-                );
-            res.status(201).send(
-                getExerciseTemplateResponseDataSchema.encode(exerciseTemplate)
             );
         });
 

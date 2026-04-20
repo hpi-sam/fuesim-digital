@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import type { VersionedElementContent } from './models/versioned-element-content.js';
-import {
-    elementVersionIdSchema,
+import type {
     ElementVersionId,
     CollectionVersionId,
     VersionedCollectionPartial,
 } from './models/versioned-id-schema.js';
+import { elementVersionIdSchema } from './models/versioned-id-schema.js';
 import { elementDtoSchema } from './models/versioned-elements.js';
 import type { ElementDto } from './models/versioned-elements.js';
 
@@ -113,8 +113,8 @@ export function getCollectionElementDiff(
             changes.push({
                 id: potentiallyUpdated.new.versionId,
                 type: 'update',
-                old: potentiallyUpdated!.old,
-                new: potentiallyUpdated!.new,
+                old: potentiallyUpdated.old,
+                new: potentiallyUpdated.new,
             });
         });
 
@@ -156,7 +156,7 @@ export async function dependencyTreeConflictResolution(
         // 1 is used for collections in collections
         // 2 is used for collections in exercises
         strictLevels: number;
-    } = { strictLevels: 1 },
+    },
     retrievers: {
         getCollectionDependencies: (
             collectionVersionId: CollectionVersionId
@@ -188,10 +188,13 @@ export async function dependencyTreeConflictResolution(
         const deps = await retrievers.getCollectionDependencies(
             collection.versionId
         );
-        for (const dep of deps) {
-            strictLevelCollections.push(collection);
-            await loadDeps(dep, currentLevel + 1);
-        }
+
+        await Promise.all(
+            deps.map(async (dep) => {
+                strictLevelCollections.push(collection);
+                return loadDeps(dep, currentLevel + 1);
+            })
+        );
     };
 
     await loadDeps(baseCollection, 1);
@@ -199,9 +202,7 @@ export async function dependencyTreeConflictResolution(
     const groupedIds = strictLevelCollections.reduce<{
         [key: string]: CollectionVersionId[];
     }>((acc, collection) => {
-        if (acc[collection.entityId] === undefined) {
-            acc[collection.entityId] = [];
-        }
+        acc[collection.entityId] ??= [];
         acc[collection.entityId]!.push(collection.versionId);
         return acc;
     }, {});
@@ -227,18 +228,23 @@ export async function dependencyTreeConflictResolution(
         const deps = await retrievers.getCollectionDependencies(
             collection.versionId
         );
-        for (const dep of deps) {
-            await loadLooseDeps(dep);
-            // We do not check if two versions of the same collection are in the loose level,
-            // since we use mix-n-match resolution for the loose level
-            //
-            // So we only need to check for version conflicts on the elements
-        }
+
+        await Promise.all(
+            deps.map(async (dep) =>
+                // We do not check if two versions of the same collection are in the loose level,
+                // since we use mix-n-match resolution for the loose level
+                //
+                // So we only need to check for version conflicts on the elements
+                loadLooseDeps(dep)
+            )
+        );
     };
 
-    for (const collection of looseLevelCollections) {
-        await loadLooseDeps(collection);
-    }
+    await Promise.all(
+        looseLevelCollections.map(async (collection) =>
+            loadLooseDeps(collection)
+        )
+    );
 
     console.log({ looseLevelElements });
 

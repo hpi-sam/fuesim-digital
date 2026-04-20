@@ -1,24 +1,27 @@
-import { inject, Injectable } from '@angular/core';
-import {
+import { inject } from '@angular/core';
+import type {
     ActivatedRouteSnapshot,
-    Resolve,
-    ResolveFn,
+    ResolveFn} from '@angular/router';
+import {
+    
     Router,
 } from '@angular/router';
+import type {
+    CollectionEntityId} from 'fuesim-digital-shared';
 import {
-    CollectionEntityId,
     isCollectionEntityId,
 } from 'fuesim-digital-shared';
+import type { BehaviorSubject} from 'rxjs';
+import type {
+    CollectionSubscriptionData} from '../../core/exercise-element.service';
 import {
-    CollectionService,
-    CollectionSubscriptionData,
+    CollectionService
 } from '../../core/exercise-element.service';
-import { BehaviorSubject, Observable } from 'rxjs';
 
-export type CollectionDataResolverResult = {
+export interface CollectionDataResolverResult {
     subject: BehaviorSubject<CollectionSubscriptionData | null>;
     collectionEntityId: CollectionEntityId;
-};
+}
 
 export const collectionDataResolver: ResolveFn<CollectionDataResolverResult> = (
     route: ActivatedRouteSnapshot

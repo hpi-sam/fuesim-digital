@@ -22,7 +22,7 @@ export class MarketplaceColletionItemComponent {
         params: () => ({
             collection: this.collection(),
         }),
-        loader: ({ params: { collection } }) =>
+        loader: async ({ params: { collection } }) =>
             this.collectionService.getCollectionVersion(collection),
     });
 
@@ -30,7 +30,7 @@ export class MarketplaceColletionItemComponent {
         params: () => ({
             collection: this.collection(),
         }),
-        loader: ({ params: { collection } }) =>
+        loader: async ({ params: { collection } }) =>
             this.collectionService.checkNewerVersionAvailable(collection),
     });
 
@@ -44,7 +44,7 @@ export class MarketplaceColletionItemComponent {
             collectionEntity: collection.entityId,
             elements: gatherCollectionElements(elements).allVisibleElements(),
         });
-        //TODO: Keep in mind, that some elements may still be transitive dependencies of other collections!
-        //WE SHOULD NOT REMOVE THEM IN THIS CASE!
+        // TODO: Keep in mind, that some elements may still be transitive dependencies of other collections!
+        // WE SHOULD NOT REMOVE THEM IN THIS CASE!
     }
 }

@@ -2,7 +2,6 @@ import { Injectable, signal, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ClientToServerEvents,
-    ElementDto,
     ExerciseAction,
     ExerciseKey,
     ExerciseState,

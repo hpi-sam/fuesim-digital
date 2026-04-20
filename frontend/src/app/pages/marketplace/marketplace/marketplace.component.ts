@@ -1,9 +1,8 @@
 import { Component, inject, resource } from '@angular/core';
-import { DatePipe, JsonPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CollectionService } from '../../../core/exercise-element.service';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
-import { CollectionCardComponent } from '../collection-card/collection-card.component';
+import { CollectionService } from '../../../core/exercise-element.service';
+import { CollectionCardComponent } from '../shared/cards/collection-card/collection-card.component';
 
 @Component({
     selector: 'app-marketplace',

@@ -1,9 +1,10 @@
 import { Component, inject, resource } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CollectionService } from '../../../core/exercise-element.service';
-import { CollectionCardComponent } from '../collection-card/collection-card.component';
+import { CollectionCardComponent } from '../shared/cards/collection-card/collection-card.component';
 
 @Component({
+    selector: 'app-marketplace-archive',
     imports: [RouterLink, CollectionCardComponent],
     templateUrl: './marketplace-archive.component.html',
     styleUrl: './marketplace-archive.component.scss',

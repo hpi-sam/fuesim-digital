@@ -14,6 +14,7 @@ import {
     countedCollectionDtoSchema,
     elementDtoSchema,
 } from './models/index.js';
+import type { CollectionEntityId } from './marketplace/index.js';
 import {
     versionedElementContentSchema,
     collectionVersionIdSchema,
@@ -22,7 +23,6 @@ import {
     collectionRelationshipTypeSchema,
     collectionElementsDtoSchema,
     collectionVisibilitySchema,
-    CollectionEntityId,
     elementEntityIdSchema,
     collectionElementsSingleSchema,
 } from './marketplace/index.js';
@@ -239,6 +239,7 @@ class Route<TRequest = never, TResponse = never> {
 /* eslint-disable @typescript-eslint/naming-convention */
 
 export namespace Marketplace {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     export namespace Element {
         export const Create = new Route({
             request: z.object({

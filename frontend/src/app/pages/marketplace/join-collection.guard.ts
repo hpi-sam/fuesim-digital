@@ -5,17 +5,9 @@ import type {
 } from '@angular/router';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Store } from '@ngrx/store';
-import { ApiService } from '../../core/api.service';
-import { ApplicationService } from '../../core/application.service';
-import { MessageService } from '../../core/messages/message.service';
-import { AppState } from '../../state/app.state';
-import { selectExerciseStateMode } from '../../state/application/selectors/application.selectors';
-import { selectStateSnapshot } from '../../state/get-state-snapshot';
-import { tryToJoinExercise } from '../exercises/shared/join-exercise-modal/try-to-join-exercise';
+import { firstValueFrom } from 'rxjs';
 import { CollectionService } from '../../core/exercise-element.service';
-import { JoinCollectionModalComponent } from './join-collection-modal/join-collection-modal.component';
-import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { JoinCollectionModalComponent } from './shared/modals/join-collection-modal/join-collection-modal.component';
 
 @Injectable({
     providedIn: 'root',
@@ -57,11 +49,12 @@ export class JoinCollectionGuard {
             if (!result) {
                 this.router.navigate(['/']);
                 return false;
-            } else {
-                await this.collectionService.joinCollectionByJoinCode(joinCode);
-                return true;
             }
+
+            await this.collectionService.joinCollectionByJoinCode(joinCode);
+            return true;
         } catch (e) {
+            console.error(e);
             this.router.navigate(['/']);
             return false;
         }

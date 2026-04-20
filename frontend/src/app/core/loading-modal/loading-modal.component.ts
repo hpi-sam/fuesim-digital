@@ -3,19 +3,12 @@ import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { AutofocusDirective } from '../../shared/directives/autofocus.directive';
-import { ExactMatchValidatorDirective } from '../../shared/validation/exact-match-validator.directive';
-import { DisplayValidationComponent } from '../../shared/validation/display-validation/display-validation.component';
 
 @Component({
+    selector: 'app-loading-modal',
     templateUrl: './loading-modal.component.html',
     styleUrls: ['./loading-modal.component.scss'],
-    imports: [
-        FormsModule,
-        AutofocusDirective,
-        ExactMatchValidatorDirective,
-        DisplayValidationComponent,
-    ],
+    imports: [FormsModule],
 })
 export class LoadingModalComponent implements OnDestroy {
     readonly activeModal = inject(NgbActiveModal);

@@ -1,16 +1,15 @@
 import { Component, computed, inject, resource, signal } from '@angular/core';
-import { CollectionService } from '../../../../../../core/exercise-element.service';
 import {
     CollectionDto,
     CollectionEntityId,
-    CollectionVersionId,
     gatherCollectionElements,
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
-import { CollectionElementsListComponent } from '../../../../../marketplace/marketplace-set-detail/collection-elements-list/collection-elements-list.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { DatePipe } from '@angular/common';
+import { CollectionElementsListComponent } from '../../../../../marketplace/shared/collection-elements-list/collection-elements-list.component';
+import { CollectionService } from '../../../../../../core/exercise-element.service';
 
 @Component({
     templateUrl: './marketplace-select-collection-modal.component.html',
@@ -26,7 +25,7 @@ export class MarketplaceSelectCollectionModalComponent {
     public showDependencyElements = false;
 
     public readonly userAvailableCollections = resource({
-        loader: () =>
+        loader: async () =>
             this.collectionService.getMyCollections({
                 includeDraftState: false,
             }),
@@ -36,7 +35,7 @@ export class MarketplaceSelectCollectionModalComponent {
         params: () => ({
             collection: this.selectedCollection(),
         }),
-        loader: ({ params: { collection } }) =>
+        loader: async ({ params: { collection } }) =>
             collection
                 ? Promise.all([
                       this.collectionService.getCollectionVersion(collection),
@@ -58,9 +57,9 @@ export class MarketplaceSelectCollectionModalComponent {
         if (!data) return [];
         if (this.showDependencyElements) {
             return gatherCollectionElements(data[1]).allVisibleElements();
-        } else {
+        } 
             return data[1].direct;
-        }
+        
     });
 
     public readonly selectedCollection =

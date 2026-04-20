@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { collectionDtoSchema } from './collection.js';
-import { elementDtoSchema, ElementDto } from './versioned-elements.js';
+import type { ElementDto } from './versioned-elements.js';
+import { elementDtoSchema } from './versioned-elements.js';
 
-//TODO: Improve this naming
+// TODO: Improve this naming
 export const collectionElementsSingleSchema = z.strictObject({
     collection: collectionDtoSchema,
     elements: z.array(elementDtoSchema),

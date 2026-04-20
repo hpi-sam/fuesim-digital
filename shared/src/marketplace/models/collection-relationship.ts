@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { collectionEntityIdSchema } from './versioned-id-schema.js';
 
 // This is sorted by permission level, so the order matters

@@ -1,8 +1,7 @@
 import type {
-    CollectionDto,
+    
     CollectionEntityId,
     CollectionVersionId,
-    ElementDto,
 } from 'fuesim-digital-shared';
 import { Marketplace } from 'fuesim-digital-shared';
 import type {
@@ -169,7 +168,7 @@ export class CollectionEventSender {
                     collection: latestDraftStateVersion,
                     elements: draftStateElements,
                     userRelationship,
-                    publishedElements: publishedElements,
+                    publishedElements,
                 },
             })
         );

@@ -1,7 +1,7 @@
 import { dependencyTreeConflictResolution } from './conflict-detection.js';
-import { VersionedCollectionPartial } from './models/collection.js';
-import { VersionedElementPartial } from './models/versioned-elements.js';
-import {
+import type { VersionedCollectionPartial } from './models/collection.js';
+import type { VersionedElementPartial } from './models/versioned-elements.js';
+import type {
     CollectionVersionId,
     ElementVersionId,
     CollectionEntityId,

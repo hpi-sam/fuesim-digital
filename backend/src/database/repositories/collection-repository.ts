@@ -25,7 +25,6 @@ import {
     and,
     max,
     gt,
-    count,
 } from 'drizzle-orm';
 import {
     collectionDependencyMappingTable,
@@ -838,10 +837,9 @@ export class CollectionRepository extends BaseRepository {
                             title: latestElements.title,
                             description: latestElements.description,
                             content: latestElements.content,
-                        } satisfies Record<
-                            keyof typeof elementTable.$inferInsert,
-                            any
-                        >)
+                        } satisfies {
+                            [K in keyof typeof elementTable.$inferInsert]: any;
+                        })
                         .from(latestElements)
                         .innerJoin(
                             elementCollectionMappingTable,
@@ -1088,7 +1086,7 @@ export class CollectionRepository extends BaseRepository {
         collectionEntityId: CollectionEntityId,
         unarchive = false
     ) {
-        return await this.databaseConnection
+        return this.databaseConnection
             .update(collectionTable)
             .set({
                 archived: !unarchive,

@@ -1,6 +1,5 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { firstValueFrom } from 'rxjs';
 import { LoadingModalComponent } from './loading-modal.component';
 
 @Injectable({

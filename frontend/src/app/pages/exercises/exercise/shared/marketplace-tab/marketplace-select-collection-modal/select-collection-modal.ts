@@ -1,7 +1,7 @@
-import { CollectionEntityId } from 'fuesim-digital-shared';
+import type { CollectionEntityId } from 'fuesim-digital-shared';
 import { lastValueFrom } from 'rxjs';
+import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MarketplaceSelectCollectionModalComponent } from './marketplace-select-collection-modal.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 export async function openSelectCollectionModal(
     ngbModalService: NgbModal,

@@ -17,7 +17,6 @@ import {
     selectVehicles,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
-import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import {
     ChangeImpact,
     EditableElementChangeImpact,
@@ -28,11 +27,7 @@ import { openSelectCollectionModal } from './marketplace-select-collection-modal
 
 @Component({
     selector: 'app-marketplace-tab',
-    imports: [
-        MapEditorCardComponent,
-        NgbDropdownModule,
-        MarketplaceColletionItemComponent,
-    ],
+    imports: [NgbDropdownModule, MarketplaceColletionItemComponent],
     templateUrl: './marketplace-tab.component.html',
     styleUrl: './marketplace-tab.component.scss',
 })
@@ -100,7 +95,7 @@ export class MarketplaceTabComponent {
                 newerCollectionVersionAvailable.latestVersion
             );
 
-        /*const changeImpacts = await this.calcChangeImpact({
+        /* const changeImpacts = await this.calcChangeImpact({
             inExercise: Object.values(allExerciseVehicles),
             new: newerCollection.direct,
             // TODO: this is not always correct - actually fetch the data here

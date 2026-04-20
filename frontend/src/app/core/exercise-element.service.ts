@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
     CollectionDto,
     CollectionElementsDto,
@@ -198,8 +198,9 @@ export class CollectionService {
             this.httpClient.get<
                 typeof Marketplace.Collection.GetByEntityId.Response
             >(
-                `${this.ENDPOINT}/${entityId}?allowdraftstate=` +
+                `${this.ENDPOINT}/${entityId}?allowdraftstate=${
                     opts.allowDraftState
+                }`
             )
         );
 
@@ -425,6 +426,8 @@ export class CollectionService {
             body: 'Die Sammlung wurde wiederhergestellt und ist nun in Ihrer Sammlungsliste sichtbar.',
             color: 'success',
         });
+
+        return data;
     }
 
     public async addCollectionDependency(opts: {
@@ -486,7 +489,6 @@ export class CollectionService {
                 title: 'Sammlung konnte nicht gespeichert werden',
                 body: 'Probieren Sie es erneut oder laden Sie die Seite neu.',
             });
-            return;
         }
     }
 
@@ -505,7 +507,6 @@ export class CollectionService {
                 title: 'Sammlung konnte nicht zurückgesetzt werden',
                 body: 'Probieren Sie es erneut oder laden Sie die Seite neu.',
             });
-            return;
         }
     }
 
@@ -830,9 +831,7 @@ export class CollectionService {
                 `${this.ENDPOINT}/${collectionEntityId}/import`,
                 Marketplace.Element.Import.requestSchema.parse({
                     elements: elements.filter((element) =>
-                        nonParsedElements.some(
-                            (nonParsed) => nonParsed === element
-                        )
+                        nonParsedElements.includes(element)
                     ),
                 })
             )

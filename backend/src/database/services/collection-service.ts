@@ -349,23 +349,6 @@ export class CollectionService {
         );
     }
 
-    /*
-    public async checkRequiredChangesForDependencyUpgrade(data: {
-        dependingCollection: CollectionVersionId;
-        currentDependencyVersion: CollectionVersionId;
-        nextDependencyVersion: CollectionVersionId;
-    }) {
-        const currentDependencyElements =
-            await this.getElementsOfCollectionVersion(
-                data.currentDependencyVersion,
-                {
-                    includeDependencies: false,
-                    allowDraftState: true,
-                }
-            );
-    }
-    */
-
     public async addCollectionDependency(
         data: {
             importTo: CollectionEntityId;

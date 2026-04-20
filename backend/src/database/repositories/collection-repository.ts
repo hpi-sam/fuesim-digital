@@ -53,8 +53,6 @@ export class CollectionRepository extends BaseRepository {
             .toString('base64url')
             .replaceAll(' ', '-');
 
-        console.log(`CODE :'${newCode}'`);
-
         return this.onlySingleStrict(
             await this.databaseConnection
                 .insert(collectionJoinCodesTable)

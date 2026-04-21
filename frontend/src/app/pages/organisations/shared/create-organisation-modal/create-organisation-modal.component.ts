@@ -2,7 +2,7 @@ import { Component, inject, output, signal } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import {
     postOrganisationRequestDataSchema,
-    PostOrganisationRequestDataSchema,
+    PostOrganisationRequestData,
 } from 'fuesim-digital-shared';
 import {
     form,
@@ -30,7 +30,7 @@ export class CreateOrganisationModalComponent {
     private readonly activeModal = inject(NgbActiveModal);
 
     public readonly created = output<boolean>();
-    readonly model = signal<PostOrganisationRequestDataSchema>({
+    readonly model = signal<PostOrganisationRequestData>({
         name: '',
         description: '',
     });

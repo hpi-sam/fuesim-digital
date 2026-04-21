@@ -23,7 +23,7 @@ import {
     PatchParallelExerciseRequestData,
     GroupParticipantKey,
     getOrganisationsResponseDataSchema,
-    PostOrganisationRequestDataSchema,
+    PostOrganisationRequestData,
     getOrganisationResponseDataSchema,
     OrganisationId,
     PatchOrganisationRequestData,
@@ -238,7 +238,7 @@ export class ApiService {
         ).then(postJoinParallelExerciseResponseDataSchema.parse);
     }
 
-    public async createOrganisation(data: PostOrganisationRequestDataSchema) {
+    public async createOrganisation(data: PostOrganisationRequestData) {
         return lastValueFrom(
             this.httpClient.post(`${httpOrigin}/api/organisations/`, data)
         ).then(getOrganisationResponseDataSchema.parse);

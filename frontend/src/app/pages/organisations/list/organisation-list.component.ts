@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import type { GetOrganisationsResponseDataSchema } from 'fuesim-digital-shared';
+import type { GetOrganisationsResponseData } from 'fuesim-digital-shared';
 import { HttpResourceRef } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ApiService } from '../../../core/api.service';
@@ -18,9 +18,7 @@ export class OrganisationListComponent {
     private readonly apiService = inject(ApiService);
     private readonly ngbModalService = inject(NgbModal);
 
-    organisations: HttpResourceRef<
-        GetOrganisationsResponseDataSchema | undefined
-    >;
+    organisations: HttpResourceRef<GetOrganisationsResponseData | undefined>;
 
     constructor() {
         this.organisations = this.apiService.getOrganisationsResource();

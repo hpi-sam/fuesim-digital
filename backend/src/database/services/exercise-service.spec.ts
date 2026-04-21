@@ -51,17 +51,16 @@ describe('Exercise-Service', () => {
             null
         );
 
-        const saveTick: () => Promise<void> = (
-            environment.server as any
-        ).saveTick.bind(environment.server);
-        await saveTick();
+        const saveUnsavedExercises = async () =>
+            environment.services.exerciseService.saveUnsavedExercises();
+        await saveUnsavedExercises();
 
         expect(markAsAboutToBeSavedMock).toHaveBeenCalledTimes(1);
         // one action still unsaved
         expect(exercise.temporaryActionHistory.length).toBe(1);
 
         markAsAboutToBeSaved();
-        await saveTick();
+        await saveUnsavedExercises();
         expect(markAsAboutToBeSavedMock).toHaveBeenCalledTimes(2);
         expect(exercise.temporaryActionHistory.length).toBe(0);
     });
@@ -87,7 +86,7 @@ describe('Exercise-Service', () => {
             null
         );
 
-        await environment.server.saveTick();
+        await environment.services.exerciseService.saveUnsavedExercises();
 
         const exerciseEntry =
             await environment.repositories.exerciseRepository.getExerciseById(
@@ -124,7 +123,7 @@ describe('Exercise-Service', () => {
             null
         );
 
-        await environment.server.saveTick();
+        await environment.services.exerciseService.saveUnsavedExercises();
 
         const exerciseTemplateEntry =
             await environment.repositories.exerciseRepository.getExerciseTemplateById(
@@ -137,5 +136,84 @@ describe('Exercise-Service', () => {
         expect(exerciseTemplateEntry!.lastUpdatedAt.getTime()).toBeLessThan(
             Date.now()
         );
+    });
+
+    describe('upkeep tick', () => {
+        it('unloads exercises with no clients', async () => {
+            const exerciseKeys = await createExercise(environment);
+            const exerciseMap =
+                environment.services.exerciseService.TESTING_getExerciseMap();
+            expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(true);
+
+            await environment.server.exerciseUpkeepTick();
+
+            expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(false);
+            expect(exerciseMap.has(exerciseKeys.participantKey)).toBe(false);
+        });
+
+        it('keeps exercises with active clients', async () => {
+            const exerciseKeys = await createExercise(environment);
+            const exerciseMap =
+                environment.services.exerciseService.TESTING_getExerciseMap();
+
+            await environment.withWebsocket(async (socket) => {
+                const join = await socket.emit(
+                    'joinExercise',
+                    exerciseKeys.trainerKey,
+                    'Test'
+                );
+                expect(join.success).toBe(true);
+
+                await environment.server.exerciseUpkeepTick();
+
+                expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(true);
+            });
+        });
+    });
+
+    describe('restoring from database', () => {
+        it('getExerciseByKey restores an unloaded exercise', async () => {
+            const exerciseKeys = await createExercise(environment);
+            const originalId = (
+                await environment.services.exerciseService.getExerciseByKey(
+                    exerciseKeys.trainerKey
+                )
+            ).exercise.id;
+            const exerciseMap =
+                environment.services.exerciseService.TESTING_getExerciseMap();
+
+            await environment.server.exerciseUpkeepTick();
+            expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(false);
+
+            const restored =
+                await environment.services.exerciseService.getExerciseByKey(
+                    exerciseKeys.trainerKey
+                );
+
+            expect(restored.exercise.id).toBe(originalId);
+            expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(true);
+        });
+
+        it('getExerciseById restores an unloaded exercise', async () => {
+            const exerciseKeys = await createExercise(environment);
+            const originalId = (
+                await environment.services.exerciseService.getExerciseByKey(
+                    exerciseKeys.trainerKey
+                )
+            ).exercise.id;
+            const exerciseMap =
+                environment.services.exerciseService.TESTING_getExerciseMap();
+
+            await environment.server.exerciseUpkeepTick();
+            expect(exerciseMap.has(originalId)).toBe(false);
+
+            const restored =
+                await environment.services.exerciseService.getExerciseById(
+                    originalId
+                );
+
+            expect(restored.exercise.id).toBe(originalId);
+            expect(exerciseMap.has(originalId)).toBe(true);
+        });
     });
 });

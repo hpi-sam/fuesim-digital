@@ -826,13 +826,16 @@ export class CollectionService {
             color: 'info',
         });
 
+        const creatingElements = elements.filter(
+            (element) => !nonParsedElements.includes(element)
+        );
+        console.log({ creatingElements });
+
         const data = await lastValueFrom(
-            this.httpClient.post<typeof Marketplace.Element.Import.Response>(
-                `${this.ENDPOINT}/${collectionEntityId}/import`,
-                Marketplace.Element.Import.requestSchema.parse({
-                    elements: elements.filter((element) =>
-                        nonParsedElements.includes(element)
-                    ),
+            this.httpClient.post<typeof Marketplace.Element.Create.Response>(
+                `${this.ENDPOINT}/${collectionEntityId}/create`,
+                Marketplace.Element.Create.requestSchema.parse({
+                    data: creatingElements,
                 })
             )
         );

@@ -247,31 +247,6 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
-    /*
-     * Import elements from file
-     * TODO: @Quixelation : IMPLEMENT
-     */
-    editorRouter.post('/:collectionEntityId/import', async (req, res) => {
-        const collectionEntityId = getCollectionEntityId(req);
-
-        const parsedBody = Marketplace.Element.Create.requestSchema.parse(
-            req.body
-        );
-        throw new Error('Not implemented yet');
-
-        const data = await collectionService.createExerciseObjects(
-            collectionEntityId,
-            parsedBody.data
-        );
-
-        res.send(
-            Marketplace.Element.Create.responseSchema.encode({
-                newSetVersionId: data.newSetVersionId,
-                result: data.results,
-            })
-        );
-    });
-
     adminRouter.get('/:collectionEntityId/invitecode', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 

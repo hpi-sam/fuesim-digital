@@ -128,7 +128,7 @@ export class OrganisationService {
                 organisationId: organisation.id,
             });
         if (!inviteLink) {
-            throw new NotFoundError();
+            throw new ApiError();
         }
         return {
             ...inviteLink,
@@ -145,7 +145,7 @@ export class OrganisationService {
                 token
             );
         if (!data) {
-            throw new NotFoundError();
+            throw new PermissionDeniedError();
         }
         if (data.organisation_invite_link.expirationDate < new Date()) {
             throw new ApiError('Dieser Einladungslink ist leider abgelaufen.');

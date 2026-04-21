@@ -460,12 +460,17 @@ export class CollectionRepository extends BaseRepository {
             if (!draftStateToBeDeleted)
                 throw new Error('No draft state found to be deleted');
 
-            const deletedElements = await tx
+            const deletedElementMappings = await tx
                 .delete(elementCollectionMappingTable)
                 .where(
-                    eq(
-                        elementCollectionMappingTable.setVersionId,
-                        draftStateToBeDeleted.versionId
+                    and(
+                        eq(
+                            elementCollectionMappingTable.setVersionId,
+                            draftStateToBeDeleted.versionId
+                        ),
+                        // Only delete mappings for element-versions that
+                        // are only referenced in this collection version
+                        eq(elementCollectionMappingTable.isBaseReference, true)
                     )
                 )
                 .returning();
@@ -494,7 +499,7 @@ export class CollectionRepository extends BaseRepository {
                 );
 
             await Promise.all(
-                deletedElements.map((m) =>
+                deletedElementMappings.map((m) =>
                     tx
                         .delete(elementTable)
                         .where(eq(elementTable.versionId, m.elementVersionId))

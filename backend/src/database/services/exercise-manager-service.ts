@@ -139,7 +139,6 @@ export class ExerciseManagerService {
         const newExercise =
             await this.exerciseService.createExercise(newExerciseEntry);
         const activeExercise = new ActiveExercise(newExercise, []);
-        await this.exerciseService.loadExercise(activeExercise);
         await this.exerciseRepository.updateExerciseTemplate(
             exerciseTemplate.id,
             { lastExerciseCreatedAt: new Date() }

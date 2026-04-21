@@ -91,6 +91,9 @@ export class ExerciseClientWrapper extends ClientWrapper {
                 : role !== 'trainer'
         );
         this.chosenExercise.addClient(this);
+        // Load exercise only after client has been added to
+        // prevent immediate removal by automatic unloading
+        this.services.exerciseService.loadExercise(this.chosenExercise);
         return this.relatedExerciseClient.id;
     }
 

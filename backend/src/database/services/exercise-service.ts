@@ -144,7 +144,6 @@ export class ExerciseService {
         } satisfies ExerciseInsert;
         const exerciseEntry = await this.createExercise(exerciseInsert);
         const activeExercise = new ActiveExercise(exerciseEntry);
-        await this.loadExercise(activeExercise);
         return activeExercise;
     }
 
@@ -200,8 +199,6 @@ export class ExerciseService {
 
             // The actions haven't been saved in the database yet -> keep them
             activeExercise.restore(true);
-
-            await this.loadExercise(activeExercise);
 
             return activeExercise;
         } catch (err) {
@@ -314,8 +311,6 @@ export class ExerciseService {
 
             // The actions have already been saved in the database -> do not keep them
             exercise.restore(false);
-
-            this.loadExercise(exercise);
 
             return exercise;
         });

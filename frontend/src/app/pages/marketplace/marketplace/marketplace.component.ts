@@ -22,7 +22,7 @@ export class MarketplaceComponent {
     public async createNewCollection() {
         const title = await this.promptModalService.prompt({
             title: 'Neue Sammlung erstellen',
-            description: 'Gebe einen Titel für deine neue Sammlung ein.',
+            description: 'Geben Sie einen Titel für die neue Sammlung ein.',
             confirmationButtonText: 'Erstellen',
         });
         if (!title.result) return;

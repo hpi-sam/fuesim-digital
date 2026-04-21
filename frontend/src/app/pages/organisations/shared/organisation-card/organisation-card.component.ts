@@ -1,6 +1,6 @@
 import { Component, input, output, inject } from '@angular/core';
 import type {
-    GetOrganisationsResponseDataSchema,
+    GetOrganisationsResponseData,
     PatchOrganisationRequestData,
 } from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
@@ -22,8 +22,7 @@ export class OrganisationCardComponent {
         ConfirmationModalService
     );
 
-    readonly organisation =
-        input.required<GetOrganisationsResponseDataSchema[0]>();
+    readonly organisation = input.required<GetOrganisationsResponseData[0]>();
     readonly updated = output();
 
     async patchOrganisation(data: PatchOrganisationRequestData) {

@@ -35,7 +35,7 @@ export const getOrganisationResponseDataSchema = z.object({
     personalOrganisationOf: z.string().nullable(),
 });
 
-export type GetOrganisationResponseDataSchema = z.infer<
+export type GetOrganisationResponseData = z.infer<
     typeof getOrganisationResponseDataSchema
 >;
 
@@ -54,7 +54,7 @@ export const getOrganisationDetailsResponseDataSchema = z.object({
     ),
 });
 
-export type GetOrganisationDetailsResponseDataSchema = z.infer<
+export type GetOrganisationDetailsResponseData = z.infer<
     typeof getOrganisationDetailsResponseDataSchema
 >;
 
@@ -64,7 +64,7 @@ export const getOrganisationsResponseDataSchema = z.array(
         userRole: organisationMembershipRoleSchema.nullable(),
     })
 );
-export type GetOrganisationsResponseDataSchema = z.infer<
+export type GetOrganisationsResponseData = z.infer<
     typeof getOrganisationsResponseDataSchema
 >;
 
@@ -76,7 +76,7 @@ export const postOrganisationRequestDataSchema = z.object({
         .trim(),
     description: z.string().trim(),
 });
-export type PostOrganisationRequestDataSchema = z.infer<
+export type PostOrganisationRequestData = z.infer<
     typeof postOrganisationRequestDataSchema
 >;
 

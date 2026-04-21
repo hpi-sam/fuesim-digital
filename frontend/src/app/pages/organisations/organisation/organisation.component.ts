@@ -7,10 +7,9 @@ import {
     NgbNavItem,
     NgbNavLink,
     NgbNavOutlet,
-    NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import {
-    GetOrganisationDetailsResponseDataSchema,
+    GetOrganisationDetailsResponseData,
     OrganisationMembershipId,
     OrganisationMembershipRole,
     organisationMembershipRoleAllowedValues,
@@ -18,12 +17,10 @@ import {
     PatchOrganisationRequestData,
 } from 'fuesim-digital-shared';
 import { ActivatedRoute, Router } from '@angular/router';
-import { QrCodeComponent } from 'ng-qrcode';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/api.service';
 import { MessageService } from '../../../core/messages/message.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
-import { ExerciseStateBadgeInnerComponent } from '../../../shared/components/exercise-state-badge-inner/exercise-state-badge-inner.component';
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { InlineTextEditorComponent } from '../../../shared/components/inline-text-editor/inline-text-editor.component';
 import { InviteMemberModalComponent } from '../shared/invite-member-modal/invite-member-modal.component';
@@ -36,10 +33,7 @@ import { AuthService } from '../../../core/auth.service';
     styleUrls: ['./organisation.component.scss'],
     imports: [
         HeaderComponent,
-        ExerciseStateBadgeInnerComponent,
-        QrCodeComponent,
         FooterComponent,
-        NgbTooltip,
         InlineTextEditorComponent,
         NgbNav,
         NgbNavItem,
@@ -68,7 +62,7 @@ export class OrganisationComponent {
         organisationMembershipRoleAllowedValues;
 
     organisation: HttpResourceRef<
-        GetOrganisationDetailsResponseDataSchema | undefined
+        GetOrganisationDetailsResponseData | undefined
     >;
 
     async patchOrganisation(data: PatchOrganisationRequestData) {
@@ -101,7 +95,7 @@ export class OrganisationComponent {
     }
 
     async deleteMembership(
-        member: GetOrganisationDetailsResponseDataSchema['members'][0]
+        member: GetOrganisationDetailsResponseData['members'][0]
     ) {
         const deletionConfirmed = await this.confirmationModalService.confirm({
             title: 'Mitglied aus der Organisation entfernen',

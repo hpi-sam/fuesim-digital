@@ -3,7 +3,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import {
     ExportImportFile,
-    GetOrganisationsResponseDataSchema,
+    GetOrganisationsResponseData,
     OrganisationId,
     PostExerciseTemplateRequestData,
     postExerciseTemplateRequestDataSchema,
@@ -17,7 +17,6 @@ import {
 } from '@angular/forms/signals';
 import { ApiService } from '../../../../core/api.service';
 import { AutofocusDirective } from '../../../../shared/directives/autofocus.directive';
-import { DisplayValidationComponent } from '../../../../shared/validation/display-validation/display-validation.component';
 import { DisplayModelValidationComponent } from '../../../../shared/validation/display-model-validation/display-model-validation.component.js';
 import { AuthService } from '../../../../core/auth.service.js';
 import { MessageService } from '../../../../core/messages/message.service.js';
@@ -30,7 +29,6 @@ import { FileInputDirective } from '../../../../shared/directives/file-input.dir
     imports: [
         FormsModule,
         AutofocusDirective,
-        DisplayValidationComponent,
         DisplayModelValidationComponent,
         FormField,
         FileInputDirective,
@@ -61,9 +59,7 @@ export class CreateExerciseTemplateModalComponent {
         );
     });
 
-    organisations: HttpResourceRef<
-        GetOrganisationsResponseDataSchema | undefined
-    >;
+    organisations: HttpResourceRef<GetOrganisationsResponseData | undefined>;
 
     constructor() {
         this.organisations = this.apiService.getOrganisationsAsEditorResource();

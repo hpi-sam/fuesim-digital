@@ -349,19 +349,14 @@ export class CollectionService {
         );
     }
 
-    public async addCollectionDependency(
-        data: {
-            importTo: CollectionEntityId;
-            importFrom: CollectionVersionId;
-        },
-        opts: { throwOnDraftState: boolean } = { throwOnDraftState: true }
-    ) {
-        const { throwOnDraftState } = opts;
-
+    public async addCollectionDependency(data: {
+        importTo: CollectionEntityId;
+        importFrom: CollectionVersionId;
+    }) {
         return this.reduce(
             data.importTo,
             async (tx, draftState, eventBuffer) => {
-                let importFromCollection = tx.exists(
+                const importFromCollection = tx.exists(
                     await tx.collectionRepository.getCollectionByVersionId(
                         data.importFrom
                     )
@@ -370,23 +365,9 @@ export class CollectionService {
                 // TODO: Check if dependency can be added!
 
                 if (importFromCollection.draftState) {
-                    if (throwOnDraftState) {
-                        throw new Error(
-                            `Collection version with id ${data.importFrom} is in draft state and can not be imported`
-                        );
-                    } else {
-                        const nonDraftStateCollection =
-                            await tx.collectionRepository.getLatestCollectionByEntityId(
-                                importFromCollection.entityId,
-                                { allowDraftState: false }
-                            );
-                        if (nonDraftStateCollection === null) {
-                            throw new Error(
-                                `Collection with id ${importFromCollection.entityId} has no non-draft version and can not be imported`
-                            );
-                        }
-                        importFromCollection = nonDraftStateCollection;
-                    }
+                    throw new Error(
+                        `Collection version with id ${data.importFrom} is in draft state and can not be imported`
+                    );
                 }
 
                 const existingDependencies = await tx.getCollectionDependencies(

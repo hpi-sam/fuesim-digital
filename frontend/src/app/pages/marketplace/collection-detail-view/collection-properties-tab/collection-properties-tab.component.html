@@ -1,19 +1,9 @@
 <h4 class="h4 mt-4">Eigenschaften</h4>
 <div class="form-group mb-3">
     <label class="form-label">Name der Sammlung</label>
-    <input
-        #nameInput="ngModel"
-        [(ngModel)]="collectionTitle"
-        required
-        type="text"
-        class="form-control"
-    />
+    <input #nameInput="ngModel" [(ngModel)]="collectionTitle" required type="text" class="form-control" />
     <app-display-validation [ngModelInput]="nameInput"></app-display-validation>
-    <button
-        class="btn btn-primary mt-2"
-        type="button"
-        (click)="updateCollectionTitle()"
-    >
+    <button class="btn btn-primary mt-2" type="button" (click)="updateCollectionTitle()">
         Umbenennen
     </button>
 </div>
@@ -21,92 +11,68 @@
 <h4 class="h4 mt-5">
     Mitglieder
     @if (inviteCode.isLoading() || members.isLoading()) {
-        <div
-            class="spinner-border spinner-border-sm text-primary"
-            role="status"
-        >
-            <span class="visually-hidden">Loading...</span>
-        </div>
+    <div class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
     }
 </h4>
 @if (inviteCode.hasValue() && inviteCode.value() !== null) {
-    <span class="text-muted">Einladungslink zum Beitreten der Sammlung:</span>
-    <div
-        class="bg-light p-1 border rounded w-100 d-flex flex-row align-items-center justify-content-between ps-3"
-    >
-        <span class="user-select-all font-monospace">{{
-            inviteJoinLink()
+<span class="text-muted">Einladungslink zum Beitreten der Sammlung:</span>
+<div class="bg-light p-1 border rounded w-100 d-flex flex-row align-items-center justify-content-between ps-3">
+    <span class="user-select-all font-monospace">{{
+        inviteJoinLink()
         }}</span>
-        <div>
-            <app-copy-button [value]="inviteJoinLink()" />
-            <button
-                class="btn text-danger"
-                type="button"
-                (click)="revokeInviteCode()"
-                ngbTooltip="Einladungslink ungültig machen"
-            >
-                <i class="bi bi-x-square"></i>
-            </button>
-        </div>
+    <div>
+        <button class="btn-link text-body" app-copy-button [value]="inviteJoinLink()"></button>
+        <button class="btn text-danger" type="button" (click)="revokeInviteCode()"
+            ngbTooltip="Einladungslink ungültig machen">
+            <i class="bi bi-x-square"></i>
+        </button>
     </div>
+</div>
 } @else {
-    <button
-        class="btn btn-outline-primary w-"
-        type="button"
-        (click)="createInviteCode()"
-    >
-        Einladungslink erstellen
-    </button>
+<button class="btn btn-outline-primary w-" type="button" (click)="createInviteCode()">
+    Einladungslink erstellen
+</button>
 }
 
 @if (members.hasValue()) {
-    <ul class="list-group mt-3">
-        @for (member of members.value(); track member.id) {
-            <li
-                class="list-group-item d-flex flex-row align-items-center gap-3"
-            >
-                <select
-                    [disabled]="member.id === ownUserId()"
-                    (change)="updateCollectionMemberRole(member.id, $event)"
-                    class="form-select form-select-sm w-auto"
-                >
-                    @for (role of allowedRoleValues; track role) {
-                        <option
-                            [selected]="role === member.role"
-                            [value]="role"
-                        >
-                            {{ role | collectionRelationshipType }}
-                        </option>
-                    }
-                </select>
-                <span>
-                    {{ member.displayName }}
-                    @if (member.id === ownUserId()) {
-                        <span class="badge text-bg-secondary ms-1">Sie</span>
-                    }
-                </span>
-                @if (member.id !== ownUserId()) {
-                    <button
-                        class="btn btn-outline-danger btn-sm ms-auto"
-                        (click)="
+<ul class="list-group mt-3">
+    @for (member of members.value(); track member.id) {
+    <li class="list-group-item d-flex flex-row align-items-center gap-3">
+        <select [disabled]="member.id === ownUserId()" (change)="updateCollectionMemberRole(member.id, $event)"
+            class="form-select form-select-sm w-auto">
+            @for (role of allowedRoleValues; track role) {
+            <option [selected]="role === member.role" [value]="role">
+                {{ role | collectionRelationshipType }}
+            </option>
+            }
+        </select>
+        <span>
+            {{ member.displayName }}
+            @if (member.id === ownUserId()) {
+            <span class="badge text-bg-secondary ms-1">Sie</span>
+            }
+        </span>
+        @if (member.id !== ownUserId()) {
+        <button class="btn btn-outline-danger btn-sm ms-auto" (click)="
                             removeCollectionMember(
                                 member.id,
                                 member.displayName
                             )
-                        "
-                    >
-                        <i class="bi bi-x-square"></i>
-                    </button>
-                }
-            </li>
+                        ">
+            <i class="bi bi-x-square"></i>
+        </button>
         }
-    </ul>
+    </li>
+    }
+</ul>
 }
 
 @if (!collection().archived) {
-    <h4 class="h4 mt-5">Gefahrenzone</h4>
-    <ul class="list-group">
-        <!--<li
+<h4 class="h4 mt-5">Gefahrenzone</h4>
+<ul class="list-group">
+    <!--<li
             class="list-group-item d-flex flex-row align-items-center justify-content-between gap-2"
         >
             <div class="d-flex flex-column">
@@ -134,25 +100,19 @@
                 </span>
             }
         </li>-->
-        <li
-            class="list-group-item d-flex flex-row align-items-center justify-content-between gap-2"
-        >
-            <div class="d-flex flex-column">
-                <b> Sammlung archivieren </b>
-                <small class="text-muted">
-                    Wenn eine Sammlung archiviert wird, wird diese nicht mehr in
-                    der Übersicht angezeigt. Bereits bestehende Übungsszenarien,
-                    die Elemente aus dieser Sammlung verwenden, können weiterhin
-                    auf diese Elemente zugreifen.
-                </small>
-            </div>
-            <button
-                class="btn btn-outline-danger text-nowrap"
-                type="button"
-                (click)="archiveCollection()"
-            >
-                Sammlung archivieren
-            </button>
-        </li>
-    </ul>
+    <li class="list-group-item d-flex flex-row align-items-center justify-content-between gap-2">
+        <div class="d-flex flex-column">
+            <b> Sammlung archivieren </b>
+            <small class="text-muted">
+                Wenn eine Sammlung archiviert wird, wird diese nicht mehr in
+                der Übersicht angezeigt. Bereits bestehende Übungsszenarien,
+                die Elemente aus dieser Sammlung verwenden, können weiterhin
+                auf diese Elemente zugreifen.
+            </small>
+        </div>
+        <button class="btn btn-outline-danger text-nowrap" type="button" (click)="archiveCollection()">
+            Sammlung archivieren
+        </button>
+    </li>
+</ul>
 }

@@ -17,6 +17,7 @@ import { CollectionEventSender } from '../collections/collection-event-sender.js
 
 export function createCollectionsRouter(collectionService: CollectionService) {
     const router = Router();
+    router.use(isAuthenticatedMiddleware);
 
     const reqParamValidator =
         <U extends string & {}>(
@@ -96,18 +97,6 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     const adminRouter = createRoleRouter('admin');
     const editorRouter = createRoleRouter('editor');
     const viewerRouter = createRoleRouter('viewer');
-
-    router.use((req, res, next) => {
-        console.debug(
-            '[CollectionsRouter] Request received:',
-            req.method,
-            req.path,
-            'User:',
-            req.session?.user.id
-        );
-        next();
-    });
-    router.use(isAuthenticatedMiddleware);
 
     router.get('/my', async (req, res) => {
         const includeDraftState = req.query['includeDraftState'] === 'true';
@@ -408,13 +397,10 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                 'importSetVersionId'
             );
 
-            const data = await collectionService.addCollectionDependency(
-                {
-                    importTo: collectionEntityId,
-                    importFrom: importSetVersionId,
-                },
-                { throwOnDraftState: false }
-            );
+            const data = await collectionService.addCollectionDependency({
+                importTo: collectionEntityId,
+                importFrom: importSetVersionId,
+            });
 
             res.send(
                 Marketplace.Collection.Import.responseSchema.encode({
@@ -475,6 +461,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     viewerRouter.get('/:collectionEntityId/events', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 
+        // eslint-disable-next-line no-new
         new CollectionEventSender(
             req,
             res,

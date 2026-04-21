@@ -57,6 +57,7 @@ export function createVehicleParameters(
     const vehicle: Vehicle = {
         entityId: entityVersion?.entityId,
         versionId: entityVersion?.versionId,
+        usedBy: [],
         id: vehicleId,
         type: 'vehicle',
         templateId: vehicleTemplate.id,

@@ -29,6 +29,7 @@ import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Pixel } from 'ol/pixel';
+import { Immutable } from 'immer';
 import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region';
 import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region';
 import type { FeatureManager } from '../exercise-map/utility/feature-manager';
@@ -174,7 +175,7 @@ export class DragElementService {
         ];
         const position = { x, y };
         // create the element
-        let createdElement: Element | null = null;
+        let createdElement: Immutable<Element> | null = null;
         switch (this.transferringTemplate.type) {
             case 'vehicle':
                 {

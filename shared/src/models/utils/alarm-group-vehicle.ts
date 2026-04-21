@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
 import {
     elementVersionIdSchema,
     type ElementVersionId,

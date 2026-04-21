@@ -1,16 +1,18 @@
-import { IsValue } from '../../utils/validators/index.js';
+import { IsValue } from '../../utils/validators/is-value.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
-    type VersionedCollectionPartial,
-    versionedCollectionPartialSchema,
-    type CollectionEntityId,
-    collectionEntityIdSchema,
     elementDtoSchema,
     ElementDto,
-    VersionedElementContent,
-} from '../../index.js';
+} from '../../marketplace/models/versioned-elements.js';
 
+import { VersionedElementContent } from '../../marketplace/models/versioned-element-content.js';
+import {
+    collectionEntityIdSchema,
+    versionedCollectionPartialSchema,
+    type VersionedCollectionPartial,
+    type CollectionEntityId,
+} from './../../marketplace/models/versioned-id-schema.js';
 export class AddCollection implements Action {
     @IsValue('[Collection] Add Collection' as const)
     public readonly type = '[Collection] Add Collection';
@@ -39,7 +41,7 @@ export namespace CollectionReducers {
         reducer: (draftState, data) => {
             const addElement = (
                 obj: { [id: string]: any },
-                element: ElementDto
+                element: (typeof data.elements)[number]
             ) => {
                 obj[element.entityId] = {
                     ...element.content,

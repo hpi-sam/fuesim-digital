@@ -158,7 +158,8 @@ export const actionTable = pgTable(
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
 
-const stateVersionedEntity = <EntityBrand, VersionBrand>(prefix: string) => ({
+function stateVersionedEntity <EntityBrand, VersionBrand>(prefix: string) {
+  return {
     versionId: defaultPrefixedUUID(`${prefix}_version`)
         .unique()
         .notNull()
@@ -176,7 +177,8 @@ const stateVersionedEntity = <EntityBrand, VersionBrand>(prefix: string) => ({
         .$onUpdateFn(() => new Date())
         .defaultNow()
         .notNull(),
-});
+}
+}
 
 export const collectionTable = pgTable(
     'collections',

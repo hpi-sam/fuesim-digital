@@ -12,6 +12,7 @@ import { CollectionElementsListComponent } from '../../collection-elements-list/
 import { CollectionService } from '../../../../../core/exercise-element.service';
 
 @Component({
+    selector: 'app-select-collection-modal',
     templateUrl: './marketplace-select-collection-modal.component.html',
     styleUrl: './marketplace-select-collection-modal.component.scss',
     imports: [CollectionElementsListComponent, DatePipe],

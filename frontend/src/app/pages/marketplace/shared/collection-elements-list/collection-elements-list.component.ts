@@ -50,13 +50,20 @@ export class CollectionElementsListComponent {
     ]);
 
     public readonly elementsGroupedByType = computed(() =>
-        this.visibleElements().reduce<{
-            [type: string]: ElementDto[];
-        }>((acc, element) => {
-            const type = element.content.type;
-            acc[type] ??= [];
-            acc[type].push(element);
-            return acc;
-        }, {})
+        Object.fromEntries(
+            Object.entries(
+                this.visibleElements().reduce<{
+                    [type: string]: ElementDto[];
+                }>((acc, element) => {
+                    const type = element.content.type;
+                    acc[type] ??= [];
+                    acc[type].push(element);
+                    return acc;
+                }, {})
+            ).map(([type, elements]) => [
+                type,
+                elements.sort((a, b) => a.title.localeCompare(b.title)),
+            ])
+        )
     );
 }

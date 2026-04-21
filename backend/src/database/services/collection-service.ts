@@ -1240,9 +1240,6 @@ export class CollectionService {
                     return;
                 }
                 if (collectionOfDependency.versionId === collectionVersionId) {
-                    console.log(
-                        `Dependency with element version id ${dependency.versionId} is directly in the same collection version ${collectionVersionId} and is therefore NOT relevant`
-                    );
                     return;
                 }
                 relevantDependencies.push({

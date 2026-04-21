@@ -28,7 +28,6 @@ export function createVehicleParameters(
     vehiclePosition: MapCoordinates,
     entityVersion?: VersionedElementPartial
 ): VehicleParameters {
-    console.log(entityVersion);
     const materials = vehicleTemplate.materialTemplateIds
         .map((materialTemplateId: UUID) => {
             const materialTemplate = materialTemplates[materialTemplateId];

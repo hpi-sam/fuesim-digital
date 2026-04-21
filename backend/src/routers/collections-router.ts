@@ -526,8 +526,6 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             );
         }
 
-        console.log('New collection state after revert:', newCollectionState);
-
         if (!newCollectionState) {
             throw new Error('Failed to revert collection draft state');
         }

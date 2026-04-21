@@ -22,12 +22,6 @@ export class EditConflictResolutionComponent {
     public resolveConflict(
         resolution: Marketplace.Element.EditConflictResolution['strategy']
     ) {
-        console.log(
-            'Resolving conflict with strategy',
-            resolution,
-            this.data,
-            this.affectedElementVersions
-        );
         this.data.onSubmit(this.contentToBeSubmitted, {
             strategy: resolution,
             affectingElementIds: this.affectedElementVersions.map(

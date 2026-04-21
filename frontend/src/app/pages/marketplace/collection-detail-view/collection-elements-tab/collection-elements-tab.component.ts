@@ -129,8 +129,6 @@ export class CollectionElementsTabComponent {
                 );
             }
 
-            console.log(migratedPartialExport);
-
             await this.collectionService.importElements(
                 this.collectionData().collection.entityId,
                 [

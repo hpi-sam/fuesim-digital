@@ -91,7 +91,6 @@ export class UsedCollectionItemComponent {
                     .ids,
             });
         }
-        console.log({ currentCollectionDependencies });
 
         // Calculate which elements of the current collection depend
         // on changed elements of the dependency, to be able to

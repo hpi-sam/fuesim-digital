@@ -44,7 +44,6 @@ export class JoinCollectionGuard {
             );
             modal.componentInstance.collection = preview;
             const result = await firstValueFrom(modal.componentInstance.onJoin);
-            console.log({ result });
 
             if (!result) {
                 this.router.navigate(['/']);

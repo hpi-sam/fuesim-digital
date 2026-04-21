@@ -17,8 +17,6 @@ export const collectionDataResolver: ResolveFn<CollectionDataResolverResult> = (
 ) => {
     const router = inject(Router);
     const collectionService = inject(CollectionService);
-
-    console.log('Resolving collection data for route', route);
     const collectionEntityId = route.paramMap.get('collectionEntityId') ?? '';
 
     if (!isCollectionEntityId(collectionEntityId)) {
@@ -28,7 +26,6 @@ export const collectionDataResolver: ResolveFn<CollectionDataResolverResult> = (
 
     const collectionSubject =
         collectionService.subscribeToCollection(collectionEntityId);
-    console.log('got resolver', collectionSubject);
 
     return {
         subject: collectionSubject,

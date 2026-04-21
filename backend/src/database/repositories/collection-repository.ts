@@ -493,10 +493,6 @@ export class CollectionRepository extends BaseRepository {
                     )
                 );
 
-            console.log(
-                `Deleted element mappings: ${JSON.stringify(deletedElements)}`
-            );
-
             await Promise.all(
                 deletedElements.map((m) =>
                     tx
@@ -719,7 +715,7 @@ export class CollectionRepository extends BaseRepository {
             sourceCollectionVersionId
         );
 
-        await this.databaseConnection.transaction(async (tx) => {
+        return this.databaseConnection.transaction(async (tx) => {
             const inserts = [];
             for (const dependency of dependencies) {
                 inserts.push(
@@ -734,12 +730,6 @@ export class CollectionRepository extends BaseRepository {
             }
             return Promise.all(inserts);
         });
-
-        console.log(
-            await this.getCollectionVersionDirectDependencies(
-                targetCollectionVersionId
-            )
-        );
     }
 
     public async copyReferencesBetweenCollections(

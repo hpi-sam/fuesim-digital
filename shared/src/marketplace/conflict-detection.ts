@@ -51,8 +51,6 @@ export function getCollectionElementDiff(
     currentElements: ElementDto[],
     newElements: ElementDto[]
 ): ChangedElementDto[] {
-    console.log(currentElements);
-    console.log(newElements);
     const changes: ChangedElementDto[] = [];
 
     const currentElementEntityIds = new Set(
@@ -215,7 +213,6 @@ export async function dependencyTreeConflictResolution(
     }
 
     // -- LOOSE LEVEL --
-    console.log({ looseLevelCollections });
 
     const looseLevelElements: ElementDto[] = [];
 
@@ -245,8 +242,6 @@ export async function dependencyTreeConflictResolution(
             loadLooseDeps(collection)
         )
     );
-
-    console.log({ looseLevelElements });
 
     return { strictLevelCollections, groupedIds };
 }

@@ -24,7 +24,6 @@ export class ChangeImpactModalComponent {
     public readonly selectedChangeIndex = signal<number | null>(null);
 
     public selectChange(index: number) {
-        console.log('Selected change index:', index);
         this.selectedChangeIndex.set(index);
     }
 
@@ -36,13 +35,9 @@ export class ChangeImpactModalComponent {
         if (index === null) return;
 
         const selectedChange = this.changes[index];
+
         if (!selectedChange) return;
-
         if (selectedChange.type !== 'removed') return;
-
-        console.log(
-            `Setting action type for change ${selectedChange.id} to ${type}`
-        );
 
         this.changesToApply.update((current) => {
             let existingEntry = current[selectedChange.id];
@@ -55,8 +50,6 @@ export class ChangeImpactModalComponent {
             } satisfies RemoveChangeApply;
 
             existingEntry.action = type;
-
-            console.log(existingEntry);
 
             return {
                 ...current,

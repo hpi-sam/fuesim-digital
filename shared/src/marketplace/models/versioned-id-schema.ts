@@ -6,8 +6,10 @@ export const collectionEntityIdSchema = z
     .regex(/^set_entity_.+$/u)
     .brand<'SetEntityId'>();
 export type CollectionEntityId = z.infer<typeof collectionEntityIdSchema>;
-export function isCollectionEntityId (value: string | null): value is CollectionEntityId {
-  return collectionEntityIdSchema.safeParse(value).success
+export function isCollectionEntityId(
+    value: string | null
+): value is CollectionEntityId {
+    return collectionEntityIdSchema.safeParse(value).success;
 }
 
 export const collectionVersionIdSchema = z
@@ -15,8 +17,10 @@ export const collectionVersionIdSchema = z
     .regex(/^set_version_.+$/u)
     .brand<'SetVersionId'>();
 export type CollectionVersionId = z.infer<typeof collectionVersionIdSchema>;
-export function isCollectionVersionId (value: string): value is CollectionVersionId {
-  return collectionVersionIdSchema.safeParse(value).success
+export function isCollectionVersionId(
+    value: string
+): value is CollectionVersionId {
+    return collectionVersionIdSchema.safeParse(value).success;
 }
 
 export const versionedCollectionPartialSchema = z.strictObject({
@@ -33,8 +37,10 @@ export const elementEntityIdSchema = z
     .regex(/^element_entity_.+$/u)
     .brand<'ElementEntityId'>();
 export type ElementEntityId = z.infer<typeof elementEntityIdSchema>;
-export function isElementEntityId (value: string | null): value is ElementEntityId {
-  return elementEntityIdSchema.safeParse(value).success
+export function isElementEntityId(
+    value: string | null
+): value is ElementEntityId {
+    return elementEntityIdSchema.safeParse(value).success;
 }
 
 export const elementVersionIdSchema = z
@@ -42,8 +48,8 @@ export const elementVersionIdSchema = z
     .regex(/^element_version_.+$/u)
     .brand<'ElementVersionId'>();
 export type ElementVersionId = z.infer<typeof elementVersionIdSchema>;
-export function isElementVersionId (value: string): value is ElementVersionId {
-  return elementVersionIdSchema.safeParse(value).success
+export function isElementVersionId(value: string): value is ElementVersionId {
+    return elementVersionIdSchema.safeParse(value).success;
 }
 
 export const versionedElementPartialSchema = z.strictObject({

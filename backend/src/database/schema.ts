@@ -158,26 +158,26 @@ export const actionTable = pgTable(
 );
 export type ActionEntry = InferSelectModel<typeof actionTable>;
 
-function stateVersionedEntity <EntityBrand, VersionBrand>(prefix: string) {
-  return {
-    versionId: defaultPrefixedUUID(`${prefix}_version`)
-        .unique()
-        .notNull()
-        .primaryKey()
-        .$type<VersionBrand>(),
-    entityId: defaultPrefixedUUID(`${prefix}_entity`)
-        .notNull()
-        .$type<EntityBrand>(),
-    version: integer().notNull(),
-    stateVersion: integer().notNull(),
-    createdAt: timestamp({ withTimezone: true, mode: 'date' })
-        .defaultNow()
-        .notNull(),
-    editedAt: timestamp({ withTimezone: true, mode: 'date' })
-        .$onUpdateFn(() => new Date())
-        .defaultNow()
-        .notNull(),
-}
+function stateVersionedEntity<EntityBrand, VersionBrand>(prefix: string) {
+    return {
+        versionId: defaultPrefixedUUID(`${prefix}_version`)
+            .unique()
+            .notNull()
+            .primaryKey()
+            .$type<VersionBrand>(),
+        entityId: defaultPrefixedUUID(`${prefix}_entity`)
+            .notNull()
+            .$type<EntityBrand>(),
+        version: integer().notNull(),
+        stateVersion: integer().notNull(),
+        createdAt: timestamp({ withTimezone: true, mode: 'date' })
+            .defaultNow()
+            .notNull(),
+        editedAt: timestamp({ withTimezone: true, mode: 'date' })
+            .$onUpdateFn(() => new Date())
+            .defaultNow()
+            .notNull(),
+    };
 }
 
 export const collectionTable = pgTable(

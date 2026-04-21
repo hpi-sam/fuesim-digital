@@ -34,7 +34,6 @@ import { newNewPatientDataRequestedRadiogram } from '../../models/radiogram/new-
 import { newRadiogramUnpublishedStatus } from '../../models/radiogram/status/radiogram-unpublished-status.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import type { TransferCountsRadiogram } from '../../models/radiogram/transfer-counts-radiogram.js';
-import { StrictObject } from '../../utils/strict-object.js';
 import {
     addResourceDescription,
     type ResourceDescription,
@@ -409,7 +408,7 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
 
                             const expectedPatientsPerRegion =
                                 Object.fromEntries(
-                                    StrictObject.entries(
+                                    Object.entries(
                                         behaviorState.patientsExpectedInRegions
                                     ).filter(
                                         ([regionId]) =>

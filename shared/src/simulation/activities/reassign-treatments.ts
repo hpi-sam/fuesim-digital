@@ -35,7 +35,7 @@ import { newPersonnelResource } from '../../models/utils/rescue-resource.js';
 import { newResourceRequiredEvent } from '../events/resources-required.js';
 import type { PatientStatus } from '../../models/utils/patient-status.js';
 import type { Personnel } from '../../models/personnel.js';
-import { StrictObject } from '../../utils/strict-object.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
 import type { SimulationActivity } from './simulation-activity.js';
@@ -299,7 +299,7 @@ const estimatedSkDistribution = { green: 7 / 10, yellow: 2 / 10, red: 1 / 10 };
 
 // We only ever allow two patients to be treated by one personnel, except for notarzt
 const capacities = Object.fromEntries(
-    StrictObject.entries(defaultPersonnelTemplates).map(
+    Object.entries(defaultPersonnelTemplates).map(
         ([personnelType, { canCaterFor }]) => [
             personnelType,
             {
@@ -354,7 +354,7 @@ const requiresExclusivity: {
 };
 
 // Ascending priority
-const personnelTypePriorityList = StrictObject.entries(personnelPriorities)
+const personnelTypePriorityList = Object.entries(personnelPriorities)
     .sort(([typeA, priorityA], [typeB, priorityB]) => priorityA - priorityB)
     .map(([personnelType]) => personnelType);
 // Descending priority
@@ -829,7 +829,7 @@ function estimateRequiredPersonnel(
 ): ResourceDescription {
     const groupedPersonnel = groupBy(personnel, (p) => p.personnelType);
     const havePersonnel: ResourceDescription = Object.fromEntries(
-        StrictObject.keys(personnelPriorities).map((pt) => [
+        TypeAssertedObject.keys(personnelPriorities).map((pt) => [
             pt,
             groupedPersonnel[pt]?.length ?? 0,
         ])
@@ -849,7 +849,7 @@ function requiredPersonnelForPatients(
     patientCounts: ResourceDescription<TreatablePatientStatus>
 ): ResourceDescription {
     const requiredByType = Object.fromEntries(
-        StrictObject.entries(patientCounts).map(
+        TypeAssertedObject.entries(patientCounts).map(
             ([patientType, patientCount]) => [
                 patientType,
                 scaleResourceDescription(
@@ -937,7 +937,7 @@ function calculateMissingPersonnel(
         patientStatusMissingPersonnel.yellow['notarzt'] ?? 0
     );
 
-    const secured = StrictObject.values(totalMissingPersonnel).every(
+    const secured = Object.values(totalMissingPersonnel).every(
         (cnt) => cnt <= 0
     );
 
@@ -960,13 +960,13 @@ function calculateSubstitutedMissingPersonnel(
     cateringDict: { [k: string]: CateringPersonnel },
     personnelTreatments: PersonnelToPatientCategoryDict
 ): ResourceDescription {
-    const substitutions = StrictObject.entries(personnelTreatments)
+    const substitutions = Object.entries(personnelTreatments)
         .map(
             ([persId, roles]) =>
                 [cateringDict[persId]!.personnel.personnelType, roles] as const
         )
         .filter(([realPersonnelType, roles]) =>
-            StrictObject.keys(roles).some(
+            Object.keys(roles).some(
                 (personnelType) => personnelType !== realPersonnelType
             )
         )
@@ -975,7 +975,7 @@ function calculateSubstitutedMissingPersonnel(
                 personnelTypePriorityList.map((personnelType) => {
                     const role = roles[personnelType];
                     const requiredPersonnelCount = role
-                        ? StrictObject.keys(role)
+                        ? TypeAssertedObject.keys(role)
                               .map(
                                   (patientType) =>
                                       (role[patientType] ?? 0) /

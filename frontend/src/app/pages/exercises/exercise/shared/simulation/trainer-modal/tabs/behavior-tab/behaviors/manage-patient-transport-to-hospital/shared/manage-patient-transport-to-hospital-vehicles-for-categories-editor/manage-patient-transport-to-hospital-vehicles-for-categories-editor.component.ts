@@ -6,7 +6,6 @@ import type {
     PatientStatusForTransport,
     UUID,
 } from 'fuesim-digital-shared';
-import { StrictObject } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
 import {
@@ -82,7 +81,7 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
         ]).pipe(
             map(
                 ([behaviorState, vehicleTypes]) =>
-                    StrictObject.fromEntries(
+                    Object.fromEntries(
                         this.patientStatusForTransport.map(
                             (patientStatusForTransport) => [
                                 patientStatusForTransport,

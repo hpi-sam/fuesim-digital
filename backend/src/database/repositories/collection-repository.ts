@@ -5,10 +5,10 @@ import type {
     CollectionRelationshipType,
     CollectionVersionId,
     CollectionVisibility,
-    CountedCollectionDto,
     ElementDto,
     ElementEntityId,
     ElementVersionId,
+    ExtendedCollectionDto,
     Marketplace,
     VersionedElementContent,
     VersionedElementPartial,
@@ -904,13 +904,13 @@ export class CollectionRepository extends BaseRepository {
     public async getLatestCollectionForUser(
         userId: string,
         opts?: { allowDraftState?: boolean; archived?: boolean }
-    ): Promise<CountedCollectionDto[]> {
-        return this.transaction((tx) => {
+    ): Promise<ExtendedCollectionDto[]> {
+        return this.transaction(async (tx) => {
             const latestCollections = tx.latestCollections({
                 allowDraftState: opts?.allowDraftState ?? true,
             });
 
-            const result = tx.databaseConnection
+            const result = await tx.databaseConnection
                 .with(latestCollections)
                 .select(getTableColumns(collectionTable))
                 .from(collectionUserMappingTable)
@@ -932,7 +932,21 @@ export class CollectionRepository extends BaseRepository {
                     )
                 );
 
-            return result;
+            const extendedCollections = await Promise.all(
+                result.map(async (collection) => {
+                    const relationship = await tx.getUserRoleInCollection(
+                        collection.entityId,
+                        userId
+                    );
+
+                    return {
+                        ...collection,
+                        relationship: relationship!,
+                    } satisfies ExtendedCollectionDto;
+                })
+            );
+
+            return extendedCollections;
         });
     }
 

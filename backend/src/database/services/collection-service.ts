@@ -8,6 +8,7 @@ import type {
     ElementDto,
     ElementEntityId,
     ElementVersionId,
+    ExtendedCollectionDto,
     Marketplace,
     VersionedElementContent,
     VersionedElementPartial,
@@ -457,7 +458,7 @@ export class CollectionService {
     public async getLatestCollectionsForUser(
         userId: string,
         opts: { includeDraftState: boolean; archived?: boolean }
-    ) {
+    ): Promise<ExtendedCollectionDto[]> {
         return this.collectionRepository.getLatestCollectionForUser(userId, {
             allowDraftState: opts.includeDraftState,
             archived: opts.archived,

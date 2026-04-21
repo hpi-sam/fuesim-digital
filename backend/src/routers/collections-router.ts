@@ -492,7 +492,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         try {
             newCollectionState =
                 await collectionService.revertDraftState(collectionEntityId);
-        } catch (err) {
+        } catch {
             res.send(
                 Marketplace.Collection.DeleteDraftState.responseSchema.encode({
                     result: null,

@@ -1,0 +1,5 @@
+@use './../../_change-indicator-colors' as ci;
+
+.draftstate-indicator {
+    color: ci.$change-primary;
+}

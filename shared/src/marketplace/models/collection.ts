@@ -5,6 +5,7 @@ import {
     collectionEntityIdSchema,
 } from './versioned-id-schema.js';
 import { collectionVisibilitySchema } from './collection-visibility.js';
+import { collectionRelationshipTypeSchema } from './collection-relationship.js';
 
 export const collectionDtoSchema = z.object({
     ...stateVersionedEntitySchema.shape,
@@ -20,9 +21,10 @@ export const collectionDtoSchema = z.object({
 
 export type CollectionDto = z.infer<typeof collectionDtoSchema>;
 
-export const countedCollectionDtoSchema = z.object({
+export const extendedCollectionDtoSchema = z.object({
     ...collectionDtoSchema.shape,
     elementCount: z.number(),
+    relationship: collectionRelationshipTypeSchema,
 });
 
-export type CountedCollectionDto = z.infer<typeof countedCollectionDtoSchema>;
+export type ExtendedCollectionDto = z.infer<typeof extendedCollectionDtoSchema>;

@@ -8,18 +8,28 @@
     </div>
     <ul class="list-group list-group-flush">
         <li class="list-group-item">
-            Erstellt am: {{ collection().createdAt | date }}
+            <i class="bi bi-clock me-1"></i> Zuletzt bearbeitet:
+            {{ collection().editedAt | date }}
         </li>
         <li class="list-group-item">
-            Zuletzt bearbeitet: {{ collection().editedAt | date }}
-        </li>
-        <li class="list-group-item">
+            <i class="bi bi-grid me-1"></i>
             {{ collection().elementCount }} Einträge
             @if (collection().draftState) {
-                <br />
-                <div class="badge text-bg-secondary">
-                    enthält nicht aktualisierte Änderungen
-                </div>
+                <i class="bi bi-pencil-fill ms-1 draftstate-indicator"></i>
+            }
+        </li>
+        <li class="list-group-item">
+            <i class="bi bi-person-badge me-1"></i>
+            @switch (collection().relationship) {
+                @case ('admin') {
+                    Besitzer
+                }
+                @case ('editor') {
+                    Bearbeiter
+                }
+                @case ('viewer') {
+                    Betrachter
+                }
             }
         </li>
     </ul>

@@ -11,7 +11,7 @@ import { logEntrySchema } from './models/log-entry.js';
 import { stringToDate } from './models/utils/date.js';
 import {
     collectionDtoSchema,
-    countedCollectionDtoSchema,
+    extendedCollectionDtoSchema,
 } from './marketplace/models/collection.js';
 import { elementDtoSchema } from './marketplace/models/versioned-elements.js';
 import type { CollectionEntityId } from './marketplace/models/versioned-id-schema.js';
@@ -425,7 +425,7 @@ export namespace Marketplace {
 
         export const LoadMy = new Route({
             response: z.object({
-                result: z.array(countedCollectionDtoSchema),
+                result: z.array(extendedCollectionDtoSchema),
             }),
         });
 

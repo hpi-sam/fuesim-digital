@@ -1211,6 +1211,8 @@ export class CollectionService {
                 targetVersion: newCollection.versionId,
             });
 
+            await tx.saveDraftState(newCollection.entityId);
+
             return newCollection;
         });
     }

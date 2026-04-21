@@ -96,10 +96,11 @@ export class MarketplaceSetDetailComponent implements OnDestroy, OnInit {
             this.selectedCollectionData()?.collection.versionId;
         if (!selectedVersion) return;
 
-        await this.collectionService.duplicateCollection(
+        const newCollection = await this.collectionService.duplicateCollection(
             this.collection.collectionEntityId,
             selectedVersion
         );
+        this.router.navigate(['/collections/', newCollection.entityId]);
     }
 
     public async leaveCollection() {

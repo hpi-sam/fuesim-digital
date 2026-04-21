@@ -11,7 +11,7 @@ import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { isElementVersionId } from '../../index.js';
+import { isElementVersionId } from '../../marketplace/models/versioned-id-schema.js';
 import { getElement } from './utils/get-element.js';
 
 export class AddAlarmGroupAction implements Action {

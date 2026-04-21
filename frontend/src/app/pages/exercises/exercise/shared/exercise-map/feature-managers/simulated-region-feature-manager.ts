@@ -14,6 +14,7 @@ import { Fill } from 'ol/style';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
+import type { Immutable } from 'immer';
 import { SimulatedRegionPopupComponent } from '../shared/simulated-region-popup/simulated-region-popup.component';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -30,7 +31,6 @@ import {
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { PointRelativePopupHelper } from '../utility/point-relative-popup-helper';
 import { MoveableFeatureManager } from './moveable-feature-manager';
-import { Immutable } from 'immer';
 
 export class SimulatedRegionFeatureManager
     extends MoveableFeatureManager<SimulatedRegion, Polygon>

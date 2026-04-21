@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { uuidSchema } from '../utils/uuid.js';
-import { imagePropertiesSchema } from './utils/image-properties.js';
 import { versionedElementModel } from '../marketplace/models/versioned-element-model.js';
+import { imagePropertiesSchema } from './utils/image-properties.js';
 
 export const vehicleTemplateSchema = z.strictObject({
     ...versionedElementModel.partial().shape,

@@ -92,7 +92,7 @@
                 </button>
                 <div ngbDropdownMenu>
                     @for (
-                        materialTemplate of materialTemplates$ | async | values;
+                        materialTemplate of materialTemplates | values;
                         track materialTemplate.id
                     ) {
                         <button
@@ -115,7 +115,22 @@
                 materialTemplate of values().materialTemplateIds;
                 track materialTemplate;
                 let index = $index
-            ) {}
+            ) {
+                @let material = getMaterialTemplateById(materialTemplate);
+                @if (material === undefined) {
+                    <div class="alert alert-danger" role="alert">
+                        Fehler: Materialvorlage mit ID
+                        {{ materialTemplate }} nicht gefunden.
+                    </div>
+                } @else {
+                    <app-map-editor-card
+                        [title]="material.name"
+                        [imageUrl]="material.image.url"
+                        [enableDeleteButton]="!disabled()"
+                        (elementDelete)="removeMaterial($index)"
+                    />
+                }
+            }
         </div>
     } @else {
         <div class="text-muted mt-3 mb-3">Keine Materialien zugewiesen</div>
@@ -135,9 +150,7 @@
                 </button>
                 <div ngbDropdownMenu>
                     @for (
-                        personnelTemplate of personnelTemplates$
-                            | async
-                            | values;
+                        personnelTemplate of personnelTemplates | values;
                         track personnelTemplate.id
                     ) {
                         <button
@@ -160,7 +173,22 @@
                 personnelTemplate of values().personnelTemplateIds;
                 track personnelTemplate;
                 let index = $index
-            ) {}
+            ) {
+                @let personnel = getPersonnelTemplateById(personnelTemplate);
+                @if (personnel === undefined) {
+                    <div class="alert alert-danger" role="alert">
+                        Fehler: Personalvorlage mit ID
+                        {{ personnelTemplate }} nicht gefunden.
+                    </div>
+                } @else {
+                    <app-map-editor-card
+                        [title]="personnel.name"
+                        [imageUrl]="personnel.image.url"
+                        [enableDeleteButton]="!disabled()"
+                        (elementDelete)="removePersonnel($index)"
+                    />
+                }
+            }
         </div>
     } @else {
         <div class="text-muted mt-3 mb-3">Kein Personal zugewiesen</div>

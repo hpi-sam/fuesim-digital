@@ -12,20 +12,22 @@ import { stringToDate } from './models/utils/date.js';
 import {
     collectionDtoSchema,
     countedCollectionDtoSchema,
-    elementDtoSchema,
-} from './models/index.js';
-import type { CollectionEntityId } from './marketplace/index.js';
+} from './marketplace/models/collection.js';
+import { elementDtoSchema } from './marketplace/models/versioned-elements.js';
+import type { CollectionEntityId } from './marketplace/models/versioned-id-schema.js';
 import {
-    versionedElementContentSchema,
     collectionVersionIdSchema,
     elementVersionIdSchema,
     collectionEntityIdSchema,
-    collectionRelationshipTypeSchema,
-    collectionElementsDtoSchema,
-    collectionVisibilitySchema,
     elementEntityIdSchema,
+} from './marketplace/models/versioned-id-schema.js';
+import { collectionRelationshipTypeSchema } from './marketplace/models/collection-relationship.js';
+import { versionedElementContentSchema } from './marketplace/models/versioned-element-content.js';
+import {
+    collectionElementsDtoSchema,
     collectionElementsSingleSchema,
-} from './marketplace/index.js';
+} from './marketplace/models/collection-elements.js';
+import { collectionVisibilitySchema } from './marketplace/models/collection-visibility.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,

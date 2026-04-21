@@ -10,6 +10,7 @@ import type OlMap from 'ol/Map';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
+import type { Immutable } from 'immer';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -19,7 +20,6 @@ import { selectTransferLines } from '../../../../../../state/application/selecto
 import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { ElementManager } from './element-manager';
-import { Immutable } from 'immer';
 
 export class TransferLinesFeatureManager
     extends ElementManager<TransferLine, LineString>

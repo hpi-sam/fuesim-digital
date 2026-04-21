@@ -8,7 +8,6 @@ import type {
     PatientCategory,
     TechnicalChallenge,
     TechnicalChallengeTemplate,
-    Vehicle,
     VehicleTemplate,
     VersionedElementPartial,
 } from 'fuesim-digital-shared';
@@ -30,6 +29,7 @@ import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Pixel } from 'ol/pixel';
+import { Immutable } from 'immer';
 import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region';
 import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region';
 import type { FeatureManager } from '../exercise-map/utility/feature-manager';
@@ -44,7 +44,6 @@ import {
     selectCurrentTime,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
-import { Immutable, WritableDraft } from 'immer';
 
 @Injectable({
     providedIn: 'root',

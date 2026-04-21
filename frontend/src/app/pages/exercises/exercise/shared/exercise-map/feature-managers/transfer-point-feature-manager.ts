@@ -10,6 +10,7 @@ import type Point from 'ol/geom/Point';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
+import type { Immutable } from 'immer';
 import { ChooseTransferTargetPopupComponent } from '../shared/choose-transfer-target-popup/choose-transfer-target-popup.component';
 import { TransferPointPopupComponent } from '../shared/transfer-point-popup/transfer-point-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -26,7 +27,6 @@ import {
 } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
-import { Immutable } from 'immer';
 
 export class TransferPointFeatureManager extends MoveableFeatureManager<TransferPoint> {
     private readonly popupHelper = new ImagePopupHelper(this.olMap, this.layer);

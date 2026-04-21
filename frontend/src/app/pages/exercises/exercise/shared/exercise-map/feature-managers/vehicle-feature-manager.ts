@@ -13,6 +13,7 @@ import type { TranslateEvent } from 'ol/interaction/Translate';
 import type OlMap from 'ol/Map';
 import { pairwise, startWith, takeUntil, type Subject } from 'rxjs';
 import { Fill, Stroke, Style, Text as OlText } from 'ol/style';
+import type { Immutable } from 'immer';
 import { VehiclePopupComponent } from '../shared/vehicle-popup/vehicle-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
@@ -31,7 +32,6 @@ import {
 import { selectVisibleVehicles } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
-import { Immutable } from 'immer';
 
 type PossibleVehicleStatus = Exclude<PatientStatus, 'white'>;
 

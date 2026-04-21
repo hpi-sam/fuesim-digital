@@ -6,9 +6,10 @@ import {
     output,
     signal,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
 import {
     cloneDeepMutable,
+    defaultMaterialTemplatesById,
+    defaultPersonnelTemplatesById,
     uuid,
     type MaterialTemplate,
     type PersonnelTemplate,
@@ -17,7 +18,6 @@ import {
 import { cloneDeep } from 'lodash-es';
 import { WritableDraft } from 'immer';
 import { FormsModule } from '@angular/forms';
-import { AsyncPipe } from '@angular/common';
 
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -29,11 +29,7 @@ import { AutofocusDirective } from '../../../../../../shared/directives/autofocu
 import { getImageAspectRatio } from '../../../../../../shared/functions/get-image-aspect-ratio';
 import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
 import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
-import { AppState } from '../../../../../../state/app.state';
-import {
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
-} from '../../../../../../state/application/selectors/exercise.selectors';
+import { MapEditorCardComponent } from '../../../../../../shared/components/map-editor-card/map-editor-card.component';
 
 @Component({
     selector: 'app-vehicle-template-form-marketplace',
@@ -42,7 +38,7 @@ import {
         FormsModule,
         NgbDropdownModule,
         AutofocusDirective,
-        AsyncPipe,
+        MapEditorCardComponent,
         ValuesPipe,
     ],
     templateUrl: './vehicle-template-form.component.html',
@@ -52,7 +48,6 @@ export class VehicleTemplateFormMarketplaceComponent
     implements BaseVersionedElementSubmodal<VehicleTemplate>
 {
     private readonly messageService = inject(MessageService);
-    private readonly store = inject<Store<AppState>>(Store);
 
     public readonly data =
         input.required<VersionedElementModalData<VehicleTemplate>>();
@@ -75,8 +70,8 @@ export class VehicleTemplateFormMarketplaceComponent
 
     public readonly dataSubmit = output<VehicleTemplate>();
 
-    public materialTemplates$ = this.store.select(selectMaterialTemplates);
-    public personnelTemplates$ = this.store.select(selectPersonnelTemplates);
+    public materialTemplates = defaultMaterialTemplatesById;
+    public personnelTemplates = defaultPersonnelTemplatesById;
 
     constructor() {
         effect(() => {
@@ -113,6 +108,14 @@ export class VehicleTemplateFormMarketplaceComponent
                 aspectRatio,
             },
         });
+    }
+
+    public getPersonnelTemplateById(id: string) {
+        return this.personnelTemplates[id];
+    }
+
+    public getMaterialTemplateById(id: string) {
+        return this.materialTemplates[id];
     }
 
     public addPersonnel(personnelTemplate: PersonnelTemplate) {

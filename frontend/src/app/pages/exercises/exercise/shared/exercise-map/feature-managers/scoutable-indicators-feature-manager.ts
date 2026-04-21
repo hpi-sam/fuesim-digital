@@ -18,6 +18,7 @@ import {
     patientScoutableImageUrl,
 } from 'fuesim-digital-shared';
 import type { TranslateEvent } from 'ol/interaction/Translate';
+import type { Immutable } from 'immer';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { selectVisibleScoutableIndicators } from '../../../../../../state/application/selectors/shared.selectors';
 import type { AppState } from '../../../../../../state/app.state';
@@ -29,7 +30,6 @@ import { scoutableElementTypeSelectorMap } from '../../../../../../state/applica
 import type { OlMapManager } from '../utility/ol-map-manager';
 import type { MoveableFeatureManager } from './moveable-feature-manager';
 import { ElementManager } from './element-manager';
-import { Immutable } from 'immer';
 
 export class ScoutableIndicatorsFeatureManager
     extends ElementManager<ScoutableIndicator, Point>

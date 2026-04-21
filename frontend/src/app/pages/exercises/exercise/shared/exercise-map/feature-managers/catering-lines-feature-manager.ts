@@ -8,6 +8,7 @@ import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from 'fuesim-digital-shared';
+import type { Immutable } from 'immer';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { LineStyleHelper } from '../utility/style-helper/line-style-helper';
@@ -16,7 +17,6 @@ import type { CateringLine } from '../../../../../../shared/types/catering-line'
 import type { AppState } from '../../../../../../state/app.state';
 import { selectVisibleCateringLines } from '../../../../../../state/application/selectors/shared.selectors';
 import { ElementManager } from './element-manager';
-import { Immutable } from 'immer';
 
 export class CateringLinesFeatureManager
     extends ElementManager<CateringLine, LineString>

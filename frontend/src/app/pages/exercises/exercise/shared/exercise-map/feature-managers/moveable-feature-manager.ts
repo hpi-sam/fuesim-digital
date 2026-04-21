@@ -7,6 +7,7 @@ import type { Observable, Subject } from 'rxjs';
 import type { Element as StateElement, UUID } from 'fuesim-digital-shared';
 import type { FeatureLike } from 'ol/Feature';
 import type Style from 'ol/style/Style';
+import type { Immutable } from 'immer';
 import type { FeatureManager } from '../utility/feature-manager';
 import type {
     GeometryHelper,
@@ -21,7 +22,6 @@ import { selectCurrentMainRole } from '../../../../../../state/application/selec
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { PopupService } from '../utility/popup.service';
 import { ElementManager } from './element-manager';
-import { Immutable } from 'immer';
 
 /**
  * Manages the position of the element.

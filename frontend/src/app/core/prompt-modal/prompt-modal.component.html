@@ -1,0 +1,32 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ title }}</h4>
+    <button type="button" class="btn-close" (click)="confirm(null)"></button>
+</div>
+<div class="modal-body">
+    <div>{{ description }}</div>
+    <div class="mt-3">
+        <input
+            #confirmationInput="ngModel"
+            [(ngModel)]="confirmationStringValue"
+            [appAutofocus]="true"
+            class="form-control"
+            type="text"
+        />
+        <app-display-validation
+            [ngModelInput]="confirmationInput"
+        ></app-display-validation>
+    </div>
+</div>
+<div class="modal-footer">
+    <button
+        type="button"
+        class="btn btn-outline-secondary"
+        autofocus
+        (click)="confirm(false)"
+    >
+        Abbrechen
+    </button>
+    <button type="button" class="btn btn-primary" (click)="confirm(true)">
+        {{ confirmationButtonText }}
+    </button>
+</div>

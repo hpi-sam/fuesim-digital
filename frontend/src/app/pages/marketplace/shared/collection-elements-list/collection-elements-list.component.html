@@ -16,6 +16,10 @@
                         [collection]="collection()"
                         [mode]="editable() ? 'edit' : 'view'"
                         [hideVersionHistory]="!editable()"
+                        [showCreatedIndicator]="
+                            elementHasChanges()[exerciseObject.entityId] ===
+                            'create'
+                        "
                         [showChangedIndicator]="
                             elementHasChanges()[exerciseObject.entityId] ===
                             'update'

@@ -296,10 +296,11 @@ export class CollectionService {
                 });
 
                 eventBuffer.next({
-                    event: 'collection:refresh-elements',
+                    event: 'collection:refresh-data',
                     data: {
-                        draft: elements,
-                        published: elements,
+                        draftElements: elements,
+                        publishedElements: elements,
+                        publishedCollection: data,
                     },
                     collectionEntityId,
                 });
@@ -336,10 +337,10 @@ export class CollectionService {
                 });
 
                 eventBuffer.next({
-                    event: 'collection:refresh-elements',
+                    event: 'collection:refresh-data',
                     data: {
-                        draft: elements,
-                        published: elements,
+                        draftElements: elements,
+                        publishedElements: elements,
                     },
                     collectionEntityId,
                 });

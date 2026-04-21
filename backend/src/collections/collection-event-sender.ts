@@ -167,6 +167,7 @@ export class CollectionEventSender {
                     collection: latestDraftStateVersion,
                     elements: draftStateElements,
                     userRelationship,
+                    publishedCollection: latestPubishedVersion,
                     publishedElements,
                 },
             })

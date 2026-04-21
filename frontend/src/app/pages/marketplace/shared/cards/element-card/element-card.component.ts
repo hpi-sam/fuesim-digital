@@ -32,6 +32,7 @@ export class ElementCardComponent {
     >('static');
     public readonly hideVersionHistory = input<boolean>(false);
     public readonly showChangedIndicator = input<boolean>(false);
+    public readonly showCreatedIndicator = input<boolean>(false);
     public readonly showAsGhost = input<boolean>(false);
 
     public openEditor() {

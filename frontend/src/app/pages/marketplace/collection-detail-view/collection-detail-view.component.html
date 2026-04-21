@@ -8,7 +8,19 @@
     </a>
     @if (selectedCollectionData(); as collectionData) {
         <div class="d-flex flex-row justify-content-between container w-100">
-            <h2>{{ collectionData.collection.title }}</h2>
+            <h2>
+                {{ collectionData.collection.title }}
+                @if (
+                    collectionData.collection.title !==
+                    collectionData.publishedCollection.title
+                ) {
+                    <s class="text-danger"
+                        ><span class="text-secondary">{{
+                            collectionData.publishedCollection.title
+                        }}</span></s
+                    >
+                }
+            </h2>
 
             <div class="d-flex flex-row gap-2 align-items-center">
                 <button
@@ -35,17 +47,31 @@
         <div
             class="d-flex flex-row justify-content-between align-items-center container w-100 mb-3"
         >
-            <div class="d-flex flex-column gap-1">
-                <span class="text-muted">
-                    Version {{ collectionData.collection.version }} &middot;
-                    Erstellungsdatum:
-                    {{ collectionData.collection.createdAt | date }} &middot;
-                    {{ collectionData.objects.direct.length }}
-                    Einträge
+            <div class="d-flex flex-column text-muted">
+                <span>
+                    <i class="bi bi-grid"></i>
+                    {{ collectionData.objects.direct.length }} Einträge
                 </span>
-                <span
-                    class="text-muted d-flex flex-row gap-1 align-items-center"
-                >
+                @if (collectionData.collection.draftState) {
+                    <span>
+                        <i class="bi bi-pencil"></i>
+                        In Bearbeitung: Version
+                        {{ collectionData.collection.version }} &middot; Zuletzt
+                        bearbeitet:
+                        {{ collectionData.collection.editedAt | date }}
+                    </span>
+                }
+                <span>
+                    <i class="bi bi-globe2"></i>
+                    @if (collectionData.collection.draftState) {
+                        Zuletzt Veröffentlicht:
+                    }
+                    Version
+                    {{ collectionData.publishedCollection.version }} &middot;
+                    Zuletzt veröffentlicht:
+                    {{ collectionData.publishedCollection.editedAt | date }}
+                </span>
+                <span class="d-flex flex-row gap-1 align-items-center">
                     @if (collectionData.objects.imported.length > 0) {
                         Verwendete Sammlungen:
                         @for (

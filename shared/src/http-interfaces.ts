@@ -547,6 +547,7 @@ export namespace Marketplace {
                 z.object({
                     collection: collectionDtoSchema,
                     elements: collectionElementsDtoSchema,
+                    publishedCollection: collectionDtoSchema,
                     publishedElements: collectionElementsDtoSchema,
                     userRelationship: collectionRelationshipTypeSchema,
                 })
@@ -574,17 +575,19 @@ export namespace Marketplace {
                 collectionDtoSchema
             );
 
-            export const CollectionRefreshElements = defineEvent(
-                'collection:refresh-elements',
+            export const CollectionRefreshData = defineEvent(
+                'collection:refresh-data',
                 z.object({
-                    draft: collectionElementsDtoSchema.optional(),
-                    published: collectionElementsDtoSchema.optional(),
+                    draftElements: collectionElementsDtoSchema.optional(),
+                    publishedElements: collectionElementsDtoSchema.optional(),
+                    draftCollection: collectionDtoSchema.optional(),
+                    publishedCollection: collectionDtoSchema.optional(),
                 })
             );
 
             export const SSEvent = new TypedSchema(
                 z.union([
-                    CollectionRefreshElements.schema,
+                    CollectionRefreshData.schema,
                     CollectionUpdate.schema,
                     DependencyChange.schema,
                     DependencyReplaceData.schema,

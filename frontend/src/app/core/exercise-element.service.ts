@@ -20,6 +20,7 @@ import { MessageService } from './messages/message.service';
 export interface CollectionSubscriptionData {
     collection: CollectionDto;
     objects: CollectionElementsDto;
+    publishedCollection: CollectionDto;
     publishedElements: CollectionElementsDto;
     ownRole: CollectionRelationshipType;
 }
@@ -60,6 +61,8 @@ export class CollectionService {
                     subject.next({
                         collection: changeEvent.data.collection,
                         objects: changeEvent.data.elements,
+                        publishedCollection:
+                            changeEvent.data.publishedCollection,
                         publishedElements: changeEvent.data.publishedElements,
                         ownRole: changeEvent.data.userRelationship,
                     });
@@ -148,15 +151,23 @@ export class CollectionService {
                     subject.next(newValue);
                     break;
                 }
-                case 'collection:refresh-elements': {
+                case 'collection:refresh-data': {
                     const currentValue = subject.getValue();
                     if (!currentValue) return;
                     const newValue = {
                         ...currentValue,
                         publishedElements:
-                            changeEvent.data.published ??
+                            changeEvent.data.publishedElements ??
                             currentValue.publishedElements,
-                        objects: changeEvent.data.draft ?? currentValue.objects,
+                        objects:
+                            changeEvent.data.draftElements ??
+                            currentValue.objects,
+                        collection:
+                            changeEvent.data.draftCollection ??
+                            currentValue.collection,
+                        publishedCollection:
+                            changeEvent.data.publishedCollection ??
+                            currentValue.publishedCollection,
                     } satisfies CollectionSubscriptionData;
                     subject.next(newValue);
                     break;

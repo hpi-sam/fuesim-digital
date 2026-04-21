@@ -11,6 +11,5 @@
     $opacity: 0.67;
     opacity: $opacity;
     border-color: rgba(ci.$change-deleted, $opacity);
-    border-width: map.get(bootstrap.$border-widths, 2);
     border-style: dashed;
 }

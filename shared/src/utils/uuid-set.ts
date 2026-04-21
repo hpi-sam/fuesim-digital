@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import { z } from 'zod';
 import { uuidSchema } from './uuid.js';
 
 export const uuidSetSchema = z.record(uuidSchema, z.literal(true));

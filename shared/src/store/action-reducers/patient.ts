@@ -1,39 +1,40 @@
-import { IsBoolean, IsString, IsUUID, MaxLength } from 'class-validator';
 import { WritableDraft } from 'immer';
-import { type Patient, patientSchema } from '../../models/patient.js';
-import {
-    newMapPositionAt,
-    type PatientStatus,
-    isOnMap,
-    type MapCoordinates,
-    currentSimulatedRegionIdOf,
-    currentCoordinatesOf,
-    isInSimulatedRegion,
-    currentSimulatedRegionOf,
-    mapCoordinatesSchema,
-    patientStatusSchema,
-} from '../../models/index.js';
+import { IsBoolean, IsString, IsUUID, MaxLength } from 'class-validator';
+import type { Action, ActionReducer } from '../action-reducer.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { ReducerError } from '../reducer-error.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import {
-    cloneDeepMutable,
-    StrictObject,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
-import { PatientRemovedEvent } from '../../simulation/index.js';
+    currentCoordinatesOf,
+    currentSimulatedRegionIdOf,
+    currentSimulatedRegionOf,
+    isInSimulatedRegion,
+    isOnMap,
+} from '../../models/utils/position/position-helpers.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
+import { newPatientRemovedEvent } from '../../simulation/events/patient-removed.js';
+import type { ExerciseState } from '../../state.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type Patient, patientSchema } from '../../models/patient.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { updateTreatments } from './utils/calculate-treatments.js';
-import { getElement } from './utils/index.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import {
+    type PatientStatus,
+    patientStatusSchema,
+} from '../../models/utils/patient-status.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
+import { updateTreatments } from './utils/calculate-treatments.js';
 import { logPatientAdded, logPatientRemoved } from './utils/log.js';
+import { getElement } from './utils/get-element.js';
 
 /**
  * Performs all necessary actions to remove a patient from the state.
@@ -47,10 +48,7 @@ export function deletePatient(
     const patient = getElement(draftState, 'patient', patientId);
     if (isInSimulatedRegion(patient)) {
         const simulatedRegion = currentSimulatedRegionOf(draftState, patient);
-        sendSimulationEvent(
-            simulatedRegion,
-            PatientRemovedEvent.create(patientId)
-        );
+        sendSimulationEvent(simulatedRegion, newPatientRemovedEvent(patientId));
     }
     removeElementPosition(draftState, 'patient', patientId);
     delete draftState.patients[patientId];
@@ -233,7 +231,7 @@ export namespace PatientActionReducers {
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    PatientRemovedEvent.create(patientId)
+                    newPatientRemovedEvent(patientId)
                 );
 
                 const coordinates = cloneDeepMutable(
@@ -269,7 +267,7 @@ export namespace PatientActionReducers {
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    PatientRemovedEvent.create(patientId)
+                    newPatientRemovedEvent(patientId)
                 );
             }
             logPatientRemoved(draftState, patientId);

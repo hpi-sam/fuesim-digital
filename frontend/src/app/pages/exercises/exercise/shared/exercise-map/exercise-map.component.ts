@@ -1,9 +1,10 @@
-import type { AfterViewInit, OnDestroy } from '@angular/core';
+import { type AfterViewInit, type OnDestroy } from '@angular/core';
 import {
     Component,
     ElementRef,
     ViewContainerRef,
     inject,
+    signal,
     viewChild,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -83,7 +84,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
         this.openLayersContainer().nativeElement.addEventListener(
             'fullscreenchange',
             (event) => {
-                this.fullscreenEnabled = document.fullscreenElement !== null;
+                this.fullscreenEnabled.set(document.fullscreenElement !== null);
             }
         );
 
@@ -96,9 +97,9 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    public fullscreenEnabled = false;
+    public readonly fullscreenEnabled = signal(false);
     public toggleFullscreen() {
-        if (!this.fullscreenEnabled) {
+        if (!this.fullscreenEnabled()) {
             this.openLayersContainer().nativeElement.requestFullscreen();
         } else {
             document.exitFullscreen();

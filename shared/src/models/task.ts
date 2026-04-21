@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuidSchema } from '../utils/index.js';
+import { uuidSchema } from '../utils/uuid.js';
 
 export const taskSchema = z.object({
     id: uuidSchema,

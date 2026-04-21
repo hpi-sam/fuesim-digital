@@ -1,10 +1,17 @@
 import { IsString, IsUUID } from 'class-validator';
 import { WritableDraft } from 'immer';
 import {
-    newMapPositionAt,
-    type ExerciseOccupation,
-    exerciseOccupationSchema,
-    changeOccupation,
+    changePosition,
+    changePositionWithId,
+} from '../../models/utils/position/position-helpers-mutable.js';
+import type { ExerciseState } from '../../state.js';
+import type { Action, ActionReducer } from '../action-reducer.js';
+import { ReducerError } from '../reducer-error.js';
+import { sendSimulationEvent } from '../../simulation/events/utils.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { newNoPosition } from '../../models/utils/position/no-position.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
     currentCoordinatesOf,
     currentSimulatedRegionIdOf,
     currentSimulatedRegionOf,
@@ -13,42 +20,37 @@ import {
     isInTransfer,
     isInVehicle,
     isOnMap,
-    type MapCoordinates,
+} from '../../models/utils/position/position-helpers.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import {
     type VehicleParameters,
-    mapCoordinatesSchema,
-    newVehiclePositionIn,
-    newSimulatedRegionPositionIn,
     vehicleParametersSchema,
-} from '../../models/index.js';
+} from '../../models/utils/vehicle-parameters.js';
 import {
-    changePosition,
-    changePositionWithId,
-} from '../../models/utils/position/position-helpers-mutable.js';
-import type { ExerciseState } from '../../state.js';
-import { imageSizeToPosition } from '../../state-helpers/index.js';
-import type { UUID } from '../../utils/index.js';
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
 import {
-    cloneDeepMutable,
-    StrictObject,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
-import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import {
-    MaterialAvailableEvent,
-    MaterialRemovedEvent,
-    NewPatientEvent,
-    PersonnelAvailableEvent,
-    PersonnelRemovedEvent,
-    VehicleRemovedEvent,
-} from '../../simulation/index.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { newNoPosition } from '../../models/utils/position/no-position.js';
+    type ExerciseOccupation,
+    exerciseOccupationSchema,
+} from '../../models/utils/occupations/exercise-occupation.js';
+import { newVehiclePositionIn } from '../../models/utils/position/vehicle-position.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { imageSizeToPosition } from '../../state-helpers/image-size-to-position.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { changeOccupation } from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newMaterialRemovedEvent } from '../../simulation/events/material-removed.js';
+import { newPersonnelRemovedEvent } from '../../simulation/events/personnel-removed.js';
+import { newVehicleRemovedEvent } from '../../simulation/events/vehicle-removed.js';
+import { newNewPatientEvent } from '../../simulation/events/new-patient.js';
+import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
+import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
+import { StrictObject } from '../../utils/strict-object.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getElement } from './utils/get-element.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
-import { getElement } from './utils/index.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
 import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
 import { checkRestrictedVehicleMovementOrThrow } from './utils/restricted-vehicle-movement.js';
@@ -77,7 +79,7 @@ export function deleteVehicle(
             );
             sendSimulationEvent(
                 simulatedRegion,
-                MaterialRemovedEvent.create(materialId)
+                newMaterialRemovedEvent(materialId)
             );
         }
 
@@ -94,7 +96,7 @@ export function deleteVehicle(
             );
             sendSimulationEvent(
                 simulatedRegion,
-                PersonnelRemovedEvent.create(personnelId)
+                newPersonnelRemovedEvent(personnelId)
             );
         }
 
@@ -120,10 +122,7 @@ export function deleteVehicle(
 
     if (isInSimulatedRegion(vehicle)) {
         const simulatedRegion = currentSimulatedRegionOf(draftState, vehicle);
-        sendSimulationEvent(
-            simulatedRegion,
-            VehicleRemovedEvent.create(vehicleId)
-        );
+        sendSimulationEvent(simulatedRegion, newVehicleRemovedEvent(vehicleId));
     }
 
     // Delete the vehicle
@@ -418,7 +417,7 @@ export namespace VehicleActionReducers {
                     );
                     sendSimulationEvent(
                         simulatedRegion,
-                        NewPatientEvent.create(patientId)
+                        newNewPatientEvent(patientId)
                     );
                     delete vehicle.patientIds[patientId];
                 }
@@ -439,7 +438,7 @@ export namespace VehicleActionReducers {
                         );
                         sendSimulationEvent(
                             simulatedRegion,
-                            PersonnelAvailableEvent.create(personnelId)
+                            newPersonnelAvailableEvent(personnelId)
                         );
                     }
                 }
@@ -459,7 +458,7 @@ export namespace VehicleActionReducers {
                         );
                         sendSimulationEvent(
                             simulatedRegion,
-                            MaterialAvailableEvent.create(materialId)
+                            newMaterialAvailableEvent(materialId)
                         );
                     }
                 }
@@ -580,7 +579,7 @@ export namespace VehicleActionReducers {
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    VehicleRemovedEvent.create(vehicleId)
+                    newVehicleRemovedEvent(vehicleId)
                 );
 
                 const coordinates = cloneDeepMutable(

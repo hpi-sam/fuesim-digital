@@ -1,4 +1,4 @@
-import type { Action } from '../store/index.js';
+import type { Action } from '../store/action-reducer.js';
 import type { Migration } from './migration-functions.js';
 
 export const removeSetParticipantIdAction4: Migration = {

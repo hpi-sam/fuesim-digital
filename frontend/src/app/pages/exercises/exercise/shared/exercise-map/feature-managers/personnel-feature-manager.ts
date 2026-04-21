@@ -159,7 +159,6 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
     private trackWorkingPersonnel($destroy: Observable<void>) {
         this.store
             .select(selectWorkingPersonnel)
-
             .pipe(takeUntil($destroy))
             .subscribe((workingPersonnel) => {
                 this.workingPersonnel = workingPersonnel;

@@ -1,12 +1,13 @@
 import { z } from 'zod';
 import type { WritableDraft } from 'immer';
-import type { UUID } from '../../utils/index.js';
-import { uuid, uuidSchema } from '../../utils/index.js';
+import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import type { ExerciseState } from '../../state.js';
 import { taskSchema } from '../task.js';
-import type { ImageProperties } from '../utils/index.js';
-import { imagePropertiesSchema } from '../utils/index.js';
-import { getElement } from '../../store/action-reducers/utils/index.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from '../utils/image-properties.js';
+import { getElement } from '../../store/action-reducers/utils/get-element.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,

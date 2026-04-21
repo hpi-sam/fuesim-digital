@@ -1,7 +1,9 @@
-import type { Client } from '../models/index.js';
 import type { ExerciseState } from '../state.js';
-import type { ExerciseAction } from './action-reducers/index.js';
-import { lookupReducerFor } from './action-reducers/index.js';
+import type { Client } from '../models/client.js';
+import {
+    type ExerciseAction,
+    lookupReducerFor,
+} from './action-reducers/action-reducers.js';
 
 /**
  *

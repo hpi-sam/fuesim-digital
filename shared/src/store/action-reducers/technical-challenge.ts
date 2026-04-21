@@ -1,23 +1,21 @@
 import { z } from 'zod';
-import type { ActionReducer } from '../../index.js';
-import {
-    cloneDeepMutable,
-    lookupReducerFor,
-    currentStateOf,
-    ReducerError,
-    taskSchema,
-    getElement,
-    sizeSchema,
-    technicalChallengeIdSchema,
-    newMapPositionAt,
-    uuidSchema,
-    mapCoordinatesSchema,
-} from '../../index.js';
-import {
-    technicalChallengeSchema,
-    personnelSchema,
-} from '../../models/index.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
+import { personnelSchema } from '../../models/personnel.js';
+import type { ActionReducer } from '../action-reducer.js';
+import { uuidSchema } from '../../utils/uuid.js';
+import { mapCoordinatesSchema } from '../../models/utils/position/map-coordinates.js';
+import {
+    technicalChallengeIdSchema,
+    technicalChallengeSchema,
+} from '../../models/technical-challenge/technical-challenge.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { sizeSchema } from '../../models/utils/size.js';
+import { ReducerError } from '../reducer-error.js';
+import { currentStateOf } from '../../models/technical-challenge/state-machine.js';
+import { taskSchema } from '../../models/task.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getElement } from './utils/get-element.js';
+import { lookupReducerFor } from './action-reducers.js';
 
 const createTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Create technical challenge'),

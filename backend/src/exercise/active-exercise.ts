@@ -5,15 +5,24 @@ import type {
     ExerciseKey,
     ParticipantKey,
     TrainerKey,
-    ExerciseState,
 } from 'fuesim-digital-shared';
-import { reduceExerciseState } from 'fuesim-digital-shared';
+import {
+    ExerciseState,
+    validateExerciseState,
+    applyAction,
+    cloneDeepMutable,
+    reduceExerciseState,
+    ReducerError,
+    validateExerciseAction,
+} from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type {
     ExerciseEntry,
     ExerciseTemplateEntry,
 } from '../database/schema.js';
 import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
+import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
+import { RestoreError } from '../utils/restore-error.js';
 import { ActionWrapper } from './action-wrapper.js';
 import type { ExerciseClientWrapper } from './client-wrapper.js';
 import { patientTick } from './patient-ticking.js';
@@ -267,5 +276,95 @@ export class ActiveExercise {
         this.clients.forEach((clientWrapper) => clientWrapper.disconnect());
         // Pause the exercise to stop the tick
         this.pause();
+    }
+
+    private validateAction(action: ExerciseAction) {
+        const errors = validateExerciseAction(action);
+        if (errors.length > 0) {
+            throw new ValidationErrorWrapper(errors);
+        }
+    }
+
+    public restore(keepActions: boolean): void {
+        // Check State Version
+        if (this.exercise.stateVersion !== ExerciseState.currentStateVersion) {
+            throw new RestoreError(
+                `The exercise was created with an incompatible version of the state (got version ${this.exercise.stateVersion}, required version ${ExerciseState.currentStateVersion})`,
+                this.exercise.id
+            );
+        }
+
+        // Validate initial state
+        const errors = validateExerciseState(this.exercise.initialStateString);
+        if (errors.length > 0) {
+            throw new ValidationErrorWrapper(errors);
+        }
+
+        this.restoreState(keepActions);
+    }
+
+    /**
+     * @param keepActions This indicates whether to keep the actions that were applied while restoring in the array (when `true`) or to remove them (when `false` and when the database gets used)
+     * Recreates the {@link currentState} by applying all actions from {@link temporaryActionHistory} to the {@link initialState}
+     * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
+     */
+    private restoreState(keepActions: boolean) {
+        // TODO: switch to use cloneDeep() and then produce()
+        let currentState = cloneDeepMutable(this.exercise.initialStateString);
+
+        this.temporaryActionHistory.forEach((actionWrapper) => {
+            this.validateAction(actionWrapper.getAction().actionString);
+            try {
+                currentState = applyAction(
+                    currentState,
+                    actionWrapper.getAction().actionString
+                );
+            } catch (e: unknown) {
+                if (e instanceof ReducerError) {
+                    throw new RestoreError(
+                        `A reducer error occurred while restoring (Action ${
+                            actionWrapper.getAction().index
+                        }: \`${JSON.stringify(actionWrapper.getAction().actionString)}\`)`,
+                        this.exercise.id,
+                        e
+                    );
+                }
+                throw e;
+            }
+        });
+        this.exercise.currentStateString = currentState;
+        this.incrementIdGenerator.setCurrent(
+            this.temporaryActionHistory.length
+        );
+        if (!keepActions) {
+            // Remove all actions to not save them again in the database
+            this.temporaryActionHistory.splice(
+                0,
+                this.temporaryActionHistory.length
+            );
+        }
+        // Pause exercise
+        if (this.exercise.currentStateString.currentStatus === 'running')
+            this.reduce(
+                {
+                    type: '[Exercise] Pause',
+                },
+                // Exercise emitter Id is always null
+                null
+            );
+        // Remove all clients from state
+        Object.values(this.exercise.currentStateString.clients).forEach(
+            (client) => {
+                const removeClientAction: ExerciseAction = {
+                    type: '[Client] Remove client',
+                    clientId: client.id,
+                };
+                this.reduce(
+                    removeClientAction,
+                    // Exercise emitterId is always null
+                    null
+                );
+            }
+        );
     }
 }

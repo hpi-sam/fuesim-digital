@@ -2,24 +2,25 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseState,
     ImageProperties,
+    SimulatedRegion,
 } from 'fuesim-digital-shared';
 import {
-    TransferToHospitalBehaviorState,
-    ManagePatientTransportToHospitalBehaviorState,
-    TransferBehaviorState,
+    newAssignLeaderBehaviorState,
+    newReportBehaviorState,
+    newUnloadArrivingVehiclesBehaviorState,
+    newTreatPatientsBehaviorState,
+    newProvidePersonnelBehaviorState,
+    newRequestBehaviorState,
+    newTransferBehaviorState,
+    newTransferToHospitalBehaviorState,
+    newAnswerRequestsBehaviorState,
+    newAutomaticallyDistributeVehiclesBehaviorState,
     cloneDeepMutable,
-    SimulatedRegion,
     uuid,
-    AnswerRequestsBehaviorState,
-    AssignLeaderBehaviorState,
-    AutomaticallyDistributeVehiclesBehaviorState,
-    ProvidePersonnelBehaviorState,
-    ReportBehaviorState,
-    RequestBehaviorState,
-    TreatPatientsBehaviorState,
-    UnloadArrivingVehiclesBehaviorState,
     StrictObject,
     newNoPosition,
+    simulatedRegionImage,
+    newManagePatientTransportToHospitalBehaviorState,
 } from 'fuesim-digital-shared';
 import type { WritableDraft } from 'immer';
 import { toUtf8Base64 } from './utils/base64';
@@ -30,8 +31,8 @@ export interface SimulatedRegionDragTemplate {
     stereotype: SimulatedRegion;
 }
 
-const height = SimulatedRegion.image.height / 23.5;
-const width = height * SimulatedRegion.image.aspectRatio;
+const height = simulatedRegionImage.height / 23.5;
+const width = height * simulatedRegionImage.aspectRatio;
 const size = {
     height,
     width,
@@ -46,14 +47,14 @@ const stereotypes: SimulatedRegion[] = [
         borderColor: '#cc0000',
         activities: {},
         behaviors: [
-            AssignLeaderBehaviorState.create(),
-            ReportBehaviorState.create(),
-            UnloadArrivingVehiclesBehaviorState.create(),
-            TreatPatientsBehaviorState.create(),
-            ProvidePersonnelBehaviorState.create(),
-            RequestBehaviorState.create(),
-            TransferBehaviorState.create(),
-            TransferToHospitalBehaviorState.create(),
+            newAssignLeaderBehaviorState(),
+            newReportBehaviorState(),
+            newUnloadArrivingVehiclesBehaviorState(),
+            newTreatPatientsBehaviorState(),
+            newProvidePersonnelBehaviorState(),
+            newRequestBehaviorState(),
+            newTransferBehaviorState(),
+            newTransferToHospitalBehaviorState(),
         ],
         inEvents: [],
         position,
@@ -66,11 +67,11 @@ const stereotypes: SimulatedRegion[] = [
         borderColor: '#00cc00',
         activities: {},
         behaviors: [
-            AssignLeaderBehaviorState.create(),
-            ReportBehaviorState.create(),
-            TransferBehaviorState.create(),
-            AnswerRequestsBehaviorState.create(),
-            AutomaticallyDistributeVehiclesBehaviorState.create(),
+            newAssignLeaderBehaviorState(),
+            newReportBehaviorState(),
+            newTransferBehaviorState(),
+            newAnswerRequestsBehaviorState(),
+            newAutomaticallyDistributeVehiclesBehaviorState(),
         ],
         inEvents: [],
         position,
@@ -83,9 +84,9 @@ const stereotypes: SimulatedRegion[] = [
         borderColor: '#0000cc',
         activities: {},
         behaviors: [
-            AssignLeaderBehaviorState.create(),
-            ReportBehaviorState.create(),
-            ManagePatientTransportToHospitalBehaviorState.create(),
+            newAssignLeaderBehaviorState(),
+            newReportBehaviorState(),
+            newManagePatientTransportToHospitalBehaviorState(),
         ],
         inEvents: [],
         position,
@@ -97,10 +98,7 @@ const stereotypes: SimulatedRegion[] = [
         name: 'Generische Simulation ???',
         borderColor: '#cccc00',
         activities: {},
-        behaviors: [
-            AssignLeaderBehaviorState.create(),
-            ReportBehaviorState.create(),
-        ],
+        behaviors: [newAssignLeaderBehaviorState(), newReportBehaviorState()],
         inEvents: [],
         position,
         size,
@@ -125,7 +123,7 @@ function coloredImageUrl(borderColor: string): ImageProperties {
     `;
     const url = `data:image/svg+xml;base64,${toUtf8Base64(content)}`;
     return {
-        ...SimulatedRegion.image,
+        ...simulatedRegionImage,
         url,
     };
 }

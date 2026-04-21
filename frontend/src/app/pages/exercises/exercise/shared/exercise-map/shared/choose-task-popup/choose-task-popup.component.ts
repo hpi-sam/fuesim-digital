@@ -9,7 +9,7 @@ import { createSelectAvailableTasks } from '../../../../../../../state/applicati
     selector: 'app-choose-task-popup',
     imports: [],
     templateUrl: './choose-task-popup.component.html',
-    styleUrl: './choose-task-popup.component.scss',
+    styleUrl: '../chooser-popup.scss',
 })
 export class ChooseTaskPopupComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
@@ -28,7 +28,7 @@ export class ChooseTaskPopupComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // @ts-expect-error deferred initialization
+        // @ts-expect-error deferred initialization, depends on technicalChallengeId
         this.availableTasks = this.store.selectSignal(
             createSelectAvailableTasks(this.technicalChallengeId)
         );

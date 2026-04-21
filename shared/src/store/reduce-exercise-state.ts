@@ -1,8 +1,10 @@
 import type { WritableDraft } from 'immer';
 import { freeze, produce } from 'immer';
 import type { ExerciseState } from '../state.js';
-import type { ExerciseAction } from './action-reducers/index.js';
-import { lookupReducerFor } from './action-reducers/index.js';
+import {
+    type ExerciseAction,
+    lookupReducerFor,
+} from './action-reducers/action-reducers.js';
 
 /**
  * A pure reducer function that applies the action on the state without mutating it.

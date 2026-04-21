@@ -1,23 +1,21 @@
 import { IsString, IsUUID } from 'class-validator';
 import {
-    type MapCoordinates,
-    type Size,
-    newMapPositionAt,
-    type Viewport,
-    mapCoordinatesSchema,
-    sizeSchema,
-} from '../../models/index.js';
-import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { viewportSchema } from '../../models/viewport.js';
-import { getElement } from './utils/index.js';
+import { type Viewport, viewportSchema } from '../../models/viewport.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { type Size, sizeSchema } from '../../models/utils/size.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { getElement } from './utils/get-element.js';
 
 export class AddViewportAction implements Action {
     @IsValue('[Viewport] Add viewport' as const)

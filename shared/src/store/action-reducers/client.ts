@@ -1,15 +1,15 @@
 import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 import { type Client, clientSchema } from '../../models/client.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import {
     type SpecificRole,
     specificRoleSchema,
 } from '../../models/utils/role.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { getElement } from './utils/index.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getElement } from './utils/get-element.js';
 
 export class AddClientAction implements Action {
     @IsValue('[Client] Add client' as const)

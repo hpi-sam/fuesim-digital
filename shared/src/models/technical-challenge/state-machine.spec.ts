@@ -2,18 +2,18 @@ import type { Immutable, WritableDraft } from 'immer';
 import { produce } from 'immer';
 import type { ParticipantKey } from '../../exercise-keys.js';
 import { ExerciseState } from '../../state.js';
-import { getDefaultTechnicalChallengeTemplate } from '../../data/index.js';
-import { StateMachineTesting } from '../../data/default-state/tmp-default-technical-challenge.js';
-import { lookupReducerFor } from '../../store/index.js';
+import {
+    getDefaultTechnicalChallengeTemplate,
+    StateMachineTesting,
+} from '../../data/default-state/tmp-default-technical-challenge.js';
 import { newPersonnelFromTemplate } from '../personnel.js';
 import { defaultPersonnelTemplates } from '../../data/default-state/personnel-templates.js';
-import { uuid } from '../../utils/index.js';
-import {
-    currentCoordinatesOf,
-    newMapCoordinatesAt,
-    newMapPositionAt,
-    newNoPosition,
-} from '../utils/index.js';
+import { lookupReducerFor } from '../../store/action-reducers/action-reducers.js';
+import { newMapPositionAt } from '../utils/position/map-position.js';
+import { newNoPosition } from '../utils/position/no-position.js';
+import { currentCoordinatesOf } from '../utils/position/position-helpers.js';
+import { newMapCoordinatesAt } from '../utils/position/map-coordinates.js';
+import { uuid } from '../../utils/uuid.js';
 import { newTechnicalChallengeFromTemplate } from './technical-challenge-template.js';
 
 const tickInterval = 1000;

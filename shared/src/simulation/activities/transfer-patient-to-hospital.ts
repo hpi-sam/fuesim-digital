@@ -1,67 +1,49 @@
-import { IsUUID } from 'class-validator';
-import {
-    changeOccupation,
-    getCreate,
-    newIntermediateOccupation,
-} from '../../models/index.js';
-import type { UUID, UUIDSet } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsUUIDSet, IsValue } from '../../utils/validators/index.js';
+import { z } from 'zod';
 import { sendSimulationEvent } from '../events/utils.js';
-import {
-    PatientTransferToHospitalSuccessfulEvent,
-    TransferPatientsInSpecificVehicleRequestEvent,
-} from '../events/index.js';
-import { catchAllHospitalId } from '../../data/index.js';
+import { getPatientVisibleStatus } from '../../models/patient.js';
+import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import {
     getElement,
     tryGetElement,
-} from '../../store/action-reducers/utils/index.js';
-import { getPatientVisibleStatus } from '../../models/patient.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+} from '../../store/action-reducers/utils/get-element.js';
+import { changeOccupation } from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newIntermediateOccupation } from '../../models/utils/occupations/intermediate-occupation.js';
+import { newTransferPatientsInSpecificVehicleRequestEvent } from '../events/transfer-patients-in-specific-vehicle-request.js';
+import { catchAllHospitalId } from '../../data/default-state/catch-all-hospital.js';
+import { newPatientTransferToHospitalSuccessfulEvent } from '../events/patient-transfer-to-hospital-successful.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
-export class TransferPatientToHospitalActivityState
-    implements SimulationActivityState
-{
-    @IsValue('transferPatientToHospitalActivity' as const)
-    public readonly type = 'transferPatientToHospitalActivity';
+export const transferPatientToHospitalActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('transferPatientToHospitalActivity'),
+    patientIds: uuidSetSchema,
+    vehicleId: uuidSchema,
+    transferManagementRegionId: uuidSchema,
+});
+export type TransferPatientToHospitalActivityState = z.infer<
+    typeof transferPatientToHospitalActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    @IsUUIDSet()
-    public readonly patientIds: UUIDSet;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferManagementRegionId: UUID;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        patientIds: UUIDSet,
-        vehicleId: UUID,
-        transferManagementRegionId: UUID
-    ) {
-        this.id = id;
-        this.patientIds = patientIds;
-        this.vehicleId = vehicleId;
-        this.transferManagementRegionId = transferManagementRegionId;
-    }
-
-    static readonly create = getCreate(this);
+export function newTransferPatientToHospitalActivityState(
+    id: UUID,
+    patientIds: UUIDSet,
+    vehicleId: UUID,
+    transferManagementRegionId: UUID
+): TransferPatientToHospitalActivityState {
+    return {
+        id,
+        type: 'transferPatientToHospitalActivity',
+        patientIds,
+        vehicleId,
+        transferManagementRegionId,
+    };
 }
 
 export const transferPatientToHospitalActivity: SimulationActivity<TransferPatientToHospitalActivityState> =
     {
-        activityState: TransferPatientToHospitalActivityState,
+        activityStateSchema: transferPatientToHospitalActivityStateSchema,
         tick(
             draftState,
             simulatedRegion,
@@ -96,7 +78,7 @@ export const transferPatientToHospitalActivity: SimulationActivity<TransferPatie
 
             sendSimulationEvent(
                 simulatedRegion,
-                TransferPatientsInSpecificVehicleRequestEvent.create(
+                newTransferPatientsInSpecificVehicleRequestEvent(
                     activityState.patientIds,
                     activityState.vehicleId,
                     'hospital',
@@ -109,7 +91,7 @@ export const transferPatientToHospitalActivity: SimulationActivity<TransferPatie
                 patients.forEach((patient) => {
                     sendSimulationEvent(
                         transferManagementRegion,
-                        PatientTransferToHospitalSuccessfulEvent.create(
+                        newPatientTransferToHospitalSuccessfulEvent(
                             getPatientVisibleStatus(
                                 patient,
                                 draftState.configuration.pretriageEnabled,

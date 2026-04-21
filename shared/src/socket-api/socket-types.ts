@@ -1,12 +1,12 @@
 import type { ExerciseState } from '../state.js';
-import type { ExerciseAction } from '../store/index.js';
 import type {
     JoinExerciseResponseDataInput,
     JoinParallelExerciseResponseData,
     UpdateParallelExerciseResponseData,
 } from '../http-interfaces.js';
-import type { UUID } from '../utils/index.js';
 import type { ExerciseKey } from '../exercise-keys.js';
+import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
+import type { UUID } from '../utils/uuid.js';
 
 export interface ServerToClientEvents {
     performAction: (action: ExerciseAction) => void;

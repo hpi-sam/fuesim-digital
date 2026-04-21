@@ -1,4 +1,4 @@
-import { StrictObject } from '../utils/index.js';
+import { StrictObject } from '../utils/strict-object.js';
 import type { Migration } from './migration-functions.js';
 
 export const renameIncorrectPatientImages12: Migration = {

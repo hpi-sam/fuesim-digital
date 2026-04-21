@@ -1,31 +1,28 @@
-import { IsUUID } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import type { ReportableInformation } from '../behaviors/utils.js';
-import { reportableInformationAllowedValues } from '../behaviors/utils.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { z } from 'zod';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import {
+    type ReportableInformation,
+    reportableInformationSchema,
+} from '../behaviors/utils.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class CollectInformationEvent implements SimulationEvent {
-    @IsValue('collectInformationEvent')
-    readonly type = 'collectInformationEvent';
+export const collectInformationEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
+    type: z.literal('collectInformationEvent'),
+    generateReportActivityId: uuidSchema,
+    informationType: reportableInformationSchema,
+});
+export type CollectInformationEvent = z.infer<
+    typeof collectInformationEventSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly generateReportActivityId: UUID;
-
-    @IsLiteralUnion(reportableInformationAllowedValues)
-    readonly informationType: ReportableInformation;
-    /**
-     * @deprecated Use {@link create} instead.
-     */
-    constructor(
-        generateReportActivityId: UUID,
-        informationType: ReportableInformation
-    ) {
-        this.generateReportActivityId = generateReportActivityId;
-        this.informationType = informationType;
-    }
-
-    static readonly create = getCreate(this);
+export function newCollectInformationEvent(
+    generateReportActivityId: UUID,
+    informationType: ReportableInformation
+): CollectInformationEvent {
+    return {
+        type: 'collectInformationEvent',
+        generateReportActivityId,
+        informationType,
+    };
 }

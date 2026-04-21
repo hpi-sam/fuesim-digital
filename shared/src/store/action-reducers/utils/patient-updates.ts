@@ -3,8 +3,7 @@ import {
     type HealthPoints,
     healthPointsSchema,
 } from '../../../models/utils/health-points.js';
-import type { UUID } from '../../../utils/index.js';
-import { uuidValidationOptions } from '../../../utils/uuid.js';
+import { type UUID, uuidValidationOptions } from '../../../utils/uuid.js';
 import { IsZodSchema } from '../../../utils/validators/is-zod-object.js';
 
 export class PatientUpdate {

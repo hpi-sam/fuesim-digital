@@ -3,12 +3,10 @@ import {
     currentStateOf,
     newMapCoordinatesAt,
     newSize,
-} from 'fuesim-digital-shared';
-import type {
-    TechnicalChallengeState,
-    TechnicalChallenge,
-    UUID,
-    Element as StateElement,
+    type TechnicalChallengeState,
+    type TechnicalChallenge,
+    type UUID,
+    type Element as StateElement,
 } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
@@ -32,11 +30,11 @@ import {
     selectCurrentMainRole,
     selectVisibleTechnicalChallenges,
 } from '../../../../../../state/application/selectors/shared.selectors';
-import { ChooseTaskPopupComponent } from '../shared/choose-task-popup/choose-task-popup.component';
-import { PointRelativePopupHelper } from '../utility/point-relative-popup-helper';
-import type { OlMapManager } from '../utility/ol-map-manager';
+import { ChooseTaskPopupComponent } from '../shared/choose-task-popup/choose-task-popup.component.js';
+import { PointRelativePopupHelper } from '../utility/point-relative-popup-helper.js';
+import type { OlMapManager } from '../utility/ol-map-manager.js';
 import { MoveableFeatureManager } from './moveable-feature-manager';
-import type { PersonnelFeatureManager } from './personnel-feature-manager';
+import type { PersonnelFeatureManager } from './personnel-feature-manager.js';
 
 export class TechnicalChallengeFeatureManager
     extends MoveableFeatureManager<TechnicalChallenge, Polygon>

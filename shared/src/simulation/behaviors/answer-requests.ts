@@ -1,53 +1,47 @@
-import { IsInt, IsUUID, Min, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import {
-    VehicleResource,
-    getCreate,
-    isInSpecificSimulatedRegion,
-} from '../../models/utils/index.js';
-import { getElementByPredicate } from '../../store/action-reducers/utils/index.js';
-import type { UUID } from '../../utils/index.js';
-import {
-    cloneDeepMutable,
-    uuid,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { addActivity } from '../activities/utils.js';
-import { nextUUID } from '../utils/randomness.js';
-import { DelayEventActivityState } from '../activities/index.js';
-import {
-    ResourceRequiredEvent,
-    TransferVehiclesRequestEvent,
-} from '../events/index.js';
+import { z } from 'zod';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
+import {
+    newTransferVehiclesRequestEvent,
+    transferVehiclesRequestEventSchema,
+} from '../events/transfer-vehicles-request.js';
+import { getElementByPredicate } from '../../store/action-reducers/utils/get-element.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { addActivity } from '../activities/utils.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { nextUUID } from '../utils/randomness.js';
+import { newResourceRequiredEvent } from '../events/resources-required.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import { uuid } from '../../utils/uuid.js';
+import {
+    type SimulationBehavior,
+    simulationBehaviorStateSchema,
 } from './simulation-behavior.js';
 
-export class AnswerRequestsBehaviorState implements SimulationBehaviorState {
-    @IsValue('answerRequestsBehavior')
-    readonly type = 'answerRequestsBehavior';
+export const answerRequestsBehaviorStateSchema = z.strictObject({
+    ...simulationBehaviorStateSchema.shape,
+    type: z.literal('answerRequestsBehavior'),
+    receivedEvents: z.array(transferVehiclesRequestEventSchema),
+    requestsHandled: z.int().nonnegative(),
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export type AnswerRequestsBehaviorState = z.infer<
+    typeof answerRequestsBehaviorStateSchema
+>;
 
-    @Type(() => TransferVehiclesRequestEvent)
-    @ValidateNested()
-    public readonly receivedEvents: readonly TransferVehiclesRequestEvent[] =
-        [];
-
-    @IsInt()
-    @Min(0)
-    public readonly requestsHandled: number = 0;
-
-    static readonly create = getCreate(this);
+export function newAnswerRequestsBehaviorState(): AnswerRequestsBehaviorState {
+    return {
+        type: 'answerRequestsBehavior',
+        id: uuid(),
+        receivedEvents: [],
+        requestsHandled: 0,
+    };
 }
 
 export const answerRequestsBehavior: SimulationBehavior<AnswerRequestsBehaviorState> =
     {
-        behaviorState: AnswerRequestsBehaviorState,
+        behaviorStateSchema: answerRequestsBehaviorStateSchema,
+        newBehaviorState: newAnswerRequestsBehaviorState,
         handleEvent: (draftState, simulatedRegion, behaviorState, event) => {
             switch (event.type) {
                 case 'resourceRequiredEvent': {
@@ -65,21 +59,20 @@ export const answerRequestsBehavior: SimulationBehavior<AnswerRequestsBehaviorSt
                                             event.requiringSimulatedRegionId
                                         )
                                 );
-                            const eventToSend =
-                                TransferVehiclesRequestEvent.create(
-                                    event.requiredResource.vehicleCounts,
-                                    'transferPoint',
-                                    requiringSimulatedRegionTransferPoint.id,
-                                    event.requiringSimulatedRegionId,
-                                    requiringSimulatedRegionTransferPoint.id +
-                                        behaviorState.requestsHandled
-                                );
+                            const eventToSend = newTransferVehiclesRequestEvent(
+                                event.requiredResource.vehicleCounts,
+                                'transferPoint',
+                                requiringSimulatedRegionTransferPoint.id,
+                                event.requiringSimulatedRegionId,
+                                requiringSimulatedRegionTransferPoint.id +
+                                    behaviorState.requestsHandled
+                            );
                             behaviorState.receivedEvents.push(
                                 cloneDeepMutable(eventToSend)
                             );
                             addActivity(
                                 simulatedRegion,
-                                DelayEventActivityState.create(
+                                newDelayEventActivityState(
                                     nextUUID(draftState),
                                     eventToSend,
                                     draftState.currentTime
@@ -129,11 +122,11 @@ export const answerRequestsBehavior: SimulationBehavior<AnswerRequestsBehaviorSt
                         if (createEvent) {
                             addActivity(
                                 simulatedRegion,
-                                DelayEventActivityState.create(
+                                newDelayEventActivityState(
                                     nextUUID(draftState),
-                                    ResourceRequiredEvent.create(
+                                    newResourceRequiredEvent(
                                         simulatedRegion.id,
-                                        VehicleResource.create(
+                                        newVehicleResource(
                                             vehiclesNotAvailable
                                         ),
                                         requestEvent!.key ?? ''

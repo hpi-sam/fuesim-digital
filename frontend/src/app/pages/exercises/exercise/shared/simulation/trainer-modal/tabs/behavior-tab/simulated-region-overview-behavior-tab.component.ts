@@ -97,7 +97,7 @@ export class SimulatedRegionOverviewBehaviorTabComponent
                     type: '[SimulatedRegion] Add Behavior',
                     simulatedRegionId: this.simulatedRegion().id,
                     behaviorState:
-                        simulationBehaviorDictionary.transferBehavior.behaviorState.create(),
+                        simulationBehaviorDictionary.transferBehavior.newBehaviorState(),
                 });
                 this.selectedBehavior = this.simulatedRegion().behaviors.find(
                     (behavior) => behavior.type === 'transferBehavior'
@@ -147,7 +147,7 @@ export class SimulatedRegionOverviewBehaviorTabComponent
         }
         const behaviorState = simulationBehaviorDictionary[
             behaviorType
-        ].behaviorState.create(...args);
+        ].newBehaviorState(...args);
         this.exerciseService.proposeAction({
             type: '[SimulatedRegion] Add Behavior',
             simulatedRegionId: this.simulatedRegion().id,

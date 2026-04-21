@@ -1,96 +1,95 @@
-import * as z from 'zod';
-import {
-    Equals,
-    IsObject,
-    IsOptional,
-    IsUUID,
-    ValidateNested,
-} from 'class-validator';
+import { z } from 'zod';
+import { Equals, IsObject, IsOptional, IsUUID } from 'class-validator';
 import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
 import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
-import {
-    AlarmGroup,
-    Client,
-    EocLogEntry,
-    Hospital,
-    HospitalPatient,
-    type LogEntry,
-    RestrictedZone,
-    MapImage,
-    MapImageTemplate,
-    Material,
-    Patient,
-    Personnel,
-    SimulatedRegion,
-    TransferPoint,
-    Vehicle,
-    VehicleTemplate,
-    Viewport,
-    getCreate,
-    SpatialTree,
-    MaterialTemplate,
-    PersonnelTemplate,
-    exerciseStatusSchema,
-    exerciseTypeSchema,
-    type ExerciseType,
-    type ExerciseStatus,
-    logEntrySchema,
-    scoutableSchema,
-    userGeneratedContentSchema,
-    Scoutable,
-    UserGeneratedContent,
-    technicalChallengeSchema,
-    TechnicalChallenge,
-    taskSchema,
-    Task,
-} from './models/index.js';
-import type { ExerciseRadiogram } from './models/radiogram/index.js';
-import { getRadiogramConstructor } from './models/radiogram/index.js';
 import {
     newSeededRandomState,
     type RandomState,
     randomStateSchema,
 } from './simulation/utils/randomness.js';
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
-import type { UUID } from './utils/index.js';
-import { IsIdMap, IsMultiTypedIdMap } from './utils/validators/index.js';
-import { uuidSchema, uuid, uuidValidationOptions } from './utils/index.js';
-import {
-    createCatchAllHospital,
-    catchAllHospitalId,
-    defaultPatientCategories,
-    defaultMapImagesTemplatesById,
-    defaultVehicleTemplatesById,
-} from './data/index.js';
 import { IsZodSchema } from './utils/validators/is-zod-object.js';
-import { vehicleSchema } from './models/vehicle.js';
-import type { TreatmentAssignment } from './store/index.js';
-import { restrictedZoneSchema } from './models/restricted-zone.js';
-import { materialSchema } from './models/material.js';
-import { materialTemplateSchema } from './models/material-template.js';
-import { personnelTemplateSchema } from './models/personnel-template.js';
-import { personnelSchema } from './models/personnel.js';
-import { vehicleTemplateSchema } from './models/vehicle-template.js';
+import { Vehicle, vehicleSchema } from './models/vehicle.js';
+import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
+import {
+    RestrictedZone,
+    restrictedZoneSchema,
+} from './models/restricted-zone.js';
+import { Material, materialSchema } from './models/material.js';
+import {
+    type MaterialTemplate,
+    materialTemplateSchema,
+} from './models/material-template.js';
+import {
+    type PersonnelTemplate,
+    personnelTemplateSchema,
+} from './models/personnel-template.js';
+import { Personnel, personnelSchema } from './models/personnel.js';
+import {
+    type VehicleTemplate,
+    vehicleTemplateSchema,
+} from './models/vehicle-template.js';
 import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
 import {
     operationalSectionSchema,
     OperationalSection,
 } from './models/operational-section.js';
-import { hospitalSchema } from './models/hospital.js';
-import { mapImageTemplateSchema } from './models/map-image-template.js';
-import { mapImageSchema } from './models/map-image.js';
-import { viewportSchema } from './models/viewport.js';
-import { transferPointSchema } from './models/transfer-point.js';
-import { alarmGroupSchema } from './models/alarm-group.js';
-import { clientSchema } from './models/client.js';
-import { eocLogEntrySchema } from './models/eoc-log-entry.js';
+import { Hospital, hospitalSchema } from './models/hospital.js';
+import {
+    type MapImageTemplate,
+    mapImageTemplateSchema,
+} from './models/map-image-template.js';
+import { type MapImage, mapImageSchema } from './models/map-image.js';
+import { Viewport, viewportSchema } from './models/viewport.js';
+import { TransferPoint, transferPointSchema } from './models/transfer-point.js';
+import { type AlarmGroup, alarmGroupSchema } from './models/alarm-group.js';
+import { Client, clientSchema } from './models/client.js';
+import { type EocLogEntry, eocLogEntrySchema } from './models/eoc-log-entry.js';
 import {
     exerciseConfigurationSchema,
     newExerciseConfiguration,
 } from './models/exercise-configuration.js';
-import { patientSchema } from './models/patient.js';
-import { hospitalPatientSchema } from './models/hospital-patient.js';
+import { Patient, patientSchema } from './models/patient.js';
+import {
+    HospitalPatient,
+    hospitalPatientSchema,
+} from './models/hospital-patient.js';
 import { patientCategorySchema } from './models/patient-category.js';
+import { UUID, uuid, uuidSchema, uuidValidationOptions } from './utils/uuid.js';
+import {
+    catchAllHospitalId,
+    createCatchAllHospital,
+} from './data/default-state/catch-all-hospital.js';
+import { defaultPatientCategories } from './data/default-state/patient-templates.js';
+import { defaultMapImagesTemplatesById } from './data/default-state/map-images-templates.js';
+import { SpatialTree } from './models/utils/spatial-tree.js';
+import { type LogEntry, logEntrySchema } from './models/log-entry.js';
+import type { TreatmentAssignment } from './store/action-reducers/exercise.js';
+import { getCreate } from './models/utils/get-create.js';
+import {
+    type ExerciseStatus,
+    exerciseStatusSchema,
+    type ExerciseType,
+    exerciseTypeSchema,
+} from './models/utils/exercise-status.js';
+import {
+    type SimulatedRegion,
+    simulatedRegionSchema,
+} from './models/simulated-region.js';
+import {
+    type ExerciseRadiogram,
+    exerciseRadiogramSchema,
+} from './models/radiogram/exercise-radiogram.js';
+import {
+    type UserGeneratedContent,
+    userGeneratedContentSchema,
+} from './models/user-generated-content.js';
+import { type Scoutable, scoutableSchema } from './models/scoutable.js';
+import {
+    type TechnicalChallenge,
+    technicalChallengeSchema,
+} from './models/technical-challenge/technical-challenge.js';
+import { type Task, taskSchema } from './models/task.js';
 import {
     getDefaultTasks,
     getDefaultUserGeneratedContents,
@@ -125,7 +124,7 @@ export class ExerciseState {
     @IsOptional()
     public readonly autojoinViewportId: UUID | null = null;
 
-    @IsIdMap(SimulatedRegion)
+    @IsZodSchema(z.record(uuidSchema, simulatedRegionSchema))
     public readonly simulatedRegions: {
         readonly [key: UUID]: SimulatedRegion;
     } = {};
@@ -181,8 +180,7 @@ export class ExerciseState {
     @IsZodSchema(z.array(z.string()))
     public readonly collectedClientNames: string[] = [];
 
-    @IsMultiTypedIdMap(getRadiogramConstructor)
-    @ValidateNested()
+    @IsZodSchema(z.record(uuidSchema, exerciseRadiogramSchema))
     public readonly radiograms: { readonly [key: UUID]: ExerciseRadiogram } =
         {};
     @IsZodSchema(z.record(uuidSchema, operationalSectionSchema))

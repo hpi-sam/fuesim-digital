@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { uuid, uuidSchema, uuidSetSchema } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { uuidSetSchema } from '../utils/uuid-set.js';
 
 export const hospitalSchema = z.strictObject({
     id: uuidSchema,

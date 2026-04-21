@@ -1,12 +1,10 @@
 import { plainToInstance } from 'class-transformer';
 import type { ValidationError } from 'class-validator';
 import { validateSync } from 'class-validator';
-import type { ExportImportFile } from '../export-import/file-format/index.js';
-import {
-    PartialExport,
-    StateExport,
-} from '../export-import/file-format/index.js';
-import type { Constructor } from '../utils/index.js';
+import type { ExportImportFile } from '../export-import/file-format/export-import-file.js';
+import { StateExport } from '../export-import/file-format/state-export.js';
+import { PartialExport } from '../export-import/file-format/partial-export.js';
+import type { Constructor } from '../utils/constructor.js';
 import { defaultValidateOptions } from './validation-options.js';
 
 /**

@@ -1,5 +1,5 @@
 import type { WritableDraft } from 'immer';
-import type { ExerciseState } from '../../../index.js';
+import type { ExerciseState } from '../../../state.js';
 
 /**
  * Update position of all vehicles in and behind `position` to make space.

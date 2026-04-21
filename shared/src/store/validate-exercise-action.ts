@@ -8,9 +8,12 @@ import { validateSync } from 'class-validator';
 import type { ZodError } from 'zod';
 import type { GenericPropertyDecorator } from '../utils/validators/generic-property-decorator.js';
 import { makeValidator } from '../utils/validators/make-validator.js';
-import type { ExerciseAction } from './action-reducers/index.js';
-import { isActionType, lookupReducerFor } from './action-reducers/index.js';
 import { defaultValidateOptions } from './validation-options.js';
+import {
+    type ExerciseAction,
+    isActionType,
+    lookupReducerFor,
+} from './action-reducers/action-reducers.js';
 
 /**
  *

@@ -1,9 +1,9 @@
 import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../../state.js';
-import { getElement } from '../../../store/action-reducers/utils/index.js';
-import type { UUID } from '../../../utils/index.js';
 import type { SimulatedRegion } from '../../simulated-region.js';
 import type { Transfer } from '../transfer.js';
+import type { UUID } from '../../../utils/uuid.js';
+import { getElement } from '../../../store/action-reducers/utils/get-element.js';
 import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
 import type { Position } from './position.js';

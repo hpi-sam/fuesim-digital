@@ -1,70 +1,58 @@
-import { IsInt, IsOptional, IsUUID, Min } from 'class-validator';
 import { cloneDeep } from 'lodash-es';
 import type { WritableDraft } from 'immer';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { UUID, UUIDSet } from '../../utils/index.js';
-import { cloneDeepMutable, uuid } from '../../utils/index.js';
-import {
-    IsUUIDSet,
-    IsUUIDSetMap,
-    IsValue,
-} from '../../utils/validators/index.js';
-import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
-import {
-    DelayEventActivityState,
-    RecurringEventActivityState,
-} from '../activities/index.js';
-import { addActivity } from '../activities/utils.js';
-import { TryToDistributeEvent } from '../events/try-to-distribute.js';
+import { z } from 'zod';
 import { nextUUID } from '../utils/randomness.js';
-import { TransferVehiclesRequestEvent } from '../events/index.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
-} from './simulation-behavior.js';
+import { uuidSetSchema } from '../../utils/uuid-set.js';
+import { resourceDescriptionSchema } from '../../models/utils/resource-description.js';
+import type { UUID } from '../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
+import { addActivity } from '../activities/utils.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { newTryToDistributeEvent } from '../events/try-to-distribute.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { newTransferVehiclesRequestEvent } from '../events/transfer-vehicles-request.js';
+import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
 
-export class AutomaticallyDistributeVehiclesBehaviorState
-    implements SimulationBehaviorState
-{
-    @IsValue('automaticallyDistributeVehiclesBehavior')
-    readonly type = 'automaticallyDistributeVehiclesBehavior';
+export const automaticallyDistributeVehiclesBehaviorStateSchema =
+    z.strictObject({
+        ...simulationBehaviorStateSchema.shape,
+        type: z.literal('automaticallyDistributeVehiclesBehavior'),
+        distributionDestinations: uuidSetSchema,
+        distributionLimits: resourceDescriptionSchema,
+        distributedRounds: resourceDescriptionSchema,
+        distributedLastRound: resourceDescriptionSchema,
+        remainingInNeed: z.record(z.string(), uuidSetSchema),
+        /**
+         * This *MUST* be greater than about 10 tick durations to ensure that we can wait for a response
+         */
+        distributionDelay: z.int().min(1),
+        recurringActivityId: uuidSchema.optional(),
+    });
 
-    @IsUUID()
-    public readonly id: UUID = uuid();
+export type AutomaticallyDistributeVehiclesBehaviorState = z.infer<
+    typeof automaticallyDistributeVehiclesBehaviorStateSchema
+>;
 
-    @IsUUIDSet()
-    public readonly distributionDestinations: UUIDSet = {};
-
-    @IsResourceDescription()
-    public readonly distributionLimits: { [vehicleType: string]: number } = {};
-
-    @IsResourceDescription()
-    public readonly distributedRounds: { [vehicleType: string]: number } = {};
-
-    @IsResourceDescription()
-    public readonly distributedLastRound: { [vehicleType: string]: number } =
-        {};
-
-    @IsUUIDSetMap()
-    public readonly remainingInNeed: { [vehicleType: string]: UUIDSet } = {};
-
-    @IsInt()
-    @Min(1)
-    /*
-     * This *MUST* be greater than about 10 tick durations to Ensure that we can wait for a response
-     */
-    public readonly distributionDelay: number = 60_000; // 1 minute
-
-    @IsUUID()
-    @IsOptional()
-    public readonly recurringActivityId!: UUID;
-
-    static readonly create = getCreate(this);
+export function newAutomaticallyDistributeVehiclesBehaviorState(): AutomaticallyDistributeVehiclesBehaviorState {
+    return {
+        type: 'automaticallyDistributeVehiclesBehavior',
+        id: uuid(),
+        distributionDestinations: {},
+        distributionLimits: {},
+        distributedRounds: {},
+        distributedLastRound: {},
+        remainingInNeed: {},
+        distributionDelay: 60_000, // 1 minute
+        recurringActivityId: undefined,
+    };
 }
 
 export const automaticallyDistributeVehiclesBehavior: SimulationBehavior<AutomaticallyDistributeVehiclesBehaviorState> =
     {
-        behaviorState: AutomaticallyDistributeVehiclesBehaviorState,
+        behaviorStateSchema: automaticallyDistributeVehiclesBehaviorStateSchema,
+        newBehaviorState: newAutomaticallyDistributeVehiclesBehaviorState,
         handleEvent: (draftState, simulatedRegion, behaviorState, event) => {
             switch (event.type) {
                 case 'tickEvent': {
@@ -74,9 +62,9 @@ export const automaticallyDistributeVehiclesBehavior: SimulationBehavior<Automat
                             nextUUID(draftState);
                         addActivity(
                             simulatedRegion,
-                            RecurringEventActivityState.create(
+                            newRecurringEventActivityState(
                                 behaviorState.recurringActivityId,
-                                TryToDistributeEvent.create(behaviorState.id),
+                                newTryToDistributeEvent(behaviorState.id),
                                 draftState.currentTime,
                                 behaviorState.distributionDelay
                             )
@@ -179,9 +167,9 @@ export const automaticallyDistributeVehiclesBehavior: SimulationBehavior<Automat
                             }
                             addActivity(
                                 simulatedRegion,
-                                DelayEventActivityState.create(
+                                newDelayEventActivityState(
                                     nextUUID(draftState),
-                                    TransferVehiclesRequestEvent.create(
+                                    newTransferVehiclesRequestEvent(
                                         cloneDeep(vehiclesToBeSent[region]),
                                         'transferPoint',
                                         region,

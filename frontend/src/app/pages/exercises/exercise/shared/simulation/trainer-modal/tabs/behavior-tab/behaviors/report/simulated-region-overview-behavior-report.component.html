@@ -23,7 +23,7 @@
             <option value="noSelect" disabled hidden selected>
                 Wählen Sie die Information des Berichts
             </option>
-            @for (information of reportableInformations; track information) {
+            @for (information of reportableInformation; track information) {
                 <option [value]="information">
                     {{ reportableInformationTranslationMap[information] }}
                 </option>
@@ -124,7 +124,7 @@
 
     <h5 class="mt-3">Regelmäßige Berichte</h5>
 
-    @for (information of reportableInformations; track information) {
+    @for (information of reportableInformation; track information) {
         @if (recurringActivities[information]; as recurringActivity) {
             <div>
                 <div class="row align-items-center mb-2 mw-100">

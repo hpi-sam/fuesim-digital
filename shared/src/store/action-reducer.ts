@@ -1,10 +1,9 @@
 import type { Immutable, WritableDraft } from 'immer';
 import type { ZodType } from 'zod';
 import type { Client } from '../models/client.js';
-import type { Role } from '../models/index.js';
-import type { SpecificRole } from '../models/utils/role.js';
+import type { Role, SpecificRole } from '../models/utils/role.js';
 import type { ExerciseState } from '../state.js';
-import type { Constructor } from '../utils/index.js';
+import type { Constructor } from '../utils/constructor.js';
 
 interface BaseActionReducer<A extends Action = Action> {
     readonly reducer: ReducerFunction<A>;

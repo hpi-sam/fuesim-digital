@@ -1,17 +1,18 @@
-import * as z from 'zod';
+import { z } from 'zod';
 import type { Immutable } from 'immer';
-import { type UUID, uuid, uuidSchema } from '../utils/index.js';
 import type { ExerciseState } from '../state.js';
-import type { AllowedValues } from '../utils/validators/index.js';
-import type { ImageProperties, MapCoordinates, Size } from './utils/index.js';
+import type { AllowedValues } from '../utils/validators/is-literal-union.js';
+import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
+import { type Size, sizeSchema } from './utils/size.js';
+import { positionSchema } from './utils/position/position.js';
+import type { ImageProperties } from './utils/image-properties.js';
+import type { MapCoordinates } from './utils/position/map-coordinates.js';
+import { newMapPositionAt } from './utils/position/map-position.js';
 import {
-    isWithinExtent,
-    newMapPositionAt,
-    positionSchema,
-    isOnMap,
     currentCoordinatesOf,
-} from './utils/index.js';
-import { sizeSchema } from './utils/size.js';
+    isOnMap,
+    isWithinExtent,
+} from './utils/position/position-helpers.js';
 
 export const vehicleRestrictionSchema = z.literal([
     'ignore',

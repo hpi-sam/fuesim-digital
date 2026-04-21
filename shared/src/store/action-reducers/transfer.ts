@@ -1,39 +1,43 @@
 import { IsInt, IsOptional, IsUUID } from 'class-validator';
 import { WritableDraft } from 'immer';
 import {
-    type StartPoint,
-    type MapPosition,
-    newTransferPositionFor,
-    startPointSchema,
-    isPositionOnMap,
-    isInTransfer,
-    currentTransferOf,
-    isPositionInSimulatedRegion,
-    simulatedRegionIdOfPosition,
-    createVehicleActionTag,
-    createTransferPointTag,
-} from '../../models/index.js';
-import {
     changePosition,
     offsetMapPositionBy,
 } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import type { AllowedValues } from '../../utils/validators/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import {
-    PersonnelAvailableEvent,
-    VehicleArrivedEvent,
-} from '../../simulation/index.js';
-import { imageSizeToPosition } from '../../state-helpers/index.js';
 import type { Vehicle } from '../../models/vehicle.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { transferPointImage } from '../../models/transfer-point.js';
-import { getElement } from './utils/index.js';
+import { newVehicleArrivedEvent } from '../../simulation/events/vehicle-arrived.js';
+import {
+    createTransferPointTag,
+    createVehicleActionTag,
+} from '../../models/utils/tag-helpers.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import {
+    type AllowedValues,
+    IsLiteralUnion,
+} from '../../utils/validators/is-literal-union.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    type StartPoint,
+    startPointSchema,
+} from '../../models/utils/start-points.js';
+import {
+    currentTransferOf,
+    isInTransfer,
+    isPositionInSimulatedRegion,
+    isPositionOnMap,
+    simulatedRegionIdOfPosition,
+} from '../../models/utils/position/position-helpers.js';
+import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import type { MapPosition } from '../../models/utils/position/map-position.js';
+import { imageSizeToPosition } from '../../state-helpers/image-size-to-position.js';
+import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
 import {
     logElementAddedToTransfer,
     logTransferEdited,
@@ -41,6 +45,7 @@ import {
     logTransferPause,
     logVehicle,
 } from './utils/log.js';
+import { getElement } from './utils/get-element.js';
 
 export type TransferableElementType = 'personnel' | 'vehicle';
 const transferableElementTypeAllowedValues: AllowedValues<TransferableElementType> =
@@ -82,13 +87,13 @@ export function letElementArrive(
         if (elementType === 'personnel') {
             sendSimulationEvent(
                 simulatedRegion,
-                PersonnelAvailableEvent.create(elementId)
+                newPersonnelAvailableEvent(elementId)
             );
         }
         if (elementType === 'vehicle') {
             sendSimulationEvent(
                 simulatedRegion,
-                VehicleArrivedEvent.create(elementId, draftState.currentTime)
+                newVehicleArrivedEvent(elementId, draftState.currentTime)
             );
         }
     }

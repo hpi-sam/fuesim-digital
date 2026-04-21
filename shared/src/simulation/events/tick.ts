@@ -1,22 +1,16 @@
-import { IsInt, IsPositive } from 'class-validator';
-import { IsValue } from '../../utils/validators/index.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { z } from 'zod';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class TickEvent implements SimulationEvent {
-    @IsValue('tickEvent')
-    readonly type = 'tickEvent';
+export const tickEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
+    type: z.literal('tickEvent'),
+    tickInterval: z.int().positive(),
+});
+export type TickEvent = z.infer<typeof tickEventSchema>;
 
-    @IsInt()
-    @IsPositive()
-    public readonly tickInterval: number;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(tickInterval: number) {
-        this.tickInterval = tickInterval;
-    }
-
-    static readonly create = getCreate(this);
+export function newTickEvent(tickInterval: number): TickEvent {
+    return {
+        type: 'tickEvent',
+        tickInterval,
+    };
 }

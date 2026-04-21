@@ -5,7 +5,7 @@
     tabindex="-1"
     data-cy="openLayersContainer"
 >
-    @if (fullscreenEnabled) {
+    @if (fullscreenEnabled()) {
         <app-display-messages></app-display-messages>
     }
     <div
@@ -59,8 +59,8 @@
             title="Vollbildmodus"
         >
             <i
-                [class.bi-fullscreen]="!fullscreenEnabled"
-                [class.bi-fullscreen-exit]="fullscreenEnabled"
+                [class.bi-fullscreen]="!fullscreenEnabled()"
+                [class.bi-fullscreen-exit]="fullscreenEnabled()"
             ></i>
         </button>
     </div>

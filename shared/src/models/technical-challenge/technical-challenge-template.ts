@@ -1,11 +1,9 @@
 import { z } from 'zod';
 import { cloneDeep } from 'lodash-es';
-import {
-    imagePropertiesSchema,
-    newNoPosition,
-    newSize,
-} from '../utils/index.js';
 import { uuid, uuidSchema } from '../../utils/uuid.js';
+import { imagePropertiesSchema } from '../utils/image-properties.js';
+import { newNoPosition } from '../utils/position/no-position.js';
+import { newSize } from '../utils/size.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,

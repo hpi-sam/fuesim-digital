@@ -1,13 +1,14 @@
 import { z } from 'zod';
-import { uuid, uuidSchema } from '../utils/index.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { positionSchema } from './utils/position/position.js';
+import { type Size, sizeSchema } from './utils/size.js';
+import type { ImageProperties } from './utils/image-properties.js';
+import type { MapCoordinates } from './utils/position/map-coordinates.js';
+import { newMapPositionAt } from './utils/position/map-position.js';
 import {
     lowerRightCornerOf,
     upperLeftCornerOf,
-    sizeSchema,
-    positionSchema,
-    newMapPositionAt,
-} from './utils/index.js';
-import type { ImageProperties, MapCoordinates, Size } from './utils/index.js';
+} from './utils/position/position-helpers.js';
 
 export const viewportSchema = z.strictObject({
     id: uuidSchema,

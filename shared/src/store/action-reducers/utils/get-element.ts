@@ -1,17 +1,19 @@
 import { freeze, isDraft, type WritableDraft } from 'immer';
-import type { ExerciseRadiogram } from '../../../models/radiogram/index.js';
-import type {
-    ExerciseSimulationActivityState,
-    ExerciseSimulationActivityType,
-    ExerciseSimulationBehaviorState,
-    ExerciseSimulationBehaviorType,
-} from '../../../simulation/index.js';
 import type { ExerciseState } from '../../../state.js';
-import type { UUID } from '../../../utils/index.js';
 import type { ElementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { ReducerError } from '../../reducer-error.js';
 import { newUserGeneratedContent } from '../../../models/user-generated-content.js';
+import type { UUID } from '../../../utils/uuid.js';
+import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
+import type {
+    ExerciseSimulationBehaviorState,
+    ExerciseSimulationBehaviorType,
+} from '../../../simulation/behaviors/exercise-simulation-behavior.js';
+import type {
+    ExerciseSimulationActivityState,
+    ExerciseSimulationActivityType,
+} from '../../../simulation/activities/exercise-simulation-activity.js';
 
 /**
  * @returns The element with the given id
@@ -151,7 +153,9 @@ export function getBehaviorById<T extends ExerciseSimulationBehaviorType>(
             `Expected behavior with id ${behaviorId} to be of type ${behaviorType}, but was ${behavior.type}`
         );
     }
-    return behavior as WritableDraft<ExerciseSimulationBehaviorState<T>>;
+    return behavior as WritableDraft<
+        ExerciseSimulationBehaviorState & { type: T }
+    >;
 }
 
 export function getActivityById<T extends ExerciseSimulationActivityType>(
@@ -176,5 +180,7 @@ export function getActivityById<T extends ExerciseSimulationActivityType>(
             `Expected activity with id ${activityId} to be of type ${activityType}, but was ${activity.type}`
         );
     }
-    return activity as WritableDraft<ExerciseSimulationActivityState<T>>;
+    return activity as WritableDraft<
+        ExerciseSimulationActivityState & { type: T }
+    >;
 }

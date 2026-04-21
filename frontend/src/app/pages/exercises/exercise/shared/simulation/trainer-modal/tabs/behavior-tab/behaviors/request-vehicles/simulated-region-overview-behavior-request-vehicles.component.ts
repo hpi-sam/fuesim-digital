@@ -1,14 +1,12 @@
 import type { OnChanges } from '@angular/core';
 import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type {
-    RecurringEventActivityState,
-    RequestBehaviorState,
-    UUID,
-} from 'fuesim-digital-shared';
 import {
-    SimulatedRegionRequestTargetConfiguration,
-    TraineesRequestTargetConfiguration,
+    newSimulatedRegionRequestTargetConfiguration,
+    newTraineesRequestTargetConfiguration,
+    type RecurringEventActivityState,
+    type RequestBehaviorState,
+    type UUID,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map, combineLatest } from 'rxjs';
@@ -152,10 +150,10 @@ export class RequestVehiclesComponent implements OnChanges {
         let requestTargetConfiguration;
         if (requestTarget === 'trainees') {
             requestTargetConfiguration =
-                TraineesRequestTargetConfiguration.create();
+                newTraineesRequestTargetConfiguration();
         } else {
             requestTargetConfiguration =
-                SimulatedRegionRequestTargetConfiguration.create(requestTarget);
+                newSimulatedRegionRequestTargetConfiguration(requestTarget);
         }
         this.exerciseService.proposeAction({
             type: '[RequestBehavior] Update RequestTarget',

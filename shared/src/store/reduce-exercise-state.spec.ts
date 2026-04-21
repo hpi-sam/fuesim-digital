@@ -1,11 +1,11 @@
-import type { Viewport, ExerciseStatus } from '../models/index.js';
-import { newMapPositionAt } from '../models/index.js';
 import { ExerciseState } from '../state.js';
-import type { UUID } from '../utils/index.js';
-import { uuid } from '../utils/index.js';
 import type { ParticipantKey } from '../exercise-keys.js';
-import { reduceExerciseState } from './reduce-exercise-state.js';
+import type { Viewport } from '../models/viewport.js';
+import { newMapPositionAt } from '../models/utils/position/map-position.js';
+import { uuid, type UUID } from '../utils/uuid.js';
+import type { ExerciseStatus } from '../models/utils/exercise-status.js';
 import { ReducerError } from './reducer-error.js';
+import { reduceExerciseState } from './reduce-exercise-state.js';
 
 describe('exerciseReducer', () => {
     let state: ExerciseState;

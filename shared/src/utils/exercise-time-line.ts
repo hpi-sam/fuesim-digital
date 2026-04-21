@@ -1,5 +1,5 @@
 import type { ExerciseState } from '../state.js';
-import type { ExerciseAction } from '../store/index.js';
+import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
 import type { UUID } from './uuid.js';
 
 export interface ExerciseTimeline {

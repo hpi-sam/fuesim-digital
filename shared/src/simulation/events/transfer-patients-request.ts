@@ -1,51 +1,36 @@
-import { IsString, IsUUID } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
-import {
-    IsLiteralUnion,
-    IsUUIDSet,
-    IsValue,
-} from '../../utils/validators/index.js';
-import type { UUID, UUIDSet } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
+import { z } from 'zod';
 import type { TransferDestination } from '../utils/transfer-destination.js';
-import { transferDestinationTypeAllowedValues } from '../utils/transfer-destination.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
+import { type UUIDSet, uuidSetSchema } from '../../utils/uuid-set.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class TransferPatientsRequestEvent implements SimulationEvent {
-    @IsValue('transferPatientsRequestEvent')
-    readonly type = 'transferPatientsRequestEvent';
+export const transferPatientsRequestEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
+    type: z.literal('transferPatientsRequestEvent'),
+    vehicleType: z.string(),
+    patientIds: uuidSetSchema,
+    transferInitiatingRegionId: uuidSchema.optional(),
+    transferDestinationType: transferDestinationTypeSchema,
+    transferDestinationId: uuidSchema,
+});
+export type TransferPatientsRequestEvent = z.infer<
+    typeof transferPatientsRequestEventSchema
+>;
 
-    @IsString()
-    readonly vehicleType: string;
-
-    @IsUUIDSet()
-    readonly patientIds: UUIDSet;
-
-    @IsUUID(4, uuidValidationOptions)
-    readonly transferInitiatingRegionId?: UUID;
-
-    @IsLiteralUnion(transferDestinationTypeAllowedValues)
-    readonly transferDestinationType: TransferDestination;
-
-    @IsUUID(4, uuidValidationOptions)
-    readonly transferDestinationId: UUID;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        vehicleType: string,
-        patientIds: UUIDSet,
-        transferDestinationType: TransferDestination,
-        transferDestinationId: UUID,
-        transferInitiatingRegionId?: UUID
-    ) {
-        this.vehicleType = vehicleType;
-        this.patientIds = patientIds;
-        this.transferInitiatingRegionId = transferInitiatingRegionId;
-        this.transferDestinationType = transferDestinationType;
-        this.transferDestinationId = transferDestinationId;
-    }
-
-    static readonly create = getCreate(this);
+export function newTransferPatientsRequestEvent(
+    vehicleType: string,
+    patientIds: UUIDSet,
+    transferDestinationType: TransferDestination,
+    transferDestinationId: UUID,
+    transferInitiatingRegionId?: UUID
+): TransferPatientsRequestEvent {
+    return {
+        type: 'transferPatientsRequestEvent',
+        vehicleType,
+        patientIds,
+        transferDestinationType,
+        transferDestinationId,
+        transferInitiatingRegionId,
+    };
 }

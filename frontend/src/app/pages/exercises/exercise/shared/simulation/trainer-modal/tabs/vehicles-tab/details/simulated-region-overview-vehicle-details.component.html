@@ -44,18 +44,9 @@
                 scope="vehicle"
             />
         </div>
-        <div class="d-flex flex-row-reverse">
+        <div class="d-flex mb-1">
             <button
-                class="btn btn-outline-danger ms-1"
-                type="button"
-                (click)="removeVehicle()"
-                ngbTooltip="Personal, Material und ggfs Patienten des Fahrzeug werden ebenfalls gelöscht!"
-            >
-                <span class="bi bi-trash me-1"></span>
-                Löschen
-            </button>
-            <button
-                class="btn btn-outline-secondary ms-1"
+                class="btn btn-outline-secondary me-1 flex-grow-1"
                 type="button"
                 (click)="moveVehicleToMap()"
                 ngbTooltip="Personal, Material und ggfs Patienten des Fahrzeugs verlassen den Bereich ebenfalls"
@@ -64,7 +55,7 @@
                 Auf die Karte holen
             </button>
             <button
-                class="btn btn-outline-secondary"
+                class="btn btn-outline-secondary flex-grow-1"
                 type="button"
                 (click)="initiateVehicleTransfer()"
                 ngbTooltip="Dies fügt, wenn noch nicht vorhanden, dem Bereich das Fahrzeuge Versenden Verhalten hinzu. Personal und Material im Fahrzeug werden ebenfalls transferiert. Patienten im Fahrzeug werden automatisch vorausgewählt."
@@ -73,5 +64,14 @@
                 Transferieren
             </button>
         </div>
+        <button
+            class="btn btn-outline-danger"
+            type="button"
+            (click)="removeVehicle()"
+            ngbTooltip="Personal, Material und ggfs Patienten des Fahrzeug werden ebenfalls gelöscht!"
+        >
+            <span class="bi bi-trash me-1"></span>
+            Löschen
+        </button>
     </div>
 }

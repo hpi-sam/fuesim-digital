@@ -1,6 +1,5 @@
 import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../../state.js';
-import { getElement } from '../../../store/action-reducers/utils/index.js';
 import {
     removeTreatmentsOfElement,
     updateTreatments,
@@ -10,8 +9,6 @@ import {
     removeElementPosition,
     updateElementPosition,
 } from '../../../store/action-reducers/utils/spatial-elements.js';
-import type { UUID } from '../../../utils/index.js';
-import { cloneDeepMutable } from '../../../utils/index.js';
 import { checkRestrictedVehicleMovementOrThrow } from '../../../store/action-reducers/utils/restricted-vehicle-movement.js';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from '../../element.js';
@@ -20,6 +17,10 @@ import type { Client } from '../../client.js';
 import type { Hospital } from '../../hospital.js';
 import type { Scoutable } from '../../scoutable.js';
 import type { UserGeneratedContent } from '../../user-generated-content.js';
+import type { UUID } from '../../../utils/uuid.js';
+import { getElement } from '../../../store/action-reducers/utils/get-element.js';
+import { cloneDeepMutable } from '../../../utils/clone-deep.js';
+import type { Task } from '../../task.js';
 import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
 import { newMapPositionAt } from './map-position.js';
@@ -35,7 +36,7 @@ import type { WithPosition } from './with-position.js';
 
 type MovableElement = Exclude<
     Element,
-    AlarmGroup | Client | Hospital | Scoutable | UserGeneratedContent
+    AlarmGroup | Client | Hospital | Scoutable | Task | UserGeneratedContent
 >;
 type MovableType = MovableElement['type'];
 

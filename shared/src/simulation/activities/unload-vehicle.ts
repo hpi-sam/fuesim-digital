@@ -1,60 +1,43 @@
-import { IsInt, IsUUID, Min } from 'class-validator';
-import {
-    changeOccupation,
-    getCreate,
-    isInSpecificSimulatedRegion,
-    newNoOccupation,
-} from '../../models/index.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
+import { z } from 'zod';
 import { unloadVehicle } from '../utils/vehicle.js';
-import { tryGetElement } from '../../store/action-reducers/utils/index.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { tryGetElement } from '../../store/action-reducers/utils/get-element.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { changeOccupation } from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newNoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
-export class UnloadVehicleActivityState implements SimulationActivityState {
-    @IsValue('unloadVehicleActivity' as const)
-    public readonly type = 'unloadVehicleActivity';
+export const unloadVehicleActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('unloadVehicleActivity'),
+    vehicleId: uuidSchema,
+    startTime: z.int().nonnegative(),
+    duration: z.int().nonnegative(),
+});
+export type UnloadVehicleActivityState = z.infer<
+    typeof unloadVehicleActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId: UUID;
-
-    @IsInt()
-    @Min(0)
-    public readonly startTime: number;
-
-    @IsInt()
-    @Min(0)
-    public readonly duration: number;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        vehicleId: UUID,
-        startTime: number,
-        duration: number
-    ) {
-        this.vehicleId = vehicleId;
-        this.startTime = startTime;
-        this.duration = duration;
-        this.id = id;
-    }
-
-    static readonly create = getCreate(this);
+export function newUnloadVehicleActivityState(
+    id: UUID,
+    vehicleId: UUID,
+    startTime: number,
+    duration: number
+): UnloadVehicleActivityState {
+    return {
+        id,
+        type: 'unloadVehicleActivity',
+        vehicleId,
+        startTime,
+        duration,
+    };
 }
 
 // Because this activity relies on a cancel condition, we cannot model it as a DelayEventActivity
 export const unloadVehicleActivity: SimulationActivity<UnloadVehicleActivityState> =
     {
-        activityState: UnloadVehicleActivityState,
+        activityStateSchema: unloadVehicleActivityStateSchema,
         tick(
             draftState,
             simulatedRegion,

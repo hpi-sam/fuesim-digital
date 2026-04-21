@@ -1,28 +1,27 @@
 import { IsBoolean, IsNumber, IsString, IsUUID } from 'class-validator';
 import { Action, ActionReducer } from '../action-reducer.js';
-import { IsValue } from '../../utils/validators/index.js';
-import {
-    type RestrictedZone,
-    type MapCoordinates,
-    type Size,
-    type VehicleRestriction,
-    newMapPositionAt,
-    mapCoordinatesSchema,
-} from '../../models/index.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
 import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { sizeSchema } from '../../models/utils/size.js';
+import { type Size, sizeSchema } from '../../models/utils/size.js';
 import {
+    type RestrictedZone,
     restrictedZoneSchema,
+    type VehicleRestriction,
     vehicleRestrictionAllowedValues,
 } from '../../models/restricted-zone.js';
-import { getElement } from './utils/index.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { getElement } from './utils/get-element.js';
 
 export class AddRestrictedZoneAction implements Action {
     @IsValue('[RestrictedZone] Add restricted zone' as const)

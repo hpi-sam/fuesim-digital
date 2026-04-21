@@ -385,7 +385,9 @@ export function createSelectBehaviorStatesByType<
         createSelectBehaviorStates(simulatedRegionId),
         (behaviors) =>
             behaviors.filter(
-                (behavior): behavior is ExerciseSimulationBehaviorState<T> =>
+                (
+                    behavior
+                ): behavior is ExerciseSimulationBehaviorState & { type: T } =>
                     behavior.type === behaviorType
             )
     );
@@ -398,7 +400,9 @@ export function createSelectActivityStatesByType<
         createSelectActivityStates(simulatedRegionId),
         (activities) =>
             Object.values(activities).filter(
-                (activity): activity is ExerciseSimulationActivityState<T> =>
+                (
+                    activity
+                ): activity is ExerciseSimulationActivityState & { type: T } =>
                     activity.type === activityType
             )
     );
@@ -427,8 +431,9 @@ export const selectWorkingPersonnel = createSelector(
     (challenges) => {
         const workingPersonnel = new Set<UUID>();
         for (const challenge of Object.values(challenges)) {
-            // eslint-disable-next-line guard-for-in
-            for (const personnelId in challenge.assignedPersonnel) {
+            for (const personnelId of Object.keys(
+                challenge.assignedPersonnel
+            )) {
                 workingPersonnel.add(personnelId);
             }
         }

@@ -1,9 +1,13 @@
 import type { WritableDraft } from 'immer';
-import type { UUID } from '../utils/index.js';
 import type { ExerciseState } from '../state.js';
-import type { Personnel, TechnicalChallenge } from '../models/index.js';
-import { currentCoordinatesOf, isWithinExtent } from '../models/index.js';
-import { getElement } from '../store/action-reducers/utils/index.js';
+import type { UUID } from '../utils/uuid.js';
+import type { Personnel } from '../models/personnel.js';
+import {
+    currentCoordinatesOf,
+    isWithinExtent,
+} from '../models/utils/position/position-helpers.js';
+import { getElement } from '../store/action-reducers/utils/get-element.js';
+import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
 
 function isPersonnelAssigned(
     personnelId: UUID,

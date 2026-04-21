@@ -1,15 +1,14 @@
 import { IsUUID } from 'class-validator';
-import {
-    type MapCoordinates,
-    newMapPositionAt,
-    mapCoordinatesSchema,
-} from '../../models/index.js';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { removeInvalidAssignments } from '../../state-helpers/technical-challenge-assignment.js';
 
 export class MovePersonnelAction implements Action {

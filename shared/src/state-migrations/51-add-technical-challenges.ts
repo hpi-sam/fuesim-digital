@@ -1,5 +1,6 @@
-import type { Task, TechnicalChallenge } from '../models/index.js';
-import type { UUID } from '../utils/index.js';
+import type { UUID } from '../utils/uuid.js';
+import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
+import type { Task } from '../models/task.js';
 import type { Migration } from './migration-functions.js';
 
 export const addTechnicalChallenges51: Migration = {

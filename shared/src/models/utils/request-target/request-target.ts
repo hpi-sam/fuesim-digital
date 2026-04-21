@@ -1,14 +1,20 @@
 import type { WritableDraft } from 'immer';
-import type { VehicleResource } from '../../../models/index.js';
+import type { ZodType } from 'zod';
+import { z } from 'zod';
 import type { ExerciseState } from '../../../state.js';
-import type { Constructor, UUID } from '../../../utils/index.js';
+import type { UUID } from '../../../utils/uuid.js';
+import type { VehicleResource } from '../rescue-resource.js';
 
-export class RequestTargetConfiguration {
-    public readonly type!: `${string}RequestTarget`;
-}
+export const requestTargetConfigurationSchema = z.strictObject({
+    type: z.templateLiteral([z.string(), 'RequestTarget']),
+});
+export type RequestTargetConfiguration = z.infer<
+    typeof requestTargetConfigurationSchema
+>;
 
 export interface RequestTarget<T extends RequestTargetConfiguration> {
-    readonly configuration: Constructor<T>;
+    readonly configurationSchema: ZodType<T>;
+    readonly type: T['type'];
     readonly createRequest: (
         draftState: WritableDraft<ExerciseState>,
         requestingSimulatedRegionId: UUID,

@@ -7,9 +7,12 @@
             class="navbar-nav d-flex flex-row"
         >
             @if (auth.authData().user) {
+                <li ngbNavItem="start" class="nav-item mx-2">
+                    <a ngbNavLink class="nav-link" routerLink="/">Start</a>
+                </li>
                 <li ngbNavItem="exercises" class="nav-item mx-2">
                     <a ngbNavLink class="nav-link" routerLink="/exercises/">
-                        Meine Übungen
+                        Übungen
                     </a>
                 </li>
                 <li ngbNavItem="exercise_templates" class="nav-item mx-2">
@@ -18,17 +21,17 @@
                         class="nav-link"
                         routerLink="/exercises/templates"
                     >
-                        Meine Übungsvorlagen
+                        Übungsvorlagen
                     </a>
                 </li>
-                @if (parallelExercisesEnabled.value()) {
+                @if (parallelExercisesEnabled()) {
                     <li ngbNavItem="parallel" class="nav-item mx-2">
                         <a
                             ngbNavLink
                             class="nav-link"
                             routerLink="/exercises/parallel"
                         >
-                            Meine Parallelübungen
+                            Parallelübungen
                         </a>
                     </li>
                 }

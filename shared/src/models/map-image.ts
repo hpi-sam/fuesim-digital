@@ -1,13 +1,14 @@
 import { z } from 'zod';
-import type { UUID } from '../utils/index.js';
-import { uuidSchema, uuid } from '../utils/index.js';
-import {
-    newMapPositionAt,
-    imagePropertiesSchema,
-    positionSchema,
-} from './utils/index.js';
-import type { MapCoordinates, ImageProperties } from './utils/index.js';
+import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import type { MapImageTemplate } from './map-image-template.js';
+import { positionSchema } from './utils/position/position.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from './utils/image-properties.js';
+import type { MapCoordinates } from './utils/position/map-coordinates.js';
+import { newMapPositionAt } from './utils/position/map-position.js';
+
 export const mapImageSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('mapImage'),

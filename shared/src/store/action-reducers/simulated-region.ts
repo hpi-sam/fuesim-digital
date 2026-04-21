@@ -1,52 +1,56 @@
-import { Type } from 'class-transformer';
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
+import type { Action, ActionReducer } from '../action-reducer.js';
+import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
-    SimulatedRegion,
     type TransferPoint,
-    isInSpecificSimulatedRegion,
-    type MapCoordinates,
-    mapCoordinatesSchema,
-    newMapPositionAt,
-    newSimulatedRegionPositionIn,
-    type Size,
-    sizeSchema,
-} from '../../models/index.js';
+    transferPointSchema,
+} from '../../models/transfer-point.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import {
+    type ExerciseSimulationBehaviorState,
+    exerciseSimulationBehaviorStateSchema,
+    simulationBehaviorDictionary,
+} from '../../simulation/behaviors/exercise-simulation-behavior.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import type { ExerciseSimulationBehaviorState } from '../../simulation/index.js';
-import {
-    simulationBehaviorTypeOptions,
-    VehicleArrivedEvent,
-    PersonnelAvailableEvent,
-    NewPatientEvent,
-    MaterialAvailableEvent,
-    simulationBehaviorDictionary,
-} from '../../simulation/index.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ExpectedReducerError, ReducerError } from '../reducer-error.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { transferPointSchema } from '../../models/transfer-point.js';
+import { newVehicleArrivedEvent } from '../../simulation/events/vehicle-arrived.js';
+import { newNewPatientEvent } from '../../simulation/events/new-patient.js';
+import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
+import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
+import {
+    type SimulatedRegion,
+    simulatedRegionSchema,
+} from '../../models/simulated-region.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { type Size, sizeSchema } from '../../models/utils/size.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
 import { TransferPointActionReducers } from './transfer-point.js';
 import { isCompletelyLoaded } from './utils/completely-load-vehicle.js';
-import { getElement, getElementByPredicate } from './utils/index.js';
 import {
     logBehaviorAdded,
     logBehaviorRemoved,
     logSimulatedRegionAddElement,
     logSimulatedRegionNameChange,
 } from './utils/log.js';
+import { getElement, getElementByPredicate } from './utils/get-element.js';
 
 export class AddSimulatedRegionAction implements Action {
     @IsValue('[SimulatedRegion] Add simulated region' as const)
     readonly type = '[SimulatedRegion] Add simulated region';
-    @ValidateNested()
-    @Type(() => SimulatedRegion)
+
+    @IsZodSchema(simulatedRegionSchema)
     public simulatedRegion!: SimulatedRegion;
 
     @IsZodSchema(transferPointSchema)
@@ -122,8 +126,7 @@ export class AddBehaviorToSimulatedRegionAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly simulatedRegionId!: UUID;
 
-    @Type(...simulationBehaviorTypeOptions)
-    @ValidateNested()
+    @IsZodSchema(exerciseSimulationBehaviorStateSchema)
     public readonly behaviorState!: ExerciseSimulationBehaviorState;
 }
 
@@ -297,7 +300,7 @@ export namespace SimulatedRegionActionReducers {
                     case 'vehicle':
                         sendSimulationEvent(
                             simulatedRegion,
-                            VehicleArrivedEvent.create(
+                            newVehicleArrivedEvent(
                                 element.id,
                                 draftState.currentTime
                             )
@@ -306,19 +309,19 @@ export namespace SimulatedRegionActionReducers {
                     case 'patient':
                         sendSimulationEvent(
                             simulatedRegion,
-                            NewPatientEvent.create(element.id)
+                            newNewPatientEvent(element.id)
                         );
                         break;
                     case 'personnel':
                         sendSimulationEvent(
                             simulatedRegion,
-                            PersonnelAvailableEvent.create(element.id)
+                            newPersonnelAvailableEvent(element.id)
                         );
                         break;
                     case 'material':
                         sendSimulationEvent(
                             simulatedRegion,
-                            MaterialAvailableEvent.create(element.id)
+                            newMaterialAvailableEvent(element.id)
                         );
                         break;
                 }

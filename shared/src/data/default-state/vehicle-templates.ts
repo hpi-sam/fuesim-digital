@@ -1,4 +1,5 @@
-import type { VehicleTemplate, ImageProperties } from '../../models/index.js';
+import type { VehicleTemplate } from '../../models/vehicle-template.js';
+import type { ImageProperties } from '../../models/utils/image-properties.js';
 import { defaultMaterialTemplates } from './material-templates.js';
 import { defaultPersonnelTemplates } from './personnel-templates.js';
 

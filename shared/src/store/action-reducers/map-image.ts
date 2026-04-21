@@ -7,25 +7,22 @@ import {
     IsUUID,
 } from 'class-validator';
 import { WritableDraft } from 'immer';
-import {
-    type MapImage,
-    type MapCoordinates,
-    mapCoordinatesSchema,
-    newMapPositionAt,
-} from '../../models/index.js';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
-import {
-    assertExhaustiveness,
-    cloneDeepMutable,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { mapImageSchema } from '../../models/map-image.js';
-import { getElement } from './utils/index.js';
+import { type MapImage, mapImageSchema } from '../../models/map-image.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { assertExhaustiveness } from '../../utils/assert-exhaustiveness.js';
+import { getElement } from './utils/get-element.js';
 
 export class AddMapImageAction implements Action {
     @IsValue('[MapImage] Add MapImage' as const)

@@ -1,58 +1,45 @@
-import { Type } from 'class-transformer';
-import { IsBoolean, IsUUID, ValidateNested } from 'class-validator';
+import { z } from 'zod';
 import type { ExerciseRadiogram } from '../../models/radiogram/exercise-radiogram.js';
-import { radiogramTypeOptions } from '../../models/radiogram/exercise-radiogram.js';
+import { exerciseRadiogramSchema } from '../../models/radiogram/exercise-radiogram.js';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { ExerciseSimulationEvent } from '../events/exercise-simulation-event.js';
-import { simulationEventTypeOptions } from '../events/exercise-simulation-event.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import {
+    type ExerciseSimulationEvent,
+    exerciseSimulationEventSchema,
+} from '../events/exercise-simulation-event.js';
+import type { UUID } from '../../utils/uuid.js';
+import type { SimulationActivity } from './simulation-activity.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
 
-export class GenerateReportActivityState implements SimulationActivityState {
-    @IsValue('generateReportActivity')
-    readonly type = 'generateReportActivity';
+export const generateReportActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('generateReportActivity'),
+    radiogram: exerciseRadiogramSchema,
+    collectEvent: exerciseSimulationEventSchema,
+    hasSendEvent: z.boolean(),
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly id: UUID;
+export type GenerateReportActivityState = z.infer<
+    typeof generateReportActivityStateSchema
+>;
 
-    @Type(...radiogramTypeOptions)
-    @ValidateNested()
-    readonly radiogram: ExerciseRadiogram;
-
-    @Type(...simulationEventTypeOptions)
-    @ValidateNested()
-    readonly collectEvent: ExerciseSimulationEvent;
-
-    @IsBoolean()
-    readonly hasSendEvent: boolean;
-
-    /**
-     * @deprecated Use {@link create} instead.
-     */
-    constructor(
-        id: UUID,
-        radiogram: ExerciseRadiogram,
-        collectEvent: ExerciseSimulationEvent
-    ) {
-        this.id = id;
-        this.radiogram = radiogram;
-        this.collectEvent = collectEvent;
-        this.hasSendEvent = false;
-    }
-
-    static readonly create = getCreate(this);
+export function newGenerateReportActivityState(
+    id: UUID,
+    radiogram: ExerciseRadiogram,
+    collectEvent: ExerciseSimulationEvent
+): GenerateReportActivityState {
+    return {
+        id,
+        type: 'generateReportActivity',
+        radiogram,
+        collectEvent,
+        hasSendEvent: false,
+    };
 }
 
 export const generateReportActivity: SimulationActivity<GenerateReportActivityState> =
     {
-        activityState: GenerateReportActivityState,
+        activityStateSchema: generateReportActivityStateSchema,
         tick(
             draftState,
             simulatedRegion,

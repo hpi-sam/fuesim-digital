@@ -1,12 +1,10 @@
-import * as z from 'zod';
-import {
-    noOccupationSchema,
-    intermediateOccupationSchema,
-    loadOccupationSchema,
-    waitForTransferOccupationSchema,
-    unloadingOccupationSchema,
-    patientTransferOccupation,
-} from './index.js';
+import { z } from 'zod';
+import { intermediateOccupationSchema } from './intermediate-occupation.js';
+import { noOccupationSchema } from './no-occupation.js';
+import { loadOccupationSchema } from './load-occupation.js';
+import { waitForTransferOccupationSchema } from './wait-for-transfer-occupation.js';
+import { unloadingOccupationSchema } from './unloading-occupation.js';
+import { patientTransferOccupation } from './patient-transfer-occupation.js';
 
 export const exerciseOccupationSchema = z.union([
     intermediateOccupationSchema,

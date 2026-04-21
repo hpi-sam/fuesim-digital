@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 import type { ExerciseState } from '../../src/state.js';
-import { getElement } from '../../src/index.js';
-import type { UUID } from '../../src/index.js';
+import type { UUID } from '../../src/utils/uuid.js';
+import { getElement } from '../../src/store/action-reducers/utils/get-element.js';
 
 export interface Catering {
     /**

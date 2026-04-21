@@ -1,12 +1,10 @@
 import { z } from 'zod';
-import { uuidSchema } from '../../utils/index.js';
-import {
-    positionSchema,
-    imagePropertiesSchema,
-    sizeSchema,
-} from '../utils/index.js';
-import { personnelSchema } from '../personnel.js';
+import { uuidSchema } from '../../utils/uuid.js';
+import { imagePropertiesSchema } from '../utils/image-properties.js';
+import { positionSchema } from '../utils/position/position.js';
 import { taskSchema } from '../task.js';
+import { personnelSchema } from '../personnel.js';
+import { sizeSchema } from '../utils/size.js';
 import {
     stateMachineSchema,
     technicalChallengeStateIdSchema,

@@ -2,275 +2,296 @@
     @if (alarmGroups$ | async; as alarmGroups) {
         @if (transferPoints$ | async; as transferPoints) {
             <form (ngSubmit)="!useAlarmGroupButtons() && sendAlarmGroup()">
-                @if (!useAlarmGroupButtons()) {
-                    <div class="d-flex flex-row align-items-center">
-                        <label class="flex-shrink-1 text-nowrap"
-                            >Alarmgruppe:</label
-                        >
-                        <button
-                            [ngbPopover]="selectAlarmGroupTemplate"
-                            #selectAlarmGroupPopover="ngbPopover"
-                            placement="bottom"
-                            [disabled]="(alarmGroupOptions?.length ?? 0) === 0"
-                            [appAutofocus]="true"
-                            tabindex="1"
-                            class="btn btn-outline-primary flex-grow-1 flex-shrink-1 ms-2 d-flex flex-row"
-                            style="width: 1px"
-                            type="button"
-                            data-cy="sendAlarmGroupChooseAlarmGroupButton"
-                        >
-                            <span
-                                class="flex-grow-1 flex-shrink-1 text-nowrap overflow-hidden"
-                                style="text-overflow: ellipsis; width: 1px"
-                            >
-                                {{
-                                    selectedAlarmGroupOption
-                                        ? selectedAlarmGroupOption.name
-                                        : 'Alarmgruppe auswählen'
-                                }}
-                            </span>
-                            <app-hotkey-indicator
-                                [hotkey]="selectAlarmGroupHotkey"
-                                class="flex-shrink-1 ms-1"
-                            />
-                            <i
-                                class="bi bi-caret-down-fill flex-shrink-1 ms-1"
-                            ></i>
-                        </button>
-                        <ng-template #selectAlarmGroupTemplate>
-                            @if ((alarmGroupOptions?.length ?? 0) !== 0) {
-                                <app-searchable-dropdown
-                                    [options]="alarmGroupOptions!"
-                                    (selected)="
-                                        selectedAlarmGroupOption = $event;
-                                        selectAlarmGroupPopover.close()
-                                    "
-                                />
-                            }
-                        </ng-template>
-                    </div>
-                }
-                <div class="d-flex flex-row align-items-center mt-2">
-                    <label class="flex-shrink-1 text-nowrap">Ziel:</label>
-                    <button
-                        [ngbPopover]="selectTargetTemplate"
-                        #selectTargetPopover="ngbPopover"
-                        placement="bottom"
-                        [disabled]="(transferPoints?.length ?? 0) === 0"
-                        tabindex="2"
-                        class="btn btn-outline-primary flex-grow-1 flex-shrink-1 ms-2 d-flex flex-row"
-                        style="width: 1px"
-                        type="button"
-                        data-cy="sendAlarmGroupChooseTargetButton"
-                    >
-                        <span
-                            class="flex-grow-1 flex-shrink-1 text-nowrap overflow-hidden"
-                            style="text-overflow: ellipsis; width: 1px"
-                        >
-                            {{
-                                selectedTarget
-                                    ? selectedTarget.name
-                                    : 'Ziel auswählen'
-                            }}
-                        </span>
-                        <app-hotkey-indicator
-                            [hotkey]="selectTargetHotkey"
-                            class="flex-shrink-1 ms-1"
-                        />
-                        <i class="bi bi-caret-down-fill flex-shrink-1 ms-1"></i>
-                    </button>
-                    <ng-template #selectTargetTemplate>
-                        @if ((transferPoints?.length ?? 0) !== 0) {
-                            <app-searchable-dropdown
-                                [options]="transferPoints!"
-                                (selected)="
-                                    selectedTarget = $event;
-                                    selectTargetPopover.close()
-                                "
-                            />
-                        }
-                    </ng-template>
-                </div>
-                @if (useFirstVehicles()) {
-                    <div>
-                        <h6 class="fw-bold mt-4">
-                            Abweichendes Ziel für die ersten Fahrzeuge
-                        </h6>
-                        <div class="d-flex flex-row align-items-center mt-2">
+                <fieldset [disabled]="interfaceDisabled()">
+                    @if (!useAlarmGroupButtons()) {
+                        <div class="d-flex flex-row align-items-center">
                             <label class="flex-shrink-1 text-nowrap"
-                                >Anzahl Fahrzeuge:</label
+                                >Alarmgruppe:</label
                             >
-                            <input
-                                [(ngModel)]="firstVehiclesCount"
-                                #firstVehiclesInput="ngModel"
-                                appIntegerValidator
-                                required
-                                min="0"
-                                step="1"
-                                name="firstVehiclesCount"
-                                type="number"
-                                tabindex="3"
-                                class="form-control flex-grow-1 flex-shrink-1 ms-2"
-                                style="width: 1px"
-                            />
-                        </div>
-                        <app-display-validation
-                            [ngModelInput]="firstVehiclesInput"
-                        />
-                        <div class="d-flex flex-row align-items-center mt-2">
-                            <label class="flex-shrink-1 text-nowrap">
-                                {{
-                                    firstVehiclesCount === 1
-                                        ? 'Das erste Fahrzeug fährt nach:'
-                                        : `Die ersten ${firstVehiclesCount}
-                    Fahrzeuge fahren nach:`
-                                }}
-                            </label>
                             <button
-                                [ngbPopover]="selectFirstVehiclesTargetTemplate"
-                                #selectFirstVehiclesTargetPopover="ngbPopover"
+                                [ngbPopover]="selectAlarmGroupTemplate"
+                                #selectAlarmGroupPopover="ngbPopover"
                                 placement="bottom"
                                 [disabled]="
-                                    (transferPoints?.length ?? 0) === 0 ||
-                                    firstVehiclesCount < 1
+                                    (alarmGroupOptions?.length ?? 0) === 0
                                 "
-                                tabindex="4"
+                                [appAutofocus]="true"
+                                tabindex="1"
                                 class="btn btn-outline-primary flex-grow-1 flex-shrink-1 ms-2 d-flex flex-row"
                                 style="width: 1px"
                                 type="button"
+                                data-cy="sendAlarmGroupChooseAlarmGroupButton"
                             >
                                 <span
                                     class="flex-grow-1 flex-shrink-1 text-nowrap overflow-hidden"
                                     style="text-overflow: ellipsis; width: 1px"
                                 >
                                     {{
-                                        selectedFirstVehiclesTarget
-                                            ? selectedFirstVehiclesTarget.name
-                                            : 'Ziel für die ersten Fahrzeuge auswählen'
+                                        selectedAlarmGroupOption
+                                            ? selectedAlarmGroupOption.name
+                                            : 'Alarmgruppe auswählen'
                                     }}
                                 </span>
                                 <app-hotkey-indicator
-                                    [hotkey]="selectFirstVehiclesTargetHotkey"
+                                    [hotkey]="selectAlarmGroupHotkey"
                                     class="flex-shrink-1 ms-1"
                                 />
                                 <i
                                     class="bi bi-caret-down-fill flex-shrink-1 ms-1"
                                 ></i>
                             </button>
-                            <ng-template #selectFirstVehiclesTargetTemplate>
-                                @if ((transferPoints?.length ?? 0) !== 0) {
+                            <ng-template #selectAlarmGroupTemplate>
+                                @if ((alarmGroupOptions?.length ?? 0) !== 0) {
                                     <app-searchable-dropdown
-                                        [options]="transferPoints!"
+                                        [options]="alarmGroupOptions!"
                                         (selected)="
-                                            selectedFirstVehiclesTarget =
-                                                $event;
-                                            selectFirstVehiclesTargetPopover.close()
+                                            selectedAlarmGroupOption = $event;
+                                            selectAlarmGroupPopover.close()
                                         "
                                     />
                                 }
                             </ng-template>
                         </div>
-                        @if (firstVehiclesCount > 1) {
-                            <span class="row g-0 mt-2 text-muted">
-                                Sollte die aktuelle Alarmgruppe weniger als
-                                {{ firstVehiclesCount }} Fahrzeuge haben, werden
-                                alle Fahrzeuge zum alternativen Zielort
-                                geschickt und die verbleibende Zahl an
-                                Fahrzeugen für die nächste Alarmgruppe
-                                übernommen.
-                            </span>
-                        }
-                    </div>
-                }
-                @if (!useAlarmGroupButtons()) {
-                    @let selectedAlarmGroup =
-                        selectedAlarmGroupOption?.key === null
-                            ? null
-                            : (alarmGroups[selectedAlarmGroupOption!.key] ??
-                              null);
-                    @let triggerLimitReached =
-                        selectedAlarmGroup?.triggerLimit === null
-                            ? false
-                            : (selectedAlarmGroup?.triggerCount ?? 0) >=
-                              (selectedAlarmGroup?.triggerLimit ?? 0);
-
-                    <button
-                        class="btn btn-primary mt-4 row g-0 w-100"
-                        [tabIndex]="5"
-                        [disabled]="!canSubmit || triggerLimitReached"
-                        data-cy="sendAlarmGroupSendButton"
-                    >
-                        Sende Alarmgruppe
-                        @if (loading) {
+                    }
+                    <div class="d-flex flex-row align-items-center mt-2">
+                        <label class="flex-shrink-1 text-nowrap">Ziel:</label>
+                        <button
+                            [ngbPopover]="selectTargetTemplate"
+                            #selectTargetPopover="ngbPopover"
+                            placement="bottom"
+                            [disabled]="(transferPoints?.length ?? 0) === 0"
+                            tabindex="2"
+                            class="btn btn-outline-primary flex-grow-1 flex-shrink-1 ms-2 d-flex flex-row"
+                            style="width: 1px"
+                            type="button"
+                            data-cy="sendAlarmGroupChooseTargetButton"
+                        >
                             <span
-                                class="spinner-border spinner-border-sm"
-                                role="status"
-                                aria-hidden="true"
-                            ></span>
-                        } @else {
+                                class="flex-grow-1 flex-shrink-1 text-nowrap overflow-hidden"
+                                style="text-overflow: ellipsis; width: 1px"
+                            >
+                                {{
+                                    selectedTarget
+                                        ? selectedTarget.name
+                                        : 'Ziel auswählen'
+                                }}
+                            </span>
                             <app-hotkey-indicator
-                                [hotkey]="submitHotkey"
-                                class="ms-1"
+                                [hotkey]="selectTargetHotkey"
+                                class="flex-shrink-1 ms-1"
                             />
-                        }
-                    </button>
-
-                    @if (triggerLimitReached) {
-                        <div class="alert alert-warning mt-2" role="alert">
-                            Diese Alarmgruppe kann nicht mehr ausgelöst werden,
-                            da sie ihre maximale Anzahl an Auslösungen erreicht
-                            hat.
+                            <i
+                                class="bi bi-caret-down-fill flex-shrink-1 ms-1"
+                            ></i>
+                        </button>
+                        <ng-template #selectTargetTemplate>
+                            @if ((transferPoints?.length ?? 0) !== 0) {
+                                <app-searchable-dropdown
+                                    [options]="transferPoints!"
+                                    (selected)="
+                                        selectedTarget = $event;
+                                        selectTargetPopover.close()
+                                    "
+                                />
+                            }
+                        </ng-template>
+                    </div>
+                    @if (useFirstVehicles()) {
+                        <div>
+                            <h6 class="fw-bold mt-4">
+                                Abweichendes Ziel für die ersten Fahrzeuge
+                            </h6>
+                            <div
+                                class="d-flex flex-row align-items-center mt-2"
+                            >
+                                <label class="flex-shrink-1 text-nowrap"
+                                    >Anzahl Fahrzeuge:</label
+                                >
+                                <input
+                                    [(ngModel)]="firstVehiclesCount"
+                                    #firstVehiclesInput="ngModel"
+                                    appIntegerValidator
+                                    required
+                                    min="0"
+                                    step="1"
+                                    name="firstVehiclesCount"
+                                    type="number"
+                                    tabindex="3"
+                                    class="form-control flex-grow-1 flex-shrink-1 ms-2"
+                                    style="width: 1px"
+                                />
+                            </div>
+                            <app-display-validation
+                                [ngModelInput]="firstVehiclesInput"
+                            />
+                            <div
+                                class="d-flex flex-row align-items-center mt-2"
+                            >
+                                <label class="flex-shrink-1 text-nowrap">
+                                    {{
+                                        firstVehiclesCount === 1
+                                            ? 'Das erste Fahrzeug fährt nach:'
+                                            : `Die ersten ${firstVehiclesCount}
+                    Fahrzeuge fahren nach:`
+                                    }}
+                                </label>
+                                <button
+                                    [ngbPopover]="
+                                        selectFirstVehiclesTargetTemplate
+                                    "
+                                    #selectFirstVehiclesTargetPopover="ngbPopover"
+                                    placement="bottom"
+                                    [disabled]="
+                                        (transferPoints?.length ?? 0) === 0 ||
+                                        firstVehiclesCount < 1
+                                    "
+                                    tabindex="4"
+                                    class="btn btn-outline-primary flex-grow-1 flex-shrink-1 ms-2 d-flex flex-row"
+                                    style="width: 1px"
+                                    type="button"
+                                >
+                                    <span
+                                        class="flex-grow-1 flex-shrink-1 text-nowrap overflow-hidden"
+                                        style="
+                                            text-overflow: ellipsis;
+                                            width: 1px;
+                                        "
+                                    >
+                                        {{
+                                            selectedFirstVehiclesTarget
+                                                ? selectedFirstVehiclesTarget.name
+                                                : 'Ziel für die ersten Fahrzeuge auswählen'
+                                        }}
+                                    </span>
+                                    <app-hotkey-indicator
+                                        [hotkey]="
+                                            selectFirstVehiclesTargetHotkey
+                                        "
+                                        class="flex-shrink-1 ms-1"
+                                    />
+                                    <i
+                                        class="bi bi-caret-down-fill flex-shrink-1 ms-1"
+                                    ></i>
+                                </button>
+                                <ng-template #selectFirstVehiclesTargetTemplate>
+                                    @if ((transferPoints?.length ?? 0) !== 0) {
+                                        <app-searchable-dropdown
+                                            [options]="transferPoints!"
+                                            (selected)="
+                                                selectedFirstVehiclesTarget =
+                                                    $event;
+                                                selectFirstVehiclesTargetPopover.close()
+                                            "
+                                        />
+                                    }
+                                </ng-template>
+                            </div>
+                            @if (firstVehiclesCount > 1) {
+                                <span class="row g-0 mt-2 text-muted">
+                                    Sollte die aktuelle Alarmgruppe weniger als
+                                    {{ firstVehiclesCount }} Fahrzeuge haben,
+                                    werden alle Fahrzeuge zum alternativen
+                                    Zielort geschickt und die verbleibende Zahl
+                                    an Fahrzeugen für die nächste Alarmgruppe
+                                    übernommen.
+                                </span>
+                            }
                         </div>
                     }
-                }
-                @if (useAlarmGroupButtons()) {
-                    <div class="d-flex flex-row flex-wrap gap-2 mt-4">
-                        @for (
-                            alarmGroup of alarmGroupOptions;
-                            track alarmGroup.key
-                        ) {
-                            @let alarmGroupData = alarmGroups[alarmGroup!.key]!;
-                            @let usesRemaining =
-                                alarmGroupData.triggerLimit === null
-                                    ? -1
-                                    : alarmGroupData.triggerLimit -
-                                      alarmGroupData.triggerCount;
-                            <button
-                                [disabled]="
-                                    !selectedTarget || usesRemaining === 0
-                                "
-                                class="btn btn-primary g-0"
-                                (click)="
-                                    selectedAlarmGroupOption = alarmGroup;
-                                    sendAlarmGroup()
-                                "
-                            >
-                                {{ alarmGroup.name }}
-                                @if (alarmGroupData.triggerLimit !== null) {
-                                    <span
-                                        class="badge border"
-                                        [class.text-bg-light]="usesRemaining"
-                                        style="margin-left: 3px"
-                                        >{{ usesRemaining }}</span
-                                    >
-                                }
-                            </button>
-                        }
-                        @if (alarmGroupOptions.length <= 0) {
-                            <div class="text-muted">
-                                Es sind keine Alarmierungsgruppen vorhanden.
+                    @if (!useAlarmGroupButtons()) {
+                        @let selectedAlarmGroup =
+                            selectedAlarmGroupOption?.key === null
+                                ? null
+                                : (alarmGroups[selectedAlarmGroupOption!.key] ??
+                                  null);
+                        @let triggerLimitReached =
+                            selectedAlarmGroup?.triggerLimit === null
+                                ? false
+                                : (selectedAlarmGroup?.triggerCount ?? 0) >=
+                                  (selectedAlarmGroup?.triggerLimit ?? 0);
+
+                        <button
+                            class="btn btn-primary mt-4 row g-0 w-100"
+                            [tabIndex]="5"
+                            [disabled]="!canSubmit || triggerLimitReached"
+                            data-cy="sendAlarmGroupSendButton"
+                        >
+                            Sende Alarmgruppe
+                            @if (loading) {
+                                <span
+                                    class="spinner-border spinner-border-sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                ></span>
+                            } @else {
+                                <app-hotkey-indicator
+                                    [hotkey]="submitHotkey"
+                                    class="ms-1"
+                                />
+                            }
+                        </button>
+
+                        @if (triggerLimitReached) {
+                            <div class="alert alert-warning mt-2" role="alert">
+                                Diese Alarmgruppe kann nicht mehr ausgelöst
+                                werden, da sie ihre maximale Anzahl an
+                                Auslösungen erreicht hat.
                             </div>
                         }
-                    </div>
-                }
-                @if (
-                    !useAlarmGroupButtons() ||
-                    (useAlarmGroupButtons() && alarmGroupOptions.length > 0)
-                ) {
-                    <span class="row g-0 mt-2 text-muted">
-                        Sie können mehrere Alarmgruppen nacheinander starten.
-                    </span>
-                }
+                    }
+                    @if (useAlarmGroupButtons()) {
+                        <div class="d-flex flex-row flex-wrap gap-2 mt-4">
+                            @for (
+                                alarmGroup of alarmGroupOptions;
+                                track alarmGroup.key
+                            ) {
+                                @let alarmGroupData =
+                                    alarmGroups[alarmGroup!.key]!;
+                                @let usesRemaining =
+                                    alarmGroupData.triggerLimit === null
+                                        ? -1
+                                        : alarmGroupData.triggerLimit -
+                                          alarmGroupData.triggerCount;
+                                <button
+                                    [disabled]="
+                                        !selectedTarget || usesRemaining === 0
+                                    "
+                                    class="btn btn-primary g-0"
+                                    (click)="
+                                        selectedAlarmGroupOption = alarmGroup;
+                                        sendAlarmGroup()
+                                    "
+                                >
+                                    {{ alarmGroup.name }}
+                                    @if (alarmGroupData.triggerLimit !== null) {
+                                        <span
+                                            class="badge border"
+                                            [class.text-bg-light]="
+                                                usesRemaining
+                                            "
+                                            style="margin-left: 3px"
+                                            >{{ usesRemaining }}</span
+                                        >
+                                    }
+                                </button>
+                            }
+                            @if (alarmGroupOptions.length <= 0) {
+                                <div class="text-muted">
+                                    Es sind keine Alarmierungsgruppen vorhanden.
+                                </div>
+                            }
+                        </div>
+                    }
+                    @if (
+                        !useAlarmGroupButtons() ||
+                        (useAlarmGroupButtons() && alarmGroupOptions.length > 0)
+                    ) {
+                        <span class="row g-0 mt-2 text-muted">
+                            Sie können mehrere Alarmgruppen nacheinander
+                            starten.
+                        </span>
+                    }
+                </fieldset>
             </form>
         }
     }

@@ -1,22 +1,24 @@
 import { IsString, IsUUID, IsInt, IsArray } from 'class-validator';
 import { WritableDraft } from 'immer';
-import {
-    type VehicleTemplate,
-    imagePropertiesSchema,
-    type ImageProperties,
-} from '../../models/index.js';
 import type { ExerciseState } from '../../state.js';
-import type { UUID } from '../../utils/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
+    type VehicleTemplate,
+    vehicleTemplateSchema,
+} from '../../models/vehicle-template.js';
+import {
+    type UUID,
     uuidArrayValidationOptions,
     uuidValidationOptions,
-    cloneDeepMutable,
-} from '../../utils/index.js';
-import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
+} from '../../utils/uuid.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from '../../models/utils/image-properties.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 
 export class AddVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Add vehicleTemplate')

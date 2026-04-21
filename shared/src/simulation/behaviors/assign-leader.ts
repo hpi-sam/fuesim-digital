@@ -1,55 +1,51 @@
-import { IsOptional, IsUUID } from 'class-validator';
 import { groupBy } from 'lodash-es';
 import type { WritableDraft } from 'immer';
-import type {
-    MaterialCountRadiogram,
-    PersonnelCountRadiogram,
-    TransferConnectionsRadiogram,
-    VehicleCountRadiogram,
-} from '../../models/radiogram/index.js';
+import { z } from 'zod';
+import { StrictObject } from '../../utils/strict-object.js';
 import {
     getActivityById,
     getElement,
     getElementByPredicate,
-} from '../../store/action-reducers/utils/index.js';
-import type { UUID } from '../../utils/index.js';
-import {
-    StrictObject,
-    uuid,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { LeaderChangedEvent } from '../events/leader-changed.js';
-import type { ExerciseState } from '../../state.js';
-import { nextUUID } from '../utils/randomness.js';
-import { getCreate } from '../../models/utils/get-create.js';
+} from '../../store/action-reducers/utils/get-element.js';
+import type { VehicleOccupationsRadiogram } from '../../models/radiogram/vehicle-occupations-radiogram.js';
 import {
     currentSimulatedRegionIdOf,
     isInSimulatedRegion,
     isInSpecificSimulatedRegion,
 } from '../../models/utils/position/position-helpers.js';
+import type { ExerciseState } from '../../state.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import { addActivity } from '../activities/utils.js';
-import { DelayEventActivityState } from '../activities/delay-event.js';
-import { VehicleOccupationsRadiogram } from '../../models/radiogram/vehicle-occupations-radiogram.js';
-import { ResourceDescription } from '../../models/index.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { nextUUID } from '../utils/randomness.js';
+import { newLeaderChangedEvent } from '../events/leader-changed.js';
+import type { MaterialCountRadiogram } from '../../models/radiogram/material-count-radiogram.js';
+import type { PersonnelCountRadiogram } from '../../models/radiogram/personnel-count-radiogram.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import type { TransferConnectionsRadiogram } from '../../models/radiogram/transfer-connections-radiogram.js';
+import type { VehicleCountRadiogram } from '../../models/radiogram/vehicle-count-radiogram.js';
+import {
+    type SimulationBehavior,
+    simulationBehaviorStateSchema,
 } from './simulation-behavior.js';
 
-export class AssignLeaderBehaviorState implements SimulationBehaviorState {
-    @IsValue('assignLeaderBehavior' as const)
-    readonly type = 'assignLeaderBehavior';
+export const assignLeaderBehaviorStateSchema = z.strictObject({
+    ...simulationBehaviorStateSchema.shape,
+    type: z.literal('assignLeaderBehavior'),
+    leaderId: uuidSchema.optional(),
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export type AssignLeaderBehaviorState = z.infer<
+    typeof assignLeaderBehaviorStateSchema
+>;
 
-    @IsOptional()
-    @IsUUID(4, uuidValidationOptions)
-    public readonly leaderId: UUID | undefined;
-
-    static readonly create = getCreate(this);
+export function newAssignLeaderBehaviorState(): AssignLeaderBehaviorState {
+    return {
+        type: 'assignLeaderBehavior',
+        id: uuid(),
+        leaderId: undefined,
+    };
 }
 
 const personnelPriorities: { [key in string]: number } = {
@@ -62,7 +58,8 @@ const personnelPriorities: { [key in string]: number } = {
 
 export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState> =
     {
-        behaviorState: AssignLeaderBehaviorState,
+        behaviorStateSchema: assignLeaderBehaviorStateSchema,
+        newBehaviorState: newAssignLeaderBehaviorState,
         handleEvent(draftState, simulatedRegion, behaviorState, event) {
             switch (event.type) {
                 case 'personnelAvailableEvent':
@@ -376,9 +373,9 @@ function changeLeader(
 ) {
     addActivity(
         simulatedRegion,
-        DelayEventActivityState.create(
+        newDelayEventActivityState(
             nextUUID(draftState),
-            LeaderChangedEvent.create(
+            newLeaderChangedEvent(
                 behaviorState.leaderId ?? null,
                 newLeaderId ?? null
             ),

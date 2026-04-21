@@ -49,6 +49,10 @@ function baseTable<T>() {
     };
 }
 
+export const accessKeyTable = pgTable('access_key', {
+    key: varchar().$type<AccessKey>().primaryKey().notNull(),
+});
+
 export const userTable = pgTable('users', {
     /**
      * This should always be the sub claim from the OIDC provider

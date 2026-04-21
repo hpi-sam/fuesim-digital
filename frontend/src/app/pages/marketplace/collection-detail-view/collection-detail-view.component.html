@@ -141,7 +141,9 @@
                     >
                         <i class="bi bi-eye"></i>
                     </button>
-                    @if (checkRole(collectionData.ownRole).isAtLeast('admin')) {
+                    @if (
+                        checkRole(collectionData.ownRole).isAtLeast('editor')
+                    ) {
                         <button
                             class="btn btn-outline-danger btn-sm"
                             ngbTooltip="Änderungen verwerfen"
@@ -149,6 +151,8 @@
                         >
                             <i class="bi bi-trash"></i>
                         </button>
+                    }
+                    @if (checkRole(collectionData.ownRole).isAtLeast('admin')) {
                         <button
                             class="btn btn-primary btn-sm"
                             (click)="saveDraftState()"

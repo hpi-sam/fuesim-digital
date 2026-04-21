@@ -52,7 +52,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     const createRoleRouter = (
         lowestAllowedRole: CollectionRelationshipType
     ) => {
-        const roleRouter = Router({ mergeParams: true });
+        const roleRouter = Router({ mergeParams: false });
         roleRouter.use('/:collectionEntityId', async (req, res, next) => {
             const collectionEntityId = getCollectionEntityId(req);
 
@@ -82,6 +82,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
             const rolecheck =
                 checkCollectionRole(relationship).isAtLeast(lowestAllowedRole);
+
             if (!rolecheck) {
                 res.status(403).send({
                     error: 'You do not have the required permissions to perform this action',
@@ -91,7 +92,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             next();
         });
 
-        return router;
+        return roleRouter;
     };
 
     const adminRouter = createRoleRouter('admin');
@@ -481,7 +482,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     /*
      * Discards the current draft state and resets it to the latest published version.
      */
-    adminRouter.delete('/:collectionEntityId/draft', async (req, res) => {
+    editorRouter.delete('/:collectionEntityId/draft', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 
         let newCollectionState:
@@ -492,7 +493,6 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             newCollectionState =
                 await collectionService.revertDraftState(collectionEntityId);
         } catch (err) {
-            console.error('Error while reverting draft state:', err);
             res.send(
                 Marketplace.Collection.DeleteDraftState.responseSchema.encode({
                     result: null,

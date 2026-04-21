@@ -39,4 +39,5 @@
     [collection]="collectionData().collection"
     [collectionElements]="collectionData().objects.direct"
     [publishedElements]="collectionData().publishedElements.direct"
+    [editable]="checkRole(collectionData().ownRole).isAtLeast('editor')"
 />

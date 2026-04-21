@@ -8,6 +8,7 @@ import {
     signal,
 } from '@angular/core';
 import {
+    checkCollectionRole,
     CollectionDto,
     collectionRelationshipTypeAllowedValues,
     collectionRelationshipTypeSchema,
@@ -52,7 +53,17 @@ export class CollectionDetailsTabComponent {
             collectionEntityId: this.collection().entityId,
         }),
         loader: async ({ params: { collectionEntityId } }) =>
-            this.collectionService.getCollectionMembers(collectionEntityId),
+            (
+                await this.collectionService.getCollectionMembers(
+                    collectionEntityId
+                )
+            )
+                .sort((a, b) => b.displayName.localeCompare(a.displayName))
+                .sort(
+                    (a, b) =>
+                        checkCollectionRole(b.role).indexOf() -
+                        checkCollectionRole(a.role).indexOf()
+                ),
     });
 
     public readonly ownUserId = computed(

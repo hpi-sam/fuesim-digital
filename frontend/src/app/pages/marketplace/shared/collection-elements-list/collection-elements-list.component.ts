@@ -18,7 +18,7 @@ import { ElementCardComponent } from '../cards/element-card/element-card.compone
 export class CollectionElementsListComponent {
     public readonly collection = input.required<VersionedCollectionPartial>();
     public readonly collectionElements = input.required<ElementDto[]>();
-    public readonly publishedElements = input<ElementDto[]>([]);
+    public readonly publishedElements = input<ElementDto[] | null>(null);
     public readonly editable = input(true);
 
     // This array defined the order in which the element types are displayed in the UI.
@@ -29,8 +29,10 @@ export class CollectionElementsListComponent {
     ];
 
     public readonly elementHasChanges = computed(() => {
+        const publishedElements = this.publishedElements();
+        if (!publishedElements) return {};
         const changes = getCollectionElementDiff(
-            this.publishedElements(),
+            publishedElements,
             this.collectionElements()
         );
         return changes.reduce<{ [entityId: string]: ChangeElementType }>(
@@ -44,7 +46,7 @@ export class CollectionElementsListComponent {
 
     public readonly visibleElements = computed(() => [
         ...this.collectionElements(),
-        ...this.publishedElements().filter(
+        ...(this.publishedElements() ?? []).filter(
             (f) => this.elementHasChanges()[f.entityId] === 'remove'
         ),
     ]);

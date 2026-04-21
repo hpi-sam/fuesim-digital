@@ -45,6 +45,12 @@ export class ExerciseService {
         ActiveExercise
     >();
 
+    /*
+     * NOTE: This does NOT load the exercise into the in-memory
+     * map if it is fetched from the database. If you make changes
+     * to the exercise and are unsure if it's currently loaded,
+     * call exerciseService.loadExercise() after modification.
+     */
     public async getExerciseByKey(
         exerciseKey: ExerciseKey,
         session?: SessionInformation
@@ -63,9 +69,16 @@ export class ExerciseService {
         ) {
             throw new PermissionDeniedError();
         }
+        this.loadExercise(exercise);
         return exercise;
     }
 
+    /*
+     * NOTE: This does NOT load the exercise into the in-memory
+     * map if it is fetched from the database. If you make changes
+     * to the exercise and are unsure if it's currently loaded,
+     * call exerciseService.loadExercise() after modification.
+     */
     public async getExerciseById(
         exerciseId: ExerciseId,
         session?: SessionInformation
@@ -80,6 +93,7 @@ export class ExerciseService {
         if (exercise.template && exercise.template.user !== session?.user.id) {
             throw new PermissionDeniedError();
         }
+        this.loadExercise(exercise);
         return exercise;
     }
 

@@ -13,6 +13,7 @@ import {
     createTestEnvironment,
     createTestUserSession,
 } from '../../test/utils.js';
+import type { SessionInformation } from '../../auth/auth-service.js';
 
 describe('join exercise', () => {
     const environment = createTestEnvironment();
@@ -60,12 +61,17 @@ describe('join exercise', () => {
     describe('exercise template', () => {
         let exerciseTemplate: GetExerciseTemplateResponseData;
         let session: string;
+        let sessionInformation: SessionInformation;
         beforeEach(async () => {
             session = await createTestUserSession(environment);
             exerciseTemplate = await createExerciseTemplate(
                 environment,
                 session
             );
+            sessionInformation =
+                (await environment.services.authService.getDataFromSessionToken(
+                    session
+                ))!;
         });
         it('fails joining with trainer key if not logged in', async () => {
             await environment.withWebsocket(async (socket) => {
@@ -107,9 +113,11 @@ describe('join exercise', () => {
         });
 
         it('fails joining with participant key if not logged in', async () => {
-            const exercise = environment.services.exerciseService
-                .TESTING_getExerciseMap()
-                .get(exerciseTemplate.trainerKey)!;
+            const exercise =
+                await environment.services.exerciseService.getExerciseByKey(
+                    exerciseTemplate.trainerKey,
+                    sessionInformation
+                );
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',
@@ -121,9 +129,11 @@ describe('join exercise', () => {
             });
         });
         it('fails joining with participant key if logged in', async () => {
-            const exercise = environment.services.exerciseService
-                .TESTING_getExerciseMap()
-                .get(exerciseTemplate.trainerKey)!;
+            const exercise =
+                await environment.services.exerciseService.getExerciseByKey(
+                    exerciseTemplate.trainerKey,
+                    sessionInformation
+                );
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
                     'joinExercise',

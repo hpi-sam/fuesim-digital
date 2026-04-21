@@ -46,6 +46,10 @@ describe('exercise manager service', () => {
                 'standalone',
                 sessionInformation
             );
+        await environment.services.exerciseService.getExerciseByKey(
+            newActiveExercise.trainerKey,
+            sessionInformation
+        );
         expect(
             environment.services.exerciseService.TESTING_getExerciseMap().size
         ).toBe(6);

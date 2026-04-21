@@ -89,6 +89,9 @@ export class ParallelExerciseService {
         };
         exercise.applyAction(setAutojoinViewportAction, null);
 
+        // Ensure exercise is in-memory to persist changes
+        this.exerciseService.loadExercise(exercise);
+
         this.newJoin.next({
             parallelExerciseId: parallelExercise.id,
             activeExercise: exercise,

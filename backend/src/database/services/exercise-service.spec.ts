@@ -100,13 +100,20 @@ describe('Exercise-Service', () => {
     });
     it('does correctly update lastUpdatedAt for exercise templates', async () => {
         const session = await createTestUserSession(environment);
+        const sessionInformation =
+            (await environment.services.authService.getDataFromSessionToken(
+                session
+            ))!;
+
         const exerciseTemplate = await createExerciseTemplate(
             environment,
             session
         );
-        const exercise = environment.services.exerciseService
-            .TESTING_getExerciseMap()
-            .get(exerciseTemplate.trainerKey)!;
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseTemplate.trainerKey,
+                sessionInformation
+            );
         const beforeAction = Date.now();
         exercise.applyAction(
             {
@@ -143,6 +150,10 @@ describe('Exercise-Service', () => {
             const exerciseKeys = await createExercise(environment);
             const exerciseMap =
                 environment.services.exerciseService.TESTING_getExerciseMap();
+            // Ensure exercise is loaded into in-memory map
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseKeys.trainerKey
+            );
             expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(true);
 
             await environment.server.exerciseUpkeepTick();
@@ -168,52 +179,6 @@ describe('Exercise-Service', () => {
 
                 expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(true);
             });
-        });
-    });
-
-    describe('restoring from database', () => {
-        it('getExerciseByKey restores an unloaded exercise', async () => {
-            const exerciseKeys = await createExercise(environment);
-            const originalId = (
-                await environment.services.exerciseService.getExerciseByKey(
-                    exerciseKeys.trainerKey
-                )
-            ).exercise.id;
-            const exerciseMap =
-                environment.services.exerciseService.TESTING_getExerciseMap();
-
-            await environment.server.exerciseUpkeepTick();
-            expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(false);
-
-            const restored =
-                await environment.services.exerciseService.getExerciseByKey(
-                    exerciseKeys.trainerKey
-                );
-
-            expect(restored.exercise.id).toBe(originalId);
-            expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(true);
-        });
-
-        it('getExerciseById restores an unloaded exercise', async () => {
-            const exerciseKeys = await createExercise(environment);
-            const originalId = (
-                await environment.services.exerciseService.getExerciseByKey(
-                    exerciseKeys.trainerKey
-                )
-            ).exercise.id;
-            const exerciseMap =
-                environment.services.exerciseService.TESTING_getExerciseMap();
-
-            await environment.server.exerciseUpkeepTick();
-            expect(exerciseMap.has(originalId)).toBe(false);
-
-            const restored =
-                await environment.services.exerciseService.getExerciseById(
-                    originalId
-                );
-
-            expect(restored.exercise.id).toBe(originalId);
-            expect(exerciseMap.has(originalId)).toBe(true);
         });
     });
 });

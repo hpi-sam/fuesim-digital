@@ -16,6 +16,7 @@ import type { CateringLine } from '../../../../../../shared/types/catering-line'
 import type { AppState } from '../../../../../../state/app.state';
 import { selectVisibleCateringLines } from '../../../../../../state/application/selectors/shared.selectors';
 import { ElementManager } from './element-manager';
+import { Immutable } from 'immer';
 
 export class CateringLinesFeatureManager
     extends ElementManager<CateringLine, LineString>
@@ -104,7 +105,7 @@ export class CateringLinesFeatureManager
     ) {}
 
     onFeatureDrop(
-        droppedElement: Element,
+        droppedElement: Immutable<Element>,
         droppedOnFeature: Feature<LineString>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

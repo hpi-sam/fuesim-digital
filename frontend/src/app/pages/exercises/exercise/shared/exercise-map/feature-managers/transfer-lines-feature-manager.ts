@@ -19,6 +19,7 @@ import { selectTransferLines } from '../../../../../../state/application/selecto
 import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { ElementManager } from './element-manager';
+import { Immutable } from 'immer';
 
 export class TransferLinesFeatureManager
     extends ElementManager<TransferLine, LineString>
@@ -111,7 +112,7 @@ export class TransferLinesFeatureManager
     ) {}
 
     onFeatureDrop(
-        droppedElement: Element,
+        droppedElement: Immutable<Element>,
         droppedOnFeature: Feature<LineString>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

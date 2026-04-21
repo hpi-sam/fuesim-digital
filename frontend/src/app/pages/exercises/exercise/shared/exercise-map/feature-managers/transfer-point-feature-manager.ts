@@ -26,6 +26,7 @@ import {
 } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
+import { Immutable } from 'immer';
 
 export class TransferPointFeatureManager extends MoveableFeatureManager<TransferPoint> {
     private readonly popupHelper = new ImagePopupHelper(this.olMap, this.layer);
@@ -87,7 +88,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
     );
 
     public override onFeatureDrop(
-        droppedElement: Element | undefined,
+        droppedElement: Immutable<Element> | undefined,
         droppedOnFeature: Feature<Point>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

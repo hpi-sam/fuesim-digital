@@ -18,6 +18,7 @@ import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { Immutable } from 'immer';
 
 function calculateTopRightViewPoint(view: View) {
     const extent = getTopRight(view.calculateExtent());
@@ -85,7 +86,7 @@ export class DeleteFeatureManager implements FeatureManager<Point> {
     }
 
     public onFeatureDrop(
-        droppedElement: Element,
+        droppedElement: Immutable<Element>,
         droppedOnFeature: Feature<Point>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

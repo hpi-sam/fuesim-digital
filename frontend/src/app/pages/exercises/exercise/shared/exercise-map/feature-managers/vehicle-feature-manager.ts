@@ -31,6 +31,7 @@ import {
 import { selectVisibleVehicles } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
+import { Immutable } from 'immer';
 
 type PossibleVehicleStatus = Exclude<PatientStatus, 'white'>;
 
@@ -213,7 +214,7 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
     }
 
     public override onFeatureDrop(
-        droppedElement: Element | undefined,
+        droppedElement: Immutable<Element> | undefined,
         droppedOnFeature: Feature<Point>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

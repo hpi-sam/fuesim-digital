@@ -30,6 +30,7 @@ import {
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { PointRelativePopupHelper } from '../utility/point-relative-popup-helper';
 import { MoveableFeatureManager } from './moveable-feature-manager';
+import { Immutable } from 'immer';
 
 export class SimulatedRegionFeatureManager
     extends MoveableFeatureManager<SimulatedRegion, Polygon>
@@ -149,7 +150,7 @@ export class SimulatedRegionFeatureManager
     }
 
     public override onFeatureDrop(
-        droppedElement: Element | undefined,
+        droppedElement: Immutable<Element> | undefined,
         droppedOnFeature: Feature<any>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

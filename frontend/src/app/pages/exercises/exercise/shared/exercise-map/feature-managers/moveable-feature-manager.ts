@@ -21,6 +21,7 @@ import { selectCurrentMainRole } from '../../../../../../state/application/selec
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { PopupService } from '../utility/popup.service';
 import { ElementManager } from './element-manager';
+import { Immutable } from 'immer';
 
 /**
  * Manages the position of the element.
@@ -166,7 +167,7 @@ export abstract class MoveableFeatureManager<
      * The standard implementation is to ignore these events.
      */
     public onFeatureDrop(
-        droppedElement: StateElement,
+        droppedElement: Immutable<StateElement>,
         droppedOnFeature: Feature<FeatureType>,
         dropEvent: MouseEvent | TranslateEvent
     ): boolean {

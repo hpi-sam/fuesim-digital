@@ -29,6 +29,7 @@ import { scoutableElementTypeSelectorMap } from '../../../../../../state/applica
 import type { OlMapManager } from '../utility/ol-map-manager';
 import type { MoveableFeatureManager } from './moveable-feature-manager';
 import { ElementManager } from './element-manager';
+import { Immutable } from 'immer';
 
 export class ScoutableIndicatorsFeatureManager
     extends ElementManager<ScoutableIndicator, Point>
@@ -153,7 +154,7 @@ export class ScoutableIndicatorsFeatureManager
     }
 
     onFeatureDrop(
-        droppedElement: Element,
+        droppedElement: Immutable<Element>,
         droppedOnFeature: Feature<Point>,
         dropEvent?: MouseEvent | TranslateEvent
     ) {

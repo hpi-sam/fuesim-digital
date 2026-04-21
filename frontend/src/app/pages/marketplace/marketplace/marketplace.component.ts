@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../core/exercise-element.service';
 import { CollectionCardComponent } from '../shared/cards/collection-card/collection-card.component';
+import { PromptModalService } from '../../../core/prompt-modal/prompt-modal.service';
 
 @Component({
     selector: 'app-marketplace',
@@ -12,15 +13,20 @@ import { CollectionCardComponent } from '../shared/cards/collection-card/collect
 })
 export class MarketplaceComponent {
     private readonly collectionService = inject(CollectionService);
+    private readonly promptModalService = inject(PromptModalService);
 
     public readonly userAvailableCollections = resource({
         loader: async () => this.collectionService.getMyCollections(),
     });
 
     public async createNewCollection() {
-        const title = prompt('Name der Sammlung');
-        if (!title) return;
-        await this.collectionService.createColletion(title);
+        const title = await this.promptModalService.prompt({
+            title: 'Neue Sammlung erstellen',
+            description: 'Gebe einen Titel für deine neue Sammlung ein.',
+            confirmationButtonText: 'Erstellen',
+        });
+        if (!title.result) return;
+        await this.collectionService.createColletion(title.value);
         this.userAvailableCollections.reload();
     }
 }

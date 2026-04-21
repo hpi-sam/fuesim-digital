@@ -268,5 +268,5 @@ export class ExerciseState {
      * - If you made any changes to where/how references are stored in a model, please check
      *   if collection-service.ts/findEntitiyVersionsInContent() needs to be updated to detect the new references.
      */
-    static readonly currentStateVersion = 51;
+    static readonly currentStateVersion = 52;
 }

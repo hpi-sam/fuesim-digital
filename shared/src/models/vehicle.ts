@@ -13,7 +13,6 @@ import {
     exerciseOccupationSchema,
 } from './utils/occupations/exercise-occupation.js';
 import { operationalAssignmentSchema } from './operational-section.js';
-import { versionedElementModel } from '../marketplace/models/versioned-element-model.js';
 
 export const vehicleSchema = z.strictObject({
     ...versionedElementModel.partial().shape,

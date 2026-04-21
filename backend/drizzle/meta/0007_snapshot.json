@@ -1,836 +1,765 @@
 {
-  "id": "4c4093ad-8369-4ddc-8b2c-449e83bac927",
-  "prevId": "c18a95bf-3849-46e9-b391-d66b5f6c2f14",
-  "version": "7",
-  "dialect": "postgresql",
-  "tables": {
-    "public.action_entity": {
-      "name": "action_entity",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "uuid_generate_v4()"
+    "id": "4c4093ad-8369-4ddc-8b2c-449e83bac927",
+    "prevId": "c18a95bf-3849-46e9-b391-d66b5f6c2f14",
+    "version": "7",
+    "dialect": "postgresql",
+    "tables": {
+        "public.action_entity": {
+            "name": "action_entity",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "emitterId": {
+                    "name": "emitterId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "index": {
+                    "name": "index",
+                    "type": "bigint",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "actionString": {
+                    "name": "actionString",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "exerciseId": {
+                    "name": "exerciseId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "FK_180a58767f06b503216ba2b0982": {
+                    "name": "FK_180a58767f06b503216ba2b0982",
+                    "tableFrom": "action_entity",
+                    "tableTo": "exercise_entity",
+                    "columnsFrom": ["exerciseId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "cascade"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "emitterId": {
-          "name": "emitterId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
+        "public.collection_dependency_mapping": {
+            "name": "collection_dependency_mapping",
+            "schema": "",
+            "columns": {
+                "collectionEntityId": {
+                    "name": "collectionEntityId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "collectionVersionId": {
+                    "name": "collectionVersionId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "dependentCollectionEntityId": {
+                    "name": "dependentCollectionEntityId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "dependentCollectionVersionId": {
+                    "name": "dependentCollectionVersionId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "collection_dependency_mapping_collectionVersionId_collections_versionId_fk": {
+                    "name": "collection_dependency_mapping_collectionVersionId_collections_versionId_fk",
+                    "tableFrom": "collection_dependency_mapping",
+                    "tableTo": "collections",
+                    "columnsFrom": ["collectionVersionId"],
+                    "columnsTo": ["versionId"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "collection_dependency_mapping_dependentCollectionVersionId_collections_versionId_fk": {
+                    "name": "collection_dependency_mapping_dependentCollectionVersionId_collections_versionId_fk",
+                    "tableFrom": "collection_dependency_mapping",
+                    "tableTo": "collections",
+                    "columnsFrom": ["dependentCollectionVersionId"],
+                    "columnsTo": ["versionId"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "unique_collection_dependency": {
+                    "name": "unique_collection_dependency",
+                    "nullsNotDistinct": false,
+                    "columns": [
+                        "collectionVersionId",
+                        "dependentCollectionVersionId"
+                    ]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "index": {
-          "name": "index",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
+        "public.collection_join_codes": {
+            "name": "collection_join_codes",
+            "schema": "",
+            "columns": {
+                "code": {
+                    "name": "code",
+                    "type": "varchar",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "collection": {
+                    "name": "collection",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expiresAt": {
+                    "name": "expiresAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "collection_join_codes_collection_unique": {
+                    "name": "collection_join_codes_collection_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["collection"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "actionString": {
-          "name": "actionString",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
+        "public.collections": {
+            "name": "collections",
+            "schema": "",
+            "columns": {
+                "versionId": {
+                    "name": "versionId",
+                    "type": "varchar",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "entityId": {
+                    "name": "entityId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "version": {
+                    "name": "version",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "stateVersion": {
+                    "name": "stateVersion",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "editedAt": {
+                    "name": "editedAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "title": {
+                    "name": "title",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "description": {
+                    "name": "description",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "visibility": {
+                    "name": "visibility",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'private'"
+                },
+                "draftState": {
+                    "name": "draftState",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "archived": {
+                    "name": "archived",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "elementCount": {
+                    "name": "elementCount",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "collections_versionId_unique": {
+                    "name": "collections_versionId_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["versionId"]
+                },
+                "unique_set_version": {
+                    "name": "unique_set_version",
+                    "nullsNotDistinct": false,
+                    "columns": ["entityId", "version"]
+                },
+                "unique_set_id": {
+                    "name": "unique_set_id",
+                    "nullsNotDistinct": false,
+                    "columns": ["entityId", "versionId"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         },
-        "exerciseId": {
-          "name": "exerciseId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
+        "public.collection_user_mapping": {
+            "name": "collection_user_mapping",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "collection": {
+                    "name": "collection",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "role": {
+                    "name": "role",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "collection_user_mapping_userId_users_id_fk": {
+                    "name": "collection_user_mapping_userId_users_id_fk",
+                    "tableFrom": "collection_user_mapping",
+                    "tableTo": "users",
+                    "columnsFrom": ["userId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "unique_collection_user": {
+                    "name": "unique_collection_user",
+                    "nullsNotDistinct": false,
+                    "columns": ["userId", "collection"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.element_to_collection_mapping": {
+            "name": "element_to_collection_mapping",
+            "schema": "",
+            "columns": {
+                "setEntityId": {
+                    "name": "setEntityId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "setVersionId": {
+                    "name": "setVersionId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "elementEntityId": {
+                    "name": "elementEntityId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "elementVersionId": {
+                    "name": "elementVersionId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "isBaseReference": {
+                    "name": "isBaseReference",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "element_to_collection_mapping_setVersionId_collections_versionId_fk": {
+                    "name": "element_to_collection_mapping_setVersionId_collections_versionId_fk",
+                    "tableFrom": "element_to_collection_mapping",
+                    "tableTo": "collections",
+                    "columnsFrom": ["setVersionId"],
+                    "columnsTo": ["versionId"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "element_to_collection_mapping_elementVersionId_elements_versionId_fk": {
+                    "name": "element_to_collection_mapping_elementVersionId_elements_versionId_fk",
+                    "tableFrom": "element_to_collection_mapping",
+                    "tableTo": "elements",
+                    "columnsFrom": ["elementVersionId"],
+                    "columnsTo": ["versionId"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "unique_element_set_mapping": {
+                    "name": "unique_element_set_mapping",
+                    "nullsNotDistinct": false,
+                    "columns": ["setVersionId", "elementVersionId"]
+                },
+                "unique_element_set_mapping_2": {
+                    "name": "unique_element_set_mapping_2",
+                    "nullsNotDistinct": false,
+                    "columns": ["setVersionId", "elementEntityId"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.elements": {
+            "name": "elements",
+            "schema": "",
+            "columns": {
+                "versionId": {
+                    "name": "versionId",
+                    "type": "varchar",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "entityId": {
+                    "name": "entityId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "version": {
+                    "name": "version",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "stateVersion": {
+                    "name": "stateVersion",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "editedAt": {
+                    "name": "editedAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "title": {
+                    "name": "title",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "description": {
+                    "name": "description",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "content": {
+                    "name": "content",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "elements_versionId_unique": {
+                    "name": "elements_versionId_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["versionId"]
+                },
+                "unique_template_version": {
+                    "name": "unique_template_version",
+                    "nullsNotDistinct": false,
+                    "columns": ["entityId", "version"]
+                },
+                "unique_template_id": {
+                    "name": "unique_template_id",
+                    "nullsNotDistinct": false,
+                    "columns": ["entityId", "versionId"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.exercise_entity": {
+            "name": "exercise_entity",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "tickCounter": {
+                    "name": "tickCounter",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": 0
+                },
+                "initialStateString": {
+                    "name": "initialStateString",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "participantKey": {
+                    "name": "participantKey",
+                    "type": "char(6)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "trainerKey": {
+                    "name": "trainerKey",
+                    "type": "char(8)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "currentStateString": {
+                    "name": "currentStateString",
+                    "type": "json",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "stateVersion": {
+                    "name": "stateVersion",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "user": {
+                    "name": "user",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "lastUsedAt": {
+                    "name": "lastUsedAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "templateId": {
+                    "name": "templateId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "baseTemplateId": {
+                    "name": "baseTemplateId",
+                    "type": "uuid",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "exercise_entity_user_users_id_fk": {
+                    "name": "exercise_entity_user_users_id_fk",
+                    "tableFrom": "exercise_entity",
+                    "tableTo": "users",
+                    "columnsFrom": ["user"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "exercise_entity_templateId_exercise_template_id_fk": {
+                    "name": "exercise_entity_templateId_exercise_template_id_fk",
+                    "tableFrom": "exercise_entity",
+                    "tableTo": "exercise_template",
+                    "columnsFrom": ["templateId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "exercise_entity_baseTemplateId_exercise_template_id_fk": {
+                    "name": "exercise_entity_baseTemplateId_exercise_template_id_fk",
+                    "tableFrom": "exercise_entity",
+                    "tableTo": "exercise_template",
+                    "columnsFrom": ["baseTemplateId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "set null",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.exercise_template": {
+            "name": "exercise_template",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "primaryKey": true,
+                    "notNull": true,
+                    "default": "uuid_generate_v4()"
+                },
+                "user": {
+                    "name": "user",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "lastExerciseCreatedAt": {
+                    "name": "lastExerciseCreatedAt",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "description": {
+                    "name": "description",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "''"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "exercise_template_user_users_id_fk": {
+                    "name": "exercise_template_user_users_id_fk",
+                    "tableFrom": "exercise_template",
+                    "tableTo": "users",
+                    "columnsFrom": ["user"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.sessions": {
+            "name": "sessions",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "userId": {
+                    "name": "userId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "type": "timestamp (3)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "expiresAt": {
+                    "name": "expiresAt",
+                    "type": "timestamp (3)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "accessToken": {
+                    "name": "accessToken",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "sessions_userId_users_id_fk": {
+                    "name": "sessions_userId_users_id_fk",
+                    "tableFrom": "sessions",
+                    "tableTo": "users",
+                    "columnsFrom": ["userId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "cascade"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "public.users": {
+            "name": "users",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "username": {
+                    "name": "username",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "displayName": {
+                    "name": "displayName",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "type": "timestamp (3)",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "FK_180a58767f06b503216ba2b0982": {
-          "name": "FK_180a58767f06b503216ba2b0982",
-          "tableFrom": "action_entity",
-          "tableTo": "exercise_entity",
-          "columnsFrom": [
-            "exerciseId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
     },
-    "public.collection_dependency_mapping": {
-      "name": "collection_dependency_mapping",
-      "schema": "",
-      "columns": {
-        "collectionEntityId": {
-          "name": "collectionEntityId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "collectionVersionId": {
-          "name": "collectionVersionId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "dependentCollectionEntityId": {
-          "name": "dependentCollectionEntityId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "dependentCollectionVersionId": {
-          "name": "dependentCollectionVersionId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "collection_dependency_mapping_collectionVersionId_collections_versionId_fk": {
-          "name": "collection_dependency_mapping_collectionVersionId_collections_versionId_fk",
-          "tableFrom": "collection_dependency_mapping",
-          "tableTo": "collections",
-          "columnsFrom": [
-            "collectionVersionId"
-          ],
-          "columnsTo": [
-            "versionId"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "collection_dependency_mapping_dependentCollectionVersionId_collections_versionId_fk": {
-          "name": "collection_dependency_mapping_dependentCollectionVersionId_collections_versionId_fk",
-          "tableFrom": "collection_dependency_mapping",
-          "tableTo": "collections",
-          "columnsFrom": [
-            "dependentCollectionVersionId"
-          ],
-          "columnsTo": [
-            "versionId"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "unique_collection_dependency": {
-          "name": "unique_collection_dependency",
-          "nullsNotDistinct": false,
-          "columns": [
-            "collectionVersionId",
-            "dependentCollectionVersionId"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.collection_join_codes": {
-      "name": "collection_join_codes",
-      "schema": "",
-      "columns": {
-        "code": {
-          "name": "code",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "collection": {
-          "name": "collection",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expiresAt": {
-          "name": "expiresAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "collection_join_codes_collection_unique": {
-          "name": "collection_join_codes_collection_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "collection"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.collections": {
-      "name": "collections",
-      "schema": "",
-      "columns": {
-        "versionId": {
-          "name": "versionId",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "entityId": {
-          "name": "entityId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "version": {
-          "name": "version",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "stateVersion": {
-          "name": "stateVersion",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "editedAt": {
-          "name": "editedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "title": {
-          "name": "title",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "visibility": {
-          "name": "visibility",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'private'"
-        },
-        "draftState": {
-          "name": "draftState",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "archived": {
-          "name": "archived",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "elementCount": {
-          "name": "elementCount",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "collections_versionId_unique": {
-          "name": "collections_versionId_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "versionId"
-          ]
-        },
-        "unique_set_version": {
-          "name": "unique_set_version",
-          "nullsNotDistinct": false,
-          "columns": [
-            "entityId",
-            "version"
-          ]
-        },
-        "unique_set_id": {
-          "name": "unique_set_id",
-          "nullsNotDistinct": false,
-          "columns": [
-            "entityId",
-            "versionId"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.collection_user_mapping": {
-      "name": "collection_user_mapping",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "uuid_generate_v4()"
-        },
-        "collection": {
-          "name": "collection",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "role": {
-          "name": "role",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "collection_user_mapping_userId_users_id_fk": {
-          "name": "collection_user_mapping_userId_users_id_fk",
-          "tableFrom": "collection_user_mapping",
-          "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "unique_collection_user": {
-          "name": "unique_collection_user",
-          "nullsNotDistinct": false,
-          "columns": [
-            "userId",
-            "collection"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.element_to_collection_mapping": {
-      "name": "element_to_collection_mapping",
-      "schema": "",
-      "columns": {
-        "setEntityId": {
-          "name": "setEntityId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "setVersionId": {
-          "name": "setVersionId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "elementEntityId": {
-          "name": "elementEntityId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "elementVersionId": {
-          "name": "elementVersionId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "isBaseReference": {
-          "name": "isBaseReference",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "element_to_collection_mapping_setVersionId_collections_versionId_fk": {
-          "name": "element_to_collection_mapping_setVersionId_collections_versionId_fk",
-          "tableFrom": "element_to_collection_mapping",
-          "tableTo": "collections",
-          "columnsFrom": [
-            "setVersionId"
-          ],
-          "columnsTo": [
-            "versionId"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "element_to_collection_mapping_elementVersionId_elements_versionId_fk": {
-          "name": "element_to_collection_mapping_elementVersionId_elements_versionId_fk",
-          "tableFrom": "element_to_collection_mapping",
-          "tableTo": "elements",
-          "columnsFrom": [
-            "elementVersionId"
-          ],
-          "columnsTo": [
-            "versionId"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "unique_element_set_mapping": {
-          "name": "unique_element_set_mapping",
-          "nullsNotDistinct": false,
-          "columns": [
-            "setVersionId",
-            "elementVersionId"
-          ]
-        },
-        "unique_element_set_mapping_2": {
-          "name": "unique_element_set_mapping_2",
-          "nullsNotDistinct": false,
-          "columns": [
-            "setVersionId",
-            "elementEntityId"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.elements": {
-      "name": "elements",
-      "schema": "",
-      "columns": {
-        "versionId": {
-          "name": "versionId",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "entityId": {
-          "name": "entityId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "version": {
-          "name": "version",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "stateVersion": {
-          "name": "stateVersion",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "editedAt": {
-          "name": "editedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "title": {
-          "name": "title",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "content": {
-          "name": "content",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "elements_versionId_unique": {
-          "name": "elements_versionId_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "versionId"
-          ]
-        },
-        "unique_template_version": {
-          "name": "unique_template_version",
-          "nullsNotDistinct": false,
-          "columns": [
-            "entityId",
-            "version"
-          ]
-        },
-        "unique_template_id": {
-          "name": "unique_template_id",
-          "nullsNotDistinct": false,
-          "columns": [
-            "entityId",
-            "versionId"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.exercise_entity": {
-      "name": "exercise_entity",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "uuid_generate_v4()"
-        },
-        "tickCounter": {
-          "name": "tickCounter",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "initialStateString": {
-          "name": "initialStateString",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "participantKey": {
-          "name": "participantKey",
-          "type": "char(6)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "trainerKey": {
-          "name": "trainerKey",
-          "type": "char(8)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "currentStateString": {
-          "name": "currentStateString",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "stateVersion": {
-          "name": "stateVersion",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user": {
-          "name": "user",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "lastUsedAt": {
-          "name": "lastUsedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "templateId": {
-          "name": "templateId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "baseTemplateId": {
-          "name": "baseTemplateId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "exercise_entity_user_users_id_fk": {
-          "name": "exercise_entity_user_users_id_fk",
-          "tableFrom": "exercise_entity",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "exercise_entity_templateId_exercise_template_id_fk": {
-          "name": "exercise_entity_templateId_exercise_template_id_fk",
-          "tableFrom": "exercise_entity",
-          "tableTo": "exercise_template",
-          "columnsFrom": [
-            "templateId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "exercise_entity_baseTemplateId_exercise_template_id_fk": {
-          "name": "exercise_entity_baseTemplateId_exercise_template_id_fk",
-          "tableFrom": "exercise_entity",
-          "tableTo": "exercise_template",
-          "columnsFrom": [
-            "baseTemplateId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.exercise_template": {
-      "name": "exercise_template",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "uuid_generate_v4()"
-        },
-        "user": {
-          "name": "user",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "lastExerciseCreatedAt": {
-          "name": "lastExerciseCreatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "exercise_template_user_users_id_fk": {
-          "name": "exercise_template_user_users_id_fk",
-          "tableFrom": "exercise_template",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.sessions": {
-      "name": "sessions",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp (3)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "expiresAt": {
-          "name": "expiresAt",
-          "type": "timestamp (3)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "accessToken": {
-          "name": "accessToken",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "sessions_userId_users_id_fk": {
-          "name": "sessions_userId_users_id_fk",
-          "tableFrom": "sessions",
-          "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "username": {
-          "name": "username",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "displayName": {
-          "name": "displayName",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp (3)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    }
-  },
-  "enums": {},
-  "schemas": {},
-  "sequences": {},
-  "roles": {},
-  "policies": {},
-  "views": {},
-  "_meta": {
-    "columns": {},
+    "enums": {},
     "schemas": {},
-    "tables": {}
-  }
+    "sequences": {},
+    "roles": {},
+    "policies": {},
+    "views": {},
+    "_meta": {
+        "columns": {},
+        "schemas": {},
+        "tables": {}
+    }
 }

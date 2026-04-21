@@ -1,33 +1,45 @@
 <nav class="navbar bg-body-tertiary mb-4">
     <div class="container container-fluid">
         <a routerLink="/" class="navbar-brand">FüSim Digital</a>
-        <ul ngbNav [activeId]="route.url | async" class="navbar-nav d-flex flex-row">
+        <ul
+            ngbNav
+            [activeId]="route.url | async"
+            class="navbar-nav d-flex flex-row"
+        >
             @if (auth.authData().user) {
-            <li ngbNavItem="start" class="nav-item mx-2">
-                <a ngbNavLink class="nav-link" routerLink="/">Start</a>
-            </li>
-            <li ngbNavItem="exercises" class="nav-item mx-2">
-                <a ngbNavLink class="nav-link" routerLink="/exercises/">
-                    Übungen
-                </a>
-            </li>
-            <li ngbNavItem="exercise_templates" class="nav-item mx-2">
-                <a ngbNavLink class="nav-link" routerLink="/exercises/templates">
-                    Übungsvorlagen
-                </a>
-            </li>
-            @if (parallelExercisesEnabled()) {
-            <li ngbNavItem="parallel" class="nav-item mx-2">
-                <a ngbNavLink class="nav-link" routerLink="/exercises/parallel">
-                    Parallelübungen
-                </a>
-            </li>
-            }
-            <li ngbNavItem="marketplace" class="nav-item mx-2">
-                <a ngbNavLink class="nav-link" routerLink="/collections">
-                    Übungselemente
-                </a>
-            </li>
+                <li ngbNavItem="start" class="nav-item mx-2">
+                    <a ngbNavLink class="nav-link" routerLink="/">Start</a>
+                </li>
+                <li ngbNavItem="exercises" class="nav-item mx-2">
+                    <a ngbNavLink class="nav-link" routerLink="/exercises/">
+                        Übungen
+                    </a>
+                </li>
+                <li ngbNavItem="exercise_templates" class="nav-item mx-2">
+                    <a
+                        ngbNavLink
+                        class="nav-link"
+                        routerLink="/exercises/templates"
+                    >
+                        Übungsvorlagen
+                    </a>
+                </li>
+                @if (parallelExercisesEnabled()) {
+                    <li ngbNavItem="parallel" class="nav-item mx-2">
+                        <a
+                            ngbNavLink
+                            class="nav-link"
+                            routerLink="/exercises/parallel"
+                        >
+                            Parallelübungen
+                        </a>
+                    </li>
+                }
+                <li ngbNavItem="marketplace" class="nav-item mx-2">
+                    <a ngbNavLink class="nav-link" routerLink="/collections">
+                        Übungselemente
+                    </a>
+                </li>
             }
         </ul>
 

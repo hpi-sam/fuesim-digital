@@ -67,26 +67,14 @@
         </div>
     </div>
     @if (values().properties.length > 0) {
-        <div
-            class="d-flex flex-column gap-3 mt-3"
-            cdkDropList
-            (cdkDropListDropped)="onDrop($event)"
-        >
+        <div class="d-flex flex-column gap-3 mt-3">
             @for (
                 formProperty of measureTemplateForm.properties;
                 let index = $index;
                 track $index
             ) {
                 @let property = values().properties[index]!;
-                <div class="card" cdkDrag>
-                    <div class="drag-placeholder" *cdkDragPlaceholder></div>
-                    <div class="card drag-preview" *cdkDragPreview>
-                        <div class="card-body py-2 px-3">
-                            <h6 class="mb-0">
-                                {{ humanReadablePropertyName(property.type) }}
-                            </h6>
-                        </div>
-                    </div>
+                <div class="card">
                     <div class="card-body">
                         <div
                             class="d-flex align-items-center justify-content-between property-header"
@@ -103,10 +91,26 @@
                                 >
                                     <i class="bi bi-trash"></i>
                                 </button>
-                                <i
-                                    class="bi bi-list fs-3 drag-handle"
-                                    cdkDragHandle
-                                ></i>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary btn-sm"
+                                    (click)="moveUp(index)"
+                                    [disabled]="index === 0"
+                                    ngbTooltip="Nach oben"
+                                >
+                                    <i class="bi bi-arrow-up"></i>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary btn-sm"
+                                    (click)="moveDown(index)"
+                                    [disabled]="
+                                        index === values().properties.length - 1
+                                    "
+                                    ngbTooltip="Nach unten"
+                                >
+                                    <i class="bi bi-arrow-down"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="property-fields">

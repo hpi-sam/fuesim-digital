@@ -1,15 +1,6 @@
 import type { OnChanges } from '@angular/core';
 import { Component, inject, input, output, signal } from '@angular/core';
 import {
-    CdkDrag,
-    CdkDragDrop,
-    CdkDropList,
-    moveItemInArray,
-    CdkDragHandle,
-    CdkDragPlaceholder,
-    CdkDragPreview,
-} from '@angular/cdk/drag-drop';
-import {
     measurePropertyTypeSchema,
     measurePropertyTypeToGermanNameDictionary,
     measureTemplateSchema,
@@ -55,11 +46,6 @@ import { AlarmPropertyEditorComponent } from './alarm-property-editor/alarm-prop
         DisplayModelValidationComponent,
         FormField,
         AlarmPropertyEditorComponent,
-        CdkDrag,
-        CdkDropList,
-        CdkDragHandle,
-        CdkDragPlaceholder,
-        CdkDragPreview,
         NgbTooltip,
     ],
 })
@@ -117,14 +103,26 @@ export class MeasureTemplateFormComponent implements OnChanges {
         }
     }
 
-    public onDrop(event: CdkDragDrop<MeasureProperty>) {
+    public moveUp(index: number) {
+        if (index <= 0) return;
         this.values.update((v) => {
             const properties = [...v.properties];
-            moveItemInArray(
-                properties,
-                event.previousIndex,
-                event.currentIndex
-            );
+            [properties[index - 1], properties[index]] = [
+                properties[index]!,
+                properties[index - 1]!,
+            ];
+            return { ...v, properties };
+        });
+    }
+
+    public moveDown(index: number) {
+        this.values.update((v) => {
+            if (index < 0 || index >= v.properties.length - 1) return v;
+            const properties = [...v.properties];
+            [properties[index], properties[index + 1]] = [
+                properties[index + 1]!,
+                properties[index]!,
+            ];
             return { ...v, properties };
         });
     }

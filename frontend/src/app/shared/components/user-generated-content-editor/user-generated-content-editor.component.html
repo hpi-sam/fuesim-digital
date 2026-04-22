@@ -10,14 +10,14 @@
             >
             </ngx-editor>
         </div>
-        @if (editorContent() === this.userGeneratedContentElement().content) {
+        @if (isChanged()) {
+            <button class="btn btn-primary" (click)="submit()">
+                Speichern
+            </button>
+        } @else {
             <button class="btn btn-outline-success" disabled>
                 Gespeichert
                 <i class="bi bi-check"></i>
-            </button>
-        } @else {
-            <button class="btn btn-primary" (click)="onSubmit()">
-                Speichern
             </button>
         }
     </div>

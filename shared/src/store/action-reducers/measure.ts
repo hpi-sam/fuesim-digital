@@ -2,6 +2,7 @@ import { measureSchema, type Measure } from '../../models/measure/measures.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { DrawingActionReducers } from './drawing.js';
 import { EmergencyOperationCenterActionReducers } from './emergency-operation-center.js';
 import { getMeasureTemplate } from './utils/measures.js';
@@ -74,7 +75,7 @@ export namespace MeasureActionReducers {
                         break;
                 }
             });
-            newDraftState.measures[measure.id] = measure;
+            newDraftState.measures[measure.id] = cloneDeepMutable(measure);
             return newDraftState;
         },
         rights: 'participant',

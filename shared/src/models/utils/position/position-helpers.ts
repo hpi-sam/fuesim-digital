@@ -26,6 +26,20 @@ export function isInSimulatedRegion(withPosition: WithPosition): boolean {
     return isPositionInSimulatedRegion(withPosition.position);
 }
 
+export function isWithinExtent(
+    element: WithExtent,
+    coordinates: MapCoordinates
+): boolean {
+    const upperLeftCorner = upperLeftCornerOf(element);
+    const lowerRightCorner = lowerRightCornerOf(element);
+    return (
+        upperLeftCorner.x <= coordinates.x &&
+        coordinates.x <= lowerRightCorner.x &&
+        lowerRightCorner.y <= coordinates.y &&
+        coordinates.y <= upperLeftCorner.y
+    );
+}
+
 export function isInSpecificVehicle(
     withPosition: WithPosition,
     vehicleId: UUID
@@ -241,4 +255,14 @@ export function nestedCoordinatesOf(
     throw new Error(
         `Expected element to have (nested) map position, but position was of type ${withPosition.position.type}`
     );
+}
+
+export function calculateDelta(
+    from: MapCoordinates,
+    to: MapCoordinates
+): { deltaX: number; deltaY: number } {
+    return {
+        deltaX: to.x - from.x,
+        deltaY: to.y - from.y,
+    };
 }

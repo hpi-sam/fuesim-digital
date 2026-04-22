@@ -8,7 +8,7 @@ import {
     Min,
 } from 'class-validator';
 import { z } from 'zod';
-import { WritableDraft } from 'immer';
+import { type Immutable, WritableDraft } from 'immer';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
@@ -174,7 +174,7 @@ export namespace EmergencyOperationCenterActionReducers {
 
 function sendAlarmGroupVehicle(
     draftState: WritableDraft<ExerciseState>,
-    vehicleParameters: VehicleParameters,
+    vehicleParameters: Immutable<VehicleParameters>,
     time: number,
     alarmGroupId: UUID,
     targetTransferPointId: UUID

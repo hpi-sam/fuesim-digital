@@ -30,3 +30,5 @@ export * from './restricted-zone.js';
 export * from './scoutable.js';
 export * from './user-generated-content.js';
 export * from './drawing.js';
+export * from './technical-challenge/index.js';
+export * from './task.js';

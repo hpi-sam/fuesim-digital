@@ -12,12 +12,14 @@ import type {
     WithPosition,
     RestrictedZone,
     Viewport,
+    TechnicalChallenge,
 } from 'fuesim-digital-shared';
 import {
     newMapCoordinatesAt,
     currentCoordinatesOf,
     isOnMap,
     isInViewport,
+    isElementGenericScoutable,
 } from 'fuesim-digital-shared';
 
 import { pickBy } from 'lodash-es';
@@ -39,6 +41,7 @@ import {
     selectViewports,
     selectScoutables,
     scoutableElementSelectors,
+    selectTechnicalChallenges,
 } from './exercise.selectors';
 
 /**
@@ -123,6 +126,8 @@ export const selectVisibleMapImages = selectVisibleElementsFactory<MapImage>(
     // TODO: MapImages could get very big. Therefore its size must be taken into account. The current implementation is a temporary solution.
     (element, viewport) => true
 );
+export const selectVisibleTechnicalChallenges =
+    selectVisibleElementsFactory<TechnicalChallenge>(selectTechnicalChallenges);
 export const selectVisibleTransferPoints =
     selectVisibleElementsFactory<TransferPoint>(selectTransferPoints);
 export const selectVisibleSimulatedRegions =
@@ -184,20 +189,23 @@ export const selectVisibleScoutableIndicators = createSelector(
                 Object.values(selector)
                     .filter(
                         (element) =>
-                            isOnMap(element) && element.scoutableId !== null
+                            isOnMap(element) &&
+                            element.scoutableId !== null &&
+                            // Hide the indicator for map images that already have the generic scoutable icon as image
+                            !isElementGenericScoutable(element)
                     )
                     .map((element): ScoutableIndicator => {
                         const scoutable = scoutables[element.scoutableId!]!;
                         const elementPos = currentCoordinatesOf(element);
-                        /* 23 height units make one coordinate unit */
-                        const coefficient = 1 / 23;
-                        const offset = newMapCoordinatesAt(
-                            element.image.height *
-                                element.image.aspectRatio *
-                                coefficient *
-                                0.5,
-                            element.image.height * coefficient * -0.5
-                        );
+
+                        let offset;
+                        if (element.type === 'patient') {
+                            offset = newMapCoordinatesAt(1.5, 2);
+                        } else {
+                            offset = newMapCoordinatesAt(0, 0);
+                        }
+
+                        const height = Math.max(50, element.image.height / 10);
                         const indicatorPos = newMapCoordinatesAt(
                             elementPos.x + offset.x,
                             elementPos.y + offset.y
@@ -209,7 +217,7 @@ export const selectVisibleScoutableIndicators = createSelector(
                             scoutableElementId: element.id,
                             isVisibleForParticipants:
                                 scoutable.isVisibleForParticipants,
-                            height: Math.max(45, element.image.height / 10),
+                            height,
                         };
                     })
             )

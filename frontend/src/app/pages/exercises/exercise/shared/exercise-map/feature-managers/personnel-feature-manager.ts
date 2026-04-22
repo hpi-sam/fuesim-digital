@@ -3,9 +3,11 @@ import type { Personnel, UUID } from 'fuesim-digital-shared';
 import { normalZoom } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
-import type { Subject } from 'rxjs';
+import { type Observable, type Subject, takeUntil } from 'rxjs';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
+import type { Point } from 'ol/geom';
+import type { FeatureLike } from 'ol/Feature';
 import { PersonnelPopupComponent } from '../shared/personnel-popup/personnel-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
@@ -17,6 +19,8 @@ import { CircleStyleHelper } from '../utility/style-helper/circle-style-helper';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import { selectVisiblePersonnel } from '../../../../../../state/application/selectors/shared.selectors';
+import type { Positions } from '../utility/geometry-helper';
+import { selectWorkingPersonnel } from '../../../../../../state/application/selectors/exercise.selectors';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
@@ -29,6 +33,8 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
             destroy$,
             mapInteractionsManager
         );
+
+        this.trackWorkingPersonnel(destroy$);
     }
     private readonly imageStyleHelper = new ImageStyleHelper(
         (feature) => (this.getElementFromFeature(feature) as Personnel).image
@@ -45,6 +51,8 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
         'top'
     );
 
+    private workingPersonnel!: Set<UUID>;
+
     private readonly popupHelper = new ImagePopupHelper(this.olMap, this.layer);
 
     private readonly openPopupCircleStyleHelper = new CircleStyleHelper(
@@ -60,6 +68,15 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
         }),
         0.025,
         (_) => [0, 0]
+    );
+
+    private readonly currentlyWorkingStyleHelper = new CircleStyleHelper(
+        (feature) => ({
+            radius: 25,
+            fill: new Fill({ color: 'green' }),
+        }),
+        0.025,
+        (feature) => [1, 1.5]
     );
 
     constructor(
@@ -83,10 +100,23 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
         );
 
         this.layer.setStyle((feature, resolution) => {
+            const personnel = this.getElementFromFeature(
+                feature as Feature
+            ) as Personnel;
+
             const styles = [
                 this.nameStyleHelper.getStyle(feature as Feature, resolution),
                 this.imageStyleHelper.getStyle(feature as Feature, resolution),
             ];
+
+            if (this.workingPersonnel.has(personnel.id)) {
+                styles.push(
+                    this.currentlyWorkingStyleHelper.getStyle(
+                        feature as Feature,
+                        resolution
+                    )
+                );
+            }
             this.addMarking(
                 feature,
                 styles,
@@ -107,7 +137,7 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
     ): void {
         super.onFeatureClicked(event, feature);
 
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 PersonnelPopupComponent,
                 feature,
@@ -124,5 +154,37 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
                 }
             )
         );
+    }
+
+    private trackWorkingPersonnel($destroy: Observable<void>) {
+        this.store
+            .select(selectWorkingPersonnel)
+            .pipe(takeUntil($destroy))
+            .subscribe((workingPersonnel) => {
+                this.workingPersonnel = workingPersonnel;
+                this.layer.changed();
+            });
+    }
+
+    protected override async onTranslateEnd(
+        newPosition: Positions<Point>,
+        element: Personnel,
+        elementFeature: Feature<Point>
+    ): Promise<void> {
+        // check if on technical challenge
+        const pixel = this.olMap.getPixelFromCoordinate([
+            newPosition.x,
+            newPosition.y,
+        ]);
+        const features = this.olMap.getFeaturesAtPixel(pixel);
+        const isFeatureLikeTechnicalChallenge = (f: FeatureLike) =>
+            this.getElementFromFeature(f as Feature).type ===
+            'technicalChallenge';
+        const challenge = features.find(isFeatureLikeTechnicalChallenge);
+        if (challenge) {
+            return;
+        }
+
+        return super.onTranslateEnd(newPosition, element, elementFeature);
     }
 }

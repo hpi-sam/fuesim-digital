@@ -9,12 +9,14 @@ import type {
     ExerciseState,
     MeasureTemplate,
     ScoutableElementType,
+    TechnicalChallengeId,
     UUID,
     Vehicle,
     WithPosition,
 } from 'fuesim-digital-shared';
 import {
     scoutableElementKeys,
+    currentStateOf,
     isInSpecificSimulatedRegion,
     isInTransfer,
     nestedCoordinatesOf,
@@ -51,6 +53,7 @@ export const selectPersonnel = selectPropertyFactory('personnel');
 export const selectAlarmGroups = selectPropertyFactory('alarmGroups');
 export const selectMaterials = selectPropertyFactory('materials');
 export const selectMeasures = selectPropertyFactory('measures');
+export const selectTasks = selectPropertyFactory('tasks');
 export const selectTransferPoints = selectPropertyFactory('transferPoints');
 export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
@@ -60,6 +63,9 @@ export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
 export const selectDrawings = selectPropertyFactory('drawings');
 export const selectOperationalSections = selectPropertyFactory(
     'operationalSections'
+);
+export const selectTechnicalChallenges = selectPropertyFactory(
+    'technicalChallenges'
 );
 export const selectVehicleTemplates = selectPropertyFactory('vehicleTemplates');
 export const selectPersonnelTemplates =
@@ -96,9 +102,6 @@ export const selectCollectedClientNames = selectPropertyFactory(
     'collectedClientNames'
 );
 export const selectScoutables = selectPropertyFactory('scoutables');
-export const selectUserGeneratedContent = selectPropertyFactory(
-    'userGeneratedContents'
-);
 
 // Elements
 
@@ -116,6 +119,7 @@ export const createSelectPersonnel =
     createSelectElementFromMapFactory(selectPersonnel);
 export const createSelectMaterial =
     createSelectElementFromMapFactory(selectMaterials);
+export const createSelectTask = createSelectElementFromMapFactory(selectTasks);
 export const createSelectPatient =
     createSelectElementFromMapFactory(selectPatients);
 export const createSelectVehicle =
@@ -134,6 +138,9 @@ export const createSelectRestrictedZone = createSelectElementFromMapFactory(
 export const createSelectSimulatedRegion = createSelectElementFromMapFactory(
     selectSimulatedRegions
 );
+export const createSelectTechnicalChallenge = createSelectElementFromMapFactory(
+    selectTechnicalChallenges
+);
 export const createSelectClient =
     createSelectElementFromMapFactory(selectClients);
 export const createSelectVehicleTemplate = createSelectElementFromMapFactory(
@@ -150,8 +157,6 @@ export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
 );
 export const createSelectScoutable =
     createSelectElementFromMapFactory(selectScoutables);
-export const createSelectUserGeneratedContent =
-    createSelectElementFromMapFactory(selectUserGeneratedContent);
 export const createSelectMeasureTemplate = createSelectElementFromMapFactory(
     selectMeasureTemplates
 );
@@ -417,3 +422,36 @@ export function createSelectActivityStatesByType<
             )
     );
 }
+
+function createSelectAvailableTaskIds(
+    technicalChallengeId: TechnicalChallengeId
+) {
+    return createSelector(
+        createSelectTechnicalChallenge(technicalChallengeId),
+        (challenge) => Object.keys(currentStateOf(challenge).possibleTasks)
+    );
+}
+export function createSelectAvailableTasks(
+    technicalChallengeId: TechnicalChallengeId
+) {
+    return createSelector(
+        createSelectAvailableTaskIds(technicalChallengeId),
+        selectTasks,
+        (taskIds, taskMap) => taskIds.map((id) => taskMap[id]!)
+    );
+}
+
+export const selectWorkingPersonnel = createSelector(
+    selectTechnicalChallenges,
+    (challenges) => {
+        const workingPersonnel = new Set<UUID>();
+        for (const challenge of Object.values(challenges)) {
+            for (const personnelId of Object.keys(
+                challenge.assignedPersonnel
+            )) {
+                workingPersonnel.add(personnelId);
+            }
+        }
+        return workingPersonnel;
+    }
+);

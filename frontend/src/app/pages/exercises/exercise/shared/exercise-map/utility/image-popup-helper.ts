@@ -20,7 +20,13 @@ export class ImagePopupHelper {
     ) {}
 
     /**
+     * @param component {@link OpenPopupOptions.component}
      * @param feature the feature in {@link layer} next to which the popup should be opened
+     * @param closingUUIDs {@link OpenPopupOptions.closingUUIDs}
+     * @param markedForParticipantUUIDs {@link OpenPopupOptions.markedForParticipantUUIDs }
+     * @param markedForTrainerUUIDs {@link OpenPopupOptions.markedForTrainerUUIDs }
+     * @param changedLayers {@link OpenPopupOptions.changedLayers}
+     * @param context {@link OpenPopupOptions.context}
      */
     public getPopupOptions<Component>(
         component: Type<Component>,

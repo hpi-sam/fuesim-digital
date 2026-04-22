@@ -3,59 +3,39 @@
     <button type="button" class="btn-close" (click)="cancel()"></button>
 </div>
 <div class="modal-body">
-    <div class="p-3">
-        <div class="mb-3">
-            <label class="form-label fw-bold">Alarmgruppe</label>
-            @if (alarmGroupNames.length === 1) {
-                <input
-                    type="text"
-                    class="form-control"
-                    [value]="alarmGroupNames[0]!.name"
-                    readonly
-                />
-            } @else {
-                <select
-                    class="form-select"
-                    [ngModel]="selectedAlarmGroupId()"
-                    (ngModelChange)="selectedAlarmGroupId.set($event)"
-                    name="alarmGroup"
-                >
-                    <option [ngValue]="null" disabled>
-                        Alarmgruppe auswählen
-                    </option>
-                    @for (ag of alarmGroupNames; track ag.id) {
-                        <option [ngValue]="ag.id">{{ ag.name }}</option>
-                    }
-                </select>
-            }
-        </div>
-        <div class="mb-3">
-            <label class="form-label fw-bold">Ziel</label>
-            @if (transferPointNames.length === 1) {
-                <div class="form-control-plaintext">
-                    {{ transferPointNames[0]!.name }}
-                </div>
-            } @else {
-                <select
-                    class="form-select"
-                    [ngModel]="selectedTargetTransferPointId()"
-                    (ngModelChange)="selectedTargetTransferPointId.set($event)"
-                    name="targetTransferPoint"
-                >
-                    <option [ngValue]="null" disabled>Ziel auswählen</option>
-                    @for (tp of transferPointNames; track tp.id) {
-                        <option [ngValue]="tp.id">{{ tp.name }}</option>
-                    }
-                </select>
-            }
-        </div>
-        <button
-            type="button"
-            class="btn btn-primary w-100"
-            [disabled]="!canSubmit"
-            (click)="confirm()"
-        >
-            Nachalarmierung bestätigen
-        </button>
+    <div class="mb-3">
+        <label class="form-label">Alarmgruppe</label>
+        @if (allowedAlarmGroupIds().length === 1) {
+            <input
+                type="text"
+                class="form-control"
+                [value]="alarmForm.alarmGroup"
+                readonly
+            />
+        } @else {
+            <select class="form-select" [formField]="alarmForm.alarmGroup">
+                <option disabled [value]="''">Alarmgruppe auswählen</option>
+                @for (ag of allowedAlarmGroups() | values; track ag.id) {
+                    <option [value]="ag.id">{{ ag.name }}</option>
+                }
+            </select>
+        }
     </div>
+    <div class="mb-3">
+        <label class="form-label">Ziel</label>
+        <select class="form-select" [formField]="alarmForm.transferPoint">
+            <option disabled [value]="''">Ziel auswählen</option>
+            @for (tp of allowedTransferPoints() | values; track tp.id) {
+                <option [value]="tp.id">{{ tp.internalName }}</option>
+            }
+        </select>
+    </div>
+    <button
+        type="button"
+        class="btn btn-primary w-100"
+        [disabled]="!alarmForm().valid()"
+        (click)="confirm()"
+    >
+        Nachalarmierung bestätigen
+    </button>
 </div>

@@ -4,7 +4,7 @@ import { MeasureTemplateModalComponent } from './measure-template-modal.componen
 
 export function openCreateMeasureTemplateModal(
     ngbModalService: NgbModal,
-    categoryName?: string
+    categoryName: string
 ) {
     const modalRef = ngbModalService.open(MeasureTemplateModalComponent, {
         size: 'lg',

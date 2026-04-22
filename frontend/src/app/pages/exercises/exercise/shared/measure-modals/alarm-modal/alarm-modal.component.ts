@@ -1,97 +1,101 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
-import { getTransferPointFullName } from 'fuesim-digital-shared';
+import { uuidSchema } from 'fuesim-digital-shared';
+import {
+    form,
+    validateStandardSchema,
+    FormField,
+    disabled,
+} from '@angular/forms/signals';
 import type { AppState } from '../../../../../../state/app.state';
 import {
-    createSelectAlarmGroup,
-    createSelectTransferPoint,
     selectAlarmGroups,
     selectTransferPoints,
 } from '../../../../../../state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-alarm-modal',
     templateUrl: './alarm-modal.component.html',
     styleUrl: './alarm-modal.component.scss',
-    imports: [FormsModule],
+    imports: [FormsModule, FormField, ValuesPipe],
 })
 export class AlarmModalComponent {
     activeModal = inject(NgbActiveModal);
     private readonly store = inject<Store<AppState>>(Store);
 
+    private readonly alarmGroups = this.store.selectSignal(selectAlarmGroups);
     private readonly transferPoints =
         this.store.selectSignal(selectTransferPoints);
-    private readonly alarmGroups = this.store.selectSignal(selectAlarmGroups);
 
-    public alarmGroupIds: UUID[] = [];
-    public targetTransferPointIds: UUID[] = [];
+    public readonly allowedAlarmGroups = computed(() =>
+        Object.fromEntries(
+            Object.entries(this.alarmGroups()).filter((ag) =>
+                this.allowedAlarmGroupIds().includes(ag[1].id)
+            )
+        )
+    );
+    public readonly allowedTransferPoints = computed(() =>
+        Object.fromEntries(
+            Object.entries(this.transferPoints()).filter((tp) =>
+                this.allowedTransferPointIds().includes(tp[1].id)
+            )
+        )
+    );
 
-    public readonly selectedAlarmGroupId = signal<UUID | null>(null);
-    public readonly selectedTargetTransferPointId = signal<UUID | null>(null);
+    private readonly inputAlarmGroupIds = signal<UUID[]>([]);
+    private readonly inputTransferPointIds = signal<UUID[]>([]);
 
-    public alarmGroupNames: { id: UUID; name: string }[] = [];
-    public transferPointNames: { id: UUID; name: string }[] = [];
+    public readonly allowedAlarmGroupIds = computed(() =>
+        this.inputAlarmGroupIds().length === 0
+            ? Object.values(this.alarmGroups()).map((v) => v.id)
+            : this.inputAlarmGroupIds()
+    );
+    public readonly allowedTransferPointIds = computed(() =>
+        this.inputTransferPointIds().length === 0
+            ? Object.values(this.transferPoints()).map((v) => v.id)
+            : this.inputTransferPointIds()
+    );
 
-    public initialize(alarmGroupIds: UUID[], targetTransferPointIds: UUID[]) {
-        this.alarmGroupIds = alarmGroupIds;
-        this.targetTransferPointIds = targetTransferPointIds;
-
-        if (alarmGroupIds.length > 0) {
-            this.alarmGroupNames = alarmGroupIds.map((id) => {
-                const ag = selectStateSnapshot(
-                    createSelectAlarmGroup(id),
-                    this.store
-                );
-                return { id, name: ag.name };
-            });
-        } else {
-            const allAlarmGroups = this.alarmGroups();
-            this.alarmGroupNames = Object.entries(allAlarmGroups).map(
-                ([id, ag]) => ({ id, name: ag.name })
-            );
+    public readonly values = signal({
+        alarmGroup: '',
+        transferPoint: '',
+    });
+    public readonly alarmForm = form(this.values, (schemaPath) => {
+        if (this.allowedAlarmGroupIds().length === 1) {
+            disabled(schemaPath.alarmGroup);
         }
-
-        if (targetTransferPointIds.length > 0) {
-            this.transferPointNames = targetTransferPointIds.map((id) => {
-                const tp = selectStateSnapshot(
-                    createSelectTransferPoint(id),
-                    this.store
-                );
-                return { id, name: getTransferPointFullName(tp) };
-            });
-        } else {
-            const allTransferPoints = this.transferPoints();
-            this.transferPointNames = Object.entries(allTransferPoints).map(
-                ([id, tp]) => ({ id, name: getTransferPointFullName(tp) })
-            );
+        if (this.allowedTransferPointIds().length === 1) {
+            disabled(schemaPath.transferPoint);
         }
+        validateStandardSchema(schemaPath.alarmGroup, uuidSchema);
+        validateStandardSchema(schemaPath.transferPoint, uuidSchema);
+    });
 
-        if (this.alarmGroupNames.length === 1) {
-            this.selectedAlarmGroupId.set(this.alarmGroupNames[0]!.id);
-        }
-        if (this.transferPointNames.length === 1) {
-            this.selectedTargetTransferPointId.set(
-                this.transferPointNames[0]!.id
-            );
-        }
-    }
+    public initialize(alarmGroupIds: UUID[], transferPointIds: UUID[]) {
+        this.inputAlarmGroupIds.set(alarmGroupIds);
+        this.inputTransferPointIds.set(transferPointIds);
 
-    public get canSubmit() {
-        return (
-            this.selectedAlarmGroupId() !== null &&
-            this.selectedTargetTransferPointId() !== null
-        );
+        this.values.set({
+            alarmGroup:
+                this.allowedAlarmGroupIds().length === 1
+                    ? this.allowedAlarmGroups()[0]!.id
+                    : '',
+            transferPoint:
+                this.allowedTransferPointIds().length === 1
+                    ? this.allowedTransferPoints()[0]!.id
+                    : '',
+        });
     }
 
     public confirm() {
-        if (!this.canSubmit) return;
+        if (!this.alarmForm().valid()) return;
         this.activeModal.close({
-            alarmGroup: this.selectedAlarmGroupId()!,
-            targetTransferPointId: this.selectedTargetTransferPointId()!,
+            alarmGroup: this.values().alarmGroup,
+            targetTransferPointId: this.values().transferPoint,
         });
     }
 

@@ -24,6 +24,7 @@ import { DisplayModelValidationComponent } from '../../../../../../shared/valida
 export class EocLogModalComponent {
     activeModal = inject(NgbActiveModal);
 
+    public readonly templateName = signal('Einsatztagebucheintrag erstellen');
     public readonly editable = signal<boolean>(true);
 
     public readonly values = signal({
@@ -39,10 +40,13 @@ export class EocLogModalComponent {
         );
     });
 
-    public initialize(message: string | null, editable: boolean = true) {
-        if (message) {
-            this.values.set({ message });
-        }
+    public initialize(
+        message: string | null,
+        editable: boolean = true,
+        templateName?: string
+    ) {
+        if (message) this.values.set({ message });
+        if (templateName) this.templateName.set(templateName);
         this.editable.set(editable);
     }
 

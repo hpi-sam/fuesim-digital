@@ -89,7 +89,8 @@ export class MeasureService {
                 const modalRef = openAlarmModal(
                     this.ngbModalService,
                     property.alarmGroups,
-                    property.targetTransferPointIds
+                    property.targetTransferPointIds,
+                    template.name
                 );
                 try {
                     const result = await modalRef.result;

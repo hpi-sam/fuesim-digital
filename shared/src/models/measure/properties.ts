@@ -78,7 +78,7 @@ export const measurePropertyDefinitions: {
 
 // ==================================================
 export const propertyBaseSchema = z.strictObject({
-    hint: z.string().min(1, { error: 'Der Hinweistext kann nicht leer sein.' }),
+    hint: z.string(),
 });
 
 export const manualConfirmPropertySchema = z.strictObject({

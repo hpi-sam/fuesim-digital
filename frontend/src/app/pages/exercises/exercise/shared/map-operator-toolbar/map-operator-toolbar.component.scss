@@ -9,6 +9,7 @@
     -webkit-box-orient: vertical;
     word-break: break-word;
 }
+
 .drawer-collapse {
     display: grid;
     grid-template-rows: 0fr;
@@ -30,8 +31,6 @@
         border-bottom-right-radius: 0;
 
         &.active {
-            background-color: var(--bs-secondary) !important;
-            color: var(--bs-white);
             font-weight: 600;
         }
     }

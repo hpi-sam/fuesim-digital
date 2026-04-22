@@ -18,6 +18,15 @@ export class MeasureDetailsComponent {
         return this.measureService.activeProperty();
     }
 
+    public showBody() {
+        return (
+            (this.activeProperty?.hint.length ?? 0) > 0 ||
+            ['delay', 'drawFreehand', 'drawLine'].includes(
+                this.activeProperty?.type ?? ''
+            )
+        );
+    }
+
     public abortProperty() {
         this.measureService.endEvent?.next(false);
     }

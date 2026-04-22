@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4 class="modal-title">Einsatztagebucheintrag erstellen</h4>
+    <h4 class="modal-title">{{ templateName() }}</h4>
     <button type="button" class="btn-close" (click)="cancel()"></button>
 </div>
 <div class="modal-body">
@@ -20,6 +20,6 @@
         [disabled]="!eocLogForm().valid()"
         (click)="confirm()"
     >
-        Eintrag speichern
+        Speichern
     </button>
 </div>

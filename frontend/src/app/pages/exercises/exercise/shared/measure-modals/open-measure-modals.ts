@@ -6,14 +6,16 @@ import { EocLogModalComponent } from './eoc-log-modal/eoc-log-modal.component';
 export function openEocLogModal(
     ngbModalService: NgbModal,
     message: string | null = null,
-    editable: boolean = true
+    editable: boolean = true,
+    templateName?: string
 ) {
     const modalRef = ngbModalService.open(EocLogModalComponent, {
         size: 'lg',
     });
     (modalRef.componentInstance as EocLogModalComponent).initialize(
         message,
-        editable
+        editable,
+        templateName
     );
     return modalRef;
 }
@@ -21,14 +23,16 @@ export function openEocLogModal(
 export function openAlarmModal(
     ngbModalService: NgbModal,
     alarmGroupIds: UUID[],
-    targetTransferPointIds: UUID[]
+    targetTransferPointIds: UUID[],
+    templateName?: string
 ) {
     const modalRef = ngbModalService.open(AlarmModalComponent, {
         size: 'lg',
     });
     (modalRef.componentInstance as AlarmModalComponent).initialize(
         alarmGroupIds,
-        targetTransferPointIds
+        targetTransferPointIds,
+        templateName
     );
     return modalRef;
 }

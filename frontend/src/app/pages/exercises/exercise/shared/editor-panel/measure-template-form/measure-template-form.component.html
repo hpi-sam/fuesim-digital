@@ -75,7 +75,7 @@
             @for (
                 formProperty of measureTemplateForm.properties;
                 let index = $index;
-                track index
+                track $index
             ) {
                 @let property = values().properties[index]!;
                 <div class="card" cdkDrag>
@@ -132,7 +132,10 @@
                             @switch (property.type) {
                                 @case ('manualConfirm') {
                                     @let manualConfirmProperty =
-                                        asManualConfirmProperty(formProperty);
+                                        narrowProperty(
+                                            formProperty,
+                                            'manualConfirm'
+                                        );
                                     <div class="mb-3">
                                         <label class="form-label"
                                             >Bestätigungstext</label
@@ -157,14 +160,14 @@
                                         >
                                         <input
                                             [formField]="
-                                                manualConfirmProperty.confirmationString
+                                                manualConfirmProperty.confirmationString!
                                             "
                                             type="text"
                                             class="form-control"
                                         />
                                         <app-display-model-validation
                                             [field]="
-                                                manualConfirmProperty.confirmationString()
+                                                manualConfirmProperty.confirmationString!()
                                             "
                                             [hide]="true"
                                         />
@@ -172,7 +175,10 @@
                                 }
                                 @case ('response') {
                                     @let responseProperty =
-                                        asResponseProperty(formProperty);
+                                        narrowProperty(
+                                            formProperty,
+                                            'response'
+                                        );
                                     <label class="form-label"
                                         >Rückmeldung</label
                                     >
@@ -189,7 +195,7 @@
                                 }
                                 @case ('delay') {
                                     @let delayProperty =
-                                        asDelayProperty(formProperty);
+                                        narrowProperty(formProperty, 'delay');
                                     <label class="form-label"
                                         >Dauer in Sekunden</label
                                     >
@@ -224,19 +230,19 @@
                                 }
                                 @case ('eocLog') {
                                     @let eocLogProperty =
-                                        asEocLogProperty(formProperty);
+                                        narrowProperty(formProperty, 'eocLog');
                                     <label class="form-label"
                                         >Einsatztagebuch-Nachricht
                                         (optional)</label
                                     >
                                     <textarea
-                                        [formField]="eocLogProperty.message"
+                                        [formField]="eocLogProperty.message!"
                                         class="form-control"
                                         rows="3"
                                         placeholder="Text für den Eintrag"
                                     ></textarea>
                                     <app-display-model-validation
-                                        [field]="eocLogProperty.message()"
+                                        [field]="eocLogProperty.message!()"
                                         [hide]="true"
                                     />
                                     <div class="d-flex flex-row gap-2">
@@ -273,7 +279,10 @@
                                 }
                                 @case ('drawFreehand') {
                                     @let drawFreehandProperty =
-                                        asDrawFreehandProperty(formProperty);
+                                        narrowProperty(
+                                            formProperty,
+                                            'drawFreehand'
+                                        );
                                     <div class="mb-3">
                                         <label class="form-label"
                                             >Strichfarbe</label
@@ -301,7 +310,10 @@
                                 }
                                 @case ('drawLine') {
                                     @let drawLineProperty =
-                                        asDrawLineProperty(formProperty);
+                                        narrowProperty(
+                                            formProperty,
+                                            'drawLine'
+                                        );
                                     <label class="form-label"
                                         >Strichfarbe</label
                                     >

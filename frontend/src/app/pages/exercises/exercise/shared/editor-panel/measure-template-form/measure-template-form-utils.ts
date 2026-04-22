@@ -4,13 +4,6 @@ import {
     type MeasurePropertyType,
 } from 'fuesim-digital-shared';
 
-export interface EditableMeasureTemplateValues {
-    name: string;
-    properties: EditableMeasureProperty[];
-    categoryName: string;
-    replacePrevious: boolean;
-}
-
 export interface MeasureTemplateValues {
     name: string;
     properties: MeasureProperty[];
@@ -18,64 +11,8 @@ export interface MeasureTemplateValues {
     replacePrevious: boolean;
 }
 
-export interface EditableAlarmProperty {
-    type: 'alarm';
-    hint: string;
-    alarmGroups: string[];
-    targetTransferPointIds: string[];
-}
-
-export interface EditableDelayProperty {
-    type: 'delay';
-    hint: string;
-    delay: number | null;
-}
-
-export interface EditableEocLogProperty {
-    type: 'eocLog';
-    hint: string;
-    message: string;
-    editable: boolean;
-    confirm: boolean;
-}
-
-export interface EditableResponseProperty {
-    type: 'response';
-    hint: string;
-    response: string;
-}
-
-export interface EditableManualConfirmProperty {
-    type: 'manualConfirm';
-    hint: string;
-    prompt: string;
-    confirmationString: string;
-}
-
-export interface EditableDrawFreehandProperty {
-    type: 'drawFreehand';
-    hint: string;
-    strokeColor: string;
-    fillColor: string;
-}
-
-export interface EditableDrawLineProperty {
-    type: 'drawLine';
-    hint: string;
-    strokeColor: string;
-}
-
-export type EditableMeasureProperty =
-    | EditableAlarmProperty
-    | EditableDelayProperty
-    | EditableDrawFreehandProperty
-    | EditableDrawLineProperty
-    | EditableEocLogProperty
-    | EditableManualConfirmProperty
-    | EditableResponseProperty;
-
 export const emptyPropertyDefaults: {
-    [Key in MeasurePropertyType]: EditableMeasureProperty;
+    [Key in MeasurePropertyType]: Extract<MeasureProperty, { type: Key }>;
 } = {
     manualConfirm: {
         type: 'manualConfirm',
@@ -91,7 +28,7 @@ export const emptyPropertyDefaults: {
     delay: {
         type: 'delay',
         hint: measurePropertyTypeToDefaultHint.delay,
-        delay: null,
+        delay: 60,
     },
     alarm: {
         type: 'alarm',
@@ -118,21 +55,3 @@ export const emptyPropertyDefaults: {
         strokeColor: '#000000',
     },
 };
-
-export function preprocessProperty(property: EditableMeasureProperty): unknown {
-    switch (property.type) {
-        case 'manualConfirm':
-            return {
-                ...property,
-                confirmationString:
-                    property.confirmationString.trim() || undefined,
-            };
-        case 'eocLog':
-            return {
-                ...property,
-                message: property.message.trim() || undefined,
-            };
-        default:
-            return property;
-    }
-}

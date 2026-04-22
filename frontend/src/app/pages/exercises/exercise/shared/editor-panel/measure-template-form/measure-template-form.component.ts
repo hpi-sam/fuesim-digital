@@ -10,7 +10,6 @@ import {
     CdkDragPreview,
 } from '@angular/cdk/drag-drop';
 import {
-    measurePropertySchema,
     measurePropertyTypeSchema,
     measurePropertyTypeToGermanNameDictionary,
     measureTemplateSchema,
@@ -38,18 +37,8 @@ import { MessageService } from '../../../../../../core/messages/message.service'
 import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
 import { DisplayModelValidationComponent } from '../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 import {
-    EditableAlarmProperty,
-    EditableDelayProperty,
-    EditableDrawFreehandProperty,
-    EditableDrawLineProperty,
-    EditableEocLogProperty,
-    EditableManualConfirmProperty,
-    EditableMeasureProperty,
-    EditableMeasureTemplateValues,
-    EditableResponseProperty,
     emptyPropertyDefaults,
     MeasureTemplateValues,
-    preprocessProperty,
 } from './measure-template-form-utils';
 import { AlarmPropertyEditorComponent } from './alarm-property-editor/alarm-property-editor.component';
 
@@ -77,7 +66,7 @@ import { AlarmPropertyEditorComponent } from './alarm-property-editor/alarm-prop
 export class MeasureTemplateFormComponent implements OnChanges {
     private readonly messageService = inject(MessageService);
 
-    readonly initialValues = input.required<EditableMeasureTemplateValues>();
+    readonly initialValues = input.required<MeasureTemplateValues>();
     readonly btnText = input.required<string>();
 
     /**
@@ -85,7 +74,7 @@ export class MeasureTemplateFormComponent implements OnChanges {
      */
     readonly submitMeasureTemplate = output<MeasureTemplateValues>();
 
-    public readonly values = signal<EditableMeasureTemplateValues>({
+    public readonly values = signal<MeasureTemplateValues>({
         name: '',
         properties: [],
         categoryName: '',
@@ -108,11 +97,27 @@ export class MeasureTemplateFormComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChangesGeneric<this>): void {
         if (changes.initialValues.firstChange) {
-            this.values.set({ ...this.initialValues() });
+            const initial = this.initialValues();
+            this.values.set({
+                ...initial,
+                properties: initial.properties.map((p) => {
+                    switch (p.type) {
+                        case 'manualConfirm':
+                            return {
+                                ...p,
+                                confirmationString: p.confirmationString ?? '',
+                            };
+                        case 'eocLog':
+                            return { ...p, message: p.message ?? '' };
+                        default:
+                            return p;
+                    }
+                }),
+            });
         }
     }
 
-    public onDrop(event: CdkDragDrop<EditableMeasureProperty>) {
+    public onDrop(event: CdkDragDrop<MeasureProperty>) {
         this.values.update((v) => {
             const properties = [...v.properties];
             moveItemInArray(
@@ -125,16 +130,13 @@ export class MeasureTemplateFormComponent implements OnChanges {
     }
 
     public async onSubmit() {
-        const valuesOnSubmit = cloneDeep(this.values());
         try {
-            this.submitMeasureTemplate.emit({
-                name: valuesOnSubmit.name,
-                properties: valuesOnSubmit.properties.map((p) =>
-                    this.parseProperty(p)
-                ),
-                categoryName: valuesOnSubmit.categoryName,
-                replacePrevious: valuesOnSubmit.replacePrevious,
-            });
+            this.submitMeasureTemplate.emit(
+                measureTemplateSchema
+                    .omit({ id: true })
+                    .extend({ categoryName: z.string() })
+                    .parse(cloneDeep(this.values()))
+            );
         } catch (e: unknown) {
             if (!(e instanceof ZodError)) throw e;
             this.messageService.postError({
@@ -161,36 +163,14 @@ export class MeasureTemplateFormComponent implements OnChanges {
         }));
     }
 
-    private parseProperty(property: EditableMeasureProperty): MeasureProperty {
-        return measurePropertySchema.parse(preprocessProperty(property));
+    public narrowProperty<T extends MeasurePropertyType>(
+        property: FieldTree<MeasureProperty>,
+        _type: T
+    ) {
+        return property as unknown as FieldTree<
+            Extract<MeasureProperty, { type: T }>
+        >;
     }
-
-    // Type helpers
-    private createPropertyCastFunction<T extends EditableMeasureProperty>() {
-        return (property: FieldTree<EditableMeasureProperty>): FieldTree<T> =>
-            property as FieldTree<T>;
-    }
-
-    public asManualConfirmProperty =
-        this.createPropertyCastFunction<EditableManualConfirmProperty>();
-
-    public asResponseProperty =
-        this.createPropertyCastFunction<EditableResponseProperty>();
-
-    public asDelayProperty =
-        this.createPropertyCastFunction<EditableDelayProperty>();
-
-    public asAlarmProperty =
-        this.createPropertyCastFunction<EditableAlarmProperty>();
-
-    public asEocLogProperty =
-        this.createPropertyCastFunction<EditableEocLogProperty>();
-
-    public asDrawFreehandProperty =
-        this.createPropertyCastFunction<EditableDrawFreehandProperty>();
-
-    public asDrawLineProperty =
-        this.createPropertyCastFunction<EditableDrawLineProperty>();
 
     public updateAlarmGroups(index: number, alarmGroups: string[]) {
         this.values.update((v) => {

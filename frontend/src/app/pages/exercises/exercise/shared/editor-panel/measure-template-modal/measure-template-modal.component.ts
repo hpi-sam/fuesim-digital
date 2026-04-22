@@ -11,7 +11,7 @@ import {
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import type { MeasureProperty, UUID } from 'fuesim-digital-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import { cloneDeepMutable, uuid } from 'fuesim-digital-shared';
 import { MeasureTemplateFormComponent } from '../measure-template-form/measure-template-form.component';
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
@@ -22,10 +22,7 @@ import {
     selectMeasureTemplateCategories,
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
-import type {
-    EditableMeasureTemplateValues,
-    MeasureTemplateValues,
-} from '../measure-template-form/measure-template-form-utils';
+import type { MeasureTemplateValues } from '../measure-template-form/measure-template-form-utils';
 
 @Component({
     selector: 'app-measure-template-modal',
@@ -53,7 +50,7 @@ export class MeasureTemplateModalComponent
      */
     public measureTemplateId?: UUID;
 
-    public editableMeasureTemplateValues?: EditableMeasureTemplateValues;
+    public measureTemplateValues?: MeasureTemplateValues;
 
     public categoryName?: string;
     public readonly categories = this.store.selectSignal(
@@ -79,14 +76,14 @@ export class MeasureTemplateModalComponent
             const currentCategory = Object.values(this.categories()).find(
                 (c) => c.templates[this.measureTemplateId!] !== undefined
             );
-            this.editableMeasureTemplateValues = {
+            this.measureTemplateValues = {
                 name: measureTemplate.name,
-                properties: measureTemplate.properties.map(toEditableProperty),
+                properties: measureTemplate.properties,
                 categoryName: currentCategory?.name ?? '',
                 replacePrevious: measureTemplate.replacePrevious,
             };
         } else {
-            this.editableMeasureTemplateValues = {
+            this.measureTemplateValues = {
                 name: '',
                 properties: [],
                 categoryName: this.categoryName ?? '',
@@ -156,7 +153,7 @@ export class MeasureTemplateModalComponent
     public async deleteMeasureTemplate(): Promise<void> {
         const confirmDelete = await this.confirmationModalService.confirm({
             title: 'Maßnahme löschen',
-            description: `Möchten Sie die Maßnahme "${this.editableMeasureTemplateValues?.name}" wirklich löschen?`,
+            description: `Möchten Sie die Maßnahme "${this.measureTemplateValues?.name}" wirklich löschen?`,
         });
         if (!confirmDelete) {
             return;
@@ -175,22 +172,5 @@ export class MeasureTemplateModalComponent
 
     public close() {
         this.activeModal.close();
-    }
-}
-
-function toEditableProperty(property: MeasureProperty) {
-    switch (property.type) {
-        case 'manualConfirm':
-            return {
-                ...property,
-                confirmationString: property.confirmationString ?? '',
-            };
-        case 'eocLog':
-            return {
-                ...property,
-                message: property.message ?? '',
-            };
-        default:
-            return { ...property };
     }
 }

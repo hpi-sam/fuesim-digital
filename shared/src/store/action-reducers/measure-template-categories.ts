@@ -72,7 +72,7 @@ export namespace MeasureTemplateActionReducers {
                 const category = getCategory(draftState, name);
                 if (Object.entries(draftState.measureTemplates).length === 1) {
                     throw new ReducerError(
-                        `Cannot delete the last MeasureTemplateCategory`
+                        `Die letzte Maßnahmen-Kategorie kann nicht entfernt werden`
                     );
                 }
                 const templates = category.templates;

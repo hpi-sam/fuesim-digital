@@ -29,8 +29,6 @@ export type DrawingPropertyInstance = z.infer<
     typeof drawingPropertyInstanceSchema
 >;
 
-// ==================================================
-
 export const measurePropertyInstanceSchema = z.union([
     alarmPropertyInstanceSchema,
     eocLogPropertyInstanceSchema,

@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { uuidSchema } from '../../utils/uuid.js';
+import { alarmGroupSchema } from '../alarm-group.js';
+import { transferPointSchema } from '../transfer-point.js';
 
 export const measurePropertyTypeSchema = z.literal([
     'manualConfirm',
@@ -38,7 +39,10 @@ export const measurePropertyTypeToDefaultHint: {
         'Jetzt eine Linie einzeichnen (einfacher Klick um neuen Punkt zu setzen, doppelter Klick für Schlusspunkt)',
 };
 
-// ==================================================
+const trimmedOptionalString = z.preprocess(
+    (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
+    z.string().trim().optional()
+);
 
 export const requiresAnyOfSchema = z.strictObject({
     anyOf: z.array(measurePropertyTypeSchema),
@@ -76,7 +80,6 @@ export const measurePropertyDefinitions: {
     drawLine: { blockedBy: [], requires: [] },
 };
 
-// ==================================================
 export const propertyBaseSchema = z.strictObject({
     hint: z.string(),
 });
@@ -87,7 +90,7 @@ export const manualConfirmPropertySchema = z.strictObject({
     prompt: z.string().min(1, {
         error: 'Der Bestätigungstext kann nicht leer sein.',
     }),
-    confirmationString: z.string().optional(),
+    confirmationString: trimmedOptionalString,
 });
 
 export type ManualConfirmProperty = z.infer<typeof manualConfirmPropertySchema>;
@@ -115,8 +118,8 @@ export type DelayProperty = z.infer<typeof delayPropertySchema>;
 export const alarmPropertySchema = z.strictObject({
     type: z.literal('alarm'),
     ...propertyBaseSchema.shape,
-    alarmGroups: z.array(uuidSchema),
-    targetTransferPointIds: z.array(uuidSchema),
+    alarmGroups: z.array(alarmGroupSchema.shape.id),
+    targetTransferPointIds: z.array(transferPointSchema.shape.id),
 });
 
 export type AlarmProperty = z.infer<typeof alarmPropertySchema>;
@@ -125,7 +128,7 @@ export const eocLogPropertySchema = z
     .strictObject({
         type: z.literal('eocLog'),
         ...propertyBaseSchema.shape,
-        message: z.string().optional(),
+        message: trimmedOptionalString,
         editable: z.boolean(),
         confirm: z.boolean(),
     })
@@ -166,8 +169,6 @@ export const drawLinePropertySchema = z.strictObject({
 });
 
 export type DrawLineProperty = z.infer<typeof drawLinePropertySchema>;
-
-// ==================================================
 
 export const measurePropertySchema = z.union([
     manualConfirmPropertySchema,

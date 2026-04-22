@@ -74,7 +74,7 @@ export class TrainerToolbarComponent {
         openHospitalEditorModal(this.modalService);
     }
 
-    public openMeasureEditor() {
+    public openMeasuresOverview() {
         openMeasuresOverviewModal(this.modalService);
     }
 

@@ -4,15 +4,10 @@
     </h4>
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
-@if (editableMeasureTemplateValues) {
+@if (measureTemplateValues) {
     <div class="modal-body">
         <app-measure-template-form
-            [initialValues]="{
-                name: editableMeasureTemplateValues.name,
-                properties: editableMeasureTemplateValues.properties,
-                categoryName: editableMeasureTemplateValues.categoryName,
-                replacePrevious: editableMeasureTemplateValues.replacePrevious,
-            }"
+            [initialValues]="measureTemplateValues"
             [btnText]="isEditMode ? 'Speichern' : 'Maßnahme hinzufügen'"
             (submitMeasureTemplate)="submitMeasureTemplate($event)"
         />

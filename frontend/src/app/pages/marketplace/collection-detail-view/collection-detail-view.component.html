@@ -55,20 +55,18 @@
                 @if (collectionData.collection.draftState) {
                     <span>
                         <i class="bi bi-pencil"></i>
-                        In Bearbeitung: Version
-                        {{ collectionData.collection.version }} &middot; Zuletzt
-                        bearbeitet:
+                        In Bearbeitung - Letzer Stand:
                         {{ collectionData.collection.editedAt | date }}
                     </span>
                 }
                 <span>
                     <i class="bi bi-globe2"></i>
                     @if (collectionData.collection.draftState) {
-                        Zuletzt Veröffentlicht:
+                        Zuletzt gespeichert:
                     }
                     Version
-                    {{ collectionData.publishedCollection.version }} &middot;
-                    Zuletzt veröffentlicht:
+                    {{ collectionData.publishedCollection.version }}
+                    vom
                     {{ collectionData.publishedCollection.editedAt | date }}
                 </span>
                 <span class="d-flex flex-row gap-1 align-items-center">

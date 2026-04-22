@@ -50,7 +50,7 @@ export namespace MeasureTemplateActionReducers {
             },
             rights: 'trainer',
         };
-    export const moveMeasureTemplateCategory: ActionReducer<RenameMeasureTemplateCategoryAction> =
+    export const renameMeasureTemplateCategory: ActionReducer<RenameMeasureTemplateCategoryAction> =
         {
             action: RenameMeasureTemplateCategoryAction,
             reducer: (draftState, { previousName, newName }) => {

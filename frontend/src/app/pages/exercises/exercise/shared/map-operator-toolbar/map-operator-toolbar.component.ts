@@ -9,7 +9,7 @@ import { Store } from '@ngrx/store';
 import { MeasureTemplate } from 'fuesim-digital-shared';
 import type { AppState } from '../../../../../state/app.state';
 import { selectMeasureTemplateCategories } from '../../../../../state/application/selectors/exercise.selectors';
-import { MeasureService } from '../../../../../core/measures.service';
+import { MeasureService } from '../../../../../core/measure.service';
 import { ScrollButtonsComponent } from '../../../../../shared/components/scroll-buttons/scroll-buttons.component';
 import { MeasureDetailsComponent } from '../exercise-map/shared/measure-details/measure-details.component';
 

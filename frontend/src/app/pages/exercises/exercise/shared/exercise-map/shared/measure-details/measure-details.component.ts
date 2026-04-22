@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { MeasureService } from '../../../../../../../core/measures.service';
+import { MeasureService } from '../../../../../../../core/measure.service';
 
 @Component({
     selector: 'app-measure-details',

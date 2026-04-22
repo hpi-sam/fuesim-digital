@@ -70,17 +70,16 @@
         <ng-container ngbNavItem ngbNavItem="scout-Info">
             <a ngbNavLink data-cy="mapImagePopUpScoutNav">Erkundung</a>
             <ng-template ngbNavContent>
-                <app-rich-text-editor
-                    [userGeneratedContentId]="
-                        currentState().userGeneratedContentId
-                    "
+                <app-user-generated-content-editor
+                    [userGeneratedContent]="currentState().userGeneratedContent"
+                    (userGeneratedContentChange)="updateContent($event)"
                 />
             </ng-template>
         </ng-container>
     </nav>
     <div [ngbNavOutlet]="nav" class="mt-2"></div>
 } @else {
-    <app-rich-text-editor
-        [userGeneratedContentId]="currentState().userGeneratedContentId"
+    <app-user-generated-content-editor
+        [userGeneratedContent]="currentState().userGeneratedContent"
     />
 }

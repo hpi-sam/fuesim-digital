@@ -8,8 +8,11 @@ import {
     imagePropertiesSchema,
 } from '../utils/image-properties.js';
 import { getElement } from '../../store/action-reducers/utils/get-element.js';
-import type { UserGeneratedContentId } from '../user-generated-content.js';
-import { userGeneratedContentIdSchema } from '../user-generated-content.js';
+import {
+    newUserGeneratedContent,
+    type UserGeneratedContent,
+    userGeneratedContentSchema,
+} from '../user-generated-content.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,
@@ -26,7 +29,7 @@ export const technicalChallengeStateSchema = z.object({
     id: technicalChallengeStateIdSchema,
     title: z.string(),
     image: imagePropertiesSchema,
-    userGeneratedContentId: userGeneratedContentIdSchema,
+    userGeneratedContent: userGeneratedContentSchema,
     possibleTasks: z.record(taskSchema.shape.id, z.number()),
 });
 export type TechnicalChallengeState = z.infer<
@@ -37,7 +40,7 @@ export function newTechnicalChallengeState(
     title: string,
     image: ImageProperties,
     possibleTasks: UUID[] | { [key: UUID]: number } = {},
-    userGeneratedContentId?: UserGeneratedContentId
+    userGeneratedContent?: UserGeneratedContent
 ): TechnicalChallengeState {
     if (possibleTasks instanceof Array) {
         // eslint-disable-next-line no-param-reassign
@@ -47,8 +50,7 @@ export function newTechnicalChallengeState(
         id: uuid() as TechnicalChallengeStateId,
         title,
         image,
-        userGeneratedContentId:
-            userGeneratedContentId ?? (uuid() as UserGeneratedContentId),
+        userGeneratedContent: userGeneratedContent ?? newUserGeneratedContent(),
         possibleTasks,
     };
 }

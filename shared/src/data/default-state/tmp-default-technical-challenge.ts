@@ -7,10 +7,7 @@ import type { Task } from '../../models/task.js';
 import type { TechnicalChallengeTemplate } from '../../models/technical-challenge/technical-challenge-template.js';
 import { newImageProperties } from '../../models/utils/image-properties.js';
 import type { UUID } from '../../utils/uuid.js';
-import type {
-    UserGeneratedContent,
-    UserGeneratedContentId,
-} from '../../models/user-generated-content.js';
+import type { UserGeneratedContent } from '../../models/user-generated-content.js';
 
 // TODO@Felix: move into state-machine.spec.ts
 export namespace StateMachineTesting {
@@ -53,118 +50,97 @@ export namespace StateMachineTesting {
 
     // --- Contents ---
     const initialContent: UserGeneratedContent = {
-        id: '7eac4a83-99cd-406a-a4a3-d61b4d5b72bd' as UserGeneratedContentId,
         type: 'userGeneratedContent',
-        content: 'Was eine Schweinerei, jetzt mach mal was draus.',
+        content: '<p>Was eine Schweinerei, jetzt mach mal was draus.</p>',
     };
     const onlyExtiguishedContent: UserGeneratedContent = {
-        id: 'bbc61783-aed7-441f-9637-165b39e72b56' as UserGeneratedContentId,
         type: 'userGeneratedContent',
-        content: 'Feuer is nun weg, aber pass auf! Da is noch wer drin.',
+        content: '<p>Feuer is nun weg, aber pass auf! Da is noch wer drin.</p>',
     };
     const onlyDeadContent: UserGeneratedContent = {
-        id: 'a7a821a4-a4bc-44c6-a000-85ffba6b2b86' as UserGeneratedContentId,
         type: 'userGeneratedContent',
-        content: 'Der hat schon seinen Körper verlassen.',
+        content: '<p>Der hat schon seinen Körper verlassen.</p>',
     };
     const onlyTreatedContent: UserGeneratedContent = {
-        id: '295a0f00-9097-49f8-b236-7dc8070772ff' as UserGeneratedContentId,
         type: 'userGeneratedContent',
-        content: 'Da is noch Feuer. Zum glück steckt keiner mehr drin.',
+        content: '<p>Da is noch Feuer. Zum glück steckt keiner mehr drin.</p>',
     };
     const onlyBurnedOutContent: UserGeneratedContent = {
-        id: '64a92a4b-6860-4296-a06e-18e723ebd96e' as UserGeneratedContentId,
         type: 'userGeneratedContent',
-        content: 'Ein Wunder.',
+        content: '<p>Ein Wunder.</p>',
     };
     const patientDeadButExtinguishedContent: UserGeneratedContent = {
-        id: 'e6c7e148-0172-4fdc-b4e2-b80f2c28d4df' as UserGeneratedContentId,
         type: 'userGeneratedContent',
-        content: 'Feuer is weg, aber zu spät.',
+        content: '<p>Feuer is weg, aber zu spät.</p>',
     };
     const treatedAndExtinguishedContent: UserGeneratedContent = {
-        id: '489288c0-e32e-4028-8dc5-3c6c76ca2e88' as UserGeneratedContentId,
         type: 'userGeneratedContent',
-        content: 'Sehr vorbildlich, besser gehts kaum.',
+        content: '<p>Sehr vorbildlich, besser gehts kaum.</p>',
     };
     const burnedOutAndPatientDeadContent: UserGeneratedContent = {
-        id: '0aafeb9d-d934-4951-a3ba-6a2c58be0183' as UserGeneratedContentId,
         type: 'userGeneratedContent',
-        content: 'Wo waren eingentlich das Personal?',
+        content: '<p>Wo waren eingentlich das Personal?</p>',
     };
     const burnedOutButRescuedContent: UserGeneratedContent = {
-        id: 'cc94d311-c8e4-41c0-a23a-b39f97fcb551' as UserGeneratedContentId,
         type: 'userGeneratedContent',
-        content: 'Grad noch mal glück gehabt. Hätte schlimmer kommen können.',
+        content:
+            '<p>Grad noch mal glück gehabt. Hätte schlimmer kommen können.</p>',
     };
-    export const contents = Object.fromEntries(
-        [
-            initialContent,
-            onlyExtiguishedContent,
-            onlyDeadContent,
-            onlyTreatedContent,
-            onlyBurnedOutContent,
-            patientDeadButExtinguishedContent,
-            treatedAndExtinguishedContent,
-            burnedOutAndPatientDeadContent,
-            burnedOutButRescuedContent,
-        ].map((content) => [content.id, content])
-    );
 
     // --- States ---
     export const initialState = newTechnicalChallengeState(
         'Ausgangslage',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
         [extinguishFireTask.id, rescuePatientTask.id],
-        initialContent.id
+        initialContent
     );
     export const onlyExtinguished = newTechnicalChallengeState(
         'Feuer geloescht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
         [rescuePatientTask.id],
-        onlyExtiguishedContent.id
+        onlyExtiguishedContent
     );
     export const onlyDead = newTechnicalChallengeState(
         'Patient verstorben',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
         [extinguishFireTask.id],
-        onlyDeadContent.id
+        onlyDeadContent
     );
     export const onlyTreated = newTechnicalChallengeState(
         'Patient gerettet',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
         [extinguishFireTask.id],
-        onlyTreatedContent.id
+        onlyTreatedContent
     );
     export const onlyBurnedOut = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
         [rescuePatientTask.id],
-        onlyBurnedOutContent.id
+        onlyBurnedOutContent
     );
     export const patientDeadButExtinguished = newTechnicalChallengeState(
         'Patient verstorben, Feuer geloescht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
         [],
-        patientDeadButExtinguishedContent.id
+        patientDeadButExtinguishedContent
     );
     export const treatedAndExtinguished = newTechnicalChallengeState(
         'Patient gerettet und Feuer geloescht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
         [],
-        treatedAndExtinguishedContent.id
+        treatedAndExtinguishedContent
     );
     export const burnedOutAndPatientDead = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt und Patient verstorben',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
         [],
-        burnedOutAndPatientDeadContent.id
+        burnedOutAndPatientDeadContent
     );
     export const burnedOutButRescued = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt, Patient gerettet',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
         [],
-        burnedOutButRescuedContent.id
+        burnedOutButRescuedContent
     );
 }
 
@@ -302,10 +278,4 @@ export function getDefaultTechnicalChallengeTemplate(): TechnicalChallengeTempla
 
 export function getDefaultTasks(): { [key: UUID]: Task } {
     return getDefaultTechnicalChallengeTemplate().relevantTasks;
-}
-
-export function getDefaultUserGeneratedContents(): {
-    [key: UUID]: UserGeneratedContent;
-} {
-    return StateMachineTesting.contents;
 }

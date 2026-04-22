@@ -12,8 +12,9 @@ import type {
     TechnicalChallenge,
     Task,
     TechnicalChallengeState,
-    UUID,
     Guard,
+    UserGeneratedContent,
+    TechnicalChallengeId,
 } from 'fuesim-digital-shared';
 import { currentStateOf } from 'fuesim-digital-shared';
 import {
@@ -33,7 +34,8 @@ import {
     selectCurrentTime,
 } from '../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
-import { RichTextEditorComponent } from '../rich-text-editor/rich-text-editor.component';
+import { ExerciseService } from '../../../core/exercise.service.js';
+import { UserGeneratedContentEditorComponent } from '../user-generated-content-editor/user-generated-content-editor.component.js';
 
 @Component({
     selector: 'app-technical-challenge-details',
@@ -47,13 +49,14 @@ import { RichTextEditorComponent } from '../rich-text-editor/rich-text-editor.co
         NgbNavLinkBase,
         NgbNavContent,
         NgbNavOutlet,
-        RichTextEditorComponent,
+        UserGeneratedContentEditorComponent,
     ],
 })
 export class TechnicalChallengeDetailsComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
 
-    readonly technicalChallengeId = input.required<UUID>();
+    readonly technicalChallengeId = input.required<TechnicalChallengeId>();
 
     public readonly challengeAge = computed(() => {
         const technicalChallengeStartTime =
@@ -98,5 +101,14 @@ export class TechnicalChallengeDetailsComponent implements OnInit {
         this.technicalChallenge = this.store.selectSignal(
             createSelectTechnicalChallenge(this.technicalChallengeId())
         );
+    }
+
+    updateContent(content: UserGeneratedContent) {
+        this.exerciseService.proposeAction({
+            type: '[TechnicalChallenge] Update state content',
+            technicalChallengeId: this.technicalChallengeId(),
+            stateId: this.currentState().id,
+            userGeneratedContent: content,
+        });
     }
 }

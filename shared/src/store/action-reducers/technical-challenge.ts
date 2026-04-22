@@ -11,9 +11,13 @@ import {
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { sizeSchema } from '../../models/utils/size.js';
 import { ReducerError } from '../reducer-error.js';
-import { currentStateOf } from '../../models/technical-challenge/state-machine.js';
+import {
+    currentStateOf,
+    technicalChallengeStateIdSchema,
+} from '../../models/technical-challenge/state-machine.js';
 import { taskSchema } from '../../models/task.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { getElement } from './utils/get-element.js';
 import { lookupReducerFor } from './action-reducers.js';
 
@@ -52,6 +56,13 @@ const resizeTechnicalChallengeActionSchema = z.strictObject({
     technicalChallengeId: technicalChallengeIdSchema,
     targetPosition: mapCoordinatesSchema,
     newSize: sizeSchema,
+});
+
+const updateTechnicalChallengeStateContentActionSchema = z.strictObject({
+    type: z.literal('[TechnicalChallenge] Update state content'),
+    technicalChallengeId: technicalChallengeIdSchema,
+    stateId: technicalChallengeStateIdSchema,
+    userGeneratedContent: userGeneratedContentSchema,
 });
 
 export namespace TechnicalChallengeActionReducers {
@@ -129,6 +140,24 @@ export namespace TechnicalChallengeActionReducers {
                 action.targetPosition
             );
             technicalChallenge.size = action.newSize;
+            return draftState;
+        },
+        rights: 'trainer',
+    };
+    export const updateTechnicalChallengeStateContent: ActionReducer<
+        z.infer<typeof updateTechnicalChallengeStateContentActionSchema>
+    > = {
+        type: updateTechnicalChallengeStateContentActionSchema.shape.type.value,
+        actionSchema: updateTechnicalChallengeStateContentActionSchema,
+        reducer: (draftState, action) => {
+            const technicalChallenge = getElement(
+                draftState,
+                'technicalChallenge',
+                action.technicalChallengeId
+            );
+            const state = currentStateOf(technicalChallenge);
+
+            state.userGeneratedContent = action.userGeneratedContent;
             return draftState;
         },
         rights: 'trainer',

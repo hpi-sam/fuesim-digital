@@ -5,6 +5,7 @@ import {
     newSize,
     type TechnicalChallengeState,
     type TechnicalChallenge,
+    type TechnicalChallengeId,
     type UUID,
     type Element as StateElement,
 } from 'fuesim-digital-shared';
@@ -127,7 +128,7 @@ export class TechnicalChallengeFeatureManager
     ): void {
         super.onFeatureClicked(event, feature);
 
-        const technicalChallengeId = feature.getId() as UUID;
+        const technicalChallengeId = feature.getId() as TechnicalChallengeId;
 
         this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(

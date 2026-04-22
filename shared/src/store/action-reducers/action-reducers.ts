@@ -21,7 +21,6 @@ import { VehicleTemplateActionReducers } from './vehicle-templates.js';
 import { RestrictedZoneActionReducers } from './restricted-zone.js';
 import { OperationalSectionActionReducers } from './operational-section.js';
 import { ScoutableActionReducers } from './scoutable.js';
-import { UserGeneratedContentActionReducers } from './user-generated-content.js';
 import { TechnicalChallengeActionReducers } from './technical-challenge.js';
 
 /**
@@ -50,7 +49,6 @@ const actionReducers = {
     ...RestrictedZoneActionReducers,
     ...OperationalSectionActionReducers,
     ...ScoutableActionReducers,
-    ...UserGeneratedContentActionReducers,
     ...TechnicalChallengeActionReducers,
 } as const;
 

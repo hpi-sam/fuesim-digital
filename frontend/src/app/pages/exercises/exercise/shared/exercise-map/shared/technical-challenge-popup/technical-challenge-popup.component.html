@@ -1,4 +1,3 @@
-<!-- TODO: layout -->
 <h5 class="popover-header">
     {{ technicalChallenge().name }}
     <button
@@ -7,58 +6,8 @@
         class="btn-close float-end"
     ></button>
 </h5>
-<div class="popover-body" style="width: 300px">
-    <div class="mb-2">
-        <h6>Zustand:</h6>
-        {{ currentState().title }}
-    </div>
-
-    <div class="mb-3">
-        <h6>Aufgaben:</h6>
-        <ul>
-            @for (
-                task of technicalChallenge().relevantTasks | values;
-                track task.id
-            ) {
-                <li [attr.data-taskId]="task.id">
-                    {{ task.taskName }}:
-                    {{
-                        technicalChallenge().taskProgress[task.id] ?? 'unknown'
-                    }}
-                    |
-                    {{ progressGuardsByTaskId().get(task.id)?.minProgress }}
-                </li>
-            } @empty {
-                <li><em>Keine Aufgaben</em></li>
-            }
-        </ul>
-    </div>
-
-    <div class="mb-3">
-        <h6>Timer:</h6>
-        Time since creation of challenge: {{ challengeAge() }}
-        <ul>
-            @for (guard of timerGuards(); track $index) {
-                <li>
-                    {{ guard.name ?? 'unnamed' }} needs
-                    {{ guard.minTimePassed }}
-                </li>
-            }
-        </ul>
-    </div>
-
-    <div class="mb-3">
-        <h6>Zugewiesenes Personal:</h6>
-        <ul>
-            @for (
-                assignment of assignedPersonnel();
-                track assignment[0].id + assignment[1].id
-            ) {
-                @let personnel = assignment[0];
-                @let task = assignment[1];
-
-                <li>{{ personnel.typeName }}: {{ task.taskName }}</li>
-            }
-        </ul>
-    </div>
+<div class="popover-body p-0" style="width: 350px">
+    <app-technical-challenge-details
+        [technicalChallenge]="this.technicalChallenge()"
+    />
 </div>

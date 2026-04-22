@@ -1,4 +1,5 @@
 import { IsBoolean, IsUUID } from 'class-validator';
+import { z } from 'zod';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { Action, ActionReducer } from '../action-reducer.js';
 
@@ -9,14 +10,21 @@ import {
     scoutableElementSchema,
 } from '../../models/scoutable.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import {
-    type UserGeneratedContent,
-    userGeneratedContentSchema,
-} from '../../models/user-generated-content.js';
+import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getElement } from './utils/get-element.js';
 
+const updateScoutableContentActionSchema = z.strictObject({
+    type: z.literal('[Scoutable] Update content'),
+    scoutableId: scoutableSchema.shape.id,
+    userGeneratedContent: userGeneratedContentSchema,
+});
+export type UpdateScoutableContentAction = z.infer<
+    typeof updateScoutableContentActionSchema
+>;
+
+// TODO migrate to zod actions
 export class MakeElementScoutableAction implements Action {
     @IsValue('[Scoutable] Make scoutable' as const)
     public readonly type = '[Scoutable] Make scoutable';
@@ -36,17 +44,6 @@ export class SetIsVisibleForParticipants implements Action {
 
     @IsBoolean()
     public readonly value!: boolean;
-}
-
-export class UpdateScoutableContentAction implements Action {
-    @IsValue('[Scoutable] Update content')
-    public readonly type = '[Scoutable] Update content';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly scoutableId!: UUID;
-
-    @IsZodSchema(userGeneratedContentSchema)
-    public readonly userGeneratedContent!: UserGeneratedContent;
 }
 
 export namespace ScoutableActionReducers {
@@ -82,10 +79,13 @@ export namespace ScoutableActionReducers {
             rights: 'trainer',
         };
     export const updateContent: ActionReducer<UpdateScoutableContentAction> = {
-        action: UpdateScoutableContentAction,
+        type: updateScoutableContentActionSchema.shape.type.value,
+        actionSchema: updateScoutableContentActionSchema,
         reducer: (draftState, { scoutableId, userGeneratedContent }) => {
             const element = getElement(draftState, 'scoutable', scoutableId);
+
             element.userGeneratedContent = userGeneratedContent;
+
             return draftState;
         },
         rights: 'trainer',

@@ -7,6 +7,7 @@ import type { Task } from '../../models/task.js';
 import type { TechnicalChallengeTemplate } from '../../models/technical-challenge/technical-challenge-template.js';
 import { newImageProperties } from '../../models/utils/image-properties.js';
 import type { UUID } from '../../utils/uuid.js';
+import type { UserGeneratedContent } from '../../models/user-generated-content.js';
 
 // TODO@Felix: move into state-machine.spec.ts
 export namespace StateMachineTesting {
@@ -47,47 +48,99 @@ export namespace StateMachineTesting {
         name: 'ist das Fahrzeug ausgebrannt?',
     };
 
+    // --- Contents ---
+    const initialContent: UserGeneratedContent = {
+        type: 'userGeneratedContent',
+        content: '<p>Was eine Schweinerei, jetzt mach mal was draus.</p>',
+    };
+    const onlyExtiguishedContent: UserGeneratedContent = {
+        type: 'userGeneratedContent',
+        content: '<p>Feuer is nun weg, aber pass auf! Da is noch wer drin.</p>',
+    };
+    const onlyDeadContent: UserGeneratedContent = {
+        type: 'userGeneratedContent',
+        content: '<p>Der hat schon seinen Körper verlassen.</p>',
+    };
+    const onlyTreatedContent: UserGeneratedContent = {
+        type: 'userGeneratedContent',
+        content: '<p>Da is noch Feuer. Zum glück steckt keiner mehr drin.</p>',
+    };
+    const onlyBurnedOutContent: UserGeneratedContent = {
+        type: 'userGeneratedContent',
+        content: '<p>Ein Wunder.</p>',
+    };
+    const patientDeadButExtinguishedContent: UserGeneratedContent = {
+        type: 'userGeneratedContent',
+        content: '<p>Feuer is weg, aber zu spät.</p>',
+    };
+    const treatedAndExtinguishedContent: UserGeneratedContent = {
+        type: 'userGeneratedContent',
+        content: '<p>Sehr vorbildlich, besser gehts kaum.</p>',
+    };
+    const burnedOutAndPatientDeadContent: UserGeneratedContent = {
+        type: 'userGeneratedContent',
+        content: '<p>Wo waren eingentlich das Personal?</p>',
+    };
+    const burnedOutButRescuedContent: UserGeneratedContent = {
+        type: 'userGeneratedContent',
+        content:
+            '<p>Grad noch mal glück gehabt. Hätte schlimmer kommen können.</p>',
+    };
+
     // --- States ---
     export const initialState = newTechnicalChallengeState(
         'Ausgangslage',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
-        [extinguishFireTask.id, rescuePatientTask.id]
+        [extinguishFireTask.id, rescuePatientTask.id],
+        initialContent
     );
     export const onlyExtinguished = newTechnicalChallengeState(
         'Feuer geloescht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
-        [rescuePatientTask.id]
+        [rescuePatientTask.id],
+        onlyExtiguishedContent
     );
     export const onlyDead = newTechnicalChallengeState(
         'Patient verstorben',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
-        [extinguishFireTask.id]
+        [extinguishFireTask.id],
+        onlyDeadContent
     );
     export const onlyTreated = newTechnicalChallengeState(
         'Patient gerettet',
         newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
-        [extinguishFireTask.id]
+        [extinguishFireTask.id],
+        onlyTreatedContent
     );
     export const onlyBurnedOut = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
-        [rescuePatientTask.id]
+        [rescuePatientTask.id],
+        onlyBurnedOutContent
     );
     export const patientDeadButExtinguished = newTechnicalChallengeState(
         'Patient verstorben, Feuer geloescht',
-        newImageProperties('/assets/blue_car_broken.png', 100, 1)
+        newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [],
+        patientDeadButExtinguishedContent
     );
     export const treatedAndExtinguished = newTechnicalChallengeState(
         'Patient gerettet und Feuer geloescht',
-        newImageProperties('/assets/blue_car_broken.png', 100, 1)
+        newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [],
+        treatedAndExtinguishedContent
     );
     export const burnedOutAndPatientDead = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt und Patient verstorben',
-        newImageProperties('/assets/blue_car_burned_out.png', 100, 1)
+        newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
+        [],
+        burnedOutAndPatientDeadContent
     );
     export const burnedOutButRescued = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt, Patient gerettet',
-        newImageProperties('/assets/blue_car_burned_out.png', 100, 1)
+        newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
+        [],
+        burnedOutButRescuedContent
     );
 }
 

@@ -1,0 +1,85 @@
+@if (this.currentRole() === 'trainer') {
+    <nav #nav="ngbNav" ngbNav class="nav-tabs">
+        <ng-container ngbNavItem ngbNavItem="properties">
+            <a ngbNavLink data-cy="technicalDetailsPopUpPropertiesNav"
+                >Eigenschaften</a
+            >
+            <ng-template ngbNavContent>
+                <div class="mb-2">
+                    <h6>Zustand:</h6>
+                    {{ currentState().title }}
+                </div>
+
+                <div class="mb-3">
+                    <h6>Aufgaben:</h6>
+                    <ul>
+                        @for (
+                            task of technicalChallenge().relevantTasks | values;
+                            track task.id
+                        ) {
+                            <li [attr.data-taskId]="task.id">
+                                {{ task.taskName }}:
+                                {{
+                                    technicalChallenge().taskProgress[
+                                        task.id
+                                    ] ?? 'unknown'
+                                }}
+                                |
+                                {{
+                                    progressGuardsByTaskId().get(task.id)
+                                        ?.minProgress
+                                }}
+                            </li>
+                        } @empty {
+                            <li><em>Keine Aufgaben</em></li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="mb-3">
+                    <h6>Timer:</h6>
+                    Time since creation of challenge: {{ challengeAge() }}
+                    <ul>
+                        @for (guard of timerGuards(); track $index) {
+                            <li>
+                                {{ guard.name ?? 'unnamed' }} needs
+                                {{ guard.minTimePassed }}
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="mb-3">
+                    <h6>Zugewiesenes Personal:</h6>
+                    <ul>
+                        @for (
+                            assignment of assignedPersonnel();
+                            track assignment[0].id + assignment[1].id
+                        ) {
+                            @let personnel = assignment[0];
+                            @let task = assignment[1];
+
+                            <li>
+                                {{ personnel.typeName }}: {{ task.taskName }}
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </ng-template>
+        </ng-container>
+        <ng-container ngbNavItem ngbNavItem="scout-Info">
+            <a ngbNavLink data-cy="mapImagePopUpScoutNav">Erkundung</a>
+            <ng-template ngbNavContent>
+                <app-user-generated-content-editor
+                    [userGeneratedContent]="currentState().userGeneratedContent"
+                    (userGeneratedContentChange)="updateContent($event)"
+                />
+            </ng-template>
+        </ng-container>
+    </nav>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+} @else {
+    <app-user-generated-content-editor
+        [userGeneratedContent]="currentState().userGeneratedContent"
+    />
+}

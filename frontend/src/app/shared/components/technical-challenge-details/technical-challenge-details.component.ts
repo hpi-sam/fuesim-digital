@@ -1,11 +1,4 @@
-import {
-    computed,
-    OnInit,
-    Signal,
-    Component,
-    inject,
-    input,
-} from '@angular/core';
+import { computed, Signal, Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     Personnel,
@@ -14,7 +7,6 @@ import type {
     TechnicalChallengeState,
     Guard,
     UserGeneratedContent,
-    TechnicalChallengeId,
 } from 'fuesim-digital-shared';
 import { currentStateOf } from 'fuesim-digital-shared';
 import {
@@ -30,7 +22,6 @@ import { ValuesPipe } from '../../pipes/values.pipe';
 import {
     createSelectPersonnel,
     createSelectTask,
-    createSelectTechnicalChallenge,
     selectCurrentTime,
 } from '../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
@@ -52,11 +43,11 @@ import { UserGeneratedContentEditorComponent } from '../user-generated-content-e
         UserGeneratedContentEditorComponent,
     ],
 })
-export class TechnicalChallengeDetailsComponent implements OnInit {
+export class TechnicalChallengeDetailsComponent {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    readonly technicalChallengeId = input.required<TechnicalChallengeId>();
+    readonly technicalChallenge = input.required<TechnicalChallenge>();
 
     public readonly challengeAge = computed(() => {
         const technicalChallengeStartTime =
@@ -69,8 +60,6 @@ export class TechnicalChallengeDetailsComponent implements OnInit {
 
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
-    // eslint-disable-next-line
-    public technicalChallenge!: Signal<TechnicalChallenge>;
     public readonly assignedPersonnel = computed<[Personnel, Task][]>(() => {
         const assignments = this.technicalChallenge().assignedPersonnel;
         return Object.entries(assignments).map(([personnelId, taskId]) => [
@@ -97,16 +86,10 @@ export class TechnicalChallengeDetailsComponent implements OnInit {
         () => currentStateOf(this.technicalChallenge())
     );
 
-    ngOnInit(): void {
-        this.technicalChallenge = this.store.selectSignal(
-            createSelectTechnicalChallenge(this.technicalChallengeId())
-        );
-    }
-
     updateContent(content: UserGeneratedContent) {
         this.exerciseService.proposeAction({
             type: '[TechnicalChallenge] Update state content',
-            technicalChallengeId: this.technicalChallengeId(),
+            technicalChallengeId: this.technicalChallenge().id,
             stateId: this.currentState().id,
             userGeneratedContent: content,
         });

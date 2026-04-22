@@ -1,4 +1,3 @@
-<!-- TODO: layout -->
 <h5 class="popover-header">
     {{ technicalChallenge().name }}
     <button
@@ -7,9 +6,8 @@
         class="btn-close float-end"
     ></button>
 </h5>
-<!-- TODO @JohannesPotzi : make a width of 350px work -->
 <div class="popover-body p-0" style="width: 350px">
     <app-technical-challenge-details
-        [technicalChallengeId]="this.technicalChallengeId"
+        [technicalChallenge]="this.technicalChallenge()"
     />
 </div>

@@ -1,5 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbActiveModal,
+    NgbModal,
+    NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { UUID } from 'fuesim-digital-shared';
 import {
@@ -36,6 +40,7 @@ import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/ap
         CdkDropListGroup,
         FormsModule,
         AppSaveOnTypingDirective,
+        NgbTooltip,
     ],
 })
 export class MeasuresOverviewModalComponent {

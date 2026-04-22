@@ -30,7 +30,7 @@ export const measureTemplateSchema = z.strictObject({
                             .join(', ');
                         ctx.addIssue({
                             code: 'custom',
-                            message: `"${measurePropertyTypeToGermanNameDictionary[property.type]}" benötigt mindestens eine der folgenden Eigenschaften: ${names}`,
+                            message: `"${measurePropertyTypeToGermanNameDictionary[property.type]}" benötigt mindestens einen der folgenden Schritte: ${names}`,
                         });
                     }
                 }
@@ -45,7 +45,7 @@ export const measureTemplateSchema = z.strictObject({
                 }
             }
         })
-        .min(1, { error: 'Eine Maßnahme braucht mindestens eine Eigenschaft' }),
+        .min(1, { error: 'Eine Maßnahme braucht mindestens einen Schritt.' }),
     replacePrevious: z.boolean(),
 });
 

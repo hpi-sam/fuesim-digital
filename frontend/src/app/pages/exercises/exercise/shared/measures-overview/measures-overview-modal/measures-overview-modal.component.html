@@ -14,9 +14,8 @@
 <div class="modal-body" style="min-height: 60vh" cdkDropListGroup>
     @for (category of categories(); track category.name) {
         <div class="category mb-4">
-            <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="d-flex align-items-center gap-2 mb-2 mx-2">
                 <input
-                    #categoryNameInput="ngModel"
                     [ngModel]="category.name"
                     (appSaveOnTyping)="renameCategory(category.name, $event)"
                     required
@@ -28,7 +27,7 @@
                 <button
                     class="btn btn-sm btn-outline-danger"
                     (click)="deleteCategory(category.name)"
-                    title="Kategorie löschen"
+                    ngbTooltip="Kategorie löschen"
                 >
                     <i class="bi bi-trash"></i>
                 </button>
@@ -37,7 +36,7 @@
                     (click)="addMeasureTemplate(category.name)"
                 >
                     <i class="bi bi-plus"></i>
-                    Hinzufügen
+                    Maßnahme hinzufügen
                 </button>
             </div>
             <div

@@ -1,7 +1,7 @@
-<div class="card text-center me-1 mb-1" [attr.data-cy]="dataCy()">
+<div class="card text-center mx-1 my-1" [attr.data-cy]="dataCy()">
     <div class="card-body-wrapper">
-        <div class="card-body px-1 py-1">
-            <span class="card-text" placement="bottom">
+        <div class="card-body p-2">
+            <span class="card-text">
                 {{ name() }}
             </span>
         </div>
@@ -10,7 +10,7 @@
         @if (enableEditButton()) {
             <button
                 (mousedown)="elementEdit.emit(); $event.stopPropagation()"
-                class="btn btn-outline-warning btn-sm"
+                class="btn btn-outline-warning btn-sm mt-1 me-1"
             >
                 <i class="bi bi-pencil-fill"></i>
             </button>
@@ -18,7 +18,7 @@
         @if (enableDeleteButton()) {
             <button
                 (mousedown)="elementDelete.emit(); $event.stopPropagation()"
-                class="btn btn-outline-danger btn-sm"
+                class="btn btn-outline-danger btn-sm mt-1 me-1"
             >
                 <i class="bi bi-trash"></i>
             </button>

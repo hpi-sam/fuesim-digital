@@ -24,6 +24,7 @@ import {
     NgbDropdownToggle,
     NgbDropdownMenu,
     NgbDropdownItem,
+    NgbTooltip,
 } from '@ng-bootstrap/ng-bootstrap';
 import { z, ZodError } from 'zod';
 import {
@@ -70,6 +71,7 @@ import { AlarmPropertyEditorComponent } from './alarm-property-editor/alarm-prop
         CdkDragHandle,
         CdkDragPlaceholder,
         CdkDragPreview,
+        NgbTooltip,
     ],
 })
 export class MeasureTemplateFormComponent implements OnChanges {
@@ -136,7 +138,7 @@ export class MeasureTemplateFormComponent implements OnChanges {
         } catch (e: unknown) {
             if (!(e instanceof ZodError)) throw e;
             this.messageService.postError({
-                title: 'Ungültige Maßnahmeneigenschaften',
+                title: 'Ungültige Schritte',
                 body: e.message,
             });
         }

@@ -11,6 +11,7 @@
     border: 1px dashed transparent;
     border-radius: 0.25rem;
     transition: border-color 150ms ease;
+    margin: -1px;
 
     &.cdk-drop-list-dragging,
     &.cdk-drop-list-receiving {

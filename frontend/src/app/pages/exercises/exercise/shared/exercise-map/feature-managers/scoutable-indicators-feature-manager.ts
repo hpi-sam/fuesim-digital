@@ -12,7 +12,11 @@ import type {
     ScoutableElement,
     ScoutableElementType,
 } from 'fuesim-digital-shared';
-import { newImageProperties } from 'fuesim-digital-shared';
+import {
+    genericScoutableImageUrl,
+    newImageProperties,
+    patientScoutableImageUrl,
+} from 'fuesim-digital-shared';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { selectVisibleScoutableIndicators } from '../../../../../../state/application/selectors/shared.selectors';
@@ -86,11 +90,11 @@ export class ScoutableIndicatorsFeatureManager
         const indicatorElement = this.getElementFromFeature(
             feature
         ) as ScoutableIndicator;
-        return newImageProperties(
-            '/assets/magnifying-glass.svg',
-            indicatorElement.height,
-            313 / 427
-        );
+        const url =
+            indicatorElement.scoutableElementType === 'patient'
+                ? patientScoutableImageUrl
+                : genericScoutableImageUrl;
+        return newImageProperties(url, indicatorElement.height, 1);
     });
     public readonly layer: VectorLayer;
 

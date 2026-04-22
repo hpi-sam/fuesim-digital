@@ -161,7 +161,6 @@ Look at the [benchmark readme](./benchmark/README.md) for more information.
 ## Styleguide
 
 - names are never unique, ids are
-- Use [StrictObject](shared\src\utils\strict-object.ts) instead of `Object` wherever possible
 - A leading underscore should only be used
     - for private properties that may be used with getters/setters
     - to resolve certain naming conflicts (e.g. `.some(_item => ...)`)

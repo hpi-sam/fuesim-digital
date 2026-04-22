@@ -28,9 +28,9 @@ import { ElementManager } from './element-manager';
  * Automatically redraws a feature (= reevaluates its style function) when an element property has changed.
  */
 export abstract class MoveableFeatureManager<
-        ManagedElement extends PositionableElement,
-        FeatureType extends GeometryWithCoordinates = Point,
-    >
+    ManagedElement extends PositionableElement,
+    FeatureType extends GeometryWithCoordinates = Point,
+>
     extends ElementManager<ManagedElement, FeatureType>
     implements FeatureManager<FeatureType>
 {

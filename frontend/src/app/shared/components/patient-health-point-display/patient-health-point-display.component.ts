@@ -1,14 +1,13 @@
-import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
-import { createSelector, Store } from '@ngrx/store';
-import type { PatientStatus, UUID } from 'fuesim-digital-shared';
+import { computed, Component, inject, input } from '@angular/core';
+import { Store } from '@ngrx/store';
+import type { UUID } from 'fuesim-digital-shared';
 import {
     getPatientVisibleStatus,
     healthPointsDefaults,
+    isPatientBystander,
     statusNames,
 } from 'fuesim-digital-shared';
-import type { Observable } from 'rxjs';
-import { NgStyle, AsyncPipe, PercentPipe } from '@angular/common';
+import { NgStyle, PercentPipe } from '@angular/common';
 import type { AppState } from '../../../state/app.state';
 import {
     createSelectPatient,
@@ -20,42 +19,32 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-patient-health-point-display',
     templateUrl: './patient-health-point-display.component.html',
     styleUrls: ['./patient-health-point-display.component.scss'],
-    imports: [NgStyle, AsyncPipe, PercentPipe],
+    imports: [NgStyle, PercentPipe],
 })
-export class PatientHealthPointDisplayComponent implements OnChanges {
+export class PatientHealthPointDisplayComponent {
     private readonly store = inject<Store<AppState>>(Store);
 
     readonly patientId = input.required<UUID>();
+    readonly patient = computed(() =>
+        this.store.selectSignal(createSelectPatient(this.patientId()))()
+    );
+    readonly configuration = this.store.selectSignal(selectConfiguration);
+    readonly isBystander = computed(() => isPatientBystander(this.patient()));
+    readonly status = computed(() => ({
+        real: this.patient().realStatus,
+        visible: getPatientVisibleStatus(
+            this.patient(),
+            this.configuration().pretriageEnabled,
+            this.configuration().bluePatientsEnabled
+        ),
+        health: this.patient().health,
+    }));
 
-    status$!: Observable<{
-        real: PatientStatus;
-        visible: PatientStatus;
-        health: number;
-    }>;
-
-    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
+    public readonly currentRole = this.store.selectSignal(
+        selectCurrentMainRole
+    );
 
     public readonly healthPointsDefaults = healthPointsDefaults;
 
-    ngOnChanges(): void {
-        this.status$ = this.store.select(
-            createSelector(
-                createSelectPatient(this.patientId()),
-                selectConfiguration,
-                (patient, configuration) => ({
-                    real: patient.realStatus,
-                    visible: getPatientVisibleStatus(
-                        patient,
-                        configuration.pretriageEnabled,
-                        configuration.bluePatientsEnabled
-                    ),
-                    health: patient.health,
-                })
-            )
-        );
-    }
-
-    public get statusNames() {
-        return statusNames;
-    }
+    public statusNames = statusNames;
 }

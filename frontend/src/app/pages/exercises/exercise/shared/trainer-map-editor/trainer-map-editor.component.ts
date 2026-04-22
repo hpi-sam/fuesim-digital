@@ -17,6 +17,8 @@ import {
     validateExerciseExport,
     viewportImage,
     getDefaultTechnicalChallengeTemplate,
+    bystanderCategories,
+    scoutableMapImageTemplate,
 } from 'fuesim-digital-shared';
 import type {
     PatientCategory,
@@ -131,6 +133,9 @@ export class TrainerMapEditorComponent implements OnInit {
     public patientCategories$?: Observable<{
         [key in FilterCategory]?: PatientCategory[];
     }>;
+
+    public bystanderCategories = bystanderCategories;
+    public scoutableMapImageTemplate = scoutableMapImageTemplate;
 
     ngOnInit() {
         this.patientCategories$ = combineLatest([

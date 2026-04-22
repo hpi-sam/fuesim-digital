@@ -10,13 +10,15 @@ interface BaseActionReducer<A extends Action = Action> {
     readonly rights: ReducerRights<A>;
 }
 
-interface LegacyActionReducer<A extends Action = Action>
-    extends BaseActionReducer<A> {
+interface LegacyActionReducer<
+    A extends Action = Action,
+> extends BaseActionReducer<A> {
     readonly action: Constructor<A>;
 }
 
-interface SchemaBasedActionReducer<A extends Action = Action>
-    extends BaseActionReducer<A> {
+interface SchemaBasedActionReducer<
+    A extends Action = Action,
+> extends BaseActionReducer<A> {
     readonly type: A['type'];
     readonly actionSchema: ZodType<A>;
 }

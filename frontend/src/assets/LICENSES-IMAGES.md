@@ -76,10 +76,9 @@ License: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 [favicon.png](favicon.png): created by Freepik - Flaticon <https://www.flaticon.com/de/kostenlose-icons/alarm>
 
-[Magnifying-glass.svg](Magnifying-glass.svg):
-<https://commons.wikimedia.org/wiki/File:Magnifying-glass.svg#/media/File:Magnifying-glass.svg>
-RRZEicons
-License: [CC-BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/deed.en)
+[scoutable-generic.png](scoutable-generic.png), [scoutable-patient.png](scoutable-patient.png):
+edited by Jonathan Weth, based on Bootstrap Icons <https://icons.getbootstrap.com/>
+License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)
 
 [blue_car_broken.png](blue_car_broken.png),
 [blue_car_broken_burning.png](blue_car_broken_burning.png),

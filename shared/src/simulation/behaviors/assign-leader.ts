@@ -1,7 +1,6 @@
 import { groupBy } from 'lodash-es';
 import type { WritableDraft } from 'immer';
 import { z } from 'zod';
-import { StrictObject } from '../../utils/strict-object.js';
 import {
     getActivityById,
     getElement,
@@ -195,7 +194,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                         (person) => person.templateId
                                     );
                                     radiogram.personnelCount =
-                                        StrictObject.fromEntries(
+                                        Object.fromEntries(
                                             Object.entries(
                                                 groupedPersonnel
                                             ).map(([key, value]) => [
@@ -228,7 +227,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
 
                                 const connectedSimulatedRegions =
                                     Object.fromEntries(
-                                        StrictObject.entries(
+                                        Object.entries(
                                             ownTransferPoint.reachableTransferPoints
                                         )
                                             .map(
@@ -284,7 +283,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     (vehicle) => vehicle.vehicleType
                                 );
                                 radiogram.vehicleCount = Object.fromEntries(
-                                    StrictObject.entries(groupedVehicles).map(
+                                    Object.entries(groupedVehicles).map(
                                         ([vehicleType, vehicleGroup]) => [
                                             vehicleType,
                                             vehicleGroup.length,
@@ -316,7 +315,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     (vehicle) => vehicle.occupation.type
                                 );
                                 radiogram.occupations = Object.fromEntries(
-                                    StrictObject.entries(groupedVehicles).map(
+                                    Object.entries(groupedVehicles).map(
                                         ([occupationType, vehicleGroup]) => [
                                             occupationType,
                                             vehicleGroup.length,

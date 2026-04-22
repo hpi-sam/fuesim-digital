@@ -48,9 +48,7 @@ let globalLastInformationCollapsed = true;
         AsyncPipe,
     ],
 })
-export class SimulatedRegionOverviewBehaviorTreatPatientsComponent
-    implements OnInit
-{
+export class SimulatedRegionOverviewBehaviorTreatPatientsComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     readonly selectPatientService = inject(SelectPatientService);

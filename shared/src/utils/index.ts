@@ -6,7 +6,7 @@ export * from './socket-io.js';
 export * from './constructor.js';
 export * from './merge-intersection.js';
 export * from './clone-deep.js';
-export * from './strict-object.js';
+export * from './type-asserted-object.js';
 export * from './sleep.js';
 export * from './assert-exhaustiveness.js';
 export * from './sort-object.js';

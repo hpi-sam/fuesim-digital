@@ -19,7 +19,6 @@ import {
     type VehicleParameters,
     vehicleParametersSchema,
 } from '../../models/utils/vehicle-parameters.js';
-import { StrictObject } from '../../utils/strict-object.js';
 import { newAlarmGroupStartPoint } from '../../models/utils/start-points.js';
 import { getElement } from './utils/get-element.js';
 import { logAlarmGroupSent } from './utils/log.js';
@@ -104,7 +103,7 @@ export namespace EmergencyOperationCenterActionReducers {
                 alarmGroupId
             );
 
-            const sortedAlarmGroupVehicles = StrictObject.values(
+            const sortedAlarmGroupVehicles = Object.values(
                 alarmGroup.alarmGroupVehicles
             ).sort((a, b) => a.time - b.time);
 

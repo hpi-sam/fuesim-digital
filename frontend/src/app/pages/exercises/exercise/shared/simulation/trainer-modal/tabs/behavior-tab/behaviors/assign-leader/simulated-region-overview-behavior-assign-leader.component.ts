@@ -17,9 +17,7 @@ import { createSelectPersonnel } from '../../../../../../../../../../state/appli
     ],
     imports: [AsyncPipe],
 })
-export class SimulatedRegionOverviewBehaviorAssignLeaderComponent
-    implements OnChanges
-{
+export class SimulatedRegionOverviewBehaviorAssignLeaderComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
 
     readonly assignLeaderBehaviorState =

@@ -147,8 +147,7 @@ export class DrawingFeatureManager
             return false;
         }
 
-        const segmentCount =
-            geometry instanceof Polygon ? ring.length - 1 : ring.length - 1;
+        const segmentCount = ring.length - 1;
 
         for (let index = 0; index < segmentCount; index++) {
             const start = ring[index]!;

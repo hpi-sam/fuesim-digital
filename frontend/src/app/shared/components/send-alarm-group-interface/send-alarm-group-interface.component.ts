@@ -1,12 +1,7 @@
 import { computed, type OnDestroy, type OnInit } from '@angular/core';
 import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import {
-    createVehicleParameters,
-    getTransferPointFullName,
-    newMapCoordinatesAt,
-    uuid,
-} from 'fuesim-digital-shared';
+import { getTransferPointFullName } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, map, takeUntil } from 'rxjs';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';

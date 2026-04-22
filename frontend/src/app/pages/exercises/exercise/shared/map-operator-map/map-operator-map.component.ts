@@ -12,7 +12,7 @@ import {
 } from '../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
-    selector: 'app-map-operator-map-editor',
+    selector: 'app-map-operator-map',
     templateUrl: './map-operator-map.component.html',
     styleUrls: ['./map-operator-map.component.scss'],
     imports: [ExerciseMapComponent, FormsModule, MapOperatorToolbarComponent],

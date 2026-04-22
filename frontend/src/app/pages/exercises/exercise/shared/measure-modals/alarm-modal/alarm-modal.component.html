@@ -5,21 +5,12 @@
 <div class="modal-body">
     <div class="mb-3">
         <label class="form-label">Alarmgruppe</label>
-        @if (allowedAlarmGroupIds().length === 1) {
-            <input
-                type="text"
-                class="form-control"
-                [value]="alarmForm.alarmGroup"
-                readonly
-            />
-        } @else {
-            <select class="form-select" [formField]="alarmForm.alarmGroup">
-                <option disabled [value]="''">Alarmgruppe auswählen</option>
-                @for (ag of allowedAlarmGroups() | values; track ag.id) {
-                    <option [value]="ag.id">{{ ag.name }}</option>
-                }
-            </select>
-        }
+        <select class="form-select" [formField]="alarmForm.alarmGroup">
+            <option disabled [value]="''">Alarmgruppe auswählen</option>
+            @for (ag of allowedAlarmGroups() | values; track ag.id) {
+                <option [value]="ag.id">{{ ag.name }}</option>
+            }
+        </select>
     </div>
     <div class="mb-3">
         <label class="form-label">Ziel</label>

@@ -34,36 +34,34 @@
     </p>
 </div>
 <div class="form-group mb-3">
-    <label class="form-label"
-        >Eigenschaften
-        <div ngbDropdown autoClose="outside" class="d-inline-block">
-            <button
-                ngbDropdownToggle
-                type="button"
-                class="btn btn-outline-primary ms-3"
-            >
-                Eigenschaft hinzufügen
-            </button>
-            <div ngbDropdownMenu>
-                @for (property of measurePropertyTypes; track property) {
-                    <button
-                        ngbDropdownItem
-                        (click)="addProperty(property)"
-                        type="button"
-                        class="btn"
-                    >
-                        <i class="bi bi-plus"></i>
-                        {{ humanReadablePropertyName(property) }}
-                    </button>
-                }
-            </div>
-        </div></label
-    >
+    <label class="form-label">Eigenschaften</label>
+    <div ngbDropdown autoClose="outside" class="d-inline-block">
+        <button
+            ngbDropdownToggle
+            type="button"
+            class="btn btn-outline-primary ms-3"
+        >
+            Eigenschaft hinzufügen
+        </button>
+        <div ngbDropdownMenu>
+            @for (property of measurePropertyTypes; track property) {
+                <button
+                    ngbDropdownItem
+                    (click)="addProperty(property)"
+                    type="button"
+                    class="btn"
+                >
+                    <i class="bi bi-plus"></i>
+                    {{ humanReadablePropertyName(property) }}
+                </button>
+            }
+        </div>
+    </div>
     @if (values().properties.length > 0) {
         <div
             class="d-flex flex-column gap-3 mt-3"
             cdkDropList
-            (cdkDropListDropped)="drop($event)"
+            (cdkDropListDropped)="onDrop($event)"
         >
             @for (
                 formProperty of measureTemplateForm.properties;
@@ -318,7 +316,7 @@
 </div>
 
 <button
-    (click)="submit()"
+    (click)="onSubmit()"
     [disabled]="measureTemplateForm().invalid()"
     class="btn btn-primary"
 >

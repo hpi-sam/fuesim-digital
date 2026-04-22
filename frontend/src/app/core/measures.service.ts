@@ -8,7 +8,7 @@ import {
     newDrawing,
     uuid,
 } from 'fuesim-digital-shared';
-import { Subject } from 'rxjs';
+import { filter, firstValueFrom, map, Subject, timer, race } from 'rxjs';
 
 import { AppState } from '../state/app.state';
 import { selectLastClientName } from '../state/application/selectors/application.selectors';
@@ -22,10 +22,10 @@ import {
     selectCurrentTime,
 } from '../state/application/selectors/exercise.selectors';
 import { getVehicleParameters } from '../shared/functions/vehicle-parameters';
-import { MessageService } from './messages/message.service';
 import { ConfirmationModalService } from './confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from './exercise.service';
 import { DrawingInteractionService } from './drawing-interaction.service';
+import { MessageService } from './messages/message.service';
 
 @Injectable({
     providedIn: 'root',
@@ -64,13 +64,12 @@ export class MeasureService {
         switch (property.type) {
             case 'delay':
                 this.endEvent = new Subject<boolean | null>();
-                return new Promise<boolean>((resolve) => {
-                    this.endEvent?.pipe().subscribe((e) => {
-                        if (e === null) return;
-                        resolve(e);
-                    });
-                    setTimeout(() => resolve(true), property.delay * 1000);
-                });
+                return firstValueFrom(
+                    race(
+                        this.endEvent.pipe(filter((e) => e !== null)),
+                        timer(property.delay * 1000).pipe(map(() => true))
+                    )
+                );
             case 'response':
                 await this.confirmationModalService.confirm({
                     title: template.name,
@@ -218,16 +217,26 @@ export class MeasureService {
         template: MeasureTemplate,
         instances: MeasurePropertyInstance[]
     ) {
-        this.exerciseService.proposeAction({
-            type: '[Measure] Add Measure',
-            measure: {
-                clientName: this.clientName() ?? 'Unknown',
-                id: uuid(),
-                instances,
-                templateId: template.id,
-                timestamp: selectStateSnapshot(selectCurrentTime, this.store),
-            },
-        });
+        this.exerciseService
+            .proposeAction({
+                type: '[Measure] Add Measure',
+                measure: {
+                    clientName: this.clientName() ?? 'Unknown',
+                    id: uuid(),
+                    instances,
+                    templateId: template.id,
+                    timestamp: selectStateSnapshot(
+                        selectCurrentTime,
+                        this.store
+                    ),
+                },
+            })
+            .catch((e) => {
+                this.messageService.postError({
+                    title: 'Fehler beim Erstellen der Maßnahme',
+                    error: e.message,
+                });
+            });
     }
 
     private abort(instances: MeasurePropertyInstance[]) {

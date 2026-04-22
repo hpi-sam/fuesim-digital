@@ -81,7 +81,7 @@ export namespace EmergencyOperationCenterActionReducers {
             if (action.isPrivate && client.role.mainRole === 'participant') {
                 return false;
             }
-            return 'participant';
+            return 'eoc';
         },
     };
     export const sendAlarmGroup: ActionReducer<SendAlarmGroupAction> = {

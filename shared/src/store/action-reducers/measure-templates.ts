@@ -1,4 +1,3 @@
-import { IsUUID } from 'class-validator';
 import {
     type MeasureTemplate,
     measureTemplateCategorySchema,
@@ -10,7 +9,6 @@ import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { uuidValidationOptions } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     getCategory,
@@ -61,7 +59,7 @@ export class DeleteMeasureTemplateAction implements Action {
     @IsValue('[MeasureTemplate] Delete measureTemplate')
     public readonly type = '[MeasureTemplate] Delete measureTemplate';
 
-    @IsUUID(4, uuidValidationOptions)
+    @IsZodSchema(uuidSchema)
     public readonly id!: UUID;
 }
 

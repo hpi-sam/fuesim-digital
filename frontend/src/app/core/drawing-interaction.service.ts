@@ -29,6 +29,7 @@ export class DrawingInteractionService {
         request: DrawRequest
     ): Promise<DrawingResult | null> {
         return new Promise<DrawingResult | null>((resolve) => {
+            if (this.pendingResolve !== null) this.pendingResolve(null);
             this.pendingResolve = resolve;
             this.drawRequest.next(request);
         });

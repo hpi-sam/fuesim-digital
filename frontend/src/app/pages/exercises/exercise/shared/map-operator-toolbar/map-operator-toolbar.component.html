@@ -3,10 +3,7 @@
 >
     <app-measure-details class="mb-2" />
     @if (measureService.activeMeasure() === null) {
-        <div
-            class="d-flex flex-column align-items-center w-100"
-            [class.fade-out]="measureService.activeMeasure() !== null"
-        >
+        <div class="d-flex flex-column align-items-center w-100">
             <div
                 class="category-buttons btn-group"
                 role="group"

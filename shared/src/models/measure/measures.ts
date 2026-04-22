@@ -36,7 +36,6 @@ export const measureTemplateSchema = z.strictObject({
                 }
 
                 for (const blocker of def.blockedBy) {
-                    console.error(blocker, def.blockedBy);
                     if (presentTypes.has(blocker)) {
                         ctx.addIssue({
                             code: 'custom',

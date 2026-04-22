@@ -110,7 +110,7 @@ export class MeasureTemplateFormComponent implements OnChanges {
         }
     }
 
-    public drop(event: CdkDragDrop<EditableMeasureProperty>) {
+    public onDrop(event: CdkDragDrop<EditableMeasureProperty>) {
         this.values.update((v) => {
             const properties = [...v.properties];
             moveItemInArray(
@@ -122,7 +122,7 @@ export class MeasureTemplateFormComponent implements OnChanges {
         });
     }
 
-    public async submit() {
+    public async onSubmit() {
         const valuesOnSubmit = cloneDeep(this.values());
         try {
             this.submitMeasureTemplate.emit({

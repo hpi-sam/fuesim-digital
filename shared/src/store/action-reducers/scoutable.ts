@@ -26,9 +26,6 @@ export class MakeElementScoutableAction implements Action {
 
     @IsZodSchema(scoutableSchema)
     public readonly scoutable!: Scoutable;
-
-    @IsZodSchema(userGeneratedContentSchema)
-    public readonly content!: UserGeneratedContent;
 }
 export class SetIsVisibleForParticipants implements Action {
     @IsValue('[Scoutable] Set isVisibleForParticipants' as const)
@@ -41,28 +38,31 @@ export class SetIsVisibleForParticipants implements Action {
     public readonly value!: boolean;
 }
 
+export class UpdateScoutableContentAction implements Action {
+    @IsValue('[Scoutable] Update content')
+    public readonly type = '[Scoutable] Update content';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly scoutableId!: UUID;
+
+    @IsZodSchema(userGeneratedContentSchema)
+    public readonly userGeneratedContent!: UserGeneratedContent;
+}
+
 export namespace ScoutableActionReducers {
     export const makeElementScoutable: ActionReducer<MakeElementScoutableAction> =
         {
             action: MakeElementScoutableAction,
-            reducer: (draftState, { element, scoutable, content }) => {
+            reducer: (draftState, { element, scoutable }) => {
                 const stateElement = getElement(
                     draftState,
                     element.type,
                     element.id
                 );
                 stateElement.scoutableId = scoutable.id;
-                draftState.userGeneratedContents[content.id] =
-                    cloneDeepMutable(content);
                 draftState.scoutables[scoutable.id] =
                     cloneDeepMutable(scoutable);
 
-                const stateScoutable = getElement(
-                    draftState,
-                    'scoutable',
-                    scoutable.id
-                );
-                stateScoutable.userGeneratedContentId = content.id;
                 return draftState;
             },
             rights: 'trainer',
@@ -81,4 +81,13 @@ export namespace ScoutableActionReducers {
             },
             rights: 'trainer',
         };
+    export const updateContent: ActionReducer<UpdateScoutableContentAction> = {
+        action: UpdateScoutableContentAction,
+        reducer: (draftState, { scoutableId, userGeneratedContent }) => {
+            const element = getElement(draftState, 'scoutable', scoutableId);
+            element.userGeneratedContent = userGeneratedContent;
+            return draftState;
+        },
+        rights: 'trainer',
+    };
 }

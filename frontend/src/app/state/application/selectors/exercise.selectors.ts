@@ -79,9 +79,6 @@ export const selectCollectedClientNames = selectPropertyFactory(
     'collectedClientNames'
 );
 export const selectScoutables = selectPropertyFactory('scoutables');
-export const selectUserGeneratedContent = selectPropertyFactory(
-    'userGeneratedContents'
-);
 
 // Elements
 
@@ -133,8 +130,6 @@ export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
 );
 export const createSelectScoutable =
     createSelectElementFromMapFactory(selectScoutables);
-export const createSelectUserGeneratedContent =
-    createSelectElementFromMapFactory(selectUserGeneratedContent);
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,

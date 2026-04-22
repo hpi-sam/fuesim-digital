@@ -30,13 +30,11 @@ export const addScoutables50: Migration = {
         const typedState = state as {
             scoutables: { [key in UUID]: any } | undefined;
 
-            userGeneratedContents: { [key in UUID]: any } | undefined;
             patients: { [key in UUID]: { scoutableId: null | undefined } };
             mapImages: { [key in UUID]: { scoutableId: null | undefined } };
         };
 
         typedState.scoutables = {};
-        typedState.userGeneratedContents = {};
         Object.values(typedState.patients).forEach((patient) => {
             patient.scoutableId = null;
         });

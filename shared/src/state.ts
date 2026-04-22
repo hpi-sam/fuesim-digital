@@ -145,12 +145,12 @@ export class ExerciseState {
     public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
         {};
 
-    @IsZodSchema(z.record(uuidSchema, measureSchema))
+    @IsZodSchema(z.record(measureSchema.shape.id, measureSchema))
     public readonly measures: {
         readonly [key: UUID]: Measure;
     } = {};
 
-    @IsZodSchema(z.record(uuidSchema, drawingSchema))
+    @IsZodSchema(z.record(drawingSchema.shape.id, drawingSchema))
     public readonly drawings: { readonly [key: UUID]: Drawing } = {};
 
     @IsZodSchema(z.record(uuidSchema, mapImageSchema))
@@ -279,5 +279,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 50;
+    static readonly currentStateVersion = 51;
 }

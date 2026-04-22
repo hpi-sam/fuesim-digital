@@ -80,10 +80,6 @@ import {
     type ExerciseRadiogram,
     exerciseRadiogramSchema,
 } from './models/radiogram/exercise-radiogram.js';
-import {
-    type UserGeneratedContent,
-    userGeneratedContentSchema,
-} from './models/user-generated-content.js';
 import { type Scoutable, scoutableSchema } from './models/scoutable.js';
 import {
     type TechnicalChallenge,
@@ -246,16 +242,6 @@ export class ExerciseState {
 
     @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
-
-    @IsZodSchema(
-        z.record(
-            userGeneratedContentSchema.shape.id,
-            userGeneratedContentSchema
-        )
-    )
-    public readonly userGeneratedContents: {
-        readonly [key: UUID]: UserGeneratedContent;
-    } = {};
 
     /**
      * @deprecated Use {@link create} instead.

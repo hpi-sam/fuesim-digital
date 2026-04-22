@@ -18,7 +18,6 @@ export const elementTypePluralMap = {
     vehicle: 'vehicles',
     viewport: 'viewports',
     scoutable: 'scoutables',
-    userGeneratedContent: 'userGeneratedContents',
 } as const satisfies { [Key in Element['type']]: keyof ExerciseState };
 
 export type ElementTypePluralMap = typeof elementTypePluralMap;

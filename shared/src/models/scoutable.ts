@@ -3,11 +3,15 @@ import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { type Patient, patientSchema } from './patient.js';
 import { mapImageSchema } from './map-image.js';
+import {
+    newUserGeneratedContent,
+    userGeneratedContentSchema,
+} from './user-generated-content.js';
 
 export const scoutableSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('scoutable'),
-    userGeneratedContentId: uuidSchema.nullable(),
+    userGeneratedContent: userGeneratedContentSchema,
     isVisibleForParticipants: z.boolean(),
 });
 export type Scoutable = Immutable<z.infer<typeof scoutableSchema>>;
@@ -34,7 +38,7 @@ export function newScoutable(): Scoutable {
     return {
         id: uuid(),
         type: 'scoutable',
-        userGeneratedContentId: null,
+        userGeneratedContent: newUserGeneratedContent(),
         isVisibleForParticipants: true,
     };
 }

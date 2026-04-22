@@ -1,6 +1,8 @@
 import { Component, inject, input } from '@angular/core';
 import {
+    CollectionElementsDto,
     ElementDto,
+    gatherCollectionElements,
     VersionedCollectionPartial,
     VersionedElementContent,
 } from 'fuesim-digital-shared';
@@ -23,7 +25,9 @@ export class ElementCardComponent {
     private readonly collectionService = inject(CollectionService);
     private readonly confirmationService = inject(ConfirmationModalService);
 
-    public readonly availableElements = input<ElementDto[]>([]);
+    public readonly collectionElements = input<CollectionElementsDto | null>(
+        null
+    );
 
     public readonly collection = input.required<VersionedCollectionPartial>();
     public readonly element = input.required<ElementDto>();
@@ -57,7 +61,9 @@ export class ElementCardComponent {
             },
             collection: this.collection(),
             element: this.element(),
-            availableCollectionElements: this.availableElements(),
+            availableCollectionElements: gatherCollectionElements(
+                this.collectionElements()!
+            ).allElements(),
             hideVersionHistory: this.hideVersionHistory(),
         } satisfies EditingVersionedElementModalData<VersionedElementContent>;
     }

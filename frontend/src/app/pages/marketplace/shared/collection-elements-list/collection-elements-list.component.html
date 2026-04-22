@@ -12,7 +12,7 @@
                 ) {
                     <app-element-card
                         [element]="exerciseObject"
-                        [availableElements]="collectionElements()"
+                        [collectionElements]="collectionElements()"
                         [collection]="collection()"
                         [mode]="editable() ? 'edit' : 'view'"
                         [hideVersionHistory]="!editable()"

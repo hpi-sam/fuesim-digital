@@ -14,8 +14,9 @@
         track dependency.collection.versionId
     ) {
         <app-used-collection-item
-            [dependency]="dependency"
+            [collection]="dependency.collection"
             [currentCollectionEntityId]="collectionData().collection.entityId"
+            [canRemoveCollection]="canRemoveCollection()"
         />
     } @empty {
         <div class="col flex-grow-1">

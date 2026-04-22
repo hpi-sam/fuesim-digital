@@ -54,6 +54,10 @@
                             <i class="bi bi-plus"></i>
                             {{ availableVehicle.content.vehicleType }}
                         </button>
+                    } @empty {
+                        <span class="text-muted p-2 italic"
+                            >Keine Fahrzeuge</span
+                        >
                     }
                 </div>
             </div>

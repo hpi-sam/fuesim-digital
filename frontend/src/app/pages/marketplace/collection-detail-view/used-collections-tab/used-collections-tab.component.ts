@@ -18,6 +18,7 @@ export class UsedCollectionsTabComponent {
     private readonly collectionService = inject(CollectionService);
     private readonly ngbModalService = inject(NgbModal);
 
+    public readonly canRemoveCollection = input<boolean>(false);
     public readonly collectionData =
         input.required<CollectionSubscriptionData>();
 

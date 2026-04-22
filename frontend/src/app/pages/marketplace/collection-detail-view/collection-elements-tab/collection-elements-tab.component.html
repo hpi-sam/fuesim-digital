@@ -37,7 +37,7 @@
 </div>
 <app-collection-elements-list
     [collection]="collectionData().collection"
-    [collectionElements]="collectionData().objects.direct"
+    [collectionElements]="collectionData().objects"
     [publishedElements]="collectionData().publishedElements.direct"
     [editable]="checkRole(collectionData().ownRole).isAtLeast('editor')"
 />

@@ -1,7 +1,9 @@
 import { Component, computed, input } from '@angular/core';
 import {
     ChangeElementType,
+    CollectionElementsDto,
     ElementDto,
+    gatherCollectionElements,
     getCollectionElementDiff,
     VersionedCollectionPartial,
     VersionedElementContent,
@@ -17,7 +19,8 @@ import { ElementCardComponent } from '../cards/element-card/element-card.compone
 })
 export class CollectionElementsListComponent {
     public readonly collection = input.required<VersionedCollectionPartial>();
-    public readonly collectionElements = input.required<ElementDto[]>();
+    public readonly collectionElements =
+        input.required<CollectionElementsDto>();
     public readonly publishedElements = input<ElementDto[] | null>(null);
     public readonly editable = input(true);
 
@@ -33,7 +36,9 @@ export class CollectionElementsListComponent {
         if (!publishedElements) return {};
         const changes = getCollectionElementDiff(
             publishedElements,
-            this.collectionElements()
+            gatherCollectionElements(
+                this.collectionElements()
+            ).allDirectElements()
         );
         return changes.reduce<{ [entityId: string]: ChangeElementType }>(
             (acc, change) => {
@@ -45,7 +50,9 @@ export class CollectionElementsListComponent {
     });
 
     public readonly visibleElements = computed(() => [
-        ...this.collectionElements(),
+        ...gatherCollectionElements(
+            this.collectionElements()
+        ).allDirectElements(),
         ...(this.publishedElements() ?? []).filter(
             (f) => this.elementHasChanges()[f.entityId] === 'remove'
         ),

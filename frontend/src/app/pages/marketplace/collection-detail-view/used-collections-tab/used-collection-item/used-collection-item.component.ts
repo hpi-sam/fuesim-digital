@@ -12,8 +12,8 @@ import {
     ElementVersionId,
     ElementDto,
     ChangeDependencies,
-    CollectionElementsSingle,
     gatherCollectionElements,
+    CollectionDto,
 } from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -40,12 +40,20 @@ export class UsedCollectionItemComponent {
     private readonly loadingModalService = inject(LoadingModalService);
     private readonly confirmationService = inject(ConfirmationModalService);
 
+    public readonly canRemoveCollection = input<boolean>(false);
+
     public readonly currentCollectionEntityId =
         input.required<CollectionEntityId>();
-    public readonly dependency = input.required<CollectionElementsSingle>();
+
+    public readonly collection = input.required<CollectionDto>();
+    public readonly elements = resource({
+        params: () => ({ collection: this.collection() }),
+        loader: async ({ params: { collection } }) =>
+            this.collectionService.getElementsOfCollectionVersion(collection),
+    });
 
     public readonly newerVersionAvailable = resource({
-        params: () => ({ collection: this.dependency().collection }),
+        params: () => ({ collection: this.collection() }),
         loader: async ({ params: { collection } }) =>
             this.collectionService.checkNewerVersionAvailable(collection),
     });
@@ -73,7 +81,7 @@ export class UsedCollectionItemComponent {
             );
         const oldVersionElements =
             await this.collectionService.getElementsOfCollectionVersion(
-                this.dependency().collection
+                this.collection()
             );
         const changes = getCollectionElementDiff(
             oldVersionElements.direct,
@@ -139,7 +147,7 @@ export class UsedCollectionItemComponent {
     ) {
         const confirmation = await this.confirmationService.confirm({
             title: 'Sammlung als Abhängigkeit entfernen',
-            description: `Möchten Sie die Sammlung "${this.dependency().collection.title}" wirklich als Abhängigkeit entfernen? Sie verlieren dadurch innerhalb der aktuellen Sammlung, Zugriff auf diese Inhalte.`,
+            description: `Möchten Sie die Sammlung "${this.collection().title}" wirklich als Abhängigkeit entfernen? Sie verlieren dadurch innerhalb der aktuellen Sammlung, Zugriff auf diese Inhalte.`,
             confirmationButtonText: 'Abhängigkeit entfernen',
         });
 

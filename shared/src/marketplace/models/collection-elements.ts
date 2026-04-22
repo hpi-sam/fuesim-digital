@@ -37,6 +37,9 @@ export type CollectionElementsDto = z.infer<typeof collectionElementsDtoSchema>;
 
 export function gatherCollectionElements(elements: CollectionElementsDto) {
     return {
+        allDirectElements(): ElementDto[] {
+            return elements.direct;
+        },
         allVisibleElements(): ElementDto[] {
             return [
                 ...elements.direct,

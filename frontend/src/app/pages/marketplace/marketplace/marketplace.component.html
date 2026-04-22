@@ -28,6 +28,12 @@
                         fromLocation="mycollections"
                     />
                 </div>
+            } @empty {
+                <div class="col flex-grow-1">
+                    <p class="bg-light p-4 rounded-3 lead mb-0">
+                        Sie haben noch keine Sammlungen.
+                    </p>
+                </div>
             }
         </div>
     }

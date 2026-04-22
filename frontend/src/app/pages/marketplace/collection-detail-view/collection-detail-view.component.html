@@ -178,6 +178,11 @@
                 <ng-template ngbNavContent>
                     <app-used-collections-tab
                         [collectionData]="collectionData"
+                        [canRemoveCollection]="
+                            checkRole(collectionData.ownRole).isAtLeast(
+                                'editor'
+                            )
+                        "
                     />
                 </ng-template>
             </li>

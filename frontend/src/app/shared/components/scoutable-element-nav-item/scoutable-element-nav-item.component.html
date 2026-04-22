@@ -22,13 +22,12 @@
             }
         }
     </div>
-    @if (
-        (currentRole() === 'trainer' || scoutable.isVisibleForParticipants) &&
-            scoutable.userGeneratedContentId;
-        as contentId
-    ) {
+    @if (currentRole() === 'trainer' || scoutable.isVisibleForParticipants) {
         <div>
-            <app-rich-text-editor [userGeneratedContentId]="contentId" />
+            <app-user-generated-content-editor
+                [userGeneratedContent]="scoutable.userGeneratedContent"
+                (userGeneratedContentChange)="updateContent($event)"
+            />
         </div>
     }
 }

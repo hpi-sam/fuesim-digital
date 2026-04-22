@@ -30,9 +30,10 @@ function closeRing(ring: Coordinate[]): Coordinate[] {
     return [...ring, [...first]];
 }
 
-export class DrawingGeometryHelper
-    implements GeometryHelper<LineString | Polygon, Drawing>
-{
+export class DrawingGeometryHelper implements GeometryHelper<
+    LineString | Polygon,
+    Drawing
+> {
     create(element: Drawing): Feature<LineString | Polygon> {
         const coords = element.points.map(toCoordinate);
         const geometry =

@@ -31,6 +31,7 @@ import {
     FormField,
     FieldTree,
     validateStandardSchema,
+    disabled,
 } from '@angular/forms/signals';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
@@ -88,13 +89,14 @@ export class MeasureTemplateFormComponent implements OnChanges {
         categoryName: '',
         replacePrevious: false,
     });
-    public readonly measureTemplateForm = form(this.values, (schemaPath) =>
+    public readonly measureTemplateForm = form(this.values, (schemaPath) => {
+        disabled(schemaPath.categoryName);
         validateStandardSchema(schemaPath, () =>
             measureTemplateSchema
                 .omit({ id: true })
                 .extend({ categoryName: z.string() })
-        )
-    );
+        );
+    });
 
     public readonly measurePropertyTypes = measurePropertyTypeSchema.values;
 

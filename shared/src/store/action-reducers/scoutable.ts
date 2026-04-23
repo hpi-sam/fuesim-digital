@@ -1,23 +1,15 @@
-import { IsBoolean, IsUUID } from 'class-validator';
 import { z } from 'zod';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { Action, ActionReducer } from '../action-reducer.js';
+import type { ActionReducer } from '../action-reducer.js';
 
 import {
-    type Scoutable,
     scoutableSchema,
     scoutableElementTypeSchema,
-    type ScoutableElementType,
 } from '../../models/scoutable.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
-import {
-    uuidSchema,
-    type UUID,
-    uuidValidationOptions,
-} from '../../utils/uuid.js';
+import { uuidSchema } from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getElement } from './utils/get-element.js';
+import { logScoutableViewed } from './utils/log.js';
 
 const updateScoutableContentActionSchema = z.strictObject({
     type: z.literal('[Scoutable] Update content'),
@@ -28,35 +20,43 @@ export type UpdateScoutableContentAction = z.infer<
     typeof updateScoutableContentActionSchema
 >;
 
-// TODO migrate to zod actions
-export class MakeElementScoutableAction implements Action {
-    @IsValue('[Scoutable] Make scoutable' as const)
-    public readonly type = '[Scoutable] Make scoutable';
+const makeElementScoutableActionSchema = z.strictObject({
+    type: z.literal('[Scoutable] Make scoutable'),
+    elementType: scoutableElementTypeSchema,
+    elementId: uuidSchema,
+    scoutable: scoutableSchema,
+});
+export type MakeElementScoutableAction = z.infer<
+    typeof makeElementScoutableActionSchema
+>;
 
-    @IsZodSchema(scoutableElementTypeSchema)
-    public readonly elementType!: ScoutableElementType;
+const setIsVisibleForParticipantsActionSchema = z.strictObject({
+    type: z.literal('[Scoutable] Set isVisibleForParticipants'),
+    scoutableId: scoutableSchema.shape.id,
+    value: z.boolean(),
+});
+export type SetIsVisibleForParticipantsAction = z.infer<
+    typeof setIsVisibleForParticipantsActionSchema
+>;
 
-    @IsZodSchema(uuidSchema)
-    public readonly elementId!: UUID;
+const markAsViewedActionSchema = z.strictObject({
+    type: z.literal('[Scoutable] Mark as viewed'),
+    scoutableId: scoutableSchema.shape.id,
+});
+export type MarkAsViewedAction = z.infer<typeof markAsViewedActionSchema>;
 
-    @IsZodSchema(scoutableSchema)
-    public readonly scoutable!: Scoutable;
-}
-export class SetIsVisibleForParticipants implements Action {
-    @IsValue('[Scoutable] Set isVisibleForParticipants' as const)
-    public readonly type = '[Scoutable] Set isVisibleForParticipants';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly scoutableId!: UUID;
-
-    @IsBoolean()
-    public readonly value!: boolean;
-}
+const renameActionSchema = z.strictObject({
+    type: z.literal('[Scoutable] Rename'),
+    scoutableId: scoutableSchema.shape.id,
+    name: z.string(),
+});
+export type RenameAction = z.infer<typeof renameActionSchema>;
 
 export namespace ScoutableActionReducers {
     export const makeElementScoutable: ActionReducer<MakeElementScoutableAction> =
         {
-            action: MakeElementScoutableAction,
+            type: makeElementScoutableActionSchema.shape.type.value,
+            actionSchema: makeElementScoutableActionSchema,
             reducer: (draftState, { elementType, elementId, scoutable }) => {
                 const element = getElement(draftState, elementType, elementId);
                 element.scoutableId = scoutable.id;
@@ -67,9 +67,10 @@ export namespace ScoutableActionReducers {
             },
             rights: 'trainer',
         };
-    export const setIsVisibleForParticipants: ActionReducer<SetIsVisibleForParticipants> =
+    export const setIsVisibleForParticipants: ActionReducer<SetIsVisibleForParticipantsAction> =
         {
-            action: SetIsVisibleForParticipants,
+            type: setIsVisibleForParticipantsActionSchema.shape.type.value,
+            actionSchema: setIsVisibleForParticipantsActionSchema,
             reducer: (draftState, { scoutableId, value }) => {
                 const scoutable = getElement(
                     draftState,
@@ -88,6 +89,32 @@ export namespace ScoutableActionReducers {
             const element = getElement(draftState, 'scoutable', scoutableId);
 
             element.userGeneratedContent = userGeneratedContent;
+
+            return draftState;
+        },
+        rights: 'trainer',
+    };
+    export const markAsViewed: ActionReducer<MarkAsViewedAction> = {
+        type: markAsViewedActionSchema.shape.type.value,
+        actionSchema: markAsViewedActionSchema,
+        reducer: (draftState, { scoutableId }) => {
+            const scoutable = getElement(draftState, 'scoutable', scoutableId);
+
+            scoutable.viewedByParticipants = true;
+
+            logScoutableViewed(draftState, scoutable.id);
+
+            return draftState;
+        },
+        rights: 'participant',
+    };
+    export const rename: ActionReducer<RenameAction> = {
+        type: renameActionSchema.shape.type.value,
+        actionSchema: renameActionSchema,
+        reducer: (draftState, { scoutableId, name }) => {
+            const scoutable = getElement(draftState, 'scoutable', scoutableId);
+
+            scoutable.name = name;
 
             return draftState;
         },

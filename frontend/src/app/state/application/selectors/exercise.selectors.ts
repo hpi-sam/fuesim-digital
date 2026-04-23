@@ -19,6 +19,7 @@ import {
     isInSpecificSimulatedRegion,
     isInTransfer,
     nestedCoordinatesOf,
+    scoutableElementTypes,
 } from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
@@ -38,8 +39,8 @@ function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
 }
 
-export const scoutableElementSelectors = scoutableElementKeys.map((key) =>
-    selectPropertyFactory(elementTypePluralMap[key])
+export const scoutableElementSelectors = scoutableElementTypes.map(
+    (elementType) => selectPropertyFactory(elementTypePluralMap[elementType])
 );
 
 // UUIDMap properties

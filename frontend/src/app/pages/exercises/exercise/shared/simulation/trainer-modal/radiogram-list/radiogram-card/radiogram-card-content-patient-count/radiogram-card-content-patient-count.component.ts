@@ -1,8 +1,6 @@
-import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientCountRadiogram, UUID } from 'fuesim-digital-shared';
-import type { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../state/app.state';
 import {
@@ -17,39 +15,29 @@ import { PatientStatusBadgeComponent } from '../../../../../../../../../shared/c
     styleUrls: ['./radiogram-card-content-patient-count.component.scss'],
     imports: [PatientStatusBadgeComponent, AsyncPipe],
 })
-export class RadiogramCardContentPatientCountComponent implements OnInit {
+export class RadiogramCardContentPatientCountComponent {
     private readonly store = inject<Store<AppState>>(Store);
 
-    readonly radiogramId = input.required<UUID>();
-    radiogram$!: Observable<PatientCountRadiogram>;
-    bluePatientsEnabled$!: Observable<boolean>;
-    totalPatientCount$!: Observable<number>;
+    public readonly radiogramId = input.required<UUID>();
 
-    ngOnInit(): void {
-        const radiogramSelector = createSelectRadiogram<PatientCountRadiogram>(
-            this.radiogramId()
-        );
-
-        const totalPatientCountSelector = createSelector(
-            radiogramSelector,
-            (radiogram) =>
-                radiogram.patientCount.black +
-                radiogram.patientCount.white +
-                radiogram.patientCount.red +
-                radiogram.patientCount.yellow +
-                radiogram.patientCount.green +
-                radiogram.patientCount.blue
-        );
-
-        const bluePatientsEnabledSelector = createSelector(
+    protected readonly bluePatientsEnabled = this.store.selectSignal(
+        createSelector(
             selectConfiguration,
             (configuration) => configuration.bluePatientsEnabled
-        );
-
-        this.radiogram$ = this.store.select(radiogramSelector);
-        this.totalPatientCount$ = this.store.select(totalPatientCountSelector);
-        this.bluePatientsEnabled$ = this.store.select(
-            bluePatientsEnabledSelector
-        );
-    }
+        )
+    );
+    public readonly radiogram = computed(() =>
+        this.store.selectSignal(
+            createSelectRadiogram<PatientCountRadiogram>(this.radiogramId())
+        )()
+    );
+    public readonly totalPatientCount = computed(
+        () =>
+            this.radiogram().patientCount.black +
+            this.radiogram().patientCount.white +
+            this.radiogram().patientCount.red +
+            this.radiogram().patientCount.yellow +
+            this.radiogram().patientCount.green +
+            this.radiogram().patientCount.blue
+    );
 }

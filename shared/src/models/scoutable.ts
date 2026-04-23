@@ -24,15 +24,18 @@ export type Scoutable = Immutable<z.infer<typeof scoutableSchema>>;
     You might want the scoutable indicator to navigate to the scoutble nav directly,
     so refer to the mapImages popup component for a simple implemtation.
 */
-export const scoutableElementSchema = z.union([mapImageSchema, patientSchema]);
+export const scoutableElementSchema = z.discriminatedUnion('type', [
+    mapImageSchema,
+    patientSchema,
+]);
 export type ScoutableElement = z.infer<typeof scoutableElementSchema>;
+export type ScoutableElementType = ScoutableElement['type'];
 
-export const scoutableElementKeys = [
+export const scoutableElementTypes = [
     'patient',
     'mapImage',
-] satisfies Array<ScoutableElementType>;
-
-export type ScoutableElementType = ScoutableElement['type'];
+] satisfies ScoutableElementType[];
+export const scoutableElementTypeSchema = z.literal(scoutableElementTypes);
 
 export function newScoutable(): Scoutable {
     return {

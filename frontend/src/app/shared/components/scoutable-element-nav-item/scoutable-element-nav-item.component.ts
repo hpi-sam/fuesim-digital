@@ -38,7 +38,8 @@ export class ScoutableElementNavItemComponent implements OnInit {
         this.exerciseService.proposeAction(
             {
                 type: '[Scoutable] Make scoutable',
-                element,
+                elementId: element.id,
+                elementType: element.type,
                 scoutable: newScoutable(),
             },
             true

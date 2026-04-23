@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { uuidSchema } from '../../utils/uuid.js';
 import { vehicleParametersSchema } from '../utils/vehicle-parameters.js';
+import { alarmGroupSchema } from '../alarm-group.js';
+import { transferPointSchema } from '../transfer-point.js';
 
 export const alarmPropertyInstanceSchema = z.strictObject({
     type: z.literal('alarmInstance'),
-    alarmGroup: uuidSchema,
-    targetTransferPointId: uuidSchema,
+    alarmGroup: alarmGroupSchema.shape.id,
+    targetTransferPointId: transferPointSchema.shape.id,
     vehicleParameters: z.array(vehicleParametersSchema),
 });
 

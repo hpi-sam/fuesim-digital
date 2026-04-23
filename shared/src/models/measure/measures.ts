@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { UUID } from '../../utils/uuid.js';
 import { uuid, uuidSchema } from '../../utils/uuid.js';
+import { validationMessages } from '../../validation-messages.js';
 import type { MeasureProperty } from './properties.js';
 import {
     measurePropertyDefinitions,
@@ -13,9 +14,7 @@ import { measurePropertyInstanceSchema } from './instances.js';
 export const measureTemplateSchema = z.strictObject({
     type: z.literal('measureTemplate'),
     id: uuidSchema,
-    name: z
-        .string()
-        .min(1, { error: 'Der Name muss mindestens 1 Zeichen lang sein' }),
+    name: z.string().nonempty({ error: validationMessages.required }),
     properties: z
         .array(measurePropertySchema)
         .superRefine((properties, ctx) => {
@@ -71,8 +70,8 @@ export function newMeasureTemplate(
 
 export const measureTemplateCategorySchema = z.strictObject({
     type: z.literal('measureTemplateCategory'),
-    name: z.string().min(1),
-    templates: z.record(uuidSchema, measureTemplateSchema),
+    name: z.string().nonempty({ error: validationMessages.required }),
+    templates: z.record(measureTemplateSchema.shape.id, measureTemplateSchema),
 });
 
 export type MeasureTemplateCategory = z.infer<
@@ -95,7 +94,7 @@ export const measureSchema = z.strictObject({
     id: uuidSchema,
     timestamp: z.number(),
     clientName: z.string(),
-    templateId: uuidSchema,
+    templateId: measureTemplateSchema.shape.id,
     instances: z.array(measurePropertyInstanceSchema),
 });
 

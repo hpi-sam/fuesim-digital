@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { alarmGroupSchema } from '../alarm-group.js';
 import { transferPointSchema } from '../transfer-point.js';
+import { validationMessages } from '../../validation-messages.js';
 
 export const measurePropertyTypeSchema = z.literal([
     'manualConfirm',
@@ -87,8 +88,8 @@ export const propertyBaseSchema = z.strictObject({
 export const manualConfirmPropertySchema = z.strictObject({
     type: z.literal('manualConfirm'),
     ...propertyBaseSchema.shape,
-    prompt: z.string().min(1, {
-        error: 'Der Bestätigungstext kann nicht leer sein.',
+    prompt: z.string().nonempty({
+        error: validationMessages.required,
     }),
     confirmationString: trimmedOptionalString,
 });
@@ -98,9 +99,7 @@ export type ManualConfirmProperty = z.infer<typeof manualConfirmPropertySchema>;
 export const responsePropertySchema = z.strictObject({
     type: z.literal('response'),
     ...propertyBaseSchema.shape,
-    response: z.string().min(1, {
-        error: 'Die Rückmeldung kann nicht leer sein',
-    }),
+    response: z.string().nonempty({ error: validationMessages.required }),
 });
 
 export type ResponseProperty = z.infer<typeof responsePropertySchema>;
@@ -109,7 +108,7 @@ export const delayPropertySchema = z.strictObject({
     type: z.literal('delay'),
     ...propertyBaseSchema.shape,
     delay: z
-        .number({ error: 'Die Dauer der Verzögerung muss eine Zahl sein' })
+        .int({ error: 'Die Dauer der Verzögerung muss eine Zahl sein' })
         .positive({ error: 'Die Dauer der Verzögerung muss positiv sein' }),
 });
 

@@ -14,7 +14,6 @@ import type {
     WithPosition,
 } from 'fuesim-digital-shared';
 import {
-    scoutableElementKeys,
     currentStateOf,
     isInSpecificSimulatedRegion,
     isInTransfer,

@@ -9,7 +9,7 @@ import {
 import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
 
-function isPersonnelAssigned(
+export function isPersonnelAssigned(
     personnelId: UUID,
     technicalChallenge: TechnicalChallenge
 ): boolean {

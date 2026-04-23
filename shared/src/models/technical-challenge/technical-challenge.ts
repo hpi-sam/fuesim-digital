@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuidSchema } from '../../utils/uuid.js';
 import { imagePropertiesSchema } from '../utils/image-properties.js';
 import { positionSchema } from '../utils/position/position.js';
@@ -29,4 +30,6 @@ export const technicalChallengeSchema = z.strictObject({
     ...stateMachineSchema.shape,
 });
 
-export type TechnicalChallenge = z.infer<typeof technicalChallengeSchema>;
+export type TechnicalChallenge = Immutable<
+    z.infer<typeof technicalChallengeSchema>
+>;

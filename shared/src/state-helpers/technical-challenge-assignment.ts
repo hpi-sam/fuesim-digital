@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import { type WritableDraft } from 'immer';
 import type { ExerciseState } from '../state.js';
 import type { UUID } from '../utils/uuid.js';
 import type { Personnel } from '../models/personnel.js';
@@ -23,8 +23,16 @@ function isPersonnelAssignedFilter(personnelId: UUID) {
 
 function getAssignmentsOfPersonnel(
     personnelId: UUID,
+    state: WritableDraft<ExerciseState>
+): WritableDraft<TechnicalChallenge>[];
+function getAssignmentsOfPersonnel(
+    personnelId: UUID,
     state: ExerciseState
-): TechnicalChallenge[] {
+): TechnicalChallenge[];
+function getAssignmentsOfPersonnel(
+    personnelId: UUID,
+    state: ExerciseState | WritableDraft<ExerciseState>
+): TechnicalChallenge[] | WritableDraft<ExerciseState>[] {
     return Object.values(state.technicalChallenges).filter(
         isPersonnelAssignedFilter(personnelId)
     );

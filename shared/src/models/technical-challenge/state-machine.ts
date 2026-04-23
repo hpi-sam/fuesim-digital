@@ -158,7 +158,7 @@ export function currentStateOf(
 }
 
 export function simulateTechnicalChallenge(
-    technicalChallenge: TechnicalChallenge,
+    technicalChallenge: WritableDraft<TechnicalChallenge>,
     exerciseState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {

@@ -10,11 +10,19 @@ import type {
     ElementVersionId,
     ExtendedCollectionDto,
     Marketplace,
+    ParticipantKey,
+    VehicleTemplate,
     VersionedElementContent,
     VersionedElementPartial,
 } from 'fuesim-digital-shared';
-import { findElementVersionsInContent } from 'fuesim-digital-shared';
+import {
+    applyMigrations,
+    cloneDeepMutable,
+    ExerciseState,
+    findElementVersionsInContent,
+} from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
+import type { WritableDraft } from 'immer';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 
 interface EventBuffer {
@@ -556,7 +564,6 @@ export class CollectionService {
 
                 foundElements.push(
                     ...elementCollections,
-
                     ...(await this.getUsedElementsDeep(foundSubElements))
                 );
             })
@@ -1271,5 +1278,79 @@ export class CollectionService {
         return [...relevantDependencies, ...transitiveRelevantDependencies].map(
             (dep) => dep.element
         );
+    }
+
+    public async upgradeAllElementStateVersionsToLatest(): Promise<number> {
+        return this.collectionRepository.transaction(async (tx) => {
+            const allElements = await tx.UNSAFE_getAllElements();
+
+            const allElementVersions = new Set<number>();
+            allElements.forEach((element) =>
+                allElementVersions.add(element.stateVersion)
+            );
+
+            if (allElementVersions.size === 0) return 0;
+            if (allElementVersions.size > 1) {
+                throw new Error(
+                    `There are multiple stateversions present in the element table. This should not happen and indicates a problem with the migration script.`
+                );
+            }
+            const currentElementVersion = allElementVersions
+                .values()
+                .next().value!;
+            if (ExerciseState.currentStateVersion === currentElementVersion) {
+                return 0;
+            }
+
+            let state = cloneDeepMutable(
+                ExerciseState.create(
+                    '123456' as ParticipantKey
+                ) as WritableDraft<ExerciseState>
+            );
+
+            // TODO: Change this as soon as we have the new state structure with step 2 of marketplace
+            state = Object.assign(state, {
+                vehicleTemplates: allElements.reduce<{
+                    [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
+                }>((acc, element) => {
+                    if (element.content.type !== 'vehicleTemplate') return acc;
+                    acc[element.entityId] = {
+                        ...element.content,
+                        versionId: element.versionId,
+                        entityId: element.entityId,
+                    };
+                    return acc;
+                }, {}),
+                alarmGroups: allElements.reduce<{
+                    [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
+                }>((acc, element) => {
+                    if (element.content.type !== 'vehicleTemplate') return acc;
+                    acc[element.entityId] = {
+                        ...element.content,
+                        versionId: element.versionId,
+                        entityId: element.entityId,
+                    };
+                    return acc;
+                }, {}),
+            } satisfies { [T in keyof ExerciseState]?: any });
+
+            // Asserted value as we check for set-size of =1 above
+            const migratedState = applyMigrations(currentElementVersion, {
+                currentState: state,
+                history: undefined,
+            });
+
+            const affectedElementCount = await tx.UNSAFE_overwriteElements(
+                migratedState.newVersion,
+                [
+                    ...Object.values(
+                        migratedState.migratedProperties.currentState
+                            .vehicleTemplates
+                    ),
+                ]
+            );
+
+            return affectedElementCount;
+        });
     }
 }

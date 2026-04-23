@@ -17,7 +17,17 @@ import {
     collectionRelationshipTypeAllowedValues,
     ExerciseState,
 } from 'fuesim-digital-shared';
-import { eq, desc, getTableColumns, sql, and, max, gt } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
+import {
+    eq,
+    desc,
+    getTableColumns,
+    sql,
+    and,
+    max,
+    gt,
+    inArray,
+} from 'drizzle-orm';
 import {
     collectionDependencyMappingTable,
     elementCollectionMappingTable,
@@ -1092,5 +1102,62 @@ export class CollectionRepository extends BaseRepository {
             })
             .where(eq(collectionTable.entityId, collectionEntityId))
             .returning();
+    }
+
+    /**
+     * This is marked as unsafe as to prevent its use in production code (apart from upgrading scripts)
+     * as it it retrieves all elements regardless of their versions, collection mappings, etc.,
+     * and thus can lead to unintended results if used incorrectly.
+     */
+    public async UNSAFE_getAllElements() {
+        return this.databaseConnection.select().from(elementTable);
+    }
+
+    /**
+     * This should only be used in upgrading scripts!
+     *
+     * It WILL break the integrity of collections and
+     * exercises if used incorrectly
+     */
+    public async UNSAFE_overwriteElements(
+        stateVersion: number,
+        elementContents: VersionedElementContent[]
+    ): Promise<number> {
+        return this.databaseConnection.transaction(async (tx) => {
+            // from https://orm.drizzle.team/docs/guides/update-many-with-different-value
+            if (elementContents.length === 0) {
+                return 0;
+            }
+
+            const sqlChunks: SQL[] = [];
+            const ids: ElementVersionId[] = [];
+
+            sqlChunks.push(sql`(case`);
+
+            for (const content of elementContents) {
+                if (content.versionId === undefined) {
+                    console.error(
+                        'versionId is required for UNSAFE_overwriteElements',
+                        content
+                    );
+                    continue;
+                }
+                sqlChunks.push(
+                    sql`when ${elementTable.versionId} = ${content.versionId} then ${JSON.stringify(content)}::jsonb`
+                );
+                ids.push(content.versionId);
+            }
+
+            sqlChunks.push(sql`end)`);
+
+            const finalSql: SQL = sql.join(sqlChunks, sql.raw(' '));
+
+            const result = await tx
+                .update(elementTable)
+                .set({ content: finalSql, stateVersion })
+                .where(inArray(elementTable.versionId, ids))
+                .returning();
+            return result.length;
+        });
     }
 }

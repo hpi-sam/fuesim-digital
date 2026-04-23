@@ -137,6 +137,24 @@ async function main() {
             }
             throw e;
         }
+
+        // Upgrading Element StateVersions
+        try {
+            const startTime = performance.now();
+            const versionCount =
+                await collectionService.upgradeAllElementStateVersionsToLatest();
+            const endTime = performance.now();
+            console.log(
+                `✅ Successfully upgraded ${versionCount} Element StateVersions in ${(
+                    endTime - startTime
+                ).toFixed(3)} ms.`
+            );
+        } catch (e: unknown) {
+            console.error(
+                '❌ An error occurred while upgrading Element StateVersions.'
+            );
+            throw e;
+        }
     }
 
     // eslint-disable-next-line no-new

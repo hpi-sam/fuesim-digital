@@ -301,3 +301,17 @@ export function createPersonnelTypeTag(
             : personnel.templateId
     );
 }
+
+export function createScoutableTag(
+    draftState: WritableDraft<ExerciseState>,
+    scoutableId: UUID
+): Tag {
+    const scoutable = getElement(draftState, 'scoutable', scoutableId);
+    return newTag(
+        'Erkundungselement',
+        'orange',
+        'black',
+        scoutable.name,
+        scoutable.id
+    );
+}

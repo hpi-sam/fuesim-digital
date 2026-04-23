@@ -10,7 +10,6 @@ import {
 import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
 import { IsZodSchema } from './utils/validators/is-zod-object.js';
 import { Vehicle, vehicleSchema } from './models/vehicle.js';
-import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import {
     RestrictedZone,
     restrictedZoneSchema,
@@ -194,7 +193,7 @@ export class ExerciseState {
     @IsZodSchema(z.record(uuidSchema, vehicleTemplateSchema))
     public readonly vehicleTemplates: {
         readonly [key: UUID]: VehicleTemplate;
-    } = defaultVehicleTemplatesById;
+    } = {};
 
     @IsZodSchema(z.record(uuidSchema, materialTemplateSchema))
     public readonly materialTemplates: {

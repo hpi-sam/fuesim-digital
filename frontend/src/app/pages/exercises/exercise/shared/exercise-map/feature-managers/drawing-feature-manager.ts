@@ -116,7 +116,7 @@ export class DrawingFeatureManager
         return new Style({
             stroke: new Stroke({
                 color: drawing.strokeColor,
-                width: 2,
+                width: 5,
             }),
         });
     }

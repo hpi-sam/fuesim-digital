@@ -46,7 +46,10 @@ export class DrawingInteractionHandler {
                 }
                 return new Style({
                     fill: new Fill({ color: fill }),
-                    stroke: new Stroke({ color: request.strokeColor }),
+                    stroke: new Stroke({
+                        color: request.strokeColor,
+                        width: isFreehand ? 2 : 5,
+                    }),
                 });
             },
         });

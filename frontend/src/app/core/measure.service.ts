@@ -6,7 +6,7 @@ import {
     MeasurePropertyInstance,
     MeasureTemplate,
     newDrawing,
-    uuid,
+    newMeasure,
 } from 'fuesim-digital-shared';
 import { filter, firstValueFrom, map, Subject, race } from 'rxjs';
 
@@ -230,16 +230,12 @@ export class MeasureService {
         this.exerciseService
             .proposeAction({
                 type: '[Measure] Add Measure',
-                measure: {
-                    clientName: this.clientName() ?? 'Unknown',
-                    id: uuid(),
-                    instances,
-                    templateId: template.id,
-                    timestamp: selectStateSnapshot(
-                        selectCurrentTime,
-                        this.store
-                    ),
-                },
+                measure: newMeasure(
+                    selectStateSnapshot(selectCurrentTime, this.store),
+                    this.clientName() ?? '',
+                    template.id,
+                    instances
+                ),
             })
             .catch((e) => {
                 this.messageService.postError({

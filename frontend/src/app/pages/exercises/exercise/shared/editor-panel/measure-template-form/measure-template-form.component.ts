@@ -4,6 +4,7 @@ import {
     measurePropertyTypeSchema,
     measurePropertyTypeToGermanNameDictionary,
     measureTemplateSchema,
+    newMeasureTemplate,
     type MeasureProperty,
     type MeasurePropertyType,
 } from 'fuesim-digital-shared';
@@ -70,7 +71,7 @@ export class MeasureTemplateFormComponent implements OnChanges {
         disabled(schemaPath.categoryName);
         validateStandardSchema(schemaPath, () =>
             measureTemplateSchema
-                .omit({ id: true })
+                .pick({ name: true, properties: true, replacePrevious: true })
                 .extend({ categoryName: z.string() })
         );
     });
@@ -129,12 +130,12 @@ export class MeasureTemplateFormComponent implements OnChanges {
 
     public async onSubmit() {
         try {
-            this.submitMeasureTemplate.emit(
-                measureTemplateSchema
-                    .omit({ id: true })
-                    .extend({ categoryName: z.string() })
-                    .parse(cloneDeep(this.values()))
-            );
+            const { name, properties, replacePrevious, categoryName } =
+                this.values();
+            this.submitMeasureTemplate.emit({
+                ...newMeasureTemplate(name, properties, replacePrevious),
+                categoryName,
+            });
         } catch (e: unknown) {
             if (!(e instanceof ZodError)) throw e;
             this.messageService.postError({

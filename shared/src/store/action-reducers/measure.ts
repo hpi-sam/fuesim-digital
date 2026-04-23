@@ -6,6 +6,7 @@ import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { DrawingActionReducers } from './drawing.js';
 import { EmergencyOperationCenterActionReducers } from './emergency-operation-center.js';
 import { getMeasureTemplate } from './utils/measures.js';
+import { logMeasure } from './utils/log.js';
 
 export class AddMeasureAction implements Action {
     @IsValue('[Measure] Add Measure' as const)
@@ -76,6 +77,7 @@ export namespace MeasureActionReducers {
                 }
             });
             newDraftState.measures[measure.id] = cloneDeepMutable(measure);
+            logMeasure(newDraftState, measure.id);
             return newDraftState;
         },
         rights: 'participant',

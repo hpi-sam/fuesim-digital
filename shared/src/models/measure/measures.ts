@@ -1,10 +1,13 @@
 import { z } from 'zod';
-import { uuidSchema } from '../../utils/uuid.js';
+import type { UUID } from '../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
+import type { MeasureProperty } from './properties.js';
 import {
     measurePropertyDefinitions,
     measurePropertySchema,
     measurePropertyTypeToGermanNameDictionary,
 } from './properties.js';
+import type { MeasurePropertyInstance } from './instances.js';
 import { measurePropertyInstanceSchema } from './instances.js';
 
 export const measureTemplateSchema = z.strictObject({
@@ -52,6 +55,20 @@ export const measureTemplateSchema = z.strictObject({
 
 export type MeasureTemplate = z.infer<typeof measureTemplateSchema>;
 
+export function newMeasureTemplate(
+    name: string,
+    properties: MeasureProperty[],
+    replacePrevious: boolean
+): MeasureTemplate {
+    return measureTemplateSchema.parse({
+        type: 'measureTemplate',
+        id: uuid(),
+        name,
+        properties,
+        replacePrevious,
+    });
+}
+
 export const measureTemplateCategorySchema = z.strictObject({
     type: z.literal('measureTemplateCategory'),
     name: z.string().min(1),
@@ -61,6 +78,17 @@ export const measureTemplateCategorySchema = z.strictObject({
 export type MeasureTemplateCategory = z.infer<
     typeof measureTemplateCategorySchema
 >;
+
+export function newMeasureCategory(
+    name: string,
+    templates: MeasureTemplate[]
+): MeasureTemplateCategory {
+    return measureTemplateCategorySchema.parse({
+        type: 'measureTemplateCategory',
+        name,
+        templates: Object.fromEntries(templates.map((t) => [t.id, t])),
+    });
+}
 
 export const measureSchema = z.strictObject({
     type: z.literal('measure'),
@@ -72,3 +100,19 @@ export const measureSchema = z.strictObject({
 });
 
 export type Measure = z.infer<typeof measureSchema>;
+
+export function newMeasure(
+    timestamp: number,
+    clientName: string,
+    templateId: UUID,
+    instances: MeasurePropertyInstance[]
+): Measure {
+    return measureSchema.parse({
+        type: 'measure',
+        id: uuid(),
+        timestamp,
+        clientName,
+        templateId,
+        instances,
+    });
+}

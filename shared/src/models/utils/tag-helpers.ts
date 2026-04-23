@@ -23,6 +23,7 @@ import { newTag } from '../tag.js';
 import type { Personnel } from '../personnel.js';
 import type { PersonnelTemplate } from '../personnel-template.js';
 import type { UUID } from '../../utils/uuid.js';
+import type { MeasureTemplate } from '../measure/measures.js';
 import {
     type ExerciseOccupation,
     occupationToGermanDictionary,
@@ -299,5 +300,18 @@ export function createPersonnelTypeTag(
         personnel.type === 'personnelTemplate'
             ? personnel.id
             : personnel.templateId
+    );
+}
+
+export function createMeasureTemplateTag(
+    _draftState: WritableDraft<ExerciseState>,
+    measureTemplate: MeasureTemplate
+) {
+    return newTag(
+        'Maßnahme',
+        'pink',
+        'black',
+        measureTemplate.name,
+        measureTemplate.id
     );
 }

@@ -11,8 +11,12 @@ import {
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import type { UUID } from 'fuesim-digital-shared';
-import { cloneDeepMutable, uuid } from 'fuesim-digital-shared';
+import type {
+    AddMeasureTemplateAction,
+    EditMeasureTemplateAction,
+    UUID,
+} from 'fuesim-digital-shared';
+import { cloneDeepMutable, newMeasureTemplate } from 'fuesim-digital-shared';
 import { MeasureTemplateFormComponent } from '../measure-template-form/measure-template-form.component';
 import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
@@ -124,24 +128,24 @@ export class MeasureTemplateModalComponent
         categoryName,
         replacePrevious,
     }: MeasureTemplateValues) {
-        const action = this.isEditMode
-            ? {
-                  type: '[MeasureTemplate] Edit measureTemplate' as const,
-                  id: this.measureTemplateId!,
-                  name,
-                  properties,
-                  replacePrevious,
-              }
-            : {
-                  type: '[MeasureTemplate] Add measureTemplate' as const,
-                  measureTemplate: {
-                      id: uuid(),
+        const action: AddMeasureTemplateAction | EditMeasureTemplateAction =
+            this.isEditMode
+                ? {
+                      type: '[MeasureTemplate] Edit measureTemplate',
+                      id: this.measureTemplateId!,
                       name,
                       properties,
                       replacePrevious,
-                  },
-                  categoryName,
-              };
+                  }
+                : {
+                      type: '[MeasureTemplate] Add measureTemplate',
+                      measureTemplate: newMeasureTemplate(
+                          name,
+                          properties,
+                          replacePrevious
+                      ),
+                      categoryName,
+                  };
 
         this.exerciseService.proposeAction(action).then((response) => {
             if (response.success) {

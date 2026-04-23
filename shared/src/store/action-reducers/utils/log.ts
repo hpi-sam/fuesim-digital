@@ -20,6 +20,7 @@ import {
     createVehicleTag,
     createVehicleTypeTag,
     createPersonnelTypeTag,
+    createMeasureTemplateTag,
 } from '../../../models/utils/tag-helpers.js';
 import type { TreatmentProgress } from '../../../simulation/utils/treatment.js';
 import { treatmentProgressToGermanNameDictionary } from '../../../simulation/utils/treatment.js';
@@ -45,6 +46,7 @@ import {
     getExerciseBehaviorById,
     getExerciseRadiogramById,
 } from './get-element.js';
+import { getMeasureTemplate } from './measures.js';
 
 export function log(
     state: WritableDraft<ExerciseState>,
@@ -61,6 +63,23 @@ export function log(
     if (state.type === 'parallel') {
         state.lastLogEntry = logEntry;
     }
+}
+
+export function logMeasure(
+    state: WritableDraft<ExerciseState>,
+    measureId: UUID
+) {
+    const measure = state.measures[measureId];
+
+    if (!measure) return;
+
+    const measureTemplate = getMeasureTemplate(state, measure.templateId);
+
+    log(
+        state,
+        [createMeasureTemplateTag(state, measureTemplate)],
+        `Maßnahme '${measureTemplate.name}' wurde von '${measure.clientName}' durchgeführt.`
+    );
 }
 
 export function logAlarmGroup(

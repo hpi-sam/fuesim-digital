@@ -84,13 +84,25 @@ export class TechnicalChallengeFeatureManager
                 }),
             new PolygonGeometryHelper()
         );
-        this.layer.setStyle((feature, resolution) => [
-            this.imageStyleHelper.getStyle(feature as Feature, resolution),
-            new Style({
-                stroke: new Stroke({ color: 'blue' }),
-                fill: new Fill({ color: '#ffffff55' }),
-            }),
-        ]);
+        this.layer.setStyle((feature, resolution) => {
+            const styles = [
+                this.imageStyleHelper.getStyle(feature as Feature, resolution),
+                new Style({
+                    stroke: new Stroke({ color: 'blue' }),
+                    fill: new Fill({ color: '#ffffff55' }),
+                }),
+            ];
+            this.addMarking(
+                feature,
+                styles,
+                this.popupService,
+                this.store,
+                new Style({
+                    stroke: new Stroke({ color: 'orange', width: 3 }),
+                })
+            );
+            return styles;
+        });
     }
 
     override createFeature(element: TechnicalChallenge): Feature<Polygon> {
@@ -200,10 +212,10 @@ export class TechnicalChallengeFeatureManager
             ...this.popupHelper.getPopupOptions(
                 ChooseTaskPopupComponent,
                 translateEvent.coordinate,
-                [],
-                [],
-                [],
-                [],
+                [technicalChallenge.id, droppedElement.id],
+                [technicalChallenge.id, droppedElement.id],
+                [technicalChallenge.id, droppedElement.id],
+                ['personnel', 'technicalChallenge'],
                 {
                     technicalChallengeId: technicalChallenge.id,
                     personnelId: droppedElement.id,

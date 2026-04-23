@@ -45,6 +45,12 @@ const carryingUnitImage: ImageProperties = {
     aspectRatio: 1,
 };
 
+const lhfImage: ImageProperties = {
+    url: '/assets/lhf-vehicle.svg',
+    height: 100,
+    aspectRatio: 709 / 293,
+};
+
 const rtwVehicleTemplate: VehicleTemplate = {
     id: 'f7d8fe70-128d-4cc0-97bd-15e2ccd5d4b9',
     type: 'vehicleTemplate',
@@ -164,6 +170,22 @@ const rthVehicleTemplate: VehicleTemplate = {
     materialTemplateIds: [defaultMaterialTemplates.standard.id],
 };
 
+const lhfVehicleTemplate: VehicleTemplate = {
+    id: 'ab14a6af-e30f-4f2d-94e0-fdcf2f8aff41',
+    type: 'vehicleTemplate',
+    vehicleType: 'LHF',
+    name: 'LHF ???',
+    image: lhfImage,
+    patientCapacity: 0,
+    personnelTemplateIds: [
+        defaultPersonnelTemplates.sf.id,
+        defaultPersonnelTemplates.fireSquad.id,
+        defaultPersonnelTemplates.fireSquad.id,
+        defaultPersonnelTemplates.fireSingle.id,
+    ],
+    materialTemplateIds: [],
+};
+
 export const defaultVehicleTemplates = {
     rtw: rtwVehicleTemplate,
     ktw: ktwVehicleTemplate,
@@ -173,6 +195,7 @@ export const defaultVehicleTemplates = {
     carryingUnit: carryingUnitVehicleTemplate,
     rth: rthVehicleTemplate,
     naw: nawVehicleTemplate,
+    lhf: lhfVehicleTemplate,
 } as const;
 
 export const defaultVehicleTemplatesById = Object.fromEntries(

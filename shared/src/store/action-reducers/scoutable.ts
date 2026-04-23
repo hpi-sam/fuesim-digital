@@ -5,15 +5,19 @@ import { Action, ActionReducer } from '../action-reducer.js';
 import {
     type Scoutable,
     scoutableSchema,
-    type ScoutableElement,
-    scoutableElementSchema,
+    scoutableElementTypeSchema,
+    type ScoutableElementType,
 } from '../../models/scoutable.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
     type UserGeneratedContent,
     userGeneratedContentSchema,
 } from '../../models/user-generated-content.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    uuidSchema,
+    type UUID,
+    uuidValidationOptions,
+} from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getElement } from './utils/get-element.js';
 
@@ -21,8 +25,11 @@ export class MakeElementScoutableAction implements Action {
     @IsValue('[Scoutable] Make scoutable' as const)
     public readonly type = '[Scoutable] Make scoutable';
 
-    @IsZodSchema(scoutableElementSchema)
-    public readonly element!: ScoutableElement;
+    @IsZodSchema(scoutableElementTypeSchema)
+    public readonly elementType!: ScoutableElementType;
+
+    @IsZodSchema(uuidSchema)
+    public readonly elementId!: UUID;
 
     @IsZodSchema(scoutableSchema)
     public readonly scoutable!: Scoutable;
@@ -53,13 +60,9 @@ export namespace ScoutableActionReducers {
     export const makeElementScoutable: ActionReducer<MakeElementScoutableAction> =
         {
             action: MakeElementScoutableAction,
-            reducer: (draftState, { element, scoutable }) => {
-                const stateElement = getElement(
-                    draftState,
-                    element.type,
-                    element.id
-                );
-                stateElement.scoutableId = scoutable.id;
+            reducer: (draftState, { elementType, elementId, scoutable }) => {
+                const element = getElement(draftState, elementType, elementId);
+                element.scoutableId = scoutable.id;
                 draftState.scoutables[scoutable.id] =
                     cloneDeepMutable(scoutable);
 

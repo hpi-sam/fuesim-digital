@@ -1,0 +1,43 @@
+@for (type of visibleElementTypesOrder; track type) {
+    @let elementsOfType = elementsGroupedByType()[type] ?? [];
+    @if (elementsOfType.length > 0) {
+        <h4>
+            {{ (type | versionedElementDisplayName)?.plural ?? '' }}
+        </h4>
+        <div class="container mb-3">
+            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-2">
+                @for (
+                    exerciseObject of elementsOfType;
+                    track exerciseObject.versionId
+                ) {
+                    <app-element-card
+                        [element]="exerciseObject"
+                        [collectionElements]="collectionElements()"
+                        [collection]="collection()"
+                        [mode]="editable() ? 'edit' : 'view'"
+                        [hideVersionHistory]="!editable()"
+                        [showCreatedIndicator]="
+                            elementHasChanges()[exerciseObject.entityId] ===
+                            'create'
+                        "
+                        [showChangedIndicator]="
+                            elementHasChanges()[exerciseObject.entityId] ===
+                            'update'
+                        "
+                        [showAsGhost]="
+                            elementHasChanges()[exerciseObject.entityId] ===
+                            'remove'
+                        "
+                    />
+                }
+            </div>
+        </div>
+    }
+}
+@if (visibleElements().length === 0) {
+    <div class="col flex-grow-1">
+        <p class="bg-light p-4 rounded-3 lead mb-0">
+            Sie haben noch keine Elemente in dieser Sammlung.
+        </p>
+    </div>
+}

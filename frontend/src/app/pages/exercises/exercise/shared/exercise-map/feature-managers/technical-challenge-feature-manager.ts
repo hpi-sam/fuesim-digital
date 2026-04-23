@@ -17,6 +17,7 @@ import type { Polygon } from 'ol/geom';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
+import type { Immutable } from 'immer';
 import { TechnicalChallengePopupComponent } from '../shared/technical-challenge-popup/technical-challenge-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
@@ -146,7 +147,7 @@ export class TechnicalChallengeFeatureManager
     }
 
     public override onFeatureDrop(
-        droppedElement: StateElement,
+        droppedElement: Immutable<StateElement>,
         droppedOnFeature: Feature<Polygon>,
         dropEvent: MouseEvent | TranslateEvent
     ): boolean {

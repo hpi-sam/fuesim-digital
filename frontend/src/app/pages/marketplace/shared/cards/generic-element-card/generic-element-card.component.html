@@ -1,0 +1,55 @@
+<div
+    class="card h-100"
+    style="cursor: pointer"
+    [class.border-success]="showCreatedIndicator()"
+    [class.border-warning]="showChangedIndicator()"
+    [class.ghost]="showAsGhost()"
+    [class.border-2]="
+        showChangedIndicator() || showCreatedIndicator() || showAsGhost()
+    "
+>
+    <div style="height: 100px" class="d-flex">
+        <img
+            [src]="image()"
+            class="card-img-top p-3 m-auto"
+            style="max-height: 100px"
+        />
+    </div>
+    <div class="card-body d-flex flex-column justify-content-between">
+        <div>
+            <h5 class="card-title">
+                {{ title() }}
+            </h5>
+            @if (subtitle(); as subtitle) {
+                <h6 class="card-subtitle mb-2 text-body-secondary">
+                    {{ subtitle }}
+                </h6>
+            }
+        </div>
+        @if (editable()) {
+            @if (showAsGhost()) {
+                <button
+                    class="btn btn-outline-secondary btn-sm"
+                    (click)="$event.stopPropagation(); restore.emit()"
+                >
+                    Wiederherstellen
+                </button>
+            } @else {
+                <div class="d-flex flex-row flex-wrap gap-2">
+                    <button
+                        class="btn btn-outline-primary btn-sm"
+                        (click)="$event.stopPropagation(); duplicate.emit()"
+                    >
+                        <i class="bi bi-copy"></i>
+                    </button>
+                    <button
+                        class="btn btn-outline-danger btn-sm"
+                        (click)="$event.stopPropagation(); delete.emit()"
+                    >
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            }
+        }
+    </div>
+</div>

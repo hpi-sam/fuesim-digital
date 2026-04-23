@@ -7,7 +7,7 @@
             class="card col-3 p-0 rounded-0 rounded-end"
             style="min-width: 400px"
         >
-            <div class="card-header text-center">
+            <div class="card-header">
                 <h5 class="mb-0 d-flex align-items-center">
                     Editor
                     <span class="ms-auto">
@@ -322,6 +322,12 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card-header">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        Eigene Übungselemente
+                    </h5>
+                </div>
                 <div ngbAccordionItem="vehicles">
                     <h5
                         ngbAccordionHeader
@@ -337,15 +343,6 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
-                                <div class="mb-2">
-                                    <button
-                                        class="btn btn-sm btn-outline-primary"
-                                        (click)="addVehicleTemplate()"
-                                    >
-                                        <i class="bi bi-plus"></i>
-                                        Hinzufügen
-                                    </button>
-                                </div>
                                 <div class="cards">
                                     @for (
                                         vehicleTemplate of vehicleTemplates$
@@ -368,12 +365,6 @@
                                             [imageUrl]="
                                                 vehicleTemplate.image.url
                                             "
-                                            (elementEdit)="
-                                                editVehicleTemplate(
-                                                    vehicleTemplate.id
-                                                )
-                                            "
-                                            [enableEditButton]="true"
                                             [title]="
                                                 vehicleTemplate.vehicleType
                                             "

@@ -1,0 +1,40 @@
+<div class="container">
+    <h1>Meine Übungselemente</h1>
+    <p class="text-muted">
+        Verwalten Sie hier Ihre Sammlungen von Übungselementen, die Sie in Ihren
+        Übungsszenarien verwenden können.
+    </p>
+    <div class="d-flex flex-row justify-content-end gap-2 mb-3">
+        <a
+            class="btn btn-outline-secondary"
+            routerLink="/collections/archive"
+            ngbTooltip="Archivierte Sammlungen"
+        >
+            <i class="bi bi-archive"></i>
+        </a>
+        <button class="btn btn-primary" (click)="createNewCollection()">
+            Neue Sammlung erstellen
+        </button>
+    </div>
+    @if (userAvailableCollections.hasValue()) {
+        <div class="row row-cols-3">
+            @for (
+                collection of userAvailableCollections.value();
+                track collection.versionId
+            ) {
+                <div class="col mb-4">
+                    <app-collection-card
+                        [collection]="collection"
+                        fromLocation="mycollections"
+                    />
+                </div>
+            } @empty {
+                <div class="col flex-grow-1">
+                    <p class="bg-light p-4 rounded-3 lead mb-0">
+                        Sie haben noch keine Sammlungen.
+                    </p>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -5,14 +5,14 @@ import {
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    NgbDropdownButtonItem,
-    NgbDropdownItem,
+    NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AsyncPipe } from '@angular/common';
 import {
     type UUID,
     type AlarmGroup,
     newAlarmGroupVehicle,
+    ElementVersionId,
 } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
@@ -33,10 +33,9 @@ import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
         FormsModule,
         AppSaveOnTypingDirective,
         NgbDropdown,
+        NgbDropdownModule,
         NgbDropdownToggle,
         NgbDropdownMenu,
-        NgbDropdownButtonItem,
-        NgbDropdownItem,
         VehicleTemplateDisplayComponent,
         AsyncPipe,
         ValuesPipe,
@@ -131,7 +130,9 @@ export class AlarmGroupItemComponent implements OnInit {
         );
     }
 
-    public createAlarmGroupVehicle(vehicleTemplateId: UUID) {
+    public createAlarmGroupVehicle(
+        vehicleTemplateId: ElementVersionId | string
+    ) {
         const vehicleTemplate = selectStateSnapshot(
             createSelectVehicleTemplate(vehicleTemplateId),
             this.store

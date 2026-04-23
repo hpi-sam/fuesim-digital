@@ -19,3 +19,5 @@ export * from './store/action-reducers/utils/index.js';
 export * from './state-migrations/index.js';
 export * from './ids.js';
 export * from './validation-messages.js';
+export * from './marketplace/index.js';
+export * from './data/index.js';

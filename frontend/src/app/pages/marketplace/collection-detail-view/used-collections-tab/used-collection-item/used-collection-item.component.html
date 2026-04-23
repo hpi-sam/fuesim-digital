@@ -1,0 +1,63 @@
+<div class="card">
+    <div
+        class="d-flex flex-row align-items-center justify-content-between gap-2 card-header"
+    >
+        <h3 class="mb-0 d-flex flex-row align-items-center">
+            <span
+                >{{ collection().title }} (Version {{ collection().version }})
+            </span>
+            @if (collection().draftState) {
+                <div class="badge text-bg-danger">
+                    Fehler: Sammlung im Entwurfsmodus
+                </div>
+            }
+            <a
+                [routerLink]="'/collections/' + collection().entityId"
+                class="btn btn-link"
+                ><i class="bi bi-box-arrow-up-right"></i
+            ></a>
+        </h3>
+        @if (newerVersionAvailable.isLoading()) {
+            <div class="spinner-grow-sm text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        }
+        <div class="d-flex flex-row gap-2 align-items-center">
+            @if (canRemoveCollection()) {
+                <button
+                    class="btn btn-outline-danger btn-sm"
+                    (click)="removeCollectionDependency(collection().versionId)"
+                >
+                    Sammlung entfernen <i class="bi bi-x-square ms-1"></i>
+                </button>
+            }
+            @if (
+                newerVersionAvailable.hasValue() &&
+                newerVersionAvailable.value().newerVersionAvailable
+            ) {
+                <button
+                    class="btn btn-outline-primary btn-sm"
+                    (click)="openUpgradeVersionModal()"
+                >
+                    Version aktualisieren
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        @if (elements.hasValue()) {
+            <app-collection-elements-list
+                [collection]="collection()"
+                [collectionElements]="elements.value()!"
+                [editable]="false"
+            />
+        } @else {
+            <div class="d-flex align-items-center gap-2">
+                <span class="spinner-border">
+                    <span class="visually-hidden">Lädt Sammlungen</span>
+                </span>
+                <span>Sammlungselemente werden geladen...</span>
+            </div>
+        }
+    </div>
+</div>

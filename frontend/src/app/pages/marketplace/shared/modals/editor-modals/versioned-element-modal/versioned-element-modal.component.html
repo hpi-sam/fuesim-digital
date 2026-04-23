@@ -1,0 +1,87 @@
+<div class="modal-header">
+    <h4 class="modal-title">Sammlungs-Element</h4>
+</div>
+<div class="">
+    <div class="d-flex flex-row">
+        @if (data.mode !== 'create') {
+            <ul class="list-group rounded-0">
+                @if (versionHistory() !== null) {
+                    @for (
+                        version of versionHistory();
+                        track version.versionId
+                    ) {
+                        @let isCurrentVersion =
+                            version.version === data.element.version;
+                        @let isSelectedVersion =
+                            version.version === selectedVersion();
+                        <li
+                            class="list-group-item d-flex flex-column small text-nowrap"
+                            [class.active]="isSelectedVersion"
+                            [class.text-primary]="
+                                isCurrentVersion && !isSelectedVersion
+                            "
+                            [aria-current]="isCurrentVersion ? 'true' : 'false'"
+                            (click)="selectVersion(version.version)"
+                            role="button"
+                        >
+                            <b
+                                >Version {{ version.version }} (<span
+                                    class="font-monospace"
+                                    >{{ version.stateVersion }}</span
+                                >)
+                            </b>
+                            <span>{{ version.createdAt | date }}</span>
+                        </li>
+                    }
+                } @else if (data.hideVersionHistory !== true) {
+                    <div
+                        class="d-flex flex-column gap-2 align-items-center p-2"
+                    >
+                        <span>Versionen laden</span>
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                }
+            </ul>
+        }
+        <div class="modal-body">
+            @if (timeTravelMode() && data.mode !== 'view') {
+                <div class="alert alert-info" role="alert">
+                    Sie betrachten eine frühere Version der Fahrzeugvorlage.
+                    <br />
+                    Bitte wechseln Sie zurück zur aktuellen Version, um
+                    Änderungen vorzunehmen.
+                </div>
+            }
+            @let editingDisabled = timeTravelMode() || data.mode === 'view';
+            <app-versioned-element-form
+                [data]="selectedVersionData()"
+                [btnText]="
+                    data.mode === 'create'
+                        ? 'Element hinzufügen'
+                        : 'Änderungen speichern'
+                "
+                [disabled]="editingDisabled"
+                (dataSubmit)="submit($event)"
+            />
+            @if (
+                !editingDisabled &&
+                dependentElements.hasValue() &&
+                dependentElements.value().length > 0
+            ) {
+                <div class="alert alert-warning mt-2" role="alert">
+                    Folgenden Elemente der Sammlung verwenden diese Version:
+                    <ul>
+                        @for (
+                            dependentElement of dependentElements.value();
+                            track dependentElement.entityId
+                        ) {
+                            <li>{{ dependentElement.title }}</li>
+                        }
+                    </ul>
+                    Sie werden beim Speichern dazu aufgefordert, eine
+                    Konfliktlösung durchzuführen.
+                </div>
+            }
+        </div>
+    </div>
+</div>

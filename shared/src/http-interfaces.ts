@@ -8,6 +8,26 @@ import {
 import { validationMessages } from './validation-messages.js';
 import { exerciseStatusSchema } from './models/utils/exercise-status.js';
 import { logEntrySchema } from './models/log-entry.js';
+import { stringToDate } from './models/utils/date.js';
+import {
+    collectionDtoSchema,
+    extendedCollectionDtoSchema,
+} from './marketplace/models/collection.js';
+import { elementDtoSchema } from './marketplace/models/versioned-elements.js';
+import type { CollectionEntityId } from './marketplace/models/versioned-id-schema.js';
+import {
+    collectionVersionIdSchema,
+    elementVersionIdSchema,
+    collectionEntityIdSchema,
+    elementEntityIdSchema,
+} from './marketplace/models/versioned-id-schema.js';
+import { collectionRelationshipTypeSchema } from './marketplace/models/collection-relationship.js';
+import { versionedElementContentSchema } from './marketplace/models/versioned-element-content.js';
+import {
+    collectionElementsDtoSchema,
+    collectionElementsSingleSchema,
+} from './marketplace/models/collection-elements.js';
+import { collectionVisibilitySchema } from './marketplace/models/collection-visibility.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -35,15 +55,6 @@ export interface AuthQueryParams {
     loginFailure?: string;
     loginSuccess?: boolean;
 }
-
-const stringToDate = z.codec(
-    z.iso.datetime({ offset: true }), // input schema: ISO date string
-    z.date(), // output schema: Date object
-    {
-        decode: (isoString) => new Date(isoString), // ISO string → Date
-        encode: (date) => date.toISOString(), // Date → ISO string
-    }
-);
 
 export const getExerciseResponseDataSchema = z.object({
     participantKey: participantKeySchema,
@@ -210,3 +221,384 @@ export const updateParallelExerciseInstancesSchema = z.object({
 export type UpdateParallelExerciseResponseData = z.infer<
     typeof updateParallelExerciseInstancesSchema
 >;
+
+class Route<TRequest = never, TResponse = never> {
+    constructor(opts: { request?: TRequest; response?: TResponse }) {
+        this.requestSchema = opts.request as TRequest;
+        this.responseSchema = opts.response as TResponse;
+    }
+
+    public readonly requestSchema: TRequest;
+    public readonly responseSchema: TResponse;
+    public readonly Request!: TRequest extends z.ZodType
+        ? z.infer<TRequest>
+        : never;
+    public readonly Response!: TResponse extends z.ZodType
+        ? z.infer<TResponse>
+        : never;
+}
+
+/* eslint-disable @typescript-eslint/naming-convention */
+
+export namespace Marketplace {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    export namespace Element {
+        export const Create = new Route({
+            request: z.object({
+                data: z.array(versionedElementContentSchema),
+            }),
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema,
+                result: z.array(elementDtoSchema),
+            }),
+        });
+
+        export const Import = new Route({
+            request: z.object({
+                objects: z.array(elementDtoSchema),
+            }),
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema,
+                result: z.array(elementDtoSchema),
+            }),
+        });
+
+        export const editConflictResolutionSchema = z.object({
+            // This is used to check server-side if the user is aware of all changes,
+            // or if there are new changes that they should be aware of before saving their changes
+            affectingElementIds: z.array(elementVersionIdSchema),
+            strategy: z.enum(['createCopy', 'cascadeChanges']),
+        });
+
+        export type EditConflictResolution = z.infer<
+            typeof editConflictResolutionSchema
+        >;
+
+        export const Edit = new Route({
+            request: z.object({
+                data: versionedElementContentSchema,
+                conflictResolution: editConflictResolutionSchema.optional(),
+            }),
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema,
+                result: elementDtoSchema,
+            }),
+        });
+
+        export const Restore = new Route({
+            response: z.object({
+                newCollectionVersionId: collectionVersionIdSchema,
+                result: elementDtoSchema,
+            }),
+        });
+
+        export const Duplicate = new Route({
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema,
+                result: elementDtoSchema,
+            }),
+        });
+
+        export const Delete = new Route({
+            request: z.object({
+                conflictResolution: z
+                    .object({
+                        acceptedCascadingDeletions: z
+                            .array(elementVersionIdSchema)
+                            .optional(),
+                    })
+                    .optional(),
+            }),
+            response: z.object({
+                newSetVersionId: collectionVersionIdSchema.nullable(),
+                requiresConfirmation: z.array(elementDtoSchema),
+            }),
+        });
+
+        export const GetByEntityId = new Route({
+            response: z.object({
+                result: z.array(elementDtoSchema),
+            }),
+        });
+
+        export const GetInternalDependencies = new Route({
+            response: z.object({
+                result: z.array(elementDtoSchema),
+            }),
+        });
+    }
+
+    export namespace Collection {
+        export const inviteCodeDtoSchema = z.object({
+            code: z.string(),
+            expiresAt: stringToDate,
+            collection: collectionEntityIdSchema,
+        });
+
+        export type InviteCodeDto = z.infer<typeof inviteCodeDtoSchema>;
+
+        export const Create = new Route({
+            request: z.object({
+                title: z.string().trim().nonempty(),
+            }),
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
+        export const GetIsMember = new Route({
+            response: z.object({
+                result: z.boolean(),
+            }),
+        });
+
+        export const JoinByJoinCode = new Route({
+            response: z.object({
+                result: collectionEntityIdSchema,
+            }),
+        });
+
+        export const GetPreviewByJoinCode = new Route({
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
+        export const GetCollectionMembers = new Route({
+            response: z.object({
+                result: z.array(
+                    z.object({
+                        id: z.string(),
+                        displayName: z.string(),
+                        role: collectionRelationshipTypeSchema,
+                    })
+                ),
+            }),
+        });
+
+        export const PatchCollectionMember = new Route({
+            request: z.object({
+                userId: z.string(),
+                role: collectionRelationshipTypeSchema,
+            }),
+        });
+
+        export const DeleteCollectionMember = new Route({
+            request: z.object({
+                userId: z.string(),
+            }),
+        });
+
+        export const GetInviteCode = new Route({
+            response: z.object({
+                result: inviteCodeDtoSchema.nullable(),
+            }),
+        });
+
+        export const PutInviteCode = new Route({
+            response: z.object({
+                result: inviteCodeDtoSchema,
+            }),
+        });
+
+        export const DeleteInviteCode = new Route({
+            response: z.object({
+                status: z.literal(['success']),
+            }),
+        });
+
+        export const editableCollectionPropertiesSchema = z.object({
+            title: z.string().trim().nonempty().optional(),
+            description: z.string().trim().nonempty().optional(),
+        });
+
+        export type EditableCollectionProperties = z.infer<
+            typeof editableCollectionPropertiesSchema
+        >;
+
+        export const Edit = new Route({
+            request: editableCollectionPropertiesSchema,
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
+        export const LoadMy = new Route({
+            response: z.object({
+                result: z.array(extendedCollectionDtoSchema),
+            }),
+        });
+
+        export const GetByEntityId = new Route({
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
+        export const GetLatestElementsBySetVersionId = new Route({
+            response: collectionElementsDtoSchema,
+        });
+
+        export const GetCollectionVersion = new Route({
+            response: z.object({
+                result: collectionDtoSchema,
+            }),
+        });
+
+        export const RemoveDependency = new Route({
+            response: z.object({
+                result: z.union([
+                    z.object({
+                        newCollectionVersionId:
+                            collectionVersionIdSchema.nullable(),
+                        blockingElements: z.array(elementDtoSchema),
+                    }),
+                ]),
+            }),
+        });
+
+        export const ChangeVisibility = new Route({
+            request: z.object({
+                visibility: collectionVisibilitySchema,
+            }),
+            response: z.object({
+                status: z.literal(['success']),
+            }),
+        });
+
+        export const Duplicate = new Route({
+            response: z.object({
+                createdSet: collectionDtoSchema,
+            }),
+        });
+
+        export const Import = new Route({
+            response: z.object({
+                importedSet: collectionElementsSingleSchema,
+                newCollectionVersionId: collectionVersionIdSchema,
+            }),
+        });
+
+        export const SaveDraftState = new Route({
+            response: z.object({
+                result: collectionDtoSchema.nullable(),
+                saved: z.boolean().default(true),
+            }),
+        });
+
+        export const DeleteDraftState = new Route({
+            response: z.object({
+                result: collectionDtoSchema.nullable(),
+                reverted: z.boolean().default(true),
+            }),
+        });
+
+        export const GetElementsOfCollectionVersion = new Route({
+            response: collectionElementsDtoSchema,
+        });
+
+        class TypedSchema<D, T> {
+            constructor(public readonly schema: T) {}
+
+            public readonly Type!: T extends z.ZodType
+                ? // if D is defined (override type), use D, otherwise infer from T
+                  D extends unknown
+                    ? z.infer<T>
+                    : D
+                : never;
+        }
+
+        export namespace Events {
+            const defineEvent = <TName extends string, TData>(
+                eventName: TName,
+                dataSchema: TData
+            ) => {
+                const schema = z.object({
+                    event: z.literal(eventName),
+                    data: dataSchema,
+                    collectionEntityId: collectionEntityIdSchema,
+                });
+                // We need to type seperately to keep the event-name as a literal type
+                return new TypedSchema<
+                    {
+                        event: TName;
+                        collectionEntityId: CollectionEntityId;
+                        data: z.infer<TData>;
+                    },
+                    typeof schema
+                >(schema);
+            };
+
+            export const DependencyChange = defineEvent(
+                'dependency:change',
+                collectionVersionIdSchema
+            );
+
+            export const DependencyReplaceData = defineEvent(
+                'dependency:replace-data',
+                z.object({
+                    imported: z.array(collectionElementsSingleSchema),
+                    references: z.array(collectionElementsSingleSchema),
+                })
+            );
+
+            export const InitialData = defineEvent(
+                'initialdata',
+                z.object({
+                    collection: collectionDtoSchema,
+                    elements: collectionElementsDtoSchema,
+                    publishedCollection: collectionDtoSchema,
+                    publishedElements: collectionElementsDtoSchema,
+                    userRelationship: collectionRelationshipTypeSchema,
+                })
+            );
+
+            export const ElementCreate = defineEvent(
+                'element:create',
+                elementDtoSchema
+            );
+
+            export const ElementUpdate = defineEvent(
+                'element:update',
+                elementDtoSchema
+            );
+
+            export const ElementDelete = defineEvent(
+                'element:delete',
+                z.object({
+                    entityId: elementEntityIdSchema,
+                })
+            );
+
+            export const CollectionUpdate = defineEvent(
+                'collection:update',
+                collectionDtoSchema
+            );
+
+            export const CollectionRefreshData = defineEvent(
+                'collection:refresh-data',
+                z.object({
+                    draftElements: collectionElementsDtoSchema.optional(),
+                    publishedElements: collectionElementsDtoSchema.optional(),
+                    draftCollection: collectionDtoSchema.optional(),
+                    publishedCollection: collectionDtoSchema.optional(),
+                })
+            );
+
+            export const SSEvent = new TypedSchema(
+                z.union([
+                    CollectionRefreshData.schema,
+                    CollectionUpdate.schema,
+                    DependencyChange.schema,
+                    DependencyReplaceData.schema,
+                    ElementCreate.schema,
+                    ElementDelete.schema,
+                    ElementUpdate.schema,
+                    InitialData.schema,
+                ])
+            );
+        }
+    }
+}
+
+/* eslint-enable @typescript-eslint/naming-convention */

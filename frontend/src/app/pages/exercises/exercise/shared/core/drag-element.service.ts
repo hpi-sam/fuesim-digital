@@ -9,6 +9,7 @@ import type {
     TechnicalChallenge,
     TechnicalChallengeTemplate,
     VehicleTemplate,
+    VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import {
     uuid,
@@ -28,6 +29,7 @@ import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Pixel } from 'ol/pixel';
+import { Immutable } from 'immer';
 import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region';
 import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region';
 import type { FeatureManager } from '../exercise-map/utility/feature-manager';
@@ -77,14 +79,20 @@ export class DragElementService {
     private dragElement?: HTMLImageElement;
     private imageDimensions?: { width: number; height: number };
     private transferringTemplate?: TransferTemplate;
+    private transferingEntityVersion?: VersionedElementPartial;
 
     /**
      * Should be called on the mousedown event of the element to be dragged
      * @param event the mouse event
      * @param transferTemplate the template to be added
      */
-    public onMouseDown(event: MouseEvent, transferTemplate: TransferTemplate) {
+    public onMouseDown(
+        event: MouseEvent,
+        transferTemplate: TransferTemplate,
+        entityVersion?: VersionedElementPartial
+    ) {
         this.transferringTemplate = transferTemplate;
+        this.transferingEntityVersion = entityVersion;
         // Create the drag image
         const imageProperties = transferTemplate.template.image;
         const zoom = this.olMap!.getView().getZoom()!;
@@ -167,7 +175,7 @@ export class DragElementService {
         ];
         const position = { x, y };
         // create the element
-        let createdElement: Element | null = null;
+        let createdElement: Immutable<Element> | null = null;
         switch (this.transferringTemplate.type) {
             case 'vehicle':
                 {
@@ -182,7 +190,8 @@ export class DragElementService {
                             selectPersonnelTemplates,
                             this.store
                         ),
-                        position
+                        position,
+                        this.transferingEntityVersion
                     );
                     this.exerciseService.proposeAction(
                         {
@@ -345,7 +354,7 @@ export class DragElementService {
 
     private executeDropSideEffects(
         pixel: Pixel,
-        createdElement: Element | null,
+        createdElement: Immutable<Element> | null,
         event: MouseEvent
     ) {
         if (

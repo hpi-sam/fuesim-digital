@@ -87,6 +87,10 @@ import {
 } from './models/technical-challenge/technical-challenge.js';
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
+import {
+    VersionedCollectionPartial,
+    versionedCollectionPartialSchema,
+} from './marketplace/models/versioned-id-schema.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -109,6 +113,9 @@ export class ExerciseState {
 
     @IsZodSchema(randomStateSchema)
     public readonly randomState: RandomState = newSeededRandomState();
+
+    @IsZodSchema(z.array(versionedCollectionPartialSchema))
+    public readonly selectedCollections: VersionedCollectionPartial[] = [];
 
     @IsZodSchema(z.record(uuidSchema, viewportSchema))
     public readonly viewports: { readonly [key: UUID]: Viewport } = {};
@@ -256,6 +263,10 @@ export class ExerciseState {
      * **Important**
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
+     *
+     * WARNING: Before incresing this number, make sure to check:
+     * - If you made any changes to where/how references are stored in a model, please check
+     *   if collection-service.ts/findEntitiyVersionsInContent() needs to be updated to detect the new references.
      */
-    static readonly currentStateVersion = 51;
+    static readonly currentStateVersion = 52;
 }

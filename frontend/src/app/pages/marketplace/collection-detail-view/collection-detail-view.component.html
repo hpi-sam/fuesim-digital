@@ -1,0 +1,201 @@
+<div class="container">
+    <a
+        class="btn btn-outline-secondary btn-sm mb-4"
+        [routerLink]="routerBackLink.link"
+    >
+        <i class="bi bi-arrow-left"></i
+        ><span> Zurück zu {{ routerBackLink.title }}</span>
+    </a>
+    @if (selectedCollectionData(); as collectionData) {
+        <div class="d-flex flex-row justify-content-between container w-100">
+            <h2>
+                {{ collectionData.collection.title }}
+                @if (
+                    collectionData.collection.title !==
+                    collectionData.publishedCollection.title
+                ) {
+                    <s class="text-danger"
+                        ><span class="text-secondary">{{
+                            collectionData.publishedCollection.title
+                        }}</span></s
+                    >
+                }
+            </h2>
+
+            <div class="d-flex flex-row gap-2 align-items-center">
+                <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    ngbTooltip="Diese Sammlung duplizieren"
+                    (click)="duplicateCollection()"
+                >
+                    <i class="bi bi-copy"></i>
+                </button>
+                @if (checkRole(collectionData.ownRole).isAtMost('editor')) {
+                    <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        (click)="leaveCollection()"
+                        ngbTooltip="Diese Sammlung verlassen"
+                    >
+                        <i class="bi bi-person-dash-fill"></i>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div
+            class="d-flex flex-row justify-content-between align-items-center container w-100 mb-3"
+        >
+            <div class="d-flex flex-column text-muted">
+                <span>
+                    <i class="bi bi-grid"></i>
+                    {{ collectionData.objects.direct.length }} Einträge
+                </span>
+                @if (collectionData.collection.draftState) {
+                    <span>
+                        <i class="bi bi-pencil"></i>
+                        In Bearbeitung - Letzer Stand:
+                        {{ collectionData.collection.editedAt | date }}
+                    </span>
+                }
+                <span>
+                    <i class="bi bi-globe2"></i>
+                    @if (collectionData.collection.draftState) {
+                        Zuletzt gespeichert:
+                    }
+                    Version
+                    {{ collectionData.publishedCollection.version }}
+                    vom
+                    {{ collectionData.publishedCollection.editedAt | date }}
+                </span>
+                <span class="d-flex flex-row gap-1 align-items-center">
+                    @if (collectionData.objects.imported.length > 0) {
+                        <i class="bi bi-diagram-2"></i>
+                        Verwendete Sammlungen:
+                        @for (
+                            dependency of collectionData.objects.imported;
+                            track dependency.collection.versionId
+                        ) {
+                            <span class="badge bg-secondary">
+                                {{ dependency.collection.title }}
+                            </span>
+                        }
+                    }
+                </span>
+            </div>
+            <div class="d-flex flex-row gap-2 align-items-center"></div>
+        </div>
+
+        @if (collectionData.collection.archived) {
+            <div
+                class="alert alert-warning d-flex flex-row justify-content-between align-items-center gap-3"
+                role="alert"
+            >
+                <span class="d-flex flex-row align-items-center gap-3">
+                    <i class="bi bi-info-circle"></i>
+                    <span>
+                        Diese Sammlung ist archiviert und wird nicht mehr in
+                        Übungsszenarien angezeigt. Einige Funktionen sind
+                        eingeschränkt.<br />
+                        Stellen Sie diese Sammlung wieder her, um sie in
+                        Übungsszenarien verwenden zu können.
+                    </span>
+                </span>
+                @if (checkRole(collectionData.ownRole).isAtLeast('editor')) {
+                    <button
+                        class="btn btn-warning"
+                        (click)="unarchiveCollection()"
+                    >
+                        Sammlung wiederherstellen
+                    </button>
+                }
+            </div>
+        }
+        @if (collectionData.collection.draftState) {
+            <div
+                class="alert d-flex flex-row justify-content-between align-items-center gap-3 alert-change"
+                role="alert"
+            >
+                <span class="d-flex flex-row align-items-center gap-3">
+                    <i class="bi bi-info-circle"></i>
+                    <span>
+                        Diese Sammlung enthält unveröffentlichte Änderungen.<br />
+                        @if (
+                            checkRole(collectionData.ownRole).isAtLeast('admin')
+                        ) {
+                            Speichern Sie diese Version, um die Änderungen in
+                            Übungsszenarien verwenden zu können.
+                        } @else {
+                            Wenden Sie sich an einen Administrator, um diese
+                            Version zu speichern.
+                        }
+                    </span>
+                </span>
+                <div class="d-flex flex-row gap-2">
+                    <button
+                        class="btn btn-outline-primary btn-sm"
+                        ngbTooltip="Änderungen anzeigen"
+                        (click)="viewDraftStateChanges()"
+                    >
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    @if (
+                        checkRole(collectionData.ownRole).isAtLeast('editor')
+                    ) {
+                        <button
+                            class="btn btn-outline-danger btn-sm"
+                            ngbTooltip="Änderungen verwerfen"
+                            (click)="revertDraftState()"
+                        >
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+                    @if (checkRole(collectionData.ownRole).isAtLeast('admin')) {
+                        <button
+                            class="btn btn-primary btn-sm"
+                            (click)="saveDraftState()"
+                        >
+                            Als neue Version speichern
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+        <ul ngbNav #nav="ngbNav" class="nav-tabs" [animation]="false">
+            <li [ngbNavItem]="1">
+                <button ngbNavLink>Elemente</button>
+                <ng-template ngbNavContent>
+                    <app-collection-elements-tab
+                        [collectionData]="collectionData"
+                    />
+                </ng-template>
+            </li>
+            <li [ngbNavItem]="2">
+                <button ngbNavLink>Verwendete Sammlungen</button>
+                <ng-template ngbNavContent>
+                    <app-used-collections-tab
+                        [collectionData]="collectionData"
+                        [canRemoveCollection]="
+                            checkRole(collectionData.ownRole).isAtLeast(
+                                'editor'
+                            )
+                        "
+                    />
+                </ng-template>
+            </li>
+            @if (checkRole(collectionData.ownRole).isAtLeast('admin')) {
+                <li [ngbNavItem]="3">
+                    <button ngbNavLink>Eigenschaften</button>
+                    <ng-template ngbNavContent>
+                        <app-collection-details-tab
+                            [collection]="collectionData.collection"
+                        />
+                    </ng-template>
+                </li>
+            }
+        </ul>
+
+        <div [ngbNavOutlet]="nav" class="mt-2"></div>
+    }
+</div>

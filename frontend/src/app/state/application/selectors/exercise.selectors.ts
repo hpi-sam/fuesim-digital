@@ -85,6 +85,9 @@ export const selectCollectedClientNames = selectPropertyFactory(
     'collectedClientNames'
 );
 export const selectScoutables = selectPropertyFactory('scoutables');
+export const selectSelectedCollections = selectPropertyFactory(
+    'selectedCollections'
+);
 
 // Elements
 

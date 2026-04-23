@@ -14,6 +14,7 @@ import { newMapPositionAt } from '../models/utils/position/map-position.js';
 import { newNoOccupation } from '../models/utils/occupations/no-occupation.js';
 import type { MaterialTemplate } from '../models/material-template.js';
 import type { PersonnelTemplate } from '../models/personnel-template.js';
+import type { VersionedElementPartial } from '../marketplace/models/versioned-id-schema.js';
 
 /**
  * @returns a vehicle with personnel and materials to be added to the map
@@ -24,7 +25,8 @@ export function createVehicleParameters(
     vehicleTemplate: VehicleTemplate,
     materialTemplates: { readonly [key in UUID]: MaterialTemplate },
     personnelTemplates: { readonly [key in UUID]: PersonnelTemplate },
-    vehiclePosition: MapCoordinates
+    vehiclePosition: MapCoordinates,
+    entityVersion?: VersionedElementPartial
 ): VehicleParameters {
     const materials = vehicleTemplate.materialTemplateIds
         .map((materialTemplateId: UUID) => {
@@ -52,6 +54,9 @@ export function createVehicleParameters(
         .filter((val) => val !== null);
 
     const vehicle: Vehicle = {
+        entityId: entityVersion?.entityId,
+        versionId: entityVersion?.versionId,
+        usedBy: [],
         id: vehicleId,
         type: 'vehicle',
         templateId: vehicleTemplate.id,

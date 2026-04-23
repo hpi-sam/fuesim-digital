@@ -2,6 +2,7 @@ import type { Immutable } from 'immer';
 import { z } from 'zod';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { type UUIDSet, uuidSetSchema } from '../utils/uuid-set.js';
+import { versionedElementModel } from '../marketplace/models/versioned-element-model.js';
 import { type Position, positionSchema } from './utils/position/position.js';
 import {
     type ImageProperties,
@@ -14,6 +15,7 @@ import {
 import { operationalAssignmentSchema } from './operational-section.js';
 
 export const vehicleSchema = z.strictObject({
+    ...versionedElementModel.partial().shape,
     id: uuidSchema,
     type: z.literal('vehicle'),
     vehicleType: z.string(),

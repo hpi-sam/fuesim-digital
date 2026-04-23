@@ -1,9 +1,13 @@
 import { z } from 'zod';
-import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
+import {
+    elementVersionIdSchema,
+    type ElementVersionId,
+} from '../../marketplace/models/versioned-id-schema.js';
 
 export const alarmGroupVehicleSchema = z.strictObject({
     id: uuidSchema,
-    vehicleTemplateId: uuidSchema,
+    vehicleTemplateId: z.union([elementVersionIdSchema, uuidSchema]),
     /**
      * The time in ms until the vehicle arrives
      */
@@ -13,7 +17,7 @@ export const alarmGroupVehicleSchema = z.strictObject({
 export type AlarmGroupVehicle = z.infer<typeof alarmGroupVehicleSchema>;
 
 export function newAlarmGroupVehicle(
-    vehicleTemplateId: UUID,
+    vehicleTemplateId: ElementVersionId | string,
     time: number,
     name: string
 ) {
@@ -22,5 +26,5 @@ export function newAlarmGroupVehicle(
         vehicleTemplateId,
         time,
         name,
-    };
+    } satisfies AlarmGroupVehicle;
 }

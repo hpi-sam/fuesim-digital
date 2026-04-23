@@ -19,7 +19,7 @@ export const removeIllegalVehicleMovementActions22: Migration = {
                     intermediaryState,
                     'vehicle',
                     vehicleId
-                );
+                ) as WritableDraft<any>;
                 return isCompletelyLoaded(
                     intermediaryState as WritableDraft<ExerciseState>,
                     vehicle
@@ -35,7 +35,7 @@ export const removeIllegalVehicleMovementActions22: Migration = {
                         intermediaryState,
                         'vehicle',
                         elementToBeAddedId
-                    );
+                    ) as WritableDraft<any>;
                     return isCompletelyLoaded(
                         intermediaryState as WritableDraft<ExerciseState>,
                         vehicle

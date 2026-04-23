@@ -31,11 +31,9 @@ import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
-import { openCreateVehicleTemplateModal } from '../editor-panel/create-vehicle-template-modal/open-create-vehicle-template-modal';
 import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-modal/open-edit-image-template-modal';
 import { openPartialImportOverwriteModal } from '../partial-import/open-partial-import-overwrite-modal';
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
-import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
 import { restrictedZoneDragTemplates } from '../editor-panel/templates/restricted-zone';
 import { ExerciseService } from '../../../../../core/exercise.service';
 import { MessageService } from '../../../../../core/messages/message.service';
@@ -49,11 +47,11 @@ import {
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { FileInputDirective } from '../../../../../shared/directives/file-input.directive';
-import { MapEditorCardComponent } from '../editor-panel/map-editor-card/map-editor-card.component';
 import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
+import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -182,16 +180,8 @@ export class TrainerMapEditorComponent implements OnInit {
         openCreateImageTemplateModal(this.ngbModalService);
     }
 
-    public addVehicleTemplate() {
-        openCreateVehicleTemplateModal(this.ngbModalService);
-    }
-
     public editMapImageTemplate(mapImageTemplateId: UUID) {
         openEditImageTemplateModal(this.ngbModalService, mapImageTemplateId);
-    }
-
-    public editVehicleTemplate(mapImageTemplateId: UUID) {
-        openEditVehicleTemplateModal(this.ngbModalService, mapImageTemplateId);
     }
 
     public setCurrentCategory(

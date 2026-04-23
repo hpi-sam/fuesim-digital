@@ -1,5 +1,4 @@
 import type { WritableDraft } from 'immer';
-import type { ExerciseState } from '../state.js';
 import type { UUID } from '../utils/uuid.js';
 import { uuid } from '../utils/uuid.js';
 import type { Migration } from './migration-functions.js';
@@ -164,9 +163,12 @@ function migratePersonnel(personnel: Personnel) {
 export const generalizeMaterialsPersonnel44: Migration = {
     action: (intermediaryState, action) => {
         const actionType = (action as { type: string }).type;
-        const mutableIntermediaryState =
-            intermediaryState as WritableDraft<ExerciseState>;
+        const mutableIntermediaryState = intermediaryState as WritableDraft<{
+            vehicleTemplates: { [Key in UUID]: VehicleTemplate };
+            mapImageTemplates: { [Key in UUID]: MapImageTemplate };
+        }>;
 
+        console.log(mutableIntermediaryState);
         const { mapImageTemplateIds, vehicleTemplateIds } = getTemplateIds(
             Object.values(mutableIntermediaryState.vehicleTemplates),
             Object.values(mutableIntermediaryState.mapImageTemplates)

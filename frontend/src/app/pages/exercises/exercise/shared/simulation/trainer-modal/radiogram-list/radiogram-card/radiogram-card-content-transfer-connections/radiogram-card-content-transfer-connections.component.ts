@@ -17,7 +17,9 @@ import { FormatDurationPipe } from '../../../../../../../../../shared/pipes/form
     styleUrls: ['./radiogram-card-content-transfer-connections.component.scss'],
     imports: [FormatDurationPipe, AsyncPipe],
 })
-export class RadiogramCardContentTransferConnectionsComponent implements OnInit {
+export class RadiogramCardContentTransferConnectionsComponent
+    implements OnInit
+{
     private readonly store = inject<Store<AppState>>(Store);
 
     readonly radiogramId = input.required<UUID>();

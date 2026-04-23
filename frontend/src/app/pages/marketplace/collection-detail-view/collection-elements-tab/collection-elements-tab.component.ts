@@ -3,6 +3,7 @@ import {
     checkCollectionRole,
     ExerciseState,
     gatherCollectionElements,
+    getTemplates,
     migratePartialExport,
     PartialExport,
     ParticipantKey,
@@ -109,10 +110,10 @@ export class CollectionElementsTabComponent {
                         currentState.patientCategories
                     ),
                     vehicleTemplates: Object.values(
-                        currentState.vehicleTemplates
+                        getTemplates(currentState, 'vehicleTemplate')
                     ),
                     mapImageTemplates: Object.values(
-                        currentState.mapImageTemplates
+                        getTemplates(currentState, 'mapImageTemplate')
                     ),
                 };
             }

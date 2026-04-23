@@ -15,6 +15,7 @@ import {
     imagePropertiesSchema,
 } from '../../models/utils/image-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getTemplates } from '../../models/utils/template.js';
 
 export class AddMapImageTemplateAction implements Action {
     @IsValue('[MapImageTemplate] Add mapImageTemplate' as const)
@@ -51,13 +52,18 @@ export namespace MapImageTemplatesActionReducers {
         {
             action: AddMapImageTemplateAction,
             reducer: (draftState, { mapImageTemplate }) => {
-                if (draftState.mapImageTemplates[mapImageTemplate.id]) {
+                if (
+                    getTemplates(draftState, 'mapImageTemplate')[
+                        mapImageTemplate.id
+                    ]
+                ) {
                     throw new ReducerError(
                         `MapImageTemplate with id ${mapImageTemplate.id} already exists`
                     );
                 }
-                draftState.mapImageTemplates[mapImageTemplate.id] =
-                    cloneDeepMutable(mapImageTemplate);
+                getTemplates(draftState, 'mapImageTemplate')[
+                    mapImageTemplate.id
+                ] = cloneDeepMutable(mapImageTemplate);
                 return draftState;
             },
             rights: 'trainer',
@@ -80,7 +86,7 @@ export namespace MapImageTemplatesActionReducers {
             action: DeleteMapImageTemplateAction,
             reducer: (draftState, { id }) => {
                 getMapImageTemplate(draftState, id);
-                delete draftState.mapImageTemplates[id];
+                delete getTemplates(draftState, 'mapImageTemplate')[id];
                 return draftState;
             },
             rights: 'trainer',
@@ -91,7 +97,7 @@ function getMapImageTemplate(
     state: WritableDraft<ExerciseState>,
     id: UUID
 ): WritableDraft<MapImageTemplate> {
-    const mapImageTemplate = state.mapImageTemplates[id];
+    const mapImageTemplate = getTemplates(state, 'mapImageTemplate')[id];
     if (!mapImageTemplate) {
         throw new ReducerError(`MapImageTemplate with id ${id} does not exist`);
     }

@@ -209,7 +209,9 @@
                                             <input
                                                 type="checkbox"
                                                 class="btn-check"
-                                                [id]="`patient-status-filter-${category}`"
+                                                [id]="
+                                                    `patient-status-filter-${category}`
+                                                "
                                                 autocomplete="off"
                                                 [ngModel]="
                                                     selectedCategories[
@@ -227,7 +229,9 @@
                                             />
                                             <label
                                                 class="btn btn-outline-primary"
-                                                [for]="`patient-status-filter-${category}`"
+                                                [for]="
+                                                    `patient-status-filter-${category}`
+                                                "
                                             >
                                                 <app-patient-status-badge
                                                     [status]="category"

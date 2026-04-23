@@ -20,7 +20,9 @@ import { PatientStatusBadgeComponent } from '../../../../../../../../../shared/c
     ],
     imports: [PatientStatusBadgeComponent, AsyncPipe],
 })
-export class RadiogramCardContentTransferCategoryCompletedComponent implements OnInit {
+export class RadiogramCardContentTransferCategoryCompletedComponent
+    implements OnInit
+{
     private readonly store = inject<Store<AppState>>(Store);
 
     readonly radiogramId = input.required<UUID>();

@@ -43,6 +43,7 @@ import type { SimulatedRegion } from '../../models/simulated-region.js';
 import { newRecurringEventActivityState } from '../activities/recurring-event.js';
 import { newAskForPatientDataEvent } from '../events/ask-for-patient-data-event.js';
 import { newTryToSendToHospitalEvent } from '../events/try-to-send-to-hospital.js';
+import { getTemplates } from '../../models/utils/template.js';
 import { simulationBehaviorStateSchema } from './simulation-behavior.js';
 import type { SimulationBehavior } from './simulation-behavior.js';
 
@@ -375,7 +376,7 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                         event.vehiclesSent.vehicleCounts
                     ).reduce((sum, [type, count]) => {
                         const vehicleTemplate = Object.values(
-                            draftState.vehicleTemplates
+                            getTemplates(draftState, 'vehicleTemplate')
                         ).find((template) => template.vehicleType === type);
 
                         return (

@@ -12,6 +12,7 @@ import { newResourceRequiredEvent } from '../events/resources-required.js';
 import { newVehicleResource } from '../../models/utils/rescue-resource.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
 import { tryGetElement } from '../../store/action-reducers/utils/get-element.js';
+import { getTemplates } from '../../models/utils/template.js';
 import type { UnloadVehicleActivityState } from './unload-vehicle.js';
 import { simulationActivityStateSchema } from './simulation-activity.js';
 import type { SimulationActivity } from './simulation-activity.js';
@@ -131,11 +132,13 @@ function personnelInVehicleTemplate(
     vehiclePersonnel: ResourceDescription;
 } {
     const resource: ResourceDescription = {};
-    const template = draftState.vehicleTemplates[templateId];
+    const template = getTemplates(draftState, 'vehicleTemplate')[templateId];
     if (template) {
         template.personnelTemplateIds.forEach((personnelTemplateId) => {
-            const personnelTemplate =
-                draftState.personnelTemplates[personnelTemplateId];
+            const personnelTemplate = getTemplates(
+                draftState,
+                'personnelTemplate'
+            )[personnelTemplateId];
             if (!personnelTemplate) return;
             resource[personnelTemplate.personnelType] ??= 0;
             resource[personnelTemplate.personnelType]!++;

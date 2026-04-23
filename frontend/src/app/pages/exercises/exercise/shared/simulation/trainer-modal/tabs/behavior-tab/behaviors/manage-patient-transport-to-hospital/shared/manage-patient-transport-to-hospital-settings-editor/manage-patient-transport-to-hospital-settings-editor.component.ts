@@ -22,7 +22,9 @@ import { AppSaveOnTypingDirective } from '../../../../../../../../../../../../sh
     ],
     imports: [FormsModule, AppSaveOnTypingDirective, AsyncPipe],
 })
-export class ManagePatientTransportToHospitalSettingsEditorComponent implements OnChanges {
+export class ManagePatientTransportToHospitalSettingsEditorComponent
+    implements OnChanges
+{
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 

@@ -9,6 +9,7 @@ import type {
     ExerciseState,
     ScoutableElementType,
     TechnicalChallengeId,
+    Template,
     UUID,
     Vehicle,
     WithPosition,
@@ -38,6 +39,24 @@ function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
 }
 
+export const selectTemplates = selectPropertyFactory('templates');
+
+function selectTemplatesFactory<K extends Template['type']>(
+    key: K
+): MemoizedSelector<
+    AppState,
+    { [key: string]: Extract<Template, { type: K }> },
+    any
+> {
+    return createSelector(selectTemplates, (templates) =>
+        Object.fromEntries(
+            Object.entries(templates).filter(
+                ([_, template]) => template.type === key
+            ) as [string, Extract<Template, { type: K }>][]
+        )
+    );
+}
+
 export const scoutableElementSelectors = scoutableElementTypes.map(
     (elementType) => selectPropertyFactory(elementTypePluralMap[elementType])
 );
@@ -64,13 +83,13 @@ export const selectOperationalSections = selectPropertyFactory(
 export const selectTechnicalChallenges = selectPropertyFactory(
     'technicalChallenges'
 );
-export const selectVehicleTemplates = selectPropertyFactory('vehicleTemplates');
+export const selectVehicleTemplates = selectTemplatesFactory('vehicleTemplate');
 export const selectPersonnelTemplates =
-    selectPropertyFactory('personnelTemplates');
+    selectTemplatesFactory('personnelTemplate');
 export const selectMaterialTemplates =
-    selectPropertyFactory('materialTemplates');
+    selectTemplatesFactory('materialTemplate');
 export const selectMapImagesTemplates =
-    selectPropertyFactory('mapImageTemplates');
+    selectTemplatesFactory('mapImageTemplate');
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');

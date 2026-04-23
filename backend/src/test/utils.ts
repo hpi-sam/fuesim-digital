@@ -67,14 +67,14 @@ export class WebsocketClient {
 
     public async emit<
         EventKey extends keyof ClientToServerEvents,
-        Event extends ClientToServerEvents[EventKey] =
-            ClientToServerEvents[EventKey],
+        Event extends
+            ClientToServerEvents[EventKey] = ClientToServerEvents[EventKey],
         EventParameters extends Parameters<Event> = Parameters<Event>,
         // We expect the callback to be the last parameter
-        EventCallback extends LastElement<EventParameters> =
-            LastElement<EventParameters>,
-        Response extends Parameters<EventCallback>[0] =
-            Parameters<EventCallback>[0],
+        EventCallback extends
+            LastElement<EventParameters> = LastElement<EventParameters>,
+        Response extends
+            Parameters<EventCallback>[0] = Parameters<EventCallback>[0],
     >(
         event: EventKey,
         ...args: HeadElements<Parameters<Event>>
@@ -95,16 +95,16 @@ export class WebsocketClient {
 
     public on<
         EventKey extends keyof AllServerToClientEvents,
-        Callback extends AllServerToClientEvents[EventKey] =
-            AllServerToClientEvents[EventKey],
+        Callback extends
+            AllServerToClientEvents[EventKey] = AllServerToClientEvents[EventKey],
     >(event: EventKey, callback: Callback): void {
         this.socket.on(event, callback as any);
     }
 
     public async waitOn<
         EventKey extends keyof AllServerToClientEvents,
-        Callback extends AllServerToClientEvents[EventKey] =
-            AllServerToClientEvents[EventKey],
+        Callback extends
+            AllServerToClientEvents[EventKey] = AllServerToClientEvents[EventKey],
         Response extends Parameters<Callback>[0] = Parameters<Callback>[0],
     >(event: EventKey): Promise<Response> {
         return new Promise<Response>((resolve) => {

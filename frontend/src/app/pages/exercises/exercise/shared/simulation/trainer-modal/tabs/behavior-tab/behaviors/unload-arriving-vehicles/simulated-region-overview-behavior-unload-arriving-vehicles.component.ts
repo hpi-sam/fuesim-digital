@@ -37,7 +37,9 @@ import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/f
         AsyncPipe,
     ],
 })
-export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent implements OnInit {
+export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent
+    implements OnInit
+{
     private readonly exerciseService = inject(ExerciseService);
     readonly store = inject<Store<AppState>>(Store);
 

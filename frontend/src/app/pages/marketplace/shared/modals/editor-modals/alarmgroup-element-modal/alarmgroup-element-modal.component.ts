@@ -9,7 +9,7 @@ import {
 import {
     AlarmGroup,
     cloneDeepMutable,
-    ElementVersionId,
+    isElementVersionId,
     TypedElementDto,
     uuid,
     VehicleTemplate,
@@ -101,8 +101,10 @@ export class AlarmgroupElementModalComponent
     }
 
     public getAvailableVehicleByVersionId(
-        versionId: ElementVersionId
+        // We cannot assume a VersionedID here, since alarmgroupVehicleId can also be a string (from old versions)
+        versionId: string
     ): TypedElementDto<VehicleTemplate> | undefined {
+        if (!isElementVersionId(versionId)) return undefined;
         return this.availableVehicles().find((v) => v.versionId === versionId);
     }
 

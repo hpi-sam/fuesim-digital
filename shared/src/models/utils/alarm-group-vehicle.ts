@@ -7,7 +7,7 @@ import {
 
 export const alarmGroupVehicleSchema = z.strictObject({
     id: uuidSchema,
-    vehicleTemplateId: elementVersionIdSchema,
+    vehicleTemplateId: z.union([elementVersionIdSchema, uuidSchema]),
     /**
      * The time in ms until the vehicle arrives
      */
@@ -17,7 +17,7 @@ export const alarmGroupVehicleSchema = z.strictObject({
 export type AlarmGroupVehicle = z.infer<typeof alarmGroupVehicleSchema>;
 
 export function newAlarmGroupVehicle(
-    vehicleTemplateId: ElementVersionId,
+    vehicleTemplateId: ElementVersionId | string,
     time: number,
     name: string
 ) {
@@ -26,5 +26,5 @@ export function newAlarmGroupVehicle(
         vehicleTemplateId,
         time,
         name,
-    };
+    } satisfies AlarmGroupVehicle;
 }

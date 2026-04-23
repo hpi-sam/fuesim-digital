@@ -5,8 +5,7 @@ import {
     NgbDropdown,
     NgbDropdownToggle,
     NgbDropdownMenu,
-    NgbDropdownButtonItem,
-    NgbDropdownItem,
+    NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AsyncPipe } from '@angular/common';
 import {
@@ -34,10 +33,9 @@ import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
         FormsModule,
         AppSaveOnTypingDirective,
         NgbDropdown,
+        NgbDropdownModule,
         NgbDropdownToggle,
         NgbDropdownMenu,
-        NgbDropdownButtonItem,
-        NgbDropdownItem,
         VehicleTemplateDisplayComponent,
         AsyncPipe,
         ValuesPipe,
@@ -132,7 +130,9 @@ export class AlarmGroupItemComponent implements OnInit {
         );
     }
 
-    public createAlarmGroupVehicle(vehicleTemplateId: ElementVersionId) {
+    public createAlarmGroupVehicle(
+        vehicleTemplateId: ElementVersionId | string
+    ) {
         const vehicleTemplate = selectStateSnapshot(
             createSelectVehicleTemplate(vehicleTemplateId),
             this.store

@@ -5,7 +5,10 @@ import type {
     CollectionVersionId,
     VersionedCollectionPartial,
 } from './models/versioned-id-schema.js';
-import { elementVersionIdSchema } from './models/versioned-id-schema.js';
+import {
+    elementVersionIdSchema,
+    isElementVersionId,
+} from './models/versioned-id-schema.js';
 import { elementDtoSchema } from './models/versioned-elements.js';
 import type { ElementDto } from './models/versioned-elements.js';
 
@@ -128,13 +131,16 @@ export function findElementVersionsInContent(
             content.alarmGroupVehicles = Object.fromEntries(
                 Object.entries(content.alarmGroupVehicles).filter(
                     ([, vehicle]) =>
-                        !removeVersionIds.includes(vehicle.vehicleTemplateId)
+                        // We can assert "as" here since we just check if the string is included
+                        !removeVersionIds.includes(
+                            vehicle.vehicleTemplateId as ElementVersionId
+                        )
                 )
             );
             return {
-                ids: Object.values(content.alarmGroupVehicles).map(
-                    (vehicle) => vehicle.vehicleTemplateId
-                ),
+                ids: Object.values(content.alarmGroupVehicles)
+                    .map((vehicle) => vehicle.vehicleTemplateId)
+                    .filter((id) => isElementVersionId(id)),
                 newContent: content,
             };
         }

@@ -8,6 +8,7 @@
         <input
             #confirmationInput="ngModel"
             [(ngModel)]="confirmationStringValue"
+            (keydown.enter)="confirm(true)"
             [appAutofocus]="true"
             class="form-control"
             type="text"

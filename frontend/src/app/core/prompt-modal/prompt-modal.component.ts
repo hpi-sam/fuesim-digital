@@ -4,19 +4,13 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AutofocusDirective } from '../../shared/directives/autofocus.directive';
-import { ExactMatchValidatorDirective } from '../../shared/validation/exact-match-validator.directive';
 import { DisplayValidationComponent } from '../../shared/validation/display-validation/display-validation.component';
 
 @Component({
     selector: 'app-confirmation-modal',
     templateUrl: './prompt-modal.component.html',
     styleUrls: ['./prompt-modal.component.scss'],
-    imports: [
-        FormsModule,
-        AutofocusDirective,
-        ExactMatchValidatorDirective,
-        DisplayValidationComponent,
-    ],
+    imports: [FormsModule, AutofocusDirective, DisplayValidationComponent],
 })
 export class PromptModalComponent implements OnDestroy {
     readonly activeModal = inject(NgbActiveModal);

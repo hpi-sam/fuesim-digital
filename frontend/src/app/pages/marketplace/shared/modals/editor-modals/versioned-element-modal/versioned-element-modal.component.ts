@@ -9,8 +9,6 @@ import {
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ElementDto } from 'fuesim-digital-shared';
 import { DatePipe } from '@angular/common';
-import { VehicleTemplateFormMarketplaceComponent } from '../vehicle-template-form/vehicle-template-form.component';
-import { AlarmgroupElementModalComponent } from '../alarmgroup-element-modal/alarmgroup-element-modal.component';
 import { EditConflictResolutionComponent } from '../edit-conflict-resolution/edit-conflict-resolution.component';
 import { VersionedElementModalData } from '../base-versioned-element-submodal';
 import { VersionedElementFormComponent } from '../versioned-element-form/versioned-element-form.component';
@@ -19,12 +17,7 @@ import { MessageService } from '../../../../../../core/messages/message.service'
 
 @Component({
     selector: 'app-versioned-element-modal',
-    imports: [
-        VehicleTemplateFormMarketplaceComponent,
-        AlarmgroupElementModalComponent,
-        DatePipe,
-        VersionedElementFormComponent,
-    ],
+    imports: [DatePipe, VersionedElementFormComponent],
     templateUrl: './versioned-element-modal.component.html',
     styleUrl: './versioned-element-modal.component.scss',
 })

@@ -5,9 +5,9 @@ export const addCollections52: Migration = {
 
     state: (state) => {
         const typedState = state as {
-            selectedCollection: null;
+            selectedCollections: [];
         };
 
-        typedState.selectedCollection = null;
+        typedState.selectedCollections = [];
     },
 };

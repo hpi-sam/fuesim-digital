@@ -29,11 +29,11 @@ export const measurePropertyTypeToGermanNameDictionary: {
 export const measurePropertyTypeToDefaultHint: {
     [Key in MeasurePropertyType]: string;
 } = {
-    manualConfirm: 'Bitte bestätigen Sie die Maßnahme',
-    response: 'Jetzt Antwort bestätigen',
+    manualConfirm: '',
+    response: '',
     delay: 'Bitte warten Sie',
-    alarm: 'Jetzt Alarmgruppe und Transferpunkt auswählen',
-    eocLog: 'Jetzt Einsatztagebucheintrag erstellen',
+    alarm: '',
+    eocLog: '',
     drawFreehand: 'Jetzt frei Bereich einzeichnen (gedrückt halten)',
     drawLine:
         'Jetzt eine Linie einzeichnen (einfacher Klick um neuen Punkt zu setzen, doppelter Klick für Schlusspunkt)',

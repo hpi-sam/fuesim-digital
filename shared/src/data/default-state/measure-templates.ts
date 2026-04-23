@@ -4,6 +4,7 @@ import type {
 } from '../../models/measure/measures.js';
 
 const alarmMeasureTemplate: MeasureTemplate = {
+    type: 'measureTemplate',
     id: 'cfc7238d-d468-46a8-bb99-12cbc9dafe67',
     name: 'Stichworterhöhung',
     properties: [
@@ -23,6 +24,7 @@ const alarmMeasureTemplate: MeasureTemplate = {
 };
 
 const customEocLogMeasureTemplate: MeasureTemplate = {
+    type: 'measureTemplate',
     id: '3468d25c-191e-41dd-b381-f657e449004a',
     name: 'Kurzmeldung abgeben',
     properties: [
@@ -38,6 +40,7 @@ const customEocLogMeasureTemplate: MeasureTemplate = {
 };
 
 const dangerZoneMeasureTemplate: MeasureTemplate = {
+    type: 'measureTemplate',
     id: 'af38a9b0-d61e-4a64-8413-4bbd5e133932',
     name: 'Gefahrenbereich einzeichnen',
     properties: [
@@ -52,6 +55,7 @@ const dangerZoneMeasureTemplate: MeasureTemplate = {
 };
 
 const closureMeasureTemplate: MeasureTemplate = {
+    type: 'measureTemplate',
     id: 'b289c081-9c04-4682-9bef-c97e25cccac3',
     name: 'Absperrung anordnen',
     properties: [
@@ -87,6 +91,7 @@ export const defaultMeasureTemplateCategories: {
     [key: string]: MeasureTemplateCategory;
 } = {
     Maßnahmen: {
+        type: 'measureTemplateCategory',
         name: 'Maßnahmen',
         templates: defaultMeasureTemplatesById,
     },

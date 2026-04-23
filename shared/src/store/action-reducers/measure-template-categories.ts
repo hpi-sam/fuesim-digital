@@ -45,7 +45,11 @@ export namespace MeasureTemplateActionReducers {
                         `MeasureTemplateCategory with name ${name} already exist`
                     );
                 }
-                draftState.measureTemplates[name] = { name, templates: {} };
+                draftState.measureTemplates[name] = {
+                    type: 'measureTemplateCategory',
+                    name,
+                    templates: {},
+                };
                 return draftState;
             },
             rights: 'trainer',

@@ -8,6 +8,7 @@ import {
 import { measurePropertyInstanceSchema } from './instances.js';
 
 export const measureTemplateSchema = z.strictObject({
+    type: z.literal('measureTemplate'),
     id: uuidSchema,
     name: z
         .string()
@@ -52,6 +53,7 @@ export const measureTemplateSchema = z.strictObject({
 export type MeasureTemplate = z.infer<typeof measureTemplateSchema>;
 
 export const measureTemplateCategorySchema = z.strictObject({
+    type: z.literal('measureTemplateCategory'),
     name: z.string().min(1),
     templates: z.record(uuidSchema, measureTemplateSchema),
 });
@@ -61,6 +63,7 @@ export type MeasureTemplateCategory = z.infer<
 >;
 
 export const measureSchema = z.strictObject({
+    type: z.literal('measure'),
     id: uuidSchema,
     timestamp: z.number(),
     clientName: z.string(),

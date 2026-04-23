@@ -78,7 +78,7 @@ export function logMeasure(
     log(
         state,
         [createMeasureTemplateTag(state, measureTemplate)],
-        `Maßnahme '${measureTemplate.name}' wurde von '${measure.clientName}' durchgeführt.`
+        `Maßnahme '${measureTemplate.name}' von '${measure.clientName}'`
     );
 }
 

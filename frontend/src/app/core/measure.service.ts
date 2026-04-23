@@ -8,7 +8,7 @@ import {
     newDrawing,
     uuid,
 } from 'fuesim-digital-shared';
-import { filter, firstValueFrom, map, Subject, timer, race } from 'rxjs';
+import { filter, firstValueFrom, map, Subject, race } from 'rxjs';
 
 import { AppState } from '../state/app.state';
 import { selectLastClientName } from '../state/application/selectors/application.selectors';
@@ -61,13 +61,22 @@ export class MeasureService {
         property: MeasureProperty
     ): Promise<MeasurePropertyInstance | boolean> {
         this.activeProperty.set(property);
+        const currentTime = selectStateSnapshot(selectCurrentTime, this.store);
         switch (property.type) {
             case 'delay':
                 this.endEvent = new Subject<boolean | null>();
                 return firstValueFrom(
                     race(
                         this.endEvent.pipe(filter((e) => e !== null)),
-                        timer(property.delay * 1000).pipe(map(() => true))
+                        this.store
+                            .select(selectCurrentTime)
+                            .pipe(
+                                filter(
+                                    (t) =>
+                                        t >= currentTime + property.delay * 1000
+                                )
+                            )
+                            .pipe(map(() => true))
                     )
                 );
             case 'response':

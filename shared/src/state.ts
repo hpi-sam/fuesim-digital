@@ -75,7 +75,7 @@ import {
     VersionedCollectionPartial,
     versionedCollectionPartialSchema,
 } from './marketplace/models/versioned-id-schema.js';
-import { Template, templateSchema } from './models/utils/template.js';
+import { Template, templateSchema } from './models/template.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)

@@ -3,6 +3,7 @@ import type { Immutable } from 'immer';
 import { uuidSchema } from '../utils/uuid.js';
 import { versionedElementModel } from '../marketplace/models/versioned-element-model.js';
 import { imagePropertiesSchema } from './utils/image-properties.js';
+import { registerEditableValue } from './utils/editable-values-registry.js';
 import { registerDependency } from './utils/dependency-registry.js';
 
 export const vehicleTemplateSchema = z.strictObject({
@@ -16,6 +17,24 @@ export const vehicleTemplateSchema = z.strictObject({
     personnelTemplateIds: z.array(uuidSchema),
     materialTemplateIds: z.array(uuidSchema),
 });
+
+registerEditableValue(
+    {
+        model: 'vehicle',
+        template: 'vehicleTemplate',
+    },
+    [
+        {
+            id: 'name',
+            name: 'Name',
+            equality: ({ template, element }) => template.name === element.name,
+            keep: ({ oldElement, newElement }) => ({
+                ...newElement,
+                name: oldElement.name,
+            }),
+        },
+    ]
+);
 
 // We dont have any dependencies for the vehicle template YET!
 registerDependency('vehicleTemplate', {

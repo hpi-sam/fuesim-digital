@@ -15,7 +15,7 @@ import {
     imagePropertiesSchema,
 } from '../../models/utils/image-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { getTemplates } from '../../models/utils/template.js';
+import { getTemplates } from '../../models/template.js';
 
 export class AddMapImageTemplateAction implements Action {
     @IsValue('[MapImageTemplate] Add mapImageTemplate' as const)

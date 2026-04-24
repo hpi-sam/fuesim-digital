@@ -1,3 +1,4 @@
+import { Immutable } from 'immer';
 import { IsValue } from '../../utils/validators/is-value.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
@@ -6,11 +7,6 @@ import {
     ElementDto,
 } from '../../marketplace/models/versioned-elements.js';
 
-import {
-    DefinitelyVersionedElementContent,
-    isDefinitelyVersionedElementContent,
-} from '../../marketplace/models/versioned-element-content.js';
-import { ReducerError } from '../reducer-error.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     collectionEntityIdSchema,
@@ -44,7 +40,7 @@ export namespace CollectionReducers {
     export const addCollection: ActionReducer<AddCollection> = {
         action: AddCollection,
         reducer: (draftState, data) => {
-            const addElement = (element: DefinitelyVersionedElementContent) => {
+            const addElement = (element: Immutable<ElementDto>) => {
                 const mutableElement = cloneDeepMutable(element);
                 const existingElement = draftState.templates[element.entityId];
                 const usedBy: CollectionEntityId[] | undefined =
@@ -52,7 +48,7 @@ export namespace CollectionReducers {
                     existingElement?.usedBy;
 
                 draftState.templates[element.entityId] = {
-                    ...mutableElement,
+                    ...mutableElement.content,
                     entityId: element.entityId,
                     versionId: element.versionId,
                     usedBy: [
@@ -63,17 +59,12 @@ export namespace CollectionReducers {
             };
 
             for (const element of data.elements) {
-                if (!isDefinitelyVersionedElementContent(element.content)) {
-                    throw new ReducerError(
-                        `Element ${element.title} does not have versionId and entityId`
-                    );
-                }
                 switch (element.content.type) {
                     case 'vehicleTemplate':
-                        addElement(element.content);
+                        addElement(element);
                         break;
                     case 'alarmGroup':
-                        addElement(element.content);
+                        addElement(element);
                         break;
                 }
             }

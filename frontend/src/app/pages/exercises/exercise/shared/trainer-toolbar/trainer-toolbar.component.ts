@@ -10,7 +10,6 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type { TrainerKey } from 'fuesim-digital-shared';
-import { openAlarmGroupOverviewModal } from '../alarm-group-overview/open-alarm-group-overview-modal';
 import { openClientsModal } from '../clients-modal/open-clients-modal';
 import { openEmergencyOperationsCenterModal } from '../emergency-operations-center/open-emergency-operations-center-modal';
 import { openExerciseSettingsModal } from '../exercise-settings/open-exercise-settings-modal';
@@ -63,10 +62,6 @@ export class TrainerToolbarComponent {
 
     public openTransferOverview() {
         openTransferOverviewModal(this.modalService);
-    }
-
-    public openAlarmGroupOverview() {
-        openAlarmGroupOverviewModal(this.modalService);
     }
 
     public openHospitalEditor() {

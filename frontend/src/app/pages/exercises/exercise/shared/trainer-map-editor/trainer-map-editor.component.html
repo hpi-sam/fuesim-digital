@@ -1,6 +1,25 @@
-<div class="container-fluid d-flex flex-column h-100">
+<div class="container-fluid d-flex flex-column h-100" cdkDropListGroup>
     <div class="flex-fill row">
-        <div class="col p-0 rounded-start overflow-hidden">
+        @if (overwriteTrainerMap() !== null) {
+            <div
+                class="col p-0 rounded-start overflow-hidden d-flex flex-column border"
+            >
+                <div style="height: 0; overflow-y: auto; flex: auto">
+                    @switch (overwriteTrainerMap()) {
+                        @case ('alarmgroups') {
+                            <app-alarm-group-overview-page
+                                class="h-100"
+                                (closeView)="overwriteTrainerMap.set(null)"
+                            />
+                        }
+                    }
+                </div>
+            </div>
+        }
+        <div
+            class="col p-0 rounded-start overflow-hidden"
+            [class.visually-hidden]="overwriteTrainerMap() !== null"
+        >
             <app-exercise-map></app-exercise-map>
         </div>
         <div
@@ -54,7 +73,7 @@
                                     [darkBackground]="true"
                                     dataCy="draggableViewportDiv"
                                     (elementMousedown)="
-                                        dragElementService.onMouseDown($event, {
+                                        startElementDrag($event, {
                                             type: 'viewport',
                                             template: viewportTemplate,
                                         })
@@ -67,7 +86,7 @@
                                     [imageUrl]="transferPointTemplate.image.url"
                                     dataCy="draggableTransferPointDiv"
                                     (elementMousedown)="
-                                        dragElementService.onMouseDown($event, {
+                                        startElementDrag($event, {
                                             type: 'transferPoint',
                                             template: transferPointTemplate,
                                         })
@@ -112,14 +131,11 @@
                                     ) {
                                         <app-map-editor-card
                                             (elementMousedown)="
-                                                dragElementService.onMouseDown(
-                                                    $event,
-                                                    {
-                                                        type: 'simulatedRegion',
-                                                        template:
-                                                            simulatedRegionDragTemplate,
-                                                    }
-                                                )
+                                                startElementDrag($event, {
+                                                    type: 'simulatedRegion',
+                                                    template:
+                                                        simulatedRegionDragTemplate,
+                                                })
                                             "
                                             dataCy="draggableSimulatedRegionDiv"
                                             [imageUrl]="
@@ -157,14 +173,11 @@
                                     ) {
                                         <app-map-editor-card
                                             (elementMousedown)="
-                                                dragElementService.onMouseDown(
-                                                    $event,
-                                                    {
-                                                        type: 'restrictedZone',
-                                                        template:
-                                                            restrictedZoneDragTemplate,
-                                                    }
-                                                )
+                                                startElementDrag($event, {
+                                                    type: 'restrictedZone',
+                                                    template:
+                                                        restrictedZoneDragTemplate,
+                                                })
                                             "
                                             dataCy="draggablerestrictedZoneDiv"
                                             [imageUrl]="
@@ -253,7 +266,7 @@
                                             ) {
                                                 <app-map-editor-card
                                                     (elementMousedown)="
-                                                        dragElementService.onMouseDown(
+                                                        startElementDrag(
                                                             $event,
                                                             {
                                                                 type: 'patient',
@@ -361,14 +374,10 @@
                                     ) {
                                         <app-map-editor-card
                                             (elementMousedown)="
-                                                dragElementService.onMouseDown(
-                                                    $event,
-                                                    {
-                                                        type: 'vehicle',
-                                                        template:
-                                                            vehicleTemplate,
-                                                    }
-                                                )
+                                                startElementDrag($event, {
+                                                    type: 'vehicle',
+                                                    template: vehicleTemplate,
+                                                })
                                             "
                                             dataCy="draggableVehicleDiv"
                                             [imageUrl]="
@@ -404,13 +413,10 @@
                                     ) {
                                         <app-map-editor-card
                                             (elementMousedown)="
-                                                dragElementService.onMouseDown(
-                                                    $event,
-                                                    {
-                                                        type: 'technicalChallenge',
-                                                        template: template,
-                                                    }
-                                                )
+                                                startElementDrag($event, {
+                                                    type: 'technicalChallenge',
+                                                    template: template,
+                                                })
                                             "
                                             dataCy="draggableMapImageDiv"
                                             [imageUrl]="template.image.url"
@@ -454,14 +460,10 @@
                                     ) {
                                         <app-map-editor-card
                                             (elementMousedown)="
-                                                dragElementService.onMouseDown(
-                                                    $event,
-                                                    {
-                                                        type: 'mapImage',
-                                                        template:
-                                                            mapImageTemplate,
-                                                    }
-                                                )
+                                                startElementDrag($event, {
+                                                    type: 'mapImage',
+                                                    template: mapImageTemplate,
+                                                })
                                             "
                                             (elementEdit)="
                                                 editMapImageTemplate(
@@ -509,13 +511,10 @@
                                     ) {
                                         <app-map-editor-card
                                             (elementMousedown)="
-                                                dragElementService.onMouseDown(
-                                                    $event,
-                                                    {
-                                                        type: 'patient',
-                                                        template: category,
-                                                    }
-                                                )
+                                                startElementDrag($event, {
+                                                    type: 'patient',
+                                                    template: category,
+                                                })
                                             "
                                             [imageUrl]="category.image.url"
                                             [title]="
@@ -531,14 +530,11 @@
                                     }
                                     <app-map-editor-card
                                         (elementMousedown)="
-                                            dragElementService.onMouseDown(
-                                                $event,
-                                                {
-                                                    type: 'mapImage',
-                                                    template:
-                                                        scoutableMapImageTemplate,
-                                                }
-                                            )
+                                            startElementDrag($event, {
+                                                type: 'mapImage',
+                                                template:
+                                                    scoutableMapImageTemplate,
+                                            })
                                         "
                                         dataCy="draggableMapImageDiv"
                                         [imageUrl]="
@@ -554,6 +550,46 @@
                                     <i class="bi bi-info-circle me-2"></i>
                                     Erkundungsinformationen können auch zu
                                     Bildern und Patienten hinzugefügt werden.
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-header">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        Weitere Elemente
+                    </h5>
+                </div>
+
+                <div
+                    ngbAccordionItem="alarmgroups"
+                    (show)="overwriteTrainerMap.set('alarmgroups')"
+                    (hide)="overwriteTrainerMap.set(null)"
+                >
+                    <h5 ngbAccordionHeader>
+                        <button ngbAccordionButton>Alarmgruppen</button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div
+                                    class="cards"
+                                    cdkDropList
+                                    cdkDropListHasAnchor
+                                >
+                                    @for (
+                                        alarmgroup of alarmGroupTemplates$
+                                            | async
+                                            | values;
+                                        track alarmgroup.id
+                                    ) {
+                                        <app-map-editor-card
+                                            cdkDrag
+                                            [cdkDragData]="alarmgroup"
+                                            [title]="alarmgroup.name"
+                                        ></app-map-editor-card>
+                                    }
                                 </div>
                             </ng-template>
                         </div>

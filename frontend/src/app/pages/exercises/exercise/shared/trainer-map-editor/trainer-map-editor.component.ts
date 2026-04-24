@@ -28,7 +28,16 @@ import type {
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, KeyValuePipe } from '@angular/common';
-import { DragElementService } from '../core/drag-element.service';
+import {
+    CdkDrag,
+    CdkDragPlaceholder,
+    CdkDropList,
+    CdkDropListGroup,
+} from '@angular/cdk/drag-drop';
+import {
+    DragElementService,
+    TransferTemplate,
+} from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
 import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-modal/open-edit-image-template-modal';
@@ -43,6 +52,7 @@ import {
     selectVehicleTemplates,
     selectMapImagesTemplates,
     selectExerciseState,
+    selectAlarmgroupTemplates,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
@@ -53,6 +63,7 @@ import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.comp
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { MarketplaceTabComponent } from '../marketplace-tab/marketplace-tab.component';
+import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -87,6 +98,11 @@ type FilterCategory =
         AsyncPipe,
         KeyValuePipe,
         ValuesPipe,
+        CdkDrag,
+        CdkDropList,
+        CdkDropListGroup,
+        CdkDragPlaceholder,
+        AlarmGroupOverviewPageComponent,
     ],
 })
 /**
@@ -94,11 +110,13 @@ type FilterCategory =
  */
 export class TrainerMapEditorComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
-    readonly dragElementService = inject(DragElementService);
+    private readonly dragElementService = inject(DragElementService);
     readonly transferLinesService = inject(TransferLinesService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly messageService = inject(MessageService);
     private readonly exerciseService = inject(ExerciseService);
+
+    public readonly overwriteTrainerMap = signal<'alarmgroups' | null>(null);
 
     public selectedCategories$: BehaviorSubject<{
         [key in FilterCategory]: boolean;
@@ -124,6 +142,10 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public readonly mapImageTemplates$ = this.store.select(
         selectMapImagesTemplates
+    );
+
+    public readonly alarmGroupTemplates$ = this.store.select(
+        selectAlarmgroupTemplates
     );
 
     public readonly technicalChallengeTemplates: Signal<
@@ -194,6 +216,14 @@ export class TrainerMapEditorComponent implements OnInit {
             ...this.selectedCategories$.value,
             [this.colorCodeOfCategories[category]]: status,
         });
+    }
+
+    public startElementDrag(
+        event: MouseEvent,
+        transferTemplate: TransferTemplate
+    ) {
+        this.overwriteTrainerMap.set(null);
+        this.dragElementService.onMouseDown(event, transferTemplate);
     }
 
     public importingTemplates = false;

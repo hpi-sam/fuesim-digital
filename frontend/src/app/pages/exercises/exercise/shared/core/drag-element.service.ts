@@ -412,7 +412,7 @@ export class DragElementService {
     }
 }
 
-type TransferTemplate =
+export type TransferTemplate =
     | {
           type: 'mapImage';
           template: MapImageTemplate;

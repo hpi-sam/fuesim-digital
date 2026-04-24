@@ -90,6 +90,8 @@ export const selectMaterialTemplates =
     selectTemplatesFactory('materialTemplate');
 export const selectMapImagesTemplates =
     selectTemplatesFactory('mapImageTemplate');
+export const selectAlarmgroupTemplates = selectTemplatesFactory('alarmGroup');
+
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');

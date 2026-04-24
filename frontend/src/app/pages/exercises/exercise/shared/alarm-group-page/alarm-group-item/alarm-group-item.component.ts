@@ -22,8 +22,8 @@ import {
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
-import { VehicleTemplateDisplayComponent } from '../vehicle-template-display/vehicle-template-display.component';
 import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
+import { VehicleTemplateDisplayComponent } from '../vehicle-template-display/vehicle-template-display.component';
 
 @Component({
     selector: 'app-alarm-group-item',

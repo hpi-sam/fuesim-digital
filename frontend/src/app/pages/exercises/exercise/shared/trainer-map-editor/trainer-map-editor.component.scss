@@ -13,3 +13,18 @@
     justify-content: start;
     align-items: start;
 }
+
+.alarmgroup-drop-placeholder {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ccc;
+    border: dotted 3px #999;
+    opacity: 1 !important;
+}
+
+.alarmgroup-drop-placeholder.cdk-drag-placeholder {
+    opacity: 1 !important;
+}

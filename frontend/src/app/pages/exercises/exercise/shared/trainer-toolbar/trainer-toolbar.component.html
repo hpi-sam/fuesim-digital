@@ -10,13 +10,6 @@
 
     @if (exerciseService.additionalExerciseMeta()?.exerciseTemplate) {
         <button
-            (click)="openAlarmGroupOverview()"
-            class="btn btn-outline-primary ms-3"
-            data-cy="trainerToolbarAlarmGroupsButton"
-        >
-            Alarmierungsgruppen
-        </button>
-        <button
             (click)="openHospitalEditor()"
             class="btn btn-outline-primary ms-3"
             data-cy="trainerToolbarHospitalsButton"
@@ -34,14 +27,6 @@
                 Erstellung
             </button>
             <div ngbDropdownMenu>
-                <button
-                    ngbDropdownItem
-                    (click)="openAlarmGroupOverview()"
-                    class="btn btn-primary"
-                    data-cy="trainerToolbarAlarmGroupsButton"
-                >
-                    Alarmierungsgruppen
-                </button>
                 <button
                     ngbDropdownItem
                     (click)="openHospitalEditor()"

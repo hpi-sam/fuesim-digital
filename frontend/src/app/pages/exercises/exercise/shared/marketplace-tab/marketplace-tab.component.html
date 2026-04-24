@@ -5,21 +5,6 @@
     >
         Neue Sammlung hinzufügen
     </button>
-    @if (updateAvailable()?.newerVersionAvailable) {
-        <div class="alert alert-primary d-flex flex-column gap-2 mt-2">
-            <small>
-                Es ist eine neue Version der Sammlung verfügbar. Bitte
-                aktualisieren Sie die Sammlung, um die neuesten Elemente zu
-                sehen.
-            </small>
-            <button
-                class="btn btn-primary btn-sm"
-                (click)="upgradeCollectionVersion()"
-            >
-                Aktualisieren
-            </button>
-        </div>
-    }
     <ul class="list-group">
         @for (collection of selectedCollections(); track collection) {
             <li class="list-group-item">

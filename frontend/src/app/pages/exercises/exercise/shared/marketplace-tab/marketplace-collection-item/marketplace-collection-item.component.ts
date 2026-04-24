@@ -1,12 +1,14 @@
 import { Component, inject, input, resource } from '@angular/core';
 import {
+    checkEditableValueEdited,
+    cloneDeepMutable,
     ElementDto,
     gatherCollectionElements,
     uuid,
-    Vehicle,
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import { selectVehicles } from '../../../../../../state/application/selectors/exercise.selectors';
@@ -15,8 +17,10 @@ import {
     InExerciseElement,
     ChangeImpact,
     EditableElementChangeImpact,
+    RemovedElementChangeImpact,
 } from '../../change-impact-modal/change-impact-types';
 import { AppState } from '../../../../../../state/app.state';
+import { ChangeImpactModalComponent } from '../../change-impact-modal/change-impact-modal.component';
 
 @Component({
     selector: 'app-marketplace-collection-item-component',
@@ -28,6 +32,7 @@ export class MarketplaceColletionItemComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly collectionService = inject(CollectionService);
     private readonly store = inject<Store<AppState>>(Store);
+    private readonly ngbModalService = inject(NgbModal);
 
     public readonly collection = input.required<VersionedCollectionPartial>();
 
@@ -47,6 +52,14 @@ export class MarketplaceColletionItemComponent {
             this.collectionService.checkNewerVersionAvailable(collection),
     });
 
+    private async fetchCollectionElements(): Promise<ElementDto[]> {
+        const collectionElements =
+            await this.collectionService.getElementsOfCollectionVersion(
+                this.collection()
+            );
+        return gatherCollectionElements(collectionElements).allDirectElements();
+    }
+
     public async removeCollection(collection: VersionedCollectionPartial) {
         const elements =
             await this.collectionService.getElementsOfCollectionVersion(
@@ -62,6 +75,7 @@ export class MarketplaceColletionItemComponent {
     }
 
     public async upgradeCollectionVersion() {
+        console.log('UPGRADING');
         // TODO: @Quixelation: Support more than just vehicles
         const allExerciseVehicles = selectStateSnapshot(
             selectVehicles,
@@ -76,7 +90,8 @@ export class MarketplaceColletionItemComponent {
             return;
         }
 
-        const newerCollectionVersionAvailable = this.updateAvailable();
+        const newerCollectionVersionAvailable =
+            this.newerVersionAvailable.value();
         if (!newerCollectionVersionAvailable?.newerVersionAvailable) {
             console.warn(
                 'No newer collection version available, cannot calculate change impacts of upgrading collection version.'
@@ -89,11 +104,10 @@ export class MarketplaceColletionItemComponent {
                 newerCollectionVersionAvailable.latestVersion
             );
 
-        /* const changeImpacts = await this.calcChangeImpact({
+        const changeImpacts = await this.calcChangeImpact({
             inExercise: Object.values(allExerciseVehicles),
             new: newerCollection.direct,
-            // TODO: this is not always correct - actually fetch the data here
-            previous: this.elementsOfSelectedCollection(),
+            previous: await this.fetchCollectionElements(),
         });
         console.log(
             'Change impacts of upgrading collection version:',
@@ -106,7 +120,6 @@ export class MarketplaceColletionItemComponent {
         modal.componentInstance.changes =
             changeImpacts satisfies ChangeImpact[];
         modal.componentInstance.newCollectionElements = newerCollection.direct;
-        */
     }
 
     private async calcChangeImpact(data: {
@@ -114,6 +127,9 @@ export class MarketplaceColletionItemComponent {
         inExercise: InExerciseElement[];
         new: ElementDto[];
     }): Promise<ChangeImpact[]> {
+        console.log('CALCULATING CHANGE IMPACT');
+        console.log(data);
+
         const {
             addedElements: _addedElements,
             editedNewElements,
@@ -125,35 +141,43 @@ export class MarketplaceColletionItemComponent {
 
         for (const element of editedNewElements) {
             const inExercise = data.inExercise.find(
-                (e) => e.versionId === element.versionId
+                (e) => e.entityId === element.entityId
             );
             if (!inExercise) {
                 console.warn(
-                    `Element with versionId ${element.versionId} has been edited in the marketplace, but is not part of the exercise. No change impact calculation possible.`
+                    `Element ${element.title ?? element.versionId} has been edited in the marketplace, but is not part of the exercise. No change impact calculation possible.`,
+                    element
                 );
                 continue;
             }
 
-            switch (element.content.type) {
-                case 'vehicleTemplate':
-                    impacts.push(
-                        ...this.vehicleChangeImpact({
-                            previous: data.previous.find(
-                                (e) => e.versionId === element.versionId
-                            )!,
-                            inExercise,
-                            new: element,
-                        })
-                    );
-                    break;
-                default:
-                    console.warn(
-                        `No change impact calculation implemented for element type ${element.content.type}`
-                    );
+            const editedValues = checkEditableValueEdited({
+                template: element.content,
+                element: cloneDeepMutable(inExercise),
+            });
+
+            if (editedValues.length > 0) {
+                impacts.push({
+                    id: uuid(),
+                    type: 'updated',
+                    element: inExercise,
+                    entity: element,
+                    editedValues,
+                } satisfies EditableElementChangeImpact);
             }
         }
 
         for (const element of removedElements) {
+            const inExercise = data.inExercise.find(
+                (e) => e.entityId === element.entityId
+            );
+            if (!inExercise) {
+                console.warn(
+                    `Element ${element.title ?? element.versionId} has been edited in the marketplace, but is not part of the exercise. No change impact calculation possible.`,
+                    element
+                );
+                continue;
+            }
             const matchingElement = data.previous.find(
                 (e) => e.entityId === element.entityId
             );
@@ -167,11 +191,9 @@ export class MarketplaceColletionItemComponent {
             impacts.push({
                 id: uuid(),
                 type: 'removed',
-                element: data.inExercise.find(
-                    (e) => e.entityId === element.entityId
-                )!,
+                element: inExercise,
                 entity: matchingElement,
-            });
+            } satisfies RemovedElementChangeImpact);
         }
 
         return impacts;
@@ -219,31 +241,5 @@ export class MarketplaceColletionItemComponent {
             removedElements,
             unchangedElements,
         };
-    }
-
-    private vehicleChangeImpact(data: {
-        previous: ElementDto;
-        inExercise: Vehicle;
-        new: ElementDto;
-    }): EditableElementChangeImpact[] {
-        // EDITABLE FIELDS: name
-        const impacts: EditableElementChangeImpact[] = [];
-
-        if (data.inExercise.name !== data.previous.content.name) {
-            // data has been manually edited by user
-            // needs to be merged manually, otherwise user changes would be lost
-            return [
-                {
-                    id: uuid(),
-                    type: 'editable',
-                    element: data.inExercise,
-                    oldValue: data.previous.content.name,
-                    currentValue: data.inExercise.name,
-                    newValue: data.new.content.name,
-                },
-            ];
-        }
-
-        return impacts;
     }
 }

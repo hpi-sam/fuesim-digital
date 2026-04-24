@@ -1,9 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
-import { ElementDto } from 'fuesim-digital-shared';
+import { Element, ElementDto } from 'fuesim-digital-shared';
 import { z } from 'zod';
 import { JsonPipe } from '@angular/common';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
+import { VersionedElementDisplayNamePipe } from '../../../../../shared/pipes/versioned-element-type-display-name.pipe';
 import {
     ChangeImpact,
     RemovedElementChangeImpact,
@@ -13,10 +15,15 @@ import {
     selector: 'app-change-impact-modal',
     templateUrl: './change-impact-modal.component.html',
     styleUrl: './change-impact-modal.component.scss',
-    imports: [MapEditorCardComponent, JsonPipe],
+    imports: [
+        MapEditorCardComponent,
+        JsonPipe,
+        VersionedElementDisplayNamePipe,
+    ],
 })
 export class ChangeImpactModalComponent {
     private readonly collectionService = inject(CollectionService);
+    private readonly activeModal = inject(NgbActiveModal);
 
     public readonly changes: ChangeImpact[] = [];
     public readonly newCollectionElements!: ElementDto[];
@@ -29,6 +36,8 @@ export class ChangeImpactModalComponent {
 
     public readonly changesToApply = signal<{ [key: string]: ChangeApply }>({});
     public readonly elementsOfNewCollection = signal<ElementDto[] | null>(null);
+
+    public readonly replaceableElementTypes: Element['type'][] = ['vehicle'];
 
     public setRemovalActionType(type: RemoveChangeApply['action']) {
         const index = this.selectedChangeIndex();
@@ -56,6 +65,40 @@ export class ChangeImpactModalComponent {
                 [selectedChange.id]: existingEntry,
             };
         });
+    }
+
+    public selectReplacementElement(element: ElementDto) {
+        const index = this.selectedChangeIndex();
+        if (index === null) return;
+
+        const selectedChange = this.changes[index];
+
+        if (!selectedChange) return;
+        if (selectedChange.type !== 'removed') return;
+
+        this.changesToApply.update((current) => {
+            let existingEntry = current[selectedChange.id] as
+                | RemoveChangeApply
+                | undefined;
+
+            existingEntry ??= {
+                type: selectedChange.type,
+                change: selectedChange,
+                action: 'replace',
+                replaceWith: element,
+            } satisfies RemoveChangeApply;
+
+            existingEntry.replaceWith = element;
+
+            return {
+                ...current,
+                [selectedChange.id]: existingEntry,
+            };
+        });
+    }
+
+    public close(data: boolean | null) {
+        this.activeModal.close();
     }
 }
 

@@ -10,7 +10,7 @@ export type ChangeImpact =
 export interface AddedElementChangeImpact {
     id: string;
     type: 'added';
-    element: ElementDto;
+    entity: ElementDto;
 }
 
 export interface RemovedElementChangeImpact {
@@ -22,9 +22,8 @@ export interface RemovedElementChangeImpact {
 
 export interface EditableElementChangeImpact {
     id: string;
-    type: 'editable';
+    type: 'updated';
+    editedValues: { id: string; name: string }[];
     element: InExerciseElement;
-    oldValue: string;
-    currentValue: string;
-    newValue: string;
+    entity: ElementDto;
 }

@@ -1,17 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
-import {
-    CollectionDto,
-    gatherCollectionElements,
-} from 'fuesim-digital-shared';
+import { CollectionDto, gatherCollectionElements } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DragElementService } from '../core/drag-element.service';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../core/exercise.service';
 import { AppState } from '../../../../../state/app.state';
-import {
-    selectSelectedCollections,
-} from '../../../../../state/application/selectors/exercise.selectors';
+import { selectSelectedCollections } from '../../../../../state/application/selectors/exercise.selectors';
 import { openSelectCollectionModal } from '../../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';
 import { MarketplaceColletionItemComponent } from './marketplace-collection-item/marketplace-collection-item.component';
 

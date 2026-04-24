@@ -10,7 +10,10 @@
             @let newerVersion = newerVersionAvailable.value();
             @if (newerVersion; as version) {
                 @if (version.newerVersionAvailable) {
-                    <button class="btn btn-link btn-sm">
+                    <button
+                        class="btn btn-link btn-sm"
+                        (click)="upgradeCollectionVersion()"
+                    >
                         <i class="bi bi-arrow-clockwise"></i>
                     </button>
                 }

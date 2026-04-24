@@ -2,6 +2,7 @@
     class="card text-center me-1 mb-1"
     (mousedown)="elementMousedown.emit($event)"
     [attr.data-cy]="dataCy()"
+    [class.border-primary]="selected()"
 >
     <ng-content>
         <div

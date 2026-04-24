@@ -22,4 +22,5 @@ export class MapEditorCardComponent {
     readonly darkBackground = input(false);
     readonly enableEditButton = input(false);
     readonly enableDeleteButton = input(false);
+    readonly selected = input(false);
 }

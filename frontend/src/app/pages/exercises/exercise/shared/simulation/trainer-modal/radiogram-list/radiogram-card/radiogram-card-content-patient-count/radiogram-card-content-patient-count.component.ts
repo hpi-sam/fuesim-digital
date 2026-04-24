@@ -1,7 +1,6 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type { PatientCountRadiogram, UUID } from 'fuesim-digital-shared';
-import { AsyncPipe } from '@angular/common';
 import type { AppState } from '../../../../../../../../../state/app.state';
 import {
     createSelectRadiogram,
@@ -13,7 +12,7 @@ import { PatientStatusBadgeComponent } from '../../../../../../../../../shared/c
     selector: 'app-radiogram-card-content-patient-count',
     templateUrl: './radiogram-card-content-patient-count.component.html',
     styleUrls: ['./radiogram-card-content-patient-count.component.scss'],
-    imports: [PatientStatusBadgeComponent, AsyncPipe],
+    imports: [PatientStatusBadgeComponent],
 })
 export class RadiogramCardContentPatientCountComponent {
     private readonly store = inject<Store<AppState>>(Store);

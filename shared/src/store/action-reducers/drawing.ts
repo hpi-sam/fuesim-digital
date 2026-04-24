@@ -10,6 +10,7 @@ import {
     mapCoordinatesSchema,
 } from '../../models/utils/position/map-coordinates.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { ReducerError } from '../reducer-error.js';
 
 export class AddDrawingAction implements Action {
     @IsValue('[Drawing] Add drawing' as const)
@@ -51,12 +52,17 @@ export namespace DrawingActionReducers {
     export const moveDrawing: ActionReducer<MoveDrawingAction> = {
         action: MoveDrawingAction,
         reducer: (draftState, { drawingId, newPoints }) => {
+            if (newPoints.length < 2) {
+                throw new ReducerError(
+                    'At least two points are needed for a drawing.'
+                );
+            }
             const drawing = draftState.drawings[drawingId];
             if (drawing === undefined) {
                 return draftState;
             }
 
-            const [firstPoint] = newPoints;
+            const firstPoint = newPoints[0];
             if (firstPoint === undefined) {
                 return draftState;
             }

@@ -45,18 +45,17 @@ const trimmedOptionalString = z.preprocess(
     z.string().trim().optional()
 );
 
-export const requiresAnyOfSchema = z.strictObject({
+const requiresAnyOfSchema = z.strictObject({
     anyOf: z.array(measurePropertyTypeSchema),
 });
 
-export type RequiresAnyOf = z.infer<typeof requiresAnyOfSchema>;
-
-export const measurePropertyDefinitionSchema = z.strictObject({
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const measurePropertyDefinitionSchema = z.strictObject({
     blockedBy: z.array(measurePropertyTypeSchema),
     requires: z.array(requiresAnyOfSchema),
 });
 
-export type MeasurePropertyDefinition = z.infer<
+type MeasurePropertyDefinition = z.infer<
     typeof measurePropertyDefinitionSchema
 >;
 
@@ -81,11 +80,11 @@ export const measurePropertyDefinitions: {
     drawLine: { blockedBy: [], requires: [] },
 };
 
-export const propertyBaseSchema = z.strictObject({
+const propertyBaseSchema = z.strictObject({
     hint: z.string(),
 });
 
-export const manualConfirmPropertySchema = z.strictObject({
+const manualConfirmPropertySchema = z.strictObject({
     type: z.literal('manualConfirm'),
     ...propertyBaseSchema.shape,
     prompt: z.string().nonempty({
@@ -94,17 +93,13 @@ export const manualConfirmPropertySchema = z.strictObject({
     confirmationString: trimmedOptionalString,
 });
 
-export type ManualConfirmProperty = z.infer<typeof manualConfirmPropertySchema>;
-
-export const responsePropertySchema = z.strictObject({
+const responsePropertySchema = z.strictObject({
     type: z.literal('response'),
     ...propertyBaseSchema.shape,
     response: z.string().nonempty({ error: validationMessages.required }),
 });
 
-export type ResponseProperty = z.infer<typeof responsePropertySchema>;
-
-export const delayPropertySchema = z.strictObject({
+const delayPropertySchema = z.strictObject({
     type: z.literal('delay'),
     ...propertyBaseSchema.shape,
     delay: z
@@ -112,18 +107,14 @@ export const delayPropertySchema = z.strictObject({
         .positive({ error: 'Die Dauer der Verzögerung muss positiv sein' }),
 });
 
-export type DelayProperty = z.infer<typeof delayPropertySchema>;
-
-export const alarmPropertySchema = z.strictObject({
+const alarmPropertySchema = z.strictObject({
     type: z.literal('alarm'),
     ...propertyBaseSchema.shape,
     alarmGroups: z.array(alarmGroupSchema.shape.id),
     targetTransferPointIds: z.array(transferPointSchema.shape.id),
 });
 
-export type AlarmProperty = z.infer<typeof alarmPropertySchema>;
-
-export const eocLogPropertySchema = z
+const eocLogPropertySchema = z
     .strictObject({
         type: z.literal('eocLog'),
         ...propertyBaseSchema.shape,
@@ -150,26 +141,20 @@ export const eocLogPropertySchema = z
         }
     });
 
-export type EocLogProperty = z.infer<typeof eocLogPropertySchema>;
-
-export const drawFreehandPropertySchema = z.strictObject({
+const drawFreehandPropertySchema = z.strictObject({
     type: z.literal('drawFreehand'),
     ...propertyBaseSchema.shape,
     strokeColor: z.string(),
     fillColor: z.string(),
 });
 
-export type DrawFreehandProperty = z.infer<typeof drawFreehandPropertySchema>;
-
-export const drawLinePropertySchema = z.strictObject({
+const drawLinePropertySchema = z.strictObject({
     type: z.literal('drawLine'),
     ...propertyBaseSchema.shape,
     strokeColor: z.string(),
 });
 
-export type DrawLineProperty = z.infer<typeof drawLinePropertySchema>;
-
-export const measurePropertySchema = z.union([
+export const measurePropertySchema = z.discriminatedUnion('type', [
     manualConfirmPropertySchema,
     responsePropertySchema,
     delayPropertySchema,

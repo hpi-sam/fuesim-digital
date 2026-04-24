@@ -4,32 +4,22 @@ import { vehicleParametersSchema } from '../utils/vehicle-parameters.js';
 import { alarmGroupSchema } from '../alarm-group.js';
 import { transferPointSchema } from '../transfer-point.js';
 
-export const alarmPropertyInstanceSchema = z.strictObject({
+const alarmPropertyInstanceSchema = z.strictObject({
     type: z.literal('alarmInstance'),
     alarmGroup: alarmGroupSchema.shape.id,
     targetTransferPointId: transferPointSchema.shape.id,
     vehicleParameters: z.array(vehicleParametersSchema),
 });
 
-export type AlarmPropertyInstance = z.infer<typeof alarmPropertyInstanceSchema>;
-
-export const eocLogPropertyInstanceSchema = z.strictObject({
+const eocLogPropertyInstanceSchema = z.strictObject({
     type: z.literal('eocLogInstance'),
     message: z.string(),
 });
 
-export type EocLogPropertyInstance = z.infer<
-    typeof eocLogPropertyInstanceSchema
->;
-
-export const drawingPropertyInstanceSchema = z.strictObject({
+const drawingPropertyInstanceSchema = z.strictObject({
     type: z.literal('drawingInstance'),
     id: uuidSchema,
 });
-
-export type DrawingPropertyInstance = z.infer<
-    typeof drawingPropertyInstanceSchema
->;
 
 export const measurePropertyInstanceSchema = z.union([
     alarmPropertyInstanceSchema,

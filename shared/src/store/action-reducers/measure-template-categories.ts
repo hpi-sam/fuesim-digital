@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { measureTemplateCategorySchema } from '../../models/measure/measures.js';
+import {
+    measureTemplateCategorySchema,
+    newMeasureTemplateCategory,
+} from '../../models/measure/measures.js';
 import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { getCategory } from './utils/measures.js';
@@ -40,11 +43,10 @@ export namespace MeasureTemplateActionReducers {
                         `MeasureTemplateCategory with name ${name} already exist`
                     );
                 }
-                draftState.measureTemplates[name] = {
-                    type: 'measureTemplateCategory',
+                draftState.measureTemplates[name] = newMeasureTemplateCategory(
                     name,
-                    templates: {},
-                };
+                    []
+                );
                 return draftState;
             },
             rights: 'trainer',
@@ -70,12 +72,12 @@ export namespace MeasureTemplateActionReducers {
             type: '[MeasureTemplateCategory] Remove MeasureTemplateCategory',
             actionSchema: removeMeasureTemplateCategoryActionSchema,
             reducer: (draftState, { name }) => {
-                const category = getCategory(draftState, name);
                 if (Object.entries(draftState.measureTemplates).length === 1) {
                     throw new ReducerError(
                         `Die letzte Maßnahmen-Kategorie kann nicht entfernt werden`
                     );
                 }
+                const category = getCategory(draftState, name);
                 const templates = category.templates;
                 delete draftState.measureTemplates[name];
                 const otherCategory = Object.values(

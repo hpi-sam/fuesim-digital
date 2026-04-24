@@ -32,13 +32,13 @@ export type EditMeasureTemplateAction = z.infer<
     typeof editMeasureTemplateActionSchema
 >;
 
-export const moveMeasureTemplateActionSchema = z.strictObject({
-    type: z.literal('[MeasureTemplate] Move MeasureTemplate'),
+export const changeCategoryOfMeasureTemplateActionSchema = z.strictObject({
+    type: z.literal('[MeasureTemplate] Change Category of MeasureTemplate'),
     id: measureTemplateSchema.shape.id,
     categoryName: measureTemplateCategorySchema.shape.name,
 });
-export type MoveMeasureTemplateAction = z.infer<
-    typeof moveMeasureTemplateActionSchema
+export type ChangeCategoryOfMeasureTemplateAction = z.infer<
+    typeof changeCategoryOfMeasureTemplateActionSchema
 >;
 
 export const removeMeasureTemplateActionSchema = z.strictObject({
@@ -53,19 +53,15 @@ export namespace MeasureTemplateActionReducers {
         type: '[MeasureTemplate] Add MeasureTemplate',
         actionSchema: addMeasureTemplateActionSchema,
         reducer: (draftState, { measureTemplate, categoryName }) => {
-            const category = getCategory(draftState, categoryName);
-            if (
-                Object.values(draftState.measureTemplates).some((c) =>
-                    Object.values(c.templates).some(
-                        (t) => t.id === measureTemplate.id
-                    )
-                )
-            ) {
+            const templateAlreadyExists = Object.values(
+                draftState.measureTemplates
+            ).some((c) => !!c.templates[measureTemplate.id]);
+            if (templateAlreadyExists) {
                 throw new ReducerError(
                     `MeasureTemplate with id ${measureTemplate.id} already exists`
                 );
             }
-
+            const category = getCategory(draftState, categoryName);
             category.templates[measureTemplate.id] =
                 cloneDeepMutable(measureTemplate);
             return draftState;
@@ -90,10 +86,10 @@ export namespace MeasureTemplateActionReducers {
             rights: 'trainer',
         };
 
-    export const moveMeasureTemplate: ActionReducer<MoveMeasureTemplateAction> =
+    export const changeCategoryOfMeasureTemplate: ActionReducer<ChangeCategoryOfMeasureTemplateAction> =
         {
-            type: '[MeasureTemplate] Move MeasureTemplate',
-            actionSchema: moveMeasureTemplateActionSchema,
+            type: '[MeasureTemplate] Change Category of MeasureTemplate',
+            actionSchema: changeCategoryOfMeasureTemplateActionSchema,
             reducer: (draftState, { id, categoryName: category }) => {
                 const previousCategory = getCategoryForMeasureTemplateId(
                     draftState,

@@ -143,7 +143,7 @@ export class MeasuresOverviewModalComponent {
         if (event.previousContainer === event.container) return;
         const templateId = event.item.data as UUID;
         this.exerciseService.proposeAction({
-            type: '[MeasureTemplate] Move MeasureTemplate',
+            type: '[MeasureTemplate] Change Category of MeasureTemplate',
             id: templateId,
             categoryName: targetCategoryName,
         });

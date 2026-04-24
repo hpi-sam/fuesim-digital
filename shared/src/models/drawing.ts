@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import type { MapCoordinates } from './utils/position/map-coordinates.js';
 import { mapCoordinatesSchema } from './utils/position/map-coordinates.js';
@@ -19,11 +20,11 @@ export const drawingSchema = z.strictObject({
     fillColor: z.string().optional(),
 });
 
-export type Drawing = z.infer<typeof drawingSchema>;
+export type Drawing = Immutable<z.infer<typeof drawingSchema>>;
 
 export function newDrawing(
     drawingType: DrawingType,
-    points: readonly MapCoordinates[],
+    points: MapCoordinates[],
     strokeColor: string,
     fillColor?: string
 ): Drawing {
@@ -31,14 +32,12 @@ export function newDrawing(
         throw new Error('Drawings require at least two points');
     }
 
-    const [firstPoint] = points;
-
     return {
         id: uuid(),
         type: 'drawing',
         drawingType,
-        position: newMapPositionAt(firstPoint!),
-        points: [...points],
+        position: newMapPositionAt(points[0]!),
+        points,
         strokeColor,
         fillColor,
     };

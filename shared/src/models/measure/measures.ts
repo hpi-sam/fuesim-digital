@@ -78,7 +78,7 @@ export type MeasureTemplateCategory = z.infer<
     typeof measureTemplateCategorySchema
 >;
 
-export function newMeasureCategory(
+export function newMeasureTemplateCategory(
     name: string,
     templates: MeasureTemplate[]
 ): MeasureTemplateCategory {

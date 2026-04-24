@@ -24,9 +24,9 @@ export function getCategoryForMeasureTemplateId(
     state: WritableDraft<ExerciseState>,
     id: UUID
 ): WritableDraft<MeasureTemplateCategory> {
-    const category = Object.values(state.measureTemplates).filter((v) =>
-        Object.values(v.templates).some((t) => t.id === id)
-    )[0];
+    const containsTemplate = (c: MeasureTemplateCategory) => !!c.templates[id];
+    const measureTemplateCategories = Object.values(state.measureTemplates);
+    const category = measureTemplateCategories.find(containsTemplate);
     if (!category) {
         throw new ReducerError(`MeasureTemplate with id ${id} does not exist`);
     }
@@ -36,11 +36,9 @@ export function getCategoryForMeasureTemplateId(
 export function getMeasureTemplate(
     state: WritableDraft<ExerciseState>,
     id: UUID,
-    categoryParam:
-        | WritableDraft<MeasureTemplateCategory>
-        | undefined = undefined
+    category?: WritableDraft<MeasureTemplateCategory>
 ): WritableDraft<MeasureTemplate> {
-    let category = categoryParam;
+    // eslint-disable-next-line no-param-reassign
     category ??= getCategoryForMeasureTemplateId(state, id);
     const measureTemplate =
         state.measureTemplates[category.name]!.templates[id]!;

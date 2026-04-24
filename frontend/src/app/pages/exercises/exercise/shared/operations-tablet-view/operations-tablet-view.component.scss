@@ -1,0 +1,32 @@
+.otvRoot {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    // This is equivalent to negative p-2 from bootstrap.
+    // This is needed to cancel out the padding from the parent container.
+    margin: {
+        left: -0.5rem;
+        right: -0.5rem;
+        bottom: -0.5rem;
+    }
+}
+
+.otvContent {
+    height: 100%;
+    background-color: #f2f2f6;
+
+    ::ng-deep {
+        // Overwrite default bootstrap
+        .tab-content {
+            height: 100%;
+
+            .tab-pane {
+                height: 100% !important;
+            }
+        }
+    }
+}
+
+.nav-tabs.fullscreenEnabled {
+    background-color: #333333;
+}

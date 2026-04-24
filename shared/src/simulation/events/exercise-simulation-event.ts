@@ -1,130 +1,116 @@
-import type { Type } from 'class-transformer';
-import type { Constructor } from '../../utils/index.js';
-import { SimulationEvent } from './simulation-event.js';
-import { MaterialAvailableEvent } from './material-available.js';
-import { NewPatientEvent } from './new-patient.js';
-import { PersonnelAvailableEvent } from './personnel-available.js';
-import { TickEvent } from './tick.js';
-import { VehicleArrivedEvent } from './vehicle-arrived.js';
-import { TreatmentsTimerEvent } from './treatments-timer-event.js';
-import { TreatmentProgressChangedEvent } from './treatment-progress-changed.js';
-import { CollectInformationEvent } from './collect.js';
-import { StartCollectingInformationEvent } from './start-collecting.js';
-import { ResourceRequiredEvent } from './resources-required.js';
-import { VehiclesSentEvent } from './vehicles-sent.js';
-import { TryToDistributeEvent } from './try-to-distribute.js';
-import { VehicleTransferSuccessfulEvent } from './vehicle-transfer-successful.js';
-import { TransferConnectionMissingEvent } from './transfer-connection-missing.js';
-import { SendRequestEvent } from './send-request.js';
-import { LeaderChangedEvent } from './leader-changed.js';
-import { MaterialRemovedEvent } from './material-removed.js';
-import { PersonnelRemovedEvent } from './personnel-removed.js';
-import { PatientRemovedEvent } from './patient-removed.js';
-import { VehicleRemovedEvent } from './vehicle-removed.js';
-import { TransferPatientsInSpecificVehicleRequestEvent } from './transfer-patients-in-specific-vehicle-request.js';
-import { TransferSpecificVehicleRequestEvent } from './transfer-specific-vehicle-request.js';
-import { TransferVehiclesRequestEvent } from './transfer-vehicles-request.js';
-import { TransferPatientsRequestEvent } from './transfer-patients-request.js';
-import { RequestReceivedEvent } from './request-received.js';
-import { StartTransferEvent } from './start-transfer.js';
-import { DoTransferEvent } from './do-transfer.js';
-import { PatientTransferToHospitalSuccessfulEvent } from './patient-transfer-to-hospital-successful.js';
-import { PatientCategoryTransferToHospitalFinishedEvent } from './patient-category-transfer-to-hospital-finished.js';
-import { TryToSendToHospitalEvent } from './try-to-send-to-hospital.js';
-import { AskForPatientDataEvent } from './ask-for-patient-data-event.js';
-import { PatientsCountedEvent } from './patients-counted.js';
+import type { ZodType } from 'zod';
+import { z } from 'zod';
+import { materialAvailableEventSchema } from './material-available.js';
+import { newPatientEventSchema } from './new-patient.js';
+import { personnelAvailableEventSchema } from './personnel-available.js';
+import { tickEventSchema } from './tick.js';
+import { vehicleArrivedEventSchema } from './vehicle-arrived.js';
+import { treatmentsTimerEventSchema } from './treatments-timer-event.js';
+import { treatmentProgressChangedEventSchema } from './treatment-progress-changed.js';
+import { collectInformationEventSchema } from './collect.js';
+import { startCollectingInformationSchema } from './start-collecting.js';
+import { resourceRequiredEventSchema } from './resources-required.js';
+import { vehiclesSentEventSchema } from './vehicles-sent.js';
+import { tryToDistributeEventSchema } from './try-to-distribute.js';
+import { vehicleTransferSuccessfulEventSchema } from './vehicle-transfer-successful.js';
+import { transferConnectionMissingEventSchema } from './transfer-connection-missing.js';
+import { sendRequestEventSchema } from './send-request.js';
+import { leaderChangedEventSchema } from './leader-changed.js';
+import { materialRemovedEventSchema } from './material-removed.js';
+import { personnelRemovedEventSchema } from './personnel-removed.js';
+import { patientRemovedEventSchema } from './patient-removed.js';
+import { vehicleRemovedEventSchema } from './vehicle-removed.js';
+import { transferPatientsInSpecificVehicleRequestEventSchema } from './transfer-patients-in-specific-vehicle-request.js';
+import { transferSpecificVehicleRequestEventSchema } from './transfer-specific-vehicle-request.js';
+import { transferVehiclesRequestEventSchema } from './transfer-vehicles-request.js';
+import { transferPatientsRequestEventSchema } from './transfer-patients-request.js';
+import { requestReceivedEventSchema } from './request-received.js';
+import { startTransferEventSchema } from './start-transfer.js';
+import { doTransferEventSchema } from './do-transfer.js';
+import { patientTransferToHospitalSuccessfulEventSchema } from './patient-transfer-to-hospital-successful.js';
+import { patientCategoryTransferToHospitalFinishedEventSchema } from './patient-category-transfer-to-hospital-finished.js';
+import { tryToSendToHospitalEventSchema } from './try-to-send-to-hospital.js';
+import { askForPatientDataEventSchema } from './ask-for-patient-data-event.js';
+import { patientsCountedEventSchema } from './patients-counted.js';
 
-export const simulationEvents = {
-    MaterialAvailableEvent,
-    NewPatientEvent,
-    PersonnelAvailableEvent,
-    TickEvent,
-    TreatmentProgressChangedEvent,
-    TreatmentsTimerEvent,
-    VehicleArrivedEvent,
-    CollectInformationEvent,
-    StartCollectingInformationEvent,
-    ResourceRequiredEvent,
-    VehiclesSentEvent,
-    TryToDistributeEvent,
-    VehicleTransferSuccessfulEvent,
-    TransferConnectionMissingEvent,
-    SendRequestEvent,
-    LeaderChangedEvent,
-    MaterialRemovedEvent,
-    PersonnelRemovedEvent,
-    PatientRemovedEvent,
-    VehicleRemovedEvent,
-    TransferPatientsInSpecificVehicleRequestEvent,
-    TransferSpecificVehicleRequestEvent,
-    TransferVehiclesRequestEvent,
-    TransferPatientsRequestEvent,
-    RequestReceivedEvent,
-    StartTransferEvent,
-    DoTransferEvent,
-    PatientCategoryTransferToHospitalFinishedEvent,
-    PatientTransferToHospitalSuccessfulEvent,
-    TryToSendToHospitalEvent,
-    AskForPatientDataEvent,
-    PatientsCountedEvent,
-};
+export const exerciseSimulationEventSchema = z.discriminatedUnion('type', [
+    materialAvailableEventSchema,
+    newPatientEventSchema,
+    personnelAvailableEventSchema,
+    tickEventSchema,
+    treatmentProgressChangedEventSchema,
+    treatmentsTimerEventSchema,
+    vehicleArrivedEventSchema,
+    collectInformationEventSchema,
+    startCollectingInformationSchema,
+    resourceRequiredEventSchema,
+    vehiclesSentEventSchema,
+    tryToDistributeEventSchema,
+    vehicleTransferSuccessfulEventSchema,
+    transferConnectionMissingEventSchema,
+    sendRequestEventSchema,
+    leaderChangedEventSchema,
+    materialRemovedEventSchema,
+    personnelRemovedEventSchema,
+    patientRemovedEventSchema,
+    vehicleRemovedEventSchema,
+    transferPatientsInSpecificVehicleRequestEventSchema,
+    transferSpecificVehicleRequestEventSchema,
+    transferVehiclesRequestEventSchema,
+    transferPatientsRequestEventSchema,
+    requestReceivedEventSchema,
+    startTransferEventSchema,
+    doTransferEventSchema,
+    patientCategoryTransferToHospitalFinishedEventSchema,
+    patientTransferToHospitalSuccessfulEventSchema,
+    tryToSendToHospitalEventSchema,
+    askForPatientDataEventSchema,
+    patientsCountedEventSchema,
+]);
 
-export type ExerciseSimulationEvent = InstanceType<
-    (typeof simulationEvents)[keyof typeof simulationEvents]
+export type ExerciseSimulationEvent = z.infer<
+    typeof exerciseSimulationEventSchema
 >;
 
 type ExerciseSimulationEventDictionary = {
-    [EventType in ExerciseSimulationEvent as EventType['type']]: Constructor<EventType>;
+    [EventType in ExerciseSimulationEvent as EventType['type']]: ZodType<EventType>;
 };
 
-// TODO: compute dynamically
 export const simulationEventDictionary: ExerciseSimulationEventDictionary = {
-    materialAvailableEvent: MaterialAvailableEvent,
-    newPatientEvent: NewPatientEvent,
-    personnelAvailableEvent: PersonnelAvailableEvent,
-    tickEvent: TickEvent,
-    treatmentProgressChangedEvent: TreatmentProgressChangedEvent,
-    treatmentsTimerEvent: TreatmentsTimerEvent,
-    vehicleArrivedEvent: VehicleArrivedEvent,
-    collectInformationEvent: CollectInformationEvent,
-    startCollectingInformationEvent: StartCollectingInformationEvent,
-    resourceRequiredEvent: ResourceRequiredEvent,
-    vehiclesSentEvent: VehiclesSentEvent,
-    tryToDistributeEvent: TryToDistributeEvent,
-    vehicleTransferSuccessfulEvent: VehicleTransferSuccessfulEvent,
-    transferConnectionMissingEvent: TransferConnectionMissingEvent,
-    sendRequestEvent: SendRequestEvent,
-    leaderChangedEvent: LeaderChangedEvent,
-    materialRemovedEvent: MaterialRemovedEvent,
-    personnelRemovedEvent: PersonnelRemovedEvent,
-    patientRemovedEvent: PatientRemovedEvent,
-    vehicleRemovedEvent: VehicleRemovedEvent,
+    materialAvailableEvent: materialAvailableEventSchema,
+    newPatientEvent: newPatientEventSchema,
+    personnelAvailableEvent: personnelAvailableEventSchema,
+    tickEvent: tickEventSchema,
+    treatmentProgressChangedEvent: treatmentProgressChangedEventSchema,
+    treatmentsTimerEvent: treatmentsTimerEventSchema,
+    vehicleArrivedEvent: vehicleArrivedEventSchema,
+    collectInformationEvent: collectInformationEventSchema,
+    startCollectingInformationEvent: startCollectingInformationSchema,
+    resourceRequiredEvent: resourceRequiredEventSchema,
+    vehiclesSentEvent: vehiclesSentEventSchema,
+    tryToDistributeEvent: tryToDistributeEventSchema,
+    vehicleTransferSuccessfulEvent: vehicleTransferSuccessfulEventSchema,
+    transferConnectionMissingEvent: transferConnectionMissingEventSchema,
+    sendRequestEvent: sendRequestEventSchema,
+    leaderChangedEvent: leaderChangedEventSchema,
+    materialRemovedEvent: materialRemovedEventSchema,
+    personnelRemovedEvent: personnelRemovedEventSchema,
+    patientRemovedEvent: patientRemovedEventSchema,
+    vehicleRemovedEvent: vehicleRemovedEventSchema,
     transferPatientsInSpecificVehicleRequestEvent:
-        TransferPatientsInSpecificVehicleRequestEvent,
-    transferSpecificVehicleRequestEvent: TransferSpecificVehicleRequestEvent,
-    transferVehiclesRequestEvent: TransferVehiclesRequestEvent,
-    transferPatientsRequestEvent: TransferPatientsRequestEvent,
-    requestReceivedEvent: RequestReceivedEvent,
-    startTransferEvent: StartTransferEvent,
-    doTransferEvent: DoTransferEvent,
+        transferPatientsInSpecificVehicleRequestEventSchema,
+    transferSpecificVehicleRequestEvent:
+        transferSpecificVehicleRequestEventSchema,
+    transferVehiclesRequestEvent: transferVehiclesRequestEventSchema,
+    transferPatientsRequestEvent: transferPatientsRequestEventSchema,
+    requestReceivedEvent: requestReceivedEventSchema,
+    startTransferEvent: startTransferEventSchema,
+    doTransferEvent: doTransferEventSchema,
     patientCategoryTransferToHospitalFinishedEvent:
-        PatientCategoryTransferToHospitalFinishedEvent,
+        patientCategoryTransferToHospitalFinishedEventSchema,
     patientTransferToHospitalSuccessfulEvent:
-        PatientTransferToHospitalSuccessfulEvent,
-    tryToSendToHospitalEvent: TryToSendToHospitalEvent,
-    askForPatientDataEvent: AskForPatientDataEvent,
-    patientsCountedEvent: PatientsCountedEvent,
+        patientTransferToHospitalSuccessfulEventSchema,
+    tryToSendToHospitalEvent: tryToSendToHospitalEventSchema,
+    askForPatientDataEvent: askForPatientDataEventSchema,
+    patientsCountedEvent: patientsCountedEventSchema,
 };
-
-export const simulationEventTypeOptions: Parameters<typeof Type> = [
-    () => SimulationEvent,
-    {
-        keepDiscriminatorProperty: true,
-        discriminator: {
-            property: 'type',
-            subTypes: Object.entries(simulationEventDictionary).map(
-                ([name, value]) => ({ name, value })
-            ),
-        },
-    },
-];

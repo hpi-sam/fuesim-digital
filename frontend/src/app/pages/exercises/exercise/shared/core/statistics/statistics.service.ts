@@ -1,16 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
-    isNotInVehicle,
     currentCoordinatesOf,
     isOnMap,
     loopTroughTime,
     uuid,
-    Viewport,
-    isNotInTransfer,
     isInSpecificSimulatedRegion,
     cloneDeepMutable,
-} from 'digital-fuesim-manv-shared';
+    isInVehicle,
+    isInTransfer,
+    isInViewport,
+} from 'fuesim-digital-shared';
 import type {
     Personnel,
     Client,
@@ -20,24 +20,22 @@ import type {
     WithPosition,
     UUID,
     LogEntry,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { countBy } from 'lodash-es';
 import { ReplaySubject } from 'rxjs';
-import { ApiService } from 'src/app/core/api.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectCurrentTime } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import type { AreaStatistics } from './area-statistics';
+import { ApiService } from '../../../../../../core/api.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectCurrentTime } from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { StatisticsEntry } from './statistics-entry';
+import type { AreaStatistics } from './area-statistics';
 
 @Injectable({
     providedIn: 'root',
 })
 export class StatisticsService {
-    constructor(
-        private readonly apiService: ApiService,
-        private readonly store: Store<AppState>
-    ) {}
+    private readonly apiService = inject(ApiService);
+    private readonly store = inject<Store<AppState>>(Store);
 
     public updatingStatistics = false;
     // TODO: When changing the exercise, this still emits the statistics of the previous exercise
@@ -119,7 +117,7 @@ export class StatisticsService {
             draftState.viewports,
             (viewport, element) =>
                 isOnMap(element) &&
-                Viewport.isInViewport(viewport, currentCoordinatesOf(element)),
+                isInViewport(viewport, currentCoordinatesOf(element)),
             true
         );
         const simulatedRegionsStatistics = this.generateFilteredAreaStatistics(
@@ -178,14 +176,13 @@ export class StatisticsService {
                     client.role.mainRole === 'participant'
             ).length,
             patients: countBy(patients, (patient) => patient.realStatus),
-            vehicles: countBy(vehicles, (vehicle) => vehicle.vehicleType),
+            vehicles: countBy(vehicles, (vehicle) => vehicle.templateId),
             personnel: countBy(
                 personnel.filter(
                     (_personnel) =>
-                        isNotInVehicle(_personnel) &&
-                        isNotInTransfer(_personnel)
+                        !isInVehicle(_personnel) && !isInTransfer(_personnel)
                 ),
-                (_personnel) => _personnel.personnelType
+                (_personnel) => _personnel.templateId
             ),
         };
     }

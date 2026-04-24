@@ -1,209 +1,244 @@
-<ng-container
-    *ngIf="
-        automaticallyDistributeVehiclesBehaviorState$
-            | async as automaticallyDistributeVehiclesBehaviorState
-    "
->
+@if (
+    automaticallyDistributeVehiclesBehaviorState$ | async;
+    as automaticallyDistributeVehiclesBehaviorState
+) {
     <h4>Automatische Verteilung von Fahrzeugen</h4>
 
     <h5>Zu Verteilende Fahrzeuge</h5>
 
-    <div
-        ngbDropdown
-        *ngIf="addableVehicleTypes$ | async as addableVehicleTypes"
-        placement="bottom-start"
-        autoClose="outside"
-        class="d-inline-block overflow-visible text-center m-3"
-    >
-        <button
-            ngbDropdownToggle
-            type="button"
-            class="btn btn-outline-primary"
-            [disabled]="addableVehicleTypes.length === 0"
+    @if (addableVehicleTypes$ | async; as addableVehicleTypes) {
+        <div
+            ngbDropdown
+            placement="bottom-start"
+            autoClose="outside"
+            class="d-inline-block overflow-visible text-center m-3"
         >
-            <span class="bi-plus me-1"></span>
-            Weiteres Fahrzeug verteilen
-        </button>
-        <div *ngIf="addableVehicleTypes.length" ngbDropdownMenu>
             <button
-                *ngFor="let addableType of addableVehicleTypes"
-                ngbDropdownItem
-                (click)="addVehicle(addableType)"
-                class="dropdown-item"
+                ngbDropdownToggle
+                type="button"
+                class="btn btn-outline-primary"
+                [disabled]="addableVehicleTypes.length === 0"
             >
                 <span class="bi-plus me-1"></span>
-                {{ addableType }}
+                Weiteres Fahrzeug verteilen
             </button>
-        </div>
-    </div>
-
-    <ng-container *ngIf="distributionLimits$ | async as distributionLimits">
-        <table class="w-100 table" *ngIf="distributionLimits.length > 0">
-            <thead>
-                <tr>
-                    <th style="width: 50%">Fahrzeug</th>
-                    <th style="width: 10%">Limit</th>
-                    <th style="min-width: 60pt"></th>
-                    <th style="width: 10%">Verteilt</th>
-                    <th style="width: 10%"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let vehicleLimit of distributionLimits">
-                    <td>{{ vehicleLimit.vehicleType }}</td>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input
-                                [ngModel]="
-                                    vehicleLimit.vehicleAmount !== infinity
-                                "
-                                (ngModelChange)="
-                                    $event
-                                        ? limitedLimitOfVehicle(
-                                              vehicleLimit.vehicleType,
-                                              automaticallyDistributeVehiclesBehaviorState
-                                                  .distributedRounds[
-                                                  vehicleLimit.vehicleType
-                                              ]
-                                                  ? (automaticallyDistributeVehiclesBehaviorState
-                                                        .distributedRounds[
-                                                        vehicleLimit.vehicleType
-                                                    ] ?? 1)
-                                                  : 1
-                                          )
-                                        : unlimitedLimitOfVehicle(
-                                              vehicleLimit.vehicleType
-                                          )
-                                "
-                                type="checkbox"
-                                role="switch"
-                                class="form-check-input"
-                                title="Limit aktivieren"
-                            />
-                        </div>
-                    </td>
-                    <td>
-                        <div
-                            *ngIf="vehicleLimit.vehicleAmount !== infinity"
-                            [title]="
-                                'Wie viele Runden ' +
-                                vehicleLimit.vehicleType +
-                                ' verteilt werden soll.'
-                            "
-                            class="input-group input-group-sm float-start"
-                            style="max-width: 75pt"
+            @if (addableVehicleTypes.length) {
+                <div ngbDropdownMenu>
+                    @for (
+                        addableType of addableVehicleTypes;
+                        track addableType
+                    ) {
+                        <button
+                            ngbDropdownItem
+                            (click)="addVehicle(addableType)"
+                            class="dropdown-item"
                         >
-                            <input
-                                #timeInput="ngModel"
-                                [ngModel]="vehicleLimit.vehicleAmount"
-                                (appSaveOnTyping)="
-                                    changeLimitOfVehicle(
-                                        vehicleLimit.vehicleType,
-                                        $event
-                                    )
-                                "
-                                [min]="
+                            <span class="bi-plus me-1"></span>
+                            {{ addableType }}
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @if (distributionLimits$ | async; as distributionLimits) {
+        @if (distributionLimits.length > 0) {
+            <table class="w-100 table">
+                <thead>
+                    <tr>
+                        <th style="width: 50%">Fahrzeug</th>
+                        <th style="width: 10%">Limit</th>
+                        <th style="min-width: 60pt"></th>
+                        <th style="width: 10%">Verteilt</th>
+                        <th style="width: 10%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (
+                        vehicleLimit of distributionLimits;
+                        track vehicleLimit
+                    ) {
+                        <tr>
+                            <td>{{ vehicleLimit.vehicleType }}</td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input
+                                        [ngModel]="
+                                            vehicleLimit.vehicleAmount !==
+                                            infinity
+                                        "
+                                        (ngModelChange)="
+                                            $event
+                                                ? limitedLimitOfVehicle(
+                                                      vehicleLimit.vehicleType,
+                                                      automaticallyDistributeVehiclesBehaviorState
+                                                          .distributedRounds[
+                                                          vehicleLimit
+                                                              .vehicleType
+                                                      ]
+                                                          ? (automaticallyDistributeVehiclesBehaviorState
+                                                                .distributedRounds[
+                                                                vehicleLimit
+                                                                    .vehicleType
+                                                            ] ?? 1)
+                                                          : 1
+                                                  )
+                                                : unlimitedLimitOfVehicle(
+                                                      vehicleLimit.vehicleType
+                                                  )
+                                        "
+                                        type="checkbox"
+                                        role="switch"
+                                        class="form-check-input"
+                                        title="Limit aktivieren"
+                                    />
+                                </div>
+                            </td>
+                            <td>
+                                @if (vehicleLimit.vehicleAmount !== infinity) {
+                                    <div
+                                        [title]="
+                                            'Wie viele Runden ' +
+                                            vehicleLimit.vehicleType +
+                                            ' verteilt werden soll.'
+                                        "
+                                        class="input-group input-group-sm float-start"
+                                        style="max-width: 75pt"
+                                    >
+                                        <input
+                                            #timeInput="ngModel"
+                                            [ngModel]="
+                                                vehicleLimit.vehicleAmount
+                                            "
+                                            (appSaveOnTyping)="
+                                                changeLimitOfVehicle(
+                                                    vehicleLimit.vehicleType,
+                                                    $event
+                                                )
+                                            "
+                                            [min]="
+                                                automaticallyDistributeVehiclesBehaviorState
+                                                    .distributedRounds[
+                                                    vehicleLimit.vehicleType
+                                                ]
+                                                    ? (automaticallyDistributeVehiclesBehaviorState
+                                                          .distributedRounds[
+                                                          vehicleLimit
+                                                              .vehicleType
+                                                      ] ?? 1)
+                                                    : 1
+                                            "
+                                            required
+                                            step="1"
+                                            type="number"
+                                            class="form-control form-control-sm d-inline-block no-validation"
+                                            data-cy="alarmGroupVehicleDelayInput"
+                                        />
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                {{
                                     automaticallyDistributeVehiclesBehaviorState
                                         .distributedRounds[
                                         vehicleLimit.vehicleType
-                                    ]
-                                        ? (automaticallyDistributeVehiclesBehaviorState
-                                              .distributedRounds[
-                                              vehicleLimit.vehicleType
-                                          ] ?? 1)
-                                        : 1
-                                "
-                                required
-                                step="1"
-                                type="number"
-                                class="form-control form-control-sm d-inline-block no-validation"
-                                data-cy="alarmGroupVehicleDelayInput"
-                            />
-                        </div>
-                    </td>
-                    <td>
-                        {{
-                            automaticallyDistributeVehiclesBehaviorState
-                                .distributedRounds[vehicleLimit.vehicleType] ??
-                                0
-                        }}
-                    </td>
-                    <td>
-                        <button
-                            type="button"
-                            class="btn btn-outline-danger float-end"
-                            (click)="removeVehicle(vehicleLimit.vehicleType)"
-                        >
-                            <span class="bi-trash"></span>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </ng-container>
+                                    ] ?? 0
+                                }}
+                            </td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger float-end"
+                                    (click)="
+                                        removeVehicle(vehicleLimit.vehicleType)
+                                    "
+                                >
+                                    <span class="bi-trash"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
 
     <h5>Fahrzeuge Erhaltende Bereiche</h5>
 
-    <div
-        *ngIf="addableTransferPoints$ | async | values as addableTransferPoints"
-        ngbDropdown
-        placement="bottom-start"
-        autoClose="outside"
-        class="d-inline-block overflow-visible text-center m-3"
-    >
-        <button
-            ngbDropdownToggle
-            type="button"
-            class="btn btn-outline-primary"
-            [disabled]="addableTransferPoints.length === 0"
+    @if (addableTransferPoints$ | async | values; as addableTransferPoints) {
+        <div
+            ngbDropdown
+            placement="bottom-start"
+            autoClose="outside"
+            class="d-inline-block overflow-visible text-center m-3"
         >
-            <span class="bi-plus me-1"></span>
-            Ziel hinzufügen
-        </button>
-        <div *ngIf="addableTransferPoints.length" ngbDropdownMenu>
             <button
-                *ngFor="
-                    let transferPoint of addableTransferPoints
-                        | orderBy: getTransferPointOrderByValue;
-                    trackBy: 'id' | appTrackByProperty
-                "
-                ngbDropdownItem
-                (click)="addDistributionDestination(transferPoint.id)"
+                ngbDropdownToggle
+                type="button"
+                class="btn btn-outline-primary"
+                [disabled]="addableTransferPoints.length === 0"
             >
                 <span class="bi-plus me-1"></span>
-                <app-transfer-point-name
-                    [transferPointId]="transferPoint.id"
-                ></app-transfer-point-name>
+                Ziel hinzufügen
             </button>
-        </div>
-    </div>
-    <ng-container
-        *ngIf="distributionDestinations$ | async as distributionDestinations"
-    >
-        <table class="w-100 table" *ngIf="distributionDestinations.length > 0">
-            <thead>
-                <tr>
-                    <th class="w-50">Ziel</th>
-                    <th class="w-auto"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let destination of distributionDestinations">
-                    <td>{{ destination.name }}</td>
-
-                    <td>
+            @if (addableTransferPoints.length) {
+                <div ngbDropdownMenu>
+                    @for (
+                        transferPoint of addableTransferPoints
+                            | orderBy: getTransferPointOrderByValue;
+                        track transferPoint.id
+                    ) {
                         <button
-                            type="button"
-                            class="btn btn-outline-danger float-end"
+                            ngbDropdownItem
                             (click)="
-                                removeDistributionDestination(destination.id)
+                                addDistributionDestination(transferPoint.id)
                             "
                         >
-                            <span class="bi-trash"></span>
+                            <span class="bi-plus me-1"></span>
+                            <app-transfer-point-name
+                                [transferPointId]="transferPoint.id"
+                            ></app-transfer-point-name>
                         </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </ng-container>
-</ng-container>
+                    }
+                </div>
+            }
+        </div>
+    }
+    @if (distributionDestinations$ | async; as distributionDestinations) {
+        @if (distributionDestinations.length > 0) {
+            <table class="w-100 table">
+                <thead>
+                    <tr>
+                        <th class="w-50">Ziel</th>
+                        <th class="w-auto"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (
+                        destination of distributionDestinations;
+                        track destination
+                    ) {
+                        <tr>
+                            <td>{{ destination.name }}</td>
+
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger float-end"
+                                    (click)="
+                                        removeDistributionDestination(
+                                            destination.id
+                                        )
+                                    "
+                                >
+                                    <span class="bi-trash"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+}

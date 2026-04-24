@@ -2,25 +2,27 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseState,
     ImageProperties,
-    Mutable,
-} from 'digital-fuesim-manv-shared';
-import {
-    TransferToHospitalBehaviorState,
-    ManagePatientTransportToHospitalBehaviorState,
-    TransferBehaviorState,
-    cloneDeepMutable,
-    MapPosition,
     SimulatedRegion,
+} from 'fuesim-digital-shared';
+import {
+    newAssignLeaderBehaviorState,
+    newReportBehaviorState,
+    newUnloadArrivingVehiclesBehaviorState,
+    newTreatPatientsBehaviorState,
+    newProvidePersonnelBehaviorState,
+    newRequestBehaviorState,
+    newTransferBehaviorState,
+    newTransferToHospitalBehaviorState,
+    newAnswerRequestsBehaviorState,
+    newAutomaticallyDistributeVehiclesBehaviorState,
+    cloneDeepMutable,
     uuid,
-    AnswerRequestsBehaviorState,
-    AssignLeaderBehaviorState,
-    AutomaticallyDistributeVehiclesBehaviorState,
-    ProvidePersonnelBehaviorState,
-    ReportBehaviorState,
-    RequestBehaviorState,
-    TreatPatientsBehaviorState,
-    UnloadArrivingVehiclesBehaviorState,
-} from 'digital-fuesim-manv-shared';
+    newNoPosition,
+    simulatedRegionImage,
+    newManagePatientTransportToHospitalBehaviorState,
+} from 'fuesim-digital-shared';
+import type { WritableDraft } from 'immer';
+import { toUtf8Base64 } from './utils/base64';
 
 export interface SimulatedRegionDragTemplate {
     editorName: string;
@@ -28,13 +30,13 @@ export interface SimulatedRegionDragTemplate {
     stereotype: SimulatedRegion;
 }
 
-const height = SimulatedRegion.image.height / 23.5;
-const width = height * SimulatedRegion.image.aspectRatio;
+const height = simulatedRegionImage.height / 23.5;
+const width = height * simulatedRegionImage.aspectRatio;
 const size = {
     height,
     width,
 };
-const position: MapPosition = MapPosition.create({ x: 0, y: 0 });
+const position = newNoPosition();
 
 const stereotypes: SimulatedRegion[] = [
     {
@@ -44,14 +46,14 @@ const stereotypes: SimulatedRegion[] = [
         borderColor: '#cc0000',
         activities: {},
         behaviors: [
-            AssignLeaderBehaviorState.create(),
-            ReportBehaviorState.create(),
-            UnloadArrivingVehiclesBehaviorState.create(),
-            TreatPatientsBehaviorState.create(),
-            ProvidePersonnelBehaviorState.create(),
-            RequestBehaviorState.create(),
-            TransferBehaviorState.create(),
-            TransferToHospitalBehaviorState.create(),
+            newAssignLeaderBehaviorState(),
+            newReportBehaviorState(),
+            newUnloadArrivingVehiclesBehaviorState(),
+            newTreatPatientsBehaviorState(),
+            newProvidePersonnelBehaviorState(),
+            newRequestBehaviorState(),
+            newTransferBehaviorState(),
+            newTransferToHospitalBehaviorState(),
         ],
         inEvents: [],
         position,
@@ -64,11 +66,11 @@ const stereotypes: SimulatedRegion[] = [
         borderColor: '#00cc00',
         activities: {},
         behaviors: [
-            AssignLeaderBehaviorState.create(),
-            ReportBehaviorState.create(),
-            TransferBehaviorState.create(),
-            AnswerRequestsBehaviorState.create(),
-            AutomaticallyDistributeVehiclesBehaviorState.create(),
+            newAssignLeaderBehaviorState(),
+            newReportBehaviorState(),
+            newTransferBehaviorState(),
+            newAnswerRequestsBehaviorState(),
+            newAutomaticallyDistributeVehiclesBehaviorState(),
         ],
         inEvents: [],
         position,
@@ -81,9 +83,9 @@ const stereotypes: SimulatedRegion[] = [
         borderColor: '#0000cc',
         activities: {},
         behaviors: [
-            AssignLeaderBehaviorState.create(),
-            ReportBehaviorState.create(),
-            ManagePatientTransportToHospitalBehaviorState.create(),
+            newAssignLeaderBehaviorState(),
+            newReportBehaviorState(),
+            newManagePatientTransportToHospitalBehaviorState(),
         ],
         inEvents: [],
         position,
@@ -92,13 +94,10 @@ const stereotypes: SimulatedRegion[] = [
     {
         type: 'simulatedRegion',
         id: '',
-        name: 'Einsatzabschnitt ???',
+        name: 'Generische Simulation ???',
         borderColor: '#cccc00',
         activities: {},
-        behaviors: [
-            AssignLeaderBehaviorState.create(),
-            ReportBehaviorState.create(),
-        ],
+        behaviors: [newAssignLeaderBehaviorState(), newReportBehaviorState()],
         inEvents: [],
         position,
         size,
@@ -121,9 +120,9 @@ function coloredImageUrl(borderColor: string): ImageProperties {
          y="0.036193207" />
     </svg>
     `;
-    const url = `data:image/svg+xml;base64,${window.btoa(content)}`;
+    const url = `data:image/svg+xml;base64,${toUtf8Base64(content)}`;
     return {
-        ...SimulatedRegion.image,
+        ...simulatedRegionImage,
         url,
     };
 }
@@ -138,15 +137,15 @@ export const simulatedRegionDragTemplates: SimulatedRegionDragTemplate[] =
     }));
 
 function reconstituteBehavior(
-    behavior: Mutable<ExerciseSimulationBehaviorState>,
+    behavior: WritableDraft<ExerciseSimulationBehaviorState>,
     state: ExerciseState
 ) {
     behavior.id = uuid();
     switch (behavior.type) {
         case 'providePersonnelBehavior':
-            behavior.vehicleTemplatePriorities = state.vehicleTemplates.map(
-                (template) => template.id
-            );
+            behavior.vehicleTemplatePriorities = Object.values(
+                state.vehicleTemplates
+            ).map((template) => template.id);
             break;
         default:
             break;

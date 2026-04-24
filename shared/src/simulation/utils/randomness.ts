@@ -1,39 +1,34 @@
 /* eslint-disable no-bitwise */
-import { IsInt, Min, ValidateIf } from 'class-validator';
 import { sha256 } from '@noble/hashes/sha256';
 import { v4 } from 'uuid';
-import { getCreate } from '../../models/utils/get-create.js';
+import type { WritableDraft } from 'immer';
+import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
+import type { UUID } from '../../utils/uuid.js';
 
-export class RandomState {
-    @IsValue('randomState' as const)
-    readonly type = 'randomState';
+export const randomStateSchema = z.strictObject({
+    type: z.literal('randomState'),
+    algo: z.literal('sha256-id-ctr'),
+    counter: z.int().nonnegative(),
+});
+export type RandomState = z.infer<typeof randomStateSchema>;
 
-    @IsLiteralUnion({ 'sha256-id-ctr': true })
-    readonly algo = 'sha256-id-ctr';
-
-    @ValidateIf((o) => o.algo === 'sha256-id-ctr')
-    @IsInt()
-    @Min(0)
-    readonly counter: number = 0;
-
-    static readonly create = getCreate(this);
-}
-
-export function seededRandomState() {
-    return RandomState.create();
+export function newSeededRandomState(): RandomState {
+    return {
+        type: 'randomState',
+        algo: 'sha256-id-ctr',
+        counter: 0,
+    };
 }
 
 export function nextBool(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     probability: number = 0.5
 ): boolean {
     return nextInt(draftState, 4294967296) / 4294967296 < probability;
 }
 
-export function nextUUID(draftState: Mutable<ExerciseState>): UUID {
+export function nextUUID(draftState: WritableDraft<ExerciseState>): UUID {
     return v4({
         random: advance(draftState),
     });
@@ -47,7 +42,7 @@ export function nextUUID(draftState: Mutable<ExerciseState>): UUID {
  * @returns An integer from `0` (inclusive) to `upperBound` (exclusive)
  */
 export function nextInt(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     upperBound: number
 ): number {
     const state = advance(draftState)
@@ -62,7 +57,7 @@ export function nextInt(
  * @param draftState The exercise state where the pseudo random number generator state is stored
  * @returns An array of length 32 (specific to sha256) of numbers from 0-255
  */
-function advance(draftState: Mutable<ExerciseState>): Uint8Array {
+function advance(draftState: WritableDraft<ExerciseState>): Uint8Array {
     const state = draftState.randomState;
     const result = sha256(`${draftState.id}${state.counter.toString()}`);
     state.counter++;

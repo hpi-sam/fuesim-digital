@@ -1,23 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import type { Sort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
-import { statusNames } from 'digital-fuesim-manv-shared';
+import { statusNames } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, startWith, Subject } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../state/app.state';
 import {
     selectHospitalPatients,
     selectHospitals,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { FormatDurationPipe } from '../../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-hospital-patients-table',
     templateUrl: './hospital-patients-table.component.html',
     styleUrls: ['./hospital-patients-table.component.scss'],
-    standalone: false,
+    imports: [MatSort, MatSortHeader, AsyncPipe, FormatDurationPipe],
 })
 export class HospitalPatientsTableComponent {
-    constructor(public readonly store: Store<AppState>) {}
+    readonly store = inject<Store<AppState>>(Store);
 
     public readonly sortEvent$ = new Subject<Sort>();
 

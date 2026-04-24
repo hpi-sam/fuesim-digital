@@ -1,29 +1,31 @@
-import type { SimulatedRegion } from '../../models/index.js';
+import type { WritableDraft } from 'immer';
+import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
-import type { Constructor, Mutable, UUID } from '../../utils/index.js';
-import type { ExerciseSimulationEvent } from '../events/index.js';
+import { uuidSchema } from '../../utils/uuid.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import type { ExerciseSimulationEvent } from '../events/exercise-simulation-event.js';
 
-export class SimulationBehaviorState {
-    readonly type!: `${string}Behavior`;
-    readonly id!: UUID;
-}
+export const simulationBehaviorStateSchema = z.strictObject({
+    type: z.templateLiteral([z.string(), `Behavior`]),
+    id: uuidSchema,
+});
 
-export interface SimulationBehavior<
-    S extends SimulationBehaviorState,
-    C extends Constructor<S> = Constructor<S>,
-> {
-    readonly behaviorState: C & {
-        readonly create: (...args: ConstructorParameters<C>) => S;
-    };
+export type SimulationBehaviorState = z.infer<
+    typeof simulationBehaviorStateSchema
+>;
+
+export interface SimulationBehavior<S extends SimulationBehaviorState> {
+    readonly behaviorStateSchema: z.ZodType<S>;
+    readonly newBehaviorState: (...args: any) => S;
     readonly handleEvent: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<S>,
-        event: Mutable<ExerciseSimulationEvent>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<S>,
+        event: WritableDraft<ExerciseSimulationEvent>
     ) => void;
     readonly onRemove?: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<S>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<S>
     ) => void;
 }

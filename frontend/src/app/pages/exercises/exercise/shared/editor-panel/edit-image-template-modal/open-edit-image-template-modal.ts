@@ -1,5 +1,5 @@
 import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import { EditImageTemplateModalComponent } from './edit-image-template-modal.component';
 
 export async function openEditImageTemplateModal(

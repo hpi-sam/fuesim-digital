@@ -4,22 +4,25 @@
         style="min-height: 0"
     >
         <div class="col-sm overflow-auto mh-100" style="max-width: 30%">
-            <p
-                *ngIf="simulatedRegion.behaviors.length === 0"
-                class="text-muted font-bold"
-            >
-                Es sind noch keine Verhaltensweisen vorhanden.
-            </p>
+            @if (simulatedRegion().behaviors.length === 0) {
+                <p class="text-muted font-bold">
+                    Es sind noch keine Verhaltensweisen vorhanden.
+                </p>
+            }
             <div class="mb-3">
                 <div class="list-group">
-                    <button
-                        *ngFor="let behavior of simulatedRegion.behaviors"
-                        [class.active]="behavior === selectedBehavior"
-                        (click)="onBehaviorSelect(behavior)"
-                        class="list-group-item list-group-item-action d-flex align-items-center flex-nowrap"
-                    >
-                        {{ behavior.type | behaviorTypeToGermanName }}
-                    </button>
+                    @for (
+                        behavior of simulatedRegion().behaviors;
+                        track behavior
+                    ) {
+                        <button
+                            [class.active]="behavior === selectedBehavior"
+                            (click)="onBehaviorSelect(behavior)"
+                            class="list-group-item list-group-item-action d-flex align-items-center flex-nowrap"
+                        >
+                            {{ behavior.type | behaviorTypeToGermanName }}
+                        </button>
+                    }
                 </div>
             </div>
         </div>
@@ -27,64 +30,77 @@
             class="col-sm overflow-auto mh-100 h-100 w-100"
             style="max-width: 70%"
         >
-            <div [ngSwitch]="selectedBehavior?.type">
-                <app-simulated-region-overview-behavior-assign-leader
-                    *ngSwitchCase="'assignLeaderBehavior'"
-                    [assignLeaderBehaviorState]="$any(selectedBehavior)"
-                />
-                <app-simulated-region-overview-behavior-treat-patients
-                    *ngSwitchCase="'treatPatientsBehavior'"
-                    [simulatedRegionId]="simulatedRegion.id"
-                    [treatPatientsBehaviorId]="selectedBehavior!.id"
-                />
-                <app-simulated-region-overview-behavior-unload-arriving-vehicles
-                    *ngSwitchCase="'unloadArrivingVehiclesBehavior'"
-                    [simulatedRegionId]="simulatedRegion.id"
-                    [behaviorId]="selectedBehavior!.id"
-                />
-                <app-simulated-region-overview-behavior-report
-                    *ngSwitchCase="'reportBehavior'"
-                    [simulatedRegionId]="simulatedRegion.id"
-                    [reportBehaviorId]="selectedBehavior!.id"
-                />
-                <app-simulated-region-overview-behavior-automatically-distribute-vehicles
-                    *ngSwitchCase="'automaticallyDistributeVehiclesBehavior'"
-                    [simulatedRegionId]="simulatedRegion.id"
-                    [automaticallyDistributeVehiclesBehaviorId]="
-                        selectedBehavior!.id
-                    "
-                />
-                <app-simulated-region-overview-behavior-provide-personnel
-                    *ngSwitchCase="'providePersonnelBehavior'"
-                    [simulatedRegionId]="simulatedRegion.id"
-                    [behaviorId]="selectedBehavior!.id"
-                />
-                <app-simulated-region-overview-behavior-answer-vehicle-requests
-                    *ngSwitchCase="'answerRequestsBehavior'"
-                />
-                <app-simulated-region-overview-behavior-request-vehicles
-                    *ngSwitchCase="'requestBehavior'"
-                    [simulatedRegionId]="simulatedRegion.id"
-                    [requestBehaviorId]="selectedBehavior!.id"
-                />
-                <app-simulated-region-overview-behavior-transfer-vehicles
-                    *ngSwitchCase="'transferBehavior'"
-                    [simulatedRegionId]="simulatedRegion.id"
-                    [transferBehaviorId]="selectedBehavior!.id"
-                    [initialTransferOptions]="initialTransferOptions"
-                />
-                <app-simulated-region-overview-behavior-transfer-to-hospital
-                    *ngSwitchCase="'transferToHospitalBehavior'"
-                />
-                <app-simulated-region-overview-behavior-manage-patient-transport-to-hospital
-                    *ngSwitchCase="'managePatientTransportToHospitalBehavior'"
-                    [simulatedRegionId]="simulatedRegion.id"
-                    [behaviorId]="selectedBehavior!.id"
-                />
-                <p *ngSwitchDefault class="text-muted font-bold">
-                    Bitte wählen Sie eine Verhaltensweise auf der linken Seite
-                    aus, um diese bearbeiten zu können.
-                </p>
+            <div>
+                @switch (selectedBehavior?.type) {
+                    @case ('assignLeaderBehavior') {
+                        <app-simulated-region-overview-behavior-assign-leader
+                            [assignLeaderBehaviorState]="$any(selectedBehavior)"
+                        />
+                    }
+                    @case ('treatPatientsBehavior') {
+                        <app-simulated-region-overview-behavior-treat-patients
+                            [simulatedRegionId]="simulatedRegion().id"
+                            [treatPatientsBehaviorId]="selectedBehavior!.id"
+                        />
+                    }
+                    @case ('unloadArrivingVehiclesBehavior') {
+                        <app-simulated-region-overview-behavior-unload-arriving-vehicles
+                            [simulatedRegionId]="simulatedRegion().id"
+                            [behaviorId]="selectedBehavior!.id"
+                        />
+                    }
+                    @case ('reportBehavior') {
+                        <app-simulated-region-overview-behavior-report
+                            [simulatedRegionId]="simulatedRegion().id"
+                            [reportBehaviorId]="selectedBehavior!.id"
+                        />
+                    }
+                    @case ('automaticallyDistributeVehiclesBehavior') {
+                        <app-simulated-region-overview-behavior-automatically-distribute-vehicles
+                            [simulatedRegionId]="simulatedRegion().id"
+                            [automaticallyDistributeVehiclesBehaviorId]="
+                                selectedBehavior!.id
+                            "
+                        />
+                    }
+                    @case ('providePersonnelBehavior') {
+                        <app-simulated-region-overview-behavior-provide-personnel
+                            [simulatedRegionId]="simulatedRegion().id"
+                            [behaviorId]="selectedBehavior!.id"
+                        />
+                    }
+                    @case ('answerRequestsBehavior') {
+                        <app-simulated-region-overview-behavior-answer-vehicle-requests />
+                    }
+                    @case ('requestBehavior') {
+                        <app-simulated-region-overview-behavior-request-vehicles
+                            [simulatedRegionId]="simulatedRegion().id"
+                            [requestBehaviorId]="selectedBehavior!.id"
+                        />
+                    }
+                    @case ('transferBehavior') {
+                        <app-simulated-region-overview-behavior-transfer-vehicles
+                            [simulatedRegionId]="simulatedRegion().id"
+                            [transferBehaviorId]="selectedBehavior!.id"
+                            [initialTransferOptions]="initialTransferOptions()"
+                        />
+                    }
+                    @case ('transferToHospitalBehavior') {
+                        <app-simulated-region-overview-behavior-transfer-to-hospital />
+                    }
+                    @case ('managePatientTransportToHospitalBehavior') {
+                        <app-simulated-region-overview-behavior-manage-patient-transport-to-hospital
+                            [simulatedRegionId]="simulatedRegion().id"
+                            [behaviorId]="selectedBehavior!.id"
+                        />
+                    }
+                    @default {
+                        <p class="text-muted font-bold">
+                            Bitte wählen Sie eine Verhaltensweise auf der linken
+                            Seite aus, um diese bearbeiten zu können.
+                        </p>
+                    }
+                }
             </div>
         </div>
     </div>
@@ -107,21 +123,25 @@
                     <span class="bi-plus me-1"></span>
                     Hinzufügen
                 </button>
-                <div
-                    *ngIf="(behaviorTypesToBeAdded$ | async)?.length"
-                    ngbDropdownMenu
-                >
-                    <button
-                        *ngFor="
-                            let behaviorType of behaviorTypesToBeAdded$ | async
-                        "
-                        ngbDropdownItem
-                        (click)="addBehavior($any(behaviorType))"
-                    >
-                        <span class="bi-plus me-1"></span>
-                        {{ $any(behaviorType) | behaviorTypeToGermanName }}
-                    </button>
-                </div>
+                @if ((behaviorTypesToBeAdded$ | async)?.length) {
+                    <div ngbDropdownMenu>
+                        @for (
+                            behaviorType of behaviorTypesToBeAdded$ | async;
+                            track behaviorType
+                        ) {
+                            <button
+                                ngbDropdownItem
+                                (click)="addBehavior($any(behaviorType))"
+                            >
+                                <span class="bi-plus me-1"></span>
+                                {{
+                                    $any(behaviorType)
+                                        | behaviorTypeToGermanName
+                                }}
+                            </button>
+                        }
+                    </div>
+                }
             </div>
         </div>
         <div class="col-sm">

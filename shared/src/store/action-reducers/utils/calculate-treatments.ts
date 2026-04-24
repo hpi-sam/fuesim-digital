@@ -1,21 +1,21 @@
 import { groupBy } from 'lodash-es';
-import type {
-    MapCoordinates,
-    PatientStatus,
-} from '../../../models/utils/index.js';
-import {
-    currentCoordinatesOf,
-    isNotOnMap,
-    isInSimulatedRegion,
-} from '../../../models/utils/position/position-helpers.js';
-import { SpatialTree } from '../../../models/utils/spatial-tree.js';
+import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../../state.js';
 import { maxTreatmentRange } from '../../../state-helpers/max-treatment-range.js';
-import type { Mutable, UUID } from '../../../utils/index.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
-import type { Personnel } from '../../../models/personnel.js';
 import type { Material } from '../../../models/material.js';
-import { Patient } from '../../../models/patient.js';
+import type { Patient } from '../../../models/patient.js';
+import { getPatientVisibleStatus } from '../../../models/patient.js';
+import {
+    currentCoordinatesOf,
+    isInSimulatedRegion,
+    isOnMap,
+} from '../../../models/utils/position/position-helpers.js';
+import { SpatialTree } from '../../../models/utils/spatial-tree.js';
+import type { PatientStatus } from '../../../models/utils/patient-status.js';
+import type { Personnel } from '../../../models/personnel.js';
+import type { MapCoordinates } from '../../../models/utils/position/map-coordinates.js';
+import type { UUID } from '../../../utils/uuid.js';
 import { getElement } from './get-element.js';
 
 // TODO: `caterFor` and `treat` are currently used as synonyms without a clear distinction.
@@ -34,8 +34,8 @@ export interface CatersFor {
  */
 export function couldCaterFor(
     status: Exclude<PatientStatus, 'white'>,
-    cateringElement: Mutable<Material | Personnel>,
-    catersFor: Mutable<CatersFor>
+    cateringElement: WritableDraft<Material | Personnel>,
+    catersFor: WritableDraft<CatersFor>
 ) {
     // black can't be treated (anymore) and blue patients should not (yet) be treated
     if (status === 'black' || status === 'blue') {
@@ -76,14 +76,14 @@ export function couldCaterFor(
  * @returns Whether the patient can be catered for by the {@link cateringElement}.
  */
 export function tryToCaterFor(
-    cateringElement: Mutable<Material | Personnel>,
-    catersFor: Mutable<CatersFor>,
-    patient: Mutable<Patient>,
+    cateringElement: WritableDraft<Material | Personnel>,
+    catersFor: WritableDraft<CatersFor>,
+    patient: WritableDraft<Patient>,
     pretriageEnabled: boolean,
     bluePatientsEnabled: boolean
 ) {
     const status = getCateringStatus(
-        Patient.getVisibleStatus(patient, pretriageEnabled, bluePatientsEnabled)
+        getPatientVisibleStatus(patient, pretriageEnabled, bluePatientsEnabled)
     );
 
     if (!couldCaterFor(status, cateringElement, catersFor)) {
@@ -107,7 +107,7 @@ export function tryToCaterFor(
  * @param elementIdsToBeSkipped the elements whose treatment should not be updated
  */
 function updateCateringAroundPatient(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     position: MapCoordinates,
     elementType: 'material' | 'personnel',
     elementIdsToBeSkipped: Set<UUID>
@@ -124,8 +124,8 @@ function updateCateringAroundPatient(
 }
 
 export function removeTreatmentsOfElement(
-    state: Mutable<ExerciseState>,
-    element: Mutable<Material | Patient | Personnel>
+    state: WritableDraft<ExerciseState>,
+    element: WritableDraft<Material | Patient | Personnel>
 ) {
     if (element.type === 'patient') {
         const patient = element;
@@ -169,8 +169,8 @@ export function removeTreatmentsOfElement(
  * Also sets {@link Patient.visibleStatusChanged} back to `false` (if element is a patient)
  */
 export function updateTreatments(
-    state: Mutable<ExerciseState>,
-    element: Mutable<Material | Patient | Personnel>
+    state: WritableDraft<ExerciseState>,
+    element: WritableDraft<Material | Patient | Personnel>
 ) {
     // The requirement of this function is not to result in a "perfect" treatment pattern.
     // Instead, it should just find an intuitive and reasonably realistic treatment pattern.
@@ -181,7 +181,7 @@ export function updateTreatments(
         return;
     }
 
-    if (isNotOnMap(element)) {
+    if (!isOnMap(element)) {
         removeTreatmentsOfElement(state, element);
         return;
     }
@@ -222,8 +222,8 @@ export function updateTreatments(
 }
 
 function updateCatering(
-    state: Mutable<ExerciseState>,
-    cateringElement: Mutable<Material | Personnel>
+    state: WritableDraft<ExerciseState>,
+    cateringElement: WritableDraft<Material | Personnel>
 ) {
     // Reset treatment of this catering (material/personnel) and start over again
     removeTreatmentsOfElement(state, cateringElement);
@@ -236,7 +236,7 @@ function updateCatering(
             cateringElement.canCaterFor.yellow === 0 &&
             cateringElement.canCaterFor.green === 0) ||
         // The element is no longer in a position to treat a patient on the map
-        isNotOnMap(cateringElement)
+        !isOnMap(cateringElement)
     ) {
         return;
     }
@@ -280,7 +280,7 @@ function updateCatering(
         return;
     }
 
-    const patientsInTreatmentRange: Mutable<Patient>[] =
+    const patientsInTreatmentRange: WritableDraft<Patient>[] =
         SpatialTree.findAllElementsInCircle(
             state.spatialTrees.patients,
             currentCoordinatesOf(cateringElement),
@@ -292,7 +292,7 @@ function updateCatering(
 
     const patientsPerStatus = groupBy(patientsInTreatmentRange, (patient) =>
         getCateringStatus(
-            Patient.getVisibleStatus(
+            getPatientVisibleStatus(
                 patient,
                 state.configuration.pretriageEnabled,
                 state.configuration.bluePatientsEnabled

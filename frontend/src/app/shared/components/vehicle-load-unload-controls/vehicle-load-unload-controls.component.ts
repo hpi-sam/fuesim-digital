@@ -1,40 +1,40 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Role, UUID } from 'digital-fuesim-manv-shared';
-import { isInSpecificVehicle } from 'digital-fuesim-manv-shared';
+import type { Role, UUID } from 'fuesim-digital-shared';
+import { isInSpecificVehicle } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map, startWith, switchMap } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../core/exercise.service';
+import type { AppState } from '../../../state/app.state';
 import {
-    createSelectMaterial,
-    createSelectPatient,
-    createSelectPersonnel,
     createSelectVehicle,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
+    createSelectMaterial,
+    createSelectPersonnel,
+    createSelectPatient,
+} from '../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-vehicle-load-unload-controls',
     templateUrl: './vehicle-load-unload-controls.component.html',
     styleUrls: ['./vehicle-load-unload-controls.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class VehicleLoadUnloadControlsComponent implements OnChanges {
-    @Input()
-    vehicleId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
+    readonly vehicleId = input.required<UUID>();
 
     vehicleLoadState$?: Observable<{ loadable: boolean; unloadable: boolean }>;
     currentRole$!: Observable<Role | undefined>;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
-
     ngOnChanges(): void {
-        const vehicle$ = this.store.select(createSelectVehicle(this.vehicleId));
+        const vehicle$ = this.store.select(
+            createSelectVehicle(this.vehicleId())
+        );
 
         this.currentRole$ = this.store.select(selectCurrentMainRole);
 
@@ -89,14 +89,14 @@ export class VehicleLoadUnloadControlsComponent implements OnChanges {
     public unloadVehicle() {
         this.exerciseService.proposeAction({
             type: '[Vehicle] Unload vehicle',
-            vehicleId: this.vehicleId,
+            vehicleId: this.vehicleId(),
         });
     }
 
     public loadVehicle() {
         this.exerciseService.proposeAction({
             type: '[Vehicle] Completely load vehicle',
-            vehicleId: this.vehicleId,
+            vehicleId: this.vehicleId(),
         });
     }
 }

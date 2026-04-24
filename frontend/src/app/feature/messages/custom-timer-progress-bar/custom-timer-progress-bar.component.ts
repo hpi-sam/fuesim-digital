@@ -6,10 +6,11 @@ import {
     transition,
 } from '@angular/animations';
 import type { OnChanges, OnDestroy } from '@angular/core';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ReplaySubject, Subject, delay, switchMap, takeUntil, tap } from 'rxjs';
-import { CustomTimer } from 'src/app/core/messages/custom-timer';
-import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-generic';
+import { AsyncPipe } from '@angular/common';
+import { CustomTimer } from '../../../core/messages/custom-timer';
+import { SimpleChangesGeneric } from '../../../shared/types/simple-changes-generic';
 
 @Component({
     selector: 'app-custom-timer-progress-bar',
@@ -45,11 +46,11 @@ import type { SimpleChangesGeneric } from 'src/app/shared/types/simple-changes-g
         ]),
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class CustomTimerProgressBarComponent implements OnChanges, OnDestroy {
-    @Input() timer!: CustomTimer;
-    @Input() color?: 'danger' | 'info' | 'success' | 'warning';
+    readonly timer = input.required<CustomTimer>();
+    readonly color = input<'danger' | 'info' | 'success' | 'warning'>();
 
     private readonly destroyed$ = new ReplaySubject<void>(1);
     private readonly timer$ = new Subject<CustomTimer>();
@@ -86,7 +87,7 @@ export class CustomTimerProgressBarComponent implements OnChanges, OnDestroy {
                 switch (timerState) {
                     case 'start':
                         {
-                            let transitionDuration = this.timer.getTimeLeft();
+                            let transitionDuration = this.timer().getTimeLeft();
                             if (transitionDuration < 0) {
                                 transitionDuration = 0;
                             }
@@ -106,8 +107,8 @@ export class CustomTimerProgressBarComponent implements OnChanges, OnDestroy {
                                     // percent
                                     100 *
                                     (1 -
-                                        this.timer.getTimeLeft() /
-                                            this.timer.time),
+                                        this.timer().getTimeLeft() /
+                                            this.timer().time),
                             },
                         });
                         break;
@@ -119,7 +120,7 @@ export class CustomTimerProgressBarComponent implements OnChanges, OnDestroy {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (changes.timer) {
             this.animationParams$.next(undefined);
-            this.timer$.next(this.timer);
+            this.timer$.next(this.timer());
         }
     }
 

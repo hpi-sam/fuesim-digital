@@ -1,11 +1,14 @@
-import { Type } from 'class-transformer';
-import { IsUUID, ValidateNested } from 'class-validator';
-import { MapPosition, MapCoordinates } from '../../models/utils/index.js';
-import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
+import { IsUUID } from 'class-validator';
 import type { Action, ActionReducer } from '../action-reducer.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 
 export class MoveMaterialAction implements Action {
     @IsValue('[Material] Move material' as const)
@@ -14,8 +17,7 @@ export class MoveMaterialAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly materialId!: UUID;
 
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -25,7 +27,7 @@ export namespace MaterialActionReducers {
         reducer: (draftState, { materialId, targetPosition }) => {
             changePositionWithId(
                 materialId,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 'material',
                 draftState
             );

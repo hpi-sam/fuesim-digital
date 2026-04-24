@@ -1,4 +1,4 @@
-import { uuid } from 'digital-fuesim-manv-shared';
+import { uuid } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import { CustomTimer } from './custom-timer';
 
@@ -21,10 +21,6 @@ export interface MessageConfig {
             | 'success'
             | 'warning';
     };
-    /**
-     * A json-value that should be logged (e.g. for errors)
-     */
-    logValue?: unknown;
     /**
      * The styling of the message
      */

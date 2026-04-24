@@ -1,4 +1,4 @@
-<ng-container *ngIf="values">
+@if (values) {
     <div class="form-group mb-3">
         <label class="form-label">Bildadresse:</label>
         <input
@@ -55,6 +55,6 @@
         "
         class="btn btn-primary"
     >
-        {{ btnText }}
+        {{ btnText() }}
     </button>
-</ng-container>
+}

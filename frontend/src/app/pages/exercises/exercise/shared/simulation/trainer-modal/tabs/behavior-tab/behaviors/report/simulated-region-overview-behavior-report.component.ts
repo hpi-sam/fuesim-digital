@@ -1,35 +1,50 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     RecurringEventActivityState,
     ReportableInformation,
     ReportBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     reportableInformationTypeToGermanNameDictionary,
-    reportableInformations,
-} from 'digital-fuesim-manv-shared';
+    reportableInformationAllowedValues,
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe, DatePipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
-    createSelectActivityStates,
     createSelectBehaviorState,
+    createSelectActivityStates,
     selectCurrentTime,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { SimulationEventBasedReportEditorComponent } from '../../../../../shared/simulation-event-based-report-editor/simulation-event-based-report-editor.component';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-report',
     templateUrl: './simulated-region-overview-behavior-report.component.html',
     styleUrls: ['./simulated-region-overview-behavior-report.component.scss'],
-    standalone: false,
+    imports: [
+        NgbCollapse,
+        FormsModule,
+        SimulationEventBasedReportEditorComponent,
+        AppSaveOnTypingDirective,
+        AsyncPipe,
+        DatePipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
-    @Input() simulatedRegionId!: UUID;
-    @Input() reportBehaviorId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly reportBehaviorId = input.required<UUID>();
 
     reportBehaviorState$!: Observable<ReportBehaviorState>;
 
@@ -39,7 +54,7 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
 
     currentTime$!: Observable<number>;
 
-    reportableInformations = reportableInformations;
+    reportableInformation = reportableInformationAllowedValues;
     reportableInformationTranslationMap =
         reportableInformationTypeToGermanNameDictionary;
 
@@ -47,21 +62,16 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
     repeatingReport = false;
     selectedInformation: ReportableInformation | 'noSelect' = 'noSelect';
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
-
     ngOnInit(): void {
         this.reportBehaviorState$ = this.store.select(
             createSelectBehaviorState<ReportBehaviorState>(
-                this.simulatedRegionId,
-                this.reportBehaviorId
+                this.simulatedRegionId(),
+                this.reportBehaviorId()
             )
         );
 
         const activities$ = this.store.select(
-            createSelectActivityStates(this.simulatedRegionId)
+            createSelectActivityStates(this.simulatedRegionId())
         );
 
         this.recurringActivities$ = combineLatest([
@@ -89,8 +99,8 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
     updateInterval(informationType: ReportableInformation, interval: string) {
         this.exerciseService.proposeAction({
             type: '[ReportBehavior] Update Recurring Report',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.reportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.reportBehaviorId(),
             informationType,
             interval: Number(interval) * 1000 * 60,
         });
@@ -99,8 +109,8 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
     removeRepeatingReports(informationType: ReportableInformation) {
         this.exerciseService.proposeAction({
             type: '[ReportBehavior] Remove Recurring Report',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.reportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.reportBehaviorId(),
             informationType,
         });
     }
@@ -115,15 +125,15 @@ export class SimulatedRegionOverviewBehaviorReportComponent implements OnInit {
         if (repeating) {
             this.exerciseService.proposeAction({
                 type: '[ReportBehavior] Create Recurring Report',
-                simulatedRegionId: this.simulatedRegionId,
-                behaviorId: this.reportBehaviorId,
+                simulatedRegionId: this.simulatedRegionId(),
+                behaviorId: this.reportBehaviorId(),
                 informationType,
                 interval: Number(interval) * 1000 * 60,
             });
         } else {
             this.exerciseService.proposeAction({
                 type: '[ReportBehavior] Create Report',
-                simulatedRegionId: this.simulatedRegionId,
+                simulatedRegionId: this.simulatedRegionId(),
                 informationType,
                 interfaceSignallerKey: null,
             });

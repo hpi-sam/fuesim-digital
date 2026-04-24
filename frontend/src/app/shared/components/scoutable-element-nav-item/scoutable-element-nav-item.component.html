@@ -1,0 +1,33 @@
+@if (scoutable(); as scoutable) {
+    <div class="m-2">
+        @if (currentRole() === 'trainer') {
+            @if (scoutable.isVisibleForParticipants) {
+                <button
+                    class="btn btn-outline-primary btn-sm me-2"
+                    ngbTooltip="Für Teilnehmende verstecken"
+                    (click)="setVisibility(false)"
+                >
+                    <i class="bi bi-eye"></i>
+                </button>
+                <span>Inhalte sind für Teilnehmende sichtbar.</span>
+            } @else {
+                <button
+                    class="btn btn-outline-primary btn-sm me-2"
+                    ngbTooltip="Für Teilnehmende sichtbar machen"
+                    (click)="setVisibility(true)"
+                >
+                    <i class="bi bi-eye-slash"></i>
+                </button>
+                <span>Inhalte sind für Teilnehmende nicht sichtbar.</span>
+            }
+        }
+    </div>
+    @if (currentRole() === 'trainer' || scoutable.isVisibleForParticipants) {
+        <div>
+            <app-user-generated-content-editor
+                [userGeneratedContent]="scoutable.userGeneratedContent"
+                (userGeneratedContentChange)="updateContent($event)"
+            />
+        </div>
+    }
+}

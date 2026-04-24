@@ -1,8 +1,10 @@
-import { LogEntry } from '../../../models/log-entry.js';
-import type { ExerciseRadiogram } from '../../../models/radiogram/index.js';
+import type { WritableDraft } from 'immer';
+import { newLogEntry } from '../../../models/log-entry.js';
 import type { Tag } from '../../../models/tag.js';
-import { personnelTypeNames } from '../../../models/utils/personnel-type.js';
-import { statusNames } from '../../../models/utils/patient-status.js';
+import {
+    type PatientStatus,
+    statusNames,
+} from '../../../models/utils/patient-status.js';
 import {
     createAlarmGroupTag,
     createBehaviorTag,
@@ -22,15 +24,7 @@ import {
 import type { TreatmentProgress } from '../../../simulation/utils/treatment.js';
 import { treatmentProgressToGermanNameDictionary } from '../../../simulation/utils/treatment.js';
 import type { ExerciseState } from '../../../state.js';
-import type { UUID } from '../../../utils/index.js';
-import { formatDuration, StrictObject } from '../../../utils/index.js';
-import type { Mutable } from '../../../utils/immutability.js';
-import { Patient } from '../../../models/patient.js';
-import type {
-    PatientStatus,
-    Personnel,
-    Vehicle,
-} from '../../../models/index.js';
+import { getPatientVisibleStatus } from '../../../models/patient.js';
 import {
     currentSimulatedRegionIdOf,
     currentSimulatedRegionOf,
@@ -40,6 +34,12 @@ import type { WithPosition } from '../../../models/utils/position/with-position.
 import type { TransferPoint } from '../../../models/transfer-point.js';
 import type { Hospital } from '../../../models/hospital.js';
 import { behaviorTypeToGermanNameDictionary } from '../../../simulation/behaviors/utils.js';
+import type { UUID } from '../../../utils/uuid.js';
+import type { Personnel } from '../../../models/personnel.js';
+import type { Vehicle } from '../../../models/vehicle.js';
+import { formatDuration } from '../../../utils/format-duration.js';
+import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
+import { TypeAssertedObject } from '../../../utils/type-asserted-object.js';
 import {
     getElement,
     getExerciseBehaviorById,
@@ -47,17 +47,24 @@ import {
 } from './get-element.js';
 
 export function log(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     tags: Tag[],
     description: string
 ) {
     if (!logActive(state)) return;
 
-    state.logEntries!.push(new LogEntry(description, tags, state.currentTime));
+    const logEntry = newLogEntry(description, tags, state.currentTime);
+
+    if (state.logEntries) {
+        state.logEntries.push(logEntry);
+    }
+    if (state.type === 'parallel') {
+        state.lastLogEntry = logEntry;
+    }
 }
 
 export function logAlarmGroup(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     additionalTags: Tag[],
     description: string,
     alarmGroupId: UUID
@@ -72,7 +79,7 @@ export function logAlarmGroup(
 }
 
 export function logAlarmGroupSent(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     alarmGroupId: UUID
 ) {
     if (!logActive(state)) return;
@@ -88,7 +95,7 @@ export function logAlarmGroupSent(
 }
 
 export function logPatient(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     additionalTags: Tag[],
     description: string,
     patientId: UUID
@@ -103,7 +110,7 @@ export function logPatient(
 }
 
 export function logPatientAdded(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     patientId: UUID
 ) {
     if (!logActive(state)) return;
@@ -112,7 +119,7 @@ export function logPatientAdded(
 }
 
 export function logPatientRemoved(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     patientId: UUID
 ) {
     if (!logActive(state)) return;
@@ -121,14 +128,14 @@ export function logPatientRemoved(
 }
 
 export function logPatientVisibleStatusChanged(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     patientId: UUID
 ) {
     if (!logActive(state)) return;
 
     const patient = getElement(state, 'patient', patientId);
 
-    const visibleStatus = Patient.getVisibleStatus(
+    const visibleStatus = getPatientVisibleStatus(
         patient,
         state.configuration.pretriageEnabled,
         state.configuration.bluePatientsEnabled
@@ -143,7 +150,7 @@ export function logPatientVisibleStatusChanged(
 }
 
 export function logSimulatedRegion(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     additionalTags: Tag[],
     description: string,
     simulatedRegionId: UUID
@@ -158,7 +165,7 @@ export function logSimulatedRegion(
 }
 
 export function logSimulatedRegionNameChange(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
     newName: string
 ) {
@@ -179,7 +186,7 @@ export function logSimulatedRegionNameChange(
 }
 
 export function logSimulatedRegionAddElement(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
     elementId: string,
     elementType: 'material' | 'patient' | 'personnel' | 'vehicle'
@@ -218,8 +225,8 @@ export function logSimulatedRegionAddElement(
 
                 logSimulatedRegion(
                     state,
-                    [createPersonnelTypeTag(state, element.personnelType)],
-                    `Dem Bereich wurde ein ${element.personnelType} hinzugefügt`,
+                    [createPersonnelTypeTag(state, element)],
+                    `Dem Bereich wurde ein ${element.typeName} hinzugefügt`,
                     simulatedRegionId
                 );
             }
@@ -243,7 +250,7 @@ export function logSimulatedRegionAddElement(
 }
 
 export function logBehavior(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     additionalTags: Tag[],
     description: string,
     simulatedRegionId: UUID,
@@ -263,7 +270,7 @@ export function logBehavior(
 }
 
 export function logBehaviorAdded(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
     behaviorId: UUID
 ) {
@@ -293,7 +300,7 @@ export function logBehaviorAdded(
 }
 
 export function logBehaviorRemoved(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
     behaviorId: UUID
 ) {
@@ -323,7 +330,7 @@ export function logBehaviorRemoved(
 }
 
 export function logTransferPoint(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     additionalTags: Tag[],
     description: string,
     transferPointId: UUID
@@ -348,7 +355,7 @@ export function logTransferPoint(
 }
 
 export function logTransferPointConnection(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     transferSourceId: UUID,
     transferTargetId: UUID,
     transferTargetType: 'hospital' | 'transferPoint'
@@ -383,7 +390,7 @@ export function logTransferPointConnection(
 }
 
 export function logTransferPointConnectionRemoved(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     transferSourceId: UUID,
     transferTargetId: UUID,
     transferTargetType: 'hospital' | 'transferPoint'
@@ -418,7 +425,7 @@ export function logTransferPointConnectionRemoved(
 }
 
 export function logElementAddedToTransfer(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     transferSourceId: UUID,
     transferSourceType: 'alarmGroup' | 'transferPoint',
     elementId: UUID,
@@ -451,10 +458,7 @@ export function logElementAddedToTransfer(
                             : createTransferPointTag(state, transferTargetId)
                         : createHospitalTag(state, transferTargetId),
                     elementType === 'personnel'
-                        ? createPersonnelTypeTag(
-                              state,
-                              (element as Personnel).personnelType
-                          )
+                        ? createPersonnelTypeTag(state, element as Personnel)
                         : createVehicleTypeTag(
                               state,
                               (element as Vehicle).vehicleType
@@ -494,10 +498,7 @@ export function logElementAddedToTransfer(
                             : createTransferPointTag(state, transferTargetId)
                         : createHospitalTag(state, transferTargetId),
                     elementType === 'personnel'
-                        ? createPersonnelTypeTag(
-                              state,
-                              (element as Personnel).personnelType
-                          )
+                        ? createPersonnelTypeTag(state, element as Personnel)
                         : createVehicleTypeTag(
                               state,
                               (element as Vehicle).vehicleType
@@ -524,7 +525,7 @@ export function logElementAddedToTransfer(
 }
 
 export function logTransferEdited(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     elementId: UUID,
     elementType: 'personnel' | 'vehicle',
     oldTransferTargetId: UUID,
@@ -542,10 +543,7 @@ export function logTransferEdited(
         state,
         [
             elementType === 'personnel'
-                ? createPersonnelTypeTag(
-                      state,
-                      (element as Personnel).personnelType
-                  )
+                ? createPersonnelTypeTag(state, element as Personnel)
                 : createVehicleTypeTag(state, (element as Vehicle).vehicleType),
             ...(newTransferTargetId === oldTransferTargetId
                 ? []
@@ -568,7 +566,7 @@ export function logTransferEdited(
 }
 
 export function logTransferFinished(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     elementId: UUID,
     elementType: 'personnel' | 'vehicle',
     transferTargetId: UUID
@@ -582,10 +580,7 @@ export function logTransferFinished(
         state,
         [
             elementType === 'personnel'
-                ? createPersonnelTypeTag(
-                      state,
-                      (element as Personnel).personnelType
-                  )
+                ? createPersonnelTypeTag(state, element as Personnel)
                 : createVehicleTypeTag(state, (element as Vehicle).vehicleType),
             ...(elementType === 'vehicle'
                 ? [createVehicleTag(state, elementId)]
@@ -601,7 +596,7 @@ export function logTransferFinished(
 }
 
 export function logTransferPause(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     elementId: UUID,
     elementType: 'personnel' | 'vehicle',
     transferTargetId: UUID,
@@ -616,10 +611,7 @@ export function logTransferPause(
         state,
         [
             elementType === 'personnel'
-                ? createPersonnelTypeTag(
-                      state,
-                      (element as Personnel).personnelType
-                  )
+                ? createPersonnelTypeTag(state, element as Personnel)
                 : createVehicleTypeTag(state, (element as Vehicle).vehicleType),
             ...(elementType === 'vehicle'
                 ? [createVehicleTag(state, elementId)]
@@ -637,7 +629,7 @@ export function logTransferPause(
 }
 
 export function logRadiogram(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     additionalTags: Tag[],
     description: string,
     radiogramId: UUID
@@ -658,7 +650,7 @@ export function logRadiogram(
     );
 }
 export function logTreatmentStatusChangedInSimulatedRegion(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     treatmentProgress: TreatmentProgress,
     simulatedRegionId: UUID,
     additionalTags: Tag[] = []
@@ -683,7 +675,7 @@ export function logTreatmentStatusChangedInSimulatedRegion(
 }
 
 export function logLastPatientTransported(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     patientStatus: PatientStatus,
     simulatedRegionId: UUID,
     description: string,
@@ -703,7 +695,7 @@ export function logLastPatientTransported(
 }
 
 export function logLastPatientTransportedInSimulatedRegion(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     patientStatus: PatientStatus,
     simulatedRegionId: UUID
 ) {
@@ -724,7 +716,7 @@ export function logLastPatientTransportedInSimulatedRegion(
 }
 
 export function logLastPatientTransportedInMultipleSimulatedRegions(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     patientStatus: PatientStatus,
     managingSimulatedRegionId: UUID
 ) {
@@ -745,7 +737,7 @@ export function logLastPatientTransportedInMultipleSimulatedRegions(
 }
 
 export function logVehicle(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     additionalTags: Tag[],
     description: string,
     vehicleId: UUID
@@ -775,7 +767,7 @@ export function logVehicle(
 }
 
 export function logVehicleAdded(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     vehicleId: UUID
 ) {
     if (!logActive(state)) return;
@@ -784,7 +776,7 @@ export function logVehicleAdded(
 }
 
 export function logVehicleRemoved(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     vehicleId: UUID
 ) {
     if (!logActive(state)) return;
@@ -793,7 +785,7 @@ export function logVehicleRemoved(
 }
 
 function createPatientTags(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     patientIds: UUID[]
 ): Tag[] {
     return patientIds.flatMap((patientId) =>
@@ -802,7 +794,7 @@ function createPatientTags(
 }
 
 function createTagsForRadiogramType(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     radiogram: ExerciseRadiogram
 ): Tag[] {
     switch (radiogram.type) {
@@ -820,7 +812,7 @@ function createTagsForRadiogramType(
 }
 
 function createRadiogramDescription(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     radiogram: ExerciseRadiogram
 ): string {
     if (!radiogram.informationAvailable) return '';
@@ -860,7 +852,7 @@ function createRadiogramDescription(
         case 'personnelCountRadiogram': {
             return `In dieser Region gab es die folgenden Einsatzkräfte: ${generateCountString(
                 radiogram.personnelCount,
-                (type) => personnelTypeNames[type]
+                (id) => state.personnelTemplates[id]?.name ?? ''
             )}.`;
         }
         case 'resourceRequestRadiogram': {
@@ -902,11 +894,11 @@ function generateCountString<K extends string>(
     countsObject: { readonly [key in K]: number },
     nameOf: (key: K) => string
 ): string {
-    return StrictObject.keys(countsObject)
+    return TypeAssertedObject.keys(countsObject)
         .map((status) => `${countsObject[status]} ${nameOf(status)}`)
         .join(', ');
 }
 
-export function logActive(state: Mutable<ExerciseState>): boolean {
-    return !!state.logEntries;
+export function logActive(state: WritableDraft<ExerciseState>): boolean {
+    return !!state.logEntries || state.type === 'parallel';
 }

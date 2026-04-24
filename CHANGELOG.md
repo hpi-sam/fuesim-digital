@@ -7,6 +7,46 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-04-24
+
+### Added
+
+- Provide CSV export for patients to import them into IVENA MANV.
+- Enable users to login with SSO via an OpenID Connect providers.
+- Restricted Zones can be used to limit the number of vehicles that can be placed in a specific area. The restrictions can be applied per vehicle template.
+- Vehicles on the map have an indicator that shows the number of occupied and total patient slots. This indicator is disabled by default and can be enabled for an exercise. Optionally, the indicator is drawn in the status color of the most urgent patient in the vehicle.
+- Add exercise manager to allow logged-in users to manage their own exercises and exercise templates.
+- Alarm groups can now be limited to a maximum number of activations. When the limit is reached, the alarm group cannot be sent anymore.
+- Docker images are now also available on GHCR.
+- Add a new role "Einsatzübersicht" ("operations detail view") that simulates the view of a tablet device used by operation commanders on site
+    - Add view to manage on-location vehicles in operational sections
+    - Add overview map with 3D view and on-location-vehicles as well as in-transfer-vehicles list
+- Add scoutable elements: Patients and map images now have a new tab "Erkundung" for scouting information. Trainers can edit rich text for scoutables and toggle visibility for participants.
+    - Add an indicator to scoutable elements on the map, which leads directly to the scouting tab.
+    - Add some presets for simple bystanders and scoutable elements (tab "Erkundung" in the map editor).
+
+### Changed
+
+- Improve hints for exercise settings.
+- Add hints for transfer point settings.
+- The Docker image of the software has been redesigned, including the following breaking changes:
+    - TLS handling has been dropped from the image. Please use a separate reverse proxy for TLS. The variables `DFM_ENABLE_SSL`, `DFM_ENABLE_HSTS`, and `DFM_FORCE_NEW_SSL_CERTS` have no effect and the container only accepts connections on port 80.
+    - With the removal of TLS handling, the application container does not need a volume any longer. The variable `DFM_PERSISTENT_DATA_PATH` has been removed.
+    - The `DFM_UPLOAD_LIMIT` variable now supports custom units. For the previous behavior (megabytes), please append a "m" suffix.
+    - Assets have to be mounted to `/usr/local/app/frontend/assets/about` (dropped `dist/digital-fuesim-manv` from the path).
+    - Several other internal changes to the container, especially the nginx configuration. If you relied on overwriting config files for your setup, please review the code diff.
+- Show large, non-dismissable modal if the connection to the server got lost.
+- Add modal for inviting participants and trainers via QR codes.
+- Participants and trainers are now consistently called "Teilnehmende" and "Übungsleitende", respectively, in the frontend.
+- Exercise keys are now consistently called "Übungs-PIN", "Teilnehmenden-PIN" and "Übungsleitungs-PIN" in the frontend.
+- Use PostgreSQL 18 as default database. Please ensure to update your production database.
+
+### Fixed
+
+- Viewports are now consistently called "Ansicht" in the frontend and some other incorrect usages of "Einsatzabschnitt" have been corrected.
+- The map is now visible again in replay mode.
+- Participants can now only use the emergency operations center if the exercise is running.
+
 ## [0.10.0] - 2025-12-08
 
 ### Added
@@ -14,6 +54,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Trainees can mark patients for transport priority. Those patients show a red outline around their popup.
 - Participants can now be assigned to an emergency operations view, allowing them to send alarm groups and write public messages to the emergency operations center log.
 - The emergency operations center log now differentiates between public messages and private messages only visible to trainers.
+- From the simulated region pop-up, a visual overview of all objects inside the region can be opened as a modal.
 
 ### Changed
 
@@ -24,6 +65,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Sending an alarm group with a higher first vehicle count than total alarm group vehicles is now handled gracefully.
 - Fixed a bug where different clients might see different behavior of the simulation when they're using different locales.
+- Name of material is shown in the material popup.
 
 ## [0.9.0] - 2025-09-23
 
@@ -330,19 +372,20 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.10.0...HEAD
-[0.10.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.9.0...v0.10.0
-[0.9.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.1...v0.9.0
-[0.8.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.8.0...v0.8.1
-[0.8.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.1...v0.8.0
-[0.7.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.7.0...v0.7.1
-[0.7.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.5.1...v0.6.0
-[0.5.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.5.0...v0.5.1
-[0.5.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.2.1...v0.3.0
-[0.2.1]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/v0.0.0...v0.1.0
-[0.0.0]: https://github.com/hpi-sam/digital-fuesim-manv/compare/37bd43bc1beb4aa9ad597b1ac763dd71b5709737...v0.0.0
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.10.0...v0.11.0
+[0.10.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.9.0...v0.10.0
+[0.9.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.8.1...v0.9.0
+[0.8.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.7.1...v0.8.0
+[0.7.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.5.1...v0.6.0
+[0.5.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.0.0...v0.1.0
+[0.0.0]: https://github.com/hpi-sam/fuesim-digital/compare/37bd43bc1beb4aa9ad597b1ac763dd71b5709737...v0.0.0

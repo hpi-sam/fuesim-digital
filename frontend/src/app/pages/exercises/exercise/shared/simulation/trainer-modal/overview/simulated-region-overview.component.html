@@ -56,12 +56,13 @@
                     ngbTooltip="Transfer"
                     >Transfer</a
                 >
-                <ng-template ngbNavContent
-                    ><app-other-transfer-point-tab
-                        class="mh-100 d-block h-100"
-                        *ngIf="transferPointId$ | async as transferPointId"
-                        [transferPointId]="transferPointId"
-                    />
+                <ng-template ngbNavContent>
+                    @if (transferPointId$ | async; as transferPointId) {
+                        <app-other-transfer-point-tab
+                            class="mh-100 d-block h-100"
+                            [transferPointId]="transferPointId"
+                        />
+                    }
                 </ng-template>
             </ng-container>
             <ng-container ngbNavItem="behaviors">

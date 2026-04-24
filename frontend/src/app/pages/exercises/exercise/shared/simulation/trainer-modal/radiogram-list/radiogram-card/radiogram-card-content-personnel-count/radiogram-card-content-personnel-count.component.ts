@@ -1,35 +1,36 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { PersonnelCountRadiogram, UUID } from 'digital-fuesim-manv-shared';
+import type { PersonnelCountRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectRadiogram } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../../../../state/app.state';
+import {
+    selectPersonnelTemplates,
+    createSelectRadiogram,
+} from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { ValuesPipe } from '../../../../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-radiogram-card-content-personnel-count',
     templateUrl: './radiogram-card-content-personnel-count.component.html',
     styleUrls: ['./radiogram-card-content-personnel-count.component.scss'],
-    standalone: false,
+    imports: [ValuesPipe, AsyncPipe],
 })
 export class RadiogramCardContentPersonnelCountComponent implements OnInit {
-    @Input() radiogramId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly radiogramId = input.required<UUID>();
 
     radiogram$!: Observable<PersonnelCountRadiogram>;
 
-    readonly personnelCategories = [
-        'notarzt',
-        'notSan',
-        'rettSan',
-        'san',
-        'gf',
-    ] as const;
-
-    constructor(private readonly store: Store<AppState>) {}
+    public readonly personnelTemplates$ = this.store.select(
+        selectPersonnelTemplates
+    );
 
     ngOnInit(): void {
         this.radiogram$ = this.store.select(
-            createSelectRadiogram<PersonnelCountRadiogram>(this.radiogramId)
+            createSelectRadiogram<PersonnelCountRadiogram>(this.radiogramId())
         );
     }
 }

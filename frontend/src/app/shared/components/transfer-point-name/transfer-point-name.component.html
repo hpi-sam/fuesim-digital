@@ -1,6 +1,6 @@
-<ng-container *ngIf="transferPoint$ | async as transferPoint">
+@if (transferPoint$ | async; as transferPoint) {
     {{ transferPoint.externalName }}
-    <span *ngIf="transferPoint.internalName" class="text-muted">
-        ({{ transferPoint.internalName }})
-    </span>
-</ng-container>
+    @if (transferPoint.internalName) {
+        <span class="text-muted"> ({{ transferPoint.internalName }}) </span>
+    }
+}

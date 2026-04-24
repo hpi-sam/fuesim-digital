@@ -1,4 +1,4 @@
-<ng-container *ngIf="viewport$ | async as viewport">
+@if (viewport$ | async; as viewport) {
     <h5 class="popover-header">
         Ansicht {{ viewport.name }}
         <button
@@ -8,7 +8,7 @@
         ></button>
     </h5>
     <div class="popover-body" style="width: 350px; height: 300px">
-        <ng-container *ngIf="(currentRole$ | async) === 'trainer'">
+        @if ((currentRole$ | async) === 'trainer') {
             <div class="form-group pb-3">
                 <label class="form-label">Name</label>
                 <input
@@ -23,6 +23,6 @@
                     [ngModelInput]="nameInput"
                 ></app-display-validation>
             </div>
-        </ng-container>
+        }
     </div>
-</ng-container>
+}

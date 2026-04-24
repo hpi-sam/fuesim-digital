@@ -1,26 +1,26 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type {
     ActivatedRouteSnapshot,
     RouterStateSnapshot,
 } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { ApplicationService } from 'src/app/core/application.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectExerciseStateMode } from 'src/app/state/application/selectors/application.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { ApplicationService } from '../../../core/application.service';
+import { MessageService } from '../../../core/messages/message.service';
+import type { AppState } from '../../../state/app.state';
+import { selectExerciseStateMode } from '../../../state/application/selectors/application.selectors';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
+import { ParallelExerciseService } from '../../../core/parallel-exercise.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class LeaveExerciseGuard {
-    constructor(
-        private readonly applicationService: ApplicationService,
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService
-    ) {}
+    private readonly applicationService = inject(ApplicationService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
+    private readonly parallelExerciseService = inject(ParallelExerciseService);
 
-    canDeactivate(
+    async canDeactivate(
         component: unknown,
         currentRoute: ActivatedRouteSnapshot,
         currentState: RouterStateSnapshot,
@@ -32,12 +32,14 @@ export class LeaveExerciseGuard {
             selectStateSnapshot(selectExerciseStateMode, this.store) !==
             undefined
         ) {
-            this.applicationService.leaveExercise();
-            this.messageService.postMessage({
-                title: 'Übung verlassen',
-                body: 'Sie können der Übung über die Übungs-ID wieder beitreten.',
-                color: 'info',
-            });
+            await this.applicationService.leaveExercise();
+            if (!this.parallelExerciseService.isJoined) {
+                this.messageService.postMessage({
+                    title: 'Übung verlassen',
+                    body: 'Sie können der Übung über die Übungs-PIN wieder beitreten.',
+                    color: 'info',
+                });
+            }
         }
         return true;
     }

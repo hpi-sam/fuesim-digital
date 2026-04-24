@@ -1,32 +1,32 @@
-import type { ExerciseState, Mutable, UUID } from 'digital-fuesim-manv-shared';
-import { applyMigrations } from 'digital-fuesim-manv-shared';
-import type { EntityManager } from 'typeorm';
+import type {
+    ExerciseAction,
+    ExerciseId,
+    ExerciseState,
+} from 'fuesim-digital-shared';
+import { applyMigrations } from 'fuesim-digital-shared';
+import type { WritableDraft } from 'immer';
 import { RestoreError } from '../utils/restore-error.js';
-import { ActionWrapperEntity } from './entities/action-wrapper.entity.js';
-import { ExerciseWrapperEntity } from './entities/exercise-wrapper.entity.js';
+import type { ExerciseRepository } from './repositories/exercise-repository.js';
+import type { ActionRepository } from './repositories/action-repository.js';
 
 export async function migrateInDatabase(
-    exerciseId: UUID,
-    entityManager: EntityManager
+    exerciseId: ExerciseId,
+    exerciseRepository: ExerciseRepository,
+    actionRepository: ActionRepository
 ): Promise<void> {
-    const exercise = await entityManager.findOne(ExerciseWrapperEntity, {
-        where: { id: exerciseId },
-    });
-    if (exercise === null) {
+    const exercise = await exerciseRepository.getExerciseById(exerciseId);
+    if (!exercise) {
         throw new RestoreError(
             'Cannot find exercise to convert in database',
             exerciseId
         );
     }
-    const loadedInitialState = JSON.parse(exercise.initialStateString);
-    const loadedCurrentState = JSON.parse(exercise.currentStateString);
+
+    const loadedInitialState = exercise.initialStateString;
+    const loadedCurrentState = exercise.currentStateString;
     const loadedActions = (
-        await entityManager.find(ActionWrapperEntity, {
-            where: { exercise: { id: exerciseId } },
-            select: { actionString: true },
-            order: { index: 'ASC' },
-        })
-    ).map((action) => JSON.parse(action.actionString));
+        await actionRepository.getActionsForExerciseId(exerciseId)
+    ).map((action) => action.actionString);
     const {
         newVersion,
         migratedProperties: { currentState, history },
@@ -37,29 +37,23 @@ export async function migrateInDatabase(
             actions: loadedActions,
         },
     });
-    const initialState: Mutable<ExerciseState> =
+    const initialState: WritableDraft<ExerciseState> =
         history?.initialState ?? currentState;
     const actions = history?.actions ?? [];
 
     exercise.stateVersion = newVersion;
-    // Save exercise wrapper
-    const patch: Partial<ExerciseWrapperEntity> = {
-        stateVersion: exercise.stateVersion,
-        initialStateString: JSON.stringify(initialState),
-        currentStateString: JSON.stringify(currentState),
-    };
-    await entityManager.update(
-        ExerciseWrapperEntity,
-        { id: exerciseId },
-        patch
-    );
+    exercise.initialStateString = initialState;
+    exercise.currentStateString = currentState;
+
+    await exerciseRepository.saveExerciseState(exercise);
+
     // Save actions
     let patchedActionsIndex = 0;
     const indicesToRemove: number[] = [];
     const actionsToUpdate: {
         previousIndex: number;
         newIndex: number;
-        actionString: string;
+        actionString: ExerciseAction;
     }[] = [];
     if (actions.length > 0) {
         actions.forEach((action, i) => {
@@ -70,40 +64,29 @@ export async function migrateInDatabase(
             actionsToUpdate.push({
                 previousIndex: i,
                 newIndex: patchedActionsIndex++,
-                actionString: JSON.stringify(action),
+                actionString: action,
             });
         });
         if (indicesToRemove.length > 0) {
-            await entityManager
-                .createQueryBuilder()
-                .delete()
-                .from(ActionWrapperEntity)
-                // eslint-disable-next-line unicorn/string-content
-                .where('index IN (:...ids)', { ids: indicesToRemove })
-                .andWhere({ exercise: { id: exerciseId } })
-                .execute();
+            await actionRepository.deleteActionIndices(
+                exerciseId,
+                indicesToRemove
+            );
         }
         if (actionsToUpdate.length > 0) {
             await Promise.all(
                 actionsToUpdate.map(
                     async ({ previousIndex, newIndex, actionString }) =>
-                        entityManager.update(
-                            ActionWrapperEntity,
-                            {
-                                index: previousIndex,
-                                exercise: { id: exerciseId },
-                            },
-                            { actionString, index: newIndex }
+                        actionRepository.updateActionIndex(
+                            exerciseId,
+                            previousIndex,
+                            newIndex,
+                            actionString
                         )
                 )
             );
         }
     } else {
-        await entityManager
-            .createQueryBuilder()
-            .delete()
-            .from(ActionWrapperEntity)
-            .where({ exercise: { id: exerciseId } })
-            .execute();
+        await actionRepository.deleteAllForExercise(exerciseId);
     }
 }

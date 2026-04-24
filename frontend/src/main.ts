@@ -1,10 +1,30 @@
 /// <reference types="@angular/localize" />
 
-import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import {
+    enableProdMode,
+    importProvidersFrom,
+    inject,
+    provideAppInitializer,
+} from '@angular/core';
 
-import { AppModule } from './app/app.module';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { StoreModule } from '@ngrx/store';
+import { provideRouter } from '@angular/router';
+import { provideSignalFormsConfig } from '@angular/forms/signals';
+import { NG_STATUS_CLASSES } from '@angular/forms/signals/compat';
+import {
+    withCredentialsInterceptor,
+    errorHandlingInterceptor,
+} from './app/shared/functions/http';
 import { environment } from './environments/environment';
+import type { AppState } from './app/state/app.state';
+import { appReducers } from './app/state/app.reducer';
+import { AppComponent } from './app/app.component';
+import { appRoutes } from './app/app.routes';
+import { AuthService } from './app/core/auth.service';
 
 if (environment.production) {
     enableProdMode();
@@ -19,6 +39,27 @@ if (environment.production) {
     };
 }
 
-platformBrowserDynamic()
-    .bootstrapModule(AppModule)
-    .catch((err) => console.error(err));
+bootstrapApplication(AppComponent, {
+    providers: [
+        provideRouter(appRoutes),
+        importProvidersFrom(
+            CommonModule,
+            BrowserModule,
+            BrowserAnimationsModule,
+            StoreModule.forRoot<AppState>(appReducers)
+        ),
+        provideHttpClient(
+            withInterceptors([
+                withCredentialsInterceptor,
+                errorHandlingInterceptor,
+            ])
+        ),
+        provideSignalFormsConfig({
+            classes: NG_STATUS_CLASSES,
+        }),
+        // Returns promise to block application loading until AuthService is initialized
+        provideAppInitializer(
+            async (): Promise<void> => inject(AuthService).initialize()
+        ),
+    ],
+}).catch((err) => console.error(err));

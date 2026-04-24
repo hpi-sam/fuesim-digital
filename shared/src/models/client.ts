@@ -1,55 +1,29 @@
-import {
-    IsBoolean,
-    IsOptional,
-    IsString,
-    IsUUID,
-    MaxLength,
-    ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import type { UUID } from '../utils/index.js';
-import { uuid, uuidValidationOptions } from '../utils/index.js';
-import { IsValue } from '../utils/validators/index.js';
-import { getCreate } from './utils/index.js';
-import { ClientRole } from './client-role.js';
+import { z } from 'zod';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import type { ClientRole } from './client-role.js';
+import { clientRoleSchema } from './client-role.js';
 
-export class Client {
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export const clientSchema = z.strictObject({
+    id: uuidSchema,
+    type: z.literal('client'),
+    name: z.string().max(255),
+    role: clientRoleSchema,
+    viewRestrictedToViewportId: uuidSchema.optional(),
+    isInWaitingRoom: z.boolean(),
+});
+export type Client = z.infer<typeof clientSchema>;
 
-    @IsValue('client' as const)
-    public readonly type = 'client';
-
-    @IsString()
-    // Required by database
-    @MaxLength(255)
-    public readonly name: string;
-
-    @ValidateNested()
-    @Type(() => ClientRole)
-    public readonly role: ClientRole;
-
-    @IsUUID(4, uuidValidationOptions)
-    @IsOptional()
-    public readonly viewRestrictedToViewportId?: UUID;
-
-    @IsBoolean()
-    public readonly isInWaitingRoom: boolean;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        name: string,
-        role: ClientRole,
-        isInWaitingRoom?: boolean,
-        viewRestrictedToViewportId?: UUID
-    ) {
-        this.name = name;
-        this.role = role;
-        this.viewRestrictedToViewportId = viewRestrictedToViewportId;
-        this.isInWaitingRoom = isInWaitingRoom ?? true;
-    }
-
-    static readonly create = getCreate(this);
+export function newClient(
+    name: string,
+    role: ClientRole,
+    isInWaitingRoom: boolean = false
+): Client {
+    return {
+        id: uuid(),
+        type: 'client',
+        name,
+        role,
+        viewRestrictedToViewportId: undefined,
+        isInWaitingRoom,
+    };
 }

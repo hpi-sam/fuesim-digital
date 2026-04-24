@@ -1,7 +1,7 @@
 import {
     currentCoordinatesOf,
-    MapCoordinates,
-} from 'digital-fuesim-manv-shared';
+    newMapCoordinatesAt,
+} from 'fuesim-digital-shared';
 import { Feature } from 'ol';
 import { Polygon } from 'ol/geom';
 import type {
@@ -13,9 +13,10 @@ import type {
 } from './geometry-helper';
 import { interpolate } from './geometry-helper';
 
-export class PolygonGeometryHelper
-    implements GeometryHelper<Polygon, ResizableElement>
-{
+export class PolygonGeometryHelper implements GeometryHelper<
+    Polygon,
+    ResizableElement
+> {
     create = (element: ResizableElement): Feature<Polygon> =>
         new Feature(new Polygon(this.getElementCoordinates(element)));
 
@@ -60,7 +61,7 @@ export class PolygonGeometryHelper
     getFeaturePosition = (feature: Feature<Polygon>): Positions<Polygon> =>
         this.getFeatureCoordinates(feature).map((coordinates) =>
             coordinates.map((coordinate) =>
-                MapCoordinates.create(coordinate[0]!, coordinate[1]!)
+                newMapCoordinatesAt(coordinate[0]!, coordinate[1]!)
             )
         );
 }

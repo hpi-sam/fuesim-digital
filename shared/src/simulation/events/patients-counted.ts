@@ -1,24 +1,23 @@
-import { getCreate } from '../../models/utils/get-create.js';
-import type { PatientStatus } from '../../models/utils/patient-status.js';
-import { patientStatusAllowedValues } from '../../models/utils/patient-status.js';
+import { z } from 'zod';
+import {
+    type PatientStatus,
+    patientStatusSchema,
+} from '../../models/utils/patient-status.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class PatientsCountedEvent implements SimulationEvent {
-    @IsValue('patientsCountedEvent')
-    readonly type = 'patientsCountedEvent';
+export const patientsCountedEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
+    type: z.literal('patientsCountedEvent'),
+    patientCount: z.record(patientStatusSchema, z.int().nonnegative()),
+});
+export type PatientsCountedEvent = z.infer<typeof patientsCountedEventSchema>;
 
-    @IsResourceDescription(patientStatusAllowedValues)
-    readonly patientCount: ResourceDescription<PatientStatus>;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(patientCount: ResourceDescription<PatientStatus>) {
-        this.patientCount = patientCount;
-    }
-
-    static readonly create = getCreate(this);
+export function newPatientsCountedEvent(
+    patientCount: ResourceDescription<PatientStatus>
+): PatientsCountedEvent {
+    return {
+        type: 'patientsCountedEvent',
+        patientCount,
+    };
 }

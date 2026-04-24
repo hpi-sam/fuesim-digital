@@ -1,4 +1,4 @@
-import type { UUID } from '../utils/index.js';
+import type { UUID } from '../utils/uuid.js';
 import type { Migration } from './migration-functions.js';
 
 interface Patient {

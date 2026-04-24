@@ -10,23 +10,24 @@
     style="max-height: 300px; overflow: auto"
 >
     <!-- Using mousedown instead of click events since click events do not work reliably in bootstrap popovers. -->
-    <button
-        *ngFor="let option of filteredOptions; index as i"
-        (mousedown)="selected.emit(option)"
-        type="button"
-        class="list-group-item list-group-item-action"
-        [class.active]="selectedIndex === i"
-        data-cy="searchableDropdownOptionButton"
-    >
-        <span
+    @for (option of filteredOptions; track option; let i = $index) {
+        <button
             (mousedown)="selected.emit(option)"
-            class="badge"
-            [style.color]="option.color ?? 'inherit'"
-            [style.backgroundColor]="option.backgroundColor ?? 'inherit'"
+            type="button"
+            class="list-group-item list-group-item-action"
+            [class.active]="selectedIndex === i"
+            data-cy="searchableDropdownOptionButton"
         >
-            {{ option.name }}
-        </span>
-    </button>
+            <span
+                (mousedown)="selected.emit(option)"
+                class="badge"
+                [style.color]="option.color ?? 'inherit'"
+                [style.backgroundColor]="option.backgroundColor ?? 'inherit'"
+            >
+                {{ option.name }}
+            </span>
+        </button>
+    }
     <small class="text-muted">
         <app-hotkey-indicator keys="Enter" />: Bestätigen,
         <app-hotkey-indicator keys="Esc" />: Abbrechen

@@ -7,52 +7,48 @@
         overflow-y: auto;
     "
 >
-    <button
-        *ngFor="
-            let reachableTransferPoint of reachableTransferPoints$ | async;
-            trackBy: 'id'
-                | appTrackByProperty: (reachableTransferPoints$ | async)
-        "
-        (click)="transferTo(reachableTransferPoint.id, 'transferPoint')"
-        type="button"
-        class="dropdown-item"
-        data-cy="chooseTransferTargetPopupOtherTransferPointDropdown"
-    >
-        <app-transfer-point-name
-            [transferPointId]="reachableTransferPoint.id"
-        ></app-transfer-point-name>
-    </button>
-    <ng-container *ngIf="droppedElementType === 'vehicle'">
-        <div
-            *ngIf="
-                (reachableTransferPoints$ | async)?.length &&
-                (reachableHospitals$ | async)?.length
-            "
-            class="dropdown-divider"
-        ></div>
+    @for (
+        reachableTransferPoint of reachableTransferPoints$ | async;
+        track reachableTransferPoint.id
+    ) {
         <button
-            *ngFor="
-                let reachableHospital of reachableHospitals$ | async;
-                trackBy: 'id'
-                    | appTrackByProperty: (reachableHospitals$ | async)
-            "
-            (click)="transferTo(reachableHospital.id, 'hospital')"
+            (click)="transferTo(reachableTransferPoint.id, 'transferPoint')"
             type="button"
             class="dropdown-item"
-            data-cy="chooseTransferTargetPopupHospitalDropdown"
+            data-cy="chooseTransferTargetPopupOtherTransferPointDropdown"
         >
-            <app-hospital-name
-                [hospitalId]="reachableHospital.id"
-            ></app-hospital-name>
+            <app-transfer-point-name
+                [transferPointId]="reachableTransferPoint.id"
+            ></app-transfer-point-name>
         </button>
-    </ng-container>
-    <div
-        *ngIf="
-            (reachableTransferPoints$ | async)?.length === 0 &&
-            (reachableHospitals$ | async)?.length === 0
-        "
-        class="text-muted p-1 fst-italic"
-    >
-        Keine Aktion möglich.
-    </div>
+    }
+    @if (droppedElementType === 'vehicle') {
+        @if (
+            (reachableTransferPoints$ | async)?.length &&
+            (reachableHospitals$ | async)?.length
+        ) {
+            <div class="dropdown-divider"></div>
+        }
+        @for (
+            reachableHospital of reachableHospitals$ | async;
+            track reachableHospital.id
+        ) {
+            <button
+                (click)="transferTo(reachableHospital.id, 'hospital')"
+                type="button"
+                class="dropdown-item"
+                data-cy="chooseTransferTargetPopupHospitalDropdown"
+            >
+                <app-hospital-name
+                    [hospitalId]="reachableHospital.id"
+                ></app-hospital-name>
+            </button>
+        }
+    }
+    @if (
+        (reachableTransferPoints$ | async)?.length === 0 &&
+        (reachableHospitals$ | async)?.length === 0
+    ) {
+        <div class="text-muted p-1 fst-italic">Keine Aktion möglich.</div>
+    }
 </div>

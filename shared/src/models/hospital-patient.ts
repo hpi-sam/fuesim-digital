@@ -1,176 +1,81 @@
-import { Type } from 'class-transformer';
-import {
-    IsBoolean,
-    IsNumber,
-    IsString,
-    IsUUID,
-    Min,
-    ValidateNested,
-} from 'class-validator';
-import type { Mutable, UUID } from '../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../utils/index.js';
-import { IsIdMap, IsLiteralUnion, IsValue } from '../utils/validators/index.js';
-import type { HealthPoints, PatientStatus } from './utils/index.js';
-import {
-    getCreate,
-    ImageProperties,
-    IsValidHealthPoint,
-    patientStatusAllowedValues,
-} from './utils/index.js';
-import { BiometricInformation } from './utils/biometric-information.js';
-import { PersonalInformation } from './utils/personal-information.js';
-import { PatientHealthState } from './patient-health-state.js';
-import type { Patient } from './index.js';
+import type { WritableDraft } from 'immer';
+import { z } from 'zod';
+import { uuidSchema } from '../utils/uuid.js';
 
-export class HospitalPatient {
+import { personalInformationSchema } from './utils/personal-information.js';
+import { patientHealthStateSchema } from './patient-health-state.js';
+import { biometricInformationSchema } from './utils/biometric-information.js';
+import { patientStatusSchema } from './utils/patient-status.js';
+import { imagePropertiesSchema } from './utils/image-properties.js';
+import { healthPointsSchema } from './utils/health-points.js';
+import type { Patient } from './patient.js';
+
+export const hospitalPatientSchema = z.strictObject({
     /**
      * Id of the patient that was transported to a hospital, the original patient gets deleted
      */
-    @IsUUID(4, uuidValidationOptions)
-    public readonly patientId: UUID;
-
-    @IsValue('hospitalPatient' as const)
-    public readonly type = 'hospitalPatient';
-
-    @IsString()
-    public readonly identifier: string;
-
-    @IsString()
-    public readonly customQRCode: string = '';
-
+    patientId: uuidSchema,
+    type: z.literal('hospitalPatient'),
+    identifier: z.string(),
+    customQRCode: z.string(),
     /**
      * the vehicle that a patient was transported with
      */
-    @IsString()
-    public readonly vehicleType: string;
-
+    vehicleType: z.string(),
     /**
      * The time the patient started to be sent to a hospital
      */
-    @IsNumber()
-    public readonly startTime: number;
-
+    startTime: z.number(),
     /**
      * The time the patient would arrive at a hospital
      */
-    @IsNumber()
-    public readonly arrivalTime: number;
-
-    @ValidateNested()
-    @Type(() => PersonalInformation)
-    public readonly personalInformation: PersonalInformation;
-
-    @ValidateNested()
-    @Type(() => BiometricInformation)
-    public readonly biometricInformation: BiometricInformation;
-
-    @IsLiteralUnion(patientStatusAllowedValues)
-    public readonly pretriageStatus: PatientStatus;
-
-    @IsLiteralUnion(patientStatusAllowedValues)
-    public readonly realStatus: PatientStatus;
-
-    @IsBoolean()
-    public readonly hasTransportPriority: boolean;
-
-    @ValidateNested()
-    @Type(() => ImageProperties)
-    public readonly image: ImageProperties;
-
-    @IsIdMap(PatientHealthState)
-    public readonly healthStates: {
-        readonly [stateId: UUID]: PatientHealthState;
-    } = {};
-
+    arrivalTime: z.number(),
+    personalInformation: personalInformationSchema,
+    biometricInformation: biometricInformationSchema,
+    pretriageStatus: patientStatusSchema,
+    realStatus: patientStatusSchema,
+    hasTransportPriority: z.boolean(),
+    image: imagePropertiesSchema,
+    healthStates: z.record(uuidSchema, patientHealthStateSchema),
     /**
      * The id of the current health state in {@link healthStates}
      */
-    @IsUUID(4, uuidValidationOptions)
-    public readonly currentHealthStateId: UUID;
+    currentHealthStateId: uuidSchema,
+    health: healthPointsSchema,
+    treatmentTime: z.number().nonnegative(),
+});
+export type HospitalPatient = z.infer<typeof hospitalPatientSchema>;
 
-    /**
-     * See {@link HealthPoints} for context of this property.
-     */
-    @IsValidHealthPoint()
-    public readonly health: HealthPoints;
-
-    @IsNumber()
-    @Min(0)
-    public treatmentTime = 0;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        patientId: UUID,
-        identifier: string,
-        customQRCode: string,
-        vehicleType: string,
-        startTime: number,
-        arrivalTime: number,
-        personalInformation: PersonalInformation,
-        biometricInformation: BiometricInformation,
-        pretriageStatus: PatientStatus,
-        realStatus: PatientStatus,
-        hasTransportPriority: boolean,
-        healthStates: { readonly [stateId: UUID]: PatientHealthState },
-        currentHealthStateId: UUID,
-        image: ImageProperties,
-        health: HealthPoints,
-        treatmentTime: number
-    ) {
-        this.patientId = patientId;
-        this.identifier = identifier;
-        this.customQRCode = customQRCode;
-        this.vehicleType = vehicleType;
-        this.startTime = startTime;
-        this.arrivalTime = arrivalTime;
-        this.personalInformation = personalInformation;
-        this.biometricInformation = biometricInformation;
-        this.pretriageStatus = pretriageStatus;
-        this.realStatus = realStatus;
-        this.hasTransportPriority = hasTransportPriority;
-        this.healthStates = healthStates;
-        this.currentHealthStateId = currentHealthStateId;
-        this.image = image;
-        this.health = health;
-        this.treatmentTime = treatmentTime;
-    }
-
-    static readonly create = getCreate(this);
-
-    /**
-     * used to create a Mutable\<HospitalPatient\> inside action-reducers/hospital.ts
-     * @param patient that should be copied
-     * @param startTime time the transport starts
-     * @param arrivalTime time the patient would arrive at a hospital
-     * @returns a Mutable\<HospitalPatient\>
-     */
-    static createFromPatient(
-        patient: Mutable<Patient>,
-        vehicleType: string,
-        startTime: number,
-        arrivalTime: number
-    ) {
-        return cloneDeepMutable(
-            HospitalPatient.create(
-                patient.id,
-                patient.identifier,
-                patient.customQRCode,
-                vehicleType,
-                startTime,
-                arrivalTime,
-                patient.personalInformation,
-                patient.biometricInformation,
-                patient.pretriageStatus,
-                patient.realStatus,
-                patient.hasTransportPriority,
-                patient.healthStates,
-                patient.currentHealthStateId,
-                patient.image,
-                patient.health,
-                patient.treatmentTime
-            )
-        );
-    }
+/**
+ * used to create a Mutable\<HospitalPatient\> inside action-reducers/hospital.ts
+ * @param patient that should be copied
+ * @param startTime time the transport starts
+ * @param arrivalTime time the patient would arrive at a hospital
+ * @returns a Mutable\<HospitalPatient\>
+ */
+export function newHospitalPatientFromPatient(
+    patient: WritableDraft<Patient>,
+    vehicleType: string,
+    startTime: number,
+    arrivalTime: number
+): HospitalPatient {
+    return {
+        patientId: patient.id,
+        type: 'hospitalPatient',
+        identifier: patient.identifier,
+        customQRCode: patient.customQRCode,
+        vehicleType,
+        startTime,
+        arrivalTime,
+        personalInformation: patient.personalInformation,
+        biometricInformation: patient.biometricInformation,
+        pretriageStatus: patient.pretriageStatus,
+        realStatus: patient.realStatus,
+        hasTransportPriority: patient.hasTransportPriority,
+        healthStates: patient.healthStates,
+        currentHealthStateId: patient.currentHealthStateId,
+        image: patient.image,
+        health: patient.health,
+        treatmentTime: patient.treatmentTime,
+    };
 }

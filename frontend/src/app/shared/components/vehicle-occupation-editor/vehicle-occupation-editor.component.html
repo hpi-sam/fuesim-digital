@@ -1,14 +1,14 @@
-<div
-    class="d-flex justify-content-between align-items-center"
-    *appLet="occupation$ | async as occupation"
->
-    <span>{{ occupation.type | occupationName }}.</span>
-    <button
-        type="button"
-        class="btn btn-outline-danger ms-3"
-        *ngIf="occupation.type !== 'noOccupation'"
-        (click)="cancelOccupation()"
-    >
-        Abbrechen
-    </button>
-</div>
+@if (occupation$ | async; as occupation) {
+    <div class="d-flex justify-content-between align-items-center">
+        <span>{{ occupation.type | occupationName }}.</span>
+        @if (occupation.type !== 'noOccupation') {
+            <button
+                type="button"
+                class="btn btn-outline-danger ms-3"
+                (click)="cancelOccupation()"
+            >
+                Abbrechen
+            </button>
+        }
+    </div>
+}

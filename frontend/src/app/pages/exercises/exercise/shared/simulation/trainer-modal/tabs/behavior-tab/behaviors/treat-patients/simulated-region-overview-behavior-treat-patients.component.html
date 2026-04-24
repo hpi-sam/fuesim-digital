@@ -1,350 +1,360 @@
-<div
-    class="container"
-    *appLet="treatPatientsBehaviorState$ | async as treatPatientsBehaviorState"
->
-    <div
-        class="row align-items-center m-3"
-        (click)="informationCollapsed = !informationCollapsed"
-        style="cursor: pointer"
-    >
-        <div class="col-sm">
-            <h4 class="ps-0 pe-0 text-nowrap">
-                <i
-                    *ngIf="informationCollapsed; else informationExpanded"
-                    class="bi bi-caret-right-fill"
-                ></i>
-                <ng-template #informationExpanded
-                    ><i class="bi bi-caret-down-fill"></i></ng-template
-                >Informationen
-            </h4>
-        </div>
-        <div class="col-sm justify-content-center" *ngIf="informationCollapsed">
-            <app-treatment-status-badge
-                [treatmentProgress]="
-                    treatPatientsBehaviorState.treatmentProgress
-                "
-            ></app-treatment-status-badge>
-        </div>
-    </div>
-    <div
-        class="row m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="informationCollapsed"
-    >
-        <h5 class="mt-2">Allgemein</h5>
-    </div>
-    <div
-        class="row align-items-center m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="informationCollapsed"
-    >
-        <div class="col-sm">Derzeitige Phase</div>
-        <div class="col-sm" *ngIf="!informationCollapsed">
-            <app-treatment-status-badge
-                [treatmentProgress]="
-                    treatPatientsBehaviorState.treatmentProgress
-                "
-            ></app-treatment-status-badge>
-        </div>
-    </div>
-    <div
-        class="row align-items-center m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="informationCollapsed"
-        *ngIf="
-            timeUntilNextRecalculation$ | async as timeUntilNextRecalculation
-        "
-    >
-        <div class="col-sm">Nächste Zuteilungs-Berechnung in</div>
-        <div class="col-sm">
-            {{ timeUntilNextRecalculation | formatDuration }}
-        </div>
-    </div>
-
-    <div
-        class="row m-3"
-        *ngIf="((patientIds$ | async) ?? []).length > 0"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="informationCollapsed"
-    >
-        <h5 class="mt-2">Derzeitige Zuordnung</h5>
-        <p class="text-muted">
-            Klicken Sie auf einen Patienten, um die Details zu sehen.
-        </p>
-    </div>
-
-    <div
-        class="row align-items-center m-3"
-        *ngIf="((patientIds$ | async) ?? []).length > 0"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="informationCollapsed"
-    >
-        <div class="col-sm justify-content-center">
-            <h6 class="text-center">ID</h6>
-        </div>
-        <div class="col-sm justify-content-center">
-            <h6 class="text-center">Sichtungs<wbr />kategorie</h6>
-        </div>
-        <div class="col-sm justify-content-center">
-            <h6 class="text-center">Verlauf</h6>
+<div class="container">
+    @if (treatPatientsBehaviorState$ | async; as treatPatientsBehaviorState) {
+        <div
+            class="row align-items-center m-3"
+            (click)="informationCollapsed = !informationCollapsed"
+            style="cursor: pointer"
+        >
+            <div class="col-sm">
+                <h4 class="ps-0 pe-0 text-nowrap">
+                    @if (informationCollapsed) {
+                        <i class="bi bi-caret-right-fill"></i>
+                    } @else {
+                        <i class="bi bi-caret-down-fill"></i>
+                    }
+                    Informationen
+                </h4>
+            </div>
+            @if (informationCollapsed) {
+                <div class="col-sm justify-content-center">
+                    <app-treatment-status-badge
+                        [treatmentProgress]="
+                            treatPatientsBehaviorState.treatmentProgress
+                        "
+                    ></app-treatment-status-badge>
+                </div>
+            }
         </div>
         <div
-            *ngIf="
-                treatPatientsBehaviorState.treatmentProgress !==
-                    'noTreatment' &&
-                treatPatientsBehaviorState.treatmentProgress !== 'unknown'
-            "
-            class="col-sm justify-content-center"
+            class="row m-3"
+            #collapse="ngbCollapse"
+            [(ngbCollapse)]="informationCollapsed"
         >
-            <h6 class="text-center">Zugeteiltes Personal</h6>
+            <h5 class="mt-2">Allgemein</h5>
         </div>
-    </div>
-    <div
-        *ngFor="let patientId of patientIds$ | async"
-        class="row m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="informationCollapsed"
-    >
-        <div>
-            <app-simulated-region-overview-behavior-treat-patients-patient-details
-                [patientId]="patientId"
-                [cateringsActive]="
+        <div
+            class="row align-items-center m-3"
+            #collapse="ngbCollapse"
+            [(ngbCollapse)]="informationCollapsed"
+        >
+            <div class="col-sm">Derzeitige Phase</div>
+            @if (!informationCollapsed) {
+                <div class="col-sm">
+                    <app-treatment-status-badge
+                        [treatmentProgress]="
+                            treatPatientsBehaviorState.treatmentProgress
+                        "
+                    ></app-treatment-status-badge>
+                </div>
+            }
+        </div>
+        @if (
+            timeUntilNextRecalculation$ | async;
+            as timeUntilNextRecalculation
+        ) {
+            <div
+                class="row align-items-center m-3"
+                #collapse="ngbCollapse"
+                [(ngbCollapse)]="informationCollapsed"
+            >
+                <div class="col-sm">Nächste Zuteilungs-Berechnung in</div>
+                <div class="col-sm">
+                    {{ timeUntilNextRecalculation | formatDuration }}
+                </div>
+            </div>
+        }
+
+        @if (((patientIds$ | async) ?? []).length > 0) {
+            <div
+                class="row m-3"
+                #collapse="ngbCollapse"
+                [(ngbCollapse)]="informationCollapsed"
+            >
+                <h5 class="mt-2">Derzeitige Zuordnung</h5>
+                <p class="text-muted">
+                    Klicken Sie auf einen Patienten, um die Details zu sehen.
+                </p>
+            </div>
+        }
+
+        @if (((patientIds$ | async) ?? []).length > 0) {
+            <div
+                class="row align-items-center m-3"
+                #collapse="ngbCollapse"
+                [(ngbCollapse)]="informationCollapsed"
+            >
+                <div class="col-sm justify-content-center">
+                    <h6 class="text-center">ID</h6>
+                </div>
+                <div class="col-sm justify-content-center">
+                    <h6 class="text-center">Sichtungs<wbr />kategorie</h6>
+                </div>
+                <div class="col-sm justify-content-center">
+                    <h6 class="text-center">Verlauf</h6>
+                </div>
+                @if (
                     treatPatientsBehaviorState.treatmentProgress !==
                         'noTreatment' &&
                     treatPatientsBehaviorState.treatmentProgress !== 'unknown'
-                "
-                (click)="selectPatientService.selectPatient(patientId)"
-                class="row align-items-center ps-0 pe-0"
-                style="overflow-x: auto; flex-wrap: nowrap; cursor: pointer"
-            ></app-simulated-region-overview-behavior-treat-patients-patient-details>
-        </div>
-    </div>
+                ) {
+                    <div class="col-sm justify-content-center">
+                        <h6 class="text-center">Zugeteiltes Personal</h6>
+                    </div>
+                }
+            </div>
+        }
+        @for (patientId of patientIds$ | async; track patientId) {
+            <div
+                class="row m-3"
+                #collapse="ngbCollapse"
+                [(ngbCollapse)]="informationCollapsed"
+            >
+                <div>
+                    <app-simulated-region-overview-behavior-treat-patients-patient-details
+                        [patientId]="patientId"
+                        [cateringsActive]="
+                            treatPatientsBehaviorState.treatmentProgress !==
+                                'noTreatment' &&
+                            treatPatientsBehaviorState.treatmentProgress !==
+                                'unknown'
+                        "
+                        (click)="selectPatientService.selectPatient(patientId)"
+                        class="row align-items-center ps-0 pe-0"
+                        style="
+                            overflow-x: auto;
+                            flex-wrap: nowrap;
+                            cursor: pointer;
+                        "
+                    ></app-simulated-region-overview-behavior-treat-patients-patient-details>
+                </div>
+            </div>
+        }
 
-    <div
-        class="row align-items-center m-3"
-        (click)="settingsCollapsed = !settingsCollapsed"
-        style="cursor: pointer"
-    >
-        <div class="col-sm">
-            <h4 style="padding-left: 0; padding-right: 0">
-                <i
-                    *ngIf="settingsCollapsed; else settingsExpanded"
-                    class="bi bi-caret-right-fill"
-                ></i>
-                <ng-template #settingsExpanded
-                    ><i class="bi bi-caret-down-fill"></i></ng-template
-                >Einstellungen
-            </h4>
-        </div>
-    </div>
-    <div
-        class="row m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="settingsCollapsed"
-    >
-        <h5 class="mt-2">
-            Häufigkeit der Zuteilungs-Berechnung durch die Simulation in den
-            jeweiligen Zuständen
-        </h5>
-    </div>
-    <div
-        class="row align-items-center m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="settingsCollapsed"
-    >
-        <div class="col-sm">Erkunden</div>
-        <div class="col-sm">
-            <div
-                title="Wie häufig neu berechnet werden soll, wenn das Personal grade angekommen ist und gezählt wird."
-                class="input-group input-group-sm float-start"
-                style="max-width: 250px"
-            >
-                <!-- The input is in seconds -->
-                <input
-                    #timeInput="ngModel"
-                    [ngModel]="
-                        treatPatientsBehaviorState.intervals.unknown / 1000
-                    "
-                    (appSaveOnTyping)="
-                        updateTreatPatientsBehaviorState(
-                            $event * 1000,
-                            undefined,
-                            undefined,
-                            undefined,
-                            undefined
-                        )
-                    "
-                    min="0"
-                    required
-                    step="1"
-                    type="number"
-                    class="form-control form-control-sm d-inline-block no-validation"
-                    data-cy="alarmGroupVehicleDelayInput"
-                />
-                <span class="input-group-text">Sec</span>
+        <div
+            class="row align-items-center m-3"
+            (click)="settingsCollapsed = !settingsCollapsed"
+            style="cursor: pointer"
+        >
+            <div class="col-sm">
+                <h4 style="padding-left: 0; padding-right: 0">
+                    @if (settingsCollapsed) {
+                        <i class="bi bi-caret-right-fill"></i>
+                    } @else {
+                        <i class="bi bi-caret-down-fill"></i>
+                    }
+                    Einstellungen
+                </h4>
             </div>
         </div>
-    </div>
-    <div
-        class="row align-items-center m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="settingsCollapsed"
-    >
-        <div class="col-sm">Vorsichten</div>
-        <div class="col-sm">
-            <div
-                title="Wie häufig neu berechnet werden soll, wenn das Zählen der Patienten abgeschlossen ist und vorgesichtet wird."
-                class="input-group input-group-sm float-start"
-                style="max-width: 250px"
-            >
-                <!-- The input is in seconds -->
-                <input
-                    #timeInput="ngModel"
-                    [ngModel]="
-                        treatPatientsBehaviorState.intervals.counted / 1000
-                    "
-                    (appSaveOnTyping)="
-                        updateTreatPatientsBehaviorState(
-                            undefined,
-                            $event * 1000,
-                            undefined,
-                            undefined,
-                            undefined
-                        )
-                    "
-                    min="0"
-                    required
-                    step="1"
-                    type="number"
-                    class="form-control form-control-sm d-inline-block no-validation"
-                    data-cy="alarmGroupVehicleDelayInput"
-                />
-                <span class="input-group-text">Sec</span>
-            </div>
-        </div>
-    </div>
-    <div
-        class="row align-items-center m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="settingsCollapsed"
-    >
-        <div class="col-sm">Behandeln, Personal fehlt</div>
-        <div class="col-sm">
-            <div
-                title="Wie häufig neu berechnet werden soll, nachdem das Personal vorgesichtet hat aber die Erstversorgung noch nicht sichergestellt ist."
-                class="input-group input-group-sm float-start"
-                style="max-width: 250px"
-            >
-                <!-- The input is in seconds -->
-                <input
-                    #timeInput="ngModel"
-                    [ngModel]="
-                        treatPatientsBehaviorState.intervals.triaged / 1000
-                    "
-                    (appSaveOnTyping)="
-                        updateTreatPatientsBehaviorState(
-                            undefined,
-                            undefined,
-                            $event * 1000,
-                            undefined,
-                            undefined
-                        )
-                    "
-                    min="0"
-                    required
-                    step="1"
-                    type="number"
-                    class="form-control form-control-sm d-inline-block no-validation"
-                    data-cy="alarmGroupVehicleDelayInput"
-                />
-                <span class="input-group-text">Sec</span>
-            </div>
-        </div>
-    </div>
-    <div
-        class="row align-items-center m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="settingsCollapsed"
-    >
-        <div class="col-sm">Erstversorgung sichergestellt</div>
-        <div class="col-sm">
-            <div
-                title="Wie häufig neu berechnet werden soll, nachdem die Erstversorgung sichergesetellt ist."
-                class="input-group input-group-sm float-start"
-                style="max-width: 250px"
-            >
-                <!-- The input is in seconds -->
-                <input
-                    #timeInput="ngModel"
-                    [ngModel]="
-                        treatPatientsBehaviorState.intervals.secured / 1000
-                    "
-                    (appSaveOnTyping)="
-                        updateTreatPatientsBehaviorState(
-                            undefined,
-                            undefined,
-                            undefined,
-                            $event * 1000,
-                            undefined
-                        )
-                    "
-                    min="0"
-                    required
-                    step="1"
-                    type="number"
-                    class="form-control form-control-sm d-inline-block no-validation"
-                    data-cy="alarmGroupVehicleDelayInput"
-                />
-                <span class="input-group-text">Sec</span>
-            </div>
-        </div>
-    </div>
-    <div class="row m-3">
-        <h5
-            class="mt-2"
+        <div
+            class="row m-3"
             #collapse="ngbCollapse"
             [(ngbCollapse)]="settingsCollapsed"
         >
-            Weiteres
-        </h5>
-    </div>
-    <div
-        class="row align-items-center m-3"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="settingsCollapsed"
-    >
-        <div class="col-sm">Zähldauer pro Patient</div>
-        <div class="col-sm">
-            <div
-                title="Wie lange es dauert, einen Patienten zu zählen."
-                class="input-group input-group-sm float-start"
-                style="max-width: 250px"
-            >
-                <!-- The input is in seconds -->
-                <input
-                    #timeInput="ngModel"
-                    [ngModel]="
-                        treatPatientsBehaviorState.intervals
-                            .countingTimePerPatient / 1000
-                    "
-                    (appSaveOnTyping)="
-                        updateTreatPatientsBehaviorState(
-                            undefined,
-                            undefined,
-                            undefined,
-                            undefined,
-                            $event * 1000
-                        )
-                    "
-                    min="0"
-                    required
-                    step="1"
-                    type="number"
-                    class="form-control form-control-sm d-inline-block no-validation"
-                    data-cy="alarmGroupVehicleDelayInput"
-                />
-                <span class="input-group-text">Sec</span>
+            <h5 class="mt-2">
+                Häufigkeit der Zuteilungs-Berechnung durch die Simulation in den
+                jeweiligen Zuständen
+            </h5>
+        </div>
+        <div
+            class="row align-items-center m-3"
+            #collapse="ngbCollapse"
+            [(ngbCollapse)]="settingsCollapsed"
+        >
+            <div class="col-sm">Erkunden</div>
+            <div class="col-sm">
+                <div
+                    title="Wie häufig neu berechnet werden soll, wenn das Personal grade angekommen ist und gezählt wird."
+                    class="input-group input-group-sm float-start"
+                    style="max-width: 250px"
+                >
+                    <!-- The input is in seconds -->
+                    <input
+                        #timeInput="ngModel"
+                        [ngModel]="
+                            treatPatientsBehaviorState.intervals.unknown / 1000
+                        "
+                        (appSaveOnTyping)="
+                            updateTreatPatientsBehaviorState(
+                                $event * 1000,
+                                undefined,
+                                undefined,
+                                undefined,
+                                undefined
+                            )
+                        "
+                        min="0"
+                        required
+                        step="1"
+                        type="number"
+                        class="form-control form-control-sm d-inline-block no-validation"
+                        data-cy="alarmGroupVehicleDelayInput"
+                    />
+                    <span class="input-group-text">Sec</span>
+                </div>
             </div>
         </div>
-    </div>
+        <div
+            class="row align-items-center m-3"
+            #collapse="ngbCollapse"
+            [(ngbCollapse)]="settingsCollapsed"
+        >
+            <div class="col-sm">Vorsichten</div>
+            <div class="col-sm">
+                <div
+                    title="Wie häufig neu berechnet werden soll, wenn das Zählen der Patienten abgeschlossen ist und vorgesichtet wird."
+                    class="input-group input-group-sm float-start"
+                    style="max-width: 250px"
+                >
+                    <!-- The input is in seconds -->
+                    <input
+                        #timeInput="ngModel"
+                        [ngModel]="
+                            treatPatientsBehaviorState.intervals.counted / 1000
+                        "
+                        (appSaveOnTyping)="
+                            updateTreatPatientsBehaviorState(
+                                undefined,
+                                $event * 1000,
+                                undefined,
+                                undefined,
+                                undefined
+                            )
+                        "
+                        min="0"
+                        required
+                        step="1"
+                        type="number"
+                        class="form-control form-control-sm d-inline-block no-validation"
+                        data-cy="alarmGroupVehicleDelayInput"
+                    />
+                    <span class="input-group-text">Sec</span>
+                </div>
+            </div>
+        </div>
+        <div
+            class="row align-items-center m-3"
+            #collapse="ngbCollapse"
+            [(ngbCollapse)]="settingsCollapsed"
+        >
+            <div class="col-sm">Behandeln, Personal fehlt</div>
+            <div class="col-sm">
+                <div
+                    title="Wie häufig neu berechnet werden soll, nachdem das Personal vorgesichtet hat aber die Erstversorgung noch nicht sichergestellt ist."
+                    class="input-group input-group-sm float-start"
+                    style="max-width: 250px"
+                >
+                    <!-- The input is in seconds -->
+                    <input
+                        #timeInput="ngModel"
+                        [ngModel]="
+                            treatPatientsBehaviorState.intervals.triaged / 1000
+                        "
+                        (appSaveOnTyping)="
+                            updateTreatPatientsBehaviorState(
+                                undefined,
+                                undefined,
+                                $event * 1000,
+                                undefined,
+                                undefined
+                            )
+                        "
+                        min="0"
+                        required
+                        step="1"
+                        type="number"
+                        class="form-control form-control-sm d-inline-block no-validation"
+                        data-cy="alarmGroupVehicleDelayInput"
+                    />
+                    <span class="input-group-text">Sec</span>
+                </div>
+            </div>
+        </div>
+        <div
+            class="row align-items-center m-3"
+            #collapse="ngbCollapse"
+            [(ngbCollapse)]="settingsCollapsed"
+        >
+            <div class="col-sm">Erstversorgung sichergestellt</div>
+            <div class="col-sm">
+                <div
+                    title="Wie häufig neu berechnet werden soll, nachdem die Erstversorgung sichergesetellt ist."
+                    class="input-group input-group-sm float-start"
+                    style="max-width: 250px"
+                >
+                    <!-- The input is in seconds -->
+                    <input
+                        #timeInput="ngModel"
+                        [ngModel]="
+                            treatPatientsBehaviorState.intervals.secured / 1000
+                        "
+                        (appSaveOnTyping)="
+                            updateTreatPatientsBehaviorState(
+                                undefined,
+                                undefined,
+                                undefined,
+                                $event * 1000,
+                                undefined
+                            )
+                        "
+                        min="0"
+                        required
+                        step="1"
+                        type="number"
+                        class="form-control form-control-sm d-inline-block no-validation"
+                        data-cy="alarmGroupVehicleDelayInput"
+                    />
+                    <span class="input-group-text">Sec</span>
+                </div>
+            </div>
+        </div>
+        <div class="row m-3">
+            <h5
+                class="mt-2"
+                #collapse="ngbCollapse"
+                [(ngbCollapse)]="settingsCollapsed"
+            >
+                Weiteres
+            </h5>
+        </div>
+        <div
+            class="row align-items-center m-3"
+            #collapse="ngbCollapse"
+            [(ngbCollapse)]="settingsCollapsed"
+        >
+            <div class="col-sm">Zähldauer pro Patient</div>
+            <div class="col-sm">
+                <div
+                    title="Wie lange es dauert, einen Patienten zu zählen."
+                    class="input-group input-group-sm float-start"
+                    style="max-width: 250px"
+                >
+                    <!-- The input is in seconds -->
+                    <input
+                        #timeInput="ngModel"
+                        [ngModel]="
+                            treatPatientsBehaviorState.intervals
+                                .countingTimePerPatient / 1000
+                        "
+                        (appSaveOnTyping)="
+                            updateTreatPatientsBehaviorState(
+                                undefined,
+                                undefined,
+                                undefined,
+                                undefined,
+                                $event * 1000
+                            )
+                        "
+                        min="0"
+                        required
+                        step="1"
+                        type="number"
+                        class="form-control form-control-sm d-inline-block no-validation"
+                        data-cy="alarmGroupVehicleDelayInput"
+                    />
+                    <span class="input-group-text">Sec</span>
+                </div>
+            </div>
+        </div>
+    }
 </div>

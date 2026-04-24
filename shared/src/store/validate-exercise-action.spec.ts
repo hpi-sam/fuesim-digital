@@ -1,7 +1,7 @@
-import { Viewport } from '../models/index.js';
-import type { MapCoordinates } from '../models/utils/index.js';
-import type { ExerciseAction } from './action-reducers/index.js';
-import { validateExerciseAction } from './index.js';
+import type { MapCoordinates } from '../models/utils/position/map-coordinates.js';
+import { newViewport } from '../models/viewport.js';
+import { validateExerciseAction } from './validate-exercise-action.js';
+import type { ExerciseAction } from './action-reducers/action-reducers.js';
 
 describe('validateExerciseAction', () => {
     it('should accept a valid action object', () => {
@@ -14,14 +14,10 @@ describe('validateExerciseAction', () => {
         expect(
             validateExerciseAction({
                 type: '[Viewport] Add viewport',
-                viewport: Viewport.create(
+                viewport: newViewport(
                     {
                         x: 0,
                         y: 0,
-                    },
-                    {
-                        height: 1,
-                        width: 1,
                     },
                     ''
                 ),

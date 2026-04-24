@@ -1,26 +1,19 @@
-import { IsNumber } from 'class-validator';
-import { getCreate } from './get-create.js';
+import { z } from 'zod';
 
-export class Size {
+export const sizeSchema = z.strictObject({
     /**
-     * The width in meters.
+     * The width in meters
      */
-    @IsNumber()
-    public readonly width: number;
+    width: z.number(),
 
     /**
-     * The height in meters.
+     * The height in meters
      */
-    @IsNumber()
-    public readonly height: number;
+    height: z.number(),
+});
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(width: number, height: number) {
-        this.width = width;
-        this.height = height;
-    }
+export type Size = z.infer<typeof sizeSchema>;
 
-    static readonly create = getCreate(this);
+export function newSize(width: number, height: number): Size {
+    return { width, height };
 }

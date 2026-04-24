@@ -1,39 +1,28 @@
-import { IsNumber, IsString, IsUUID, Min } from 'class-validator';
-import type { UUID, UUIDSet } from '../utils/index.js';
-import { uuid, uuidValidationOptions } from '../utils/index.js';
-import { IsUUIDSet, IsValue } from '../utils/validators/index.js';
-import { getCreate } from './utils/index.js';
+import { z } from 'zod';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { uuidSetSchema } from '../utils/uuid-set.js';
 
-export class Hospital {
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
-
-    @IsValue('hospital' as const)
-    public readonly type = 'hospital';
-
-    @IsString()
-    public readonly name: string;
-
+export const hospitalSchema = z.strictObject({
+    id: uuidSchema,
+    type: z.literal('hospital'),
+    name: z.string(),
     /**
      * The time in ms it takes to transport a patient to this hospital
      */
-    @IsNumber()
-    @Min(0)
-    readonly transportDuration: number = 0;
-
+    transportDuration: z.number().nonnegative(),
     /**
-     * These Ids reference a hospitalPatients patientId
+     * These ids reference a hospital patient patientId
      */
-    @IsUUIDSet()
-    public readonly patientIds: UUIDSet = {};
+    patientIds: uuidSetSchema,
+});
+export type Hospital = z.infer<typeof hospitalSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(name: string, transportDuration: number) {
-        this.name = name;
-        this.transportDuration = transportDuration;
-    }
-
-    static readonly create = getCreate(this);
+export function newHospital(name: string, transportDuration: number): Hospital {
+    return {
+        id: uuid(),
+        type: 'hospital',
+        name,
+        transportDuration,
+        patientIds: {},
+    };
 }

@@ -1,38 +1,47 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import type {
     UUID,
-    Mutable,
     VehicleTemplate,
-} from 'digital-fuesim-manv-shared';
-import { cloneDeepMutable } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectVehicleTemplate } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
+    MaterialTemplate,
+    PersonnelTemplate,
+} from 'fuesim-digital-shared';
+import { cloneDeepMutable } from 'fuesim-digital-shared';
+import { WritableDraft } from 'immer';
 import type { ChangedVehicleTemplateValues } from '../vehicle-template-form/vehicle-template-form.component';
+import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    createSelectVehicleTemplate,
+    selectMaterialTemplates,
+    selectPersonnelTemplates,
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { VehicleTemplateFormComponent } from '../vehicle-template-form/vehicle-template-form.component';
 
 @Component({
     selector: 'app-edit-vehicle-template-modal',
     templateUrl: './edit-vehicle-template-modal.component.html',
     styleUrls: ['./edit-vehicle-template-modal.component.scss'],
-    standalone: false,
+    imports: [VehicleTemplateFormComponent],
 })
 export class EditVehicleTemplateModalComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
+
     // This is set after the modal creation and therefore accessible in ngOnInit
     public vehicleTemplateId!: UUID;
 
-    public vehicleTemplate?: Mutable<VehicleTemplate>;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly activeModal: NgbActiveModal,
-        private readonly confirmationModalService: ConfirmationModalService
-    ) {}
+    public vehicleTemplate?: WritableDraft<VehicleTemplate>;
+    public materialTemplates?: WritableDraft<MaterialTemplate[]> = [];
+    public personnelTemplates?: WritableDraft<PersonnelTemplate[]> = [];
 
     ngOnInit(): void {
         this.vehicleTemplate = cloneDeepMutable(
@@ -41,6 +50,26 @@ export class EditVehicleTemplateModalComponent implements OnInit {
                 this.store
             )
         );
+
+        const materialTemplates = selectStateSnapshot(
+            selectMaterialTemplates,
+            this.store
+        );
+        this.materialTemplates = cloneDeepMutable(
+            this.vehicleTemplate.materialTemplateIds.map(
+                (templateId) => materialTemplates[templateId]
+            )
+        ).filter((template) => template !== undefined);
+
+        const personnelTemplates = selectStateSnapshot(
+            selectPersonnelTemplates,
+            this.store
+        );
+        this.personnelTemplates = cloneDeepMutable(
+            this.vehicleTemplate.personnelTemplateIds.map(
+                (templateId) => personnelTemplates[templateId]
+            )
+        ).filter((template) => template !== undefined);
     }
 
     public async deleteVehicleTemplate(): Promise<void> {
@@ -70,8 +99,8 @@ export class EditVehicleTemplateModalComponent implements OnInit {
         aspectRatio,
         patientCapacity,
         type,
-        materialTypes,
-        personnelTypes,
+        materialTemplateIds,
+        personnelTemplateIds,
     }: ChangedVehicleTemplateValues): void {
         if (!this.vehicleTemplate) {
             console.error("VehicleTemplate wasn't initialized yet");
@@ -87,9 +116,9 @@ export class EditVehicleTemplateModalComponent implements OnInit {
                     height,
                     aspectRatio,
                 },
-                materials: materialTypes,
+                materialTemplateIds,
+                personnelTemplateIds,
                 patientCapacity,
-                personnelTypes,
                 vehicleType: type,
             })
             .then((response) => {

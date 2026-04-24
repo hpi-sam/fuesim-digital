@@ -1,3 +1,3 @@
 [submodule "test-scenarios"]
 	path = test-scenarios
-	url = https://github.com/hpi-sam/digital-fuesim-manv-public-test-scenarios.git
+	url = https://github.com/hpi-sam/fuesim-digital-public-test-scenarios.git

@@ -1,19 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { uuid } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
+import { uuid } from 'fuesim-digital-shared';
 import type {
     ChangedVehicleTemplateValues,
     EditableVehicleTemplateValues,
 } from '../vehicle-template-form/vehicle-template-form.component';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import { VehicleTemplateFormComponent } from '../vehicle-template-form/vehicle-template-form.component';
 
 @Component({
     selector: 'app-create-vehicle-template-modal',
     templateUrl: './create-vehicle-template-modal.component.html',
     styleUrls: ['./create-vehicle-template-modal.component.scss'],
-    standalone: false,
+    imports: [VehicleTemplateFormComponent],
 })
 export class CreateVehicleTemplateModalComponent {
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly exerciseService = inject(ExerciseService);
+
     public readonly editableVehicleTemplateValues: EditableVehicleTemplateValues =
         {
             url: null,
@@ -21,14 +25,9 @@ export class CreateVehicleTemplateModalComponent {
             name: null,
             patientCapacity: 1,
             type: null,
-            materialTypes: [],
-            personnelTypes: [],
+            materialTemplates: [],
+            personnelTemplates: [],
         };
-
-    constructor(
-        private readonly activeModal: NgbActiveModal,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public createVehicleTemplate({
         url,
@@ -37,8 +36,8 @@ export class CreateVehicleTemplateModalComponent {
         aspectRatio,
         patientCapacity,
         type,
-        materialTypes,
-        personnelTypes,
+        materialTemplateIds,
+        personnelTemplateIds,
     }: ChangedVehicleTemplateValues) {
         this.exerciseService
             .proposeAction({
@@ -52,9 +51,9 @@ export class CreateVehicleTemplateModalComponent {
                         aspectRatio,
                     },
                     name,
-                    materials: materialTypes,
+                    materialTemplateIds,
+                    personnelTemplateIds,
                     patientCapacity,
-                    personnel: personnelTypes,
                     vehicleType: type,
                 },
             })

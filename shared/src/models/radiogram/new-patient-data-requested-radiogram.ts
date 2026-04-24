@@ -1,55 +1,27 @@
-import {
-    IsBoolean,
-    IsString,
-    IsUUID,
-    ValidateIf,
-    ValidateNested,
-} from 'class-validator';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { IsRadiogramStatus } from '../../utils/validators/is-radiogram-status.js';
-import { getCreate } from '../utils/get-create.js';
-import type { Radiogram } from './radiogram.js';
+import { z } from 'zod';
+import type { UUID } from '../../utils/uuid.js';
+import { radiogramSchema } from './radiogram.js';
 import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
 
-export class NewPatientDataRequestedRadiogram implements Radiogram {
-    @IsUUID(4, uuidValidationOptions)
-    readonly id: UUID;
+export const newPatientDataRequestedRadiogramSchema = z.strictObject({
+    ...radiogramSchema.shape,
+    type: z.literal('newPatientDataRequestedRadiogram'),
+});
+export type NewPatientDataRequestedRadiogram = z.infer<
+    typeof newPatientDataRequestedRadiogramSchema
+>;
 
-    @IsValue('newPatientDataRequestedRadiogram')
-    readonly type = 'newPatientDataRequestedRadiogram';
-
-    @IsUUID(4, uuidValidationOptions)
-    readonly simulatedRegionId: UUID;
-
-    /**
-     * @deprecated use the helpers from {@link radiogram-helpers.ts}
-     * or {@link radiogram-helpers-mutable.ts} instead
-     */
-    @IsRadiogramStatus()
-    @ValidateNested()
-    readonly status: ExerciseRadiogramStatus;
-
-    @IsBoolean()
-    readonly informationAvailable: boolean = true;
-
-    @IsString()
-    @ValidateIf((_, value) => value !== null)
-    public readonly informationRequestKey: string | null = null;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        simulatedRegionId: UUID,
-        status: ExerciseRadiogramStatus
-    ) {
-        this.id = id;
-        this.simulatedRegionId = simulatedRegionId;
-        this.status = status;
-    }
-
-    static readonly create = getCreate(this);
+export function newNewPatientDataRequestedRadiogram(
+    id: UUID,
+    simulatedRegionId: UUID,
+    status: ExerciseRadiogramStatus
+): NewPatientDataRequestedRadiogram {
+    return {
+        id,
+        type: 'newPatientDataRequestedRadiogram',
+        simulatedRegionId,
+        status,
+        informationRequestKey: null,
+        informationAvailable: true,
+    };
 }

@@ -1,44 +1,39 @@
-import { Type } from 'class-transformer';
-import {
-    IsBoolean,
-    IsString,
-    IsUUID,
-    MaxLength,
-    ValidateNested,
-} from 'class-validator';
-import { Patient } from '../../models/patient.js';
-import type { PatientStatus } from '../../models/utils/index.js';
-import {
-    isOnMap,
-    MapPosition,
-    patientStatusAllowedValues,
-    MapCoordinates,
-    isNotInSimulatedRegion,
-    currentSimulatedRegionIdOf,
-    currentCoordinatesOf,
-    isInSimulatedRegion,
-    currentSimulatedRegionOf,
-} from '../../models/utils/index.js';
+import { WritableDraft } from 'immer';
+import { IsBoolean, IsString, IsUUID, MaxLength } from 'class-validator';
+import type { Action, ActionReducer } from '../action-reducer.js';
+import { ReducerError } from '../reducer-error.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     changePosition,
     changePositionWithId,
 } from '../../models/utils/position/position-helpers-mutable.js';
-import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import {
-    cloneDeepMutable,
-    StrictObject,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
-import { PatientRemovedEvent } from '../../simulation/events/index.js';
+    currentCoordinatesOf,
+    currentSimulatedRegionIdOf,
+    currentSimulatedRegionOf,
+    isInSimulatedRegion,
+    isOnMap,
+} from '../../models/utils/position/position-helpers.js';
 import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import { updateTreatments } from './utils/calculate-treatments.js';
-import { getElement } from './utils/get-element.js';
+import { newPatientRemovedEvent } from '../../simulation/events/patient-removed.js';
+import type { ExerciseState } from '../../state.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type Patient, patientSchema } from '../../models/patient.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import {
+    type PatientStatus,
+    patientStatusSchema,
+} from '../../models/utils/patient-status.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
+import { updateTreatments } from './utils/calculate-treatments.js';
 import { logPatientAdded, logPatientRemoved } from './utils/log.js';
+import { getElement } from './utils/get-element.js';
 
 /**
  * Performs all necessary actions to remove a patient from the state.
@@ -46,16 +41,13 @@ import { logPatientAdded, logPatientRemoved } from './utils/log.js';
  * @param patientId The ID of the patient to be deleted
  */
 export function deletePatient(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     patientId: UUID
 ) {
     const patient = getElement(draftState, 'patient', patientId);
     if (isInSimulatedRegion(patient)) {
         const simulatedRegion = currentSimulatedRegionOf(draftState, patient);
-        sendSimulationEvent(
-            simulatedRegion,
-            PatientRemovedEvent.create(patientId)
-        );
+        sendSimulationEvent(simulatedRegion, newPatientRemovedEvent(patientId));
     }
     removeElementPosition(draftState, 'patient', patientId);
     delete draftState.patients[patientId];
@@ -64,8 +56,8 @@ export function deletePatient(
 export class AddPatientAction implements Action {
     @IsValue('[Patient] Add patient' as const)
     public readonly type = '[Patient] Add patient';
-    @ValidateNested()
-    @Type(() => Patient)
+
+    @IsZodSchema(patientSchema)
     public readonly patient!: Patient;
 }
 
@@ -76,8 +68,7 @@ export class MovePatientAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly patientId!: UUID;
 
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -103,7 +94,7 @@ export class SetVisibleStatusAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly patientId!: UUID;
 
-    @IsLiteralUnion(patientStatusAllowedValues)
+    @IsZodSchema(patientStatusSchema)
     public readonly patientStatus!: PatientStatus;
 }
 
@@ -161,7 +152,7 @@ export namespace PatientActionReducers {
         action: AddPatientAction,
         reducer: (draftState, { patient }) => {
             if (
-                StrictObject.entries(patient.healthStates).some(
+                Object.entries(patient.healthStates).some(
                     ([id, healthState]) => healthState.id !== id
                 )
             ) {
@@ -169,7 +160,7 @@ export namespace PatientActionReducers {
                     "Not all health state's ids match their key id"
                 );
             }
-            StrictObject.values(patient.healthStates).forEach((healthState) => {
+            Object.values(patient.healthStates).forEach((healthState) => {
                 healthState.nextStateConditions.forEach(
                     (nextStateCondition) => {
                         if (
@@ -211,7 +202,7 @@ export namespace PatientActionReducers {
         reducer: (draftState, { patientId, targetPosition }) => {
             changePositionWithId(
                 patientId,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 'patient',
                 draftState
             );
@@ -226,7 +217,7 @@ export namespace PatientActionReducers {
             reducer: (draftState, { patientId }) => {
                 const patient = getElement(draftState, 'patient', patientId);
 
-                if (isNotInSimulatedRegion(patient)) {
+                if (!isInSimulatedRegion(patient)) {
                     throw new ReducerError(
                         `Patient with Id: ${patientId} was expected to be in simulated region but position was of type: ${patient.position.type}`
                     );
@@ -239,7 +230,7 @@ export namespace PatientActionReducers {
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    PatientRemovedEvent.create(patientId)
+                    newPatientRemovedEvent(patientId)
                 );
 
                 const coordinates = cloneDeepMutable(
@@ -253,7 +244,7 @@ export namespace PatientActionReducers {
 
                 changePositionWithId(
                     patientId,
-                    MapPosition.create(coordinates),
+                    newMapPositionAt(coordinates),
                     'patient',
                     draftState
                 );
@@ -275,7 +266,7 @@ export namespace PatientActionReducers {
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    PatientRemovedEvent.create(patientId)
+                    newPatientRemovedEvent(patientId)
                 );
             }
             logPatientRemoved(draftState, patientId);

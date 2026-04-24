@@ -1,62 +1,78 @@
-<ng-container
-    *ngIf="radiogram.informationAvailable; else informationUnavailable"
-    [ngSwitch]="radiogram.type"
->
-    <app-radiogram-card-content-vehicle-count
-        *ngSwitchCase="'vehicleCountRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-vehicle-occupations
-        *ngSwitchCase="'vehicleOccupationsRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-patient-count
-        *ngSwitchCase="'patientCountRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-treatment-status
-        *ngSwitchCase="'treatmentStatusRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-personnel-count
-        *ngSwitchCase="'personnelCountRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-material-count
-        *ngSwitchCase="'materialCountRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-missing-transfer-connection
-        *ngSwitchCase="'missingTransferConnectionRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-resource-request
-        *ngSwitchCase="'resourceRequestRadiogram'"
-        [radiogramId]="radiogram.id"
-        [shownInSignallerModal]="shownInSignallerModal"
-    />
-    <app-radiogram-card-content-transfer-connections
-        *ngSwitchCase="'transferConnectionsRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-transfer-counts
-        *ngSwitchCase="'transferCountsRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-transfer-category-completed
-        *ngSwitchCase="'transferCategoryCompletedRadiogram'"
-        [radiogramId]="radiogram.id"
-    />
-    <app-radiogram-card-content-transport-patient-count-request
-        *ngSwitchCase="'newPatientDataRequestedRadiogram'"
-    />
-    <app-radiogram-card-content-fallback
-        *ngSwitchDefault
-        [radiogramType]="radiogram.type"
-    />
-</ng-container>
-<ng-template #informationUnavailable>
+@if (radiogram().informationAvailable) {
+    @switch (radiogram().type) {
+        @case ('vehicleCountRadiogram') {
+            <app-radiogram-card-content-vehicle-count
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('vehicleOccupationsRadiogram') {
+            <app-radiogram-card-content-vehicle-occupations
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('patientCountRadiogram') {
+            <app-radiogram-card-content-patient-count
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('treatmentStatusRadiogram') {
+            <app-radiogram-card-content-treatment-status
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('personnelCountRadiogram') {
+            <app-radiogram-card-content-personnel-count
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('materialCountRadiogram') {
+            <app-radiogram-card-content-material-count
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('missingTransferConnectionRadiogram') {
+            <app-radiogram-card-content-missing-transfer-connection
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('resourceRequestRadiogram') {
+            <app-radiogram-card-content-resource-request
+                [radiogramId]="radiogram().id"
+                [shownInSignallerModal]="shownInSignallerModal()"
+            />
+        }
+        @case ('transferConnectionsRadiogram') {
+            <app-radiogram-card-content-transfer-connections
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('transferCountsRadiogram') {
+            <app-radiogram-card-content-transfer-counts
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('transferCategoryCompletedRadiogram') {
+            <app-radiogram-card-content-transfer-category-completed
+                [radiogramId]="radiogram().id"
+            />
+        }
+        @case ('newPatientDataRequestedRadiogram') {
+            <app-radiogram-card-content-transport-patient-count-request />
+        }
+        @default {
+            <!--
+            Without the cast to any, typescript would consider `radiogram: never`, since the cases above are exhaustive.
+            This would be a prime example of @ts-expect-error (see https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-9.html#-ts-expect-error-comments),
+            to ignore the property access on never and receive a warning if these is no error (i.e., the cases are not exhaustive)
+            but those comments are not supported in templates (see https://github.com/angular/angular/issues/39397)
+            -->
+            <app-radiogram-card-content-fallback
+                [radiogramType]="$any(radiogram()).type"
+            />
+        }
+    }
+} @else {
     <app-radiogram-card-content-information-unavailable
-        [radiogramType]="radiogram.type"
+        [radiogramType]="radiogram().type"
     />
-</ng-template>
+}

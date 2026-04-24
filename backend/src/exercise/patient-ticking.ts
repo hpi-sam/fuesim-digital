@@ -2,18 +2,19 @@ import type {
     ExerciseState,
     HealthPoints,
     PatientUpdate,
-    PersonnelType,
-} from 'digital-fuesim-manv-shared';
+    Patient,
+} from 'fuesim-digital-shared';
 import {
+    canBeTreated,
     getElement,
     healthPointsDefaults,
-    Patient,
-} from 'digital-fuesim-manv-shared';
+    isTreatedByPersonnel,
+} from 'fuesim-digital-shared';
 
 /**
  * The count of assigned personnel and material that cater for a {@link Patient}.
  */
-type Catering = { [key in PersonnelType | 'material']: number };
+type Catering = { [key in string]: number } & { material: number };
 
 /**
  * Apply the patient tick to the {@link state}
@@ -26,10 +27,10 @@ export function patientTick(
     patientTickInterval: number
 ): PatientUpdate[] {
     return Object.values(state.patients)
-        .filter((patient) => Patient.canBeTreated(patient))
+        .filter(canBeTreated)
         .map((patient) => {
             // update the time a patient is being treated, to check for pretriage later
-            const treatmentTime = Patient.isTreatedByPersonnel(patient)
+            const treatmentTime = isTreatedByPersonnel(patient)
                 ? patient.treatmentTime + patientTickInterval
                 : patient.treatmentTime;
             const nextHealthPoints = getNextPatientHealthPoints(
@@ -73,12 +74,15 @@ function getDedicatedResources(
     };
 
     // Get the number of every personnel
-    Object.keys(patient.assignedPersonnelIds).forEach(
-        (personnelId) =>
-            cateringTypes[
-                getElement(state, 'personnel', personnelId).personnelType
-            ]++
-    );
+    Object.keys(patient.assignedPersonnelIds).forEach((personnelId) => {
+        const personnelType = getElement(
+            state,
+            'personnel',
+            personnelId
+        ).personnelType;
+        if (!cateringTypes[personnelType]) return;
+        cateringTypes[personnelType]++;
+    });
 
     return cateringTypes;
 }
@@ -98,9 +102,9 @@ function getNextPatientHealthPoints(
     patientTickInterval: number
 ): HealthPoints {
     let material = treatedBy.material;
-    const notarzt = treatedBy.notarzt;
-    const notSan = treatedBy.notSan;
-    const rettSan = treatedBy.rettSan;
+    const notarzt = treatedBy['notarzt'] ?? 0;
+    const notSan = treatedBy['notSan'] ?? 0;
+    const rettSan = treatedBy['rettSan'] ?? 0;
     // TODO: Sans should be able to treat patients too.
     const functionParameters =
         patient.healthStates[patient.currentHealthStateId]!.functionParameters;
@@ -156,8 +160,7 @@ function getNextStateId(patient: Patient) {
             (nextConditions.maximumHealth === undefined ||
                 patient.health <= nextConditions.maximumHealth) &&
             (nextConditions.isBeingTreated === undefined ||
-                Patient.isTreatedByPersonnel(patient) ===
-                    nextConditions.isBeingTreated)
+                isTreatedByPersonnel(patient) === nextConditions.isBeingTreated)
         ) {
             return nextConditions.matchingHealthStateId;
         }

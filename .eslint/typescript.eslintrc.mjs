@@ -1,3 +1,5 @@
+import esLintAntfuPlugin from 'eslint-plugin-antfu';
+
 export default {
     files: ['**/*.ts', '**/*.js'],
 
@@ -6,6 +8,10 @@ export default {
         '**/migrations/**/*.js',
         'jest.config.js',
     ],
+
+    plugins: {
+        antfu: esLintAntfuPlugin,
+    },
 
     rules: {
         /**
@@ -115,6 +121,11 @@ export default {
                         importNames: ['HotkeysService'],
                         message:
                             'Please use the abstraction layer from frontend/src/app/shared/services/hotkeys.service.ts instead.',
+                    },
+                    {
+                        name: 'zod',
+                        importNames: ['uuid'],
+                        message: 'Please use uuid from shared instead.',
                     },
                 ],
 
@@ -394,6 +405,7 @@ export default {
             'warn',
             {
                 args: 'none',
+                enableAutofixRemoval: { imports: true },
             },
         ],
         '@typescript-eslint/no-use-before-define': 'off',
@@ -409,5 +421,6 @@ export default {
         '@typescript-eslint/no-misused-new': 'warn',
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+        'antfu/top-level-function': 'error',
     },
 };

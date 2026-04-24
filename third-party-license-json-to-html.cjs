@@ -34,7 +34,7 @@ let inspired_by_or_copied_from_data = fs
 
 let inspired_by_or_copied_from =
     `<h1>List of links used for inspiration or copied from or as guidance</h1>
-                <a>If you want to know, where these where used search inside the source code for this specific URL <a href="assets/source-code/digital-fuesim-manv.zip">here</a>.</a>
+                <a>If you want to know, where these where used search inside the source code for this specific URL <a href="assets/source-code/fuesim-digital.zip">here</a>.</a>
                 ` + inspired_by_or_copied_from_data;
 
 let table_header = json2html.render(data[0], template_table_header);

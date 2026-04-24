@@ -1,9 +1,10 @@
+import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../../state.js';
-import { getElement } from '../../../store/action-reducers/utils/get-element.js';
-import type { Mutable, UUID } from '../../../utils/index.js';
 import type { SimulatedRegion } from '../../simulated-region.js';
 import type { Transfer } from '../transfer.js';
-import { MapCoordinates } from './map-coordinates.js';
+import type { UUID } from '../../../utils/uuid.js';
+import { getElement } from '../../../store/action-reducers/utils/get-element.js';
+import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
 import type { Position } from './position.js';
 import type { SimulatedRegionPosition } from './simulated-region-position.js';
@@ -23,18 +24,6 @@ export function isInTransfer(withPosition: WithPosition): boolean {
 }
 export function isInSimulatedRegion(withPosition: WithPosition): boolean {
     return isPositionInSimulatedRegion(withPosition.position);
-}
-export function isNotOnMap(withPosition: WithPosition): boolean {
-    return !isOnMap(withPosition);
-}
-export function isNotInVehicle(withPosition: WithPosition): boolean {
-    return !isInVehicle(withPosition);
-}
-export function isNotInTransfer(withPosition: WithPosition): boolean {
-    return !isInTransfer(withPosition);
-}
-export function isNotInSimulatedRegion(withPosition: WithPosition): boolean {
-    return !isInSimulatedRegion(withPosition);
 }
 
 export function isInSpecificVehicle(
@@ -96,9 +85,9 @@ export function currentSimulatedRegionIdOf(withPosition: WithPosition): UUID {
 }
 
 export function currentSimulatedRegionOf(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     withPosition: WithPosition
-): Mutable<SimulatedRegion> {
+): WritableDraft<SimulatedRegion> {
     if (isInSimulatedRegion(withPosition)) {
         return getElement(
             draftState,
@@ -111,34 +100,28 @@ export function currentSimulatedRegionOf(
     );
 }
 
-export function isPositionOnMap(position: Position): boolean {
+export function isPositionOnMap(position: Position): position is MapPosition {
     return position.type === 'coordinates';
 }
-export function isPositionInVehicle(position: Position): boolean {
+export function isPositionInVehicle(
+    position: Position
+): position is VehiclePosition {
     return position.type === 'vehicle';
 }
-export function isPositionInTransfer(position: Position): boolean {
+export function isPositionInTransfer(
+    position: Position
+): position is TransferPosition {
     return position.type === 'transfer';
 }
-export function isPositionInSimulatedRegion(position: Position): boolean {
+export function isPositionInSimulatedRegion(
+    position: Position
+): position is SimulatedRegionPosition {
     return position.type === 'simulatedRegion';
-}
-export function isPositionNotOnMap(position: Position): boolean {
-    return !isPositionOnMap(position);
-}
-export function isPositionNotInVehicle(position: Position): boolean {
-    return !isPositionInVehicle(position);
-}
-export function isPositionNotInTransfer(position: Position): boolean {
-    return !isPositionInTransfer(position);
-}
-export function isPositionNotInSimulatedRegion(position: Position): boolean {
-    return !isPositionInSimulatedRegion(position);
 }
 
 export function coordinatesOfPosition(position: Position): MapCoordinates {
     if (isPositionOnMap(position)) {
-        return (position as MapPosition).coordinates;
+        return position.coordinates;
     }
     throw new TypeError(
         `Expected position to be on Map. Was of type ${position.type}.`
@@ -147,7 +130,7 @@ export function coordinatesOfPosition(position: Position): MapCoordinates {
 
 export function vehicleIdOfPosition(position: Position): UUID {
     if (isPositionInVehicle(position)) {
-        return (position as VehiclePosition).vehicleId;
+        return position.vehicleId;
     }
     throw new TypeError(
         `Expected position to be in vehicle. Was of type ${position.type}.`
@@ -156,7 +139,7 @@ export function vehicleIdOfPosition(position: Position): UUID {
 
 export function transferOfPosition(position: Position): Transfer {
     if (isPositionInTransfer(position)) {
-        return (position as TransferPosition).transfer;
+        return position.transfer;
     }
     throw new TypeError(
         `Expected position to be in transfer. Was of type ${position.type}.`
@@ -165,7 +148,7 @@ export function transferOfPosition(position: Position): Transfer {
 
 export function simulatedRegionIdOfPosition(position: Position): UUID {
     if (isPositionInSimulatedRegion(position)) {
-        return (position as SimulatedRegionPosition).simulatedRegionId;
+        return position.simulatedRegionId;
     }
     throw new TypeError(
         `Expected position to be in simulatedRegion. Was of type ${position.type}.`
@@ -183,7 +166,7 @@ export function upperLeftCornerOf(element: WithExtent): MapCoordinates {
         corner.y -= element.size.height;
     }
 
-    return MapCoordinates.create(corner.x, corner.y);
+    return corner;
 }
 
 export function lowerRightCornerOf(element: WithExtent): MapCoordinates {
@@ -197,7 +180,35 @@ export function lowerRightCornerOf(element: WithExtent): MapCoordinates {
         corner.y -= element.size.height;
     }
 
-    return MapCoordinates.create(corner.x, corner.y);
+    return corner;
+}
+
+export interface BoundingBox {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+}
+
+export function getBoundingBox(elements: WithExtent[]): BoundingBox {
+    const minX = Math.min(
+        ...elements.map((element) => upperLeftCornerOf(element).x)
+    );
+    const minY = Math.min(
+        ...elements.map((element) => lowerRightCornerOf(element).y)
+    );
+    const maxX = Math.max(
+        ...elements.map((element) => lowerRightCornerOf(element).x)
+    );
+    const maxY = Math.max(
+        ...elements.map((element) => upperLeftCornerOf(element).y)
+    );
+    return {
+        minX,
+        maxX,
+        minY,
+        maxY,
+    };
 }
 
 export function nestedCoordinatesOf(

@@ -1,20 +1,16 @@
-import { IsUUID } from 'class-validator';
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../get-create.js';
-import type { UUID } from '../../../utils/index.js';
-import { uuidValidationOptions } from '../../../utils/index.js';
-import type { Occupation } from './occupation.js';
+import { z } from 'zod';
+import { uuidSchema } from '../../../utils/uuid.js';
 
-export class LoadOccupation implements Occupation {
-    @IsValue('loadOccupation')
-    readonly type = 'loadOccupation';
+export const loadOccupationSchema = z.strictObject({
+    type: z.literal('loadOccupation'),
+    loadingActivityId: uuidSchema,
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly loadingActivityId: UUID;
+export type LoadOccupation = z.infer<typeof loadOccupationSchema>;
 
-    constructor(loadingActivityId: UUID) {
-        this.loadingActivityId = loadingActivityId;
-    }
-
-    static readonly create = getCreate(this);
+export function newLoadOccupation(loadingActivityId: string): LoadOccupation {
+    return {
+        type: 'loadOccupation',
+        loadingActivityId,
+    };
 }

@@ -4,8 +4,8 @@ import type {
     SimulatedRegion,
     // eslint-disable-next-line @typescript-eslint/no-shadow
     Element,
-} from 'digital-fuesim-manv-shared';
-import { MapCoordinates, Size } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { newMapCoordinatesAt, newSize } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type { Polygon } from 'ol/geom';
 import type { TranslateEvent } from 'ol/interaction/Translate';
@@ -14,21 +14,21 @@ import { Fill } from 'ol/style';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectCurrentMainRole,
-    selectVisibleSimulatedRegions,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { SimulatedRegionPopupComponent } from '../shared/simulated-region-popup/simulated-region-popup.component';
-import { calculatePopupPositioning } from '../utility/calculate-popup-positioning';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PolygonGeometryHelper } from '../utility/polygon-geometry-helper';
 import { ResizeRectangleInteraction } from '../utility/resize-rectangle-interaction';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectVisibleSimulatedRegions,
+    selectCurrentMainRole,
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { PointRelativePopupHelper } from '../utility/point-relative-popup-helper';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class SimulatedRegionFeatureManager
@@ -56,7 +56,7 @@ export class SimulatedRegionFeatureManager
     ) {
         super(
             olMap,
-            (targetPositions, simulatedRegion) => {
+            async (targetPositions, simulatedRegion) =>
                 exerciseService.proposeAction(
                     {
                         type: '[SimulatedRegion] Move simulated region',
@@ -64,8 +64,7 @@ export class SimulatedRegionFeatureManager
                         targetPosition: targetPositions[0]![0]!,
                     },
                     true
-                );
-            },
+                ),
             new PolygonGeometryHelper()
         );
         this.layer.setStyle((feature, resolution) => [
@@ -114,11 +113,11 @@ export class SimulatedRegionFeatureManager
                     {
                         type: '[SimulatedRegion] Resize simulated region',
                         simulatedRegionId: element.id,
-                        targetPosition: MapCoordinates.create(
+                        targetPosition: newMapCoordinatesAt(
                             topLeftCoordinate[0]!,
                             topLeftCoordinate[1]!
                         ),
-                        newSize: Size.create(
+                        newSize: newSize(
                             currentElement.size.width * scale.x,
                             currentElement.size.height * scale.y
                         ),
@@ -152,7 +151,7 @@ export class SimulatedRegionFeatureManager
     public override onFeatureDrop(
         droppedElement: Element | undefined,
         droppedOnFeature: Feature<any>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) {
         const droppedOnSimulatedRegion = this.getElementFromFeature(
             droppedOnFeature
@@ -184,6 +183,8 @@ export class SimulatedRegionFeatureManager
         return false;
     }
 
+    private readonly popupHelper = new PointRelativePopupHelper(this.olMap);
+
     public override onFeatureClicked(
         event: MapBrowserEvent<any>,
         feature: Feature<any>
@@ -194,29 +195,19 @@ export class SimulatedRegionFeatureManager
         ) {
             return;
         }
-        const zoom = this.olMap.getView().getZoom()!;
-        const margin = 10 / zoom;
 
-        this.popupService.openPopup({
-            elementUUID: feature.getId()?.toString(),
-            component: SimulatedRegionPopupComponent,
-            closingUUIDs: [feature.getId() as UUID],
-            markedForParticipantUUIDs: [],
-            markedForTrainerUUIDs: [],
-            changedLayers: [],
-            context: {
-                simulatedRegionId: feature.getId() as UUID,
-            },
-            // We want the popup to be centered on the mouse position
-            ...calculatePopupPositioning(
+        const simulatedRegionId = feature.getId() as UUID;
+        this.popupService.openPopup(
+            this.popupHelper.getPopupOptions(
+                SimulatedRegionPopupComponent,
                 event.coordinate,
-                {
-                    height: margin,
-                    width: margin,
-                },
-                this.olMap.getView().getCenter()!
-            ),
-        });
+                [simulatedRegionId],
+                [],
+                [],
+                [],
+                { simulatedRegionId }
+            )
+        );
     }
 
     public override isFeatureTranslatable(feature: Feature<Polygon>): boolean {

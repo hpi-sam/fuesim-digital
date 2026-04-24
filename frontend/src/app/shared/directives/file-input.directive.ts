@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
+import { Directive, HostListener, output } from '@angular/core';
 
 /**
  * This directive must only be used on file inputs and provides an output similar to `(input)`,
@@ -9,12 +9,9 @@ import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
  * <input type="file" (appFileInput)="processFileList($event)" />
  * ````
  */
-@Directive({
-    selector: 'input[appFileInput]',
-    standalone: false,
-})
+@Directive({ selector: 'input[appFileInput]' })
 export class FileInputDirective {
-    @Output() readonly appFileInput = new EventEmitter<FileList>();
+    readonly appFileInput = output<FileList>();
 
     @HostListener('input', ['$event'])
     public onInput(event: Event) {

@@ -1,35 +1,47 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ConfirmationModalService } from 'src/app/core/confirmation-modal/confirmation-modal.service';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectExerciseStatus } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectOwnClient } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { AsyncPipe } from '@angular/common';
+import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
+import { ExerciseService } from '../../../core/exercise.service';
+import type { AppState } from '../../../state/app.state';
+import {
+    selectExerciseStatus,
+    selectExerciseType,
+} from '../../../state/application/selectors/exercise.selectors';
+import { selectOwnClient } from '../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../state/get-state-snapshot';
+import { ParallelExerciseService } from '../../../core/parallel-exercise.service';
 
 @Component({
     selector: 'app-start-pause-button',
     templateUrl: './start-pause-button.component.html',
     styleUrls: ['./start-pause-button.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class StartPauseButtonComponent {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
+    private readonly parallelExerciseService = inject(ParallelExerciseService);
+
     public exerciseStatus$ = this.store.select(selectExerciseStatus);
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly confirmationModalService: ConfirmationModalService
-    ) {}
-
     public async pauseExercise() {
-        const response = await this.exerciseService.proposeAction({
-            type: '[Exercise] Pause',
-        });
-        if (response.success) {
-            this.sendLogAction(
-                `Übung wurde pausiert. (${this.getCurrentDate()})`
-            );
+        if (
+            selectStateSnapshot(selectExerciseType, this.store) !== 'parallel'
+        ) {
+            const response = await this.exerciseService.proposeAction({
+                type: '[Exercise] Pause',
+            });
+            if (response.success) {
+                this.sendLogAction(
+                    `Übung wurde pausiert. (${this.getCurrentDate()})`
+                );
+            }
+        } else {
+            await this.parallelExerciseService.pauseParallelExercise();
         }
     }
 
@@ -46,13 +58,19 @@ export class StartPauseButtonComponent {
                 return;
             }
         }
-        const response = await this.exerciseService.proposeAction({
-            type: '[Exercise] Start',
-        });
-        if (response.success) {
-            this.sendLogAction(
-                `Übung wurde gestartet. (${this.getCurrentDate()})`
-            );
+        if (
+            selectStateSnapshot(selectExerciseType, this.store) !== 'parallel'
+        ) {
+            const response = await this.exerciseService.proposeAction({
+                type: '[Exercise] Start',
+            });
+            if (response.success) {
+                this.sendLogAction(
+                    `Übung wurde gestartet. (${this.getCurrentDate()})`
+                );
+            }
+        } else {
+            await this.parallelExerciseService.startParallelExercise();
         }
     }
 

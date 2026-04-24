@@ -1,12 +1,11 @@
-import { Component, Input } from '@angular/core';
-import { Tag } from 'digital-fuesim-manv-shared';
+import { Component, input } from '@angular/core';
+import type { Tag } from 'fuesim-digital-shared';
 
 @Component({
     selector: 'app-tag',
     templateUrl: './tag.component.html',
     styleUrls: ['./tag.component.scss'],
-    standalone: false,
 })
 export class TagComponent {
-    @Input() tag!: Tag;
+    readonly tag = input.required<Tag>();
 }

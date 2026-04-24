@@ -1,15 +1,19 @@
-import type { Vehicle, VehicleTemplate } from '../models/index.js';
-import { VehicleParameters, Material, Personnel } from '../models/index.js';
+import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
+import { newMaterialFromTemplate } from '../models/material.js';
+import { newPersonnelFromTemplate } from '../models/personnel.js';
+import type { UUID } from '../utils/uuid.js';
+import type { VehicleTemplate } from '../models/vehicle-template.js';
+import type { MapCoordinates } from '../models/utils/position/map-coordinates.js';
+import {
+    newVehicleParameters,
+    type VehicleParameters,
+} from '../models/utils/vehicle-parameters.js';
+import { newVehiclePositionIn } from '../models/utils/position/vehicle-position.js';
+import type { Vehicle } from '../models/vehicle.js';
+import { newMapPositionAt } from '../models/utils/position/map-position.js';
+import { newNoOccupation } from '../models/utils/occupations/no-occupation.js';
 import type { MaterialTemplate } from '../models/material-template.js';
 import type { PersonnelTemplate } from '../models/personnel-template.js';
-import type { PersonnelType, MapCoordinates } from '../models/utils/index.js';
-import { MapPosition } from '../models/utils/position/map-position.js';
-import type { MaterialType } from '../models/utils/material-type.js';
-import { VehiclePosition } from '../models/utils/position/vehicle-position.js';
-
-import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
-import { NoOccupation } from '../models/utils/occupations/no-occupation.js';
-import type { UUID } from '../utils/index.js';
 
 /**
  * @returns a vehicle with personnel and materials to be added to the map
@@ -18,34 +22,39 @@ import type { UUID } from '../utils/index.js';
 export function createVehicleParameters(
     vehicleId: UUID,
     vehicleTemplate: VehicleTemplate,
-    materialTemplates: {
-        [Key in MaterialType]: MaterialTemplate;
-    },
-    personnelTemplates: {
-        [Key in PersonnelType]: PersonnelTemplate;
-    },
+    materialTemplates: { readonly [key in UUID]: MaterialTemplate },
+    personnelTemplates: { readonly [key in UUID]: PersonnelTemplate },
     vehiclePosition: MapCoordinates
 ): VehicleParameters {
-    const materials = vehicleTemplate.materials.map((currentMaterial) =>
-        Material.generateMaterial(
-            materialTemplates[currentMaterial],
-            vehicleId,
-            vehicleTemplate.name,
-            VehiclePosition.create(vehicleId)
-        )
-    );
-    const personnel = vehicleTemplate.personnel.map((currentPersonnel) =>
-        Personnel.generatePersonnel(
-            personnelTemplates[currentPersonnel],
-            vehicleId,
-            vehicleTemplate.name,
-            VehiclePosition.create(vehicleId)
-        )
-    );
+    const materials = vehicleTemplate.materialTemplateIds
+        .map((materialTemplateId: UUID) => {
+            const materialTemplate = materialTemplates[materialTemplateId];
+            if (!materialTemplate) return null;
+            return newMaterialFromTemplate(
+                materialTemplate,
+                vehicleId,
+                vehicleTemplate.name,
+                newVehiclePositionIn(vehicleId)
+            );
+        })
+        .filter((val) => val !== null);
+    const personnel = vehicleTemplate.personnelTemplateIds
+        .map((personnelTemplateId: UUID) => {
+            const personnelTemplate = personnelTemplates[personnelTemplateId];
+            if (!personnelTemplate) return null;
+            return newPersonnelFromTemplate(
+                personnelTemplate,
+                vehicleId,
+                vehicleTemplate.name,
+                newVehiclePositionIn(vehicleId)
+            );
+        })
+        .filter((val) => val !== null);
 
     const vehicle: Vehicle = {
         id: vehicleId,
         type: 'vehicle',
+        templateId: vehicleTemplate.id,
         materialIds: arrayToUUIDSet(materials.map((m) => m.id)),
         vehicleType: vehicleTemplate.vehicleType,
         name: vehicleTemplate.name,
@@ -53,9 +62,10 @@ export function createVehicleParameters(
         image: vehicleTemplate.image,
         patientIds: {},
         personnelIds: arrayToUUIDSet(personnel.map((p) => p.id)),
-        position: MapPosition.create(vehiclePosition),
-        occupation: NoOccupation.create(),
+        position: newMapPositionAt(vehiclePosition),
+        occupation: newNoOccupation(),
+        operationalAssignment: null,
     };
 
-    return VehicleParameters.create(vehicle, materials, personnel);
+    return newVehicleParameters(vehicle, materials, personnel);
 }

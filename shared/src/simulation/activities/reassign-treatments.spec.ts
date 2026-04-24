@@ -1,33 +1,33 @@
-import { produce } from 'immer';
-import {
-    Personnel,
-    SimulatedRegion,
-    TransferPoint,
-} from '../../models/index.js';
-import type { PatientStatus, PersonnelType } from '../../models/utils/index.js';
-import {
-    CanCaterFor,
-    MapCoordinates,
-    SimulatedRegionPosition,
-    Size,
-} from '../../models/utils/index.js';
+import { produce, type WritableDraft } from 'immer';
 import { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuid } from '../../utils/index.js';
-import { AssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
 import { addPersonnel } from '../../../tests/utils/personnel.spec.js';
 import { defaultPersonnelTemplates } from '../../data/default-state/personnel-templates.js';
-import { TreatmentProgressChangedEvent } from '../events/index.js';
 import { assertCatering } from '../../../tests/utils/catering.spec.js';
 import { addMaterial } from '../../../tests/utils/materials.spec.js';
 import { sendSimulationEvent } from '../events/utils.js';
+import { newCanCaterFor } from '../../models/utils/cater-for.js';
+import type { ParticipantKey } from '../../exercise-keys.js';
+import { uuid, type UUID } from '../../utils/uuid.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { newSimulatedRegion } from '../../models/simulated-region.js';
+import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
+import { newSize } from '../../models/utils/size.js';
+import { newTransferPoint } from '../../models/transfer-point.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import type { AssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
+import { newAssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newPersonnelFromTemplate } from '../../models/personnel.js';
+import type { PatientStatus } from '../../models/utils/patient-status.js';
+import { newTreatmentProgressChangedEvent } from '../events/treatment-progress-changed.js';
+import type { ReassignTreatmentsActivityState } from './reassign-treatments.js';
 import {
+    newReassignTreatmentsActivityState,
     reassignTreatmentsActivity,
-    ReassignTreatmentsActivityState,
 } from './reassign-treatments.js';
 
-const emptyState = ExerciseState.create('123456');
+const emptyState = ExerciseState.create('123456' as ParticipantKey);
 
 /**
  * TODO: Update comment and rename function
@@ -39,23 +39,21 @@ function setupStateAndApplyTreatments(
     activityState: ReassignTreatmentsActivityState,
     leaderId?: UUID,
     mutateBeforeState?: (
-        state: Mutable<ExerciseState>,
+        state: WritableDraft<ExerciseState>,
         simulatedRegion: SimulatedRegion
     ) => void
 ) {
-    const simulatedRegion = SimulatedRegion.create(
-        MapCoordinates.create(0, 0),
-        Size.create(10, 10),
+    const simulatedRegion = newSimulatedRegion(
+        newMapCoordinatesAt(0, 0),
+        newSize(10, 10),
         'test region'
     );
-    const transferPoint = TransferPoint.create(
-        SimulatedRegionPosition.create(simulatedRegion.id),
-        {},
-        {},
+    const transferPoint = newTransferPoint(
+        newSimulatedRegionPositionIn(simulatedRegion.id),
         '',
         `[Simuliert] test region`
     );
-    const leaderBehaviorState = AssignLeaderBehaviorState.create();
+    const leaderBehaviorState = newAssignLeaderBehaviorState();
     const beforeState = produce(emptyState, (draftState) => {
         draftState.simulatedRegions[simulatedRegion.id] =
             cloneDeepMutable(simulatedRegion);
@@ -68,7 +66,7 @@ function setupStateAndApplyTreatments(
         if (leaderId) {
             (
                 draftState.simulatedRegions[simulatedRegion.id]
-                    ?.behaviors[0] as Mutable<AssignLeaderBehaviorState>
+                    ?.behaviors[0] as WritableDraft<AssignLeaderBehaviorState>
             ).leaderId = leaderId;
         }
 
@@ -105,12 +103,12 @@ describe('reassign treatment', () => {
             it('goes to noTreatment when there is nothing', () => {
                 const { beforeState, newState, simulatedRegion, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(uuid(), state, 0)
+                        newReassignTreatmentsActivityState(uuid(), state, 0)
                     );
                 const shouldState = produce(beforeState, (draftState) => {
                     sendSimulationEvent(
                         draftState.simulatedRegions[simulatedRegion!.id]!,
-                        TreatmentProgressChangedEvent.create('noTreatment')
+                        newTreatmentProgressChangedEvent('noTreatment')
                     );
                 });
                 expect(newState).toStrictEqual(shouldState);
@@ -120,25 +118,21 @@ describe('reassign treatment', () => {
             it('goes to noTreatment when there is no personnel', () => {
                 const { beforeState, newState, simulatedRegion, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         undefined,
                         (draftState, { id }) => {
                             addPatient(
                                 draftState,
                                 'white',
                                 'red',
-                                SimulatedRegionPosition.create(id)
+                                newSimulatedRegionPositionIn(id)
                             );
                         }
                     );
                 const shouldState = produce(beforeState, (draftState) => {
                     sendSimulationEvent(
                         draftState.simulatedRegions[simulatedRegion!.id]!,
-                        TreatmentProgressChangedEvent.create('noTreatment')
+                        newTreatmentProgressChangedEvent('noTreatment')
                     );
                 });
                 expect(newState).toStrictEqual(shouldState);
@@ -148,27 +142,23 @@ describe('reassign treatment', () => {
             it('goes to noTreatment when there is no leading personnel', () => {
                 const { beforeState, newState, simulatedRegion, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         undefined,
                         (draftState, { id }) => {
                             addPatient(
                                 draftState,
                                 'white',
                                 'red',
-                                SimulatedRegionPosition.create(id)
+                                newSimulatedRegionPositionIn(id)
                             );
 
                             addPersonnel(
                                 draftState,
-                                Personnel.generatePersonnel(
+                                newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(id)
+                                    newSimulatedRegionPositionIn(id)
                                 )
                             );
                         }
@@ -176,7 +166,7 @@ describe('reassign treatment', () => {
                 const shouldState = produce(beforeState, (draftState) => {
                     sendSimulationEvent(
                         draftState.simulatedRegions[simulatedRegion!.id]!,
-                        TreatmentProgressChangedEvent.create('noTreatment')
+                        newTreatmentProgressChangedEvent('noTreatment')
                     );
                 });
                 expect(newState).toStrictEqual(shouldState);
@@ -188,28 +178,22 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, simulatedRegion) => {
                             addPatient(
                                 draftState,
                                 'white',
                                 'red',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             );
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         simulatedRegion.id
                                     )
                                 ),
@@ -231,49 +215,45 @@ describe('reassign treatment', () => {
                 let catererId: UUID = '';
 
                 const { beforeState, newState } = setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, simulatedRegion) => {
                         addPatient(
                             draftState,
                             'black',
                             'black',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
                         addPatient(
                             draftState,
                             'black',
                             'black',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
                         addPatient(
                             draftState,
                             'black',
                             'black',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
 
                         catererId = addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         ).id;
                     }
@@ -293,41 +273,33 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate, newActivityState } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(
-                        uuid(),
-                        'unknown',
-                        0
-                    ),
+                    newReassignTreatmentsActivityState(uuid(), 'unknown', 0),
                     leaderId,
                     (draftState, simulatedRegion) => {
                         addPatient(
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
 
                         addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         );
 
@@ -345,7 +317,7 @@ describe('reassign treatment', () => {
             const countingTime = 1000 * 20;
 
             const activityState = cloneDeepMutable(
-                ReassignTreatmentsActivityState.create(
+                newReassignTreatmentsActivityState(
                     uuid(),
                     'unknown',
                     countingTime
@@ -362,30 +334,26 @@ describe('reassign treatment', () => {
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
 
                         addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         );
 
@@ -404,7 +372,7 @@ describe('reassign treatment', () => {
             const countingTime = 1000 * 20;
 
             const activityState = cloneDeepMutable(
-                ReassignTreatmentsActivityState.create(
+                newReassignTreatmentsActivityState(
                     uuid(),
                     'unknown',
                     countingTime
@@ -421,15 +389,15 @@ describe('reassign treatment', () => {
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -438,11 +406,11 @@ describe('reassign treatment', () => {
 
                         addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             )
@@ -472,41 +440,33 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(
-                        uuid(),
-                        'counted',
-                        0
-                    ),
+                    newReassignTreatmentsActivityState(uuid(), 'counted', 0),
                     leaderId,
                     (draftState, simulatedRegion) => {
                         patientId = addPatient(
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         ).id;
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
 
                         catererId = addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         ).id;
                     }
@@ -530,53 +490,45 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(
-                        uuid(),
-                        'counted',
-                        0
-                    ),
+                    newReassignTreatmentsActivityState(uuid(), 'counted', 0),
                     leaderId,
                     (draftState, simulatedRegion) => {
                         addPatient(
                             draftState,
                             'red',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
                         whitePatientId = addPatient(
                             draftState,
                             'white',
                             'red',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         ).id;
                         addPatient(
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             ),
                             id: leaderId,
                         });
 
                         catererId = addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
-                                    simulatedRegion.id
-                                )
+                                newSimulatedRegionPositionIn(simulatedRegion.id)
                             )
                         ).id;
                     }
@@ -597,22 +549,22 @@ describe('reassign treatment', () => {
             const leaderId = uuid();
 
             const { terminate, simulatedRegion } = setupStateAndApplyTreatments(
-                ReassignTreatmentsActivityState.create(uuid(), 'counted', 0),
+                newReassignTreatmentsActivityState(uuid(), 'counted', 0),
                 leaderId,
                 (draftState, _simulatedRegion) => {
                     addPatient(
                         draftState,
                         'white',
                         'red',
-                        SimulatedRegionPosition.create(_simulatedRegion.id)
+                        newSimulatedRegionPositionIn(_simulatedRegion.id)
                     );
 
                     addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         id: leaderId,
                     });
@@ -627,51 +579,53 @@ describe('reassign treatment', () => {
             const leaderId = uuid();
 
             const { terminate, simulatedRegion } = setupStateAndApplyTreatments(
-                ReassignTreatmentsActivityState.create(uuid(), 'counted', 0),
+                newReassignTreatmentsActivityState(uuid(), 'counted', 0),
                 leaderId,
                 (draftState, _simulatedRegion) => {
                     addPatient(
                         draftState,
                         'red',
                         'red',
-                        SimulatedRegionPosition.create(_simulatedRegion.id)
+                        newSimulatedRegionPositionIn(_simulatedRegion.id)
                     );
                     addPatient(
                         draftState,
                         'yellow',
                         'yellow',
-                        SimulatedRegionPosition.create(_simulatedRegion.id)
+                        newSimulatedRegionPositionIn(_simulatedRegion.id)
                     );
                     addPatient(
                         draftState,
                         'green',
                         'green',
-                        SimulatedRegionPosition.create(_simulatedRegion.id)
+                        newSimulatedRegionPositionIn(_simulatedRegion.id)
                     );
 
                     addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         id: leaderId,
                     });
 
                     addPersonnel(
                         draftState,
-                        Personnel.generatePersonnel(
+                        newPersonnelFromTemplate(
                             defaultPersonnelTemplates.rettSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         )
                     );
                 }
             );
 
             expect(terminate).toHaveBeenCalled();
+
+            console.log(simulatedRegion?.inEvents);
 
             const event = simulatedRegion?.inEvents.find(
                 (element) => element.type === 'treatmentProgressChangedEvent'
@@ -691,7 +645,7 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, _simulatedRegion) => {
                         redPatientIds.push(
@@ -699,7 +653,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 'red',
                                 'red',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id
@@ -708,25 +662,25 @@ describe('reassign treatment', () => {
                             draftState,
                             'yellow',
                             'yellow',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
                         redPatientIds.push(
                             addPatient(
                                 draftState,
                                 'red',
                                 'red',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -735,26 +689,26 @@ describe('reassign treatment', () => {
 
                         notSanId = addPersonnel(
                             draftState,
-                            Personnel.generatePersonnel(
+                            newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             )
                         ).id;
 
                         rettSanId = addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(2, 0, 0, 'and'),
+                            canCaterFor: newCanCaterFor(2, 0, 0, 'and'),
                         }).id;
                     }
                 );
@@ -782,34 +736,34 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, _simulatedRegion) => {
                         addPatient(
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
                         yellowPatientId = addPatient(
                             draftState,
                             'yellow',
                             'yellow',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ).id;
                         addPatient(
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -817,15 +771,15 @@ describe('reassign treatment', () => {
                         });
 
                         catererId = addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.rettSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(0, 1, 0, 'and'),
+                            canCaterFor: newCanCaterFor(0, 1, 0, 'and'),
                         }).id;
                     }
                 );
@@ -850,18 +804,14 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             addPatient(
                                 draftState,
                                 'green',
                                 'green',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             );
@@ -869,7 +819,7 @@ describe('reassign treatment', () => {
                                 draftState,
                                 higherStatus,
                                 higherStatus,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id;
@@ -877,17 +827,17 @@ describe('reassign treatment', () => {
                                 draftState,
                                 'green',
                                 'green',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             );
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -896,11 +846,11 @@ describe('reassign treatment', () => {
 
                             catererId = addPersonnel(
                                 draftState,
-                                Personnel.generatePersonnel(
+                                newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 )
@@ -925,7 +875,7 @@ describe('reassign treatment', () => {
             let catererId: UUID = '';
 
             const { newState, terminate } = setupStateAndApplyTreatments(
-                ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                newReassignTreatmentsActivityState(uuid(), state, 0),
                 leaderId,
                 (draftState, _simulatedRegion) => {
                     for (let i = 0; i < 10; i++) {
@@ -933,28 +883,28 @@ describe('reassign treatment', () => {
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
                     }
 
                     addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         id: leaderId,
                     });
 
                     catererId = addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.san,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
-                        canCaterFor: CanCaterFor.create(0, 0, 10, 'and'),
+                        canCaterFor: newCanCaterFor(0, 0, 10, 'and'),
                     }).id;
                 }
             );
@@ -972,7 +922,7 @@ describe('reassign treatment', () => {
             let catererId: UUID = '';
 
             const { newState, terminate } = setupStateAndApplyTreatments(
-                ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                newReassignTreatmentsActivityState(uuid(), state, 0),
                 leaderId,
                 (draftState, _simulatedRegion) => {
                     for (let i = 0; i < 10; i++) {
@@ -980,28 +930,28 @@ describe('reassign treatment', () => {
                             draftState,
                             'green',
                             'green',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         );
                     }
 
                     addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.notSan,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
                         id: leaderId,
                     });
 
                     catererId = addPersonnel(draftState, {
-                        ...Personnel.generatePersonnel(
+                        ...newPersonnelFromTemplate(
                             defaultPersonnelTemplates.san,
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ),
-                        canCaterFor: CanCaterFor.create(0, 0, 1, 'and'),
+                        canCaterFor: newCanCaterFor(0, 0, 1, 'and'),
                     }).id;
                 }
             );
@@ -1021,28 +971,24 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             addPatient(
                                 draftState,
                                 status,
                                 status,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             );
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1050,15 +996,15 @@ describe('reassign treatment', () => {
                             });
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
-                                canCaterFor: CanCaterFor.create(0, 0, 0, 'and'),
+                                canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
                             });
                         }
                     );
@@ -1084,28 +1030,24 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             patientId = addPatient(
                                 draftState,
                                 patientStatus,
                                 patientStatus,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id;
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1113,15 +1055,15 @@ describe('reassign treatment', () => {
                             });
 
                             catererId = addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates[higherPersonnel],
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
-                                canCaterFor: CanCaterFor.create(1, 0, 0, 'and'),
+                                canCaterFor: newCanCaterFor(1, 0, 0, 'and'),
                             }).id;
                         }
                     );
@@ -1145,22 +1087,22 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, _simulatedRegion) => {
                         patientId = addPatient(
                             draftState,
                             'red',
                             'red',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ).id;
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -1168,27 +1110,27 @@ describe('reassign treatment', () => {
                         });
 
                         generalCatererId = addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(1, 0, 0, 'and'),
+                            canCaterFor: newCanCaterFor(1, 0, 0, 'and'),
                         }).id;
 
                         notarztId = addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notarzt,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(1, 0, 0, 'and'),
+                            canCaterFor: newCanCaterFor(1, 0, 0, 'and'),
                         }).id;
                     }
                 );
@@ -1215,22 +1157,22 @@ describe('reassign treatment', () => {
 
             const { beforeState, newState, terminate } =
                 setupStateAndApplyTreatments(
-                    ReassignTreatmentsActivityState.create(uuid(), state, 0),
+                    newReassignTreatmentsActivityState(uuid(), state, 0),
                     leaderId,
                     (draftState, _simulatedRegion) => {
                         patientId = addPatient(
                             draftState,
                             'red',
                             'red',
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ).id;
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.notSan,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
@@ -1238,20 +1180,20 @@ describe('reassign treatment', () => {
                         });
 
                         addPersonnel(draftState, {
-                            ...Personnel.generatePersonnel(
+                            ...newPersonnelFromTemplate(
                                 defaultPersonnelTemplates.san,
                                 uuid(),
                                 '',
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ),
-                            canCaterFor: CanCaterFor.create(0, 0, 0, 'and'),
+                            canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
                         });
 
                         catererId = addMaterial(
                             draftState,
-                            SimulatedRegionPosition.create(_simulatedRegion.id)
+                            newSimulatedRegionPositionIn(_simulatedRegion.id)
                         ).id;
                     }
                 );
@@ -1279,18 +1221,14 @@ describe('reassign treatment', () => {
 
                 const { beforeState, newState, terminate } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
-                            uuid(),
-                            state,
-                            0
-                        ),
+                        newReassignTreatmentsActivityState(uuid(), state, 0),
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             higherPatientId = addPatient(
                                 draftState,
                                 higherStatus,
                                 higherStatus,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id;
@@ -1298,17 +1236,17 @@ describe('reassign treatment', () => {
                                 draftState,
                                 lowerStatus,
                                 lowerStatus,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             );
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1316,20 +1254,20 @@ describe('reassign treatment', () => {
                             });
 
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.san,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
-                                canCaterFor: CanCaterFor.create(0, 0, 0, 'and'),
+                                canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
                             });
 
                             catererId = addMaterial(
                                 draftState,
-                                SimulatedRegionPosition.create(
+                                newSimulatedRegionPositionIn(
                                     _simulatedRegion.id
                                 )
                             ).id;
@@ -1350,14 +1288,14 @@ describe('reassign treatment', () => {
 
     describe('in triaged state', () => {
         function setupPatientsAndPersonnel(
-            draftState: Mutable<ExerciseState>,
+            draftState: WritableDraft<ExerciseState>,
             simulatedRegion: SimulatedRegion,
             patients: readonly {
                 readonly state: PatientStatus;
                 readonly count: number;
             }[],
             personnel: readonly {
-                readonly type: PersonnelType;
+                readonly type: keyof typeof defaultPersonnelTemplates;
                 readonly count: number;
             }[]
         ) {
@@ -1367,7 +1305,7 @@ describe('reassign treatment', () => {
                         draftState,
                         state,
                         state,
-                        SimulatedRegionPosition.create(simulatedRegion.id)
+                        newSimulatedRegionPositionIn(simulatedRegion.id)
                     );
                 }
             });
@@ -1376,11 +1314,11 @@ describe('reassign treatment', () => {
                 for (let i = 0; i < count; i++) {
                     addPersonnel(
                         draftState,
-                        Personnel.generatePersonnel(
+                        newPersonnelFromTemplate(
                             defaultPersonnelTemplates[type],
                             uuid(),
                             '',
-                            SimulatedRegionPosition.create(simulatedRegion.id)
+                            newSimulatedRegionPositionIn(simulatedRegion.id)
                         )
                     );
                 }
@@ -1422,7 +1360,7 @@ describe('reassign treatment', () => {
 
                 const { terminate, simulatedRegion } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
+                        newReassignTreatmentsActivityState(
                             uuid(),
                             'triaged',
                             0
@@ -1430,11 +1368,11 @@ describe('reassign treatment', () => {
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),
@@ -1500,7 +1438,7 @@ describe('reassign treatment', () => {
 
                 const { terminate, simulatedRegion } =
                     setupStateAndApplyTreatments(
-                        ReassignTreatmentsActivityState.create(
+                        newReassignTreatmentsActivityState(
                             uuid(),
                             'triaged',
                             0
@@ -1508,11 +1446,11 @@ describe('reassign treatment', () => {
                         leaderId,
                         (draftState, _simulatedRegion) => {
                             addPersonnel(draftState, {
-                                ...Personnel.generatePersonnel(
+                                ...newPersonnelFromTemplate(
                                     defaultPersonnelTemplates.notSan,
                                     uuid(),
                                     '',
-                                    SimulatedRegionPosition.create(
+                                    newSimulatedRegionPositionIn(
                                         _simulatedRegion.id
                                     )
                                 ),

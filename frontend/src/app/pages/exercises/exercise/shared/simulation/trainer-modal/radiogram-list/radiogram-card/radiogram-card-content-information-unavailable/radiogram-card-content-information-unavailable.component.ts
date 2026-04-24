@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
-import type { ExerciseRadiogram } from 'digital-fuesim-manv-shared';
+import { Component, input } from '@angular/core';
+import type { ExerciseRadiogram } from 'fuesim-digital-shared';
+import { HumanReadableRadiogramTypePipe } from '../../human-readable-radiogram-type.pipe';
 
 @Component({
     selector: 'app-radiogram-card-content-information-unavailable',
@@ -8,8 +9,8 @@ import type { ExerciseRadiogram } from 'digital-fuesim-manv-shared';
     styleUrls: [
         './radiogram-card-content-information-unavailable.component.scss',
     ],
-    standalone: false,
+    imports: [HumanReadableRadiogramTypePipe],
 })
 export class RadiogramCardContentInformationUnavailableComponent {
-    @Input() radiogramType!: ExerciseRadiogram['type'];
+    readonly radiogramType = input.required<ExerciseRadiogram['type']>();
 }

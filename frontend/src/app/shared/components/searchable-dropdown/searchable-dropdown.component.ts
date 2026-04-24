@@ -2,13 +2,15 @@ import type { AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import {
     Component,
     ElementRef,
-    EventEmitter,
-    Input,
-    Output,
-    ViewChild,
+    inject,
+    input,
+    output,
+    viewChild,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import type { HotkeyLayer } from '../../services/hotkeys.service';
 import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
+import { HotkeyIndicatorComponent } from '../hotkey-indicator/hotkey-indicator.component';
 
 export interface SearchableDropdownOption {
     key: string;
@@ -21,19 +23,20 @@ export interface SearchableDropdownOption {
     selector: 'app-searchable-dropdown',
     templateUrl: './searchable-dropdown.component.html',
     styleUrls: ['./searchable-dropdown.component.scss'],
-    standalone: false,
+    imports: [FormsModule, HotkeyIndicatorComponent],
 })
 export class SearchableDropdownComponent
     implements OnInit, AfterViewInit, OnDestroy
 {
-    @Input()
-    public options: SearchableDropdownOption[] = [];
+    private readonly hotkeysService = inject(HotkeysService);
+
+    public readonly options = input<SearchableDropdownOption[]>([]);
 
     public filter = '';
     public selectedIndex = -1;
 
     public get filteredOptions() {
-        return this.options.filter((option) =>
+        return this.options().filter((option) =>
             option.name.toLowerCase().includes(this.filter.toLowerCase())
         );
     }
@@ -49,14 +52,10 @@ export class SearchableDropdownComponent
         this.confirmSelection()
     );
 
-    @Output()
-    public readonly selected: EventEmitter<SearchableDropdownOption> =
-        new EventEmitter();
+    public readonly selected = output<SearchableDropdownOption>();
 
-    @ViewChild('searchInput')
-    private readonly searchInput!: ElementRef;
-
-    constructor(private readonly hotkeysService: HotkeysService) {}
+    private readonly searchInput =
+        viewChild.required<ElementRef>('searchInput');
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer(true);
@@ -66,7 +65,7 @@ export class SearchableDropdownComponent
     }
 
     ngAfterViewInit() {
-        this.searchInput.nativeElement.focus();
+        this.searchInput().nativeElement.focus();
     }
 
     ngOnDestroy(): void {
@@ -95,7 +94,7 @@ export class SearchableDropdownComponent
             this.selectedIndex > -1 &&
             this.selectedIndex < this.filteredOptions.length
         ) {
-            this.selected.emit(this.filteredOptions[this.selectedIndex]);
+            this.selected.emit(this.filteredOptions[this.selectedIndex]!);
         }
     }
 }

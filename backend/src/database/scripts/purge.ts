@@ -1,28 +1,24 @@
-import { createNewDataSource } from '../data-source.js';
 import { DatabaseService } from '../services/database-service.js';
+import { exerciseTable } from './../schema.js';
 
-const dataSource = await createNewDataSource().initialize();
+const databaseService = await DatabaseService.createNewDatabaseConnection();
 
-const databaseService = new DatabaseService(dataSource);
+databaseService.databaseConnection.transaction(async (manager) => {
+    if (
+        DatabaseService.isInMemoryConnection(databaseService.databaseConnection)
+    ) {
+        console.warn(
+            'PURGING IN-MEMORY DATABASE! Set DFM_USE_DB=true to purge PostgreSQL database.'
+        );
+    }
+    try {
+        const deleteResult = await manager.delete(exerciseTable).returning();
 
-await databaseService.transaction(async (manager) => {
-    const exercises = await databaseService.exerciseWrapperService.getFindAll({
-        select: { id: true },
-    })(manager);
+        console.log(`Successfully deleted ${deleteResult.length} exercises.`);
 
-    const deleteResult = await Promise.all(
-        exercises.map(async (exercise) =>
-            databaseService.exerciseWrapperService.getRemove(exercise.id)(
-                manager
-            )
-        )
-    );
-
-    console.log(
-        `Successfully deleted ${deleteResult.reduce(
-            (currentAffectedCount, currentDeleteResult) =>
-                currentAffectedCount + (currentDeleteResult.affected ?? 0),
-            0
-        )} of ${exercises.length} exercises.`
-    );
+        const remaining = await manager.select().from(exerciseTable);
+        console.log(`${remaining.length} exercises remaining in database.`);
+    } catch (error) {
+        console.error('Error during purge operation:', error);
+    }
 });

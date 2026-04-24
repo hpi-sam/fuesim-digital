@@ -1,22 +1,26 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     UnloadArrivingVehiclesBehaviorState,
     UnloadVehicleActivityState,
     UUID,
-} from 'digital-fuesim-manv-shared';
-import { StrictObject } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
 import {
-    createSelectActivityStates,
     createSelectBehaviorState,
-    selectCurrentTime,
+    createSelectActivityStates,
     selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectCurrentTime,
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { DisplayValidationComponent } from '../../../../../../../../../../shared/validation/display-validation/display-validation.component';
+import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-unload-arriving-vehicles',
@@ -25,41 +29,41 @@ import {
     styleUrls: [
         './simulated-region-overview-behavior-unload-arriving-vehicles.component.scss',
     ],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        DisplayValidationComponent,
+        FormatDurationPipe,
+        AsyncPipe,
+    ],
 })
-export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent
-    implements OnInit
-{
-    @Input()
-    simulatedRegionId!: UUID;
+export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    readonly store = inject<Store<AppState>>(Store);
 
-    @Input()
-    behaviorId!: UUID;
+    readonly simulatedRegionId = input.required<UUID>();
+
+    readonly behaviorId = input.required<UUID>();
 
     unloadDuration$?: Observable<number>;
     vehiclesStatus$?: Observable<VehicleUnloadStatus[]>;
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        public readonly store: Store<AppState>
-    ) {}
-
     ngOnInit(): void {
         const selectBehavior =
             createSelectBehaviorState<UnloadArrivingVehiclesBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             );
         this.unloadDuration$ = this.store
             .select(selectBehavior)
             .pipe(map((state) => state.unloadDelay));
 
         const unloadingSelector = createSelector(
-            createSelectActivityStates(this.simulatedRegionId),
+            createSelectActivityStates(this.simulatedRegionId()),
             selectBehavior,
             selectVehicles,
             (activities, behavior, vehicles) =>
-                StrictObject.values(behavior.vehicleActivityMap)
+                Object.values(behavior.vehicleActivityMap)
                     .map(
                         (activityId) =>
                             activities[activityId] as
@@ -95,8 +99,8 @@ export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent
     updateUnloadTime(duration: number) {
         this.exerciseService.proposeAction({
             type: '[UnloadArrivingVehiclesBehavior] Update UnloadDelay',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             unloadDelay: duration,
         });
     }

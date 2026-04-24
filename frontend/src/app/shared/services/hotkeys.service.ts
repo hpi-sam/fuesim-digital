@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import { StrictObject, uuid } from 'digital-fuesim-manv-shared';
+import { Injectable, inject } from '@angular/core';
+import type { UUID } from 'fuesim-digital-shared';
+import { uuid } from 'fuesim-digital-shared';
 import {
     BehaviorSubject,
     combineLatest,
@@ -100,7 +100,7 @@ export class Hotkey {
         if (this.keys === '+') return this.keys;
 
         let keys = this.keys.toLowerCase();
-        StrictObject.entries(hotkeyReplacements).forEach(([from, to]) => {
+        Object.entries(hotkeyReplacements).forEach(([from, to]) => {
             keys = keys.replaceAll(from, to);
         });
 
@@ -156,10 +156,10 @@ export class HotkeyLayer {
     providedIn: 'root',
 })
 export class HotkeysService {
+    private readonly ngNeatHotkeysService = inject(NgNeatHotkeysService);
+
     private readonly layers: HotkeyLayer[] = [];
     private registeredHotkeys: { [key: string]: boolean } = {};
-
-    constructor(private readonly ngNeatHotkeysService: NgNeatHotkeysService) {}
 
     /**
      * Creates a new layer and registers it at this service.

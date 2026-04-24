@@ -7,9 +7,10 @@ import {
     Legend,
     LinearScale,
     Tooltip,
+    Colors,
 } from 'chart.js';
-import { formatDuration } from 'digital-fuesim-manv-shared';
-import { rgbColorPalette } from 'src/app/shared/functions/colors';
+import { formatDuration } from 'fuesim-digital-shared';
+import { rgbColorPalette } from '../../../../../../shared/functions/colors';
 
 Chart.register(
     CategoryScale,
@@ -17,7 +18,8 @@ Chart.register(
     BarElement,
     BarController,
     Tooltip,
-    Legend
+    Legend,
+    Colors
 );
 
 type Data = number | null;

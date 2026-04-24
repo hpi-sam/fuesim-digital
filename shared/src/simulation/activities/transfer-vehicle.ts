@@ -1,95 +1,73 @@
-import { IsOptional, IsString, IsUUID } from 'class-validator';
-import { Type } from 'class-transformer';
-import {
-    MissingTransferConnectionRadiogram,
-    RadiogramUnpublishedStatus,
-} from '../../models/radiogram/index.js';
+import { z } from 'zod';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
-import type { ExerciseOccupation } from '../../models/utils/index.js';
+import { sendSimulationEvent } from '../events/utils.js';
+import { nextUUID } from '../utils/randomness.js';
+import type { TransferDestination } from '../utils/transfer-destination.js';
+import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
+import { HospitalActionReducers } from '../../store/action-reducers/hospital.js';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import {
-    changeOccupation,
-    getCreate,
-    isInSpecificSimulatedRegion,
-    isInSpecificVehicle,
-    NoOccupation,
-    occupationTypeOptions,
-    TransferStartPoint,
-} from '../../models/utils/index.js';
-import { VehicleResource } from '../../models/utils/rescue-resource.js';
-import { TransferActionReducers } from '../../store/action-reducers/transfer.js';
+    type ExerciseOccupation,
+    exerciseOccupationSchema,
+} from '../../models/utils/occupations/exercise-occupation.js';
 import {
     getElement,
     getElementByPredicate,
     tryGetElement,
-} from '../../store/action-reducers/utils/index.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
+} from '../../store/action-reducers/utils/get-element.js';
 import {
-    TransferConnectionMissingEvent,
-    VehicleTransferSuccessfulEvent,
-} from '../events/index.js';
-import { sendSimulationEvent } from '../events/utils.js';
-import { nextUUID } from '../utils/randomness.js';
-import type { TransferDestination } from '../utils/transfer-destination.js';
-import { transferDestinationTypeAllowedValues } from '../utils/transfer-destination.js';
-import { HospitalActionReducers } from '../../store/action-reducers/hospital.js';
+    isInSpecificSimulatedRegion,
+    isInSpecificVehicle,
+} from '../../models/utils/position/position-helpers.js';
+import { changeOccupation } from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newNoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { newTransferConnectionMissingEvent } from '../events/transfer-connection-missing.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newMissingTransferConnectionRadiogram } from '../../models/radiogram/missing-transfer-connection-radiogram.js';
+import { newRadiogramUnpublishedStatus } from '../../models/radiogram/status/radiogram-unpublished-status.js';
+import { TransferActionReducers } from '../../store/action-reducers/transfer.js';
+import { newTransferStartPoint } from '../../models/utils/start-points.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import { newVehicleTransferSuccessfulEvent } from '../events/vehicle-transfer-successful.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
-export class TransferVehicleActivityState implements SimulationActivityState {
-    @IsValue('transferVehicleActivity' as const)
-    public readonly type = 'transferVehicleActivity';
+export const transferVehicleActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('transferVehicleActivity'),
+    vehicleId: uuidSchema,
+    transferDestinationType: transferDestinationTypeSchema,
+    transferDestinationId: uuidSchema,
+    successorOccupation: exerciseOccupationSchema.optional(),
+    key: z.string().optional(),
+});
+export type TransferVehicleActivityState = z.infer<
+    typeof transferVehicleActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    readonly id: UUID;
-
-    @IsUUID(4, uuidValidationOptions)
-    readonly vehicleId: UUID;
-
-    @IsLiteralUnion(transferDestinationTypeAllowedValues)
-    readonly transferDestinationType: TransferDestination;
-
-    @IsUUID(4, uuidValidationOptions)
-    readonly transferDestinationId: UUID;
-
-    @IsOptional()
-    @Type(...occupationTypeOptions)
-    readonly successorOccupation?: ExerciseOccupation;
-
-    @IsOptional()
-    @IsString()
-    readonly key?: string;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        vehicleId: UUID,
-        transferDestinationType: TransferDestination,
-        transferDestinationId: UUID,
-        key?: string,
-        successorOccupation?: ExerciseOccupation
-    ) {
-        this.id = id;
-        this.vehicleId = vehicleId;
-
-        this.transferDestinationType = transferDestinationType;
-        this.transferDestinationId = transferDestinationId;
-        this.key = key;
-        this.successorOccupation = successorOccupation;
-    }
-
-    static readonly create = getCreate(this);
+export function newTransferVehicleActivityState(
+    id: UUID,
+    vehicleId: UUID,
+    transferDestinationType: TransferDestination,
+    transferDestinationId: UUID,
+    key?: string,
+    successorOccupation?: ExerciseOccupation
+): TransferVehicleActivityState {
+    return {
+        id,
+        type: 'transferVehicleActivity',
+        vehicleId,
+        transferDestinationType,
+        transferDestinationId,
+        key,
+        successorOccupation,
+    };
 }
 
 export const transferVehicleActivity: SimulationActivity<TransferVehicleActivityState> =
     {
-        activityState: TransferVehicleActivityState,
+        activityStateSchema: transferVehicleActivityStateSchema,
         tick(
             draftState,
             simulatedRegion,
@@ -136,7 +114,7 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
             changeOccupation(
                 draftState,
                 vehicle,
-                activityState.successorOccupation ?? NoOccupation.create()
+                activityState.successorOccupation ?? newNoOccupation()
             );
 
             switch (activityState.transferDestinationType) {
@@ -158,7 +136,7 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
                     ) {
                         sendSimulationEvent(
                             simulatedRegion,
-                            TransferConnectionMissingEvent.create(
+                            newTransferConnectionMissingEvent(
                                 activityState.transferDestinationId,
                                 activityState.key
                             )
@@ -166,10 +144,10 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
                         publishRadiogram(
                             draftState,
                             cloneDeepMutable(
-                                MissingTransferConnectionRadiogram.create(
+                                newMissingTransferConnectionRadiogram(
                                     nextUUID(draftState),
                                     simulatedRegion.id,
-                                    RadiogramUnpublishedStatus.create(),
+                                    newRadiogramUnpublishedStatus(),
                                     activityState.transferDestinationId
                                 )
                             )
@@ -183,9 +161,7 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
                         type: '[Transfer] Add to transfer',
                         elementType: 'vehicle',
                         elementId: activityState.vehicleId,
-                        startPoint: TransferStartPoint.create(
-                            ownTransferPoint.id
-                        ),
+                        startPoint: newTransferStartPoint(ownTransferPoint.id),
                         targetTransferPointId:
                             activityState.transferDestinationId,
                     });
@@ -213,10 +189,10 @@ export const transferVehicleActivity: SimulationActivity<TransferVehicleActivity
 
             sendSimulationEvent(
                 simulatedRegion,
-                VehicleTransferSuccessfulEvent.create(
+                newVehicleTransferSuccessfulEvent(
                     activityState.transferDestinationId,
                     activityState.key ?? '',
-                    VehicleResource.create(vehicleResourceDescription)
+                    newVehicleResource(vehicleResourceDescription)
                 )
             );
 

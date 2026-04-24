@@ -1,0 +1,149 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        Aufstellung von {{ (simulatedRegion$ | async)?.name }}
+    </h4>
+    <button
+        type="button"
+        class="btn-close"
+        (click)="close()"
+        data-cy="SimulatedRegionPreviewCloseButton"
+    ></button>
+</div>
+<div
+    class="modal-body p-4"
+    style="height: min(80vh, 2000px); max-height: min(80vh, 2000px)"
+>
+    <div class="row h-100">
+        <div class="col-lg-8 col-xl-9 h-100" style="overflow-y: scroll">
+            @if (patients$ | async; as patients) {
+                <div class="cards">
+                    @for (patient of patients; track patient.id) {
+                        <app-simulated-region-preview-card
+                            dataCy="patientWithVisibleStatusDiv"
+                            [imageUrl]="patient.image.url"
+                            [darkBackground]="selected()?.id === patient.id"
+                            [title]="patient.identifier"
+                            (elementMousedown)="selectElement(patient)"
+                        >
+                        </app-simulated-region-preview-card>
+                    }
+                </div>
+                @if (
+                    (patients$ | async)?.length &&
+                    ((groupedVehicles$ | async)?.length ||
+                        (personnelByCategory$ | async)?.length ||
+                        (material$ | async)?.length)
+                ) {
+                    <hr />
+                }
+            }
+            @if (personnelByCategory$ | async; as personnel) {
+                <div class="cards">
+                    @for (personnel of personnel; track personnel.id) {
+                        <app-simulated-region-preview-card
+                            dataCy="personnelDiv"
+                            [imageUrl]="personnel.image.url"
+                            [darkBackground]="selected()?.id === personnel.id"
+                            [title]="personnel.vehicleName"
+                            (elementMousedown)="selectElement(personnel)"
+                        >
+                        </app-simulated-region-preview-card>
+                    }
+                </div>
+                @if (
+                    (personnelByCategory$ | async)?.length &&
+                    ((groupedVehicles$ | async)?.length ||
+                        (material$ | async)?.length)
+                ) {
+                    <hr />
+                }
+            }
+            @if (material$ | async; as material) {
+                <div class="cards">
+                    @for (material of material; track material.id) {
+                        <app-simulated-region-preview-card
+                            dataCy="personnelDiv"
+                            [imageUrl]="material.image.url"
+                            [darkBackground]="selected()?.id === material.id"
+                            [title]="material.vehicleName"
+                            (elementMousedown)="selectElement(material)"
+                        >
+                        </app-simulated-region-preview-card>
+                    }
+                </div>
+                @if (
+                    (material$ | async)?.length &&
+                    (groupedVehicles$ | async)?.length
+                ) {
+                    <hr />
+                }
+            }
+
+            @if (groupedVehicles$ | async; as groupedVehicles) {
+                <div class="cards">
+                    @for (
+                        vehicleGroup of groupedVehicles;
+                        track vehicleGroup.vehicleType
+                    ) {
+                        @for (
+                            vehicle of vehicleGroup.vehicles;
+                            track vehicle.id
+                        ) {
+                            <app-simulated-region-preview-card
+                                dataCy="vehicleDiv"
+                                [imageUrl]="vehicle.image.url"
+                                [darkBackground]="selected()?.id === vehicle.id"
+                                [title]="vehicle.name"
+                                (elementMousedown)="selectElement(vehicle)"
+                            >
+                            </app-simulated-region-preview-card>
+                        }
+                    }
+                </div>
+            }
+        </div>
+        <div
+            class="col-lg-4 col-xl-3 h-100"
+            style="border-left: 1px solid darkgrey"
+        >
+            @if (selected(); as selected) {
+                @if (selected.type === 'patient') {
+                    <h4>
+                        Patient <app-patient-header [patientId]="selected.id" />
+                    </h4>
+                    <app-patients-details
+                        class="overflow-auto w-100 d-inline-block flex-grow-1"
+                        [patientId]="selected.id"
+                    />
+                    <app-simulated-region-overview-patient-interaction-bar
+                        class="w-100 d-inline-block"
+                        [patientId]="selected.id"
+                    />
+                }
+
+                @if (selected.type === 'personnel') {
+                    <h4>
+                        {{ selected.typeName }} von {{ selected.vehicleName }}
+                    </h4>
+                    <app-personnel-details [personnelId]="selected.id" />
+                }
+
+                @if (selected.type === 'material') {
+                    <h4>
+                        {{ selected.typeName }} aus {{ selected.vehicleName }}
+                    </h4>
+                    <app-material-details [materialId]="selected.id" />
+                }
+
+                @if (selected.type === 'vehicle') {
+                    <app-simulated-region-overview-vehicle-details
+                        [simulatedRegion]="(simulatedRegion$ | async)!"
+                        [vehicle]="selected"
+                    />
+                }
+            } @else {
+                <p class="text-muted">Kein Objekt ausgewählt.</p>
+            }
+        </div>
+    </div>
+</div>

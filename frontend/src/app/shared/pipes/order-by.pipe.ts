@@ -1,11 +1,8 @@
 import type { PipeTransform } from '@angular/core';
 import { Pipe } from '@angular/core';
-import type { Immutable } from 'digital-fuesim-manv-shared';
+import { Immutable } from 'immer';
 
-@Pipe({
-    name: 'orderBy',
-    standalone: false,
-})
+@Pipe({ name: 'orderBy' })
 export class OrderByPipe implements PipeTransform {
     public transform<Item extends object>(
         array: Immutable<Item[]> | null | undefined,

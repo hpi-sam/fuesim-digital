@@ -1,11 +1,10 @@
 <div class="input-group">
     <label class="input-group-text"
         >Filter
-        <app-hotkey-indicator
-            *ngIf="filterHotkey"
-            [hotkey]="filterHotkey"
-            class="ms-1"
-        />:
+        @if (filterHotkey) {
+            <app-hotkey-indicator [hotkey]="filterHotkey" class="ms-1" />
+        }
+        :
     </label>
     <input
         type="search"
@@ -17,106 +16,113 @@
     />
 </div>
 
-<small *ngIf="filterActive" class="text-muted">
-    <app-hotkey-indicator [hotkey]="exitFilterHotkey" />: Filter verlassen
-    <br />
-    <app-hotkey-indicator [hotkey]="upHotkey" />/<app-hotkey-indicator
-        [hotkey]="downHotkey"
-    />: Vorheriges/Nächstes Element auswählen
-</small>
+@if (filterActive) {
+    <small class="text-muted">
+        <app-hotkey-indicator [hotkey]="exitFilterHotkey" />: Filter verlassen
+        <br />
+        <app-hotkey-indicator [hotkey]="upHotkey" />/<app-hotkey-indicator
+            [hotkey]="downHotkey"
+        />: Vorheriges/Nächstes Element auswählen
+    </small>
+}
 
 <ul class="list-group list-group-flush mt-2">
-    <li
-        *ngFor="
-            let interaction of filteredInteractions;
-            index as index;
-            trackBy: 'key' | appTrackByProperty
-        "
-        class="list-group-item"
-        [class.active]="index === selectedIndex"
-    >
-        <div
-            *appLet="interaction.requestable$ | async as requestable"
-            class="d-flex flex-row mb-2"
-        >
-            <div class="flex-grow-1">
-                <span [class.text-muted]="!requestable">
-                    <strong>{{ interaction.name }}</strong>
-                    <span *ngIf="interaction.details as details">
-                        {{ details }}
+    @for (
+        interaction of filteredInteractions;
+        track interaction.key;
+        let index = $index
+    ) {
+        <li class="list-group-item" [class.active]="index === selectedIndex">
+            @let requestable = interaction.requestable$ | async;
+            <div class="d-flex flex-row mb-2">
+                <div class="flex-grow-1">
+                    <span [class.text-muted]="!requestable">
+                        <strong>{{ interaction.name }}</strong>
+                        @if (interaction.details; as details) {
+                            <span>
+                                {{ details }}
+                            </span>
+                        }
                     </span>
-                </span>
-                <ng-container *ngIf="!requestable && interaction.errorMessage">
-                    <br />
-                    <span class="text-warning">{{
-                        interaction.errorMessage
-                    }}</span>
-                </ng-container>
-            </div>
-            <div class="flex-shrink-1 text-nowrap">
-                <button
-                    *appLet="
+                    @if (!requestable && interaction.errorMessage) {
+                        <br />
+                        <span class="text-warning">{{
+                            interaction.errorMessage
+                        }}</span>
+                    }
+                </div>
+                <div class="flex-shrink-1 text-nowrap">
+                    @let loading =
                         interaction.loading$ === undefined
                             ? false
-                            : (interaction.loading$ | async) as loading
-                    "
-                    [disabled]="!requestable || loading"
-                    class="btn btn-primary"
-                    [class.btn-primary]="index !== selectedIndex"
-                    [class.btn-outline-light]="index === selectedIndex"
-                    (click)="interaction.callback()"
-                >
-                    {{ primaryActionLabel }}
-                    <span
-                        *ngIf="loading; else hotkeys"
-                        class="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                    ></span>
-                    <ng-template #hotkeys>
-                        <app-hotkey-indicator
-                            *ngIf="index !== selectedIndex"
-                            [hotkey]="interaction.hotkeys.primary"
-                        />
-                        <app-hotkey-indicator
-                            *ngIf="index === selectedIndex"
-                            [hotkey]="confirmHotkey"
-                        />
-                    </ng-template>
-                </button>
-                <button
-                    *ngIf="showSecondaryButton"
-                    [disabled]="!requestable || !interaction.hasSecondaryAction"
-                    class="btn btn-secondary ms-1"
-                    (click)="tryCallSecondaryAction(interaction)"
-                >
-                    <i class="bi bi-clock-history"></i>
-                    <ng-container *ngIf="interaction.hotkeys.secondary">
-                        <app-hotkey-indicator
-                            *ngIf="index !== selectedIndex"
-                            [hotkey]="interaction.hotkeys.secondary"
-                            class="ms-1"
-                        />
-                        <app-hotkey-indicator
-                            *ngIf="index === selectedIndex"
-                            [hotkey]="confirmSecondaryHotkey"
-                            class="ms-1"
-                        />
-                    </ng-container>
-                </button>
+                            : (interaction.loading$ | async);
+                    <button
+                        [disabled]="!requestable || loading"
+                        class="btn btn-primary"
+                        [class.btn-primary]="index !== selectedIndex"
+                        [class.btn-outline-light]="index === selectedIndex"
+                        (click)="interaction.callback()"
+                    >
+                        {{ primaryActionLabel() }}
+                        @if (loading) {
+                            <span
+                                class="spinner-border spinner-border-sm"
+                                role="status"
+                                aria-hidden="true"
+                            ></span>
+                        } @else {
+                            @if (index !== selectedIndex) {
+                                <app-hotkey-indicator
+                                    [hotkey]="interaction.hotkeys.primary"
+                                />
+                            }
+                            @if (index === selectedIndex) {
+                                <app-hotkey-indicator
+                                    [hotkey]="confirmHotkey"
+                                />
+                            }
+                        }
+                    </button>
+                    @if (showSecondaryButton()) {
+                        <button
+                            [disabled]="
+                                !requestable || !interaction.hasSecondaryAction
+                            "
+                            class="btn btn-secondary ms-1"
+                            (click)="tryCallSecondaryAction(interaction)"
+                        >
+                            <i class="bi bi-clock-history"></i>
+                            @if (interaction.hotkeys.secondary) {
+                                @if (index !== selectedIndex) {
+                                    <app-hotkey-indicator
+                                        [hotkey]="interaction.hotkeys.secondary"
+                                        class="ms-1"
+                                    />
+                                }
+                                @if (index === selectedIndex) {
+                                    <app-hotkey-indicator
+                                        [hotkey]="confirmSecondaryHotkey"
+                                        class="ms-1"
+                                    />
+                                }
+                            }
+                        </button>
+                    }
+                </div>
             </div>
-        </div>
 
-        <app-radiogram-card
-            *ngFor="
-                let radiogram of (requestedRadiograms$ | async)?.[
+            @for (
+                radiogram of (requestedRadiograms$ | async)?.[
                     interaction.key
                 ] ?? [];
-                trackBy: 'id' | appTrackByProperty
-            "
-            [radiogramId]="radiogram.id"
-            [first]="false"
-            [shownInSignallerModal]="false"
-        />
-    </li>
+                track radiogram.id
+            ) {
+                <app-radiogram-card
+                    [radiogramId]="radiogram.id"
+                    [first]="false"
+                    [shownInSignallerModal]="false"
+                />
+            }
+        </li>
+    }
 </ul>

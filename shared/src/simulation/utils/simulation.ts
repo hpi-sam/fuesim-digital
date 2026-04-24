@@ -1,14 +1,14 @@
-import type { SimulatedRegion } from '../../models/index.js';
+import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable } from '../../utils/index.js';
-import { simulationActivityDictionary } from '../activities/index.js';
 import { terminateActivity } from '../activities/utils.js';
-import { simulationBehaviorDictionary } from '../behaviors/index.js';
-import { TickEvent } from '../events/tick.js';
+import { newTickEvent } from '../events/tick.js';
 import { sendSimulationEvent } from '../events/utils.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { simulationActivityDictionary } from '../activities/exercise-simulation-activity.js';
+import { simulationBehaviorDictionary } from '../behaviors/exercise-simulation-behavior.js';
 
 export function simulateAllRegions(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {
     Object.values(draftState.simulatedRegions).forEach((simulatedRegion) => {
@@ -17,18 +17,18 @@ export function simulateAllRegions(
 }
 
 function simulateSingleRegion(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
     tickInterval: number
 ) {
-    sendSimulationEvent(simulatedRegion, TickEvent.create(tickInterval));
+    sendSimulationEvent(simulatedRegion, newTickEvent(tickInterval));
     handleSimulationEvents(draftState, simulatedRegion);
     tickActivities(draftState, simulatedRegion, tickInterval);
 }
 
 function tickActivities(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
     tickInterval: number
 ) {
     Object.values(simulatedRegion.activities).forEach((activityState) => {
@@ -49,8 +49,8 @@ function tickActivities(
 }
 
 export function handleSimulationEvents(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>
 ) {
     simulatedRegion.behaviors.forEach((behaviorState) => {
         simulatedRegion.inEvents.forEach((event) => {

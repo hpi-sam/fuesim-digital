@@ -1,21 +1,25 @@
+import type { WritableDraft } from 'immer';
 import { ExerciseState } from '../state.js';
-import type { ExerciseAction } from '../store/index.js';
-import { ReducerError, applyAction } from '../store/index.js';
-import type { Mutable, UUID } from '../utils/index.js';
-import { cloneDeepMutable } from '../utils/index.js';
+import type { ParticipantKey } from '../exercise-keys.js';
 import {
-    PartialExport,
     StateExport,
-} from '../export-import/file-format/index.js';
-import type { MapImageTemplate, VehicleTemplate } from '../models/index.js';
-import type { PatientCategory } from '../models/patient-category.js';
-import type { Migration } from './migration-functions.js';
+    type MigratedStateExport,
+} from '../export-import/file-format/state-export.js';
+import { cloneDeepMutable } from '../utils/clone-deep.js';
+import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
+import { PartialExport } from '../export-import/file-format/partial-export.js';
+import { applyAction } from '../store/reduce-exercise-state.js';
+import { ReducerError } from '../store/reducer-error.js';
+import type { UUID } from '../utils/uuid.js';
 import { migrations } from './migration-functions.js';
+import type { Migration } from './migration-functions.js';
 
 export function migrateStateExport(
     stateExportToMigrate: StateExport
-): Mutable<StateExport> {
-    const stateExport = cloneDeepMutable(stateExportToMigrate);
+): WritableDraft<MigratedStateExport> {
+    const stateExport = cloneDeepMutable(
+        stateExportToMigrate
+    ) as WritableDraft<MigratedStateExport>;
     const {
         newVersion,
         migratedProperties: { currentState, history },
@@ -36,7 +40,7 @@ export function migrateStateExport(
             stateExport.history = {
                 actionHistory: history.actions.filter(
                     // Remove actions that are marked to be removed by the migrations
-                    (action): action is Mutable<ExerciseAction> =>
+                    (action): action is WritableDraft<ExerciseAction> =>
                         action !== null
                 ),
                 initialState: history.initialState,
@@ -48,16 +52,35 @@ export function migrateStateExport(
     return stateExport;
 }
 export function migratePartialExport(
-    partialExportToMigrate: PartialExport
-): Mutable<PartialExport> {
+    partialExportToMigrate: PartialExport,
+    currentState: ExerciseState
+): WritableDraft<PartialExport> {
     // Encapsulate the partial export in a state export and migrate it
     const mutablePartialExport = cloneDeepMutable(partialExportToMigrate);
+    const dummyState = cloneDeepMutable(
+        ExerciseState.create('123456' as ParticipantKey)
+    );
     const stateExport = cloneDeepMutable(
         new StateExport({
-            ...cloneDeepMutable(ExerciseState.create('123456')),
+            ...dummyState,
             mapImageTemplates: mutablePartialExport.mapImageTemplates ?? [],
             patientCategories: mutablePartialExport.patientCategories ?? [],
             vehicleTemplates: mutablePartialExport.vehicleTemplates ?? [],
+            // We need this hotfix since otherwise migration 44 is not happy
+            materialTemplates: Object.fromEntries(
+                Object.entries(dummyState.materialTemplates).map(
+                    ([id, template]) => [
+                        id,
+                        {
+                            ...template,
+                            materialType:
+                                template.image.url === '/assets/material.svg'
+                                    ? 'standard'
+                                    : 'big',
+                        },
+                    ]
+                )
+            ),
         })
     );
     stateExport.fileVersion = mutablePartialExport.fileVersion;
@@ -68,19 +91,39 @@ export function migratePartialExport(
     // `undefined` will be ignored while `[]` would remove all existing entries.
     const mapImageTemplates =
         mutablePartialExport.mapImageTemplates !== undefined
-            ? (migratedStateExport.currentState
-                  .mapImageTemplates as MapImageTemplate[])
+            ? Object.values(migratedStateExport.currentState.mapImageTemplates)
             : undefined;
     const patientCategories =
         mutablePartialExport.patientCategories !== undefined
-            ? (migratedStateExport.currentState
-                  .patientCategories as PatientCategory[])
+            ? migratedStateExport.currentState.patientCategories
             : undefined;
-    const vehicleTemplates =
+    let vehicleTemplates =
         mutablePartialExport.vehicleTemplates !== undefined
-            ? (migratedStateExport.currentState
-                  .vehicleTemplates as VehicleTemplate[])
+            ? Object.values(migratedStateExport.currentState.vehicleTemplates)
             : undefined;
+
+    // Fix template id lookups, since migration 44 always computes new template IDs
+    if (vehicleTemplates)
+        vehicleTemplates = vehicleTemplates.map((t) => ({
+            ...t,
+            personnelTemplateIds: t.personnelTemplateIds.map((id) => {
+                const requiredType =
+                    migratedStateExport.currentState.personnelTemplates[id]!
+                        .personnelType;
+                return Object.values(currentState.personnelTemplates).find(
+                    (pt) => pt.personnelType === requiredType
+                )!.id;
+            }),
+            materialTemplateIds: t.materialTemplateIds.map((id) => {
+                const requiredType =
+                    migratedStateExport.currentState.materialTemplates[id]!
+                        .image.url;
+                return Object.values(currentState.materialTemplates).find(
+                    (mt) => mt.image.url === requiredType
+                )!.id;
+            }),
+        }));
+
     const migratedPartialExport = new PartialExport(
         patientCategories,
         vehicleTemplates,
@@ -105,13 +148,13 @@ export function applyMigrations<
 ): {
     newVersion: number;
     migratedProperties: {
-        currentState: Mutable<ExerciseState>;
+        currentState: WritableDraft<ExerciseState>;
         history: H extends undefined
             ? undefined
             :
                   | {
-                        initialState: Mutable<ExerciseState>;
-                        actions: (Mutable<ExerciseAction> | null)[];
+                        initialState: WritableDraft<ExerciseState>;
+                        actions: (WritableDraft<ExerciseAction> | null)[];
                     }
                   | undefined;
     };
@@ -128,7 +171,7 @@ export function applyMigrations<
         migrateState(migrationsToApply, history.initialState);
         const intermediaryState = cloneDeepMutable(
             history.initialState
-        ) as Mutable<ExerciseState>;
+        ) as WritableDraft<ExerciseState>;
         try {
             history.actions.forEach((action, index) => {
                 if (action !== null) {
@@ -180,7 +223,7 @@ export function applyMigrations<
     }
     migrateState(migrationsToApply, propertiesToMigrate.currentState);
     const currentState =
-        propertiesToMigrate.currentState as Mutable<ExerciseState>;
+        propertiesToMigrate.currentState as WritableDraft<ExerciseState>;
     return {
         newVersion,
         migratedProperties: {
@@ -201,7 +244,7 @@ function migrateState(migrationsToApply: Migration[], currentState: object) {
  */
 function migrateAction(
     migrationsToApply: Migration[],
-    intermediaryState: object,
+    intermediaryState: ExerciseState,
     action: object
 ): boolean {
     return migrationsToApply.every((migration) => {

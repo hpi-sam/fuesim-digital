@@ -1,12 +1,12 @@
 import type { OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ReportBehaviorState,
     SimulationBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
-import { StrictObject } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { TypeAssertedObject } from 'fuesim-digital-shared';
 import {
     map,
     of,
@@ -16,18 +16,22 @@ import {
     takeUntil,
     type Observable,
 } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import {
+    createSelectBehaviorStates,
+    createSelectBehaviorState,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
+import type { HotkeyLayer } from '../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    createSelectBehaviorState,
-    createSelectBehaviorStates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+} from '../../../../../../../shared/services/hotkeys.service';
+import { AppSaveOnTypingDirective } from '../../../../../../../shared/directives/app-save-on-typing.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 type ReportPropertyName = Exclude<
     keyof ReportBehaviorState,
@@ -76,14 +80,23 @@ interface EventBasedReport {
     selector: 'app-simulation-event-based-report-editor',
     templateUrl: './simulation-event-based-report-editor.component.html',
     styleUrls: ['./simulation-event-based-report-editor.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        HotkeyIndicatorComponent,
+        AsyncPipe,
+    ],
 })
 export class SimulationEventBasedReportEditorComponent
     implements OnChanges, OnDestroy, OnInit
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() reportBehaviorId!: UUID;
-    @Input() useHotkeys = false;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly hotkeysService = inject(HotkeysService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly reportBehaviorId = input.required<UUID>();
+    readonly useHotkeys = input(false);
 
     private hotkeyLayer: HotkeyLayer | undefined;
 
@@ -99,12 +112,6 @@ export class SimulationEventBasedReportEditorComponent
 
     private readonly destroy$ = new Subject<void>();
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly hotkeysService: HotkeysService
-    ) {}
-
     ngOnInit(): void {
         this.canReport$ = this.simulatedRegionId$.pipe(
             switchMap((simulatedRegionId) =>
@@ -115,8 +122,8 @@ export class SimulationEventBasedReportEditorComponent
                     : of([])
             ),
             map((behaviors) =>
-                StrictObject.fromEntries(
-                    StrictObject.entries(eventBasedReportData).map(
+                Object.fromEntries(
+                    Object.entries(eventBasedReportData).map(
                         ([eventId, eventDetails]) => [
                             eventId,
                             eventDetails.requiredBehaviors.every(
@@ -133,27 +140,25 @@ export class SimulationEventBasedReportEditorComponent
             takeUntil(this.destroy$)
         );
 
-        this.eventBasedReports = StrictObject.entries(eventBasedReportData).map(
-            ([eventId, eventDetails]) => ({
-                eventId,
-                propertyName: eventDetails.propertyName,
-                description: eventDetails.description,
-                changeCallback: (isEnabled) =>
-                    this.updateEventBasedReport(eventId, isEnabled),
-                hotkey: new Hotkey(
-                    eventDetails.hotkeyKeys,
-                    false,
-                    () => this.toggleEventBasedReport(eventId),
-                    this.canReport$.pipe(
-                        map((canReport) => !!canReport[eventId])
-                    )
-                ),
-            })
-        );
+        this.eventBasedReports = TypeAssertedObject.entries(
+            eventBasedReportData
+        ).map(([eventId, eventDetails]) => ({
+            eventId,
+            propertyName: eventDetails.propertyName,
+            description: eventDetails.description,
+            changeCallback: (isEnabled) =>
+                this.updateEventBasedReport(eventId, isEnabled),
+            hotkey: new Hotkey(
+                eventDetails.hotkeyKeys,
+                false,
+                () => this.toggleEventBasedReport(eventId),
+                this.canReport$.pipe(map((canReport) => !!canReport[eventId]))
+            ),
+        }));
 
         this.hotkeyLayer = this.hotkeysService.createLayer(
             false,
-            this.useHotkeys
+            this.useHotkeys()
         );
         this.eventBasedReports.forEach((eventBasedReport) => {
             this.hotkeyLayer!.addHotkey(eventBasedReport.hotkey);
@@ -162,16 +167,17 @@ export class SimulationEventBasedReportEditorComponent
 
     ngOnChanges(changes: SimpleChanges): void {
         if ('useHotkeys' in changes && this.hotkeyLayer) {
-            this.hotkeyLayer.enabled = this.useHotkeys;
+            this.hotkeyLayer.enabled = this.useHotkeys();
         }
 
         if ('simulatedRegionId' in changes || 'reportBehaviorId' in changes) {
-            this.simulatedRegionId$.next(this.simulatedRegionId);
+            const simulatedRegionId = this.simulatedRegionId();
+            this.simulatedRegionId$.next(simulatedRegionId);
 
             this.reportBehaviorState$ = this.store.select(
                 createSelectBehaviorState<ReportBehaviorState>(
-                    this.simulatedRegionId,
-                    this.reportBehaviorId
+                    simulatedRegionId,
+                    this.reportBehaviorId()
                 )
             );
         }
@@ -185,8 +191,8 @@ export class SimulationEventBasedReportEditorComponent
     updateEventBasedReport(type: EventId, isEnabled: boolean) {
         this.exerciseService.proposeAction({
             type: eventBasedReportData[type].actionType,
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.reportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.reportBehaviorId(),
             reportChanges: isEnabled,
         });
     }
@@ -194,16 +200,16 @@ export class SimulationEventBasedReportEditorComponent
     toggleEventBasedReport(eventId: EventId) {
         const reportBehavior = selectStateSnapshot<ReportBehaviorState>(
             createSelectBehaviorState(
-                this.simulatedRegionId,
-                this.reportBehaviorId
+                this.simulatedRegionId(),
+                this.reportBehaviorId()
             ),
             this.store
         );
 
         this.exerciseService.proposeAction({
             type: eventBasedReportData[eventId].actionType,
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.reportBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.reportBehaviorId(),
             reportChanges:
                 !reportBehavior[eventBasedReportData[eventId].propertyName],
         });

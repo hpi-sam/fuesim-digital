@@ -1,6 +1,6 @@
 {
-    "name": "digital-fuesim-manv-shared",
-    "version": "0.10.0",
+    "name": "fuesim-digital-shared",
+    "version": "0.11.0",
     "type": "module",
     "main": "./dist/index.js",
     "esnext": "./dist/index.js",
@@ -20,26 +20,37 @@
         "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --verbose --watch"
     },
     "private": true,
-    "engines": {
-        "node": ">=22",
-        "npm": ">=11"
+    "devEngines": {
+        "runtime": {
+            "name": "node",
+            "version": "~24.13.0",
+            "onFail": "error"
+        },
+        "packageManager": {
+            "name": "npm",
+            "version": "~11.6.2",
+            "onFail": "error"
+        }
     },
     "dependencies": {
         "@noble/hashes": "^1.7.1",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.1",
         "immer": "^10.1.1",
-        "lodash-es": "^4.17.21",
+        "lodash-es": "^4.17.23",
+        "papaparse": "^5.5.3",
         "rbush": "^4.0.1",
-        "rbush-knn": "github:mourner/rbush-knn#semver:^4.0.0",
+        "rbush-knn": "^4.0.0",
         "reflect-metadata": "^0.2.2",
-        "uuid": "^11.1.0"
+        "uuid": "^11.1.0",
+        "zod": "^4.1.13"
     },
     "devDependencies": {
         "@eslint/compat": "^1.4.0",
         "@eslint/js": "^9.36.0",
         "@types/jest": "^30.0.0",
         "@types/lodash-es": "^4.17.12",
+        "@types/papaparse": "^5.5.2",
         "@types/rbush": "^4.0.0",
         "@types/validator": "^13.12.3",
         "eslint": "^9.36.0",
@@ -48,10 +59,10 @@
         "eslint-plugin-unicorn": "^56.0.1",
         "jest": "^30.2.0",
         "jest-extended": "^4.0.2",
+        "socket.io": "^4.8.3",
         "ts-jest": "^29.4.5",
-        "ts-node": "^10.9.2",
-        "typescript": "~5.8.2",
-        "typescript-eslint": "^8.45.0"
+        "typescript": "~5.9.3",
+        "typescript-eslint": "^8.55.0"
     },
     "exports": {
         ".": {

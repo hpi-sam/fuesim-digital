@@ -1,18 +1,17 @@
-import type { MapCoordinates } from '../../../models/utils/index.js';
+import type { WritableDraft } from 'immer';
+import type { ExerciseState } from '../../../state.js';
+import type { ElementTypePluralMap } from '../../../utils/element-type-plural-map.js';
+import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
+import type { UUID } from '../../../utils/uuid.js';
 import {
     currentCoordinatesOf,
-    isNotOnMap,
     isOnMap,
 } from '../../../models/utils/position/position-helpers.js';
 import { SpatialTree } from '../../../models/utils/spatial-tree.js';
-import type { ExerciseState } from '../../../state.js';
+import type { MapCoordinates } from '../../../models/utils/position/map-coordinates.js';
 import { cloneDeepMutable } from '../../../utils/clone-deep.js';
-import type { ElementTypePluralMap } from '../../../utils/element-type-plural-map.js';
-import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
-import type { Mutable } from '../../../utils/immutability.js';
-import type { UUID } from '../../../utils/uuid.js';
-import { removeTreatmentsOfElement } from './calculate-treatments.js';
 import { getElement } from './get-element.js';
+import { removeTreatmentsOfElement } from './calculate-treatments.js';
 
 /**
  * The element types for which a spatial tree exists in the state to improve the performance (see {@link SpatialTree}).
@@ -28,12 +27,12 @@ export type SpatialElementPlural = SpatialTypePluralMap[SpatialElementType];
  * Must be called if an element is added to the state
  */
 export function addElementPosition(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     elementType: SpatialElementType,
     elementId: UUID
 ) {
     const element = getElement(state, elementType, elementId);
-    if (isNotOnMap(element)) {
+    if (!isOnMap(element)) {
         return;
     }
     SpatialTree.addElement(
@@ -47,7 +46,7 @@ export function addElementPosition(
  * Changes the elements position and executes side effects to guarantee the consistency of the state
  */
 export function updateElementPosition(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     elementType: SpatialElementType,
     elementId: UUID,
     targetPosition: MapCoordinates
@@ -75,13 +74,13 @@ export function updateElementPosition(
  * Must be called when an element is deleted from the state
  */
 export function removeElementPosition(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     elementType: SpatialElementType,
     elementId: UUID
 ) {
     const element = getElement(state, elementType, elementId);
     removeTreatmentsOfElement(state, element);
-    if (isNotOnMap(element)) {
+    if (!isOnMap(element)) {
         return;
     }
     SpatialTree.removeElement(

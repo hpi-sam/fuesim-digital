@@ -1,55 +1,72 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import type {
     Material,
     Patient,
     PatientStatus,
     Personnel,
-    PersonnelType,
     Vehicle,
-} from 'digital-fuesim-manv-shared';
-import { SimulatedRegion } from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
+import { SimulatedRegion } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { FormsModule } from '@angular/forms';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../state/app.state';
 import {
-    createSelectElementsInSimulatedRegion,
-    selectMaterials,
-    selectPatients,
-    selectPersonnel,
     selectVehicleTemplates,
-    selectVehicles,
+    selectPersonnelTemplates,
+    selectMaterialTemplates,
+    createSelectElementsInSimulatedRegion,
+    selectPatients,
     createSelectByPredicate,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectVehicles,
+    selectPersonnel,
+    selectMaterials,
+} from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { DisplayValidationComponent } from '../../../../../../../../shared/validation/display-validation/display-validation.component';
+import { PatientStatusBadgeComponent } from '../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { ValuesPipe } from '../../../../../../../../shared/pipes/values.pipe';
+import { WithDollarPipe } from './utils/with-dollar';
 
 const patientCategories = ['red', 'yellow', 'green', 'black'] as const;
 export type PatientCategory = (typeof patientCategories)[number];
-
-const personnelCategories = [
-    'notarzt',
-    'notSan',
-    'rettSan',
-    'san',
-    'gf',
-] as const;
-export type PersonnelCategory = (typeof personnelCategories)[number];
 
 @Component({
     selector: 'app-simulated-region-overview-general-tab',
     templateUrl: './simulated-region-overview-general-tab.component.html',
     styleUrls: ['./simulated-region-overview-general-tab.component.scss'],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        DisplayValidationComponent,
+        NgbCollapse,
+        PatientStatusBadgeComponent,
+        ValuesPipe,
+        AsyncPipe,
+        WithDollarPipe,
+    ],
 })
 export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
-    @Input() simulatedRegion!: SimulatedRegion;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly simulatedRegion = input.required<SimulatedRegion>();
 
     public readonly vehicleTemplates$ = this.store.select(
         selectVehicleTemplates
     );
+    public readonly personnelTemplates$ = this.store.select(
+        selectPersonnelTemplates
+    );
+    public readonly materialTemplates$ = this.store.select(
+        selectMaterialTemplates
+    );
 
     public readonly patientCategories = patientCategories;
-    public readonly personnelCategories = personnelCategories;
 
     patients: {
         [Key in `${PatientCategory | 'all'}$`]?: Observable<Patient[]>;
@@ -57,31 +74,20 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
     vehicles$?: Observable<{ [Key in string]?: Vehicle[] }>;
 
-    personnel: {
-        [Key in `${PersonnelCategory | 'all'}$`]?: Observable<Personnel[]>;
-    } = {};
+    personnel$?: Observable<{ [Key in string]?: Personnel[] }>;
 
-    material$?: Observable<Material[]>;
+    materials$?: Observable<{ [Key in string]?: Material[] }>;
 
     public patientsCollapsed = true;
     public vehiclesCollapsed = true;
     public personnelCollapsed = true;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
+    public materialsCollapsed = true;
 
     ngOnInit(): void {
         const containedPatientsSelector = createSelectElementsInSimulatedRegion(
             selectPatients,
-            this.simulatedRegion.id
+            this.simulatedRegion().id
         );
-        const containedPersonnelSelector =
-            createSelectElementsInSimulatedRegion(
-                selectPersonnel,
-                this.simulatedRegion.id
-            );
 
         this.patients.all$ = this.store.select(containedPatientsSelector);
         patientCategories.forEach((category) => {
@@ -98,7 +104,7 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
                 selectVehicleTemplates,
                 createSelectElementsInSimulatedRegion(
                     selectVehicles,
-                    this.simulatedRegion.id
+                    this.simulatedRegion().id
                 ),
                 (vehicleTemplates, vehicles) => {
                     const categorizedVehicles: { [Key in string]?: Vehicle[] } =
@@ -106,14 +112,10 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
 
                     categorizedVehicles['all'] = [];
 
-                    vehicleTemplates.forEach((template) => {
-                        categorizedVehicles[template.vehicleType] ??= [];
-                    });
-
                     vehicles.forEach((vehicle) => {
-                        categorizedVehicles[vehicle.vehicleType] ??= [];
+                        categorizedVehicles[vehicle.templateId] ??= [];
 
-                        categorizedVehicles[vehicle.vehicleType]!.push(vehicle);
+                        categorizedVehicles[vehicle.templateId]!.push(vehicle);
 
                         categorizedVehicles['all']!.push(vehicle);
                     });
@@ -123,20 +125,59 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
             )
         );
 
-        this.personnel.all$ = this.store.select(containedPersonnelSelector);
-        personnelCategories.forEach((category) => {
-            this.personnel[`${category}$`] = this.store.select(
-                createSelectByPredicate(
-                    containedPersonnelSelector,
-                    this.createPersonnelTypePredicate(category)
-                )
-            );
-        });
+        this.personnel$ = this.store.select(
+            createSelector(
+                createSelectElementsInSimulatedRegion(
+                    selectPersonnel,
+                    this.simulatedRegion().id
+                ),
+                (personnel) => {
+                    const categorizedPersonnel: {
+                        [Key in string]?: Personnel[];
+                    } = {};
 
-        this.material$ = this.store.select(
-            createSelectElementsInSimulatedRegion(
-                selectMaterials,
-                this.simulatedRegion.id
+                    categorizedPersonnel['all'] = [];
+
+                    personnel.forEach((singlePersonnel) => {
+                        categorizedPersonnel[singlePersonnel.templateId] ??= [];
+
+                        categorizedPersonnel[singlePersonnel.templateId]!.push(
+                            singlePersonnel
+                        );
+
+                        categorizedPersonnel['all']!.push(singlePersonnel);
+                    });
+
+                    return categorizedPersonnel;
+                }
+            )
+        );
+
+        this.materials$ = this.store.select(
+            createSelector(
+                createSelectElementsInSimulatedRegion(
+                    selectMaterials,
+                    this.simulatedRegion().id
+                ),
+                (materials) => {
+                    const categorizedMaterials: {
+                        [Key in string]?: Material[];
+                    } = {};
+
+                    categorizedMaterials['all'] = [];
+
+                    materials.forEach((material) => {
+                        categorizedMaterials[material.templateId] ??= [];
+
+                        categorizedMaterials[material.templateId]!.push(
+                            material
+                        );
+
+                        categorizedMaterials['all']!.push(material);
+                    });
+
+                    return categorizedMaterials;
+                }
             )
         );
     }
@@ -147,16 +188,10 @@ export class SimulatedRegionOverviewGeneralTabComponent implements OnInit {
         return (patient) => patient.realStatus === status;
     }
 
-    createPersonnelTypePredicate(
-        type: PersonnelType
-    ): (personnel: Personnel) => boolean {
-        return (patient) => patient.personnelType === type;
-    }
-
     public async renameSimulatedRegion(newName: string) {
         this.exerciseService.proposeAction({
             type: '[SimulatedRegion] Rename simulated region',
-            simulatedRegionId: this.simulatedRegion.id,
+            simulatedRegionId: this.simulatedRegion().id,
             newName,
         });
     }

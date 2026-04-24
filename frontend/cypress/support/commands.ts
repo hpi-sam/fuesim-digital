@@ -44,10 +44,10 @@
 
 import type {
     JsonObject,
-    UUID,
     SocketResponse,
     ExerciseAction,
-} from 'digital-fuesim-manv-shared';
+    JoinExerciseResponseDataInput,
+} from 'fuesim-digital-shared';
 import { io } from 'socket.io-client';
 
 export function dragToMap(
@@ -106,28 +106,33 @@ export function createExercise() {
             .its('body')
             .as('createBody')
     );
-    cy.get('@createBody', { log: false }).its('trainerId').as('trainerId');
+    cy.get('@createBody', { log: false }).its('trainerKey').as('trainerKey');
     cy.get('@createBody', { log: false })
-        .its('participantId')
-        .as('participantId');
+        .its('participantKey')
+        .as('participantKey');
     return cy;
 }
 
 export function joinExerciseAsTrainer() {
-    cy.get('@trainerId', { log: false }).then((trainerId) =>
+    cy.get('@trainerKey', { log: false }).then((trainerKey) =>
         // eslint-disable-next-line @typescript-eslint/no-base-to-string
-        cy.visit(`exercises/${trainerId}`)
+        cy.visit(`exercises/${trainerKey}`)
     );
     cy.get('[data-cy=joinExerciseModalButton]').click();
     return cy;
 }
 
 export function joinExerciseAsParticipant() {
-    cy.get('@participantId', { log: false }).then((participantId) =>
+    cy.get('@participantKey', { log: false }).then((participantKey) =>
         // eslint-disable-next-line @typescript-eslint/no-base-to-string
-        cy.visit(`exercises/${participantId}`)
+        cy.visit(`exercises/${participantKey}`)
     );
     cy.get('[data-cy=joinExerciseModalButton]').click();
+    return cy;
+}
+
+export function closeAllToasts() {
+    cy.get('.toast-header .btn-close').click();
     return cy;
 }
 
@@ -140,22 +145,26 @@ export function initializeParticipantSocket() {
         }
     );
 
-    cy.get('@participantId', { log: false }).then((participantId: any) => {
+    cy.get('@participantKey', { log: false }).then((participantKey: any) => {
         cy.get('@participantSocket', { log: false }).then(
             (participantSocket: any) => {
                 cy.wrap(
-                    new Promise<SocketResponse<UUID>>((resolve) => {
-                        participantSocket.emit(
-                            'joinExercise',
-                            participantId,
-                            '',
-                            (response: SocketResponse<UUID>) =>
-                                resolve(response)
-                        );
-                    }),
+                    new Promise<SocketResponse<JoinExerciseResponseDataInput>>(
+                        (resolve) => {
+                            participantSocket.emit(
+                                'joinExercise',
+                                participantKey,
+                                '',
+                                (
+                                    response: SocketResponse<JoinExerciseResponseDataInput>
+                                ) => resolve(response)
+                            );
+                        }
+                    ),
                     { log: false }
                 )
                     .its('payload')
+                    .its('clientId')
                     .as('participantSocketUUID');
             }
         );
@@ -188,20 +197,25 @@ export function initializeTrainerSocket() {
         }
     );
 
-    cy.get('@trainerId', { log: false }).then((trainerId: any) => {
+    cy.get('@trainerKey', { log: false }).then((trainerKey: any) => {
         cy.get('@trainerSocket', { log: false }).then((trainerSocket: any) => {
             cy.wrap(
-                new Promise<SocketResponse<UUID>>((resolve) => {
-                    trainerSocket.emit(
-                        'joinExercise',
-                        trainerId,
-                        '',
-                        (response: SocketResponse<UUID>) => resolve(response)
-                    );
-                }),
+                new Promise<SocketResponse<JoinExerciseResponseDataInput>>(
+                    (resolve) => {
+                        trainerSocket.emit(
+                            'joinExercise',
+                            trainerKey,
+                            '',
+                            (
+                                response: SocketResponse<JoinExerciseResponseDataInput>
+                            ) => resolve(response)
+                        );
+                    }
+                ),
                 { log: false }
             )
                 .its('payload')
+                .its('clientId')
                 .as('trainerSocketUUID');
         });
     });

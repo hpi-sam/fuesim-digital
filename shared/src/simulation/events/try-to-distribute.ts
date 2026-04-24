@@ -1,22 +1,17 @@
-import { IsUUID } from 'class-validator';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { UUID } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { SimulationEvent } from './simulation-event.js';
+import { z } from 'zod';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
+import { simulationEventSchema } from './simulation-event.js';
 
-export class TryToDistributeEvent implements SimulationEvent {
-    @IsValue('tryToDistributeEvent')
-    readonly type = 'tryToDistributeEvent';
+export const tryToDistributeEventSchema = z.strictObject({
+    ...simulationEventSchema.shape,
+    type: z.literal('tryToDistributeEvent'),
+    behaviorId: uuidSchema,
+});
 
-    @IsUUID()
-    public readonly behaviorId: UUID;
+export type TryToDistributeEvent = z.infer<typeof tryToDistributeEventSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(behaviorId: UUID) {
-        this.behaviorId = behaviorId;
-    }
-
-    static readonly create = getCreate(this);
+export function newTryToDistributeEvent(
+    behaviorId: UUID
+): TryToDistributeEvent {
+    return { type: 'tryToDistributeEvent', behaviorId };
 }

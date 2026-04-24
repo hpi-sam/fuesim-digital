@@ -1,28 +1,30 @@
-import { Type } from 'class-transformer';
-import {
-    IsString,
-    ValidateNested,
-    IsUUID,
-    IsInt,
-    IsArray,
-} from 'class-validator';
-import { VehicleTemplate } from '../../models/index.js';
-import type { PersonnelType } from '../../models/utils/index.js';
-import { ImageProperties } from '../../models/utils/index.js';
-import type { MaterialType } from '../../models/utils/material-type.js';
+import { IsString, IsUUID, IsInt, IsArray } from 'class-validator';
+import { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
-import { uuidValidationOptions, cloneDeepMutable } from '../../utils/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { IsValue } from '../../utils/validators/is-value.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import {
+    type VehicleTemplate,
+    vehicleTemplateSchema,
+} from '../../models/vehicle-template.js';
+import {
+    type UUID,
+    uuidArrayValidationOptions,
+    uuidValidationOptions,
+} from '../../utils/uuid.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from '../../models/utils/image-properties.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 
 export class AddVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Add vehicleTemplate')
     public readonly type = '[VehicleTemplate] Add vehicleTemplate';
 
-    @ValidateNested()
-    @Type(() => VehicleTemplate)
+    @IsZodSchema(vehicleTemplateSchema)
     public readonly vehicleTemplate!: VehicleTemplate;
 }
 
@@ -42,17 +44,16 @@ export class EditVehicleTemplateAction implements Action {
     @IsInt()
     public readonly patientCapacity!: number;
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
+    @IsZodSchema(imagePropertiesSchema)
     public readonly image!: ImageProperties;
 
-    @IsString({ each: true })
+    @IsUUID(4, uuidArrayValidationOptions)
     @IsArray()
-    public readonly materials!: readonly MaterialType[];
+    public readonly materialTemplateIds!: readonly UUID[];
 
-    @IsString({ each: true })
+    @IsUUID(4, uuidArrayValidationOptions)
     @IsArray()
-    public readonly personnelTypes!: readonly PersonnelType[];
+    public readonly personnelTemplateIds!: readonly UUID[];
 }
 
 export class DeleteVehicleTemplateAction implements Action {
@@ -67,16 +68,13 @@ export namespace VehicleTemplateActionReducers {
     export const addVehicleTemplate: ActionReducer<AddVehicleTemplateAction> = {
         action: AddVehicleTemplateAction,
         reducer: (draftState, { vehicleTemplate }) => {
-            if (
-                draftState.vehicleTemplates.some(
-                    (template) => template.id === vehicleTemplate.id
-                )
-            ) {
+            if (draftState.vehicleTemplates[vehicleTemplate.id]) {
                 throw new ReducerError(
                     `VehicleTemplate with id ${vehicleTemplate.id} already exists`
                 );
             }
-            draftState.vehicleTemplates.push(cloneDeepMutable(vehicleTemplate));
+            draftState.vehicleTemplates[vehicleTemplate.id] =
+                cloneDeepMutable(vehicleTemplate);
             return draftState;
         },
         rights: 'trainer',
@@ -93,8 +91,8 @@ export namespace VehicleTemplateActionReducers {
                     vehicleType,
                     image,
                     patientCapacity,
-                    materials,
-                    personnelTypes,
+                    materialTemplateIds,
+                    personnelTemplateIds,
                 }
             ) => {
                 const vehicleTemplate = getVehicleTemplate(draftState, id);
@@ -102,8 +100,10 @@ export namespace VehicleTemplateActionReducers {
                 vehicleTemplate.name = name;
                 vehicleTemplate.patientCapacity = patientCapacity;
                 vehicleTemplate.vehicleType = vehicleType;
-                vehicleTemplate.materials = cloneDeepMutable(materials);
-                vehicleTemplate.personnel = cloneDeepMutable(personnelTypes);
+                vehicleTemplate.materialTemplateIds =
+                    cloneDeepMutable(materialTemplateIds);
+                vehicleTemplate.personnelTemplateIds =
+                    cloneDeepMutable(personnelTemplateIds);
 
                 return draftState;
             },
@@ -115,10 +115,7 @@ export namespace VehicleTemplateActionReducers {
             action: DeleteVehicleTemplateAction,
             reducer: (draftState, { id }) => {
                 getVehicleTemplate(draftState, id);
-                draftState.vehicleTemplates =
-                    draftState.vehicleTemplates.filter(
-                        (template) => template.id !== id
-                    );
+                delete draftState.vehicleTemplates[id];
                 // Delete this template from every alarm group
                 for (const alarmGroup of Object.values(
                     draftState.alarmGroups
@@ -136,12 +133,10 @@ export namespace VehicleTemplateActionReducers {
 }
 
 function getVehicleTemplate(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     id: UUID
-): Mutable<VehicleTemplate> {
-    const vehicleTemplate = state.vehicleTemplates.find(
-        (template) => template.id === id
-    );
+): WritableDraft<VehicleTemplate> {
+    const vehicleTemplate = state.vehicleTemplates[id];
     if (!vehicleTemplate) {
         throw new ReducerError(`VehicleTemplate with id ${id} does not exist`);
     }

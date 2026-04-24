@@ -1,21 +1,32 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
     SimulatedRegion,
     PatientStatus,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { FormsModule } from '@angular/forms';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../../../state/app.state';
 import {
     createSelectBehaviorState,
-    selectConfiguration,
     selectSimulatedRegions,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    selectConfiguration,
+} from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../../../shared/directives/app-save-on-typing.directive';
 
 @Component({
     selector: 'app-manage-patient-transport-to-hospital-managed-regions-table',
@@ -24,13 +35,24 @@ import {
     styleUrls: [
         './manage-patient-transport-to-hospital-managed-regions-table.component.scss',
     ],
-    standalone: false,
+    imports: [
+        PatientStatusBadgeComponent,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+    ],
 })
-export class ManagePatientTransportToHospitalManagedRegionsTableComponent
-    implements OnChanges
-{
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+export class ManagePatientTransportToHospitalManagedRegionsTableComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public behaviorState$!: Observable<ManagePatientTransportToHospitalBehaviorState>;
     public managedSimulatedRegions$!: Observable<SimulatedRegion[]>;
@@ -39,16 +61,11 @@ export class ManagePatientTransportToHospitalManagedRegionsTableComponent
 
     public selectedSimulatedRegionId?: UUID;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
-
     ngOnChanges(): void {
         this.behaviorState$ = this.store.select(
             createSelectBehaviorState<ManagePatientTransportToHospitalBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
 
@@ -102,8 +119,8 @@ export class ManagePatientTransportToHospitalManagedRegionsTableComponent
     addSimulatedRegionToManage(managedSimulatedRegionId: UUID) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Add Simulated Region To Manage For Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             managedSimulatedRegionId,
         });
     }
@@ -111,8 +128,8 @@ export class ManagePatientTransportToHospitalManagedRegionsTableComponent
     removeSimulatedRegionToManage(managedSimulatedRegionId: UUID) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Remove Simulated Region To Manage From Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             managedSimulatedRegionId,
         });
     }
@@ -124,8 +141,8 @@ export class ManagePatientTransportToHospitalManagedRegionsTableComponent
     ) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Update Patients Expected In Region For Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             managedSimulatedRegionId,
             patientsExpected,
             patientStatus,

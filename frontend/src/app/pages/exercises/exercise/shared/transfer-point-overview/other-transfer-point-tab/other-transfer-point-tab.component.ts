@@ -1,29 +1,46 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, inject, input, viewChild } from '@angular/core';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import { TransferPoint } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
+import { getTransferPointFullName, TransferPoint } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
-import type { AppState } from 'src/app/state/app.state';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { SearchableDropdownOption } from '../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { AppState } from '../../../../../../state/app.state';
 import {
     createSelectTransferPoint,
     selectTransferPoints,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import { TransferPointNameComponent } from '../../../../../../shared/components/transfer-point-name/transfer-point-name.component';
+import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
+import { SearchableDropdownComponent } from '../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-other-transfer-point-tab',
     templateUrl: './other-transfer-point-tab.component.html',
     styleUrls: ['./other-transfer-point-tab.component.scss'],
-    standalone: false,
+    imports: [
+        TransferPointNameComponent,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        NgbPopover,
+        SearchableDropdownComponent,
+        AsyncPipe,
+        ValuesPipe,
+    ],
 })
 export class OtherTransferPointTabComponent implements OnInit {
-    @Input() public transferPointId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
 
-    @ViewChild(NgbPopover) popover!: NgbPopover;
+    public readonly transferPointId = input.required<UUID>();
+
+    readonly popover = viewChild.required(NgbPopover);
 
     public transferPoint$!: Observable<TransferPoint>;
 
@@ -36,14 +53,9 @@ export class OtherTransferPointTabComponent implements OnInit {
      */
     public transferPointsToBeAdded$!: Observable<SearchableDropdownOption[]>;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
-
     ngOnInit() {
         this.transferPoint$ = this.store.select(
-            createSelectTransferPoint(this.transferPointId)
+            createSelectTransferPoint(this.transferPointId())
         );
 
         const transferPoints$ = this.store.select(selectTransferPoints);
@@ -51,16 +63,16 @@ export class OtherTransferPointTabComponent implements OnInit {
         this.transferPointsToBeAdded$ = transferPoints$.pipe(
             map((transferPoints) => {
                 const currentTransferPoint =
-                    transferPoints[this.transferPointId]!;
+                    transferPoints[this.transferPointId()]!;
                 return Object.entries(transferPoints)
                     .filter(
                         ([key]) =>
-                            key !== this.transferPointId &&
+                            key !== this.transferPointId() &&
                             !currentTransferPoint.reachableTransferPoints[key]
                     )
                     .map(([id, transferPoint]) => ({
                         key: id,
-                        name: TransferPoint.getFullName(transferPoint),
+                        name: getTransferPointFullName(transferPoint),
                     }));
             })
         );
@@ -73,7 +85,7 @@ export class OtherTransferPointTabComponent implements OnInit {
                 Object.entries(transferPoint.reachableTransferPoints)
                     .map(([key, value]) => ({
                         id: key,
-                        name: TransferPoint.getFullName(transferPoints[key]!),
+                        name: getTransferPointFullName(transferPoints[key]!),
                         duration: value.duration,
                     }))
                     .sort((a, b) => a.name.localeCompare(b.name))
@@ -84,7 +96,7 @@ export class OtherTransferPointTabComponent implements OnInit {
     public connectTransferPoint(transferPointId: UUID, duration?: number) {
         this.exerciseService.proposeAction({
             type: '[TransferPoint] Connect TransferPoints',
-            transferPointId1: this.transferPointId,
+            transferPointId1: this.transferPointId(),
             transferPointId2: transferPointId,
             duration,
         });
@@ -93,12 +105,12 @@ export class OtherTransferPointTabComponent implements OnInit {
     public disconnectTransferPoint(transferPointId: UUID) {
         this.exerciseService.proposeAction({
             type: '[TransferPoint] Disconnect TransferPoints',
-            transferPointId1: this.transferPointId,
+            transferPointId1: this.transferPointId(),
             transferPointId2: transferPointId,
         });
     }
 
     public getTransferPointOrderByValue: (
         transferPoint: TransferPoint
-    ) => string = (transferPoint) => TransferPoint.getFullName(transferPoint);
+    ) => string = (transferPoint) => getTransferPointFullName(transferPoint);
 }

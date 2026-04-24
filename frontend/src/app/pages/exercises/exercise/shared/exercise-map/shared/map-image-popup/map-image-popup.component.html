@@ -1,104 +1,20 @@
-<ng-container *ngIf="mapImage$ | async as mapImage">
+@if (mapImageId) {
     <h5 class="popover-header">
-        Bildinformationen
+        @if (currentRole() === 'trainer') {
+            Bildinformationen
+        } @else {
+            Erkundung
+        }
         <button
             (click)="closePopup()"
             type="button"
             class="btn-close float-end"
         ></button>
     </h5>
-    <div class="popover-body" style="width: 350px; height: 300px">
-        <ng-container *ngIf="(currentRole$ | async) === 'trainer'">
-            <!-- TODO: This is a workaround to make it possible to add images. In the future these things should not be done via the popup. -->
-            <label class="form-label">URL</label>
-            <div class="input-group mb-3">
-                <input
-                    #urlInput="ngModel"
-                    [(ngModel)]="url"
-                    required
-                    appImageExistsValidator
-                    type="text"
-                    class="form-control"
-                />
-                <!-- During typing the url could get to an invalid value, which results in the image not being shown on the map and the popup closing  -->
-                <button
-                    [disabled]="urlInput.invalid"
-                    (click)="saveUrl()"
-                    class="btn btn-warning"
-                >
-                    Speichern
-                </button>
-            </div>
-            <app-display-validation
-                [ngModelInput]="urlInput"
-            ></app-display-validation>
-
-            <div class="form-group pb-3">
-                <label class="form-label">Höhe</label>
-                <input
-                    #heightInput="ngModel"
-                    [ngModel]="mapImage.image.height"
-                    (appSaveOnTyping)="resizeImage($event)"
-                    required
-                    min="1"
-                    step="1"
-                    appIntegerValidator
-                    type="number"
-                    class="form-control"
-                />
-                <app-display-validation
-                    [ngModelInput]="heightInput"
-                ></app-display-validation>
-            </div>
-            <div class="form-check form-switch pb-3">
-                <input
-                    type="checkbox"
-                    class="form-check-input"
-                    [ngModel]="mapImage.isLocked"
-                    (ngModelChange)="setLocked($event)"
-                />
-                <label class="form-check-label">Position sperren</label>
-            </div>
-            <div>
-                <h6>
-                    Reihenfolge
-                    <span
-                        class="text-muted"
-                        title="Die aktuelle Position des Bildes in der Reihenfolge"
-                        >({{ mapImage.zIndex }})</span
-                    >
-                </h6>
-                <div class="btn-group btn-group-sm">
-                    <button
-                        class="btn btn-sm btn-outline-primary"
-                        title="Vor allen anderen Bildern positionieren"
-                        (click)="changeZIndex('bringToFront')"
-                    >
-                        Vordergrund
-                    </button>
-                    <button
-                        class="btn btn-sm btn-outline-primary"
-                        title="Eine Ebene nach vorne"
-                        (click)="changeZIndex('oneLayerForward')"
-                    >
-                        +1
-                    </button>
-                    <button
-                        class="btn btn-sm btn-outline-primary"
-                        (click)="changeZIndex('oneLayerBack')"
-                        title="Eine Ebene nach hinten"
-                    >
-                        -1
-                    </button>
-                    <button
-                        class="btn btn-sm btn-outline-primary"
-                        title="Hinter allen anderen Bildern positionieren"
-                        (click)="changeZIndex('bringToBack')"
-                    >
-                        Hintergrund
-                    </button>
-                </div>
-            </div>
-        </ng-container>
+    <div class="popover-body p-0" style="width: 350px">
+        <app-map-images-details
+            [mapImageId]="mapImageId"
+            [openScoutInfo]="openScoutInfo"
+        />
     </div>
-</ng-container>
+}

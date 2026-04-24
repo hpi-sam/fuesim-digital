@@ -1,63 +1,52 @@
-import { Type } from 'class-transformer';
-import { IsNumber, Max, Min, ValidateNested } from 'class-validator';
+import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
-import { IsLiteralUnion, IsValue } from '../utils/validators/index.js';
-import type { PersonnelType } from './utils/personnel-type.js';
-import { personnelTypeAllowedValues } from './utils/personnel-type.js';
-import { CanCaterFor } from './utils/cater-for.js';
-import { ImageProperties } from './utils/image-properties.js';
-import { getCreate } from './utils/get-create.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { type CanCaterFor, canCaterForSchema } from './utils/cater-for.js';
+import {
+    type ImageProperties,
+    imagePropertiesSchema,
+} from './utils/image-properties.js';
 
-// TODO: These are not (yet) saved in the state -> Decide whether they should and if not move this file from the models folder away
-export class PersonnelTemplate {
-    @IsValue('personnelTemplate' as const)
-    public readonly type = 'personnelTemplate';
-
-    @IsLiteralUnion(personnelTypeAllowedValues)
-    public readonly personnelType: PersonnelType;
-
-    @ValidateNested()
-    @Type(() => CanCaterFor)
-    public readonly canCaterFor: CanCaterFor;
-
+export const personnelTemplateSchema = z.strictObject({
+    id: uuidSchema,
+    type: z.literal('personnelTemplate'),
+    personnelType: z.string(),
+    name: z.string(),
+    abbreviation: z.string(),
+    canCaterFor: canCaterForSchema,
     /**
      * Patients in this range are preferred over patients farther away (even if they are less injured).
      * Guaranteed to be <= {@link maxTreatmentRange}.
      */
-    @IsNumber()
-    @Min(0)
-    @Max(maxTreatmentRange)
-    public readonly overrideTreatmentRange: number;
-
+    overrideTreatmentRange: z.number().min(0).max(maxTreatmentRange),
     /**
      * Only patients in this range around the personnel's position can be treated.
      * Guaranteed to be <= {@link maxTreatmentRange}.
      */
-    @IsNumber()
-    @Min(0)
-    @Max(maxTreatmentRange)
-    public readonly treatmentRange: number;
+    treatmentRange: z.number().min(0).max(maxTreatmentRange),
+    image: imagePropertiesSchema,
+});
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
-    public readonly image: ImageProperties;
+export type PersonnelTemplate = z.infer<typeof personnelTemplateSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        personnelType: PersonnelType,
-        image: ImageProperties,
-        canCaterFor: CanCaterFor,
-        overrideTreatmentRange: number,
-        treatmentRange: number
-    ) {
-        this.personnelType = personnelType;
-        this.image = image;
-        this.canCaterFor = canCaterFor;
-        this.overrideTreatmentRange = overrideTreatmentRange;
-        this.treatmentRange = treatmentRange;
-    }
-
-    static readonly create = getCreate(this);
+export function newPersonnelTemplate(
+    personnelType: string,
+    name: string,
+    abbreviation: string,
+    canCaterFor: CanCaterFor,
+    overrideTreatmentRange: number,
+    treatmentRange: number,
+    image: ImageProperties
+): PersonnelTemplate {
+    return {
+        id: uuid(),
+        type: 'personnelTemplate',
+        personnelType,
+        name,
+        abbreviation,
+        canCaterFor,
+        overrideTreatmentRange,
+        treatmentRange,
+        image,
+    };
 }

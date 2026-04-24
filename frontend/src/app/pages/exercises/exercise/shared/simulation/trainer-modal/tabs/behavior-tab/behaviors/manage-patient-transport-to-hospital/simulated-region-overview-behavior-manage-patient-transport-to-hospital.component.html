@@ -1,16 +1,16 @@
 <div class="mb-3">
     <h5>Status</h5>
     <app-manage-patient-transport-to-hospital-status-editor
-        [simulatedRegionId]="simulatedRegionId"
-        [behaviorId]="behaviorId"
+        [simulatedRegionId]="simulatedRegionId()"
+        [behaviorId]="behaviorId()"
     />
 </div>
 
 <div class="mb-3">
     <h5>Ziel für Fahrzeuganfragen</h5>
     <app-manage-patient-transport-to-hospital-request-target-editor
-        [simulatedRegionId]="simulatedRegionId"
-        [behaviorId]="behaviorId"
+        [simulatedRegionId]="simulatedRegionId()"
+        [behaviorId]="behaviorId()"
     />
 </div>
 
@@ -18,8 +18,8 @@
     <h5>Abtransport bis</h5>
 
     <app-manage-patient-transport-to-hospital-maximum-category-editor
-        [simulatedRegionId]="simulatedRegionId"
-        [behaviorId]="behaviorId"
+        [simulatedRegionId]="simulatedRegionId()"
+        [behaviorId]="behaviorId()"
     />
 </div>
 
@@ -27,23 +27,23 @@
     <h5>Verwaltete simulierte Bereiche</h5>
 
     <app-manage-patient-transport-to-hospital-managed-regions-table
-        [simulatedRegionId]="simulatedRegionId"
-        [behaviorId]="behaviorId"
+        [simulatedRegionId]="simulatedRegionId()"
+        [behaviorId]="behaviorId()"
     />
 </div>
 
 <div class="mb-3">
     <h5>Fahrzeuge für den Patiententransport</h5>
     <app-manage-patient-transport-to-hospital-vehicles-for-categories-editor
-        [simulatedRegionId]="simulatedRegionId"
-        [behaviorId]="behaviorId"
+        [simulatedRegionId]="simulatedRegionId()"
+        [behaviorId]="behaviorId()"
     />
 </div>
 
 <div>
     <h5>Einstellungen</h5>
     <app-manage-patient-transport-to-hospital-settings-editor
-        [simulatedRegionId]="simulatedRegionId"
-        [behaviorId]="behaviorId"
+        [simulatedRegionId]="simulatedRegionId()"
+        [behaviorId]="behaviorId()"
     />
 </div>

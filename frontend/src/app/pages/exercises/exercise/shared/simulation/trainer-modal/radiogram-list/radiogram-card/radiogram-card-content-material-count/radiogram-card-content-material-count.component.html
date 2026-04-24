@@ -2,11 +2,16 @@
 <p class="card-text">Das Material reicht für folgende Patientenzahlen:</p>
 <table class="table card-text">
     <tbody>
-        <tr *ngFor="let patientCategory of capacity$ | async | keys">
-            <td class="ps-4">
-                <app-patient-status-badge [status]="patientCategory" />
-            </td>
-            <td>{{ (capacity$ | async)?.[patientCategory] }}</td>
-        </tr>
+        @for (
+            patientCategory of capacity$ | async | keys;
+            track patientCategory
+        ) {
+            <tr>
+                <td class="ps-4">
+                    <app-patient-status-badge [status]="patientCategory" />
+                </td>
+                <td>{{ (capacity$ | async)?.[patientCategory] }}</td>
+            </tr>
+        }
     </tbody>
 </table>

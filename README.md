@@ -1,8 +1,10 @@
-# Digitale FüSim MANV
+# FüSim Digital
 
-## If you're interested in the most recent stable release, please check out the [main](https://github.com/hpi-sam/digital-fuesim-manv/tree/main) branch.
+## If you're interested in the most recent stable release, please check out the [main](https://github.com/hpi-sam/fuesim-digital/tree/main) branch.
 
-This is the codebase for a digital implementation of the "FüSim MANV" (Führungssimulation Massenanfall von Verletzen), a German simulation system for training emergency medical services leadership personnel on how to manage [Mass Casualty Incidents](https://en.wikipedia.org/wiki/Mass-casualty_incident).
+This is the codebase for the "FüSim Digital", a simulation system for training emergency services leadership personnel on how to manage mass casualty incidents and other major incidents.
+
+It originally was a digital implementation of the "FüSim MANV" (Führungssimulation Massenanfall von Verletzen), a German simulation system for training emergency medical services leadership personnel on how to manage [Mass Casualty Incidents](https://en.wikipedia.org/wiki/Mass-casualty_incident).
 
 **You can try it out at [https://fuesim-manv.de/](https://fuesim-manv.de/)**.
 
@@ -18,33 +20,41 @@ The concept is as follows:
 - After the exercise is started, _patients_ that are not adequately treated by _personnel_ and _material_ can deteriorate and die. The goal of the _participants_ is to prevent the _patients_ from dying and transport them to the _hospitals_. To do this effectively they have to communicate with each other (via real radio devices, or remote via third-party services) and make the right decisions.
 - Afterward, the exercise can be evaluated via statistics and a "time-travel" feature.
 
-This simulation has been designed in cooperation with and with support from the [Federal Academy for Civil Protection and Civil Defence](https://www.bbk.bund.de/DE/Themen/Akademie-BABZ/akademie-babz_node.html) of the [Federal Office of Civil Protection and Disaster Assistance Germany](https://www.bbk.bund.de/DE/Home/home_node.html), who are the original copyright holders of the analog "FüSim MANV" simulation system, and the [Malteser Hilfsdienst e.V. Berlin](https://www.malteser-berlin.de/) as well as the [Johanniter Akademie NRW, Campus Münster der Johanniter-Unfall-Hilfe e.V.](https://www.johanniter.de/bildungseinrichtungen/johanniter-akademie/johanniter-akademie-nordrhein-westfalen/standorte-der-akademie-in-nordrhein-westfalen/campus-muenster/)
+This simulation has been designed in cooperation with and with support from
+
+- the [Federal Academy for Civil Protection and Civil Defence](https://www.bbk.bund.de/DE/Themen/Akademie-BABZ/akademie-babz_node.html) of the [Federal Office of Civil Protection and Disaster Assistance Germany](https://www.bbk.bund.de/DE/Home/home_node.html), who are the original copyright holders of the analog "FüSim MANV" simulation system
+- the [Malteser Hilfsdienst e.V. Berlin](https://www.malteser-berlin.de/)
+- the [Johanniter Akademie NRW, Campus Münster der Johanniter-Unfall-Hilfe e.V.](https://www.johanniter.de/bildungseinrichtungen/johanniter-akademie/johanniter-akademie-nordrhein-westfalen/standorte-der-akademie-in-nordrhein-westfalen/campus-muenster/)
+- and the [Berliner Feuerwehr- und Rettungsdienst-Akademie (BFRA)](https://www.berliner-feuerwehr.de/ueber-uns/ausbildung-an-der-bfra/) of the [Berliner Feuerwehr](https://www.berliner-feuerwehr.de/).
 
 The simulation is implemented as a web application with an Angular frontend and NodeJS backend.
 
-This project is currently developed as a [bachelor project](https://hpi.de/en/studies/before-your-studies/degree-programs/bachelor.html) at the [HPI](https://hpi.de/). You can find the official project website [here](https://hpi.de/giese/teaching/bachelor-projects/digitales-fuehrungssimulationstraining.html).
+This project is currently developed as a [bachelor project](https://hpi.de/en/studies/before-your-studies/degree-programs/bachelor.html) at the [HPI](https://hpi.de/). You can find the official project website [here](https://hpi.de/giese/teaching/bachelor-projects/fuesim-on-fire.html).
 
 ## Links for collaborators
 
-- [Internal test scenarios](https://github.com/hpi-sam/digital-fuesim-manv_test-scenarios)
-    - Used only for private testing
-- [Public test scenarios](https://github.com/hpi-sam/digital-fuesim-manv-public-test-scenarios)
+- [Internal test scenarios](https://github.com/hpi-sam/fuesim-digital-private-test-scenarios)
+    - Used only for private testing, potentially contains personal data of past users
+- [Public test scenarios](https://github.com/hpi-sam/fuesim-digital-public-test-scenarios)
     - Used for test scenarios in pipelines, Can also be used for private testing
     - For usage see the README.md in that repo
     - This repo is also a submodule of this repo. Use `--recurse-submodules` when cloning the repo or `run git submodule update --init --recursive` if you have cloned the repo already to get its contents.
 
 ## Installation
 
-1. Install [NodeJs](https://nodejs.org/) (at least version 22.x) (if you need different node versions on your machine we recommend [nvm](https://github.com/nvm-sh/nvm) or [nvm for windows](https://github.com/coreybutler/nvm-windows))
-2. [npm](https://www.npmjs.com/) should already come with NodeJs - if not install it
-3. Clone the repo by running `git clone https://github.com/hpi-sam/digital-fuesim-manv`. To be able to run migration tests, you also have to clone the submodules: use `git clone --recurse-submodules https://github.com/hpi-sam/digital-fuesim-manv` or run `git submodule update --init --recursive` if you have cloned the repo already.
+1. Install [NodeJs](https://nodejs.org/)  
+   Please use the version specified at `devEngines.runtime.version` in `./package.json`. If you need different node versions on your machine we recommend [nvm](https://github.com/nvm-sh/nvm) or [nvm for windows](https://github.com/coreybutler/nvm-windows)
+2. [npm](https://www.npmjs.com/) should already come with NodeJs.  
+   The npm version specified by `devEngines.packageManager.version` matches the npm version that is bundled with the correct NodeJs version. Please do not update npm on your own.
+3. Clone the repo by running `git clone https://github.com/hpi-sam/fuesim-digital`. To be able to run migration tests, you also have to clone the submodules: use `git clone --recurse-submodules https://github.com/hpi-sam/fuesim-digital` or run `git submodule update --init --recursive` if you have cloned the repo already.
 4. Run `npm run setup` from the root folder
 5. Copy the [`.env.example`](./.env.example) file to `./.env` and adjust the settings as you need them. Note that some of the variables are explained under the next point.
 6. Choose whether you want to use a database:
    You can (optionally) use a database for the persistence of exercise data. Look at the [relevant section](./backend/README.md#database) in the backend README for further information.
    Note that to not use the database you have to edit an environment variable, see the [relevant section](./backend/README.md#without-a-database).
-7. (Optional) We have a list of recommended [vscode](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
-8. (Optional) We have prepared default settings, tasks and debug configurations for VS Code. You can find them in `.vscode/*.example`. Crete a copy of those files removing the `.example` and adjust them to your needs. The files without `.example`-Extensions are untracked so your adjustments won't be committed automatically.
+7. Connect an OpenID-Connect provider for authentication in the `.env` file.
+8. (Optional) We have a list of recommended [vscode](https://code.visualstudio.com/) extensions. We strongly recommend you to use them if you are developing. You can see them via [the `@recommended` filter in the extensions panel](https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions).
+9. (Optional) We have prepared default settings, tasks and debug configurations for VS Code. You can find them in `.vscode/*.example`. Crete a copy of those files removing the `.example` and adjust them to your needs. The files without `.example`-Extensions are untracked so your adjustments won't be committed automatically.
 
 ## Starting for development
 
@@ -59,7 +69,7 @@ If you're not using a database anyway, you could use the task `Start all but dat
 1. Open a terminal in `/shared` and run `npm run watch`
 2. Open another terminal in `/frontend` and run `npm run start`
 3. Open another terminal in `/backend` and run `npm run start`
-4. Consider the database -- see point 7 of the [installation](#installation).
+4. Consider the database and authentication -- see point 6+7 of the [installation](#installation).
 
 ## Starting for deployment (using docker)
 
@@ -68,7 +78,7 @@ You need to have [`docker`](https://www.docker.com/) installed.
 ### With docker compose (recommended)
 
 1. [`docker compose`](https://docs.docker.com/compose/) needs to be installed. Note that, depending on your setup, you may use `docker-compose` instead of `docker compose`. In this case, just replace the space in the commands with a dash (`-`). For more information, see the [relevant section of the documentation](https://docs.docker.com/compose/#compose-v2-and-the-new-docker-compose-command).
-2. Run `docker compose up -d` in the root directory. This also starts the database. If you don't want to start the database run `docker compose up -d digital-fuesim-manv` instead.
+2. Run `docker compose up -d` in the root directory. This also starts the database. If you don't want to start the database run `docker compose up -d app` instead.
 
 ### Without docker compose
 
@@ -87,7 +97,7 @@ Note the database requirements depicted in [the installation section](#installat
 
 #### Option 2
 
-1. Run `docker build -f docker/Dockerfile -t digital-fuesim-manv .`
+1. Run `docker build -f docker/Dockerfile -t fuesim-digital .`
 
 ### Docker volumes / persistent data
 
@@ -118,7 +128,7 @@ In addition, you can make use of the following browser extensions:
 
 ### Migration tests
 
-Whenever adding a new action or new state altering ui components (things that a user can use to alter the state in new ways) one should add exports of exercises in which the new features where tested to the [Public test scenarios](https://github.com/hpi-sam/digital-fuesim-manv-public-test-scenarios)
+Whenever adding a new action or new state altering ui components (things that a user can use to alter the state in new ways) one should add exports of exercises in which the new features where tested to the [Public test scenarios](https://github.com/hpi-sam/fuesim-digital-public-test-scenarios)
 
 The test scenarios are stored in a submodule. Use `--recurse-submodules` when cloning the repo or run `git submodule update --init --recursive` if you have cloned the repo already.
 
@@ -151,7 +161,6 @@ Look at the [benchmark readme](./benchmark/README.md) for more information.
 ## Styleguide
 
 - names are never unique, ids are
-- Use [StrictObject](shared\src\utils\strict-object.ts) instead of `Object` wherever possible
 - A leading underscore should only be used
     - for private properties that may be used with getters/setters
     - to resolve certain naming conflicts (e.g. `.some(_item => ...)`)
@@ -292,8 +301,9 @@ If you need to read from the state to change it, you should do this inside the a
 
 ## Licenses and Attributions
 
-Digital Fuesim MANV
-Copyright (C) 2023 See [README.md#contributors](README.md#contributors) for authors/contributors (bottom of this document).
+FüSim Digital
+
+Copyright (C) 2021-2026 See [README.md#contributors](README.md#contributors) for authors/contributors (bottom of this document).
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the [GNU Affero General Public License](LICENSE.md) as
@@ -308,7 +318,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 You should have received a copy of the [GNU Affero General Public License](LICENSE.md)
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-Some files are excluded to the mentioned license, read [LICENSE-README.md](LICENSE-README.md) for further information to which files these applies.
+Some files are excluded to the mentioned license, read [LICENSE-README.md](LICENSE-README.md) for further information to which files these apply.
 
 Keep in mind, that if you don't use docker you have to run `npm run licensing:all` before building the `frontend` to give users the option to download a copy of the source code of this software (and a list of attributions of third-parties, e.g. their libraries) or use another way that lets users download the source code of this software for free. If you didn't modify the source code, a link to this github repository is enough, but you can do both. If you run `npm run deployment` this command is already included.
 
@@ -330,7 +340,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=fekoch"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=fekoch"
                 title="Code"
                 >💻</a
             >
@@ -349,7 +359,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=JohannesPotzi"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=JohannesPotzi"
                 title="Code"
                 >💻</a
             >
@@ -368,7 +378,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=Quixelation"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=Quixelation"
                 title="Code"
                 >💻</a
             >
@@ -387,7 +397,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=hansegucker"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=hansegucker"
                 title="Code"
                 >💻</a
             >
@@ -408,7 +418,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=Greenscreen23"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=Greenscreen23"
                 title="Code"
                 >💻</a
             >
@@ -427,7 +437,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=Nils1729"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=Nils1729"
                 title="Code"
                 >💻</a
             >
@@ -446,7 +456,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=benn02"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=benn02"
                 title="Code"
                 >💻</a
             >
@@ -465,7 +475,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=lukasrad02"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=lukasrad02"
                 title="Code"
                 >💻</a
             >
@@ -485,7 +495,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=Dassderdie"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=Dassderdie"
                 title="Code"
                 >💻</a
             >
@@ -504,7 +514,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=ClFeSc"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=ClFeSc"
                 title="Code"
                 >💻</a
             >
@@ -523,7 +533,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=hpistudent72"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=hpistudent72"
                 title="Code"
                 >💻</a
             >
@@ -541,7 +551,7 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             </a>
             <br />
             <a
-                href="https://github.com/hpi-sam/digital-fuesim-manv/commits?author=anonym-HPI"
+                href="https://github.com/hpi-sam/fuesim-digital/commits?author=anonym-HPI"
                 title="Code"
                 >💻</a
             >
@@ -583,14 +593,14 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             💻
             <br />
-            <small>Contributor <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
+            <small>Contributor <a href="https://github.com/hpi-sam/fuesim-digital/pull/1109">#1109</a><small>
         </td>
         <td style="text-align: center">
             Konstantin Ebeling
             <br />
             💻
             <br />
-            <small>Contributor <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
+            <small>Contributor <a href="https://github.com/hpi-sam/fuesim-digital/pull/1109">#1109</a><small>
         </td>
     </tr>
     <tr>
@@ -599,7 +609,49 @@ Keep in mind, that if you don't use docker you have to run `npm run licensing:al
             <br />
             👀
             <br />
-            <small>Reviewer <a href="https://github.com/hpi-sam/digital-fuesim-manv/pull/1109">#1109</a><small>
+            <small>Reviewer <a href="https://github.com/hpi-sam/fuesim-digital/pull/1109">#1109</a><small>
+        </td>
+        <td style="text-align: center">
+            <a href="https://github.com/Tim-08">
+                <img
+                    src="https://avatars.githubusercontent.com/u/64322264?v=4?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>Tim Siemer</b></sub>
+            </a>
+            <br />
+            💻
+            <br />
+            <small>Student 2025<small>
+        </td>
+        <td style="text-align: center">
+            <a href="https://github.com/CmdShiftMarkus">
+                <img
+                    src="https://avatars.githubusercontent.com/u/58256184?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>CmdShiftMarkus</b></sub>
+            </a>
+            <br />
+            💻
+            <br />
+            <small>Student 2025<small>
+        </td>
+            <td style="text-align: center">
+            <a href="https://github.com/polarfuchs23">
+                <img
+                    src="https://avatars.githubusercontent.com/u/73428431?v=4"
+                    width="100px;"
+                />
+                <br />
+                <sub><b>polarfuchs23</b></sub>
+            </a>
+            <br />
+            💻
+            <br />
+            <small>Student 2025<small>
         </td>
     </tr>
 </table>

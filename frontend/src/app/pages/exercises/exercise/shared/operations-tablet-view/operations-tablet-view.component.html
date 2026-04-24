@@ -1,0 +1,45 @@
+<div class="otvRoot" #otvRoot>
+    <nav
+        ngbNav
+        [animation]="false"
+        #nav="ngbNav"
+        class="nav-tabs"
+        [class.fullscreenEnabled]="fullscreenEnabled()"
+    >
+        <ng-container ngbNavItem>
+            <button ngbNavLink>Einsatzabschnitte</button>
+            <ng-template ngbNavContent>
+                <app-operational-sections-tab />
+            </ng-template>
+        </ng-container>
+        <ng-container ngbNavItem [destroyOnHide]="false">
+            <button ngbNavLink>Einsatzdetails</button>
+            <ng-template ngbNavContent>
+                <app-operation-details-tab />
+            </ng-template>
+        </ng-container>
+        <div class="ms-auto">
+            <button
+                class="btn"
+                [class.btn-outline-dark]="!fullscreenEnabled()"
+                [class.btn-outline-light]="fullscreenEnabled()"
+                title="Vollbildmodus"
+                (click)="toggleFullscreen()"
+            >
+                <span class="pe-2">
+                    {{
+                        fullscreenEnabled() ? 'Vollbild verlassen' : 'Vollbild'
+                    }}
+                </span>
+                <i
+                    [class.bi-fullscreen]="!fullscreenEnabled()"
+                    [class.bi-fullscreen-exit]="fullscreenEnabled()"
+                ></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="otvContent">
+        <div [ngbNavOutlet]="nav"></div>
+    </div>
+</div>

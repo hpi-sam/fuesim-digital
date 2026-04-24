@@ -1,0 +1,128 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Rolle</th>
+            <th scope="col">Ansicht</th>
+            <th scope="col">In der Übung</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (client of clients$ | async | values; track client.id) {
+            <tr>
+                <td class="align-middle">
+                    {{ client.name }}
+                </td>
+                @if (client.role.mainRole === 'trainer') {
+                    <td class="align-middle">
+                        {{
+                            client.role.mainRole === 'trainer'
+                                ? 'Übungsleiter'
+                                : 'Teilnehmer'
+                        }}
+                    </td>
+                }
+                @if (client.role.mainRole === 'participant') {
+                    <td ngbDropdown>
+                        <button
+                            class="btn btn-outline-primary btn-sm"
+                            ngbDropdownToggle
+                            data-cy="clientPopupSetRoleButton"
+                        >
+                            {{
+                                client.role.specificRole
+                                    | specificRoleDisplayName
+                            }}
+                        </button>
+                        <div ngbDropdownMenu>
+                            <button
+                                ngbDropdownItem
+                                (click)="
+                                    changeToSpecificRole(
+                                        client.id,
+                                        'mapOperator'
+                                    )
+                                "
+                            >
+                                <span>Kartenansicht</span>
+                            </button>
+                            <button
+                                ngbDropdownItem
+                                (click)="changeToSpecificRole(client.id, 'eoc')"
+                            >
+                                <span>Leitstelle</span>
+                            </button>
+                            <button
+                                ngbDropdownItem
+                                (click)="
+                                    changeToSpecificRole(
+                                        client.id,
+                                        'operationsTablet'
+                                    )
+                                "
+                            >
+                                <span>Einsatzübersicht</span>
+                            </button>
+                        </div>
+                    </td>
+                }
+                <!-- Choose the viewport -->
+                <td ngbDropdown>
+                    <button
+                        [disabled]="
+                            client.role.specificRole !== 'mapOperator' &&
+                            client.role.mainRole !== 'trainer'
+                        "
+                        class="btn btn-outline-primary btn-sm"
+                        ngbDropdownToggle
+                        data-cy="clientPopupSetViewportButton"
+                    >
+                        @if (client.viewRestrictedToViewportId) {
+                            {{
+                                (viewports$ | async)?.[
+                                    client.viewRestrictedToViewportId!
+                                ]?.name
+                            }}
+                        } @else {
+                            <i> Nicht zugewiesen </i>
+                        }
+                    </button>
+                    <div ngbDropdownMenu>
+                        @for (
+                            viewport of viewports$ | async | values;
+                            track viewport.id
+                        ) {
+                            <button
+                                ngbDropdownItem
+                                (click)="
+                                    restrictToViewport(client.id, viewport.id)
+                                "
+                                data-cy="clientPopupSetViewportDropdownButton"
+                            >
+                                {{ viewport.name }}
+                            </button>
+                        }
+                        <button
+                            ngbDropdownItem
+                            (click)="restrictToViewport(client.id, undefined)"
+                            data-cy="clientPopupUnsetViewportDropdownButton"
+                        >
+                            <i> Nicht zugewiesen </i>
+                        </button>
+                    </div>
+                </td>
+                <td class="align-middle">
+                    <div class="form-switch">
+                        <input
+                            [ngModel]="!client.isInWaitingRoom"
+                            (ngModelChange)="setWaitingRoom(client.id, !$event)"
+                            class="form-check-input"
+                            type="checkbox"
+                            data-cy="clientPopupSetWaitingRoomCheckbox"
+                        />
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

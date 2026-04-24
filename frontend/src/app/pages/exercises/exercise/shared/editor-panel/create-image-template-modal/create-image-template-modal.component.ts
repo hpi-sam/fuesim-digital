@@ -1,29 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { uuid } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
+import { uuid } from 'fuesim-digital-shared';
 import type {
     ChangedImageTemplateValues,
     EditableImageTemplateValues,
 } from '../image-template-form/image-template-form.component';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import { ImageTemplateFormComponent } from '../image-template-form/image-template-form.component';
 
 @Component({
     selector: 'app-create-image-template-modal',
     templateUrl: './create-image-template-modal.component.html',
     styleUrls: ['./create-image-template-modal.component.scss'],
-    standalone: false,
+    imports: [ImageTemplateFormComponent],
 })
 export class CreateImageTemplateModalComponent {
+    readonly activeModal = inject(NgbActiveModal);
+    private readonly exerciseService = inject(ExerciseService);
+
     public readonly editableImageTemplateValues: EditableImageTemplateValues = {
         url: null,
         height: 100,
         name: null,
     };
-
-    constructor(
-        public readonly activeModal: NgbActiveModal,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public createImageTemplate({
         url,

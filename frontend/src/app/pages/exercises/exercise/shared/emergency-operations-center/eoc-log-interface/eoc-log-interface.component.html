@@ -1,7 +1,7 @@
 <div class="card">
     <h5 class="card-header">Einsatztagebuch</h5>
     <div class="card-body">
-        <div class="p-3 border-bottom">
+        <fieldset class="p-3 border-bottom" [disabled]="interfaceDisabled()">
             <textarea
                 [(ngModel)]="newLogEntry"
                 [appAutofocus]="true"
@@ -17,71 +17,88 @@
             >
                 Eintrag speichern
             </button>
-            <div class="form-check form-switch mt-2" *ngIf="clientIsTrainer">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    [ngModel]="!sendingPrivateLog"
-                    (ngModelChange)="sendingPrivateLog = !$event"
-                />
-                <label class="form-check-label">
-                    Als öffentliche Leitstellen-Notiz speichern
-                </label>
-            </div>
-        </div>
-        <ng-container *ngIf="eocLogEntries$ | async as eocLogEntries">
-            <div *ngIf="eocLogEntries.length === 0" class="text-muted p-3">
-                Es sind noch keine Einträge vorhanden.
-            </div>
+            @if (currentRole() === 'trainer') {
+                <div class="form-check form-switch mt-2">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        [ngModel]="!sendingPrivateLog"
+                        (ngModelChange)="sendingPrivateLog = !$event"
+                    />
+                    <label class="form-check-label">
+                        Als öffentliche Leitstellen-Notiz speichern
+                    </label>
+                </div>
+            }
+        </fieldset>
+        @if (eocLogEntries$ | async; as eocLogEntries) {
+            @if (eocLogEntries.length === 0) {
+                <div class="text-muted p-3">
+                    Es sind noch keine Einträge vorhanden.
+                </div>
+            }
 
-            <ul
-                *ngIf="eocLogEntries.length > 0"
-                style="max-height: 50vh; overflow: auto"
-                class="list-group list-group-flush"
-            >
-                <ng-container *ngFor="let eocLogEntry of eocLogEntries">
-                    <li
-                        class="list-group-item"
-                        style="border-left-width: 4px"
-                        [style.border-left-color]="
-                            eocLogEntry.isPrivate ? '#0b02bf' : '#aaaaaa'
-                        "
-                        *ngIf="clientIsTrainer || !eocLogEntry.isPrivate"
-                    >
-                        <div class="row">
-                            <div class="col-2">
-                                <span class="fw-bold">
-                                    {{
-                                        eocLogEntry.exerciseTimestamp
-                                            | formatDuration
-                                    }}
-                                </span>
-                                <br />
-                                von
-                                <span class="font-monospace">
-                                    {{ eocLogEntry.clientName }}
-                                </span>
-                            </div>
-
-                            <div
-                                class="col"
-                                style="white-space: pre-wrap"
-                                [style.color]="
-                                    eocLogEntry.isPrivate ? '#0b02bf' : 'unset'
+            @if (eocLogEntries.length > 0) {
+                <ul
+                    style="max-height: 50vh; overflow: auto"
+                    class="list-group list-group-flush"
+                >
+                    @for (eocLogEntry of eocLogEntries; track eocLogEntry) {
+                        @if (
+                            currentRole() === 'trainer' ||
+                            !eocLogEntry.isPrivate
+                        ) {
+                            <li
+                                class="list-group-item"
+                                style="border-left-width: 4px"
+                                [style.border-left-color]="
+                                    eocLogEntry.isPrivate
+                                        ? '#0b02bf'
+                                        : '#aaaaaa'
                                 "
                             >
-                                <em
-                                    *ngIf="eocLogEntry.isPrivate"
-                                    style="display: block; opacity: 0.8"
-                                >
-                                    [Private Übungsnotiz]
-                                </em>
-                                {{ eocLogEntry.message }}
-                            </div>
-                        </div>
-                    </li>
-                </ng-container>
-            </ul>
-        </ng-container>
+                                <div class="row">
+                                    <div class="col-2">
+                                        <span class="fw-bold">
+                                            {{
+                                                eocLogEntry.exerciseTimestamp
+                                                    | formatDuration
+                                            }}
+                                        </span>
+                                        <br />
+                                        von
+                                        <span class="font-monospace">
+                                            {{ eocLogEntry.clientName }}
+                                        </span>
+                                    </div>
+
+                                    <div
+                                        class="col"
+                                        style="white-space: pre-wrap"
+                                        [style.color]="
+                                            eocLogEntry.isPrivate
+                                                ? '#0b02bf'
+                                                : 'unset'
+                                        "
+                                    >
+                                        @if (eocLogEntry.isPrivate) {
+                                            <em
+                                                style="
+                                                    display: block;
+                                                    opacity: 0.8;
+                                                "
+                                            >
+                                                [Private Übungsnotiz]
+                                            </em>
+                                        }
+                                        {{ eocLogEntry.message }}
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    }
+                </ul>
+            }
+        }
     </div>
 </div>

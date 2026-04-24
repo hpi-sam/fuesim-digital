@@ -1,5 +1,5 @@
 import type { OnDestroy } from '@angular/core';
-import { Directive, EventEmitter, Output } from '@angular/core';
+import { Directive, inject, output } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { Subject, debounceTime, filter, takeUntil, tap } from 'rxjs';
 import { isBeingTestedByCypress } from '../functions/cypress';
@@ -22,19 +22,18 @@ import { isBeingTestedByCypress } from '../functions/cypress';
  *
  * Inspired by https://stackoverflow.com/a/65079996
  */
-@Directive({
-    selector: '[appSaveOnTyping][ngModel]',
-    standalone: false,
-})
+@Directive({ selector: '[appSaveOnTyping][ngModel]' })
 export class AppSaveOnTypingDirective implements OnDestroy {
     destroy$ = new Subject<void>();
-    @Output() readonly appSaveOnTyping: EventEmitter<any> = new EventEmitter();
+    readonly appSaveOnTyping = output<any>();
 
     private lastInputValue?: any;
     private lastInputValueWasValid = false;
     private lastSubmittedValue?: any;
 
-    constructor(ngModel: NgModel) {
+    constructor() {
+        const ngModel = inject(NgModel);
+
         ngModel.update
             .pipe(
                 tap((value) => {
@@ -53,7 +52,7 @@ export class AppSaveOnTypingDirective implements OnDestroy {
                     return;
                 }
                 this.lastSubmittedValue = value;
-                this.appSaveOnTyping.next(value);
+                this.appSaveOnTyping.emit(value);
             });
     }
 
@@ -65,7 +64,7 @@ export class AppSaveOnTypingDirective implements OnDestroy {
             // The last input value was not submitted yet
             // We want to emit this last value before the appSaveOnTyping gets
             // unsubscribed from during the destruction of the parent component
-            this.appSaveOnTyping.next(this.lastInputValue);
+            this.appSaveOnTyping.emit(this.lastInputValue);
         }
         this.destroy$.next();
     }

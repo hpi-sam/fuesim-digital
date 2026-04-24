@@ -1,11 +1,6 @@
 <h5 class="card-title">Meldung über Fahrzeugnutzung</h5>
 
-<ng-container
-    *ngIf="
-        (((radiogram$ | async)!.occupations | keys).length ?? 0) > 0;
-        else noVehicles
-    "
->
+@if (((radiogram$ | async)!.occupations | keys).length > 0) {
     <p class="card-text">
         Die Fahrzeuge in diesem Bereich werden wie folgt genutzt:
     </p>
@@ -18,20 +13,19 @@
             </tr>
         </thead>
         <tbody>
-            <tr
-                *ngFor="
-                    let occupation of (radiogram$ | async)!.occupations
-                        | keyvalue
-                "
-            >
-                <td>
-                    {{ $any(occupation.key) | occupationShortName }}
-                </td>
-                <td>{{ occupation.value }}</td>
-            </tr>
+            @for (
+                occupation of (radiogram$ | async)!.occupations | keyvalue;
+                track occupation
+            ) {
+                <tr>
+                    <td>
+                        {{ $any(occupation.key) | occupationShortName }}
+                    </td>
+                    <td>{{ occupation.value }}</td>
+                </tr>
+            }
         </tbody>
     </table>
-</ng-container>
-<ng-template #noVehicles>
+} @else {
     <p class="card-text">Derzeit befinden sich hier keine Fahrzeuge.</p>
-</ng-template>
+}

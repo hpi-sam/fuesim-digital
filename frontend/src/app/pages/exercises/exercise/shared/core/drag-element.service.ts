@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -7,33 +7,36 @@ import type {
     MapImageTemplate,
     PatientCategory,
     VehicleTemplate,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     uuid,
     createVehicleParameters,
-    MapImage,
     normalZoom,
-    PatientTemplate,
-    TransferPoint,
-    Viewport,
-    SimulatedRegionPosition,
-    MapPosition,
-} from 'digital-fuesim-manv-shared';
+    newMapPositionAt,
+    newSimulatedRegionPositionIn,
+    newMapImageFromTemplate,
+    newViewport,
+    defaultViewportSize,
+    newTransferPoint,
+    newPatientFromTemplate,
+} from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Pixel } from 'ol/pixel';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectExerciseState,
-    selectMaterialTemplates,
-    selectPersonnelTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import type { SimulatedRegionDragTemplate } from '../editor-panel/templates/simulated-region';
 import { reconstituteSimulatedRegionTemplate } from '../editor-panel/templates/simulated-region';
 import type { FeatureManager } from '../exercise-map/utility/feature-manager';
+import type { RestrictedZoneDragTemplate } from '../editor-panel/templates/restricted-zone';
+import { reconstituteRestrictedZoneTemplate } from '../editor-panel/templates/restricted-zone';
+import { ExerciseService } from '../../../../../core/exercise.service';
+import type { AppState } from '../../../../../state/app.state';
+import {
+    selectMaterialTemplates,
+    selectPersonnelTemplates,
+    selectExerciseState,
+} from '../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 
 @Injectable({
     providedIn: 'root',
@@ -42,13 +45,11 @@ import type { FeatureManager } from '../exercise-map/utility/feature-manager';
  * This service handles the adding of elements via drag and drop from the trainer map editor to the map
  */
 export class DragElementService {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+
     private olMap?: OlMap;
     layerFeatureManagerDictionary?: Map<VectorLayer, FeatureManager<any>>;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>
-    ) {}
 
     public registerMap(olMap: OlMap) {
         this.olMap = olMap;
@@ -190,7 +191,7 @@ export class DragElementService {
                 break;
             case 'patient':
                 {
-                    const patient = PatientTemplate.generatePatient(
+                    const patient = newPatientFromTemplate(
                         this.transferringTemplate.template.patientTemplates[
                             Math.floor(
                                 Math.random() *
@@ -199,7 +200,7 @@ export class DragElementService {
                             )
                         ]!,
                         this.transferringTemplate.template.name,
-                        MapPosition.create(position)
+                        newMapPositionAt(position)
                     );
                     this.exerciseService.proposeAction(
                         {
@@ -213,19 +214,12 @@ export class DragElementService {
                 break;
             case 'viewport':
                 {
-                    // This ratio has been determined by trial and error
-                    const height = Viewport.image.height / 23.5;
-                    const width = height * Viewport.image.aspectRatio;
-                    const viewport = Viewport.create(
+                    const viewport = newViewport(
                         {
-                            x: position.x - width / 2,
-                            y: position.y + height / 2,
+                            x: position.x - defaultViewportSize.width / 2,
+                            y: position.y + defaultViewportSize.height / 2,
                         },
-                        {
-                            height,
-                            width,
-                        },
-                        'Einsatzabschnitt'
+                        'Ansicht ???'
                     );
                     this.exerciseService.proposeAction(
                         {
@@ -240,13 +234,12 @@ export class DragElementService {
 
             case 'mapImage':
                 {
-                    const template = this.transferringTemplate.template.image;
-                    const mapImage = MapImage.create(
-                        position,
+                    const template = this.transferringTemplate.template;
+                    const mapImage = newMapImageFromTemplate(
                         template,
-                        false,
-                        0
+                        position
                     );
+
                     this.exerciseService.proposeAction({
                         type: '[MapImage] Add MapImage',
                         mapImage,
@@ -256,10 +249,8 @@ export class DragElementService {
                 break;
             case 'transferPoint':
                 {
-                    const transferPoint = TransferPoint.create(
-                        MapPosition.create(position),
-                        {},
-                        {},
+                    const transferPoint = newTransferPoint(
+                        newMapPositionAt(position),
                         '???',
                         '???'
                     );
@@ -283,14 +274,12 @@ export class DragElementService {
                         this.transferringTemplate.template.stereotype,
                         exerciseState
                     );
-                    simulatedRegion.position = MapPosition.create({
+                    simulatedRegion.position = newMapPositionAt({
                         x: position.x - simulatedRegion.size.width / 2,
                         y: position.y + simulatedRegion.size.height / 2,
                     });
-                    const transferPoint = TransferPoint.create(
-                        SimulatedRegionPosition.create(simulatedRegion.id),
-                        {},
-                        {},
+                    const transferPoint = newTransferPoint(
+                        newSimulatedRegionPositionIn(simulatedRegion.id),
                         '',
                         `[Simuliert] ${simulatedRegion.name}`
                     );
@@ -305,17 +294,38 @@ export class DragElementService {
                     createdElement = simulatedRegion;
                 }
                 break;
+            case 'restrictedZone':
+                {
+                    const restrictedZone = reconstituteRestrictedZoneTemplate(
+                        this.transferringTemplate.template.stereotype,
+                        selectStateSnapshot(selectExerciseState, this.store)
+                    );
+                    restrictedZone.position = newMapPositionAt({
+                        x: position.x - restrictedZone.size.width / 2,
+                        y: position.y + restrictedZone.size.height / 2,
+                    });
+                    this.exerciseService.proposeAction(
+                        {
+                            type: '[RestrictedZone] Add restricted zone',
+                            restrictedZone,
+                        },
+                        true
+                    );
+                    createdElement = restrictedZone;
+                }
+                break;
 
             default:
                 break;
         }
 
-        this.executeDropSideEffects(pixel, createdElement);
+        this.executeDropSideEffects(pixel, createdElement, event);
     };
 
     private executeDropSideEffects(
         pixel: Pixel,
-        createdElement: Element | null
+        createdElement: Element | null,
+        event: MouseEvent
     ) {
         if (
             createdElement === null ||
@@ -334,7 +344,11 @@ export class DragElementService {
             // We stop propagating the event as soon as the onFeatureDropped function returns true
             return this.layerFeatureManagerDictionary
                 .get(layer as VectorLayer)!
-                .onFeatureDrop(createdElement, droppedOnFeature as Feature);
+                .onFeatureDrop(
+                    createdElement,
+                    droppedOnFeature as Feature,
+                    event
+                );
         });
     }
 
@@ -364,6 +378,10 @@ type TransferTemplate =
     | {
           type: 'patient';
           template: PatientCategory;
+      }
+    | {
+          type: 'restrictedZone';
+          template: RestrictedZoneDragTemplate;
       }
     | {
           type: 'simulatedRegion';

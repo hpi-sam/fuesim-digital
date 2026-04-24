@@ -1,0 +1,57 @@
+@if (edit) {
+    <form class="d-flex flex-grow-1" #f="ngForm" (ngSubmit)="save()">
+        <div class="flex-grow-1">
+            @if (singleLine()) {
+                <input
+                    #inlineInput="ngModel"
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="newValue"
+                    [required]="required()"
+                    [title]="name()"
+                    name="inline"
+                    [appAutofocus]="true"
+                />
+                <app-display-validation
+                    [ngModelInput]="inlineInput"
+                ></app-display-validation>
+            } @else {
+                <textarea
+                    #inlineInput="ngModel"
+                    class="form-control form-control-sm"
+                    rows="3"
+                    [(ngModel)]="newValue"
+                    [required]="required()"
+                    [title]="name()"
+                    name="inline"
+                    [appAutofocus]="true"
+                ></textarea>
+                <app-display-validation
+                    [ngModelInput]="inlineInput"
+                ></app-display-validation>
+            }
+        </div>
+
+        <button
+            class="btn btn-primary ms-2"
+            type="submit"
+            [disabled]="!f.form.valid"
+            title="Speichern"
+        >
+            <i class="bi bi-floppy" aria-hidden="true"></i>
+        </button>
+    </form>
+} @else {
+    <div class="d-flex">
+        <div class="flex-grow-1" [title]="name()">
+            @if (value()) {
+                {{ value() }}
+            } @else {
+                –
+            }
+        </div>
+        <button class="btn btn-sm" (click)="startEdit()" title="Bearbeiten">
+            <i class="bi bi-pencil"></i>
+        </button>
+    </div>
+}

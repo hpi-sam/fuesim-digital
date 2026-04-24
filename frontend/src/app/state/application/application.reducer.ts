@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
-import type { ExerciseState } from 'digital-fuesim-manv-shared';
-import { reduceExerciseState, ReducerError } from 'digital-fuesim-manv-shared';
+import type { ExerciseState } from 'fuesim-digital-shared';
+import { reduceExerciseState, ReducerError } from 'fuesim-digital-shared';
 import {
     createApplyServerActionAction,
     createJoinExerciseAction,
@@ -66,11 +66,11 @@ export const applicationReducer = createReducer(
     ),
     on(
         createJoinExerciseAction,
-        (state, { ownClientId, exerciseId, clientName, exerciseState }) => ({
+        (state, { ownClientId, exerciseKey, clientName, exerciseState }) => ({
             ...state,
             exerciseState,
             exerciseStateMode: 'exercise' as const,
-            exerciseId,
+            exerciseKey,
             ownClientId,
             lastClientName: clientName,
         })

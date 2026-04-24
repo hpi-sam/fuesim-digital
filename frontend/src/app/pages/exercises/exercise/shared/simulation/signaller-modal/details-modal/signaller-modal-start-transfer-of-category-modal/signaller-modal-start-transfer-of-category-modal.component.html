@@ -26,14 +26,14 @@
 
     <button class="btn btn-primary w-100 mt-2" tabindex="3">
         Speichern
-        <span
-            *ngIf="loadingCount > 0; else hotkey"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-        ></span>
-        <ng-template #hotkey>
+        @if (loadingCount > 0) {
+            <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+            ></span>
+        } @else {
             <app-hotkey-indicator keys="Enter" />
-        </ng-template>
+        }
     </button>
 </form>

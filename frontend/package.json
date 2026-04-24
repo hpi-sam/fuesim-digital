@@ -1,6 +1,6 @@
 {
-    "name": "digital-fuesim-manv-frontend",
-    "version": "0.10.0",
+    "name": "fuesim-digital-frontend",
+    "version": "0.11.0",
     "type": "module",
     "scripts": {
         "cy:open": "cypress open",
@@ -22,49 +22,62 @@
         "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --verbose --watch"
     },
     "private": true,
-    "engines": {
-        "node": ">=22",
-        "npm": ">=11"
+    "devEngines": {
+        "runtime": {
+            "name": "node",
+            "version": "~24.13.0",
+            "onFail": "error"
+        },
+        "packageManager": {
+            "name": "npm",
+            "version": "~11.6.2",
+            "onFail": "error"
+        }
     },
     "dependencies": {
-        "@angular/animations": "~19.2.17",
-        "@angular/common": "~19.2.17",
-        "@angular/compiler": "~19.2.17",
-        "@angular/core": "~19.2.17",
-        "@angular/forms": "~19.2.17",
-        "@angular/material": "^19.2.8",
-        "@angular/platform-browser": "~19.2.17",
-        "@angular/platform-browser-dynamic": "~19.2.17",
-        "@angular/router": "~19.2.17",
-        "@ng-bootstrap/ng-bootstrap": "^18.0.0",
+        "@angular/animations": "~21.2.8",
+        "@angular/common": "~21.2.8",
+        "@angular/compiler": "~21.2.8",
+        "@angular/core": "~21.2.8",
+        "@angular/forms": "~21.2.8",
+        "@angular/material": "^21.2.3",
+        "@angular/platform-browser": "~21.2.8",
+        "@angular/platform-browser-dynamic": "~21.2.8",
+        "@angular/router": "~21.2.8",
+        "@ng-bootstrap/ng-bootstrap": "^20.0.0",
         "@ngneat/hotkeys": "^4.1.0",
-        "@ngrx/store": "^19.1.0",
+        "@ngrx/store": "^21.0.1",
         "@popperjs/core": "^2.11.8",
         "bootstrap": "^5.3.3",
         "bootstrap-icons": "^1.11.3",
         "chart.js": "^4.4.8",
         "class-validator": "^0.14.1",
-        "digital-fuesim-manv-shared": "file:../shared",
+        "fuesim-digital-shared": "file:../shared",
         "immer": "^10.1.1",
-        "lodash-es": "4.17.21",
-        "ng-qrcode": "^19.0.1",
+        "lodash-es": "^4.17.23",
+        "maplibre-gl": "^5.17.0",
+        "ng-qrcode": "^21.0.0",
+        "ngx-editor": "^19.0.0-beta.1",
         "ol": "^10.6.1",
+        "papaparse": "^5.5.3",
         "rxjs": "~7.8.0",
         "socket.io-client": "^4.8.1",
-        "tslib": "^2.8.1"
+        "tslib": "^2.8.1",
+        "zod": "^4.1.12",
+        "zone.js": "^0.15.1"
     },
     "devDependencies": {
-        "@angular/build": "^19.2.19",
-        "@angular/cli": "~19.2.10",
-        "@angular/compiler-cli": "~19.2.17",
-        "@angular/localize": "~19.2.17",
+        "@angular/build": "^21.2.7",
+        "@angular/cli": "~21.2.7",
+        "@angular/compiler-cli": "~21.2.8",
+        "@angular/localize": "~21.2.8",
         "@eslint/compat": "^1.4.0",
         "@eslint/js": "^9.36.0",
         "@types/chart.js": "^2.9.41",
         "@types/jest": "^30.0.0",
         "@types/lodash-es": "^4.17.12",
         "@types/node": "^22.14.0",
-        "angular-eslint": "19.8.1",
+        "angular-eslint": "21.2.0",
         "cypress": "^14.3.0",
         "eslint": "^9.28.0",
         "eslint-config-prettier": "^10.1.1",
@@ -74,8 +87,8 @@
         "eslint-plugin-unicorn": "^56.0.1",
         "jest": "^30.2.0",
         "ts-jest": "^29.4.5",
-        "typescript": "~5.8.2",
-        "typescript-eslint": "8.33.1"
+        "typescript": "~5.9.3",
+        "typescript-eslint": "^8.55.0"
     },
     "overrides": {
         "@istanbuljs/load-nyc-config": {

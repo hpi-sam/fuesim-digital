@@ -1,9 +1,10 @@
+import type { WritableDraft } from 'immer';
 import { nextUUID } from '../simulation/utils/randomness.js';
 import type { ExerciseState } from '../state.js';
-import { getElement } from '../store/action-reducers/utils/index.js';
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
-import type { Mutable, UUID } from '../utils/index.js';
-import { uuid } from '../utils/index.js';
+import { uuid, type UUID } from '../utils/uuid.js';
+import { getElement } from '../store/action-reducers/utils/get-element.js';
+import type { VehicleTemplate } from '../models/vehicle-template.js';
 import type { Migration } from './migration-functions.js';
 
 interface VehicleParameters {
@@ -12,8 +13,9 @@ interface VehicleParameters {
     personnel?: Personnel[];
 }
 
-type ImagePropertiesStub = unknown;
-
+interface ImageProperties {
+    url: string;
+}
 type Position = MapPosition | VehiclePosition;
 
 interface MapPosition {
@@ -44,7 +46,7 @@ interface MaterialTemplate {
     canCaterFor: CanCaterFor;
     overrideTreatmentRange: number;
     treatmentRange: number;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
 }
 
 interface Material {
@@ -57,43 +59,30 @@ interface Material {
     overrideTreatmentRange: number;
     treatmentRange: number;
     position: Position;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
 }
-
-type PersonnelType = 'gf' | 'notarzt' | 'notSan' | 'rettSan' | 'san';
 
 interface PersonnelTemplate {
     type: 'personnelTemplate';
-    personnelType: PersonnelType;
+    personnelType: string;
     canCaterFor: CanCaterFor;
     overrideTreatmentRange: number;
     treatmentRange: number;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
 }
 
 interface Personnel {
     id: UUID;
     type: 'personnel';
     vehicleId: UUID;
-    personnelType: PersonnelType;
+    personnelType: string;
     vehicleName: string;
     assignedPatientIds: UUIDSet;
     canCaterFor: CanCaterFor;
     overrideTreatmentRange: number;
     treatmentRange: number;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
     position: Position;
-}
-
-interface VehicleTemplate {
-    id: UUID;
-    type: 'vehicleTemplate';
-    vehicleType: string;
-    name: string;
-    image: ImagePropertiesStub;
-    patientCapacity: number;
-    personnel: PersonnelType[];
-    materials: MaterialType[];
 }
 
 interface Vehicle {
@@ -104,7 +93,7 @@ interface Vehicle {
     materialIds: UUIDSet;
     patientCapacity: number;
     position: Position;
-    image: ImagePropertiesStub;
+    image: ImageProperties;
     personnelIds: UUIDSet;
     patientIds: UUIDSet;
     occupation: { type: 'noOccupation' };
@@ -155,27 +144,29 @@ function createVehicleParameters(
     vehicleId: UUID,
     vehicleTemplate: VehicleTemplate,
     materialTemplates: {
-        [Key in MaterialType]: MaterialTemplate;
+        [Key in UUID]: MaterialTemplate;
     },
     personnelTemplates: {
-        [Key in PersonnelType]: PersonnelTemplate;
+        [Key in UUID]: PersonnelTemplate;
     }
 ): VehicleParameters {
-    const materials = vehicleTemplate.materials.map((currentMaterial) =>
-        createMaterial(
-            materialTemplates[currentMaterial],
-            vehicleId,
-            vehicleTemplate.name,
-            { type: 'vehicle', vehicleId }
-        )
+    const materials = vehicleTemplate.materialTemplateIds.map(
+        (materialTemplateId) =>
+            createMaterial(
+                materialTemplates[materialTemplateId]!,
+                vehicleId,
+                vehicleTemplate.name,
+                { type: 'vehicle', vehicleId }
+            )
     );
-    const personnel = vehicleTemplate.personnel.map((currentPersonnel) =>
-        createPersonnel(
-            personnelTemplates[currentPersonnel],
-            vehicleId,
-            vehicleTemplate.name,
-            { type: 'vehicle', vehicleId }
-        )
+    const personnel = vehicleTemplate.personnelTemplateIds.map(
+        (personnelTemplateId) =>
+            createPersonnel(
+                personnelTemplates[personnelTemplateId]!,
+                vehicleId,
+                vehicleTemplate.name,
+                { type: 'vehicle', vehicleId }
+            )
     );
 
     const vehicle: Vehicle = {
@@ -222,18 +213,9 @@ export const deterministicAlarmGroups38: Migration = {
                     firstVehiclesCount: number;
                     firstVehiclesTargetTransferPointId: UUID | undefined;
                 };
-                const typedState = intermediaryState as {
-                    materialTemplates: {
-                        [Key in MaterialType]: MaterialTemplate;
-                    };
-                    personnelTemplates: {
-                        [Key in PersonnelType]: PersonnelTemplate;
-                    };
-                    vehicleTemplates: VehicleTemplate[];
-                };
 
                 const alarmGroup = getElement(
-                    intermediaryState as any,
+                    intermediaryState,
                     'alarmGroup',
                     typedAction.alarmGroupId
                 );
@@ -249,11 +231,45 @@ export const deterministicAlarmGroups38: Migration = {
                     }
                 );
 
-                const vehicleTemplatesById = Object.fromEntries(
-                    typedState.vehicleTemplates.map((template) => [
-                        template.id,
-                        template,
-                    ])
+                // Build personnel templates and material templates from current state as state version 38
+                const personnelTemplates = Object.fromEntries(
+                    Object.values(intermediaryState.personnelTemplates).map(
+                        (template) => [
+                            template.id,
+                            {
+                                personnelType: template.personnelType,
+                                type: template.type,
+                                canCaterFor: template.canCaterFor,
+                                overrideTreatmentRange:
+                                    template.overrideTreatmentRange,
+                                treatmentRange: template.treatmentRange,
+                                image: template.image,
+                            } satisfies PersonnelTemplate,
+                        ]
+                    )
+                );
+
+                const materialTemplates = Object.fromEntries(
+                    Object.values(intermediaryState.materialTemplates).map(
+                        (template) => {
+                            const materialType: MaterialType =
+                                template.image.url === '/assets/material.svg'
+                                    ? 'standard'
+                                    : 'big';
+                            return [
+                                template.id,
+                                {
+                                    materialType,
+                                    type: template.type,
+                                    canCaterFor: template.canCaterFor,
+                                    overrideTreatmentRange:
+                                        template.overrideTreatmentRange,
+                                    treatmentRange: template.treatmentRange,
+                                    image: template.image,
+                                } satisfies MaterialTemplate,
+                            ];
+                        }
+                    )
                 );
 
                 // We're trying to restore the original vehicle IDs that were generated with `nextUUID`.
@@ -269,7 +285,9 @@ export const deterministicAlarmGroups38: Migration = {
                 const vehicleIds = Object.fromEntries(
                     alarmGroupVehicles.map((alarmGroupVehicle) => [
                         alarmGroupVehicle.id,
-                        nextUUID(intermediaryState as Mutable<ExerciseState>),
+                        nextUUID(
+                            intermediaryState as WritableDraft<ExerciseState>
+                        ),
                     ])
                 );
 
@@ -282,13 +300,13 @@ export const deterministicAlarmGroups38: Migration = {
                         createVehicleParameters(
                             vehicleIds[alarmGroupVehicle.id]!,
                             {
-                                ...vehicleTemplatesById[
+                                ...intermediaryState.vehicleTemplates[
                                     alarmGroupVehicle.vehicleTemplateId
                                 ]!,
                                 name: alarmGroupVehicle.name,
                             },
-                            typedState.materialTemplates,
-                            typedState.personnelTemplates
+                            materialTemplates,
+                            personnelTemplates
                         )
                 );
 

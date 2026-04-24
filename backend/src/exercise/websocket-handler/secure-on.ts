@@ -1,14 +1,11 @@
-import type { ClientToServerEvents } from 'digital-fuesim-manv-shared';
+import type { ClientToServerEvents } from 'fuesim-digital-shared';
 import type { SocketReservedEventsMap } from '../../../node_modules/socket.io/dist/socket-types.js';
 import type {
     ReservedOrUserEventNames,
     ReservedOrUserListener,
 } from '../../../node_modules/socket.io/dist/typed-events.js';
 import type { ExerciseSocket } from '../../exercise-server.js';
-
-function isDevelopment() {
-    return process.env['NODE_ENV'] !== 'production';
-}
+import { isDevelopment } from '../../config.js';
 
 export function secureOn<
     Ev extends ReservedOrUserEventNames<
@@ -21,14 +18,9 @@ export function secureOn<
         Ev
     >,
 >(client: ExerciseSocket, event: Ev, listener: Callback) {
-    client.on(event, (async (
-        arg0: any,
-        arg1: any,
-        callback: any,
-        ...args: any[]
-    ) => {
+    client.on(event, ((arg0: any, arg1: any, callback: any, ...args: any[]) => {
         try {
-            await listener(arg0, arg1, callback, ...args);
+            listener(arg0, arg1, callback, ...args);
         } catch (e: unknown) {
             if (isDevelopment()) {
                 throw e;

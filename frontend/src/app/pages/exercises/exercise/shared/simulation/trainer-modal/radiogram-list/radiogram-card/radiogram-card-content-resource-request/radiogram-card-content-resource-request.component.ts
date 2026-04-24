@@ -1,30 +1,34 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type {
-    ResourceRequestRadiogram,
-    UUID,
-} from 'digital-fuesim-manv-shared';
-import { isAccepted, isDone } from 'digital-fuesim-manv-shared';
+import type { ResourceRequestRadiogram, UUID } from 'fuesim-digital-shared';
+import { isAccepted, isDone } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
+import { AsyncPipe } from '@angular/common';
 import {
     Hotkey,
     HotkeyLayer,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectRadiogram } from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../../../shared/services/hotkeys.service';
+import { ExerciseService } from '../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../state/app.state';
+import { createSelectRadiogram } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { HotkeyIndicatorComponent } from '../../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
+import { KeysPipe } from '../../../../../../../../../shared/pipes/keys.pipe';
 
 @Component({
     selector: 'app-radiogram-card-content-resource-request',
     templateUrl: './radiogram-card-content-resource-request.component.html',
     styleUrls: ['./radiogram-card-content-resource-request.component.scss'],
-    standalone: false,
+    imports: [HotkeyIndicatorComponent, KeysPipe, AsyncPipe],
 })
 export class RadigoramCardContentResourceRequestComponent implements OnInit {
-    @Input() radiogramId!: UUID;
-    @Input() shownInSignallerModal = false;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly hotkeyService = inject(HotkeysService);
+
+    readonly radiogramId = input.required<UUID>();
+    readonly shownInSignallerModal = input(false);
 
     radiogram$!: Observable<ResourceRequestRadiogram>;
     enableActionButtons$!: Observable<boolean>;
@@ -34,31 +38,27 @@ export class RadigoramCardContentResourceRequestComponent implements OnInit {
     acceptHotkey!: Hotkey;
     denyHotkey!: Hotkey;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService,
-        private readonly hotkeyService: HotkeysService
-    ) {
+    constructor() {
         this.hotkeyLayer = this.hotkeyService.createLayer(false, false);
     }
 
     acceptRequest() {
         this.exerciseService.proposeAction({
             type: '[Radiogram] Accept resource request',
-            radiogramId: this.radiogramId,
+            radiogramId: this.radiogramId(),
         });
     }
 
     denyRequest() {
         this.exerciseService.proposeAction({
             type: '[Radiogram] Deny resource request',
-            radiogramId: this.radiogramId,
+            radiogramId: this.radiogramId(),
         });
     }
 
     ngOnInit(): void {
         const selectRadiogram = createSelectRadiogram<ResourceRequestRadiogram>(
-            this.radiogramId
+            this.radiogramId()
         );
         this.radiogram$ = this.store.select(selectRadiogram);
         this.enableActionButtons$ = this.store.select(
@@ -88,6 +88,6 @@ export class RadigoramCardContentResourceRequestComponent implements OnInit {
         );
         this.hotkeyLayer.addHotkey(this.acceptHotkey);
         this.hotkeyLayer.addHotkey(this.denyHotkey);
-        this.hotkeyLayer.enabled = this.shownInSignallerModal;
+        this.hotkeyLayer.enabled = this.shownInSignallerModal();
     }
 }

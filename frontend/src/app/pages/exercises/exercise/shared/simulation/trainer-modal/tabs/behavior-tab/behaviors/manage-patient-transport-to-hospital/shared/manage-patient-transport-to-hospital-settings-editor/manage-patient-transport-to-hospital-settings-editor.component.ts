@@ -1,14 +1,17 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ManagePatientTransportToHospitalBehaviorState,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectBehaviorState } from 'src/app/state/application/selectors/exercise.selectors';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../../../state/app.state';
+import { createSelectBehaviorState } from '../../../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../../../shared/directives/app-save-on-typing.directive';
 
 @Component({
     selector: 'app-manage-patient-transport-to-hospital-settings-editor',
@@ -17,26 +20,22 @@ import { createSelectBehaviorState } from 'src/app/state/application/selectors/e
     styleUrls: [
         './manage-patient-transport-to-hospital-settings-editor.component.scss',
     ],
-    standalone: false,
+    imports: [FormsModule, AppSaveOnTypingDirective, AsyncPipe],
 })
-export class ManagePatientTransportToHospitalSettingsEditorComponent
-    implements OnChanges
-{
-    @Input() simulatedRegionId!: UUID;
-    @Input() behaviorId!: UUID;
+export class ManagePatientTransportToHospitalSettingsEditorComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly behaviorId = input.required<UUID>();
 
     public behaviorState$!: Observable<ManagePatientTransportToHospitalBehaviorState>;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     ngOnChanges(): void {
         this.behaviorState$ = this.store.select(
             createSelectBehaviorState<ManagePatientTransportToHospitalBehaviorState>(
-                this.simulatedRegionId,
-                this.behaviorId
+                this.simulatedRegionId(),
+                this.behaviorId()
             )
         );
     }
@@ -44,8 +43,8 @@ export class ManagePatientTransportToHospitalSettingsEditorComponent
     updateRequestVehicleDelay(requestVehicleDelay: number) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Update Request Vehicle Delay For Patient Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             requestVehicleDelay,
         });
     }
@@ -53,8 +52,8 @@ export class ManagePatientTransportToHospitalSettingsEditorComponent
     updateRequestPatientCountDelay(requestPatientCountDelay: number) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Update Request Patient Count Delay For Patient Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             requestPatientCountDelay,
         });
     }
@@ -62,8 +61,8 @@ export class ManagePatientTransportToHospitalSettingsEditorComponent
     updatePromiseInvalidationInterval(promiseInvalidationInterval: number) {
         this.exerciseService.proposeAction({
             type: '[ManagePatientsTransportToHospitalBehavior] Update Promise Invalidation Interval For Patient Transport',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.behaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.behaviorId(),
             promiseInvalidationInterval,
         });
     }

@@ -1,4 +1,4 @@
-<div class="pt-2">
+<div class="d-flex pt-2">
     <button
         (click)="openExerciseSettings()"
         class="btn btn-outline-primary"
@@ -8,117 +8,145 @@
         Einstellungen
     </button>
 
-    <div ngbDropdown placement="top-start" class="d-inline-block">
+    @if (exerciseService.additionalExerciseMeta()?.exerciseTemplate) {
         <button
-            type="button"
+            (click)="openAlarmGroupOverview()"
             class="btn btn-outline-primary ms-3"
-            ngbDropdownToggle
-            data-cy="trainerToolbarCreationButton"
+            data-cy="trainerToolbarAlarmGroupsButton"
         >
-            Erstellung
+            Alarmierungsgruppen
         </button>
-        <div ngbDropdownMenu>
-            <button
-                ngbDropdownItem
-                (click)="openAlarmGroupOverview()"
-                class="btn btn-primary"
-                data-cy="trainerToolbarAlarmGroupsButton"
-            >
-                Alarmierungsgruppen
-            </button>
-            <button
-                ngbDropdownItem
-                (click)="openHospitalEditor()"
-                class="btn btn-primary"
-                data-cy="trainerToolbarHospitalsButton"
-            >
-                Krankenhäuser
-            </button>
-        </div>
-    </div>
-
-    <div ngbDropdown placement="top-start" class="d-inline-block">
         <button
-            type="button"
+            (click)="openHospitalEditor()"
             class="btn btn-outline-primary ms-3"
-            ngbDropdownToggle
-            data-cy="trainerToolbarExecutionButton"
+            data-cy="trainerToolbarHospitalsButton"
         >
-            Durchführung
+            Krankenhäuser
         </button>
-        <div ngbDropdownMenu>
+    } @else {
+        <div ngbDropdown placement="top-start" class="d-inline-block">
             <button
-                ngbDropdownItem
-                (click)="openClientOverview()"
-                class="btn btn-primary"
-                data-cy="trainerToolbarParticipantsButton"
+                type="button"
+                class="btn btn-outline-primary ms-3"
+                ngbDropdownToggle
+                data-cy="trainerToolbarCreationButton"
             >
-                Teilnehmerübersicht
+                Erstellung
             </button>
-            <button
-                ngbDropdownItem
-                (click)="openTransferOverview()"
-                class="btn btn-primary"
-                data-cy="trainerToolbarTransferButton"
-            >
-                Transferübersicht
-            </button>
-            <button
-                ngbDropdownItem
-                (click)="openEmergencyOperationsCenter()"
-                class="btn btn-primary"
-                data-cy="trainerToolbarControlCenterButton"
-            >
-                Leitstelle
-            </button>
-            <button
-                ngbDropdownItem
-                (click)="openSimulationTrainerModal()"
-                class="btn btn-primary"
-            >
-                Simulationseinstellungen (Übungsleitung)
-            </button>
-            <button
-                ngbDropdownItem
-                (click)="openSimulationSignallerModal()"
-                class="btn btn-primary"
-            >
-                Simulationsübersicht (Funker)
-            </button>
+            <div ngbDropdownMenu>
+                <button
+                    ngbDropdownItem
+                    (click)="openAlarmGroupOverview()"
+                    class="btn btn-primary"
+                    data-cy="trainerToolbarAlarmGroupsButton"
+                >
+                    Alarmierungsgruppen
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="openHospitalEditor()"
+                    class="btn btn-primary"
+                    data-cy="trainerToolbarHospitalsButton"
+                >
+                    Krankenhäuser
+                </button>
+            </div>
         </div>
-    </div>
+    }
 
-    <div ngbDropdown placement="top-start" class="d-inline-block">
-        <button
-            type="button"
-            class="btn btn-outline-primary ms-3"
-            ngbDropdownToggle
-            data-cy="trainerToolbarEvaluationButton"
-        >
-            Auswertung
+    @if (!exerciseService.additionalExerciseMeta()?.exerciseTemplate) {
+        <div ngbDropdown placement="top-start" class="d-inline-block">
+            <button
+                type="button"
+                class="btn btn-outline-primary ms-3"
+                ngbDropdownToggle
+                data-cy="trainerToolbarExecutionButton"
+            >
+                Durchführung
+            </button>
+            <div ngbDropdownMenu>
+                <button
+                    ngbDropdownItem
+                    (click)="openClientsModal()"
+                    class="btn btn-primary"
+                    data-cy="trainerToolbarParticipantsButton"
+                >
+                    Teilnehmende
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="openTransferOverview()"
+                    class="btn btn-primary"
+                    data-cy="trainerToolbarTransferButton"
+                >
+                    Transferübersicht
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="openEmergencyOperationsCenter()"
+                    class="btn btn-primary"
+                    data-cy="trainerToolbarControlCenterButton"
+                >
+                    Leitstelle
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="openSimulationTrainerModal()"
+                    class="btn btn-primary"
+                >
+                    Simulationseinstellungen (Übungsleitung)
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="openSimulationSignallerModal()"
+                    class="btn btn-primary"
+                >
+                    Simulationsübersicht (Funker)
+                </button>
+            </div>
+        </div>
+
+        <div ngbDropdown placement="top-start" class="d-inline-block">
+            <button
+                type="button"
+                class="btn btn-outline-primary ms-3"
+                ngbDropdownToggle
+                data-cy="trainerToolbarEvaluationButton"
+            >
+                Auswertung
+            </button>
+            <div ngbDropdownMenu>
+                <button
+                    ngbDropdownItem
+                    (click)="openExerciseStatisticsModal()"
+                    class="btn btn-primary"
+                    data-cy="trainerToolbarStatisticsButton"
+                >
+                    Statistiken
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="applicationService.startTimeTravel()"
+                    class="btn btn-primary"
+                    data-cy="trainerToolbarRecordingButton"
+                >
+                    Aufzeichnung
+                </button>
+            </div>
+        </div>
+
+        <app-start-pause-button />
+
+        <div class="flex-grow-1"></div>
+
+        <button (click)="deleteExercise()" class="btn btn-danger ms-3">
+            Übung löschen
         </button>
-        <div ngbDropdownMenu>
-            <button
-                ngbDropdownItem
-                (click)="openExerciseStatisticsModal()"
-                class="btn btn-primary"
-                data-cy="trainerToolbarStatisticsButton"
-            >
-                Statistiken
-            </button>
-            <button
-                ngbDropdownItem
-                (click)="applicationService.startTimeTravel()"
-                class="btn btn-primary"
-                data-cy="trainerToolbarRecordingButton"
-            >
-                Aufzeichnung
-            </button>
+    } @else {
+        <div class="ms-3 d-flex alert alert-warning p-2 mb-0 px-3" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Dies ist eine Übungsvorlage. Erstellen Sie eine Übung aus dieser
+            Vorlage, um sie zu starten.
         </div>
-    </div>
-
-    <app-start-pause-button />
-    <button (click)="deleteExercise()" class="btn btn-danger ms-3 float-end">
-        Übung löschen
-    </button>
+    }
 </div>

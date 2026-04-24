@@ -1,6 +1,6 @@
 {
-    "name": "digital-fuesim-manv-backend",
-    "version": "0.10.0",
+    "name": "fuesim-digital-backend",
+    "version": "0.11.0",
     "type": "module",
     "scripts": {
         "start:once:linux-macos": "NODE_ENV=production node dist/src/index.js",
@@ -13,49 +13,61 @@
         "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,html}\"",
         "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,html}\"",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose",
-        "test:migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose ./test/http-migration.spec.ts",
-        "test:ci-no-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci --testPathIgnorePatterns ./test/http-migration.spec.ts",
-        "test:ci-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci ./test/http-migration.spec.ts",
+        "test:migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose ./src/test/http-migration.spec.ts",
+        "test:ci-no-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci --testPathIgnorePatterns ./src/test/http-migration.spec.ts",
+        "test:ci-migration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci ./src/test/http-migration.spec.ts",
         "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --verbose --watch",
-        "typeorm:cli": "NODE_ENV=migration node --loader ts-node/esm ./node_modules/typeorm/cli -d src/database/migration-datasource.ts",
-        "typeorm:cli:prod": "NODE_ENV=migration node ./node_modules/typeorm/cli -d dist/src/database/migration-datasource.js",
-        "typeorm:cli:windows": "set NODE_ENV=migration&& node --loader ts-node/esm ./node_modules/typeorm/cli -d src/database/migration-datasource.ts",
-        "migration:generate": "genmigration() { npm run typeorm:cli migration:generate \"./src/database/migrations/$1\"; }; genmigration",
-        "migration:generate:windows": ".\\src\\database\\migrations\\generate-migration.bat",
-        "migration:run": "npm run typeorm:cli migration:run",
-        "migration:run:prod": "npm run typeorm:cli:prod migration:run",
-        "migration:run:windows": "npm run typeorm:cli:windows migration:run",
-        "migration:revert": "npm run typeorm:cli migration:revert",
-        "migration:revert:windows": "npm run typeorm:cli:windows migration:revert",
-        "db:purge": "node --loader ts-node/esm src/database/scripts/purge.ts"
+        "migration:generate": "npx drizzle-kit generate",
+        "migration:run": "npx drizzle-kit migrate",
+        "migration:check": "npx drizzle-kit check",
+        "db:studio": "npx drizzle-kit studio",
+        "db:purge": "tsx src/database/scripts/purge.ts"
     },
     "private": true,
-    "engines": {
-        "node": ">=22",
-        "npm": ">=11"
+    "devEngines": {
+        "runtime": {
+            "name": "node",
+            "version": "~24.13.0",
+            "onFail": "error"
+        },
+        "packageManager": {
+            "name": "npm",
+            "version": "~11.6.2",
+            "onFail": "error"
+        }
     },
     "dependencies": {
+        "@electric-sql/pglite": "^0.3.14",
+        "@types/cookie-parser": "^1.4.10",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.1",
+        "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
-        "digital-fuesim-manv-shared": "file:../shared",
         "dotenv": "^16.4.7",
+        "drizzle-kit": "^0.31.7",
+        "drizzle-orm": "^0.45.2",
         "envalid": "^8.0.0",
-        "express": "^5.1.0",
-        "lodash-es": "4.17.21",
+        "express": "^5.2.0",
+        "fuesim-digital-shared": "file:../shared",
+        "immer": "^11.1.4",
+        "lodash-es": "^4.17.23",
+        "openid-client": "^6.8.1",
         "pg": "^8.14.1",
+        "rxjs": "^7.8.2",
         "socket.io": "^4.8.1",
         "supertest": "^7.1.0",
-        "typeorm": "^0.3.26"
+        "zod": "^4.1.13"
     },
     "devDependencies": {
         "@eslint/compat": "^1.4.0",
         "@eslint/js": "^9.36.0",
+        "@types/cookie": "^0.6.0",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",
         "@types/jest": "^30.0.0",
-        "@types/lodash-es": "^4.17.6",
-        "@types/node": "^22",
+        "@types/lodash-es": "^4.17.12",
+        "@types/node": "^22.19.1",
+        "@types/pg": "^8.15.6",
         "@types/supertest": "^6.0.3",
         "eslint": "^9.36.0",
         "eslint-config-prettier": "^10.1.1",
@@ -64,14 +76,16 @@
         "jest": "^30.2.0",
         "socket.io-client": "^4.5.4",
         "ts-jest": "^29.4.5",
-        "ts-node": "^10.9.2",
         "tsx": "^4.19.3",
-        "typescript": "~5.8.2",
-        "typescript-eslint": "^8.45.0"
+        "typescript": "~5.9.3",
+        "typescript-eslint": "^8.55.0"
     },
     "overrides": {
         "@istanbuljs/load-nyc-config": {
             "js-yaml": "^4.1.1"
+        },
+        "@esbuild-kit/core-utils": {
+            "esbuild": "0.27.0"
         }
     }
 }

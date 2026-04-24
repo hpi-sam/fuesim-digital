@@ -6,37 +6,39 @@
         {{ (simulatedRegion$ | async)?.name ?? 'Gelöschter Bereich' }}
     </h6>
     <div class="card-body">
-        <div *ngIf="radiogram$ | async as radiogram" class="position-relative">
-            <app-radiogram-card-content
-                [radiogram]="radiogram!"
-                [shownInSignallerModal]="shownInSignallerModal"
-            ></app-radiogram-card-content>
-            <div
-                *ngIf="(status$ | async) === 'unread'"
-                class="position-absolute top-0 left-0 w-100 h-100"
-                style="
-                    background-color: rgba(255, 255, 255, 0.25);
-                    backdrop-filter: blur(3px);
-                "
-            ></div>
-        </div>
+        @if (radiogram$ | async; as radiogram) {
+            <div class="position-relative">
+                <app-radiogram-card-content
+                    [radiogram]="radiogram!"
+                    [shownInSignallerModal]="shownInSignallerModal()"
+                ></app-radiogram-card-content>
+                @if ((status$ | async) === 'unread') {
+                    <div
+                        class="position-absolute top-0 left-0 w-100 h-100"
+                        style="
+                            background-color: rgba(255, 255, 255, 0.25);
+                            backdrop-filter: blur(3px);
+                        "
+                    ></div>
+                }
+            </div>
+        }
     </div>
     <div class="card-footer">
-        <ng-container [ngSwitch]="status$ | async">
-            <ng-container *ngSwitchCase="'unread'">
+        @switch (status$ | async) {
+            @case ('unread') {
                 <span>Bereit zur Durchsage</span>
                 <button
                     class="btn btn-primary float-end"
                     (click)="acceptRadiogram()"
                 >
                     Durchsagen
-                    <app-hotkey-indicator
-                        *ngIf="first && shownInSignallerModal"
-                        [hotkey]="acceptHotkey"
-                    />
+                    @if (first() && shownInSignallerModal()) {
+                        <app-hotkey-indicator [hotkey]="acceptHotkey" />
+                    }
                 </button>
-            </ng-container>
-            <ng-container *ngSwitchCase="'ownAccepted'">
+            }
+            @case ('ownAccepted') {
                 <span class="text-success"
                     >Wird von <span class="fw-semibold">Ihnen</span> durchgesagt
                     <div class="btn-group float-end">
@@ -45,25 +47,23 @@
                             (click)="returnRadiogram()"
                         >
                             Zurücklegen
-                            <app-hotkey-indicator
-                                *ngIf="first && shownInSignallerModal"
-                                [hotkey]="returnHotkey"
-                            />
+                            @if (first() && shownInSignallerModal()) {
+                                <app-hotkey-indicator [hotkey]="returnHotkey" />
+                            }
                         </button>
                         <button
                             class="btn btn-success"
                             (click)="markRadiogramAsDone()"
                         >
                             Fertig
-                            <app-hotkey-indicator
-                                *ngIf="first && shownInSignallerModal"
-                                [hotkey]="acceptHotkey"
-                            />
+                            @if (first() && shownInSignallerModal()) {
+                                <app-hotkey-indicator [hotkey]="acceptHotkey" />
+                            }
                         </button>
                     </div>
                 </span>
-            </ng-container>
-            <ng-container *ngSwitchCase="'otherAccepted'">
+            }
+            @case ('otherAccepted') {
                 <span class="card-text">
                     Wird von
                     <span class="fw-semibold">{{
@@ -77,10 +77,10 @@
                         Übernehmen
                     </button>
                 </span>
-            </ng-container>
-            <ng-container *ngSwitchCase="'done'">
+            }
+            @case ('done') {
                 <span>Wurde bereits durchgesagt</span>
-            </ng-container>
-        </ng-container>
+            }
+        }
     </div>
 </div>

@@ -1,31 +1,32 @@
-import { IsValue } from '../../../utils/validators/is-value.js';
+import type { WritableDraft } from 'immer';
+import { z } from 'zod';
 import { cloneDeepMutable } from '../../../utils/clone-deep.js';
-import { getCreate } from '../../../models/utils/get-create.js';
-import { RadiogramUnpublishedStatus } from '../../../models/radiogram/status/radiogram-unpublished-status.js';
-import { publishRadiogram } from '../../../models/radiogram/radiogram-helpers-mutable.js';
+import { newRadiogramUnpublishedStatus } from '../../radiogram/status/radiogram-unpublished-status.js';
+import { publishRadiogram } from '../../radiogram/radiogram-helpers-mutable.js';
 import { nextUUID } from '../../../simulation/utils/randomness.js';
-import { ResourceRequestRadiogram } from '../../radiogram/resource-request-radiogram.js';
-import type { Mutable } from '../../../utils/immutability.js';
+import type { ResourceRequestRadiogram } from '../../radiogram/resource-request-radiogram.js';
+import { newResourceRequestRadiogram } from '../../radiogram/resource-request-radiogram.js';
 import { isDone, isUnread } from '../../radiogram/radiogram-helpers.js';
-import { StrictObject } from '../../../utils/strict-object.js';
 import { isEmptyResource } from '../rescue-resource.js';
-import type {
-    RequestTarget,
-    RequestTargetConfiguration,
-} from './request-target.js';
+import type { RequestTarget } from './request-target.js';
+import { requestTargetConfigurationSchema } from './request-target.js';
 
-export class TraineesRequestTargetConfiguration
-    implements RequestTargetConfiguration
-{
-    @IsValue('traineesRequestTarget')
-    public readonly type = 'traineesRequestTarget';
+export const traineesRequestTargetConfigurationSchema = z.strictObject({
+    ...requestTargetConfigurationSchema.shape,
+    type: z.literal('traineesRequestTarget'),
+});
+export type TraineesRequestTargetConfiguration = z.infer<
+    typeof traineesRequestTargetConfigurationSchema
+>;
 
-    static readonly create = getCreate(this);
+export function newTraineesRequestTargetConfiguration(): TraineesRequestTargetConfiguration {
+    return { type: 'traineesRequestTarget' };
 }
 
 export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfiguration> =
     {
-        configuration: TraineesRequestTargetConfiguration,
+        configurationSchema: traineesRequestTargetConfigurationSchema,
+        type: 'traineesRequestTarget',
         createRequest: (
             draftState,
             requestingSimulatedRegionId,
@@ -33,14 +34,12 @@ export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfigura
             requestedResource,
             key
         ) => {
-            const unreadRadiogram = StrictObject.values(
-                draftState.radiograms
-            ).find(
+            const unreadRadiogram = Object.values(draftState.radiograms).find(
                 (radiogram) =>
                     radiogram.type === 'resourceRequestRadiogram' &&
                     isUnread(radiogram) &&
                     radiogram.resourceRequestKey === key
-            ) as Mutable<ResourceRequestRadiogram> | undefined;
+            ) as WritableDraft<ResourceRequestRadiogram> | undefined;
             if (unreadRadiogram) {
                 if (isEmptyResource(requestedResource)) {
                     delete draftState.radiograms[unreadRadiogram.id];
@@ -51,7 +50,7 @@ export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfigura
             }
 
             if (
-                StrictObject.values(draftState.radiograms)
+                Object.values(draftState.radiograms)
                     .filter(
                         (radiogram) =>
                             radiogram.type === 'resourceRequestRadiogram' &&
@@ -61,11 +60,11 @@ export const traineesRequestTarget: RequestTarget<TraineesRequestTargetConfigura
                 !isEmptyResource(requestedResource)
             ) {
                 const radiogram = cloneDeepMutable(
-                    ResourceRequestRadiogram.create(
+                    newResourceRequestRadiogram(
                         nextUUID(draftState),
                         requestingSimulatedRegionId,
                         null,
-                        RadiogramUnpublishedStatus.create()
+                        newRadiogramUnpublishedStatus()
                     )
                 );
                 radiogram.requiredResource = requestedResource;

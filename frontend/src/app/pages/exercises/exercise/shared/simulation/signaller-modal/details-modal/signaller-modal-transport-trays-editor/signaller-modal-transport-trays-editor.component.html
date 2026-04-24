@@ -1,81 +1,82 @@
-<div
-    *ngIf="manageTransportBehavior$ | async as behavior"
-    class="container d-flex flex-column h-100"
->
-    <p
-        *ngIf="((managedRegions$ | async)?.length ?? 0) === 0"
-        class="text-muted font-bold"
-    >
-        Es sind noch keine zu verwaltenden Abschnitte festgelegt.
-    </p>
-    <div class="mb-3 overflow-auto flex-grow-1 flex-shrink-1">
-        <ul class="list-group">
-            <li
-                *ngFor="
-                    let managedRegion of managedRegions$ | async;
-                    index as index;
-                    trackBy: 'key' | appTrackByProperty
-                "
-                class="list-group-item d-flex align-items-center flex-nowrap p-0"
+@if (manageTransportBehavior$ | async; as behavior) {
+    <div class="container d-flex flex-column h-100">
+        @if (((managedRegions$ | async)?.length ?? 0) === 0) {
+            <p class="text-muted font-bold">
+                Es sind noch keine zu verwaltenden Patientenablagen festgelegt.
+            </p>
+        }
+        <div class="mb-3 overflow-auto flex-grow-1 flex-shrink-1">
+            <ul class="list-group">
+                @for (
+                    managedRegion of managedRegions$ | async;
+                    track managedRegion.key;
+                    let index = $index
+                ) {
+                    <li
+                        class="list-group-item d-flex align-items-center flex-nowrap p-0"
+                    >
+                        <div class="flex-grow-1 ps-2 pe-2 text-truncate">
+                            {{ managedRegion.name }}
+                        </div>
+                        <button
+                            class="btn btn-link text-danger text-decoration-none"
+                            ngbTooltip="Region nicht mehr verwalten"
+                            [tabIndex]="index + 1"
+                            (click)="removeManagedRegion(managedRegion)"
+                        >
+                            <i class="bi-trash"></i>
+                        </button>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="row">
+            <button
+                type="button"
+                class="btn btn-outline-success col me-1"
+                [ngbPopover]="addRegionTemplate"
+                autoClose="outside"
+                #addRegionPopover="ngbPopover"
+                [disabled]="(canAdd$ | async) !== true"
+                [tabIndex]="((managedRegions$ | async)?.length ?? 0) + 1"
+                [appAutofocus]="true"
             >
-                <div class="flex-grow-1 ps-2 pe-2 text-truncate">
-                    {{ managedRegion.name }}
-                </div>
-                <button
-                    class="btn btn-link text-danger text-decoration-none"
-                    ngbTooltip="Region nicht mehr verwalten"
-                    [tabIndex]="index + 1"
-                    (click)="removeManagedRegion(managedRegion)"
-                >
-                    <i class="bi-trash"></i>
-                </button>
-            </li>
-        </ul>
-    </div>
-    <div class="row">
-        <button
-            type="button"
-            class="btn btn-outline-success col me-1"
-            [ngbPopover]="addRegionTemplate"
-            autoClose="outside"
-            #addRegionPopover="ngbPopover"
-            [disabled]="(canAdd$ | async) !== true"
-            [tabIndex]="((managedRegions$ | async)?.length ?? 0) + 1"
-            [appAutofocus]="true"
-        >
-            <span class="bi-plus me-1"></span>
-            Hinzufügen
-            <app-hotkey-indicator [hotkey]="addRegionHotkey" />
+                <span class="bi-plus me-1"></span>
+                Hinzufügen
+                <app-hotkey-indicator [hotkey]="addRegionHotkey" />
+            </button>
+            <ng-template #addRegionTemplate>
+                <app-searchable-dropdown
+                    [options]="(unmanagedRegions$ | async)!"
+                    (selected)="
+                        addManagedRegion($event); addRegionPopover.close()
+                    "
+                />
+            </ng-template>
+            <button
+                type="button"
+                class="btn btn-outline-danger col ms-1"
+                [ngbPopover]="removeRegionTemplate"
+                autoClose="outside"
+                #removeRegionPopover="ngbPopover"
+                [disabled]="(canRemove$ | async) !== true"
+                [tabIndex]="((managedRegions$ | async)?.length ?? 0) + 2"
+            >
+                <span class="bi-plus me-1"></span>
+                Entfernen
+                <app-hotkey-indicator [hotkey]="removeRegionHotkey" />
+            </button>
+            <ng-template #removeRegionTemplate>
+                <app-searchable-dropdown
+                    [options]="(managedRegions$ | async)!"
+                    (selected)="
+                        removeManagedRegion($event); removeRegionPopover.close()
+                    "
+                />
+            </ng-template>
+        </div>
+        <button class="btn btn-primary row mt-2" (click)="close()">
+            Fertig<app-hotkey-indicator [hotkey]="finishHotkey" />
         </button>
-        <ng-template #addRegionTemplate>
-            <app-searchable-dropdown
-                [options]="(unmanagedRegions$ | async)!"
-                (selected)="addManagedRegion($event); addRegionPopover.close()"
-            />
-        </ng-template>
-        <button
-            type="button"
-            class="btn btn-outline-danger col ms-1"
-            [ngbPopover]="removeRegionTemplate"
-            autoClose="outside"
-            #removeRegionPopover="ngbPopover"
-            [disabled]="(canRemove$ | async) !== true"
-            [tabIndex]="((managedRegions$ | async)?.length ?? 0) + 2"
-        >
-            <span class="bi-plus me-1"></span>
-            Entfernen
-            <app-hotkey-indicator [hotkey]="removeRegionHotkey" />
-        </button>
-        <ng-template #removeRegionTemplate>
-            <app-searchable-dropdown
-                [options]="(managedRegions$ | async)!"
-                (selected)="
-                    removeManagedRegion($event); removeRegionPopover.close()
-                "
-            />
-        </ng-template>
     </div>
-    <button class="btn btn-primary row mt-2" (click)="close()">
-        Fertig<app-hotkey-indicator [hotkey]="finishHotkey" />
-    </button>
-</div>
+}

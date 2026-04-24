@@ -1,32 +1,27 @@
-version: '3'
 services:
-    digital-fuesim-manv:
+    app:
         depends_on:
+            # - authelia # for development setup only
             - db
-        image: digitalfuesimmanv/dfm
+        image: ghcr.io/hpi-sam/fuesim-digital
         # Use this to build the container for yourself:
         #build:
         #    context: .
         #    dockerfile: docker/Dockerfile
         restart: unless-stopped
-        container_name: digital-fuesim-manv
         ports:
             - 80:80
-        # uncomment port 443 if HTTPS is used
-        #    - 443:443
         env_file:
             - .env
-        volumes:
-            - dfm-data:/${DFM_PERSISTENT_DATA_PATH}
+        # volumes:
             # To overwrite the contents of the about pages, mount a directory into the container
             # The directory can contain terms.html, license.html, privacy.html and imprint.html
             # Example
-            # - ./about:/usr/local/app/frontend/dist/digital-fuesim-manv/assets/about
+            # - ./about:/usr/local/app/frontend/assets/about
     db:
-        image: postgres:14
-        container_name: dfm_postgres
+        image: postgres:18
         volumes:
-            - dfm_db:/var/lib/postgresql/data
+            - db:/var/lib/postgresql
         # Use this to expose the database to your host machine
         #ports:
         #    - 127.0.0.1:${DFM_DB_PORT}:5432
@@ -34,9 +29,17 @@ services:
             - POSTGRES_USER=${DFM_DB_USER}
             - POSTGRES_PASSWORD=${DFM_DB_PASSWORD}
             - POSTGRES_DB=${DFM_DB_NAME}
+    # THIS IS ONLY FOR DEVELOPMENT - for production, please use a proper configured OIDC provider
+    authelia:
+        image: docker.io/authelia/authelia:4.39.16
+        restart: unless-stopped
+        ports:
+            - 127.0.0.1:9091:9091
+        volumes:
+            - ./docker/authelia-config:/config:ro
+            - authelia-secrets:/secrets
 
 volumes:
     # database is in this volume
-    dfm_db:
-    # needed to keep persistency, right now SSL
-    dfm-data:
+    db:
+    authelia-secrets:

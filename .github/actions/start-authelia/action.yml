@@ -1,0 +1,13 @@
+name: Start Authelia
+description: Starts an Authelia instance for testing purposes
+runs:
+    using: composite
+    steps:
+        - name: Start Authelia OIDC Docker container
+          run: |
+              export AUTHELIA_CONTAINER_ID=$(docker run -p 9091/tcp -v ${GITHUB_WORKSPACE}/docker/authelia-config:/config -v authelia-secrets:/secrets -d docker.io/authelia/authelia:4.39.16)
+              export AUTHELIA_CONTAINER_PORT=$(docker port $AUTHELIA_CONTAINER_ID 9091/tcp | grep 0.0.0.0 | cut -c 9-)
+              echo "Authelia container started with ID $AUTHELIA_CONTAINER_ID on port $AUTHELIA_CONTAINER_PORT"
+              echo "AUTHELIA_CONTAINER_ID=$AUTHELIA_CONTAINER_ID" >> "$GITHUB_ENV"
+              echo "AUTHELIA_CONTAINER_PORT=$AUTHELIA_CONTAINER_PORT" >> "$GITHUB_ENV"
+          shell: bash

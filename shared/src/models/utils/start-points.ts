@@ -1,64 +1,43 @@
-import type { TypeOptions } from 'class-transformer';
-import { IsNumber, IsUUID, Min } from 'class-validator';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { getCreate } from './get-create.js';
+import { z } from 'zod';
+import { type UUID, uuidSchema } from '../../utils/uuid.js';
 
-export type StartPoint = AlarmGroupStartPoint | TransferStartPoint;
+const transferStartPointSchema = z.strictObject({
+    type: z.literal('transferStartPoint'),
+    transferPointId: uuidSchema,
+});
 
-export class TransferStartPoint {
-    @IsValue('transferStartPoint' as const)
-    public readonly type = 'transferStartPoint';
+const alarmGroupStartPointSchema = z.strictObject({
+    type: z.literal('alarmGroupStartPoint'),
+    alarmGroupId: uuidSchema,
+    duration: z.number().min(0),
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly transferPointId: UUID;
+export const startPointSchema = z.union([
+    alarmGroupStartPointSchema,
+    transferStartPointSchema,
+]);
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(transferPointId: UUID) {
-        this.transferPointId = transferPointId;
-    }
+export type StartPoint = z.infer<typeof startPointSchema>;
+export type TransferStartPoint = z.infer<typeof transferStartPointSchema>;
+export type AlarmGroupStartPoint = z.infer<typeof alarmGroupStartPointSchema>;
 
-    static readonly create = getCreate(this);
+export function newTransferStartPoint(
+    transferPointId: UUID
+): TransferStartPoint {
+    return {
+        type: 'transferStartPoint',
+        transferPointId,
+    };
 }
 
-export class AlarmGroupStartPoint {
-    @IsValue('alarmGroupStartPoint' as const)
-    public readonly type = 'alarmGroupStartPoint';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly alarmGroupId: UUID;
-
-    @IsNumber()
-    @Min(0)
-    public readonly duration: number;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(alarmGroupId: UUID, duration: number) {
-        this.alarmGroupId = alarmGroupId;
-        this.duration = duration;
-    }
-
-    static readonly create = getCreate(this);
+export function newAlarmGroupStartPoint(
+    alarmGroupId: UUID,
+    duration: number
+): AlarmGroupStartPoint {
+    const startPoint = {
+        type: 'alarmGroupStartPoint',
+        alarmGroupId,
+        duration,
+    } satisfies AlarmGroupStartPoint;
+    return alarmGroupStartPointSchema.parse(startPoint);
 }
-
-export const startPointTypeOptions: TypeOptions = {
-    keepDiscriminatorProperty: true,
-    discriminator: {
-        property: 'type',
-        subTypes: [
-            {
-                name: 'alarmGroupStartPoint',
-                value: AlarmGroupStartPoint,
-            },
-            {
-                name: 'transferStartPoint',
-                value: TransferStartPoint,
-            },
-        ],
-    },
-};

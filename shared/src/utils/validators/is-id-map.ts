@@ -8,7 +8,7 @@ import { IsMultiTypedStringMap } from './is-string-map.js';
 // An `isIdMap` function is omitted.
 // It's currently not used and it's not trivial to migrate the decorator approach below
 // to a standalone function.
-// For reference, such an implementation once existed as part of https://github.com/hpi-sam/digital-fuesim-manv/pull/125.
+// For reference, such an implementation once existed as part of https://github.com/hpi-sam/fuesim-digital/pull/125.
 
 /**
  * An `IdMap` is of type `{ readonly [key: UUID]: T }`

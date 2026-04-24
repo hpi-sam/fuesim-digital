@@ -1,18 +1,22 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { TransferCountsRadiogram, UUID } from 'digital-fuesim-manv-shared';
+import type { TransferCountsRadiogram, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectRadiogram } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../../../../state/app.state';
+import { createSelectRadiogram } from '../../../../../../../../../state/application/selectors/exercise.selectors';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 
 @Component({
     selector: 'app-radiogram-card-content-transfer-counts',
     templateUrl: './radiogram-card-content-transfer-counts.component.html',
     styleUrls: ['./radiogram-card-content-transfer-counts.component.scss'],
-    standalone: false,
+    imports: [PatientStatusBadgeComponent, AsyncPipe],
 })
 export class RadiogramCardContentTransferCountsComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+
     /**
      * Categories that should always be listed in the table.
      */
@@ -32,15 +36,13 @@ export class RadiogramCardContentTransferCountsComponent implements OnInit {
      */
     readonly showIfTransferredCategories = ['black'] as const;
 
-    @Input() radiogramId!: UUID;
+    readonly radiogramId = input.required<UUID>();
 
     radiogram$!: Observable<TransferCountsRadiogram>;
 
-    constructor(private readonly store: Store<AppState>) {}
-
     ngOnInit(): void {
         this.radiogram$ = this.store.select(
-            createSelectRadiogram<TransferCountsRadiogram>(this.radiogramId)
+            createSelectRadiogram<TransferCountsRadiogram>(this.radiogramId())
         );
     }
 }

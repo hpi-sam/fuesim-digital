@@ -1,4 +1,4 @@
-<ng-container *ngIf="hotkey; else plainKeys">
+@if (hotkey(); as hotkey) {
     <kbd
         class="badge text-bg-dark"
         [ngClass]="{
@@ -8,9 +8,8 @@
     >
         <small>{{ hotkey.keys }}</small>
     </kbd>
-</ng-container>
-<ng-template #plainKeys>
+} @else {
     <kbd class="badge text-bg-dark">
-        <small>{{ keys }}</small>
+        <small>{{ keys() }}</small>
     </kbd>
-</ng-template>
+}

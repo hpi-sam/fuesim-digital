@@ -1,16 +1,18 @@
 <h5>Transport für SK abgeschlossen</h5>
-
-<ng-container *appLet="radiogram$ | async as radiogram">
+@if (radiogram$ | async; as radiogram) {
     <span>
         In
-        <strong *ngIf="radiogram.scope === 'singleRegion'">
-            dieser Patientenablage
-        </strong>
-        <strong *ngIf="radiogram.scope === 'transportManagement'">
-            allen von dieser Transportorganisation verwalteten Patientenablagen
-        </strong>
+        @if (radiogram.scope === 'singleRegion') {
+            <strong> dieser Patientenablage </strong>
+        }
+        @if (radiogram.scope === 'transportManagement') {
+            <strong>
+                allen von dieser Transportorganisation verwalteten
+                Patientenablagen
+            </strong>
+        }
         ist der Abtransport der Patienten mit Sichtungskategorie
     </span>
     <app-patient-status-badge [status]="radiogram.completedCategory" />
     <span> abgeschlossen.</span>
-</ng-container>
+}

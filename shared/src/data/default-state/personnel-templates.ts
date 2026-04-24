@@ -1,77 +1,102 @@
-import { PersonnelTemplate } from '../../models/personnel-template.js';
-import { CanCaterFor } from '../../models/utils/cater-for.js';
-import type { PersonnelType } from '../../models/utils/personnel-type.js';
+import type { PersonnelTemplate } from '../../models/personnel-template.js';
+import { newCanCaterFor } from '../../models/utils/cater-for.js';
+import { cloneDeepImmutable } from '../../utils/clone-deep.js';
 import {
     defaultOverrideTreatmentRange,
     defaultTreatmentRange,
 } from './default-treatment-range.js';
 
-const sanPersonnelTemplate = PersonnelTemplate.create(
-    'san',
-    {
+const sanPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
+    id: '21b42fa5-2194-4efe-bc22-b525854a0495',
+    type: 'personnelTemplate',
+    personnelType: 'san',
+    name: 'Sanitäter',
+    image: {
         url: '/assets/san-personnel.svg',
         height: 80,
         aspectRatio: 1,
     },
-    CanCaterFor.create(0, 0, 5, 'and'),
-    defaultOverrideTreatmentRange,
-    defaultTreatmentRange
-);
+    canCaterFor: newCanCaterFor(0, 0, 5, 'and'),
+    overrideTreatmentRange: defaultOverrideTreatmentRange,
+    treatmentRange: defaultTreatmentRange,
+    abbreviation: 'San',
+});
 
-const rettSanPersonnelTemplate = PersonnelTemplate.create(
-    'rettSan',
-    {
+const rettSanPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
+    id: '1295a150-e985-431e-bab9-0c06a0bd24a1',
+    type: 'personnelTemplate',
+    personnelType: 'rettSan',
+    name: 'Rettungssanitäter',
+    image: {
         url: '/assets/rettSan-personnel.svg',
         height: 80,
         aspectRatio: 1,
     },
-    CanCaterFor.create(1, 2, 0, 'and'),
-    defaultOverrideTreatmentRange,
-    defaultTreatmentRange
-);
+    canCaterFor: newCanCaterFor(1, 2, 0, 'and'),
+    overrideTreatmentRange: defaultOverrideTreatmentRange,
+    treatmentRange: defaultTreatmentRange,
+    abbreviation: 'RS',
+});
 
-const notSanPersonnelTemplate = PersonnelTemplate.create(
-    'notSan',
-    {
+const notSanPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
+    id: '1cbd045b-3133-44d6-9f88-d4d5a571b83f',
+    type: 'personnelTemplate',
+    personnelType: 'notSan',
+    name: 'Notfallsanitäter',
+    image: {
         url: '/assets/notSan-personnel.svg',
         height: 80,
         aspectRatio: 1,
     },
-    CanCaterFor.create(2, 1, 0, 'and'),
-    defaultOverrideTreatmentRange,
-    defaultTreatmentRange
-);
+    canCaterFor: newCanCaterFor(2, 1, 0, 'and'),
+    overrideTreatmentRange: defaultOverrideTreatmentRange,
+    treatmentRange: defaultTreatmentRange,
+    abbreviation: 'NFS',
+});
 
-const notarztPersonnelTemplate = PersonnelTemplate.create(
-    'notarzt',
-    {
+const notarztPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
+    id: 'd8f128d2-2532-4ac1-8439-d79aed4ed994',
+    type: 'personnelTemplate',
+    personnelType: 'notarzt',
+    name: 'Notarzt',
+    image: {
         url: '/assets/notarzt-personnel.svg',
         height: 80,
         aspectRatio: 1,
     },
-    CanCaterFor.create(2, 2, 2, 'and'),
-    defaultOverrideTreatmentRange,
-    15
-);
+    canCaterFor: newCanCaterFor(2, 2, 2, 'and'),
+    overrideTreatmentRange: defaultOverrideTreatmentRange,
+    treatmentRange: 15,
+    abbreviation: 'NA',
+});
 
-const gfPersonnelTemplate = PersonnelTemplate.create(
-    'gf',
-    {
+const gfPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
+    id: '4f02b429-2f9e-42c3-b844-be760565cd31',
+    type: 'personnelTemplate',
+    personnelType: 'gf',
+    name: 'Gruppenführer',
+    image: {
         url: '/assets/gf-personnel.svg',
         height: 80,
         aspectRatio: 1,
     },
-    CanCaterFor.create(0, 0, 0, 'and'),
-    0,
-    0
-);
+    canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
+    overrideTreatmentRange: 0,
+    treatmentRange: 0,
+    abbreviation: 'GF',
+});
 
-export const defaultPersonnelTemplates: {
-    [key in PersonnelType]: PersonnelTemplate;
-} = {
+export const defaultPersonnelTemplates = {
     san: sanPersonnelTemplate,
     rettSan: rettSanPersonnelTemplate,
     notSan: notSanPersonnelTemplate,
     notarzt: notarztPersonnelTemplate,
     gf: gfPersonnelTemplate,
-};
+} as const;
+
+export const defaultPersonnelTemplatesById = Object.fromEntries(
+    Object.values(defaultPersonnelTemplates).map((template) => [
+        template.id,
+        template,
+    ])
+);

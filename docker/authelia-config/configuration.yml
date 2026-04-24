@@ -1,0 +1,101 @@
+authentication_backend:
+    password_reset:
+        disable: true
+    password_change:
+        disable: true
+    file:
+        path: '/config/users.yml'
+        watch: true
+storage:
+    encryption_key: 'this_is_not_a_secure_encryption_key'
+    local:
+        path: '/secrets/db.sqlite3'
+access_control:
+    default_policy: 'one_factor'
+session:
+    cookies:
+        - domain: 127.0.0.1
+          authelia_url: https://127.0.0.1:9091
+notifier:
+    filesystem:
+        filename: '/secrets/notification.txt'
+identity_providers:
+    oidc:
+        hmac_secret: 'this_is_a_secret_abc123abc123abc'
+        jwks:
+            - key: |
+                  -----BEGIN PRIVATE KEY-----
+                  MIIJQgIBADANBgkqhkiG9w0BAQEFAASCCSwwggkoAgEAAoICAQDFUDddo6s0myNX
+                  m0bvuRcsTEoJI+C7FGIlc1Tepcc79GFW7wD5QxRakt0y2rnIL41EBL8kdaNF+cWz
+                  szUbt5cZLkEMjWDpm6l6u7j9ewpy3DLqGVDYJAKeAsdJZwjiwuIclZu1a6c1uyg1
+                  5YHhRJt8gOS/F7uZMrSABYNQF+MyOr9Wpjp69woU0aKaue0WSUNWYmgL+KqqgrlH
+                  uRHYBhqD4lgZdlRFzdz0RyDuTBLiCqqVw8Pz7p2VRMCLJNzpzAOiQS5soSkYS6LI
+                  8+7sDsAt9vzWkeW4LXmNGJpUdMTrUy3IK8Ez43WT/MpG0uHaEleKIGCChOFU9Tsp
+                  5nxwyNjP2uXGIUyVSwpIf74TVwJpuuv3TaxAM/6z9w/RxdtQADScrj9GiOeOclBD
+                  /Xa+dw/gB0b+5mUh9HvF6BU58EUbfYdbUGwZ5WEbiUt9UPvcJLM756YsEPDpF1aC
+                  HtEuZ+DEifLrNSNWZpI4I0AJjfmAW/6ghJhJD/ZA5e/5b6GOv34HjXRlcqCeE+at
+                  R0Mczz2vLlMcotRp4/DicGSlbz0Lg2MQVOjEHzWuyvYQG90leV+eUYLa2thaF3vH
+                  BHxATuEHV45nI0IXfhzg7zhLfy0Zw71Ih4W59tJfkmPfegMl9qGEeFCvefiNBOuR
+                  mUL57RAAzrnAlY0hXwurrd0VQbBmkwIDAQABAoICAD6dJwSrFIBcHsoFN2yJQuZG
+                  y1O9M+qKHF8gCzWgS+olseIBdEClXcckRdeGe2AgXubPzsxGHGrvSSKuYtMJ3oQa
+                  HoBaOP/I6u5MtfaSXg12/R02rWX5f28fGJidfr9e8pv5ifD3WZd+bdM0opOWzvSi
+                  fnR5lomWApuBpFr9SZa998wKchJlZKiYoc4R5D+nPhwinDv4TEhRtXQiMZxoy29A
+                  m45w82s3Wb+W9sdIEtHyapGeDwfQl+cvax58szHqENkjcBT+y2ivT9gPOKlmQOwV
+                  LcT1hX19yM3Smd7lMzwuKCAWangJ3Vz54kK5Vvx5x5fIkHe6rTrlm0G/p4uu4MX9
+                  cq9mI99AGWLJGDqWjIASSw30yoQXfkwOawbZGymAGSB1LVYHK0EFPfEVIw3aVWfd
+                  pf1AQJ8+g4tVX3xi9iK2wJzrhBkM3+vYhAttLDillYeHhSG0VeFNLUlU71oQvCuG
+                  uGep0rjtnKudMtvNTRSw5ZLsxsT7zgdx4R1fGy42Xf4RC4LDvOF7Zf2OIfk0O+tD
+                  tWVeYifqoPVSP9dyadB80vMTdVLdFlSOwFNKvsLGfLqYIm46/JLb2NQOYzRNAhvH
+                  vc2YdoNVjnQ3mgCKKTH00BhKpaKqTjvVj5cH/sUXE5IkzcTBZfZvjGYnKLq/J2g6
+                  tKvxC5dTvDdmYb11X/ZxAoIBAQD71mrYhRqbVnolRujy3MgU4qRwUj/1AlX6LvG8
+                  YA8fAJVLV5n9mjSKVGu+Gop7QQnOHVFGK+69M5rXejc2AJ0qH4uOsw8QmqhiJ+66
+                  gkG1otgp71WiX4AEHVtmGo9TH6NTljoKYRV8ya0EPwtup5l1Ul0Oyg7S5NEaxYzW
+                  hB4eB+tUATH028UIIlzwFH9+f+BIfi+ZNU6K/TIxYPACNOYkjp+N3kpeHe8uCIRI
+                  eVicEgAcYOlY0XqSP8HzEk8LqwemaDkqV2QFk3VKgzVkB4m9GQxVHhY3LCrQtvLr
+                  yiIK5vZ3vJNzYSnTwE/PVjTpS2oiVeoD8+nMGfAzLOd8als5AoIBAQDIkxgptO+2
+                  eiAVE6wMr+iKlbKiW9lMfAi/jTd7WzEukqUXbQUaw/mnAKdac52ksM/CmYxDpT8X
+                  yNpwWcxNTDcqiLgCmxYeiKwKt7oMwtJ7MvDeVqYP8ByVVuJ5oZjKNJO3ZAk9C8Gn
+                  YPTcba9tCxkWSFywtcvQyBTdXVIeIvmtdehwIkTLmycojYmKh9qgVTuuXpTt23Gz
+                  dwf1+vwqT7CYT0cnd+cea7c6r/+SH9h4IB8HHpc5oyTK/v2bF48aruFgKHC8UOJr
+                  FczpgJWxESbtd9JAoq8vUm0WUo2OYpujC6WR/cqroLt+cAJQdN09vl4ZAoxoXhcS
+                  r2tpPnQeJ7QrAoIBACi3jibbvmWHIdCNGnTJxX+69SND6RtP+V6t4F+4mDlG+txn
+                  mXorSHtlEtZ1rBYpedBdZRqXV843Xb2hAPQ2PTLmTsYPpUvl9XuJQUvea4lWfuSo
+                  0YujLSt9I53qhWnHH70P+OpcsACxCsw49Tw61NDnNCyD9smaPUS60/6K9eOdHCtE
+                  1jLkpYKfK6+VYNevDTArVr7Ko5xNO6RILAXvT5ZxiNKDMjrtVBJ5RgoBtJXnQyVT
+                  debqV4r1zAHk3+rfCCmbiEKURpOwN7KIbEV0Ao0UU64fYzAgb/u22KfO0po4pXjO
+                  gHiTKRQXb8/x/DQMAWjzwxZIhXB+cRuVEwhGmeECggEBAMKHt2Wr8NogNEF85N8h
+                  NP5EFg7V2jkOC0YM5oSje13aKHhB6jN9YwKP5cAaZgi226m3Voy9FiYxTXqt/THy
+                  +4YrN5x/YcKXd5SlgLKjuZR3YZminEjU7kQBEoI5MoDa4XF6emNUpat6o8GuN/gg
+                  TWKJKCzTBSwnAeV4fw5viYys0JUBB4wZnK7+JynOfUIHqGyDmxnePbZ7eaMem7dF
+                  ttbh/PbQmb2tZvZqgArvC/nl3XIAP1dNXX/sM3daMBcHCdtDHaPnJtIJQMYvSf+D
+                  zSd/kNHTdukEnnyJ8HTqOly2DQ09AnXW3EHSzMvPrEwX+Bd1m0wWBXa/4AMg6Wnd
+                  xCUCggEAWHRaSUTgE8LJiPrX5MXRVhl7h8NURnE3wOq+M3+WkaWQv/ec9gubzwY8
+                  osEZhc89nU1GJEn53Nh4UjtAv+tjGUXJE9ajduc9rqiKQR4Mi2NSQNVY/0saJI6c
+                  sqB37XOXFx3Z8JvMBCsL0YWHckEi2MHjk+DjLigdAfW5dv+qcbTlArv3ATvb0sh8
+                  AEdh3MXDcHT2/Bz5j9SB2kgwZnGiuy3/0I9q0CgcZKKs+uQObdF9BI9iOnbIvGoI
+                  7VgAHlV7xHf0MdCzYiMF5Gl8/eJ9ECl0nW18M5ykrQVydz0G3viFrFoo6CA0tqLF
+                  DnBZNimVKsrhsAhNAA6pOezpjE9qjg==
+                  -----END PRIVATE KEY-----
+        enable_client_debug_messages: true
+        cors:
+            allowed_origins:
+                - 'http://localhost:4200'
+        clients:
+            - client_id: 'fuesim-digital'
+              client_name: 'FüSim Digital'
+              # ZMuRxjZ0AbSvKAtvWH85kOf1db2OmLoXzFw4UsZC~TcewXaiMExdGPVXv9qP4eNj3GG55Tky
+              client_secret: '$pbkdf2-sha512$310000$bB3bu5juXUfr6Y1MBfTEOw$uBKK4tJMXfS0S3mA5cdPMKimN1u9mhZdVvqhJcsAkg3XZrueVTW5m77mS0l6SyUM8EF.36qQ461rGwQkuxBGFQ'
+              public: false
+              redirect_uris:
+                  - 'http://localhost:3201/api/auth/oidc-callback'
+              authorization_policy: 'one_factor'
+              # https://www.authelia.com/integration/openid-connect/openid-connect-1.0-claims/#scope-definitions
+              scopes:
+                  - 'openid'
+                  - 'groups'
+                  - 'email'
+                  - 'profile'
+              grant_types:
+                  - 'refresh_token'
+                  - 'authorization_code'
+              token_endpoint_auth_method: 'client_secret_post'

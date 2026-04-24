@@ -5,10 +5,8 @@ import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Observable, Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
-import type { Element, UUID } from 'digital-fuesim-manv-shared';
+import type { Element, UUID } from 'fuesim-digital-shared';
 import type { FeatureLike } from 'ol/Feature';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
 import type Style from 'ol/style/Style';
 import type { FeatureManager } from '../utility/feature-manager';
 import type {
@@ -20,6 +18,8 @@ import type {
 import { MovementAnimator } from '../utility/movement-animator';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { TranslateInteraction } from '../utility/translate-interaction';
+import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { ElementManager } from './element-manager';
 
 /**
@@ -28,9 +28,9 @@ import { ElementManager } from './element-manager';
  * Automatically redraws a feature (= reevaluates its style function) when an element property has changed.
  */
 export abstract class MoveableFeatureManager<
-        ManagedElement extends PositionableElement,
-        FeatureType extends GeometryWithCoordinates = Point,
-    >
+    ManagedElement extends PositionableElement,
+    FeatureType extends GeometryWithCoordinates = Point,
+>
     extends ElementManager<ManagedElement, FeatureType>
     implements FeatureManager<FeatureType>
 {
@@ -41,7 +41,7 @@ export abstract class MoveableFeatureManager<
         private readonly proposeMovementAction: (
             newPosition: Positions<FeatureType>,
             element: ManagedElement
-        ) => void,
+        ) => Promise<{ success: boolean }>,
         protected readonly geometryHelper: GeometryHelper<
             FeatureType,
             ManagedElement
@@ -68,8 +68,20 @@ export abstract class MoveableFeatureManager<
         this.layer.getSource()!.addFeature(elementFeature);
         TranslateInteraction.onTranslateEnd<FeatureType>(
             elementFeature,
-            (newPosition) => {
-                this.proposeMovementAction(newPosition, element);
+            async (newPosition) => {
+                if (
+                    !(await this.proposeMovementAction(newPosition, element))
+                        .success
+                ) {
+                    // Roll back movement if it wasn't successful
+                    this.movementAnimator.animateFeatureMovement(
+                        elementFeature,
+                        this.geometryHelper.getElementCoordinates(
+                            this.getElementFromFeature(elementFeature)
+                        )
+                    );
+                    elementFeature.changed();
+                }
             },
             this.geometryHelper.getFeaturePosition
         );
@@ -136,7 +148,8 @@ export abstract class MoveableFeatureManager<
 
     public onFeatureClicked(
         event: MapBrowserEvent<any>,
-        feature: Feature<FeatureType>
+        feature: Feature<FeatureType>,
+        condition?: boolean
         // eslint-disable-next-line @typescript-eslint/no-empty-function
     ): void {}
 
@@ -146,7 +159,7 @@ export abstract class MoveableFeatureManager<
     public onFeatureDrop(
         droppedElement: Element,
         droppedOnFeature: Feature<FeatureType>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ): boolean {
         return false;
     }

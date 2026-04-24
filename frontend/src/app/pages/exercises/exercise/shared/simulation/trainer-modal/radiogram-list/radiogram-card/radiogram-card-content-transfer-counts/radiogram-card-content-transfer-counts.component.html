@@ -1,10 +1,15 @@
 <h5>Transportstatus</h5>
 
-<ng-container *appLet="radiogram$ | async as radiogram">
-    <p *ngIf="radiogram.scope === 'singleRegion'">Für diese Patientenablage.</p>
-    <p *ngIf="radiogram.scope === 'transportManagement'">
-        Für alle von dieser Transportorganisation verwalteten Patientenablagen.
-    </p>
+@if (radiogram$ | async; as radiogram) {
+    @if (radiogram.scope === 'singleRegion') {
+        <p>Für diese Patientenablage.</p>
+    }
+    @if (radiogram.scope === 'transportManagement') {
+        <p>
+            Für alle von dieser Transportorganisation verwalteten
+            Patientenablagen.
+        </p>
+    }
 
     <table class="table table-sm w-100">
         <thead>
@@ -15,26 +20,8 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let category of alwaysShowCategories">
-                <td>
-                    <app-patient-status-badge [status]="category" />
-                </td>
-                <td>
-                    {{ radiogram.transferredPatientsCounts[category] }}
-                </td>
-                <td>
-                    {{ radiogram.remainingPatientsCounts[category] }}
-                </td>
-            </tr>
-            <ng-container
-                *ngFor="let category of showIfTransferredOrRemainingCategories"
-            >
-                <tr
-                    *ngIf="
-                        radiogram.transferredPatientsCounts[category] > 0 ||
-                        radiogram.remainingPatientsCounts[category] > 0
-                    "
-                >
+            @for (category of alwaysShowCategories; track category) {
+                <tr>
                     <td>
                         <app-patient-status-badge [status]="category" />
                     </td>
@@ -45,20 +32,43 @@
                         {{ radiogram.remainingPatientsCounts[category] }}
                     </td>
                 </tr>
-            </ng-container>
-            <ng-container *ngFor="let category of showIfTransferredCategories">
-                <tr *ngIf="radiogram.transferredPatientsCounts[category] > 0">
-                    <td>
-                        <app-patient-status-badge [status]="category" />
-                    </td>
-                    <td>
-                        {{ radiogram.transferredPatientsCounts[category] }}
-                    </td>
-                    <td>
-                        {{ radiogram.remainingPatientsCounts[category] }}
-                    </td>
-                </tr>
-            </ng-container>
+            }
+            @for (
+                category of showIfTransferredOrRemainingCategories;
+                track category
+            ) {
+                @if (
+                    radiogram.transferredPatientsCounts[category] > 0 ||
+                    radiogram.remainingPatientsCounts[category] > 0
+                ) {
+                    <tr>
+                        <td>
+                            <app-patient-status-badge [status]="category" />
+                        </td>
+                        <td>
+                            {{ radiogram.transferredPatientsCounts[category] }}
+                        </td>
+                        <td>
+                            {{ radiogram.remainingPatientsCounts[category] }}
+                        </td>
+                    </tr>
+                }
+            }
+            @for (category of showIfTransferredCategories; track category) {
+                @if (radiogram.transferredPatientsCounts[category] > 0) {
+                    <tr>
+                        <td>
+                            <app-patient-status-badge [status]="category" />
+                        </td>
+                        <td>
+                            {{ radiogram.transferredPatientsCounts[category] }}
+                        </td>
+                        <td>
+                            {{ radiogram.remainingPatientsCounts[category] }}
+                        </td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
-</ng-container>
+}

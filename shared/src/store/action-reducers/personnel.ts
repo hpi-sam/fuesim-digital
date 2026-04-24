@@ -1,11 +1,14 @@
-import { Type } from 'class-transformer';
-import { IsUUID, ValidateNested } from 'class-validator';
-import { MapPosition, MapCoordinates } from '../../models/utils/index.js';
+import { IsUUID } from 'class-validator';
 import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
-import type { UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 
 export class MovePersonnelAction implements Action {
     @IsValue('[Personnel] Move personnel' as const)
@@ -14,8 +17,7 @@ export class MovePersonnelAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly personnelId!: UUID;
 
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -25,7 +27,7 @@ export namespace PersonnelActionReducers {
         reducer: (draftState, { personnelId, targetPosition }) => {
             changePositionWithId(
                 personnelId,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 'personnel',
                 draftState
             );

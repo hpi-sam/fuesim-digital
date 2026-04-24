@@ -1,4 +1,4 @@
-import type { AllowedValues } from '../../../utils/validators/index.js';
+import { z } from 'zod';
 
 /**
  * Defines the scope of the radiogram on the transfer progress.
@@ -6,9 +6,8 @@ import type { AllowedValues } from '../../../utils/validators/index.js';
  * * `transportManagement`: The information is about all simulated regions that are managed
  *   by the transport management behavior of the simulated region that sent the radiogram
  */
-export type Scope = 'singleRegion' | 'transportManagement';
-
-export const scopeAllowedValues: AllowedValues<Scope> = {
-    singleRegion: true,
-    transportManagement: true,
-};
+export const transferProgressScopeSchema = z.literal([
+    'singleRegion',
+    'transportManagement',
+]);
+export type TransferProgressScope = z.infer<typeof transferProgressScopeSchema>;

@@ -1,8 +1,4 @@
-import type {
-    PatientStatus,
-    PersonnelType,
-    Vehicle,
-} from 'digital-fuesim-manv-shared';
+import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 
 /**
  * The statistics for an area in the exercise (e.g. a viewport or the whole exercise).
@@ -16,17 +12,17 @@ export interface AreaStatistics {
     };
 
     /**
-     * The number of vehicles (inclusive in transfer) per type.
+     * The number of vehicles (inclusive in transfer) per vehicle template.
      */
     readonly vehicles: {
-        readonly [vehicleType: Vehicle['vehicleType']]: number | undefined;
+        readonly [key in UUID]: number;
     };
 
     /**
-     * The number of disembarked personnel that is not in transfer per personnelType.
+     * The number of disembarked personnel that is not in transfer per personnel template.
      */
     readonly personnel: {
-        readonly [personnelType in PersonnelType]?: number;
+        readonly [key in UUID]: number;
     };
 
     readonly numberOfActiveParticipants: number;

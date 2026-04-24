@@ -1,4 +1,4 @@
-<ng-container *ngIf="simulatedRegion$ | async as simulatedRegion">
+@if (simulatedRegion$ | async; as simulatedRegion) {
     <h5 class="popover-header">
         Simulierter Bereich {{ simulatedRegion.name }}
         <button
@@ -16,12 +16,21 @@
         >
             <i class="bi bi-box-arrow-up-right"></i>
         </a>
+        <a
+            (click)="openPreviewModal()"
+            role="button"
+            class="link-secondary float-end me-2"
+            placements="bottom"
+            ngbTooltip="Vorschau des Bereichs öffnen"
+        >
+            <i class="bi bi-eye-fill"></i>
+        </a>
     </h5>
     <div class="popover-body" style="width: 650px; height: 400px">
-        <ng-container *ngIf="(currentRole$ | async) === 'trainer'">
+        @if ((currentRole$ | async) === 'trainer') {
             <app-simulated-region-overview-general
                 [simulatedRegionId]="simulatedRegion.id"
             />
-        </ng-container>
+        }
     </div>
-</ng-container>
+}

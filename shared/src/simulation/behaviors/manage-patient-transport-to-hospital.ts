@@ -1,191 +1,156 @@
-import {
-    IsBoolean,
-    IsInt,
-    IsOptional,
-    IsString,
-    IsUUID,
-    Min,
-    ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import type {
-    PatientStatus,
-    PatientStatusForTransport,
-} from '../../models/utils/index.js';
-import {
-    PatientTransferOccupation,
-    currentSimulatedRegionOf,
-    getCreate,
-    isInSpecificSimulatedRegion,
-    patientStatusAllowedValues,
-} from '../../models/utils/index.js';
-import type { Mutable, UUID, UUIDSet } from '../../utils/index.js';
-import {
-    StrictObject,
-    cloneDeepMutable,
-    uuid,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import {
-    IsLiteralUnion,
-    IsUUIDSet,
-    IsValue,
-} from '../../utils/validators/index.js';
+import type { WritableDraft } from 'immer';
+import { z } from 'zod';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
 import {
-    DelayEventActivityState,
-    PublishRadiogramActivityState,
-    RecurringEventActivityState,
-    SendRemoteEventActivityState,
-} from '../activities/index.js';
+    patientsTransportPromiseSchema,
+    newPatientsTransportPromise,
+} from '../utils/patients-transported-promise.js';
+import { logLastPatientTransportedInMultipleSimulatedRegions } from '../../store/action-reducers/utils/log.js';
+import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
 import {
-    AskForPatientDataEvent,
-    PatientCategoryTransferToHospitalFinishedEvent,
-    TransferVehiclesRequestEvent,
-    TryToSendToHospitalEvent,
-} from '../events/index.js';
-import type { TransferCountsRadiogram } from '../../models/radiogram/index.js';
-import { RadiogramUnpublishedStatus } from '../../models/radiogram/index.js';
-import { IsPatientsPerUUID } from '../../utils/validators/is-patients-per-uuid.js';
-import { NewPatientDataRequestedRadiogram } from '../../models/radiogram/new-patient-data-requested-radiogram.js';
-import { CountPatientsActivityState } from '../activities/count-patients.js';
-import type { ExerciseState } from '../../state.js';
+    type PatientStatus,
+    type PatientStatusForTransport,
+    patientStatusForTransportSchema,
+    patientStatusSchema,
+} from '../../models/utils/patient-status.js';
 import {
     getActivityById,
     getElement,
     getElementByPredicate,
-} from '../../store/action-reducers/utils/index.js';
-import { PatientsTransportPromise } from '../utils/patients-transported-promise.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
-import { addResourceDescription } from '../../models/utils/resource-description.js';
+} from '../../store/action-reducers/utils/get-element.js';
+import {
+    currentSimulatedRegionOf,
+    isInSpecificSimulatedRegion,
+} from '../../models/utils/position/position-helpers.js';
+import { newSendRemoteEventActivityState } from '../activities/send-remote-event.js';
+import { newTransferVehiclesRequestEvent } from '../events/transfer-vehicles-request.js';
+import { newPatientTransferOccupation } from '../../models/utils/occupations/patient-transfer-occupation.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { newPatientCategoryTransferToHospitalFinishedEvent } from '../events/patient-category-transfer-to-hospital-finished.js';
+import { newCountPatientsActivityState } from '../activities/count-patients.js';
+import { newPublishRadiogramActivityState } from '../activities/publish-radiogram.js';
+import { newNewPatientDataRequestedRadiogram } from '../../models/radiogram/new-patient-data-requested-radiogram.js';
+import { newRadiogramUnpublishedStatus } from '../../models/radiogram/status/radiogram-unpublished-status.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import type { TransferCountsRadiogram } from '../../models/radiogram/transfer-counts-radiogram.js';
+import {
+    addResourceDescription,
+    type ResourceDescription,
+} from '../../models/utils/resource-description.js';
+import type { ExerciseState } from '../../state.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
-import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
-import { logLastPatientTransportedInMultipleSimulatedRegions } from '../../store/action-reducers/utils/log.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
-} from './simulation-behavior.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { newAskForPatientDataEvent } from '../events/ask-for-patient-data-event.js';
+import { newTryToSendToHospitalEvent } from '../events/try-to-send-to-hospital.js';
+import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
 
 interface PatientsPerRegion {
     [simulatedRegionId: UUID]: ResourceDescription<PatientStatus>;
 }
 
-class VehiclesForPatients {
-    @IsValue('vehiclesForPatients')
-    readonly type = 'vehiclesForPatients';
+const vehiclesForPatientsSchema = z.strictObject({
+    type: z.literal('vehiclesForPatients'),
+    red: z.array(z.string()),
+    redIndex: z.int().nonnegative(),
+    yellow: z.array(z.string()),
+    yellowIndex: z.int().nonnegative(),
+    green: z.array(z.string()),
+    greenIndex: z.int().nonnegative(),
+});
 
-    @IsString({ each: true })
-    readonly red: readonly string[] = ['RTW'];
+type VehiclesForPatients = z.infer<typeof vehiclesForPatientsSchema>;
 
-    @IsInt()
-    @Min(0)
-    readonly redIndex: number = 0;
-
-    @IsString({ each: true })
-    readonly yellow: readonly string[] = ['RTW'];
-
-    @IsInt()
-    @Min(0)
-    readonly yellowIndex: number = 0;
-
-    @IsString({ each: true })
-    readonly green: readonly string[] = ['RTW', 'KTW'];
-
-    @IsInt()
-    @Min(0)
-    readonly greenIndex: number = 0;
-
-    static readonly create = getCreate(this);
+function newVehiclesForPatients(): VehiclesForPatients {
+    return {
+        type: 'vehiclesForPatients',
+        red: ['RTW'],
+        redIndex: 0,
+        yellow: ['RTW'],
+        yellowIndex: 0,
+        green: ['RTW', 'KTW'],
+        greenIndex: 0,
+    };
 }
 
-export class ManagePatientTransportToHospitalBehaviorState
-    implements SimulationBehaviorState
-{
-    @IsValue('managePatientTransportToHospitalBehavior')
-    readonly type = 'managePatientTransportToHospitalBehavior';
+export const managePatientTransportToHospitalBehaviorStateSchema =
+    z.strictObject({
+        ...simulationBehaviorStateSchema.shape,
+        type: z.literal('managePatientTransportToHospitalBehavior'),
+        requestTargetId: uuidSchema.optional(),
+        simulatedRegionsToManage: z.record(uuidSchema, z.literal(true)),
+        /**
+         * Stores the amount of patients expected in some regions.
+         * Regions are NOT removed from this, if they are not managed anymore,
+         * as the behavior should still have its knowledge about how many patients
+         * are in this region. Therefore, to find the amount of patients in managed
+         * regions, one must filter this object to only contain keys that are also
+         * in {@link simulatedRegionsToManage}
+         */
+        patientsExpectedInRegions: z.record(
+            uuidSchema,
+            z.record(patientStatusSchema, z.int().nonnegative())
+        ),
+        patientsExpectedToStillBeTransportedByRegion: z.array(
+            patientsTransportPromiseSchema
+        ),
+        transferredPatientCounts: z.record(
+            patientStatusSchema,
+            z.int().nonnegative()
+        ),
+        vehiclesForPatients: vehiclesForPatientsSchema,
+        /**
+         * @deprecated Use {@link updateRequestVehiclesDelay} instead
+         */
+        requestVehiclesDelay: z.int().nonnegative(),
+        /**
+         * @deprecated Use {@link updateRequestPatientCountsDelay} instead
+         */
+        requestPatientCountsDelay: z.int().nonnegative(),
+        promiseInvalidationInterval: z.int().nonnegative(),
+        maximumCategoryToTransport: patientStatusForTransportSchema,
+        transportStarted: z.boolean(),
+        recurringPatientDataRequestActivityId: uuidSchema.optional(),
+        recurringSendToHospitalActivityId: uuidSchema.optional(),
+    });
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export type ManagePatientTransportToHospitalBehaviorState = z.infer<
+    typeof managePatientTransportToHospitalBehaviorStateSchema
+>;
 
-    @IsOptional()
-    @IsUUID(4, uuidValidationOptions)
-    public readonly requestTargetId?: UUID;
-
-    @IsUUIDSet()
-    public readonly simulatedRegionsToManage: UUIDSet = {};
-
-    /**
-     * Stores the amount of patients expected in some regions.
-     * Regions are NOT removed from this, if they are not managed anymore,
-     * as the behavior should still have its knowledge about how many patients
-     * are in this region. Therefore, to find the amount of patients in managed
-     * regions, one must filter this object to only contain keys that are also
-     * in {@link simulatedRegionsToManage}
-     */
-    @IsPatientsPerUUID()
-    public readonly patientsExpectedInRegions: PatientsPerRegion = {};
-
-    @Type(() => PatientsTransportPromise)
-    @ValidateNested()
-    public readonly patientsExpectedToStillBeTransportedByRegion: readonly PatientsTransportPromise[] =
-        [];
-
-    @IsResourceDescription(patientStatusAllowedValues)
-    public readonly transferredPatientCounts: ResourceDescription<PatientStatus> =
-        {
+export function newManagePatientTransportToHospitalBehaviorState(): ManagePatientTransportToHospitalBehaviorState {
+    return {
+        type: 'managePatientTransportToHospitalBehavior',
+        id: uuid(),
+        requestTargetId: undefined,
+        simulatedRegionsToManage: {},
+        patientsExpectedInRegions: {},
+        patientsExpectedToStillBeTransportedByRegion: [],
+        transferredPatientCounts: {
             red: 0,
             yellow: 0,
             green: 0,
             blue: 0,
             black: 0,
             white: 0,
-        };
-
-    @Type(() => VehiclesForPatients)
-    @ValidateNested()
-    public readonly vehiclesForPatients: VehiclesForPatients =
-        VehiclesForPatients.create();
-
-    /**
-     * @deprecated Use {@link updateRequestVehiclesDelay} instead
-     */
-    @IsInt()
-    @Min(0)
-    public readonly requestVehiclesDelay: number = 60 * 1000;
-
-    /**
-     * @deprecated Use {@link updateRequestPatientCountsDelay} instead
-     */
-    @IsInt()
-    @Min(0)
-    public readonly requestPatientCountsDelay: number = 15 * 60 * 1000;
-
-    @IsInt()
-    @Min(0)
-    public readonly promiseInvalidationInterval: number = 30 * 60 * 1000;
-
-    @IsLiteralUnion(patientStatusAllowedValues)
-    public readonly maximumCategoryToTransport: PatientStatusForTransport =
-        'red';
-
-    @IsBoolean()
-    public readonly transportStarted: boolean = false;
-
-    @IsOptional()
-    @IsUUID(4, uuidValidationOptions)
-    readonly recurringPatientDataRequestActivityId?: UUID;
-
-    @IsOptional()
-    @IsUUID(4, uuidValidationOptions)
-    readonly recurringSendToHospitalActivityId?: UUID;
-
-    static readonly create = getCreate(this);
+        },
+        vehiclesForPatients: newVehiclesForPatients(),
+        requestVehiclesDelay: 60 * 1000,
+        requestPatientCountsDelay: 15 * 60 * 1000,
+        promiseInvalidationInterval: 30 * 60 * 1000,
+        maximumCategoryToTransport: 'red',
+        transportStarted: false,
+        recurringPatientDataRequestActivityId: undefined,
+        recurringSendToHospitalActivityId: undefined,
+    };
 }
 
 export const managePatientTransportToHospitalBehavior: SimulationBehavior<ManagePatientTransportToHospitalBehaviorState> =
     {
-        behaviorState: ManagePatientTransportToHospitalBehaviorState,
+        behaviorStateSchema:
+            managePatientTransportToHospitalBehaviorStateSchema,
+        newBehaviorState: newManagePatientTransportToHospitalBehaviorState,
         handleEvent: (draftState, simulatedRegion, behaviorState, event) => {
             switch (event.type) {
                 case 'tickEvent': {
@@ -214,19 +179,20 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                         break;
                     }
 
-                    const patientsExpectedInRegions = Object.fromEntries(
-                        Object.entries(
-                            patientsExpectedInRegionsAfterTransports(
-                                draftState,
-                                behaviorState
+                    const patientsExpectedInRegions: PatientsPerRegion =
+                        Object.fromEntries(
+                            Object.entries(
+                                patientsExpectedInRegionsAfterTransports(
+                                    draftState,
+                                    behaviorState
+                                )
+                            ).filter(
+                                ([simulatedRegionId, _]) =>
+                                    behaviorState.simulatedRegionsToManage[
+                                        simulatedRegionId
+                                    ]
                             )
-                        ).filter(
-                            ([simulatedRegionId, _]) =>
-                                behaviorState.simulatedRegionsToManage[
-                                    simulatedRegionId
-                                ]
-                        )
-                    );
+                        );
 
                     const highestCategoryThatIsNeeded =
                         orderedPatientCategories.find((category) =>
@@ -273,16 +239,16 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                     if (vehicleType) {
                         addActivity(
                             simulatedRegion,
-                            SendRemoteEventActivityState.create(
+                            newSendRemoteEventActivityState(
                                 nextUUID(draftState),
                                 behaviorState.requestTargetId,
-                                TransferVehiclesRequestEvent.create(
+                                newTransferVehiclesRequestEvent(
                                     { [vehicleType]: 1 },
                                     'transferPoint',
                                     targetTransferPoint.id,
                                     simulatedRegion.id,
                                     undefined,
-                                    PatientTransferOccupation.create(
+                                    newPatientTransferOccupation(
                                         simulatedRegion.id
                                     )
                                 )
@@ -327,9 +293,9 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                         ) {
                             addActivity(
                                 simulatedRegion,
-                                DelayEventActivityState.create(
+                                newDelayEventActivityState(
                                     nextUUID(draftState),
-                                    PatientCategoryTransferToHospitalFinishedEvent.create(
+                                    newPatientCategoryTransferToHospitalFinishedEvent(
                                         event.patientCategory,
                                         false
                                     ),
@@ -362,9 +328,7 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                     ) {
                         addActivity(
                             simulatedRegion,
-                            CountPatientsActivityState.create(
-                                nextUUID(draftState)
-                            )
+                            newCountPatientsActivityState(nextUUID(draftState))
                         );
                     }
 
@@ -378,12 +342,12 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                     ) {
                         addActivity(
                             simulatedRegion,
-                            PublishRadiogramActivityState.create(
+                            newPublishRadiogramActivityState(
                                 nextUUID(draftState),
-                                NewPatientDataRequestedRadiogram.create(
+                                newNewPatientDataRequestedRadiogram(
                                     nextUUID(draftState),
                                     simulatedRegion.id,
-                                    RadiogramUnpublishedStatus.create()
+                                    newRadiogramUnpublishedStatus()
                                 )
                             )
                         );
@@ -410,10 +374,9 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                     const numberOfPatients = Object.entries(
                         event.vehiclesSent.vehicleCounts
                     ).reduce((sum, [type, count]) => {
-                        const vehicleTemplate =
-                            draftState.vehicleTemplates.find(
-                                (template) => template.vehicleType === type
-                            );
+                        const vehicleTemplate = Object.values(
+                            draftState.vehicleTemplates
+                        ).find((template) => template.vehicleType === type);
 
                         return (
                             sum +
@@ -423,7 +386,7 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
 
                     behaviorState.patientsExpectedToStillBeTransportedByRegion.push(
                         cloneDeepMutable(
-                            PatientsTransportPromise.create(
+                            newPatientsTransportPromise(
                                 draftState.currentTime,
                                 numberOfPatients,
                                 destinationSimulatedRegion.id
@@ -440,11 +403,12 @@ export const managePatientTransportToHospitalBehavior: SimulationBehavior<Manage
                                 simulatedRegion.id,
                                 event.generateReportActivityId,
                                 'generateReportActivity'
-                            ).radiogram as Mutable<TransferCountsRadiogram>;
+                            )
+                                .radiogram as WritableDraft<TransferCountsRadiogram>;
 
                             const expectedPatientsPerRegion =
                                 Object.fromEntries(
-                                    StrictObject.entries(
+                                    Object.entries(
                                         behaviorState.patientsExpectedInRegions
                                     ).filter(
                                         ([regionId]) =>
@@ -493,9 +457,9 @@ const orderedPatientCategories: PatientStatusForTransport[] = [
 ];
 
 export function updateRequestVehiclesDelay(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>,
     newDelay: number
 ) {
     behaviorState.requestVehiclesDelay = newDelay;
@@ -511,9 +475,9 @@ export function updateRequestVehiclesDelay(
 }
 
 export function updateRequestPatientCountsDelay(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>,
     newDelay: number
 ) {
     behaviorState.requestPatientCountsDelay = newDelay;
@@ -529,8 +493,8 @@ export function updateRequestPatientCountsDelay(
 }
 
 function patientsExpectedInRegionsAfterTransports(
-    draftState: Mutable<ExerciseState>,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>
+    draftState: WritableDraft<ExerciseState>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>
 ) {
     behaviorState.patientsExpectedToStillBeTransportedByRegion =
         behaviorState.patientsExpectedToStillBeTransportedByRegion.filter(
@@ -568,7 +532,7 @@ function patientsExpectedInRegionsAfterTransports(
 }
 
 function getNextVehicleForPatientStatus(
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>,
     patientStatus: PatientStatusForTransport
 ) {
     behaviorState.vehiclesForPatients[`${patientStatus}Index`]++;
@@ -585,18 +549,18 @@ function getNextVehicleForPatientStatus(
 }
 
 function addActivities(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>
 ) {
     if (!behaviorState.recurringPatientDataRequestActivityId) {
         behaviorState.recurringPatientDataRequestActivityId =
             nextUUID(draftState);
         addActivity(
             simulatedRegion,
-            RecurringEventActivityState.create(
+            newRecurringEventActivityState(
                 behaviorState.recurringPatientDataRequestActivityId,
-                AskForPatientDataEvent.create(behaviorState.id),
+                newAskForPatientDataEvent(behaviorState.id),
                 draftState.currentTime,
                 behaviorState.requestPatientCountsDelay
             )
@@ -607,9 +571,9 @@ function addActivities(
         behaviorState.recurringSendToHospitalActivityId = nextUUID(draftState);
         addActivity(
             simulatedRegion,
-            RecurringEventActivityState.create(
+            newRecurringEventActivityState(
                 behaviorState.recurringSendToHospitalActivityId,
-                TryToSendToHospitalEvent.create(behaviorState.id),
+                newTryToSendToHospitalEvent(behaviorState.id),
                 draftState.currentTime,
                 behaviorState.requestVehiclesDelay
             )
@@ -618,9 +582,9 @@ function addActivities(
 }
 
 function removeActivities(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<ManagePatientTransportToHospitalBehaviorState>
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<ManagePatientTransportToHospitalBehaviorState>
 ) {
     if (behaviorState.recurringPatientDataRequestActivityId) {
         terminateActivity(

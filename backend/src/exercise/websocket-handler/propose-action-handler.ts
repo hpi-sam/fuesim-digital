@@ -1,26 +1,30 @@
-import type { ExerciseAction } from 'digital-fuesim-manv-shared';
+import type { ExerciseAction } from 'fuesim-digital-shared';
 import {
     ReducerError,
     ExpectedReducerError,
     validateExerciseAction,
     validatePermissions,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { ExerciseServer, ExerciseSocket } from '../../exercise-server.js';
 import { clientMap } from '../client-map.js';
+import { ExerciseClientWrapper } from '../client-wrapper.js';
 import { secureOn } from './secure-on.js';
 
-export const registerProposeActionHandler = (
+export function registerProposeActionHandler(
     io: ExerciseServer,
     client: ExerciseSocket
-) => {
+) {
     secureOn(
         client,
         'proposeAction',
         (action: ExerciseAction, callback): void => {
             const clientWrapper = clientMap.get(client);
-            if (!clientWrapper) {
-                // There is no client. Skip.
-                console.error('Got an action from missing client');
+            if (!(clientWrapper instanceof ExerciseClientWrapper)) {
+                callback({
+                    success: false,
+                    message: 'No exercise selected',
+                    expected: false,
+                });
                 return;
             }
             // 1. validate json
@@ -34,8 +38,8 @@ export const registerProposeActionHandler = (
                 return;
             }
             // 2. Get matching exercise wrapper & client wrapper
-            const exerciseWrapper = clientWrapper.exercise;
-            if (!exerciseWrapper) {
+            const activeExercise = clientWrapper.exercise;
+            if (!activeExercise) {
                 callback({
                     success: false,
                     message: 'No exercise selected',
@@ -54,7 +58,7 @@ export const registerProposeActionHandler = (
             }
 
             const exerciseClient =
-                exerciseWrapper.getStateSnapshot().clients[
+                activeExercise.getStateSnapshot().clients[
                     clientWrapper.client.id
                 ];
             if (!exerciseClient) {
@@ -71,7 +75,7 @@ export const registerProposeActionHandler = (
                 !validatePermissions(
                     exerciseClient,
                     action,
-                    exerciseWrapper.getStateSnapshot()
+                    activeExercise.getStateSnapshot()
                 )
             ) {
                 callback({
@@ -83,7 +87,7 @@ export const registerProposeActionHandler = (
             }
             // 4. apply & broadcast action (+ save to timeline)
             try {
-                exerciseWrapper.applyAction(action, clientWrapper.client.id);
+                activeExercise.applyAction(action, clientWrapper.client.id);
             } catch (error: any) {
                 if (error instanceof ReducerError) {
                     if (error instanceof ExpectedReducerError) {
@@ -109,4 +113,4 @@ export const registerProposeActionHandler = (
             });
         }
     );
-};
+}

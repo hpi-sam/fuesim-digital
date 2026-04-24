@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://www.authelia.com/schemas/latest/json-schema/user-database.json
+# for creating passwords: docker run --rm -it authelia/authelia:latest authelia crypto hash generate argon2
+users:
+    demo1:
+        disabled: false
+        displayname: 'John Doe'
+        # password is "demo"
+        password: '$argon2id$v=19$m=65536,t=3,p=4$RrAj9JJ+i2YCeX9d0o7DZA$S1ZRmsjwTWa1zMz3bcpHjQ1ae31tJf0Mt1vu0UKQcFY'
+        email: 'john.doe@example.org'
+        groups:
+            - 'admins'
+            - 'users'
+    demo2:
+        disabled: false
+        displayname: 'Jane Roe'
+        # password is "demo"
+        password: '$argon2id$v=19$m=65536,t=3,p=4$RrAj9JJ+i2YCeX9d0o7DZA$S1ZRmsjwTWa1zMz3bcpHjQ1ae31tJf0Mt1vu0UKQcFY'
+        email: 'jane.roe@example.org'
+        groups:
+            - 'users'

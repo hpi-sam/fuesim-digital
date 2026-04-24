@@ -1,12 +1,13 @@
-import { Component, Input } from '@angular/core';
-import type { ExerciseRadiogram } from 'digital-fuesim-manv-shared';
+import { Component, input } from '@angular/core';
+import type { ExerciseRadiogram } from 'fuesim-digital-shared';
+import { HumanReadableRadiogramTypePipe } from '../../human-readable-radiogram-type.pipe';
 
 @Component({
     selector: 'app-radiogram-card-content-fallback',
     templateUrl: './radiogram-card-content-fallback.component.html',
     styleUrls: ['./radiogram-card-content-fallback.component.scss'],
-    standalone: false,
+    imports: [HumanReadableRadiogramTypePipe],
 })
 export class RadiogramCardContentFallbackComponent {
-    @Input() radiogramType!: ExerciseRadiogram['type'];
+    readonly radiogramType = input.required<ExerciseRadiogram['type']>();
 }

@@ -1,57 +1,53 @@
-import { IsOptional, IsUUID } from 'class-validator';
 import { groupBy } from 'lodash-es';
-import type {
-    MaterialCountRadiogram,
-    PersonnelCountRadiogram,
-    TransferConnectionsRadiogram,
-    VehicleCountRadiogram,
-} from '../../models/radiogram/index.js';
+import type { WritableDraft } from 'immer';
+import { z } from 'zod';
 import {
     getActivityById,
     getElement,
     getElementByPredicate,
-} from '../../store/action-reducers/utils/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
-import {
-    StrictObject,
-    uuid,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { LeaderChangedEvent } from '../events/leader-changed.js';
-import type { ExerciseState } from '../../state.js';
-import { nextUUID } from '../utils/randomness.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import type { PersonnelType } from '../../models/utils/personnel-type.js';
+} from '../../store/action-reducers/utils/get-element.js';
+import type { VehicleOccupationsRadiogram } from '../../models/radiogram/vehicle-occupations-radiogram.js';
 import {
     currentSimulatedRegionIdOf,
     isInSimulatedRegion,
     isInSpecificSimulatedRegion,
 } from '../../models/utils/position/position-helpers.js';
+import type { ExerciseState } from '../../state.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
+import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import { addActivity } from '../activities/utils.js';
-import { DelayEventActivityState } from '../activities/delay-event.js';
-import { VehicleOccupationsRadiogram } from '../../models/radiogram/vehicle-occupations-radiogram.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { nextUUID } from '../utils/randomness.js';
+import { newLeaderChangedEvent } from '../events/leader-changed.js';
+import type { MaterialCountRadiogram } from '../../models/radiogram/material-count-radiogram.js';
+import type { PersonnelCountRadiogram } from '../../models/radiogram/personnel-count-radiogram.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import type { TransferConnectionsRadiogram } from '../../models/radiogram/transfer-connections-radiogram.js';
+import type { VehicleCountRadiogram } from '../../models/radiogram/vehicle-count-radiogram.js';
+import {
+    type SimulationBehavior,
+    simulationBehaviorStateSchema,
 } from './simulation-behavior.js';
 
-export class AssignLeaderBehaviorState implements SimulationBehaviorState {
-    @IsValue('assignLeaderBehavior' as const)
-    readonly type = 'assignLeaderBehavior';
+export const assignLeaderBehaviorStateSchema = z.strictObject({
+    ...simulationBehaviorStateSchema.shape,
+    type: z.literal('assignLeaderBehavior'),
+    leaderId: uuidSchema.optional(),
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export type AssignLeaderBehaviorState = z.infer<
+    typeof assignLeaderBehaviorStateSchema
+>;
 
-    @IsOptional()
-    @IsUUID(4, uuidValidationOptions)
-    public readonly leaderId: UUID | undefined;
-
-    static readonly create = getCreate(this);
+export function newAssignLeaderBehaviorState(): AssignLeaderBehaviorState {
+    return {
+        type: 'assignLeaderBehavior',
+        id: uuid(),
+        leaderId: undefined,
+    };
 }
 
-const personnelPriorities: { [Key in PersonnelType]: number } = {
+const personnelPriorities: { [key in string]: number } = {
     notarzt: 0,
     san: 1,
     rettSan: 2,
@@ -61,7 +57,8 @@ const personnelPriorities: { [Key in PersonnelType]: number } = {
 
 export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState> =
     {
-        behaviorState: AssignLeaderBehaviorState,
+        behaviorStateSchema: assignLeaderBehaviorStateSchema,
+        newBehaviorState: newAssignLeaderBehaviorState,
         handleEvent(draftState, simulatedRegion, behaviorState, event) {
             switch (event.type) {
                 case 'personnelAvailableEvent':
@@ -141,7 +138,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                         event.generateReportActivityId,
                                         'generateReportActivity'
                                     )
-                                        .radiogram as Mutable<MaterialCountRadiogram>;
+                                        .radiogram as WritableDraft<MaterialCountRadiogram>;
                                     const materials = Object.values(
                                         draftState.materials
                                     ).filter((material) =>
@@ -183,9 +180,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                         event.generateReportActivityId,
                                         'generateReportActivity'
                                     )
-                                        .radiogram as Mutable<PersonnelCountRadiogram>;
-                                    const personnelCount =
-                                        radiogram.personnelCount;
+                                        .radiogram as WritableDraft<PersonnelCountRadiogram>;
                                     const personnel = Object.values(
                                         draftState.personnel
                                     ).filter((person) =>
@@ -196,20 +191,17 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     );
                                     const groupedPersonnel = groupBy(
                                         personnel,
-                                        (person) => person.personnelType
+                                        (person) => person.templateId
                                     );
-                                    personnelCount.gf =
-                                        groupedPersonnel['gf']?.length ?? 0;
-                                    personnelCount.notSan =
-                                        groupedPersonnel['notSan']?.length ?? 0;
-                                    personnelCount.notarzt =
-                                        groupedPersonnel['notarzt']?.length ??
-                                        0;
-                                    personnelCount.rettSan =
-                                        groupedPersonnel['rettSan']?.length ??
-                                        0;
-                                    personnelCount.san =
-                                        groupedPersonnel['san']?.length ?? 0;
+                                    radiogram.personnelCount =
+                                        Object.fromEntries(
+                                            Object.entries(
+                                                groupedPersonnel
+                                            ).map(([key, value]) => [
+                                                key,
+                                                value.length,
+                                            ])
+                                        ) as ResourceDescription;
 
                                     radiogram.informationAvailable = true;
                                 }
@@ -221,7 +213,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     event.generateReportActivityId,
                                     'generateReportActivity'
                                 )
-                                    .radiogram as Mutable<TransferConnectionsRadiogram>;
+                                    .radiogram as WritableDraft<TransferConnectionsRadiogram>;
 
                                 const ownTransferPoint = getElementByPredicate(
                                     draftState,
@@ -235,7 +227,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
 
                                 const connectedSimulatedRegions =
                                     Object.fromEntries(
-                                        StrictObject.entries(
+                                        Object.entries(
                                             ownTransferPoint.reachableTransferPoints
                                         )
                                             .map(
@@ -276,7 +268,8 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     simulatedRegion.id,
                                     event.generateReportActivityId,
                                     'generateReportActivity'
-                                ).radiogram as Mutable<VehicleCountRadiogram>;
+                                )
+                                    .radiogram as WritableDraft<VehicleCountRadiogram>;
                                 const vehicles = Object.values(
                                     draftState.vehicles
                                 ).filter((vehicle) =>
@@ -290,7 +283,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     (vehicle) => vehicle.vehicleType
                                 );
                                 radiogram.vehicleCount = Object.fromEntries(
-                                    StrictObject.entries(groupedVehicles).map(
+                                    Object.entries(groupedVehicles).map(
                                         ([vehicleType, vehicleGroup]) => [
                                             vehicleType,
                                             vehicleGroup.length,
@@ -308,7 +301,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     event.generateReportActivityId,
                                     'generateReportActivity'
                                 )
-                                    .radiogram as Mutable<VehicleOccupationsRadiogram>;
+                                    .radiogram as WritableDraft<VehicleOccupationsRadiogram>;
                                 const vehicles = Object.values(
                                     draftState.vehicles
                                 ).filter((vehicle) =>
@@ -322,7 +315,7 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
                                     (vehicle) => vehicle.occupation.type
                                 );
                                 radiogram.occupations = Object.fromEntries(
-                                    StrictObject.entries(groupedVehicles).map(
+                                    Object.entries(groupedVehicles).map(
                                         ([occupationType, vehicleGroup]) => [
                                             occupationType,
                                             vehicleGroup.length,
@@ -345,9 +338,9 @@ export const assignLeaderBehavior: SimulationBehavior<AssignLeaderBehaviorState>
     };
 
 function selectNewLeader(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<AssignLeaderBehaviorState>,
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<AssignLeaderBehaviorState>,
     changeLeaderIfNoLeaderSelected: boolean
 ) {
     const personnel = Object.values(draftState.personnel).filter(
@@ -365,23 +358,23 @@ function selectNewLeader(
 
     personnel.sort(
         (a, b) =>
-            personnelPriorities[b.personnelType] -
-            personnelPriorities[a.personnelType]
+            (personnelPriorities[b.personnelType] ?? -1) -
+            (personnelPriorities[a.personnelType] ?? -1)
     );
     changeLeader(draftState, simulatedRegion, behaviorState, personnel[0]?.id);
 }
 
 function changeLeader(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<AssignLeaderBehaviorState>,
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<AssignLeaderBehaviorState>,
     newLeaderId: UUID | undefined
 ) {
     addActivity(
         simulatedRegion,
-        DelayEventActivityState.create(
+        newDelayEventActivityState(
             nextUUID(draftState),
-            LeaderChangedEvent.create(
+            newLeaderChangedEvent(
                 behaviorState.leaderId ?? null,
                 newLeaderId ?? null
             ),

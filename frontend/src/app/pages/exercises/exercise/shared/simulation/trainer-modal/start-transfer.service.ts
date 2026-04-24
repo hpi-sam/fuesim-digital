@@ -4,7 +4,7 @@ import type {
     TransferPoint,
     UUIDSet,
     Vehicle,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 
 export interface TransferOptions {
@@ -13,7 +13,9 @@ export interface TransferOptions {
     transferDestination?: Hospital | TransferPoint;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class StartTransferService {
     public readonly transferOptions = new Subject<TransferOptions>();
 

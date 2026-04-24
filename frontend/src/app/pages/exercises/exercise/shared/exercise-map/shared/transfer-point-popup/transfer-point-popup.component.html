@@ -1,4 +1,4 @@
-<ng-container *ngIf="transferPoint$ | async as transferPoint">
+@if (transferPoint$ | async; as transferPoint) {
     <h5 class="popover-header">
         {{ transferPoint.externalName }}
         <button
@@ -20,7 +20,10 @@
                 <a ngbNavLink data-cy="transferPointPopupNamesNav">Namen</a>
                 <ng-template ngbNavContent>
                     <div class="form-group pb-3">
-                        <label class="form-label">Interner Name</label>
+                        <label class="form-label mb-0">Interner Name</label>
+                        <p class="small text-muted mb-1">
+                            Dieser Name wird auf der Karte angezeigt.
+                        </p>
                         <input
                             #internalNameInput="ngModel"
                             [ngModel]="transferPoint.internalName"
@@ -41,7 +44,10 @@
                     </div>
 
                     <div class="form-group pb-3">
-                        <label class="form-label">Externer Name</label>
+                        <label class="form-label mb-0">Externer Name</label>
+                        <p class="small text-muted mb-1">
+                            Dieser Name wird anderen Transferpunkten angezeigt.
+                        </p>
                         <input
                             #externalNameInput="ngModel"
                             [ngModel]="transferPoint.externalName"
@@ -95,4 +101,4 @@
             style="min-height: 0"
         ></div>
     </div>
-</ng-container>
+}

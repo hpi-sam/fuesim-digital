@@ -1,15 +1,13 @@
-<ng-container *ngIf="startPoint.type === 'alarmGroupStartPoint'">
-    <ng-container
-        *ngIf="
-            alarmGroupName$ | async as alarmGroupName;
-            else alarmGroupDeleted
-        "
-    >
+@let startPoint = this.startPoint();
+@if (startPoint.type === 'alarmGroupStartPoint') {
+    @if (alarmGroupName$ | async; as alarmGroupName) {
         {{ alarmGroupName }}
-    </ng-container>
-    <ng-template #alarmGroupDeleted>Gelöschte Alarmgruppe</ng-template>
-</ng-container>
-<app-transfer-point-name
-    *ngIf="startPoint.type === 'transferStartPoint'"
-    [transferPointId]="startPoint.transferPointId"
-></app-transfer-point-name>
+    } @else {
+        Gelöschte Alarmgruppe
+    }
+}
+@if (startPoint.type === 'transferStartPoint') {
+    <app-transfer-point-name
+        [transferPointId]="startPoint.transferPointId"
+    ></app-transfer-point-name>
+}

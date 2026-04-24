@@ -16,17 +16,21 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let row of sortedRows$ | async">
-            <td>{{ row.patientIdentifier }}</td>
-            <td>{{ row.patientStatus }}</td>
-            <td>{{ row.vehicleType }}</td>
-            <td>{{ row.departureTime | formatDuration }}</td>
-            <td>{{ row.arrivalTime | formatDuration }}</td>
-            <td>{{ row.hospitalName }}</td>
-        </tr>
+        @for (row of sortedRows$ | async; track row) {
+            <tr>
+                <td>{{ row.patientIdentifier }}</td>
+                <td>{{ row.patientStatus }}</td>
+                <td>{{ row.vehicleType }}</td>
+                <td>{{ row.departureTime | formatDuration }}</td>
+                <td>{{ row.arrivalTime | formatDuration }}</td>
+                <td>{{ row.hospitalName }}</td>
+            </tr>
+        }
     </tbody>
 </table>
 
-<div *ngIf="!(sortedRows$ | async)?.length" class="text-muted">
-    Es wurden noch keine Patienten an Krankenhäuser transportiert.
-</div>
+@if (!(sortedRows$ | async)?.length) {
+    <div class="text-muted">
+        Es wurden noch keine Patienten an Krankenhäuser transportiert.
+    </div>
+}

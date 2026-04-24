@@ -1,24 +1,25 @@
-import type { SimulatedRegion, Vehicle } from '../../models/index.js';
-import { createVehicleActionTag } from '../../models/utils/tag-helpers.js';
+import type { WritableDraft } from 'immer';
+import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
+import type { ExerciseState } from '../../state.js';
+import { logVehicle } from '../../store/action-reducers/utils/log.js';
+import { sendSimulationEvent } from '../events/utils.js';
+import type { SimulatedRegion } from '../../models/simulated-region.js';
+import type { Vehicle } from '../../models/vehicle.js';
 import {
     isInSpecificSimulatedRegion,
     isInSpecificVehicle,
-    SimulatedRegionPosition,
-} from '../../models/utils/index.js';
-import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
-import type { ExerciseState } from '../../state.js';
-import { getElement } from '../../store/action-reducers/utils/index.js';
-import { logVehicle } from '../../store/action-reducers/utils/log.js';
-import type { Mutable } from '../../utils/index.js';
-import { NewPatientEvent } from '../events/index.js';
-import { MaterialAvailableEvent } from '../events/material-available.js';
-import { PersonnelAvailableEvent } from '../events/personnel-available.js';
-import { sendSimulationEvent } from '../events/utils.js';
+} from '../../models/utils/position/position-helpers.js';
+import { createVehicleActionTag } from '../../models/utils/tag-helpers.js';
+import { getElement } from '../../store/action-reducers/utils/get-element.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { newMaterialAvailableEvent } from '../events/material-available.js';
+import { newPersonnelAvailableEvent } from '../events/personnel-available.js';
+import { newNewPatientEvent } from '../events/new-patient.js';
 
 export function unloadVehicle(
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    vehicle: Mutable<Vehicle>
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    vehicle: WritableDraft<Vehicle>
 ) {
     if (!isInSpecificSimulatedRegion(vehicle, simulatedRegion.id)) {
         console.error(
@@ -46,7 +47,7 @@ export function unloadVehicle(
             if (isInSpecificVehicle(element, vehicle.id)) {
                 changePositionWithId(
                     elementId,
-                    SimulatedRegionPosition.create(simulatedRegion.id),
+                    newSimulatedRegionPositionIn(simulatedRegion.id),
                     elementType,
                     draftState
                 );
@@ -55,19 +56,19 @@ export function unloadVehicle(
                     case 'material':
                         sendSimulationEvent(
                             simulatedRegion,
-                            MaterialAvailableEvent.create(element.id)
+                            newMaterialAvailableEvent(element.id)
                         );
                         break;
                     case 'personnel':
                         sendSimulationEvent(
                             simulatedRegion,
-                            PersonnelAvailableEvent.create(element.id)
+                            newPersonnelAvailableEvent(element.id)
                         );
                         break;
                     case 'patient':
                         sendSimulationEvent(
                             simulatedRegion,
-                            NewPatientEvent.create(element.id)
+                            newNewPatientEvent(element.id)
                         );
                         break;
                 }

@@ -17,7 +17,7 @@ export const rgbColorPalette = {
     grey: 'rgb(173, 181, 189)',
     black: 'rgb(33, 37, 41)',
     white: 'rgb(248, 249, 250)',
-};
+} as const;
 
 /**
  * @param color
@@ -31,15 +31,4 @@ export function getRgbaColor(
     return rgbColorPalette[color]
         .replace('rgb', 'rgba')
         .replace(')', `, ${alpha})`);
-}
-
-/**
- *
- * @returns a random color with the provided alpha value like `rgba(23, 12, 252, 0.75)`
- */
-export function generateRandomRgbaColor(alpha: number): string {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }

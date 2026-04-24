@@ -3,8 +3,8 @@ import { ClientActionReducers } from './client.js';
 import { ExerciseActionReducers } from './exercise.js';
 import { ConfigurationActionReducers } from './configuration.js';
 import { HospitalActionReducers } from './hospital.js';
-import { MapImageTemplatesActionReducers } from './map-image-templates.js';
-import { MapImagesActionReducers } from './map-images.js';
+import { MapImageTemplatesActionReducers } from './map-image-template.js';
+import { MapImagesActionReducers } from './map-image.js';
 import { MaterialActionReducers } from './material.js';
 import { PatientActionReducers } from './patient.js';
 import { PersonnelActionReducers } from './personnel.js';
@@ -17,6 +17,9 @@ import { SimulatedRegionActionReducers } from './simulated-region.js';
 import { SimulationActionReducers } from './simulation.js';
 import { RadiogramActionReducers } from './radiogram.js';
 import { VehicleTemplateActionReducers } from './vehicle-templates.js';
+import { RestrictedZoneActionReducers } from './restricted-zone.js';
+import { OperationalSectionActionReducers } from './operational-section.js';
+import { ScoutableActionReducers } from './scoutable.js';
 
 /**
  * All action reducers of the exercise must be registered here
@@ -41,6 +44,9 @@ const actionReducers = {
     ...SimulationActionReducers,
     ...RadiogramActionReducers,
     ...VehicleTemplateActionReducers,
+    ...RestrictedZoneActionReducers,
+    ...OperationalSectionActionReducers,
+    ...ScoutableActionReducers,
 };
 
 type ExerciseActionReducer =

@@ -1,0 +1,21 @@
+@use './_variables.scss' as vars;
+
+.operational-sections-stack {
+    gap: vars.$tabContainerPadding;
+    padding: vars.$tabContainerPadding;
+}
+
+.section-gap {
+    gap: vars.$tabContainerPadding;
+    flex: 1 1 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.fixed-panel-width {
+    width: vars.$containerWidth;
+}
+
+.border-dashed-style {
+    border-style: dashed;
+}

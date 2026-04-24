@@ -1,4 +1,4 @@
-import { stringCompare } from 'digital-fuesim-manv-shared';
+import { stringCompare } from 'fuesim-digital-shared';
 import { hashString } from './hash-string';
 
 /**

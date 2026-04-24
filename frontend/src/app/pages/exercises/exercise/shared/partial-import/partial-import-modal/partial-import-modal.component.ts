@@ -1,23 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import type { PartialExport } from 'digital-fuesim-manv-shared';
-import { preparePartialExportForImport } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { MessageService } from 'src/app/core/messages/message.service';
+import type { PartialExport } from 'fuesim-digital-shared';
+import { preparePartialExportForImport } from 'fuesim-digital-shared';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import { MessageService } from '../../../../../../core/messages/message.service';
+import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
 
 @Component({
     selector: 'app-partial-import-modal',
     templateUrl: './partial-import-modal.component.html',
     styleUrls: ['./partial-import-modal.component.scss'],
-    standalone: false,
+    imports: [AutofocusDirective],
 })
 export class PartialImportModalComponent {
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly messageService = inject(MessageService);
+    private readonly exerciseService = inject(ExerciseService);
+
     public importingPartialExport = false;
-    constructor(
-        private readonly activeModal: NgbActiveModal,
-        private readonly messageService: MessageService,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public partialExport!: PartialExport;
 

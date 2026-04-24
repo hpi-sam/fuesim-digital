@@ -2,11 +2,22 @@
 
 <p>Aktuell verfügbares Personal:</p>
 
-<table *ngIf="radiogram$ | async as radiogram" class="table table-sm">
-    <tbody>
-        <tr *ngFor="let personnelCategory of personnelCategories">
-            <td>{{ personnelCategory | personnelName }}</td>
-            <td>{{ radiogram.personnelCount[personnelCategory] }}</td>
-        </tr>
-    </tbody>
-</table>
+@if (radiogram$ | async; as radiogram) {
+    <table class="table table-sm">
+        <tbody>
+            @for (
+                personnelTemplate of personnelTemplates$ | async | values;
+                track personnelTemplate.id
+            ) {
+                @if (radiogram.personnelCount[personnelTemplate.id]) {
+                    <tr>
+                        <td>{{ personnelTemplate.name }}</td>
+                        <td>
+                            {{ radiogram.personnelCount[personnelTemplate.id] }}
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}

@@ -9,18 +9,25 @@ import type {
     UUID,
     Vehicle,
     WithPosition,
-} from 'digital-fuesim-manv-shared';
+    RestrictedZone,
+    Viewport,
+} from 'fuesim-digital-shared';
 import {
+    newMapCoordinatesAt,
     currentCoordinatesOf,
     isOnMap,
-    Viewport,
-} from 'digital-fuesim-manv-shared';
+    isInViewport,
+    isElementGenericScoutable,
+} from 'fuesim-digital-shared';
+
 import { pickBy } from 'lodash-es';
-import type { CateringLine } from 'src/app/shared/types/catering-line';
 import type { AppState } from '../../app.state';
+import type { CateringLine } from '../../../shared/types/catering-line';
+import type { ScoutableIndicator } from '../../../shared/types/scoutable-indicator';
 import { selectOwnClientId } from './application.selectors';
 import {
     selectClients,
+    selectRestrictedZones,
     selectMapImages,
     selectMaterials,
     selectPatients,
@@ -29,6 +36,8 @@ import {
     selectTransferPoints,
     selectVehicles,
     selectViewports,
+    selectScoutables,
+    scoutableElementSelectors,
 } from './exercise.selectors';
 
 /**
@@ -46,12 +55,12 @@ export const selectOwnClient = createSelector(
  */
 export const selectCurrentRole = createSelector(
     selectOwnClient,
-    (ownClient) => ownClient!.role
+    (ownClient) => ownClient?.role
 );
 
 export const selectCurrentMainRole = createSelector(
     selectCurrentRole,
-    (currentRole) => currentRole.mainRole
+    (currentRole) => currentRole?.mainRole
 );
 
 export const selectRestrictedViewport = createSelector(
@@ -73,10 +82,10 @@ function selectVisibleElementsFactory<
     },
 >(
     selectElements: (state: AppState) => Elements,
-    isInViewport: (element: Element, viewport: Viewport) => boolean = (
+    isInViewportHelper: (element: Element, viewport: Viewport) => boolean = (
         element,
         viewport
-    ) => Viewport.isInViewport(viewport, currentCoordinatesOf(element))
+    ) => isInViewport(viewport, currentCoordinatesOf(element))
 ) {
     return createSelector(
         selectRestrictedViewport,
@@ -89,7 +98,7 @@ function selectVisibleElementsFactory<
                     isOnMap(element) &&
                     // No viewport restriction
                     (!restrictedViewport ||
-                        isInViewport(element, restrictedViewport))
+                        isInViewportHelper(element, restrictedViewport))
             )
     );
 }
@@ -117,6 +126,8 @@ export const selectVisibleTransferPoints =
     selectVisibleElementsFactory<TransferPoint>(selectTransferPoints);
 export const selectVisibleSimulatedRegions =
     selectVisibleElementsFactory<SimulatedRegion>(selectSimulatedRegions);
+export const selectVisibleRestrictedZones =
+    selectVisibleElementsFactory<RestrictedZone>(selectRestrictedZones);
 
 export const selectVisibleCateringLines = createSelector(
     selectRestrictedViewport,
@@ -147,13 +158,74 @@ export const selectVisibleCateringLines = createSelector(
             .filter(
                 ({ catererPosition, patientPosition }) =>
                     !viewport ||
-                    Viewport.isInViewport(viewport, catererPosition) ||
-                    Viewport.isInViewport(viewport, patientPosition)
+                    isInViewport(viewport, catererPosition) ||
+                    isInViewport(viewport, patientPosition)
             )
             .reduce<{ [id: `${UUID}:${UUID}`]: CateringLine }>(
                 (cateringLinesObject, cateringLine) => {
                     cateringLinesObject[cateringLine.id] = cateringLine;
                     return cateringLinesObject;
+                },
+                {}
+            )
+);
+
+export const selectVisibleScoutableIndicators = createSelector(
+    selectCurrentMainRole,
+    selectScoutables,
+    selectRestrictedViewport,
+    ...scoutableElementSelectors,
+    (currentRole, scoutables, viewport, ...elementSelectors) =>
+        elementSelectors
+            .flatMap((selector) =>
+                Object.values(selector)
+                    .filter(
+                        (element) =>
+                            isOnMap(element) &&
+                            element.scoutableId !== null &&
+                            // Hide the indicator for map images that already have the generic scoutable icon as image
+                            !isElementGenericScoutable(element)
+                    )
+                    .map((element): ScoutableIndicator => {
+                        const scoutable = scoutables[element.scoutableId!]!;
+                        const elementPos = currentCoordinatesOf(element);
+
+                        let offset;
+                        if (element.type === 'patient') {
+                            offset = newMapCoordinatesAt(1.5, 2);
+                        } else {
+                            offset = newMapCoordinatesAt(0, 0);
+                        }
+
+                        const height = Math.max(50, element.image.height / 10);
+                        const indicatorPos = newMapCoordinatesAt(
+                            elementPos.x + offset.x,
+                            elementPos.y + offset.y
+                        );
+                        return {
+                            id: `${scoutable.id}:${element.id}`,
+                            position: indicatorPos,
+                            scoutableElementType: element.type,
+                            scoutableElementId: element.id,
+                            isVisibleForParticipants:
+                                scoutable.isVisibleForParticipants,
+                            height,
+                        };
+                    })
+            )
+            /* for performance, we dont select indicators out of view. */
+            .filter(
+                (scoutableIndicator) =>
+                    (!viewport ||
+                        isInViewport(viewport, scoutableIndicator.position)) &&
+                    (scoutableIndicator.isVisibleForParticipants ||
+                        currentRole === 'trainer')
+            )
+            .reduce<{ [id: `${UUID}:${UUID}`]: ScoutableIndicator }>(
+                (scoutableIndicatorsObject, scoutableIndicator) => {
+                    scoutableIndicatorsObject[scoutableIndicator.id] =
+                        scoutableIndicator;
+                    return scoutableIndicatorsObject;
                 },
                 {}
             )

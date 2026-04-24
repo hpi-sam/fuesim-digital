@@ -1,4 +1,4 @@
-<ng-container *ngIf="behaviorState$ | async as behaviorState">
+@if (behaviorState$ | async; as behaviorState) {
     <div ngbDropdown placement="bottom-start">
         <button
             type="button"
@@ -11,14 +11,15 @@
             />
         </button>
         <div ngbDropdownMenu class="position-absolute" style="min-width: 100px">
-            <button
-                *ngFor="let category of patientStatusForTransport"
-                ngbDropdownItem
-                (click)="updateMaximumCategoryToTransport(category)"
-                class="btn-outline-secondary"
-            >
-                <app-patient-status-badge [status]="category" />
-            </button>
+            @for (category of patientStatusForTransport; track category) {
+                <button
+                    ngbDropdownItem
+                    (click)="updateMaximumCategoryToTransport(category)"
+                    class="btn-outline-secondary"
+                >
+                    <app-patient-status-badge [status]="category" />
+                </button>
+            }
         </div>
     </div>
-</ng-container>
+}

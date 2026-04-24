@@ -1,5 +1,5 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import type { MemoizedSelector } from '@ngrx/store';
 import { Store, createSelector } from '@ngrx/store';
 import type {
@@ -10,30 +10,46 @@ import type {
     UUIDSet,
     Vehicle,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     cloneDeepMutable,
     isInSpecificVehicle,
     isInSpecificSimulatedRegion,
     Patient,
-} from 'digital-fuesim-manv-shared';
+    getPatientVisibleStatus,
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { FormsModule } from '@angular/forms';
 import {
-    createSelectActivityStatesByType,
-    createSelectBehaviorState,
-    createSelectElementsInSimulatedRegion,
-    selectConfiguration,
-    selectCurrentTime,
-    selectHospitals,
-    selectPatients,
-    selectTransferPoints,
-    selectVehicles,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { comparePatientsByVisibleStatus } from '../../../compare-patients';
 import type { TransferOptions } from '../../../../start-transfer.service';
+import { ExerciseService } from '../../../../../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../../../../../state/app.state';
+import {
+    createSelectBehaviorState,
+    selectVehicles,
+    selectHospitals,
+    selectTransferPoints,
+    createSelectActivityStatesByType,
+    selectCurrentTime,
+    createSelectElementsInSimulatedRegion,
+    selectPatients,
+    selectConfiguration,
+} from '../../../../../../../../../../state/application/selectors/exercise.selectors';
+import { AppSaveOnTypingDirective } from '../../../../../../../../../../shared/directives/app-save-on-typing.directive';
+import { PatientIdentifierComponent } from '../../../../../../../../../../shared/components/patient-identifier/patient-identifier.component';
+import { PatientStatusBadgeComponent } from '../../../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { PatientStatusDisplayComponent } from '../../../../../../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
+import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/format-duration.pipe';
 
 let globalLastInformationCollapsed = true;
 let globalLastSettingsCollapsed = true;
@@ -46,14 +62,31 @@ let globalLastTransferCollapsed = true;
     styleUrls: [
         './simulated-region-overview-behavior-transfer-vehicles.component.scss',
     ],
-    standalone: false,
+    imports: [
+        NgbCollapse,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        PatientIdentifierComponent,
+        PatientStatusBadgeComponent,
+        PatientStatusDisplayComponent,
+        FormatDurationPipe,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
     implements OnInit, OnDestroy
 {
-    @Input() simulatedRegionId!: UUID;
-    @Input() transferBehaviorId!: UUID;
-    @Input() initialTransferOptions?: TransferOptions;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
+    readonly simulatedRegionId = input.required<UUID>();
+    readonly transferBehaviorId = input.required<UUID>();
+    readonly initialTransferOptions = input<TransferOptions>();
 
     private readonly destroy$ = new Subject<void>();
     private readonly destroyPatients$ = new Subject<void>();
@@ -130,26 +163,22 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
         globalLastTransferCollapsed = value;
     }
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {
+    constructor() {
         this._informationCollapsed = globalLastInformationCollapsed;
         this._settingsCollapsed = globalLastSettingsCollapsed;
         this._transferCollapsed = globalLastTransferCollapsed;
     }
 
     ngOnInit(): void {
-        if (this.initialTransferOptions) {
+        const initialTransferOptions = this.initialTransferOptions();
+        if (initialTransferOptions) {
             this.transferCollapsed = false;
-            this.selectedVehicle =
-                this.initialTransferOptions.vehicleToTransfer;
+            this.selectedVehicle = initialTransferOptions.vehicleToTransfer;
             this.selectedDestination =
-                this.initialTransferOptions.transferDestination;
+                initialTransferOptions.transferDestination;
             this.selectedPatients =
-                cloneDeepMutable(
-                    this.initialTransferOptions.patientsToTransfer
-                ) ?? {};
+                cloneDeepMutable(initialTransferOptions.patientsToTransfer) ??
+                {};
             this.minPatients = Object.values(this.selectedPatients).filter(
                 (clicked) => clicked
             ).length;
@@ -159,8 +188,8 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
             AppState,
             TransferBehaviorState
         > = createSelectBehaviorState(
-            this.simulatedRegionId,
-            this.transferBehaviorId
+            this.simulatedRegionId(),
+            this.transferBehaviorId()
         );
 
         const bufferedTransferEventQueueSelector = createSelector(
@@ -197,7 +226,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
 
         const activeRecurringEventActivityStatesSelector =
             createSelectActivityStatesByType(
-                this.simulatedRegionId,
+                this.simulatedRegionId(),
                 'recurringEventActivity'
             );
 
@@ -232,7 +261,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
         );
 
         const activeActivityStatesSelector = createSelectActivityStatesByType(
-            this.simulatedRegionId,
+            this.simulatedRegionId(),
             'loadVehicleActivity'
         );
 
@@ -278,7 +307,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
                 Object.values(transferPoints).find((transferPoint) =>
                     isInSpecificSimulatedRegion(
                         transferPoint,
-                        this.simulatedRegionId
+                        this.simulatedRegionId()
                     )
                 )!
         );
@@ -286,7 +315,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
         const vehiclesInSimulatedRegionSelector =
             createSelectElementsInSimulatedRegion(
                 selectVehicles,
-                this.simulatedRegionId
+                this.simulatedRegionId()
             );
 
         const reachableTransferPointsSelector = createSelector(
@@ -366,24 +395,24 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
     public updatePatientLoadTime(loadTimePerPatient: number) {
         this.exerciseService.proposeAction({
             type: '[TransferBehavior] Update Patient Load Time',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transferBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transferBehaviorId(),
             loadTimePerPatient,
         });
     }
     public updatePersonnelLoadTime(personnelLoadTime: number) {
         this.exerciseService.proposeAction({
             type: '[TransferBehavior] Update Personnel Load Time',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transferBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transferBehaviorId(),
             personnelLoadTime,
         });
     }
     public updateSendDelay(delayBetweenSends: number) {
         this.exerciseService.proposeAction({
             type: '[TransferBehavior] Update Delay Between Sends',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transferBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transferBehaviorId(),
             delayBetweenSends,
         });
     }
@@ -417,8 +446,8 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
 
         this.exerciseService.proposeAction({
             type: '[TransferBehavior] Send Transfer Request Event',
-            simulatedRegionId: this.simulatedRegionId,
-            behaviorId: this.transferBehaviorId,
+            simulatedRegionId: this.simulatedRegionId(),
+            behaviorId: this.transferBehaviorId(),
             vehicleId: this.selectedVehicle.id,
             destinationType: this.selectedDestination.type,
             destinationId: this.selectedDestination.id,
@@ -436,7 +465,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
         const patientsInSimulatedRegionSelector =
             createSelectElementsInSimulatedRegion(
                 selectPatients,
-                this.simulatedRegionId
+                this.simulatedRegionId()
             );
 
         const patientsInSelectedVehicleSelector = createSelector(
@@ -461,7 +490,7 @@ export class SimulatedRegionOverviewBehaviorTransferVehiclesComponent
                             )
                         )
                         .map((patient) => ({
-                            visibleStatus: Patient.getVisibleStatus(
+                            visibleStatus: getPatientVisibleStatus(
                                 patient,
                                 configuration.pretriageEnabled,
                                 configuration.bluePatientsEnabled

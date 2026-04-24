@@ -1,40 +1,41 @@
-import { produce } from 'immer';
-import {
-    ImageProperties,
-    MapCoordinates,
-    SimulatedRegion,
-    SimulatedRegionPosition,
-    SimulatedRegionRequestTargetConfiguration,
-    Size,
-    TransferPoint,
-    Vehicle,
-    VehicleResource,
-} from '../../models/index.js';
+import { produce, type WritableDraft } from 'immer';
 import { ExerciseState } from '../../state.js';
-import {
-    ResourceRequiredEvent,
-    VehicleArrivedEvent,
-    VehiclesSentEvent,
-} from '../events/index.js';
-import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import type { Mutable } from '../../utils/immutability.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import { handleSimulationEvents } from '../utils/simulation.js';
-import { StrictObject, uuid } from '../../utils/index.js';
-import { RecurringEventActivityState } from '../activities/index.js';
 import { addActivity } from '../activities/utils.js';
-import { SendRequestEvent } from '../events/send-request.js';
-import { ResourcePromise } from '../utils/resource-promise.js';
-import { NoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { newSendRequestEvent } from '../events/send-request.js';
+import { newResourcePromise } from '../utils/resource-promise.js';
+import { newVehicle } from '../../models/vehicle.js';
+import type { ParticipantKey } from '../../exercise-keys.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { newImageProperties } from '../../models/utils/image-properties.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { newNoOccupation } from '../../models/utils/occupations/no-occupation.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newVehicleArrivedEvent } from '../events/vehicle-arrived.js';
 import {
-    RequestBehaviorState,
+    newSimulatedRegion,
+    type SimulatedRegion,
+} from '../../models/simulated-region.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
+import { newSize } from '../../models/utils/size.js';
+import { newTransferPoint } from '../../models/transfer-point.js';
+import { uuid } from '../../utils/uuid.js';
+import { newSimulatedRegionRequestTargetConfiguration } from '../../models/utils/request-target/simulated-region.js';
+import { newResourceRequiredEvent } from '../events/resources-required.js';
+import { newVehiclesSentEvent } from '../events/vehicles-sent.js';
+import type { RequestBehaviorState } from './request.js';
+import {
     getResourcesToRequest,
     updateBehaviorsRequestInterval,
     updateBehaviorsRequestTarget,
+    newRequestBehaviorState,
 } from './request.js';
 
 // constants
-const emptyState = ExerciseState.create('123456');
+const emptyState = ExerciseState.create('123456' as ParticipantKey);
 const currentTime = 12345;
 const requestKey = 'initial-request';
 const oldTime = currentTime - 100;
@@ -74,25 +75,23 @@ const withOldTime = ['withOldPromises', 'withOldAndNewPromises'] as const;
 // helper functions
 function setupStateAndInteract(
     initializeRequestsAndPromises: (
-        state: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        state: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => void,
     interaction: (
-        state: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        state: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => void
 ) {
-    const simulatedRegion = SimulatedRegion.create(
-        MapCoordinates.create(0, 0),
-        Size.create(10, 10),
+    const simulatedRegion = newSimulatedRegion(
+        newMapCoordinatesAt(0, 0),
+        newSize(10, 10),
         'test region'
     );
-    const transferPoint = TransferPoint.create(
-        SimulatedRegionPosition.create(simulatedRegion.id),
-        {},
-        {},
+    const transferPoint = newTransferPoint(
+        newSimulatedRegionPositionIn(simulatedRegion.id),
         '',
         `[Simuliert] test region`
     );
@@ -101,7 +100,7 @@ function setupStateAndInteract(
         draftState.simulatedRegions[simulatedRegion.id] =
             cloneDeepMutable(simulatedRegion);
         draftState.simulatedRegions[simulatedRegion.id]?.behaviors.push(
-            cloneDeepMutable(RequestBehaviorState.create())
+            cloneDeepMutable(newRequestBehaviorState())
         );
         draftState.transferPoints[transferPoint.id] =
             cloneDeepMutable(transferPoint);
@@ -111,13 +110,13 @@ function setupStateAndInteract(
         const mutableSimulatedRegion =
             draftState.simulatedRegions[simulatedRegion.id]!;
         const behaviorState = mutableSimulatedRegion
-            .behaviors[0] as Mutable<RequestBehaviorState>;
+            .behaviors[0] as WritableDraft<RequestBehaviorState>;
         behaviorState.recurringEventActivityId = uuid();
         addActivity(
             mutableSimulatedRegion,
-            RecurringEventActivityState.create(
+            newRecurringEventActivityState(
                 behaviorState.recurringEventActivityId,
-                SendRequestEvent.create(),
+                newSendRequestEvent(),
                 draftState.currentTime,
                 behaviorState.requestInterval
             )
@@ -135,7 +134,8 @@ function setupStateAndInteract(
         interaction(
             draftState,
             mutableSimulatedRegion,
-            mutableSimulatedRegion.behaviors[0] as Mutable<RequestBehaviorState>
+            mutableSimulatedRegion
+                .behaviors[0] as WritableDraft<RequestBehaviorState>
         );
         handleSimulationEvents(draftState, mutableSimulatedRegion);
     });
@@ -158,35 +158,33 @@ function setupStateAndInteract(
     };
 }
 
-const updateRequestInterval = (
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<RequestBehaviorState>
-) => {
+function updateRequestInterval(
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<RequestBehaviorState>
+) {
     updateBehaviorsRequestInterval(
         draftState,
         simulatedRegion,
         behaviorState,
         newRequestInterval
     );
-};
+}
 
-const updateRequestTarget = (
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<RequestBehaviorState>
-) => {
+function updateRequestTarget(
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<RequestBehaviorState>
+) {
     const otherSimulatedRegion = cloneDeepMutable(
-        SimulatedRegion.create(
-            MapCoordinates.create(0, 0),
-            Size.create(10, 10),
+        newSimulatedRegion(
+            newMapCoordinatesAt(0, 0),
+            newSize(10, 10),
             'requestable region'
         )
     );
-    const transferPoint = TransferPoint.create(
-        SimulatedRegionPosition.create(otherSimulatedRegion.id),
-        {},
-        {},
+    const transferPoint = newTransferPoint(
+        newSimulatedRegionPositionIn(otherSimulatedRegion.id),
         '',
         `[Simuliert] requestable region`
     );
@@ -198,134 +196,132 @@ const updateRequestTarget = (
         draftState,
         simulatedRegion,
         behaviorState,
-        SimulatedRegionRequestTargetConfiguration.create(
-            otherSimulatedRegion.id
-        )
+        newSimulatedRegionRequestTargetConfiguration(otherSimulatedRegion.id)
     );
-};
+}
 
-const updateInvalidationInterval = (
-    draftState: Mutable<ExerciseState>,
-    simulatedRegion: Mutable<SimulatedRegion>,
-    behaviorState: Mutable<RequestBehaviorState>
-) => {
+function updateInvalidationInterval(
+    draftState: WritableDraft<ExerciseState>,
+    simulatedRegion: WritableDraft<SimulatedRegion>,
+    behaviorState: WritableDraft<RequestBehaviorState>
+) {
     behaviorState.invalidatePromiseInterval = newInvalidationInterval;
     // update its promised resources
     getResourcesToRequest(draftState, behaviorState);
-};
+}
 
 // factories
 const addRequestsAndPromises = {
     withoutRequestsAndPromises: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
         // eslint-disable-next-line @typescript-eslint/no-empty-function
     ) => {},
     withRequests: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.requestedResources[requestKey] = cloneDeepMutable(
-            VehicleResource.create({
+            newVehicleResource({
                 KTW: 1,
             })
         );
     },
     withPromises: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
         ]);
     },
     withOldPromises: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(oldTime, VehicleResource.create({ KTW: 1 })),
+            newResourcePromise(oldTime, newVehicleResource({ KTW: 1 })),
         ]);
     },
     withOldAndNewPromises: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(oldTime, VehicleResource.create({ KTW: 1 })),
-            ResourcePromise.create(
+            newResourcePromise(oldTime, newVehicleResource({ KTW: 1 })),
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
         ]);
     },
     withRequestsAndEnoughPromises: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.requestedResources[requestKey] = cloneDeepMutable(
-            VehicleResource.create({
+            newVehicleResource({
                 KTW: 1,
             })
         );
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
         ]);
     },
     withRequestsAndNotEnoughPromises: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.requestedResources[requestKey] = cloneDeepMutable(
-            VehicleResource.create({
+            newVehicleResource({
                 KTW: 2,
             })
         );
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
         ]);
     },
     withPromiseOfOtherType: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ RTW: 1 })
+                newVehicleResource({ RTW: 1 })
             ),
         ]);
     },
     withPromisesOfMultipleTypes: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         behaviorState.promisedResources = cloneDeepMutable([
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ KTW: 1 })
+                newVehicleResource({ KTW: 1 })
             ),
-            ResourcePromise.create(
+            newResourcePromise(
                 draftState.currentTime,
-                VehicleResource.create({ RTW: 1 })
+                newVehicleResource({ RTW: 1 })
             ),
         ]);
     },
@@ -333,81 +329,82 @@ const addRequestsAndPromises = {
 
 const sendEvent = {
     resourceRequiredEvent: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         sendSimulationEvent(
             simulatedRegion,
-            ResourceRequiredEvent.create(
+            newResourceRequiredEvent(
                 simulatedRegion.id,
-                VehicleResource.create({ KTW: 1 }),
+                newVehicleResource({ KTW: 1 }),
                 'new-request-key'
             )
         );
     },
     resourceRequiredEventWithKnownKey: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         sendSimulationEvent(
             simulatedRegion,
-            ResourceRequiredEvent.create(
+            newResourceRequiredEvent(
                 simulatedRegion.id,
-                VehicleResource.create({ KTW: 1 }),
+                newVehicleResource({ KTW: 1 }),
                 requestKey
             )
         );
     },
     vehiclesSendEvent: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
         const transferPoint = Object.values(draftState.transferPoints)[0]!;
         sendSimulationEvent(
             simulatedRegion,
-            VehiclesSentEvent.create(
-                VehicleResource.create({ KTW: 1 }),
+            newVehiclesSentEvent(
+                newVehicleResource({ KTW: 1 }),
                 transferPoint.id
             )
         );
     },
     ktwVehicleArrivedEvent: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
-        const vehicle = Vehicle.create(
+        const vehicle = newVehicle(
             'KTW',
             'KTW 1',
+            uuid(),
             {},
             0,
-            ImageProperties.create('', 0, 0),
-            SimulatedRegionPosition.create(simulatedRegion.id),
-            NoOccupation.create()
+            newImageProperties('', 0, 0),
+            newSimulatedRegionPositionIn(simulatedRegion.id),
+            newNoOccupation()
         );
         draftState.vehicles[vehicle.id] = cloneDeepMutable(vehicle);
 
         sendSimulationEvent(
             simulatedRegion,
-            VehicleArrivedEvent.create(vehicle.id, draftState.currentTime)
+            newVehicleArrivedEvent(vehicle.id, draftState.currentTime)
         );
     },
     sendRequestEvent: (
-        draftState: Mutable<ExerciseState>,
-        simulatedRegion: Mutable<SimulatedRegion>,
-        behaviorState: Mutable<RequestBehaviorState>
+        draftState: WritableDraft<ExerciseState>,
+        simulatedRegion: WritableDraft<SimulatedRegion>,
+        behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
-        sendSimulationEvent(simulatedRegion, SendRequestEvent.create());
+        sendSimulationEvent(simulatedRegion, newSendRequestEvent());
     },
 };
 
 // tests
 describe('request behavior', () => {
     describe('on a resource required event', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should note the request', () => {
@@ -418,14 +415,14 @@ describe('request behavior', () => {
 
                     expect(
                         afterBehaviorState.requestedResources['new-request-key']
-                    ).toEqual(VehicleResource.create({ KTW: 1 }));
+                    ).toEqual(newVehicleResource({ KTW: 1 }));
                 });
             }
         );
     });
 
     describe('on a resource required event with a known key', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should overwrite any existing requests', () => {
@@ -444,7 +441,7 @@ describe('request behavior', () => {
     });
 
     describe('on a vehicle send event', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should note the promise', () => {
@@ -458,7 +455,7 @@ describe('request behavior', () => {
                     expect(promisedResources.length).toBeGreaterThanOrEqual(1);
                     const promise = promisedResources.at(-1)!;
                     expect(promise.resource).toEqual(
-                        VehicleResource.create({ KTW: 1 })
+                        newVehicleResource({ KTW: 1 })
                     );
                 });
             }
@@ -507,10 +504,10 @@ describe('request behavior', () => {
 
                 const activities = afterSimulatedRegion.activities;
                 expect(
-                    StrictObject.keys(activities).length
+                    TypeAssertedObject.keys(activities).length
                 ).toBeGreaterThanOrEqual(1);
 
-                const activity = StrictObject.values(activities).find(
+                const activity = TypeAssertedObject.values(activities).find(
                     (a) => a.type === 'createRequestActivity'
                 );
                 expect(activity).toBeDefined();
@@ -520,14 +517,14 @@ describe('request behavior', () => {
                     afterBehaviorState.requestTarget
                 );
                 expect(typedActivity.requestedResource).toEqual(
-                    VehicleResource.create({ KTW: 1 })
+                    newVehicleResource({ KTW: 1 })
                 );
             });
         });
     });
 
     describe('when the request interval is updated', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should update the request interval', () => {
@@ -547,9 +544,10 @@ describe('request behavior', () => {
                         updateRequestInterval
                     );
 
-                    const afterRecurringEventActivity = StrictObject.values(
-                        afterSimulatedRegion.activities
-                    ).find((a) => a.type === 'recurringEventActivity')!;
+                    const afterRecurringEventActivity =
+                        TypeAssertedObject.values(
+                            afterSimulatedRegion.activities
+                        ).find((a) => a.type === 'recurringEventActivity')!;
 
                     expect(
                         afterRecurringEventActivity.recurrenceIntervalTime
@@ -560,7 +558,7 @@ describe('request behavior', () => {
     });
 
     describe('when the request target is updated', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should update the request target', () => {

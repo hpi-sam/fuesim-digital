@@ -1,38 +1,31 @@
-<ng-container *ngIf="requestBehaviorState$ | async as requestBehaviorState">
+@if (requestBehaviorState$ | async; as requestBehaviorState) {
     <h5>Anfragenziel</h5>
 
-    <ng-container *ngIf="{ time: nextTimeoutIn$ | async } as nextTimeoutIn">
-        <span
-            *ngIf="
-                nextTimeoutIn.time !== null && nextTimeoutIn.time !== undefined
-            "
-            class="text-muted"
-            >Nächste potentielle Anfrage in
-            {{ nextTimeoutIn.time | formatDuration }}</span
-        >
-    </ng-container>
+    @if ({ time: nextTimeoutIn$ | async }; as nextTimeoutIn) {
+        @if (nextTimeoutIn.time !== null && nextTimeoutIn.time !== undefined) {
+            <span class="text-muted"
+                >Nächste potentielle Anfrage in
+                {{ nextTimeoutIn.time | formatDuration }}</span
+            >
+        }
+    }
 
-    <ng-container
-        *ngIf="selectedRequestTarget$ | async as selectedRequestTarget"
-    >
-        <ng-container
-            *ngIf="requestTargetOptions$ | async as requestTargetOptions"
-        >
+    @if (selectedRequestTarget$ | async; as selectedRequestTarget) {
+        @if (requestTargetOptions$ | async; as requestTargetOptions) {
             <select
                 #requestTargetSelect
                 class="form-select no-validation"
                 [ngModel]="selectedRequestTarget"
                 (change)="updateRequestTarget(requestTargetSelect.value)"
             >
-                <option
-                    *ngFor="let option of requestTargetOptions | keys"
-                    [value]="option"
-                >
-                    {{ requestTargetOptions[option] }}
-                </option>
+                @for (option of requestTargetOptions | keys; track option) {
+                    <option [value]="option">
+                        {{ requestTargetOptions[option] }}
+                    </option>
+                }
             </select>
-        </ng-container>
-    </ng-container>
+        }
+    }
 
     <div class="mt-3">
         <h5>Zeitintervalle</h5>
@@ -92,4 +85,4 @@
             </div>
         </div>
     </div>
-</ng-container>
+}

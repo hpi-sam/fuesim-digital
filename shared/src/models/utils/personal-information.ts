@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { z } from 'zod';
 import {
     femaleFirstNames,
     maleFirstNames,
@@ -6,40 +6,26 @@ import {
 } from '../../data/generator-data/first-names.js';
 import { streetNames } from '../../data/generator-data/street-names.js';
 import { surnames } from '../../data/generator-data/surnames.js';
-import { getCreate } from './get-create.js';
 import type { Sex } from './sex.js';
 
-export class PersonalInformation {
-    @IsString()
-    public readonly name: string;
-    @IsString()
-    public readonly address: string;
+export const personalInformationSchema = z.strictObject({
+    name: z.string(),
+    address: z.string(),
     /**
      * Without year
      * @example
      * `24.02.`
      */
-    @IsString()
-    public readonly birthdate: string;
+    birthdate: z.string(),
+});
+export type PersonalInformation = z.infer<typeof personalInformationSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(name: string, address: string, birthdate: string) {
-        this.name = name;
-        this.address = address;
-        this.birthdate = birthdate;
-    }
-
-    static readonly create = getCreate(this);
-
-    static generatePersonalInformation(sex: Sex): PersonalInformation {
-        return PersonalInformation.create(
-            generateName(sex),
-            generateAddress(),
-            generateBirthDate()
-        );
-    }
+export function generatePersonalInformation(sex: Sex): PersonalInformation {
+    return {
+        name: generateName(sex),
+        address: generateAddress(),
+        birthdate: generateBirthDate(),
+    };
 }
 
 function generateAddress() {

@@ -12,106 +12,117 @@
         >
             <nav #nav="ngbNav" ngbNav class="nav-tabs">
                 <ng-container ngbNavItem="areas">
-                    <a ngbNavLink>Einsatzbereiche</a>
+                    <a ngbNavLink>Ansichten &amp; simulierte Bereiche</a>
                     <ng-template ngbNavContent>
-                        <div
-                            ngbDropdown
-                            class="d-inline-block"
-                            *ngIf="
-                                areaStatisticsService.areaSpec$
-                                    | async as areaSpec
-                            "
-                        >
-                            <button
-                                class="btn btn-outline-primary me-3"
-                                title="Bereich für Statistik auswählen"
-                                ngbDropdownToggle
-                            >
-                                <ng-container [ngSwitch]="areaSpec.type">
-                                    <app-viewport-name
-                                        *ngSwitchCase="'viewport'"
-                                        [viewportId]="$any(areaSpec).id"
-                                    ></app-viewport-name>
-                                    <app-simulated-region-name
-                                        *ngSwitchCase="'simulatedRegion'"
-                                        [simulatedRegionId]="$any(areaSpec).id"
-                                    ></app-simulated-region-name>
-                                    <ng-container *ngSwitchCase="'all'">
+                        @if (
+                            areaStatisticsService.areaSpec$ | async;
+                            as areaSpec
+                        ) {
+                            <div ngbDropdown class="d-inline-block">
+                                <button
+                                    class="btn btn-outline-primary me-3"
+                                    title="Bereich für Statistik auswählen"
+                                    ngbDropdownToggle
+                                >
+                                    @switch (areaSpec.type) {
+                                        @case ('viewport') {
+                                            <app-viewport-name
+                                                [viewportId]="$any(areaSpec).id"
+                                            ></app-viewport-name>
+                                        }
+                                        @case ('simulatedRegion') {
+                                            <app-simulated-region-name
+                                                [simulatedRegionId]="
+                                                    $any(areaSpec).id
+                                                "
+                                            ></app-simulated-region-name>
+                                        }
+                                        @case ('all') {
+                                            Gesamt
+                                        }
+                                    }
+                                </button>
+                                <div ngbDropdownMenu>
+                                    <button
+                                        ngbDropdownItem
+                                        (click)="
+                                            areaStatisticsService.setArea({
+                                                type: 'all',
+                                            })
+                                        "
+                                    >
                                         Gesamt
-                                    </ng-container>
-                                </ng-container>
-                            </button>
-                            <div ngbDropdownMenu>
-                                <button
-                                    ngbDropdownItem
-                                    (click)="
-                                        areaStatisticsService.setArea({
-                                            type: 'all',
-                                        })
-                                    "
-                                >
-                                    Gesamt
-                                </button>
-                                <button
-                                    *ngFor="
-                                        let viewportId of viewportIds$ | async
-                                    "
-                                    ngbDropdownItem
-                                    (click)="
-                                        areaStatisticsService.setArea({
-                                            type: 'viewport',
-                                            id: viewportId,
-                                        })
-                                    "
-                                >
-                                    <app-viewport-name
-                                        [viewportId]="viewportId"
-                                    ></app-viewport-name>
-                                </button>
-                                <button
-                                    *ngFor="
-                                        let simulatedRegionId of simulatedRegionIds$
-                                            | async
-                                    "
-                                    ngbDropdownItem
-                                    (click)="
-                                        areaStatisticsService.setArea({
-                                            type: 'simulatedRegion',
-                                            id: simulatedRegionId,
-                                        })
-                                    "
-                                >
-                                    <app-simulated-region-name
-                                        [simulatedRegionId]="simulatedRegionId"
-                                    ></app-simulated-region-name>
-                                </button>
+                                    </button>
+                                    @for (
+                                        viewportId of viewportIds$ | async;
+                                        track viewportId
+                                    ) {
+                                        <button
+                                            ngbDropdownItem
+                                            (click)="
+                                                areaStatisticsService.setArea({
+                                                    type: 'viewport',
+                                                    id: viewportId,
+                                                })
+                                            "
+                                        >
+                                            <app-viewport-name
+                                                [viewportId]="viewportId"
+                                            ></app-viewport-name>
+                                        </button>
+                                    }
+                                    @for (
+                                        simulatedRegionId of simulatedRegionIds$
+                                            | async;
+                                        track simulatedRegionId
+                                    ) {
+                                        <button
+                                            ngbDropdownItem
+                                            (click)="
+                                                areaStatisticsService.setArea({
+                                                    type: 'simulatedRegion',
+                                                    id: simulatedRegionId,
+                                                })
+                                            "
+                                        >
+                                            <app-simulated-region-name
+                                                [simulatedRegionId]="
+                                                    simulatedRegionId
+                                                "
+                                            ></app-simulated-region-name>
+                                        </button>
+                                    }
+                                </div>
                             </div>
-                        </div>
+                        }
                         <button
                             class="btn btn-sm btn-primary"
                             (click)="statisticsService.updateStatistics()"
                             [disabled]="statisticsService.updatingStatistics"
                         >
-                            <span
-                                *ngIf="statisticsService.updatingStatistics"
-                                class="spinner-border spinner-border-sm"
-                            ></span>
+                            @if (statisticsService.updatingStatistics) {
+                                <span
+                                    class="spinner-border spinner-border-sm"
+                                ></span>
+                            }
                             Aktualisieren
                         </button>
 
                         <br />
                         <br />
                         <h3>Patienten</h3>
-                        <app-stacked-bar-chart
-                            *ngIf="patientsStatistics$ | async as statistics"
-                            [statistics]="statistics"
-                        ></app-stacked-bar-chart>
+                        @if (patientsStatistics$ | async; as statistics) {
+                            <app-stacked-bar-chart
+                                [statistics]="statistics"
+                            ></app-stacked-bar-chart>
+                        }
                         <br />
                         <h3>Fahrzeuge</h3>
-                        <app-stacked-bar-chart
-                            *ngIf="vehiclesStatistics$ | async as statistics"
-                            [statistics]="statistics"
-                        ></app-stacked-bar-chart>
+                        @if (vehiclesStatistics$ | async; as statistics) {
+                            <app-stacked-bar-chart
+                                [statistics]="statistics"
+                            ></app-stacked-bar-chart>
+                        }
                         <br />
                         <h3>
                             Einsatzkräfte
@@ -119,10 +130,11 @@
                                 >(weder im Transfer noch im Fahrzeug)</small
                             >
                         </h3>
-                        <app-stacked-bar-chart
-                            *ngIf="personnelStatistics$ | async as statistics"
-                            [statistics]="statistics"
-                        ></app-stacked-bar-chart>
+                        @if (personnelStatistics$ | async; as statistics) {
+                            <app-stacked-bar-chart
+                                [statistics]="statistics"
+                            ></app-stacked-bar-chart>
+                        }
                     </ng-template>
                 </ng-container>
                 <ng-container ngbNavItem="hospitals">
@@ -141,10 +153,9 @@
         </div>
         <div class="vr"></div>
         <div class="w-50 mw-50 h-100 mh-100 ps-3">
-            <app-log-table
-                *ngIf="logEntries$ | async as logEntries"
-                [logEntries]="logEntries"
-            />
+            @if (logEntries$ | async; as logEntries) {
+                <app-log-table [logEntries]="logEntries" />
+            }
         </div>
     </div>
 </div>

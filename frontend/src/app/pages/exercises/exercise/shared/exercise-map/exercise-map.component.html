@@ -5,56 +5,62 @@
     tabindex="-1"
     data-cy="openLayersContainer"
 >
-    <app-display-messages *ngIf="fullscreenEnabled"></app-display-messages>
+    @if (fullscreenEnabled()) {
+        <app-display-messages></app-display-messages>
+    }
     <div
         class="position-absolute btn-group-vertical"
         style="z-index: 10"
         (click)="$event.stopPropagation()"
     >
         <button
-            (click)="olMapManager?.changeZoom('zoomIn')"
+            (click)="olMapManagerService.olMapManager?.changeZoom('zoomIn')"
             class="btn btn-sm btn-light"
             title="Vergrößern"
         >
             <i class="bi-zoom-in"></i>
         </button>
         <button
-            (click)="olMapManager?.changeZoom('zoomOut')"
+            (click)="olMapManagerService.olMapManager?.changeZoom('zoomOut')"
             class="btn btn-sm btn-light"
             title="Verkleinern"
         >
             <i class="bi-zoom-out"></i>
         </button>
-        <button
-            *ngIf="
-                (currentRole$ | async) !== 'participant' &&
-                (restrictedToViewport$ | async) === undefined
-            "
-            (click)="olMapManager?.tryToFitViewForOverview()"
-            class="btn btn-sm btn-light"
-            title="Alle Ansichten anzeigen"
-        >
-            <i class="bi-aspect-ratio"></i>
-        </button>
-        <button
-            *ngIf="
-                (currentRole$ | async) !== 'participant' &&
-                (restrictedToViewport$ | async) === undefined
-            "
-            (click)="goToCoordinates()"
-            class="btn btn-sm btn-light"
-            title="Zu Koordinaten springen"
-        >
-            <i class="bi bi-pin-map"></i>
-        </button>
+        @if (
+            (currentRole$ | async) !== 'participant' &&
+            (restrictedToViewport$ | async) === undefined
+        ) {
+            <button
+                (click)="
+                    olMapManagerService.olMapManager?.tryToFitViewForOverview()
+                "
+                class="btn btn-sm btn-light"
+                title="Alle Ansichten anzeigen"
+            >
+                <i class="bi-aspect-ratio"></i>
+            </button>
+        }
+        @if (
+            (currentRole$ | async) !== 'participant' &&
+            (restrictedToViewport$ | async) === undefined
+        ) {
+            <button
+                (click)="goToCoordinates()"
+                class="btn btn-sm btn-light"
+                title="Zu Koordinaten springen"
+            >
+                <i class="bi bi-pin-map"></i>
+            </button>
+        }
         <button
             (click)="toggleFullscreen()"
             class="btn btn-sm btn-light"
             title="Vollbildmodus"
         >
             <i
-                [class.bi-fullscreen]="!fullscreenEnabled"
-                [class.bi-fullscreen-exit]="fullscreenEnabled"
+                [class.bi-fullscreen]="!fullscreenEnabled()"
+                [class.bi-fullscreen-exit]="fullscreenEnabled()"
             ></i>
         </button>
     </div>

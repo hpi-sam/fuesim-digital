@@ -1,17 +1,29 @@
-import { Type } from 'class-transformer';
-import { IsBoolean, IsString, ValidateNested } from 'class-validator';
-import { TileMapProperties } from '../../models/utils/index.js';
-import { cloneDeepMutable } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
+import { IsBoolean, IsString } from 'class-validator';
 import type { Action, ActionReducer } from '../action-reducer.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import {
+    type TileMapProperties,
+    tileMapPropertiesSchema,
+    type OperationsMapProperties,
+    operationsMapPropertiesSchema,
+} from '../../models/utils/map-properties.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 
 export class SetTileMapPropertiesAction implements Action {
     @IsValue('[Configuration] Set tileMapProperties' as const)
     public readonly type = '[Configuration] Set tileMapProperties';
 
-    @ValidateNested()
-    @Type(() => TileMapProperties)
+    @IsZodSchema(tileMapPropertiesSchema)
     public readonly tileMapProperties!: TileMapProperties;
+}
+
+export class SetOperationsMapPropertiesAction implements Action {
+    @IsValue('[Configuration] Set operationsMapProperties' as const)
+    public readonly type = '[Configuration] Set operationsMapProperties';
+
+    @IsZodSchema(operationsMapPropertiesSchema)
+    public readonly operationsMapProperties!: OperationsMapProperties;
 }
 
 export class SetPretriageEnabledAction implements Action {
@@ -38,6 +50,25 @@ export class SetPatientIdentifierPrefixAction implements Action {
     public readonly patientIdentifierPrefix!: string;
 }
 
+export class SetVehicleStatusHighlightEnabled implements Action {
+    @IsValue('[Configuration] Set vehicleStatusHighlightEnabled' as const)
+    public readonly type = '[Configuration] Set vehicleStatusHighlightEnabled';
+
+    @IsBoolean()
+    public readonly vehicleStatusHighlightEnabled!: boolean;
+}
+
+export class SetVehicleStatusInPatientStatusColorEnabled implements Action {
+    @IsValue(
+        '[Configuration] Set vehicleStatusInPatientStatusColorEnabled' as const
+    )
+    public readonly type =
+        '[Configuration] Set vehicleStatusInPatientStatusColorEnabled';
+
+    @IsBoolean()
+    public readonly vehicleStatusInPatientStatusColor!: boolean;
+}
+
 export namespace ConfigurationActionReducers {
     export const setTileMapProperties: ActionReducer<SetTileMapPropertiesAction> =
         {
@@ -45,6 +76,17 @@ export namespace ConfigurationActionReducers {
             reducer: (draftState, { tileMapProperties }) => {
                 draftState.configuration.tileMapProperties =
                     cloneDeepMutable(tileMapProperties);
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setOperationsMapProperties: ActionReducer<SetOperationsMapPropertiesAction> =
+        {
+            action: SetOperationsMapPropertiesAction,
+            reducer: (draftState, { operationsMapProperties }) => {
+                draftState.configuration.operationsMapProperties =
+                    operationsMapProperties;
                 return draftState;
             },
             rights: 'trainer',
@@ -76,6 +118,28 @@ export namespace ConfigurationActionReducers {
             reducer(draftState, { patientIdentifierPrefix }) {
                 draftState.configuration.patientIdentifierPrefix =
                     patientIdentifierPrefix;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setVehicleStatusHighlight: ActionReducer<SetVehicleStatusHighlightEnabled> =
+        {
+            action: SetVehicleStatusHighlightEnabled,
+            reducer(draftState, { vehicleStatusHighlightEnabled }) {
+                draftState.configuration.vehicleStatusHighlight =
+                    vehicleStatusHighlightEnabled;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setVehicleStatusInSkColor: ActionReducer<SetVehicleStatusInPatientStatusColorEnabled> =
+        {
+            action: SetVehicleStatusInPatientStatusColorEnabled,
+            reducer(draftState, { vehicleStatusInPatientStatusColor }) {
+                draftState.configuration.vehicleStatusInPatientStatusColor =
+                    vehicleStatusInPatientStatusColor;
                 return draftState;
             },
             rights: 'trainer',

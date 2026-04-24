@@ -2,19 +2,19 @@
     <div class="d-flex justify-content-center">
         <app-patient-status-data-field
             class="me-1"
-            [patientStatusDataField]="patientStatus.firstField"
+            [patientStatusDataField]="patientStatus().firstField"
         />
         <app-patient-status-data-field
             class="me-1"
-            [patientStatusDataField]="patientStatus.secondField"
+            [patientStatusDataField]="patientStatus().secondField"
         />
         <app-patient-status-data-field
             class="me-1"
-            [patientStatusDataField]="patientStatus.thirdField"
+            [patientStatusDataField]="patientStatus().thirdField"
         />
     </div>
     <app-patient-status-tags-field
         class="mt-1"
-        [patientStatusTagsField]="patientStatus.tags"
+        [patientStatusTagsField]="patientStatus().tags"
     ></app-patient-status-tags-field>
 </div>

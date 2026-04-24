@@ -1,0 +1,20 @@
+@use 'bootstrap/scss/bootstrap' as bootstrap;
+@use './../_variables.scss' as vars;
+
+.sectionLeaderSlot {
+    height: vars.$vehicleTagHeight;
+    width: vars.$vehicleTagWidth;
+    border-radius: vars.$borderRadius;
+    position: relative;
+    outline: vars.$borderSize dashed vars.$dashedBorderColor;
+    outline-offset: -(vars.$borderSize + 1px);
+
+    &:empty::after {
+        content: var(--innerTitle);
+        position: relative;
+        top: 4px;
+        left: 8px;
+        font-size: 14px;
+        color: vars.$dashedBorderColor;
+    }
+}

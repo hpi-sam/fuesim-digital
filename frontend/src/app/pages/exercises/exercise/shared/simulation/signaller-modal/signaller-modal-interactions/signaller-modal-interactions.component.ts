@@ -1,18 +1,17 @@
 import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseRadiogram,
     ExerciseSimulationBehaviorType,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
-    StrictObject,
     getInformationRequestKeyDetails,
     isAccepted,
     isInterfaceSignallerKeyForClient,
     isUnread,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
 import {
     BehaviorSubject,
@@ -23,20 +22,24 @@ import {
     map,
     takeUntil,
 } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../../core/exercise.service';
+import { SearchableDropdownOption } from '../../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import type { HotkeyLayer } from '../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectOwnClientId } from 'src/app/state/application/selectors/application.selectors';
+} from '../../../../../../../shared/services/hotkeys.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import { selectOwnClientId } from '../../../../../../../state/application/selectors/application.selectors';
 import {
     createSelectBehaviorStates,
     selectRadiograms,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+} from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../state/get-state-snapshot';
+import { HotkeyIndicatorComponent } from '../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
+import { RadiogramCardComponent } from '../../trainer-modal/radiogram-list/radiogram-card/radiogram-card.component';
 
 export type InterfaceSignallerInteraction = Omit<
     SearchableDropdownOption,
@@ -81,24 +84,27 @@ export function setLoadingState(
     selector: 'app-signaller-modal-interactions',
     templateUrl: './signaller-modal-interactions.component.html',
     styleUrls: ['./signaller-modal-interactions.component.scss'],
-    standalone: false,
+    imports: [
+        HotkeyIndicatorComponent,
+        FormsModule,
+        RadiogramCardComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalInteractionsComponent
     implements OnInit, OnChanges, OnDestroy
 {
-    @Input()
-    simulatedRegionId?: UUID;
-    @Input()
-    interactions: InterfaceSignallerInteraction[] = [];
-    @Input()
-    primaryActionLabel = '';
-    @Input()
-    showSecondaryButton = true;
-    @Input()
-    filterHotkeyKeys!: string;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly hotkeysService = inject(HotkeysService);
 
-    @ViewChild('filterInput')
-    filterInput!: ElementRef;
+    readonly simulatedRegionId = input<UUID>();
+    readonly interactions = input<InterfaceSignallerInteraction[]>([]);
+    readonly primaryActionLabel = input('');
+    readonly showSecondaryButton = input(true);
+    readonly filterHotkeyKeys = input.required<string>();
+
+    readonly filterInput = viewChild.required<ElementRef>('filterInput');
 
     private interactionHotkeys: {
         [key: string]: { primary: Hotkey; secondary?: Hotkey };
@@ -119,7 +125,7 @@ export class SignallerModalInteractionsComponent
     get filteredInteractions() {
         const lowerFilterPhrases = this.filter.toLowerCase().split(/\s+/u);
 
-        return this.interactions
+        return this.interactions()
             .map((interaction) => ({
                 ...interaction,
                 hotkeys: this.interactionHotkeys[interaction.key]!,
@@ -140,7 +146,7 @@ export class SignallerModalInteractionsComponent
 
     filterHotkey!: Hotkey;
     readonly exitFilterHotkey = new Hotkey('Esc', false, () => {
-        this.filterInput.nativeElement.blur();
+        this.filterInput().nativeElement.blur();
     });
     readonly upHotkey = new Hotkey('up', false, () =>
         this.decreaseSelectedIndex()
@@ -150,11 +156,11 @@ export class SignallerModalInteractionsComponent
     );
     readonly confirmHotkey = new Hotkey('Enter', false, () => {
         this.selectionPrimaryAction();
-        this.filterInput.nativeElement.blur();
+        this.filterInput().nativeElement.blur();
     });
     readonly confirmSecondaryHotkey = new Hotkey('⇧ + Enter', false, () => {
         this.selectionSecondaryAction();
-        this.filterInput.nativeElement.blur();
+        this.filterInput().nativeElement.blur();
     });
 
     requestedRadiograms$!: Observable<{ [key: string]: ExerciseRadiogram[] }>;
@@ -162,11 +168,7 @@ export class SignallerModalInteractionsComponent
     private readonly changeOrDestroy$ = new Subject<void>();
     private readonly destroy$ = new Subject<void>();
 
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly hotkeysService: HotkeysService
-    ) {
+    constructor() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
     }
 
@@ -189,12 +191,13 @@ export class SignallerModalInteractionsComponent
         this.interactionHotkeys = {};
         this.interactionRequestable = {};
 
-        if (this.simulatedRegionId) {
+        const simulatedRegionId = this.simulatedRegionId();
+        if (simulatedRegionId) {
             const behaviors$ = this.store.select(
-                createSelectBehaviorStates(this.simulatedRegionId)
+                createSelectBehaviorStates(simulatedRegionId)
             );
 
-            this.interactions.forEach((interaction) => {
+            this.interactions().forEach((interaction) => {
                 this.interactionRequestable[interaction.key] = behaviors$.pipe(
                     map((behaviors) =>
                         interaction.requiredBehaviors.every(
@@ -208,12 +211,12 @@ export class SignallerModalInteractionsComponent
                 );
             });
         } else {
-            this.interactions.forEach((interaction) => {
+            this.interactions().forEach((interaction) => {
                 this.interactionRequestable[interaction.key] = of(true);
             });
         }
 
-        this.interactions.forEach((interaction) => {
+        this.interactions().forEach((interaction) => {
             const enabled$ = combineLatest([
                 interaction.loading$ ?? of(false),
                 this.interactionRequestable[interaction.key]!,
@@ -247,16 +250,17 @@ export class SignallerModalInteractionsComponent
             this.interactionHotkeys[interaction.key] = hotkeys;
         });
 
-        if (this.filterHotkeyKeys && this.filterHotkeyKeys !== '') {
-            this.filterHotkey = new Hotkey(this.filterHotkeyKeys, false, () => {
-                this.filterInput.nativeElement.focus();
+        const filterHotkeyKeys = this.filterHotkeyKeys();
+        if (filterHotkeyKeys && filterHotkeyKeys !== '') {
+            this.filterHotkey = new Hotkey(filterHotkeyKeys, false, () => {
+                this.filterInput().nativeElement.focus();
             });
             this.hotkeyLayer.addHotkey(this.filterHotkey);
         }
 
         const radiograms$ = this.store
             .select(selectRadiograms)
-            .pipe(map((radiograms) => StrictObject.values(radiograms)));
+            .pipe(map((radiograms) => Object.values(radiograms)));
 
         // Automatically accept all radiograms that contain reports for requested information
         radiograms$
@@ -283,7 +287,7 @@ export class SignallerModalInteractionsComponent
                     });
 
                     setLoadingState(
-                        this.interactions,
+                        this.interactions(),
                         getInformationRequestKeyDetails(
                             radiogram.informationRequestKey!
                         ),
@@ -303,7 +307,7 @@ export class SignallerModalInteractionsComponent
                             radiogram.informationRequestKey,
                             this.clientId
                         ) &&
-                        radiogram.simulatedRegionId === this.simulatedRegionId
+                        radiogram.simulatedRegionId === this.simulatedRegionId()
                 )
             ),
             map((radiograms) =>

@@ -1,27 +1,17 @@
-import { Type } from 'class-transformer';
-import { IsArray, ValidateNested } from 'class-validator';
-import type { Immutable } from 'immer';
-import { cloneDeepImmutable } from '../../utils/index.js';
-import type { AllowedValues } from '../../utils/validators/index.js';
-import { IsLiteralUnion } from '../../utils/validators/index.js';
-import { getCreate } from './get-create.js';
+import { z } from 'zod';
 
 /**
- * A letter that defines the color of a patient in a patient status.
+ * A letter that defines the color of a patient in a patient status.#
+ * * `B`: bystander
  * * `V`: ex (black)
  * * `W`: SK IV (blue)
  * * `X`: SK III (green)
  * * `Y`: SK II (yellow)
  * * `Z`: SK I (red)
  */
-export type ColorCode = 'V' | 'W' | 'X' | 'Y' | 'Z';
-const colorCodeAllowedValues: AllowedValues<ColorCode> = {
-    V: true,
-    W: true,
-    X: true,
-    Y: true,
-    Z: true,
-};
+const colorCodeAllowedValues = ['B', 'V', 'W', 'X', 'Y', 'Z'] as const;
+export const colorCodeSchema = z.literal(colorCodeAllowedValues);
+export type ColorCode = z.infer<typeof colorCodeSchema>;
 
 /**
  * A letter that defines how a patients changes
@@ -31,82 +21,51 @@ const colorCodeAllowedValues: AllowedValues<ColorCode> = {
  * * `D`: complication
  * * `E`: dead
  */
-export type BehaviourCode = 'A' | 'B' | 'C' | 'D' | 'E';
-const behaviourCodeAllowedValues: AllowedValues<BehaviourCode> = {
-    A: true,
-    B: true,
-    C: true,
-    D: true,
-    E: true,
-};
+const behaviourCodeAllowedValues = ['A', 'B', 'C', 'D', 'E'] as const;
+export const behaviourCodeSchema = z.literal(behaviourCodeAllowedValues);
+export type BehaviourCode = z.infer<typeof behaviourCodeSchema>;
 
-type Tag = 'P';
-const tagAllowedValues: AllowedValues<Tag> = {
-    P: true,
-};
+const patientTagAllowedValues = ['P'] as const;
+export const patientTagSchema = z.literal(patientTagAllowedValues);
+export type PatientTag = z.infer<typeof patientTagSchema>;
 
-export type Tags = Immutable<Tag[]>;
+export const patientStatusDataFieldSchema = z.strictObject({
+    colorCode: colorCodeSchema,
+    behaviourCode: behaviourCodeSchema,
+});
+export type PatientStatusDataField = z.infer<
+    typeof patientStatusDataFieldSchema
+>;
 
-export class PatientStatusDataField {
-    @IsLiteralUnion(colorCodeAllowedValues)
-    public readonly colorCode: ColorCode;
-
-    @IsLiteralUnion(behaviourCodeAllowedValues)
-    public readonly behaviourCode: BehaviourCode;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(colorCode: ColorCode, behaviourCode: BehaviourCode) {
-        this.colorCode = colorCode;
-        this.behaviourCode = behaviourCode;
-    }
-
-    static readonly create = getCreate(this);
+export function newPatientStatusDataField(
+    colorCode: ColorCode,
+    behaviourCode: BehaviourCode
+): PatientStatusDataField {
+    return { colorCode, behaviourCode };
 }
 
-export class PatientStatusCode {
-    @ValidateNested()
-    @Type(() => PatientStatusDataField)
-    public readonly firstField!: PatientStatusDataField;
+export const patientStatusCodeSchema = z.strictObject({
+    firstField: patientStatusDataFieldSchema,
+    secondField: patientStatusDataFieldSchema,
+    thirdField: patientStatusDataFieldSchema,
+    tags: z.array(patientTagSchema),
+});
+export type PatientStatusCode = z.infer<typeof patientStatusCodeSchema>;
 
-    @ValidateNested()
-    @Type(() => PatientStatusDataField)
-    public readonly secondField!: PatientStatusDataField;
-
-    @ValidateNested()
-    @Type(() => PatientStatusDataField)
-    public readonly thirdField!: PatientStatusDataField;
-
-    @IsArray()
-    @IsLiteralUnion(tagAllowedValues, {
-        each: true,
-    })
-    public readonly tags!: Tags;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(code: string) {
-        // Plain to Instance calls constructors without arguments, therefore we have to catch it
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (code === undefined) {
-            return;
-        }
-        this.firstField = PatientStatusDataField.create(
-            code[0] as ColorCode,
-            code[1] as BehaviourCode
-        );
-        this.secondField = PatientStatusDataField.create(
-            code[2] as ColorCode,
-            code[3] as BehaviourCode
-        );
-        this.thirdField = PatientStatusDataField.create(
-            code[4] as ColorCode,
-            code[5] as BehaviourCode
-        );
-        this.tags = cloneDeepImmutable([...code.slice(6)]) as Tags;
-    }
-
-    static readonly create = getCreate(this);
+export function newPatientStatusCode(code: string) {
+    return {
+        firstField: newPatientStatusDataField(
+            code[0]! as ColorCode,
+            code[1]! as BehaviourCode
+        ),
+        secondField: newPatientStatusDataField(
+            code[2]! as ColorCode,
+            code[3]! as BehaviourCode
+        ),
+        thirdField: newPatientStatusDataField(
+            code[4]! as ColorCode,
+            code[5]! as BehaviourCode
+        ),
+        tags: [...code.slice(6)] as PatientTag[],
+    };
 }

@@ -1,14 +1,15 @@
+import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../state.js';
-import { getExerciseRadiogramById } from '../../store/action-reducers/utils/get-element.js';
 import { logRadiogram } from '../../store/action-reducers/utils/log.js';
-import type { Mutable, UUID } from '../../utils/index.js';
 import { createRadiogramActionTag } from '../utils/tag-helpers.js';
-import type { ExerciseRadiogram } from './exercise-radiogram.js';
+import type { UUID } from '../../utils/uuid.js';
+import { getExerciseRadiogramById } from '../../store/action-reducers/utils/get-element.js';
 import { publishTimeOf } from './radiogram-helpers.js';
+import type { ExerciseRadiogram } from './exercise-radiogram.js';
 
 export function publishRadiogram(
-    draftState: Mutable<ExerciseState>,
-    radiogram: Mutable<ExerciseRadiogram>
+    draftState: WritableDraft<ExerciseState>,
+    radiogram: WritableDraft<ExerciseRadiogram>
 ) {
     radiogram.status = {
         type: 'unreadRadiogramStatus',
@@ -24,7 +25,7 @@ export function publishRadiogram(
 }
 
 export function acceptRadiogram(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     radiogramId: UUID,
     clientId: UUID
 ) {
@@ -43,7 +44,7 @@ export function acceptRadiogram(
 }
 
 export function returnRadiogram(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     radiogramId: UUID
 ) {
     const radiogram = getExerciseRadiogramById(draftState, radiogramId);
@@ -61,7 +62,7 @@ export function returnRadiogram(
 }
 
 export function markRadiogramDone(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     radiogramId: UUID
 ) {
     const radiogram = getExerciseRadiogramById(draftState, radiogramId);

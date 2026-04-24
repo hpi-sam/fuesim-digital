@@ -1,4 +1,3 @@
-<!-- eslint-disable @angular-eslint/template/no-call-expression -->
 <table class="table table-striped">
     <thead>
         <tr>
@@ -6,99 +5,89 @@
             <th scope="col">Start</th>
             <th scope="col">Ziel</th>
             <!-- We know that this resolves synchronous -->
-            <th
-                *ngIf="exerciseStatus$ | async as exerciseStatus"
-                scope="col"
-                [class.text-muted]="exerciseStatus !== 'running'"
-                [title]="
-                    'Die Übung ist aktuell ' +
-                    (exerciseStatus === 'running' ? 'aktiv' : 'pausiert')
-                "
-            >
-                <i
-                    [class.bi-pause-fill]="exerciseStatus !== 'running'"
-                    [class.bi-play-fill]="exerciseStatus === 'running'"
+            @if (exerciseStatus$ | async; as exerciseStatus) {
+                <th
+                    scope="col"
+                    [class.text-muted]="exerciseStatus !== 'running'"
+                    [title]="
+                        'Die Übung ist aktuell ' +
+                        (exerciseStatus === 'running' ? 'aktiv' : 'pausiert')
+                    "
                 >
-                </i>
-                Ankunft in
-            </th>
+                    <i
+                        [class.bi-pause-fill]="exerciseStatus !== 'running'"
+                        [class.bi-play-fill]="exerciseStatus === 'running'"
+                    >
+                    </i>
+                    Ankunft in
+                </th>
+            }
         </tr>
     </thead>
     <tbody>
         <!-- Vehicles -->
-        <tr
-            *ngFor="
-                let vehicle of vehiclesInTransfer$ | async;
-                trackBy: 'id'
-                    | appTrackByProperty: (vehiclesInTransfer$ | async)
-            "
-        >
-            <td class="align-middle">
-                {{ vehicle.name }}
-            </td>
-            <td class="align-middle">
-                <app-start-point-name
-                    [startPoint]="currentTransferOf(vehicle).startPoint"
-                ></app-start-point-name>
-            </td>
-            <td class="align-middle">
-                <app-transfer-target-input
-                    [elementType]="'vehicle'"
-                    [elementId]="vehicle.id"
-                    [transfer]="currentTransferOf(vehicle)"
-                ></app-transfer-target-input>
-            </td>
-            <td class="align-middle">
-                <app-transfer-time-input
-                    [elementType]="'vehicle'"
-                    [elementId]="vehicle.id"
-                    [transfer]="currentTransferOf(vehicle)"
-                ></app-transfer-time-input>
-            </td>
-        </tr>
+        @for (vehicle of vehiclesInTransfer$ | async; track vehicle.id) {
+            <tr>
+                <td class="align-middle">
+                    {{ vehicle.name }}
+                </td>
+                <td class="align-middle">
+                    <app-start-point-name
+                        [startPoint]="currentTransferOf(vehicle).startPoint"
+                    ></app-start-point-name>
+                </td>
+                <td class="align-middle">
+                    <app-transfer-target-input
+                        [elementType]="'vehicle'"
+                        [elementId]="vehicle.id"
+                        [transfer]="currentTransferOf(vehicle)"
+                    ></app-transfer-target-input>
+                </td>
+                <td class="align-middle">
+                    <app-transfer-time-input
+                        [elementType]="'vehicle'"
+                        [elementId]="vehicle.id"
+                        [transfer]="currentTransferOf(vehicle)"
+                    ></app-transfer-time-input>
+                </td>
+            </tr>
+        }
         <!-- Personnel -->
-        <tr
-            *ngFor="
-                let personnel of personnelInTransfer$ | async;
-                trackBy: 'id'
-                    | appTrackByProperty: (personnelInTransfer$ | async)
-            "
-        >
-            <td class="align-middle">
-                {{ personnel.vehicleName }}
-                <span class="text-muted">
-                    {{ personnelTypeNames[personnel.personnelType] }}
-                </span>
-            </td>
-            <td class="align-middle">
-                <app-start-point-name
-                    [startPoint]="currentTransferOf(personnel).startPoint"
-                ></app-start-point-name>
-            </td>
-            <td class="align-middle">
-                <app-transfer-target-input
-                    [elementType]="'personnel'"
-                    [elementId]="personnel.id"
-                    [transfer]="currentTransferOf(personnel)"
-                ></app-transfer-target-input>
-            </td>
-            <td class="align-middle">
-                <app-transfer-time-input
-                    [elementType]="'personnel'"
-                    [elementId]="personnel.id"
-                    [transfer]="currentTransferOf(personnel)"
-                ></app-transfer-time-input>
-            </td>
-        </tr>
+        @for (personnel of personnelInTransfer$ | async; track personnel.id) {
+            <tr>
+                <td class="align-middle">
+                    {{ personnel.vehicleName }}
+                    <span class="text-muted">
+                        {{ personnel.typeName }}
+                    </span>
+                </td>
+                <td class="align-middle">
+                    <app-start-point-name
+                        [startPoint]="currentTransferOf(personnel).startPoint"
+                    ></app-start-point-name>
+                </td>
+                <td class="align-middle">
+                    <app-transfer-target-input
+                        [elementType]="'personnel'"
+                        [elementId]="personnel.id"
+                        [transfer]="currentTransferOf(personnel)"
+                    ></app-transfer-target-input>
+                </td>
+                <td class="align-middle">
+                    <app-transfer-time-input
+                        [elementType]="'personnel'"
+                        [elementId]="personnel.id"
+                        [transfer]="currentTransferOf(personnel)"
+                    ></app-transfer-time-input>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
-<p
-    *ngIf="
-        (vehiclesInTransfer$ | async)?.length === 0 &&
-        (personnelInTransfer$ | async)?.length === 0
-    "
-    class="text-muted text-center"
->
-    Keine Rettungskräfte im Transfer
-</p>
+@if (
+    (vehiclesInTransfer$ | async)?.length === 0 &&
+    (personnelInTransfer$ | async)?.length === 0
+) {
+    <p class="text-muted text-center">Keine Rettungskräfte im Transfer</p>
+}

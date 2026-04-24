@@ -73,3 +73,9 @@ Bootstrap-Icon `bi-trash-fill` (edited)
 [naw-vehicle.png](naw-vehicle.png):  
 Lukas Radermacher, based on <https://commons.wikimedia.org/wiki/File:RTW_Altenburg.png> by Florian Greiz 23  
 License: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+[favicon.png](favicon.png): created by Freepik - Flaticon <https://www.flaticon.com/de/kostenlose-icons/alarm>
+
+[scoutable-generic.png](scoutable-generic.png), [scoutable-patient.png](scoutable-patient.png):
+edited by Jonathan Weth, based on Bootstrap Icons <https://icons.getbootstrap.com/>
+License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)

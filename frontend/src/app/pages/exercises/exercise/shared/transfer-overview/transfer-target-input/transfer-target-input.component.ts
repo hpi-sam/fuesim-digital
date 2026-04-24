@@ -1,34 +1,50 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { UUID } from 'digital-fuesim-manv-shared';
-import { Transfer } from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectTransferPoints } from 'src/app/state/application/selectors/exercise.selectors';
+import type { UUID, Transfer } from 'fuesim-digital-shared';
+import {
+    NgbDropdown,
+    NgbDropdownToggle,
+    NgbDropdownMenu,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectTransferPoints } from '../../../../../../state/application/selectors/exercise.selectors';
+import { TransferPointNameComponent } from '../../../../../../shared/components/transfer-point-name/transfer-point-name.component';
+import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
 
 @Component({
     selector: 'app-transfer-target-input',
     templateUrl: './transfer-target-input.component.html',
     styleUrls: ['./transfer-target-input.component.scss'],
-    standalone: false,
+    imports: [
+        NgbDropdown,
+        NgbDropdownToggle,
+        TransferPointNameComponent,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
+        AsyncPipe,
+        ValuesPipe,
+    ],
 })
 export class TransferTargetInputComponent {
-    @Input() elementType!: 'personnel' | 'vehicle';
-    @Input() elementId!: UUID;
-    @Input() transfer!: Transfer;
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly exerciseService = inject(ExerciseService);
+
+    readonly elementType = input.required<'personnel' | 'vehicle'>();
+    readonly elementId = input.required<UUID>();
+    readonly transfer = input.required<Transfer>();
 
     public readonly transferPoints$ = this.store.select(selectTransferPoints);
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly exerciseService: ExerciseService
-    ) {}
 
     public setTransferTarget(targetTransferPointId: UUID) {
         this.exerciseService.proposeAction({
             type: '[Transfer] Edit transfer',
-            elementType: this.elementType,
-            elementId: this.elementId,
+            elementType: this.elementType(),
+            elementId: this.elementId(),
             targetTransferPointId,
         });
     }

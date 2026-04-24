@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { ExerciseTimeline } from 'digital-fuesim-manv-shared';
+import type { ExerciseTimeline } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom } from 'rxjs';
 import type { AppState } from '../state/app.state';
@@ -10,7 +10,7 @@ import {
     createStartTimeTravelAction,
 } from '../state/application/application.actions';
 import {
-    selectExerciseId,
+    selectExerciseKey,
     selectTimeConstraints,
 } from '../state/application/selectors/application.selectors';
 import { selectCurrentTime } from '../state/application/selectors/exercise.selectors';
@@ -30,25 +30,23 @@ import { TimeJumpHelper } from './time-jump-helper';
     providedIn: 'root',
 })
 export class TimeTravelService {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly httpClient = inject(HttpClient);
+    private readonly messageService = inject(MessageService);
+
     private timeJumpHelper?: TimeJumpHelper;
 
     private activatingTimeTravel = false;
-
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly httpClient: HttpClient,
-        private readonly messageService: MessageService
-    ) {}
 
     /**
      * Use the function in ApplicationService instead
      */
     public async startTimeTravel() {
         this.activatingTimeTravel = true;
-        const exerciseId = selectStateSnapshot(selectExerciseId, this.store);
+        const exerciseKey = selectStateSnapshot(selectExerciseKey, this.store);
         const exerciseTimeLine = await lastValueFrom(
             this.httpClient.get<ExerciseTimeline>(
-                `${httpOrigin}/api/exercise/${exerciseId}/history`
+                `${httpOrigin}/api/exercise/${exerciseKey}/history`
             )
         ).catch((error) => {
             this.stopTimeTravel();

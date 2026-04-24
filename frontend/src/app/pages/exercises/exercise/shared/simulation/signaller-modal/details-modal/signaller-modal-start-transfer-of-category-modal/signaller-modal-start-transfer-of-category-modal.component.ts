@@ -1,20 +1,24 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ExerciseAction,
     PatientStatusForTransport,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
-import { HotkeysService } from 'src/app/shared/services/hotkeys.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectBehaviorStatesByType } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { MessageService } from 'src/app/core/messages/message.service';
+import { FormsModule } from '@angular/forms';
 import { SignallerModalDetailsService } from '../signaller-modal-details.service';
+import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
+import { HotkeysService } from '../../../../../../../../shared/services/hotkeys.service';
+import { ExerciseService } from '../../../../../../../../core/exercise.service';
+import { MessageService } from '../../../../../../../../core/messages/message.service';
+import type { AppState } from '../../../../../../../../state/app.state';
+import { createSelectBehaviorStatesByType } from '../../../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../../../state/get-state-snapshot';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { PatientStatusDropdownComponent } from '../../../../../../../../shared/components/patient-status-dropdown/patient-status-dropdown.component';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-start-transfer-of-category-modal',
@@ -23,12 +27,23 @@ import { SignallerModalDetailsService } from '../signaller-modal-details.service
     styleUrls: [
         './signaller-modal-start-transfer-of-category-modal.component.scss',
     ],
-    standalone: false,
+    imports: [
+        FormsModule,
+        AutofocusDirective,
+        PatientStatusDropdownComponent,
+        HotkeyIndicatorComponent,
+    ],
 })
 export class SignallerModalStartTransferOfCategoryModalComponent
     implements OnInit, OnDestroy
 {
-    @Input() simulatedRegionId!: UUID;
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly hotkeysService = inject(HotkeysService);
+    private readonly detailsModal = inject(SignallerModalDetailsService);
+    private readonly messageService = inject(MessageService);
+
+    readonly simulatedRegionId = input.required<UUID>();
 
     private hotkeyLayer!: HotkeyLayer;
     private readonly destroy$ = new Subject<void>();
@@ -44,14 +59,6 @@ export class SignallerModalStartTransferOfCategoryModalComponent
         'yellow',
         'green',
     ] as const satisfies PatientStatusForTransport[];
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        private readonly hotkeysService: HotkeysService,
-        private readonly detailsModal: SignallerModalDetailsService,
-        private readonly messageService: MessageService
-    ) {}
 
     ngOnInit() {
         this.hotkeyLayer = this.hotkeysService.createLayer();
@@ -72,7 +79,7 @@ export class SignallerModalStartTransferOfCategoryModalComponent
     getTransportBehaviorState() {
         return selectStateSnapshot(
             createSelectBehaviorStatesByType(
-                this.simulatedRegionId,
+                this.simulatedRegionId(),
                 'managePatientTransportToHospitalBehavior'
             ),
             this.store
@@ -95,6 +102,7 @@ export class SignallerModalStartTransferOfCategoryModalComponent
         // Hence, all actions to be proposed are collected here and proposed in the end.
         const actionsToPropose: ExerciseAction[] = [];
 
+        const simulatedRegionId = this.simulatedRegionId();
         if (
             this.maximumStatus !==
             transportBehaviorState.maximumCategoryToTransport
@@ -103,7 +111,7 @@ export class SignallerModalStartTransferOfCategoryModalComponent
 
             actionsToPropose.push({
                 type: '[ManagePatientsTransportToHospitalBehavior] Update Maximum Category To Transport',
-                simulatedRegionId: this.simulatedRegionId,
+                simulatedRegionId,
                 behaviorId: transportBehaviorState.id,
                 maximumCategoryToTransport: this.maximumStatus,
             });
@@ -115,7 +123,7 @@ export class SignallerModalStartTransferOfCategoryModalComponent
                 type: this.transportStarted
                     ? '[ManagePatientsTransportToHospitalBehavior] Start Transport'
                     : '[ManagePatientsTransportToHospitalBehavior] Stop Transport',
-                simulatedRegionId: this.simulatedRegionId,
+                simulatedRegionId,
                 behaviorId: transportBehaviorState.id,
             });
         }

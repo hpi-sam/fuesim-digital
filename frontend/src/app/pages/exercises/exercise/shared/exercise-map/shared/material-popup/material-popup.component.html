@@ -1,6 +1,7 @@
-<ng-container *ngIf="material$ | async as material">
+@if (material$ | async; as material) {
     <h5 class="popover-header">
-        Material aus {{ material.vehicleName }}
+        <strong>{{ material.typeName }}</strong>
+        aus {{ material.vehicleName }}
         <button
             (click)="closePopup()"
             type="button"
@@ -8,24 +9,6 @@
         ></button>
     </h5>
     <div class="popover-body" style="max-width: 350px">
-        Dieses Material
-        <span
-            *ngIf="
-                (material.canCaterFor | caterCapacityCount) === 0;
-                else caterInfo
-            "
-        >
-            kann nicht zur Versorgung von Patienten genutzt werden.</span
-        >
-        <ng-template #caterInfo>
-            <span>{{
-                material.canCaterFor.logicalOperator === 'or'
-                    ? ' kann nur bei Patienten einer der unten gelisteten Sichtungskategorie gleichzeitig genutzt werden.'
-                    : ' kann bei Patienten verschiedener Sichtungskategorien gleichzeitig genutzt werden. Dabei kann es zur Versorgung von Patienten einer niedriger priorisierten Sichtungskategorie genutzt werden.'
-            }}</span>
-            <app-cater-capacity
-                [canCaterFor]="material.canCaterFor"
-            ></app-cater-capacity>
-        </ng-template>
+        <app-material-details [materialId]="material.id" />
     </div>
-</ng-container>
+}

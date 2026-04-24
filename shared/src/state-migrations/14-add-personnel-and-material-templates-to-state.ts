@@ -1,4 +1,4 @@
-import { cloneDeepMutable } from '../utils/index.js';
+import { cloneDeepMutable } from '../utils/clone-deep.js';
 import type { Migration } from './migration-functions.js';
 
 export const addPersonnelAndMaterialToState14: Migration = {

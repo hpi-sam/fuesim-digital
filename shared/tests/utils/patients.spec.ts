@@ -1,26 +1,29 @@
-import { generateDummyPatient } from '../../src/data/index.js';
-import { Patient } from '../../src/models/index.js';
-import type { PatientStatus, Position } from '../../src/models/utils/index.js';
+import type { WritableDraft } from 'immer';
+import type { ExerciseState } from '../../src/state.js';
+import type { PatientStatus } from '../../src/models/utils/patient-status.js';
+import type { Position } from '../../src/models/utils/position/position.js';
+import type { UUID } from '../../src/utils/uuid.js';
+import type { Patient } from '../../src/models/patient.js';
+import { patientPretriageTimeThreshold } from '../../src/models/patient.js';
+import { cloneDeepMutable } from '../../src/utils/clone-deep.js';
+import { generateDummyPatient } from '../../src/data/dummy-objects/patient.js';
 import {
     currentCoordinatesOf,
     isOnMap,
-    SpatialTree,
-} from '../../src/models/utils/index.js';
-import type { ExerciseState } from '../../src/state.js';
-import type { Mutable, UUID } from '../../src/utils/index.js';
-import { cloneDeepMutable } from '../../src/utils/index.js';
+} from '../../src/models/utils/position/position-helpers.js';
+import { SpatialTree } from '../../src/models/utils/spatial-tree.js';
 
 export function addPatient(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     pretriageStatus: PatientStatus,
     realStatus: PatientStatus,
     position?: Position,
     uuid?: UUID
-): Mutable<Patient> {
+): WritableDraft<Patient> {
     const patient = cloneDeepMutable(generateDummyPatient());
     patient.pretriageStatus = pretriageStatus;
     if (pretriageStatus !== 'white') {
-        patient.treatmentTime = Patient.pretriageTimeThreshold;
+        patient.treatmentTime = patientPretriageTimeThreshold;
     }
     patient.realStatus = realStatus;
     if (position) {

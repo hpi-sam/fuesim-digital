@@ -1,54 +1,72 @@
-<div *ngIf="errors && ngModelInput.dirty" class="mt-2 text-danger">
-    <div *ngIf="errors['required']">Diese Eingabe ist erforderlich.</div>
-    <div *ngIf="errors['minlength'] as minLengthError">
-        Die Eingabe muss mindestens {{ minLengthError.requiredLength }} Zeichen
-        lang sein. Es fehlen noch
-        {{ minLengthError.requiredLength - minLengthError.actualLength }}
-        Zeichen.
+@if (errors && ngModelInput().dirty) {
+    <div class="mt-2 text-danger validation-text">
+        @if (errors['required']) {
+            <div>{{ validationMessages.required }}</div>
+        }
+        @if (errors['minlength']; as minLengthError) {
+            <div>
+                Die Eingabe muss mindestens
+                {{ minLengthError.requiredLength }} Zeichen lang sein. Es fehlen
+                noch
+                {{
+                    minLengthError.requiredLength - minLengthError.actualLength
+                }}
+                Zeichen.
+            </div>
+        }
+        @if (errors['maxlength']; as maxLengthError) {
+            <div>
+                Die Eingabe darf höchstens
+                {{ maxLengthError.requiredLength }} Zeichen lang sein. Es sind
+                {{
+                    maxLengthError.actualLength - maxLengthError.requiredLength
+                }}
+                Zeichen zu viel.
+            </div>
+        }
+        @if (errors['pattern']; as patternError) {
+            <div>
+                Die Eingabe entspricht nicht dem Muster:
+                <span class="font-monospace">
+                    {{ patternError.requiredPattern }} </span
+                >.
+            </div>
+        }
+        @if (errors['email']; as emailError) {
+            <div>Die Eingabe ist keine valide E-Mail-Adresse.</div>
+        }
+        @if (errors['min']; as minError) {
+            <div>Die Eingabe muss mindestens {{ minError.min }} sein.</div>
+        }
+        @if (errors['max']; as maxError) {
+            <div>Die Eingabe darf höchstens {{ maxError.max }} sein.</div>
+        }
+        @if (errors['integer']; as maxError) {
+            <div>Die Eingabe muss eine ganze Zahl sein.</div>
+        }
+        @if (errors['url']; as maxError) {
+            <div>Die Eingabe ist keine valide URL.</div>
+        }
+        @if (errors['exactMatch']; as exactMatchError) {
+            <div>
+                Die Eingabe entspricht nicht
+                <span class="font-monospace">{{
+                    exactMatchError.stringToMatch
+                }}</span
+                >.
+            </div>
+        }
+        @if (errors['imageExists']; as imageExistsError) {
+            <div>
+                Kein Bild gefunden
+                @if (imageExistsError.error) {
+                    (<span class="font-monospace">{{
+                        imageExistsError.error
+                    }}</span
+                    >)
+                }
+                .
+            </div>
+        }
     </div>
-    <div *ngIf="errors['maxlength'] as maxLengthError">
-        Die Eingabe darf höchstens {{ maxLengthError.requiredLength }} Zeichen
-        lang sein. Es sind
-        {{ maxLengthError.actualLength - maxLengthError.requiredLength }}
-        Zeichen zu viel.
-    </div>
-    <div *ngIf="errors['pattern'] as patternError">
-        Die Eingabe entspricht nicht dem Muster:
-        <span class="font-monospace"> {{ patternError.requiredPattern }} </span
-        >.
-    </div>
-    <div *ngIf="errors['email'] as emailError">
-        Die Eingabe ist keine valide E-Mail-Adresse.
-    </div>
-    <div *ngIf="errors['min'] as minError">
-        Die Eingabe muss mindestens {{ minError.min }} sein.
-    </div>
-    <div *ngIf="errors['max'] as maxError">
-        Die Eingabe darf höchstens {{ maxError.max }} sein.
-    </div>
-    <div *ngIf="errors['integer'] as maxError">
-        Die Eingabe muss eine ganze Zahl sein.
-    </div>
-    <div *ngIf="errors['url'] as maxError">
-        Die Eingabe ist keine valide URL.
-    </div>
-    <div *ngIf="errors['exactMatch'] as exactMatchError">
-        Die Eingabe entspricht nicht
-        <span class="font-monospace">{{ exactMatchError.stringToMatch }}</span
-        >.
-    </div>
-    <div *ngIf="errors['exerciseExists'] as exerciseExistsError">
-        Es existiert keine Übung mit der Id
-        <span class="font-monospace">{{ exerciseExistsError.id }}</span
-        >.
-    </div>
-    <div *ngIf="errors['imageExists'] as imageExistsError">
-        Kein Bild gefunden<ng-container *ngIf="imageExistsError.error">
-            (<span class="font-monospace">{{ imageExistsError.error }}</span
-            >) </ng-container
-        >.
-    </div>
-    <div *ngIf="errors['joinId']">
-        Die Eingabe muss eine gültige Übungs-ID (6 oder 8 Ziffern) sein.
-    </div>
-</div>
+}

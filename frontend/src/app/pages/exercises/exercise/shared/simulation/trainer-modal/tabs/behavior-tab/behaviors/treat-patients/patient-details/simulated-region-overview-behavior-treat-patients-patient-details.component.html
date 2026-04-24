@@ -1,5 +1,5 @@
 <div class="col-sm d-inline-flex justify-content-center">
-    <app-patient-identifier [patientId]="patientId" />
+    <app-patient-identifier [patientId]="patientId()" />
 </div>
 <div class="col-sm d-inline-flex justify-content-center">
     <app-patient-status-badge
@@ -11,55 +11,55 @@
         [patientStatus]="(patient$ | async)!.patientStatusCode"
     ></app-patient-status-display>
 </div>
-<div
-    class="col-sm d-inline-flex justify-content-start"
-    style="flex-wrap: wrap"
-    *ngIf="cateringsActive"
->
+@if (cateringsActive()) {
     <div
-        *ngFor="let person of caterings$ | async"
-        class="d-flex flex-grow-1 m-1 d-inline-flex"
-        style="
-            width: 50px;
-            min-width: 50px;
-            max-width: 50px;
-            padding-left: 0px;
-            padding-right: 0px;
-        "
+        class="col-sm d-inline-flex justify-content-start"
+        style="flex-wrap: wrap"
     >
-        <div
-            class="container d-grid flex-grow-1"
-            style="
-                width: 50px;
-                min-width: 50px;
-                max-width: 50px;
-                padding-left: 0;
-                padding-right: 0;
-            "
-        >
-            <ngb-progressbar
-                type="info"
-                [value]="(1 / person.assignedPatientCount) * 100"
-                style="grid-column: 1; grid-row: 1"
-                class="h-100 w-100 flex-grow-1"
-            >
-            </ngb-progressbar>
-            <span
-                [ngbTooltip]="
-                    'Dieser ' +
-                    (person.personnelType | personnelName) +
-                    ' schenkt diesem Patienten ' +
-                    (1 / person.assignedPatientCount) * 100 +
-                    '% seiner Aufmerksamkeit.'
+        @for (person of caterings$ | async; track person) {
+            <div
+                class="d-flex flex-grow-1 m-1 d-inline-flex"
+                style="
+                    width: 50px;
+                    min-width: 50px;
+                    max-width: 50px;
+                    padding-left: 0px;
+                    padding-right: 0px;
                 "
-                [openDelay]="300"
-                [closeDelay]="100"
-                style="grid-column: 1; grid-row: 1"
-                class="h-100 w-100 flex-grow-1 text-center"
-                >{{
-                    person.personnelType | personnelTypeToGermanAbbreviation
-                }}</span
             >
-        </div>
+                <div
+                    class="container d-grid flex-grow-1"
+                    style="
+                        width: 50px;
+                        min-width: 50px;
+                        max-width: 50px;
+                        padding-left: 0;
+                        padding-right: 0;
+                    "
+                >
+                    <ngb-progressbar
+                        type="info"
+                        [value]="(1 / person.assignedPatientCount) * 100"
+                        style="grid-column: 1; grid-row: 1"
+                        class="h-100 w-100 flex-grow-1"
+                    >
+                    </ngb-progressbar>
+                    <span
+                        [ngbTooltip]="
+                            'Dieser ' +
+                            person.typeName +
+                            ' schenkt diesem Patienten ' +
+                            (1 / person.assignedPatientCount) * 100 +
+                            '% seiner Aufmerksamkeit.'
+                        "
+                        [openDelay]="300"
+                        [closeDelay]="100"
+                        style="grid-column: 1; grid-row: 1"
+                        class="h-100 w-100 flex-grow-1 text-center"
+                        >{{ person.typeAbbreviation }}</span
+                    >
+                </div>
+            </div>
+        }
     </div>
-</div>
+}

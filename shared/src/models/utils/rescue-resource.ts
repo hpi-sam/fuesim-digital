@@ -1,71 +1,43 @@
-import type { Type } from 'class-transformer';
-import { StrictObject } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import { IsResourceDescription } from '../../utils/validators/is-resource-description.js';
-import { getCreate } from './get-create.js';
-import type { PersonnelType } from './personnel-type.js';
-import { personnelTypeAllowedValues } from './personnel-type.js';
-import type { ResourceDescription } from './resource-description.js';
+import { z } from 'zod';
+import {
+    type ResourceDescription,
+    resourceDescriptionSchema,
+} from './resource-description.js';
 
-class RescueResource {
-    public readonly type!: `${string}Resource`;
+export const vehicleResourceSchema = z.strictObject({
+    type: z.literal('vehicleResource'),
+    vehicleCounts: resourceDescriptionSchema,
+});
+
+export type VehicleResource = z.infer<typeof vehicleResourceSchema>;
+
+export function newVehicleResource(
+    vehicleCounts: ResourceDescription
+): VehicleResource {
+    return { type: 'vehicleResource', vehicleCounts };
 }
 
-export class VehicleResource {
-    @IsValue('vehicleResource' as const)
-    public readonly type = 'vehicleResource';
+export const personnelResourceSchema = z.strictObject({
+    type: z.literal('personnelResource'),
+    personnelCounts: resourceDescriptionSchema,
+});
 
-    @IsResourceDescription()
-    public readonly vehicleCounts: ResourceDescription;
+export type PersonnelResource = z.infer<typeof personnelResourceSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(vehicleCounts: ResourceDescription) {
-        this.vehicleCounts = vehicleCounts;
-    }
-
-    static readonly create = getCreate(this);
+export function newPersonnelResource(
+    personnelCounts: ResourceDescription
+): PersonnelResource {
+    return { type: 'personnelResource', personnelCounts };
 }
 
-export class PersonnelResource {
-    @IsValue('personnelResource' as const)
-    public readonly type = 'personnelResource';
+export const exerciseRescueResourceSchema = z.discriminatedUnion('type', [
+    vehicleResourceSchema,
+    personnelResourceSchema,
+]);
 
-    @IsResourceDescription(personnelTypeAllowedValues)
-    public readonly personnelCounts: ResourceDescription<PersonnelType>;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(personnelCounts?: ResourceDescription<PersonnelType>) {
-        this.personnelCounts = personnelCounts ?? {
-            gf: 0,
-            notarzt: 0,
-            notSan: 0,
-            rettSan: 0,
-            san: 0,
-        };
-    }
-
-    static readonly create = getCreate(this);
-}
-
-export type ExerciseRescueResource = PersonnelResource | VehicleResource;
-
-export const rescueResourceTypeOptions: Parameters<typeof Type> = [
-    () => RescueResource,
-    {
-        keepDiscriminatorProperty: true,
-        discriminator: {
-            property: 'type',
-            subTypes: [
-                { name: 'vehicleResource', value: VehicleResource },
-                { name: 'personnelResource', value: PersonnelResource },
-            ],
-        },
-    },
-];
+export type ExerciseRescueResource = z.infer<
+    typeof exerciseRescueResourceSchema
+>;
 
 export function isEmptyResource(resource: ExerciseRescueResource) {
     let resourceDescription: ResourceDescription;
@@ -77,7 +49,5 @@ export function isEmptyResource(resource: ExerciseRescueResource) {
             resourceDescription = resource.vehicleCounts;
             break;
     }
-    return StrictObject.values(resourceDescription).every(
-        (count) => count === 0
-    );
+    return Object.values(resourceDescription).every((count) => count === 0);
 }

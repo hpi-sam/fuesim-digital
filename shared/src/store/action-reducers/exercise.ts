@@ -5,40 +5,41 @@ import {
     IsBoolean,
     IsInt,
     IsPositive,
+    IsUUID,
 } from 'class-validator';
-import type { Personnel, PersonnelType, Vehicle } from '../../models/index.js';
-import { PartialExport } from '../../export-import/file-format/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import {
-    createPersonnelTypeTag,
-    personnelTypeAllowedValues,
-    personnelTypeNames,
-    Patient,
-} from '../../models/index.js';
-import {
-    getStatus,
-    isNotInTransfer,
-    currentTransferOf,
-    TransferPosition,
-} from '../../models/utils/index.js';
+import { WritableDraft } from 'immer';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
 import { simulateAllRegions } from '../../simulation/utils/simulation.js';
 import type { ExerciseState } from '../../state.js';
-import type { Mutable, UUID } from '../../utils/index.js';
-import { cloneDeepMutable, StrictObject, uuid } from '../../utils/index.js';
 import type { ElementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
-import type { TransferableElementType } from './transfer.js';
-import { letElementArrive } from './transfer.js';
-import { updateTreatments } from './utils/calculate-treatments.js';
+import { getPatientVisibleStatus } from '../../models/patient.js';
+import { createPersonnelTypeTag } from '../../models/utils/tag-helpers.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
+import { PartialExport } from '../../export-import/file-format/partial-export.js';
+import { getStatus } from '../../models/utils/health-points.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import type { Personnel } from '../../models/personnel.js';
+import type { Vehicle } from '../../models/vehicle.js';
+import {
+    currentTransferOf,
+    isInTransfer,
+} from '../../models/utils/position/position-helpers.js';
+import { type UUID, uuid, uuidValidationOptions } from '../../utils/uuid.js';
+import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import { PatientUpdate } from './utils/patient-updates.js';
 import {
     logPatientVisibleStatusChanged,
     logActive,
     logPatient,
 } from './utils/log.js';
+import { updateTreatments } from './utils/calculate-treatments.js';
+import { letElementArrive } from './transfer.js';
+import type { TransferableElementType } from './transfer.js';
 
 export class PauseExerciseAction implements Action {
     @IsValue('[Exercise] Pause' as const)
@@ -48,6 +49,14 @@ export class PauseExerciseAction implements Action {
 export class StartExerciseAction implements Action {
     @IsValue('[Exercise] Start' as const)
     public readonly type = '[Exercise] Start';
+}
+
+export class SetAutojoinViewportAction implements Action {
+    @IsValue('[Exercise] Set autojoin viewport' as const)
+    public readonly type = '[Exercise] Set autojoin viewport';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly viewportId!: UUID;
 }
 
 export class ExerciseTickAction implements Action {
@@ -113,6 +122,16 @@ export namespace ExerciseActionReducers {
         rights: 'trainer',
     };
 
+    export const setAutojoinViewport: ActionReducer<SetAutojoinViewportAction> =
+        {
+            action: SetAutojoinViewportAction,
+            reducer: (draftState, { viewportId }) => {
+                draftState.autojoinViewportId = viewportId;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
     export const exerciseTick: ActionReducer<ExerciseTickAction> = {
         action: ExerciseTickAction,
         reducer: (draftState, { patientUpdates, tickInterval }) => {
@@ -123,7 +142,7 @@ export namespace ExerciseActionReducers {
             patientUpdates.forEach((patientUpdate) => {
                 const currentPatient = draftState.patients[patientUpdate.id]!;
 
-                const visibleStatusBefore = Patient.getVisibleStatus(
+                const visibleStatusBefore = getPatientVisibleStatus(
                     currentPatient,
                     draftState.configuration.pretriageEnabled,
                     draftState.configuration.bluePatientsEnabled
@@ -135,7 +154,7 @@ export namespace ExerciseActionReducers {
                 currentPatient.treatmentTime = patientUpdate.treatmentTime;
                 currentPatient.realStatus = getStatus(currentPatient.health);
 
-                const visibleStatusAfter = Patient.getVisibleStatus(
+                const visibleStatusAfter = getPatientVisibleStatus(
                     currentPatient,
                     draftState.configuration.pretriageEnabled,
                     draftState.configuration.bluePatientsEnabled
@@ -181,13 +200,12 @@ export namespace ExerciseActionReducers {
         reducer: (draftState, { mode, partialExport }) => {
             const mutablePartialExport = cloneDeepMutable(partialExport);
             if (mutablePartialExport.mapImageTemplates !== undefined) {
-                if (mode === 'append') {
-                    draftState.mapImageTemplates.push(
-                        ...mutablePartialExport.mapImageTemplates
-                    );
-                } else {
-                    draftState.mapImageTemplates =
-                        mutablePartialExport.mapImageTemplates;
+                if (mode !== 'append') {
+                    draftState.mapImageTemplates = {};
+                }
+                for (const mapImageTemplate of mutablePartialExport.mapImageTemplates) {
+                    draftState.mapImageTemplates[mapImageTemplate.id] =
+                        mapImageTemplate;
                 }
             }
             if (mutablePartialExport.patientCategories !== undefined) {
@@ -201,19 +219,18 @@ export namespace ExerciseActionReducers {
                 }
             }
             if (mutablePartialExport.vehicleTemplates !== undefined) {
-                if (mode === 'append') {
-                    draftState.vehicleTemplates.push(
-                        ...mutablePartialExport.vehicleTemplates
-                    );
-                } else {
+                if (mode !== 'append') {
                     // Remove all vehicles from all alarm groups as all existing vehicle templates are being removed
                     for (const alarmGroup of Object.values(
                         draftState.alarmGroups
                     )) {
                         alarmGroup.alarmGroupVehicles = {};
                     }
-                    draftState.vehicleTemplates =
-                        mutablePartialExport.vehicleTemplates;
+                    draftState.vehicleTemplates = {};
+                }
+                for (const vehicleTemplate of mutablePartialExport.vehicleTemplates) {
+                    draftState.vehicleTemplates[vehicleTemplate.id] =
+                        vehicleTemplate;
                 }
             }
             return draftState;
@@ -228,31 +245,37 @@ type TransferTypePluralMap = Pick<
 >;
 
 function refreshTransfer(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     type: keyof TransferTypePluralMap,
     tickInterval: number
 ): void {
     const elements = draftState[elementTypePluralMap[type]];
-    Object.values(elements).forEach((element: Mutable<Personnel | Vehicle>) => {
-        if (isNotInTransfer(element)) {
-            return;
+    Object.values(elements).forEach(
+        (element: WritableDraft<Personnel | Vehicle>) => {
+            if (!isInTransfer(element)) {
+                return;
+            }
+            if (currentTransferOf(element).isPaused) {
+                const newTransfer = cloneDeepMutable(
+                    currentTransferOf(element)
+                );
+                newTransfer.endTimeStamp += tickInterval;
+                changePosition(
+                    element,
+                    newTransferPositionFor(newTransfer),
+                    draftState
+                );
+                return;
+            }
+            // Not transferred yet
+            if (
+                currentTransferOf(element).endTimeStamp > draftState.currentTime
+            ) {
+                return;
+            }
+            letElementArrive(draftState, type, element.id);
         }
-        if (currentTransferOf(element).isPaused) {
-            const newTransfer = cloneDeepMutable(currentTransferOf(element));
-            newTransfer.endTimeStamp += tickInterval;
-            changePosition(
-                element,
-                TransferPosition.create(newTransfer),
-                draftState
-            );
-            return;
-        }
-        // Not transferred yet
-        if (currentTransferOf(element).endTimeStamp > draftState.currentTime) {
-            return;
-        }
-        letElementArrive(draftState, type, element.id);
-    });
+    );
 }
 
 /**
@@ -287,31 +310,32 @@ export function preparePartialExportForImport(
 }
 
 export interface TreatmentAssignment {
-    [patientId: UUID]: { [personnelType in PersonnelType]: number };
+    [patientId: UUID]: ResourceDescription;
 }
 
 function calculateTreatmentAssignment(
-    draftState: Mutable<ExerciseState>
+    draftState: WritableDraft<ExerciseState>
 ): TreatmentAssignment {
-    const treatmentAssignment = StrictObject.fromEntries(
+    const treatmentAssignment = Object.fromEntries(
         Object.keys(draftState.patients).map((patientId) => [
             patientId,
-            StrictObject.fromEntries(
-                StrictObject.keys(personnelTypeAllowedValues).map(
-                    (personnelType) => [personnelType, 0]
-                )
+            Object.fromEntries(
+                Object.values(draftState.personnelTemplates).map((template) => [
+                    template.id,
+                    0,
+                ])
             ),
         ])
     ) as TreatmentAssignment;
 
-    StrictObject.values(draftState.personnel).forEach((personnel) => {
-        const assignedPatientCount = StrictObject.keys(
+    Object.values(draftState.personnel).forEach((personnel) => {
+        const assignedPatientCount = Object.keys(
             personnel.assignedPatientIds
         ).length;
-        StrictObject.keys(personnel.assignedPatientIds)
+        Object.keys(personnel.assignedPatientIds)
             .filter((patientId) => treatmentAssignment[patientId])
             .forEach((patientId) => {
-                treatmentAssignment[patientId]![personnel.personnelType] +=
+                treatmentAssignment[patientId]![personnel.templateId]! +=
                     1 / assignedPatientCount;
             });
     });
@@ -320,36 +344,40 @@ function calculateTreatmentAssignment(
 }
 
 function evaluateTreatmentReassignment(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     newTreatmentAssignment: TreatmentAssignment
 ) {
     if (!draftState.previousTreatmentAssignment) return;
-
     Object.keys(newTreatmentAssignment)
         .filter((patientId) =>
-            StrictObject.keys(personnelTypeAllowedValues).some(
-                (personnelType) =>
-                    newTreatmentAssignment[patientId]![personnelType] !==
+            Object.values(draftState.personnelTemplates).some(
+                (personnelTemplate) =>
+                    newTreatmentAssignment[patientId]![personnelTemplate.id] !==
                     draftState.previousTreatmentAssignment![patientId]?.[
-                        personnelType
+                        personnelTemplate.id
                     ]
             )
         )
         .forEach((patientId) => {
             logPatient(
                 draftState,
-                StrictObject.entries(newTreatmentAssignment[patientId]!)
+                Object.entries(newTreatmentAssignment[patientId]!)
                     .filter(([, count]) => count > 0)
-                    .map(([personnelType]) =>
-                        createPersonnelTypeTag(draftState, personnelType)
+                    .map(([personnelTemplateId]) =>
+                        createPersonnelTypeTag(
+                            draftState,
+                            draftState.personnelTemplates[personnelTemplateId]!
+                        )
                     ),
                 `Diese Einsatzkräfte wurden dem Patienten neu zugeteilt: ${
-                    StrictObject.entries(newTreatmentAssignment[patientId]!)
+                    Object.entries(newTreatmentAssignment[patientId]!)
                         .filter(([, count]) => count > 0)
                         .map(
-                            ([personnelType, count]) =>
+                            ([personnelTemplateId, count]) =>
                                 `${+count.toFixed(2)} ${
-                                    personnelTypeNames[personnelType]
+                                    draftState.personnelTemplates[
+                                        personnelTemplateId
+                                    ]!.name
                                 }`
                         )
                         .join(', ') || 'Keine Einsatzkräfte'

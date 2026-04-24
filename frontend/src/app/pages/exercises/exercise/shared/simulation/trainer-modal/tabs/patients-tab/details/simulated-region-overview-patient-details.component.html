@@ -1,0 +1,10 @@
+@if (patientId()) {
+    <app-patients-details
+        class="overflow-auto w-100 d-inline-block flex-grow-1"
+        [patientId]="patientId()"
+    />
+    <app-simulated-region-overview-patient-interaction-bar
+        class="w-100 d-inline-block"
+        [patientId]="patientId()"
+    />
+}

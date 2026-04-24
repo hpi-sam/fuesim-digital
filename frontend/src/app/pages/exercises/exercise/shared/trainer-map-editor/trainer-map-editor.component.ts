@@ -1,23 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+    NgbModal,
+    NgbAccordionDirective,
+    NgbAccordionItem,
+    NgbAccordionHeader,
+    NgbAccordionToggle,
+    NgbAccordionButton,
+    NgbAccordionCollapse,
+    NgbAccordionBody,
+    NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
-    Viewport,
-    TransferPoint,
     PartialExport,
     migratePartialExport,
+    transferPointImage,
     validateExerciseExport,
-} from 'digital-fuesim-manv-shared';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import { MessageService } from 'src/app/core/messages/message.service';
-import type { PatientCategory, UUID } from 'digital-fuesim-manv-shared';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectVehicleTemplates,
-    selectPatientCategories,
-    selectMapImagesTemplates,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    viewportImage,
+    bystanderCategories,
+    scoutableMapImageTemplate,
+} from 'fuesim-digital-shared';
+import type { PatientCategory, UUID } from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
@@ -26,6 +33,24 @@ import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-
 import { openPartialImportOverwriteModal } from '../partial-import/open-partial-import-overwrite-modal';
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
 import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
+import { restrictedZoneDragTemplates } from '../editor-panel/templates/restricted-zone';
+import { ExerciseService } from '../../../../../core/exercise.service';
+import { MessageService } from '../../../../../core/messages/message.service';
+import type { AppState } from '../../../../../state/app.state';
+import {
+    selectPatientCategories,
+    selectVehicleTemplates,
+    selectMapImagesTemplates,
+    selectExerciseState,
+} from '../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
+import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
+import { FileInputDirective } from '../../../../../shared/directives/file-input.directive';
+import { MapEditorCardComponent } from '../editor-panel/map-editor-card/map-editor-card.component';
+import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
+import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
+import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -41,12 +66,39 @@ type FilterCategory =
     selector: 'app-trainer-map-editor',
     templateUrl: './trainer-map-editor.component.html',
     styleUrls: ['./trainer-map-editor.component.scss'],
-    standalone: false,
+    imports: [
+        ExerciseMapComponent,
+        FileInputDirective,
+        NgbAccordionDirective,
+        NgbAccordionItem,
+        NgbAccordionHeader,
+        NgbAccordionToggle,
+        NgbAccordionButton,
+        NgbCollapse,
+        NgbAccordionCollapse,
+        NgbAccordionBody,
+        MapEditorCardComponent,
+        FormsModule,
+        PatientStatusBadgeComponent,
+        NgbTooltip,
+        PatientStatusDisplayComponent,
+        TrainerToolbarComponent,
+        AsyncPipe,
+        KeyValuePipe,
+        ValuesPipe,
+    ],
 })
 /**
  * A wrapper around the map that provides trainers with more options and tools.
  */
 export class TrainerMapEditorComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly dragElementService = inject(DragElementService);
+    readonly transferLinesService = inject(TransferLinesService);
+    private readonly ngbModalService = inject(NgbModal);
+    private readonly messageService = inject(MessageService);
+    private readonly exerciseService = inject(ExerciseService);
+
     public selectedCategories$: BehaviorSubject<{
         [key in FilterCategory]: boolean;
     }> = new BehaviorSubject<{ [key in FilterCategory]: boolean }>({
@@ -77,6 +129,9 @@ export class TrainerMapEditorComponent implements OnInit {
         [key in FilterCategory]?: PatientCategory[];
     }>;
 
+    public bystanderCategories = bystanderCategories;
+    public scoutableMapImageTemplate = scoutableMapImageTemplate;
+
     ngOnInit() {
         this.patientCategories$ = combineLatest([
             this.allPatientCategories$,
@@ -106,23 +161,16 @@ export class TrainerMapEditorComponent implements OnInit {
         this.transferLinesService.displayTransferLines = newValue;
     }
 
-    constructor(
-        private readonly store: Store<AppState>,
-        public readonly dragElementService: DragElementService,
-        public readonly transferLinesService: TransferLinesService,
-        private readonly ngbModalService: NgbModal,
-        private readonly messageService: MessageService,
-        private readonly exerciseService: ExerciseService
-    ) {}
+    public readonly simulatedRegionDragTemplates = simulatedRegionDragTemplates;
 
-    public readonly simulatedRegionTemplates = simulatedRegionDragTemplates;
+    public readonly restrictedZoneDragTemplates = restrictedZoneDragTemplates;
 
     public readonly viewportTemplate = {
-        image: Viewport.image,
+        image: viewportImage,
     };
 
     public readonly transferPointTemplate = {
-        image: TransferPoint.image,
+        image: transferPointImage,
     };
 
     public addImageTemplate() {
@@ -163,8 +211,10 @@ export class TrainerMapEditorComponent implements OnInit {
             const importedPlainObject = JSON.parse(
                 importedText
             ) as PartialExport;
-            const migratedPartialExport =
-                migratePartialExport(importedPlainObject);
+            const migratedPartialExport = migratePartialExport(
+                importedPlainObject,
+                selectStateSnapshot(selectExerciseState, this.store)
+            );
             const validation = validateExerciseExport(migratedPartialExport);
             if (validation.length > 0) {
                 throw Error(
@@ -175,6 +225,10 @@ export class TrainerMapEditorComponent implements OnInit {
                 this.ngbModalService,
                 migratedPartialExport
             );
+        } catch {
+            this.messageService.postError({
+                title: 'Fehler beim Importieren von Vorlagen',
+            });
         } finally {
             this.importingTemplates = false;
         }

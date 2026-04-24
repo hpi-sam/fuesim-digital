@@ -1,4 +1,5 @@
-import { IsInt, IsOptional, IsUUID, Min } from 'class-validator';
+import type { Immutable, WritableDraft } from 'immer';
+import { z } from 'zod';
 import type { ExerciseState } from '../../state.js';
 import type { CatersFor } from '../../store/action-reducers/utils/calculate-treatments.js';
 import {
@@ -6,83 +7,67 @@ import {
     removeTreatmentsOfElement,
     tryToCaterFor,
 } from '../../store/action-reducers/utils/calculate-treatments.js';
-import type { Immutable, Mutable } from '../../utils/immutability.js';
-import { stringCompare, type UUID } from '../../utils/index.js';
-import { uuidValidationOptions } from '../../utils/uuid.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
 import type { TreatmentProgress } from '../utils/treatment.js';
-import { treatmentProgressAllowedValues } from '../utils/treatment.js';
-import {
-    ResourceRequiredEvent,
-    TreatmentProgressChangedEvent,
-} from '../events/index.js';
+import { treatmentProgressSchema } from '../utils/treatment.js';
 import { sendSimulationEvent } from '../events/utils.js';
-import type { AssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
 import { defaultPersonnelTemplates } from '../../data/default-state/personnel-templates.js';
-import { StrictObject } from '../../utils/strict-object.js';
-import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import type { Material } from '../../models/material.js';
-import type { Personnel } from '../../models/personnel.js';
-import { Patient } from '../../models/patient.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import type { Patient } from '../../models/patient.js';
+import {
+    getPatientVisibleStatus,
+    isPretriageStatusLocked,
+} from '../../models/patient.js';
+import { logTreatmentStatusChangedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
+import type { UUID } from '../../utils/uuid.js';
+import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
+import { stringCompare } from '../../utils/string-compare.js';
+import type { AssignLeaderBehaviorState } from '../behaviors/assign-leader.js';
+import { newTreatmentProgressChangedEvent } from '../events/treatment-progress-changed.js';
 import {
     addResourceDescription,
     ceilResourceDescription,
     maxResourceDescription,
+    type ResourceDescription,
     scaleResourceDescription,
     subtractResourceDescription,
 } from '../../models/utils/resource-description.js';
-import { logTreatmentStatusChangedInSimulatedRegion } from '../../store/action-reducers/utils/log.js';
-import { getCreate } from '../../models/utils/get-create.js';
-import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
-import type { PersonnelType } from '../../models/utils/personnel-type.js';
-import { PersonnelResource } from '../../models/utils/rescue-resource.js';
+import { newPersonnelResource } from '../../models/utils/rescue-resource.js';
+import { newResourceRequiredEvent } from '../events/resources-required.js';
 import type { PatientStatus } from '../../models/utils/patient-status.js';
-import type {
-    SimulationActivity,
-    SimulationActivityState,
-} from './simulation-activity.js';
+import type { Personnel } from '../../models/personnel.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { simulationActivityStateSchema } from './simulation-activity.js';
+import type { SimulationActivity } from './simulation-activity.js';
 
-export class ReassignTreatmentsActivityState
-    implements SimulationActivityState
-{
-    @IsValue('reassignTreatmentsActivity' as const)
-    public readonly type = 'reassignTreatmentsActivity';
+export const reassignTreatmentsActivityStateSchema = z.strictObject({
+    ...simulationActivityStateSchema.shape,
+    type: z.literal('reassignTreatmentsActivity'),
+    treatmentProgress: treatmentProgressSchema,
+    countingStartedAt: z.int().nonnegative().optional(),
+    countingTimePerPatient: z.int().nonnegative(),
+});
+export type ReassignTreatmentsActivityState = z.infer<
+    typeof reassignTreatmentsActivityStateSchema
+>;
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID;
-
-    @IsLiteralUnion(treatmentProgressAllowedValues)
-    public readonly treatmentProgress: TreatmentProgress;
-
-    @IsOptional()
-    @IsInt()
-    @Min(0)
-    public readonly countingStartedAt: number | undefined;
-
-    @IsInt()
-    @Min(0)
-    public readonly countingTimePerPatient: number;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        id: UUID,
-        treatmentProgress: TreatmentProgress,
-        countingTimePerPatient: number
-    ) {
-        this.id = id;
-        this.treatmentProgress = treatmentProgress;
-        this.countingTimePerPatient = countingTimePerPatient;
-    }
-
-    static readonly create = getCreate(this);
+export function newReassignTreatmentsActivityState(
+    id: UUID,
+    treatmentProgress: TreatmentProgress,
+    countingTimePerPatient: number
+): ReassignTreatmentsActivityState {
+    return {
+        id,
+        type: 'reassignTreatmentsActivity',
+        treatmentProgress,
+        countingTimePerPatient,
+        countingStartedAt: undefined,
+    };
 }
 
 export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsActivityState> =
     {
-        activityState: ReassignTreatmentsActivityState,
+        activityStateSchema: reassignTreatmentsActivityStateSchema,
         tick(draftState, simulatedRegion, activityState, _, terminate) {
             const patients = Object.values(draftState.patients)
                 .filter((patient) =>
@@ -119,7 +104,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                 if (progress !== 'noTreatment') {
                     sendSimulationEvent(
                         simulatedRegion,
-                        TreatmentProgressChangedEvent.create('noTreatment')
+                        newTreatmentProgressChangedEvent('noTreatment')
                     );
                     logTreatmentStatusChangedInSimulatedRegion(
                         draftState,
@@ -141,16 +126,14 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
             }
 
             let allowTerminate = true;
-            let missingPersonnel:
-                | ResourceDescription<PersonnelType>
-                | undefined;
+            let missingPersonnel: ResourceDescription | undefined;
 
             switch (progress) {
                 case 'noTreatment': {
                     // Since we've reached this line, there is a leader and other personnel so treatment can start
                     sendSimulationEvent(
                         simulatedRegion,
-                        TreatmentProgressChangedEvent.create('unknown')
+                        newTreatmentProgressChangedEvent('unknown')
                     );
                     logTreatmentStatusChangedInSimulatedRegion(
                         draftState,
@@ -164,7 +147,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                     if (finished) {
                         sendSimulationEvent(
                             simulatedRegion,
-                            TreatmentProgressChangedEvent.create('counted')
+                            newTreatmentProgressChangedEvent('counted')
                         );
                         logTreatmentStatusChangedInSimulatedRegion(
                             draftState,
@@ -190,7 +173,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                         } else {
                             sendSimulationEvent(
                                 simulatedRegion,
-                                TreatmentProgressChangedEvent.create('counted')
+                                newTreatmentProgressChangedEvent('counted')
                             );
                             logTreatmentStatusChangedInSimulatedRegion(
                                 draftState,
@@ -212,7 +195,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                     if (secured && progress !== 'secured') {
                         sendSimulationEvent(
                             simulatedRegion,
-                            TreatmentProgressChangedEvent.create('secured')
+                            newTreatmentProgressChangedEvent('secured')
                         );
                         logTreatmentStatusChangedInSimulatedRegion(
                             draftState,
@@ -224,7 +207,7 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
                     if (!secured && progress !== 'triaged') {
                         sendSimulationEvent(
                             simulatedRegion,
-                            TreatmentProgressChangedEvent.create('triaged')
+                            newTreatmentProgressChangedEvent('triaged')
                         );
                         logTreatmentStatusChangedInSimulatedRegion(
                             draftState,
@@ -238,12 +221,12 @@ export const reassignTreatmentsActivity: SimulationActivity<ReassignTreatmentsAc
             }
 
             if (missingPersonnel !== undefined) {
-                const missingResource = PersonnelResource.create(
+                const missingResource = newPersonnelResource(
                     ceilResourceDescription(missingPersonnel)
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    ResourceRequiredEvent.create(
+                    newResourceRequiredEvent(
                         simulatedRegion.id,
                         missingResource,
                         'reassignTreatmentsActivity'
@@ -263,35 +246,35 @@ type TreatablePatientStatus = Exclude<
 >;
 
 interface CateringMaterial {
-    material: Mutable<Material>;
+    material: WritableDraft<Material>;
     catersFor: CatersFor;
 }
 
 interface CateringPersonnel {
-    personnel: Mutable<Personnel>;
+    personnel: WritableDraft<Personnel>;
     priority: number;
     catersFor: CatersFor;
 }
 
 type PatientToPersonnelDict = {
-    [patientId in UUID]: { [personnelType in PersonnelType]?: UUID[] };
+    [patientId in UUID]: { [personnelType in string]?: UUID[] };
 };
 
 type PersonnelToPatientCategoryDict = {
     [personnelId in UUID]: {
-        [personnelType in PersonnelType]?: {
+        [personnelType in string]?: {
             [sk in TreatablePatientStatus]?: number;
         };
     };
 };
 
 interface PersonnelSubstitution {
-    from: ResourceDescription<PersonnelType>;
-    to: Mutable<PersonnelType>;
+    from: ResourceDescription;
+    to: string;
 }
 
 function createCateringMaterials(
-    materials: Mutable<Material>[]
+    materials: WritableDraft<Material>[]
 ): CateringMaterial[] {
     return materials.map((material) => ({
         material,
@@ -299,7 +282,7 @@ function createCateringMaterials(
     }));
 }
 
-const personnelPriorities: { [Key in PersonnelType]: number } = {
+const personnelPriorities: { [key in string]: number } = {
     gf: 0,
     san: 1,
     rettSan: 2,
@@ -307,12 +290,16 @@ const personnelPriorities: { [Key in PersonnelType]: number } = {
     notarzt: 4,
 };
 
+const emptyPersonnelCounts = Object.fromEntries(
+    Object.keys(personnelPriorities).map((personnelType) => [personnelType, 0])
+);
+
 // Estimation for required personnel based on the 7/2/1 rule.
 const estimatedSkDistribution = { green: 7 / 10, yellow: 2 / 10, red: 1 / 10 };
 
 // We only ever allow two patients to be treated by one personnel, except for notarzt
 const capacities = Object.fromEntries(
-    StrictObject.entries(defaultPersonnelTemplates).map(
+    Object.entries(defaultPersonnelTemplates).map(
         ([personnelType, { canCaterFor }]) => [
             personnelType,
             {
@@ -322,37 +309,37 @@ const capacities = Object.fromEntries(
             },
         ]
     )
-) as { [key in PersonnelType]: ResourceDescription<TreatablePatientStatus> };
-capacities.notarzt = {
+) as { [key in string]: ResourceDescription<TreatablePatientStatus> };
+capacities['notarzt'] = {
     green: defaultPersonnelTemplates.notarzt.canCaterFor.green,
     red: defaultPersonnelTemplates.notarzt.canCaterFor.red,
     yellow: defaultPersonnelTemplates.notarzt.canCaterFor.yellow,
 };
 
 const minimumRequiredPersonnel: {
-    [SK in TreatablePatientStatus]: Immutable<
-        ResourceDescription<PersonnelType>
-    >;
+    [SK in TreatablePatientStatus]: Immutable<ResourceDescription>;
 } = {
     red: {
         gf: 0,
         san: 0,
         rettSan: 1,
         notSan: 1,
-        notarzt: 1 / capacities.notarzt.red,
+        notarzt: 1 / capacities['notarzt'].red,
     },
     yellow: {
         gf: 0,
         san: 0,
         rettSan: 1,
         notSan: 0,
-        notarzt: 1 / (capacities.notarzt.yellow + capacities.notarzt.red),
+        notarzt: 1 / (capacities['notarzt'].yellow + capacities['notarzt'].red),
     },
     green: {
         gf: 0,
         san:
             1 /
-            (capacities.san.green + capacities.san.yellow + capacities.san.red),
+            ((capacities['san']?.green ?? 0) +
+                (capacities['san']?.yellow ?? 0) +
+                (capacities['san']?.red ?? 0)),
         rettSan: 0,
         notSan: 0,
         notarzt: 0,
@@ -360,14 +347,14 @@ const minimumRequiredPersonnel: {
 };
 
 const requiresExclusivity: {
-    [SK in TreatablePatientStatus]?: { [Per in PersonnelType]?: boolean };
+    [SK in TreatablePatientStatus]?: { [Per in string]?: boolean };
 } = {
     red: { rettSan: true, notSan: true },
     yellow: { rettSan: true },
 };
 
 // Ascending priority
-const personnelTypePriorityList = StrictObject.entries(personnelPriorities)
+const personnelTypePriorityList = Object.entries(personnelPriorities)
     .sort(([typeA, priorityA], [typeB, priorityB]) => priorityA - priorityB)
     .map(([personnelType]) => personnelType);
 // Descending priority
@@ -376,11 +363,11 @@ const reversedPersonnelTypePriorityList = [
 ].reverse();
 
 function createCateringPersonnel(
-    personnel: Mutable<Personnel>[]
+    personnel: WritableDraft<Personnel>[]
 ): CateringPersonnel[] {
     return personnel.map((pers) => ({
         personnel: pers,
-        priority: personnelPriorities[pers.personnelType],
+        priority: personnelPriorities[pers.personnelType] ?? -1,
         catersFor: {
             red: 0,
             yellow: 0,
@@ -397,9 +384,9 @@ function createCateringPersonnel(
  * @returns Whether all patients have been counted
  */
 function count(
-    draftState: Mutable<ExerciseState>,
-    activityState: Mutable<ReassignTreatmentsActivityState>,
-    patients: Mutable<Patient>[]
+    draftState: WritableDraft<ExerciseState>,
+    activityState: WritableDraft<ReassignTreatmentsActivityState>,
+    patients: WritableDraft<Patient>[]
 ): boolean {
     if (activityState.countingStartedAt) {
         return (
@@ -423,20 +410,20 @@ function count(
  * @returns Whether all patients are triaged and estimated numbers of personnel that is missing to secure treatment
  */
 function triage(
-    draftState: Mutable<ExerciseState>,
-    patients: Mutable<Patient>[],
-    personnel: Mutable<Personnel>[],
-    materials: Mutable<Material>[]
-): [boolean, ResourceDescription<PersonnelType>] {
-    const patientsToTreat: Mutable<Patient>[] = [];
+    draftState: WritableDraft<ExerciseState>,
+    patients: WritableDraft<Patient>[],
+    personnel: WritableDraft<Personnel>[],
+    materials: WritableDraft<Material>[]
+): [boolean, ResourceDescription] {
+    const patientsToTreat: WritableDraft<Patient>[] = [];
     const cateringPersonnel = createCateringPersonnel(personnel).sort(
         (a, b) => a.priority - b.priority
     );
-    const emptyPersonnelCount = PersonnelResource.create().personnelCounts;
+    const emptyPersonnelCount = { ...emptyPersonnelCounts };
     const triagePersonnelSubstitution: PersonnelSubstitution[] = [];
 
     patients.forEach((patient) => {
-        if (Patient.pretriageStatusIsLocked(patient)) {
+        if (isPretriageStatusLocked(patient)) {
             patientsToTreat.push(patient);
             return;
         }
@@ -500,11 +487,11 @@ function triage(
  * @returns Whether the treatment for all patients is secured and numbers of personnel that is missing to secure treatment.
  */
 function treat(
-    draftState: Mutable<ExerciseState>,
-    patients: Mutable<Patient>[],
-    personnel: Mutable<Personnel>[],
-    materials: Mutable<Material>[]
-): [boolean, ResourceDescription<PersonnelType>] {
+    draftState: WritableDraft<ExerciseState>,
+    patients: WritableDraft<Patient>[],
+    personnel: WritableDraft<Personnel>[],
+    materials: WritableDraft<Material>[]
+): [boolean, ResourceDescription] {
     return assignTreatments(
         draftState,
         patients,
@@ -584,9 +571,7 @@ function sumOfTreatments(cateringPersonnel: CateringPersonnel): number {
  * Determines if {@link patients} contains no patient that is not triaged.
  */
 function allPatientsTriaged(patients: Patient[]): boolean {
-    return patients.every((patient) =>
-        Patient.pretriageStatusIsLocked(patient)
-    );
+    return patients.every(isPretriageStatusLocked);
 }
 
 /**
@@ -603,9 +588,9 @@ function allPatientsTriaged(patients: Patient[]): boolean {
  */
 function findAssignablePersonnel(
     groupedPersonnel: {
-        [Key in PersonnelType]?: CateringPersonnel[];
+        [Key in string]?: CateringPersonnel[];
     },
-    minType: PersonnelType,
+    minType: string,
     patientStatus: TreatablePatientStatus,
     maxPatients: number,
     mixWithHigherStatus = true
@@ -662,13 +647,13 @@ function findAssignablePersonnel(
  * @returns Whether the treatment for all patients is secured and numbers of personnel that is missing to secure treatment.
  */
 function assignTreatments(
-    draftState: Mutable<ExerciseState>,
-    patients: Mutable<Patient>[],
+    draftState: WritableDraft<ExerciseState>,
+    patients: WritableDraft<Patient>[],
     cateringPersonnel: CateringPersonnel[],
-    materials: Mutable<Material>[]
-): [boolean, ResourceDescription<PersonnelType>] {
+    materials: WritableDraft<Material>[]
+): [boolean, ResourceDescription] {
     const groupedPatients = groupBy(patients, (patient) =>
-        Patient.getVisibleStatus(
+        getPatientVisibleStatus(
             patient,
             draftState.configuration.pretriageEnabled,
             draftState.configuration.bluePatientsEnabled
@@ -708,7 +693,7 @@ function assignTreatments(
     // A notarzt may be used to replace a lower tier personnel if there is not enough
     // In this case, we consider the notarzt to be more occupied that by it's normal work so we don't want to use them here
     const remainingNotarzts =
-        groupedPersonnel.notarzt?.filter((notarzt) =>
+        groupedPersonnel['notarzt']?.filter((notarzt) =>
             hasNoTreatments(notarzt)
         ) ?? [];
 
@@ -772,14 +757,14 @@ function assignTreatments(
 }
 
 function tryAssignPersonnel(
-    patient: Mutable<Patient>,
+    patient: WritableDraft<Patient>,
     patientStatus: TreatablePatientStatus,
-    minType: PersonnelType,
+    minType: string,
     context: {
-        groupedPersonnel: { [K in PersonnelType]?: CateringPersonnel[] };
+        groupedPersonnel: { [K in string]?: CateringPersonnel[] };
         personnelTreatments: PersonnelToPatientCategoryDict;
         patientTreatments: PatientToPersonnelDict;
-        draftState: Mutable<ExerciseState>;
+        draftState: WritableDraft<ExerciseState>;
     },
     mixWithHigherStatus = true,
     maxPatients: number = 2
@@ -815,7 +800,7 @@ function recordPatientTreatedByPersonnel(
     patientId: UUID,
     patientStatus: TreatablePatientStatus,
     personnelId: UUID,
-    minType: PersonnelType,
+    minType: string,
     context: {
         personnelTreatments: PersonnelToPatientCategoryDict;
         patientTreatments: PatientToPersonnelDict;
@@ -841,14 +826,14 @@ function recordPatientTreatedByPersonnel(
 function estimateRequiredPersonnel(
     patientCount: number,
     personnel: Personnel[]
-): ResourceDescription<PersonnelType> {
+): ResourceDescription {
     const groupedPersonnel = groupBy(personnel, (p) => p.personnelType);
-    const havePersonnel = Object.fromEntries(
-        StrictObject.keys(personnelPriorities).map((pt) => [
+    const havePersonnel: ResourceDescription = Object.fromEntries(
+        TypeAssertedObject.keys(personnelPriorities).map((pt) => [
             pt,
             groupedPersonnel[pt]?.length ?? 0,
         ])
-    ) as ResourceDescription<PersonnelType>;
+    );
     const wantPersonnel = requiredPersonnelForPatients(
         scaleResourceDescription(estimatedSkDistribution, patientCount)
     );
@@ -862,9 +847,9 @@ function estimateRequiredPersonnel(
 
 function requiredPersonnelForPatients(
     patientCounts: ResourceDescription<TreatablePatientStatus>
-): ResourceDescription<PersonnelType> {
+): ResourceDescription {
     const requiredByType = Object.fromEntries(
-        StrictObject.entries(patientCounts).map(
+        TypeAssertedObject.entries(patientCounts).map(
             ([patientType, patientCount]) => [
                 patientType,
                 scaleResourceDescription(
@@ -882,9 +867,9 @@ function requiredPersonnelForPatients(
         // Green should not be mixed. Therefore we ceil them before merging.
         ceilResourceDescription(requiredByType['green']!)
     );
-    result.notarzt = Math.max(
-        requiredByType['red']!.notarzt,
-        requiredByType['yellow']!.notarzt
+    result['notarzt'] = Math.max(
+        requiredByType['red']!['notarzt'] ?? 0,
+        requiredByType['yellow']!['notarzt'] ?? 0
     );
     return result;
 }
@@ -906,8 +891,7 @@ function calculateMissingPersonnel(
         (['red', 'yellow', 'green'] as const).map((patientStatus) => {
             const patients = groupedPatients[patientStatus] ?? [];
 
-            let statusMissingPersonnel =
-                PersonnelResource.create().personnelCounts;
+            let statusMissingPersonnel = { ...emptyPersonnelCounts };
             patients.forEach((patient) => {
                 const patientMissingPersonnel = cloneDeepMutable(
                     minimumRequiredPersonnel[patientStatus]
@@ -920,6 +904,7 @@ function calculateMissingPersonnel(
                         )
                         .forEach((p) => {
                             if (p) {
+                                patientMissingPersonnel[personnelType] ??= 0;
                                 patientMissingPersonnel[personnelType] -=
                                     1 /
                                     (requiresExclusivity[patientStatus]?.[
@@ -937,7 +922,7 @@ function calculateMissingPersonnel(
             });
             return [patientStatus, statusMissingPersonnel] as const;
         })
-    ) as { [K in TreatablePatientStatus]: ResourceDescription<PersonnelType> };
+    ) as { [K in TreatablePatientStatus]: ResourceDescription };
 
     const totalMissingPersonnel = addResourceDescription(
         addResourceDescription(
@@ -947,12 +932,12 @@ function calculateMissingPersonnel(
         ceilResourceDescription(patientStatusMissingPersonnel.green)
     );
 
-    totalMissingPersonnel.notarzt = Math.max(
-        patientStatusMissingPersonnel.red.notarzt,
-        patientStatusMissingPersonnel.yellow.notarzt
+    totalMissingPersonnel['notarzt'] = Math.max(
+        patientStatusMissingPersonnel.red['notarzt'] ?? 0,
+        patientStatusMissingPersonnel.yellow['notarzt'] ?? 0
     );
 
-    const secured = StrictObject.values(totalMissingPersonnel).every(
+    const secured = Object.values(totalMissingPersonnel).every(
         (cnt) => cnt <= 0
     );
 
@@ -971,17 +956,17 @@ function calculateMissingPersonnel(
 }
 
 function calculateSubstitutedMissingPersonnel(
-    missingPersonnel: ResourceDescription<PersonnelType>,
+    missingPersonnel: ResourceDescription,
     cateringDict: { [k: string]: CateringPersonnel },
     personnelTreatments: PersonnelToPatientCategoryDict
-): ResourceDescription<PersonnelType> {
-    const substitutions = StrictObject.entries(personnelTreatments)
+): ResourceDescription {
+    const substitutions = Object.entries(personnelTreatments)
         .map(
             ([persId, roles]) =>
                 [cateringDict[persId]!.personnel.personnelType, roles] as const
         )
         .filter(([realPersonnelType, roles]) =>
-            StrictObject.keys(roles).some(
+            Object.keys(roles).some(
                 (personnelType) => personnelType !== realPersonnelType
             )
         )
@@ -990,18 +975,18 @@ function calculateSubstitutedMissingPersonnel(
                 personnelTypePriorityList.map((personnelType) => {
                     const role = roles[personnelType];
                     const requiredPersonnelCount = role
-                        ? StrictObject.keys(role)
+                        ? TypeAssertedObject.keys(role)
                               .map(
                                   (patientType) =>
                                       (role[patientType] ?? 0) /
-                                      capacities[personnelType][patientType]
+                                      capacities[personnelType]![patientType]
                               )
                               .reduce((a, b) => Math.max(a, b), 0)
                         : 0;
 
                     return [personnelType, requiredPersonnelCount];
                 })
-            ) as ResourceDescription<PersonnelType>;
+            ) as ResourceDescription;
             return { from, to: realPersonnelType };
         });
 
@@ -1009,18 +994,18 @@ function calculateSubstitutedMissingPersonnel(
 }
 
 function applySubstitutions(
-    missing: ResourceDescription<PersonnelType>,
+    missing: ResourceDescription,
     substitutions: PersonnelSubstitution[]
 ) {
     let stillMissing = { ...missing };
     reversedPersonnelTypePriorityList.forEach((personnelType) => {
-        while (stillMissing[personnelType] > 0) {
+        while ((stillMissing[personnelType] ?? 0) > 0) {
             const substitutionIndex = substitutions.findIndex(
                 (s) => s.to === personnelType
             );
             if (substitutionIndex === -1) break;
             const substitution = substitutions.splice(substitutionIndex, 1)[0]!;
-            stillMissing[substitution.to] -= 1;
+            stillMissing[substitution.to]! -= 1;
 
             stillMissing = addResourceDescription(
                 stillMissing,

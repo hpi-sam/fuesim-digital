@@ -1,18 +1,33 @@
 import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, inject, input } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
-import type { SimulatedRegion, UUID } from 'digital-fuesim-manv-shared';
-import { isInSpecificSimulatedRegion } from 'digital-fuesim-manv-shared';
+import type { SimulatedRegion, UUID } from 'fuesim-digital-shared';
+import { isInSpecificSimulatedRegion } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { Subject, takeUntil } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
 import {
-    selectTransferPoints,
-    createSelectSimulatedRegion,
-} from 'src/app/state/application/selectors/exercise.selectors';
+    NgbNav,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbTooltip,
+    NgbNavContent,
+    NgbNavOutlet,
+} from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe } from '@angular/common';
 import { SelectPatientService } from '../select-patient.service';
 import type { TransferOptions } from '../start-transfer.service';
 import { StartTransferService } from '../start-transfer.service';
+import type { AppState } from '../../../../../../../state/app.state';
+import {
+    createSelectSimulatedRegion,
+    selectTransferPoints,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
+import { SimulatedRegionOverviewGeneralTabComponent } from '../tabs/general-tab/simulated-region-overview-general-tab.component';
+import { SimulatedRegionOverviewPatientsTabComponent } from '../tabs/patients-tab/tab/simulated-region-overview-patients-tab.component';
+import { SimulatedRegionOverviewVehiclesTabComponent } from '../tabs/vehicles-tab/tab/simulated-region-overview-vehicles-tab.component';
+import { OtherTransferPointTabComponent } from '../../../transfer-point-overview/other-transfer-point-tab/other-transfer-point-tab.component';
+import { SimulatedRegionOverviewBehaviorTabComponent } from '../tabs/behavior-tab/simulated-region-overview-behavior-tab.component';
 
 type NavIds =
     | 'behaviors'
@@ -31,12 +46,30 @@ let activeNavId: NavIds = 'general';
     templateUrl: './simulated-region-overview.component.html',
     styleUrls: ['./simulated-region-overview.component.scss'],
     encapsulation: ViewEncapsulation.None,
-    standalone: false,
+    imports: [
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbTooltip,
+        NgbNavContent,
+        SimulatedRegionOverviewGeneralTabComponent,
+        SimulatedRegionOverviewPatientsTabComponent,
+        SimulatedRegionOverviewVehiclesTabComponent,
+        OtherTransferPointTabComponent,
+        SimulatedRegionOverviewBehaviorTabComponent,
+        NgbNavOutlet,
+        AsyncPipe,
+    ],
 })
 export class SimulatedRegionOverviewGeneralComponent
     implements OnInit, OnDestroy
 {
-    @Input() simulatedRegionId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly selectPatientService = inject(SelectPatientService);
+    readonly startTransferService = inject(StartTransferService);
+
+    readonly simulatedRegionId = input.required<UUID>();
 
     simulatedRegion$!: Observable<SimulatedRegion>;
 
@@ -55,15 +88,9 @@ export class SimulatedRegionOverviewGeneralComponent
 
     private readonly destroy$ = new Subject<void>();
 
-    constructor(
-        private readonly store: Store<AppState>,
-        readonly selectPatientService: SelectPatientService,
-        readonly startTransferService: StartTransferService
-    ) {}
-
     ngOnInit(): void {
         this.simulatedRegion$ = this.store.select(
-            createSelectSimulatedRegion(this.simulatedRegionId)
+            createSelectSimulatedRegion(this.simulatedRegionId())
         );
         this.transferPointId$ = this.store.select(
             createSelector(
@@ -72,7 +99,7 @@ export class SimulatedRegionOverviewGeneralComponent
                     Object.values(transferPoints).find((transferPoint) =>
                         isInSpecificSimulatedRegion(
                             transferPoint,
-                            this.simulatedRegionId
+                            this.simulatedRegionId()
                         )
                     )!.id
             )

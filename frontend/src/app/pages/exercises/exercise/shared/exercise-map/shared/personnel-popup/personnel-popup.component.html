@@ -1,6 +1,6 @@
-<ng-container *ngIf="personnel$ | async as personnel">
+@if (personnel$ | async; as personnel) {
     <h5 class="popover-header">
-        {{ personnel.personnelType | personnelName }}
+        {{ personnel.typeName }}
         von
         {{ personnel.vehicleName }}
         <button
@@ -10,24 +10,6 @@
         ></button>
     </h5>
     <div class="popover-body" style="max-width: 350px">
-        Diese Einsatzkraft
-        <span
-            *ngIf="
-                (personnel.canCaterFor | caterCapacityCount) === 0;
-                else caterInfo
-            "
-        >
-            kann keine Patienten versorgen.</span
-        >
-        <ng-template #caterInfo>
-            <span>{{
-                personnel.canCaterFor.logicalOperator === 'or'
-                    ? ' kann nur Patienten einer der unten gelisteten Sichtungskategorie gleichzeitig versorgen.'
-                    : ' kann Patienten verschiedener Sichtungskategorien gleichzeitig versorgen. Dabei kann sie auch Patienten einer niedriger priorisierten Sichtungskategorie versorgen.'
-            }}</span>
-            <app-cater-capacity
-                [canCaterFor]="personnel.canCaterFor"
-            ></app-cater-capacity>
-        </ng-template>
+        <app-personnel-details [personnelId]="personnel.id" />
     </div>
-</ng-container>
+}

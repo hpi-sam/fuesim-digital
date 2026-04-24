@@ -1,5 +1,4 @@
 import {
-    IsArray,
     IsBoolean,
     IsInt,
     IsOptional,
@@ -7,27 +6,24 @@ import {
     IsUUID,
     MaxLength,
     Min,
-    ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import {
-    AlarmGroupStartPoint,
-    EocLogEntry,
-    VehicleParameters,
-} from '../../models/index.js';
-import type { Mutable, UUID } from '../../utils/index.js';
-import {
-    StrictObject,
-    cloneDeepMutable,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
+import { z } from 'zod';
+import { WritableDraft } from 'immer';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
-import { getElement } from './utils/index.js';
-import { VehicleActionReducers } from './vehicle.js';
-import { TransferActionReducers } from './transfer.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { newEocLogEntry } from '../../models/eoc-log-entry.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    type VehicleParameters,
+    vehicleParametersSchema,
+} from '../../models/utils/vehicle-parameters.js';
+import { newAlarmGroupStartPoint } from '../../models/utils/start-points.js';
+import { getElement } from './utils/get-element.js';
 import { logAlarmGroupSent } from './utils/log.js';
+import { TransferActionReducers } from './transfer.js';
+import { VehicleActionReducers } from './vehicle.js';
 
 export class AddLogEntryAction implements Action {
     @IsValue('[Emergency Operation Center] Add Log Entry' as const)
@@ -53,9 +49,7 @@ export class SendAlarmGroupAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly alarmGroupId!: UUID;
 
-    @IsArray()
-    @ValidateNested()
-    @Type(() => VehicleParameters)
+    @IsZodSchema(z.array(vehicleParametersSchema))
     public readonly sortedVehicleParameters!: readonly VehicleParameters[];
 
     @IsUUID(4, uuidValidationOptions)
@@ -74,13 +68,13 @@ export namespace EmergencyOperationCenterActionReducers {
     export const addLogEntry: ActionReducer<AddLogEntryAction> = {
         action: AddLogEntryAction,
         reducer: (draftState, { name, message, isPrivate }) => {
-            const logEntry = EocLogEntry.create(
+            const logEntry = newEocLogEntry(
                 draftState.currentTime,
                 message,
                 name,
                 isPrivate
             );
-            draftState.eocLog.push(cloneDeepMutable(logEntry));
+            draftState.eocLog.push(logEntry);
             return draftState;
         },
         rights: (client, action) => {
@@ -109,7 +103,7 @@ export namespace EmergencyOperationCenterActionReducers {
                 alarmGroupId
             );
 
-            const sortedAlarmGroupVehicles = StrictObject.values(
+            const sortedAlarmGroupVehicles = Object.values(
                 alarmGroup.alarmGroupVehicles
             ).sort((a, b) => a.time - b.time);
 
@@ -170,7 +164,7 @@ export namespace EmergencyOperationCenterActionReducers {
             });
 
             logAlarmGroupSent(draftState, alarmGroupId);
-            alarmGroup.sent = true;
+            alarmGroup.triggerCount += 1;
 
             return draftState;
         },
@@ -179,7 +173,7 @@ export namespace EmergencyOperationCenterActionReducers {
 }
 
 function sendAlarmGroupVehicle(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     vehicleParameters: VehicleParameters,
     time: number,
     alarmGroupId: UUID,
@@ -193,9 +187,7 @@ function sendAlarmGroupVehicle(
         type: '[Transfer] Add to transfer',
         elementType: vehicleParameters.vehicle.type,
         elementId: vehicleParameters.vehicle.id,
-        startPoint: cloneDeepMutable(
-            AlarmGroupStartPoint.create(alarmGroupId, time)
-        ),
+        startPoint: newAlarmGroupStartPoint(alarmGroupId, time),
         targetTransferPointId,
     });
 }

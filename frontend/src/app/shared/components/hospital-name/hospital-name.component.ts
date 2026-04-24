@@ -1,27 +1,28 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Hospital, UUID } from 'digital-fuesim-manv-shared';
+import type { Hospital, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectHospital } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../state/app.state';
+import { createSelectHospital } from '../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-hospital-name',
     templateUrl: './hospital-name.component.html',
     styleUrls: ['./hospital-name.component.scss'],
-    standalone: false,
+    imports: [AsyncPipe],
 })
 export class HospitalNameComponent implements OnChanges {
-    @Input() hospitalId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly hospitalId = input.required<UUID>();
 
     public hospital$?: Observable<Hospital>;
 
-    constructor(private readonly store: Store<AppState>) {}
-
     ngOnChanges() {
         this.hospital$ = this.store.select(
-            createSelectHospital(this.hospitalId)
+            createSelectHospital(this.hospitalId())
         );
     }
 }

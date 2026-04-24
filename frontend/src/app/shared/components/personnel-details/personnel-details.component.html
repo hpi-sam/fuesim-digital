@@ -1,0 +1,15 @@
+@if (personnel$ | async; as personnel) {
+    Diese Einsatzkraft
+    @if ((personnel.canCaterFor | caterCapacityCount) === 0) {
+        <span> kann keine Patienten versorgen.</span>
+    } @else {
+        <span>{{
+            personnel.canCaterFor.logicalOperator === 'or'
+                ? ' kann nur Patienten einer der unten gelisteten Sichtungskategorie gleichzeitig versorgen.'
+                : ' kann Patienten verschiedener Sichtungskategorien gleichzeitig versorgen. Dabei kann sie auch Patienten einer niedriger priorisierten Sichtungskategorie versorgen.'
+        }}</span>
+        <app-cater-capacity
+            [canCaterFor]="personnel.canCaterFor"
+        ></app-cater-capacity>
+    }
+}

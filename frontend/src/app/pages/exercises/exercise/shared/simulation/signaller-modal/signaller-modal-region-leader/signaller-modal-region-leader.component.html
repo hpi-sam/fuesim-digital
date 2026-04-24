@@ -1,9 +1,8 @@
-<ng-container *ngIf="leader$ | async as leader; else noLeader">
+@if (leader$ | async; as leader) {
     Führungskraft:
-    <strong>{{ leader.personnelType | personnelName }}</strong>
+    <strong>{{ leader.typeName }}</strong>
     von
     <strong>{{ leader.vehicleName }}</strong>
-</ng-container>
-<ng-template #noLeader>
+} @else {
     <span class="text-danger">Keine Führungskraft</span>
-</ng-template>
+}

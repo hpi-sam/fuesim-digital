@@ -1,4 +1,4 @@
-<ng-container *ngIf="vehicle$ | async as vehicle">
+@if (vehicle$ | async; as vehicle) {
     <h5 class="popover-header">
         {{ vehicle.name }}
         <button
@@ -8,14 +8,16 @@
         ></button>
     </h5>
     <div class="popover-body">
-        <div *ngIf="(currentRole$ | async) === 'trainer'" class="mb-3">
-            <label class="form-label">Fahrzeugname</label>
-            <app-vehicle-name-editor [vehicleId]="vehicle.id" />
-        </div>
+        @if ((currentRole$ | async) === 'trainer') {
+            <div class="mb-3">
+                <label class="form-label">Fahrzeugname</label>
+                <app-vehicle-name-editor [vehicleId]="vehicle.id" />
+            </div>
+        }
         <div class="mb-3">
             <app-vehicle-available-slots-display [vehicleId]="vehicle.id" />
         </div>
 
         <app-vehicle-load-unload-controls [vehicleId]="vehicle.id" />
     </div>
-</ng-container>
+}

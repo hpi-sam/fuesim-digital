@@ -1,6 +1,6 @@
 {
-    "name": "digital-fuesim-manv-benchmark",
-    "version": "0.10.0",
+    "name": "fuesim-digital-benchmark",
+    "version": "0.11.0",
     "type": "module",
     "scripts": {
         "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,html}\"",
@@ -10,14 +10,22 @@
         "benchmark": "(pwd && npm run benchmark:linux-macos) || npm run benchmark:windows"
     },
     "private": true,
-    "engines": {
-        "node": ">=22",
-        "npm": ">=11"
+    "devEngines": {
+        "runtime": {
+            "name": "node",
+            "version": "~24.13.0",
+            "onFail": "error"
+        },
+        "packageManager": {
+            "name": "npm",
+            "version": "~11.6.2",
+            "onFail": "error"
+        }
     },
     "dependencies": {
-        "digital-fuesim-manv-shared": "file:../shared",
+        "fuesim-digital-shared": "file:../shared",
         "immer": "^10.1.1",
-        "lodash-es": "^4.17.21"
+        "lodash-es": "^4.17.23"
     },
     "devDependencies": {
         "@eslint/compat": "^1.4.0",
@@ -28,10 +36,9 @@
         "eslint-config-prettier": "^10.1.1",
         "eslint-plugin-import": "~2.31.0",
         "eslint-plugin-unicorn": "^56.0.1",
-        "ts-node": "^10.9.1",
         "tsx": "^4.19.3",
-        "typescript": "~5.8.2",
-        "typescript-eslint": "^8.45.0"
+        "typescript": "~5.9.3",
+        "typescript-eslint": "^8.55.0"
     },
     "overrides": {
         "@istanbuljs/load-nyc-config": {

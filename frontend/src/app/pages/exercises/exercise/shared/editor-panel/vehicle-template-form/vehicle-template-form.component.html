@@ -1,4 +1,4 @@
-<ng-container *ngIf="values">
+@if (values) {
     <div class="form-group mb-3">
         <label class="form-label">Standardname von neuen Fahrzeugen:</label>
         <input
@@ -89,50 +89,42 @@
                     Material hinzufügen
                 </button>
                 <div ngbDropdownMenu>
-                    <button
-                        *ngFor="
-                            let materialTemplate of materialTemplates$
-                                | async
-                                | values
-                        "
-                        ngbDropdownItem
-                        (click)="addMaterial(materialTemplate.materialType)"
-                        type="button"
-                        class="btn"
-                    >
-                        <i class="bi bi-plus"></i>
-                        {{ materialTypeNames[materialTemplate.materialType] }}
-                    </button>
+                    @for (
+                        materialTemplate of materialTemplates$ | async | values;
+                        track materialTemplate.id
+                    ) {
+                        <button
+                            ngbDropdownItem
+                            (click)="addMaterial(materialTemplate)"
+                            type="button"
+                            class="btn"
+                        >
+                            <i class="bi bi-plus"></i>
+                            {{ materialTemplate.name }}
+                        </button>
+                    }
                 </div>
             </div></label
         >
-        <div
-            *ngIf="values.materialTypes.length > 0; else noMaterialTemplates"
-            class="d-flex flex-wrap"
-        >
-            <app-map-editor-card
-                *ngFor="
-                    let materialTypes of values.materialTypes;
-                    let index = index
-                "
-                style="width: 8rem"
-            >
-                <app-material-template-display
-                    [materialTemplateType]="materialTypes"
-                >
-                </app-material-template-display>
-                <button
-                    (click)="removeMaterial(index)"
-                    class="btn btn-sm btn-outline-danger position-absolute"
-                    style="top: 0; right: 0"
-                >
-                    <i class="bi bi-trash"></i>
-                </button>
-            </app-map-editor-card>
-        </div>
-        <ng-template #noMaterialTemplates>
+        @if (values.materialTemplates.length > 0) {
+            <div class="d-flex flex-wrap">
+                @for (
+                    materialTemplate of values.materialTemplates;
+                    track materialTemplate;
+                    let index = $index
+                ) {
+                    <app-map-editor-card
+                        [imageUrl]="materialTemplate.image.url"
+                        [title]="materialTemplate.name"
+                        style="width: 8rem"
+                        [enableDeleteButton]="true"
+                        (elementDelete)="removeMaterial(index)"
+                    ></app-map-editor-card>
+                }
+            </div>
+        } @else {
             <div class="text-muted mt-3 mb-3">Keine Materialien zugewiesen</div>
-        </ng-template>
+        }
     </div>
     <div class="form-group mb-3">
         <label class="form-label"
@@ -146,52 +138,44 @@
                     Personal hinzufügen
                 </button>
                 <div ngbDropdownMenu>
-                    <button
-                        *ngFor="
-                            let personnelTemplate of personnelTemplates$
-                                | async
-                                | values
-                        "
-                        ngbDropdownItem
-                        (click)="addPersonnel(personnelTemplate.personnelType)"
-                        type="button"
-                        class="btn"
-                    >
-                        <i class="bi bi-plus"></i>
-                        {{
-                            personnelTypeNames[personnelTemplate.personnelType]
-                        }}
-                    </button>
+                    @for (
+                        personnelTemplate of personnelTemplates$
+                            | async
+                            | values;
+                        track personnelTemplate.id
+                    ) {
+                        <button
+                            ngbDropdownItem
+                            (click)="addPersonnel(personnelTemplate)"
+                            type="button"
+                            class="btn"
+                        >
+                            <i class="bi bi-plus"></i>
+                            {{ personnelTemplate.name }}
+                        </button>
+                    }
                 </div>
             </div></label
         >
-        <div
-            *ngIf="values.personnelTypes.length > 0; else noPersonnelTemplates"
-            class="d-flex flex-wrap"
-        >
-            <app-map-editor-card
-                *ngFor="
-                    let personnelType of values.personnelTypes;
-                    let index = index
-                "
-                style="width: 8rem"
-            >
-                <app-personnel-template-display
-                    [personnelTemplateType]="personnelType"
-                >
-                </app-personnel-template-display>
-                <button
-                    (click)="removePersonnel(index)"
-                    class="btn btn-outline-danger btn-sm position-absolute"
-                    style="top: 0; right: 0"
-                >
-                    <i class="bi bi-trash"></i>
-                </button>
-            </app-map-editor-card>
-        </div>
-        <ng-template #noPersonnelTemplates>
+        @if (values.personnelTemplates.length > 0) {
+            <div class="d-flex flex-wrap">
+                @for (
+                    personnelTemplate of values.personnelTemplates;
+                    track personnelTemplate;
+                    let index = $index
+                ) {
+                    <app-map-editor-card
+                        [imageUrl]="personnelTemplate.image.url"
+                        [title]="personnelTemplate.name"
+                        style="width: 8rem"
+                        [enableDeleteButton]="true"
+                        (elementDelete)="removePersonnel(index)"
+                    ></app-map-editor-card>
+                }
+            </div>
+        } @else {
             <div class="text-muted mt-3 mb-3">Kein Personal zugewiesen</div>
-        </ng-template>
+        }
     </div>
 
     <!-- If the button is not disabled the vehicleTemplate is correct -->
@@ -206,6 +190,6 @@
         "
         class="btn btn-primary"
     >
-        {{ btnText }}
+        {{ btnText() }}
     </button>
-</ng-container>
+}

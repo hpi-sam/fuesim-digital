@@ -1,8 +1,17 @@
-import { Type } from 'class-transformer';
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
-import type { ExerciseOccupation } from '../../models/utils/index.js';
+import { IsString, IsUUID } from 'class-validator';
+import { WritableDraft } from 'immer';
 import {
-    changeOccupation,
+    changePosition,
+    changePositionWithId,
+} from '../../models/utils/position/position-helpers-mutable.js';
+import type { ExerciseState } from '../../state.js';
+import type { Action, ActionReducer } from '../action-reducer.js';
+import { ReducerError } from '../reducer-error.js';
+import { sendSimulationEvent } from '../../simulation/events/utils.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { newNoPosition } from '../../models/utils/position/no-position.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
     currentCoordinatesOf,
     currentSimulatedRegionIdOf,
     currentSimulatedRegionOf,
@@ -11,42 +20,40 @@ import {
     isInTransfer,
     isInVehicle,
     isOnMap,
-    MapCoordinates,
-    MapPosition,
-    occupationTypeOptions,
-    SimulatedRegionPosition,
-    VehicleParameters,
-    VehiclePosition,
-} from '../../models/utils/index.js';
+} from '../../models/utils/position/position-helpers.js';
+import { IsValue } from '../../utils/validators/is-value.js';
 import {
-    changePosition,
-    changePositionWithId,
-} from '../../models/utils/position/position-helpers-mutable.js';
-import type { ExerciseState } from '../../state.js';
+    type VehicleParameters,
+    vehicleParametersSchema,
+} from '../../models/utils/vehicle-parameters.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
+import {
+    type ExerciseOccupation,
+    exerciseOccupationSchema,
+} from '../../models/utils/occupations/exercise-occupation.js';
+import { newVehiclePositionIn } from '../../models/utils/position/vehicle-position.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import { imageSizeToPosition } from '../../state-helpers/image-size-to-position.js';
-import type { Mutable, UUID } from '../../utils/index.js';
-import {
-    cloneDeepMutable,
-    StrictObject,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
-import { sendSimulationEvent } from '../../simulation/events/utils.js';
-import {
-    MaterialAvailableEvent,
-    MaterialRemovedEvent,
-    NewPatientEvent,
-    PersonnelAvailableEvent,
-    PersonnelRemovedEvent,
-    VehicleRemovedEvent,
-} from '../../simulation/events/index.js';
+import { newSimulatedRegionPositionIn } from '../../models/utils/position/simulated-region-position.js';
+import { changeOccupation } from '../../models/utils/occupations/occupation-helpers-mutable.js';
+import { newMaterialRemovedEvent } from '../../simulation/events/material-removed.js';
+import { newPersonnelRemovedEvent } from '../../simulation/events/personnel-removed.js';
+import { newVehicleRemovedEvent } from '../../simulation/events/vehicle-removed.js';
+import { newNewPatientEvent } from '../../simulation/events/new-patient.js';
+import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
+import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getElement } from './utils/get-element.js';
 import { deletePatient } from './patient.js';
 import { completelyLoadVehicle as completelyLoadVehicleHelper } from './utils/completely-load-vehicle.js';
-import { getElement } from './utils/get-element.js';
 import { removeElementPosition } from './utils/spatial-elements.js';
 import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
+import { checkRestrictedVehicleMovementOrThrow } from './utils/restricted-vehicle-movement.js';
+import { fillPositionAt } from './utils/operational-assignment-positions.js';
 
 /**
  * Performs all necessary actions to remove a vehicle from the state.
@@ -54,7 +61,7 @@ import { logVehicleAdded, logVehicleRemoved } from './utils/log.js';
  * @param vehicleId The ID of the vehicle to be deleted
  */
 export function deleteVehicle(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     vehicleId: UUID
 ) {
     logVehicleRemoved(draftState, vehicleId);
@@ -71,7 +78,7 @@ export function deleteVehicle(
             );
             sendSimulationEvent(
                 simulatedRegion,
-                MaterialRemovedEvent.create(materialId)
+                newMaterialRemovedEvent(materialId)
             );
         }
 
@@ -88,7 +95,7 @@ export function deleteVehicle(
             );
             sendSimulationEvent(
                 simulatedRegion,
-                PersonnelRemovedEvent.create(personnelId)
+                newPersonnelRemovedEvent(personnelId)
             );
         }
 
@@ -101,12 +108,20 @@ export function deleteVehicle(
         deletePatient(draftState, patientId);
     });
 
+    if (
+        vehicle.operationalAssignment?.type === 'operationalSection' &&
+        vehicle.operationalAssignment.role === 'operationalSectionMember'
+    ) {
+        fillPositionAt(
+            draftState,
+            vehicle.operationalAssignment.sectionId,
+            vehicle.operationalAssignment.position
+        );
+    }
+
     if (isInSimulatedRegion(vehicle)) {
         const simulatedRegion = currentSimulatedRegionOf(draftState, vehicle);
-        sendSimulationEvent(
-            simulatedRegion,
-            VehicleRemovedEvent.create(vehicleId)
-        );
+        sendSimulationEvent(simulatedRegion, newVehicleRemovedEvent(vehicleId));
     }
 
     // Delete the vehicle
@@ -117,8 +132,7 @@ export class AddVehicleAction implements Action {
     @IsValue('[Vehicle] Add vehicle' as const)
     public readonly type = '[Vehicle] Add vehicle';
 
-    @ValidateNested()
-    @Type(() => VehicleParameters)
+    @IsZodSchema(vehicleParametersSchema)
     public readonly vehicleParameters!: VehicleParameters;
 }
 
@@ -139,8 +153,7 @@ export class MoveVehicleAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly vehicleId!: UUID;
 
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -204,8 +217,7 @@ export class SetVehicleOccupationAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly vehicleId!: UUID;
 
-    @Type(...occupationTypeOptions)
-    @ValidateNested()
+    @IsZodSchema(exerciseOccupationSchema)
     public readonly occupation!: ExerciseOccupation;
 }
 
@@ -220,8 +232,7 @@ export namespace VehicleActionReducers {
                         material.vehicleId !== vehicle.id ||
                         vehicle.materialIds[material.id] === undefined
                 ) ||
-                StrictObject.keys(vehicle.materialIds).length !==
-                    materials.length
+                Object.keys(vehicle.materialIds).length !== materials.length
             ) {
                 throw new ReducerError(
                     'Vehicle material ids do not match material ids'
@@ -233,18 +244,25 @@ export namespace VehicleActionReducers {
                         currentPersonnel.vehicleId !== vehicle.id ||
                         vehicle.personnelIds[currentPersonnel.id] === undefined
                 ) ||
-                StrictObject.keys(vehicle.personnelIds).length !==
-                    personnel.length
+                Object.keys(vehicle.personnelIds).length !== personnel.length
             ) {
                 throw new ReducerError(
                     'Vehicle personnel ids do not match personnel ids'
                 );
             }
+
+            checkRestrictedVehicleMovementOrThrow(
+                draftState,
+                vehicle,
+                newNoPosition(),
+                vehicle.position
+            );
+
             draftState.vehicles[vehicle.id] = cloneDeepMutable(vehicle);
             for (const material of cloneDeepMutable(materials)) {
                 changePosition(
                     material,
-                    VehiclePosition.create(vehicle.id),
+                    newVehiclePositionIn(vehicle.id),
                     draftState
                 );
                 draftState.materials[material.id] = material;
@@ -252,7 +270,7 @@ export namespace VehicleActionReducers {
             for (const person of cloneDeepMutable(personnel)) {
                 changePosition(
                     person,
-                    VehiclePosition.create(vehicle.id),
+                    newVehiclePositionIn(vehicle.id),
                     draftState
                 );
                 draftState.personnel[person.id] = person;
@@ -270,7 +288,7 @@ export namespace VehicleActionReducers {
         reducer: (draftState, { vehicleId, targetPosition }) => {
             changePositionWithId(
                 vehicleId,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 'vehicle',
                 draftState
             );
@@ -339,9 +357,7 @@ export namespace VehicleActionReducers {
                     x += space;
                     changePositionWithId(
                         patientId,
-                        MapPosition.create(
-                            MapCoordinates.create(x, unloadPosition.y)
-                        ),
+                        newMapPositionAt({ x, y: unloadPosition.y }),
                         'patient',
                         draftState
                     );
@@ -358,9 +374,7 @@ export namespace VehicleActionReducers {
                     if (isInVehicle(personnel)) {
                         changePositionWithId(
                             personnelId,
-                            MapPosition.create(
-                                MapCoordinates.create(x, unloadPosition.y)
-                            ),
+                            newMapPositionAt({ x, y: unloadPosition.y }),
                             'personnel',
                             draftState
                         );
@@ -377,9 +391,7 @@ export namespace VehicleActionReducers {
                     if (isInVehicle(material)) {
                         changePosition(
                             material,
-                            MapPosition.create(
-                                MapCoordinates.create(x, unloadPosition.y)
-                            ),
+                            newMapPositionAt({ x, y: unloadPosition.y }),
                             draftState
                         );
                     }
@@ -396,13 +408,13 @@ export namespace VehicleActionReducers {
                 for (const patientId of patientIds) {
                     changePositionWithId(
                         patientId,
-                        SimulatedRegionPosition.create(simulatedRegionId),
+                        newSimulatedRegionPositionIn(simulatedRegionId),
                         'patient',
                         draftState
                     );
                     sendSimulationEvent(
                         simulatedRegion,
-                        NewPatientEvent.create(patientId)
+                        newNewPatientEvent(patientId)
                     );
                     delete vehicle.patientIds[patientId];
                 }
@@ -417,13 +429,13 @@ export namespace VehicleActionReducers {
                     if (isInVehicle(personnel)) {
                         changePositionWithId(
                             personnelId,
-                            SimulatedRegionPosition.create(simulatedRegionId),
+                            newSimulatedRegionPositionIn(simulatedRegionId),
                             'personnel',
                             draftState
                         );
                         sendSimulationEvent(
                             simulatedRegion,
-                            PersonnelAvailableEvent.create(personnelId)
+                            newPersonnelAvailableEvent(personnelId)
                         );
                     }
                 }
@@ -438,12 +450,12 @@ export namespace VehicleActionReducers {
                     if (isInVehicle(material)) {
                         changePosition(
                             material,
-                            SimulatedRegionPosition.create(simulatedRegionId),
+                            newSimulatedRegionPositionIn(simulatedRegionId),
                             draftState
                         );
                         sendSimulationEvent(
                             simulatedRegion,
-                            MaterialAvailableEvent.create(materialId)
+                            newMaterialAvailableEvent(materialId)
                         );
                     }
                 }
@@ -475,7 +487,7 @@ export namespace VehicleActionReducers {
                     }
                     changePosition(
                         material,
-                        VehiclePosition.create(vehicleId),
+                        newVehiclePositionIn(vehicleId),
                         draftState
                     );
                     break;
@@ -498,7 +510,7 @@ export namespace VehicleActionReducers {
                     }
                     changePosition(
                         personnel,
-                        VehiclePosition.create(vehicleId),
+                        newVehiclePositionIn(vehicleId),
                         draftState
                     );
                     break;
@@ -520,7 +532,7 @@ export namespace VehicleActionReducers {
                     vehicle.patientIds[elementToBeLoadedId] = true;
                     changePosition(
                         patient,
-                        VehiclePosition.create(vehicleId),
+                        newVehiclePositionIn(vehicleId),
                         draftState
                     );
 
@@ -564,7 +576,7 @@ export namespace VehicleActionReducers {
                 );
                 sendSimulationEvent(
                     simulatedRegion,
-                    VehicleRemovedEvent.create(vehicleId)
+                    newVehicleRemovedEvent(vehicleId)
                 );
 
                 const coordinates = cloneDeepMutable(
@@ -577,7 +589,7 @@ export namespace VehicleActionReducers {
 
                 changePositionWithId(
                     vehicleId,
-                    MapPosition.create(coordinates),
+                    newMapPositionAt(coordinates),
                     'vehicle',
                     draftState
                 );

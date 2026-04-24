@@ -1,124 +1,65 @@
-import { Type } from 'class-transformer';
-import {
-    IsUUID,
-    IsString,
-    ValidateNested,
-    IsNumber,
-    Min,
-    Max,
-} from 'class-validator';
+import { z } from 'zod';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
-import type { UUID, UUIDSet } from '../utils/index.js';
-import { uuidValidationOptions, uuid } from '../utils/index.js';
-import {
-    IsLiteralUnion,
-    IsUUIDSet,
-    IsValue,
-} from '../utils/validators/index.js';
-import { IsPosition } from '../utils/validators/is-position.js';
+import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
+import { uuidSetSchema } from '../utils/uuid-set.js';
 import type { PersonnelTemplate } from './personnel-template.js';
-import type { PersonnelType } from './utils/index.js';
-import { CanCaterFor, ImageProperties, getCreate } from './utils/index.js';
-import type { Position } from './utils/position/position.js';
-import { personnelTypeAllowedValues } from './utils/personnel-type.js';
+import { canCaterForSchema } from './utils/cater-for.js';
+import { imagePropertiesSchema } from './utils/image-properties.js';
+import { type Position, positionSchema } from './utils/position/position.js';
 
-export class Personnel {
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export const personnelSchema = z.strictObject({
+    id: uuidSchema,
+    type: z.literal('personnel'),
+    vehicleId: uuidSchema,
+    vehicleName: z.string(),
+    /**
+     * @deprecated This will be refactored into a capability-based system. Please already consider using {@link templateId} if you only need an opaque identifier of the type and you don't assert any properties of the personnel.
+     */
+    personnelType: z.string(),
+    templateId: uuidSchema,
+    typeName: z.string(),
+    typeAbbreviation: z.string(),
+    assignedPatientIds: uuidSetSchema,
 
-    @IsValue('personnel' as const)
-    public readonly type = 'personnel';
-
-    @IsUUID(4, uuidValidationOptions)
-    public readonly vehicleId: UUID;
-
-    @IsLiteralUnion(personnelTypeAllowedValues)
-    public readonly personnelType: PersonnelType;
-
-    @IsString()
-    public readonly vehicleName: string;
-
-    @IsUUIDSet()
-    public readonly assignedPatientIds: UUIDSet;
-
-    @ValidateNested()
-    @Type(() => CanCaterFor)
-    public readonly canCaterFor: CanCaterFor;
-
+    canCaterFor: canCaterForSchema,
     /**
      * Patients in this range are preferred over patients that are more far away (even if they are less injured).
      * Guaranteed to be <= {@link maxTreatmentRange}.
      * Setting this to `0` means deactivating this range.
      */
-    @IsNumber()
-    @Min(0)
-    @Max(maxTreatmentRange)
-    public readonly overrideTreatmentRange: number;
-
+    overrideTreatmentRange: z.number().min(0).max(maxTreatmentRange),
     /**
      * Only patients in this range around the personnel's position can be treated.
      * Guaranteed to be <= {@link maxTreatmentRange}.
      * Setting this to `0` means deactivating this range.
      */
-    @IsNumber()
-    @Min(0)
-    @Max(maxTreatmentRange)
-    public readonly treatmentRange: number;
+    treatmentRange: z.number().min(0).max(maxTreatmentRange),
+    image: imagePropertiesSchema,
+    position: positionSchema,
+});
 
-    @ValidateNested()
-    @Type(() => ImageProperties)
-    public readonly image: ImageProperties;
+export type Personnel = z.infer<typeof personnelSchema>;
 
-    /**
-     * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
-     */
-    @IsPosition()
-    @ValidateNested()
-    public readonly position: Position;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        vehicleId: UUID,
-        vehicleName: string,
-        personnelType: PersonnelType,
-        assignedPatientIds: UUIDSet,
-        image: ImageProperties,
-        canCaterFor: CanCaterFor,
-        treatmentRange: number,
-        overrideTreatmentRange: number,
-        position: Position
-    ) {
-        this.vehicleId = vehicleId;
-        this.vehicleName = vehicleName;
-        this.personnelType = personnelType;
-        this.assignedPatientIds = assignedPatientIds;
-        this.image = image;
-        this.canCaterFor = canCaterFor;
-        this.treatmentRange = treatmentRange;
-        this.overrideTreatmentRange = overrideTreatmentRange;
-        this.position = position;
-    }
-
-    static readonly create = getCreate(this);
-
-    static generatePersonnel(
-        personnelTemplate: PersonnelTemplate,
-        vehicleId: UUID,
-        vehicleName: string,
-        position: Position
-    ): Personnel {
-        return this.create(
-            vehicleId,
-            vehicleName,
-            personnelTemplate.personnelType,
-            {},
-            personnelTemplate.image,
-            personnelTemplate.canCaterFor,
-            personnelTemplate.treatmentRange,
-            personnelTemplate.overrideTreatmentRange,
-            position
-        );
-    }
+export function newPersonnelFromTemplate(
+    personnelTemplate: PersonnelTemplate,
+    vehicleId: UUID,
+    vehicleName: string,
+    position: Position
+): Personnel {
+    return {
+        id: uuid(),
+        type: 'personnel',
+        vehicleId,
+        vehicleName,
+        personnelType: personnelTemplate.personnelType,
+        templateId: personnelTemplate.id,
+        typeName: personnelTemplate.name,
+        typeAbbreviation: personnelTemplate.abbreviation,
+        assignedPatientIds: {},
+        image: personnelTemplate.image,
+        canCaterFor: personnelTemplate.canCaterFor,
+        treatmentRange: personnelTemplate.treatmentRange,
+        overrideTreatmentRange: personnelTemplate.overrideTreatmentRange,
+        position,
+    };
 }

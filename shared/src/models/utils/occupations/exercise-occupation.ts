@@ -1,53 +1,23 @@
-import type { Type } from 'class-transformer';
-import type { Constructor } from '../../../utils/index.js';
-import { IntermediateOccupation } from './intermediate-occupation.js';
-import { Occupation } from './occupation.js';
-import { NoOccupation } from './no-occupation.js';
-import { LoadOccupation } from './load-occupation.js';
-import { WaitForTransferOccupation } from './wait-for-transfer-occupation.js';
-import { UnloadingOccupation } from './unloading-occupation.js';
-import { PatientTransferOccupation } from './patient-transfer-occupation.js';
+import { z } from 'zod';
+import { intermediateOccupationSchema } from './intermediate-occupation.js';
+import { noOccupationSchema } from './no-occupation.js';
+import { loadOccupationSchema } from './load-occupation.js';
+import { waitForTransferOccupationSchema } from './wait-for-transfer-occupation.js';
+import { unloadingOccupationSchema } from './unloading-occupation.js';
+import { patientTransferOccupation } from './patient-transfer-occupation.js';
 
-export const occupations = {
-    IntermediateOccupation,
-    NoOccupation,
-    LoadOccupation,
-    WaitForTransferOccupation,
-    UnloadingOccupation,
-    PatientTransferOccupation,
-};
+export const exerciseOccupationSchema = z.union([
+    intermediateOccupationSchema,
+    noOccupationSchema,
+    loadOccupationSchema,
+    waitForTransferOccupationSchema,
+    unloadingOccupationSchema,
+    patientTransferOccupation,
+]);
 
-export type ExerciseOccupation = InstanceType<
-    (typeof occupations)[keyof typeof occupations]
->;
-
-type ExerciseOccupationDictionary = {
-    [Occupation in ExerciseOccupation as Occupation['type']]: Constructor<Occupation>;
-};
+export type ExerciseOccupation = z.infer<typeof exerciseOccupationSchema>;
 
 export type ExerciseOccupationType = ExerciseOccupation['type'];
-
-export const occupationDictionary: ExerciseOccupationDictionary = {
-    intermediateOccupation: IntermediateOccupation,
-    noOccupation: NoOccupation,
-    loadOccupation: LoadOccupation,
-    waitForTransferOccupation: WaitForTransferOccupation,
-    unloadingOccupation: UnloadingOccupation,
-    patientTransferOccupation: PatientTransferOccupation,
-};
-
-export const occupationTypeOptions: Parameters<typeof Type> = [
-    () => Occupation,
-    {
-        keepDiscriminatorProperty: true,
-        discriminator: {
-            property: 'type',
-            subTypes: Object.entries(occupationDictionary).map(
-                ([name, value]) => ({ name, value })
-            ),
-        },
-    },
-];
 
 export const occupationToGermanDictionary: {
     [key in ExerciseOccupationType]: string;

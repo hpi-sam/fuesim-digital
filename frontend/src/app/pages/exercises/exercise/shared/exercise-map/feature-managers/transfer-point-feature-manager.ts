@@ -1,27 +1,30 @@
 import type { Store } from '@ngrx/store';
 // eslint-disable-next-line @typescript-eslint/no-shadow
-import type { UUID, Element } from 'digital-fuesim-manv-shared';
-import { TransferPoint, TransferStartPoint } from 'digital-fuesim-manv-shared';
+import type { UUID, Element, TransferPoint } from 'fuesim-digital-shared';
+import {
+    newTransferStartPoint,
+    transferPointImage,
+} from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
 import type { TranslateEvent } from 'ol/interaction/Translate';
 import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectCurrentMainRole,
-    selectVisibleTransferPoints,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { ChooseTransferTargetPopupComponent } from '../shared/choose-transfer-target-popup/choose-transfer-target-popup.component';
 import { TransferPointPopupComponent } from '../shared/transfer-point-popup/transfer-point-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
-import { ImagePopupHelper } from '../utility/popup-helper';
+import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { NameStyleHelper } from '../utility/style-helper/name-style-helper';
 import type { PopupService } from '../utility/popup.service';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectVisibleTransferPoints,
+    selectCurrentMainRole,
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class TransferPointFeatureManager extends MoveableFeatureManager<TransferPoint> {
@@ -35,7 +38,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
     ) {
         super(
             olMap,
-            (targetPosition, transferPoint) => {
+            async (targetPosition, transferPoint) =>
                 exerciseService.proposeAction(
                     {
                         type: '[TransferPoint] Move TransferPoint',
@@ -43,8 +46,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
                         targetPosition,
                     },
                     true
-                );
-            },
+                ),
             new PointGeometryHelper(),
             600
         );
@@ -72,11 +74,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
     }
 
     private readonly imageStyleHelper = new ImageStyleHelper(
-        (feature: Feature) => ({
-            url: TransferPoint.image.url,
-            height: TransferPoint.image.height,
-            aspectRatio: TransferPoint.image.aspectRatio,
-        })
+        (feature: Feature) => transferPointImage
     );
     private readonly nameStyleHelper = new NameStyleHelper(
         (feature: Feature) => ({
@@ -91,7 +89,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
     public override onFeatureDrop(
         droppedElement: Element | undefined,
         droppedOnFeature: Feature<Point>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) {
         // TODO: droppedElement isn't necessarily a transfer point -> fix getElementFromFeature typings
         const droppedOnTransferPoint = this.getElementFromFeature(
@@ -141,7 +139,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
                                 type: '[Transfer] Add to transfer',
                                 elementType: droppedElement.type,
                                 elementId: droppedElement.id,
-                                startPoint: TransferStartPoint.create(
+                                startPoint: newTransferStartPoint(
                                     droppedOnTransferPoint.id
                                 ),
                                 targetTransferPointId: targetId,

@@ -1,60 +1,50 @@
-import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
-import { createSelector, Store } from '@ngrx/store';
-import type { PatientStatus, UUID } from 'digital-fuesim-manv-shared';
+import { computed, Component, inject, input } from '@angular/core';
+import { Store } from '@ngrx/store';
+import type { UUID } from 'fuesim-digital-shared';
 import {
+    getPatientVisibleStatus,
     healthPointsDefaults,
-    Patient,
+    isPatientBystander,
     statusNames,
-} from 'digital-fuesim-manv-shared';
-import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+} from 'fuesim-digital-shared';
+import { NgStyle, PercentPipe } from '@angular/common';
+import type { AppState } from '../../../state/app.state';
 import {
     createSelectPatient,
     selectConfiguration,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
+} from '../../../state/application/selectors/exercise.selectors';
+import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 
 @Component({
     selector: 'app-patient-health-point-display',
     templateUrl: './patient-health-point-display.component.html',
     styleUrls: ['./patient-health-point-display.component.scss'],
-    standalone: false,
+    imports: [NgStyle, PercentPipe],
 })
-export class PatientHealthPointDisplayComponent implements OnInit {
-    @Input() patientId!: UUID;
+export class PatientHealthPointDisplayComponent {
+    private readonly store = inject<Store<AppState>>(Store);
 
-    status$!: Observable<{
-        real: PatientStatus;
-        visible: PatientStatus;
-        health: number;
-    }>;
+    readonly patientId = input.required<UUID>();
+    readonly patient = computed(() =>
+        this.store.selectSignal(createSelectPatient(this.patientId()))()
+    );
+    readonly configuration = this.store.selectSignal(selectConfiguration);
+    readonly isBystander = computed(() => isPatientBystander(this.patient()));
+    readonly status = computed(() => ({
+        real: this.patient().realStatus,
+        visible: getPatientVisibleStatus(
+            this.patient(),
+            this.configuration().pretriageEnabled,
+            this.configuration().bluePatientsEnabled
+        ),
+        health: this.patient().health,
+    }));
 
-    public readonly currentRole$ = this.store.select(selectCurrentMainRole);
+    public readonly currentRole = this.store.selectSignal(
+        selectCurrentMainRole
+    );
 
     public readonly healthPointsDefaults = healthPointsDefaults;
 
-    constructor(private readonly store: Store<AppState>) {}
-
-    ngOnInit(): void {
-        this.status$ = this.store.select(
-            createSelector(
-                createSelectPatient(this.patientId),
-                selectConfiguration,
-                (patient, configuration) => ({
-                    real: patient.realStatus,
-                    visible: Patient.getVisibleStatus(
-                        patient,
-                        configuration.pretriageEnabled,
-                        configuration.bluePatientsEnabled
-                    ),
-                    health: patient.health,
-                })
-            )
-        );
-    }
-
-    public get statusNames() {
-        return statusNames;
-    }
+    public statusNames = statusNames;
 }

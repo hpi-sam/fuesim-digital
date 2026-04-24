@@ -1,39 +1,72 @@
-import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { effect, signal, Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { toLonLat } from 'ol/proj';
-import { OlMapManager } from '../../exercise-map/utility/ol-map-manager';
+import {
+    form,
+    FormField,
+    validateStandardSchema,
+} from '@angular/forms/signals';
+import { z } from 'zod';
+import { FormsModule } from '@angular/forms';
+import {
+    coordinateStringSchema,
+    OlMapCoordinatesInput,
+    olMapCoordinatesSchema,
+} from '../../exercise-map/utility/ol-map-manager';
+import { OlMapManagerService } from '../../exercise-map/utility/ol-map-manager.service';
+import { DisplayModelValidationComponent } from '../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 
 @Component({
     selector: 'app-coordinate-picker-modal',
     templateUrl: './coordinate-picker-modal.component.html',
     styleUrls: ['./coordinate-picker-modal.component.scss'],
-    standalone: false,
+    imports: [FormsModule, DisplayModelValidationComponent, FormField],
 })
-export class CoordinatePickerModalComponent implements OnInit {
-    @Input()
-    public olMapManager!: OlMapManager;
+export class CoordinatePickerModalComponent {
+    activeModal = inject(NgbActiveModal);
+    private readonly olMapManagerService = inject(OlMapManagerService);
 
-    public latitude = '';
-    public longitude = '';
+    public readonly coordinatesModel = signal<OlMapCoordinatesInput>({
+        longitude: '',
+        latitude: '',
+    });
+    public readonly coordinatesForm = form(
+        this.coordinatesModel,
+        (schemaPath) => {
+            validateStandardSchema(
+                schemaPath,
+                z.object({
+                    longitude: coordinateStringSchema,
+                    latitude: coordinateStringSchema,
+                })
+            );
+        }
+    );
 
-    constructor(public activeModal: NgbActiveModal) {}
+    constructor() {
+        effect(() => {
+            if (
+                this.olMapManagerService.olMapManager &&
+                !this.coordinatesModel().longitude
+            ) {
+                const coordinates =
+                    this.olMapManagerService.olMapManager.getLonLat();
 
-    ngOnInit() {
-        const center = this.olMapManager.getCoordinates();
+                if (!coordinates) return;
 
-        if (!center) return;
-
-        const latLonCoordinates = toLonLat(center)
-            .reverse()
-            .map((coordinate) => coordinate.toFixed(6));
-
-        this.latitude = latLonCoordinates[0]!;
-        this.longitude = latLonCoordinates[1]!;
+                this.coordinatesModel.set(
+                    olMapCoordinatesSchema.encode({
+                        longitude: coordinates[0]!,
+                        latitude: coordinates[1]!,
+                    })
+                );
+            }
+        });
     }
 
     public goToCoordinates() {
-        this.olMapManager.tryGoToCoordinates(+this.latitude, +this.longitude);
+        this.olMapManagerService.olMapManager!.tryGoToCoordinates(
+            olMapCoordinatesSchema.parse(this.coordinatesModel())
+        );
         this.activeModal.close();
     }
 

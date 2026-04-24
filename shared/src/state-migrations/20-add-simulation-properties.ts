@@ -1,5 +1,5 @@
-import { seededRandomState } from '../simulation/utils/randomness.js';
-import type { UUID } from '../utils/index.js';
+import { newSeededRandomState } from '../simulation/utils/randomness.js';
+import type { UUID } from '../utils/uuid.js';
 import type { Migration } from './migration-functions.js';
 
 export const addSimulationProperties20: Migration = {
@@ -22,7 +22,7 @@ export const addSimulationProperties20: Migration = {
         return true;
     },
     state: (state: any) => {
-        state.randomState = seededRandomState();
+        state.randomState = newSeededRandomState();
 
         const typedState = state as {
             simulatedRegions: {

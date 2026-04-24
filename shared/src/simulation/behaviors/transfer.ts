@@ -1,104 +1,71 @@
-import {
-    IsInt,
-    IsOptional,
-    IsUUID,
-    Min,
-    ValidateNested,
-} from 'class-validator';
 import { groupBy } from 'lodash-es';
-import { Type } from 'class-transformer';
-import {
-    VehicleResource,
-    currentSimulatedRegionOf,
-    getCreate,
-    isInSimulatedRegion,
-    isInSpecificSimulatedRegion,
-} from '../../models/utils/index.js';
-import type { UUID } from '../../utils/index.js';
-import {
-    cloneDeepMutable,
-    uuid,
-    uuidValidationOptions,
-} from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
+import { z } from 'zod';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
+import { amountOfResourcesInVehicle } from '../../models/utils/amount-of-resources-in-vehicle.js';
 import {
     getElement,
     tryGetElement,
-} from '../../store/action-reducers/utils/index.js';
-import {
-    DelayEventActivityState,
-    LoadVehicleActivityState,
-    RecurringEventActivityState,
-    SendRemoteEventActivityState,
-} from '../activities/index.js';
+} from '../../store/action-reducers/utils/get-element.js';
 import {
     changeOccupation,
     isUnoccupied,
     isUnoccupiedOrIntermediarilyOccupied,
 } from '../../models/utils/occupations/occupation-helpers-mutable.js';
-import { amountOfResourcesInVehicle } from '../../models/utils/amount-of-resources-in-vehicle.js';
-import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { newWaitForTransferOccupation } from '../../models/utils/occupations/wait-for-transfer-occupation.js';
+import { newRecurringEventActivityState } from '../activities/recurring-event.js';
+import { newDoTransferEvent } from '../events/do-transfer.js';
+import { newTransferVehicleActivityState } from '../activities/transfer-vehicle.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { startTransferEventSchema } from '../events/start-transfer.js';
+import { uuid, uuidSchema } from '../../utils/uuid.js';
 import {
-    DoTransferEvent,
-    RequestReceivedEvent,
-    StartTransferEvent,
-    VehiclesSentEvent,
-} from '../events/index.js';
-import { LoadOccupation } from '../../models/utils/occupations/load-occupation.js';
-import { WaitForTransferOccupation } from '../../models/utils/occupations/wait-for-transfer-occupation.js';
-import { TransferVehicleActivityState } from '../activities/transfer-vehicle.js';
-import type {
-    SimulationBehavior,
-    SimulationBehaviorState,
-} from './simulation-behavior.js';
+    currentSimulatedRegionOf,
+    isInSimulatedRegion,
+    isInSpecificSimulatedRegion,
+} from '../../models/utils/position/position-helpers.js';
+import { newLoadOccupation } from '../../models/utils/occupations/load-occupation.js';
+import { newLoadVehicleActivityState } from '../activities/load-vehicle.js';
+import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { newDelayEventActivityState } from '../activities/delay-event.js';
+import { newRequestReceivedEvent } from '../events/request-received.js';
+import { newSendRemoteEventActivityState } from '../activities/send-remote-event.js';
+import { newVehiclesSentEvent } from '../events/vehicles-sent.js';
+import { newVehicleResource } from '../../models/utils/rescue-resource.js';
+import { simulationBehaviorStateSchema } from './simulation-behavior.js';
+import type { SimulationBehavior } from './simulation-behavior.js';
 
-export class TransferBehaviorState implements SimulationBehaviorState {
-    @IsValue('transferBehavior' as const)
-    readonly type = 'transferBehavior';
+export const transferBehaviorStateSchema = z.strictObject({
+    ...simulationBehaviorStateSchema.shape,
+    type: z.literal('transferBehavior'),
+    loadTimePerPatient: z.int().nonnegative(),
+    personnelLoadTime: z.int().nonnegative(),
+    delayBetweenSends: z.int().nonnegative(),
+    startTransferEventQueue: z.array(startTransferEventSchema),
+    recurringActivityId: uuidSchema.optional(),
+});
 
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
+export type TransferBehaviorState = z.infer<typeof transferBehaviorStateSchema>;
 
-    @IsInt()
-    @Min(0)
-    public readonly loadTimePerPatient: number;
-
-    @IsInt()
-    @Min(0)
-    public readonly personnelLoadTime: number;
-
-    @IsInt()
-    @Min(0)
-    public readonly delayBetweenSends: number;
-
-    @Type(() => StartTransferEvent)
-    @ValidateNested()
-    public readonly startTransferEventQueue: readonly StartTransferEvent[] = [];
-
-    @IsUUID(4, uuidValidationOptions)
-    @IsOptional()
-    public readonly recurringActivityId: UUID | undefined;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        loadTimePerPatient: number = 60_000, // 1 minute
-        personnelLoadTime: number = 120_000, // 2 minutes
-        delayBetweenSends: number = 60_000 // 1 minute
-    ) {
-        this.loadTimePerPatient = loadTimePerPatient;
-        this.personnelLoadTime = personnelLoadTime;
-        this.delayBetweenSends = delayBetweenSends;
-    }
-
-    static readonly create = getCreate(this);
+export function newTransferBehaviorState(
+    loadTimePerPatient: number = 60_000, // 1 minute
+    personnelLoadTime: number = 120_000, // 2 minutes
+    delayBetweenSends: number = 60_000 // 1 minute
+): TransferBehaviorState {
+    return {
+        id: uuid(),
+        type: 'transferBehavior',
+        loadTimePerPatient,
+        personnelLoadTime,
+        delayBetweenSends,
+        startTransferEventQueue: [],
+        recurringActivityId: undefined,
+    };
 }
 
 export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
-    behaviorState: TransferBehaviorState,
+    behaviorStateSchema: transferBehaviorStateSchema,
+    newBehaviorState: newTransferBehaviorState,
     handleEvent(draftState, simulatedRegion, behaviorState, event) {
         switch (event.type) {
             case 'transferPatientsRequestEvent':
@@ -140,7 +107,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                         const activityId = nextUUID(draftState);
                         addActivity(
                             simulatedRegion,
-                            LoadVehicleActivityState.create(
+                            newLoadVehicleActivityState(
                                 activityId,
                                 vehicleToLoad.id,
                                 event.transferDestinationType,
@@ -153,7 +120,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                         changeOccupation(
                             draftState,
                             vehicleToLoad,
-                            LoadOccupation.create(activityId)
+                            newLoadOccupation(activityId)
                         );
                     }
                 }
@@ -179,7 +146,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                     const activityId = nextUUID(draftState);
                     addActivity(
                         simulatedRegion,
-                        LoadVehicleActivityState.create(
+                        newLoadVehicleActivityState(
                             activityId,
                             vehicle.id,
                             event.transferDestinationType,
@@ -192,7 +159,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                     changeOccupation(
                         draftState,
                         vehicle,
-                        LoadOccupation.create(activityId)
+                        newLoadOccupation(activityId)
                     );
                 }
                 break;
@@ -214,7 +181,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                     const activityId = nextUUID(draftState);
                     addActivity(
                         simulatedRegion,
-                        LoadVehicleActivityState.create(
+                        newLoadVehicleActivityState(
                             activityId,
                             vehicle.id,
                             event.transferDestinationType,
@@ -229,7 +196,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                     changeOccupation(
                         draftState,
                         vehicle,
-                        LoadOccupation.create(activityId)
+                        newLoadOccupation(activityId)
                     );
                 }
                 break;
@@ -291,7 +258,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                                 const activityId = nextUUID(draftState);
                                 addActivity(
                                     simulatedRegion,
-                                    LoadVehicleActivityState.create(
+                                    newLoadVehicleActivityState(
                                         activityId,
                                         loadableVehicles![index]!.id,
                                         event.transferDestinationType,
@@ -308,7 +275,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                                 changeOccupation(
                                     draftState,
                                     loadableVehicles![index]!,
-                                    LoadOccupation.create(activityId)
+                                    newLoadOccupation(activityId)
                                 );
                                 sentVehicles[vehicleType]++;
                             }
@@ -319,9 +286,9 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
 
                     addActivity(
                         simulatedRegion,
-                        DelayEventActivityState.create(
+                        newDelayEventActivityState(
                             nextUUID(draftState),
-                            RequestReceivedEvent.create(
+                            newRequestReceivedEvent(
                                 sentVehicles,
                                 event.transferDestinationType,
                                 event.transferDestinationId,
@@ -336,11 +303,11 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                     if (event.transferInitiatingRegionId) {
                         addActivity(
                             simulatedRegion,
-                            SendRemoteEventActivityState.create(
+                            newSendRemoteEventActivityState(
                                 nextUUID(draftState),
                                 event.transferInitiatingRegionId,
-                                VehiclesSentEvent.create(
-                                    VehicleResource.create(sentVehicles),
+                                newVehiclesSentEvent(
+                                    newVehicleResource(sentVehicles),
                                     event.transferDestinationId,
                                     event.key
                                 )
@@ -373,13 +340,11 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                             ) {
                                 addActivity(
                                     simulatedRegion,
-                                    SendRemoteEventActivityState.create(
+                                    newSendRemoteEventActivityState(
                                         nextUUID(draftState),
                                         targetSimulatedRegion.id,
-                                        VehiclesSentEvent.create(
-                                            VehicleResource.create(
-                                                sentVehicles
-                                            ),
+                                        newVehiclesSentEvent(
+                                            newVehicleResource(sentVehicles),
                                             transferPoint.id
                                         )
                                     )
@@ -402,7 +367,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                     changeOccupation(
                         draftState,
                         vehicle,
-                        WaitForTransferOccupation.create()
+                        newWaitForTransferOccupation()
                     );
 
                     behaviorState.startTransferEventQueue.push(event);
@@ -418,9 +383,9 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                             nextUUID(draftState);
                         addActivity(
                             simulatedRegion,
-                            RecurringEventActivityState.create(
+                            newRecurringEventActivityState(
                                 behaviorState.recurringActivityId,
-                                DoTransferEvent.create(),
+                                newDoTransferEvent(),
                                 draftState.currentTime,
                                 behaviorState.delayBetweenSends
                             )
@@ -456,7 +421,7 @@ export const transferBehavior: SimulationBehavior<TransferBehaviorState> = {
                         }
                         addActivity(
                             simulatedRegion,
-                            TransferVehicleActivityState.create(
+                            newTransferVehicleActivityState(
                                 nextUUID(draftState),
                                 vehicle.id,
                                 transferEvent.transferDestinationType,

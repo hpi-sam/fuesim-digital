@@ -1,17 +1,18 @@
 import type { OnInit } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     MissingTransferConnectionRadiogram,
     UUID,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../../../../state/app.state';
 import {
     createSelectRadiogram,
     selectTransferPoints,
-} from 'src/app/state/application/selectors/exercise.selectors';
+} from '../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-radiogram-card-content-missing-transfer-connection',
@@ -20,21 +21,19 @@ import {
     styleUrls: [
         './radiogram-card-content-missing-transfer-connection.component.scss',
     ],
-    standalone: false,
+    imports: [AsyncPipe],
 })
-export class RadigoramCardContentMissingTransferConnectionComponent
-    implements OnInit
-{
-    @Input() radiogramId!: UUID;
+export class RadigoramCardContentMissingTransferConnectionComponent implements OnInit {
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly radiogramId = input.required<UUID>();
 
     transferPointName$!: Observable<string>;
-
-    constructor(private readonly store: Store<AppState>) {}
 
     ngOnInit(): void {
         const radiogram$ = this.store.select(
             createSelectRadiogram<MissingTransferConnectionRadiogram>(
-                this.radiogramId
+                this.radiogramId()
             )
         );
 

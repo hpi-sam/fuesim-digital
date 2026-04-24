@@ -1,5 +1,6 @@
-import { SpatialTree } from '../models/utils/index.js';
-import { cloneDeepMutable, StrictObject } from '../utils/index.js';
+import { cloneDeepMutable } from '../utils/clone-deep.js';
+import { SpatialTree } from '../models/utils/spatial-tree.js';
+import { TypeAssertedObject } from '../utils/type-asserted-object.js';
 import type { Migration } from './migration-functions.js';
 
 export const treatmentSystemImprovements8: Migration = {
@@ -32,7 +33,7 @@ export const treatmentSystemImprovements8: Migration = {
             patients: SpatialTree.create(),
             personnel: SpatialTree.create(),
         });
-        for (const material of StrictObject.values(state.materials)) {
+        for (const material of TypeAssertedObject.values(state.materials)) {
             migrateMaterial(material);
             if (!material.position) {
                 continue;
@@ -43,7 +44,7 @@ export const treatmentSystemImprovements8: Migration = {
                 material.position
             );
         }
-        for (const personnel of StrictObject.values(state.personnel)) {
+        for (const personnel of TypeAssertedObject.values(state.personnel)) {
             migratePersonnel(personnel);
             if (!personnel.position) {
                 continue;
@@ -55,14 +56,16 @@ export const treatmentSystemImprovements8: Migration = {
             );
         }
         // Migrate patients
-        for (const patient of StrictObject.values(state.patients)) {
+        for (const patient of TypeAssertedObject.values(state.patients)) {
             migratePatient(patient);
-            for (const personnel of StrictObject.values(state.personnel)) {
+            for (const personnel of TypeAssertedObject.values(
+                state.personnel
+            )) {
                 if (personnel.assignedPatientIds[patient.id]) {
                     patient.assignedPersonnelIds[personnel.id] = true;
                 }
             }
-            for (const material of StrictObject.values(state.materials)) {
+            for (const material of TypeAssertedObject.values(state.materials)) {
                 if (material.assignedPatientIds[patient.id]) {
                     patient.assignedMaterialIds[material.id] = true;
                 }

@@ -31,34 +31,28 @@
         </div>
     </div>
     <div class="overflow-auto p-4">
-        <ng-container
-            *ngIf="(visibleRadiograms$ | async)?.length; else noRadiograms"
-        ></ng-container>
-        <app-radiogram-card
-            *ngFor="
-                let radiogram of visibleRadiograms$ | async;
-                first as first;
-                trackBy: 'id' | appTrackByProperty: (visibleRadiograms$ | async)
-            "
-            [radiogramId]="radiogram.id"
-            [first]="first"
-            [shownInSignallerModal]="shownInSignallerModal"
-        ></app-radiogram-card>
-        <ng-template #noRadiograms>
-            <div
-                *ngIf="
-                    radiogramListService.showDone$ | async;
-                    else noNotDoneRadiograms
-                "
-                class="text-muted mt-3 mb-3"
-            >
-                Es sind noch keine Funksprüche vorhanden.
-            </div>
-            <ng-template #noNotDoneRadiograms>
+        @if ((visibleRadiograms$ | async)?.length) {
+        } @else {
+            @if (radiogramListService.showDone$ | async) {
+                <div class="text-muted mt-3 mb-3">
+                    Es sind noch keine Funksprüche vorhanden.
+                </div>
+            } @else {
                 <div class="text-muted mt-3 mb-3">
                     Es sind keine ausstehenden Funksprüche vorhanden.
                 </div>
-            </ng-template>
-        </ng-template>
+            }
+        }
+        @for (
+            radiogram of visibleRadiograms$ | async;
+            track radiogram.id;
+            let first = $first
+        ) {
+            <app-radiogram-card
+                [radiogramId]="radiogram.id"
+                [first]="first"
+                [shownInSignallerModal]="shownInSignallerModal()"
+            ></app-radiogram-card>
+        }
     </div>
 </div>

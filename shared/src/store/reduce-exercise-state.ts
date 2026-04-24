@@ -1,8 +1,10 @@
+import type { WritableDraft } from 'immer';
 import { freeze, produce } from 'immer';
 import type { ExerciseState } from '../state.js';
-import type { Mutable } from '../utils/index.js';
-import type { ExerciseAction } from './action-reducers/index.js';
-import { getExerciseActionTypeDictionary } from './action-reducers/index.js';
+import {
+    type ExerciseAction,
+    getExerciseActionTypeDictionary,
+} from './action-reducers/action-reducers.js';
 
 const exerciseActionTypeDictionary = getExerciseActionTypeDictionary();
 
@@ -31,7 +33,7 @@ export function reduceExerciseState(
  * @returns the new state
  */
 export function applyAction(
-    draftState: Mutable<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     action: ExerciseAction
 ) {
     // Make sure that the action isn't mutated in the reducer (short circuits if the action is already frozen)

@@ -1,15 +1,16 @@
-import { Component, Input } from '@angular/core';
-import type { PatientStatus } from 'digital-fuesim-manv-shared';
-import { statusNames } from 'digital-fuesim-manv-shared';
+import { Component, input } from '@angular/core';
+import type { PatientStatus } from 'fuesim-digital-shared';
+import { statusNames } from 'fuesim-digital-shared';
+import { NgStyle } from '@angular/common';
 
 @Component({
     selector: 'app-patient-status-badge',
     templateUrl: './patient-status-badge.component.html',
     styleUrls: ['./patient-status-badge.component.scss'],
-    standalone: false,
+    imports: [NgStyle],
 })
 export class PatientStatusBadgeComponent {
-    @Input() status!: PatientStatus;
+    readonly status = input.required<PatientStatus>();
 
     public readonly statusNames = statusNames;
 }

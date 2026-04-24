@@ -20,16 +20,4 @@ export namespace CustomValidators {
                 ? null
                 : { integer: true as const };
     }
-    export function joinIdValidator() {
-        return (control: AbstractControl) =>
-            /^((\d{6})|(\d{8}))$/u.test(control.value)
-                ? null
-                : { joinId: true as const };
-    }
-    export function geographicCoordinateValidator() {
-        return (control: AbstractControl) =>
-            /^-?\d{1,3}(.\d+)?$/u.test(control.value)
-                ? null
-                : { geographicCoordinate: true as const };
-    }
 }

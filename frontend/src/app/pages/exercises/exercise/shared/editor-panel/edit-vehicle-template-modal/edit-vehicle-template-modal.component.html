@@ -2,23 +2,28 @@
     <h4 class="modal-title">Fahrzeugvorlage bearbeiten</h4>
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
-<div *ngIf="vehicleTemplate" class="modal-body">
-    <app-vehicle-template-form
-        [initialValues]="{
-            name: vehicleTemplate.name,
-            type: vehicleTemplate.vehicleType,
-            url: vehicleTemplate.image.url,
-            height: vehicleTemplate.image.height,
-            patientCapacity: vehicleTemplate.patientCapacity,
-            materialTypes: vehicleTemplate.materials,
-            personnelTypes: vehicleTemplate.personnel,
-        }"
-        (submitVehicleTemplate)="editVehicleTemplate($event)"
-        [btnText]="'Speichern'"
-    ></app-vehicle-template-form>
+@if (vehicleTemplate) {
+    <div class="modal-body">
+        <app-vehicle-template-form
+            [initialValues]="{
+                name: vehicleTemplate.name,
+                type: vehicleTemplate.vehicleType,
+                url: vehicleTemplate.image.url,
+                height: vehicleTemplate.image.height,
+                patientCapacity: vehicleTemplate.patientCapacity,
+                materialTemplates: materialTemplates || [],
+                personnelTemplates: personnelTemplates || [],
+            }"
+            (submitVehicleTemplate)="editVehicleTemplate($event)"
+            [btnText]="'Speichern'"
+        ></app-vehicle-template-form>
 
-    <button class="btn btn-danger float-end" (click)="deleteVehicleTemplate()">
-        <i class="bi bi-trash-fill"></i>
-        Löschen
-    </button>
-</div>
+        <button
+            class="btn btn-danger float-end"
+            (click)="deleteVehicleTemplate()"
+        >
+            <i class="bi bi-trash-fill"></i>
+            Löschen
+        </button>
+    </div>
+}

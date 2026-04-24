@@ -3,7 +3,7 @@
         <label class="form-label">Name</label>
         <input
             #nameInput="ngModel"
-            [ngModel]="simulatedRegion.name"
+            [ngModel]="simulatedRegion().name"
             (appSaveOnTyping)="renameSimulatedRegion($event)"
             required
             type="text"
@@ -22,31 +22,29 @@
                 style="cursor: pointer"
             >
                 <th scope="rowgroup" class="w-75">
-                    <i
-                        *ngIf="patientsCollapsed; else patientsExpanded"
-                        class="bi bi-caret-right-fill"
-                    ></i>
-                    <ng-template #patientsExpanded
-                        ><i class="bi bi-caret-down-fill"></i
-                    ></ng-template>
+                    @if (patientsCollapsed) {
+                        <i class="bi bi-caret-right-fill"></i>
+                    } @else {
+                        <i class="bi bi-caret-down-fill"></i>
+                    }
+
                     Patienten
                 </th>
                 <th class="w-25">{{ (patients.all$ | async)?.length }}</th>
             </tr>
-            <tr
-                *ngFor="let patientCategory of patientCategories"
-                #collapse="ngbCollapse"
-                [(ngbCollapse)]="patientsCollapsed"
-            >
-                <td class="ps-4">
-                    <app-patient-status-badge [status]="patientCategory" />
-                </td>
-                <td>
-                    {{
-                        (patients[patientCategory | withDollar] | async)?.length
-                    }}
-                </td>
-            </tr>
+            @for (patientCategory of patientCategories; track patientCategory) {
+                <tr #collapse="ngbCollapse" [(ngbCollapse)]="patientsCollapsed">
+                    <td class="ps-4">
+                        <app-patient-status-badge [status]="patientCategory" />
+                    </td>
+                    <td>
+                        {{
+                            (patients[patientCategory | withDollar] | async)
+                                ?.length
+                        }}
+                    </td>
+                </tr>
+            }
         </tbody>
         <tbody>
             <tr
@@ -54,32 +52,37 @@
                 style="cursor: pointer"
             >
                 <th scope="rowgroup" class="w-75">
-                    <i
-                        *ngIf="vehiclesCollapsed; else vehiclesExpanded"
-                        class="bi bi-caret-right-fill"
-                    ></i>
-                    <ng-template #vehiclesExpanded
-                        ><i class="bi bi-caret-down-fill"></i
-                    ></ng-template>
+                    @if (vehiclesCollapsed) {
+                        <i class="bi bi-caret-right-fill"></i>
+                    } @else {
+                        <i class="bi bi-caret-down-fill"></i>
+                    }
+
                     Fahrzeuge
                 </th>
                 <th class="w-25">
                     {{ ((vehicles$ | async) ?? {})['all']?.length }}
                 </th>
             </tr>
-            <tr
-                *ngFor="let template of vehicleTemplates$ | async"
-                #collapse="ngbCollapse"
-                [(ngbCollapse)]="vehiclesCollapsed"
-            >
-                <td class="ps-4">{{ template.vehicleType }}</td>
-                <td>
-                    {{
-                        ((vehicles$ | async) ?? {})[template.vehicleType]
-                            ?.length
-                    }}
-                </td>
-            </tr>
+            @for (
+                template of vehicleTemplates$ | async | values;
+                track template.id
+            ) {
+                @if (
+                    ((vehicles$ | async) ?? {})[template.id]?.length;
+                    as vehiclesCount
+                ) {
+                    <tr
+                        #collapse="ngbCollapse"
+                        [(ngbCollapse)]="vehiclesCollapsed"
+                    >
+                        <td class="ps-4">{{ template.vehicleType }}</td>
+                        <td>
+                            {{ vehiclesCount }}
+                        </td>
+                    </tr>
+                }
+            }
         </tbody>
         <tbody>
             <tr
@@ -87,36 +90,75 @@
                 style="cursor: pointer"
             >
                 <th scope="rowgroup" class="w-75">
-                    <i
-                        *ngIf="personnelCollapsed; else personnelExpanded"
-                        class="bi bi-caret-right-fill"
-                    ></i>
-                    <ng-template #personnelExpanded
-                        ><i class="bi bi-caret-down-fill"></i
-                    ></ng-template>
+                    @if (personnelCollapsed) {
+                        <i class="bi bi-caret-right-fill"></i>
+                    } @else {
+                        <i class="bi bi-caret-down-fill"></i>
+                    }
+
                     Personal
                 </th>
-                <th class="w-25">{{ (personnel.all$ | async)?.length }}</th>
+                <th class="w-25">
+                    {{ ((personnel$ | async) ?? {})['all']?.length }}
+                </th>
             </tr>
-            <tr
-                *ngFor="let personnelCategory of personnelCategories"
-                #collapse="ngbCollapse"
-                [(ngbCollapse)]="personnelCollapsed"
-            >
-                <td class="ps-4">{{ personnelCategory | personnelName }}</td>
-                <td>
-                    {{
-                        (personnel[personnelCategory | withDollar] | async)
-                            ?.length
-                    }}
-                </td>
-            </tr>
+            @for (
+                template of personnelTemplates$ | async | values;
+                track template.id
+            ) {
+                @if (
+                    ((personnel$ | async) ?? {})[template.id]?.length;
+                    as personnelCount
+                ) {
+                    <tr
+                        #collapse="ngbCollapse"
+                        [(ngbCollapse)]="personnelCollapsed"
+                    >
+                        <td class="ps-4">{{ template.name }}</td>
+                        <td>
+                            {{ personnelCount }}
+                        </td>
+                    </tr>
+                }
+            }
         </tbody>
         <tbody>
-            <tr>
-                <th scope="rowgroup" class="w-75">Material</th>
-                <th class="w-25">{{ (material$ | async)?.length }}</th>
+            <tr
+                (click)="materialsCollapsed = !materialsCollapsed"
+                style="cursor: pointer"
+            >
+                <th scope="rowgroup" class="w-75">
+                    @if (materialsCollapsed) {
+                        <i class="bi bi-caret-right-fill"></i>
+                    } @else {
+                        <i class="bi bi-caret-down-fill"></i>
+                    }
+
+                    Material
+                </th>
+                <th class="w-25">
+                    {{ ((materials$ | async) ?? {})['all']?.length }}
+                </th>
             </tr>
+            @for (
+                template of materialTemplates$ | async | values;
+                track template.id
+            ) {
+                @if (
+                    ((materials$ | async) ?? {})[template.id]?.length;
+                    as materialsCount
+                ) {
+                    <tr
+                        #collapse="ngbCollapse"
+                        [(ngbCollapse)]="materialsCollapsed"
+                    >
+                        <td class="ps-4">{{ template.name }}</td>
+                        <td>
+                            {{ materialsCount }}
+                        </td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
 </div>

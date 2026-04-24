@@ -2,7 +2,7 @@
     <div class="rounded overflow-hidden flex-fill">
         <app-exercise-map></app-exercise-map>
     </div>
-    <ng-container *ngIf="timeConstraints$ | async as timeConstraints">
+    @if (timeConstraints$ | async; as timeConstraints) {
         <div class="pt-2">
             <div class="d-inline-block">
                 <span
@@ -10,32 +10,35 @@
                     title="Aktuelle Zeit"
                     >{{ timeConstraints.current | formatDuration }}</span
                 >
-                <button
-                    *ngIf="isReplaying"
-                    class="btn btn-sm btn-primary"
-                    title="Pause"
-                    (click)="stopReplay()"
-                >
-                    <i class="bi-pause-fill"></i>
-                </button>
-                <ng-container *ngIf="!isReplaying">
+                @if (isReplaying) {
                     <button
-                        *ngIf="timeConstraints.current < timeConstraints.end"
                         class="btn btn-sm btn-primary"
-                        title="Abspielen"
-                        (click)="startReplay()"
+                        title="Pause"
+                        (click)="stopReplay()"
                     >
-                        <i class="bi-play-fill"></i>
+                        <i class="bi-pause-fill"></i>
                     </button>
-                    <button
-                        *ngIf="timeConstraints.current >= timeConstraints.end"
-                        class="btn btn-sm btn-primary"
-                        title="Erneut abspielen"
-                        (click)="restartReplay()"
-                    >
-                        <i class="bi-arrow-counterclockwise"></i>
-                    </button>
-                </ng-container>
+                }
+                @if (!isReplaying) {
+                    @if (timeConstraints.current < timeConstraints.end) {
+                        <button
+                            class="btn btn-sm btn-primary"
+                            title="Abspielen"
+                            (click)="startReplay()"
+                        >
+                            <i class="bi-play-fill"></i>
+                        </button>
+                    }
+                    @if (timeConstraints.current >= timeConstraints.end) {
+                        <button
+                            class="btn btn-sm btn-primary"
+                            title="Erneut abspielen"
+                            (click)="restartReplay()"
+                        >
+                            <i class="bi-arrow-counterclockwise"></i>
+                        </button>
+                    }
+                }
                 <div class="ms-3 d-inline-block">
                     <select
                         [ngModel]="replaySpeed"
@@ -43,21 +46,20 @@
                         class="form-select form-select-sm d-inline-block no-validation"
                         title="Abspielgeschwindigkeit"
                     >
-                        <option
-                            *ngFor="let option of replaySpeedOptions"
-                            [value]="option"
-                        >
-                            &times; {{ option }}
-                        </option>
+                        @for (option of replaySpeedOptions; track option) {
+                            <option [value]="option">
+                                &times; {{ option }}
+                            </option>
+                        }
                     </select>
                 </div>
             </div>
             <div class="float-end">
                 <button
-                    (click)="openClientOverview()"
+                    (click)="openClientsModal()"
                     class="btn btn-primary btn-sm"
                 >
-                    Teilnehmerübersicht
+                    Teilnehmende
                 </button>
                 <button
                     (click)="openTransferOverview()"
@@ -97,5 +99,5 @@
                 timeConstraints.end | formatDuration
             }}</span>
         </div>
-    </ng-container>
+    }
 </div>

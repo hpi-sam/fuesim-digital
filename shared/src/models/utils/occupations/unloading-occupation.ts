@@ -1,10 +1,13 @@
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../get-create.js';
-import type { Occupation } from './occupation.js';
+import { z } from 'zod';
 
-export class UnloadingOccupation implements Occupation {
-    @IsValue('unloadingOccupation')
-    readonly type = 'unloadingOccupation';
+export const unloadingOccupationSchema = z.strictObject({
+    type: z.literal('unloadingOccupation'),
+});
 
-    static readonly create = getCreate(this);
+export type UnloadingOccupation = z.infer<typeof unloadingOccupationSchema>;
+
+export function newUnloadingOccupation(): UnloadingOccupation {
+    return {
+        type: 'unloadingOccupation',
+    };
 }

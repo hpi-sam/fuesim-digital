@@ -14,10 +14,11 @@
                         <label class="btn btn-outline-primary btn-sm">
                             <i class="bi-cloud-upload me-2"> </i>
                             Vorlagen importieren
-                            <span
-                                *ngIf="importingTemplates"
-                                class="spinner-border spinner-border-sm"
-                            ></span>
+                            @if (importingTemplates) {
+                                <span
+                                    class="spinner-border spinner-border-sm"
+                                ></span>
+                            }
                             <input
                                 (appFileInput)="importPartialExport($event)"
                                 type="file"
@@ -105,30 +106,77 @@
                         <div ngbAccordionBody>
                             <ng-template>
                                 <div class="cards">
-                                    <app-map-editor-card
-                                        *ngFor="
-                                            let simulatedRegionTemplate of simulatedRegionTemplates
-                                        "
-                                        (elementMousedown)="
-                                            dragElementService.onMouseDown(
-                                                $event,
-                                                {
-                                                    type: 'simulatedRegion',
-                                                    template:
-                                                        simulatedRegionTemplate,
-                                                }
-                                            )
-                                        "
-                                        dataCy="draggableSimulatedRegionDiv"
-                                        [imageUrl]="
-                                            simulatedRegionTemplate.image.url
-                                        "
-                                        [darkBackground]="true"
-                                        [title]="
-                                            simulatedRegionTemplate.editorName
-                                        "
-                                    >
-                                    </app-map-editor-card>
+                                    @for (
+                                        simulatedRegionDragTemplate of simulatedRegionDragTemplates;
+                                        track simulatedRegionDragTemplate
+                                    ) {
+                                        <app-map-editor-card
+                                            (elementMousedown)="
+                                                dragElementService.onMouseDown(
+                                                    $event,
+                                                    {
+                                                        type: 'simulatedRegion',
+                                                        template:
+                                                            simulatedRegionDragTemplate,
+                                                    }
+                                                )
+                                            "
+                                            dataCy="draggableSimulatedRegionDiv"
+                                            [imageUrl]="
+                                                simulatedRegionDragTemplate
+                                                    .image.url
+                                            "
+                                            [darkBackground]="true"
+                                            [title]="
+                                                simulatedRegionDragTemplate.editorName
+                                            "
+                                        >
+                                        </app-map-editor-card>
+                                    }
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+                <div ngbAccordionItem="restrictedZones">
+                    <h5 ngbAccordionHeader>
+                        <button
+                            ngbAccordionButton
+                            data-cy="restrictedZonesAccordionButton"
+                        >
+                            Zonen
+                        </button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="cards">
+                                    @for (
+                                        restrictedZoneDragTemplate of restrictedZoneDragTemplates;
+                                        track restrictedZoneDragTemplate
+                                    ) {
+                                        <app-map-editor-card
+                                            (elementMousedown)="
+                                                dragElementService.onMouseDown(
+                                                    $event,
+                                                    {
+                                                        type: 'restrictedZone',
+                                                        template:
+                                                            restrictedZoneDragTemplate,
+                                                    }
+                                                )
+                                            "
+                                            dataCy="draggablerestrictedZoneDiv"
+                                            [imageUrl]="
+                                                restrictedZoneDragTemplate.image
+                                                    .url
+                                            "
+                                            [darkBackground]="true"
+                                            [title]="
+                                                restrictedZoneDragTemplate.editorName
+                                            "
+                                        />
+                                    }
                                 </div>
                             </ng-template>
                         </div>
@@ -146,25 +194,22 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
-                                <ng-container
-                                    *appLet="
-                                        selectedCategories$
-                                            | async as selectedCategories
-                                    "
-                                >
+                                @if (
+                                    selectedCategories$ | async;
+                                    as selectedCategories
+                                ) {
                                     <div
                                         class="btn-group btn-group-sm mb-2"
                                         role="group"
                                     >
-                                        <ng-container
-                                            *ngFor="let category of categories"
-                                        >
+                                        @for (
+                                            category of categories;
+                                            track category
+                                        ) {
                                             <input
                                                 type="checkbox"
                                                 class="btn-check"
-                                                [id]="
-                                                    `patient-status-filter-${category}`
-                                                "
+                                                [id]="`patient-status-filter-${category}`"
                                                 autocomplete="off"
                                                 [ngModel]="
                                                     selectedCategories[
@@ -182,93 +227,97 @@
                                             />
                                             <label
                                                 class="btn btn-outline-primary"
-                                                [for]="
-                                                    `patient-status-filter-${category}`
-                                                "
+                                                [for]="`patient-status-filter-${category}`"
                                             >
                                                 <app-patient-status-badge
                                                     [status]="category"
                                                 />
                                             </label>
-                                        </ng-container>
+                                        }
                                     </div>
-                                    <ng-container
-                                        *ngFor="
-                                            let item of patientCategories$
-                                                | async
-                                                | keyvalue;
-                                            last as isLast
-                                        "
-                                    >
+                                    @for (
+                                        item of patientCategories$
+                                            | async
+                                            | keyvalue;
+                                        track item;
+                                        let isLast = $last
+                                    ) {
                                         <div class="cards">
-                                            <app-map-editor-card
-                                                *ngFor="
-                                                    let patientCategory of item.value
-                                                "
-                                                (elementMousedown)="
-                                                    dragElementService.onMouseDown(
-                                                        $event,
-                                                        {
-                                                            type: 'patient',
-                                                            template:
-                                                                patientCategory,
-                                                        }
-                                                    )
-                                                "
-                                                dataCy="draggablePatientDiv"
-                                            >
-                                                <span
-                                                    class="badge text-bg-secondary m-1"
-                                                    style="
-                                                        position: absolute;
-                                                        top: 1px;
-                                                        right: 1px;
+                                            @for (
+                                                patientCategory of item.value;
+                                                track patientCategory
+                                            ) {
+                                                <app-map-editor-card
+                                                    (elementMousedown)="
+                                                        dragElementService.onMouseDown(
+                                                            $event,
+                                                            {
+                                                                type: 'patient',
+                                                                template:
+                                                                    patientCategory,
+                                                            }
+                                                        )
                                                     "
-                                                    [ngbTooltip]="
-                                                        patientCategory
-                                                            .patientTemplates
-                                                            .length === 1
-                                                            ? 'Eine Variante'
-                                                            : `${patientCategory.patientTemplates.length} Varianten`
-                                                    "
+                                                    dataCy="draggablePatientDiv"
                                                 >
-                                                    <i
-                                                        class="bi bi-collection me-1"
-                                                    ></i>
-                                                    {{
-                                                        patientCategory
-                                                            .patientTemplates
-                                                            .length
-                                                    }}
-                                                </span>
-                                                <div style="height: 100px">
-                                                    <div
-                                                        class="preview-image-container small-image d-flex justify-content-center"
+                                                    <span
+                                                        class="badge text-bg-secondary m-1"
+                                                        style="
+                                                            position: absolute;
+                                                            top: 1px;
+                                                            right: 1px;
+                                                        "
+                                                        [ngbTooltip]="
+                                                            patientCategory
+                                                                .patientTemplates
+                                                                .length === 1
+                                                                ? 'Eine Variante'
+                                                                : `${patientCategory.patientTemplates.length} Varianten`
+                                                        "
                                                     >
-                                                        <img
-                                                            [src]="
-                                                                patientCategory
-                                                                    .image.url
-                                                            "
-                                                        />
-                                                    </div>
-                                                    <div
-                                                        class="p-1 text-wrap lh-1 fs-5"
-                                                        style="overflow: auto"
-                                                    >
-                                                        <app-patient-status-display
-                                                            [patientStatus]="
-                                                                patientCategory.name
+                                                        <i
+                                                            class="bi bi-collection me-1"
+                                                        ></i>
+                                                        {{
+                                                            patientCategory
+                                                                .patientTemplates
+                                                                .length
+                                                        }}
+                                                    </span>
+                                                    <div style="height: 100px">
+                                                        <div
+                                                            class="preview-image-container small-image d-flex justify-content-center"
+                                                        >
+                                                            <img
+                                                                [src]="
+                                                                    patientCategory
+                                                                        .image
+                                                                        .url
+                                                                "
+                                                            />
+                                                        </div>
+                                                        <div
+                                                            class="p-1 text-wrap lh-1 fs-5"
+                                                            style="
+                                                                overflow: auto;
                                                             "
                                                         >
-                                                        </app-patient-status-display>
+                                                            <app-patient-status-display
+                                                                [patientStatus]="
+                                                                    patientCategory.name
+                                                                "
+                                                            >
+                                                            </app-patient-status-display>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </app-map-editor-card>
+                                                </app-map-editor-card>
+                                            }
                                         </div>
-                                        <hr *ngIf="!isLast" class="mt-1 mb-2" />
-                                    </ng-container>
-                                </ng-container>
+                                        @if (!isLast) {
+                                            <hr class="mt-1 mb-2" />
+                                        }
+                                    }
+                                }
                             </ng-template>
                         </div>
                     </div>
@@ -298,31 +347,39 @@
                                     </button>
                                 </div>
                                 <div class="cards">
-                                    <app-map-editor-card
-                                        *ngFor="
-                                            let vehicleTemplate of vehicleTemplates$
-                                                | async
-                                        "
-                                        (elementMousedown)="
-                                            dragElementService.onMouseDown(
-                                                $event,
-                                                {
-                                                    type: 'vehicle',
-                                                    template: vehicleTemplate,
-                                                }
-                                            )
-                                        "
-                                        dataCy="draggableVehicleDiv"
-                                        [imageUrl]="vehicleTemplate.image.url"
-                                        (elementEdit)="
-                                            editVehicleTemplate(
-                                                vehicleTemplate.id
-                                            )
-                                        "
-                                        [enableEditButton]="true"
-                                        [title]="vehicleTemplate.vehicleType"
-                                    >
-                                    </app-map-editor-card>
+                                    @for (
+                                        vehicleTemplate of vehicleTemplates$
+                                            | async
+                                            | values;
+                                        track vehicleTemplate.id
+                                    ) {
+                                        <app-map-editor-card
+                                            (elementMousedown)="
+                                                dragElementService.onMouseDown(
+                                                    $event,
+                                                    {
+                                                        type: 'vehicle',
+                                                        template:
+                                                            vehicleTemplate,
+                                                    }
+                                                )
+                                            "
+                                            dataCy="draggableVehicleDiv"
+                                            [imageUrl]="
+                                                vehicleTemplate.image.url
+                                            "
+                                            (elementEdit)="
+                                                editVehicleTemplate(
+                                                    vehicleTemplate.id
+                                                )
+                                            "
+                                            [enableEditButton]="true"
+                                            [title]="
+                                                vehicleTemplate.vehicleType
+                                            "
+                                        >
+                                        </app-map-editor-card>
+                                    }
                                 </div>
                             </ng-template>
                         </div>
@@ -350,41 +407,115 @@
                                     </button>
                                 </div>
                                 <div class="cards">
+                                    @for (
+                                        mapImageTemplate of mapImageTemplates$
+                                            | async
+                                            | values;
+                                        track mapImageTemplate.id
+                                    ) {
+                                        <app-map-editor-card
+                                            (elementMousedown)="
+                                                dragElementService.onMouseDown(
+                                                    $event,
+                                                    {
+                                                        type: 'mapImage',
+                                                        template:
+                                                            mapImageTemplate,
+                                                    }
+                                                )
+                                            "
+                                            (elementEdit)="
+                                                editMapImageTemplate(
+                                                    mapImageTemplate.id
+                                                )
+                                            "
+                                            dataCy="draggableMapImageDiv"
+                                            [imageUrl]="
+                                                mapImageTemplate.image.url
+                                            "
+                                            [title]="mapImageTemplate.name"
+                                            [enableEditButton]="true"
+                                        >
+                                        </app-map-editor-card>
+                                    }
+                                </div>
+                                @if (
+                                    (mapImageTemplates$ | async | keyvalue)
+                                        ?.length === 0
+                                ) {
+                                    <span class="text-muted">
+                                        Keine Bilder vorhanden
+                                    </span>
+                                }
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+                <div ngbAccordionItem="scoutables">
+                    <h5 ngbAccordionHeader>
+                        <button
+                            ngbAccordionButton
+                            data-cy="scoutablesAccordionButton"
+                        >
+                            Erkundung
+                        </button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="cards">
+                                    @for (
+                                        category of bystanderCategories;
+                                        track category
+                                    ) {
+                                        <app-map-editor-card
+                                            (elementMousedown)="
+                                                dragElementService.onMouseDown(
+                                                    $event,
+                                                    {
+                                                        type: 'patient',
+                                                        template: category,
+                                                    }
+                                                )
+                                            "
+                                            [imageUrl]="category.image.url"
+                                            [title]="
+                                                category.patientTemplates[0]!
+                                                    .biometricInformation
+                                                    .sex === 'male'
+                                                    ? 'Passant'
+                                                    : 'Passantin'
+                                            "
+                                            dataCy="draggablePatientDiv"
+                                        >
+                                        </app-map-editor-card>
+                                    }
                                     <app-map-editor-card
-                                        *ngFor="
-                                            let mapImageTemplate of mapImageTemplates$
-                                                | async
-                                        "
                                         (elementMousedown)="
                                             dragElementService.onMouseDown(
                                                 $event,
                                                 {
                                                     type: 'mapImage',
-                                                    template: mapImageTemplate,
+                                                    template:
+                                                        scoutableMapImageTemplate,
                                                 }
                                             )
                                         "
-                                        (elementEdit)="
-                                            editMapImageTemplate(
-                                                mapImageTemplate.id
-                                            )
-                                        "
                                         dataCy="draggableMapImageDiv"
-                                        [imageUrl]="mapImageTemplate.image.url"
-                                        [title]="mapImageTemplate.name"
-                                        [enableEditButton]="true"
+                                        [imageUrl]="
+                                            scoutableMapImageTemplate.image.url
+                                        "
+                                        [title]="scoutableMapImageTemplate.name"
                                     >
                                     </app-map-editor-card>
                                 </div>
-                                <span
-                                    *ngIf="
-                                        (mapImageTemplates$ | async | keyvalue)
-                                            ?.length === 0
-                                    "
-                                    class="text-muted"
+                                <div
+                                    class="alert alert-secondary small mb-0 px-2 py-1 d-flex align-items-center"
                                 >
-                                    Keine Bilder vorhanden
-                                </span>
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    Erkundungsinformationen können auch zu
+                                    Bildern und Patienten hinzugefügt werden.
+                                </div>
                             </ng-template>
                         </div>
                     </div>

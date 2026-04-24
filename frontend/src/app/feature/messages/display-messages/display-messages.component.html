@@ -1,102 +1,48 @@
-<div
-    *ngIf="messageService.toastMessages$ | async as messages"
-    class="position-absolute p-2"
-    style="top: 0; right: 0; width: max-content; z-index: 10000"
->
-    <!-- Show the 5 oldest toasts, the newest should appear at the bottom -->
+@if (messageService.messages$ | async; as messages) {
     <div
-        *ngFor="
-            let message of messages | slice: 0 : 5;
-            trackBy: 'id' | appTrackByProperty: messages
-        "
-        (mouseenter)="message.destroyTimer?.pause()"
-        (mouseleave)="message.destroyTimer?.start()"
-        (click)="message.increaseDestroyTimeout(null)"
-        class="toast show position-relative mb-3"
-        style="min-width: 200px"
-        @fade
+        class="position-absolute p-2"
+        style="top: 0; right: 0; width: max-content; z-index: 10000"
     >
-        <app-custom-timer-progress-bar
-            *ngIf="message.destroyTimer"
-            [timer]="message.destroyTimer"
-            [color]="message.config.color"
-        ></app-custom-timer-progress-bar>
-        <div class="toast-header">
-            <strong [class]="'me-auto text-' + message.config.color">
-                <!-- TODO: Display an icon according to the color -->
-                {{ message.config.title }}
-            </strong>
-            <span *ngIf="message.amount > 1" class="ms-2 badge bg-secondary">{{
-                message.amount
-            }}</span>
-            <button
-                type="button"
-                class="ms-2 mb-1 btn-close"
-                (click)="message.destroy()"
-            ></button>
-        </div>
-        <div
-            *ngIf="message.config.body || message.config.logValue"
-            class="toast-body"
-        >
-            <app-message-body [message]="message"></app-message-body>
-        </div>
-    </div>
-</div>
-
-<div
-    *ngIf="messageService.alertMessages$ | async as messages"
-    style="
-        bottom: 0;
-        left: 0;
-        right: 0;
-        position: fixed;
-        z-index: 10000;
-        opacity: 0.95;
-    "
-    class="container"
->
-    <!-- Show the 5 newest alerts, the newest should appear on the bottom -->
-    <div
-        *ngFor="
-            let message of messages | slice: -5;
-            trackBy: 'id' | appTrackByProperty: messages
-        "
-        (mouseenter)="message.destroyTimer?.pause()"
-        (mouseleave)="message.destroyTimer?.start()"
-        (click)="message.increaseDestroyTimeout(null)"
-        @fade
-        [ngClass]="
-            'alert alert-' + message.config.color + ' alert-dismissible show'
-        "
-    >
-        <app-custom-timer-progress-bar
-            *ngIf="message.destroyTimer"
-            [timer]="message.destroyTimer"
-            [color]="message.config.color"
-            style="
-                position: absolute;
-                top: 0;
-                left: 0;
-                z-index: 2;
-                color: inherit;
-                width: 100%;
-            "
-        ></app-custom-timer-progress-bar>
-        <h4 class="alert-heading">
-            <!-- TODO: Display an icon according to the color https://github.com/hpi-sam/digital-fuesim-manv/issues/184 -->
-            {{ message.config.title }}
-            <span
-                *ngIf="message.amount > 1"
-                class="ms-2 badge badge-secondary"
-                >{{ message.amount }}</span
+        <!-- Show the 5 oldest toasts, the newest should appear at the bottom -->
+        @for (message of messages | slice: 0 : 5; track message.id) {
+            <div
+                (mouseenter)="message.destroyTimer?.pause()"
+                (mouseleave)="message.destroyTimer?.start()"
+                (click)="message.increaseDestroyTimeout(null)"
+                class="toast show position-relative mb-3"
+                style="min-width: 200px"
+                @fade
             >
-        </h4>
-        <button
-            type="button"
-            class="btn-close"
-            (click)="message.destroy()"
-        ></button>
-        <app-message-body [message]="message"></app-message-body>
+                @if (message.destroyTimer) {
+                    <app-custom-timer-progress-bar
+                        [timer]="message.destroyTimer"
+                        [color]="message.config.color"
+                    ></app-custom-timer-progress-bar>
+                }
+                <div class="toast-header">
+                    <strong [class]="'me-auto text-' + message.config.color">
+                        <!-- TODO: Display an icon according to the color -->
+                        {{ message.config.title }}
+                    </strong>
+                    @if (message.amount > 1) {
+                        <span class="ms-2 badge bg-secondary">{{
+                            message.amount
+                        }}</span>
+                    }
+                    <button
+                        type="button"
+                        class="ms-2 mb-1 btn-close"
+                        (click)="message.destroy()"
+                    ></button>
+                </div>
+                @if (message.config.body) {
+                    <div class="toast-body">
+                        <app-message-body
+                            [message]="message"
+                        ></app-message-body>
+                    </div>
+                }
+            </div>
+        }
     </div>
-</div>
+}

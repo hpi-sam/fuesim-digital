@@ -1,11 +1,12 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Personnel } from 'digital-fuesim-manv-shared';
-import { AssignLeaderBehaviorState } from 'digital-fuesim-manv-shared';
+import type { Personnel } from 'fuesim-digital-shared';
+import { AssignLeaderBehaviorState } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectPersonnel } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../../../../../state/app.state';
+import { createSelectPersonnel } from '../../../../../../../../../../state/application/selectors/exercise.selectors';
 
 @Component({
     selector: 'app-simulated-region-overview-behavior-assign-leader',
@@ -14,22 +15,21 @@ import { createSelectPersonnel } from 'src/app/state/application/selectors/exerc
     styleUrls: [
         './simulated-region-overview-behavior-assign-leader.component.scss',
     ],
-    standalone: false,
+    imports: [AsyncPipe],
 })
-export class SimulatedRegionOverviewBehaviorAssignLeaderComponent
-    implements OnChanges
-{
-    @Input()
-    assignLeaderBehaviorState!: AssignLeaderBehaviorState;
+export class SimulatedRegionOverviewBehaviorAssignLeaderComponent implements OnChanges {
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly assignLeaderBehaviorState =
+        input.required<AssignLeaderBehaviorState>();
 
     currentLeader?: Observable<Personnel>;
 
-    constructor(private readonly store: Store<AppState>) {}
-
     ngOnChanges(): void {
-        if (this.assignLeaderBehaviorState.leaderId) {
+        const assignLeaderBehaviorState = this.assignLeaderBehaviorState();
+        if (assignLeaderBehaviorState.leaderId) {
             this.currentLeader = this.store.select(
-                createSelectPersonnel(this.assignLeaderBehaviorState.leaderId)
+                createSelectPersonnel(assignLeaderBehaviorState.leaderId)
             );
         }
     }

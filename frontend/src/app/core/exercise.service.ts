@@ -1,15 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type {
     ClientToServerEvents,
     ExerciseAction,
+    ExerciseKey,
     ExerciseState,
+    JoinExerciseResponseData,
     ServerToClientEvents,
     SocketResponse,
-    UUID,
-} from 'digital-fuesim-manv-shared';
-import { socketIoTransports } from 'digital-fuesim-manv-shared';
-import { freeze } from 'immer';
+} from 'fuesim-digital-shared';
+import {
+    joinExerciseResponseDataSchema,
+    socketIoTransports,
+} from 'fuesim-digital-shared';
+import { freeze, WritableDraft } from 'immer';
 import {
     debounceTime,
     filter,
@@ -20,6 +24,7 @@ import {
 } from 'rxjs';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { handleChanges } from '../shared/functions/handle-changes';
 import type { AppState } from '../state/app.state';
 import {
@@ -42,6 +47,7 @@ import { selectStateSnapshot } from '../state/get-state-snapshot';
 import { websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 import { OptimisticActionHandler } from './optimistic-action-handler';
+import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 
 /**
  * This Service deals with the state synchronization of a live exercise.
@@ -54,6 +60,10 @@ import { OptimisticActionHandler } from './optimistic-action-handler';
     providedIn: 'root',
 })
 export class ExerciseService {
+    private readonly store = inject<Store<AppState>>(Store);
+    private readonly messageService = inject(MessageService);
+    private readonly ngbModalService = inject(NgbModal);
+
     private readonly socket: Socket<
         ServerToClientEvents,
         ClientToServerEvents
@@ -67,10 +77,10 @@ export class ExerciseService {
         SocketResponse
     >;
 
-    constructor(
-        private readonly store: Store<AppState>,
-        private readonly messageService: MessageService
-    ) {
+    public readonly additionalExerciseMeta =
+        signal<JoinExerciseResponseData | null>(null);
+
+    constructor() {
         this.socket.on('performAction', (action: ExerciseAction) => {
             freeze(action, true);
             this.optimisticActionHandler?.performAction(action);
@@ -79,15 +89,8 @@ export class ExerciseService {
             if (reason === 'io client disconnect') {
                 return;
             }
-            this.messageService.postError(
-                {
-                    title: 'Die Verbindung zum Server wurde unterbrochen',
-                    body: 'Laden Sie die Seite neu, um die Verbindung wieder herzustellen.',
-                    error: reason,
-                },
-                'alert',
-                null
-            );
+            console.error(reason);
+            openConnectionLostModal(this.ngbModalService);
         });
     }
 
@@ -99,7 +102,7 @@ export class ExerciseService {
      * @returns whether the join was successful
      */
     public async joinExercise(
-        exerciseId: string,
+        exerciseKey: ExerciseKey,
         clientName: string
     ): Promise<boolean> {
         this.socket.connect().on('connect_error', (error) => {
@@ -108,11 +111,11 @@ export class ExerciseService {
                 error,
             });
         });
-        const joinResponse = await new Promise<SocketResponse<UUID>>(
+        const joinResponse = await new Promise<SocketResponse<object>>(
             (resolve) => {
                 this.socket.emit(
                     'joinExercise',
-                    exerciseId,
+                    exerciseKey,
                     clientName,
                     resolve
                 );
@@ -125,6 +128,11 @@ export class ExerciseService {
             });
             return false;
         }
+        const joinResponsePayload = joinExerciseResponseDataSchema.parse(
+            joinResponse.payload
+        );
+        this.additionalExerciseMeta.set(joinResponsePayload);
+
         const getStateResponse = await new Promise<
             SocketResponse<ExerciseState>
         >((resolve) => {
@@ -140,9 +148,9 @@ export class ExerciseService {
         }
         this.store.dispatch(
             createJoinExerciseAction(
-                joinResponse.payload,
+                joinResponsePayload.clientId,
                 getStateResponse.payload,
-                exerciseId,
+                exerciseKey,
                 clientName
             )
         );
@@ -153,28 +161,46 @@ export class ExerciseService {
             SocketResponse
         >(
             (exercise) =>
-                this.store.dispatch(createSetExerciseStateAction(exercise)),
+                this.store.dispatch(
+                    createSetExerciseStateAction(
+                        exercise as WritableDraft<ExerciseState>
+                    )
+                ),
             () => selectStateSnapshot(selectExerciseState, this.store),
             (action) =>
-                this.store.dispatch(createApplyServerActionAction(action)),
+                this.store.dispatch(
+                    createApplyServerActionAction(
+                        action as WritableDraft<ExerciseAction>
+                    )
+                ),
             async (action) => {
                 const response = await new Promise<SocketResponse>(
                     (resolve) => {
-                        this.socket.emit('proposeAction', action, resolve);
+                        this.socket.emit(
+                            'proposeAction',
+                            action as WritableDraft<ExerciseAction>,
+                            resolve
+                        );
                     }
                 );
                 if (!response.success) {
+                    const errorMessage = `Action failed: ${response.message}`;
                     if (!response.expected) {
                         this.messageService.postError({
                             title: 'Fehler beim Senden der Aktion',
-                            error: response.message,
+                            error: errorMessage,
                         });
                     } else {
-                        this.messageService.postError({
-                            title: 'Diese Aktion ist nicht gestattet!',
-                            error: response.message,
-                        });
+                        this.messageService.postError(
+                            {
+                                title: 'Diese Aktion ist nicht gestattet!',
+                                body: response.message,
+                                error: errorMessage,
+                            },
+                            null
+                        );
                     }
+                    console.error(action);
                 }
                 return response;
             }
@@ -232,11 +258,11 @@ export class ExerciseService {
                 handleChanges(oldClients, newClients, {
                     createHandler: (newClient) => {
                         this.messageService.postMessage({
-                            title: `${newClient.name} ist als ${
+                            title: `${
                                 newClient.role.mainRole === 'trainer'
-                                    ? 'Trainer'
-                                    : 'Teilnehmer'
-                            } beigetreten.`,
+                                    ? 'Übungsleitende'
+                                    : 'Teilnehmende'
+                            }: ${newClient.name} ist beigetreten.`,
                             color: 'info',
                         });
                     },

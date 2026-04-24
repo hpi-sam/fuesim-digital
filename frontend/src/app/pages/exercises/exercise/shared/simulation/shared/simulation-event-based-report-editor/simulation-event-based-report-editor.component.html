@@ -1,28 +1,28 @@
-<div
-    *ngFor="let eventBasedReport of eventBasedReports"
-    class="row align-items-center m-3"
->
-    <div class="col-auto">
-        <input
-            [id]="'eventBasedReportEditor_' + eventBasedReport.eventId"
-            [ngModel]="
-                (reportBehaviorState$ | async)?.[eventBasedReport.propertyName]
-            "
-            [disabled]="
-                (canReport$ | async)?.[eventBasedReport.eventId] !== true
-            "
-            (appSaveOnTyping)="eventBasedReport.changeCallback($event)"
-            type="checkbox"
-            class="form-check-input no-validation"
-        />
-    </div>
-    <div class="col-sm">
-        <label [for]="'eventBasedReportEditor_' + eventBasedReport.eventId">
-            {{ eventBasedReport.description }}
-            <app-hotkey-indicator
-                *ngIf="useHotkeys"
-                [hotkey]="eventBasedReport.hotkey"
+@for (eventBasedReport of eventBasedReports; track eventBasedReport) {
+    <div class="row align-items-center m-3">
+        <div class="col-auto">
+            <input
+                [id]="'eventBasedReportEditor_' + eventBasedReport.eventId"
+                [ngModel]="
+                    (reportBehaviorState$ | async)?.[
+                        eventBasedReport.propertyName
+                    ]
+                "
+                [disabled]="
+                    (canReport$ | async)?.[eventBasedReport.eventId] !== true
+                "
+                (appSaveOnTyping)="eventBasedReport.changeCallback($event)"
+                type="checkbox"
+                class="form-check-input no-validation"
             />
-        </label>
+        </div>
+        <div class="col-sm">
+            <label [for]="'eventBasedReportEditor_' + eventBasedReport.eventId">
+                {{ eventBasedReport.description }}
+                @if (useHotkeys()) {
+                    <app-hotkey-indicator [hotkey]="eventBasedReport.hotkey" />
+                }
+            </label>
+        </div>
     </div>
-</div>
+}

@@ -1,22 +1,25 @@
-<div class="btn-group">
+<div class="btn-group d-flex mb-1">
     <button
         (click)="unloadVehicle()"
         [disabled]="!(vehicleLoadState$ | async)?.unloadable"
         class="btn btn-outline-primary"
         data-cy="vehiclePopupUnloadButton"
     >
-        <i class="bi-box-arrow-left"></i>
+        <i class="bi-box-arrow-left me-1"></i>
         Alle aussteigen
     </button>
-    <button
-        *ngIf="(currentRole$ | async) === 'trainer'"
-        (click)="loadVehicle()"
-        [disabled]="!(vehicleLoadState$ | async)?.loadable"
-        class="btn btn-outline-primary"
-    >
-        <i class="bi-box-arrow-in-right"></i>
-        Alle einsteigen
-    </button>
+    @if ((currentRole$ | async) === 'trainer') {
+        <button
+            (click)="loadVehicle()"
+            [disabled]="!(vehicleLoadState$ | async)?.loadable"
+            class="btn btn-outline-primary"
+        >
+            <i class="bi-box-arrow-in-right me-1"></i>
+            Alle einsteigen
+        </button>
+    }
 </div>
 
-<p>Personal, das sich gerade im Transfer befindet, kann nicht einsteigen.</p>
+<p class="small">
+    Personal, das sich gerade im Transfer befindet, kann nicht einsteigen.
+</p>

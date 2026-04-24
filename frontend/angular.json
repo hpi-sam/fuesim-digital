@@ -3,7 +3,7 @@
     "version": 1,
     "newProjectRoot": "projects",
     "projects": {
-        "digital-fuesim-manv": {
+        "fuesim-digital": {
             "projectType": "application",
             "schematics": {
                 "@schematics/angular:component": {
@@ -16,12 +16,15 @@
             "root": "",
             "sourceRoot": "src",
             "prefix": "app",
+            "i18n": {
+                "sourceLocale": "de"
+            },
             "architect": {
                 "build": {
                     "builder": "@angular/build:application",
                     "options": {
                         "outputPath": {
-                            "base": "dist/digital-fuesim-manv",
+                            "base": "dist/fuesim-digital",
                             "browser": ""
                         },
                         "index": "src/index.html",
@@ -32,7 +35,7 @@
                         ],
                         "tsConfig": "tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
-                        "assets": ["src/favicon.ico", "src/assets"],
+                        "assets": ["src/assets"],
                         "styles": [
                             "src/styles.scss",
                             "node_modules/bootstrap-icons/font/bootstrap-icons.scss"
@@ -143,16 +146,16 @@
                     "builder": "@angular/build:dev-server",
                     "configurations": {
                         "production": {
-                            "buildTarget": "digital-fuesim-manv:build:production"
+                            "buildTarget": "fuesim-digital:build:production"
                         },
                         "development": {
-                            "buildTarget": "digital-fuesim-manv:build:development"
+                            "buildTarget": "fuesim-digital:build:development"
                         }
                     },
                     "options": {
                         "prebundle": {
                             "exclude": [
-                                "digital-fuesim-manv-shared",
+                                "fuesim-digital-shared",
                                 "@noble/hashes/sha256",
                                 "@noble/hashes/crypto",
                                 "rbush-knn",
@@ -166,7 +169,7 @@
                 "extract-i18n": {
                     "builder": "@angular/build:extract-i18n",
                     "options": {
-                        "buildTarget": "digital-fuesim-manv:build"
+                        "buildTarget": "fuesim-digital:build"
                     }
                 },
                 "lint": {
@@ -180,5 +183,31 @@
     },
     "cli": {
         "analytics": false
+    },
+    "schematics": {
+        "@schematics/angular:component": {
+            "type": "component"
+        },
+        "@schematics/angular:directive": {
+            "type": "directive"
+        },
+        "@schematics/angular:service": {
+            "type": "service"
+        },
+        "@schematics/angular:guard": {
+            "typeSeparator": "."
+        },
+        "@schematics/angular:interceptor": {
+            "typeSeparator": "."
+        },
+        "@schematics/angular:module": {
+            "typeSeparator": "."
+        },
+        "@schematics/angular:pipe": {
+            "typeSeparator": "."
+        },
+        "@schematics/angular:resolver": {
+            "typeSeparator": "."
+        }
     }
 }

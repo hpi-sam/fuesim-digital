@@ -4,22 +4,20 @@
 >
     <div class="col-sm">
         <h4 class="ps-0 pe-0 text-nowrap">
-            <i
-                *ngIf="informationCollapsed; else informationExpanded"
-                class="bi bi-caret-right-fill"
-            >
-            </i>
-            <ng-template #informationExpanded>
-                <i class="bi bi-caret-down-fill"> </i> </ng-template
-            >Informationen
+            @if (informationCollapsed) {
+                <i class="bi bi-caret-right-fill"> </i>
+            } @else {
+                <i class="bi bi-caret-down-fill"> </i>
+            }
+            Informationen
         </h4>
     </div>
 </div>
 <div #collapse="ngbCollapse" [(ngbCollapse)]="informationCollapsed">
-    <ng-container *ngIf="bufferedTransfers$ | async as bufferedTransfers">
+    @if (bufferedTransfers$ | async; as bufferedTransfers) {
         <h5>Auf Transfer wartende Fahrzeuge</h5>
 
-        <ng-container *ngIf="bufferedTransfers.length > 0; else noneBuffered">
+        @if (bufferedTransfers.length > 0) {
             <span
                 >Nächste Ausfahrt möglich in
                 {{ (bufferDelay$ | async) ?? 0 | formatDuration }}</span
@@ -35,81 +33,90 @@
                 </thead>
 
                 <tbody>
-                    <tr *ngFor="let bufferedTransfer of bufferedTransfers">
-                        <td>
-                            {{ bufferedTransfer.vehicleName }}
-                        </td>
-                        <td>
-                            {{ bufferedTransfer.destination }}
-                        </td>
-                        <td>
-                            {{ bufferedTransfer.numberOfPatients }}
-                        </td>
-                    </tr>
+                    @for (
+                        bufferedTransfer of bufferedTransfers;
+                        track bufferedTransfer
+                    ) {
+                        <tr>
+                            <td>
+                                {{ bufferedTransfer.vehicleName }}
+                            </td>
+                            <td>
+                                {{ bufferedTransfer.destination }}
+                            </td>
+                            <td>
+                                {{ bufferedTransfer.numberOfPatients }}
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
-        </ng-container>
-        <ng-template #noneBuffered>
+        } @else {
             <span class="text-muted">
                 Derzeit warten keine Fahrzeuge auf den Transfer.
             </span>
-        </ng-template>
-    </ng-container>
+        }
+    }
 
-    <ng-container *ngIf="activeActivities$ | async as activeActivities">
+    @if (activeActivities$ | async; as activeActivities) {
         <h5>Fahrzeuge, die gerade für den Transfer beladen werden</h5>
 
-        <table
-            *ngIf="activeActivities.length > 0; else noActivities"
-            class="table table-striped"
-        >
-            <thead>
-                <tr>
-                    <th style="width: 30%">Fahrzeug</th>
-                    <th style="width: 30%">Ziel</th>
-                    <th style="width: 20%">Patienten</th>
-                    <th style="width: 20%">Verbleibende Zeit</th>
-                </tr>
-            </thead>
+        @if (activeActivities.length > 0) {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 30%">Fahrzeug</th>
+                        <th style="width: 30%">Ziel</th>
+                        <th style="width: 20%">Patienten</th>
+                        <th style="width: 20%">Verbleibende Zeit</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                <tr *ngFor="let activeActivity of activeActivities">
-                    <td>
-                        {{ activeActivity.vehicleName }}
-                    </td>
-                    <td>
-                        {{ activeActivity.destination }}
-                    </td>
-                    <td>
-                        {{ activeActivity.numberOfPatients }}
-                    </td>
-                    <td>
-                        {{ activeActivity.remainingTime | formatDuration }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <ng-template #noActivities>
+                <tbody>
+                    @for (
+                        activeActivity of activeActivities;
+                        track activeActivity
+                    ) {
+                        <tr>
+                            <td>
+                                {{ activeActivity.vehicleName }}
+                            </td>
+                            <td>
+                                {{ activeActivity.destination }}
+                            </td>
+                            <td>
+                                {{ activeActivity.numberOfPatients }}
+                            </td>
+                            <td>
+                                {{
+                                    activeActivity.remainingTime
+                                        | formatDuration
+                                }}
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        } @else {
             <span class="text-muted">
                 Derzeit werden keine Fahrzeuge für den Transfer beladen.
             </span>
-        </ng-template>
-    </ng-container>
+        }
+    }
 </div>
-<ng-container *ngIf="transferBehaviorState$ | async as transferBehaviorState">
+@if (transferBehaviorState$ | async; as transferBehaviorState) {
     <div
         (click)="settingsCollapsed = !settingsCollapsed"
         style="cursor: pointer"
     >
         <div class="col-sm">
             <h4 class="ps-0 pe-0 text-nowrap">
-                <i
-                    *ngIf="settingsCollapsed; else settingsExpanded"
-                    class="bi bi-caret-right-fill"
-                ></i>
-                <ng-template #settingsExpanded
-                    ><i class="bi bi-caret-down-fill"></i></ng-template
-                >Einstellungen
+                @if (settingsCollapsed) {
+                    <i class="bi bi-caret-right-fill"></i>
+                } @else {
+                    <i class="bi bi-caret-down-fill"></i>
+                }
+                Einstellungen
             </h4>
         </div>
     </div>
@@ -196,17 +203,16 @@
             </div>
         </div>
     </div>
-</ng-container>
+}
 <div (click)="transferCollapsed = !transferCollapsed" style="cursor: pointer">
     <div class="col-sm">
         <h4 class="ps-0 pe-0 text-nowrap">
-            <i
-                *ngIf="transferCollapsed; else transferExpanded"
-                class="bi bi-caret-right-fill"
-            ></i>
-            <ng-template #transferExpanded
-                ><i class="bi bi-caret-down-fill"></i></ng-template
-            >Transfer initiieren
+            @if (transferCollapsed) {
+                <i class="bi bi-caret-right-fill"></i>
+            } @else {
+                <i class="bi bi-caret-down-fill"></i>
+            }
+            Transfer initiieren
         </h4>
     </div>
 </div>
@@ -217,115 +223,110 @@
         ausgewählte Fahrzeug passen. Das Fahrzeug kann nur zu einem Fahrzeug
         geändert werden, in welches alle ausgewählten Patienten passen.
     </p>
-    <div
-        ngbDropdown
-        *ngIf="useableVehicles$ | async as useableVehicles"
-        placement="bottom-start"
-        autoClose="outside"
-        class="d-inline-block overflow-visible text-center m-3"
-    >
-        <button
-            ngbDropdownToggle
-            type="button"
-            class="btn btn-outline-primary"
-            [disabled]="
-                useableVehicles.length === 0 ||
-                (useableVehicles.length === 1 && selectedVehicle)
-            "
-        >
-            <span *ngIf="selectedVehicle; else noVehicleToSend">{{
-                selectedVehicle.name
-            }}</span>
-            <ng-template #noVehicleToSend>
-                <span class="text-muted"> Kein Fahrzeug ausgewählt </span>
-            </ng-template>
-        </button>
+    @if (useableVehicles$ | async; as useableVehicles) {
         <div
-            *ngIf="
+            ngbDropdown
+            placement="bottom-start"
+            autoClose="outside"
+            class="d-inline-block overflow-visible text-center m-3"
+        >
+            <button
+                ngbDropdownToggle
+                type="button"
+                class="btn btn-outline-primary"
+                [disabled]="
+                    useableVehicles.length === 0 ||
+                    (useableVehicles.length === 1 && selectedVehicle)
+                "
+            >
+                @if (selectedVehicle) {
+                    <span>{{ selectedVehicle.name }}</span>
+                } @else {
+                    <span class="text-muted"> Kein Fahrzeug ausgewählt </span>
+                }
+            </button>
+            @if (
                 useableVehicles.length &&
                 (useableVehicles.length !== 1 || !selectedVehicle)
-            "
-            ngbDropdownMenu
-        >
-            <ng-container *ngFor="let useableVehicle of useableVehicles">
-                <ng-container
-                    *ngIf="useableVehicle.patientCapacity >= minPatients"
-                >
-                    <ng-container *ngIf="useableVehicle !== selectedVehicle">
-                        <button
-                            ngbDropdownItem
-                            (click)="selectedVehicle = useableVehicle"
-                            class="dropdown-item"
-                        >
-                            <span class="bi-plus me-1"></span>
-                            {{ useableVehicle.name }}
-                        </button>
-                    </ng-container>
-                </ng-container>
-            </ng-container>
+            ) {
+                <div ngbDropdownMenu>
+                    @for (
+                        useableVehicle of useableVehicles;
+                        track useableVehicle
+                    ) {
+                        @if (useableVehicle.patientCapacity >= minPatients) {
+                            @if (useableVehicle !== selectedVehicle) {
+                                <button
+                                    ngbDropdownItem
+                                    (click)="selectedVehicle = useableVehicle"
+                                    class="dropdown-item"
+                                >
+                                    <span class="bi-plus me-1"></span>
+                                    {{ useableVehicle.name }}
+                                </button>
+                            }
+                        }
+                    }
+                </div>
+            }
         </div>
-    </div>
-    <table
-        *ngIf="patients$ | async as patients; else noPatients"
-        class="table table-striped table-hover"
-    >
-        <thead>
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">SK</th>
-                <th scope="col">Gesichtet</th>
-                <th scope="col">Verlauf</th>
-                <th scope="col">Ausgewählt</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr
-                *ngFor="let patient of patients"
-                (click)="togglePatientSelection(patient)"
-                [class.table-primary]="selectedPatients[patient.id]"
-                style="cursor: pointer"
-            >
-                <td>
-                    <app-patient-identifier [patientId]="patient.id" />
-                </td>
-                <td>
-                    <app-patient-status-badge [status]="patient.realStatus" />
-                </td>
-                <td>
-                    <app-patient-status-badge
-                        [status]="patient.visibleStatus"
-                    />
-                </td>
-                <td>
-                    <app-patient-status-display
-                        [patientStatus]="patient.patientStatusCode"
-                    />
-                </td>
-                <td>
-                    <i
-                        class="bi bi-check-lg"
-                        [hidden]="!selectedPatients[patient.id]"
-                    ></i>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <ng-template #noPatients>
+    }
+    @if (patients$ | async; as patients) {
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">SK</th>
+                    <th scope="col">Gesichtet</th>
+                    <th scope="col">Verlauf</th>
+                    <th scope="col">Ausgewählt</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (patient of patients; track patient) {
+                    <tr
+                        (click)="togglePatientSelection(patient)"
+                        [class.table-primary]="selectedPatients[patient.id]"
+                        style="cursor: pointer"
+                    >
+                        <td>
+                            <app-patient-identifier [patientId]="patient.id" />
+                        </td>
+                        <td>
+                            <app-patient-status-badge
+                                [status]="patient.realStatus"
+                            />
+                        </td>
+                        <td>
+                            <app-patient-status-badge
+                                [status]="patient.visibleStatus"
+                            />
+                        </td>
+                        <td>
+                            <app-patient-status-display
+                                [patientStatus]="patient.patientStatusCode"
+                            />
+                        </td>
+                        <td>
+                            <i
+                                class="bi bi-check-lg"
+                                [hidden]="!selectedPatients[patient.id]"
+                            ></i>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    } @else {
         <p class="text-muted">
             Es befinden sich keine Patienten in der Region.
         </p>
-    </ng-template>
+    }
 
     <div class="row align-items-end justify-content-between flex-shrink-1 mt-3">
         <div class="col-sm mh-100">
-            <ng-container
-                *ngIf="
-                    reachableTransferPoints$ | async as reachableTransferPoints
-                "
-            >
-                <ng-container
-                    *ngIf="reachableHospitals$ | async as reachableHospitals"
-                >
+            @if (reachableTransferPoints$ | async; as reachableTransferPoints) {
+                @if (reachableHospitals$ | async; as reachableHospitals) {
                     <div
                         ngbDropdown
                         placement="bottom-start"
@@ -346,88 +347,76 @@
                                     selectedDestination)
                             "
                         >
-                            <span
-                                *ngIf="
-                                    selectedDestination;
-                                    else noSelectedDestination
-                                "
-                                >{{
+                            @if (selectedDestination) {
+                                <span>{{
                                     selectedDestination.name
                                         ? selectedDestination.name
                                         : selectedDestination.externalName
-                                }}</span
-                            >
-                            <ng-template #noSelectedDestination>
+                                }}</span>
+                            } @else {
                                 <span class="text-muted">
                                     Kein Ziel ausgewählt
                                 </span>
-                            </ng-template>
+                            }
                         </button>
-                        <div
-                            *ngIf="
-                                reachableTransferPoints.length +
-                                    reachableHospitals.length &&
-                                (reachableTransferPoints.length +
-                                    reachableHospitals.length !==
-                                    1 ||
-                                    !selectedDestination)
-                            "
-                            ngbDropdownMenu
-                        >
-                            <ng-container
-                                *ngFor="
-                                    let reachableTransferPoint of reachableTransferPoints
-                                "
-                            >
-                                <ng-container
-                                    *ngIf="
+                        @if (
+                            reachableTransferPoints.length +
+                                reachableHospitals.length &&
+                            (reachableTransferPoints.length +
+                                reachableHospitals.length !==
+                                1 ||
+                                !selectedDestination)
+                        ) {
+                            <div ngbDropdownMenu>
+                                @for (
+                                    reachableTransferPoint of reachableTransferPoints;
+                                    track reachableTransferPoint
+                                ) {
+                                    @if (
                                         reachableTransferPoint !==
                                         selectedDestination
-                                    "
-                                >
-                                    <button
-                                        ngbDropdownItem
-                                        (click)="
-                                            selectedDestination =
-                                                reachableTransferPoint
-                                        "
-                                        class="dropdown-item"
-                                    >
-                                        <span class="bi-plus me-1"></span>
-                                        {{
-                                            reachableTransferPoint.externalName
-                                        }}
-                                    </button>
-                                </ng-container>
-                            </ng-container>
-                            <ng-container
-                                *ngFor="
-                                    let reachableHospital of reachableHospitals
-                                "
-                            >
-                                <ng-container
-                                    *ngIf="
+                                    ) {
+                                        <button
+                                            ngbDropdownItem
+                                            (click)="
+                                                selectedDestination =
+                                                    reachableTransferPoint
+                                            "
+                                            class="dropdown-item"
+                                        >
+                                            <span class="bi-plus me-1"></span>
+                                            {{
+                                                reachableTransferPoint.externalName
+                                            }}
+                                        </button>
+                                    }
+                                }
+                                @for (
+                                    reachableHospital of reachableHospitals;
+                                    track reachableHospital
+                                ) {
+                                    @if (
                                         reachableHospital !==
                                         selectedDestination
-                                    "
-                                >
-                                    <button
-                                        ngbDropdownItem
-                                        (click)="
-                                            selectedDestination =
-                                                reachableHospital
-                                        "
-                                        class="dropdown-item"
-                                    >
-                                        <span class="bi-plus me-1"></span>
-                                        {{ reachableHospital.name }}
-                                    </button>
-                                </ng-container>
-                            </ng-container>
-                        </div>
+                                    ) {
+                                        <button
+                                            ngbDropdownItem
+                                            (click)="
+                                                selectedDestination =
+                                                    reachableHospital
+                                            "
+                                            class="dropdown-item"
+                                        >
+                                            <span class="bi-plus me-1"></span>
+                                            {{ reachableHospital.name }}
+                                        </button>
+                                    }
+                                }
+                            </div>
+                        }
                     </div>
-                </ng-container>
-            </ng-container>
+                }
+            }
         </div>
         <div class="col-sm">
             <div class="d-inline-block float-end">

@@ -1,36 +1,32 @@
 import type { OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import type {
-    MapImageTemplate,
-    Mutable,
-    UUID,
-} from 'digital-fuesim-manv-shared';
+import type { MapImageTemplate, UUID } from 'fuesim-digital-shared';
 import { cloneDeep } from 'lodash-es';
-import { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectMapImageTemplate } from 'src/app/state/application/selectors/exercise.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
+import { WritableDraft } from 'immer';
 import type { ChangedImageTemplateValues } from '../image-template-form/image-template-form.component';
+import { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { createSelectMapImageTemplate } from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { ImageTemplateFormComponent } from '../image-template-form/image-template-form.component';
 
 @Component({
     selector: 'app-edit-image-template-modal',
     templateUrl: './edit-image-template-modal.component.html',
     styleUrls: ['./edit-image-template-modal.component.scss'],
-    standalone: false,
+    imports: [ImageTemplateFormComponent],
 })
 export class EditImageTemplateModalComponent implements OnInit {
+    private readonly exerciseService = inject(ExerciseService);
+    private readonly store = inject<Store<AppState>>(Store);
+    readonly activeModal = inject(NgbActiveModal);
+
     // This is set after the modal creation and therefore accessible in ngOnInit
     public mapImageTemplateId!: UUID;
 
-    public mapImageTemplate?: Mutable<MapImageTemplate>;
-
-    constructor(
-        private readonly exerciseService: ExerciseService,
-        private readonly store: Store<AppState>,
-        public readonly activeModal: NgbActiveModal
-    ) {}
+    public mapImageTemplate?: WritableDraft<MapImageTemplate>;
 
     ngOnInit(): void {
         this.mapImageTemplate = cloneDeep(

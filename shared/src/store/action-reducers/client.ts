@@ -1,19 +1,21 @@
-import { Type } from 'class-transformer';
-import { IsBoolean, IsOptional, IsUUID, ValidateNested } from 'class-validator';
-import { Client } from '../../models/client.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsLiteralUnion, IsValue } from '../../utils/validators/index.js';
+import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
+import { type Client, clientSchema } from '../../models/client.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
-import type { SpecificRole } from '../../models/utils/role.js';
-import { specificRoleAllowedValues } from '../../models/utils/role.js';
+import {
+    type SpecificRole,
+    specificRoleSchema,
+} from '../../models/utils/role.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
+import { IsValue } from '../../utils/validators/is-value.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getElement } from './utils/get-element.js';
 
 export class AddClientAction implements Action {
     @IsValue('[Client] Add client' as const)
     public readonly type = '[Client] Add client';
-    @ValidateNested()
-    @Type(() => Client)
+
+    @IsZodSchema(clientSchema)
     public readonly client!: Client;
 }
 
@@ -48,7 +50,7 @@ export class ChangeSpecificClientRoleAction implements Action {
     public readonly type = '[Client] Change specific client role';
     @IsUUID(4, uuidValidationOptions)
     public readonly clientId!: UUID;
-    @IsLiteralUnion(specificRoleAllowedValues)
+    @IsZodSchema(specificRoleSchema)
     public readonly newRole!: SpecificRole;
 }
 
@@ -56,7 +58,23 @@ export namespace ClientActionReducers {
     export const addClient: ActionReducer<AddClientAction> = {
         action: AddClientAction,
         reducer: (draftState, { client }) => {
-            draftState.clients[client.id] = cloneDeepMutable(client);
+            const clientMutable = cloneDeepMutable(client);
+            clientMutable.name = clientMutable.name.trim();
+            if (
+                draftState.autojoinViewportId &&
+                draftState.autojoinViewportId in draftState.viewports
+            ) {
+                clientMutable.viewRestrictedToViewportId =
+                    draftState.autojoinViewportId;
+                clientMutable.isInWaitingRoom = false;
+            }
+            draftState.clients[client.id] = clientMutable;
+            if (
+                clientMutable.name &&
+                !draftState.collectedClientNames.includes(clientMutable.name)
+            ) {
+                draftState.collectedClientNames.push(clientMutable.name);
+            }
             return draftState;
         },
         rights: 'server',

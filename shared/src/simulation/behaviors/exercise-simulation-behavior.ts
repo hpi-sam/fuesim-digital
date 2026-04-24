@@ -1,18 +1,65 @@
-import type { Type } from 'class-transformer';
-import { SimulationBehaviorState } from './simulation-behavior.js';
-import { assignLeaderBehavior } from './assign-leader.js';
-import { treatPatientsBehavior } from './treat-patients.js';
-import { unloadArrivingVehiclesBehavior } from './unload-arrived-vehicles.js';
-import { reportBehavior } from './report.js';
-import { automaticallyDistributeVehiclesBehavior } from './automatically-distribute-vehicles.js';
-import { providePersonnelBehavior } from './provide-personnel.js';
-import { answerRequestsBehavior } from './answer-requests.js';
-import { requestBehavior } from './request.js';
-import { transferBehavior } from './transfer.js';
-import { transferToHospitalBehavior } from './transfer-to-hospital.js';
-import { managePatientTransportToHospitalBehavior } from './manage-patient-transport-to-hospital.js';
+import { z } from 'zod';
+import {
+    assignLeaderBehavior,
+    assignLeaderBehaviorStateSchema,
+} from './assign-leader.js';
+import {
+    treatPatientsBehavior,
+    treatPatientsBehaviorStateSchema,
+} from './treat-patients.js';
+import {
+    unloadArrivingVehiclesBehavior,
+    unloadArrivingVehiclesBehaviorStateSchema,
+} from './unload-arrived-vehicles.js';
+import { reportBehavior, reportBehaviorStateSchema } from './report.js';
+import {
+    automaticallyDistributeVehiclesBehavior,
+    automaticallyDistributeVehiclesBehaviorStateSchema,
+} from './automatically-distribute-vehicles.js';
+import {
+    providePersonnelBehavior,
+    providePersonnelBehaviorStateSchema,
+} from './provide-personnel.js';
+import {
+    answerRequestsBehavior,
+    answerRequestsBehaviorStateSchema,
+} from './answer-requests.js';
+import { requestBehavior, requestBehaviorStateSchema } from './request.js';
+import { transferBehavior, transferBehaviorStateSchema } from './transfer.js';
+import {
+    transferToHospitalBehavior,
+    transferToHospitalBehaviorStateSchema,
+} from './transfer-to-hospital.js';
+import {
+    managePatientTransportToHospitalBehavior,
+    managePatientTransportToHospitalBehaviorStateSchema,
+} from './manage-patient-transport-to-hospital.js';
 
-export const simulationBehaviors = {
+export const exerciseSimulationBehaviorStateSchema = z.discriminatedUnion(
+    'type',
+    [
+        automaticallyDistributeVehiclesBehaviorStateSchema,
+        assignLeaderBehaviorStateSchema,
+        treatPatientsBehaviorStateSchema,
+        unloadArrivingVehiclesBehaviorStateSchema,
+        reportBehaviorStateSchema,
+        providePersonnelBehaviorStateSchema,
+        answerRequestsBehaviorStateSchema,
+        requestBehaviorStateSchema,
+        transferBehaviorStateSchema,
+        transferToHospitalBehaviorStateSchema,
+        managePatientTransportToHospitalBehaviorStateSchema,
+    ]
+);
+
+export type ExerciseSimulationBehaviorState = z.infer<
+    typeof exerciseSimulationBehaviorStateSchema
+>;
+
+export type ExerciseSimulationBehaviorType =
+    ExerciseSimulationBehaviorState['type'];
+
+export const simulationBehaviorDictionary = {
     automaticallyDistributeVehiclesBehavior,
     assignLeaderBehavior,
     treatPatientsBehavior,
@@ -24,41 +71,4 @@ export const simulationBehaviors = {
     transferBehavior,
     transferToHospitalBehavior,
     managePatientTransportToHospitalBehavior,
-};
-
-export type ExerciseSimulationBehavior =
-    (typeof simulationBehaviors)[keyof typeof simulationBehaviors];
-
-export type ExerciseSimulationBehaviorType = InstanceType<
-    ExerciseSimulationBehavior['behaviorState']
->['type'];
-
-export type ExerciseSimulationBehaviorDictionary = {
-    [Behavior in ExerciseSimulationBehavior as InstanceType<
-        Behavior['behaviorState']
-    >['type']]: Behavior;
-};
-
-export type ExerciseSimulationBehaviorState<
-    T extends ExerciseSimulationBehaviorType = ExerciseSimulationBehaviorType,
-> = InstanceType<ExerciseSimulationBehaviorDictionary[T]['behaviorState']>;
-
-export const simulationBehaviorDictionary = Object.fromEntries(
-    Object.values(simulationBehaviors).map((behavior) => [
-        new behavior.behaviorState().type,
-        behavior,
-    ])
-) as ExerciseSimulationBehaviorDictionary;
-
-export const simulationBehaviorTypeOptions: Parameters<typeof Type> = [
-    () => SimulationBehaviorState,
-    {
-        keepDiscriminatorProperty: true,
-        discriminator: {
-            property: 'type',
-            subTypes: Object.entries(simulationBehaviorDictionary).map(
-                ([name, value]) => ({ name, value: value.behaviorState })
-            ),
-        },
-    },
-];
+} as const;

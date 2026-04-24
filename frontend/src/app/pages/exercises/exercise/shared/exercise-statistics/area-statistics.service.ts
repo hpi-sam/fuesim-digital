@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import { Injectable, inject } from '@angular/core';
+import type { UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import type { AreaStatistics } from '../core/statistics/area-statistics';
@@ -9,6 +9,8 @@ import { StatisticsService } from '../core/statistics/statistics.service';
     providedIn: 'root',
 })
 export class AreaStatisticsService {
+    private readonly statisticsService = inject(StatisticsService);
+
     private readonly areaSpec: AreaSpec = { type: 'all' };
     public readonly areaSpec$ = new BehaviorSubject<AreaSpec>(this.areaSpec);
 
@@ -43,8 +45,6 @@ export class AreaStatisticsService {
                         ) as AreaStatisticsEntry[]
             )
         );
-
-    constructor(private readonly statisticsService: StatisticsService) {}
 
     public setArea(areaSpec: AreaSpec) {
         this.areaSpec$.next(areaSpec);

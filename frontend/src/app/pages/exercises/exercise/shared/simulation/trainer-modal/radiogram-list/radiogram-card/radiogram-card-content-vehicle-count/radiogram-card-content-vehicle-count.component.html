@@ -1,6 +1,6 @@
 <h5 class="card-title">Meldung über Fahrzeuganzahlen</h5>
 
-<ng-container *ngIf="((totalVehicleCount$ | async) ?? 0) > 0; else noVehicles">
+@if (((totalVehicleCount$ | async) ?? 0) > 0) {
     <p class="card-text">
         Derzeit befinden sich hier
         {{ totalVehicleCount$ | async }} Fahrzeuge, die unter die folgenden
@@ -15,18 +15,17 @@
             </tr>
         </thead>
         <tbody>
-            <tr
-                *ngFor="
-                    let vehicleCount of (radiogram$ | async)!.vehicleCount
-                        | keyvalue
-                "
-            >
-                <td>{{ vehicleCount.key }}</td>
-                <td>{{ vehicleCount.value }}</td>
-            </tr>
+            @for (
+                vehicleCount of (radiogram$ | async)!.vehicleCount | keyvalue;
+                track vehicleCount
+            ) {
+                <tr>
+                    <td>{{ vehicleCount.key }}</td>
+                    <td>{{ vehicleCount.value }}</td>
+                </tr>
+            }
         </tbody>
     </table>
-</ng-container>
-<ng-template #noVehicles>
+} @else {
     <p class="card-text">Derzeit befinden sich hier keine Fahrzeuge.</p>
-</ng-template>
+}

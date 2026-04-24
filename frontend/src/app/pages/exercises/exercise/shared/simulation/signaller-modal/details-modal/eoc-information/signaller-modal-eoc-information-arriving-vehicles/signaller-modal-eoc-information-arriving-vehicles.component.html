@@ -1,4 +1,4 @@
-<ng-container *ngIf="arrivingVehicles.length > 0; else noArrivingVehicles">
+@if (arrivingVehicles.length > 0) {
     <p>
         Aktuell sind folgende
         <strong>{{ arrivingVehicles.length }} Fahrzeuge</strong> auf Anfahrt:
@@ -12,10 +12,15 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let arrivingVehicleGroup of arrivingVehicleGroups">
-                <td>{{ arrivingVehicleGroup.type }}</td>
-                <td>{{ arrivingVehicleGroup.count }}</td>
-            </tr>
+            @for (
+                arrivingVehicleGroup of arrivingVehicleGroups;
+                track arrivingVehicleGroup
+            ) {
+                <tr>
+                    <td>{{ arrivingVehicleGroup.type }}</td>
+                    <td>{{ arrivingVehicleGroup.count }}</td>
+                </tr>
+            }
         </tbody>
     </table>
 
@@ -29,18 +34,17 @@
             </tr>
         </thead>
         <tbody>
-            <tr
-                *ngFor="
-                    let arrivingVehicle of arrivingVehicles;
-                    trackBy: 'id' | appTrackByProperty
-                "
-            >
-                <td>{{ arrivingVehicle.name }}</td>
-                <td>{{ arrivingVehicle.remainingMinutes }} Minuten</td>
-            </tr>
+            @for (
+                arrivingVehicle of arrivingVehicles;
+                track arrivingVehicle.id
+            ) {
+                <tr>
+                    <td>{{ arrivingVehicle.name }}</td>
+                    <td>{{ arrivingVehicle.remainingMinutes }} Minuten</td>
+                </tr>
+            }
         </tbody>
     </table>
-</ng-container>
-<ng-template #noArrivingVehicles>
+} @else {
     <p>Aktuell sind <strong>keine</strong> Fahrzeuge auf Anfahrt.</p>
-</ng-template>
+}

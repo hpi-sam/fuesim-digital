@@ -24,23 +24,23 @@
             <nav
                 #nav="ngbNav"
                 ngbNav
-                [(activeId)]="currentSimulatedRegionId"
+                [activeId]="currentSimulatedRegionId()"
                 class="nav-tabs"
             >
-                <ng-container
-                    *ngFor="let id of simulatedRegionIds$ | async"
-                    [ngbNavItem]="id"
-                >
-                    <a ngbNavLink
-                        ><app-simulated-region-name [simulatedRegionId]="id"
-                    /></a>
-                    <ng-template ngbNavContent>
-                        <app-simulated-region-overview-general
-                            class="mh-100 d-block h-100"
-                            [simulatedRegionId]="id"
-                        />
-                    </ng-template>
-                </ng-container>
+                @for (id of simulatedRegionIds$ | async; track id) {
+                    <ng-container [ngbNavItem]="id">
+                        <a ngbNavLink
+                            ><app-simulated-region-name
+                                [simulatedRegionId]="id"
+                        /></a>
+                        <ng-template ngbNavContent>
+                            <app-simulated-region-overview-general
+                                class="mh-100 d-block h-100"
+                                [simulatedRegionId]="id"
+                            />
+                        </ng-template>
+                    </ng-container>
+                }
             </nav>
             <div
                 [ngbNavOutlet]="nav"

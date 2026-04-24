@@ -1,22 +1,13 @@
 <app-show-more defaultHeight="100px">
-    <ng-container *ngIf="message.config.body as body">
+    @if (message().config.body; as body) {
         {{ body }}
-    </ng-container>
-    <button
-        *ngIf="message.config.button as button"
-        [class]="'btn btn-sm ms-2 btn-' + button.color"
-        (click)="message.event$.next('click')"
-    >
-        {{ button.name }}
-    </button>
-    <div
-        *ngIf="message.config.logValue && message.config.body"
-        class="mt-3"
-    ></div>
-    <pre
-        *ngIf="message.config.logValue"
-        class="m-0"
-        style="white-space: pre-wrap; max-height: 300px"
-    ><code>{{ message.config.logValue | logToString }}</code>
-    </pre>
+    }
+    @if (message().config.button; as button) {
+        <button
+            [class]="'btn btn-sm ms-2 btn-' + button.color"
+            (click)="message().event$.next('click')"
+        >
+            {{ button.name }}
+        </button>
+    }
 </app-show-more>

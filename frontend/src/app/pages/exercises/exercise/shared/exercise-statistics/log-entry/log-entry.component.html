@@ -3,10 +3,12 @@
     (click)="selectTime()"
 >
     <div>
-        <span class="me-2">{{ logEntry.description }}</span>
-        <app-tag *ngFor="let tag of logEntry.tags" [tag]="tag" />
+        <span class="me-2">{{ logEntry().description }}</span>
+        @for (tag of logEntry().tags; track tag) {
+            <app-tag [tag]="tag" />
+        }
     </div>
     <div>
-        <span class="fw-bold">{{ logEntry.timestamp | formatDuration }}</span>
+        <span class="fw-bold">{{ logEntry().timestamp | formatDuration }}</span>
     </div>
 </div>

@@ -1,23 +1,25 @@
-import { Component, Input } from '@angular/core';
-import { LogEntry } from 'digital-fuesim-manv-shared';
+import { Component, inject, input } from '@angular/core';
+import { LogEntry } from 'fuesim-digital-shared';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
+import { TagComponent } from '../tag/tag.component';
+import { FormatDurationPipe } from '../../../../../../shared/pipes/format-duration.pipe';
 
 @Component({
     selector: 'app-log-entry',
     templateUrl: './log-entry.component.html',
     styleUrls: ['./log-entry.component.scss'],
-    standalone: false,
+    imports: [TagComponent, FormatDurationPipe],
 })
 export class LogEntryComponent {
-    @Input() logEntry!: LogEntry;
+    private readonly statisticsTimeSelectionService = inject(
+        StatisticsTimeSelectionService
+    );
 
-    constructor(
-        private readonly statisticsTimeSelectionService: StatisticsTimeSelectionService
-    ) {}
+    readonly logEntry = input.required<LogEntry>();
 
     selectTime() {
         this.statisticsTimeSelectionService.selectTime(
-            this.logEntry.timestamp,
+            this.logEntry().timestamp,
             'log'
         );
     }

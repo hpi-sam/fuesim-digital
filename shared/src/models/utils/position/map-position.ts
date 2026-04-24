@@ -1,38 +1,19 @@
-import { Type } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../get-create.js';
-import { MapCoordinates } from './map-coordinates.js';
-// import needed to display @link Links in Comments
-import {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isOnMap,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isNotOnMap,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    currentCoordinatesOf,
-} from './position-helpers.js';
+import { z } from 'zod';
+import type { MapCoordinates } from './map-coordinates.js';
+import { mapCoordinatesSchema } from './map-coordinates.js';
 
-export class MapPosition {
-    /**
-     * @deprecated Use {@link isOnMap } or {@link isNotOnMap} instead
-     */
-    @IsValue('coordinates')
-    public readonly type = 'coordinates';
+export const mapPositionSchema = z.strictObject({
+    /** @deprecated use {@link isOnMap} */
+    type: z.literal('coordinates'),
+    /** @deprecated use {@link currentCoordinatesOf} */
+    coordinates: mapCoordinatesSchema,
+});
 
-    /**
-     * @deprecated Use {@link currentCoordinatesOf} instead
-     */
-    @Type(() => MapCoordinates)
-    @ValidateNested()
-    public readonly coordinates: MapCoordinates;
+export type MapPosition = z.infer<typeof mapPositionSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(position: MapCoordinates) {
-        this.coordinates = position;
-    }
-
-    static readonly create = getCreate(this);
+export function newMapPositionAt(coordinates: MapCoordinates): MapPosition {
+    return {
+        type: 'coordinates',
+        coordinates,
+    };
 }

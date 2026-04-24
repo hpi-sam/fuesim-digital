@@ -5,23 +5,25 @@
         ngbDropdownToggle
     >
         <app-transfer-point-name
-            [transferPointId]="transfer.targetTransferPointId"
+            [transferPointId]="transfer().targetTransferPointId"
         ></app-transfer-point-name>
     </button>
     <div ngbDropdownMenu>
-        <button
-            *ngFor="
-                let transferPoint of transferPoints$ | async | values;
-                trackBy: 'id'
-                    | appTrackByProperty: (transferPoints$ | async | values)
-            "
-            ngbDropdownItem
-            [disabled]="transferPoint.id === transfer.targetTransferPointId"
-            (click)="setTransferTarget(transferPoint.id)"
-        >
-            <app-transfer-point-name
-                [transferPointId]="transferPoint.id"
-            ></app-transfer-point-name>
-        </button>
+        @for (
+            transferPoint of transferPoints$ | async | values;
+            track transferPoint.id
+        ) {
+            <button
+                ngbDropdownItem
+                [disabled]="
+                    transferPoint.id === transfer().targetTransferPointId
+                "
+                (click)="setTransferTarget(transferPoint.id)"
+            >
+                <app-transfer-point-name
+                    [transferPointId]="transferPoint.id"
+                ></app-transfer-point-name>
+            </button>
+        }
     </div>
 </div>

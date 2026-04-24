@@ -1,28 +1,39 @@
 import type { OnChanges } from '@angular/core';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { SimulatedRegion, UUID } from 'digital-fuesim-manv-shared';
+import type { SimulatedRegion, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
-import type { AppState } from 'src/app/state/app.state';
-import { createSelectSimulatedRegion } from 'src/app/state/application/selectors/exercise.selectors';
+import { AsyncPipe } from '@angular/common';
+import type { AppState } from '../../../../../../../state/app.state';
+import { createSelectSimulatedRegion } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { SignallerModalRegionLeaderComponent } from '../signaller-modal-region-leader/signaller-modal-region-leader.component';
+import { SignallerModalRegionInformationComponent } from '../signaller-modal-region-information/signaller-modal-region-information.component';
+import { SignallerModalRegionCommandsComponent } from '../signaller-modal-region-commands/signaller-modal-region-commands.component';
+import { SignallerModalNoLeaderOverlayComponent } from '../signaller-modal-no-leader-overlay/signaller-modal-no-leader-overlay.component';
 
 @Component({
     selector: 'app-signaller-modal-region',
     templateUrl: './signaller-modal-region.component.html',
     styleUrls: ['./signaller-modal-region.component.scss'],
-    standalone: false,
+    imports: [
+        SignallerModalRegionLeaderComponent,
+        SignallerModalRegionInformationComponent,
+        SignallerModalRegionCommandsComponent,
+        SignallerModalNoLeaderOverlayComponent,
+        AsyncPipe,
+    ],
 })
 export class SignallerModalRegionOverviewComponent implements OnChanges {
-    @Input() simulatedRegionId!: UUID;
+    private readonly store = inject<Store<AppState>>(Store);
+
+    readonly simulatedRegionId = input.required<UUID>();
 
     simulatedRegion$!: Observable<SimulatedRegion>;
     noLeaderOverlayVisible = false;
 
-    constructor(private readonly store: Store<AppState>) {}
-
     ngOnChanges() {
         this.simulatedRegion$ = this.store.select(
-            createSelectSimulatedRegion(this.simulatedRegionId)
+            createSelectSimulatedRegion(this.simulatedRegionId())
         );
     }
 

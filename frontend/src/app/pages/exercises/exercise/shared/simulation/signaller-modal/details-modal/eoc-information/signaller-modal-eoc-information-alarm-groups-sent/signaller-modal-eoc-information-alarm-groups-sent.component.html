@@ -1,17 +1,13 @@
-<ng-container *ngIf="alarmGroupsSent.length > 0; else noAlarmGroupsSent">
+@if (alarmGroupsSent.length > 0) {
     <p>Folgende Alarmgruppen wurden bereits alarmiert:</p>
 
     <ul>
-        <li
-            *ngFor="
-                let alarmGroup of alarmGroupsSent;
-                trackBy: 'id' | appTrackByProperty
-            "
-        >
-            {{ alarmGroup }}
-        </li>
+        @for (alarmGroup of alarmGroupsSent; track alarmGroup) {
+            <li>
+                {{ alarmGroup }}
+            </li>
+        }
     </ul>
-</ng-container>
-<ng-template #noAlarmGroupsSent>
+} @else {
     <p>Es wurden noch <strong>keine</strong> Alarmgruppen alarmiert.</p>
-</ng-template>
+}

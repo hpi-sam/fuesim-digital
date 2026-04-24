@@ -1,22 +1,23 @@
 import type { Store } from '@ngrx/store';
-import type { MapImage, UUID } from 'digital-fuesim-manv-shared';
+import type { MapImage, UUID } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type Point from 'ol/geom/Point';
 import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectCurrentMainRole,
-    selectVisibleMapImages,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 import { MapImagePopupComponent } from '../shared/map-image-popup/map-image-popup.component';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { PointGeometryHelper } from '../utility/point-geometry-helper';
-import { ImagePopupHelper } from '../utility/popup-helper';
+import { ImagePopupHelper } from '../utility/image-popup-helper';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import type { PopupService } from '../utility/popup.service';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import {
+    selectVisibleMapImages,
+    selectCurrentMainRole,
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import { createSelectScoutable } from '../../../../../../state/application/selectors/exercise.selectors';
 import { MoveableFeatureManager } from './moveable-feature-manager';
 
 export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
@@ -43,7 +44,7 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
     ) {
         super(
             olMap,
-            (targetPosition, mapImage) => {
+            async (targetPosition, mapImage) =>
                 exerciseService.proposeAction(
                     {
                         type: '[MapImage] Move MapImage',
@@ -51,8 +52,7 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
                         targetPosition,
                     },
                     true
-                );
-            },
+                ),
             new PointGeometryHelper(),
             10_000
         );
@@ -71,12 +71,21 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
 
     public override onFeatureClicked(
         event: MapBrowserEvent<any>,
-        feature: Feature<any>
+        feature: Feature<any>,
+        openScoutInfo?: boolean
     ): void {
         super.onFeatureClicked(event, feature);
-
+        const element = this.getElementFromFeature(feature) as MapImage;
+        const scoutableVisible =
+            element.scoutableId &&
+            selectStateSnapshot(
+                createSelectScoutable(element.scoutableId),
+                this.store
+            ).isVisibleForParticipants;
         if (
-            selectStateSnapshot(selectCurrentMainRole, this.store) !== 'trainer'
+            selectStateSnapshot(selectCurrentMainRole, this.store) !==
+                'trainer' &&
+            !scoutableVisible
         ) {
             return;
         }
@@ -90,6 +99,7 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
                 [],
                 {
                     mapImageId: feature.getId() as UUID,
+                    openScoutInfo: openScoutInfo ?? false,
                 }
             )
         );

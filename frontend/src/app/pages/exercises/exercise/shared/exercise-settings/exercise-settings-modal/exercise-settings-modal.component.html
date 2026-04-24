@@ -7,11 +7,11 @@
         <div class="card-header">Karte</div>
         <div class="card-body">
             <div class="form-group mb-3">
-                <label class="form-label">Serveradresse:</label>
-                <p class="small">
+                <label class="form-label mb-1">Serveradresse:</label>
+                <p class="small text-muted mb-2">
                     <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
                     Unter dieser Adresse werden die Karten-Kacheln geladen. Die
-                    Url muss die Platzhalter für die Koordinaten
+                    URL muss die Platzhalter für die Koordinaten
                     <code>{{ '{' }}x{{ '}' }}</code
                     >, <code>{{ '{' }}y{{ '}' }}</code> oder
                     <code>{{ '{' }}-y{{ '}' }}</code
@@ -24,7 +24,7 @@
                     [(ngModel)]="tileMapProperties.tileUrl"
                     [appAutofocus]="true"
                     appUrlValidator
-                    [pattern]="tileMapUrlRegex"
+                    [pattern]="tileUrlRegex"
                     required
                     type="url"
                     class="form-control"
@@ -34,7 +34,7 @@
                     [ngModelInput]="tileUrlInput"
                 ></app-display-validation>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label class="form-label">Maximaler Zoom:</label>
                 <input
                     #maxZoomInput="ngModel"
@@ -51,78 +51,214 @@
                     [ngModelInput]="maxZoomInput"
                 ></app-display-validation>
             </div>
+
+            <button
+                (click)="updateTileMapProperties()"
+                class="btn btn-primary"
+                data-cy="settingsSaveTileMapPropertiesButton"
+            >
+                Karteneinstellungen speichern
+            </button>
         </div>
-        <button
-            (click)="updateTileMapProperties()"
-            class="btn btn-primary"
-            data-cy="settingsSaveTileMapPropertiesButton"
-        >
-            Speichern
-        </button>
     </div>
     <br />
-    <div *ngIf="configuration$ | async as configuration" class="card">
-        <div class="card-header">Übungsmodus</div>
+    <div class="card">
+        <div class="card-header">Einsatzübersicht</div>
         <div class="card-body">
             <div class="form-group mb-3">
-                Mit Vorsichtung üben?
-                <div class="form-switch">
-                    <input
-                        [ngModel]="configuration.pretriageEnabled"
-                        (ngModelChange)="setPretriageFlag($event)"
-                        class="form-check-input"
-                        type="checkbox"
-                        data-cy="settingsPretriageCheckbox"
-                    />
-                </div>
+                <label class="form-label mb-1">Serveradresse:</label>
+                <p class="small text-muted mb-2">
+                    <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
+                    Unter dieser Adresse werden die Karten-Kacheln für die
+                    Einsatzübersicht geladen. Die URL muss die Platzhalter für
+                    die Koordinaten
+                    <code>{{ '{' }}x{{ '}' }}</code
+                    >, <code>{{ '{' }}y{{ '}' }}</code> oder
+                    <code>{{ '{' }}-y{{ '}' }}</code
+                    >, sowie der Zoomstufe
+                    <code>{{ '{' }}z{{ '}' }}</code> enthalten. Bitte beachten
+                    Sie die Lizenzbedingungen der entsprechenden Karten-Server.
+                </p>
+                <input
+                    #operationsMapTileUrlInput="ngModel"
+                    [(ngModel)]="operationsMapProperties.tileUrl"
+                    [appAutofocus]="true"
+                    appUrlValidator
+                    [pattern]="tileUrlRegex"
+                    required
+                    type="url"
+                    class="form-control"
+                    placeholder="https://a.tile.openstreetmap.de/{z}/{x}/{y}.png"
+                />
+                <app-display-validation
+                    [ngModelInput]="operationsMapTileUrlInput"
+                ></app-display-validation>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label mb-1">
+                    Serveradresse für Gebäudedaten:
+                </label>
+                <p class="small text-muted mb-2">
+                    Unter dieser Adresse werden die 3D-Gebäudedaten geladen.
+                    Bitte beachten Sie die Lizenzbedingungen der entsprechenden
+                    Server.
+                </p>
+                <input
+                    #operationsUrlInput="ngModel"
+                    [(ngModel)]="operationsMapProperties.dataUrl"
+                    [appAutofocus]="true"
+                    appUrlValidator
+                    required
+                    type="url"
+                    class="form-control"
+                    placeholder="https://tiles.openfreemap.org/planet"
+                />
+                <app-display-validation
+                    [ngModelInput]="operationsUrlInput"
+                ></app-display-validation>
             </div>
 
             <div class="form-group mb-3">
-                Mit SK IV Patienten üben?
+                3D-Gebäude anzeigen?
                 <div class="form-switch">
                     <input
-                        [ngModel]="configuration.bluePatientsEnabled"
-                        (ngModelChange)="setBluePatientsFlag($event)"
+                        [(ngModel)]="operationsMapProperties.enable3dBuildings"
                         class="form-check-input"
                         type="checkbox"
-                        data-cy="settingsBluePatientsCheckbox"
+                        data-cy="settingsOperationsMap3dBuildingsCheckbox"
                     />
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label mb-0">Präfix der Patienten-IDs:</label>
-                <span
-                    class="text-warning"
-                    ngbTooltip="Das Präfix bestehender IDs wird nicht geändert!"
-                >
-                    {{ ' ' }}<i class="bi bi-exclamation-triangle"></i>
-                </span>
-                <span
-                    *ngIf="configuration.patientIdentifierPrefix.length > 3"
-                    class="text-warning d-block"
-                >
-                    IDs mit langen Präfixen können ggfs nicht vollständig
-                    angezeigt werden. Bitte ziehen Sie ein kürzeres Präfix in
-                    Betracht.
-                </span>
-                <span class="text-muted d-block">
-                    Mit den aktuellen Einstellungen haben Patienten-IDs die
-                    folgende Form:
-                    <code>{{ configuration.patientIdentifierPrefix }}1234</code>
-                </span>
-                <input
-                    #patientIdentifierPrefixInput="ngModel"
-                    [ngModel]="configuration.patientIdentifierPrefix"
-                    (appSaveOnTyping)="updatePatientIdentifierPrefix($event)"
-                    class="form-control"
-                    type="text"
-                    placeholder="Präfix, z.B. B-"
-                />
-                <app-display-validation
-                    [ngModelInput]="patientIdentifierPrefixInput"
-                />
-            </div>
+            <button
+                (click)="updateOperationsMapProperties()"
+                class="btn btn-primary"
+                data-cy="settingsSaveOperationsMapPropertiesButton"
+            >
+                Einstellungen für die Einsatzübersicht speichern
+            </button>
         </div>
     </div>
+    <br />
+    @if (configuration$ | async; as configuration) {
+        <div class="card">
+            <div class="card-header">Patienten</div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    Mit Vorsichtung üben?
+                    <div class="form-switch">
+                        <input
+                            [ngModel]="configuration.pretriageEnabled"
+                            (ngModelChange)="setPretriageFlag($event)"
+                            class="form-check-input"
+                            type="checkbox"
+                            data-cy="settingsPretriageCheckbox"
+                        />
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    Mit SK IV Patienten üben?
+                    <div class="form-switch">
+                        <input
+                            [ngModel]="configuration.bluePatientsEnabled"
+                            (ngModelChange)="setBluePatientsFlag($event)"
+                            class="form-check-input"
+                            type="checkbox"
+                            data-cy="settingsBluePatientsCheckbox"
+                        />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label mb-1">
+                        Präfix der Patienten-IDs:
+                    </label>
+                    <span
+                        class="text-warning"
+                        ngbTooltip="Das Präfix bestehender IDs wird nicht geändert!"
+                    >
+                        {{ ' ' }}<i class="bi bi-exclamation-triangle"></i>
+                    </span>
+                    @if (configuration.patientIdentifierPrefix.length > 3) {
+                        <span class="text-warning d-block">
+                            IDs mit langen Präfixen können ggfs nicht
+                            vollständig angezeigt werden. Bitte ziehen Sie ein
+                            kürzeres Präfix in Betracht.
+                        </span>
+                    }
+                    <p class="text-muted small mb-2">
+                        Mit den aktuellen Einstellungen haben Patienten-IDs die
+                        folgende Form:
+                        <code
+                            >{{
+                                configuration.patientIdentifierPrefix
+                            }}1234</code
+                        >
+                    </p>
+                    <input
+                        #patientIdentifierPrefixInput="ngModel"
+                        [ngModel]="configuration.patientIdentifierPrefix"
+                        (appSaveOnTyping)="
+                            updatePatientIdentifierPrefix($event)
+                        "
+                        class="form-control"
+                        type="text"
+                        placeholder="Präfix, z.B. B-"
+                    />
+                    <app-display-validation
+                        [ngModelInput]="patientIdentifierPrefixInput"
+                    />
+                </div>
+            </div>
+        </div>
+    }
+    <br />
+    @if (configuration$ | async; as configuration) {
+        <div class="card">
+            <div class="card-header">Statusanzeige für Fahrzeuge</div>
+            <div class="card-body">
+                <p class="small text-muted">
+                    Die Statusanzeige zeigt über jedem Fahrzeug an, wie viele
+                    Patienten sich aktuell im Fahrzeug befinden und wie viele
+                    Plätze das Fahrzeug insgesamt bietet. Sie kann optional in
+                    der Farbe der Sichtungskategorie des Patienten angezeigt
+                    werden, bei mehreren Patienten wird die Kategorie mit der
+                    höchsten Priorität gewählt.
+                </p>
+                <div class="form-group mb-3">
+                    Statusanzeige für Fahrzeuge aktivieren?
+                    <div class="form-switch">
+                        <input
+                            [ngModel]="configuration.vehicleStatusHighlight"
+                            (ngModelChange)="
+                                setVehicleStatusHighlightFlag($event)
+                            "
+                            class="form-check-input"
+                            type="checkbox"
+                            data-cy="settingsVehicleStatusHighlightCheckbox"
+                        />
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    Statusanzeige in zugehörige SK-Farbe einfärben?
+                    <div class="form-switch">
+                        <input
+                            [ngModel]="
+                                configuration.vehicleStatusInPatientStatusColor
+                            "
+                            (ngModelChange)="
+                                setVehicleStatusInPatientStatusColorFlag($event)
+                            "
+                            class="form-check-input"
+                            type="checkbox"
+                            data-cy="settingsvehicleStatusInSkColorCheckbox"
+                            [disabled]="!configuration.vehicleStatusHighlight"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>

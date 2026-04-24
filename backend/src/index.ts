@@ -1,37 +1,105 @@
 import * as util from 'node:util';
-import { ReducerError } from 'digital-fuesim-manv-shared';
+import { ReducerError } from 'fuesim-digital-shared';
+import { DatabaseService } from './database/services/database-service.js';
 import { ValidationErrorWrapper } from './utils/validation-error-wrapper.js';
 import { RestoreError } from './utils/restore-error.js';
-import { ExerciseWrapper } from './exercise/exercise-wrapper.js';
 import { Config } from './config.js';
-import { createNewDataSource } from './database/data-source.js';
-import { DatabaseService } from './database/services/database-service.js';
 import { FuesimServer } from './fuesim-server.js';
+import { ActionRepository } from './database/repositories/action-repository.js';
+import { ExerciseRepository } from './database/repositories/exercise-repository.js';
+import { ExerciseService } from './database/services/exercise-service.js';
+import { UserRepository } from './database/repositories/user-repository.js';
+import { SessionRepository } from './database/repositories/session-repository.js';
+import { AuthService } from './auth/auth-service.js';
+import { ExerciseManagerService } from './database/services/exercise-manager-service.js';
+import { AccessKeyService } from './database/services/access-key-service.js';
+import { AccessKeyRepository } from './database/repositories/access-key-repository.js';
+import type { Repositories } from './database/repositories/index.js';
+import { ParallelExerciseRepository } from './database/repositories/parallel-exercise-repository.js';
+import type { Services } from './database/services/index.js';
+import { ParallelExerciseService } from './database/services/parallel-exercise-service.js';
 
 async function main() {
     Config.initialize();
 
-    const dataSource = createNewDataSource();
-    if (Config.useDb) {
-        try {
-            await dataSource.initialize();
-        } catch (e: unknown) {
-            console.error('Error connecting to the database:', e);
-            return;
-        }
-        console.log('Successfully connected to the database.');
-    } else {
+    if (!Config.useDb) {
         console.warn(
             'Note that no database gets used. This means any data created will be stored in-memory until the exercise gets deleted or the server stops, and in case the server stops all data is gone.'
         );
     }
-    const databaseService = new DatabaseService(dataSource);
+
+    let databaseService: DatabaseService;
+    try {
+        databaseService = await DatabaseService.createNewDatabaseConnection();
+    } catch (e: unknown) {
+        console.error('Error connecting to the database:');
+        throw e;
+    }
+    console.log('Successfully connected to the database.');
+
+    const repositories: Repositories = {
+        exerciseRepository: new ExerciseRepository(
+            databaseService.databaseConnection
+        ),
+        actionRepository: new ActionRepository(
+            databaseService.databaseConnection
+        ),
+        userRepository: new UserRepository(databaseService.databaseConnection),
+        sessionRepository: new SessionRepository(
+            databaseService.databaseConnection
+        ),
+        accessKeyRepository: new AccessKeyRepository(
+            databaseService.databaseConnection
+        ),
+        parallelExerciseRepository: new ParallelExerciseRepository(
+            databaseService.databaseConnection
+        ),
+    };
+
+    const accessKeyService = new AccessKeyService(
+        repositories.accessKeyRepository
+    );
+    const exerciseService = new ExerciseService(
+        repositories.exerciseRepository,
+        repositories.actionRepository,
+        accessKeyService
+    );
+    const exerciseManagerService = new ExerciseManagerService(
+        repositories.exerciseRepository,
+        exerciseService
+    );
+    const parallelExerciseService = new ParallelExerciseService(
+        repositories.parallelExerciseRepository,
+        accessKeyService,
+        exerciseManagerService,
+        exerciseService
+    );
+
+    let authService: AuthService;
+    try {
+        authService = await new AuthService(
+            repositories.userRepository,
+            repositories.sessionRepository
+        ).initialize();
+    } catch (e: unknown) {
+        console.error('Error initializing AuthService:');
+        throw e;
+    }
+
+    const services: Services = {
+        authService,
+        exerciseManagerService,
+        exerciseService,
+        parallelExerciseService,
+        accessKeyService,
+        databaseService,
+    };
+
     if (Config.useDb) {
         try {
             console.log('Loading exercises from database…');
             const startTime = performance.now();
-            const exercises =
-                await ExerciseWrapper.restoreAllExercises(databaseService);
+            const exercises = await exerciseService.restoreAllExercises();
             const endTime = performance.now();
             console.log(
                 `✅ Successfully loaded ${exercises.length} exercise(s) in ${(
@@ -61,8 +129,9 @@ async function main() {
             throw e;
         }
     }
+
     // eslint-disable-next-line no-new
-    new FuesimServer(databaseService);
+    new FuesimServer(services);
 }
 
 main();

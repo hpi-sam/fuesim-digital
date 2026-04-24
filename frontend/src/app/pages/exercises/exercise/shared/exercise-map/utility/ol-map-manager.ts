@@ -1,25 +1,19 @@
 import type { Store } from '@ngrx/store';
+import type { Viewport } from 'fuesim-digital-shared';
 import {
     upperLeftCornerOf,
     lowerRightCornerOf,
-} from 'digital-fuesim-manv-shared';
+    isInViewport,
+    getBoundingBox,
+} from 'fuesim-digital-shared';
 import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
 import OlMap from 'ol/Map';
 import { Subject, takeUntil } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import {
-    selectSimulatedRegions,
-    selectViewports,
-} from 'src/app/state/application/selectors/exercise.selectors';
-import {
-    selectCurrentMainRole,
-    selectRestrictedViewport,
-} from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
+import { z } from 'zod';
+import type { Coordinate } from 'ol/coordinate';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import { startingPosition } from '../../starting-position';
 import { CateringLinesFeatureManager } from '../feature-managers/catering-lines-feature-manager';
@@ -32,15 +26,41 @@ import { SimulatedRegionFeatureManager } from '../feature-managers/simulated-reg
 import { TransferLinesFeatureManager } from '../feature-managers/transfer-lines-feature-manager';
 import { TransferPointFeatureManager } from '../feature-managers/transfer-point-feature-manager';
 import { VehicleFeatureManager } from '../feature-managers/vehicle-feature-manager';
+import { ViewportFeatureManager } from '../feature-managers/viewport-feature-manager';
+import { RestrictedZoneFeatureManager } from '../feature-managers/restricted-zone-feature-manager';
+import type { AppState } from '../../../../../../state/app.state';
 import {
-    isInViewport,
-    ViewportFeatureManager,
-} from '../feature-managers/viewport-feature-manager';
+    selectViewports,
+    selectSimulatedRegions,
+} from '../../../../../../state/application/selectors/exercise.selectors';
+import {
+    selectRestrictedViewport,
+    selectCurrentMainRole,
+} from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import { ScoutableIndicatorsFeatureManager } from '../feature-managers/scoutable-indicators-feature-manager';
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
 import { SatelliteLayerManager } from './satellite-layer-manager';
 import type { PopupService } from './popup.service';
+
+export const coordinateStringSchema = z
+    .string()
+    .regex(/^-?\d{1,3}(.\d+)?$/u, 'Die Eingabe ist keine gültige Koordinate.');
+const coordinateStringToNumber = z.codec(coordinateStringSchema, z.number(), {
+    decode: (str) => Number.parseFloat(str),
+    encode: (num) => num.toFixed(6),
+});
+
+export const olMapCoordinatesSchema = z.object({
+    longitude: coordinateStringToNumber,
+    latitude: coordinateStringToNumber,
+    zoom: coordinateStringToNumber.optional(),
+});
+export type OlMapCoordinates = z.infer<typeof olMapCoordinatesSchema>;
+export type OlMapCoordinatesInput = z.input<typeof olMapCoordinatesSchema>;
 
 export class OlMapManager {
     private readonly _olMap: OlMap;
@@ -131,6 +151,13 @@ export class OlMapManager {
         return this._olMap;
     }
 
+    private isInViewport(coordinate: Coordinate, viewport: Viewport): boolean {
+        return isInViewport(viewport, {
+            x: coordinate[0]!,
+            y: coordinate[1]!,
+        });
+    }
+
     private registerViewportRestriction() {
         this.tryToFitViewForOverview(false);
         this.store
@@ -157,7 +184,7 @@ export class OlMapManager {
                 ];
                 view.fit(targetExtent);
                 const matchingZoom = view.getZoom()!;
-                if (isInViewport(center, viewport)) {
+                if (this.isInViewport(center, viewport)) {
                     // We only want to change the zoom if necessary
                     view.setZoom(previousZoom);
                     view.setCenter(center);
@@ -191,30 +218,33 @@ export class OlMapManager {
             view.setCenter([startingPosition.x, startingPosition.y]);
             return;
         }
-        const minX = Math.min(
-            ...elements.map((element) => upperLeftCornerOf(element).x)
-        );
-        const minY = Math.min(
-            ...elements.map((element) => lowerRightCornerOf(element).y)
-        );
-        const maxX = Math.max(
-            ...elements.map((element) => lowerRightCornerOf(element).x)
-        );
-        const maxY = Math.max(
-            ...elements.map((element) => upperLeftCornerOf(element).y)
-        );
+        const boundingBox = getBoundingBox(elements);
         const padding = 25;
-        view.fit([minX, minY, maxX, maxY], {
-            padding: [padding, padding, padding, padding],
-            duration: animate ? 1000 : undefined,
-        });
+        view.fit(
+            [
+                boundingBox.minX,
+                boundingBox.minY,
+                boundingBox.maxX,
+                boundingBox.maxY,
+            ],
+            {
+                padding: [padding, padding, padding, padding],
+                duration: animate ? 1000 : undefined,
+            }
+        );
     }
 
     public getCoordinates() {
         return this.olMap.getView().getCenter();
     }
 
-    public tryGoToCoordinates(latitude: number, longitude: number) {
+    public getLonLat() {
+        const center = this.getCoordinates();
+        if (!center) return;
+        return toLonLat(center);
+    }
+
+    public tryGoToCoordinates(coordinates: OlMapCoordinates) {
         if (
             selectStateSnapshot(selectCurrentMainRole, this.store) ===
                 'participant' &&
@@ -226,8 +256,20 @@ export class OlMapManager {
         }
 
         const view = this.olMap.getView();
-        view.setCenter(fromLonLat([longitude, latitude]));
-        view.setZoom(OlMapManager.defaultZoom);
+        view.setCenter(
+            fromLonLat([coordinates.longitude, coordinates.latitude])
+        );
+        view.setZoom(coordinates.zoom ?? OlMapManager.defaultZoom);
+    }
+
+    public getCoordinatesAsQueryParams() {
+        const coordinates = this.getLonLat();
+        if (!coordinates) return;
+        return olMapCoordinatesSchema.encode({
+            longitude: coordinates[0]!,
+            latitude: coordinates[1]!,
+            zoom: this.olMap.getView().getZoom(),
+        });
     }
 
     public changeZoom(mode: 'zoomIn' | 'zoomOut') {
@@ -303,6 +345,15 @@ export class OlMapManager {
             this.store,
             this.olMap
         );
+        const scoutableIndicatorsFeatureManger =
+            new ScoutableIndicatorsFeatureManager(this.store, this.olMap, this);
+
+        const restrictedZoneFeatureManager = new RestrictedZoneFeatureManager(
+            this.olMap,
+            this.exerciseService,
+            this.store,
+            this.popupService
+        );
 
         const viewportFeatureManager = new ViewportFeatureManager(
             this.olMap,
@@ -328,6 +379,7 @@ export class OlMapManager {
 
         this.featureManagers = [
             deleteFeatureManager,
+            restrictedZoneFeatureManager,
             transferLinesFeatureManager,
             simulatedRegionFeatureManager,
             mapImageFeatureManager,
@@ -335,6 +387,7 @@ export class OlMapManager {
             vehicleFeatureManager,
             cateringLinesFeatureManager,
             patientFeatureManager,
+            scoutableIndicatorsFeatureManger,
             personnelFeatureManager,
             materialFeatureManager,
             viewportFeatureManager,
@@ -361,6 +414,10 @@ export class OlMapManager {
             transferLinesFeatureManager
         );
         this.featureNameFeatureManagerDictionary.set(
+            'scoutableIndicator',
+            scoutableIndicatorsFeatureManger
+        );
+        this.featureNameFeatureManagerDictionary.set(
             'transferPoint',
             transferPointFeatureManager
         );
@@ -375,6 +432,10 @@ export class OlMapManager {
         this.featureNameFeatureManagerDictionary.set(
             'viewport',
             viewportFeatureManager
+        );
+        this.featureNameFeatureManagerDictionary.set(
+            'restrictedZone',
+            restrictedZoneFeatureManager
         );
         this.featureNameFeatureManagerDictionary.set(
             'delete',

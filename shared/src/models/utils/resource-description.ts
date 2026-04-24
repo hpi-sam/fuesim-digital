@@ -1,4 +1,5 @@
-import { StrictObject } from '../../utils/index.js';
+import { z } from 'zod';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 
 export const addResourceDescription = createCombine((a, b) => a + b);
 export const subtractResourceDescription = createCombine((a, b) => a - b);
@@ -6,6 +7,11 @@ export const greaterEqualResourceDescription = createCompare((a, b) => a >= b);
 export const scaleResourceDescription = createMap((a, s) => a * s);
 export const ceilResourceDescription = createMap(Math.ceil);
 export const maxResourceDescription = createMap(Math.max);
+
+export const resourceDescriptionSchema = z.record(
+    z.string(),
+    z.int().nonnegative()
+);
 
 export type ResourceDescription<K extends string = string> = {
     [key in K]: number;
@@ -15,21 +21,36 @@ type ReadonlyResourceDescription<K extends string = string> = {
     readonly [key in K]: number;
 };
 
+function getKeys<K extends string>(
+    a: Partial<ResourceDescription<K>>,
+    b: Partial<ResourceDescription<K>>
+) {
+    return [
+        ...new Set([
+            ...TypeAssertedObject.keys(a),
+            ...TypeAssertedObject.keys(b),
+        ]),
+    ];
+}
+
 export function createCombine(transform: (a: number, b: number) => number) {
     return <K extends string>(
-        a: ResourceDescription<K>,
-        b: ResourceDescription<K>
+        a: Partial<ResourceDescription<K>>,
+        b: Partial<ResourceDescription<K>>
     ) =>
         Object.fromEntries(
-            StrictObject.keys(a).map((key) => [key, transform(a[key], b[key])])
+            getKeys(a, b).map((key) => [
+                key,
+                transform(a[key] ?? 0, b[key] ?? 0),
+            ])
         ) as ResourceDescription<K>;
 }
 
 export function createCompare(comparator: (a: number, b: number) => boolean) {
     return <K extends string>(
-        a: ReadonlyResourceDescription<K>,
-        b: ReadonlyResourceDescription<K>
-    ) => StrictObject.keys(a).every((key) => comparator(a[key], b[key]));
+        a: Partial<ReadonlyResourceDescription<K>>,
+        b: Partial<ReadonlyResourceDescription<K>>
+    ) => getKeys(a, b).every((key) => comparator(a[key] ?? 0, b[key] ?? 0));
 }
 
 export function createMap(fn: (a: number, ...args: any) => number) {
@@ -38,7 +59,7 @@ export function createMap(fn: (a: number, ...args: any) => number) {
         ...args: any
     ) =>
         Object.fromEntries(
-            StrictObject.entries(a).map(([key, value]) => [
+            TypeAssertedObject.entries(a).map(([key, value]) => [
                 key,
                 fn(value, ...args),
             ])
@@ -50,7 +71,7 @@ export function addPartialResourceDescriptions<K extends string>(
 ): Partial<ResourceDescription<K>> {
     return resourceDescriptions.reduce<Partial<ResourceDescription<K>>>(
         (total, current) => {
-            StrictObject.entries(current).forEach(([key, value]) => {
+            TypeAssertedObject.entries(current).forEach(([key, value]) => {
                 total[key] = (total[key] ?? 0) + (value ?? 0);
             });
             return total;
@@ -70,7 +91,7 @@ export function subtractPartialResourceDescriptions<K extends string>(
             -1
         ) as ResourceDescription<K>,
     ]);
-    StrictObject.entries(result)
+    TypeAssertedObject.entries(result)
         .filter(([_, value]) => (value ?? 0) <= 0)
         .forEach(([key]) => delete result[key]);
     return result;

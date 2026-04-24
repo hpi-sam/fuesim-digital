@@ -4,13 +4,15 @@ import type {
     SimpleChanges,
     AfterViewInit,
 } from '@angular/core';
-import { Component, Input } from '@angular/core';
-import type { LogEntry, Tag } from 'digital-fuesim-manv-shared';
-import { StrictObject } from 'digital-fuesim-manv-shared';
+import { Component, inject, input } from '@angular/core';
+import type { LogEntry, Tag } from 'fuesim-digital-shared';
 import { difference } from 'lodash-es';
 import { Subject, takeUntil } from 'rxjs';
-import type { SearchableDropdownOption } from 'src/app/shared/components/searchable-dropdown/searchable-dropdown.component';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { StatisticsTimeSelectionService } from '../statistics-time-selection.service';
+import type { SearchableDropdownOption } from '../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import { SearchableDropdownComponent } from '../../../../../../shared/components/searchable-dropdown/searchable-dropdown.component';
+import { LogEntryComponent } from '../log-entry/log-entry.component';
 
 type KnownSpecifier = Omit<Tag, 'category'>;
 
@@ -23,10 +25,14 @@ interface Filter {
     selector: 'app-log-table',
     templateUrl: './log-table.component.html',
     styleUrls: ['./log-table.component.scss'],
-    standalone: false,
+    imports: [NgbPopover, SearchableDropdownComponent, LogEntryComponent],
 })
 export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
-    @Input() public logEntries!: readonly LogEntry[];
+    private readonly statisticsTimeSelectionService = inject(
+        StatisticsTimeSelectionService
+    );
+
+    public readonly logEntries = input.required<readonly LogEntry[]>();
 
     public knownCategories: {
         [category: string]: { [specifier: string]: KnownSpecifier };
@@ -34,10 +40,6 @@ export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
 
     public filters: Filter[] = [];
     private readonly destroy$ = new Subject<void>();
-
-    constructor(
-        private readonly statisticsTimeSelectionService: StatisticsTimeSelectionService
-    ) {}
 
     public get availableCategories() {
         const knownCategoryNames = Object.keys(this.knownCategories);
@@ -52,8 +54,8 @@ export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
     }
 
     public get availableSpecifiersPerCategory() {
-        return StrictObject.fromEntries(
-            StrictObject.entries(this.knownCategories).map(
+        return Object.fromEntries(
+            Object.entries(this.knownCategories).map(
                 ([knownCategory, knownSpecifiers]) => [
                     knownCategory,
                     Object.values(knownSpecifiers)
@@ -99,7 +101,7 @@ export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
                 );
             });
 
-        return this.logEntries.filter(predicate);
+        return this.logEntries().filter(predicate);
     }
 
     ngAfterViewInit(): void {
@@ -131,7 +133,7 @@ export class LogTableComponent implements OnChanges, OnDestroy, AfterViewInit {
         this.knownCategories = {};
 
         // Process all tags in reverse order to use the latest available display name and color
-        [...this.logEntries].reverse().forEach((logEntry) => {
+        [...this.logEntries()].reverse().forEach((logEntry) => {
             logEntry.tags.forEach((tag) => {
                 if (!(tag.category in this.knownCategories)) {
                     this.knownCategories[tag.category] = {};

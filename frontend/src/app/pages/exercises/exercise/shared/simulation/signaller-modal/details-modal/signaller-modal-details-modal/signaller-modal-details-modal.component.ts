@@ -1,36 +1,45 @@
-import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, TemplateRef } from '@angular/core';
+import {
+    OnDestroy,
+    signal,
+    Component,
+    TemplateRef,
+    inject,
+    effect,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import type { HotkeyLayer } from 'src/app/shared/services/hotkeys.service';
+import { NgTemplateOutlet } from '@angular/common';
+import type { HotkeyLayer } from '../../../../../../../../shared/services/hotkeys.service';
 import {
     Hotkey,
     HotkeysService,
-} from 'src/app/shared/services/hotkeys.service';
+} from '../../../../../../../../shared/services/hotkeys.service';
+import { AutofocusDirective } from '../../../../../../../../shared/directives/autofocus.directive';
+import { HotkeyIndicatorComponent } from '../../../../../../../../shared/components/hotkey-indicator/hotkey-indicator.component';
 
 @Component({
     selector: 'app-signaller-modal-details-modal',
     templateUrl: './signaller-modal-details-modal.component.html',
     styleUrls: ['./signaller-modal-details-modal.component.scss'],
-    standalone: false,
+    imports: [AutofocusDirective, NgTemplateOutlet, HotkeyIndicatorComponent],
 })
-export class SignallerModalDetailsModalComponent implements OnInit, OnDestroy {
-    @Input() title = '';
-    @Input() body!: TemplateRef<any>;
-    @Input() hotkeysEnabled = true;
+export class SignallerModalDetailsModalComponent implements OnDestroy {
+    private readonly activeModal = inject(NgbActiveModal);
+    private readonly hotkeysService = inject(HotkeysService);
+
+    readonly title = signal('');
+    readonly body = signal<TemplateRef<any> | null>(null);
+    readonly hotkeysEnabled = signal(true);
 
     private hotkeyLayer?: HotkeyLayer;
     private readonly closeHotkey = new Hotkey('Esc', false, () => this.close());
 
-    constructor(
-        private readonly activeModal: NgbActiveModal,
-        private readonly hotkeysService: HotkeysService
-    ) {}
-
-    ngOnInit() {
-        if (this.hotkeysEnabled) {
-            this.hotkeyLayer = this.hotkeysService.createLayer(true);
-            this.hotkeyLayer.addHotkey(this.closeHotkey);
-        }
+    constructor() {
+        effect(() => {
+            if (this.hotkeysEnabled() && !this.hotkeyLayer) {
+                this.hotkeyLayer = this.hotkeysService.createLayer(true);
+                this.hotkeyLayer.addHotkey(this.closeHotkey);
+            }
+        });
     }
 
     ngOnDestroy() {

@@ -1,40 +1,17 @@
-import { Type } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
-import { IsValue } from '../../../utils/validators/index.js';
-import { getCreate } from '../get-create.js';
-import { Transfer } from '../transfer.js';
-import {
-    // import needed to display @link Links in Comments
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isInTransfer,
-    // import needed to display @link Links in Comments
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isNotInTransfer,
-    // import needed to display @link Links in Comments
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    currentTransferOf,
-} from './position-helpers.js';
+import { z } from 'zod';
+import type { Transfer } from '../transfer.js';
+import { transferSchema } from '../transfer.js';
 
-export class TransferPosition {
-    /**
-     * @deprecated Use {@link isInTransfer } or {@link isNotInTransfer} instead
-     */
-    @IsValue('transfer')
-    public readonly type = 'transfer';
+export const transferPositionSchema = z.strictObject({
+    type: z.literal('transfer'),
+    transfer: transferSchema,
+});
 
-    /**
-     * @deprecated Use {@link currentTransferOf } instead
-     */
-    @Type(() => Transfer)
-    @ValidateNested()
-    public readonly transfer: Transfer;
+export type TransferPosition = z.infer<typeof transferPositionSchema>;
 
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(transfer: Transfer) {
-        this.transfer = transfer;
-    }
-
-    static readonly create = getCreate(this);
+export function newTransferPositionFor(transfer: Transfer): TransferPosition {
+    return {
+        type: 'transfer',
+        transfer,
+    };
 }

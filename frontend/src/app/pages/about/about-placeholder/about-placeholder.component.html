@@ -1,29 +1,24 @@
-<div class="container">
-    <h1 class="display-3 mt-3">Digitale FüSim MANV</h1>
-    <h2 class="display-4">{{ pageTitle }}</h2>
+<app-header />
+<main class="container">
+    <h1>{{ pageTitle() }}</h1>
 
     <p>
-        <a (click)="back($event)" href="#">Zurück zur vorherigen Seite</a> |
-        <a routerLink="/">Zur Startseite</a>
+        <a (click)="back($event)" href="#">Zurück zur vorherigen Seite</a>
     </p>
 
-    <div
-        *ngIf="content$ | async; else placeholder"
-        [innerHTML]="content$ | async"
-    ></div>
-    <ng-template #placeholder>
+    @if (content$ | async) {
+        <div [innerHTML]="content$ | async"></div>
+    } @else {
         <p>
             Sie können den Inhalt der Seite unter
-            <code>frontend/src/assets/about/{{ contentFile }}</code> bearbeiten.
+            <code>frontend/src/assets/about/{{ contentFile() }}</code>
+            bearbeiten.
         </p>
         <p>
             Falls Sie das Docker-Deployment verwenden, finden Sie in der
             <code>docker-compose.yml</code> Beispiel-Datei eine Anleitung, wie
             Sie Inhalte für diese Seite bereitstellen können.
         </p>
-    </ng-template>
-
-    <div class="my-4 p-2 bg-light rounded-3">
-        <app-footer />
-    </div>
-</div>
+    }
+</main>
+<app-footer />

@@ -1,15 +1,18 @@
-import type { ExerciseRadiogram } from '../../../models/radiogram/index.js';
-import type {
-    ExerciseSimulationActivityState,
-    ExerciseSimulationActivityType,
-    ExerciseSimulationBehaviorState,
-    ExerciseSimulationBehaviorType,
-} from '../../../simulation/index.js';
+import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../../../state.js';
-import type { Mutable, UUID } from '../../../utils/index.js';
 import type { ElementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { elementTypePluralMap } from '../../../utils/element-type-plural-map.js';
 import { ReducerError } from '../../reducer-error.js';
+import type { UUID } from '../../../utils/uuid.js';
+import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
+import type {
+    ExerciseSimulationBehaviorState,
+    ExerciseSimulationBehaviorType,
+} from '../../../simulation/behaviors/exercise-simulation-behavior.js';
+import type {
+    ExerciseSimulationActivityState,
+    ExerciseSimulationActivityType,
+} from '../../../simulation/activities/exercise-simulation-activity.js';
 
 /**
  * @returns The element with the given id
@@ -17,7 +20,7 @@ import { ReducerError } from '../../reducer-error.js';
  */
 export function getElement<
     ElementType extends keyof ElementTypePluralMap,
-    State extends ExerciseState | Mutable<ExerciseState>,
+    State extends ExerciseState | WritableDraft<ExerciseState>,
 >(state: State, elementType: ElementType, elementId: UUID) {
     const element = tryGetElement(state, elementType, elementId);
     if (!element) {
@@ -33,7 +36,7 @@ export function getElement<
  */
 export function tryGetElement<
     ElementType extends keyof ElementTypePluralMap,
-    State extends ExerciseState | Mutable<ExerciseState>,
+    State extends ExerciseState | WritableDraft<ExerciseState>,
 >(state: State, elementType: ElementType, elementId: UUID) {
     return state[elementTypePluralMap[elementType]][elementId] as
         | State[ElementTypePluralMap[ElementType]][UUID]
@@ -42,7 +45,7 @@ export function tryGetElement<
 
 export function getElementByPredicate<
     ElementType extends keyof ElementTypePluralMap,
-    State extends Mutable<ExerciseState>,
+    State extends WritableDraft<ExerciseState>,
 >(
     state: State,
     elementType: ElementType,
@@ -62,7 +65,7 @@ export function getElementByPredicate<
 }
 
 export function getExerciseRadiogramById(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     radiogramId: UUID
 ) {
     const radiogram = state.radiograms[radiogramId];
@@ -75,7 +78,7 @@ export function getExerciseRadiogramById(
 }
 
 export function getRadiogramById<R extends ExerciseRadiogram>(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     radiogramId: UUID,
     radiogramType: R['type']
 ) {
@@ -90,11 +93,11 @@ export function getRadiogramById<R extends ExerciseRadiogram>(
             `Expected radiogram with id ${radiogramId} to be of type ${radiogramType}, but was ${radiogram.type}`
         );
     }
-    return radiogram as Mutable<R>;
+    return radiogram as WritableDraft<R>;
 }
 
 export function getExerciseBehaviorById(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
     behaviorId: UUID
 ) {
@@ -113,7 +116,7 @@ export function getExerciseBehaviorById(
 }
 
 export function getBehaviorById<T extends ExerciseSimulationBehaviorType>(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
     behaviorId: UUID,
     behaviorType: T
@@ -134,11 +137,13 @@ export function getBehaviorById<T extends ExerciseSimulationBehaviorType>(
             `Expected behavior with id ${behaviorId} to be of type ${behaviorType}, but was ${behavior.type}`
         );
     }
-    return behavior as Mutable<ExerciseSimulationBehaviorState<T>>;
+    return behavior as WritableDraft<
+        ExerciseSimulationBehaviorState & { type: T }
+    >;
 }
 
 export function getActivityById<T extends ExerciseSimulationActivityType>(
-    state: Mutable<ExerciseState>,
+    state: WritableDraft<ExerciseState>,
     simulatedRegionId: UUID,
     activityId: UUID,
     activityType: T
@@ -159,5 +164,7 @@ export function getActivityById<T extends ExerciseSimulationActivityType>(
             `Expected activity with id ${activityId} to be of type ${activityType}, but was ${activity.type}`
         );
     }
-    return activity as Mutable<ExerciseSimulationActivityState<T>>;
+    return activity as WritableDraft<
+        ExerciseSimulationActivityState & { type: T }
+    >;
 }

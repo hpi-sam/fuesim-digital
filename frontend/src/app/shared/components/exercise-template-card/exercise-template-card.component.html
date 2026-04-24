@@ -1,0 +1,107 @@
+@if (exerciseTemplate(); as exerciseTemplate) {
+    <div class="card" id="exerciseTemplate.id">
+        <div class="card-body">
+            <h2 class="card-title h4 d-flex">
+                <app-inline-text-editor
+                    class="flex-grow-1"
+                    [required]="true"
+                    [value]="exerciseTemplate.name"
+                    name="Name der Übungsvorlage"
+                    (update)="
+                        patchExerciseTemplate({
+                            name: $event,
+                        })
+                    "
+                    [singleLine]="true"
+                />
+            </h2>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <i class="bi bi-clock me-2"></i>
+                erstellt am {{ exerciseTemplate.createdAt | date: 'medium' }}
+            </li>
+            <li class="list-group-item">
+                <i class="bi bi-clock me-2"></i>
+                zuletzt geändert am
+                {{ exerciseTemplate.lastUpdatedAt | date: 'medium' }}
+            </li>
+            <li class="list-group-item">
+                <i class="bi bi-rocket me-2"></i>
+                @if (exerciseTemplate.lastExerciseCreatedAt) {
+                    Letzte Übung erstellt am
+                    {{
+                        exerciseTemplate.lastExerciseCreatedAt | date: 'medium'
+                    }}
+                } @else {
+                    <em>Noch keine Übung erstellt</em>
+                }
+            </li>
+            <li class="list-group-item d-flex">
+                <app-inline-text-editor
+                    class="flex-grow-1"
+                    [value]="exerciseTemplate.description"
+                    name="Beschreibung der Übungsvorlage"
+                    (update)="
+                        patchExerciseTemplate({
+                            description: $event,
+                        })
+                    "
+                />
+            </li>
+        </ul>
+        <div class="card-body d-flex">
+            <a
+                [routerLink]="`/exercises/${exerciseTemplate.trainerKey}`"
+                class="btn btn-primary me-2"
+            >
+                Öffnen
+            </a>
+
+            @if (parallelExercisesEnabled()) {
+                <div ngbDropdown autoClose="outside">
+                    <button
+                        ngbDropdownToggle
+                        type="button"
+                        class="btn btn-primary"
+                    >
+                        Neue Übung
+                    </button>
+                    <div ngbDropdownMenu>
+                        <button
+                            ngbDropdownItem
+                            class="btn btn-primary"
+                            (click)="createExercise()"
+                        >
+                            Einzelübung
+                        </button>
+                        <button
+                            ngbDropdownItem
+                            class="btn btn-primary"
+                            (click)="createParallelExercise()"
+                        >
+                            Parallelübung
+                        </button>
+                    </div>
+                </div>
+            } @else {
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="createExercise()"
+                >
+                    Neue Übung
+                </button>
+            }
+
+            <div class="flex-grow-1"></div>
+            <button
+                class="btn btn-outline-danger"
+                (click)="deleteExerciseTemplate()"
+            >
+                <i class="bi bi-trash me-2"></i>
+                Löschen
+            </button>
+        </div>
+    </div>
+}

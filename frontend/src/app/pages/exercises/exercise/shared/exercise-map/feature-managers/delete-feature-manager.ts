@@ -10,14 +10,14 @@ import VectorSource from 'ol/source/Vector';
 import Icon from 'ol/style/Icon';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
-import type { ExerciseService } from 'src/app/core/exercise.service';
-import type { AppState } from 'src/app/state/app.state';
-import { selectCurrentMainRole } from 'src/app/state/application/selectors/shared.selectors';
-import { selectStateSnapshot } from 'src/app/state/get-state-snapshot';
 // eslint-disable-next-line @typescript-eslint/no-shadow
-import type { Element } from 'digital-fuesim-manv-shared';
+import type { Element } from 'fuesim-digital-shared';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
+import type { ExerciseService } from '../../../../../../core/exercise.service';
+import type { AppState } from '../../../../../../state/app.state';
+import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
+import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 
 function calculateTopRightViewPoint(view: View) {
     const extent = getTopRight(view.calculateExtent());
@@ -87,7 +87,7 @@ export class DeleteFeatureManager implements FeatureManager<Point> {
     public onFeatureDrop(
         droppedElement: Element,
         droppedOnFeature: Feature<Point>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) {
         const id = droppedElement.id;
         switch (droppedElement.type) {
@@ -130,6 +130,13 @@ export class DeleteFeatureManager implements FeatureManager<Point> {
                 this.exerciseService.proposeAction({
                     type: '[SimulatedRegion] Remove simulated region',
                     simulatedRegionId: id,
+                });
+                return true;
+            }
+            case 'restrictedZone': {
+                this.exerciseService.proposeAction({
+                    type: '[RestrictedZone] Remove restricted zone',
+                    restrictedZoneId: id,
                 });
                 return true;
             }

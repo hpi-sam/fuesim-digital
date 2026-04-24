@@ -1,3 +1,3 @@
-<ng-container *ngIf="hospital$ | async as hospital">
+@if (hospital$ | async; as hospital) {
     {{ hospital.name }}
-</ng-container>
+}

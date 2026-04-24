@@ -1,11 +1,15 @@
 import './utils/dotenv-config.js';
 import dotenv from 'dotenv';
-import { bool, cleanEnv, makeValidator, num, str } from 'envalid';
+import { bool, cleanEnv, makeValidator, num, str, url } from 'envalid';
 
 export class Config {
     private static _websocketPort?: number;
 
     private static _httpPort?: number;
+
+    private static _httpBackendUrl?: string;
+
+    private static _httpFrontendUrl?: string;
 
     private static _uploadLimit?: number;
 
@@ -23,6 +27,20 @@ export class Config {
 
     private static _dbPort?: number;
 
+    private static _authUrl?: string;
+
+    private static _authClientId?: string;
+
+    private static _authClientSecret?: string;
+
+    private static _authUserRegistrationAdapter?: string;
+
+    private static _authSelfServiceUrl?: string;
+
+    private static _devNoWaitingRoom?: boolean;
+
+    private static _parallelExercisesEnabled?: boolean;
+
     public static get websocketPort(): number {
         this.throwIfNotInitialized();
         return this._websocketPort!;
@@ -31,6 +49,16 @@ export class Config {
     public static get httpPort(): number {
         this.throwIfNotInitialized();
         return this._httpPort!;
+    }
+
+    public static get httpBackendUrl(): string {
+        this.throwIfNotInitialized();
+        return this._httpBackendUrl!;
+    }
+
+    public static get httpFrontendUrl(): string {
+        this.throwIfNotInitialized();
+        return this._httpFrontendUrl!;
     }
 
     public static get uploadLimit(): number {
@@ -73,6 +101,41 @@ export class Config {
         return this._dbPort!;
     }
 
+    public static get authUrl(): string {
+        this.throwIfNotInitialized();
+        return this._authUrl!;
+    }
+
+    public static get authClientId(): string {
+        this.throwIfNotInitialized();
+        return this._authClientId!;
+    }
+
+    public static get authClientSecret(): string {
+        this.throwIfNotInitialized();
+        return this._authClientSecret!;
+    }
+
+    public static get authUserRegistrationAdapter(): string {
+        this.throwIfNotInitialized();
+        return this._authUserRegistrationAdapter!;
+    }
+
+    public static get authSelfServiceUrl(): string {
+        this.throwIfNotInitialized();
+        return this._authSelfServiceUrl!;
+    }
+
+    public static get devNoWaitingRoom(): boolean {
+        this.throwIfNotInitialized();
+        return this._devNoWaitingRoom!;
+    }
+
+    public static get parallelExercisesEnabled(): boolean {
+        this.throwIfNotInitialized();
+        return this._parallelExercisesEnabled!;
+    }
+
     private static createTCPPortValidator() {
         return makeValidator((x) => {
             const int = Number.parseInt(x);
@@ -96,6 +159,14 @@ export class Config {
             DFM_WEBSOCKET_PORT_TESTING: tcpPortValidator({ default: 13200 }),
             DFM_HTTP_PORT: tcpPortValidator({ default: 3201 }),
             DFM_HTTP_PORT_TESTING: tcpPortValidator({ default: 13201 }),
+            DFM_HTTP_BACKEND_URL: url({ default: 'http://localhost:3201' }),
+            DFM_HTTP_BACKEND_URL_TESTING: url({
+                default: 'http://localhost:13201',
+            }),
+            DFM_HTTP_FRONTEND_URL: url({ default: 'http://localhost:4200' }),
+            DFM_HTTP_FRONTEND_URL_TESTING: url({
+                default: 'http://localhost:14200',
+            }),
             DFM_UPLOAD_LIMIT: num({ default: 200 }),
             DFM_USE_DB: bool(),
             DFM_USE_DB_TESTING: bool({ default: undefined }),
@@ -126,6 +197,24 @@ export class Config {
             DFM_DB_HOST_TESTING: str({ default: undefined }),
             DFM_DB_PORT: tcpPortValidator({ default: 5432 }),
             DFM_DB_PORT_TESTING: tcpPortValidator({ default: undefined }),
+            DFM_AUTH_URL: url({ default: 'http://127.0.0.1:9091/' }),
+            DFM_AUTH_URL_TESTING: url({ default: 'http://127.0.0.1:9091/' }),
+            DFM_AUTH_CLIENT_ID: str({ default: 'dfm-backend' }),
+            DFM_AUTH_CLIENT_ID_TESTING: str({ default: 'dfm-backend' }),
+            DFM_AUTH_CLIENT_SECRET: str({ default: '' }),
+            DFM_AUTH_CLIENT_SECRET_TESTING: str({ default: '' }),
+            DFM_AUTH_USER_REGISTRATION_ADAPTER: str({
+                default: '',
+                choices: ['', 'keycloak'],
+            }),
+            DFM_AUTH_USER_REGISTRATION_ADAPTER_TESTING: str({
+                default: '',
+                choices: ['', 'keycloak'],
+            }),
+            DFM_AUTH_SELF_SERVICE_URL: url({ default: '' }),
+            DFM_AUTH_SELF_SERVICE_URL_TESTING: url({ default: '' }),
+            DFM_DEV_NO_WAITING_ROOM: bool({ default: false }),
+            DFM_PARALLEL_EXERCISES_ENABLED: bool({ default: true }),
         });
     }
 
@@ -151,6 +240,14 @@ export class Config {
         this._httpPort = testing
             ? env.DFM_HTTP_PORT_TESTING
             : env.DFM_HTTP_PORT;
+        this._httpBackendUrl =
+            testing && env.DFM_HTTP_BACKEND_URL_TESTING
+                ? env.DFM_HTTP_BACKEND_URL_TESTING
+                : env.DFM_HTTP_BACKEND_URL;
+        this._httpFrontendUrl =
+            testing && env.DFM_HTTP_FRONTEND_URL_TESTING
+                ? env.DFM_HTTP_FRONTEND_URL_TESTING
+                : env.DFM_HTTP_FRONTEND_URL;
         this._uploadLimit = env.DFM_UPLOAD_LIMIT;
         this._useDb =
             testing && env.DFM_USE_DB_TESTING
@@ -180,6 +277,34 @@ export class Config {
             testing && env.DFM_DB_PORT_TESTING
                 ? env.DFM_DB_PORT_TESTING
                 : env.DFM_DB_PORT;
+        this._authUrl =
+            testing && env.DFM_AUTH_URL_TESTING
+                ? env.DFM_AUTH_URL_TESTING
+                : env.DFM_AUTH_URL;
+        this._authClientId =
+            testing && env.DFM_AUTH_CLIENT_ID_TESTING
+                ? env.DFM_AUTH_CLIENT_ID_TESTING
+                : env.DFM_AUTH_CLIENT_ID;
+        this._authClientSecret =
+            testing && env.DFM_AUTH_CLIENT_SECRET_TESTING
+                ? env.DFM_AUTH_CLIENT_SECRET_TESTING
+                : env.DFM_AUTH_CLIENT_SECRET;
+        this._authUserRegistrationAdapter =
+            testing && env.DFM_AUTH_USER_REGISTRATION_ADAPTER_TESTING
+                ? env.DFM_AUTH_USER_REGISTRATION_ADAPTER_TESTING
+                : env.DFM_AUTH_USER_REGISTRATION_ADAPTER;
+        this._authSelfServiceUrl =
+            testing && env.DFM_AUTH_SELF_SERVICE_URL_TESTING
+                ? env.DFM_AUTH_SELF_SERVICE_URL_TESTING
+                : env.DFM_AUTH_SELF_SERVICE_URL;
+        this._devNoWaitingRoom = env.DFM_DEV_NO_WAITING_ROOM;
+        this._parallelExercisesEnabled = testing
+            ? true
+            : env.DFM_PARALLEL_EXERCISES_ENABLED;
         this.isInitialized = true;
     }
+}
+
+export function isDevelopment() {
+    return process.env['NODE_ENV'] !== 'production';
 }

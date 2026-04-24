@@ -1,81 +1,62 @@
-import { IsString, IsUUID, ValidateNested } from 'class-validator';
-import type { UUID, UUIDSet } from '../utils/index.js';
-import { uuid, uuidValidationOptions } from '../utils/index.js';
-import {
-    IsReachableTransferPoints,
-    IsUUIDSet,
-    IsValue,
-} from '../utils/validators/index.js';
-import { IsPosition } from '../utils/validators/is-position.js';
-import type { ImageProperties, Position } from './utils/index.js';
-import { getCreate, isInSimulatedRegion } from './utils/index.js';
+import { z } from 'zod';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import { uuidSetSchema } from '../utils/uuid-set.js';
+import { type Position, positionSchema } from './utils/position/position.js';
+import type { ImageProperties } from './utils/image-properties.js';
+import { isInSimulatedRegion } from './utils/position/position-helpers.js';
 
-export class TransferPoint {
-    @IsUUID(4, uuidValidationOptions)
-    public readonly id: UUID = uuid();
-
-    @IsValue('transferPoint' as const)
-    public readonly type = 'transferPoint';
-
-    /**
-     * @deprecated Do not access directly, use helper methods from models/utils/position/position-helpers(-mutable) instead.
-     */
-    @ValidateNested()
-    @IsPosition()
-    public readonly position: Position;
-
-    @IsReachableTransferPoints()
-    public readonly reachableTransferPoints: ReachableTransferPoints;
-
-    @IsUUIDSet()
-    public readonly reachableHospitals: UUIDSet = {};
-
-    @IsString()
-    public readonly internalName: string;
-
-    @IsString()
-    public readonly externalName: string;
-
-    /**
-     * @deprecated Use {@link create} instead
-     */
-    constructor(
-        position: Position,
-        reachableTransferPoints: ReachableTransferPoints,
-        reachableHospitals: UUIDSet,
-        internalName: string,
-        externalName: string
-    ) {
-        this.position = position;
-        this.reachableTransferPoints = reachableTransferPoints;
-        this.reachableHospitals = reachableHospitals;
-        this.internalName = internalName;
-        this.externalName = externalName;
-    }
-
-    static readonly create = getCreate(this);
-
-    static image: ImageProperties = {
-        url: 'assets/transfer-point.svg',
-        height: 400,
-        aspectRatio: 134 / 102,
-    };
-
-    public static getFullName(transferPoint: TransferPoint): string {
-        if (isInSimulatedRegion(transferPoint)) {
-            // Transfer points in simulated regions don't have an internal name and we don't want to show empty parentheses
-            return transferPoint.externalName;
-        }
-
-        return `${transferPoint.externalName} (${transferPoint.internalName})`;
-    }
-}
-
-export interface ReachableTransferPoints {
-    readonly [connectTransferPointId: UUID]: {
+export const reachableTransferPointsSchema = z.record(
+    uuidSchema,
+    z.object({
         /**
          * The time in ms it takes to get from this transfer point to the other one.
          */
-        readonly duration: number;
+        duration: z.number().nonnegative(),
+    })
+);
+export type ReachableTransferPoints = z.infer<
+    typeof reachableTransferPointsSchema
+>;
+
+export const transferPointSchema = z.strictObject({
+    id: uuidSchema,
+    type: z.literal('transferPoint'),
+    position: positionSchema,
+    reachableTransferPoints: reachableTransferPointsSchema,
+    reachableHospitals: uuidSetSchema,
+    internalName: z.string(),
+    externalName: z.string(),
+});
+export type TransferPoint = z.infer<typeof transferPointSchema>;
+
+export const transferPointImage: ImageProperties = {
+    url: 'assets/transfer-point.svg',
+    height: 400,
+    aspectRatio: 134 / 102,
+};
+
+export function newTransferPoint(
+    position: Position,
+    internalName: string,
+    externalName: string
+): TransferPoint {
+    return {
+        id: uuid(),
+        type: 'transferPoint',
+        position,
+        reachableTransferPoints: {},
+        reachableHospitals: {},
+        internalName,
+        externalName,
     };
+}
+
+export function getTransferPointFullName(transferPoint: TransferPoint): string {
+    if (isInSimulatedRegion(transferPoint)) {
+        // Transfer points in simulated regions don't have an internal name,
+        // and we don't want to show empty parentheses
+        return transferPoint.externalName;
+    }
+
+    return `${transferPoint.externalName} (${transferPoint.internalName})`;
 }

@@ -4,7 +4,7 @@ import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type { Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
-import type { Element } from 'digital-fuesim-manv-shared';
+import type { Element } from 'fuesim-digital-shared';
 import type { OlMapInteractionsManager } from './ol-map-interactions-manager';
 
 /**
@@ -37,7 +37,7 @@ export interface FeatureManager<T extends Geometry> {
     onFeatureDrop: (
         droppedElement: Element,
         droppedOnFeature: Feature<T>,
-        dropEvent?: TranslateEvent
+        dropEvent: MouseEvent | TranslateEvent
     ) => boolean;
 
     register: (

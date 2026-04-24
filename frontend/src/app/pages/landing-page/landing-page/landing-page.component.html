@@ -1,98 +1,128 @@
-<div class="container">
-    <h1 class="display-3 m-3 text-center">Digitale FüSim MANV</h1>
-    <div class="p-5 mb-4 bg-light rounded-3">
-        <div class="display-6">Übung beitreten</div>
-        <p>
-            Bitte geben Sie hier Ihre von der Übungsleitung erhaltene Übungs-ID
-            ein!
-        </p>
-        <div class="input-group">
-            <!--
-                Still using `[maxLength]` and `[minLength]` in addition to `appJoinIdValidator`
-                since this automatically prevents input of more than 8 chars
-            -->
-            <input
-                [(ngModel)]="exerciseId"
-                [appAutofocus]="true"
-                (keydown.enter)="joinExercise()"
-                (paste)="pasteExerciseId($event)"
-                [minLength]="6"
-                [maxLength]="8"
-                required
-                appJoinIdValidator
-                appExerciseExistsValidator
-                class="form-control form-control-lg"
-                placeholder="Übungs-ID"
-                type="text"
-                data-cy="exerciseIdInput"
-                #exerciseIdInput="ngModel"
-            />
-            <button
-                (click)="joinExercise()"
-                [disabled]="exerciseIdInput.invalid"
-                class="btn btn-primary"
-                type="button"
-                data-cy="joinExerciseButton"
-            >
-                Übung beitreten
-            </button>
-        </div>
-        <app-display-validation
-            [ngModelInput]="exerciseIdInput"
-        ></app-display-validation>
-    </div>
-    <div class="p-5 mb-4 bg-light rounded-3">
-        <div class="display-6">Neue Übung erstellen</div>
-        <br />
-        <div class="mb-3">
-            <button
-                (click)="createExercise()"
-                class="btn btn-primary btn-lg"
-                data-cy="createExerciseButton"
-            >
-                Übung erstellen
-            </button>
-            <label
-                class="btn btn-outline-primary btn-lg ms-5"
-                [class.disabled]="importingExercise"
-            >
-                <i class="bi-cloud-upload me-2"> </i>
-                Übung importieren
-                <span
-                    *ngIf="importingExercise"
-                    class="spinner-border spinner-border-sm"
-                ></span>
-                <input
-                    (appFileInput)="importExerciseState($event)"
-                    type="file"
-                    accept="application/json"
-                    class="d-none"
-                    [disabled]="importingExercise"
-                />
-            </label>
+<app-header />
+
+<main class="container">
+    <div class="row mb-4 d-flex">
+        <div class="col">
+            <div class="p-4 bg-light rounded-3 h-100">
+                <h2>Übung beitreten</h2>
+                <p class="lead">
+                    Bitte geben Sie hier die Übungs-PIN ein, die sie von der
+                    Übungsleitung erhalten haben:
+                </p>
+                <div class="input-group">
+                    <input
+                        [appAutofocus]="true"
+                        (keydown.enter)="joinExercise()"
+                        (paste)="pasteExerciseKey($event)"
+                        [formField]="joinForm.joinKey"
+                        class="form-control form-control-lg"
+                        placeholder="Übungs-PIN"
+                        type="text"
+                        data-cy="exerciseKeyInput"
+                    />
+                    <button
+                        (click)="joinExercise()"
+                        [disabled]="joinForm().invalid()"
+                        class="btn btn-primary"
+                        type="button"
+                        data-cy="joinExerciseButton"
+                    >
+                        Übung beitreten
+                    </button>
+                </div>
+                @if (model().joinKey.length > 0) {
+                    <app-display-model-validation
+                        [field]="joinForm.joinKey()"
+                    />
+                }
+            </div>
         </div>
 
-        <p *ngIf="exerciseHasBeenCreated" class="mb-0">
-            Sie haben eine Übung mit der Übungsleitungs-ID
-            <span class="font-monospace fw-bolder user-select-all">{{
-                trainerId
-            }}</span>
-            und der Teilnehmer-ID
-            <span class="font-monospace fw-bolder user-select-all">{{
-                participantId
-            }}</span>
-            erstellt.
-        </p>
+        <div class="col">
+            <div class="p-4 bg-light rounded-3 h-100">
+                <h2>Neue Übung erstellen</h2>
+                @if (auth.authData().user) {
+                    <div class="mb-3">
+                        <p class="lead">
+                            Nutzen Sie den Übungsmanager, um wiederverwendbare
+                            Übungsvorlagen zu erstellen:
+                        </p>
+                        <a
+                            class="btn btn-primary btn-lg"
+                            routerLink="/exercises/templates/"
+                            >Übungsvorlagen verwalten</a
+                        >
+                    </div>
+                } @else {
+                    <div class="mb-3">
+                        <p class="lead">
+                            Melden Sie sich an, um Übungen bequem zu erstellen
+                            und zu verwalten:
+                        </p>
+                        <a class="btn btn-primary btn-lg" [href]="loginUrl"
+                            >Anmelden</a
+                        >
+                    </div>
+                }
+                <div class="mb-3">
+                    <p class="lead">
+                        Oder erstellen Sie direkt eine Übung, um sofort
+                        loszulegen:
+                    </p>
+                    <button
+                        (click)="createExercise()"
+                        class="btn btn-primary btn-lg me-3"
+                        data-cy="createExerciseButton"
+                    >
+                        Übung erstellen
+                    </button>
+                    <label
+                        class="btn btn-outline-primary btn-lg"
+                        [class.disabled]="importingExercise"
+                    >
+                        <i class="bi-cloud-upload me-2"> </i>
+                        Übung importieren
+                        @if (importingExercise) {
+                            <span
+                                class="spinner-border spinner-border-sm"
+                            ></span>
+                        }
+                        <input
+                            (appFileInput)="importExerciseState($event)"
+                            type="file"
+                            accept="application/json"
+                            class="d-none"
+                            [disabled]="importingExercise"
+                        />
+                    </label>
+                </div>
+
+                @if (exerciseHasBeenCreated) {
+                    <div class="alert alert-success" role="alert">
+                        Sie haben eine Übung mit der Übungsleitungs-PIN
+                        <span
+                            class="font-monospace fw-bolder user-select-all"
+                            >{{ trainerKey }}</span
+                        >
+                        und der Teilnehmenden-PIN
+                        <span
+                            class="font-monospace fw-bolder user-select-all"
+                            >{{ participantKey }}</span
+                        >
+                        erstellt.
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 
-    <div class="mb-4 rounded-3">
+    <div>
         <h2>Über dieses Projekt</h2>
         <p>
-            Diese Webseite entstand im Rahmen mehrerer sogenannter
-            Bachelorprojekte am
-            <a href="hpi.de">Hasso-Plattner-Institut Potsdam</a> in den Jahren
-            2021, 2022 und 2023. Sie stellt eine digitale Umsetzung der
-            Führungssimulation MANV (FüSim MANV) dar, einer von der
+            Diese Webanwendung entstand im Rahmen mehrerer Bachelorprojekte am
+            <a href="https://hpi.de">Hasso-Plattner-Institut Potsdam</a> in den
+            Jahren 2021, 2022, 2023, 2025 und 2026. Sie basiert auf der
+            Führungssimulation MANV (FüSim MANV), einer von der
             <a
                 href="https://www.bbk.bund.de/DE/Themen/Akademie-BABZ/akademie-babz_node.html"
                 >Bundesakademie für Bevölkerungsschutz und Zivile
@@ -103,39 +133,38 @@
                 >Bundesamt für Bevölkerungsschutz und Katastrophenhilfe</a
             >
             entwickelten Simulation für medizinische Führungskräfte für den Fall
-            eines Massenanfalls von Verletzten (MANV).
+            eines Massenanfalls von Verletzten (MANV). Sie ermöglicht zunehmend
+            auch das Üben anderer Großschadenslagen.
         </p>
         <p>
             Der Quelltext dieser Webseite und die dahinterstehenden Technologien
-            stehen als Open-Source-Software unter
-            <a href="https://github.com/hpi-sam/digital-fuesim-manv"
-                >https://github.com/hpi-sam/digital-fuesim-manv</a
-            >
+            stehen als Open-Source-Software auf
+            <a href="https://github.com/hpi-sam/fuesim-digital"> GitHub </a>
             zur Verfügung. Weitere Informationen über dieses und weitere
             Projekte finden Sie auf der
             <a href="https://manv-simulation.de">Projektwebseite</a>.
         </p>
         <h4>Projektbeteiligte</h4>
-        <div class="p-2">
-            <a href="https://www.hpi.de/">
+        <p>
+            <a href="https://hpi.de/">
                 <img
                     class="me-5 m-2"
                     style="height: 80px"
-                    src="https://www13.hpi.uni-potsdam.de/fileadmin/user_upload/fachgebiete/giese/Bachelorprojekte/2021/hpi-logo.jpg"
+                    src="/assets/partners/hpi-logo.jpg"
                     alt="HPI"
             /></a>
             <a href="https://www.bbk.bund.de/">
                 <img
                     class="me-5 m-2 mb-4"
                     style="height: 80px"
-                    src="https://www13.hpi.uni-potsdam.de/fileadmin/user_upload/fachgebiete/giese/Bachelorprojekte/2021/bbk-logo.jpg"
+                    src="/assets/partners/bbk-logo.jpg"
                     alt="BBK"
             /></a>
             <a href="https://www.berliner-feuerwehr.de/">
                 <img
                     class="me-5 m-2 mb-4"
                     style="height: 50px"
-                    src="https://www13.hpi.uni-potsdam.de/fileadmin/user_upload/fachgebiete/giese/Bachelorprojekte/2025/logo_berliner-feuerwehr.svg"
+                    src="/assets/partners/logo_berliner-feuerwehr.svg"
                     alt="Berliner Feuerwehr"
             /></a>
             <a
@@ -144,39 +173,39 @@
                 <img
                     class="me-5 m-2 mb-4"
                     style="height: 100px"
-                    src="https://www13.hpi.uni-potsdam.de/fileadmin/user_upload/fachgebiete/giese/Bachelorprojekte/2022/johanniter-akademie-nrw-logo.png"
+                    src="/assets/partners/johanniter-akademie-nrw-logo.png"
                     alt="Johanniter Akademie NRW, Campus Münster"
             /></a>
             <a href="https://www.malteser-berlin.de/">
                 <img
                     class="me-5 m-2 mb-4"
                     style="height: 60px"
-                    src="https://www13.hpi.uni-potsdam.de/fileadmin/user_upload/fachgebiete/giese/Bachelorprojekte/2021/malteser-logo.jpg"
+                    src="/assets/partners/malteser-logo.jpg"
                     alt="Malteser Berlin"
             /></a>
-        </div>
-        <div>
-            <span class="fw-bold">Projektteam 2025/26: </span>
+        </p>
+        <p>
+            <strong>Projektteam 2025/26: </strong>
             <a href="https://github.com/fekoch">Felix Koch</a>,
             <a href="https://github.com/JohannesPotzi">Johannes Potzi</a>,
             <a href="https://github.com/Quixelation">Robert Stündl</a> und
             <a href="https://github.com/hansegucker">Jonathan Weth</a>
             <br />
 
-            <span class="fw-bold">Projektteam 2022/23: </span>
+            <strong>Projektteam 2022/23: </strong>
             <a href="https://github.com/Greenscreen23">Lukas Hagen</a>,
             <a href="https://github.com/Nils1729">Nils Hanff</a>,
             <a href="https://github.com/benn02">Benildur Nickel</a> und
             <a href="https://github.com/lukasrad02">Lukas Radermacher</a>
             <br />
 
-            <span class="fw-bold">Projektteam 2021/22: </span>
+            <strong>Projektteam 2021/22: </strong>
             <a href="https://github.com/Dassderdie">Julian Schmidt</a>,
             <a href="https://github.com/ClFeSc">Clemens Schielicke</a>, Florian
             Krummrey und Marvin Müller-Mettnau
             <br />
 
-            <span class="fw-bold">Betreuende: </span>
+            <strong>Betreuende: </strong>
             <a href="https://hpi.de/giese/people/matthias-barkowsky.html"
                 >Matthias Barkowsky</a
             >
@@ -184,10 +213,8 @@
             <a href="https://hpi.de/giese/people/christian-schaeffer.html"
                 >Christian Schäffer</a
             >
-        </div>
+        </p>
     </div>
+</main>
 
-    <div class="mb-4 p-2 bg-light rounded-3">
-        <app-footer />
-    </div>
-</div>
+<app-footer />

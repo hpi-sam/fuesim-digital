@@ -7,29 +7,38 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
+    ScoutableElementType,
     UUID,
+    Vehicle,
     WithPosition,
-} from 'digital-fuesim-manv-shared';
+} from 'fuesim-digital-shared';
 import {
     isInSpecificSimulatedRegion,
     isInTransfer,
     nestedCoordinatesOf,
-} from 'digital-fuesim-manv-shared';
-import type { TransferLine } from 'src/app/shared/types/transfer-line';
+    scoutableElementTypes,
+} from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';
+import type { TransferLine } from '../../../shared/types/transfer-line';
+import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
 
 // Properties
 
 /**
  * Check before via selectExerciseStateMode whether the exerciseState is defined
  */
-export const selectExerciseState = (state: AppState) =>
+export function selectExerciseState(state: AppState) {
     // TODO: we currently expect this to only be used of the exerciseStateMode is not undefined
-    state.application.exerciseState!;
+    return state.application.exerciseState!;
+}
 
 function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
 }
+
+export const scoutableElementSelectors = scoutableElementTypes.map(
+    (elementType) => selectPropertyFactory(elementTypePluralMap[elementType])
+);
 
 // UUIDMap properties
 export const selectViewports = selectPropertyFactory('viewports');
@@ -45,7 +54,10 @@ export const selectHospitals = selectPropertyFactory('hospitals');
 export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
 export const selectRadiograms = selectPropertyFactory('radiograms');
-// Array properties
+export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
+export const selectOperationalSections = selectPropertyFactory(
+    'operationalSections'
+);
 export const selectVehicleTemplates = selectPropertyFactory('vehicleTemplates');
 export const selectPersonnelTemplates =
     selectPropertyFactory('personnelTemplates');
@@ -53,14 +65,20 @@ export const selectMaterialTemplates =
     selectPropertyFactory('materialTemplates');
 export const selectMapImagesTemplates =
     selectPropertyFactory('mapImageTemplates');
+// Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');
 // Misc properties
 export const selectConfiguration = selectPropertyFactory('configuration');
 export const selectEocLogEntries = selectPropertyFactory('eocLog');
 export const selectExerciseStatus = selectPropertyFactory('currentStatus');
-export const selectParticipantId = selectPropertyFactory('participantId');
+export const selectParticipantKey = selectPropertyFactory('participantKey');
 export const selectCurrentTime = selectPropertyFactory('currentTime');
+export const selectExerciseType = selectPropertyFactory('type');
+export const selectCollectedClientNames = selectPropertyFactory(
+    'collectedClientNames'
+);
+export const selectScoutables = selectPropertyFactory('scoutables');
 
 // Elements
 
@@ -90,47 +108,54 @@ export const createSelectHospital =
     createSelectElementFromMapFactory(selectHospitals);
 export const createSelectViewport =
     createSelectElementFromMapFactory(selectViewports);
+export const createSelectRestrictedZone = createSelectElementFromMapFactory(
+    selectRestrictedZones
+);
 export const createSelectSimulatedRegion = createSelectElementFromMapFactory(
     selectSimulatedRegions
 );
 export const createSelectClient =
     createSelectElementFromMapFactory(selectClients);
-export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
-    return createSelector(
-        selectRadiograms,
-        (radiograms) => radiograms[id] as R
-    );
-}
+export const createSelectVehicleTemplate = createSelectElementFromMapFactory(
+    selectVehicleTemplates
+);
 export const createSelectMaterialTemplate = createSelectElementFromMapFactory(
     selectMaterialTemplates
 );
 export const createSelectPersonnelTemplate = createSelectElementFromMapFactory(
     selectPersonnelTemplates
 );
-
-function createSelectElementFromArrayFactory<Element extends { id: UUID }>(
-    elementsSelector: (state: AppState) => readonly Element[]
-) {
-    return (id: UUID) =>
-        createSelector(
-            elementsSelector,
-            (elements) => elements.find((element) => element.id === id)!
-        );
-}
-
-// Element from Array
-export const createSelectMapImageTemplate = createSelectElementFromArrayFactory(
+export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
     selectMapImagesTemplates
 );
-export const createSelectVehicleTemplate = createSelectElementFromArrayFactory(
-    selectVehicleTemplates
-);
+export const createSelectScoutable =
+    createSelectElementFromMapFactory(selectScoutables);
+export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
+    return createSelector(
+        selectRadiograms,
+        (radiograms) => radiograms[id] as R
+    );
+}
+
+export const scoutableElementTypeSelectorMap: {
+    [key in ScoutableElementType]: (
+        id: string
+    ) => MemoizedSelector<AppState, any, any>;
+} = {
+    patient: createSelectPatient,
+    mapImage: createSelectMapImage,
+};
 
 // Misc selectors
 
 export const selectTileMapProperties = createSelector(
     selectConfiguration,
     (configuration) => configuration.tileMapProperties
+);
+
+export const selectOperationsMapProperties = createSelector(
+    selectConfiguration,
+    (configuration) => configuration.operationsMapProperties
 );
 
 export const selectTransferLines = createSelector(
@@ -185,6 +210,18 @@ export function createSelectReachableHospitals(transferPointId: UUID) {
     );
 }
 
+export function createSelectVehiclesInOperationalSection(
+    operationalSectionId: UUID
+) {
+    return createSelector(selectVehicles, (vehicles) =>
+        Object.values(vehicles).filter(
+            (vehicle) =>
+                vehicle.operationalAssignment?.type === 'operationalSection' &&
+                vehicle.operationalAssignment.sectionId === operationalSectionId
+        )
+    );
+}
+
 export const selectVehiclesInTransfer = createSelector(
     selectVehicles,
     (vehicles) =>
@@ -196,6 +233,77 @@ export const selectPersonnelInTransfer = createSelector(
     (personnel) =>
         Object.values(personnel).filter((_personnel) =>
             isInTransfer(_personnel)
+        )
+);
+
+export const selectLocalOperationsCommand = createSelector(
+    selectVehicles,
+    (vehicles) =>
+        Object.values(vehicles).find(
+            (v) => v.operationalAssignment?.type === 'localOperationsCommand'
+        )
+);
+
+export function createSelectOperationalSectionLeader(sectionId: string) {
+    return createSelector(
+        createSelectVehiclesInOperationalSection(sectionId),
+        (vehicles) =>
+            Object.values(vehicles)
+                .filter(
+                    (vehicle) =>
+                        vehicle.operationalAssignment?.type ===
+                            'operationalSection' &&
+                        vehicle.operationalAssignment.role ===
+                            'operationalSectionLeader'
+                )
+                .at(0)
+    );
+}
+
+export function createSelectOperationalSectionMembers(sectionId: string) {
+    return createSelector(
+        createSelectVehiclesInOperationalSection(sectionId),
+        (vehicles) =>
+            Object.values(vehicles).filter(
+                // This type annotation is necessary to not have to repeat the same conditions later
+                (
+                    vehicle
+                ): vehicle is Vehicle & {
+                    operationalAssignment: NonNullable<
+                        Vehicle['operationalAssignment']
+                    > & {
+                        role: 'operationalSectionMember';
+                        position: number;
+                    };
+                } =>
+                    vehicle.operationalAssignment?.type ===
+                        'operationalSection' &&
+                    vehicle.operationalAssignment.role ===
+                        'operationalSectionMember'
+            )
+    );
+}
+
+export function createSelectSortedOperationalSectionMembers(sectionId: string) {
+    return createSelector(
+        createSelectOperationalSectionMembers(sectionId),
+        (vehicles) =>
+            vehicles.sort(
+                (a, b) =>
+                    a.operationalAssignment.position -
+                    b.operationalAssignment.position
+            )
+    );
+}
+
+export const selectVehiclesInTransferFromAlarmgroup = createSelector(
+    selectVehiclesInTransfer,
+    (vehicles) =>
+        Object.values(vehicles).filter(
+            (vehicle) =>
+                vehicle.position.type === 'transfer' &&
+                vehicle.position.transfer.startPoint.type ===
+                    'alarmGroupStartPoint'
         )
 );
 
@@ -262,7 +370,9 @@ export function createSelectBehaviorStatesByType<
         createSelectBehaviorStates(simulatedRegionId),
         (behaviors) =>
             behaviors.filter(
-                (behavior): behavior is ExerciseSimulationBehaviorState<T> =>
+                (
+                    behavior
+                ): behavior is ExerciseSimulationBehaviorState & { type: T } =>
                     behavior.type === behaviorType
             )
     );
@@ -275,7 +385,9 @@ export function createSelectActivityStatesByType<
         createSelectActivityStates(simulatedRegionId),
         (activities) =>
             Object.values(activities).filter(
-                (activity): activity is ExerciseSimulationActivityState<T> =>
+                (
+                    activity
+                ): activity is ExerciseSimulationActivityState & { type: T } =>
                     activity.type === activityType
             )
     );

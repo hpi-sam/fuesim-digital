@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import type { UUID } from 'digital-fuesim-manv-shared';
+import type { UUID } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SelectPatientService {
     public readonly patientSelected = new Subject<UUID>();
 

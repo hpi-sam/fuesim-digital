@@ -1,40 +1,40 @@
-import { Type } from 'class-transformer';
+import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
+import type { Action, ActionReducer } from '../action-reducer.js';
+import { ReducerError } from '../reducer-error.js';
+import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
-    IsNumber,
-    IsOptional,
-    IsString,
-    IsUUID,
-    ValidateNested,
-} from 'class-validator';
-import { TransferPoint } from '../../models/index.js';
+    type TransferPoint,
+    transferPointSchema,
+} from '../../models/transfer-point.js';
+import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
 import {
     currentTransferOf,
     isInTransfer,
-    MapCoordinates,
-    MapPosition,
     nestedCoordinatesOf,
-} from '../../models/utils/index.js';
-import { changePositionWithId } from '../../models/utils/position/position-helpers-mutable.js';
-import type { UUID } from '../../utils/index.js';
-import { cloneDeepMutable, uuidValidationOptions } from '../../utils/index.js';
-import { IsValue } from '../../utils/validators/index.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
-import { ReducerError } from '../reducer-error.js';
-import { letElementArrive } from './transfer.js';
-import { calculateDistance } from './utils/calculate-distance.js';
+} from '../../models/utils/position/position-helpers.js';
+import {
+    type MapCoordinates,
+    mapCoordinatesSchema,
+} from '../../models/utils/position/map-coordinates.js';
+import { IsValue } from '../../utils/validators/is-value.js';
 import { getElement } from './utils/get-element.js';
 import {
     logTransferPointConnection,
     logTransferPointConnectionRemoved,
 } from './utils/log.js';
+import { letElementArrive } from './transfer.js';
+import { calculateDistance } from './utils/calculate-distance.js';
 
 // TODO check: type "TransferPoint" the T is big, in other files, the second word starts with a small letter
 
 export class AddTransferPointAction implements Action {
     @IsValue('[TransferPoint] Add TransferPoint' as const)
     public readonly type = `[TransferPoint] Add TransferPoint`;
-    @ValidateNested()
-    @Type(() => TransferPoint)
+
+    @IsZodSchema(transferPointSchema)
     public readonly transferPoint!: TransferPoint;
 }
 
@@ -45,8 +45,7 @@ export class MoveTransferPointAction implements Action {
     @IsUUID(4, uuidValidationOptions)
     public readonly transferPointId!: UUID;
 
-    @ValidateNested()
-    @Type(() => MapCoordinates)
+    @IsZodSchema(mapCoordinatesSchema)
     public readonly targetPosition!: MapCoordinates;
 }
 
@@ -136,7 +135,7 @@ export namespace TransferPointActionReducers {
         reducer: (draftState, { transferPointId, targetPosition }) => {
             changePositionWithId(
                 transferPointId,
-                MapPosition.create(targetPosition),
+                newMapPositionAt(targetPosition),
                 'transferPoint',
                 draftState
             );

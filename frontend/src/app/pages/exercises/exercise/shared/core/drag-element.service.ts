@@ -86,13 +86,25 @@ export class DragElementService {
      * @param event the mouse event
      * @param transferTemplate the template to be added
      */
-    public onMouseDown(
-        event: MouseEvent,
-        transferTemplate: TransferTemplate,
-        entityVersion?: VersionedElementPartial
-    ) {
+    public onMouseDown(event: MouseEvent, transferTemplate: TransferTemplate) {
         this.transferringTemplate = transferTemplate;
-        this.transferingEntityVersion = entityVersion;
+        if (
+            'versionId' in transferTemplate.template &&
+            'entityId' in transferTemplate.template
+        ) {
+            const transferingEntityVersion = {
+                entityId: transferTemplate.template.entityId,
+                versionId: transferTemplate.template.versionId,
+            };
+            if (
+                transferingEntityVersion.entityId !== undefined &&
+                transferingEntityVersion.versionId !== undefined
+            ) {
+                // @ts-expect-error: the attributes literally CANNOT BE UNDEFINED!
+                this.transferingEntityVersion = transferingEntityVersion;
+            }
+        }
+
         // Create the drag image
         const imageProperties = transferTemplate.template.image;
         const zoom = this.olMap!.getView().getZoom()!;

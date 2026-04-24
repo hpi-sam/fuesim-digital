@@ -18,11 +18,11 @@ import {
     NgbNavOutlet,
 } from '@ng-bootstrap/ng-bootstrap';
 import type { AppState } from '../../../state/app.state';
-import { ValuesPipe } from '../../pipes/values.pipe';
 import {
     createSelectPersonnel,
     createSelectTask,
     selectCurrentTime,
+    selectExerciseStatus,
 } from '../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 import { ExerciseService } from '../../../core/exercise.service.js';
@@ -33,7 +33,6 @@ import { UserGeneratedContentEditorComponent } from '../user-generated-content-e
     templateUrl: './technical-challenge-details.component.html',
     styleUrls: ['./technical-challenge-details.component.scss'],
     imports: [
-        ValuesPipe,
         NgbNav,
         NgbNavItem,
         NgbNavLink,
@@ -59,6 +58,30 @@ export class TechnicalChallengeDetailsComponent {
     });
 
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
+    readonly exerciseStatus = this.store.selectSignal(selectExerciseStatus);
+
+    public readonly animated = computed(
+        () => this.exerciseStatus() === 'running'
+    );
+
+    calculateProgress(current: number, max: number) {
+        return {
+            current: current / 1000,
+            max: max / 1000,
+            percentage: (current / max) * 100,
+            finished: current >= max,
+        };
+    }
+
+    public readonly tasksProgress = computed(() =>
+        Object.values(this.technicalChallenge().relevantTasks).map((task) => ({
+            ...task,
+            ...this.calculateProgress(
+                this.technicalChallenge().taskProgress[task.id] ?? 0,
+                this.progressGuardsByTaskId().get(task.id)?.minProgress ?? 0
+            ),
+        }))
+    );
 
     public readonly assignedPersonnel = computed<[Personnel, Task][]>(() => {
         const assignments = this.technicalChallenge().assignedPersonnel;
@@ -71,6 +94,11 @@ export class TechnicalChallengeDetailsComponent {
     public readonly guards = computed<Guard[]>(() =>
         this.technicalChallenge().transitions.map(({ guard }) => guard)
     );
+    public readonly visibleGuards = computed<Guard[]>(() =>
+        this.technicalChallenge()
+            .transitions.filter((t) => t.from === this.currentState().id)
+            .map(({ guard }) => guard)
+    );
     public readonly progressGuards = computed(() =>
         this.guards().filter((guard) => guard.type === 'progressGuard')
     );
@@ -80,6 +108,17 @@ export class TechnicalChallengeDetailsComponent {
     );
     public readonly timerGuards = computed(() =>
         this.guards().filter((guard) => guard.type === 'timerGuard')
+    );
+    public readonly visibleTimerGuards = computed(() =>
+        this.visibleGuards()
+            .filter((guard) => guard.type === 'timerGuard')
+            .map((guard) => ({
+                ...guard,
+                ...this.calculateProgress(
+                    this.challengeAge(),
+                    guard.minTimePassed
+                ),
+            }))
     );
 
     public readonly currentState: Signal<TechnicalChallengeState> = computed(

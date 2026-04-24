@@ -1,14 +1,10 @@
+import { z } from 'zod';
 import {
-    type MeasureTemplate,
     measureTemplateCategorySchema,
     measureTemplateSchema,
 } from '../../models/measure/measures.js';
-import type { MeasureProperty } from '../../models/measure/properties.js';
-import { uuidSchema, type UUID } from '../../utils/uuid.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     getCategory,
@@ -16,56 +12,46 @@ import {
     getMeasureTemplate,
 } from './utils/measures.js';
 
-export class AddMeasureTemplateAction implements Action {
-    @IsValue('[MeasureTemplate] Add measureTemplate')
-    public readonly type = '[MeasureTemplate] Add measureTemplate';
+export const addMeasureTemplateActionSchema = z.strictObject({
+    type: z.literal('[MeasureTemplate] Add MeasureTemplate'),
+    measureTemplate: measureTemplateSchema,
+    categoryName: measureTemplateCategorySchema.shape.name,
+});
+export type AddMeasureTemplateAction = z.infer<
+    typeof addMeasureTemplateActionSchema
+>;
 
-    @IsZodSchema(measureTemplateSchema)
-    public readonly measureTemplate!: MeasureTemplate;
+export const editMeasureTemplateActionSchema = z.strictObject({
+    type: z.literal('[MeasureTemplate] Edit MeasureTemplate'),
+    id: measureTemplateSchema.shape.id,
+    name: measureTemplateSchema.shape.name,
+    properties: measureTemplateSchema.shape.properties,
+    replacePrevious: measureTemplateSchema.shape.replacePrevious,
+});
+export type EditMeasureTemplateAction = z.infer<
+    typeof editMeasureTemplateActionSchema
+>;
 
-    @IsZodSchema(measureTemplateCategorySchema.shape.name)
-    public readonly categoryName!: string;
-}
+export const moveMeasureTemplateActionSchema = z.strictObject({
+    type: z.literal('[MeasureTemplate] Move MeasureTemplate'),
+    id: measureTemplateSchema.shape.id,
+    categoryName: measureTemplateCategorySchema.shape.name,
+});
+export type MoveMeasureTemplateAction = z.infer<
+    typeof moveMeasureTemplateActionSchema
+>;
 
-export class EditMeasureTemplateAction implements Action {
-    @IsValue('[MeasureTemplate] Edit measureTemplate')
-    public readonly type = '[MeasureTemplate] Edit measureTemplate';
-
-    @IsZodSchema(uuidSchema)
-    public readonly id!: UUID;
-
-    @IsZodSchema(measureTemplateSchema.shape.name)
-    public readonly name!: string;
-
-    @IsZodSchema(measureTemplateSchema.shape.properties)
-    public readonly properties!: readonly MeasureProperty[];
-
-    @IsZodSchema(measureTemplateSchema.shape.replacePrevious)
-    public readonly replacePrevious!: boolean;
-}
-
-export class MoveMeasureTemplateAction implements Action {
-    @IsValue('[MeasureTemplate] Move measureTemplate')
-    public readonly type = '[MeasureTemplate] Move measureTemplate';
-
-    @IsZodSchema(uuidSchema)
-    public readonly id!: UUID;
-
-    @IsZodSchema(measureTemplateCategorySchema.shape.name)
-    public readonly categoryName!: string;
-}
-
-export class DeleteMeasureTemplateAction implements Action {
-    @IsValue('[MeasureTemplate] Delete measureTemplate')
-    public readonly type = '[MeasureTemplate] Delete measureTemplate';
-
-    @IsZodSchema(uuidSchema)
-    public readonly id!: UUID;
-}
-
+export const removeMeasureTemplateActionSchema = z.strictObject({
+    type: z.literal('[MeasureTemplate] Remove MeasureTemplate'),
+    id: measureTemplateSchema.shape.id,
+});
+export type RemoveMeasureTemplateAction = z.infer<
+    typeof removeMeasureTemplateActionSchema
+>;
 export namespace MeasureTemplateActionReducers {
     export const addMeasureTemplate: ActionReducer<AddMeasureTemplateAction> = {
-        action: AddMeasureTemplateAction,
+        type: '[MeasureTemplate] Add MeasureTemplate',
+        actionSchema: addMeasureTemplateActionSchema,
         reducer: (draftState, { measureTemplate, categoryName }) => {
             const category = getCategory(draftState, categoryName);
             if (
@@ -89,7 +75,8 @@ export namespace MeasureTemplateActionReducers {
 
     export const editMeasureTemplate: ActionReducer<EditMeasureTemplateAction> =
         {
-            action: EditMeasureTemplateAction,
+            type: '[MeasureTemplate] Edit MeasureTemplate',
+            actionSchema: editMeasureTemplateActionSchema,
             reducer: (
                 draftState,
                 { id, name, properties, replacePrevious }
@@ -105,7 +92,8 @@ export namespace MeasureTemplateActionReducers {
 
     export const moveMeasureTemplate: ActionReducer<MoveMeasureTemplateAction> =
         {
-            action: MoveMeasureTemplateAction,
+            type: '[MeasureTemplate] Move MeasureTemplate',
+            actionSchema: moveMeasureTemplateActionSchema,
             reducer: (draftState, { id, categoryName: category }) => {
                 const previousCategory = getCategoryForMeasureTemplateId(
                     draftState,
@@ -126,9 +114,10 @@ export namespace MeasureTemplateActionReducers {
             rights: 'trainer',
         };
 
-    export const deleteMeasureTemplate: ActionReducer<DeleteMeasureTemplateAction> =
+    export const removeMeasureTemplate: ActionReducer<RemoveMeasureTemplateAction> =
         {
-            action: DeleteMeasureTemplateAction,
+            type: '[MeasureTemplate] Remove MeasureTemplate',
+            actionSchema: removeMeasureTemplateActionSchema,
             reducer: (draftState, { id }) => {
                 const category = getCategoryForMeasureTemplateId(
                     draftState,

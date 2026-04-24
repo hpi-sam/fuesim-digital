@@ -1,44 +1,39 @@
+import { z } from 'zod';
 import { measureTemplateCategorySchema } from '../../models/measure/measures.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { Action, ActionReducer } from '../action-reducer.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { getCategory } from './utils/measures.js';
 
-export class AddMeasureTemplateCategoryAction implements Action {
-    @IsValue('[MeasureTemplateCategory] Add measureTemplateCategory')
-    public readonly type =
-        '[MeasureTemplateCategory] Add measureTemplateCategory';
+export const addMeasureTemplateCategoryActionSchema = z.strictObject({
+    type: z.literal('[MeasureTemplateCategory] Add MeasureTemplateCategory'),
+    name: measureTemplateCategorySchema.shape.name,
+});
+export type AddMeasureTemplateCategoryAction = z.infer<
+    typeof addMeasureTemplateCategoryActionSchema
+>;
 
-    @IsZodSchema(measureTemplateCategorySchema.shape.name)
-    public readonly name!: string;
-}
+export const renameMeasureTemplateCategoryActionSchema = z.strictObject({
+    type: z.literal('[MeasureTemplateCategory] Rename MeasureTemplateCategory'),
+    previousName: measureTemplateCategorySchema.shape.name,
+    newName: measureTemplateCategorySchema.shape.name,
+});
+export type RenameMeasureTemplateCategoryAction = z.infer<
+    typeof renameMeasureTemplateCategoryActionSchema
+>;
 
-export class RenameMeasureTemplateCategoryAction implements Action {
-    @IsValue('[MeasureTemplateCategory] Rename measureTemplateCategory')
-    public readonly type =
-        '[MeasureTemplateCategory] Rename measureTemplateCategory';
-
-    @IsZodSchema(measureTemplateCategorySchema.shape.name)
-    public readonly previousName!: string;
-
-    @IsZodSchema(measureTemplateCategorySchema.shape.name)
-    public readonly newName!: string;
-}
-
-export class DeleteMeasureTemplateCategoryAction implements Action {
-    @IsValue('[MeasureTemplateCategory] Delete measureTemplateCategory')
-    public readonly type =
-        '[MeasureTemplateCategory] Delete measureTemplateCategory';
-
-    @IsZodSchema(measureTemplateCategorySchema.shape.name)
-    public readonly name!: string;
-}
+export const removeMeasureTemplateCategoryActionSchema = z.strictObject({
+    type: z.literal('[MeasureTemplateCategory] Remove MeasureTemplateCategory'),
+    name: measureTemplateCategorySchema.shape.name,
+});
+export type RemoveMeasureTemplateCategoryAction = z.infer<
+    typeof removeMeasureTemplateCategoryActionSchema
+>;
 
 export namespace MeasureTemplateActionReducers {
     export const addMeasureTemplateCategory: ActionReducer<AddMeasureTemplateCategoryAction> =
         {
-            action: AddMeasureTemplateCategoryAction,
+            type: '[MeasureTemplateCategory] Add MeasureTemplateCategory',
+            actionSchema: addMeasureTemplateCategoryActionSchema,
             reducer: (draftState, { name }) => {
                 if (draftState.measureTemplates[name] !== undefined) {
                     throw new ReducerError(
@@ -56,7 +51,8 @@ export namespace MeasureTemplateActionReducers {
         };
     export const renameMeasureTemplateCategory: ActionReducer<RenameMeasureTemplateCategoryAction> =
         {
-            action: RenameMeasureTemplateCategoryAction,
+            type: '[MeasureTemplateCategory] Rename MeasureTemplateCategory',
+            actionSchema: renameMeasureTemplateCategoryActionSchema,
             reducer: (draftState, { previousName, newName }) => {
                 if (previousName === newName) return draftState;
 
@@ -69,9 +65,10 @@ export namespace MeasureTemplateActionReducers {
             },
             rights: 'trainer',
         };
-    export const deleteMeasureTemplateCategory: ActionReducer<DeleteMeasureTemplateCategoryAction> =
+    export const removeMeasureTemplateCategory: ActionReducer<RemoveMeasureTemplateCategoryAction> =
         {
-            action: DeleteMeasureTemplateCategoryAction,
+            type: '[MeasureTemplateCategory] Remove MeasureTemplateCategory',
+            actionSchema: removeMeasureTemplateCategoryActionSchema,
             reducer: (draftState, { name }) => {
                 const category = getCategory(draftState, name);
                 if (Object.entries(draftState.measureTemplates).length === 1) {

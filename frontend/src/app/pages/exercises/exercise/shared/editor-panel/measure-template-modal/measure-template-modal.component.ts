@@ -131,14 +131,14 @@ export class MeasureTemplateModalComponent
         const action: AddMeasureTemplateAction | EditMeasureTemplateAction =
             this.isEditMode
                 ? {
-                      type: '[MeasureTemplate] Edit measureTemplate',
+                      type: '[MeasureTemplate] Edit MeasureTemplate',
                       id: this.measureTemplateId!,
                       name,
                       properties,
                       replacePrevious,
                   }
                 : {
-                      type: '[MeasureTemplate] Add measureTemplate',
+                      type: '[MeasureTemplate] Add MeasureTemplate',
                       measureTemplate: newMeasureTemplate(
                           name,
                           properties,
@@ -164,7 +164,7 @@ export class MeasureTemplateModalComponent
         }
         this.exerciseService
             .proposeAction({
-                type: '[MeasureTemplate] Delete measureTemplate',
+                type: '[MeasureTemplate] Remove MeasureTemplate',
                 id: this.measureTemplateId!,
             })
             .then((response) => {

@@ -76,7 +76,7 @@ export class MeasuresOverviewModalComponent {
             name = `${base} ${suffix++}`;
         }
         this.exerciseService.proposeAction({
-            type: '[MeasureTemplateCategory] Add measureTemplateCategory',
+            type: '[MeasureTemplateCategory] Add MeasureTemplateCategory',
             name,
         });
     }
@@ -92,7 +92,7 @@ export class MeasuresOverviewModalComponent {
             return;
         }
         this.exerciseService.proposeAction({
-            type: '[MeasureTemplateCategory] Rename measureTemplateCategory',
+            type: '[MeasureTemplateCategory] Rename MeasureTemplateCategory',
             previousName,
             newName: trimmed,
         });
@@ -105,7 +105,7 @@ export class MeasuresOverviewModalComponent {
         });
         if (!confirmDelete) return;
         this.exerciseService.proposeAction({
-            type: '[MeasureTemplateCategory] Delete measureTemplateCategory',
+            type: '[MeasureTemplateCategory] Remove MeasureTemplateCategory',
             name,
         });
     }
@@ -131,7 +131,7 @@ export class MeasuresOverviewModalComponent {
             return;
         }
         this.exerciseService.proposeAction({
-            type: '[MeasureTemplate] Delete measureTemplate',
+            type: '[MeasureTemplate] Remove MeasureTemplate',
             id: measureTemplateId,
         });
     }
@@ -143,7 +143,7 @@ export class MeasuresOverviewModalComponent {
         if (event.previousContainer === event.container) return;
         const templateId = event.item.data as UUID;
         this.exerciseService.proposeAction({
-            type: '[MeasureTemplate] Move measureTemplate',
+            type: '[MeasureTemplate] Move MeasureTemplate',
             id: templateId,
             categoryName: targetCategoryName,
         });

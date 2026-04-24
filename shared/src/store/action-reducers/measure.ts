@@ -1,24 +1,22 @@
-import { measureSchema, type Measure } from '../../models/measure/measures.js';
-import { IsValue } from '../../utils/validators/is-value.js';
-import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import type { Action, ActionReducer } from '../action-reducer.js';
+import { z } from 'zod';
+import { measureSchema } from '../../models/measure/measures.js';
+import type { ActionReducer } from '../action-reducer.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { DrawingActionReducers } from './drawing.js';
 import { EmergencyOperationCenterActionReducers } from './emergency-operation-center.js';
 import { getMeasureTemplate } from './utils/measures.js';
 import { logMeasure } from './utils/log.js';
 
-export class AddMeasureAction implements Action {
-    @IsValue('[Measure] Add Measure' as const)
-    public readonly type = '[Measure] Add Measure';
-
-    @IsZodSchema(measureSchema)
-    public readonly measure!: Measure;
-}
+export const addMeasureActionSchema = z.strictObject({
+    type: z.literal('[Measure] Add Measure'),
+    measure: measureSchema,
+});
+export type AddMeasureAction = z.infer<typeof addMeasureActionSchema>;
 
 export namespace MeasureActionReducers {
     export const addMeasure: ActionReducer<AddMeasureAction> = {
-        action: AddMeasureAction,
+        type: '[Measure] Add Measure',
+        actionSchema: addMeasureActionSchema,
         reducer: (draftState, { measure }) => {
             let newDraftState = draftState;
             const template = getMeasureTemplate(draftState, measure.templateId);

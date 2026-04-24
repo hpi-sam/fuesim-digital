@@ -47,8 +47,8 @@ export namespace CollectionReducers {
             const addElement = (element: DefinitelyVersionedElementContent) => {
                 const mutableElement = cloneDeepMutable(element);
                 const existingElement = draftState.templates[element.entityId];
-                // @ts-expect-error: Not all templates have usedBy :)
                 const usedBy: CollectionEntityId[] | undefined =
+                    // @ts-expect-error: Not all templates have usedBy :)
                     existingElement?.usedBy;
 
                 draftState.templates[element.entityId] = {
@@ -89,8 +89,8 @@ export namespace CollectionReducers {
             draftState.templates = Object.fromEntries(
                 Object.entries(draftState.templates)
                     .filter(([_, element]) => {
-                        // @ts-expect-error: Not every template has usedBy :)
                         const usedBy: CollectionEntityId[] =
+                            // @ts-expect-error: Not every template has usedBy :)
                             element.usedBy ?? [];
 
                         if (
@@ -102,8 +102,8 @@ export namespace CollectionReducers {
                         return true;
                     })
                     .map(([key, element]) => {
-                        // @ts-expect-error: Not every template has usedBy :)
                         const usedBy: CollectionEntityId[] =
+                            // @ts-expect-error: Not every template has usedBy :)
                             element.usedBy ?? [];
                         return [
                             key,

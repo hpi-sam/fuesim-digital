@@ -149,14 +149,14 @@ export class MeasureService {
                 this.endEvent = new Subject<boolean | null>();
                 const result =
                     await this.drawingInteractionService.requestDrawing({
-                        drawingType: 'freehand',
+                        drawingType: 'polygon',
                         strokeColor: property.strokeColor,
                         fillColor: property.fillColor,
                         endEvent: this.endEvent,
                     });
                 if (!result) return false;
                 const drawing = newDrawing(
-                    'freehand',
+                    'polygon',
                     result.points,
                     property.strokeColor,
                     property.fillColor

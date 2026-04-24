@@ -5,7 +5,7 @@ import { mapCoordinatesSchema } from './utils/position/map-coordinates.js';
 import { newMapPositionAt } from './utils/position/map-position.js';
 import { positionSchema } from './utils/position/position.js';
 
-export const drawingTypeSchema = z.literal(['freehand', 'line']);
+export const drawingTypeSchema = z.literal(['polygon', 'line']);
 
 export type DrawingType = z.infer<typeof drawingTypeSchema>;
 

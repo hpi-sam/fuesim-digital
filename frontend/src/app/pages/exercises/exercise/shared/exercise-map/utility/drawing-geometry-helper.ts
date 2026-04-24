@@ -37,7 +37,7 @@ export class DrawingGeometryHelper implements GeometryHelper<
     create(element: Drawing): Feature<LineString | Polygon> {
         const coords = element.points.map(toCoordinate);
         const geometry =
-            element.drawingType === 'freehand'
+            element.drawingType === 'polygon'
                 ? new Polygon([closeRing(coords)])
                 : new LineString(coords);
         return new Feature(geometry);
@@ -46,7 +46,7 @@ export class DrawingGeometryHelper implements GeometryHelper<
     getElementCoordinates(element: Drawing): Coordinates<LineString | Polygon> {
         const coords = element.points.map(toCoordinate);
         return (
-            element.drawingType === 'freehand' ? [closeRing(coords)] : coords
+            element.drawingType === 'polygon' ? [closeRing(coords)] : coords
         ) as Coordinates<LineString | Polygon>;
     }
 

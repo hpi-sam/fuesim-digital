@@ -25,12 +25,12 @@ export class DrawingInteractionHandler {
     }
 
     private handleDrawRequest(request: DrawRequest) {
-        const isFreehand = request.drawingType === 'freehand';
-        const drawType = isFreehand ? 'Polygon' : 'LineString';
+        const isPolygon = request.drawingType === 'polygon';
+        const drawType = isPolygon ? 'Polygon' : 'LineString';
 
         const olDraw = new Draw({
             type: drawType,
-            freehand: isFreehand,
+            freehand: isPolygon,
             style: (feature) => {
                 const geometryType = feature.getGeometry()?.getType();
                 const fill = [...asArray(request.fillColor ?? '#000000')];
@@ -48,7 +48,7 @@ export class DrawingInteractionHandler {
                     fill: new Fill({ color: fill }),
                     stroke: new Stroke({
                         color: request.strokeColor,
-                        width: isFreehand ? 2 : 5,
+                        width: isPolygon ? 2 : 5,
                     }),
                 });
             },

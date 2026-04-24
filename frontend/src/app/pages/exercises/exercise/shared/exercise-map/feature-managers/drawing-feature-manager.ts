@@ -63,7 +63,7 @@ export class DrawingFeatureManager
         targetPositions: Positions<LineString | Polygon>,
         drawing: Drawing
     ): MapCoordinates[] {
-        if (drawing.drawingType === 'freehand') {
+        if (drawing.drawingType === 'polygon') {
             const rings = targetPositions as MapCoordinates[][];
             return this.normalizePoints(rings[0]);
         }
@@ -100,7 +100,7 @@ export class DrawingFeatureManager
             });
         }
 
-        if (drawing.drawingType === 'freehand' && drawing.fillColor) {
+        if (drawing.drawingType === 'polygon' && drawing.fillColor) {
             const fill = [...asArray(drawing.fillColor)];
             fill[3] = 0.2;
 

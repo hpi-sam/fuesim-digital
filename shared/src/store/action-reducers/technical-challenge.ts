@@ -20,6 +20,7 @@ import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { getElement } from './utils/get-element.js';
 import { lookupReducerFor } from './action-reducers.js';
+import { logTechnicalChallengePersonnelAssigned } from './utils/log.js';
 
 const createTechnicalChallengeActionSchema = z.strictObject({
     type: z.literal('[TechnicalChallenge] Create technical challenge'),
@@ -114,6 +115,13 @@ export namespace TechnicalChallengeActionReducers {
                 );
             }
             technicalChallenge.assignedPersonnel[personnelId] = taskId;
+
+            logTechnicalChallengePersonnelAssigned(
+                draftState,
+                technicalChallengeId,
+                personnelId,
+                taskId
+            );
 
             lookupReducerFor('[Personnel] Move personnel').reducer(draftState, {
                 type: '[Personnel] Move personnel',

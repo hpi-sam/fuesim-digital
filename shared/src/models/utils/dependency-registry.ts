@@ -1,8 +1,8 @@
 import type { Immutable } from 'immer';
 import type { ElementVersionId } from '../../marketplace/models/versioned-id-schema.js';
 import type { Element as FuesimElement } from '../element.js';
+import type { Template as FuesimTemplate } from '../template.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import type { Template as FuesimTemplate } from './../template.js';
 
 type FuesimCombined = FuesimElement | FuesimTemplate;
 

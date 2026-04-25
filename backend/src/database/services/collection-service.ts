@@ -19,7 +19,6 @@ import {
     applyMigrations,
     cloneDeepMutable,
     ExerciseState,
-    getDependencyChecker,
     getElementDependencies,
     replaceDependencies,
 } from 'fuesim-digital-shared';

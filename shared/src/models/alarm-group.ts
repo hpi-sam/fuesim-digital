@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { versionedElementModel } from '../marketplace/models/versioned-element-model.js';
+import { isElementVersionId } from '../marketplace/models/versioned-id-schema.js';
 import { alarmGroupVehicleSchema } from './utils/alarm-group-vehicle.js';
+import { registerDependency } from './utils/dependency-registry.js';
 
 export const alarmGroupSchema = z.strictObject({
     ...versionedElementModel.partial().shape,
@@ -13,6 +15,34 @@ export const alarmGroupSchema = z.strictObject({
     triggerLimit: z.number().nonnegative().nullable(),
 });
 export type AlarmGroup = z.infer<typeof alarmGroupSchema>;
+
+registerDependency('alarmGroup', {
+    detect: (content) =>
+        Object.values(content.alarmGroupVehicles)
+            .map((vehicle) => vehicle.vehicleTemplateId)
+            .filter((id) => isElementVersionId(id)),
+    replace: (content, replacements) => {
+        content.alarmGroupVehicles = Object.fromEntries(
+            Object.entries(content.alarmGroupVehicles)
+                .filter((f) => {
+                    const replacement = replacements.find(
+                        (r) => r.old === f[1].vehicleTemplateId
+                    );
+                    return replacement?.new !== null;
+                })
+                .map(([key, vehicle]) => {
+                    const replacement = replacements.find(
+                        (r) => r.old === vehicle.vehicleTemplateId
+                    );
+                    if (replacement && replacement.new !== null) {
+                        vehicle.vehicleTemplateId = replacement.new;
+                    }
+                    return [key, vehicle];
+                })
+        );
+        return content;
+    },
+});
 
 export function newAlarmGroup(name: string): AlarmGroup {
     return {

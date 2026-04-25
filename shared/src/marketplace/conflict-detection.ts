@@ -1,14 +1,9 @@
 import { z } from 'zod';
-import type { VersionedElementContent } from './models/versioned-element-content.js';
 import type {
-    ElementVersionId,
     CollectionVersionId,
     VersionedCollectionPartial,
 } from './models/versioned-id-schema.js';
-import {
-    elementVersionIdSchema,
-    isElementVersionId,
-} from './models/versioned-id-schema.js';
+import { elementVersionIdSchema } from './models/versioned-id-schema.js';
 import { elementDtoSchema } from './models/versioned-elements.js';
 import type { ElementDto } from './models/versioned-elements.js';
 
@@ -120,37 +115,6 @@ export function getCollectionElementDiff(
         });
 
     return changes;
-}
-
-export function findElementVersionsInContent(
-    content: VersionedElementContent,
-    removeVersionIds: ElementVersionId[] = []
-): { ids: ElementVersionId[]; newContent: VersionedElementContent } {
-    switch (content.type) {
-        case 'alarmGroup': {
-            content.alarmGroupVehicles = Object.fromEntries(
-                Object.entries(content.alarmGroupVehicles).filter(
-                    ([, vehicle]) =>
-                        // We can assert "as" here since we just check if the string is included
-                        !removeVersionIds.includes(
-                            vehicle.vehicleTemplateId as ElementVersionId
-                        )
-                )
-            );
-            return {
-                ids: Object.values(content.alarmGroupVehicles)
-                    .map((vehicle) => vehicle.vehicleTemplateId)
-                    .filter((id) => isElementVersionId(id)),
-                newContent: content,
-            };
-        }
-        case 'vehicleTemplate': {
-            return {
-                ids: [],
-                newContent: content,
-            };
-        }
-    }
 }
 
 export async function dependencyTreeConflictResolution(

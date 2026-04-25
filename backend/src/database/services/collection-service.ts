@@ -19,7 +19,8 @@ import {
     applyMigrations,
     cloneDeepMutable,
     ExerciseState,
-    findElementVersionsInContent,
+    getElementDependencies,
+    replaceDependencies,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type { WritableDraft } from 'immer';
@@ -536,13 +537,11 @@ export class CollectionService {
         const foundElements: CollectionElementsSingle[] = [];
         await Promise.all(
             elements.map(async (element) => {
-                const elementVersions = findElementVersionsInContent(
-                    element.content
-                );
+                const elementVersions = getElementDependencies(element.content);
 
                 const foundSubElements: ElementDto[] = (
                     await Promise.all(
-                        elementVersions.ids.map(async (m) =>
+                        elementVersions.map(async (m) =>
                             this.collectionRepository.getElementVersionByVersionId(
                                 m
                             )
@@ -867,7 +866,7 @@ export class CollectionService {
     ): Promise<ElementDto[]> {
         const directElementReferences = (
             await Promise.all(
-                findElementVersionsInContent(element.content).ids.map(
+                getElementDependencies(element.content).map(
                     async (elementVersionId) =>
                         this.collectionRepository.getElementVersionByVersionId(
                             elementVersionId
@@ -1038,10 +1037,10 @@ export class CollectionService {
                             containingElement
                         )
                     );
-                    const newContent = findElementVersionsInContent(
+                    const newContent = replaceDependencies(
                         containingElementData.content,
-                        [removeElementVersionId]
-                    ).newContent;
+                        [{ old: removeElementVersionId, new: null }]
+                    );
                     await tx.updateElement(
                         containingElementData.entityId,
                         newContent

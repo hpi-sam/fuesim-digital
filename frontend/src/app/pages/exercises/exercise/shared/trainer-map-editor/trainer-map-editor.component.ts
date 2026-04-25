@@ -1,10 +1,4 @@
-import {
-    OnInit,
-    inject,
-    Component,
-    Signal,
-    signal,
-} from '@angular/core';
+import { OnInit, inject, Component, Signal, signal } from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,

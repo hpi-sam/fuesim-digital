@@ -27,6 +27,10 @@ registerEditableValue(
         {
             id: 'name',
             name: 'Name',
+            asString: ({ template, element }) => ({
+                template: template.name,
+                model: element.name,
+            }),
             equality: ({ template, element }) => template.name === element.name,
             keep: ({ oldElement, newElement }) => ({
                 ...newElement,

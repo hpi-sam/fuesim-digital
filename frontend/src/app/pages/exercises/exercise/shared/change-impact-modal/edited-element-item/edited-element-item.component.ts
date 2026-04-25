@@ -5,40 +5,34 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     ChangeApply,
-    RemoveChangeApply,
-    RemovedElementChangeImpact,
+    EditableChangeApply,
+    EditableElementChangeImpact,
 } from '../change-impact-types';
 import { MapEditorCardComponent } from '../../../../../../shared/components/map-editor-card/map-editor-card.component';
 
 @Component({
-    selector: 'app-change-impact-deleted-element-item',
-    templateUrl: './deleted-element-item.component.html',
-    styleUrl: './deleted-element-item.component.scss',
+    selector: 'app-change-impact-edited-element-item',
+    templateUrl: './edited-element-item.component.html',
+    styleUrl: './edited-element-item.component.scss',
     imports: [MapEditorCardComponent],
 })
-export class DeletedElementChangeApplyItemComponent {
-    public readonly change = input.required<RemovedElementChangeImpact>();
+export class EditedElementChangeApplyItemComponent {
+    public readonly change = input.required<EditableElementChangeImpact>();
     public readonly applyingChange = input<ChangeApply>();
     public readonly elementsOfNewCollection = input.required<ElementDto[]>();
 
-    public readonly applyChange = output<RemoveChangeApply>();
+    public readonly applyChange = output<EditableChangeApply>();
     public readonly applyForAll = output();
 
     public readonly replaceableElementTypes: FuesimElement['type'][] = [
         'vehicle',
     ];
 
-    public setActionType(
-        action: RemoveChangeApply['action'],
-        replaceWith?: ElementDto
-    ) {
-        if (replaceWith && action !== 'replace') return;
-
+    public setActionType(action: EditableChangeApply['action']) {
         this.applyChange.emit({
-            type: 'removed',
+            type: 'editable',
             change: this.change(),
             action,
-            replaceWith,
         });
     }
 }

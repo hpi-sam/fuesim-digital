@@ -13,27 +13,38 @@
     <ul class="list-group">
         @for (change of changes; track change.id; let idx = $index) {
             <li
-                class="list-group-item d-flex flex-column"
+                class="list-group-item d-flex flex-row align-items-start gap-2"
                 (click)="selectChange(idx)"
                 role="button"
                 [class.active]="selectedChangeIndex() === idx"
             >
-                <span>{{
-                    (change.entity.content.type | versionedElementDisplayName)
-                        ?.singular ?? ''
-                }}</span>
-                <b class="mb-1">{{ change.entity.title }}</b>
-                @switch (change.type) {
-                    @case ('updated') {
-                        <span class="badge bg-warning text-dark">Änderung</span>
-                    }
-                    @case ('added') {
-                        <span class="badge bg-success">Neu</span>
-                    }
-                    @case ('removed') {
-                        <span class="badge bg-danger">Entfernt</span>
-                    }
+                @if (actionExistsForChange(change)) {
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                } @else {
+                    <i class="bi bi-exclamation-triangle-fill text-warning"></i>
                 }
+                <div class="d-flex flex-column">
+                    <span>{{
+                        (
+                            change.entity.content.type
+                            | versionedElementDisplayName
+                        )?.singular ?? ''
+                    }}</span>
+                    <b class="mb-1">{{ change.entity.title }}</b>
+                    @switch (change.type) {
+                        @case ('updated') {
+                            <span class="badge bg-warning text-dark"
+                                >Änderung</span
+                            >
+                        }
+                        @case ('added') {
+                            <span class="badge bg-success">Neu</span>
+                        }
+                        @case ('removed') {
+                            <span class="badge bg-danger">Entfernt</span>
+                        }
+                    }
+                </div>
             </li>
         }
     </ul>
@@ -49,16 +60,17 @@
                         [applyingChange]="applyingChanges"
                         [elementsOfNewCollection]="newCollectionElements"
                         (applyChange)="applyChange(selectedChange, $event)"
+                        (applyForAll)="applyChangeForAll(selectedChange)"
                     />
                 }
                 @case ('updated') {
-                    @for (
-                        editedValue of selectedChange.editedValues;
-                        track editedValue.id
-                    ) {
-                        {{ editedValue.name }}
-                    }
-                    <pre>{{ selectedChange | json }}</pre>
+                    <app-change-impact-edited-element-item
+                        [change]="selectedChange"
+                        [applyingChange]="applyingChanges"
+                        [elementsOfNewCollection]="newCollectionElements"
+                        (applyChange)="applyChange(selectedChange, $event)"
+                        (applyForAll)="applyChangeForAll(selectedChange)"
+                    />
                 }
                 @default {
                     <div class="alert alert-warning" role="alert">
@@ -81,7 +93,38 @@
     <button type="button" class="btn btn-outline-danger" (click)="close(false)">
         Abbrechen
     </button>
-    <button type="button" class="btn btn-primary" (click)="close(true)">
-        OK
-    </button>
+    @let remainingChangesCount = changes.length - actionedChangesCount();
+    @let progress = (actionedChangesCount() / changes.length) * 100;
+    <div class="d-flex flex-row align-items-center gap-3">
+        <div class="d-flex flex-column align-items-center gap-1">
+            <small class="text-muted">
+                {{ remainingChangesCount }} Änderungen verbleibend</small
+            >
+            <div class="progress" style="width: 200px; height: 100%">
+                <div
+                    class="progress-bar"
+                    role="progressbar"
+                    [style.width.%]="progress"
+                    [aria-valuenow]="progress"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                >
+                    {{ actionedChangesCount() }} / {{ changes.length }}
+                </div>
+            </div>
+        </div>
+        <button
+            type="button"
+            class="btn btn-primary"
+            (click)="close(true)"
+            [disabled]="remainingChangesCount > 0"
+            [ngbTooltip]="
+                remainingChangesCount > 0
+                    ? 'Bitte alle Änderungen bearbeiten, bevor Sie fortfahren können.'
+                    : undefined
+            "
+        >
+            Alle Änderungen übernehmen
+        </button>
+    </div>
 </div>

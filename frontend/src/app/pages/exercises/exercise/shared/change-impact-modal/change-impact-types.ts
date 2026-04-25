@@ -1,4 +1,7 @@
-import type { Vehicle, ElementDto, Element as FuesimElement } from 'fuesim-digital-shared';
+import type {
+    ElementDto,
+    Element as FuesimElement,
+} from 'fuesim-digital-shared';
 import { z } from 'zod';
 
 export type ChangeImpact =
@@ -22,12 +25,20 @@ export interface RemovedElementChangeImpact {
 export interface EditableElementChangeImpact {
     id: string;
     type: 'updated';
-    editedValues: { id: string; name: string }[];
+    editedValues: {
+        id: string;
+        name: string;
+        template: string;
+        model: string;
+    }[];
     element: FuesimElement;
     entity: ElementDto;
 }
 
-export type ChangeApply = AddedChangeApply | EditableChangeApply | RemoveChangeApply;
+export type ChangeApply =
+    | AddedChangeApply
+    | EditableChangeApply
+    | RemoveChangeApply;
 
 export const removeChangeApplyActionSchema = z.literal([
     'remove',
@@ -44,10 +55,12 @@ export interface RemoveChangeApply {
 
 export interface EditableChangeApply {
     type: 'editable';
+    change: EditableElementChangeImpact;
     action: 'keep' | 'update';
 }
 
 export interface AddedChangeApply {
     type: 'added';
+    change: AddedElementChangeImpact;
     action: 'keep';
 }

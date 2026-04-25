@@ -1,0 +1,87 @@
+@let applyChange = applyingChange();
+<p>Element {{ change().entity.title }} wurde verändert.</p>
+<p>
+    Bitte wählen sie eine geeignete Vorgehensweise für die folgenden Attribute
+    aus.
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Attribut</th>
+            <th scope="col">Aktueller Wert</th>
+            <th scope="col">Neuer Wert</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (editedValue of change().editedValues; track editedValue.id) {
+            <tr>
+                <th scope="row">{{ editedValue.name }}</th>
+                <td class="text-danger">{{ editedValue.model }}</td>
+                <td class="text-success">{{ editedValue.template }}</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="card mt-2">
+    <div class="card-header">
+        <div class="form-check">
+            <input
+                type="radio"
+                id="remove"
+                name="action"
+                value="remove"
+                class="form-check-input"
+                [checked]="applyChange?.action === 'keep'"
+                (change)="setActionType('keep')"
+            />
+            <label for="remove" class="form-check-label text-danger">
+                Alte Werte beibehalten
+            </label>
+        </div>
+    </div>
+    <div class="card-header">
+        <div class="form-check">
+            <input
+                type="radio"
+                id="keep"
+                name="action"
+                value="keep"
+                [checked]="applyChange?.action === 'update'"
+                class="form-check-input"
+                (change)="setActionType('update')"
+            />
+            <label for="keep" class="form-check-label text-success">
+                Neue Werte übernehmen
+            </label>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+@let selectedKeep = applyChange && applyChange.action === 'keep';
+@let selectedUpdate = applyChange && applyChange.action === 'update';
+
+<div class="alert alert-info" role="alert">
+    <b class="d-block">Folgende Aktion wird auf das Element angewendet:</b>
+    @if (selectedKeep) {
+        <span>Die Attribute des Elements bleiben unverändert</span>
+    } @else if (selectedUpdate) {
+        <span
+            >Die aktuellen Attribute werden durch die neuen Attribute
+            ersetzt.</span
+        >
+    } @else {
+        <i>Es wurde noch keine Aktion ausgewählt.</i>
+    }
+    @if (selectedKeep || selectedUpdate) {
+        <button
+            class="btn btn-sm btn-outline-primary d-block mt-2"
+            (click)="applyForAll.emit()"
+        >
+            Diese Aktion für alle Objekte dieses Typs anwenden
+        </button>
+    }
+</div>

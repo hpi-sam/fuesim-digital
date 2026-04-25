@@ -71,7 +71,6 @@ import {
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 import {
-    
     VersionedCollectionPartial,
     versionedCollectionPartialSchema,
 } from './marketplace/models/versioned-id-schema.js';

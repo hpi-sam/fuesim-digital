@@ -15,6 +15,13 @@ export interface EditableValuesRegistryEntry<
         template: Extract<FuesimTemplate, { type: Template }>;
         element: Extract<FuesimElement, { type: Element }>;
     }) => boolean;
+    asString: (data: {
+        template: Extract<FuesimTemplate, { type: Template }>;
+        element: Extract<FuesimElement, { type: Element }>;
+    }) => {
+        template: string;
+        model: string;
+    };
     /**
      * How to bring the values over to the new element version
      */
@@ -67,15 +74,17 @@ export function getEditableValueCheckers<
 export function checkEditableValueEdited(data: {
     template: FuesimTemplate;
     element: FuesimElement;
-}) {
+}): { id: string; name: string; template: string; model: string }[] {
     const { template, element } = data;
     const checkers = getEditableValueCheckers(element.type, template.type);
-    const editedValues: { id: string; name: string }[] = [];
-    for (const { id, name, equality } of checkers) {
+    const editedValues = [];
+    for (const { id, name, equality, asString } of checkers) {
         if (!equality({ template, element })) {
+            const asStringResult = asString({ template, element });
             editedValues.push({
                 id,
                 name,
+                ...asStringResult,
             });
         }
     }

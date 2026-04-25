@@ -11,9 +11,10 @@ import {
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Immutable } from 'immer';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
-import { selectTemplates, selectVehicles } from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectVehicles } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import {
     ChangeImpact,
@@ -23,7 +24,6 @@ import {
 import { AppState } from '../../../../../../state/app.state';
 import { ChangeImpactModalComponent } from '../../change-impact-modal/change-impact-modal.component';
 import { LoadingModalService } from '../../../../../../core/loading-modal/loading-modal.service';
-import { Immutable } from 'immer';
 
 @Component({
     selector: 'app-marketplace-collection-item-component',
@@ -81,13 +81,17 @@ export class MarketplaceColletionItemComponent {
     public async upgradeCollectionVersion() {
         try {
             this.loadingModalService.showLoading({
-                title: "Neue Version wird geladen",
-                description: "Bitte warten Sie, während die neue Version der Sammlung geladen wird und die Auswirkungen von Änderungen berechnet werden.",
+                title: 'Neue Version wird geladen',
+                description:
+                    'Bitte warten Sie, während die neue Version der Sammlung geladen wird und die Auswirkungen von Änderungen berechnet werden.',
             });
 
             const selectedCollection = this.collection();
 
-            const newerCollectionVersionAvailable = await this.collectionService.checkNewerVersionAvailable(selectedCollection);
+            const newerCollectionVersionAvailable =
+                await this.collectionService.checkNewerVersionAvailable(
+                    selectedCollection
+                );
             if (!newerCollectionVersionAvailable.newerVersionAvailable) {
                 return;
             }
@@ -98,11 +102,8 @@ export class MarketplaceColletionItemComponent {
                 );
 
             const elementsInExercise = {
-                ...selectStateSnapshot(
-                    selectVehicles,
-                    this.store
-                )
-            }
+                ...selectStateSnapshot(selectVehicles, this.store),
+            };
             const changeImpacts = await this.calcChangeImpact({
                 inExercise: Object.values(elementsInExercise),
                 new: newerCollectionElements.direct,
@@ -111,13 +112,16 @@ export class MarketplaceColletionItemComponent {
 
             this.loadingModalService.closeLoading();
 
-            const modal = this.ngbModalService.open(ChangeImpactModalComponent, {
-                size: 'xl',
-            });
+            const modal = this.ngbModalService.open(
+                ChangeImpactModalComponent,
+                {
+                    size: 'xl',
+                }
+            );
             modal.componentInstance.changes =
                 changeImpacts satisfies ChangeImpact[];
-            modal.componentInstance.newCollectionElements = newerCollectionElements.direct;
-
+            modal.componentInstance.newCollectionElements =
+                newerCollectionElements.direct;
         } catch (error) {
             this.loadingModalService.closeLoading();
             throw error;
@@ -129,9 +133,6 @@ export class MarketplaceColletionItemComponent {
         inExercise: Immutable<FuesimElement>[];
         new: ElementDto[];
     }): Promise<ChangeImpact[]> {
-        console.log('CALCULATING CHANGE IMPACT');
-        console.log(data);
-
         const {
             addedElements: _addedElements,
             editedNewElements,
@@ -142,43 +143,36 @@ export class MarketplaceColletionItemComponent {
         const impacts: ChangeImpact[] = [];
 
         for (const element of editedNewElements) {
-            const inExercise = data.inExercise.find(
+            const inExercise = data.inExercise.filter(
                 (e) => getEntityIdFromElement(e) === element.entityId
             );
-            if (!inExercise) {
-                console.warn(
-                    `Element ${element.title ?? element.versionId} has been edited in the marketplace, but is not part of the exercise. No change impact calculation possible.`,
-                    element
-                );
+            if (inExercise.length === 0) {
                 continue;
             }
 
-            const editedValues = checkEditableValueEdited({
-                template: element.content,
-                element: cloneDeepMutable(inExercise),
-            });
+            for (const elementInExercise of inExercise) {
+                const editedValues = checkEditableValueEdited({
+                    template: element.content,
+                    element: cloneDeepMutable(elementInExercise),
+                });
 
-            if (editedValues.length > 0) {
-                impacts.push({
-                    id: uuid(),
-                    type: 'updated',
-                    element: cloneDeepMutable(inExercise),
-                    entity: element,
-                    editedValues,
-                } satisfies EditableElementChangeImpact);
+                if (editedValues.length > 0) {
+                    impacts.push({
+                        id: uuid(),
+                        type: 'updated',
+                        element: cloneDeepMutable(elementInExercise),
+                        entity: element,
+                        editedValues,
+                    } satisfies EditableElementChangeImpact);
+                }
             }
         }
 
-
         for (const element of removedElements) {
-            const inExercise = data.inExercise.find(
+            const inExercise = data.inExercise.filter(
                 (e) => getEntityIdFromElement(e) === element.entityId
             );
-            if (!inExercise) {
-                console.warn(
-                    `Element ${element.title ?? element.versionId} has been edited in the marketplace, but is not part of the exercise. No change impact calculation possible.`,
-                    element
-                );
+            if (inExercise.length === 0) {
                 continue;
             }
             const matchingElement = data.previous.find(
@@ -191,12 +185,14 @@ export class MarketplaceColletionItemComponent {
                 continue;
             }
 
-            impacts.push({
-                id: uuid(),
-                type: 'removed',
-                element: cloneDeepMutable(inExercise),
-                entity: matchingElement,
-            } satisfies RemovedElementChangeImpact);
+            for (const elementInExercise of inExercise) {
+                impacts.push({
+                    id: uuid(),
+                    type: 'removed',
+                    element: cloneDeepMutable(elementInExercise),
+                    entity: matchingElement,
+                } satisfies RemovedElementChangeImpact);
+            }
         }
 
         return impacts;

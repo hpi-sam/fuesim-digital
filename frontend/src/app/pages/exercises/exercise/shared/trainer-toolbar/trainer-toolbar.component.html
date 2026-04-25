@@ -8,37 +8,6 @@
         Einstellungen
     </button>
 
-    @if (exerciseService.additionalExerciseMeta()?.exerciseTemplate) {
-        <button
-            (click)="openHospitalEditor()"
-            class="btn btn-outline-primary ms-3"
-            data-cy="trainerToolbarHospitalsButton"
-        >
-            Krankenhäuser
-        </button>
-    } @else {
-        <div ngbDropdown placement="top-start" class="d-inline-block">
-            <button
-                type="button"
-                class="btn btn-outline-primary ms-3"
-                ngbDropdownToggle
-                data-cy="trainerToolbarCreationButton"
-            >
-                Erstellung
-            </button>
-            <div ngbDropdownMenu>
-                <button
-                    ngbDropdownItem
-                    (click)="openHospitalEditor()"
-                    class="btn btn-primary"
-                    data-cy="trainerToolbarHospitalsButton"
-                >
-                    Krankenhäuser
-                </button>
-            </div>
-        </div>
-    }
-
     @if (!exerciseService.additionalExerciseMeta()?.exerciseTemplate) {
         <div ngbDropdown placement="top-start" class="d-inline-block">
             <button

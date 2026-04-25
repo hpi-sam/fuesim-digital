@@ -40,15 +40,19 @@ export namespace CollectionReducers {
     export const addCollection: ActionReducer<AddCollection> = {
         action: AddCollection,
         reducer: (draftState, data) => {
-            const addElement = (element: Immutable<ElementDto>) => {
+            const addElement = (
+                element: Immutable<ElementDto>,
+                useVersionId: boolean = false
+            ) => {
                 const mutableElement = cloneDeepMutable(element);
                 const existingElement = draftState.templates[element.entityId];
                 const usedBy: CollectionEntityId[] | undefined =
                     // @ts-expect-error: Not all templates have usedBy :)
                     existingElement?.usedBy;
 
-                draftState.templates[element.entityId] = {
+                draftState.templates[element.versionId] = {
                     ...mutableElement.content,
+                    id: useVersionId ? element.versionId : element.content.id,
                     entityId: element.entityId,
                     versionId: element.versionId,
                     usedBy: [
@@ -61,10 +65,10 @@ export namespace CollectionReducers {
             for (const element of data.elements) {
                 switch (element.content.type) {
                     case 'vehicleTemplate':
-                        addElement(element);
+                        addElement(element, true);
                         break;
                     case 'alarmGroup':
-                        addElement(element);
+                        addElement(element, true);
                         break;
                 }
             }

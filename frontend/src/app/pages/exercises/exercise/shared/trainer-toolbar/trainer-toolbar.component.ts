@@ -14,7 +14,6 @@ import { openClientsModal } from '../clients-modal/open-clients-modal';
 import { openEmergencyOperationsCenterModal } from '../emergency-operations-center/open-emergency-operations-center-modal';
 import { openExerciseSettingsModal } from '../exercise-settings/open-exercise-settings-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
-import { openHospitalEditorModal } from '../hospital-editor/hospital-editor-modal';
 import { openSimulationTrainerModal } from '../simulation/trainer-modal/open-simulation-trainer-modal';
 import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
 import { openSimulationSignallerModal } from '../simulation/signaller-modal/open-simulation-signaller-modal';
@@ -62,10 +61,6 @@ export class TrainerToolbarComponent {
 
     public openTransferOverview() {
         openTransferOverviewModal(this.modalService);
-    }
-
-    public openHospitalEditor() {
-        openHospitalEditorModal(this.modalService);
     }
 
     public openEmergencyOperationsCenter() {

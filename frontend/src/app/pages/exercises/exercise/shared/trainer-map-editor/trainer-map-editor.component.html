@@ -9,7 +9,19 @@
                         @case ('alarmgroups') {
                             <app-alarm-group-overview-page
                                 class="h-100"
-                                (closeView)="overwriteTrainerMap.set(null)"
+                                (closeView)="
+                                    overwriteTrainerMap.set(null);
+                                    accordion.collapseAll()
+                                "
+                            />
+                        }
+                        @case ('hospitals') {
+                            <app-hospital-editor-page
+                                class="h-100"
+                                (closeView)="
+                                    overwriteTrainerMap.set(null);
+                                    accordion.collapseAll()
+                                "
                             />
                         }
                     }
@@ -51,6 +63,7 @@
             <!-- We want the editor panel to overflow, if it is too high -->
             <div
                 ngbAccordion
+                #accordion="ngbAccordion"
                 [closeOthers]="true"
                 style="flex: auto; height: 0; overflow-y: auto"
             >
@@ -346,7 +359,7 @@
                     </h5>
                 </div>
 
-                <div ngbAccordionItem="marketplace">
+                <div>
                     <app-marketplace-tab />
                 </div>
 
@@ -365,31 +378,39 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
-                                <div class="cards">
-                                    @for (
-                                        vehicleTemplate of vehicleTemplates$
-                                            | async
-                                            | values;
-                                        track vehicleTemplate.id
-                                    ) {
-                                        <app-map-editor-card
-                                            (elementMousedown)="
-                                                startElementDrag($event, {
-                                                    type: 'vehicle',
-                                                    template: vehicleTemplate,
-                                                })
-                                            "
-                                            dataCy="draggableVehicleDiv"
-                                            [imageUrl]="
-                                                vehicleTemplate.image.url
-                                            "
-                                            [title]="
-                                                vehicleTemplate.vehicleType
-                                            "
-                                        >
-                                        </app-map-editor-card>
-                                    }
-                                </div>
+                                @let vehicleTemplates =
+                                    (vehicleTemplates$ | async | values) ?? [];
+                                @if (vehicleTemplates.length > 0) {
+                                    <div class="cards">
+                                        @for (
+                                            vehicleTemplate of vehicleTemplates;
+                                            track vehicleTemplate.id
+                                        ) {
+                                            <app-map-editor-card
+                                                (elementMousedown)="
+                                                    startElementDrag($event, {
+                                                        type: 'vehicle',
+                                                        template:
+                                                            vehicleTemplate,
+                                                    })
+                                                "
+                                                dataCy="draggableVehicleDiv"
+                                                [imageUrl]="
+                                                    vehicleTemplate.image.url
+                                                "
+                                                [title]="
+                                                    vehicleTemplate.vehicleType
+                                                "
+                                            >
+                                            </app-map-editor-card>
+                                        }
+                                    </div>
+                                } @else {
+                                    <i class="small text-muted"
+                                        >Sie haben keine Fahrzeuge aus
+                                        Sammlungen</i
+                                    >
+                                }
                             </ng-template>
                         </div>
                     </div>
@@ -573,23 +594,56 @@
                     <div ngbAccordionCollapse>
                         <div ngbAccordionBody>
                             <ng-template>
+                                @let alarmGroupTemplates =
+                                    (alarmGroupTemplates$ | async | values) ??
+                                    [];
+                                @if (alarmGroupTemplates.length > 0) {
+                                    <div
+                                        class="cards"
+                                        cdkDropList
+                                        cdkDropListHasAnchor
+                                    >
+                                        @for (
+                                            alarmgroup of alarmGroupTemplates$
+                                                | async
+                                                | values;
+                                            track alarmgroup.id
+                                        ) {
+                                            <app-map-editor-card
+                                                cdkDrag
+                                                [cdkDragData]="alarmgroup"
+                                                [title]="alarmgroup.name"
+                                            ></app-map-editor-card>
+                                        }
+                                    </div>
+                                } @else {
+                                    <i class="small text-muted"
+                                        >Sie haben keine Alarmgruppen aus
+                                        Sammlungen</i
+                                    >
+                                }
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    ngbAccordionItem="hospitals"
+                    (show)="overwriteTrainerMap.set('hospitals')"
+                    (hide)="overwriteTrainerMap.set(null)"
+                >
+                    <h5 ngbAccordionHeader>
+                        <button ngbAccordionButton>Krankenhäuser</button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
                                 <div
-                                    class="cards"
-                                    cdkDropList
-                                    cdkDropListHasAnchor
+                                    class="alert alert-secondary small mb-0 px-2 py-1 d-flex align-items-center"
                                 >
-                                    @for (
-                                        alarmgroup of alarmGroupTemplates$
-                                            | async
-                                            | values;
-                                        track alarmgroup.id
-                                    ) {
-                                        <app-map-editor-card
-                                            cdkDrag
-                                            [cdkDragData]="alarmgroup"
-                                            [title]="alarmgroup.name"
-                                        ></app-map-editor-card>
-                                    }
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Bearbeiten Sie Krankenhäuser in der Ansicht
+                                    links.
                                 </div>
                             </ng-template>
                         </div>

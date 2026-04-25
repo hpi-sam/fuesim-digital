@@ -1,11 +1,7 @@
 import { Component, inject, output } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AsyncPipe } from '@angular/common';
-import {
-    AlarmGroup,
-    newAlarmGroup,
-    uuid,
-} from 'fuesim-digital-shared';
+import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AlarmGroup, newAlarmGroup, uuid } from 'fuesim-digital-shared';
 import {
     CdkDrag,
     CdkDragDrop,
@@ -29,6 +25,7 @@ import { AlarmGroupItemComponent } from './alarm-group-item/alarm-group-item.com
     imports: [
         AlarmGroupItemComponent,
         AsyncPipe,
+        JsonPipe,
         ValuesPipe,
         CdkDropList,
         CdkDrag,
@@ -44,7 +41,7 @@ export class AlarmGroupOverviewPageComponent {
 
     public readonly alarmGroups$ = this.store.select(selectAlarmGroups);
 
-    public readonly vehicleTemplates$ = this.store.select(
+    public readonly vehicleTemplates$ = this.store.selectSignal(
         selectVehicleTemplates
     );
 

@@ -1,4 +1,10 @@
-import { OnInit, inject, Component, Signal, signal } from '@angular/core';
+import {
+    OnInit,
+    inject,
+    Component,
+    Signal,
+    signal,
+} from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,
@@ -64,6 +70,7 @@ import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { MarketplaceTabComponent } from '../marketplace-tab/marketplace-tab.component';
 import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
+import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -103,6 +110,7 @@ type FilterCategory =
         CdkDropListGroup,
         CdkDragPlaceholder,
         AlarmGroupOverviewPageComponent,
+        HospitalEditorPageComponent,
     ],
 })
 /**
@@ -116,7 +124,9 @@ export class TrainerMapEditorComponent implements OnInit {
     private readonly messageService = inject(MessageService);
     private readonly exerciseService = inject(ExerciseService);
 
-    public readonly overwriteTrainerMap = signal<'alarmgroups' | null>(null);
+    public readonly overwriteTrainerMap = signal<
+        'alarmgroups' | 'hospitals' | null
+    >(null);
 
     public selectedCategories$: BehaviorSubject<{
         [key in FilterCategory]: boolean;

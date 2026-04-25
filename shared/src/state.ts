@@ -71,11 +71,12 @@ import {
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 import {
-    elementVersionIdSchema,
+    
     VersionedCollectionPartial,
     versionedCollectionPartialSchema,
 } from './marketplace/models/versioned-id-schema.js';
 import { Template, templateSchema } from './models/template.js';
+import { hybridIdSchema } from './utils/hybrid-id.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -215,9 +216,7 @@ export class ExerciseState {
     @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
 
-    @IsZodSchema(
-        z.record(z.union([uuidSchema, elementVersionIdSchema]), templateSchema)
-    )
+    @IsZodSchema(z.record(hybridIdSchema, templateSchema))
     public readonly templates: { readonly [key: UUID]: Template } = {
         ...defaultMaterialTemplatesById,
         ...defaultMapImagesTemplatesById,

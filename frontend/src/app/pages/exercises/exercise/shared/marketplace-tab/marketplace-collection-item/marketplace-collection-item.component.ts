@@ -6,21 +6,24 @@ import {
     gatherCollectionElements,
     uuid,
     VersionedCollectionPartial,
+    Element as FuesimElement,
+    getEntityIdFromElement,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
-import { selectVehicles } from '../../../../../../state/application/selectors/exercise.selectors';
+import { selectTemplates, selectVehicles } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import {
-    InExerciseElement,
     ChangeImpact,
     EditableElementChangeImpact,
     RemovedElementChangeImpact,
 } from '../../change-impact-modal/change-impact-types';
 import { AppState } from '../../../../../../state/app.state';
 import { ChangeImpactModalComponent } from '../../change-impact-modal/change-impact-modal.component';
+import { LoadingModalService } from '../../../../../../core/loading-modal/loading-modal.service';
+import { Immutable } from 'immer';
 
 @Component({
     selector: 'app-marketplace-collection-item-component',
@@ -33,6 +36,7 @@ export class MarketplaceColletionItemComponent {
     private readonly collectionService = inject(CollectionService);
     private readonly store = inject<Store<AppState>>(Store);
     private readonly ngbModalService = inject(NgbModal);
+    private readonly loadingModalService = inject(LoadingModalService);
 
     public readonly collection = input.required<VersionedCollectionPartial>();
 
@@ -75,56 +79,54 @@ export class MarketplaceColletionItemComponent {
     }
 
     public async upgradeCollectionVersion() {
-        console.log('UPGRADING');
-        // TODO: @Quixelation: Support more than just vehicles
-        const allExerciseVehicles = selectStateSnapshot(
-            selectVehicles,
-            this.store
-        );
+        try {
+            this.loadingModalService.showLoading({
+                title: "Neue Version wird geladen",
+                description: "Bitte warten Sie, während die neue Version der Sammlung geladen wird und die Auswirkungen von Änderungen berechnet werden.",
+            });
 
-        const selectedCollection = this.collection();
-        if (selectedCollection === null) {
-            console.warn(
-                'No collection selected, cannot calculate change impacts of upgrading collection version.'
-            );
-            return;
+            const selectedCollection = this.collection();
+
+            const newerCollectionVersionAvailable = await this.collectionService.checkNewerVersionAvailable(selectedCollection);
+            if (!newerCollectionVersionAvailable.newerVersionAvailable) {
+                return;
+            }
+
+            const newerCollectionElements =
+                await this.collectionService.getElementsOfCollectionVersion(
+                    newerCollectionVersionAvailable.latestVersion
+                );
+
+            const elementsInExercise = {
+                ...selectStateSnapshot(
+                    selectVehicles,
+                    this.store
+                )
+            }
+            const changeImpacts = await this.calcChangeImpact({
+                inExercise: Object.values(elementsInExercise),
+                new: newerCollectionElements.direct,
+                previous: await this.fetchCollectionElements(),
+            });
+
+            this.loadingModalService.closeLoading();
+
+            const modal = this.ngbModalService.open(ChangeImpactModalComponent, {
+                size: 'xl',
+            });
+            modal.componentInstance.changes =
+                changeImpacts satisfies ChangeImpact[];
+            modal.componentInstance.newCollectionElements = newerCollectionElements.direct;
+
+        } catch (error) {
+            this.loadingModalService.closeLoading();
+            throw error;
         }
-
-        const newerCollectionVersionAvailable =
-            this.newerVersionAvailable.value();
-        if (!newerCollectionVersionAvailable?.newerVersionAvailable) {
-            console.warn(
-                'No newer collection version available, cannot calculate change impacts of upgrading collection version.'
-            );
-            return;
-        }
-
-        const newerCollection =
-            await this.collectionService.getElementsOfCollectionVersion(
-                newerCollectionVersionAvailable.latestVersion
-            );
-
-        const changeImpacts = await this.calcChangeImpact({
-            inExercise: Object.values(allExerciseVehicles),
-            new: newerCollection.direct,
-            previous: await this.fetchCollectionElements(),
-        });
-        console.log(
-            'Change impacts of upgrading collection version:',
-            changeImpacts
-        );
-
-        const modal = this.ngbModalService.open(ChangeImpactModalComponent, {
-            size: 'xl',
-        });
-        modal.componentInstance.changes =
-            changeImpacts satisfies ChangeImpact[];
-        modal.componentInstance.newCollectionElements = newerCollection.direct;
     }
 
     private async calcChangeImpact(data: {
         previous: ElementDto[];
-        inExercise: InExerciseElement[];
+        inExercise: Immutable<FuesimElement>[];
         new: ElementDto[];
     }): Promise<ChangeImpact[]> {
         console.log('CALCULATING CHANGE IMPACT');
@@ -141,7 +143,7 @@ export class MarketplaceColletionItemComponent {
 
         for (const element of editedNewElements) {
             const inExercise = data.inExercise.find(
-                (e) => e.entityId === element.entityId
+                (e) => getEntityIdFromElement(e) === element.entityId
             );
             if (!inExercise) {
                 console.warn(
@@ -160,16 +162,17 @@ export class MarketplaceColletionItemComponent {
                 impacts.push({
                     id: uuid(),
                     type: 'updated',
-                    element: inExercise,
+                    element: cloneDeepMutable(inExercise),
                     entity: element,
                     editedValues,
                 } satisfies EditableElementChangeImpact);
             }
         }
 
+
         for (const element of removedElements) {
             const inExercise = data.inExercise.find(
-                (e) => e.entityId === element.entityId
+                (e) => getEntityIdFromElement(e) === element.entityId
             );
             if (!inExercise) {
                 console.warn(
@@ -191,7 +194,7 @@ export class MarketplaceColletionItemComponent {
             impacts.push({
                 id: uuid(),
                 type: 'removed',
-                element: inExercise,
+                element: cloneDeepMutable(inExercise),
                 entity: matchingElement,
             } satisfies RemovedElementChangeImpact);
         }

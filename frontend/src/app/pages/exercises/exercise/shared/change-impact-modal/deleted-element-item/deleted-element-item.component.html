@@ -1,0 +1,148 @@
+
+@let applyChange = applyingChange();
+<p>
+                        Element {{ change().entity.title }} wurde
+                        entfernt.
+                    </p>
+                    <p>Bitte wählen sie eine geeignete Vorgehensweise aus.</p>
+                    @let replacementPossible =
+                        replaceableElementTypes.includes(
+                            change().element.type
+                        );
+                    <div class="card">
+                        @if (replacementPossible) {
+                            <div class="card-header">
+                                <div class="form-check">
+                                    <input
+                                        type="radio"
+                                        id="keep"
+                                        name="action"
+                                        value="keep"
+                                        [checked]="
+                                            applyChange?.action ===
+                                            'replace'
+                                        "
+                                        class="form-check-input"
+                                        (change)="
+                                            setActionType('replace', undefined)
+                                        "
+                                    />
+                                    <label for="keep" class="form-check-label">
+                                        Element ersetzen
+                                    </label>
+                                    <br />
+                                </div>
+                            </div>
+
+                            @if (
+                                applyChange &&
+                                applyChange.action === 'replace'
+                            ) {
+                                <div class="card-body">
+                                    <p>
+                                        Wählen Sie das Element aus, durch
+                                        welches das aktuelle ersetzt werden
+                                        soll:
+                                    </p>
+                                    <div
+                                        class="d-flex flex-row gap-1 flex-wrap"
+                                    >
+                                        @for (
+                                            newElement of elementsOfNewCollection();
+                                            track newElement.versionId
+                                        ) {
+                                            @switch (
+                                                change().element.type
+                                            ) {
+                                                @case ('vehicle') {
+                                                    @if (
+                                                        newElement.content
+                                                            .type ===
+                                                        'vehicleTemplate'
+                                                    ) {
+                                                        <app-map-editor-card
+                                                            [title]="
+                                                                newElement
+                                                                    .content
+                                                                    .name
+                                                            "
+                                                            [imageUrl]="
+                                                                newElement
+                                                                    .content
+                                                                    .image.url
+                                                            "
+                                                            (click)="
+                                                                setActionType(
+                                                                    'replace',
+                                                                    newElement
+                                                                )
+                                                            "
+                                                            [selected]="
+                                                                applyChange
+                                                                    .replaceWith
+                                                                    ?.versionId ===
+                                                                newElement.versionId
+                                                            "
+                                                        />
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                        <div class="card-header">
+                            <div class="form-check">
+                                <input
+                                    type="radio"
+                                    id="remove"
+                                    name="action"
+                                    value="remove"
+                                    class="form-check-input"
+                                    [checked]="
+                                        applyChange?.action === 'remove'
+                                    "
+                                    (change)="setActionType('remove')"
+                                />
+                                <label for="remove" class="form-check-label"
+                                    >Element entfernen</label
+                                ><br />
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    @let selectedChangeReplace =
+                        applyChange &&
+                        applyChange.action === 'replace' &&
+                        applyChange.replaceWith;
+                    @let selectedChangeRemove =
+                        applyChange && applyChange.action === 'remove';
+
+                    <div class="alert alert-info" role="alert">
+                        <b class="d-block"
+                            >Folgende Aktion wird auf das Element angewendet:</b
+                        >
+                        @if (selectedChangeReplace) {
+                            <span
+                                >Das Element
+                                {{ change().entity.title }} wird durch
+                                {{ applyChange.replaceWith!.title }}
+                                ersetzt.</span
+                            >
+                        } @else if (selectedChangeRemove) {
+                            <span>Das Element wird entfernt.</span>
+                        } @else {
+                            <i>Es wurde noch keine Aktion ausgewählt.</i>
+                        }
+                        @if (selectedChangeReplace || selectedChangeRemove) {
+                            <button
+                                class="btn btn-sm btn-outline-primary d-block mt-2"
+                            >
+                                Diese Aktion für alle Objekte dieses Typs
+                                anwenden
+                            </button>
+                        }
+                    </div>

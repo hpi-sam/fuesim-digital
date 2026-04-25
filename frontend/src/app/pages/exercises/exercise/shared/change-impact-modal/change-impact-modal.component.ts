@@ -1,15 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
-import { Element, ElementDto } from 'fuesim-digital-shared';
-import { z } from 'zod';
+import {  ElementDto } from 'fuesim-digital-shared';
 import { JsonPipe } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { VersionedElementDisplayNamePipe } from '../../../../../shared/pipes/versioned-element-type-display-name.pipe';
 import {
+    ChangeApply,
     ChangeImpact,
-    RemovedElementChangeImpact,
 } from './change-impact-types';
+import { DeletedElementChangeApplyItemComponent } from './deleted-element-item/deleted-element-item.component';
 
 @Component({
     selector: 'app-change-impact-modal',
@@ -19,12 +19,14 @@ import {
         MapEditorCardComponent,
         JsonPipe,
         VersionedElementDisplayNamePipe,
+        DeletedElementChangeApplyItemComponent
     ],
 })
 export class ChangeImpactModalComponent {
     private readonly collectionService = inject(CollectionService);
     private readonly activeModal = inject(NgbActiveModal);
 
+    // This data must be provided when opening the modal via NgbModal.
     public readonly changes: ChangeImpact[] = [];
     public readonly newCollectionElements!: ElementDto[];
 
@@ -35,66 +37,12 @@ export class ChangeImpactModalComponent {
     }
 
     public readonly changesToApply = signal<{ [key: string]: ChangeApply }>({});
-    public readonly elementsOfNewCollection = signal<ElementDto[] | null>(null);
 
-    public readonly replaceableElementTypes: Element['type'][] = ['vehicle'];
-
-    public setRemovalActionType(type: RemoveChangeApply['action']) {
-        const index = this.selectedChangeIndex();
-        if (index === null) return;
-
-        const selectedChange = this.changes[index];
-
-        if (!selectedChange) return;
-        if (selectedChange.type !== 'removed') return;
-
-        this.changesToApply.update((current) => {
-            let existingEntry = current[selectedChange.id];
-
-            existingEntry ??= {
-                type: selectedChange.type,
-                change: selectedChange,
-                action: type,
-                replaceWith: undefined,
-            } satisfies RemoveChangeApply;
-
-            existingEntry.action = type;
-
-            return {
+    public async applyChange(change: ChangeImpact, apply: ChangeApply) {
+        this.changesToApply.update((current) => ({
                 ...current,
-                [selectedChange.id]: existingEntry,
-            };
-        });
-    }
-
-    public selectReplacementElement(element: ElementDto) {
-        const index = this.selectedChangeIndex();
-        if (index === null) return;
-
-        const selectedChange = this.changes[index];
-
-        if (!selectedChange) return;
-        if (selectedChange.type !== 'removed') return;
-
-        this.changesToApply.update((current) => {
-            let existingEntry = current[selectedChange.id] as
-                | RemoveChangeApply
-                | undefined;
-
-            existingEntry ??= {
-                type: selectedChange.type,
-                change: selectedChange,
-                action: 'replace',
-                replaceWith: element,
-            } satisfies RemoveChangeApply;
-
-            existingEntry.replaceWith = element;
-
-            return {
-                ...current,
-                [selectedChange.id]: existingEntry,
-            };
-        });
+                [change.id]: apply,
+            }))
     }
 
     public close(data: boolean | null) {
@@ -102,27 +50,3 @@ export class ChangeImpactModalComponent {
     }
 }
 
-type ChangeApply = AddedChangeApply | EditableChangeApply | RemoveChangeApply;
-
-export const removeChangeApplyActionSchema = z.literal([
-    'remove',
-    'replace',
-    'placeholder',
-]);
-
-interface RemoveChangeApply {
-    type: 'removed';
-    change: RemovedElementChangeImpact;
-    action: z.infer<typeof removeChangeApplyActionSchema>;
-    replaceWith?: ElementDto;
-}
-
-interface EditableChangeApply {
-    type: 'editable';
-    action: 'keep' | 'update';
-}
-
-interface AddedChangeApply {
-    type: 'added';
-    action: 'keep';
-}

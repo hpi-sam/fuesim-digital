@@ -12,6 +12,10 @@ import { applyAction } from '../store/reduce-exercise-state.js';
 import { ReducerError } from '../store/reducer-error.js';
 import type { UUID } from '../utils/uuid.js';
 import { getTemplates } from '../models/template.js';
+import {
+    
+    defaultPersonnelTemplatesById,
+} from '../data/default-state/personnel-templates.js';
 import { migrations } from './migration-functions.js';
 import type { Migration } from './migration-functions.js';
 
@@ -67,6 +71,9 @@ export function migratePartialExport(
             mapImageTemplates: mutablePartialExport.mapImageTemplates ?? [],
             patientCategories: mutablePartialExport.patientCategories ?? [],
             vehicleTemplates: mutablePartialExport.vehicleTemplates ?? [],
+            // We need this, bc migration 44 needs this and we've removed the default templates from the ExerciseState
+            // in exchange for the marketplace
+            personnelTemplates: defaultPersonnelTemplatesById,
             // We need this hotfix since otherwise migration 44 is not happy
             materialTemplates: Object.fromEntries(
                 Object.entries(
@@ -86,6 +93,7 @@ export function migratePartialExport(
     );
     stateExport.fileVersion = mutablePartialExport.fileVersion;
     stateExport.dataVersion = mutablePartialExport.dataVersion;
+
     const migratedStateExport = migrateStateExport(stateExport as StateExport);
     // Check for `undefined` in the original partial export here as `undefined` has the meaning of `no changes`
     // compared to `[]` with the meaning of `nothing`. If later choosing to override using this partial export,

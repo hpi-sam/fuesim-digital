@@ -3,12 +3,14 @@ import {
     checkCollectionRole,
     ExerciseState,
     gatherCollectionElements,
-    getTemplates,
+    MapImageTemplate,
     migratePartialExport,
     PartialExport,
     ParticipantKey,
+    PatientCategory,
     StateExport,
     validateExerciseExport,
+    VehicleTemplate,
     VersionedElementContent,
 } from 'fuesim-digital-shared';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -100,8 +102,11 @@ export class CollectionElementsTabComponent {
             if (importedPlainObject.type === 'partial') {
                 partialObject = importedPlainObject;
             } else {
-                const currentState =
-                    importedPlainObject.currentState as ExerciseState;
+                const currentState = importedPlainObject.currentState as {
+                    vehicleTemplates: { [key: string]: VehicleTemplate };
+                    mapImageTemplates: { [key: string]: MapImageTemplate };
+                    patientCategories: { [key: string]: PatientCategory };
+                };
                 partialObject = {
                     type: 'partial',
                     dataVersion: importedPlainObject.dataVersion,
@@ -110,10 +115,10 @@ export class CollectionElementsTabComponent {
                         currentState.patientCategories
                     ),
                     vehicleTemplates: Object.values(
-                        getTemplates(currentState, 'vehicleTemplate')
+                        currentState.vehicleTemplates
                     ),
                     mapImageTemplates: Object.values(
-                        getTemplates(currentState, 'mapImageTemplate')
+                        currentState.mapImageTemplates
                     ),
                 };
             }

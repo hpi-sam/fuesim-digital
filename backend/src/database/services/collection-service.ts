@@ -439,6 +439,14 @@ export class CollectionService {
                     )
                 );
 
+                const newCollectionVersionElements =
+                    await tx.getElementsOfCollectionVersion(
+                        upgradeToCollection.versionId,
+                        {
+                            allowDraftState: false,
+                        }
+                    );
+
                 // Only allow upgrading if we already depend on the collection
                 const existingDependencies = await tx.getCollectionDependencies(
                     draftState.versionId
@@ -453,7 +461,7 @@ export class CollectionService {
                 }
 
                 // Fetch, which elements of our Collection depend on the collection we want to upgrade
-                const elementDependencies =
+                const dependingElements =
                     await tx.getDependingElementsForCollection({
                         depender: draftState.versionId,
                         dependency: existingCollectionDependency.versionId,
@@ -461,7 +469,7 @@ export class CollectionService {
 
                 // Check if the provided acceptedElementDeletions actually account for all depending elements
                 if (
-                    !elementDependencies.every((ed) =>
+                    !dependingElements.every((ed) =>
                         data.acceptedElementDeletions.includes(ed.versionId)
                     )
                 ) {
@@ -471,29 +479,36 @@ export class CollectionService {
                 }
 
                 await Promise.all(
-                    elementDependencies.map(async (ed) => {
+                    dependingElements.map(async (dependingElement) => {
                         const dependencies =
-                            await tx.getDependenciesOfElement(ed);
+                            await tx.getDependenciesOfElement(dependingElement);
                         const dependencyCheck = getDependencyChecker(
-                            ed.content.type
+                            dependingElement.content.type
                         );
                         if (!dependencyCheck) {
                             if (dependencies.length > 0) {
                                 throw new Error(
-                                    `Element with type ${ed.content.type} has dependencies but no dependency checker is implemented for this type.`
+                                    `Element with type ${dependingElement.content.type} has dependencies but no dependency checker is implemented for this type.`
                                 );
                             }
                             return;
                         }
+
                         const newContent = replaceDependencies(
-                            ed.content,
+                            dependingElement.content,
                             dependencies.map((d) => ({
                                 old: d.versionId,
-                                new: null,
+                                new:
+                                    newCollectionVersionElements.direct.find(
+                                        (f) => f.entityId === d.entityId
+                                    )?.versionId ?? null,
                             }))
                         );
 
-                        await tx.updateElement(ed.entityId, newContent);
+                        await tx.updateElement(
+                            dependingElement.entityId,
+                            cloneDeepMutable(newContent)
+                        );
                     })
                 );
 
@@ -1186,7 +1201,7 @@ export class CollectionService {
                     );
                     await tx.updateElement(
                         containingElementData.entityId,
-                        newContent
+                        cloneDeepMutable(newContent)
                     );
                 })
             );

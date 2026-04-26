@@ -19,6 +19,7 @@ import {
     applyMigrations,
     cloneDeepMutable,
     ExerciseState,
+    getDependencyChecker,
     getElementDependencies,
     isVersionedElementContent,
     replaceDependencies,

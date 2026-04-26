@@ -23,6 +23,7 @@ export class CollectionElementsListComponent {
         input.required<CollectionElementsDto>();
     public readonly publishedElements = input<ElementDto[] | null>(null);
     public readonly editable = input(true);
+    public readonly showImportedElements = input(false);
 
     // This array defined the order in which the element types are displayed in the UI.
     // Types not included in this array will NOT be displayed in the UI
@@ -50,9 +51,11 @@ export class CollectionElementsListComponent {
     });
 
     public readonly visibleElements = computed(() => [
-        ...gatherCollectionElements(
+        ...
+            gatherCollectionElements(
             this.collectionElements()
         ).allDirectElements(),
+        ...(this.showImportedElements() ? gatherCollectionElements(this.collectionElements()).allImportedElements() : []),
         ...(this.publishedElements() ?? []).filter(
             (f) => this.elementHasChanges()[f.entityId] === 'remove'
         ),

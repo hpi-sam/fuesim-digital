@@ -9,7 +9,6 @@ import {
     isElementVersionId,
     Marketplace,
 } from 'fuesim-digital-shared';
-import { z } from 'zod';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { NotFoundError } from '../utils/http.js';
 import type { CollectionService } from '../database/services/collection-service.js';
@@ -182,11 +181,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     viewerRouter.get('/:collectionEntityId', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 
-        const allowDraftState = z.coerce
-            .boolean()
-            .optional()
-            .default(false)
-            .parse(req.query['allowdraftstate']);
+        const allowDraftState = req.query['allowdraftstate'] === 'true';
 
         const result = await collectionService.getLatestCollectionById(
             collectionEntityId,

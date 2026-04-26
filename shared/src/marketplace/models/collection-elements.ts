@@ -40,6 +40,9 @@ export function gatherCollectionElements(elements: CollectionElementsDto) {
         allDirectElements(): ElementDto[] {
             return elements.direct;
         },
+        allImportedElements(): ElementDto[] {
+            return elements.imported.flatMap((imported) => imported.elements);
+        },
         allVisibleElements(): ElementDto[] {
             return [
                 ...elements.direct,

@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { elementSchema } from '../models/element.js';
 import { elementDtoSchema } from './models/versioned-elements.js';
 
-
 // IMPACT
 export const addedElementChangeImpactSchema = z.object({
     id: z.string(),
@@ -10,8 +9,9 @@ export const addedElementChangeImpactSchema = z.object({
     entity: elementDtoSchema,
 });
 
-export type AddedElementChangeImpact = z.infer<typeof addedElementChangeImpactSchema>;
-
+export type AddedElementChangeImpact = z.infer<
+    typeof addedElementChangeImpactSchema
+>;
 
 export const removedElementChangeImpactSchema = z.object({
     id: z.string(),
@@ -20,7 +20,9 @@ export const removedElementChangeImpactSchema = z.object({
     entity: elementDtoSchema,
 });
 
-export type RemovedElementChangeImpact = z.infer<typeof removedElementChangeImpactSchema>;
+export type RemovedElementChangeImpact = z.infer<
+    typeof removedElementChangeImpactSchema
+>;
 
 export const editableElementChangeImpactSchema = z.object({
     id: z.string(),
@@ -37,8 +39,9 @@ export const editableElementChangeImpactSchema = z.object({
     entity: elementDtoSchema,
 });
 
-export type EditableElementChangeImpact = z.infer<typeof editableElementChangeImpactSchema>;
-
+export type EditableElementChangeImpact = z.infer<
+    typeof editableElementChangeImpactSchema
+>;
 
 export const changeImpactSchema = z.discriminatedUnion('type', [
     addedElementChangeImpactSchema,
@@ -48,7 +51,6 @@ export const changeImpactSchema = z.discriminatedUnion('type', [
 
 export type ChangeImpact = z.infer<typeof changeImpactSchema>;
 
-
 // CHANGE APPLY
 
 export const removeChangeApplyActionSchema = z.literal([
@@ -57,13 +59,12 @@ export const removeChangeApplyActionSchema = z.literal([
     'placeholder',
 ]);
 
-
 export const removeChangeApplySchema = z.object({
     type: z.literal('removed'),
     change: removedElementChangeImpactSchema,
     action: removeChangeApplyActionSchema,
     replaceWith: elementDtoSchema.optional(),
-})
+});
 
 export type RemoveChangeApply = z.infer<typeof removeChangeApplySchema>;
 

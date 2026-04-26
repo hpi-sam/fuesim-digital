@@ -113,13 +113,13 @@ export namespace CollectionReducers {
             collection.versionId = data.collectionVersion.versionId;
 
             draftState.templates = Object.fromEntries(
-                Object.entries(draftState.templates).map(([key, element]) => 
+                Object.entries(draftState.templates).map(([key, element]) =>
                     /* const changeToApply = data.changesToApply.find(f=>f.change.entity.versionId === element.versionId);
                     if (!changeToApply) {
                         return [key, element];
                     }*/
 
-                     [key, element]
+                    [key, element]
                 )
             );
 

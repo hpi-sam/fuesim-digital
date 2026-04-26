@@ -991,7 +991,7 @@ export class CollectionService {
                                 newElementVersion.versionId
                             )
                         );
-                        tx.updateElement(
+                        await tx.updateElement(
                             dependingElement.entityId,
                             newContent,
                             resolutionStrategy

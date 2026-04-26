@@ -1,4 +1,13 @@
-import { OnInit, inject, Component, Signal, signal } from '@angular/core';
+import {
+    OnInit,
+    inject,
+    Component,
+    Signal,
+    signal,
+    TemplateRef,
+    viewChild,
+    ElementRef,
+} from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,
@@ -8,6 +17,7 @@ import {
     NgbAccordionCollapse,
     NgbAccordionBody,
     NgbTooltip,
+    NgbOffcanvas,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
@@ -117,6 +127,9 @@ export class TrainerMapEditorComponent implements OnInit {
     private readonly ngbModalService = inject(NgbModal);
     private readonly messageService = inject(MessageService);
     private readonly exerciseService = inject(ExerciseService);
+    private readonly offcanvasService = inject(NgbOffcanvas);
+
+    private readonly mapRef = viewChild<ElementRef<HTMLDivElement>>('mapRef');
 
     public readonly overwriteTrainerMap = signal<
         'alarmgroups' | 'hospitals' | null
@@ -190,6 +203,33 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public changeDisplayTransferLines(newValue: boolean) {
         this.transferLinesService.displayTransferLines = newValue;
+    }
+
+    public openOffcanvasView(
+        template: 'alarmgroups' | 'hospitals',
+        ref: TemplateRef<any>
+    ) {
+        this.overwriteTrainerMap.set(template);
+        const mapContainer = this.mapRef();
+        if (!mapContainer) {
+            console.error(
+                'Map container not found, offcanvas might not be positioned correctly'
+            );
+        }
+        console.log(mapContainer?.nativeElement);
+        this.offcanvasService.open(ref, {
+            position: 'end',
+            scroll: true,
+            container: mapContainer?.nativeElement,
+            panelClass: 'trainer-map-editor-offcanvas',
+            backdropClass: 'trainer-map-editor-offcanvas-backdrop',
+            backdrop: false,
+        });
+    }
+
+    public closeOffcanvas() {
+        this.overwriteTrainerMap.set(null);
+        this.offcanvasService.dismiss();
     }
 
     public readonly simulatedRegionDragTemplates = simulatedRegionDragTemplates;

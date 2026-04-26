@@ -1,38 +1,27 @@
 <div class="container-fluid d-flex flex-column h-100" cdkDropListGroup>
     <div class="flex-fill row">
-        @if (overwriteTrainerMap() !== null) {
-            <div
-                class="col p-0 rounded-start overflow-hidden d-flex flex-column border"
-            >
-                <div style="height: 0; overflow-y: auto; flex: auto">
-                    @switch (overwriteTrainerMap()) {
-                        @case ('alarmgroups') {
-                            <app-alarm-group-overview-page
-                                class="h-100"
-                                (closeView)="
-                                    overwriteTrainerMap.set(null);
-                                    accordion.collapseAll()
-                                "
-                            />
-                        }
-                        @case ('hospitals') {
-                            <app-hospital-editor-page
-                                class="h-100"
-                                (closeView)="
-                                    overwriteTrainerMap.set(null);
-                                    accordion.collapseAll()
-                                "
-                            />
-                        }
-                    }
-                </div>
+        <ng-template #trainermapoffcanvas let-offcanvas>
+            @switch (overwriteTrainerMap()) {
+                @case ('alarmgroups') {
+                    <app-alarm-group-overview-page
+                        class="h-100"
+                        (closeView)="closeOffcanvas(); accordion.collapseAll()"
+                    />
+                }
+                @case ('hospitals') {
+                    <app-hospital-editor-page
+                        class="h-100"
+                        (closeView)="closeOffcanvas(); accordion.collapseAll()"
+                    />
+                }
+            }
+        </ng-template>
+
+        <div class="col p-0 rounded-start overflow-hidden position-relative">
+            <div class="position-absolute h-100 w-100">
+                <app-exercise-map></app-exercise-map>
             </div>
-        }
-        <div
-            class="col p-0 rounded-start overflow-hidden"
-            [class.visually-hidden]="overwriteTrainerMap() !== null"
-        >
-            <app-exercise-map></app-exercise-map>
+            <div #mapRef class="trainer-map-editor-offcanvas-container"></div>
         </div>
         <div
             class="card col-3 p-0 rounded-0 rounded-end"
@@ -585,8 +574,10 @@
 
                 <div
                     ngbAccordionItem="alarmgroups"
-                    (show)="overwriteTrainerMap.set('alarmgroups')"
-                    (hide)="overwriteTrainerMap.set(null)"
+                    (show)="
+                        openOffcanvasView('alarmgroups', trainermapoffcanvas)
+                    "
+                    (hide)="closeOffcanvas()"
                 >
                     <h5 ngbAccordionHeader>
                         <button ngbAccordionButton>Alarmgruppen</button>
@@ -629,8 +620,8 @@
 
                 <div
                     ngbAccordionItem="hospitals"
-                    (show)="overwriteTrainerMap.set('hospitals')"
-                    (hide)="overwriteTrainerMap.set(null)"
+                    (show)="openOffcanvasView('hospitals', trainermapoffcanvas)"
+                    (hide)="closeOffcanvas()"
                 >
                     <h5 ngbAccordionHeader>
                         <button ngbAccordionButton>Krankenhäuser</button>

@@ -31,7 +31,7 @@
             alarmGroup of alarmGroups$ | async | values;
             track alarmGroup.id
         ) {
-            <li class="list-group-item" cdkDrag>
+            <li class="list-group-item" cdkDrag cdkDragDisabled>
                 <app-alarm-group-item
                     [alarmGroup]="alarmGroup"
                 ></app-alarm-group-item>

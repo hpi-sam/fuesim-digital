@@ -136,10 +136,17 @@ export class UsedCollectionItemComponent {
         if (!result) return;
 
         const newVersion = value.latestVersion;
-        await this.collectionService.addCollectionDependency({
+        await this.collectionService.upgradeCollectionDependency({
             importTo: this.currentCollectionEntityId(),
             importFrom: newVersion.versionId,
+            acceptedElementDeletions: Object.values(changeDependencies).flatMap(
+                (changeApply) => changeApply.map((m) => m.versionId)
+            ),
         });
+    }
+
+    public typedObjectKeys<T extends object>(obj: T): (keyof T)[] {
+        return Object.keys(obj) as (keyof T)[];
     }
 
     public async removeCollectionDependency(

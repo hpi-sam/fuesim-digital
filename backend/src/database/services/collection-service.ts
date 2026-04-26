@@ -19,6 +19,7 @@ import {
     applyMigrations,
     cloneDeepMutable,
     ExerciseState,
+    getDependencyChecker,
     getElementDependencies,
     replaceDependencies,
 } from 'fuesim-digital-shared';
@@ -240,51 +241,6 @@ export class CollectionService {
         );
     }
 
-    public async removeCollectionDependency(data: {
-        removeFrom: CollectionEntityId;
-        dependencyEntityId: CollectionVersionId;
-    }): Promise<{
-        newCollection: CollectionDto | null;
-        blockingElements: ElementDto[];
-    }> {
-        return this.reduce(
-            data.removeFrom,
-            async (tx, draftState, eventBuffer) => {
-                const dependingElements =
-                    await tx.getDependingElementsForCollection({
-                        depender: draftState.versionId,
-                        dependency: data.dependencyEntityId,
-                    });
-
-                if (dependingElements.length > 0) {
-                    console.warn(
-                        `Trying to remove dependency ${data.dependencyEntityId} from collection ${data.removeFrom}, but there are still elements depending on this dependency. Depending elements: ${dependingElements.map((de) => de.entityId).join(', ')}`
-                    );
-                    return {
-                        blockingElements: dependingElements,
-                        newCollection: null,
-                    };
-                }
-
-                await tx.collectionRepository.removeCollectionVersionDependency(
-                    draftState.versionId,
-                    data.dependencyEntityId
-                );
-
-                eventBuffer.next({
-                    collectionEntityId: data.removeFrom,
-                    event: 'dependency:change',
-                    data: data.dependencyEntityId,
-                });
-
-                return {
-                    newCollection: draftState,
-                    blockingElements: [],
-                };
-            }
-        );
-    }
-
     public async saveDraftState(collectionEntityId: CollectionEntityId) {
         return this.reduce(
             collectionEntityId,
@@ -388,20 +344,15 @@ export class CollectionService {
                     (dep) => dep.entityId === importFromCollection.entityId
                 );
                 if (existingCollectionDependency !== undefined) {
-                    await tx.collectionRepository.removeCollectionVersionDependency(
-                        draftState.versionId,
-                        existingCollectionDependency.versionId
-                    );
-                    await tx.collectionRepository.addCollectionVersionDependency(
-                        draftState.versionId,
-                        importFromCollection.versionId
-                    );
-                } else {
-                    await tx.collectionRepository.addCollectionVersionDependency(
-                        draftState.versionId,
-                        importFromCollection.versionId
+                    throw new Error(
+                        'This collection already depends on a version of the imported collection. Please remove the existing dependency before adding a new one.'
                     );
                 }
+
+                await tx.collectionRepository.addCollectionVersionDependency(
+                    draftState.versionId,
+                    importFromCollection.versionId
+                );
 
                 eventBuffer.next({
                     event: 'dependency:change',
@@ -419,6 +370,148 @@ export class CollectionService {
                     collection: importFromCollection,
                     elements: newlyImportedElements,
                     newCollectionVersion: draftState,
+                };
+            }
+        );
+    }
+
+    public async upgradeCollectionDependency(data: {
+        upgradeIn: CollectionEntityId;
+        upgradeTo: CollectionVersionId;
+        acceptedElementDeletions: ElementVersionId[];
+    }) {
+        return this.reduce(
+            data.upgradeIn,
+            async (tx, draftState, eventBuffer) => {
+                const upgradeToCollection = tx.exists(
+                    await tx.collectionRepository.getCollectionByVersionId(
+                        data.upgradeTo
+                    )
+                );
+
+                // Only allow upgrading if we already depend on the collection
+                const existingDependencies = await tx.getCollectionDependencies(
+                    draftState.versionId
+                );
+                const existingCollectionDependency = existingDependencies.find(
+                    (dep) => dep.entityId === upgradeToCollection.entityId
+                );
+                if (!existingCollectionDependency) {
+                    throw new Error(
+                        'Cannot upgrade collection dependency, because the collection does not have an existing dependency on the provided collection entity.'
+                    );
+                }
+
+                // Fetch, which elements of our Collection depend on the collection we want to upgrade
+                const elementDependencies =
+                    await tx.getDependingElementsForCollection({
+                        depender: draftState.versionId,
+                        dependency: existingCollectionDependency.versionId,
+                    });
+
+                // Check if the provided acceptedElementDeletions actually account for all depending elements
+                if (
+                    !elementDependencies.every((ed) =>
+                        data.acceptedElementDeletions.includes(ed.versionId)
+                    )
+                ) {
+                    throw new Error(
+                        'Not all depending elements are accounted for in the accepted element deletions.'
+                    );
+                }
+
+                await Promise.all(
+                    elementDependencies.map(async (ed) => {
+                        const dependencies =
+                            await tx.getDependenciesOfElement(ed);
+                        const dependencyCheck = getDependencyChecker(
+                            ed.content.type
+                        );
+                        if (!dependencyCheck) {
+                            if (dependencies.length > 0) {
+                                throw new Error(
+                                    `Element with type ${ed.content.type} has dependencies but no dependency checker is implemented for this type.`
+                                );
+                            }
+                            return;
+                        }
+                        const newContent = replaceDependencies(
+                            ed.content,
+                            dependencies.map((d) => ({
+                                old: d.versionId,
+                                new: null,
+                            }))
+                        );
+
+                        await tx.updateElement(ed.entityId, newContent);
+                    })
+                );
+
+                await tx.collectionRepository.removeCollectionVersionDependency(
+                    draftState.versionId,
+                    existingCollectionDependency.versionId
+                );
+
+                await tx.collectionRepository.addCollectionVersionDependency(
+                    draftState.versionId,
+                    data.upgradeTo
+                );
+
+                eventBuffer.next({
+                    collectionEntityId: data.upgradeIn,
+                    event: 'dependency:change',
+                    data: upgradeToCollection.versionId,
+                });
+
+                return {
+                    collection: upgradeToCollection,
+                    elements: [], // TODO: ,
+                    newCollectionVersion: draftState,
+                };
+            }
+        );
+    }
+
+    public async removeCollectionDependency(data: {
+        removeFrom: CollectionEntityId;
+        dependencyEntityId: CollectionVersionId;
+    }): Promise<{
+        newCollection: CollectionDto | null;
+        blockingElements: ElementDto[];
+    }> {
+        return this.reduce(
+            data.removeFrom,
+            async (tx, draftState, eventBuffer) => {
+                const dependingElements =
+                    await tx.getDependingElementsForCollection({
+                        depender: draftState.versionId,
+                        dependency: data.dependencyEntityId,
+                    });
+
+                if (dependingElements.length > 0) {
+                    console.warn(
+                        `Trying to remove dependency ${data.dependencyEntityId} from collection ${data.removeFrom}, but there are still elements depending on this dependency. Depending elements: ${dependingElements.map((de) => de.entityId).join(', ')}`
+                    );
+                    return {
+                        blockingElements: dependingElements,
+                        newCollection: null,
+                    };
+                }
+
+                await tx.collectionRepository.removeCollectionVersionDependency(
+                    draftState.versionId,
+                    data.dependencyEntityId
+                );
+
+                eventBuffer.next({
+                    collectionEntityId: data.removeFrom,
+                    event: 'dependency:change',
+                    data: data.dependencyEntityId,
+                });
+
+                return {
+                    newCollection: draftState,
+                    blockingElements: [],
                 };
             }
         );
@@ -1120,7 +1213,19 @@ export class CollectionService {
             })
         );
 
-        return dependingElements;
+        return dependingElements.reduce<ElementDto[]>(
+            (uniqueDependingElements, current) => {
+                if (
+                    !uniqueDependingElements.some(
+                        (elem) => elem.versionId === current.versionId
+                    )
+                ) {
+                    uniqueDependingElements.push(current);
+                }
+                return uniqueDependingElements;
+            },
+            []
+        );
     }
 
     public async makeCollectionPublic(collectionEntityId: CollectionEntityId) {

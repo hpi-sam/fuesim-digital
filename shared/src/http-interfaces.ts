@@ -445,6 +445,23 @@ export namespace Marketplace {
             }),
         });
 
+        export const AddDependency = new Route({
+            response: z.object({
+                importedSet: collectionElementsSingleSchema,
+                newCollectionVersionId: collectionVersionIdSchema,
+            }),
+        });
+
+        export const UpgradeDependency = new Route({
+            request: z.object({
+                acceptedElementDeletions: z.array(elementVersionIdSchema),
+            }),
+            response: z.object({
+                importedSet: collectionElementsSingleSchema,
+                newCollectionVersionId: collectionVersionIdSchema,
+            }),
+        });
+
         export const RemoveDependency = new Route({
             response: z.object({
                 result: z.union([
@@ -469,13 +486,6 @@ export namespace Marketplace {
         export const Duplicate = new Route({
             response: z.object({
                 createdSet: collectionDtoSchema,
-            }),
-        });
-
-        export const Import = new Route({
-            response: z.object({
-                importedSet: collectionElementsSingleSchema,
-                newCollectionVersionId: collectionVersionIdSchema,
             }),
         });
 

@@ -364,6 +364,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         res.send();
     });
 
+    /**
+     * Add a new Dependency to a collection
+     */
     editorRouter.post(
         '/:collectionEntityId/dependencies/:importSetVersionId',
         async (req, res) => {
@@ -379,7 +382,44 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             });
 
             res.send(
-                Marketplace.Collection.Import.responseSchema.encode({
+                Marketplace.Collection.AddDependency.responseSchema.encode({
+                    importedSet: {
+                        collection: data.collection,
+                        elements: data.elements,
+                    },
+                    newCollectionVersionId: data.newCollectionVersion.versionId,
+                })
+            );
+        }
+    );
+
+    /**
+     * Upgrade a Dependency of a collection
+     *
+     * This is seperate from the add dependency endpoint to allow for checks and resolution of internal dependencies
+     */
+    editorRouter.post(
+        '/:collectionEntityId/dependencies/:importSetVersionId/upgrade',
+        async (req, res) => {
+            const collectionEntityId = getCollectionEntityId(req);
+            const importSetVersionId = getCollectionVersionId(
+                req,
+                'importSetVersionId'
+            );
+
+            const parsedBody =
+                Marketplace.Collection.UpgradeDependency.requestSchema.parse(
+                    req.body
+                );
+
+            const data = await collectionService.upgradeCollectionDependency({
+                upgradeIn: collectionEntityId,
+                upgradeTo: importSetVersionId,
+                acceptedElementDeletions: parsedBody.acceptedElementDeletions,
+            });
+
+            res.send(
+                Marketplace.Collection.UpgradeDependency.responseSchema.encode({
                     importedSet: {
                         collection: data.collection,
                         elements: data.elements,

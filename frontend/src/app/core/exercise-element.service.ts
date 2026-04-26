@@ -446,9 +446,28 @@ export class CollectionService {
         importFrom: CollectionVersionId;
     }) {
         await lastValueFrom(
-            this.httpClient.post<typeof Marketplace.Collection.Import.Response>(
+            this.httpClient.post<
+                typeof Marketplace.Collection.AddDependency.Response
+            >(
                 `${this.ENDPOINT}/${opts.importTo}/dependencies/${opts.importFrom}`,
                 {}
+            )
+        );
+    }
+
+    public async upgradeCollectionDependency(opts: {
+        importTo: CollectionEntityId;
+        importFrom: CollectionVersionId;
+        acceptedElementDeletions: ElementVersionId[];
+    }) {
+        const data = await lastValueFrom(
+            this.httpClient.post<
+                typeof Marketplace.Collection.UpgradeDependency.Response
+            >(
+                `${this.ENDPOINT}/${opts.importTo}/dependencies/${opts.importFrom}/upgrade`,
+                Marketplace.Collection.UpgradeDependency.requestSchema.encode({
+                    acceptedElementDeletions: opts.acceptedElementDeletions,
+                })
             )
         );
     }

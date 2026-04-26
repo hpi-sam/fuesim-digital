@@ -1,4 +1,5 @@
 import { Immutable } from 'immer';
+import { z } from 'zod';
 import { IsValue } from '../../utils/validators/is-value.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
@@ -8,12 +9,14 @@ import {
 } from '../../marketplace/models/versioned-elements.js';
 
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { changeApplySchema, ChangeApply } from '../../marketplace/collection-upgrade-impact.js';
 import {
     collectionEntityIdSchema,
     versionedCollectionPartialSchema,
     type VersionedCollectionPartial,
     type CollectionEntityId,
 } from './../../marketplace/models/versioned-id-schema.js';
+
 export class AddCollection implements Action {
     @IsValue('[Collection] Add Collection' as const)
     public readonly type = '[Collection] Add Collection';
@@ -23,6 +26,21 @@ export class AddCollection implements Action {
 
     @IsZodSchema(elementDtoSchema.array())
     public readonly elements!: ElementDto[];
+}
+
+
+export class UpgradeCollection implements Action {
+    @IsValue('[Collection] Upgrade Collection' as const)
+    public readonly type = '[Collection] Upgrade Collection';
+
+    @IsZodSchema(versionedCollectionPartialSchema)
+    public readonly collectionVersion!: VersionedCollectionPartial;
+
+    @IsZodSchema(elementDtoSchema.array())
+    public readonly elements!: ElementDto[];
+
+    @IsZodSchema(z.array(changeApplySchema))
+    public readonly changesToApply!: ChangeApply[];
 }
 
 export class RemoveCollection implements Action {
@@ -78,6 +96,44 @@ export namespace CollectionReducers {
         },
         rights: 'trainer',
     };
+    export const upgradeCollection: ActionReducer<UpgradeCollection> = {
+        action: UpgradeCollection,
+        reducer: (draftState, data) => {
+            const collection = draftState.selectedCollections.find(
+                (cf) =>
+                    cf.entityId ===
+                    data.collectionVersion.entityId
+            );
+            if (!collection) {
+                console.warn(
+                    `Collection with entityId ${data.collectionVersion.entityId} not found in selectedCollections. Cannot upgrade collection.`
+                );
+                return draftState;
+            }
+            collection.versionId = data.collectionVersion.versionId;
+
+            draftState.templates = Object.fromEntries(
+                Object.entries(draftState.templates).map(([key, element]) => {
+
+                    /*const changeToApply = data.changesToApply.find(f=>f.change.entity.versionId === element.versionId);
+                    if (!changeToApply) {
+                        return [key, element];
+                    }*/
+
+
+                    return [key, element];
+                })
+            )
+
+// TODO: !!!! @Quixelation
+
+
+
+
+            return draftState;
+        },
+        rights: 'trainer',
+    }
     export const removeCollection: ActionReducer<RemoveCollection> = {
         action: RemoveCollection,
         reducer: (draftState, data) => {

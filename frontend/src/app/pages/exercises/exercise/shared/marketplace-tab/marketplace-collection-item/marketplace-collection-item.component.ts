@@ -8,6 +8,10 @@ import {
     VersionedCollectionPartial,
     Element as FuesimElement,
     getEntityIdFromElement,
+    ChangeImpact,
+    EditableElementChangeImpact,
+    RemovedElementChangeImpact,
+    CollectionElementsDto,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -16,11 +20,6 @@ import { CollectionService } from '../../../../../../core/exercise-element.servi
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import { selectVehicles } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
-import {
-    ChangeImpact,
-    EditableElementChangeImpact,
-    RemovedElementChangeImpact,
-} from '../../change-impact-modal/change-impact-types';
 import { AppState } from '../../../../../../state/app.state';
 import { ChangeImpactModalComponent } from '../../change-impact-modal/change-impact-modal.component';
 import { LoadingModalService } from '../../../../../../core/loading-modal/loading-modal.service';
@@ -61,19 +60,56 @@ export class MarketplaceColletionItemComponent {
             await this.collectionService.getElementsOfCollectionVersion(
                 this.collection()
             );
-        return gatherCollectionElements(collectionElements).allDirectElements();
+        return gatherCollectionElements(collectionElements).allVisibleElements();
     }
 
     public async removeCollection(collection: VersionedCollectionPartial) {
-        const elements =
-            await this.collectionService.getElementsOfCollectionVersion(
-                collection
+
+
+        try {
+            this.loadingModalService.showLoading({
+                title: 'Neue Version wird geladen',
+                description:
+                    'Bitte warten Sie, während die neue Version der Sammlung geladen wird und die Auswirkungen von Änderungen berechnet werden.',
+            });
+
+            const selectedCollection = this.collection();
+            const elements =
+                await this.collectionService.getElementsOfCollectionVersion(
+                    collection
+                );
+
+            const elementsInExercise = {
+                ...selectStateSnapshot(selectVehicles, this.store),
+            };
+            const changeImpacts = await this.calcChangeImpact({
+                inExercise: Object.values(elementsInExercise),
+                new: [],
+                previous: gatherCollectionElements(elements).allDirectElements(),
+            });
+
+            this.loadingModalService.closeLoading();
+
+            const modal = this.ngbModalService.open(
+                ChangeImpactModalComponent,
+                {
+                    size: 'xl',
+                }
             );
-        await this.exerciseService.proposeAction({
+            modal.componentInstance.changes =
+                changeImpacts satisfies ChangeImpact[];
+            modal.componentInstance.newCollectionElements =
+                elements.direct;
+        } catch (error) {
+            this.loadingModalService.closeLoading();
+            throw error;
+        }
+
+        /*await this.exerciseService.proposeAction({
             type: '[Collection] Remove Collection',
             collectionEntity: collection.entityId,
             elements: gatherCollectionElements(elements).allVisibleElements(),
-        });
+        });*/
         // TODO: Keep in mind, that some elements may still be transitive dependencies of other collections!
         // WE SHOULD NOT REMOVE THEM IN THIS CASE!
     }
@@ -106,7 +142,7 @@ export class MarketplaceColletionItemComponent {
             };
             const changeImpacts = await this.calcChangeImpact({
                 inExercise: Object.values(elementsInExercise),
-                new: newerCollectionElements.direct,
+                new: gatherCollectionElements(newerCollectionElements).allVisibleElements(),
                 previous: await this.fetchCollectionElements(),
             });
 
@@ -121,7 +157,7 @@ export class MarketplaceColletionItemComponent {
             modal.componentInstance.changes =
                 changeImpacts satisfies ChangeImpact[];
             modal.componentInstance.newCollectionElements =
-                newerCollectionElements.direct;
+                gatherCollectionElements(newerCollectionElements).allVisibleElements();
         } catch (error) {
             this.loadingModalService.closeLoading();
             throw error;

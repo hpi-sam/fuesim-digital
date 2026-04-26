@@ -1,13 +1,11 @@
 import { Component, input, output } from '@angular/core';
 import type {
+    ChangeApply,
     ElementDto,
     Element as FuesimElement,
-} from 'fuesim-digital-shared';
-import {
-    ChangeApply,
     RemoveChangeApply,
     RemovedElementChangeImpact,
-} from '../change-impact-types';
+} from 'fuesim-digital-shared';
 import { MapEditorCardComponent } from '../../../../../../shared/components/map-editor-card/map-editor-card.component';
 
 @Component({

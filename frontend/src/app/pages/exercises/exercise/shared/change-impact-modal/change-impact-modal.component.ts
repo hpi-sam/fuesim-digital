@@ -1,11 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
-import { ElementDto } from 'fuesim-digital-shared';
+import { ChangeApply, ChangeImpact, ElementDto } from 'fuesim-digital-shared';
 import { JsonPipe } from '@angular/common';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { VersionedElementDisplayNamePipe } from '../../../../../shared/pipes/versioned-element-type-display-name.pipe';
-import { ChangeApply, ChangeImpact } from './change-impact-types';
 import { DeletedElementChangeApplyItemComponent } from './deleted-element-item/deleted-element-item.component';
 import { EditedElementChangeApplyItemComponent } from './edited-element-item/edited-element-item.component';
 

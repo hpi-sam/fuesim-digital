@@ -314,6 +314,39 @@ export class CollectionRepository extends BaseRepository {
         return data;
     }
 
+    public async getParentCollectionsOfCollectionVersion(
+        collectionEntityId: CollectionEntityId,
+        recursive: boolean = false
+    ): Promise<CollectionEntityId[]> {
+        const data = await this.databaseConnection
+            .select()
+            .from(collectionDependencyMappingTable)
+            .where(
+                eq(
+                    collectionDependencyMappingTable.collectionEntityId,
+                    collectionEntityId
+                )
+            );
+
+        const parentCollections = [
+            ...data.map((d) => d.dependentCollectionEntityId),
+        ];
+        if (recursive) {
+            await Promise.all(
+                data.map(async (dependency) => {
+                    const parentParents =
+                        await this.getParentCollectionsOfCollectionVersion(
+                            dependency.dependentCollectionEntityId,
+                            true
+                        );
+                    parentCollections.push(...parentParents);
+                })
+            );
+        }
+
+        return parentCollections;
+    }
+
     public async removeCollectionVersionDependency(
         dependentCollectionVersionId: CollectionVersionId,
         dependencyCollectionVersionId: CollectionVersionId

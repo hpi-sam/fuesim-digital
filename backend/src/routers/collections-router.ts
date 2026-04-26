@@ -68,7 +68,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
             const userId = req.session!.user.id;
             const relationship =
-                await collectionService.getUserRoleInCollection(
+                await collectionService.getUserRoleInCollectionTransitive(
                     collectionEntityId,
                     userId
                 );

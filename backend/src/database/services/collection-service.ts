@@ -136,11 +136,61 @@ export class CollectionService {
     public async getUserRoleInCollection(
         collectionEntityId: CollectionEntityId,
         userId: string
-    ) {
+    ): Promise<CollectionRelationshipType | null> {
         return this.collectionRepository.getUserRoleInCollection(
             collectionEntityId,
             userId
         );
+    }
+
+    /**
+     * This function (unlike getUserRoleInCollection) also
+     * checks parent collections.
+     *
+     * So that a user can access a collection which is imported
+     * into another collection where the user has permissions.
+     */
+    public async getUserRoleInCollectionTransitive(
+        collectionEntityId: CollectionEntityId,
+        userId: string
+    ): Promise<CollectionRelationshipType | null> {
+        console.log(
+            `Checking permissions for user ${userId} in collection ${collectionEntityId} and its parent collections.`
+        );
+        const directRole = await this.getUserRoleInCollection(
+            collectionEntityId,
+            userId
+        );
+        if (directRole !== null) return directRole;
+        console.log(
+            `No direct permissions found for user ${userId} in collection ${collectionEntityId}. Checking parent collections…`
+        );
+
+        const parentCollections =
+            await this.collectionRepository.getParentCollectionsOfCollectionVersion(
+                collectionEntityId,
+                // we only need one level of parent collections.
+                // since we want to access dependency collections if we are part of a collection which imports them,
+                // but there is no need to check further up the chain, since there is no UI for that.
+                false
+            );
+        console.log(
+            `Found ${parentCollections.length} parent collections for collection ${collectionEntityId}. Checking permissions for user ${userId} in these collections…`
+        );
+
+        const rolesInParents = await Promise.all(
+            parentCollections.map(async (parentCollection) => {
+                const parentRole = await this.getUserRoleInCollection(
+                    parentCollection,
+                    userId
+                );
+
+                return parentRole !== null;
+            })
+        );
+
+        // if we dont have direct rights, the highest role we can get is viewer
+        return rolesInParents.some((r) => r) ? 'viewer' : null;
     }
 
     public async getCollectionMembers(collectionEntityId: CollectionEntityId) {

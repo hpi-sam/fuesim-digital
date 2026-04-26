@@ -13,23 +13,3 @@
     justify-content: start;
     align-items: start;
 }
-
-::ng-deep .trainer-map-editor-offcanvas-container {
-    right: 0 !important;
-    top: 0 !important;
-    width: 50% !important;
-    position: absolute !important;
-    height: 100% !important;
-    overflow: hidden !important;
-    scrollbar-gutter: stable !important;
-    pointer-events: none !important;
-
-    .trainer-map-editor-offcanvas,
-    .offcanvas {
-        scrollbar-gutter: stable !important;
-        position: absolute !important;
-        width: 100% !important;
-        overflow-y: auto !important;
-        pointer-events: auto !important;
-    }
-}

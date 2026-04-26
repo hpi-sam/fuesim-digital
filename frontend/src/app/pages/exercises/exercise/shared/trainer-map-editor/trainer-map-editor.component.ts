@@ -4,7 +4,6 @@ import {
     Component,
     Signal,
     signal,
-    TemplateRef,
     viewChild,
     ElementRef,
 } from '@angular/core';
@@ -203,33 +202,6 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public changeDisplayTransferLines(newValue: boolean) {
         this.transferLinesService.displayTransferLines = newValue;
-    }
-
-    public openOffcanvasView(
-        template: 'alarmgroups' | 'hospitals',
-        ref: TemplateRef<any>
-    ) {
-        this.overwriteTrainerMap.set(template);
-        const mapContainer = this.mapRef();
-        if (!mapContainer) {
-            console.error(
-                'Map container not found, offcanvas might not be positioned correctly'
-            );
-        }
-        console.log(mapContainer?.nativeElement);
-        this.offcanvasService.open(ref, {
-            position: 'end',
-            scroll: true,
-            container: mapContainer?.nativeElement,
-            panelClass: 'trainer-map-editor-offcanvas',
-            backdropClass: 'trainer-map-editor-offcanvas-backdrop',
-            backdrop: false,
-        });
-    }
-
-    public closeOffcanvas() {
-        this.overwriteTrainerMap.set(null);
-        this.offcanvasService.dismiss();
     }
 
     public readonly simulatedRegionDragTemplates = simulatedRegionDragTemplates;

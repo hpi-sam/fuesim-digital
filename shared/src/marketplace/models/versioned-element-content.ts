@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Immutable } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { alarmGroupSchema } from '../../models/alarm-group.js';
 import { vehicleTemplateSchema } from '../../models/vehicle-template.js';
 import type {
@@ -12,9 +12,20 @@ export const versionedElementContentSchema = z.union([
     alarmGroupSchema,
 ]);
 
+export const versionedElementContentAllowedTypes =
+    versionedElementContentSchema.options.map(
+        (option) => option.shape.type.value
+    );
+
 export type VersionedElementContent = Immutable<
     z.infer<typeof versionedElementContentSchema>
 >;
+
+export function isVersionedElementContent(
+    content: any
+): content is WritableDraft<VersionedElementContent> {
+    return versionedElementContentSchema.safeParse(content).success;
+}
 
 export type DefinitelyVersionedElementContent = VersionedElementContent & {
     versionId: ElementVersionId;

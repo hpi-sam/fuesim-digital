@@ -75,7 +75,7 @@ import {
     updateRequestVehiclesDelay,
 } from '../../simulation/behaviors/manage-patient-transport-to-hospital.js';
 import { UnloadArrivingVehiclesBehaviorState } from '../../simulation/behaviors/unload-arrived-vehicles.js';
-import { getTemplates } from '../../models/utils/template.js';
+import { getTemplates } from '../../models/template.js';
 import {
     getActivityById,
     getBehaviorById,

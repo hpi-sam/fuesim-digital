@@ -20,6 +20,7 @@ import {
     cloneDeepMutable,
     ExerciseState,
     getElementDependencies,
+    isVersionedElementContent,
     replaceDependencies,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
@@ -1478,12 +1479,12 @@ export class CollectionService {
 
             // TODO: Change this as soon as we have the new state structure with step 2 of marketplace
             state = Object.assign(state, {
-                vehicleTemplates: allElements.reduce<{
+                templates: allElements.reduce<{
                     [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
                 }>((acc, element) => {
                     if (element.content.type !== 'vehicleTemplate') return acc;
                     acc[element.entityId] = {
-                        ...element.content,
+                        ...cloneDeepMutable(element.content),
                         versionId: element.versionId,
                         entityId: element.entityId,
                     };
@@ -1494,7 +1495,7 @@ export class CollectionService {
                 }>((acc, element) => {
                     if (element.content.type !== 'vehicleTemplate') return acc;
                     acc[element.entityId] = {
-                        ...element.content,
+                        ...cloneDeepMutable(element.content),
                         versionId: element.versionId,
                         entityId: element.entityId,
                     };
@@ -1512,9 +1513,8 @@ export class CollectionService {
                 migratedState.newVersion,
                 [
                     ...Object.values(
-                        migratedState.migratedProperties.currentState
-                            .vehicleTemplates
-                    ),
+                        migratedState.migratedProperties.currentState.templates
+                    ).filter(isVersionedElementContent),
                 ]
             );
 

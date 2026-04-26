@@ -32,7 +32,7 @@ import { type UUID, uuid, uuidValidationOptions } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import { simulateAllTechnicalChallenges } from '../../models/technical-challenge/state-machine.js';
-import { getTemplates } from '../../models/utils/template.js';
+import { getTemplates } from '../../models/template.js';
 import { PatientUpdate } from './utils/patient-updates.js';
 import {
     logPatientVisibleStatusChanged,

@@ -21,7 +21,7 @@ import {
     type MapCoordinates,
     mapCoordinatesSchema,
 } from '../../models/utils/position/map-coordinates.js';
-import { getTemplates } from '../../models/utils/template.js';
+import { getTemplates } from '../../models/template.js';
 import { getElement } from './utils/get-element.js';
 
 export class AddRestrictedZoneAction implements Action {

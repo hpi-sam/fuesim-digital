@@ -9,7 +9,10 @@ import {
 } from '../../marketplace/models/versioned-elements.js';
 
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import { changeApplySchema, ChangeApply } from '../../marketplace/collection-upgrade-impact.js';
+import {
+    changeApplySchema,
+    ChangeApply,
+} from '../../marketplace/collection-upgrade-impact.js';
 import {
     collectionEntityIdSchema,
     versionedCollectionPartialSchema,
@@ -27,7 +30,6 @@ export class AddCollection implements Action {
     @IsZodSchema(elementDtoSchema.array())
     public readonly elements!: ElementDto[];
 }
-
 
 export class UpgradeCollection implements Action {
     @IsValue('[Collection] Upgrade Collection' as const)
@@ -100,9 +102,7 @@ export namespace CollectionReducers {
         action: UpgradeCollection,
         reducer: (draftState, data) => {
             const collection = draftState.selectedCollections.find(
-                (cf) =>
-                    cf.entityId ===
-                    data.collectionVersion.entityId
+                (cf) => cf.entityId === data.collectionVersion.entityId
             );
             if (!collection) {
                 console.warn(
@@ -113,27 +113,22 @@ export namespace CollectionReducers {
             collection.versionId = data.collectionVersion.versionId;
 
             draftState.templates = Object.fromEntries(
-                Object.entries(draftState.templates).map(([key, element]) => {
-
-                    /*const changeToApply = data.changesToApply.find(f=>f.change.entity.versionId === element.versionId);
+                Object.entries(draftState.templates).map(([key, element]) => 
+                    /* const changeToApply = data.changesToApply.find(f=>f.change.entity.versionId === element.versionId);
                     if (!changeToApply) {
                         return [key, element];
                     }*/
 
+                     [key, element]
+                )
+            );
 
-                    return [key, element];
-                })
-            )
-
-// TODO: !!!! @Quixelation
-
-
-
+            // TODO: !!!! @Quixelation
 
             return draftState;
         },
         rights: 'trainer',
-    }
+    };
     export const removeCollection: ActionReducer<RemoveCollection> = {
         action: RemoveCollection,
         reducer: (draftState, data) => {

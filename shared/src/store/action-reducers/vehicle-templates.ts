@@ -23,7 +23,7 @@ import {
     type ElementEntityId,
     elementEntityIdSchema,
 } from '../../marketplace/models/versioned-id-schema.js';
-import { getTemplates } from '../../models/utils/template.js';
+import { getTemplates } from '../../models/template.js';
 
 export class AddVehicleTemplateAction implements Action {
     @IsValue('[VehicleTemplate] Add vehicleTemplate')

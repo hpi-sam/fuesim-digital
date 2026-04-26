@@ -8,12 +8,12 @@ import {
     CollectionEntityId,
     CollectionVersionId,
     getCollectionElementDiff,
-    findElementVersionsInContent,
     ElementVersionId,
     ElementDto,
     ChangeDependencies,
     gatherCollectionElements,
     CollectionDto,
+    getElementDependencies,
 } from 'fuesim-digital-shared';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -95,8 +95,7 @@ export class UsedCollectionItemComponent {
         for (const currentElement of currentCollectionElement.direct) {
             currentCollectionDependencies.push({
                 element: currentElement,
-                dependsOn: findElementVersionsInContent(currentElement.content)
-                    .ids,
+                dependsOn: getElementDependencies(currentElement.content),
             });
         }
 

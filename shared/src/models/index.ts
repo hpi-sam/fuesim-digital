@@ -30,5 +30,4 @@ export * from './scoutable.js';
 export * from './user-generated-content.js';
 export * from './technical-challenge/index.js';
 export * from './task.js';
-export * from '../marketplace/models/versioned-elements.js';
-export * from '../marketplace/models/collection.js';
+export * from "./template.js";

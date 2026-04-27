@@ -71,9 +71,9 @@ import { PatientStatusDisplayComponent } from '../../../../../shared/components/
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
 import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
-import { MarketplaceTabComponent } from '../marketplace-tab/marketplace-tab.component';
 import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
 import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
+import { ManageExerciseCollectionsModalComponent } from '../manage-exercise-collections/manage-exercise-collections-modal.component';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -90,7 +90,6 @@ type FilterCategory =
     templateUrl: './trainer-map-editor.component.html',
     styleUrls: ['./trainer-map-editor.component.scss'],
     imports: [
-        MarketplaceTabComponent,
         ExerciseMapComponent,
         FileInputDirective,
         NgbAccordionDirective,
@@ -240,6 +239,12 @@ export class TrainerMapEditorComponent implements OnInit {
     ) {
         this.overwriteTrainerMap.set(null);
         this.dragElementService.onMouseDown(event, transferTemplate);
+    }
+
+    public openTemplateManagementModal() {
+        this.ngbModalService.open(ManageExerciseCollectionsModalComponent, {
+            size: 'xl',
+        });
     }
 
     public importingTemplates = false;

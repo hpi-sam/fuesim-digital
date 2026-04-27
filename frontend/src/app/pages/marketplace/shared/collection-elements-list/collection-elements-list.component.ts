@@ -51,11 +51,14 @@ export class CollectionElementsListComponent {
     });
 
     public readonly visibleElements = computed(() => [
-        ...
-            gatherCollectionElements(
+        ...gatherCollectionElements(
             this.collectionElements()
         ).allDirectElements(),
-        ...(this.showImportedElements() ? gatherCollectionElements(this.collectionElements()).allImportedElements() : []),
+        ...(this.showImportedElements()
+            ? gatherCollectionElements(
+                  this.collectionElements()
+              ).allImportedElements()
+            : []),
         ...(this.publishedElements() ?? []).filter(
             (f) => this.elementHasChanges()[f.entityId] === 'remove'
         ),

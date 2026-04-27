@@ -11,18 +11,24 @@
             @if (newerVersion; as version) {
                 @if (version.newerVersionAvailable) {
                     <button
-                        class="btn btn-link btn-sm"
-                        (click)="upgradeCollectionVersion()"
+                        class="btn btn-outline-warning btn-sm"
+                        (click)="
+                            $event.stopPropagation(); upgradeCollectionVersion()
+                        "
                     >
-                        <i class="bi bi-arrow-clockwise"></i>
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Auf neuere Version aktualisieren
                     </button>
                 }
             }
             <button
-                class="btn btn-link btn-sm text-danger"
-                (click)="removeCollection(collection())"
+                class="btn btn-outline-danger btn-sm text-danger"
+                (click)="
+                    $event.stopPropagation(); removeCollection(collection())
+                "
             >
                 <i class="bi bi-trash"></i>
+                Sammlung entfernen
             </button>
         </div>
     }

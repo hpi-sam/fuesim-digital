@@ -47,21 +47,13 @@
                 <h5 class="mb-0 d-flex align-items-center">
                     Editor
                     <span class="ms-auto">
-                        <label class="btn btn-outline-primary btn-sm">
-                            <i class="bi-cloud-upload me-2"> </i>
-                            Vorlagen importieren
-                            @if (importingTemplates) {
-                                <span
-                                    class="spinner-border spinner-border-sm"
-                                ></span>
-                            }
-                            <input
-                                (appFileInput)="importPartialExport($event)"
-                                type="file"
-                                accept="application/json"
-                                class="d-none"
-                            />
-                        </label>
+                        <button
+                            class="btn btn-outline-primary btn-sm"
+                            (click)="openTemplateManagementModal()"
+                        >
+                            <i class="bi-grid"></i>
+                            Vorlagen verwalten
+                        </button>
                     </span>
                 </h5>
             </div>
@@ -356,16 +348,6 @@
                             </ng-template>
                         </div>
                     </div>
-                </div>
-
-                <div class="card-header">
-                    <h5 class="mb-0 d-flex align-items-center">
-                        Eigene Übungselemente
-                    </h5>
-                </div>
-
-                <div>
-                    <app-marketplace-tab />
                 </div>
 
                 <div ngbAccordionItem="vehicles">

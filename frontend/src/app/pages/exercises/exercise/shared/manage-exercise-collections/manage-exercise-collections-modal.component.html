@@ -1,0 +1,55 @@
+<div class="modal-header">
+    <h4 class="modal-title">Sammlungen verwalten</h4>
+    <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="close()"
+    ></button>
+</div>
+
+<div class="modal-body">
+    <div class="d-inline-block w-100 px-2 mb-2">
+        <button
+            (click)="openCollectionSelectDialog()"
+            class="btn btn-outline-primary mb-3"
+        >
+            <i class="bi bi-folder-plus"></i>
+            Neue Sammlung hinzufügen
+        </button>
+
+        <div ngbAccordion #accordion="ngbAccordion" [closeOthers]="true">
+            @for (collection of selectedCollections(); track collection) {
+                <div [ngbAccordionItem]="collection.versionId">
+                    <h5 ngbAccordionHeader>
+                        <button ngbAccordionButton>
+                            <app-exercise-collection-item-component
+                                class="w-100 d-block me-3"
+                                [collection]="collection"
+                            />
+                        </button>
+                    </h5>
+
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                @if (collectionElements.isLoading()) {
+                                    <div class="spinner-border"></div>
+                                } @else if (collectionElements.hasValue()) {
+                                    <app-collection-elements-list
+                                        [collection]="collection"
+                                        [collectionElements]="
+                                            getElementsByCollection(collection)
+                                        "
+                                        [showImportedElements]="true"
+                                        [editable]="false"
+                                    />
+                                } @else {}
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

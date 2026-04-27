@@ -1,6 +1,8 @@
 <a
     class="card d-block text-decoration-none"
-    [routerLink]="'/collections/' + collection().entityId"
+    [routerLink]="
+        noLink() ? undefined : '/collections/' + collection().entityId
+    "
     [queryParams]="{ from: fromLocation() }"
 >
     <div class="card-header">

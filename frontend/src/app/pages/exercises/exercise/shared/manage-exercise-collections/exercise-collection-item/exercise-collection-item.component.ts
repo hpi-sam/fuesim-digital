@@ -24,12 +24,12 @@ import { ChangeImpactModalComponent } from '../../change-impact-modal/change-imp
 import { LoadingModalService } from '../../../../../../core/loading-modal/loading-modal.service';
 
 @Component({
-    selector: 'app-marketplace-collection-item-component',
-    templateUrl: './marketplace-collection-item.component.html',
-    styleUrl: './marketplace-collection-item.component.scss',
+    selector: 'app-exercise-collection-item-component',
+    templateUrl: './exercise-collection-item.component.html',
+    styleUrl: './exercise-collection-item.component.scss',
     imports: [],
 })
-export class MarketplaceColletionItemComponent {
+export class ExerciseColletionItemComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly collectionService = inject(CollectionService);
     private readonly store = inject<Store<AppState>>(Store);

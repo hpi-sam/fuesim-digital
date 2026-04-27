@@ -10,12 +10,17 @@ import { Subject } from 'rxjs';
 import { DatePipe } from '@angular/common';
 import { CollectionElementsListComponent } from '../../collection-elements-list/collection-elements-list.component';
 import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionCardComponent } from '../../cards/collection-card/collection-card.component';
 
 @Component({
     selector: 'app-select-collection-modal',
     templateUrl: './marketplace-select-collection-modal.component.html',
     styleUrl: './marketplace-select-collection-modal.component.scss',
-    imports: [CollectionElementsListComponent, DatePipe],
+    imports: [
+        CollectionElementsListComponent,
+        DatePipe,
+        CollectionCardComponent,
+    ],
 })
 export class MarketplaceSelectCollectionModalComponent {
     private readonly collectionService = inject(CollectionService);
@@ -56,7 +61,7 @@ export class MarketplaceSelectCollectionModalComponent {
     public readonly selectedCollectionDataElements = computed(() => {
         const data = this.selectedCollectionData.value();
         if (!data) return [];
-    console.log({showDependencyElements: this.showDependencyElements, data})
+
         if (this.showDependencyElements) {
             return gatherCollectionElements(data[1]).allVisibleElements();
         }
@@ -66,7 +71,7 @@ export class MarketplaceSelectCollectionModalComponent {
     public readonly selectedCollection =
         signal<VersionedCollectionPartial | null>(null);
 
-    public selectCollection(id: VersionedCollectionPartial) {
+    public selectCollection(id: VersionedCollectionPartial | null) {
         this.selectedCollection.set(id);
     }
 

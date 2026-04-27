@@ -5,33 +5,10 @@
     }
     <button class="btn-close ml-auto" (click)="close(null)"></button>
 </div>
-<div class="d-flex flex-row">
-    <ul class="list-group">
-        @if (userAvailableCollections.hasValue()) {
-            @for (
-                collection of userAvailableCollections.value();
-                track collection.versionId
-            ) {
-                <li
-                    class="list-group-item d-flex flex-column"
-                    role="button"
-                    (click)="selectCollection(collection)"
-                    [class.active]="
-                        selectedCollection()?.versionId === collection.versionId
-                    "
-                >
-                    <b>{{ collection.title }}</b>
-                    <span>
-                        Version {{ collection.version }},
-                        {{ collection.editedAt | date }}
-                    </span>
-                </li>
-            }
-        }
-    </ul>
-    <div class="modal-body">
-        @if (selectedCollectionData.value(); as collectionData) {
-            @let collection = collectionData[0];
+<div class="modal-body">
+    @if (selectedCollectionData.value(); as collectionData) {
+        @let collection = collectionData[0];
+        <div class="d-flex align-items-center">
             <h3>
                 {{ collection.title }}
                 <a
@@ -43,37 +20,68 @@
                     ><i class="bi bi-box-arrow-up-right"></i
                 ></a>
             </h3>
-            <span class="text-muted mb-2 d-block">
-                Folgende {{ selectedCollectionDataElements().length }} Elemente
-                aus dieser Sammlung und ggf. enthaltenen Sammlungen werden zu
-                der Übung hinzugefügt:
-            </span>
-            @if (selectedCollectionCanBeChosen()) {
-                <div class="d-flex justify-content-end">
-                    <button
-                        class="btn btn-primary ml-auto"
-                        (click)="close(collection)"
-                    >
-                        "{{ collection.title }}" verwenden
-                        <i class="bi bi-arrow-right"></i>
-                    </button>
-                </div>
-            } @else {
-                <div class="alert alert-warning">
-                    Die aktuelle Sammlung kann nicht in der folgenden Übung
-                    verwendet werden. Ggf. wird diese bereits verwendet. <br />
-                    Bitte wählen Sie eine andere Sammlung aus.
-                </div>
-            }
-            <hr />
-            <app-collection-elements-list
-                [collection]="collection"
-                [collectionElements]="collectionData[1]"
-                [editable]="false"
-                [showImportedElements]="showDependencyElements"
-            />
+        </div>
+        <span class="text-muted mb-2 d-block">
+            Möchten Sie {{ selectedCollectionDataElements().length }} Elemente
+            aus dieser Sammlung und ggf. enthaltenen Sammlungen zu der Übung
+            hinzufügen?
+        </span>
+        @if (selectedCollectionCanBeChosen()) {
+            <div class="d-flex justify-content-start gap-2">
+                <button
+                    class="btn btn-outline-secondary"
+                    (click)="selectCollection(null)"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                    Andere Sammlung auswählen
+                </button>
+                <button
+                    class="btn btn-primary ml-auto"
+                    (click)="close(collection)"
+                >
+                    "{{ collection.title }}" verwenden
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        } @else {
+            <div class="alert alert-warning">
+                Die aktuelle Sammlung kann nicht in der folgenden Übung
+                verwendet werden. Ggf. wird diese bereits verwendet. <br />
+                Bitte wählen Sie eine andere Sammlung aus.
+            </div>
+            <button
+                class="btn btn-outline-secondary"
+                (click)="selectCollection(null)"
+            >
+                <i class="bi bi-arrow-left"></i>
+                Andere Sammlung auswählen
+            </button>
         }
-    </div>
+        <hr />
+        <app-collection-elements-list
+            [collection]="collection"
+            [collectionElements]="collectionData[1]"
+            [editable]="false"
+            [showImportedElements]="showDependencyElements"
+        />
+    } @else {
+        @if (userAvailableCollections.hasValue()) {
+            <div class="row row-cols-3">
+                @for (
+                    collection of userAvailableCollections.value();
+                    track collection.versionId
+                ) {
+                    <div class="col" style="cursor: pointer">
+                        <app-collection-card
+                            [collection]="collection"
+                            (click)="selectCollection(collection)"
+                            [noLink]="true"
+                        />
+                    </div>
+                }
+            </div>
+        }
+    }
 </div>
 <div class="modal-footer justify-content-start">
     <button class="btn btn-outline-danger" (click)="close(null)">

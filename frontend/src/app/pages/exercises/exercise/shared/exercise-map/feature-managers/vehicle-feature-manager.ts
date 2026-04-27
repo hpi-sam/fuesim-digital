@@ -31,6 +31,7 @@ import {
 import { selectVisibleVehicles } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { MoveableFeatureManager } from './moveable-feature-manager';
+import { determineMarkedElements } from './utils';
 
 type PossibleVehicleStatus = Exclude<PatientStatus, 'white'>;
 
@@ -256,17 +257,22 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
 
         const vehicle = this.getElementFromFeature(feature) as Vehicle;
 
+        const markedElements = determineMarkedElements(
+            this.store,
+            feature.getId() as UUID,
+            [
+                ...Object.keys(vehicle.materialIds),
+                ...Object.keys(vehicle.personnelIds),
+            ]
+        );
+
         this.popupService.openPopup(
             this.popupHelper.getPopupOptions(
                 VehiclePopupComponent,
                 feature,
                 [feature.getId() as UUID],
-                [
-                    ...Object.keys(vehicle.materialIds),
-                    ...Object.keys(vehicle.personnelIds),
-                    feature.getId() as UUID,
-                ],
-                [feature.getId() as UUID],
+                markedElements.trainer,
+                markedElements.participant,
                 ['vehicle', 'personnel', 'material'],
                 {
                     vehicleId: feature.getId() as UUID,

@@ -9,6 +9,10 @@ import {
     operationsMapPropertiesSchema,
 } from '../../models/utils/map-properties.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import {
+    ExerciseConfiguration,
+    exerciseConfigurationSchema,
+} from '../../models/exercise-configuration.js';
 
 export class SetTileMapPropertiesAction implements Action {
     @IsValue('[Configuration] Set tileMapProperties' as const)
@@ -67,6 +71,22 @@ export class SetVehicleStatusInPatientStatusColorEnabled implements Action {
 
     @IsBoolean()
     public readonly vehicleStatusInPatientStatusColor!: boolean;
+}
+
+export class SetHighlightRelatedElements implements Action {
+    @IsValue('[Configuration] Set highlightRelatedElements' as const)
+    public readonly type = '[Configuration] Set highlightRelatedElements';
+
+    @IsZodSchema(exerciseConfigurationSchema.shape.highlightRelatedElements)
+    public readonly highlightRelatedElements!: ExerciseConfiguration['highlightRelatedElements'];
+}
+
+export class SetParticipantLoadAllEnabled implements Action {
+    @IsValue('[Configuration] Set participantLoadAllEnabled' as const)
+    public readonly type = '[Configuration] Set participantLoadAllEnabled';
+
+    @IsBoolean()
+    public readonly participantLoadAllEnabled!: boolean;
 }
 
 export namespace ConfigurationActionReducers {
@@ -140,6 +160,28 @@ export namespace ConfigurationActionReducers {
             reducer(draftState, { vehicleStatusInPatientStatusColor }) {
                 draftState.configuration.vehicleStatusInPatientStatusColor =
                     vehicleStatusInPatientStatusColor;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setHighlightRelatedElements: ActionReducer<SetHighlightRelatedElements> =
+        {
+            action: SetHighlightRelatedElements,
+            reducer(draftState, { highlightRelatedElements }) {
+                draftState.configuration.highlightRelatedElements =
+                    highlightRelatedElements;
+                return draftState;
+            },
+            rights: 'trainer',
+        };
+
+    export const setParticipantLoadAllEnabled: ActionReducer<SetParticipantLoadAllEnabled> =
+        {
+            action: SetParticipantLoadAllEnabled,
+            reducer(draftState, { participantLoadAllEnabled }) {
+                draftState.configuration.participantLoadAllEnabled =
+                    participantLoadAllEnabled;
                 return draftState;
             },
             rights: 'trainer',

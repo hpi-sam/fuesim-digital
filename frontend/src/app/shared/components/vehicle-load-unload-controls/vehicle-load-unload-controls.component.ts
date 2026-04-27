@@ -1,11 +1,7 @@
-import type { OnChanges } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
-import { Store } from '@ngrx/store';
-import type { Role, UUID } from 'fuesim-digital-shared';
+import { Component, computed, inject, input } from '@angular/core';
+import { createSelector, Store } from '@ngrx/store';
+import type { UUID } from 'fuesim-digital-shared';
 import { isInSpecificVehicle } from 'fuesim-digital-shared';
-import type { Observable } from 'rxjs';
-import { combineLatest, map, startWith, switchMap } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../core/exercise.service';
 import type { AppState } from '../../../state/app.state';
 import {
@@ -13,6 +9,7 @@ import {
     createSelectMaterial,
     createSelectPersonnel,
     createSelectPatient,
+    selectConfiguration,
 } from '../../../state/application/selectors/exercise.selectors';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 
@@ -20,71 +17,58 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
     selector: 'app-vehicle-load-unload-controls',
     templateUrl: './vehicle-load-unload-controls.component.html',
     styleUrls: ['./vehicle-load-unload-controls.component.scss'],
-    imports: [AsyncPipe],
 })
-export class VehicleLoadUnloadControlsComponent implements OnChanges {
+export class VehicleLoadUnloadControlsComponent {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
-    readonly vehicleId = input.required<UUID>();
+    public readonly vehicleId = input.required<UUID>();
 
-    vehicleLoadState$?: Observable<{ loadable: boolean; unloadable: boolean }>;
-    currentRole$!: Observable<Role | undefined>;
+    protected readonly currentRole = this.store.selectSignal(
+        selectCurrentMainRole
+    );
+    protected readonly participantLoadAllEnabled = this.store.selectSignal(
+        createSelector(
+            selectConfiguration,
+            (configuration) => configuration.participantLoadAllEnabled
+        )
+    );
 
-    ngOnChanges(): void {
-        const vehicle$ = this.store.select(
-            createSelectVehicle(this.vehicleId())
-        );
+    protected readonly vehicle = computed(() =>
+        this.store.selectSignal(createSelectVehicle(this.vehicleId()))()
+    );
+    protected readonly vehicleLoadState = computed(() => {
+        const materialInVehicle = Object.keys(this.vehicle().materialIds)
+            .map((materialId) =>
+                this.store.selectSignal(createSelectMaterial(materialId))()
+            )
+            .map((material) =>
+                isInSpecificVehicle(material, this.vehicle().id)
+            );
+        const personnelInVehicle = Object.keys(this.vehicle().personnelIds)
+            .map((personnelId) =>
+                this.store.selectSignal(createSelectPersonnel(personnelId))()
+            )
+            .map((personnel) =>
+                isInSpecificVehicle(personnel, this.vehicle().id)
+            );
+        const patientsInVehicle = Object.keys(this.vehicle().patientIds)
+            .map((patientId) =>
+                this.store.selectSignal(createSelectPatient(patientId))()
+            )
+            .map((patient) => isInSpecificVehicle(patient, this.vehicle().id));
 
-        this.currentRole$ = this.store.select(selectCurrentMainRole);
+        const elementsInVehicle = [
+            ...materialInVehicle,
+            ...personnelInVehicle,
+            ...patientsInVehicle,
+        ];
 
-        this.vehicleLoadState$ = vehicle$.pipe(
-            switchMap((vehicle) => {
-                const materialsAreInVehicle$ = Object.keys(
-                    vehicle.materialIds
-                ).map((materialId) =>
-                    this.store
-                        .select(createSelectMaterial(materialId))
-                        .pipe(
-                            map((material) =>
-                                isInSpecificVehicle(material, vehicle.id)
-                            )
-                        )
-                );
-                const personnelAreInVehicle$ = Object.keys(
-                    vehicle.personnelIds
-                ).map((personnelId) =>
-                    this.store
-                        .select(createSelectPersonnel(personnelId))
-                        .pipe(
-                            map((personnel) =>
-                                isInSpecificVehicle(personnel, vehicle.id)
-                            )
-                        )
-                );
-                const patientsAreInVehicle$ = Object.keys(
-                    vehicle.patientIds
-                ).map((patientId) =>
-                    this.store
-                        .select(createSelectPatient(patientId))
-                        .pipe(
-                            map((patient) =>
-                                isInSpecificVehicle(patient, vehicle.id)
-                            )
-                        )
-                );
-                return combineLatest([
-                    ...materialsAreInVehicle$,
-                    ...personnelAreInVehicle$,
-                    ...patientsAreInVehicle$,
-                ]).pipe(startWith([]));
-            }),
-            map((areInVehicle) => ({
-                loadable: areInVehicle.some((isInVehicle) => !isInVehicle),
-                unloadable: areInVehicle.some((isInVehicle) => isInVehicle),
-            }))
-        );
-    }
+        return {
+            loadable: elementsInVehicle.some((isInVehicle) => !isInVehicle),
+            unloadable: elementsInVehicle.some((isInVehicle) => isInVehicle),
+        };
+    });
 
     public unloadVehicle() {
         this.exerciseService.proposeAction({

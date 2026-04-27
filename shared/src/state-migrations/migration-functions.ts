@@ -48,6 +48,7 @@ import { participantIdToKey47 } from './47-participant-id-to-key.js';
 import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
 import { addScoutables50 } from './50-add-scoutables.js';
+import { configVehicleLoadingAndHighlighting51 } from './51-config-vehicle-loading-and-highlighting.js';
 
 /**
  * Migrate a single action
@@ -124,4 +125,5 @@ export const migrations: {
     48: addAutojoinViewport48,
     49: addOperationsTabletView49,
     50: addScoutables50,
+    51: configVehicleLoadingAndHighlighting51,
 };

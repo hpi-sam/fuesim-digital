@@ -49,7 +49,8 @@ import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
 import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addScoutables50 } from './50-add-scoutables.js';
 import { addTechnicalChallenges51 } from './51-add-technical-challenges.js';
-import { addMeasures52 } from './52-add-measures.js';
+import { extendScoutables52 } from './52-extend-scoutables.js';
+import { addMeasures53 } from './53-add-measures.js';
 
 /**
  * Migrate a single action
@@ -127,5 +128,6 @@ export const migrations: {
     49: addOperationsTabletView49,
     50: addScoutables50,
     51: addTechnicalChallenges51,
-    52: addMeasures52,
+    52: extendScoutables52,
+    53: addMeasures53,
 };

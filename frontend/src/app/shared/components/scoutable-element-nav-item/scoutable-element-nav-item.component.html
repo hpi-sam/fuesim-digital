@@ -1,6 +1,22 @@
 @if (scoutable(); as scoutable) {
-    <div class="m-2">
-        @if (currentRole() === 'trainer') {
+    @if (currentRole() === 'trainer') {
+        <div class="p-2">
+            <div class="form-group pb-3">
+                <label class="form-label mb-0">Interner Name</label>
+                <p class="small text-muted mb-1">
+                    Dieser Name wird in der Auswertung angezeigt.
+                </p>
+                <input
+                    #nameInput="ngModel"
+                    [ngModel]="scoutable.name"
+                    (appSaveOnTyping)="rename($event)"
+                    type="text"
+                    class="form-control"
+                />
+                <app-display-validation
+                    [ngModelInput]="nameInput"
+                ></app-display-validation>
+            </div>
             @if (scoutable.isVisibleForParticipants) {
                 <button
                     class="btn btn-outline-primary btn-sm me-2"
@@ -20,8 +36,9 @@
                 </button>
                 <span>Inhalte sind für Teilnehmende nicht sichtbar.</span>
             }
-        }
-    </div>
+        </div>
+    }
+
     @if (currentRole() === 'trainer' || scoutable.isVisibleForParticipants) {
         <div>
             <app-user-generated-content-editor

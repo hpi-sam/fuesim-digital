@@ -25,28 +25,28 @@ export namespace StateMachineTesting {
 
     // --- Guards ---
     // A guard is fulfilled when the task's progress exceeds minProgress.
-    export const isFireExtinguished: Guard = {
+    export const isFireExtinguished = {
         type: 'progressGuard',
         minProgress: 10000,
         taskId: extinguishFireTask.id,
         name: 'ist das Feuer gelöscht?',
-    };
-    export const isPatientRescued: Guard = {
+    } satisfies Guard;
+    export const isPatientRescued = {
         type: 'progressGuard',
         minProgress: 10000,
         taskId: rescuePatientTask.id,
         name: 'ist der Patient gerettet?',
-    };
-    export const isPatientDead: Guard = {
+    } satisfies Guard;
+    export const isPatientDead = {
         type: 'timerGuard',
         minTimePassed: 30_000,
         name: 'ist der Patient tot?',
-    };
-    export const isVehicleBurnedOut: Guard = {
+    } satisfies Guard;
+    export const isVehicleBurnedOut = {
         type: 'timerGuard',
         minTimePassed: 60_000,
         name: 'ist das Fahrzeug ausgebrannt?',
-    };
+    } satisfies Guard;
 
     // --- Contents ---
     const initialContent: UserGeneratedContent = {

@@ -30,6 +30,9 @@ export const technicalChallengeStateSchema = z.object({
     title: z.string(),
     image: imagePropertiesSchema,
     userGeneratedContent: userGeneratedContentSchema,
+    /**
+     * maps taskId to the task-specific progress multiplier (default 1)
+     * */
     possibleTasks: z.record(taskSchema.shape.id, z.number()),
 });
 export type TechnicalChallengeState = z.infer<
@@ -157,8 +160,28 @@ export function currentStateOf(
     return state!;
 }
 
+export function currentlyPossibleTaskIds(
+    technicalChallenge: TechnicalChallenge
+): UUID[] {
+    const currentState = currentStateOf(technicalChallenge);
+
+    return Object.keys(currentState.possibleTasks);
+}
+
+function unassignFromNonexistentTasks(
+    technicalChallenge: WritableDraft<TechnicalChallenge>
+) {
+    for (const [personnelKey, taskKey] of Object.entries(
+        technicalChallenge.assignedPersonnel
+    )) {
+        if (!currentlyPossibleTaskIds(technicalChallenge).includes(taskKey)) {
+            delete technicalChallenge.assignedPersonnel[personnelKey];
+        }
+    }
+}
+
 export function simulateTechnicalChallenge(
-    technicalChallenge: TechnicalChallenge,
+    technicalChallenge: WritableDraft<TechnicalChallenge>,
     exerciseState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {
@@ -185,6 +208,8 @@ export function simulateTechnicalChallenge(
     if (!nextTransition) return;
 
     technicalChallenge.currentStateId = nextTransition.to;
+
+    unassignFromNonexistentTasks(technicalChallenge);
 }
 
 export function simulateAllTechnicalChallenges(

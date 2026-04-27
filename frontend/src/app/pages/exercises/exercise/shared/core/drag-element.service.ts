@@ -6,7 +6,6 @@ import type {
     ImageProperties,
     MapImageTemplate,
     PatientCategory,
-    TechnicalChallenge,
     TechnicalChallengeTemplate,
     VehicleTemplate,
 } from 'fuesim-digital-shared';
@@ -325,11 +324,10 @@ export class DragElementService {
                     selectCurrentTime,
                     this.store
                 );
-                const technicalChallenge: TechnicalChallenge =
-                    newTechnicalChallengeFromTemplate(
-                        this.transferringTemplate.template,
-                        currentTime
-                    );
+                const technicalChallenge = newTechnicalChallengeFromTemplate(
+                    this.transferringTemplate.template,
+                    currentTime
+                );
                 technicalChallenge.position = newMapPositionAt(position);
                 this.exerciseService.proposeAction({
                     type: '[TechnicalChallenge] Create technical challenge',

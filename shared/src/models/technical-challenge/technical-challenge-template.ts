@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { cloneDeep } from 'lodash-es';
+import type { WritableDraft } from 'immer';
 import { uuid, uuidSchema } from '../../utils/uuid.js';
 import { imagePropertiesSchema } from '../utils/image-properties.js';
 import { newNoPosition } from '../utils/position/no-position.js';
@@ -28,7 +29,7 @@ export type TechnicalChallengeTemplate = z.infer<
 export function newTechnicalChallengeFromTemplate(
     template: TechnicalChallengeTemplate,
     creationTime: number
-): TechnicalChallenge {
+): WritableDraft<TechnicalChallenge> {
     const { states, relevantTasks, transitions, name, image } =
         cloneDeep(template);
 

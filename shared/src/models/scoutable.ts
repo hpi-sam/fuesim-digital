@@ -11,8 +11,10 @@ import {
 export const scoutableSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('scoutable'),
+    name: z.string(),
     userGeneratedContent: userGeneratedContentSchema,
     isVisibleForParticipants: z.boolean(),
+    viewedByParticipants: z.boolean(),
 });
 export type Scoutable = Immutable<z.infer<typeof scoutableSchema>>;
 
@@ -41,17 +43,27 @@ export function newScoutable(): Scoutable {
     return {
         id: uuid(),
         type: 'scoutable',
+        name: '',
         userGeneratedContent: newUserGeneratedContent(),
         isVisibleForParticipants: true,
+        viewedByParticipants: false,
     };
 }
 
-export const genericScoutableImageUrl = '/assets/scoutable-generic.png';
-export const patientScoutableImageUrl = '/assets/scoutable-patient.png';
+export const scoutableImages = {
+    unviewed: {
+        generic: '/assets/scoutable-generic.png',
+        patient: '/assets/scoutable-patient.png',
+    },
+    viewed: {
+        generic: '/assets/scoutable-generic-viewed.png',
+        patient: '/assets/scoutable-patient-viewed.png',
+    },
+} as const;
 
 export function isPatientBystander(patient: Patient) {
     return patient.patientStatusCode.firstField.colorCode === 'B';
 }
 export function isElementGenericScoutable(element: ScoutableElement) {
-    return element.image.url.endsWith(genericScoutableImageUrl);
+    return element.image.url.endsWith(scoutableImages.unviewed.generic);
 }

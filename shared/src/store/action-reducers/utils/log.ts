@@ -21,6 +21,7 @@ import {
     createVehicleTypeTag,
     createPersonnelTypeTag,
     createMeasureTemplateTag,
+    createScoutableTag,
 } from '../../../models/utils/tag-helpers.js';
 import type { TreatmentProgress } from '../../../simulation/utils/treatment.js';
 import { treatmentProgressToGermanNameDictionary } from '../../../simulation/utils/treatment.js';
@@ -920,4 +921,17 @@ function generateCountString<K extends string>(
 
 export function logActive(state: WritableDraft<ExerciseState>): boolean {
     return !!state.logEntries || state.type === 'parallel';
+}
+
+export function logScoutableViewed(
+    state: WritableDraft<ExerciseState>,
+    scoutableId: UUID
+) {
+    const scoutable = getElement(state, 'scoutable', scoutableId);
+
+    const description = scoutable.name
+        ? `Es wurde ${scoutable.name} erkundet.`
+        : `Es wurde etwas erkundet.`;
+
+    log(state, [createScoutableTag(state, scoutable.id)], description);
 }

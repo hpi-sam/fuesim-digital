@@ -14,6 +14,7 @@ import { newNoPosition } from '../utils/position/no-position.js';
 import { currentCoordinatesOf } from '../utils/position/position-helpers.js';
 import { newMapCoordinatesAt } from '../utils/position/map-coordinates.js';
 import { uuid } from '../../utils/uuid.js';
+import { isPersonnelAssigned } from '../../state-helpers/technical-challenge-assignment.js';
 import { newTechnicalChallengeFromTemplate } from './technical-challenge-template.js';
 
 const tickInterval = 1000;
@@ -35,6 +36,11 @@ function simulateNTicks(
     }
     return newState;
 }
+const assignPersonnel = produce(
+    lookupReducerFor(
+        '[TechnicalChallenge] Assign a personnel to technical challenge'
+    ).reducer
+);
 
 const emptyState: Immutable<ExerciseState> = ExerciseState.create(
     '123456' as ParticipantKey
@@ -44,7 +50,13 @@ const challenge = {
     ...newTechnicalChallengeFromTemplate(challengeTemplate, 0),
     position: newMapPositionAt(newMapCoordinatesAt(0, 0)),
 };
-const personnel = newPersonnelFromTemplate(
+const personnelA = newPersonnelFromTemplate(
+    defaultPersonnelTemplates.san,
+    uuid(),
+    'no-vehicle',
+    newNoPosition()
+);
+const personnelB = newPersonnelFromTemplate(
     defaultPersonnelTemplates.san,
     uuid(),
     'no-vehicle',
@@ -55,7 +67,19 @@ const initialState: Immutable<ExerciseState> = produce(
     emptyState,
     (draftState) => {
         draftState.technicalChallenges[challenge.id] = challenge;
-        draftState.personnel[personnel.id] = personnel;
+        draftState.personnel[personnelA.id] = personnelA;
+        draftState.personnel[personnelB.id] = personnelB;
+    }
+);
+
+const stateWithAssignedPersonnel: Immutable<ExerciseState> = assignPersonnel(
+    initialState,
+    {
+        type: '[TechnicalChallenge] Assign a personnel to technical challenge',
+        technicalChallengeId: challenge.id,
+        personnelId: personnelA.id,
+        taskId: StateMachineTesting.extinguishFireTask.id,
+        targetPosition: currentCoordinatesOf(challenge),
     }
 );
 
@@ -85,19 +109,7 @@ describe('TechnicalChallenges', () => {
     });
 
     it('should progress assigned tasks', () => {
-        const assignPersonnel = produce(
-            lookupReducerFor(
-                '[TechnicalChallenge] Assign a personnel to technical challenge'
-            ).reducer
-        );
-        const withPersonnel = assignPersonnel(initialState, {
-            type: '[TechnicalChallenge] Assign a personnel to technical challenge',
-            technicalChallengeId: challenge.id,
-            personnelId: personnel.id,
-            taskId: StateMachineTesting.extinguishFireTask.id,
-            targetPosition: currentCoordinatesOf(challenge),
-        });
-        const oneTickState = simulateOneTick(withPersonnel);
+        const oneTickState = simulateOneTick(stateWithAssignedPersonnel);
         const oneTickChallenge = oneTickState.technicalChallenges[challenge.id];
         expect(
             oneTickChallenge?.taskProgress[
@@ -186,5 +198,69 @@ describe('TechnicalChallenges', () => {
         expect(currentState(bothFailedState)).toBe(
             StateMachineTesting.burnedOutAndPatientDead.id
         );
+    });
+
+    it('should unassign personnel, if the assigned task is completed', () => {
+        const oneTickState = simulateOneTick(stateWithAssignedPersonnel);
+        const multipleAssignmentsState = assignPersonnel(oneTickState, {
+            type: '[TechnicalChallenge] Assign a personnel to technical challenge',
+            technicalChallengeId: challenge.id,
+            targetPosition: currentCoordinatesOf(challenge),
+            taskId: StateMachineTesting.rescuePatientTask.id,
+            personnelId: personnelB.id,
+        });
+        const onlyExtinguishedState = simulateNTicks(
+            multipleAssignmentsState,
+            9
+        );
+        const onlyExtinguishedChallenge =
+            onlyExtinguishedState.technicalChallenges[challenge.id]!;
+
+        expect(
+            isPersonnelAssigned(personnelA.id, onlyExtinguishedChallenge)
+        ).toBeFalse();
+        expect(
+            isPersonnelAssigned(personnelB.id, onlyExtinguishedChallenge)
+        ).toBeTrue();
+
+        const bothDoneState = simulateOneTick(onlyExtinguishedState);
+        expect(
+            isPersonnelAssigned(
+                personnelB.id,
+                bothDoneState.technicalChallenges[challenge.id]!
+            )
+        ).toBeFalse();
+    });
+
+    it('should unassign personnel, if the assigned task is no more available', () => {
+        const secondsBeforeStateChange =
+            StateMachineTesting.isPatientDead.minTimePassed / 1_000;
+        const nearlyStateChangedState = simulateNTicks(
+            initialState,
+            secondsBeforeStateChange - 1
+        );
+
+        const tooLateAssignedState = assignPersonnel(nearlyStateChangedState, {
+            type: '[TechnicalChallenge] Assign a personnel to technical challenge',
+            technicalChallengeId: challenge.id,
+            personnelId: personnelA.id,
+            taskId: StateMachineTesting.rescuePatientTask.id,
+            targetPosition: currentCoordinatesOf(challenge),
+        });
+
+        expect(
+            isPersonnelAssigned(
+                personnelA.id,
+                tooLateAssignedState.technicalChallenges[challenge.id]!
+            )
+        ).toBeTrue();
+        const taskCancelledState = simulateOneTick(tooLateAssignedState);
+
+        expect(
+            isPersonnelAssigned(
+                personnelA.id,
+                taskCancelledState.technicalChallenges[challenge.id]!
+            )
+        ).toBeFalse();
     });
 });

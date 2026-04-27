@@ -141,7 +141,9 @@ Die wichtigste Einstellung ist die <kbd>**Serveradresse**</kbd>, die bestimmt, v
 
 Neben der Serveradresse kann unter <kbd>**Maximaler Zoom**</kbd> die höchste Zoomstufe, für die Kartendaten vom Server geholt werden, eingestellt werden. Wird ein zu höher, nicht unterstützter Wert eingegeben, werden von vielen Servern Fehlerbilder statt Kartenmaterial ausgeliefert, was bei starkem Hereinzoomen eine Übung unbenutzbar macht. Es wird daher empfohlen, die für den jeweiligen Kartenserver maximale Zoomstufe zu recherchieren und hier einzugeben.
 
-Die beiden Einstellungen müssen nach einer Änderung durch einen Klick auf <kbd>Karteneinstellungen speichern</kbd> manuell bestätigt werden.
+Die Einstellungen <kbd>Serveradresse</kbd> und <kbd>Maximaler Zoom</kbd> müssen nach einer Änderung durch einen Klick auf <kbd>Karteneinstellungen speichern</kbd> manuell bestätigt werden.
+
+Zusätzlich gibt es die Option <kbd>**Markiere zusammengehörende Elemente auf der Karte**</kbd>. Standardmäßig werden Übungsleitenden angezeigt, welche Elemente auf der Karte zusammengehören, wenn sie eines dieser Elemente anklicken, indem alle Elemente einen orangenen Rahmen erhalten. Dies umfasst Fahrzeuge, Personal und Material. Über <kbd>Markiere zusammengehörende Elemente auf der Karte</kbd> kann diese Funktion auch für Teilnehmende aktiviert oder komplett ausgeschaltet werden.
 
 ### Einsatzübersicht
 
@@ -172,10 +174,20 @@ Im Feld <kbd>**Präfix der Patienten-IDs**</kbd> kann ein Präfix eingegeben wer
 > [!WARNING]
 > Wenn bereits Patienten platziert sind, ändern sich deren ID durch das Anpassen dieser Einstellung nicht.
 
-### Statusanzeige für Fahrzeuge
+### Fahrzeuge
 
 ![Einstellungsfenster](./general_settings4.png)
 
-In diesem Bereich kann eine optionale Statusanzeige für [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) aktiviert werden.
+In diesem Bereich werden die fahrzeugbezogenen Aspekte der Übung konfiguriert (siehe [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material)).
+
+<kbd>**"Alle einsteigen" für Teilnehmende aktivieren?**</kbd> legt fest, ob Teilnehmende die <kbd>Alle einsteigen</kbd>-Funktion eines Fahrzeugs nutzen können. Ist die Funktion nicht aktiv, müssen Teilnehmende das zum Fahrzeug gehörende Personal und Material selbstständig suchen und auf das Fahrzeug ziehen.
+
+> [!WARNING]
+> Wenn Teilnehmende einen Patienten in ein Fahrzeug verladen, steigen Personal und Material automatisch mit ein, unabhängig vom Wert dieser Einstellung.
+
+> [!TIP]
+> Diese Option kann gut mit der [Karten-Einstellung](#karte) <kbd>Markiere zusammengehörende Elemente auf der Karte</kbd> kombiniert werden, sodass Teilnehmende das zugehörige Personal und Material einfacher oder weniger einfach finden können.
+
+Zudem kann in diesem Bereich eine optionale Statusanzeige für [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) aktiviert werden.
 
 Sofern aktiviert, zeigt die Statusanzeige über jedem Fahrzeug an, wie viele Patienten sich aktuell im Fahrzeug befinden und wie viele Plätze es insgesamt bietet. Sie kann optional in der Farbe der Sichtungskategorie des Patienten angezeigt werden, bei mehreren Patienten wird die Kategorie mit der höchsten Priorität gewählt.

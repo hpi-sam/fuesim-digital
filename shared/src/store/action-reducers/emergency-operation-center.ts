@@ -24,6 +24,7 @@ import { getElement } from './utils/get-element.js';
 import { logAlarmGroupSent } from './utils/log.js';
 import { TransferActionReducers } from './transfer.js';
 import { VehicleActionReducers } from './vehicle.js';
+import { nextUUID } from '../../simulation/utils/randomness.js';
 
 export class AddLogEntryAction implements Action {
     @IsValue('[Emergency Operation Center] Add Log Entry' as const)
@@ -72,7 +73,8 @@ export namespace EmergencyOperationCenterActionReducers {
                 draftState.currentTime,
                 message,
                 name,
-                isPrivate
+                isPrivate,
+                nextUUID(draftState)
             );
             draftState.eocLog.push(logEntry);
             return draftState;

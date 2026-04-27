@@ -20,11 +20,11 @@ import {
     vehicleParametersSchema,
 } from '../../models/utils/vehicle-parameters.js';
 import { newAlarmGroupStartPoint } from '../../models/utils/start-points.js';
+import { nextUUID } from '../../simulation/utils/randomness.js';
 import { getElement } from './utils/get-element.js';
 import { logAlarmGroupSent } from './utils/log.js';
 import { TransferActionReducers } from './transfer.js';
 import { VehicleActionReducers } from './vehicle.js';
-import { nextUUID } from '../../simulation/utils/randomness.js';
 
 export class AddLogEntryAction implements Action {
     @IsValue('[Emergency Operation Center] Add Log Entry' as const)

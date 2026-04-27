@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { UUID, uuid, uuidSchema } from '../utils/uuid.js';
+import type { UUID } from '../utils/uuid.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
 
 export const eocLogEntrySchema = z.strictObject({
     id: uuidSchema,
@@ -18,7 +19,7 @@ export function newEocLogEntry(
     message: string,
     clientName: string,
     isPrivate: boolean,
-    id ?: UUID
+    id?: UUID
 ): EocLogEntry {
     return {
         id: id ?? uuid(),

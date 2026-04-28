@@ -36,7 +36,6 @@ import { SimulatedRegionOverviewPatientInteractionBarComponent } from '../tabs/p
 import { PersonnelDetailsComponent } from '../../../../../../../shared/components/personnel-details/personnel-details.component';
 import { MaterialDetailsComponent } from '../../../../../../../shared/components/material-details/material-details.component';
 import { SimulatedRegionOverviewVehicleDetailsComponent } from '../tabs/vehicles-tab/details/simulated-region-overview-vehicle-details.component';
-import { SimulatedRegionPreviewPatientCardComponent } from '../preview-card/patient-card/simulated-region-preview-patient-card.component';
 
 @Component({
     selector: 'app-simulated-region-preview',
@@ -44,7 +43,6 @@ import { SimulatedRegionPreviewPatientCardComponent } from '../preview-card/pati
     styleUrls: ['./simulated-region-preview.component.scss'],
     imports: [
         SimulatedRegionPreviewCardComponent,
-        SimulatedRegionPreviewPatientCardComponent,
         PatientHeaderComponent,
         PatientsDetailsComponent,
         SimulatedRegionOverviewPatientInteractionBarComponent,

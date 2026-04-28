@@ -553,7 +553,10 @@ export namespace VehicleActionReducers {
 
                 return draftState;
             },
-            rights: 'trainer',
+            rights: (state, client, action) =>
+                state.configuration.participantLoadAllEnabled
+                    ? 'participant'
+                    : 'trainer',
         };
 
     export const removeVehicleFromSimulatedRegion: ActionReducer<RemoveVehicleFromSimulatedRegionAction> =

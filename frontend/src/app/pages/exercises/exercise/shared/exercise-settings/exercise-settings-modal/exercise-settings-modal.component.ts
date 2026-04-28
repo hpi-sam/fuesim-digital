@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { cloneDeepMutable } from 'fuesim-digital-shared';
+import { cloneDeepMutable, ExerciseConfiguration } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
 import { ExerciseService } from '../../../../../../core/exercise.service';
@@ -99,6 +99,22 @@ export class ExerciseSettingsModalComponent {
             type: '[Configuration] Set vehicleStatusInPatientStatusColorEnabled',
             vehicleStatusInPatientStatusColor:
                 vehicleStatusInPatientStatusColorEnabled,
+        });
+    }
+
+    public setHighlightRelatedElements(
+        highlightRelatedElements: ExerciseConfiguration['highlightRelatedElements']
+    ) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set highlightRelatedElements',
+            highlightRelatedElements,
+        });
+    }
+
+    public setParticipantLoadAllEnabled(participantLoadAllEnabled: boolean) {
+        this.exerciseService.proposeAction({
+            type: '[Configuration] Set participantLoadAllEnabled',
+            participantLoadAllEnabled,
         });
     }
 

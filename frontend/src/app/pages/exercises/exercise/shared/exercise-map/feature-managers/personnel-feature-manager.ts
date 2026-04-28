@@ -18,6 +18,7 @@ import type { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import { selectVisiblePersonnel } from '../../../../../../state/application/selectors/shared.selectors';
 import { MoveableFeatureManager } from './moveable-feature-manager';
+import { determineMarkedElements } from './utils';
 
 export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
     public register(
@@ -107,17 +108,19 @@ export class PersonnelFeatureManager extends MoveableFeatureManager<Personnel> {
     ): void {
         super.onFeatureClicked(event, feature);
 
+        const markedElements = determineMarkedElements(
+            this.store,
+            feature.getId() as UUID,
+            [(this.getElementFromFeature(feature) as Personnel).vehicleId]
+        );
+
         this.popupService.openPopup(
             this.popupHelper.getPopupOptions(
                 PersonnelPopupComponent,
                 feature,
                 [feature.getId() as UUID],
-                [
-                    feature.getId() as UUID,
-                    (this.getElementFromFeature(feature) as Personnel)
-                        .vehicleId,
-                ],
-                [feature.getId() as UUID],
+                markedElements.trainer,
+                markedElements.participant,
                 ['personnel', 'vehicle'],
                 {
                     personnelId: feature.getId() as UUID,

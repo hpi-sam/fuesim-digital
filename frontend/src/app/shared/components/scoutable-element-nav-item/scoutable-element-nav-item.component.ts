@@ -1,27 +1,25 @@
 import { Component, computed, inject, input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import {
-    newScoutable,
-    newUserGeneratedContent,
-    ScoutableElement,
-} from 'fuesim-digital-shared';
+import { newScoutable, ScoutableElement } from 'fuesim-digital-shared';
+import { FormsModule } from '@angular/forms';
+import type { UserGeneratedContent, Scoutable } from 'fuesim-digital-shared';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 import { AppState } from '../../../state/app.state';
 import { ExerciseService } from '../../../core/exercise.service';
 import { createSelectScoutable } from '../../../state/application/selectors/exercise.selectors';
-import { RichTextEditorComponent } from '../rich-text-editor/rich-text-editor.component';
+import { UserGeneratedContentEditorComponent } from '../user-generated-content-editor/user-generated-content-editor.component.js';
 
 @Component({
     selector: 'app-scoutable-element-nav-item',
     templateUrl: './scoutable-element-nav-item.component.html',
     styleUrls: ['./scoutable-element-nav-item.component.scss'],
-    imports: [RichTextEditorComponent],
+    imports: [UserGeneratedContentEditorComponent, FormsModule],
 })
 export class ScoutableElementNavItemComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
     readonly element = input.required<ScoutableElement>();
-    readonly scoutable = computed(() => {
+    readonly scoutable = computed<Scoutable | null>(() => {
         const element = this.element();
         if (!element.scoutableId) return null;
         return this.store.selectSignal(
@@ -40,9 +38,9 @@ export class ScoutableElementNavItemComponent implements OnInit {
         this.exerciseService.proposeAction(
             {
                 type: '[Scoutable] Make scoutable',
-                element,
+                elementId: element.id,
+                elementType: element.type,
                 scoutable: newScoutable(),
-                content: newUserGeneratedContent(),
             },
             true
         );
@@ -52,6 +50,14 @@ export class ScoutableElementNavItemComponent implements OnInit {
             type: '[Scoutable] Set isVisibleForParticipants',
             scoutableId: this.scoutable()!.id,
             value,
+        });
+    }
+
+    updateContent(content: UserGeneratedContent) {
+        this.exerciseService.proposeAction({
+            type: '[Scoutable] Update content',
+            scoutableId: this.scoutable()!.id,
+            userGeneratedContent: content,
         });
     }
 }

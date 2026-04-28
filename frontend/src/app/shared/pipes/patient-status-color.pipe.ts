@@ -8,6 +8,7 @@ const colorCodeMap = {
     X: 'green',
     Y: 'yellow',
     Z: 'red',
+    B: 'grey',
 } as const satisfies { readonly [Key in ColorCode]: string };
 
 @Pipe({ name: 'patientStatusColor' })

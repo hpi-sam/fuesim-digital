@@ -209,9 +209,7 @@
                                             <input
                                                 type="checkbox"
                                                 class="btn-check"
-                                                [id]="
-                                                    `patient-status-filter-${category}`
-                                                "
+                                                [id]="`patient-status-filter-${category}`"
                                                 autocomplete="off"
                                                 [ngModel]="
                                                     selectedCategories[
@@ -229,9 +227,7 @@
                                             />
                                             <label
                                                 class="btn btn-outline-primary"
-                                                [for]="
-                                                    `patient-status-filter-${category}`
-                                                "
+                                                [for]="`patient-status-filter-${category}`"
                                             >
                                                 <app-patient-status-badge
                                                     [status]="category"
@@ -451,6 +447,75 @@
                                         Keine Bilder vorhanden
                                     </span>
                                 }
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+                <div ngbAccordionItem="scoutables">
+                    <h5 ngbAccordionHeader>
+                        <button
+                            ngbAccordionButton
+                            data-cy="scoutablesAccordionButton"
+                        >
+                            Erkundung
+                        </button>
+                    </h5>
+                    <div ngbAccordionCollapse>
+                        <div ngbAccordionBody>
+                            <ng-template>
+                                <div class="cards">
+                                    @for (
+                                        category of bystanderCategories;
+                                        track category
+                                    ) {
+                                        <app-map-editor-card
+                                            (elementMousedown)="
+                                                dragElementService.onMouseDown(
+                                                    $event,
+                                                    {
+                                                        type: 'patient',
+                                                        template: category,
+                                                    }
+                                                )
+                                            "
+                                            [imageUrl]="category.image.url"
+                                            [title]="
+                                                category.patientTemplates[0]!
+                                                    .biometricInformation
+                                                    .sex === 'male'
+                                                    ? 'Passant'
+                                                    : 'Passantin'
+                                            "
+                                            dataCy="draggablePatientDiv"
+                                        >
+                                        </app-map-editor-card>
+                                    }
+                                    <app-map-editor-card
+                                        (elementMousedown)="
+                                            dragElementService.onMouseDown(
+                                                $event,
+                                                {
+                                                    type: 'mapImage',
+                                                    template:
+                                                        scoutableMapImageTemplate,
+                                                }
+                                            )
+                                        "
+                                        dataCy="draggableMapImageDiv"
+                                        [imageUrl]="
+                                            scoutableMapImageTemplate.image.url
+                                        "
+                                        [title]="scoutableMapImageTemplate.name"
+                                    >
+                                    </app-map-editor-card>
+                                </div>
+                                <div
+                                    class="alert alert-secondary small mb-0 px-2 py-1 d-flex align-items-center"
+                                >
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    Erkundungsinformationen können auch zu
+                                    Bildern und Patienten hinzugefügt werden.
+                                </div>
                             </ng-template>
                         </div>
                     </div>

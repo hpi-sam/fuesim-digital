@@ -8,7 +8,6 @@ import {
     resourceDescriptionSchema,
 } from '../../models/utils/resource-description.js';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
-import { StrictObject } from '../../utils/strict-object.js';
 import { newResourceRequiredEvent } from '../events/resources-required.js';
 import { newVehicleResource } from '../../models/utils/rescue-resource.js';
 import type { SimulatedRegion } from '../../models/simulated-region.js';
@@ -83,7 +82,7 @@ export const providePersonnelFromVehicleActivity: SimulationActivity<ProvidePers
                     missingPersonnel
                 )
             ) {
-                const minRequiredVehiclePriorities = StrictObject.entries(
+                const minRequiredVehiclePriorities = Object.entries(
                     missingPersonnel
                 )
                     .filter(personnelStillMissing)
@@ -150,13 +149,13 @@ function personnelInUnloadingVehicles(
     simulatedRegion: SimulatedRegion
 ): ResourceDescription {
     const resource: ResourceDescription = {};
-    StrictObject.values(simulatedRegion.activities)
+    Object.values(simulatedRegion.activities)
         .filter(
             (a): a is UnloadVehicleActivityState =>
                 a.type === 'unloadVehicleActivity'
         )
         .flatMap((activity) =>
-            StrictObject.keys(
+            Object.keys(
                 tryGetElement(draftState, 'vehicle', activity.vehicleId)
                     ?.personnelIds ?? {}
             )

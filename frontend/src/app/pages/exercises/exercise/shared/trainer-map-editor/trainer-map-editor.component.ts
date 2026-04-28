@@ -17,6 +17,8 @@ import {
     transferPointImage,
     validateExerciseExport,
     viewportImage,
+    bystanderCategories,
+    scoutableMapImageTemplate,
 } from 'fuesim-digital-shared';
 import type { PatientCategory, UUID } from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
@@ -126,6 +128,9 @@ export class TrainerMapEditorComponent implements OnInit {
     public patientCategories$?: Observable<{
         [key in FilterCategory]?: PatientCategory[];
     }>;
+
+    public bystanderCategories = bystanderCategories;
+    public scoutableMapImageTemplate = scoutableMapImageTemplate;
 
     ngOnInit() {
         this.patientCategories$ = combineLatest([

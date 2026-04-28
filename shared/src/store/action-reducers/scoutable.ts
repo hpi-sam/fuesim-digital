@@ -5,15 +5,19 @@ import { Action, ActionReducer } from '../action-reducer.js';
 import {
     type Scoutable,
     scoutableSchema,
-    type ScoutableElement,
-    scoutableElementSchema,
+    scoutableElementTypeSchema,
+    type ScoutableElementType,
 } from '../../models/scoutable.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
 import {
     type UserGeneratedContent,
     userGeneratedContentSchema,
 } from '../../models/user-generated-content.js';
-import { type UUID, uuidValidationOptions } from '../../utils/uuid.js';
+import {
+    uuidSchema,
+    type UUID,
+    uuidValidationOptions,
+} from '../../utils/uuid.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getElement } from './utils/get-element.js';
 
@@ -21,14 +25,14 @@ export class MakeElementScoutableAction implements Action {
     @IsValue('[Scoutable] Make scoutable' as const)
     public readonly type = '[Scoutable] Make scoutable';
 
-    @IsZodSchema(scoutableElementSchema)
-    public readonly element!: ScoutableElement;
+    @IsZodSchema(scoutableElementTypeSchema)
+    public readonly elementType!: ScoutableElementType;
+
+    @IsZodSchema(uuidSchema)
+    public readonly elementId!: UUID;
 
     @IsZodSchema(scoutableSchema)
     public readonly scoutable!: Scoutable;
-
-    @IsZodSchema(userGeneratedContentSchema)
-    public readonly content!: UserGeneratedContent;
 }
 export class SetIsVisibleForParticipants implements Action {
     @IsValue('[Scoutable] Set isVisibleForParticipants' as const)
@@ -41,28 +45,27 @@ export class SetIsVisibleForParticipants implements Action {
     public readonly value!: boolean;
 }
 
+export class UpdateScoutableContentAction implements Action {
+    @IsValue('[Scoutable] Update content')
+    public readonly type = '[Scoutable] Update content';
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly scoutableId!: UUID;
+
+    @IsZodSchema(userGeneratedContentSchema)
+    public readonly userGeneratedContent!: UserGeneratedContent;
+}
+
 export namespace ScoutableActionReducers {
     export const makeElementScoutable: ActionReducer<MakeElementScoutableAction> =
         {
             action: MakeElementScoutableAction,
-            reducer: (draftState, { element, scoutable, content }) => {
-                const stateElement = getElement(
-                    draftState,
-                    element.type,
-                    element.id
-                );
-                stateElement.scoutableId = scoutable.id;
-                draftState.userGeneratedContents[content.id] =
-                    cloneDeepMutable(content);
+            reducer: (draftState, { elementType, elementId, scoutable }) => {
+                const element = getElement(draftState, elementType, elementId);
+                element.scoutableId = scoutable.id;
                 draftState.scoutables[scoutable.id] =
                     cloneDeepMutable(scoutable);
 
-                const stateScoutable = getElement(
-                    draftState,
-                    'scoutable',
-                    scoutable.id
-                );
-                stateScoutable.userGeneratedContentId = content.id;
                 return draftState;
             },
             rights: 'trainer',
@@ -81,4 +84,13 @@ export namespace ScoutableActionReducers {
             },
             rights: 'trainer',
         };
+    export const updateContent: ActionReducer<UpdateScoutableContentAction> = {
+        action: UpdateScoutableContentAction,
+        reducer: (draftState, { scoutableId, userGeneratedContent }) => {
+            const element = getElement(draftState, 'scoutable', scoutableId);
+            element.userGeneratedContent = userGeneratedContent;
+            return draftState;
+        },
+        rights: 'trainer',
+    };
 }

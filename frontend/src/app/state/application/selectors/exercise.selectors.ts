@@ -13,10 +13,10 @@ import type {
     WithPosition,
 } from 'fuesim-digital-shared';
 import {
-    scoutableElementKeys,
     isInSpecificSimulatedRegion,
     isInTransfer,
     nestedCoordinatesOf,
+    scoutableElementTypes,
 } from 'fuesim-digital-shared';
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
@@ -36,8 +36,8 @@ function selectPropertyFactory<Key extends keyof ExerciseState>(key: Key) {
     return createSelector(selectExerciseState, (exercise) => exercise[key]);
 }
 
-export const scoutableElementSelectors = scoutableElementKeys.map((key) =>
-    selectPropertyFactory(elementTypePluralMap[key])
+export const scoutableElementSelectors = scoutableElementTypes.map(
+    (elementType) => selectPropertyFactory(elementTypePluralMap[elementType])
 );
 
 // UUIDMap properties
@@ -79,9 +79,6 @@ export const selectCollectedClientNames = selectPropertyFactory(
     'collectedClientNames'
 );
 export const selectScoutables = selectPropertyFactory('scoutables');
-export const selectUserGeneratedContent = selectPropertyFactory(
-    'userGeneratedContents'
-);
 
 // Elements
 
@@ -133,8 +130,6 @@ export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
 );
 export const createSelectScoutable =
     createSelectElementFromMapFactory(selectScoutables);
-export const createSelectUserGeneratedContent =
-    createSelectElementFromMapFactory(selectUserGeneratedContent);
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,

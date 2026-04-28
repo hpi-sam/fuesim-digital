@@ -39,7 +39,7 @@ import type { Personnel } from '../../../models/personnel.js';
 import type { Vehicle } from '../../../models/vehicle.js';
 import { formatDuration } from '../../../utils/format-duration.js';
 import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
-import { StrictObject } from '../../../utils/strict-object.js';
+import { TypeAssertedObject } from '../../../utils/type-asserted-object.js';
 import {
     getElement,
     getExerciseBehaviorById,
@@ -894,7 +894,7 @@ function generateCountString<K extends string>(
     countsObject: { readonly [key in K]: number },
     nameOf: (key: K) => string
 ): string {
-    return StrictObject.keys(countsObject)
+    return TypeAssertedObject.keys(countsObject)
         .map((status) => `${countsObject[status]} ${nameOf(status)}`)
         .join(', ');
 }

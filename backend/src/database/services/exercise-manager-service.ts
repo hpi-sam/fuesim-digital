@@ -98,6 +98,11 @@ export class ExerciseManagerService {
         if (!updatedTemplate) {
             throw new ApiError();
         }
+        const exercise = this.exerciseService.getExerciseByKey(
+            exerciseTemplate.trainerKey,
+            session
+        );
+        exercise.template = updatedTemplate;
         return {
             ...updatedTemplate,
             trainerKey: exerciseTemplate.trainerKey,

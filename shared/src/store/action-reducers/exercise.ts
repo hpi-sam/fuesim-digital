@@ -16,7 +16,6 @@ import { elementTypePluralMap } from '../../utils/element-type-plural-map.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
-import { StrictObject } from '../../utils/strict-object.js';
 import { createPersonnelTypeTag } from '../../models/utils/tag-helpers.js';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { IsLiteralUnion } from '../../utils/validators/is-literal-union.js';
@@ -317,10 +316,10 @@ export interface TreatmentAssignment {
 function calculateTreatmentAssignment(
     draftState: WritableDraft<ExerciseState>
 ): TreatmentAssignment {
-    const treatmentAssignment = StrictObject.fromEntries(
+    const treatmentAssignment = Object.fromEntries(
         Object.keys(draftState.patients).map((patientId) => [
             patientId,
-            StrictObject.fromEntries(
+            Object.fromEntries(
                 Object.values(draftState.personnelTemplates).map((template) => [
                     template.id,
                     0,
@@ -329,11 +328,11 @@ function calculateTreatmentAssignment(
         ])
     ) as TreatmentAssignment;
 
-    StrictObject.values(draftState.personnel).forEach((personnel) => {
-        const assignedPatientCount = StrictObject.keys(
+    Object.values(draftState.personnel).forEach((personnel) => {
+        const assignedPatientCount = Object.keys(
             personnel.assignedPatientIds
         ).length;
-        StrictObject.keys(personnel.assignedPatientIds)
+        Object.keys(personnel.assignedPatientIds)
             .filter((patientId) => treatmentAssignment[patientId])
             .forEach((patientId) => {
                 treatmentAssignment[patientId]![personnel.templateId]! +=
@@ -362,7 +361,7 @@ function evaluateTreatmentReassignment(
         .forEach((patientId) => {
             logPatient(
                 draftState,
-                StrictObject.entries(newTreatmentAssignment[patientId]!)
+                Object.entries(newTreatmentAssignment[patientId]!)
                     .filter(([, count]) => count > 0)
                     .map(([personnelTemplateId]) =>
                         createPersonnelTypeTag(
@@ -371,7 +370,7 @@ function evaluateTreatmentReassignment(
                         )
                     ),
                 `Diese Einsatzkräfte wurden dem Patienten neu zugeteilt: ${
-                    StrictObject.entries(newTreatmentAssignment[patientId]!)
+                    Object.entries(newTreatmentAssignment[patientId]!)
                         .filter(([, count]) => count > 0)
                         .map(
                             ([personnelTemplateId, count]) =>

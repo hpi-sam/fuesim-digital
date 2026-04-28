@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { StrictObject } from '../../utils/strict-object.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 
 export const addResourceDescription = createCombine((a, b) => a + b);
 export const subtractResourceDescription = createCombine((a, b) => a - b);
@@ -25,7 +25,12 @@ function getKeys<K extends string>(
     a: Partial<ResourceDescription<K>>,
     b: Partial<ResourceDescription<K>>
 ) {
-    return [...new Set([...StrictObject.keys(a), ...StrictObject.keys(b)])];
+    return [
+        ...new Set([
+            ...TypeAssertedObject.keys(a),
+            ...TypeAssertedObject.keys(b),
+        ]),
+    ];
 }
 
 export function createCombine(transform: (a: number, b: number) => number) {
@@ -54,7 +59,7 @@ export function createMap(fn: (a: number, ...args: any) => number) {
         ...args: any
     ) =>
         Object.fromEntries(
-            StrictObject.entries(a).map(([key, value]) => [
+            TypeAssertedObject.entries(a).map(([key, value]) => [
                 key,
                 fn(value, ...args),
             ])
@@ -66,7 +71,7 @@ export function addPartialResourceDescriptions<K extends string>(
 ): Partial<ResourceDescription<K>> {
     return resourceDescriptions.reduce<Partial<ResourceDescription<K>>>(
         (total, current) => {
-            StrictObject.entries(current).forEach(([key, value]) => {
+            TypeAssertedObject.entries(current).forEach(([key, value]) => {
                 total[key] = (total[key] ?? 0) + (value ?? 0);
             });
             return total;
@@ -86,7 +91,7 @@ export function subtractPartialResourceDescriptions<K extends string>(
             -1
         ) as ResourceDescription<K>,
     ]);
-    StrictObject.entries(result)
+    TypeAssertedObject.entries(result)
         .filter(([_, value]) => (value ?? 0) <= 0)
         .forEach(([key]) => delete result[key]);
     return result;

@@ -1,4 +1,3 @@
-import { StrictObject } from '../utils/strict-object.js';
 import type { Migration } from './migration-functions.js';
 
 export const renameIncorrectPatientImages12: Migration = {
@@ -23,7 +22,7 @@ export const renameIncorrectPatientImages12: Migration = {
                 migrateImageProperties(patientTemplate.image);
             })
         );
-        StrictObject.values(
+        Object.values(
             (
                 state as {
                     patients: {

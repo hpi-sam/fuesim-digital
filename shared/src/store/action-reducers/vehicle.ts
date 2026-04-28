@@ -46,7 +46,6 @@ import { newVehicleRemovedEvent } from '../../simulation/events/vehicle-removed.
 import { newNewPatientEvent } from '../../simulation/events/new-patient.js';
 import { newPersonnelAvailableEvent } from '../../simulation/events/personnel-available.js';
 import { newMaterialAvailableEvent } from '../../simulation/events/material-available.js';
-import { StrictObject } from '../../utils/strict-object.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getElement } from './utils/get-element.js';
 import { deletePatient } from './patient.js';
@@ -233,8 +232,7 @@ export namespace VehicleActionReducers {
                         material.vehicleId !== vehicle.id ||
                         vehicle.materialIds[material.id] === undefined
                 ) ||
-                StrictObject.keys(vehicle.materialIds).length !==
-                    materials.length
+                Object.keys(vehicle.materialIds).length !== materials.length
             ) {
                 throw new ReducerError(
                     'Vehicle material ids do not match material ids'
@@ -246,8 +244,7 @@ export namespace VehicleActionReducers {
                         currentPersonnel.vehicleId !== vehicle.id ||
                         vehicle.personnelIds[currentPersonnel.id] === undefined
                 ) ||
-                StrictObject.keys(vehicle.personnelIds).length !==
-                    personnel.length
+                Object.keys(vehicle.personnelIds).length !== personnel.length
             ) {
                 throw new ReducerError(
                     'Vehicle personnel ids do not match personnel ids'

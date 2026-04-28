@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import type { ExerciseState } from '../../state.js';
 import { taskSchema } from '../task.js';
@@ -152,6 +152,10 @@ export const stateMachineSchema = z.strictObject({
     transitions: z.array(transitionSchema),
     simulationStartTime: z.number(),
 });
+
+export type TechnicalChallengeStateMachine = Immutable<
+    z.infer<typeof stateMachineSchema>
+>;
 
 export function currentStateOf(
     technicalChallenge: TechnicalChallenge

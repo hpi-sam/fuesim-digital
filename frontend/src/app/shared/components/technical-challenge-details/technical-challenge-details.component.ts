@@ -7,6 +7,7 @@ import type {
     TechnicalChallengeState,
     Guard,
     UserGeneratedContent,
+    TechnicalChallengeStateMachine,
 } from 'fuesim-digital-shared';
 import { currentStateOf } from 'fuesim-digital-shared';
 import {
@@ -28,6 +29,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
 import { ExerciseService } from '../../../core/exercise.service.js';
 import { UserGeneratedContentEditorComponent } from '../user-generated-content-editor/user-generated-content-editor.component.js';
 import { ProgressBarComponent } from '../progress-bar/progress-bar.component.js';
+import { StateMachineEditorComponent } from '../state-machine-editor/state-machine-editor.component.js';
 
 @Component({
     selector: 'app-technical-challenge-details',
@@ -42,6 +44,7 @@ import { ProgressBarComponent } from '../progress-bar/progress-bar.component.js'
         NgbNavOutlet,
         UserGeneratedContentEditorComponent,
         ProgressBarComponent,
+        StateMachineEditorComponent,
     ],
 })
 export class TechnicalChallengeDetailsComponent {
@@ -134,5 +137,9 @@ export class TechnicalChallengeDetailsComponent {
             stateId: this.currentState().id,
             userGeneratedContent: content,
         });
+    }
+
+    updateStateMachine(newStateMachine: TechnicalChallengeStateMachine) {
+        console.log(newStateMachine);
     }
 }

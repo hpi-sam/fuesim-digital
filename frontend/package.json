@@ -52,6 +52,7 @@
         "bootstrap-icons": "^1.11.3",
         "chart.js": "^4.4.8",
         "class-validator": "^0.14.1",
+        "diagram-js": "^15.13.0",
         "fuesim-digital-shared": "file:../shared",
         "immer": "^10.1.1",
         "lodash-es": "^4.17.23",

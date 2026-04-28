@@ -54,6 +54,7 @@ import { PatientStatusBadgeComponent } from '../../../../../shared/components/pa
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
+import { openEditTechnicalChallengeTemplateModal } from '../editor-panel/edit-technical-challenge-template-modal/open-edit-technical-challenge-template-modal.js';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -192,6 +193,13 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public editVehicleTemplate(mapImageTemplateId: UUID) {
         openEditVehicleTemplateModal(this.ngbModalService, mapImageTemplateId);
+    }
+
+    public editTechnicalChallengeTemplate(technicalChallengeTemplateId: UUID) {
+        openEditTechnicalChallengeTemplateModal(
+            this.ngbModalService,
+            technicalChallengeTemplateId
+        );
     }
 
     public setCurrentCategory(

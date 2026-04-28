@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h4 class="modal-title">Fahrzeugvorlage bearbeiten</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    <app-technical-challenge-template-form
+        [technicalChallengeTemplate]="technicalChallengeTemplate()"
+        (technicalChallengeTemplateChange)="editTechnicalChallengeTemplate($event)"
+    >
+    </app-technical-challenge-template-form>
+
+    <button
+        class="btn btn-danger float-end"
+        (click)="deleteTechnicalChallengeTemplate()"
+    >
+        <i class="bi bi-trash-fill"></i>
+        Löschen
+    </button>
+</div>

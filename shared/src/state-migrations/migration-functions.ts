@@ -48,6 +48,7 @@ import { participantIdToKey47 } from './47-participant-id-to-key.js';
 import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
 import { addScoutables50 } from './50-add-scoutables.js';
+import { addUUIDtoAddEocLogEntryAction51 } from './51-add-uuid-to-add-eoc-log-action.js';
 
 /**
  * Migrate a single action
@@ -124,4 +125,5 @@ export const migrations: {
     48: addAutojoinViewport48,
     49: addOperationsTabletView49,
     50: addScoutables50,
+    51: addUUIDtoAddEocLogEntryAction51,
 };

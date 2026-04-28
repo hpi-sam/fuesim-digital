@@ -16,5 +16,8 @@ export class SimulatedRegionPreviewCardComponent {
     readonly title = input.required<string>();
     readonly imageUrl = input.required<string>();
     readonly darkBackground = input(false);
+    /**
+     * when this is set, the patient pre-triage-status and hp are displayed
+     */
     readonly patient = input<Patient>();
 }

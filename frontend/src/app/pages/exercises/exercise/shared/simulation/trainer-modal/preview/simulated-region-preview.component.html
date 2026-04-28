@@ -18,7 +18,7 @@
             @if (patients$ | async; as patients) {
                 <div class="cards">
                     @for (patient of patients; track patient.id) {
-                        <app-simulated-region-preview-card
+                        <app-simulated-region-preview-patient-card
                             dataCy="patientWithVisibleStatusDiv"
                             [imageUrl]="patient.image.url"
                             [darkBackground]="selected()?.id === patient.id"
@@ -26,7 +26,7 @@
                             [patient]="patient"
                             (elementMousedown)="selectElement(patient)"
                         >
-                        </app-simulated-region-preview-card>
+                        </app-simulated-region-preview-patient-card>
                     }
                 </div>
                 @if (

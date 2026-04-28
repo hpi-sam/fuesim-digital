@@ -3,24 +3,16 @@
     (mousedown)="elementMousedown.emit($event)"
     [attr.data-cy]="dataCy()"
 >
-    <ng-content>
-        @if (patient(); as patient) {
-            <div class="d-flex mx-2">
-                <app-patient-health-point-display [patientId]="patient.id" />
-                <div class="flex-grow-1"></div>
-                <app-patient-status-badge [status]="patient.pretriageStatus" />
-            </div>
-        }
-        <div
-            class="preview-image-container"
-            [class.bg-secondary]="darkBackground()"
-        >
-            <img [src]="imageUrl()" class="card-img-top" />
-        </div>
-        <div class="card-body px-1 pb-0 pt-2">
-            <h6 class="text-truncate" placement="bottom">
-                {{ title() }}
-            </h6>
-        </div>
-    </ng-content>
+    <ng-content />
+    <div
+        class="preview-image-container"
+        [class.bg-secondary]="darkBackground()"
+    >
+        <img [src]="imageUrl()" class="card-img-top" />
+    </div>
+    <div class="card-body px-1 pb-0 pt-2">
+        <h6 class="text-truncate" placement="bottom">
+            {{ title() }}
+        </h6>
+    </div>
 </div>

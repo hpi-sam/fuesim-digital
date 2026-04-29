@@ -22,6 +22,9 @@ import {
     createPersonnelTypeTag,
     createMeasureTemplateTag,
     createScoutableTag,
+    createTechnicalChallengeTag,
+    createTaskTag,
+    createStateTag,
 } from '../../../models/utils/tag-helpers.js';
 import type { TreatmentProgress } from '../../../simulation/utils/treatment.js';
 import { treatmentProgressToGermanNameDictionary } from '../../../simulation/utils/treatment.js';
@@ -42,6 +45,7 @@ import type { Vehicle } from '../../../models/vehicle.js';
 import { formatDuration } from '../../../utils/format-duration.js';
 import type { ExerciseRadiogram } from '../../../models/radiogram/exercise-radiogram.js';
 import { TypeAssertedObject } from '../../../utils/type-asserted-object.js';
+import type { TechnicalChallengeStateId } from '../../../models/technical-challenge/state-machine.js';
 import {
     getElement,
     getExerciseBehaviorById,
@@ -934,4 +938,90 @@ export function logScoutableViewed(
         : `Es wurde etwas erkundet.`;
 
     log(state, [createScoutableTag(state, scoutable.id)], description);
+}
+
+export function logTechnicalChallenge(
+    state: WritableDraft<ExerciseState>,
+    additionalTags: Tag[],
+    description: string,
+    technicalChallengeId: UUID
+) {
+    if (!logActive(state)) return;
+
+    const technicalChallenge = getElement(
+        state,
+        'technicalChallenge',
+        technicalChallengeId
+    );
+
+    log(
+        state,
+        [
+            createTechnicalChallengeTag(state, technicalChallenge),
+            ...additionalTags,
+        ],
+        description
+    );
+}
+
+export function logTechnicalChallengePersonnelAssigned(
+    state: WritableDraft<ExerciseState>,
+    technicalChallengeId: UUID,
+    personnelId: UUID,
+    taskId: UUID
+) {
+    if (!logActive(state)) return;
+
+    const personnel = getElement(state, 'personnel', personnelId);
+    const task = getElement(state, 'task', taskId);
+    logTechnicalChallenge(
+        state,
+        [createPersonnelTypeTag(state, personnel), createTaskTag(state, task)],
+        'Personal wurde zu einer technischen Herausforderung zugewiesen.',
+        technicalChallengeId
+    );
+}
+
+export function logTechnicalChallengePersonnelUnassigned(
+    state: WritableDraft<ExerciseState>,
+    technicalChallengeId: UUID,
+    personnelId: UUID,
+    taskId: UUID
+) {
+    if (!logActive(state)) return;
+
+    const personnel = getElement(state, 'personnel', personnelId);
+    const task = getElement(state, 'task', taskId);
+    logTechnicalChallenge(
+        state,
+        [createPersonnelTypeTag(state, personnel), createTaskTag(state, task)],
+        'Personal wurde von einer Aufgabe in einer technischen Herausforderung entfernt.',
+        technicalChallengeId
+    );
+}
+
+export function logTechnicalChallengeStateTransition(
+    state: WritableDraft<ExerciseState>,
+    technicalChallengeId: UUID,
+    fromId: TechnicalChallengeStateId,
+    toId: TechnicalChallengeStateId
+) {
+    if (!logActive(state)) return;
+
+    const technicalChallenge = getElement(
+        state,
+        'technicalChallenge',
+        technicalChallengeId
+    );
+    const fromState = technicalChallenge.states[fromId]!;
+    const toState = technicalChallenge.states[toId]!;
+    logTechnicalChallenge(
+        state,
+        [
+            createStateTag(state, fromState, 'Startzustand'),
+            createStateTag(state, toState, 'Endzustand'),
+        ],
+        'Technische Herausforderung hat den Zustand gewechselt.',
+        technicalChallengeId
+    );
 }

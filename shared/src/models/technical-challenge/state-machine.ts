@@ -13,6 +13,10 @@ import {
     type UserGeneratedContent,
     userGeneratedContentSchema,
 } from '../user-generated-content.js';
+import {
+    logTechnicalChallengePersonnelUnassigned,
+    logTechnicalChallengeStateTransition,
+} from '../../store/action-reducers/utils/log.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,
@@ -171,13 +175,16 @@ export function currentlyPossibleTaskIds(
 function unassignFromNonexistentTasks(
     technicalChallenge: WritableDraft<TechnicalChallenge>
 ) {
-    for (const [personnelKey, taskKey] of Object.entries(
+    const unassignedPersonnel: { taskId: UUID; personnelId: UUID }[] = [];
+    for (const [personnelId, taskId] of Object.entries(
         technicalChallenge.assignedPersonnel
     )) {
-        if (!currentlyPossibleTaskIds(technicalChallenge).includes(taskKey)) {
-            delete technicalChallenge.assignedPersonnel[personnelKey];
+        if (!currentlyPossibleTaskIds(technicalChallenge).includes(taskId)) {
+            delete technicalChallenge.assignedPersonnel[personnelId];
+            unassignedPersonnel.push({ taskId, personnelId });
         }
     }
+    return unassignedPersonnel;
 }
 
 export function simulateTechnicalChallenge(
@@ -207,9 +214,27 @@ export function simulateTechnicalChallenge(
 
     if (!nextTransition) return;
 
+    logTechnicalChallengeStateTransition(
+        exerciseState,
+        technicalChallenge.id,
+        technicalChallenge.currentStateId,
+        nextTransition.to
+    );
+
     technicalChallenge.currentStateId = nextTransition.to;
 
-    unassignFromNonexistentTasks(technicalChallenge);
+    const unassignedPersonnel =
+        unassignFromNonexistentTasks(technicalChallenge);
+    if (unassignedPersonnel.length > 0) {
+        for (const { personnelId, taskId } of unassignedPersonnel) {
+            logTechnicalChallengePersonnelUnassigned(
+                exerciseState,
+                technicalChallenge.id,
+                personnelId,
+                taskId
+            );
+        }
+    }
 }
 
 export function simulateAllTechnicalChallenges(

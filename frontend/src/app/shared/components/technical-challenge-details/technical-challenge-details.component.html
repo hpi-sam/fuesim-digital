@@ -1,6 +1,6 @@
 @if (this.currentRole() === 'trainer') {
     <nav #nav="ngbNav" ngbNav class="nav-tabs">
-        <ng-container ngbNavItem ngbNavItem="properties">
+        <ng-container ngbNavItem="properties">
             <a ngbNavLink data-cy="technicalDetailsPopUpPropertiesNav"
                 >Eigenschaften</a
             >
@@ -19,6 +19,7 @@
                                 </div>
                                 <div class="col-4">
                                     <img
+                                        alt=""
                                         [src]="currentState().image.url"
                                         class="w-100"
                                     />
@@ -37,34 +38,12 @@
                                 ) {
                                     <li class="list-group-item">
                                         {{ guard.name ?? 'unbenannt' }}
-                                        <div class="progress">
-                                            <div
-                                                class="progress-bar"
-                                                [class.progress-bar-striped]="
-                                                    animated() &&
-                                                    !guard.finished
-                                                "
-                                                [class.progress-bar-animated]="
-                                                    animated() &&
-                                                    !guard.finished
-                                                "
-                                                [class.bg-info]="
-                                                    !guard.finished
-                                                "
-                                                [class.bg-warning]="
-                                                    guard.finished
-                                                "
-                                                role="progressbar"
-                                                [attr.aria-valuenow]="
-                                                    guard.current
-                                                "
-                                                aria-valuemin="0"
-                                                [attr.aria-valuemax]="guard.max"
-                                                [style.width]="`${guard.percentage}%`"
-                                            >
-                                                {{ guard.current }}s
-                                            </div>
-                                        </div>
+                                        <app-progress-bar
+                                            class="mt-1"
+                                            [paused]="!exerciseRunning()"
+                                            [max]="guard.max"
+                                            [current]="guard.current"
+                                        ></app-progress-bar>
                                     </li>
                                 } @empty {
                                     <li class="list-group-item">
@@ -83,33 +62,14 @@
                                 @for (task of tasksProgress(); track task.id) {
                                     <li
                                         [attr.data-taskId]="task.id"
-                                        class="list-group-item"
+                                        class="list-group-item flex-column"
                                     >
                                         {{ task.taskName }}
-                                        <div class="progress">
-                                            <div
-                                                class="progress-bar"
-                                                [class.progress-bar-striped]="
-                                                    animated() && !task.finished
-                                                "
-                                                [class.progress-bar-animated]="
-                                                    animated() && !task.finished
-                                                "
-                                                [class.bg-info]="!task.finished"
-                                                [class.bg-success]="
-                                                    task.finished
-                                                "
-                                                role="progressbar"
-                                                [attr.aria-valuenow]="
-                                                    task.current
-                                                "
-                                                aria-valuemin="0"
-                                                [attr.aria-valuemax]="task.max"
-                                                [style.width]="`${task.percentage}%`"
-                                            >
-                                                {{ task.current }}s
-                                            </div>
-                                        </div>
+                                        <app-progress-bar
+                                            [current]="task.current"
+                                            [max]="task.max"
+                                            [paused]="!exerciseRunning()"
+                                        ></app-progress-bar>
                                     </li>
                                 } @empty {
                                     <li class="list-group-item">
@@ -135,6 +95,7 @@
 
                                     <li class="list-group-item">
                                         <img
+                                            alt=""
                                             [src]="personnel.image.url"
                                             style="max-height: 40px"
                                         />
@@ -148,7 +109,7 @@
                 </div>
             </ng-template>
         </ng-container>
-        <ng-container ngbNavItem ngbNavItem="scout-Info">
+        <ng-container ngbNavItem="scout-Info">
             <a ngbNavLink data-cy="mapImagePopUpScoutNav">Erkundung</a>
             <ng-template ngbNavContent>
                 <app-user-generated-content-editor

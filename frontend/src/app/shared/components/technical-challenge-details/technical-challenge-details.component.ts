@@ -27,6 +27,7 @@ import {
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 import { ExerciseService } from '../../../core/exercise.service.js';
 import { UserGeneratedContentEditorComponent } from '../user-generated-content-editor/user-generated-content-editor.component.js';
+import { ProgressBarComponent } from '../progress-bar/progress-bar.component.js';
 
 @Component({
     selector: 'app-technical-challenge-details',
@@ -40,6 +41,7 @@ import { UserGeneratedContentEditorComponent } from '../user-generated-content-e
         NgbNavContent,
         NgbNavOutlet,
         UserGeneratedContentEditorComponent,
+        ProgressBarComponent,
     ],
 })
 export class TechnicalChallengeDetailsComponent {
@@ -60,7 +62,7 @@ export class TechnicalChallengeDetailsComponent {
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
     readonly exerciseStatus = this.store.selectSignal(selectExerciseStatus);
 
-    public readonly animated = computed(
+    public readonly exerciseRunning = computed(
         () => this.exerciseStatus() === 'running'
     );
 

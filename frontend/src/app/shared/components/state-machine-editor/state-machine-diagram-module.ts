@@ -23,7 +23,7 @@ interface TransitionShape {
     waypoints: Point[];
 }
 
-class StateMachineElementFactory {
+export class StateMachineElementFactory {
     createState(attrs: Partial<StateShape> = {}): StateShape {
         return {
             height: 0,
@@ -48,7 +48,7 @@ class StateMachineElementFactory {
     }
 }
 
-class StateMachineRenderer extends BaseRenderer {
+export class StateMachineRenderer extends BaseRenderer {
     static $inject = ['eventBus'] as const;
 
     constructor(eventBus: EventBus) {
@@ -62,8 +62,12 @@ class StateMachineRenderer extends BaseRenderer {
     }
 
     override drawShape(parent: SVGElement, shape: StateShape): SVGElement {
-        const circle = svgCreate('circle') as SVGCircleElement;
-        svgAppend(parent, circle);
+        const circle = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+            'circle'
+        ) as SVGCircleElement;
+        parent.append(circle);
 
         circle.setAttribute('cx', String(shape.width / 2));
         circle.setAttribute('cy', String(shape.height / 2));
@@ -81,8 +85,12 @@ class StateMachineRenderer extends BaseRenderer {
         parent: SVGElement,
         connection: TransitionShape
     ): SVGElement {
-        const path = svgCreate('path') as SVGPathElement;
-        svgAppend(parent, path);
+        const path = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg',
+            'path'
+        ) as SVGPathElement;
+        parent.append(path);
 
         const d = connection.waypoints
             .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)

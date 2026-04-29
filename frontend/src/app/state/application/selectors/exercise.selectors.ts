@@ -78,15 +78,8 @@ export const selectMeasureTemplateCategories =
     selectPropertyFactory('measureTemplates');
 export const selectMeasureTemplates = createSelector(
     selectMeasureTemplateCategories,
-    (categories) => {
-        const flat: { [id: UUID]: MeasureTemplate } = {};
-        for (const category of Object.values(categories)) {
-            for (const [id, template] of Object.entries(category.templates)) {
-                flat[id] = template;
-            }
-        }
-        return flat;
-    }
+    (categories): { [key: UUID]: MeasureTemplate } =>
+        Object.assign({}, ...Object.values(categories).map((c) => c.templates))
 );
 // Array properties
 export const selectPatientCategories =

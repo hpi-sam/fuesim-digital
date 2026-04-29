@@ -85,8 +85,8 @@ const propertyBaseSchema = z.strictObject({
 });
 
 const manualConfirmPropertySchema = z.strictObject({
-    type: z.literal('manualConfirm'),
     ...propertyBaseSchema.shape,
+    type: z.literal('manualConfirm'),
     prompt: z.string().nonempty({
         error: validationMessages.required,
     }),
@@ -94,30 +94,30 @@ const manualConfirmPropertySchema = z.strictObject({
 });
 
 const responsePropertySchema = z.strictObject({
-    type: z.literal('response'),
     ...propertyBaseSchema.shape,
+    type: z.literal('response'),
     response: z.string().nonempty({ error: validationMessages.required }),
 });
 
 const delayPropertySchema = z.strictObject({
-    type: z.literal('delay'),
     ...propertyBaseSchema.shape,
+    type: z.literal('delay'),
     delay: z
         .int({ error: 'Die Dauer der Verzögerung muss eine Zahl sein' })
         .positive({ error: 'Die Dauer der Verzögerung muss positiv sein' }),
 });
 
 const alarmPropertySchema = z.strictObject({
-    type: z.literal('alarm'),
     ...propertyBaseSchema.shape,
+    type: z.literal('alarm'),
     alarmGroups: z.array(alarmGroupSchema.shape.id),
     targetTransferPointIds: z.array(transferPointSchema.shape.id),
 });
 
 const eocLogPropertySchema = z
     .strictObject({
-        type: z.literal('eocLog'),
         ...propertyBaseSchema.shape,
+        type: z.literal('eocLog'),
         message: trimmedOptionalString,
         editable: z.boolean(),
         confirm: z.boolean(),
@@ -142,15 +142,15 @@ const eocLogPropertySchema = z
     });
 
 const drawFreehandPropertySchema = z.strictObject({
-    type: z.literal('drawFreehand'),
     ...propertyBaseSchema.shape,
+    type: z.literal('drawFreehand'),
     strokeColor: z.string(),
     fillColor: z.string(),
 });
 
 const drawLinePropertySchema = z.strictObject({
-    type: z.literal('drawLine'),
     ...propertyBaseSchema.shape,
+    type: z.literal('drawLine'),
     strokeColor: z.string(),
 });
 

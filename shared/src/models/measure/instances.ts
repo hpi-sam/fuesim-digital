@@ -21,7 +21,7 @@ const drawingPropertyInstanceSchema = z.strictObject({
     id: uuidSchema,
 });
 
-export const measurePropertyInstanceSchema = z.union([
+export const measurePropertyInstanceSchema = z.discriminatedUnion('type', [
     alarmPropertyInstanceSchema,
     eocLogPropertyInstanceSchema,
     drawingPropertyInstanceSchema,

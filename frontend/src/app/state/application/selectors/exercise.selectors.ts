@@ -25,6 +25,14 @@ import {
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
 import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
+import {
+    EvalCriterion,
+    PatientAtStatusEvalCriterion,
+    ReachTechnicalChallengeStateEvalCriterion,
+    ViewScoutableEvalCriterion,
+    XPatientsAtStatusEvalCriterion,
+} from '../../../../../../shared/dist/models/evaluation-criterion';
+import { EvalResult } from '../../../shared/types/evaluation-result';
 
 // Properties
 
@@ -82,6 +90,7 @@ export const selectMeasureTemplates = createSelector(
     (categories): { [key: UUID]: MeasureTemplate } =>
         Object.assign({}, ...Object.values(categories).map((c) => c.templates))
 );
+export const selectEvalCriteria = selectPropertyFactory('evalCriteria');
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');
@@ -154,6 +163,9 @@ export const createSelectScoutable =
 export const createSelectMeasureTemplate = createSelectElementFromMapFactory(
     selectMeasureTemplates
 );
+export const createSelectEvalCriterion =
+    createSelectElementFromMapFactory(selectEvalCriteria);
+
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,
@@ -456,4 +468,77 @@ export const selectWorkingPersonnel = createSelector(
         }
         return workingPersonnel;
     }
+);
+
+export const selectEvalResults = createSelector(
+    selectEvalCriteria,
+    selectTechnicalChallenges,
+    selectPatients,
+    selectScoutables,
+    selectCurrentTime,
+    (evalCriteria, technicalChallenges, patients, scoutables, currentTime) =>
+        Object.values(evalCriteria)
+            .flatMap((evalCriterion: EvalCriterion): EvalResult => {
+                let isCompleted = false;
+                let count = -1;
+                switch (evalCriterion.type!) {
+                    case 'doMeasureXTimesEvalCriterion': {
+                        /* TODO @JohannesPotzi @Jogius */
+                        break;
+                    }
+                    case 'reachTechnicalChallengeStateEvalCriterion': {
+                        const criterion =
+                            evalCriterion as ReachTechnicalChallengeStateEvalCriterion;
+                        const targetId = criterion.targetTechnicalChallengeId;
+                        const technicalChallenge =
+                            technicalChallenges[targetId]!;
+                        isCompleted =
+                            technicalChallenge.currentStateId === targetId;
+                        break;
+                    }
+                    case 'patientAtStatusEvalCriterion': {
+                        const criterion =
+                            evalCriterion as PatientAtStatusEvalCriterion;
+                        const targetId = criterion.targetPatientId;
+                        const patient = patients[targetId]!;
+                        isCompleted =
+                            patient.realStatus === criterion.targetStatus;
+                        break;
+                    }
+                    case 'xPatientsAtStatusEvalCriterion': {
+                        const criterion =
+                            evalCriterion as XPatientsAtStatusEvalCriterion;
+                        const currentCount = Object.values(patients).filter(
+                            (patient) =>
+                                patient.realStatus === criterion.targetStatus
+                        ).length;
+                        count = currentCount;
+                        isCompleted = currentCount === criterion.count;
+                        break;
+                    }
+                    case 'viewScoutableEvalCriterion': {
+                        const criterion =
+                            evalCriterion as ViewScoutableEvalCriterion;
+                        const scoutable =
+                            scoutables[criterion.targetScoutableId]!;
+                        isCompleted = scoutable.viewedByParticipants;
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                return {
+                    isCompleted: isCompleted,
+                    criterionId: evalCriterion.criterionId!,
+                    timestamp: currentTime,
+                    count: count !== -1 ? count : undefined,
+                };
+            })
+            .reduce<{ [evalCriterionId: UUID]: EvalResult }>(
+                (evalResultObject, evalResult) => {
+                    evalResultObject[evalResult.criterionId] = evalResult;
+                    return evalResultObject;
+                },
+                {}
+            )
 );

@@ -165,7 +165,7 @@ export namespace VehicleTemplateActionReducers {
             reducer: (draftState, { entityId }) => {
                 const vehicleTemplate = Object.values(
                     getTemplates(draftState, 'vehicleTemplate')
-                ).find((template) => template.entityId === entityId);
+                ).find((template) => template.entity?.entityId === entityId);
                 if (!vehicleTemplate) {
                     throw new ReducerError(
                         `VehicleTemplate with entityId ${entityId} does not exist`

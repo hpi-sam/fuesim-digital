@@ -1,3 +1,4 @@
+import type { Immutable } from 'immer';
 import type { Element as FuesimElement } from '../element.js';
 import type { Template as FuesimTemplate } from '../template.js';
 
@@ -26,7 +27,7 @@ export interface EditableValuesRegistryEntry<
      * How to bring the values over to the new element version
      */
     keep: <E extends Extract<FuesimElement, { type: Element }>>(data: {
-        template: Extract<FuesimTemplate, { type: Template }>;
+        template: Immutable<Extract<FuesimTemplate, { type: Template }>>;
         newElement: E;
         oldElement: E;
     }) => E;

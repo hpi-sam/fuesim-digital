@@ -2,6 +2,7 @@ import type { InputSignal, OutputEmitterRef } from '@angular/core';
 import type {
     ElementDto,
     Marketplace,
+    TypedElementDto,
     VersionedCollectionPartial,
     VersionedElementContent,
 } from 'fuesim-digital-shared';
@@ -32,7 +33,7 @@ export interface CreatingVersionedElementModalData<T>
 export interface EditingVersionedElementModalData<T>
     extends SharedVersionedElementModalData<T> {
     mode: 'edit' | 'view';
-    element: ElementDto;
+    element: TypedElementDto<T>;
     hideVersionHistory?: boolean;
 }
 

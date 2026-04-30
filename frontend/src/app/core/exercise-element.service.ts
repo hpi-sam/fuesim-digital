@@ -460,7 +460,7 @@ export class CollectionService {
         importFrom: CollectionVersionId;
         acceptedElementDeletions: ElementVersionId[];
     }) {
-        const data = await lastValueFrom(
+        await lastValueFrom(
             this.httpClient.post<
                 typeof Marketplace.Collection.UpgradeDependency.Response
             >(

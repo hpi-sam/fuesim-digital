@@ -8,7 +8,6 @@ import { Store } from '@ngrx/store';
 import {
     CollectionDto,
     CollectionElementsDto,
-    gatherCollectionElements,
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { CollectionService } from '../../../../../core/exercise-element.service';
@@ -86,7 +85,7 @@ export class ManageExerciseCollectionsModalComponent {
             await this.collectionService.getElementsOfCollectionVersion(result);
         await this.exerciseService.proposeAction({
             type: '[Collection] Add Collection',
-            elements: gatherCollectionElements(elements).allVisibleElements(),
+            elements,
             collectionVersion: {
                 versionId: result.versionId,
                 entityId: result.entityId,

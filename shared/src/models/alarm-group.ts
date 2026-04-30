@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
-import { versionedElementModel } from '../marketplace/models/versioned-element-model.js';
+import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
 import { isElementVersionId } from '../marketplace/models/versioned-id-schema.js';
 import { alarmGroupVehicleSchema } from './utils/alarm-group-vehicle.js';
 import { registerDependency } from './utils/dependency-registry.js';
 
 export const alarmGroupSchema = z.strictObject({
-    ...versionedElementModel.partial().shape,
+    ...versionedElementModelSchema.partial().shape,
     id: uuidSchema,
     type: z.literal('alarmGroup'),
     name: z.string(),

@@ -6,6 +6,8 @@ import type {
 import { elementVersionIdSchema } from './models/versioned-id-schema.js';
 import { elementDtoSchema } from './models/versioned-elements.js';
 import type { ElementDto } from './models/versioned-elements.js';
+import type { CollectionElementsDto } from './models/collection-elements.js';
+import { gatherCollectionElements } from './models/collection-elements.js';
 
 const deletedElementDtoSchema = z.object({
     id: elementVersionIdSchema,
@@ -115,6 +117,54 @@ export function getCollectionElementDiff(
         });
 
     return changes;
+}
+
+export function getCollectionElementsDiff(
+    prev: {
+        collection: VersionedCollectionPartial;
+        elements: CollectionElementsDto;
+    }[],
+    next: {
+        collection: VersionedCollectionPartial;
+        elements: CollectionElementsDto;
+    }[]
+): {
+    direct: ChangedElementDto[];
+    imported: ChangedElementDto[];
+    references: ChangedElementDto[];
+} {
+    const combinedElements = (
+        elements: { elements: CollectionElementsDto }[]
+    ): CollectionElementsDto => ({
+        direct: elements.flatMap((e) => e.elements.direct),
+        imported: elements.flatMap((e) => e.elements.imported),
+        references: elements.flatMap((e) => e.elements.references),
+    });
+
+    return {
+        direct: getCollectionElementDiff(
+            gatherCollectionElements(
+                combinedElements(prev)
+            ).allDirectElements(),
+            gatherCollectionElements(combinedElements(next)).allDirectElements()
+        ),
+        imported: getCollectionElementDiff(
+            gatherCollectionElements(
+                combinedElements(prev)
+            ).allImportedElements(),
+            gatherCollectionElements(
+                combinedElements(next)
+            ).allImportedElements()
+        ),
+        references: getCollectionElementDiff(
+            gatherCollectionElements(
+                combinedElements(prev)
+            ).allReferenceElements(),
+            gatherCollectionElements(
+                combinedElements(next)
+            ).allReferenceElements()
+        ),
+    };
 }
 
 export async function dependencyTreeConflictResolution(

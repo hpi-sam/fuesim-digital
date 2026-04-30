@@ -1,23 +1,22 @@
 import { Component, inject, input, resource } from '@angular/core';
 import {
-    checkEditableValueEdited,
-    cloneDeepMutable,
     ElementDto,
     gatherCollectionElements,
-    uuid,
     VersionedCollectionPartial,
-    Element as FuesimElement,
-    getEntityIdFromElement,
     ChangeImpact,
-    EditableElementChangeImpact,
-    RemovedElementChangeImpact,
+    getCollectionElementDiff,
+    getAllMarketplaceRegistryEntries,
+    CollectionElementsDto,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
+import { firstValueFrom } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Immutable } from 'immer';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
-import { selectVehicles } from '../../../../../../state/application/selectors/exercise.selectors';
+import {
+    selectExerciseState,
+    selectSelectedCollections,
+} from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { AppState } from '../../../../../../state/app.state';
 import { ChangeImpactModalComponent } from '../../change-impact-modal/change-impact-modal.component';
@@ -65,45 +64,39 @@ export class ExerciseColletionItemComponent {
     }
 
     public async removeCollection(collection: VersionedCollectionPartial) {
-        try {
+        /*        try {
             this.loadingModalService.showLoading({
                 title: 'Neue Version wird geladen',
                 description:
                     'Bitte warten Sie, während die neue Version der Sammlung geladen wird und die Auswirkungen von Änderungen berechnet werden.',
             });
 
-            const selectedCollection = this.collection();
             const elements =
                 await this.collectionService.getElementsOfCollectionVersion(
                     collection
                 );
 
-            const elementsInExercise = {
-                ...selectStateSnapshot(selectVehicles, this.store),
-            };
+            const elementsInExercise = getAllMarketplaceStateElements(
+                selectStateSnapshot(selectExerciseState, this.store)
+            );
+
             const changeImpacts = await this.calcChangeImpact({
-                inExercise: Object.values(elementsInExercise),
+                inExercise: elementsInExercise,
                 new: [],
-                previous:
-                    gatherCollectionElements(elements).allDirectElements(),
+                previous: gatherCollectionElements(elements).allDirectElements(),
             });
 
             this.loadingModalService.closeLoading();
 
-            const modal = this.ngbModalService.open(
-                ChangeImpactModalComponent,
-                {
-                    size: 'xl',
-                }
-            );
-            modal.componentInstance.changes =
-                changeImpacts satisfies ChangeImpact[];
+            const modal = this.ngbModalService.open(ChangeImpactModalComponent, {
+                size: 'xl',
+            });
+            modal.componentInstance.changes = changeImpacts satisfies ChangeImpact[];
             modal.componentInstance.newCollectionElements = elements.direct;
         } catch (error) {
             this.loadingModalService.closeLoading();
             throw error;
-        }
-
+        }*/
         /* await this.exerciseService.proposeAction({
             type: '[Collection] Remove Collection',
             collectionEntity: collection.entityId,
@@ -111,6 +104,10 @@ export class ExerciseColletionItemComponent {
         });*/
         // TODO: Keep in mind, that some elements may still be transitive dependencies of other collections!
         // WE SHOULD NOT REMOVE THEM IN THIS CASE!
+    }
+
+    public buildElementTree() {
+        return [];
     }
 
     public async upgradeCollectionVersion() {
@@ -136,16 +133,37 @@ export class ExerciseColletionItemComponent {
                     newerCollectionVersionAvailable.latestVersion
                 );
 
-            const elementsInExercise = {
-                ...selectStateSnapshot(selectVehicles, this.store),
-            };
-            const changeImpacts = await this.calcChangeImpact({
-                inExercise: Object.values(elementsInExercise),
-                new: gatherCollectionElements(
+            const currentState = selectStateSnapshot(
+                selectExerciseState,
+                this.store
+            );
+
+            const currentCollectionElements =
+                await this.fetchCollectionElements();
+
+            const changes = getCollectionElementDiff(
+                currentCollectionElements,
+                gatherCollectionElements(
                     newerCollectionElements
-                ).allVisibleElements(),
-                previous: await this.fetchCollectionElements(),
-            });
+                ).allVisibleElements()
+            );
+
+            const registryEntries = getAllMarketplaceRegistryEntries();
+            const changeImpacts: ChangeImpact[] = [];
+
+            for (const [type, entry] of Object.entries(registryEntries)) {
+                console.log(
+                    'Calculating change impacts for registry entry',
+                    type
+                );
+                for (const change of changes) {
+                    changeImpacts.push(
+                        ...entry.changeImpact(currentState, change)
+                    );
+                }
+            }
+
+            console.log({ changes, changeImpacts });
 
             this.loadingModalService.closeLoading();
 
@@ -155,129 +173,80 @@ export class ExerciseColletionItemComponent {
                     size: 'xl',
                 }
             );
-            modal.componentInstance.changes =
-                changeImpacts satisfies ChangeImpact[];
-            modal.componentInstance.newCollectionElements =
-                gatherCollectionElements(
-                    newerCollectionElements
-                ).allVisibleElements();
+            const componentInstance =
+                modal.componentInstance as ChangeImpactModalComponent;
+            console.log('Calculated change impacts:', changeImpacts);
+            componentInstance.changes = changeImpacts satisfies ChangeImpact[];
+            componentInstance.newCollectionElements = gatherCollectionElements(
+                newerCollectionElements
+            ).allVisibleElements();
+
+            const result = await firstValueFrom(
+                componentInstance.submitChanges
+            );
+
+            if (!result.apply) return;
+            const currentSelectedCollections = selectStateSnapshot(
+                selectSelectedCollections,
+                this.store
+            );
+
+            this.exerciseService.proposeAction({
+                type: '[Collection] Upgrade Collection',
+                changeApplies: result.changes,
+                collectionVersion:
+                    newerCollectionVersionAvailable.latestVersion,
+                overwriteTemplates: await this.getAllCollectionElements(
+                    currentSelectedCollections.map((c) => {
+                        if (c.entityId === selectedCollection.entityId) {
+                            return newerCollectionVersionAvailable.latestVersion;
+                        }
+                        return c;
+                    })
+                ),
+            });
         } catch (error) {
             this.loadingModalService.closeLoading();
             throw error;
         }
     }
 
-    private async calcChangeImpact(data: {
-        previous: ElementDto[];
-        inExercise: Immutable<FuesimElement>[];
-        new: ElementDto[];
-    }): Promise<ChangeImpact[]> {
-        const {
-            addedElements: _addedElements,
-            editedNewElements,
-            removedElements,
-            unchangedElements: _unchangedElements,
-        } = await this.checkForChangesBetweenVersions(data.previous, data.new);
+    private async getAllCollectionElements(
+        collections: VersionedCollectionPartial[]
+    ): Promise<CollectionElementsDto> {
+        const elements = await Promise.all(
+            collections.map(async (collection) =>
+                this.collectionService.getElementsOfCollectionVersion(
+                    collection
+                )
+            )
+        );
+        return elements.reduce<CollectionElementsDto>(
+            (acc, collectionElements) => {
+                acc.direct.push(...collectionElements.direct);
 
-        const impacts: ChangeImpact[] = [];
-
-        for (const element of editedNewElements) {
-            const inExercise = data.inExercise.filter(
-                (e) => getEntityIdFromElement(e) === element.entityId
-            );
-            if (inExercise.length === 0) {
-                continue;
-            }
-
-            for (const elementInExercise of inExercise) {
-                const editedValues = checkEditableValueEdited({
-                    template: element.content,
-                    element: cloneDeepMutable(elementInExercise),
-                });
-
-                if (editedValues.length > 0) {
-                    impacts.push({
-                        id: uuid(),
-                        type: 'updated',
-                        element: cloneDeepMutable(elementInExercise),
-                        entity: element,
-                        editedValues,
-                    } satisfies EditableElementChangeImpact);
+                for (const elementType of ['references', 'imported'] as const) {
+                    for (const colElements of collectionElements[elementType]) {
+                        const existingCollection = acc[elementType].find(
+                            (f) =>
+                                f.collection.entityId ===
+                                colElements.collection.entityId
+                        );
+                        if (existingCollection) {
+                            existingCollection.elements.push(
+                                ...colElements.elements
+                            );
+                        } else {
+                            acc[elementType].push({
+                                collection: colElements.collection,
+                                elements: [...colElements.elements],
+                            });
+                        }
+                    }
                 }
-            }
-        }
-
-        for (const element of removedElements) {
-            const inExercise = data.inExercise.filter(
-                (e) => getEntityIdFromElement(e) === element.entityId
-            );
-            if (inExercise.length === 0) {
-                continue;
-            }
-            const matchingElement = data.previous.find(
-                (e) => e.entityId === element.entityId
-            );
-            if (!matchingElement) {
-                console.warn(
-                    `Element with entityId ${element.entityId} has been removed in the marketplace, but was not part of the previous collection version. No change impact calculation possible.`
-                );
-                continue;
-            }
-
-            for (const elementInExercise of inExercise) {
-                impacts.push({
-                    id: uuid(),
-                    type: 'removed',
-                    element: cloneDeepMutable(elementInExercise),
-                    entity: matchingElement,
-                } satisfies RemovedElementChangeImpact);
-            }
-        }
-
-        return impacts;
-    }
-
-    private async checkForChangesBetweenVersions(
-        currentState: ElementDto[],
-        newerVersion: ElementDto[]
-    ) {
-        const addedElements = [];
-        const editedNewElements = [];
-        const removedElements = [];
-        const unchangedElements = [];
-
-        for (const element of newerVersion) {
-            const matchingElement = currentState.find(
-                (e) => e.entityId === element.entityId
-            );
-
-            if (!matchingElement) {
-                addedElements.push(element);
-                continue;
-            }
-
-            if (element.version !== matchingElement.version) {
-                editedNewElements.push(element);
-            }
-
-            unchangedElements.push(element);
-        }
-
-        for (const element of currentState) {
-            const matchingElement = newerVersion.find(
-                (e) => e.entityId === element.entityId
-            );
-
-            if (!matchingElement) {
-                removedElements.push(element);
-            }
-        }
-
-        return {
-            addedElements,
-            editedNewElements,
-            removedElements,
-            unchangedElements,
-        };
+                return acc;
+            },
+            { direct: [], imported: [], references: [] }
+        );
     }
 }

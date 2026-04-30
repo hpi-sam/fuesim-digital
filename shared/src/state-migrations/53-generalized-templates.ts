@@ -21,6 +21,15 @@ interface TypedState<
     mapImageTemplates?: {
         [key: string]: MapImage;
     };
+    alarmGroups?: {
+        [key: string]: {
+            alarmGroupVehicles: {
+                [key: string]: {
+                    type?: 'alarmGroupVehicle';
+                };
+            };
+        };
+    };
 }
 
 export const generalizedTemplates53: Migration = {
@@ -38,5 +47,13 @@ export const generalizedTemplates53: Migration = {
         delete typedState.vehicleTemplates;
         delete typedState.personnelTemplates;
         delete typedState.mapImageTemplates;
+
+        for (const alarmGroup of Object.values(typedState.alarmGroups ?? {})) {
+            for (const alarmGroupVehicle of Object.values(
+                alarmGroup.alarmGroupVehicles
+            )) {
+                alarmGroupVehicle.type = 'alarmGroupVehicle';
+            }
+        }
     },
 };

@@ -1,10 +1,11 @@
-import { Component, input, output } from '@angular/core';
-import type {
-    ChangeApply,
-    ElementDto,
-    Element as FuesimElement,
-    RemoveChangeApply,
-    RemovedElementChangeImpact,
+import { Component, effect, input, output, signal } from '@angular/core';
+import {
+    CollectionUpgradeChangeElement,
+    uuid,
+    type ChangeApply,
+    type ElementDto,
+    type RemoveChangeApply,
+    type RemovedElementChangeImpact,
 } from 'fuesim-digital-shared';
 import { MapEditorCardComponent } from '../../../../../../shared/components/map-editor-card/map-editor-card.component';
 
@@ -22,21 +23,68 @@ export class DeletedElementChangeApplyItemComponent {
     public readonly applyChange = output<RemoveChangeApply>();
     public readonly applyForAll = output();
 
-    public readonly replaceableElementTypes: FuesimElement['type'][] = [
-        'vehicle',
-    ];
+    public readonly replaceableElementTypes: CollectionUpgradeChangeElement['type'][] =
+        ['vehicle', 'alarmGroupVehicle'];
 
-    public setActionType(
-        action: RemoveChangeApply['action'],
-        replaceWith?: ElementDto
-    ) {
-        if (replaceWith && action !== 'replace') return;
+    public readonly selectedActionType = signal<
+        RemoveChangeApply['action'] | null
+    >(null);
+
+    public constructor() {
+        effect(() => {
+            this.selectedActionType.set(
+                (this.applyingChange()?.action as
+                    | RemoveChangeApply['action']
+                    | undefined) ?? null
+            );
+        });
+    }
+
+    public setActionType(action: RemoveChangeApply['action']) {
+        this.selectedActionType.set(action);
+        switch (action) {
+            case 'remove':
+                this.applyChange.emit({
+                    type: 'removed',
+                    marketplaceElement: this.change().entity,
+                    action,
+                    target: this.change().target,
+                });
+                break;
+            case 'replace':
+                // We only want to emit the change when the user
+                // has selected an element to replace with,
+                // so we wait until setReplacement is called.
+                break;
+        }
+    }
+
+    public setReplacement(entity: ElementDto) {
+        if (this.selectedActionType() !== 'replace') return;
+
+        const replacingElementContent = this.change().element;
+
+        const replacingElementContentEntity =
+            'entity' in replacingElementContent
+                ? replacingElementContent
+                : undefined;
 
         this.applyChange.emit({
             type: 'removed',
-            change: this.change(),
-            action,
-            replaceWith,
+            action: 'replace',
+            replaceWith: {
+                ...entity.content,
+                // we need to set the uuid here bc we cant in the reducer
+                id: uuid(),
+                entity: {
+                    entityId: entity.entityId,
+                    versionId: entity.versionId,
+                    type:
+                        replacingElementContentEntity?.entity?.type ?? 'direct',
+                },
+            },
+            marketplaceElement: this.change().entity,
+            target: this.change().target,
         });
     }
 }

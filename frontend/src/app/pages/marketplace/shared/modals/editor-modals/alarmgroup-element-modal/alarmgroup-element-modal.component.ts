@@ -10,6 +10,7 @@ import {
     AlarmGroup,
     cloneDeepMutable,
     isElementVersionId,
+    newAlarmGroupVehicle,
     TypedElementDto,
     uuid,
     VehicleTemplate,
@@ -39,7 +40,8 @@ import { DisplayValidationComponent } from '../../../../../../shared/validation/
 export class AlarmgroupElementModalComponent
     implements BaseVersionedElementSubmodal<AlarmGroup>
 {
-    public readonly data = input.required<VersionedElementModalData<any>>();
+    public readonly data =
+        input.required<VersionedElementModalData<AlarmGroup>>();
     public readonly btnText = input.required<string>();
 
     public readonly disabled = input<boolean>(false);
@@ -66,9 +68,7 @@ export class AlarmgroupElementModalComponent
         effect(() => {
             const data = this.data();
             if (data.mode !== 'create') {
-                this.values.set(
-                    cloneDeepMutable(data.element.content as AlarmGroup)
-                );
+                this.values.set(cloneDeepMutable(data.element.content));
             }
         });
     }
@@ -79,12 +79,12 @@ export class AlarmgroupElementModalComponent
             ...ag,
             alarmGroupVehicles: {
                 ...ag.alarmGroupVehicles,
-                [id]: {
-                    vehicleTemplateId: vehicle.versionId,
-                    id,
-                    name: vehicle.content.name,
-                    time: 0,
-                },
+                [id]: newAlarmGroupVehicle(
+                    vehicle.versionId,
+                    0,
+                    vehicle.content.name,
+                    id
+                ),
             },
         }));
     }

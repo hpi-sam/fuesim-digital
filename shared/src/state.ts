@@ -75,7 +75,6 @@ import {
     versionedCollectionPartialSchema,
 } from './marketplace/models/versioned-id-schema.js';
 import { Template, templateSchema } from './models/template.js';
-import { hybridIdSchema } from './utils/hybrid-id.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -215,7 +214,7 @@ export class ExerciseState {
     @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
 
-    @IsZodSchema(z.record(hybridIdSchema, templateSchema))
+    @IsZodSchema(z.record(uuidSchema, templateSchema))
     public readonly templates: { readonly [key: UUID]: Template } = {
         ...defaultMaterialTemplatesById,
         ...defaultMapImagesTemplatesById,

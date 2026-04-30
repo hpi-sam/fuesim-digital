@@ -1,38 +1,68 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { JsonPipe, NgTemplateOutlet } from '@angular/common';
+import { Tree, TreeItem, TreeItemGroup } from '@angular/aria/tree';
 import { ChangeApply, ChangeImpact, ElementDto } from 'fuesim-digital-shared';
-import { JsonPipe } from '@angular/common';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs';
+import { CdkTreeModule } from '@angular/cdk/tree';
 import { CollectionService } from '../../../../../core/exercise-element.service';
-import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { VersionedElementDisplayNamePipe } from '../../../../../shared/pipes/versioned-element-type-display-name.pipe';
 import { DeletedElementChangeApplyItemComponent } from './deleted-element-item/deleted-element-item.component';
 import { EditedElementChangeApplyItemComponent } from './edited-element-item/edited-element-item.component';
+import {
+    buildChangeImpactTree,
+    ChangeImpactTreeNode,
+} from './change-impact-tree-builder';
 
 @Component({
     selector: 'app-change-impact-modal',
     templateUrl: './change-impact-modal.component.html',
     styleUrl: './change-impact-modal.component.scss',
     imports: [
-        MapEditorCardComponent,
-        JsonPipe,
         VersionedElementDisplayNamePipe,
         EditedElementChangeApplyItemComponent,
         DeletedElementChangeApplyItemComponent,
         NgbTooltip,
+        CdkTreeModule,
+        Tree,
+        TreeItem,
+        TreeItemGroup,
+        NgTemplateOutlet,
+        JsonPipe,
     ],
 })
-export class ChangeImpactModalComponent {
+export class ChangeImpactModalComponent implements OnInit {
+    readonly changeImpactTreeNodes = signal<ChangeImpactTreeNode[] | null>(
+        null
+    );
+
+    readonly selected = signal([]);
+
     private readonly collectionService = inject(CollectionService);
     private readonly activeModal = inject(NgbActiveModal);
 
     // This data must be provided when opening the modal via NgbModal.
-    public readonly changes: ChangeImpact[] = [];
-    public readonly newCollectionElements!: ElementDto[];
+    public changes: ChangeImpact[] = [];
+    public newCollectionElements!: ElementDto[];
 
-    public readonly selectedChangeIndex = signal<number | null>(null);
+    public readonly submitChanges = new Subject<{
+        apply: boolean;
+        changes: ChangeApply[];
+    }>();
 
-    public selectChange(index: number) {
-        this.selectedChangeIndex.set(index);
+    public readonly selectedChange = signal<ChangeImpact | null>(null);
+
+    public ngOnInit() {
+        console.log({ changeeeeees: this.changes });
+        const tree = buildChangeImpactTree(this.changes);
+        console.log({ tree });
+        this.changeImpactTreeNodes.set(tree);
+    }
+
+    public selectChangeById(id: string | null) {
+        const change = this.changes.find((c) => c.id === id);
+        if (!change) return;
+        this.selectedChange.set(change);
     }
 
     public readonly changesToApply = signal<{ [key: string]: ChangeApply }>({});
@@ -45,16 +75,16 @@ export class ChangeImpactModalComponent {
     }
 
     public applyChangeForAll(change: ChangeImpact) {
-        console.log('Applying change for all changes of the same versionId');
         const versionId = change.entity.versionId;
-        console.log('VersionId:', versionId);
         const actionToApply = this.changesToApply()[change.id];
-        console.log('Action to apply:', actionToApply);
         if (!actionToApply) return;
 
         for (const otherChange of this.changes) {
             if (otherChange.entity.versionId === versionId) {
-                this.applyChange(otherChange, actionToApply);
+                this.applyChange(otherChange, {
+                    ...actionToApply,
+                    target: otherChange.target,
+                });
             }
         }
     }
@@ -64,18 +94,26 @@ export class ChangeImpactModalComponent {
             .length;
     }
 
-    public actionExistsForChange(change: ChangeImpact): boolean {
-        const apply = this.changesToApply()[change.id];
-        if (!apply) return false;
+    public actionExistsForNode(node: ChangeImpactTreeNode): boolean {
+        if (node.type === 'change') {
+            const apply = this.changesToApply()[node.change.id];
+            if (!apply) return false;
 
-        if (apply.type === 'removed' && apply.action === 'replace') {
-            return !!apply.replaceWith;
+            if (apply.type === 'removed' && apply.action === 'replace') {
+                return !!apply.replaceWith;
+            }
+
+            return true;
         }
-
-        return true;
+        return node.children.every((child) => this.actionExistsForNode(child));
     }
 
     public close(data: boolean | null) {
+        this.submitChanges.next({
+            apply: data === true,
+            changes: Object.values(this.changesToApply()),
+        });
+        this.submitChanges.complete();
         this.activeModal.close();
     }
 }

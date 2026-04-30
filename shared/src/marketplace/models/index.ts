@@ -8,3 +8,4 @@ export * from './versioned-element-names.js';
 export * from './collection-elements.js';
 export * from './state-versioned-entity.js';
 export * from './collection-relationship.js';
+export * from './collection-element-type.js';

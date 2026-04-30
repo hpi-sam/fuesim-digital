@@ -12,7 +12,9 @@ import {
     createTestUserSession,
     createExercise,
     createTestEnvironment,
+    defaultTestUserSessionData,
 } from '../test/utils.js';
+import type { OrganisationEntry } from '../database/schema.js';
 
 describe('exercise router', () => {
     const environment = createTestEnvironment();
@@ -136,11 +138,17 @@ describe('exercise router', () => {
         describe('exercise template', () => {
             let session: string;
             let exerciseTemplate: GetExerciseTemplateResponseData;
+            let personalOrganisation: OrganisationEntry;
             beforeEach(async () => {
                 session = await createTestUserSession(environment);
+                personalOrganisation =
+                    await environment.services.organisationService.ensurePersonalOrganisation(
+                        defaultTestUserSessionData
+                    );
                 exerciseTemplate = await createExerciseTemplate(
                     environment,
-                    session
+                    session,
+                    personalOrganisation.id
                 );
             });
 
@@ -315,11 +323,17 @@ describe('exercise router', () => {
         describe('exercise template', () => {
             let session: string;
             let exerciseTemplate: GetExerciseTemplateResponseData;
+            let personalOrganisation: OrganisationEntry;
             beforeEach(async () => {
                 session = await createTestUserSession(environment);
+                personalOrganisation =
+                    await environment.services.organisationService.ensurePersonalOrganisation(
+                        defaultTestUserSessionData
+                    );
                 exerciseTemplate = await createExerciseTemplate(
                     environment,
-                    session
+                    session,
+                    personalOrganisation.id
                 );
             });
 

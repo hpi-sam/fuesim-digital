@@ -59,9 +59,10 @@ export class ExerciseService {
         if (
             exercise.template &&
             (!session ||
-                !(await this.organisationRepository.isMemberOfOrganisationById(
+                !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                     exercise.template.organisationId,
-                    session.user.id
+                    session.user.id,
+                    ['editor', 'admin']
                 )) ||
                 !isTrainerKey(exerciseKey))
         ) {

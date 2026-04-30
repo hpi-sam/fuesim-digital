@@ -1,5 +1,5 @@
 INSERT INTO "organisation" ("name", "personalOrganisationOf")
-select concat('Organisation von ', "displayName"), "id"
+select 'Private Inhalte', "id"
 from users on conflict do nothing;
 --> statement-breakpoint
 ALTER TABLE "exercise_template" DROP CONSTRAINT "exercise_template_user_users_id_fk";

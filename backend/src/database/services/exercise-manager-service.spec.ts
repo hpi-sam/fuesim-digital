@@ -4,6 +4,7 @@ import {
     createExerciseTemplate,
     createTestEnvironment,
     createTestUserSession,
+    defaultTestUserSessionData,
 } from '../../test/utils.js';
 
 describe('exercise manager service', () => {
@@ -11,6 +12,10 @@ describe('exercise manager service', () => {
 
     it('correctly copies data from exercise template to exercise', async () => {
         const session = await createTestUserSession(environment);
+        const personalOrganisation =
+            await environment.services.organisationService.ensurePersonalOrganisation(
+                defaultTestUserSessionData
+            );
         const sessionInformation =
             (await environment.services.authService.getDataFromSessionToken(
                 session
@@ -19,13 +24,16 @@ describe('exercise manager service', () => {
         // Create exercise template and do action
         const exerciseTemplate = await createExerciseTemplate(
             environment,
-            session
+            session,
+            personalOrganisation.id
         );
-        const exercise =
-            await environment.services.exerciseService.getExerciseByKey(
-                exerciseTemplate.trainerKey,
-                sessionInformation
-            );
+        const exerciseId =
+            (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+                exerciseTemplate.id
+            ))!.exercise.id;
+        const exercise = environment.services.exerciseService
+            .TESTING_getExerciseMap()
+            .get(exerciseId)!;
         const action: ExerciseAction = {
             type: '[AlarmGroup] Add AlarmGroup',
             alarmGroup: {

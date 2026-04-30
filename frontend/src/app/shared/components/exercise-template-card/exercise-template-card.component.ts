@@ -1,6 +1,6 @@
 import { Component, input, output, inject } from '@angular/core';
 import type {
-    GetExerciseTemplateResponseData,
+    GetExerciseTemplateDetailsResponseData,
     PatchExerciseTemplateRequestData,
 } from 'fuesim-digital-shared';
 import { Router, RouterLink } from '@angular/router';
@@ -47,7 +47,7 @@ export class ExerciseTemplateCardComponent {
     protected readonly parallelExercisesEnabled =
         this.parallelExerciseService.parallelExercisesEnabled.value;
 
-    readonly exerciseTemplate = input<GetExerciseTemplateResponseData>();
+    readonly exerciseTemplate = input<GetExerciseTemplateDetailsResponseData>();
     readonly updated = output();
 
     async patchExerciseTemplate(data: PatchExerciseTemplateRequestData) {

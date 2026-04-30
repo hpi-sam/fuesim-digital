@@ -303,7 +303,7 @@ export class OrganisationService {
         if (!organisation) {
             organisation =
                 (await this.organisationRepository.createOrganisation({
-                    name: `Organisation von ${user.displayName}`,
+                    name: 'Private Inhalte',
                     personalOrganisationOf: user.id,
                 }))!;
             await this.organisationRepository.addMemberToOrganisation(

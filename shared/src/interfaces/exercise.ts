@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { exerciseTemplateIdSchema, parallelExerciseIdSchema } from '../ids.js';
 import { participantKeySchema, trainerKeySchema } from '../exercise-keys.js';
 import { stringToDate } from './utils.js';
-import { getExerciseTemplateResponseDataSchema } from './exercise-template.js';
+import { getExerciseTemplateDetailsResponseDataSchema } from './exercise-template.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -45,7 +45,9 @@ export type ExerciseExistsResponseDataInput = z.input<
 export const joinExerciseResponseDataSchema = z.object({
     clientId: z.string(),
     exerciseTemplate: z.nullable(
-        getExerciseTemplateResponseDataSchema.omit({ organisation: true })
+        getExerciseTemplateDetailsResponseDataSchema.omit({
+            organisation: true,
+        })
     ),
     parallelExerciseId: parallelExerciseIdSchema.nullable(),
 });

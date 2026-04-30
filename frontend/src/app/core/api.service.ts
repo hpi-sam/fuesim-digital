@@ -30,7 +30,7 @@ import {
     postOrganisationInviteLinkResponseDataSchema,
     OrganisationMembershipId,
     OrganisationMembershipRole,
-    getExerciseTemplateResponseDataWithoutTrainerKeySchema,
+    getExerciseTemplateResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -163,7 +163,7 @@ export class ApiService {
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
             this.httpClient.post(`${httpOrigin}/api/exercise_templates`, data)
-        ).then(getExerciseTemplateResponseDataWithoutTrainerKeySchema.parse);
+        ).then(getExerciseTemplateResponseDataSchema.parse);
     }
 
     public async patchExerciseTemplate(
@@ -175,7 +175,7 @@ export class ApiService {
                 `${httpOrigin}/api/exercise_templates/${id}`,
                 data
             )
-        ).then(getExerciseTemplateResponseDataWithoutTrainerKeySchema.parse);
+        ).then(getExerciseTemplateResponseDataSchema.parse);
     }
 
     public async createExerciseFromTemplate(templateId: ExerciseTemplateId) {

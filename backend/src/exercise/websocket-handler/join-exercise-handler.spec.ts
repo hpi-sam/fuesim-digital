@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { jest } from '@jest/globals';
 import type {
-    GetExerciseTemplateResponseData,
+    OrganisationMembershipRole,
     ParticipantKey,
 } from 'fuesim-digital-shared';
 import { generateDummyPatient, sleep } from 'fuesim-digital-shared';
@@ -12,7 +12,11 @@ import {
     createExerciseTemplate,
     createTestEnvironment,
     createTestUserSession,
+    defaultTestUserSessionData,
 } from '../../test/utils.js';
+import { createOrganisation } from '../../test/organisation-utils.js';
+import type { ExerciseTemplateDetailsEntry } from '../../database/repositories/exercise-repository.js';
+import type { OrganisationEntry } from '../../database/schema.js';
 
 describe('join exercise', () => {
     const environment = createTestEnvironment();
@@ -58,13 +62,19 @@ describe('join exercise', () => {
     });
 
     describe('exercise template', () => {
-        let exerciseTemplate: GetExerciseTemplateResponseData;
+        let exerciseTemplate: ExerciseTemplateDetailsEntry;
         let session: string;
+        let personalOrganisation: OrganisationEntry;
         beforeEach(async () => {
             session = await createTestUserSession(environment);
+            personalOrganisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
             exerciseTemplate = await createExerciseTemplate(
                 environment,
-                session
+                session,
+                personalOrganisation.id
             );
         });
         it('fails joining with trainer key if not logged in', async () => {
@@ -79,6 +89,36 @@ describe('join exercise', () => {
             });
         });
 
+        it('fails joining with trainer key if viewer', async () => {
+            const session2 = await createTestUserSession(environment, {
+                user: alternativeTestUserSessionData,
+            });
+            const organisation = await createOrganisation(
+                environment,
+                session2
+            );
+            await environment.repositories.organisationRepository.addMemberToOrganisation(
+                organisation.id,
+                defaultTestUserSessionData.id,
+                'viewer'
+            );
+
+            exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session2,
+                organisation.id
+            );
+            await environment.withWebsocket(async (socket) => {
+                const join = await socket.emit(
+                    'joinExercise',
+                    exerciseTemplate.trainerKey,
+                    'Test Client'
+                );
+
+                expect(join.success).toBe(false);
+            }, session);
+        });
+
         it('succeeds joining with trainer key if logged in', async () => {
             await environment.withWebsocket(async (socket) => {
                 const join = await socket.emit(
@@ -90,6 +130,40 @@ describe('join exercise', () => {
                 expect(join.success).toBe(true);
             }, session);
         });
+
+        it.each(['editor', 'admin'] satisfies OrganisationMembershipRole[])(
+            'succeeds with 200 if %s',
+            async (role) => {
+                const session2 = await createTestUserSession(environment, {
+                    user: alternativeTestUserSessionData,
+                });
+                const organisation = await createOrganisation(
+                    environment,
+                    session2
+                );
+                await environment.repositories.organisationRepository.addMemberToOrganisation(
+                    organisation.id,
+                    defaultTestUserSessionData.id,
+                    role
+                );
+
+                exerciseTemplate = await createExerciseTemplate(
+                    environment,
+                    session2,
+                    organisation.id
+                );
+
+                await environment.withWebsocket(async (socket) => {
+                    const join = await socket.emit(
+                        'joinExercise',
+                        exerciseTemplate.trainerKey,
+                        'Test Client'
+                    );
+
+                    expect(join.success).toBe(true);
+                }, session);
+            }
+        );
 
         it('fails joining with trainer key if logged in with wrong user', async () => {
             const session2 = await createTestUserSession(environment, {

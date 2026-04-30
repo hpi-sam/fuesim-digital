@@ -4,7 +4,7 @@ import { trainerKeySchema } from '../exercise-keys.js';
 import { stringToDate } from './utils.js';
 import { getOrganisationResponseDataSchema } from './organisation.js';
 
-export const getExerciseTemplateResponseDataWithoutTrainerKeySchema = z.object({
+export const getExerciseTemplateResponseDataSchema = z.object({
     id: exerciseTemplateIdSchema,
     createdAt: stringToDate,
     lastUpdatedAt: stringToDate,
@@ -12,16 +12,22 @@ export const getExerciseTemplateResponseDataWithoutTrainerKeySchema = z.object({
     name: z.string(),
     description: z.string(),
 });
-export const getExerciseTemplateResponseDataSchema =
-    getExerciseTemplateResponseDataWithoutTrainerKeySchema.extend({
-        trainerKey: trainerKeySchema,
-        organisation: getOrganisationResponseDataSchema,
-    });
 export type GetExerciseTemplateResponseData = z.infer<
     typeof getExerciseTemplateResponseDataSchema
 >;
 export type GetExerciseTemplateResponseDataInput = z.input<
     typeof getExerciseTemplateResponseDataSchema
+>;
+export const getExerciseTemplateDetailsResponseDataSchema =
+    getExerciseTemplateResponseDataSchema.extend({
+        trainerKey: trainerKeySchema,
+        organisation: getOrganisationResponseDataSchema,
+    });
+export type GetExerciseTemplateDetailsResponseData = z.infer<
+    typeof getExerciseTemplateDetailsResponseDataSchema
+>;
+export type GetExerciseTemplateDetailsResponseDataInput = z.input<
+    typeof getExerciseTemplateDetailsResponseDataSchema
 >;
 
 export const postExerciseTemplateRequestDataSchema = z.object({
@@ -43,7 +49,7 @@ export type PatchExerciseTemplateRequestData = z.infer<
 >;
 
 export const getExerciseTemplatesResponseDataSchema = z.array(
-    getExerciseTemplateResponseDataSchema
+    getExerciseTemplateDetailsResponseDataSchema
 );
 
 export type GetExerciseTemplatesResponseData = z.infer<

@@ -96,6 +96,11 @@ import {
 } from './models/technical-challenge/technical-challenge.js';
 import { type Task, taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
+import {
+    EvalCriterion,
+    evalCriterionSchema,
+} from './models/evaluation-criterion.js';
+import { EvalResult, evalResultSchema } from './models/evaluation-result.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -264,6 +269,14 @@ export class ExerciseState {
 
     @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
     public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
+
+    @IsZodSchema(z.record(uuidSchema, evalCriterionSchema))
+    public readonly evalCriteria: {
+        readonly [key: UUID]: EvalCriterion;
+    } = {};
+
+    @IsZodSchema(z.array(evalResultSchema))
+    public readonly evalResults: EvalResult[] = [];
 
     /**
      * @deprecated Use {@link create} instead.

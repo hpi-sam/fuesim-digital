@@ -7,6 +7,12 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-04-30
+
+### Fixed
+
+- Migrating old exercises failed in some cases and was very slow.
+
 ## [0.11.0] - 2026-04-24
 
 ### Added
@@ -372,7 +378,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.0...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.8.1...v0.9.0

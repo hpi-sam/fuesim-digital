@@ -290,6 +290,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
             firstVehiclesCount: firstVehiclesCountForAction,
             firstVehiclesTargetTransferPointId:
                 this.selectedFirstVehiclesTarget?.key,
+            eocLogId: uuid(),
         });
 
         this.loading = false;

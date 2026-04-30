@@ -23,10 +23,9 @@ jobs:
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            - name: Cache node modules
-              uses: ./.github/actions/cache-build
+            - uses: ./.github/actions/setup-install
               with:
-                  shared-dist: 'false'
+                  download-shared: false
             - name: Update version in packages
               uses: ./.github/actions/update-version
               with:

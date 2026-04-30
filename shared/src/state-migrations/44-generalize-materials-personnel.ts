@@ -1,7 +1,6 @@
 import type { WritableDraft } from 'immer';
 import type { ExerciseState } from '../state.js';
 import type { UUID } from '../utils/uuid.js';
-import { uuid } from '../utils/uuid.js';
 import type { Migration } from './migration-functions.js';
 
 interface ImageProperties {
@@ -69,18 +68,18 @@ const materialTypeNames: {
 const materialTemplateIds: {
     [key in MaterialType]: UUID;
 } = {
-    big: uuid(),
-    standard: uuid(),
+    big: 'fd64fb8c-d7b5-4869-b7f9-abb0442a41f0',
+    standard: 'eb598d06-2084-47c3-b1f2-20146a5c84ff',
 };
 
 const personnelTemplateIds: {
     [key in PersonnelType]: UUID;
 } = {
-    gf: uuid(),
-    notarzt: uuid(),
-    notSan: uuid(),
-    rettSan: uuid(),
-    san: uuid(),
+    gf: 'c927b1e2-542c-40f1-9496-7dcb3b0ee703',
+    notarzt: '024883ab-c439-4b9f-a43a-196e4e19cabc',
+    notSan: 'ede56045-97e5-41b5-8192-608dca2d8dbe',
+    rettSan: '3be5bdeb-d5f7-4f32-a106-d6500f0d45fe',
+    san: 'd55e3c73-97c8-4996-a32b-32ace66fdf6c',
 };
 
 const personnelTypeAbbreviations: {
@@ -102,6 +101,8 @@ const personnelTypeNames: {
     rettSan: 'Rettungssanitäter',
     san: 'Sanitäter',
 };
+
+const notFoundMapImageTemplateId = '70b80ca1-da8e-4544-8a4f-a40ca042858d';
 
 function getTemplateIds(
     vehicleTemplates: VehicleTemplate[],
@@ -136,7 +137,8 @@ function migrateMapImage(
     mapImage: MapImage,
     mapImageTemplateIds: { [key in string]: UUID }
 ) {
-    mapImage.templateId = mapImageTemplateIds[mapImage.image.url];
+    mapImage.templateId =
+        mapImageTemplateIds[mapImage.image.url] ?? notFoundMapImageTemplateId;
 }
 
 function migrateVehicle(
@@ -222,6 +224,19 @@ export const generalizeMaterialsPersonnel44: Migration = {
                 mapImage: MapImage;
             };
             migrateMapImage(typedAction.mapImage, mapImageTemplateIds);
+        } else if (actionType === '[Exercise] Import Templates') {
+            const typedAction = action as {
+                partialExport: {
+                    vehicleTemplates?: VehicleTemplate[];
+                    mapImageTemplates?: MapImageTemplate[];
+                };
+            };
+            if (typedAction.partialExport.vehicleTemplates?.length) {
+                for (const vehicleTemplate of typedAction.partialExport
+                    .vehicleTemplates) {
+                    migrateVehicleTemplate(vehicleTemplate);
+                }
+            }
         }
 
         return true;

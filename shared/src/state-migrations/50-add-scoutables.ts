@@ -1,7 +1,9 @@
-import type { MapImage } from '../models/map-image.js';
-import type { Patient } from '../models/patient.js';
 import type { UUID } from '../utils/uuid.js';
 import type { Migration } from './migration-functions.js';
+
+interface WithScoutableId {
+    scoutableId: null;
+}
 
 export const addScoutables50: Migration = {
     action: (intermediateState, action) => {
@@ -9,14 +11,14 @@ export const addScoutables50: Migration = {
         switch (typedAction.type) {
             case '[Patient] Add patient': {
                 const typedPatientAction = action as {
-                    patient: Patient;
+                    patient: WithScoutableId;
                 };
                 typedPatientAction.patient.scoutableId = null;
                 break;
             }
             case '[MapImage] Add MapImage': {
                 const typedMapImageAction = action as {
-                    mapImage: MapImage;
+                    mapImage: WithScoutableId;
                 };
                 typedMapImageAction.mapImage.scoutableId = null;
                 break;

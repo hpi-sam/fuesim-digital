@@ -1,5 +1,4 @@
 import type { UUID } from '../utils/uuid.js';
-import { defaultOperationsMapProperties } from '../data/default-state/map-properties.js';
 import type { Migration } from './migration-functions.js';
 
 interface VehicleParameters {
@@ -53,7 +52,11 @@ export const addOperationsTabletView49: Migration = {
         Object.values(typedState.vehicles).forEach((vehicle) => {
             vehicle.operationalAssignment = null;
         });
-        typedState.configuration.operationsMapProperties =
-            defaultOperationsMapProperties;
+        typedState.configuration.operationsMapProperties = {
+            tileUrl:
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            dataUrl: 'https://tiles.openfreemap.org/planet',
+            enable3dBuildings: true,
+        };
     },
 };

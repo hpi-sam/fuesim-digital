@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { map } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
+import { uuid } from 'fuesim-digital-shared';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../state/app.state';
 import {
@@ -56,6 +57,7 @@ export class EocLogInterfaceComponent {
                 this.currentRole() === 'trainer'
                     ? this.sendingPrivateLog
                     : false,
+            id: uuid(),
         });
         if (response.success) {
             this.newLogEntry = '';

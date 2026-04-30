@@ -261,4 +261,35 @@
             </div>
         </div>
     }
+    @if (configuration$ | async; as configuration) {
+        <div class="card">
+            <div class="card-header">Auswertung</div>
+            <div class="card-body">
+                <!-- TODO @JohannesPotzi @Jogius : this is a draft. Make this text nice :) -->
+                <p class="small text-muted">
+                    Bei Aktivierung werden die Übungsdaten nach den
+                    Auswertungskriterien (siehe "Erstellung >>
+                    "Auswertungskriterien") aggregiert und in der
+                    Auswertungübersicht aufgewertet (siehe "Auswertung" >>
+                    "Didaktische Übersicht"). Im Falle von einer Parallelübung,
+                    können sie außerdem über der Parallelübungsansicht unter
+                    "Auswertung" die laufenden Vorschritte aller Teilnehmer
+                    bezüglich der Kriterien einsehen.
+                </p>
+                <div class="form-group mb-3">
+                    Automatische Auswertung aktivieren?
+                    <!-- TODO @JohannesPotzi @Jogius : make this a slider -->
+                    <div class="form-switch">
+                        <input
+                            [ngModel]="configuration.evaluationEnabled"
+                            (ngModelChange)="setEvaluationEnabledFlag($event)"
+                            class="from-check-input"
+                            type="checkbox"
+                            data-cy="setttinsEnableEvaluationCheckbox"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>

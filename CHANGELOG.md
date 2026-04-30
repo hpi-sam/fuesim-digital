@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Fixed
+
+- Migrating old exercises failed in some cases and was very slow.
+
 ## [0.11.0] - 2026-04-24
 
 ### Added

@@ -91,7 +91,6 @@ import {
     EvalCriterion,
     evalCriterionSchema,
 } from './models/evaluation-criterion.js';
-import { EvalResult, evalResultSchema } from './models/evaluation-result.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -252,9 +251,6 @@ export class ExerciseState {
     public readonly evalCriteria: {
         readonly [key: UUID]: EvalCriterion;
     } = {};
-
-    @IsZodSchema(z.array(evalResultSchema))
-    public readonly evalResults: EvalResult[] = [];
 
     /**
      * @deprecated Use {@link create} instead.

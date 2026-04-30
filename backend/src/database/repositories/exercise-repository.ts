@@ -1,14 +1,27 @@
-import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
+import type {
+    ExerciseId,
+    ExerciseTemplateId,
+    TrainerKey,
+} from 'fuesim-digital-shared';
 import { ExerciseState } from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import {
+    type ExerciseEntry,
     type ExerciseInsert,
+    type ExerciseTemplateEntry,
     type ExerciseTemplateInsert,
+    type OrganisationEntry,
     organisationMembershipTable,
     organisationTable,
 } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
+
+export interface ExerciseTemplateDetailsEntry extends ExerciseTemplateEntry {
+    trainerKey: TrainerKey;
+    exercise: ExerciseEntry;
+    organisation: OrganisationEntry;
+}
 
 export class ExerciseRepository extends BaseRepository {
     private get exerciseTemplateQuery() {
@@ -78,7 +91,9 @@ export class ExerciseRepository extends BaseRepository {
             .orderBy(desc(exerciseTable.lastUsedAt));
     }
 
-    public getAllExerciseTemplatesForUser(userId: string) {
+    public async getAllExerciseTemplatesForUser(
+        userId: string
+    ): Promise<ExerciseTemplateDetailsEntry[]> {
         const subquery = this.databaseConnection
             .select()
             .from(organisationMembershipTable)
@@ -99,7 +114,9 @@ export class ExerciseRepository extends BaseRepository {
             );
     }
 
-    public async getExerciseTemplateById(id: ExerciseTemplateId) {
+    public async getExerciseTemplateById(
+        id: ExerciseTemplateId
+    ): Promise<ExerciseTemplateDetailsEntry | null> {
         return this.onlySingle(
             await this.exerciseTemplateQuery.where(
                 eq(exerciseTemplateTable.id, id)

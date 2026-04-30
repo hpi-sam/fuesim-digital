@@ -46,6 +46,29 @@ describe('organisation router', () => {
             expect(parsed).toEqual([]);
         });
 
+        it('returns personal organisation', async () => {
+            const organisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+
+            const response = await environment
+                .httpRequest('get', '/api/organisations', session)
+                .expect(200);
+
+            const parsed = getOrganisationsResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed).toHaveLength(1);
+            expect(parsed[0]!.id).toBe(organisation.id);
+            expect(parsed[0]!.userRole).toBe(
+                'admin' satisfies OrganisationMembershipRole
+            );
+            expect(parsed[0]!.personalOrganisationOf).toBe(
+                defaultTestUserSessionData.id
+            );
+        });
+
         it.each([
             'viewer',
             'editor',
@@ -102,6 +125,22 @@ describe('organisation router', () => {
                 response.body
             );
             expect(parsed).toEqual([]);
+        });
+
+        it('returns personal organisation', async () => {
+            const organisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+
+            const response = await environment
+                .httpRequest('get', '/api/organisations/editor', session)
+                .expect(200);
+            const parsed = getOrganisationsResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed).toHaveLength(1);
+            expect(parsed[0]!.id).toBe(organisation.id);
         });
 
         it('returns only organisations as editor/admin', async () => {
@@ -229,12 +268,37 @@ describe('organisation router', () => {
                 .expect(403);
         });
 
+        it('succeeds with 200 if personal organisation', async () => {
+            organisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+
+            const response = await environment
+                .httpRequest(
+                    'get',
+                    `/api/organisations/${organisation.id}`,
+                    session
+                )
+                .expect(200);
+            const parsed = getOrganisationDetailsResponseDataSchema.parse(
+                response.body
+            );
+            expect(parsed.id).toBe(organisation.id);
+            expect(parsed.userRole).toBe(
+                'admin' satisfies OrganisationMembershipRole
+            );
+            expect(parsed.personalOrganisationOf).toBe(
+                defaultTestUserSessionData.id
+            );
+        });
+
         it.each([
             'viewer',
             'editor',
             'admin',
         ] satisfies OrganisationMembershipRole[])(
-            "succeeds with 200 if %s'",
+            'succeeds with 200 if %s',
             async (role) => {
                 await environment.repositories.organisationRepository.addMemberToOrganisation(
                     organisation.id,
@@ -306,6 +370,21 @@ describe('organisation router', () => {
                     'patch',
                     `/api/organisations/${organisation.id}/`,
                     session2
+                )
+                .send(testData)
+                .expect(403);
+        });
+
+        it('fails with 403 if personal organisation', async () => {
+            organisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+            await environment
+                .httpRequest(
+                    'patch',
+                    `/api/organisations/${organisation.id}/`,
+                    session
                 )
                 .send(testData)
                 .expect(403);
@@ -435,6 +514,20 @@ describe('organisation router', () => {
                 .expect(403);
         });
 
+        it('Fails with 403 if personal organisation', async () => {
+            organisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+            await environment
+                .httpRequest(
+                    'delete',
+                    `/api/organisations/${organisation.id}/`,
+                    session
+                )
+                .expect(403);
+        });
+
         it.each(['viewer', 'editor'] satisfies OrganisationMembershipRole[])(
             'fails with 403 if %s',
             async (role) => {
@@ -510,6 +603,20 @@ describe('organisation router', () => {
                     'post',
                     `/api/organisations/${organisation.id}/invite_links`,
                     session2
+                )
+                .expect(403);
+        });
+
+        it('fails with 403 if personal organisation', async () => {
+            organisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+            await environment
+                .httpRequest(
+                    'post',
+                    `/api/organisations/${organisation.id}/invite_links`,
+                    session
                 )
                 .expect(403);
         });
@@ -683,6 +790,20 @@ describe('organisation router', () => {
                 .expect(404);
         });
 
+        it('fails with 403 if personal organisation', async () => {
+            organisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+            await environment
+                .httpRequest(
+                    'post',
+                    `/api/organisations/${organisation.id}/leave`,
+                    session
+                )
+                .expect(403);
+        });
+
         it.each([
             'viewer',
             'editor',
@@ -776,6 +897,28 @@ describe('organisation router', () => {
                     'patch',
                     `/api/organisations/memberships/${membership.organisation_membership.id}`,
                     session2
+                )
+                .send({
+                    role: 'viewer',
+                } satisfies PatchOrganisationMembershipRequestData)
+                .expect(403);
+        });
+
+        it('fails with 403 if personal organisation', async () => {
+            organisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+            const membership =
+                (await environment.repositories.organisationRepository.getOrganisationMembershipByUser(
+                    organisation.id,
+                    defaultTestUserSessionData.id
+                ))!;
+            await environment
+                .httpRequest(
+                    'patch',
+                    `/api/organisations/memberships/${membership.organisation_membership.id}`,
+                    session
                 )
                 .send({
                     role: 'viewer',
@@ -904,10 +1047,28 @@ describe('organisation router', () => {
                 .expect(403);
         });
 
+        it('fails with 403 if personal organisation', async () => {
+            organisation =
+                await environment.services.organisationService.ensurePersonalOrganisation(
+                    defaultTestUserSessionData
+                );
+            const membership =
+                (await environment.repositories.organisationRepository.getOrganisationMembershipByUser(
+                    organisation.id,
+                    defaultTestUserSessionData.id
+                ))!;
+            await environment
+                .httpRequest(
+                    'delete',
+                    `/api/organisations/memberships/${membership.organisation_membership.id}`,
+                    session
+                )
+                .expect(403);
+        });
+
         it.each(['viewer', 'editor'] satisfies OrganisationMembershipRole[])(
             'fails with 403 if %s',
             async (role) => {
-                const newRole = role === 'viewer' ? 'editor' : 'viewer';
                 const membership =
                     (await environment.repositories.organisationRepository.addMemberToOrganisation(
                         organisation.id,

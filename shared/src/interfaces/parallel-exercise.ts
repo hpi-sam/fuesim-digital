@@ -8,7 +8,7 @@ import {
 import { validationMessages } from '../validation-messages.js';
 import { exerciseStatusSchema } from '../models/utils/exercise-status.js';
 import { logEntrySchema } from '../models/log-entry.js';
-import { getExerciseTemplateResponseDataWithoutTrainerKeySchema } from './exercise-template.js';
+import { getExerciseTemplateResponseDataSchema } from './exercise-template.js';
 import { stringToDate } from './utils.js';
 
 export const getParallelExerciseResponseDataSchema = z.object({
@@ -17,7 +17,7 @@ export const getParallelExerciseResponseDataSchema = z.object({
     createdAt: stringToDate,
     name: z.string(),
     joinViewportId: z.uuidv4(),
-    template: getExerciseTemplateResponseDataWithoutTrainerKeySchema,
+    template: getExerciseTemplateResponseDataSchema,
 });
 export type GetParallelExerciseResponseData = z.infer<
     typeof getParallelExerciseResponseDataSchema

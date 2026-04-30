@@ -1,6 +1,6 @@
 {
     "name": "fuesim-digital-benchmark",
-    "version": "0.11.0",
+    "version": "0.11.1",
     "type": "module",
     "scripts": {
         "lint": "eslint --max-warnings 0 \"./**/*.{ts,js,yml,html}\"",

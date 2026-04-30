@@ -228,19 +228,30 @@ export class ExerciseService {
     public async restoreAllExercises(): Promise<ActiveExercise[]> {
         return this.exerciseRepository.transaction(
             async (exerciseRepoTransaction) => {
+                console.log('Migrate outdated exercises in database…');
+
                 const outdatedExercises =
                     await exerciseRepoTransaction.getOutdatedExercises();
+                const outdatedExercisesCount = outdatedExercises.length;
 
-                await Promise.all(
-                    outdatedExercises.map(async (exercise) => {
-                        await migrateInDatabase(
-                            exercise.id,
-                            exerciseRepoTransaction,
-                            this.actionRepository.withConnection(
-                                exerciseRepoTransaction
-                            )
-                        );
-                    })
+                let index = 1;
+                for (const exercise of outdatedExercises) {
+                    console.log(
+                        `Migrate exercise ${index} of ${outdatedExercisesCount} (${exercise.id})`
+                    );
+                    // eslint-disable-next-line no-await-in-loop
+                    await migrateInDatabase(
+                        exercise.id,
+                        exerciseRepoTransaction,
+                        this.actionRepository.withConnection(
+                            exerciseRepoTransaction
+                        )
+                    );
+                    index++;
+                }
+
+                console.log(
+                    'Finished migrating outdated exercises in database…'
                 );
 
                 const exercises = await Promise.all(

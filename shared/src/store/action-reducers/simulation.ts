@@ -1179,7 +1179,7 @@ export namespace SimulationActionReducers {
                     } Verhalten im Bereich ${
                         simulatedRegion.name
                     } wird Fahrzeuge vom Typ ${vehicleType} ${
-                        newLimit < Number.MAX_VALUE
+                        newLimit < Number.MAX_SAFE_INTEGER
                             ? newLimit === 0
                                 ? 'nicht'
                                 : `bis zu einem Limit von ${newLimit}`

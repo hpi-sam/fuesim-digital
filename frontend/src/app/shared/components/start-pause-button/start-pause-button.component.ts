@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AsyncPipe } from '@angular/common';
+import { uuid } from 'fuesim-digital-shared';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { ExerciseService } from '../../../core/exercise.service';
 import type { AppState } from '../../../state/app.state';
@@ -80,6 +81,7 @@ export class StartPauseButtonComponent {
             name: selectStateSnapshot(selectOwnClient, this.store)!.name,
             message,
             isPrivate: true,
+            id: uuid(),
         });
     }
 

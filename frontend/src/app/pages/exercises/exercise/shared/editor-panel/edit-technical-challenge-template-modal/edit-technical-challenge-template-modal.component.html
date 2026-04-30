@@ -5,7 +5,9 @@
 <div class="modal-body">
     <app-technical-challenge-template-form
         [technicalChallengeTemplate]="technicalChallengeTemplate()"
-        (technicalChallengeTemplateChange)="editTechnicalChallengeTemplate($event)"
+        (technicalChallengeTemplateChange)="
+            editTechnicalChallengeTemplate($event)
+        "
     >
     </app-technical-challenge-template-form>
 

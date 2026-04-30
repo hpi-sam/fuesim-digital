@@ -1,0 +1,24 @@
+<div class="col">
+    <div>
+        <label>Erkundungstext:</label>
+        <app-user-generated-content-editor
+            [userGeneratedContent]="state().userGeneratedContent"
+            (userGeneratedContentChange)="updateContent($event)"
+        ></app-user-generated-content-editor>
+    </div>
+    <div>
+        <label>Übergänge:</label>
+        <ol class="list-group list-group-numbered">
+            @for (transition of transitions(); track transition) {
+                <li class="list-group-item">
+                    <div class="d-flex flex-column">
+                        <div class="fw-bold">{{ transition.guard.name }}</div>
+                        <div>
+                            --> {{ transition.toName }}
+                        </div>
+                    </div>
+                </li>
+            }
+        </ol>
+    </div>
+</div>

@@ -118,14 +118,13 @@
                 />
             </ng-template>
         </ng-container>
-        <ng-container ngbNavItem ngbNavItem="editor">
+        <ng-container ngbNavItem="editor">
             <a ngbNavLink>Bearbeiten</a>
             <ng-template ngbNavContent>
                 <app-state-machine-editor
                     [stateMachine]="technicalChallenge()"
                     (stateMachineChange)="updateStateMachine($event)"
-                    >
-
+                >
                 </app-state-machine-editor>
             </ng-template>
         </ng-container>

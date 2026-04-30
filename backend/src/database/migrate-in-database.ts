@@ -63,12 +63,9 @@ export async function migrateInDatabase(
     });
 
     // Batch this because Postgres only supports a limited count of parameters
-    let j = 0;
-    while (j < actionsToUpdate.length) {
-        const currentBatch = actionsToUpdate.slice(j, j + 1000);
+    for (let i = 0; i < actionsToUpdate.length; i += 1000) {
+        const currentBatch = actionsToUpdate.slice(i, i + 1000);
         // eslint-disable-next-line no-await-in-loop
         await actionRepository.insertActions(currentBatch);
-
-        j += 1000;
     }
 }

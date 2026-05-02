@@ -12,7 +12,6 @@ import {
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { NotFoundError } from '../utils/http.js';
 import type { CollectionService } from '../database/services/collection-service.js';
-import { CollectionEventSender } from '../collections/collection-event-sender.js';
 
 export function createCollectionsRouter(collectionService: CollectionService) {
     const router = Router();
@@ -466,19 +465,6 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             Marketplace.Collection.GetLatestElementsBySetVersionId.responseSchema.encode(
                 data
             )
-        );
-    });
-
-    viewerRouter.get('/:collectionEntityId/events', async (req, res) => {
-        const collectionEntityId = getCollectionEntityId(req);
-
-        // eslint-disable-next-line no-new
-        new CollectionEventSender(
-            req,
-            res,
-            collectionEntityId,
-            collectionService,
-            req.session!.user.id
         );
     });
 

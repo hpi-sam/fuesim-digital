@@ -1,16 +1,22 @@
+import type { z } from 'zod';
 import type { ExerciseState } from '../state.js';
 import type {
     JoinExerciseResponseDataInput,
     JoinParallelExerciseResponseData,
+    Marketplace,
     UpdateParallelExerciseResponseData,
 } from '../http-interfaces.js';
 import type { ExerciseKey } from '../exercise-keys.js';
 import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
 import type { UUID } from '../utils/uuid.js';
+import type { CollectionEntityId } from '../marketplace/models/versioned-id-schema.js';
 
 export interface ServerToClientEvents {
     performAction: (action: ExerciseAction) => void;
     updateExerciseInstances: (data: UpdateParallelExerciseResponseData) => void;
+    collectionUpdate: (
+        data: z.input<typeof Marketplace.Collection.Events.SSEvent.schema>
+    ) => void;
 }
 
 // The last argument is always expected to be the callback function. (To be able to use it in advanced typings)
@@ -37,6 +43,14 @@ export interface ClientToServerEvents {
     ) => void;
     controlParallelExercise: (
         action: 'pause' | 'start',
+        callback: (response: SocketResponse) => void
+    ) => void;
+    joinCollectionRoom: (
+        collectionEntityId: CollectionEntityId,
+        callback: (response: SocketResponse) => void
+    ) => void;
+    leaveCollectionRoom: (
+        collectionEntityId: CollectionEntityId,
         callback: (response: SocketResponse) => void
     ) => void;
 }

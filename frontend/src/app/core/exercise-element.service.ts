@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
+    ClientToServerEvents,
     CollectionDto,
     CollectionElementsDto,
     CollectionEntityId,
@@ -9,12 +10,15 @@ import {
     ElementEntityId,
     ElementVersionId,
     Marketplace,
+    ServerToClientEvents,
+    socketIoTransports,
     VersionedCollectionPartial,
     versionedElementContentSchema,
     VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
-import { httpOrigin } from './api-origins';
+import { io, Socket } from 'socket.io-client';
+import { httpOrigin, websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 
 export interface CollectionSubscriptionData {
@@ -32,6 +36,13 @@ export class CollectionService {
     private readonly httpClient = inject(HttpClient);
     private readonly messageService = inject(MessageService);
 
+    private readonly socket: Socket<
+        ServerToClientEvents,
+        ClientToServerEvents
+    > = io(websocketOrigin, {
+        ...socketIoTransports,
+    });
+
     public readonly ENDPOINT = `${httpOrigin}/api/collections`;
     private readonly _collectionSubscriptions = new Map<
         CollectionEntityId,
@@ -41,21 +52,19 @@ export class CollectionService {
     public subscribeToCollection(
         setEntityId: CollectionEntityId
     ): BehaviorSubject<CollectionSubscriptionData | null> {
-        const collectionEventSource = new EventSource(
-            `${this.ENDPOINT}/${setEntityId}/events`,
-            { withCredentials: true }
-        );
-
         const subject = new BehaviorSubject<CollectionSubscriptionData | null>(
             null
         );
         this._collectionSubscriptions.set(setEntityId, subject);
-        collectionEventSource.addEventListener('change', (event) => {
-            const changeEvent =
-                Marketplace.Collection.Events.SSEvent.schema.parse(
-                    JSON.parse(event.data)
-                );
 
+        this.socket.emit('joinCollectionRoom', setEntityId, (response) => {
+            /* nop */
+        });
+
+        this.socket.on('collectionUpdate', (update) => {
+            const changeEvent =
+                Marketplace.Collection.Events.SSEvent.schema.decode(update);
+            console.log(update);
             switch (changeEvent.event) {
                 case 'initialdata': {
                     subject.next({
@@ -180,20 +189,11 @@ export class CollectionService {
             }
         });
 
-        collectionEventSource.onerror = (error) => {
-            console.error(
-                `Error in EventSource for setEntityId ${setEntityId}:`,
-                error
-            );
-            this.messageService.postError({
-                title: 'Verbindungsfehler',
-                body: 'Die Verbindung zum Server wurde unterbrochen. Bitte überprüfen Sie Ihre Internetverbindung und laden Sie die Seite neu.',
-            });
-        };
-
         this._collectionSubscriptions.get(setEntityId)?.subscribe({
             complete: () => {
-                collectionEventSource.close();
+                this.socket.emit('leaveCollectionRoom', setEntityId, () => {
+                    /* nop */
+                });
                 this._collectionSubscriptions.delete(setEntityId);
             },
         });

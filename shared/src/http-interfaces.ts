@@ -596,7 +596,7 @@ export namespace Marketplace {
             );
 
             export const SSEvent = new TypedSchema(
-                z.union([
+                z.discriminatedUnion('event', [
                     CollectionRefreshData.schema,
                     CollectionUpdate.schema,
                     DependencyChange.schema,

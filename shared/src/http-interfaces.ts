@@ -516,6 +516,10 @@ export namespace Marketplace {
                     ? z.infer<T>
                     : D
                 : never;
+
+            public readonly InputType!: T extends z.ZodType
+                ? z.input<T>
+                : never;
         }
 
         export namespace Events {

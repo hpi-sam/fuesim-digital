@@ -47,7 +47,11 @@ export interface ClientToServerEvents {
     ) => void;
     joinCollectionRoom: (
         collectionEntityId: CollectionEntityId,
-        callback: (response: SocketResponse) => void
+        callback: (
+            response: SocketResponse<
+                typeof Marketplace.Collection.Events.InitialData.InputType
+            >
+        ) => void
     ) => void;
     leaveCollectionRoom: (
         collectionEntityId: CollectionEntityId,

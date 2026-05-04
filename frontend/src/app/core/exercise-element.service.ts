@@ -58,7 +58,19 @@ export class CollectionService {
         this._collectionSubscriptions.set(setEntityId, subject);
 
         this.socket.emit('joinCollectionRoom', setEntityId, (response) => {
-            /* nop */
+            if (!response.success) return;
+            const initialData =
+                Marketplace.Collection.Events.InitialData.schema.decode(
+                    response.payload
+                );
+
+            subject.next({
+                collection: initialData.data.collection,
+                objects: initialData.data.elements,
+                publishedCollection: initialData.data.publishedCollection,
+                publishedElements: initialData.data.publishedElements,
+                ownRole: initialData.data.userRelationship,
+            });
         });
 
         this.socket.on('collectionUpdate', (update) => {
@@ -67,14 +79,7 @@ export class CollectionService {
             console.log(update);
             switch (changeEvent.event) {
                 case 'initialdata': {
-                    subject.next({
-                        collection: changeEvent.data.collection,
-                        objects: changeEvent.data.elements,
-                        publishedCollection:
-                            changeEvent.data.publishedCollection,
-                        publishedElements: changeEvent.data.publishedElements,
-                        ownRole: changeEvent.data.userRelationship,
-                    });
+                    // will be handled differently
                     break;
                 }
                 case 'element:create': {

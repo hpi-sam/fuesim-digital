@@ -254,9 +254,10 @@ export class CollectionClientWrapper extends ClientWrapper {
         this.stopListen$.next();
         this.chosenCollection = collectionId;
 
-        await this.sendInitialData(collectionId);
+        const initialData = await this.getInitialData(collectionId);
         await this.loadDependencies(collectionId);
         this.startListen(collectionId);
+        return initialData;
     }
 
     public async stopCollectionListener(
@@ -359,7 +360,7 @@ export class CollectionClientWrapper extends ClientWrapper {
         ).map((dependency) => dependency.entityId);
     }
 
-    private async sendInitialData(collectionEntityId: CollectionEntityId) {
+    private async getInitialData(collectionEntityId: CollectionEntityId) {
         const latestDraftStateVersion =
             await this.services.collectionService.getLatestCollectionById(
                 collectionEntityId,
@@ -401,18 +402,16 @@ export class CollectionClientWrapper extends ClientWrapper {
             return;
         }
 
-        this.notifyChange(
-            Marketplace.Collection.Events.InitialData.schema.encode({
-                collectionEntityId,
-                event: 'initialdata',
-                data: {
-                    collection: latestDraftStateVersion,
-                    elements: draftStateElements,
-                    userRelationship,
-                    publishedCollection: latestPubishedVersion,
-                    publishedElements,
-                },
-            })
-        );
+        return Marketplace.Collection.Events.InitialData.schema.encode({
+            collectionEntityId,
+            event: 'initialdata',
+            data: {
+                collection: latestDraftStateVersion,
+                elements: draftStateElements,
+                userRelationship,
+                publishedCollection: latestPubishedVersion,
+                publishedElements,
+            },
+        });
     }
 }

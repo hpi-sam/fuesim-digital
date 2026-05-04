@@ -58,7 +58,21 @@ export function registerCollectionHandler(
                 return;
             }
 
-            await clientWrapper.startCollectionListener(collectionEntityId);
+            const initialData =
+                await clientWrapper.startCollectionListener(collectionEntityId);
+            if (!initialData) {
+                callback({
+                    success: false,
+                    message: 'Failed to load initial data for this collection',
+                    expected: false,
+                });
+                return;
+            }
+
+            callback({
+                success: true,
+                payload: initialData,
+            });
         }
     );
 

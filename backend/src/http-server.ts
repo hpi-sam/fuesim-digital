@@ -15,6 +15,7 @@ import { createExerciseManagerRouter } from './routers/exercise-manager-router.j
 import { healthRouter } from './routers/health-router.js';
 import type { Services } from './database/services/index.js';
 import { createParallelExerciseRouter } from './routers/parallel-exercise-router.js';
+import { createOrganisationRouter } from './routers/organisation-router.js';
 
 declare global {
     namespace Express {
@@ -53,6 +54,11 @@ export class ApiHttpServer {
         app.use(
             '/api/parallel_exercises/',
             createParallelExerciseRouter(services.parallelExerciseService)
+        );
+
+        app.use(
+            '/api/organisations/',
+            createOrganisationRouter(services.organisationService)
         );
 
         app.use('/api/auth', createAuthRouter(services.authService));

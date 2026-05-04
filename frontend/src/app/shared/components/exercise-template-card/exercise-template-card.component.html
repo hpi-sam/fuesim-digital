@@ -1,7 +1,7 @@
 @if (exerciseTemplate(); as exerciseTemplate) {
     <div class="card" id="exerciseTemplate.id">
-        <div class="card-body">
-            <h2 class="card-title h4 d-flex">
+        <div class="card-body pt-2">
+            <h2 class="card-title h4 d-flex mt-2">
                 <app-inline-text-editor
                     class="flex-grow-1"
                     [required]="true"
@@ -16,17 +16,22 @@
                 />
             </h2>
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-                <i class="bi bi-clock me-2"></i>
-                erstellt am {{ exerciseTemplate.createdAt | date: 'medium' }}
+        <ul class="list-group list-group-flush small">
+            <li class="list-group-item py-1">
+                <i class="bi bi-house me-2"></i>
+                <app-organisation-badge
+                    [organisation]="exerciseTemplate.organisation"
+                />
             </li>
-            <li class="list-group-item">
-                <i class="bi bi-clock me-2"></i>
-                zuletzt geändert am
+            <li class="list-group-item py-1">
+                <i class="bi bi-clock me-2"></i>erstellt am
+                {{ exerciseTemplate.createdAt | date: 'medium' }}
+            </li>
+            <li class="list-group-item py-1">
+                <i class="bi bi-clock me-2"></i>zuletzt geändert am
                 {{ exerciseTemplate.lastUpdatedAt | date: 'medium' }}
             </li>
-            <li class="list-group-item">
+            <li class="list-group-item py-1">
                 <i class="bi bi-rocket me-2"></i>
                 @if (exerciseTemplate.lastExerciseCreatedAt) {
                     Letzte Übung erstellt am
@@ -37,7 +42,7 @@
                     <em>Noch keine Übung erstellt</em>
                 }
             </li>
-            <li class="list-group-item d-flex">
+            <li class="list-group-item d-flex py-1">
                 <app-inline-text-editor
                     class="flex-grow-1"
                     [value]="exerciseTemplate.description"
@@ -50,16 +55,16 @@
                 />
             </li>
         </ul>
-        <div class="card-body d-flex">
+        <div class="card-body d-flex flex-wrap">
             <a
                 [routerLink]="`/exercises/${exerciseTemplate.trainerKey}`"
-                class="btn btn-primary me-2"
+                class="btn btn-primary me-2 mb-1"
             >
                 Öffnen
             </a>
 
             @if (parallelExercisesEnabled()) {
-                <div ngbDropdown autoClose="outside">
+                <div ngbDropdown autoClose="outside" class="mb-1">
                     <button
                         ngbDropdownToggle
                         type="button"

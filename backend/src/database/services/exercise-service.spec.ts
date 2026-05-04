@@ -6,6 +6,7 @@ import {
     createExerciseTemplate,
     createTestEnvironment,
     createTestUserSession,
+    defaultTestUserSessionData,
 } from '../../test/utils.js';
 
 describe('Exercise-Service', () => {
@@ -20,9 +21,10 @@ describe('Exercise-Service', () => {
     // In a naive implementation it can happen that such actions get removed from memory without being saved to the database.
     it('does not throw away actions while saving', async () => {
         const exerciseKeys = await createExercise(environment);
-        const exercise = environment.services.exerciseService.getExerciseByKey(
-            exerciseKeys.trainerKey
-        );
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseKeys.trainerKey
+            );
         const markAsAboutToBeSaved =
             exercise.markAsAboutToBeSaved.bind(exercise);
 
@@ -66,9 +68,10 @@ describe('Exercise-Service', () => {
     });
     it('does correctly update lastUsedAt', async () => {
         const exerciseKeys = await createExercise(environment);
-        const exercise = environment.services.exerciseService.getExerciseByKey(
-            exerciseKeys.trainerKey
-        );
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseKeys.trainerKey
+            );
         const beforeAction = Date.now();
         exercise.applyAction(
             {
@@ -99,13 +102,22 @@ describe('Exercise-Service', () => {
     });
     it('does correctly update lastUpdatedAt for exercise templates', async () => {
         const session = await createTestUserSession(environment);
+        const personalOrganisation =
+            await environment.services.organisationService.ensurePersonalOrganisation(
+                defaultTestUserSessionData
+            );
         const exerciseTemplate = await createExerciseTemplate(
             environment,
-            session
+            session,
+            personalOrganisation.id
         );
+        const exerciseId =
+            (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+                exerciseTemplate.id
+            ))!.exercise.id;
         const exercise = environment.services.exerciseService
             .TESTING_getExerciseMap()
-            .get(exerciseTemplate.trainerKey)!;
+            .get(exerciseId)!;
         const beforeAction = Date.now();
         exercise.applyAction(
             {

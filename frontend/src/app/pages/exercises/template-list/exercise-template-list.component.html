@@ -1,43 +1,39 @@
 <app-header />
 <main class="container">
-    <div class="d-flex align-items-center">
+    <div class="d-flex flex-wrap align-items-center justify-content-between">
         <h1>Meine Übungsvorlagen</h1>
         <div class="flex-grow-1"></div>
-        <button class="btn btn-primary me-2" (click)="createExerciseTemplate()">
+        <button
+            class="btn btn-primary my-2 me-2"
+            (click)="createExerciseTemplate()"
+        >
             Neue Übungsvorlage erstellen
         </button>
-        <label
-            class="btn btn-outline-primary"
-            [class.disabled]="importingExercise()"
-        >
+        <label class="btn btn-outline-primary my-2">
             <i class="bi-cloud-upload me-2"> </i>
             Vorlage importieren
-            @if (importingExercise()) {
-                <span class="spinner-border spinner-border-sm"></span>
-            }
             <input
-                (appFileInput)="importExerciseTemplate($event)"
+                (appFileInput)="createExerciseTemplate($event)"
                 type="file"
                 accept="application/json"
                 class="d-none"
-                [disabled]="importingExercise()"
             />
         </label>
     </div>
     @if (exerciseTemplates.hasValue()) {
-        <div class="row row-cols-3">
+        <div class="row">
             @for (
                 exerciseTemplate of exerciseTemplates.value();
                 track exerciseTemplate.trainerKey
             ) {
-                <div class="col mb-4">
+                <div class="col col-md-12 col-lg-6 col-xl-4 mb-4">
                     <app-exercise-template-card
                         [exerciseTemplate]="exerciseTemplate"
                         (updated)="exerciseTemplates.reload()"
                     />
                 </div>
             } @empty {
-                <div class="col flex-grow-1">
+                <div class="col-12">
                     <p class="bg-light p-4 rounded-3 lead mb-0">
                         Sie haben noch keine Übungsvorlagen erstellt.
                     </p>
@@ -45,9 +41,9 @@
             }
         </div>
     } @else if (exerciseTemplates.isLoading()) {
-        <div class="row row-cols-3">
+        <div class="row">
             @for (_ of [1, 2, 3]; track $index) {
-                <div class="col">
+                <div class="col col-md-12 col-lg-6 col-xl-4">
                     <div class="card" aria-hidden="true">
                         <div class="card-body">
                             <h2 class="card-title h4 placeholder-glow">

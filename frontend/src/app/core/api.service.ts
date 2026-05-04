@@ -6,8 +6,8 @@ import {
     ExerciseKey,
     exerciseKeysSchema,
     getExercisesResponseDataSchema,
-    getExerciseTemplateResponseDataSchema,
     getExerciseTemplatesResponseDataSchema,
+    getOrganisationDetailsResponseDataSchema,
     getExerciseTemplateViewportsResponseDataSchema,
     getParallelExerciseResponseDataSchema,
     getParallelExercisesResponseDataSchema,
@@ -22,6 +22,15 @@ import {
     ParallelExerciseId,
     PatchParallelExerciseRequestData,
     GroupParticipantKey,
+    getOrganisationsResponseDataSchema,
+    PostOrganisationRequestData,
+    getOrganisationResponseDataSchema,
+    OrganisationId,
+    PatchOrganisationRequestData,
+    postOrganisationInviteLinkResponseDataSchema,
+    OrganisationMembershipId,
+    OrganisationMembershipRole,
+    getExerciseTemplateResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { freeze } from 'immer';
 import { lastValueFrom, map } from 'rxjs';
@@ -135,18 +144,25 @@ export class ApiService {
         ).then(getExerciseTemplateViewportsResponseDataSchema.parse);
     }
 
+    public getOrganisationsResource() {
+        return httpResource(() => `${httpOrigin}/api/organisations/`, {
+            parse: getOrganisationsResponseDataSchema.parse,
+        });
+    }
+    public getOrganisationsAsEditorResource() {
+        return httpResource(() => `${httpOrigin}/api/organisations/editor/`, {
+            parse: getOrganisationsResponseDataSchema.parse,
+        });
+    }
+    public getOrganisationResource(id: OrganisationId) {
+        return httpResource(() => `${httpOrigin}/api/organisations/${id}`, {
+            parse: getOrganisationDetailsResponseDataSchema.parse,
+        });
+    }
+
     public async createExerciseTemplate(data: PostExerciseTemplateRequestData) {
         return lastValueFrom(
             this.httpClient.post(`${httpOrigin}/api/exercise_templates`, data)
-        ).then(getExerciseTemplateResponseDataSchema.parse);
-    }
-
-    public async importExerciseTemplate(exportedState: StateExport) {
-        return lastValueFrom(
-            this.httpClient.post(
-                `${httpOrigin}/api/exercise_templates/import`,
-                exportedState
-            )
         ).then(getExerciseTemplateResponseDataSchema.parse);
     }
 
@@ -155,12 +171,11 @@ export class ApiService {
         data: PatchExerciseTemplateRequestData
     ) {
         return lastValueFrom(
-            this.httpClient
-                .patch(`${httpOrigin}/api/exercise_templates/${id}`, data)
-                .pipe(
-                    map((v) => getExerciseTemplateResponseDataSchema.parse(v))
-                )
-        );
+            this.httpClient.patch(
+                `${httpOrigin}/api/exercise_templates/${id}`,
+                data
+            )
+        ).then(getExerciseTemplateResponseDataSchema.parse);
     }
 
     public async createExerciseFromTemplate(templateId: ExerciseTemplateId) {
@@ -221,5 +236,75 @@ export class ApiService {
                 undefined
             )
         ).then(postJoinParallelExerciseResponseDataSchema.parse);
+    }
+
+    public async createOrganisation(data: PostOrganisationRequestData) {
+        return lastValueFrom(
+            this.httpClient.post(`${httpOrigin}/api/organisations/`, data)
+        ).then(getOrganisationResponseDataSchema.parse);
+    }
+
+    public async patchOrganisation(
+        id: OrganisationId,
+        data: PatchOrganisationRequestData
+    ) {
+        return lastValueFrom(
+            this.httpClient
+                .patch(`${httpOrigin}/api/organisations/${id}`, data)
+                .pipe(map((v) => getOrganisationResponseDataSchema.parse(v)))
+        );
+    }
+
+    public async createOrganisationInviteLink(id: OrganisationId) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/organisations/${id}/invite_links`,
+                {}
+            )
+        ).then(postOrganisationInviteLinkResponseDataSchema.parse);
+    }
+
+    public async joinOrganisation(token: string) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/organisations/join/${token}`,
+                {}
+            )
+        ).then(getOrganisationResponseDataSchema.parse);
+    }
+
+    public async updateOrganisationMembershipRole(
+        id: OrganisationMembershipId,
+        role: OrganisationMembershipRole
+    ) {
+        return lastValueFrom(
+            this.httpClient.patch(
+                `${httpOrigin}/api/organisations/memberships/${id}`,
+                { role }
+            )
+        );
+    }
+
+    public async deleteOrganisationMembership(id: OrganisationMembershipId) {
+        return lastValueFrom(
+            this.httpClient.delete(
+                `${httpOrigin}/api/organisations/memberships/${id}`
+            )
+        );
+    }
+
+    public async leaveOrganisation(id: OrganisationId) {
+        return lastValueFrom(
+            this.httpClient.post(
+                `${httpOrigin}/api/organisations/${id}/leave`,
+                {}
+            )
+        );
+    }
+
+    public async deleteOrganisation(id: OrganisationId) {
+        return lastValueFrom(
+            this.httpClient.delete(`${httpOrigin}/api/organisations/${id}`)
+        );
     }
 }

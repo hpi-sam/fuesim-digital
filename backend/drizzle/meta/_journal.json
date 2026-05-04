@@ -64,6 +64,13 @@
             "when": 1774282890531,
             "tag": "0008_exercise_template_last_used_at",
             "breakpoints": true
+        },
+        {
+            "idx": 9,
+            "version": "7",
+            "when": 1777883286274,
+            "tag": "0009_organisations",
+            "breakpoints": true
         }
     ]
 }

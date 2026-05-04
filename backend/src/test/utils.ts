@@ -1,6 +1,8 @@
 import type {
     ClientToServerEvents,
     MergeIntersection,
+    OrganisationId,
+    PostExerciseTemplateRequestData,
     ServerToClientEvents,
 } from 'fuesim-digital-shared';
 import {
@@ -33,6 +35,8 @@ import type { Services } from '../database/services/index.js';
 import { ParallelExerciseService } from '../database/services/parallel-exercise-service.js';
 import { ParallelExerciseRepository } from '../database/repositories/parallel-exercise-repository.js';
 import type { Repositories } from '../database/repositories/index.js';
+import { OrganisationService } from '../database/services/organisation-service.js';
+import { OrganisationRepository } from '../database/repositories/organisation-repository.js';
 import type { SocketReservedEvents } from './socket-reserved-events.js';
 
 // Some helper types
@@ -213,6 +217,8 @@ export function createTestEnvironment(): TestEnvironment {
     let accessKeyRepository: AccessKeyRepository;
     let parallelExerciseService: ParallelExerciseService;
     let parallelExerciseRepository: ParallelExerciseRepository;
+    let organisationService: OrganisationService;
+    let organisationRepository: OrganisationRepository;
 
     // If this gets too slow, we may look into creating the server only once
     beforeEach(async () => {
@@ -229,25 +235,32 @@ export function createTestEnvironment(): TestEnvironment {
         parallelExerciseRepository = new ParallelExerciseRepository(
             databaseService.databaseConnection
         );
+        organisationRepository = new OrganisationRepository(
+            databaseService.databaseConnection
+        );
 
         accessKeyService = new AccessKeyService(accessKeyRepository);
         exerciseService = new ExerciseService(
             exerciseRepository,
             actionRepository,
-            accessKeyService
+            accessKeyService,
+            organisationRepository
         );
         userRepository = new UserRepository(databaseService.databaseConnection);
         sessionRepository = new SessionRepository(
             databaseService.databaseConnection
         );
 
+        organisationService = new OrganisationService(organisationRepository);
         authService = await new AuthService(
             userRepository,
-            sessionRepository
+            sessionRepository,
+            organisationService
         ).initialize({ skipOidcDiscovery: true });
         exerciseManagerService = new ExerciseManagerService(
             exerciseRepository,
-            exerciseService
+            exerciseService,
+            organisationRepository
         );
         parallelExerciseService = new ParallelExerciseService(
             parallelExerciseRepository,
@@ -263,6 +276,7 @@ export function createTestEnvironment(): TestEnvironment {
             parallelExerciseRepository,
             sessionRepository,
             userRepository,
+            organisationRepository,
         };
         const services: Services = {
             authService,
@@ -271,6 +285,7 @@ export function createTestEnvironment(): TestEnvironment {
             parallelExerciseService,
             accessKeyService,
             databaseService,
+            organisationService,
         };
         environment.init(repositories, services);
     });
@@ -351,15 +366,23 @@ export async function createExercise(
 
 export async function createExerciseTemplate(
     environment: TestEnvironment,
-    session: string
+    session: string,
+    organisationId: OrganisationId
 ) {
     const response = await environment
         .httpRequest('post', '/api/exercise_templates', session)
         .send({
             name: 'Test Template',
             description: 'Test Template Description',
-        })
+            organisationId,
+            importObject: undefined,
+        } satisfies PostExerciseTemplateRequestData)
         .expect(201);
 
-    return getExerciseTemplateResponseDataSchema.parse(response.body);
+    const parsed = getExerciseTemplateResponseDataSchema.parse(response.body);
+    const template =
+        (await environment.repositories.exerciseRepository.getExerciseTemplateById(
+            parsed.id
+        ))!;
+    return template;
 }

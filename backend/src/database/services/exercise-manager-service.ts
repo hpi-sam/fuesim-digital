@@ -5,40 +5,48 @@ import type {
 } from 'fuesim-digital-shared';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
+import { type ExerciseInsert, type ExerciseTemplateInsert } from '../schema.js';
 import {
     ApiError,
     NotFoundError,
     PermissionDeniedError,
 } from '../../utils/http.js';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
+import type { OrganisationRepository } from '../repositories/organisation-repository.js';
 import type { ExerciseService } from './exercise-service.js';
 
 export class ExerciseManagerService {
     public constructor(
         private readonly exerciseRepository: ExerciseRepository,
-        private readonly exerciseService: ExerciseService
+        private readonly exerciseService: ExerciseService,
+        private readonly organisationRepository: OrganisationRepository
     ) {}
 
     public async getAllExercisesOfOwner(session: SessionInformation) {
         return this.exerciseRepository.getAllExercisesOfOwner(session.user.id);
     }
 
-    public async getAllExerciseTemplatesOfOwner(session: SessionInformation) {
-        return this.exerciseRepository.getAllExerciseTemplatesOfOwner(
+    public async getAllExerciseTemplatesForUser(session: SessionInformation) {
+        return this.exerciseRepository.getAllExerciseTemplatesForUser(
             session.user.id
         );
     }
 
     public async createExerciseTemplateFromBlank(
-        data: Omit<ExerciseTemplateInsert, 'user'>,
+        data: ExerciseTemplateInsert,
         session: SessionInformation
     ) {
+        if (
+            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                data.organisationId,
+                session.user.id,
+                ['editor', 'admin']
+            ))
+        ) {
+            throw new PermissionDeniedError();
+        }
         const exerciseTemplate =
-            await this.exerciseRepository.createExerciseTemplate({
-                ...data,
-                user: session.user.id,
-            });
+            await this.exerciseRepository.createExerciseTemplate(data);
         if (!exerciseTemplate) {
             throw new ApiError();
         }
@@ -53,14 +61,21 @@ export class ExerciseManagerService {
     }
 
     public async createExerciseTemplateFromFile(
+        data: ExerciseTemplateInsert,
         importObject: StateExport,
         session: SessionInformation
     ) {
+        if (
+            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                data.organisationId,
+                session.user.id,
+                ['editor', 'admin']
+            ))
+        ) {
+            throw new PermissionDeniedError();
+        }
         const exerciseTemplate =
-            await this.exerciseRepository.createExerciseTemplate({
-                name: 'Importierte Datei',
-                user: session.user.id,
-            });
+            await this.exerciseRepository.createExerciseTemplate(data);
         if (!exerciseTemplate) {
             throw new ApiError();
         }
@@ -87,7 +102,13 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.user !== session.user.id) {
+        if (
+            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                exerciseTemplate.organisationId,
+                session.user.id,
+                ['editor', 'admin']
+            ))
+        ) {
             throw new PermissionDeniedError();
         }
         const updatedTemplate =
@@ -98,15 +119,7 @@ export class ExerciseManagerService {
         if (!updatedTemplate) {
             throw new ApiError();
         }
-        const exercise = this.exerciseService.getExerciseByKey(
-            exerciseTemplate.trainerKey,
-            session
-        );
-        exercise.template = updatedTemplate;
-        return {
-            ...updatedTemplate,
-            trainerKey: exerciseTemplate.trainerKey,
-        };
+        return updatedTemplate;
     }
 
     public async createExerciseFromTemplate(
@@ -122,7 +135,13 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (session && exerciseTemplate.user !== session.user.id) {
+        if (
+            session &&
+            !(await this.organisationRepository.isMemberOfOrganisationById(
+                exerciseTemplate.organisationId,
+                session.user.id
+            ))
+        ) {
             throw new PermissionDeniedError();
         }
 
@@ -161,10 +180,16 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.user !== session.user.id) {
+        if (
+            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+                exerciseTemplate.organisationId,
+                session.user.id,
+                ['editor', 'admin']
+            ))
+        ) {
             throw new PermissionDeniedError();
         }
-        const activeExercise = this.exerciseService.getExerciseByKey(
+        const activeExercise = await this.exerciseService.getExerciseByKey(
             exerciseTemplate.trainerKey,
             session
         );
@@ -185,7 +210,12 @@ export class ExerciseManagerService {
         if (!exerciseTemplate) {
             throw new NotFoundError();
         }
-        if (exerciseTemplate.user !== session.user.id) {
+        if (
+            !(await this.organisationRepository.isMemberOfOrganisationById(
+                exerciseTemplate.organisationId,
+                session.user.id
+            ))
+        ) {
             throw new PermissionDeniedError();
         }
         return this.exerciseService.getExercisesViewportsById(

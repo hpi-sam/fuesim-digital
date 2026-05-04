@@ -1,4 +1,4 @@
-@if (field().errors().length) {
+@if (field().dirty() && field().errors().length) {
     <div class="mt-2 text-danger validation-text">
         @for (error of field().errors(); track error) {
             <div>{{ error.message }}</div>

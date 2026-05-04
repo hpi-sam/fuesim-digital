@@ -1,6 +1,6 @@
 import { Component, input, output, inject } from '@angular/core';
 import type {
-    GetExerciseTemplateResponseData,
+    GetExerciseTemplateDetailsResponseData,
     PatchExerciseTemplateRequestData,
 } from 'fuesim-digital-shared';
 import { Router, RouterLink } from '@angular/router';
@@ -18,6 +18,7 @@ import { ConfirmationModalService } from '../../../core/confirmation-modal/confi
 import { InlineTextEditorComponent } from '../inline-text-editor/inline-text-editor.component';
 import { CreateParallelExerciseModalComponent } from '../../../pages/exercises/shared/create-parallel-exercise-modal/create-parallel-exercise-modal.component';
 import { ParallelExerciseService } from '../../../core/parallel-exercise.service.js';
+import { OrganisationBadgeComponent } from '../../../pages/organisations/shared/organisation-badge/organisation-badge.component.js';
 
 @Component({
     selector: 'app-exercise-template-card',
@@ -31,6 +32,7 @@ import { ParallelExerciseService } from '../../../core/parallel-exercise.service
         NgbDropdownToggle,
         NgbDropdownMenu,
         NgbDropdownItem,
+        OrganisationBadgeComponent,
     ],
 })
 export class ExerciseTemplateCardComponent {
@@ -45,7 +47,7 @@ export class ExerciseTemplateCardComponent {
     protected readonly parallelExercisesEnabled =
         this.parallelExerciseService.parallelExercisesEnabled.value;
 
-    readonly exerciseTemplate = input<GetExerciseTemplateResponseData>();
+    readonly exerciseTemplate = input<GetExerciseTemplateDetailsResponseData>();
     readonly updated = output();
 
     async patchExerciseTemplate(data: PatchExerciseTemplateRequestData) {

@@ -1,0 +1,39 @@
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title h4 d-flex justify-content-between">
+            {{ organisation().name }}
+            <span
+                class="badge bg-secondary"
+                [ngbTooltip]="`${organisation().membersCount} Mitglieder`"
+            >
+                <i class="bi bi-people me-1"></i
+                >{{ organisation().membersCount }}</span
+            >
+        </h2>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex small">
+            @if (organisation().personalOrganisationOf) {
+                <span class="badge bg-primary"
+                    ><i class="bi bi-house me-1"></i> Persönliche
+                    Organisation</span
+                >
+            } @else {
+                @if (organisation().description) {
+                    {{ organisation().description }}
+                } @else {
+                    <em>Keine Beschreibung</em>
+                }
+            }
+        </li>
+    </ul>
+    <div class="card-body d-flex">
+        <a
+            [routerLink]="`/organisations/${organisation().id}`"
+            class="btn btn-primary me-2"
+        >
+            Öffnen
+        </a>
+        <div class="flex-grow-1"></div>
+    </div>
+</div>

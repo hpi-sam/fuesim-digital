@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Fixed
+
+- `DFM_UPLOAD_LIMIT` values are now correctly applied again, after a bug in version 0.11.0
+
 ## [0.11.1] - 2026-04-30
 
 ### Fixed

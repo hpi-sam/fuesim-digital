@@ -454,7 +454,7 @@ export namespace Marketplace {
 
         export const UpgradeDependency = new Route({
             request: z.object({
-                acceptedElementDeletions: z.array(elementVersionIdSchema),
+                acceptedElementChanges: z.array(elementVersionIdSchema),
             }),
             response: z.object({
                 importedSet: collectionElementsSingleSchema,

@@ -458,7 +458,7 @@ export class CollectionService {
     public async upgradeCollectionDependency(opts: {
         importTo: CollectionEntityId;
         importFrom: CollectionVersionId;
-        acceptedElementDeletions: ElementVersionId[];
+        acceptedElementChanges: ElementVersionId[];
     }) {
         await lastValueFrom(
             this.httpClient.post<
@@ -466,7 +466,7 @@ export class CollectionService {
             >(
                 `${this.ENDPOINT}/${opts.importTo}/dependencies/${opts.importFrom}/upgrade`,
                 Marketplace.Collection.UpgradeDependency.requestSchema.encode({
-                    acceptedElementDeletions: opts.acceptedElementDeletions,
+                    acceptedElementChanges: opts.acceptedElementChanges,
                 })
             )
         );

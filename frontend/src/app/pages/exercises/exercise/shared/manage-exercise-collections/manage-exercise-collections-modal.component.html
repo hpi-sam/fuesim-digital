@@ -18,6 +18,14 @@
             Neue Sammlung hinzufügen
         </button>
 
+        @if (selectedCollections().length === 0) {
+            <div class="col flex-grow-1">
+                <p class="bg-light p-4 rounded-3 lead mb-0">
+                    Es wurden noch keine Sammlungen hinzugefügt.
+                </p>
+            </div>
+        }
+
         <div ngbAccordion #accordion="ngbAccordion" [closeOthers]="true">
             @for (collection of selectedCollections(); track collection) {
                 <div [ngbAccordionItem]="collection.versionId">

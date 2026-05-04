@@ -409,7 +409,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             const data = await collectionService.upgradeCollectionDependency({
                 upgradeIn: collectionEntityId,
                 upgradeTo: importSetVersionId,
-                acceptedElementDeletions: parsedBody.acceptedElementDeletions,
+                acceptedElementChanges: parsedBody.acceptedElementChanges,
             });
 
             res.send(

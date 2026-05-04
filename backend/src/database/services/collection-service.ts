@@ -19,6 +19,8 @@ import {
     applyMigrations,
     cloneDeepMutable,
     ExerciseState,
+    gatherCollectionElements,
+    getCollectionElementDiff,
     getDependencyChecker,
     getElementDependencies,
     isVersionedElementContent,
@@ -420,7 +422,7 @@ export class CollectionService {
     public async upgradeCollectionDependency(data: {
         upgradeIn: CollectionEntityId;
         upgradeTo: CollectionVersionId;
-        acceptedElementDeletions: ElementVersionId[];
+        acceptedElementChanges: ElementVersionId[];
     }) {
         return this.reduce(
             data.upgradeIn,
@@ -430,14 +432,6 @@ export class CollectionService {
                         data.upgradeTo
                     )
                 );
-
-                const newCollectionVersionElements =
-                    await tx.getElementsOfCollectionVersion(
-                        upgradeToCollection.versionId,
-                        {
-                            allowDraftState: false,
-                        }
-                    );
 
                 // Only allow upgrading if we already depend on the collection
                 const existingDependencies = await tx.getCollectionDependencies(
@@ -452,6 +446,28 @@ export class CollectionService {
                     );
                 }
 
+                const oldCollectionVersionElements =
+                    await tx.getElementsOfCollectionVersion(
+                        existingCollectionDependency.versionId,
+                        { allowDraftState: false }
+                    );
+                const newCollectionVersionElements =
+                    await tx.getElementsOfCollectionVersion(
+                        upgradeToCollection.versionId,
+                        {
+                            allowDraftState: false,
+                        }
+                    );
+
+                const changesBetweenVersions = getCollectionElementDiff(
+                    gatherCollectionElements(
+                        oldCollectionVersionElements
+                    ).allDirectElements(),
+                    gatherCollectionElements(
+                        newCollectionVersionElements
+                    ).allDirectElements()
+                );
+
                 // Fetch, which elements of our Collection depend on the collection we want to upgrade
                 const dependingElements =
                     await tx.getDependingElementsForCollection({
@@ -459,10 +475,29 @@ export class CollectionService {
                         dependency: existingCollectionDependency.versionId,
                     });
 
+                const changedDependingElements = dependingElements.filter(
+                    (de) =>
+                        changesBetweenVersions.some(
+                            (change) => change.old?.versionId === de.versionId
+                        )
+                );
+
+                console.log(
+                    JSON.stringify(
+                        {
+                            changesBetweenVersions,
+                            dependingElements,
+                            changedDependingElements,
+                        },
+                        null,
+                        2
+                    )
+                );
+
                 // Check if the provided acceptedElementDeletions actually account for all depending elements
                 if (
-                    !dependingElements.every((ed) =>
-                        data.acceptedElementDeletions.includes(ed.versionId)
+                    !changedDependingElements.every((ed) =>
+                        data.acceptedElementChanges.includes(ed.versionId)
                     )
                 ) {
                     throw new Error(

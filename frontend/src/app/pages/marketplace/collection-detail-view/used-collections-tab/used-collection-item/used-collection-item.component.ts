@@ -140,7 +140,7 @@ export class UsedCollectionItemComponent {
         await this.collectionService.upgradeCollectionDependency({
             importTo: this.currentCollectionEntityId(),
             importFrom: newVersion.versionId,
-            acceptedElementDeletions: Object.values(changeDependencies).flatMap(
+            acceptedElementChanges: Object.values(changeDependencies).flatMap(
                 (changeApply) => changeApply.map((m) => m.versionId)
             ),
         });

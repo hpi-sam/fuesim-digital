@@ -15,6 +15,7 @@ import { viewportSchema } from './viewport.js';
 import { scoutableSchema } from './scoutable.js';
 import { technicalChallengeSchema } from './technical-challenge/technical-challenge.js';
 import { taskSchema } from './task.js';
+import { evalCriterionSchema } from './evaluation-criterion.js';
 
 export const elementSchema = z.discriminatedUnion('type', [
     alarmGroupSchema,
@@ -33,5 +34,6 @@ export const elementSchema = z.discriminatedUnion('type', [
     vehicleSchema,
     viewportSchema,
     scoutableSchema,
+    evalCriterionSchema,
 ]);
 export type Element = z.infer<typeof elementSchema>;

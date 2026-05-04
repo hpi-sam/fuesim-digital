@@ -13,39 +13,40 @@ import { PatientStatus, patientStatusSchema } from './utils/patient-status.js';
 export const evalCriterionBaseSchema = z.strictObject({
     id: uuidSchema,
     name: z.string(),
+    type: z.literal('evalCriterion'),
 });
 
 export const doMeasureXTimesEvalCriterionSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
-    type: z.literal('doMeasureXTimesEvalCriterion'),
+    criterionType: z.literal('doMeasureXTimesEvalCriterion'),
     count: z.int(),
     targetMeasureId: uuidSchema,
 });
 
 export const reachTechnicalChallengeStateEvalCriterionSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
-    type: z.literal('reachTechnicalChallengeStateEvalCriterion'),
+    criterionType: z.literal('reachTechnicalChallengeStateEvalCriterion'),
     targetTechnicalChallengeId: technicalChallengeIdSchema,
     targetTechnicalChallengeStateId: technicalChallengeStateIdSchema,
 });
 
 export const patientAtStatusEvalCriterionSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
-    type: z.literal('patientAtStatusEvalCriterion'),
+    criterionType: z.literal('patientAtStatusEvalCriterion'),
     targetPatientId: uuidSchema,
     targetStatus: patientStatusSchema,
 });
 
 export const xPatientsAtStatusEvalCriterionSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
-    type: z.literal('xPatientsAtStatusEvalCriterion'),
+    criterionType: z.literal('xPatientsAtStatusEvalCriterion'),
     count: z.int(),
     targetStatus: patientStatusSchema,
 });
 
 export const viewScoutableEvalCriterionSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
-    type: z.literal('viewScoutableEvalCriterion'),
+    criterionType: z.literal('viewScoutableEvalCriterion'),
     targetScoutableId: uuidSchema,
 });
 
@@ -67,7 +68,7 @@ export type ViewScoutableEvalCriterion = z.infer<
     typeof viewScoutableEvalCriterionSchema
 >;
 
-export const evalCriterionSchema = z.discriminatedUnion('type', [
+export const evalCriterionSchema = z.discriminatedUnion('criterionType', [
     doMeasureXTimesEvalCriterionSchema,
     reachTechnicalChallengeStateEvalCriterionSchema,
     patientAtStatusEvalCriterionSchema,
@@ -84,7 +85,8 @@ export function newDoMeasureXTimesEvalCriterion(
     return {
         id: uuid(),
         name: name,
-        type: 'doMeasureXTimesEvalCriterion',
+        type: 'evalCriterion',
+        criterionType: 'doMeasureXTimesEvalCriterion',
         count: count,
         targetMeasureId: targetMeasureId,
     };
@@ -97,7 +99,8 @@ export function newReachTechnicalChallengeStateEvalCriterion(
     return {
         id: uuid(),
         name: name,
-        type: 'reachTechnicalChallengeStateEvalCriterion',
+        type: 'evalCriterion',
+        criterionType: 'reachTechnicalChallengeStateEvalCriterion',
         targetTechnicalChallengeId: targetTechnicalChallengeId,
         targetTechnicalChallengeStateId: targetTechnicalChallengeStateId,
     };
@@ -110,7 +113,8 @@ export function newPatientAtStatusEvalCriterion(
     return {
         id: uuid(),
         name: name,
-        type: 'patientAtStatusEvalCriterion',
+        type: 'evalCriterion',
+        criterionType: 'patientAtStatusEvalCriterion',
         targetPatientId: targetPatientId,
         targetStatus: targetStatus,
     };
@@ -123,7 +127,8 @@ export function newXPatientsAtStatusEvalCriterion(
     return {
         id: uuid(),
         name: name,
-        type: 'xPatientsAtStatusEvalCriterion',
+        type: 'evalCriterion',
+        criterionType: 'xPatientsAtStatusEvalCriterion',
         count: count,
         targetStatus: targetStatus,
     };
@@ -135,7 +140,8 @@ export function newViewScoutableEvalCriterion(
     return {
         id: uuid(),
         name: name,
-        type: 'viewScoutableEvalCriterion',
+        type: 'evalCriterion',
+        criterionType: 'viewScoutableEvalCriterion',
         targetScoutableId: targetScoutableId,
     };
 }

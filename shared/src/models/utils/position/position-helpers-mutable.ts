@@ -33,10 +33,17 @@ import {
     calculateDelta,
 } from './position-helpers.js';
 import type { WithPosition } from './with-position.js';
+import { EvalCriterion } from '../../evaluation-criterion.js';
 
 type MovableElement = Exclude<
     Element,
-    AlarmGroup | Client | Hospital | Scoutable | Task | UserGeneratedContent
+    | AlarmGroup
+    | Client
+    | Hospital
+    | Scoutable
+    | Task
+    | UserGeneratedContent
+    | EvalCriterion
 >;
 type MovableType = MovableElement['type'];
 

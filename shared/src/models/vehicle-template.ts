@@ -36,6 +36,10 @@ registerEditableValue(
                 ...newElement,
                 name: oldElement.name,
             }),
+            replace: ({ newElement, newContent }) => ({
+                ...newElement,
+                name: newContent,
+            }),
         },
     ]
 );

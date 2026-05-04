@@ -1,4 +1,4 @@
-import type { ChangeImpact } from 'fuesim-digital-shared';
+import type { ChangeImpact, ElementVersionId } from 'fuesim-digital-shared';
 
 interface BaseNode {
     name: string;
@@ -21,8 +21,6 @@ export type ChangeImpactTreeNode = ChangeNode | FolderNode;
 export function buildChangeImpactTree(
     changes: ChangeImpact[]
 ): ChangeImpactTreeNode[] {
-    const baseNodes: FolderNode[] = [];
-
     const elementsOnMap: FolderNode = {
         type: 'folder',
         name: 'Elemente auf Karte',
@@ -31,18 +29,15 @@ export function buildChangeImpactTree(
         expanded: true,
     };
 
-    baseNodes.push(elementsOnMap);
-
-    const elementsInAlarmGroups: FolderNode = {
-        type: 'folder',
-        name: 'Elemente in Alarmgruppen',
-        value: 'elements-in-alarm-groups',
-        children: [],
-        expanded: true,
-    };
-
     const alarmGroupChanges: {
         [alarmGroupId: string]: { alarmGroupName: string; nodes: ChangeNode[] };
+    } = {};
+
+    const editChanges: {
+        [elementVersionId in ElementVersionId]: {
+            elementTitle: string;
+            changes: ChangeNode[];
+        };
     } = {};
 
     for (const change of changes) {
@@ -51,13 +46,33 @@ export function buildChangeImpactTree(
 
         switch (change.target.kind) {
             case 'map': {
-                console.log('Adding change to elements on map', { change });
-                elementsOnMap.children.push({
-                    type: 'change',
-                    name: change.entity.title,
-                    value: change.id,
-                    change,
-                });
+                switch (change.type) {
+                    case 'updated': {
+                        console.log('Element auf Karte geändert', { change });
+                        editChanges[change.entity.versionId] ??= {
+                            elementTitle: change.entity.title,
+                            changes: [],
+                        };
+
+                        editChanges[change.entity.versionId]!.changes.push({
+                            type: 'change',
+                            name: change.entity.title,
+                            value: change.id,
+                            change,
+                        });
+                        break;
+                    }
+                    case 'removed': {
+                        elementsOnMap.children.push({
+                            type: 'change',
+                            name: change.entity.title,
+                            value: change.id,
+                            change,
+                        });
+                        break;
+                    }
+                }
+
                 break;
             }
             case 'alarm-group-vehicle': {
@@ -75,19 +90,39 @@ export function buildChangeImpactTree(
         }
     }
 
-    elementsInAlarmGroups.children = Object.entries(alarmGroupChanges).map(
-        ([alarmGroupId, { nodes, alarmGroupName }]) => ({
+    const editedElements: FolderNode[] = Object.entries(editChanges).map(
+        ([elementVersionId, entry]) => ({
             type: 'folder',
-            name: `Alarmgruppe ${alarmGroupName}`,
-            value: alarmGroupId,
-            children: nodes,
+            name: entry.elementTitle,
+            value: elementVersionId,
+            children: entry.changes,
             expanded: true,
         })
     );
 
-    if (elementsInAlarmGroups.children.length > 0) {
-        baseNodes.push(elementsInAlarmGroups);
-    }
+    elementsOnMap.children.push(...editedElements);
+    elementsOnMap.children.sort((a, b) => a.name.localeCompare(b.name));
 
-    return baseNodes;
+    const elementsInAlarmGroups: FolderNode = {
+        type: 'folder',
+        name: 'Elemente in Alarmgruppen',
+        value: 'elements-in-alarm-groups',
+        children: Object.entries(alarmGroupChanges).map(
+            ([alarmGroupId, { nodes, alarmGroupName }]) => ({
+                type: 'folder',
+                name: `Alarmgruppe ${alarmGroupName}`,
+                value: alarmGroupId,
+                children: nodes,
+                expanded: true,
+            })
+        ),
+        expanded: true,
+    };
+
+    return [
+        ...(elementsOnMap.children.length > 0 ? [elementsOnMap] : []),
+        ...(elementsInAlarmGroups.children.length > 0
+            ? [elementsInAlarmGroups]
+            : []),
+    ];
 }

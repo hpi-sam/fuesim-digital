@@ -1,4 +1,4 @@
-@let applyChange = applyingChange();
+@let applyChange = castChangeApply(applyingChange());
 
 <p>Element {{ change().entity.title }} wurde entfernt.</p>
 <p>Bitte wählen sie eine geeignete Vorgehensweise aus.</p>
@@ -50,11 +50,9 @@
                                         "
                                         (click)="setReplacement(newElement)"
                                         [selected]="
-                                            applyChange !== undefined &&
-                                            applyChange.action === 'replace' &&
-                                            applyChange.replaceWith.entity
-                                                ?.versionId ===
+                                            isReplacementSelected(
                                                 newElement.versionId
+                                            )
                                         "
                                     />
                                 }
@@ -71,11 +69,9 @@
                                         "
                                         (click)="setReplacement(newElement)"
                                         [selected]="
-                                            applyChange !== undefined &&
-                                            applyChange.action === 'replace' &&
-                                            applyChange.replaceWith.entity
-                                                ?.versionId ===
+                                            isReplacementSelected(
                                                 newElement.versionId
+                                            )
                                         "
                                     />
                                 }
@@ -106,8 +102,7 @@
 
 <hr />
 
-@let selectedChangeReplace =
-    applyChange && applyChange.action === 'replace' && applyChange.replaceWith;
+@let selectedChangeReplace = isReplacementSelected(undefined);
 @let selectedChangeRemove = applyChange && applyChange.action === 'remove';
 
 <div class="alert alert-info" role="alert">
@@ -115,7 +110,7 @@
     @if (selectedChangeReplace) {
         <span
             >Das Element {{ change().entity.title }} wird durch
-            {{ applyChange.replaceWith!.name }}
+            {{ castReplaceChangeApply(applyChange)!.replaceWith!.name }}
             ersetzt.</span
         >
     } @else if (selectedChangeRemove) {

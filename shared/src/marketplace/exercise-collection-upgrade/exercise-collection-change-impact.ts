@@ -31,15 +31,12 @@ export type RemovedElementChangeImpact = z.infer<
 export const editableElementChangeImpactSchema = z.object({
     ...sharedChangeImpactPropertiesSchema.shape,
     type: z.literal('updated'),
-    // is this value is not set, no user action is required
-    editedValue: z
-        .object({
-            id: z.string(),
-            name: z.string(),
-            template: z.string(),
-            model: z.string(),
-        })
-        .optional(),
+    editedValue: z.object({
+        id: z.string(),
+        name: z.string(),
+        template: z.string(),
+        model: z.string(),
+    }),
     element: collectionUpgradeChangeElementSchema,
 });
 

@@ -9,29 +9,47 @@ export const sharedChangeApplySchema = z.object({
     target: changeTargetSchema,
 });
 
+export const removeReplaceChangeApplySchema = z.object({
+    type: z.literal('removed'),
+    action: z.literal('replace'),
+    replaceWith: versionedElementContentSchema,
+    ...sharedChangeApplySchema.shape,
+});
+
+export type RemoveReplaceChangeApply = z.infer<
+    typeof removeReplaceChangeApplySchema
+>;
+
 export const removeChangeApplySchema = z.discriminatedUnion('action', [
     z.object({
         type: z.literal('removed'),
         action: z.literal('remove'),
         ...sharedChangeApplySchema.shape,
     }),
-    z.object({
-        type: z.literal('removed'),
-        action: z.literal('replace'),
-        replaceWith: versionedElementContentSchema,
-        ...sharedChangeApplySchema.shape,
-    }),
+    removeReplaceChangeApplySchema,
 ]);
 
 export type RemoveChangeApply = z.infer<typeof removeChangeApplySchema>;
 
 export const editableChangeApplyActionSchema = z.literal(['keep', 'update']);
 
-export const editableChangeApplySchema = z.object({
+const editableBasicChangeApplySchema = z.object({
     type: z.literal('editable'),
     action: editableChangeApplyActionSchema,
     ...sharedChangeApplySchema.shape,
 });
+
+const editableCustomChangeApplySchema = z.object({
+    type: z.literal('editable'),
+    action: z.literal('replace'),
+    newContent: z.string(),
+    ...sharedChangeApplySchema.shape,
+});
+
+export const editableChangeApplySchema = z.discriminatedUnion('action', [
+    editableBasicChangeApplySchema,
+    editableCustomChangeApplySchema,
+]);
 
 export type EditableChangeApply = z.infer<typeof editableChangeApplySchema>;
 

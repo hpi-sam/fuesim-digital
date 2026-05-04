@@ -13,7 +13,6 @@ import type {
     RemovedElementChangeImpact,
 } from '../marketplace/exercise-collection-upgrade/exercise-collection-change-impact.js';
 import { newChangeMapTarget } from '../marketplace/exercise-collection-upgrade/exercise-collection-change-target.js';
-import type { ChangeApply } from '../marketplace/exercise-collection-upgrade/exercise-collection-change-apply.js';
 import {
     checkEditableValueEdited,
     getEditableValueCheckers,
@@ -24,6 +23,9 @@ import { changePosition } from './utils/position/position-helpers-mutable.js';
 import { newVehiclePositionIn } from './utils/position/vehicle-position.js';
 import { newMapCoordinatesAt } from './utils/position/map-coordinates.js';
 import type { VehicleTemplate } from './vehicle-template.js';
+import type { Material } from './material.js';
+import type { Personnel } from './personnel.js';
+import type { Vehicle } from './vehicle.js';
 
 function findIdArrayDifferences<T extends string>(
     oldArray: Immutable<T[]>,
@@ -42,9 +44,6 @@ function findIdArrayDifferences<T extends string>(
         // remaining oldElements were removed in newElements
         if (oldElements[id]) {
             oldElements[id] -= 1;
-            if (oldElements[id] === 0) {
-                delete oldElements[id];
-            }
         }
         // it is not present in the old elements, which means it is added
         else {
@@ -53,32 +52,136 @@ function findIdArrayDifferences<T extends string>(
     }
 
     return {
+        /*
+         * count < 0 means it is added in new array,
+         * count = 0 means it is unchanged
+         * count > 0 means it is removed in new array
+         */
         count: oldElements,
     };
 }
 
-function updateVehicleOnMap(
+/**
+ * Removed material & personnel which are not used anymore after the vehicle template change
+ * on map
+ */
+function removeUnusedAccessories(
     draftState: WritableDraft<ExerciseState>,
-    elementId: UUID,
+    oldVehicle: Immutable<Vehicle>,
     replacement: Immutable<VehicleTemplate>
-) {
-    const oldVehicle = getElement(draftState, 'vehicle', elementId);
+): VehicleTemplate {
+    const mutableReplacement = cloneDeepMutable(replacement);
 
-    findIdArrayDifferences(
+    // MATERIALS
+    const materialDifference = findIdArrayDifferences(
         Object.keys(oldVehicle.materialIds)
             .map((id) => draftState.materials[id]?.templateId)
             .filter((id): id is string => !!id),
         replacement.materialTemplateIds
     );
 
-    // Remove UNUSED Material / Personnel
-    for (const materialId of Object.keys(oldVehicle.materialIds)) {
-        delete draftState.materials[materialId];
+    const addedMaterialTemplateIds = Object.entries(
+        materialDifference.count
+    ).filter(([_, count]) => (count ?? 0) < 0);
+
+    mutableReplacement.materialTemplateIds = [];
+    for (const [materialTemplateId, count] of addedMaterialTemplateIds) {
+        for (let i = 0; i < Math.abs(count!); i++) {
+            mutableReplacement.materialTemplateIds.push(materialTemplateId);
+        }
     }
 
-    for (const personnelId of Object.keys(oldVehicle.personnelIds)) {
-        delete draftState.personnel[personnelId];
+    const unusedMaterialIds = Object.entries(materialDifference.count).filter(
+        ([_, count]) => (count ?? 0) > 0
+    );
+
+    for (const [materialTemplateId, count] of unusedMaterialIds) {
+        const materialIdsToRemove = Object.keys(oldVehicle.materialIds)
+            .filter(
+                (materialId) =>
+                    draftState.materials[materialId]?.templateId ===
+                    materialTemplateId
+            )
+            .slice(0, count); // Only remove as many materials as the count indicates
+
+        for (const materialId of materialIdsToRemove) {
+            delete draftState.materials[materialId];
+        }
     }
+
+    // PERSONNEL
+
+    const personnelDifference = findIdArrayDifferences(
+        Object.keys(oldVehicle.personnelIds)
+            .map((id) => draftState.personnel[id]?.templateId)
+            .filter((id): id is string => !!id),
+        replacement.personnelTemplateIds
+    );
+
+    const addedPersonnelTemplateIds = Object.entries(
+        personnelDifference.count
+    ).filter(([_, count]) => (count ?? 0) < 0);
+
+    mutableReplacement.personnelTemplateIds = [];
+    for (const [personnelTemplateId, count] of addedPersonnelTemplateIds) {
+        for (let i = 0; i < Math.abs(count!); i++) {
+            mutableReplacement.personnelTemplateIds.push(personnelTemplateId);
+        }
+    }
+
+    const unusedPersonnelIds = Object.entries(personnelDifference.count).filter(
+        ([_, count]) => (count ?? 0) > 0
+    );
+
+    for (const [personnelTemplateId, count] of unusedPersonnelIds) {
+        const personnelIdsToRemove = Object.keys(oldVehicle.personnelIds)
+            .filter(
+                (personnelId) =>
+                    draftState.personnel[personnelId]?.templateId ===
+                    personnelTemplateId
+            )
+            .slice(0, count); // Only remove as many materials as the count indicates
+
+        for (const personnelId of personnelIdsToRemove) {
+            delete draftState.personnel[personnelId];
+        }
+    }
+
+    return mutableReplacement;
+}
+
+function addNewAccessories(
+    draftState: WritableDraft<ExerciseState>,
+    newVehicle: Immutable<Vehicle>,
+    newMaterial: Immutable<Material>[],
+    newPersonnel: Immutable<Personnel>[]
+) {
+    for (const material of cloneDeepMutable(newMaterial)) {
+        changePosition(
+            material,
+            newVehiclePositionIn(newVehicle.id),
+            draftState
+        );
+        draftState.materials[material.id] = material;
+    }
+    for (const person of cloneDeepMutable(newPersonnel)) {
+        changePosition(person, newVehiclePositionIn(newVehicle.id), draftState);
+        draftState.personnel[person.id] = person;
+    }
+}
+
+function updateVehicleOnMap(
+    draftState: WritableDraft<ExerciseState>,
+    elementId: UUID,
+    replacement: Immutable<VehicleTemplate>,
+    editElement: (newElement: Vehicle) => Vehicle = (element) => element
+) {
+    const oldVehicle = getElement(draftState, 'vehicle', elementId);
+    const replacementVehicle = removeUnusedAccessories(
+        draftState,
+        oldVehicle,
+        replacement
+    );
 
     // Create new Element
     const materialTemplates = Object.fromEntries(
@@ -92,15 +195,14 @@ function updateVehicleOnMap(
             ([_, f]) => replacement.personnelTemplateIds.includes(f.id)
         )
     );
-
     const newElement = cloneDeepMutable(
         createVehicleParameters(
-            replacement.id,
-            replacement,
+            replacementVehicle.id,
+            replacementVehicle,
             materialTemplates,
             personnelTemplates,
             newMapCoordinatesAt(0, 0),
-            replacement.entity,
+            replacementVehicle.entity,
             true
         )
     );
@@ -108,59 +210,16 @@ function updateVehicleOnMap(
     newElement.vehicle.id = elementId;
     newElement.vehicle.position = oldVehicle.position;
 
-    // Add new Element to the state
-
-    draftState.vehicles[elementId] = cloneDeepMutable(newElement.vehicle);
-
-    for (const material of cloneDeepMutable(newElement.materials)) {
-        changePosition(
-            material,
-            newVehiclePositionIn(newElement.vehicle.id),
-            draftState
-        );
-        draftState.materials[material.id] = material;
-    }
-    for (const person of cloneDeepMutable(newElement.personnel)) {
-        changePosition(
-            person,
-            newVehiclePositionIn(newElement.vehicle.id),
-            draftState
-        );
-        draftState.personnel[person.id] = person;
-    }
-}
-
-function updateVehicleKeepData(
-    draftState: WritableDraft<ExerciseState>,
-    elementId: UUID,
-    changeApply: Immutable<ChangeApply>
-) {
-    const oldVehicle = cloneDeepMutable(
-        getElement(draftState, 'vehicle', elementId)
+    draftState.vehicles[elementId] = editElement(
+        cloneDeepMutable(newElement.vehicle)
     );
-    const vehicleTemplate = Object.values(
-        getTemplates(draftState, 'vehicleTemplate')
-    ).find(
-        (t) => t.entity?.entityId === changeApply.marketplaceElement.entityId
-    );
-    if (!vehicleTemplate) {
-        throw new ReducerError(
-            `No vehicle template found for element with id ${elementId}`
-        );
-    }
-    let updatedVehicle = cloneDeepMutable(oldVehicle);
 
-    for (const checker of getEditableValueCheckers(
-        'vehicle',
-        'vehicleTemplate'
-    )) {
-        updatedVehicle = checker.keep({
-            template: vehicleTemplate,
-            oldElement: oldVehicle,
-            newElement: updatedVehicle,
-        });
-    }
-    draftState.vehicles[oldVehicle.id] = updatedVehicle;
+    addNewAccessories(
+        draftState,
+        newElement.vehicle,
+        Object.values(newElement.materials),
+        Object.values(newElement.personnel)
+    );
 }
 
 registerMarketplaceElement('vehicleTemplate', {
@@ -189,7 +248,8 @@ registerMarketplaceElement('vehicleTemplate', {
                     updateVehicleOnMap(
                         state,
                         changeApply.target.elementId,
-                        replacement
+                        replacement,
+                        undefined
                     );
                     break;
                 }
@@ -197,10 +257,31 @@ registerMarketplaceElement('vehicleTemplate', {
         } else if (changeApply.type === 'editable') {
             switch (changeApply.action) {
                 case 'keep': {
-                    updateVehicleKeepData(
+                    const existingVehicle = getElement(
+                        state,
+                        'vehicle',
+                        changeApply.target.elementId
+                    );
+                    updateVehicleOnMap(
                         state,
                         changeApply.target.elementId,
-                        changeApply
+                        changeApply.marketplaceElement
+                            .content as VehicleTemplate,
+                        (vehicle) => {
+                            let newVehicle = vehicle;
+                            for (const checker of getEditableValueCheckers(
+                                'vehicle',
+                                'vehicleTemplate'
+                            )) {
+                                newVehicle = checker.keep({
+                                    template: changeApply.marketplaceElement
+                                        .content as VehicleTemplate,
+                                    oldElement: existingVehicle,
+                                    newElement: newVehicle,
+                                });
+                            }
+                            return newVehicle;
+                        }
                     );
                     break;
                 }
@@ -217,6 +298,37 @@ registerMarketplaceElement('vehicleTemplate', {
                         state,
                         changeApply.target.elementId,
                         replacement
+                    );
+                    break;
+                }
+                case 'replace': {
+                    const existingVehicle = getElement(
+                        state,
+                        'vehicle',
+                        changeApply.target.elementId
+                    );
+                    updateVehicleOnMap(
+                        state,
+                        changeApply.target.elementId,
+                        changeApply.marketplaceElement
+                            .content as VehicleTemplate,
+                        (vehicle) => {
+                            let newVehicle = vehicle;
+                            for (const checker of getEditableValueCheckers(
+                                'vehicle',
+                                'vehicleTemplate'
+                            )) {
+                                newVehicle = checker.replace({
+                                    template: changeApply.marketplaceElement
+                                        .content as VehicleTemplate,
+                                    oldElement: existingVehicle,
+                                    newElement: newVehicle,
+                                    newContent: changeApply.newContent,
+                                });
+                            }
+
+                            return newVehicle;
+                        }
                     );
                     break;
                 }
@@ -239,48 +351,28 @@ registerMarketplaceElement('vehicleTemplate', {
 
             for (const affectedVehicle of affectedVehicles) {
                 const editedValues = checkEditableValueEdited({
-                    template: change.old.content,
+                    template: change.new.content,
                     element: cloneDeepMutable(affectedVehicle),
                 });
 
-                if (editedValues.length === 0) {
-                    impacts.push(
-                        ...affectedVehicles.map(
-                            (vehicle) =>
-                                ({
-                                    id: uuid(),
-                                    type: 'updated',
-                                    entity: change.new,
-                                    editedValue: undefined,
-                                    element: affectedVehicle,
-                                    target: newChangeMapTarget(
-                                        'vehicle',
-                                        affectedVehicle.id
-                                    ),
-                                }) satisfies EditableElementChangeImpact
-                        )
-                    );
-                } else {
+                if (editedValues.length > 0) {
                     for (const editedValue of editedValues) {
-                        impacts.push(
-                            ...affectedVehicles.map(
-                                (vehicle) =>
-                                    ({
-                                        id: uuid(),
-                                        type: 'updated',
-                                        entity: change.new,
-                                        editedValue,
-                                        element: affectedVehicle,
-                                        target: newChangeMapTarget(
-                                            'vehicle',
-                                            affectedVehicle.id
-                                        ),
-                                    }) satisfies EditableElementChangeImpact
-                            )
-                        );
+                        impacts.push({
+                            id: uuid(),
+                            type: 'updated',
+                            entity: change.new,
+                            editedValue,
+                            element: affectedVehicle,
+                            target: newChangeMapTarget(
+                                'vehicle',
+                                affectedVehicle.id
+                            ),
+                        } satisfies EditableElementChangeImpact);
                     }
                 }
             }
+
+            console.log('Impacts for vehicle template update:', impacts);
         }
         if (change.type === 'remove') {
             // Check on Map

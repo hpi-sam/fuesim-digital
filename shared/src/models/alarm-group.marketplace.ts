@@ -1,7 +1,6 @@
 import { uuid } from '../utils/uuid.js';
 import type {
     ChangeImpact,
-    EditableElementChangeImpact,
     RemovedElementChangeImpact,
 } from '../marketplace/exercise-collection-upgrade/exercise-collection-change-impact.js';
 import { newChangeAlarmgroupVehicleTarget } from '../marketplace/exercise-collection-upgrade/exercise-collection-change-target.js';
@@ -10,19 +9,13 @@ import { registerMarketplaceElement } from './utils/marketplace-registry.js';
 
 registerMarketplaceElement('alarmGroup', {
     changeApply: (draftState, change) => {
-        if (change.type === 'added') return;
         if (change.target.kind === 'alarm-group-vehicle') {
+            if (change.type === 'added' || change.type === 'editable') {
+                throw new Error(
+                    'editable change apply is not supported for alarm group vehicles'
+                );
+            }
             switch (change.action) {
-                case 'keep': {
-                    throw new Error(
-                        'action keep not supported for alarm group vehicles'
-                    );
-                }
-                case 'update': {
-                    throw new Error(
-                        'action keep not supported for alarm group vehicles'
-                    );
-                }
                 case 'replace': {
                     const alarmGroup =
                         draftState.alarmGroups[change.target.alarmGroupId];
@@ -76,19 +69,21 @@ registerMarketplaceElement('alarmGroup', {
                 if (
                     alarmGroupVehicle.vehicleTemplateId === change.old.versionId
                 ) {
-                    impacts.push({
-                        id: uuid(),
-                        type: change.type === 'update' ? 'updated' : 'removed',
-                        target: newChangeAlarmgroupVehicleTarget(
-                            alarmGroup.id,
-                            alarmGroup.name,
-                            alarmGroupVehicle.id
-                        ),
-                        entity: change.old,
-                        element: alarmGroupVehicle,
-                    } satisfies
-                        | EditableElementChangeImpact
-                        | RemovedElementChangeImpact);
+                    // TODO: @Quixelation - support editing-detection of alarm groups
+                    // other types are currently not supported
+                    if (change.type === 'remove') {
+                        impacts.push({
+                            id: uuid(),
+                            type: 'removed',
+                            target: newChangeAlarmgroupVehicleTarget(
+                                alarmGroup.id,
+                                alarmGroup.name,
+                                alarmGroupVehicle.id
+                            ),
+                            entity: change.old,
+                            element: alarmGroupVehicle,
+                        } satisfies RemovedElementChangeImpact);
+                    }
                 }
             }
         }

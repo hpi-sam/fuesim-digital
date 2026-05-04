@@ -155,17 +155,11 @@ export class CollectionService {
         collectionEntityId: CollectionEntityId,
         userId: string
     ): Promise<CollectionRelationshipType | null> {
-        console.log(
-            `Checking permissions for user ${userId} in collection ${collectionEntityId} and its parent collections.`
-        );
         const directRole = await this.getUserRoleInCollection(
             collectionEntityId,
             userId
         );
         if (directRole !== null) return directRole;
-        console.log(
-            `No direct permissions found for user ${userId} in collection ${collectionEntityId}. Checking parent collections…`
-        );
 
         const parentCollections =
             await this.collectionRepository.getParentCollectionsOfCollectionVersion(
@@ -175,9 +169,6 @@ export class CollectionService {
                 // but there is no need to check further up the chain, since there is no UI for that.
                 false
             );
-        console.log(
-            `Found ${parentCollections.length} parent collections for collection ${collectionEntityId}. Checking permissions for user ${userId} in these collections…`
-        );
 
         const rolesInParents = await Promise.all(
             parentCollections.map(async (parentCollection) => {

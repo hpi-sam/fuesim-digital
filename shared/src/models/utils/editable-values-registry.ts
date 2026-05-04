@@ -12,10 +12,12 @@ export interface EditableValuesRegistryEntry<
     id: string;
     name: string;
     template?: Template;
+
     equality: (data: {
         template: Extract<FuesimTemplate, { type: Template }>;
         element: Extract<FuesimElement, { type: Element }>;
     }) => boolean;
+
     asString: (data: {
         template: Extract<FuesimTemplate, { type: Template }>;
         element: Extract<FuesimElement, { type: Element }>;
@@ -23,6 +25,7 @@ export interface EditableValuesRegistryEntry<
         template: string;
         model: string;
     };
+
     /**
      * How to bring the values over to the new element version
      */
@@ -30,6 +33,16 @@ export interface EditableValuesRegistryEntry<
         template: Immutable<Extract<FuesimTemplate, { type: Template }>>;
         newElement: E;
         oldElement: E;
+    }) => E;
+
+    /**
+     * How to bring the values over to the new element version
+     */
+    replace: <E extends Extract<FuesimElement, { type: Element }>>(data: {
+        template: Immutable<Extract<FuesimTemplate, { type: Template }>>;
+        newElement: E;
+        oldElement: E;
+        newContent: string;
     }) => E;
 }
 

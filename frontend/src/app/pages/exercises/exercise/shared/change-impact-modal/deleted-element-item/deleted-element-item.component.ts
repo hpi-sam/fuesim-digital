@@ -1,6 +1,8 @@
 import { Component, effect, input, output, signal } from '@angular/core';
 import {
     CollectionUpgradeChangeElement,
+    ElementVersionId,
+    RemoveReplaceChangeApply,
     uuid,
     type ChangeApply,
     type ElementDto,
@@ -29,6 +31,42 @@ export class DeletedElementChangeApplyItemComponent {
     public readonly selectedActionType = signal<
         RemoveChangeApply['action'] | null
     >(null);
+
+    public isReplacementSelected(
+        elementVersionId: ElementVersionId | undefined
+    ) {
+        const applyChange = this.applyingChange() as
+            | RemoveChangeApply
+            | undefined;
+
+        if (elementVersionId === undefined)
+            return applyChange?.action === 'replace';
+        return (
+            applyChange?.action === 'replace' &&
+            applyChange.replaceWith.entity?.versionId === elementVersionId
+        );
+    }
+
+    public castChangeApply(
+        applyChange: ChangeApply | undefined
+    ): RemoveChangeApply | undefined {
+        if (applyChange?.type === 'removed') {
+            return applyChange as RemoveChangeApply;
+        }
+        return undefined;
+    }
+
+    public castReplaceChangeApply(
+        applyChange: ChangeApply | undefined
+    ): RemoveReplaceChangeApply | undefined {
+        if (
+            applyChange?.type === 'removed' &&
+            applyChange.action === 'replace'
+        ) {
+            return applyChange as RemoveReplaceChangeApply;
+        }
+        return undefined;
+    }
 
     public constructor() {
         effect(() => {

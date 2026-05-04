@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import type {
     ChangeApply,
     EditableChangeApply,
@@ -27,17 +27,48 @@ export class EditedElementChangeApplyItemComponent {
         'vehicle',
     ];
 
+    public readonly newValue = computed(() => {
+        const applyingChange = this.applyingChange() as
+            | EditableChangeApply
+            | undefined;
+        switch (applyingChange?.action) {
+            case 'replace':
+                return applyingChange.newContent;
+            case 'update':
+                return this.change().editedValue.template;
+            case 'keep':
+                return this.change().editedValue.model;
+            default:
+                return this.change().editedValue.template;
+        }
+    });
+
     public readonly selectedActionType = signal<
         EditableChangeApply['action'] | null
     >(null);
 
-    public setActionType(action: EditableChangeApply['action']) {
+    public setActionType(
+        action: Exclude<EditableChangeApply['action'], 'replace'>
+    ) {
         this.selectedActionType.set(action);
         this.applyChange.emit({
             type: 'editable',
             action,
             marketplaceElement: this.change().entity,
             target: this.change().target,
+        });
+    }
+
+    public setReplaceWith(newContent?: string) {
+        const value = newContent ?? this.change().editedValue.template;
+
+        this.selectedActionType.set('replace');
+        this.applyChange.emit({
+            type: 'editable',
+            action: 'replace',
+            marketplaceElement: this.change().entity,
+            target: this.change().target,
+            newContent: value,
         });
     }
 }

@@ -13,10 +13,14 @@
             <th scope="col">Neuer Wert</th>
         </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+        <tr>
+            <th scope="row">{{ change().editedValue.name }}</th>
+            <td>{{ change().editedValue.model }}</td>
+            <td>{{ change().editedValue.template }}</td>
+        </tr>
+    </tbody>
 </table>
-
-{{ change().editedValue | json }}
 
 <div class="card mt-2">
     <div class="card-header">
@@ -31,10 +35,44 @@
                 (change)="setActionType('keep')"
             />
             <label for="remove" class="form-check-label text-danger">
-                Alte Werte beibehalten
+                Alten Wert beibehalten
             </label>
         </div>
     </div>
+    <div class="card-header">
+        <div class="form-check">
+            <input
+                type="radio"
+                id="replace"
+                name="action"
+                value="replace"
+                [checked]="applyChange?.action === 'replace'"
+                class="form-check-input"
+                (change)="setReplaceWith()"
+            />
+            <label for="replace" class="form-check-label">
+                Eigenen Wert verwenden
+            </label>
+        </div>
+    </div>
+    @if (applyChange?.action === 'replace') {
+        <div class="card-body">
+            <div class="mb-3">
+                <label
+                    for="editedValueChangeImpactReplaceContent"
+                    class="form-label"
+                    >Neuer Wert</label
+                >
+                <input
+                    type="email"
+                    class="form-control"
+                    id="editedValueChangeImpactReplaceContent"
+                    [value]="newValue()"
+                    (input)="setReplaceWith($event.target.value)"
+                />
+            </div>
+        </div>
+    }
     <div class="card-header">
         <div class="form-check">
             <input
@@ -47,7 +85,7 @@
                 (change)="setActionType('update')"
             />
             <label for="keep" class="form-check-label text-success">
-                Neue Werte übernehmen
+                Neuen Wert übernehmen
             </label>
         </div>
     </div>
@@ -56,16 +94,21 @@
 <hr />
 
 @let selectedKeep = applyChange && applyChange.action === 'keep';
-@let selectedUpdate = applyChange && applyChange.action === 'update';
+@let selectedUpdate =
+    applyChange &&
+    (applyChange.action === 'update' || applyChange.action === 'replace');
 
 <div class="alert alert-info" role="alert">
     <b class="d-block">Folgende Aktion wird auf das Element angewendet:</b>
     @if (selectedKeep) {
-        <span>Die Attribute des Elements bleiben unverändert</span>
+        <span
+            >Das Attribut bleibt unverändert:
+            <b class="fw-medium">{{ newValue() }}</b></span
+        >
     } @else if (selectedUpdate) {
         <span
-            >Die aktuellen Attribute werden durch die neuen Attribute
-            ersetzt.</span
+            >Das Attribut wird ersetzt:
+            <b class="fw-medium">{{ newValue() }}</b></span
         >
     } @else {
         <i>Es wurde noch keine Aktion ausgewählt.</i>

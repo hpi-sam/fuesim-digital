@@ -49,6 +49,14 @@
             </div>
         </div>
 
+        @if (org.personalOrganisationOf) {
+            <p class="alert alert-primary">
+                <i class="bi bi-info-circle me-2"></i>
+                Dies ist Ihre persönliche Organisation. Alle Inhalte sind privat
+                und nur Ihnen zugänglich.
+            </p>
+        }
+
         <nav ngbNav #nav="ngbNav" class="nav-tabs">
             <ng-container ngbNavItem="content">
                 <a ngbNavLink>

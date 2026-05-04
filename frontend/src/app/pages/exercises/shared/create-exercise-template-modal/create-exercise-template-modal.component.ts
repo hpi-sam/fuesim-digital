@@ -65,15 +65,17 @@ export class CreateExerciseTemplateModalComponent {
         this.organisations = this.apiService.getOrganisationsAsEditorResource();
         effect(() => {
             const orgs = this.organisations.value();
-            if (orgs && !this.model().organisationId) {
+            if (orgs?.length && !this.model().organisationId) {
                 const userId = this.authService.authData().user!.id;
                 const userOrg = orgs.find(
                     (org) => org.personalOrganisationOf === userId
                 );
-                this.model.set({
-                    ...this.model(),
-                    organisationId: userOrg?.id ?? ('' as OrganisationId),
-                });
+                if (userOrg) {
+                    this.model.set({
+                        ...this.model(),
+                        organisationId: userOrg.id,
+                    });
+                }
             }
         });
     }

@@ -42,6 +42,7 @@ export type GetOrganisationResponseData = z.infer<
 export const getOrganisationDetailsResponseDataSchema = z.object({
     ...getOrganisationResponseDataSchema.shape,
     userRole: organisationMembershipRoleSchema.nullable(),
+    membersCount: z.int(),
     members: z.array(
         z.object({
             id: organisationMembershipIdSchema,
@@ -62,6 +63,7 @@ export const getOrganisationsResponseDataSchema = z.array(
     z.object({
         ...getOrganisationResponseDataSchema.shape,
         userRole: organisationMembershipRoleSchema.nullable(),
+        membersCount: z.int(),
     })
 );
 export type GetOrganisationsResponseData = z.infer<

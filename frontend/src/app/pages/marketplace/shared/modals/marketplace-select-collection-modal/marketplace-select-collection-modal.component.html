@@ -65,6 +65,44 @@
             [showImportedElements]="showDependencyElements"
         />
     } @else {
+        @if (showInfoBanner) {
+            <div class="alert alert-secondary mb-3" role="alert">
+                <b class="d-block"
+                    >Übungselemente werden nun zentral verwaltet!</b
+                >
+                <span class="text-muted">
+                    Übungselemente wie Fahrzeuge und Alarmgruppen werden in
+                    sogenannten Sammlungen organisiert. Das bedeutet, dass Sie
+                    Ihre Übungselemente in Sammlungen anlegen und verwalten
+                    können, um sie dann einfach zu Ihren Übungen hinzuzufügen.
+                    <br />
+                </span>
+                <span class="mt-2 d-block text-muted">
+                    Wähle Sie eine Sammlung aus, deren Übungselemente Sie in der
+                    Übung verwenden möchten.
+                </span>
+            </div>
+        }
+        @if (allowCreate) {
+            <div
+                class="d-flex justify-content-start align-items-center gap-2 mb-3"
+            >
+                <a
+                    class="btn btn-outline-primary"
+                    routerLink="/collections"
+                    target="_blank"
+                >
+                    <i class="bi bi-folder-plus"></i>
+                    Neue Sammlung erstellen
+                </a>
+                <button
+                    class="btn btn-link"
+                    (click)="userAvailableCollections.reload()"
+                >
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+        }
         @if (userAvailableCollections.hasValue()) {
             <div class="row row-cols-3">
                 @for (
@@ -83,8 +121,10 @@
         }
     }
 </div>
-<div class="modal-footer justify-content-start">
-    <button class="btn btn-outline-danger" (click)="close(null)">
-        Abbrechen
-    </button>
-</div>
+@if (allowLeave) {
+    <div class="modal-footer justify-content-start">
+        <button class="btn btn-outline-danger" (click)="close(null)">
+            Abbrechen
+        </button>
+    </div>
+}

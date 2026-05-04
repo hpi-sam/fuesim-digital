@@ -80,17 +80,7 @@ export class ManageExerciseCollectionsModalComponent {
             ),
         });
         if (result === null) return;
-
-        const elements =
-            await this.collectionService.getElementsOfCollectionVersion(result);
-        await this.exerciseService.proposeAction({
-            type: '[Collection] Add Collection',
-            elements,
-            collectionVersion: {
-                versionId: result.versionId,
-                entityId: result.entityId,
-            },
-        });
+        await this.exerciseService.addCollection(result);
     }
 
     public close() {

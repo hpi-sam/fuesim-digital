@@ -8,6 +8,7 @@ import {
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { CollectionElementsListComponent } from '../../collection-elements-list/collection-elements-list.component';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { CollectionCardComponent } from '../../cards/collection-card/collection-card.component';
@@ -20,6 +21,7 @@ import { CollectionCardComponent } from '../../cards/collection-card/collection-
         CollectionElementsListComponent,
         DatePipe,
         CollectionCardComponent,
+        RouterLink,
     ],
 })
 export class MarketplaceSelectCollectionModalComponent {
@@ -29,6 +31,9 @@ export class MarketplaceSelectCollectionModalComponent {
     public disallowedCollections: CollectionEntityId[] = [];
     public collectionSelectionResult$ = new Subject<CollectionDto | null>();
     public showDependencyElements = false;
+    public allowLeave = true;
+    public allowCreate = false;
+    public showInfoBanner = false;
 
     public readonly userAvailableCollections = resource({
         loader: async () =>

@@ -71,7 +71,12 @@ export class OrganisationService {
                 id,
                 session.user.id
             );
-        return { ...organisation, userRole, members };
+        return {
+            ...organisation,
+            userRole,
+            members,
+            membersCount: members.length,
+        };
     }
 
     public async updateOrganisation(

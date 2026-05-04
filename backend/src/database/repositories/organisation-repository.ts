@@ -35,6 +35,13 @@ export class OrganisationRepository extends BaseRepository {
             .select({
                 ...getTableColumns(organisationTable),
                 userRole: subquery.role,
+                membersCount: this.databaseConnection.$count(
+                    organisationMembershipTable,
+                    eq(
+                        organisationMembershipTable.organisationId,
+                        organisationTable.id
+                    )
+                ),
             })
             .from(organisationTable)
             .innerJoin(

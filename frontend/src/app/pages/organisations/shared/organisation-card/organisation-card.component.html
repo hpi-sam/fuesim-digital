@@ -1,46 +1,29 @@
 <div class="card">
     <div class="card-body">
-        <h2 class="card-title h4 d-flex">
-            @if (
-                organisation().userRole === 'admin' &&
-                !organisation().personalOrganisationOf
-            ) {
-                <app-inline-text-editor
-                    class="flex-grow-1"
-                    [required]="true"
-                    [value]="organisation().name"
-                    name="Name der Organisation"
-                    (update)="
-                        patchOrganisation({
-                            name: $event,
-                        })
-                    "
-                    [singleLine]="true"
-                />
-            } @else {
-                {{ organisation().name }}
-            }
+        <h2 class="card-title h4 d-flex justify-content-between">
+            {{ organisation().name }}
+            <span
+                class="badge bg-secondary"
+                [ngbTooltip]="`${organisation().membersCount} Mitglieder`"
+            >
+                <i class="bi bi-people me-1"></i
+                >{{ organisation().membersCount }}</span
+            >
         </h2>
     </div>
     <ul class="list-group list-group-flush">
-        <li class="list-group-item d-flex">
+        <li class="list-group-item d-flex small">
             @if (organisation().personalOrganisationOf) {
                 <span class="badge bg-primary"
-                    ><i class="bi bi-house"></i> Persönliche Organisation</span
+                    ><i class="bi bi-house me-1"></i> Persönliche
+                    Organisation</span
                 >
-            } @else if (organisation().userRole === 'admin') {
-                <app-inline-text-editor
-                    class="flex-grow-1"
-                    [value]="organisation().description"
-                    name="Beschreibung der Organisation"
-                    (update)="
-                        patchOrganisation({
-                            description: $event,
-                        })
-                    "
-                />
             } @else {
-                {{ organisation().description }}
+                @if (organisation().description) {
+                    {{ organisation().description }}
+                } @else {
+                    <em>Keine Beschreibung</em>
+                }
             }
         </li>
     </ul>

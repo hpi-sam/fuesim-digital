@@ -1,43 +1,79 @@
-@for (type of visibleElementTypesOrder; track type) {
-    @let elementsOfType = elementsGroupedByType()[type] ?? [];
-    @if (elementsOfType.length > 0) {
-        <h4>
-            {{ (type | versionedElementDisplayName)?.plural ?? '' }}
-        </h4>
-        <div class="container mb-3">
-            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-2">
-                @for (
-                    exerciseObject of elementsOfType;
-                    track exerciseObject.versionId
-                ) {
-                    <app-element-card
-                        [element]="exerciseObject"
-                        [collectionElements]="collectionElements()"
-                        [collection]="collection()"
-                        [mode]="editable() ? 'edit' : 'view'"
-                        [hideVersionHistory]="!editable()"
-                        [showCreatedIndicator]="
-                            elementHasChanges()[exerciseObject.entityId] ===
-                            'create'
-                        "
-                        [showChangedIndicator]="
-                            elementHasChanges()[exerciseObject.entityId] ===
-                            'update'
-                        "
-                        [showAsGhost]="
-                            elementHasChanges()[exerciseObject.entityId] ===
-                            'remove'
-                        "
-                    />
+@for (type of visibleElementTypes; track type) {
+    @let elementsOfType = elementsGroupedByType()[type.type] ?? [];
+    @if (elementsOfType.length > 0 || allowCreation()) {
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>
+                    {{
+                        (type.type | versionedElementDisplayName)?.plural ??
+                            '???'
+                    }}
+                </h4>
+                @if (allowCreation()) {
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        (click)="type.create()"
+                    >
+                        {{
+                            (type.type | versionedElementDisplayName)
+                                ?.singular ?? 'Element'
+                        }}
+                        erstellen
+                    </button>
+                }
+            </div>
+            <div class="container mb-3">
+                <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-2">
+                    @for (
+                        exerciseObject of elementsOfType;
+                        track exerciseObject.versionId
+                    ) {
+                        <app-element-card
+                            [element]="exerciseObject"
+                            [collectionElements]="collectionElements()"
+                            [collection]="collection()"
+                            [mode]="editable() ? 'edit' : 'view'"
+                            [hideVersionHistory]="!editable()"
+                            [showCreatedIndicator]="
+                                elementHasChanges()[exerciseObject.entityId] ===
+                                'create'
+                            "
+                            [showChangedIndicator]="
+                                elementHasChanges()[exerciseObject.entityId] ===
+                                'update'
+                            "
+                            [showAsGhost]="
+                                elementHasChanges()[exerciseObject.entityId] ===
+                                'remove'
+                            "
+                        />
+                    }
+                </div>
+                @if (elementsOfType.length === 0) {
+                    <div class="col flex-grow-1">
+                        <p
+                            class="bg-light p-4 rounded-3 lead mb-0 d-flex flex-column gap-2"
+                        >
+                            <span
+                                >Sie haben noch keine
+                                {{
+                                    (type.type | versionedElementDisplayName)
+                                        ?.plural ?? 'Elemente von diesem Typ'
+                                }}</span
+                            >
+                        </p>
+                    </div>
                 }
             </div>
         </div>
     }
 }
-@if (visibleElements().length === 0) {
+
+@if (visibleElements().length === 0 && !allowCreation()) {
     <div class="col flex-grow-1">
-        <p class="bg-light p-4 rounded-3 lead mb-0">
-            Sie haben noch keine Elemente in dieser Sammlung.
+        <p class="bg-light p-4 rounded-3 lead mb-0 d-flex flex-column gap-2">
+            <span>Diese Sammlung hat noch keine Elemente</span>
         </p>
     </div>
 }

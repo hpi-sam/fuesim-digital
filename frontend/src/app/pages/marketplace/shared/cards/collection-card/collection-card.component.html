@@ -5,22 +5,22 @@
     "
     [queryParams]="{ from: fromLocation() }"
 >
-    <div class="card-header">
-        <h5 class="mb-0 my-1 card-title">{{ collection().title }}</h5>
+    <div class="card-body">
+        <h5 class="mb-0 card-title">{{ collection().title }}</h5>
     </div>
     <ul class="list-group list-group-flush">
-        <li class="list-group-item">
+        <li class="list-group-item small">
             <i class="bi bi-clock me-1"></i> Zuletzt bearbeitet:
             {{ collection().editedAt | date }}
         </li>
-        <li class="list-group-item">
+        <li class="list-group-item small">
             <i class="bi bi-grid me-1"></i>
-            {{ collection().elementCount }} Einträge
+            {{ collection().elementCount }} Übungselemente
             @if (collection().draftState) {
                 <i class="bi bi-pencil-fill ms-1 draftstate-indicator"></i>
             }
         </li>
-        <li class="list-group-item">
+        <li class="list-group-item small">
             <i class="bi bi-person-badge me-1"></i>
             @switch (collection().relationship) {
                 @case ('admin') {

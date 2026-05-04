@@ -8,6 +8,8 @@
             @if (importingElements()) {
                 <span class="ms-2 spinner-border spinner-border-sm"></span>
             }
+
+            Vorlagen importieren
             <input
                 (appFileInput)="importElementFile($event)"
                 type="file"
@@ -16,23 +18,6 @@
                 [disabled]="importingElements()"
             />
         </label>
-        <div ngbDropdown>
-            <button
-                type="button"
-                class="btn btn-outline-primary"
-                ngbDropdownToggle
-            >
-                Neues Übungselement
-            </button>
-            <div ngbDropdownMenu>
-                <button ngbDropdownItem (click)="createNewVehicle()">
-                    Fahrzeug
-                </button>
-                <button ngbDropdownItem (click)="createNewAlarmgroup()">
-                    Alarmgruppe
-                </button>
-            </div>
-        </div>
     }
 </div>
 <app-collection-elements-list
@@ -40,4 +25,5 @@
     [collectionElements]="collectionData().objects"
     [publishedElements]="collectionData().publishedElements.direct"
     [editable]="checkRole(collectionData().ownRole).isAtLeast('editor')"
+    [allowCreation]="true"
 />

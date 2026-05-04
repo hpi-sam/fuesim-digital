@@ -11,7 +11,6 @@ import {
     StateExport,
     validateExerciseExport,
     VehicleTemplate,
-    VersionedElementContent,
 } from 'fuesim-digital-shared';
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -21,8 +20,6 @@ import {
 import { FileInputDirective } from '../../../../shared/directives/file-input.directive';
 import { MessageService } from '../../../../core/messages/message.service';
 import { CollectionElementsListComponent } from '../../shared/collection-elements-list/collection-elements-list.component';
-import { CreatingVersionedElementModalData } from '../../shared/modals/editor-modals/base-versioned-element-submodal';
-import { VersionedElementModalComponent } from '../../shared/modals/editor-modals/versioned-element-modal/versioned-element-modal.component';
 
 @Component({
     selector: 'app-collection-elements-tab',
@@ -53,38 +50,6 @@ export class CollectionElementsTabComponent {
     public readonly importingElements = signal<boolean>(false);
 
     public readonly checkRole = checkCollectionRole.bind(this);
-
-    private createElementHelper(type: VersionedElementContent['type']) {
-        const selectedCollectionData = this.collectionData();
-
-        const modal = this.ngbModalService.open(
-            VersionedElementModalComponent,
-            {
-                size: 'xl',
-            }
-        );
-        modal.componentInstance.data = {
-            type,
-            mode: 'create',
-            onSubmit: async (data: any) => {
-                await this.collectionService.createElement(
-                    this.collectionData().collection.entityId,
-                    data
-                );
-            },
-            collection: selectedCollectionData.collection,
-            availableCollectionElements: this.availableElements(),
-        } satisfies CreatingVersionedElementModalData<any>;
-    }
-
-    public readonly createNewAlarmgroup = this.createElementHelper.bind(
-        this,
-        'alarmGroup'
-    );
-    public readonly createNewVehicle = this.createElementHelper.bind(
-        this,
-        'vehicleTemplate'
-    );
 
     public async importElementFile(fileList: FileList) {
         try {

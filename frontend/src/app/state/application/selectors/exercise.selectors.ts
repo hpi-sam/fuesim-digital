@@ -459,7 +459,7 @@ export const selectEvalResults = createSelector(
             .flatMap((evalCriterion: EvalCriterion): EvalResult => {
                 let isCompleted = false;
                 let count = -1;
-                switch (evalCriterion.criterionType!) {
+                switch (evalCriterion.criterionType) {
                     case 'doMeasureXTimesEvalCriterion': {
                         /* TODO @JohannesPotzi @Jogius */
                         break;
@@ -508,10 +508,10 @@ export const selectEvalResults = createSelector(
                     default:
                         break;
                 }
-                const id = evalCriterion.id!;
+                const id = evalCriterion.id;
                 return {
                     criterionId: id,
-                    criterion: evalCriteria[id] as EvalCriterion,
+                    criterion: evalCriterion,
                     isCompleted,
                     timestamp: currentTime,
                     count: count !== -1 ? count : undefined,

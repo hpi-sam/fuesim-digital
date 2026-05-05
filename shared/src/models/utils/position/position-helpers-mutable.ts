@@ -37,7 +37,13 @@ import type { WithPosition } from './with-position.js';
 
 type MovableElement = Exclude<
     Element,
-    AlarmGroup | Client | EvalCriterion | Hospital | Scoutable | Task | UserGeneratedContent
+    | AlarmGroup
+    | Client
+    | EvalCriterion
+    | Hospital
+    | Scoutable
+    | Task
+    | UserGeneratedContent
 >;
 type MovableType = MovableElement['type'];
 

@@ -1,5 +1,5 @@
 import { createSelector, type Store } from '@ngrx/store';
-import { normalZoom } from 'fuesim-digital-shared';
+import { getPatientVisibleStatus, normalZoom } from 'fuesim-digital-shared';
 import type {
     UUID,
     Vehicle,
@@ -307,11 +307,16 @@ export class VehicleFeatureManager extends MoveableFeatureManager<Vehicle> {
                 .map((id) => state.patients[id])
                 .filter(Boolean);
 
-            const getStatus = (p: any) =>
-                config.pretriageEnabled ? p.pretriageStatus : p.realStatus;
-
             const vehicleStatusColor = statusPriorities.find((s) =>
-                patients.some((p) => p && getStatus(p) === s)
+                patients.some(
+                    (p) =>
+                        p &&
+                        getPatientVisibleStatus(
+                            p,
+                            state.configuration.pretriageEnabled,
+                            state.configuration.bluePatientsEnabled
+                        ) === s
+                )
             );
             if (vehicleStatusColor)
                 statusbarColor =

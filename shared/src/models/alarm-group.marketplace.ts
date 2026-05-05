@@ -5,6 +5,7 @@ import type {
 } from '../marketplace/exercise-collection-upgrade/exercise-collection-change-impact.js';
 import { newChangeAlarmgroupVehicleTarget } from '../marketplace/exercise-collection-upgrade/exercise-collection-change-target.js';
 import { hasEntityProperties } from '../marketplace/models/versioned-element-content.js';
+import { ReducerError } from '../store/reducer-error.js';
 import { registerMarketplaceElement } from './utils/marketplace-registry.js';
 
 registerMarketplaceElement('alarmGroup', {
@@ -16,6 +17,11 @@ registerMarketplaceElement('alarmGroup', {
                 );
             }
             switch (change.action) {
+                case 'orphan': {
+                    throw new ReducerError(
+                        'orphaning alarm group vehicles is not supported'
+                    );
+                }
                 case 'replace': {
                     const alarmGroup =
                         draftState.alarmGroups[change.target.alarmGroupId];

@@ -234,6 +234,19 @@ registerMarketplaceElement('vehicleTemplate', {
 
         if (changeApply.type === 'removed') {
             switch (changeApply.action) {
+                case 'orphan': {
+                    const existingVehicle = getElement(
+                        state,
+                        'vehicle',
+                        changeApply.target.elementId
+                    );
+                    state.vehicles[changeApply.target.elementId] = {
+                        ...existingVehicle,
+                        entity: undefined,
+                    };
+
+                    break;
+                }
                 case 'remove': {
                     delete state.vehicles[changeApply.target.elementId];
                     break;

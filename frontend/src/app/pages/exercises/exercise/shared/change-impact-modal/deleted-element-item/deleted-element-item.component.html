@@ -3,10 +3,10 @@
 <p>Element {{ change().entity.title }} wurde entfernt.</p>
 <p>Bitte wählen sie eine geeignete Vorgehensweise aus.</p>
 
-@let replacementPossible = replaceableElementTypes[change().element.type];
+@let elementType = elementTypes[change().element.type];
 
 <div class="card">
-    @if (replacementPossible) {
+    @if (elementType?.replaceFilter) {
         <div class="card-header">
             <div class="form-check">
                 <input
@@ -33,9 +33,9 @@
                 </p>
                 <div class="d-flex flex-row gap-1 flex-wrap">
                     @for (
-                        newElement of replaceableElementTypes[
+                        newElement of elementTypes[
                             change().element.type
-                        ]?.filter(elementsOfNewCollection()) ?? [];
+                        ]?.replaceFilter(elementsOfNewCollection()) ?? [];
                         track newElement.versionId
                     ) {
                         <app-element-card
@@ -69,11 +69,31 @@
                 [checked]="applyChange?.action === 'remove'"
                 (change)="setActionType('remove')"
             />
-            <label for="remove" class="form-check-label"
-                >Element entfernen</label
-            ><br />
+            <label for="remove" class="form-check-label">
+                Element entfernen
+            </label>
+            <br />
         </div>
     </div>
+    @if (elementType?.orphanable) {
+        <div class="card-header">
+            <div class="form-check">
+                <input
+                    type="radio"
+                    id="orphan"
+                    name="action"
+                    value="orphan"
+                    [checked]="applyChange?.action === 'orphan'"
+                    class="form-check-input"
+                    (change)="setActionType('orphan')"
+                />
+                <label for="orphan" class="form-check-label">
+                    Element ohne Sammlung beibehalten
+                </label>
+                <br />
+            </div>
+        </div>
+    }
 </div>
 
 <hr />

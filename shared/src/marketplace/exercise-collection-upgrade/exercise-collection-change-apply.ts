@@ -23,7 +23,13 @@ export type RemoveReplaceChangeApply = z.infer<
 export const removeChangeApplySchema = z.discriminatedUnion('action', [
     z.object({
         type: z.literal('removed'),
-        action: z.literal('remove'),
+        action: z.union([
+            // Remove the element from the exercise at this target
+            z.literal('remove'),
+            // Orphan the element, i.e. keep it in the exercise but
+            // remove the relationship to the marketplace
+            z.literal('orphan'),
+        ]),
         ...sharedChangeApplySchema.shape,
     }),
     removeReplaceChangeApplySchema,

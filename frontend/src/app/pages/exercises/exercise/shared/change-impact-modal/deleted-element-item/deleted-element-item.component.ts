@@ -26,17 +26,20 @@ export class DeletedElementChangeApplyItemComponent {
     public readonly applyChange = output<RemoveChangeApply>();
     public readonly applyForAll = output();
 
-    public readonly replaceableElementTypes: {
+    public readonly elementTypes: {
         [T in CollectionUpgradeChangeElement['type']]?: {
-            filter: (elements: ElementDto[]) => ElementDto[];
+            replaceFilter: (elements: ElementDto[]) => ElementDto[];
+            orphanable: boolean;
         };
     } = {
         vehicle: {
-            filter: (elements) =>
+            orphanable: true,
+            replaceFilter: (elements) =>
                 elements.filter((e) => e.content.type === 'vehicleTemplate'),
         },
         alarmGroupVehicle: {
-            filter: (elements) =>
+            orphanable: false,
+            replaceFilter: (elements) =>
                 elements.filter((e) => e.content.type === 'vehicleTemplate'),
         },
     };
@@ -94,6 +97,7 @@ export class DeletedElementChangeApplyItemComponent {
     public setActionType(action: RemoveChangeApply['action']) {
         this.selectedActionType.set(action);
         switch (action) {
+            case 'orphan':
             case 'remove':
                 this.applyChange.emit({
                     type: 'removed',

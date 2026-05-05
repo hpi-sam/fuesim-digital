@@ -6,7 +6,7 @@ import { uuidSchema } from '../../utils/uuid.js';
 import { getElement } from './utils/get-element.js';
 import { ReducerError } from '../reducer-error.js';
 
-/* The EvalCriteria are:
+/* The EvalCriteria at criterionType are:
 doMeasureXTimesEvalCriterion
 reachTechnicalChallengeStateEvalCriterion
 patientAtStatusEvalCriterion

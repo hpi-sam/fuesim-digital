@@ -67,7 +67,16 @@ export type XPatientsAtStatusEvalCriterion = z.infer<
 export type ViewScoutableEvalCriterion = z.infer<
     typeof viewScoutableEvalCriterionSchema
 >;
-
+/* TODO @JohannesPotzi @Jogius : Is there a magical way to do this? */
+export const evalCritrionTypes = [
+    'doMeasureXTimes',
+    'reachTechnicalChallengeState',
+    'patientAtStatus',
+    'xPatientsAtStatus',
+    'viewScoutable',
+] as const;
+export const evalCriterionTypesSchema = z.literal(evalCritrionTypes);
+export type EvalcriterionType = z.infer<typeof evalCriterionTypesSchema>;
 export const evalCriterionSchema = z.discriminatedUnion('criterionType', [
     doMeasureXTimesEvalCriterionSchema,
     reachTechnicalChallengeStateEvalCriterionSchema,
@@ -75,6 +84,7 @@ export const evalCriterionSchema = z.discriminatedUnion('criterionType', [
     xPatientsAtStatusEvalCriterionSchema,
     viewScoutableEvalCriterionSchema,
 ]);
+
 export type EvalCriterion = z.infer<typeof evalCriterionSchema>;
 
 export function newDoMeasureXTimesEvalCriterion(

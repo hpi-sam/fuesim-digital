@@ -49,3 +49,20 @@ export function getAllMarketplaceRegistryEntries(): {
         [K in TemplateType]?: MarketplaceRegistryEntry;
     };
 }
+
+export function calculateChangeImpacts(
+    currentState: ExerciseState,
+    changes: ChangedElementDto[]
+): ChangeImpact[] {
+    const registryEntries = getAllMarketplaceRegistryEntries();
+    const changeImpacts: ChangeImpact[] = [];
+
+    for (const [type, entry] of Object.entries(registryEntries)) {
+        console.log('Calculating change impacts for registry entry', type);
+        for (const change of changes) {
+            changeImpacts.push(...entry.changeImpact(currentState, change));
+        }
+    }
+
+    return changeImpacts;
+}

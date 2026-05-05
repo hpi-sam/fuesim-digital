@@ -35,18 +35,12 @@
                             [collection]="collection()"
                             [mode]="editable() ? 'edit' : 'view'"
                             [hideVersionHistory]="!editable()"
-                            [showCreatedIndicator]="
-                                elementHasChanges()[exerciseObject.entityId] ===
-                                'create'
+                            [showIndicator]="
+                                getElementCardIndicatorForChangeType(
+                                    elementHasChanges()[exerciseObject.entityId]
+                                )
                             "
-                            [showChangedIndicator]="
-                                elementHasChanges()[exerciseObject.entityId] ===
-                                'update'
-                            "
-                            [showAsGhost]="
-                                elementHasChanges()[exerciseObject.entityId] ===
-                                'remove'
-                            "
+                            [small]="smallCards()"
                         />
                     }
                 </div>

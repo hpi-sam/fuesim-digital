@@ -3,13 +3,12 @@ import {
     ElementDto,
     gatherCollectionElements,
     VersionedCollectionPartial,
-    ChangeImpact,
     getCollectionElementDiff,
-    getAllMarketplaceRegistryEntries,
     CollectionElementsDto,
+    calculateChangeImpacts,
+    CollectionDto,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
-import { firstValueFrom } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
@@ -19,8 +18,9 @@ import {
 } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { AppState } from '../../../../../../state/app.state';
-import { ChangeImpactModalComponent } from '../../change-impact-modal/change-impact-modal.component';
 import { LoadingModalService } from '../../../../../../core/loading-modal/loading-modal.service';
+import { openChangeImpactModal } from '../../change-impact-modal/open-change-impact-modal';
+import { ConfirmationModalService } from '../../../../../../core/confirmation-modal/confirmation-modal.service';
 
 @Component({
     selector: 'app-exercise-collection-item-component',
@@ -34,6 +34,7 @@ export class ExerciseColletionItemComponent {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly ngbModalService = inject(NgbModal);
     private readonly loadingModalService = inject(LoadingModalService);
+    private readonly confirmationModal = inject(ConfirmationModalService);
 
     public readonly collection = input.required<VersionedCollectionPartial>();
 
@@ -63,54 +64,84 @@ export class ExerciseColletionItemComponent {
         ).allVisibleElements();
     }
 
-    public async removeCollection(collection: VersionedCollectionPartial) {
-        /*        try {
+    public async removeCollection(collection: CollectionDto) {
+        try {
             this.loadingModalService.showLoading({
                 title: 'Neue Version wird geladen',
                 description:
                     'Bitte warten Sie, während die neue Version der Sammlung geladen wird und die Auswirkungen von Änderungen berechnet werden.',
             });
 
-            const elements =
-                await this.collectionService.getElementsOfCollectionVersion(
-                    collection
-                );
-
-            const elementsInExercise = getAllMarketplaceStateElements(
-                selectStateSnapshot(selectExerciseState, this.store)
+            const currentSelectedCollections = selectStateSnapshot(
+                selectSelectedCollections,
+                this.store
             );
 
-            const changeImpacts = await this.calcChangeImpact({
-                inExercise: elementsInExercise,
-                new: [],
-                previous: gatherCollectionElements(elements).allDirectElements(),
-            });
+            const filteredCollections = currentSelectedCollections.filter(
+                (c) => c.entityId !== this.collection().entityId
+            );
+
+            const currentElements = await this.getAllCollectionElements(
+                currentSelectedCollections
+            );
+            const newElements =
+                await this.getAllCollectionElements(filteredCollections);
+
+            const elementsChanges = getCollectionElementDiff(
+                gatherCollectionElements(currentElements).allVisibleElements(),
+                gatherCollectionElements(newElements).allVisibleElements()
+            );
+
+            const currentState = selectStateSnapshot(
+                selectExerciseState,
+                this.store
+            );
+
+            const changeImpacts = calculateChangeImpacts(
+                currentState,
+                elementsChanges
+            );
+
+            const newTemplates =
+                await this.getAllCollectionElements(filteredCollections);
 
             this.loadingModalService.closeLoading();
 
-            const modal = this.ngbModalService.open(ChangeImpactModalComponent, {
-                size: 'xl',
+            const result = await openChangeImpactModal(this.ngbModalService, {
+                changeImpacts,
+                visibleAvailableElements:
+                    gatherCollectionElements(newTemplates).allVisibleElements(),
             });
-            modal.componentInstance.changes = changeImpacts satisfies ChangeImpact[];
-            modal.componentInstance.newCollectionElements = elements.direct;
+
+            if (!result.apply) return;
+            if (result.confirmationSuggested) {
+                const confirmationResult = await this.confirmationModal.confirm(
+                    {
+                        title: 'Sammlung entfernen',
+                        description: `Die Sammlung "${collection.title}" wird aus der Übung entfernt. Es werden auch alle Elemente entfernt, die nur über diese Sammlung verfügbar sind. Möchten Sie die Sammlung trotzdem entfernen?`,
+                        confirmationButtonText: 'Sammlung entfernen',
+                    }
+                );
+                if (!confirmationResult) return;
+            }
+
+            this.exerciseService.proposeAction({
+                type: '[Collection] Remove Collection',
+                changeApplies: result.changes,
+                collectionVersion: this.collection(),
+                overwriteTemplates: newTemplates,
+            });
         } catch (error) {
             this.loadingModalService.closeLoading();
             throw error;
-        }*/
-        /* await this.exerciseService.proposeAction({
-            type: '[Collection] Remove Collection',
-            collectionEntity: collection.entityId,
-            elements: gatherCollectionElements(elements).allVisibleElements(),
-        });*/
-        // TODO: Keep in mind, that some elements may still be transitive dependencies of other collections!
-        // WE SHOULD NOT REMOVE THEM IN THIS CASE!
+        }
     }
 
     public buildElementTree() {
         return [];
     }
 
-    public async upgradeCollectionVersion() {
+    public async upgradeCollectionVersion(collection: CollectionDto) {
         try {
             this.loadingModalService.showLoading({
                 title: 'Neue Version wird geladen',
@@ -138,6 +169,11 @@ export class ExerciseColletionItemComponent {
                 this.store
             );
 
+            const currentSelectedCollections = selectStateSnapshot(
+                selectSelectedCollections,
+                this.store
+            );
+
             const currentCollectionElements =
                 await this.fetchCollectionElements();
 
@@ -148,62 +184,45 @@ export class ExerciseColletionItemComponent {
                 ).allVisibleElements()
             );
 
-            const registryEntries = getAllMarketplaceRegistryEntries();
-            const changeImpacts: ChangeImpact[] = [];
+            const newTemplates = await this.getAllCollectionElements(
+                currentSelectedCollections.map((c) => {
+                    if (c.entityId === selectedCollection.entityId) {
+                        return newerCollectionVersionAvailable.latestVersion;
+                    }
+                    return c;
+                })
+            );
 
-            for (const [type, entry] of Object.entries(registryEntries)) {
-                console.log(
-                    'Calculating change impacts for registry entry',
-                    type
-                );
-                for (const change of changes) {
-                    changeImpacts.push(
-                        ...entry.changeImpact(currentState, change)
-                    );
-                }
-            }
+            const changeImpacts = calculateChangeImpacts(currentState, changes);
 
             console.log({ changes, changeImpacts });
 
             this.loadingModalService.closeLoading();
 
-            const modal = this.ngbModalService.open(
-                ChangeImpactModalComponent,
-                {
-                    size: 'xl',
-                }
-            );
-            const componentInstance =
-                modal.componentInstance as ChangeImpactModalComponent;
-            console.log('Calculated change impacts:', changeImpacts);
-            componentInstance.changes = changeImpacts satisfies ChangeImpact[];
-            componentInstance.newCollectionElements = gatherCollectionElements(
-                newerCollectionElements
-            ).allVisibleElements();
-
-            const result = await firstValueFrom(
-                componentInstance.submitChanges
-            );
+            const result = await openChangeImpactModal(this.ngbModalService, {
+                changeImpacts,
+                visibleAvailableElements:
+                    gatherCollectionElements(newTemplates).allVisibleElements(),
+            });
 
             if (!result.apply) return;
-            const currentSelectedCollections = selectStateSnapshot(
-                selectSelectedCollections,
-                this.store
-            );
+            if (result.confirmationSuggested) {
+                const confirmationResult = await this.confirmationModal.confirm(
+                    {
+                        title: 'Sammlung entfernen',
+                        description: `Die Sammlung "${collection.title}" wird auf die neueste Version aktualisiert. Es gibt keine direkten Änderungen an Elementen auf der Karte, aber es können sich Änderungen in den zur Verfügung stehenden Vorlagen ergeben.`,
+                        confirmationButtonText: 'Sammlung aktualisieren',
+                    }
+                );
+                if (!confirmationResult) return;
+            }
 
             this.exerciseService.proposeAction({
                 type: '[Collection] Upgrade Collection',
                 changeApplies: result.changes,
                 collectionVersion:
                     newerCollectionVersionAvailable.latestVersion,
-                overwriteTemplates: await this.getAllCollectionElements(
-                    currentSelectedCollections.map((c) => {
-                        if (c.entityId === selectedCollection.entityId) {
-                            return newerCollectionVersionAvailable.latestVersion;
-                        }
-                        return c;
-                    })
-                ),
+                overwriteTemplates: newTemplates,
             });
         } catch (error) {
             this.loadingModalService.closeLoading();

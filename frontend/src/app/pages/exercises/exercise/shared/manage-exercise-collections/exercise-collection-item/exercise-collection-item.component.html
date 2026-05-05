@@ -13,7 +13,8 @@
                     <button
                         class="btn btn-outline-warning btn-sm"
                         (click)="
-                            $event.stopPropagation(); upgradeCollectionVersion()
+                            $event.stopPropagation();
+                            upgradeCollectionVersion(collectionData.value())
                         "
                     >
                         <i class="bi bi-exclamation-triangle"></i>
@@ -24,7 +25,8 @@
             <button
                 class="btn btn-outline-danger btn-sm text-danger"
                 (click)="
-                    $event.stopPropagation(); removeCollection(collection())
+                    $event.stopPropagation();
+                    removeCollection(collectionData.value())
                 "
             >
                 <i class="bi bi-trash"></i>

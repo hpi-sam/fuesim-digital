@@ -43,10 +43,17 @@ export class ChangeImpactModalComponent implements OnInit {
 
     // This data must be provided when opening the modal via NgbModal.
     public changes: ChangeImpact[] = [];
-    public newCollectionElements!: ElementDto[];
+    public collectionElements!: ElementDto[];
 
     public readonly submitChanges = new Subject<{
+        /*
+         * Returns whether the user accepted to apply the changes or not.
+         */
         apply: boolean;
+        /**
+         * Whether the consumer of this data should ask the user for confirmation before applying the changes.
+         */
+        confirmationSuggested: boolean;
         changes: ChangeApply[];
     }>();
 
@@ -111,6 +118,7 @@ export class ChangeImpactModalComponent implements OnInit {
     public close(data: boolean | null) {
         this.submitChanges.next({
             apply: data === true,
+            confirmationSuggested: false,
             changes: Object.values(this.changesToApply()),
         });
         this.submitChanges.complete();

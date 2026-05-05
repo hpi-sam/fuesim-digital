@@ -3,8 +3,7 @@
 <p>Element {{ change().entity.title }} wurde entfernt.</p>
 <p>Bitte wählen sie eine geeignete Vorgehensweise aus.</p>
 
-@let replacementPossible =
-    replaceableElementTypes.includes(change().element.type);
+@let replacementPossible = replaceableElementTypes[change().element.type];
 
 <div class="card">
     @if (replacementPossible) {
@@ -34,49 +33,26 @@
                 </p>
                 <div class="d-flex flex-row gap-1 flex-wrap">
                     @for (
-                        newElement of elementsOfNewCollection();
+                        newElement of replaceableElementTypes[
+                            change().element.type
+                        ]?.filter(elementsOfNewCollection()) ?? [];
                         track newElement.versionId
                     ) {
-                        @switch (change().element.type) {
-                            @case ('vehicle') {
-                                @if (
-                                    newElement.content.type ===
-                                    'vehicleTemplate'
-                                ) {
-                                    <app-map-editor-card
-                                        [title]="newElement.content.name"
-                                        [imageUrl]="
-                                            newElement.content.image.url
-                                        "
-                                        (click)="setReplacement(newElement)"
-                                        [selected]="
-                                            isReplacementSelected(
-                                                newElement.versionId
-                                            )
-                                        "
-                                    />
-                                }
-                            }
-                            @case ('alarmGroupVehicle') {
-                                @if (
-                                    newElement.content.type ===
-                                    'vehicleTemplate'
-                                ) {
-                                    <app-map-editor-card
-                                        [title]="newElement.content.name"
-                                        [imageUrl]="
-                                            newElement.content.image.url
-                                        "
-                                        (click)="setReplacement(newElement)"
-                                        [selected]="
-                                            isReplacementSelected(
-                                                newElement.versionId
-                                            )
-                                        "
-                                    />
-                                }
-                            }
-                        }
+                        <app-element-card
+                            mode="static"
+                            [element]="newElement"
+                            [showIndicator]="
+                                isReplacementSelected(newElement.versionId)
+                                    ? 'selected'
+                                    : undefined
+                            "
+                            (click)="setReplacement(newElement)"
+                        />
+                    } @empty {
+                        <div class="alert alert-warning">
+                            Es gibt keine passenden Elemente, die als Ersatz
+                            ausgewählt werden können.
+                        </div>
                     }
                 </div>
             </div>

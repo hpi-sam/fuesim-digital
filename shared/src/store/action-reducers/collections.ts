@@ -3,10 +3,7 @@ import { z } from 'zod';
 import { IsValue } from '../../utils/validators/is-value.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import {
-    elementDtoSchema,
-    ElementDto,
-} from '../../marketplace/models/versioned-elements.js';
+import { ElementDto } from '../../marketplace/models/versioned-elements.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     type CollectionElementsDto,
@@ -21,10 +18,8 @@ import {
     changeApplySchema,
 } from '../../marketplace/exercise-collection-upgrade/exercise-collection-change-apply.js';
 import {
-    collectionEntityIdSchema,
     versionedCollectionPartialSchema,
     type VersionedCollectionPartial,
-    type CollectionEntityId,
 } from './../../marketplace/models/versioned-id-schema.js';
 
 export class AddCollection implements Action {
@@ -56,11 +51,14 @@ export class RemoveCollection implements Action {
     @IsValue('[Collection] Remove Collection' as const)
     public readonly type = '[Collection] Remove Collection';
 
-    @IsZodSchema(collectionEntityIdSchema)
-    public readonly collectionEntity!: CollectionEntityId;
+    @IsZodSchema(versionedCollectionPartialSchema)
+    public readonly collectionVersion!: VersionedCollectionPartial;
 
-    @IsZodSchema(elementDtoSchema.array())
-    public readonly elements!: ElementDto[];
+    @IsZodSchema(collectionElementsDtoSchema)
+    public readonly overwriteTemplates!: CollectionElementsDto;
+
+    @IsZodSchema(z.array(changeApplySchema))
+    public readonly changeApplies!: ChangeApply[];
 }
 
 function addElement(
@@ -112,22 +110,8 @@ export namespace CollectionReducers {
     export const upgradeCollection: ActionReducer<UpgradeCollection> = {
         action: UpgradeCollection,
         reducer: (draftState, data) => {
-            // Remove old templates
-            draftState.templates = Object.fromEntries(
-                Object.entries(draftState.templates).filter(
-                    ([_, element]) => !hasEntityProperties(element)
-                )
-            );
-
-            // Add new templates from the collections to state
-            addCollectionElements(draftState, data.overwriteTemplates);
-
-            for (const changeApply of data.changeApplies) {
-                const marketplaceEntries = getAllMarketplaceRegistryEntries();
-                for (const entry of Object.values(marketplaceEntries)) {
-                    entry.changeApply(draftState, changeApply);
-                }
-            }
+            overwriteStateTemplates(draftState, data.overwriteTemplates);
+            applyAllChangeApplies(draftState, data.changeApplies);
 
             draftState.selectedCollections = draftState.selectedCollections.map(
                 (collection) => {
@@ -147,45 +131,44 @@ export namespace CollectionReducers {
     export const removeCollection: ActionReducer<RemoveCollection> = {
         action: RemoveCollection,
         reducer: (draftState, data) => {
-            draftState.templates = Object.fromEntries(
-                Object.entries(draftState.templates)
-                    .filter(([_, element]) => {
-                        const usedBy: CollectionEntityId[] =
-                            // @ts-expect-error: Not every template has usedBy :)
-                            element.usedBy ?? [];
+            overwriteStateTemplates(draftState, data.overwriteTemplates);
+            applyAllChangeApplies(draftState, data.changeApplies);
 
-                        if (
-                            usedBy.length === 1 &&
-                            usedBy[0] === data.collectionEntity
-                        ) {
-                            return false;
-                        }
-                        return true;
-                    })
-                    .map(([key, element]) => {
-                        const usedBy: CollectionEntityId[] =
-                            // @ts-expect-error: Not every template has usedBy :)
-                            element.usedBy ?? [];
-                        return [
-                            key,
-                            {
-                                ...element,
-                                usedBy: usedBy.filter(
-                                    (entityId) =>
-                                        entityId !== data.collectionEntity
-                                ),
-                            },
-                        ];
-                    })
-            );
-
+            // Remove the collection from the selected collections in the state
             draftState.selectedCollections =
                 draftState.selectedCollections.filter(
                     (collection) =>
-                        collection.entityId !== data.collectionEntity
+                        collection.entityId !== data.collectionVersion.entityId
                 );
             return draftState;
         },
         rights: 'trainer',
     };
+}
+
+function overwriteStateTemplates(
+    draftState: WritableDraft<ExerciseState>,
+    elements: Immutable<CollectionElementsDto>
+) {
+    // Remove old templates
+    draftState.templates = Object.fromEntries(
+        Object.entries(draftState.templates).filter(
+            ([_, element]) => !hasEntityProperties(element)
+        )
+    );
+
+    // Add new templates from the collections to state
+    addCollectionElements(draftState, elements);
+}
+
+function applyAllChangeApplies(
+    draftState: WritableDraft<ExerciseState>,
+    changeApplies: Immutable<ChangeApply[]>
+) {
+    for (const changeApply of changeApplies) {
+        const marketplaceEntries = getAllMarketplaceRegistryEntries();
+        for (const entry of Object.values(marketplaceEntries)) {
+            entry.changeApply(draftState, changeApply);
+        }
+    }
 }

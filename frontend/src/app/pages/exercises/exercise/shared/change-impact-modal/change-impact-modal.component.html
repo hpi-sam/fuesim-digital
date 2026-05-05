@@ -112,7 +112,7 @@
                     <app-change-impact-deleted-element-item
                         [change]="selectedChange"
                         [applyingChange]="applyingChanges"
-                        [elementsOfNewCollection]="newCollectionElements"
+                        [elementsOfNewCollection]="collectionElements"
                         (applyChange)="applyChange(selectedChange, $event)"
                         (applyForAll)="applyChangeForAll(selectedChange)"
                     />
@@ -121,7 +121,7 @@
                     <app-change-impact-edited-element-item
                         [change]="selectedChange"
                         [applyingChange]="applyingChanges"
-                        [elementsOfNewCollection]="newCollectionElements"
+                        [elementsOfNewCollection]="collectionElements"
                         (applyChange)="applyChange(selectedChange, $event)"
                         (applyForAll)="applyChangeForAll(selectedChange)"
                     />

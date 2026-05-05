@@ -1,5 +1,6 @@
 import { Component, computed, inject, input } from '@angular/core';
 import {
+    ChangedElementDto,
     ChangeElementType,
     CollectionElementsDto,
     ElementDto,
@@ -14,6 +15,7 @@ import { ElementCardComponent } from '../cards/element-card/element-card.compone
 import { CreatingVersionedElementModalData } from '../modals/editor-modals/base-versioned-element-submodal';
 import { VersionedElementModalComponent } from '../modals/editor-modals/versioned-element-modal/versioned-element-modal.component';
 import { CollectionService } from '../../../../core/exercise-element.service';
+import { GenericElementCardIndicator } from '../cards/generic-element-card/generic-element-card.component';
 
 @Component({
     selector: 'app-collection-elements-list',
@@ -32,6 +34,7 @@ export class CollectionElementsListComponent {
     public readonly editable = input(true);
     public readonly showImportedElements = input(false);
     public readonly allowCreation = input(false);
+    public readonly smallCards = input(false);
 
     // This array defined the order in which the element types are displayed in the UI.
     // Types not included in this array will NOT be displayed in the UI
@@ -52,6 +55,21 @@ export class CollectionElementsListComponent {
             },
         },
     ];
+
+    public getElementCardIndicatorForChangeType(
+        changeType: ChangedElementDto['type'] | undefined
+    ): GenericElementCardIndicator | undefined {
+        switch (changeType) {
+            case 'create':
+                return 'created';
+            case 'update':
+                return 'changed';
+            case 'remove':
+                return 'ghost';
+            default:
+                return undefined;
+        }
+    }
 
     private createElementHelper(type: VersionedElementContent['type']) {
         const modal = this.ngbModalService.open(

@@ -7,7 +7,10 @@ import {
     VersionedElementContent,
 } from 'fuesim-digital-shared';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { GenericElementCardComponent } from '../generic-element-card/generic-element-card.component';
+import {
+    GenericElementCardComponent,
+    GenericElementCardIndicator,
+} from '../generic-element-card/generic-element-card.component';
 import { ConfirmationModalService } from '../../../../../core/confirmation-modal/confirmation-modal.service';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { EditingVersionedElementModalData } from '../../modals/editor-modals/base-versioned-element-submodal';
@@ -29,19 +32,29 @@ export class ElementCardComponent {
         null
     );
 
-    public readonly collection = input.required<VersionedCollectionPartial>();
+    public readonly collection = input<VersionedCollectionPartial>();
     public readonly element = input.required<ElementDto>();
     public readonly mode = input<
         EditingVersionedElementModalData<any>['mode'] | 'static'
     >('static');
     public readonly hideVersionHistory = input<boolean>(false);
-    public readonly showChangedIndicator = input<boolean>(false);
-    public readonly showCreatedIndicator = input<boolean>(false);
-    public readonly showAsGhost = input<boolean>(false);
+    public readonly showIndicator = input<GenericElementCardIndicator>();
+    public readonly small = input<boolean>(false);
+
+    private getCollection(): VersionedCollectionPartial {
+        const collection = this.collection();
+        if (!collection) {
+            throw new Error('Collection input is required for this action');
+        }
+        return collection;
+    }
 
     public openEditor() {
         const mode = this.mode();
         if (mode === 'static') return;
+
+        const collection = this.getCollection();
+
         const modal = this.ngbModalService.open(
             VersionedElementModalComponent,
             {
@@ -49,17 +62,17 @@ export class ElementCardComponent {
             }
         );
         modal.componentInstance.data = {
-            mode: this.showAsGhost() ? 'view' : mode,
+            mode: this.showIndicator() === 'ghost' ? 'view' : mode,
             type: this.element().content.type,
             onSubmit: async (data, conflictResolution) => {
                 this.collectionService.updateElement(
                     this.element().entityId,
                     data,
-                    this.collection().entityId,
+                    collection.entityId,
                     conflictResolution
                 );
             },
-            collection: this.collection(),
+            collection,
             element: this.element(),
             availableCollectionElements: gatherCollectionElements(
                 this.collectionElements()!
@@ -69,6 +82,8 @@ export class ElementCardComponent {
     }
 
     public async deleteElement() {
+        const collection = this.getCollection();
+
         const confirmation = await this.confirmationService.confirm({
             title: 'Element löschen',
             description: `Möchten Sie das Element "${this.element().title}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`,
@@ -77,7 +92,7 @@ export class ElementCardComponent {
         if (!confirmation) return;
         const result = await this.collectionService.deleteElement(
             this.element().entityId,
-            this.collection().entityId
+            collection.entityId
         );
         if (result.requiresConfirmation.length > 0) {
             const cascadingConfirmation =
@@ -90,23 +105,27 @@ export class ElementCardComponent {
             if (!cascadingConfirmation) return;
             await this.collectionService.deleteElement(
                 this.element().entityId,
-                this.collection().entityId,
+                collection.entityId,
                 result.requiresConfirmation.map((e) => e.versionId)
             );
         }
     }
 
     public async restoreElement() {
+        const collection = this.getCollection();
+
         await this.collectionService.restoreDeletedElement(
-            this.collection().entityId,
+            collection.entityId,
             this.element().entityId,
             this.element().versionId
         );
     }
 
     public async duplicateElement() {
+        const collection = this.getCollection();
+
         this.collectionService.duplicateElement({
-            collectionEntity: this.collection().entityId,
+            collectionEntity: collection.entityId,
             element: this.element(),
         });
     }

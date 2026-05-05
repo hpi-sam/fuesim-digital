@@ -8,6 +8,7 @@ import { personnelSchema } from '../personnel.js';
 import { sizeSchema } from '../utils/size.js';
 import {
     stateMachineSchema,
+    technicalChallengeEventSchema,
     technicalChallengeStateIdSchema,
 } from './state-machine.js';
 
@@ -27,6 +28,7 @@ export const technicalChallengeSchema = z.strictObject({
     taskProgress: z.record(taskSchema.shape.id, z.number()),
     currentStateId: technicalChallengeStateIdSchema,
     assignedPersonnel: z.record(personnelSchema.shape.id, taskSchema.shape.id),
+    events: z.record(uuidSchema, technicalChallengeEventSchema),
     ...stateMachineSchema.shape,
 });
 

@@ -36,7 +36,7 @@ import type {
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { AsyncPipe, KeyValuePipe } from '@angular/common';
+import { AsyncPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
 import {
     CdkDrag,
     CdkDragPlaceholder,
@@ -110,6 +110,7 @@ type FilterCategory =
         CdkDrag,
         CdkDropList,
         CdkDropListGroup,
+        NgTemplateOutlet,
         CdkDragPlaceholder,
         AlarmGroupOverviewPageComponent,
         HospitalEditorPageComponent,

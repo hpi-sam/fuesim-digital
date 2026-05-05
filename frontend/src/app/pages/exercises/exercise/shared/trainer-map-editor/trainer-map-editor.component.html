@@ -1,3 +1,13 @@
+<ng-template #goToTemplateManagementModal let-type="type">
+    <button
+        class="btn btn-outline-secondary btn-sm w-100 mt-1"
+        (click)="openTemplateManagementModal()"
+    >
+        <i class="bi-grid me-1"></i>
+        Weitere {{ type }} verwalten
+    </button>
+</ng-template>
+
 <div class="container-fluid d-flex flex-column h-100" cdkDropListGroup>
     <div class="flex-fill row">
         <div class="col p-0 rounded-start overflow-hidden position-relative">
@@ -398,6 +408,14 @@
                                         Sammlungen</i
                                     >
                                 }
+                                <ng-template
+                                    [ngTemplateOutlet]="
+                                        goToTemplateManagementModal
+                                    "
+                                    [ngTemplateOutletContext]="{
+                                        type: 'Fahrzeuge',
+                                    }"
+                                />
                             </ng-template>
                         </div>
                     </div>
@@ -609,6 +627,15 @@
                                         Sammlungen</i
                                     >
                                 }
+
+                                <ng-template
+                                    [ngTemplateOutlet]="
+                                        goToTemplateManagementModal
+                                    "
+                                    [ngTemplateOutletContext]="{
+                                        type: 'Alarmgruppen',
+                                    }"
+                                />
                             </ng-template>
                         </div>
                     </div>

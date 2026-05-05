@@ -12,8 +12,8 @@ import type { HotkeyLayer } from '../../services/hotkeys.service';
 import { Hotkey, HotkeysService } from '../../services/hotkeys.service';
 import { HotkeyIndicatorComponent } from '../hotkey-indicator/hotkey-indicator.component';
 
-export interface SearchableDropdownOption {
-    key: string;
+export interface SearchableDropdownOption<T extends string = string> {
+    key: T;
     name: string;
     color?: string;
     backgroundColor?: string;
@@ -25,12 +25,15 @@ export interface SearchableDropdownOption {
     styleUrls: ['./searchable-dropdown.component.scss'],
     imports: [FormsModule, HotkeyIndicatorComponent],
 })
-export class SearchableDropdownComponent
+export class SearchableDropdownComponent<Key extends string>
     implements OnInit, AfterViewInit, OnDestroy
 {
     private readonly hotkeysService = inject(HotkeysService);
 
-    public readonly options = input<SearchableDropdownOption[]>([]);
+    public readonly options = input<SearchableDropdownOption<Key>[]>([]);
+    public readonly initialSelection = input<SearchableDropdownOption<Key>>();
+
+    public readonly selected = output<SearchableDropdownOption<Key>>();
 
     public filter = '';
     public selectedIndex = -1;
@@ -52,8 +55,6 @@ export class SearchableDropdownComponent
         this.confirmSelection()
     );
 
-    public readonly selected = output<SearchableDropdownOption>();
-
     private readonly searchInput =
         viewChild.required<ElementRef>('searchInput');
 
@@ -62,6 +63,8 @@ export class SearchableDropdownComponent
         this.hotkeyLayer.addHotkey(this.upHotkey);
         this.hotkeyLayer.addHotkey(this.downHotkey);
         this.hotkeyLayer.addHotkey(this.confirmHotkey);
+        if (this.initialSelection()) {
+        }
     }
 
     ngAfterViewInit() {

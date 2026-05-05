@@ -1,7 +1,6 @@
 import {
     type Guard,
     newTechnicalChallengeState,
-    type Transition,
 } from '../../models/technical-challenge/state-machine.js';
 import type { Task } from '../../models/task.js';
 import type { TechnicalChallengeTemplate } from '../../models/technical-challenge/technical-challenge-template.js';
@@ -181,73 +180,91 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     );
 
     // --- Transitions ---
-    const transitions: Transition[] = [
-        // From initial state
-        {
-            from: initialState.id,
-            to: onlyExtinguished.id,
-            guard: isFireExtinguished,
-        },
-        { from: initialState.id, to: onlyDead.id, guard: isPatientDead },
-        {
-            from: initialState.id,
-            to: onlyTreated.id,
-            guard: isPatientRescued,
-        },
-        {
-            from: initialState.id,
-            to: onlyBurnedOut.id,
-            guard: isVehicleBurnedOut,
-        },
+    const transitions = Object.fromEntries(
+        [
+            // From initial state
+            {
+                id: 'd4b68229-51d7-4575-a500-ec8b689fed92',
+                from: initialState.id,
+                to: onlyExtinguished.id,
+                guard: isFireExtinguished,
+            },
+            {
+                id: '5cb6f69e-3ecd-4f01-86cd-a8db251e55fd',
+                from: initialState.id,
+                to: onlyDead.id,
+                guard: isPatientDead,
+            },
+            {
+                id: '9b48ba3c-d301-4687-99ac-098d764e172e',
+                from: initialState.id,
+                to: onlyTreated.id,
+                guard: isPatientRescued,
+            },
+            {
+                id: '7ad0f40e-21d4-4ff6-90ed-d7437b37b979',
+                from: initialState.id,
+                to: onlyBurnedOut.id,
+                guard: isVehicleBurnedOut,
+            },
 
-        // From onlyExtinguished
-        {
-            from: onlyExtinguished.id,
-            to: patientDeadButExtinguished.id,
-            guard: isPatientDead,
-        },
-        {
-            from: onlyExtinguished.id,
-            to: treatedAndExtinguished.id,
-            guard: isPatientRescued,
-        },
+            // From onlyExtinguished
+            {
+                id: '6f4d2832-9614-4be6-b114-ee9b751c1f82',
+                from: onlyExtinguished.id,
+                to: patientDeadButExtinguished.id,
+                guard: isPatientDead,
+            },
+            {
+                id: 'c31091e1-c452-44c5-b592-5db58b450ba0',
+                from: onlyExtinguished.id,
+                to: treatedAndExtinguished.id,
+                guard: isPatientRescued,
+            },
 
-        // From onlyDead
-        {
-            from: onlyDead.id,
-            to: patientDeadButExtinguished.id,
-            guard: isFireExtinguished,
-        },
-        {
-            from: onlyDead.id,
-            to: burnedOutAndPatientDead.id,
-            guard: isVehicleBurnedOut,
-        },
+            // From onlyDead
+            {
+                id: '4131c822-c475-4ea1-9256-3e06e11b8f9f',
+                from: onlyDead.id,
+                to: patientDeadButExtinguished.id,
+                guard: isFireExtinguished,
+            },
+            {
+                id: '7d1ca6a1-335a-4805-81ff-45da1c48eda1',
+                from: onlyDead.id,
+                to: burnedOutAndPatientDead.id,
+                guard: isVehicleBurnedOut,
+            },
 
-        // From onlyTreated
-        {
-            from: onlyTreated.id,
-            to: treatedAndExtinguished.id,
-            guard: isFireExtinguished,
-        },
-        {
-            from: onlyTreated.id,
-            to: burnedOutAndPatientDead.id,
-            guard: isVehicleBurnedOut,
-        },
+            // From onlyTreated
+            {
+                id: '131d9f2a-1831-4f64-9276-1acd6e5bc42b',
+                from: onlyTreated.id,
+                to: treatedAndExtinguished.id,
+                guard: isFireExtinguished,
+            },
+            {
+                id: '008c9dd1-b4b8-4730-846c-6ee6657f211d',
+                from: onlyTreated.id,
+                to: burnedOutAndPatientDead.id,
+                guard: isVehicleBurnedOut,
+            },
 
-        // From onlyBurnedOut
-        {
-            from: onlyBurnedOut.id,
-            to: burnedOutAndPatientDead.id,
-            guard: isPatientDead,
-        },
-        {
-            from: onlyBurnedOut.id,
-            to: burnedOutButRescued.id,
-            guard: isPatientRescued,
-        },
-    ];
+            // From onlyBurnedOut
+            {
+                id: '17841f63-54de-431f-9650-9e03e3c6e3f6',
+                from: onlyBurnedOut.id,
+                to: burnedOutAndPatientDead.id,
+                guard: isPatientDead,
+            },
+            {
+                id: '281d061d-b18c-49c4-9b8a-bc332de54302',
+                from: onlyBurnedOut.id,
+                to: burnedOutButRescued.id,
+                guard: isPatientRescued,
+            },
+        ].map((t) => [t.id, t])
+    );
 
     return {
         initialStateId: initialState.id,
@@ -259,7 +276,6 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
         ),
         name: 'Brennendes Fahrzeug mit eingeklemmter Person',
         states,
-        relevantTasks,
         transitions,
         simulationStartTime: 0,
     };
@@ -277,5 +293,10 @@ export function getDefaultTechnicalChallengeTemplate(): TechnicalChallengeTempla
 }
 
 export function getDefaultTasks(): { [key: UUID]: Task } {
-    return getDefaultTechnicalChallengeTemplate().relevantTasks;
+    return Object.fromEntries(
+        [
+            StateMachineTesting.extinguishFireTask,
+            StateMachineTesting.rescuePatientTask,
+        ].map((t) => [t.id, t])
+    );
 }

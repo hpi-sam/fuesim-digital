@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { Immutable, WritableDraft } from 'immer';
 import { uuid, uuidSchema, type UUID } from '../../utils/uuid.js';
 import type { ExerciseState } from '../../state.js';
-import { taskSchema } from '../task.js';
+import { type Task, taskSchema } from '../task.js';
 import {
     type ImageProperties,
     imagePropertiesSchema,
@@ -70,6 +70,19 @@ const progressGuardSchema = z.object({
     name: z.string().optional(),
 });
 export type ProgressGuard = z.infer<typeof progressGuardSchema>;
+export function newProgressGuardForTask(
+    task: Task,
+    minProgress?: number,
+    maxProgress?: number
+): ProgressGuard {
+    return {
+        taskId: uuid(),
+        type: 'progressGuard',
+        name: task.taskName,
+        minProgress,
+        maxProgress,
+    };
+}
 
 const timerGuardSchema = z.object({
     type: z.literal('timerGuard'),
@@ -115,6 +128,7 @@ export const guardSchema = z.union([progressGuardSchema, timerGuardSchema]);
 export type Guard = ProgressGuard | TimerGuard;
 
 export const transitionSchema = z.object({
+    id: uuidSchema,
     to: technicalChallengeStateIdSchema,
     from: technicalChallengeStateIdSchema,
     guard: guardSchema,
@@ -148,8 +162,7 @@ export const stateMachineSchema = z.strictObject({
         technicalChallengeStateSchema.shape.id,
         technicalChallengeStateSchema
     ),
-    relevantTasks: z.record(taskSchema.shape.id, taskSchema),
-    transitions: z.array(transitionSchema),
+    transitions: z.record(transitionSchema.shape.id, transitionSchema),
     simulationStartTime: z.number(),
 });
 
@@ -166,6 +179,23 @@ export function currentStateOf(
         `Invalid current state: ${technicalChallenge.currentStateId} for challenge ${technicalChallenge.id}`
     );
     return state!;
+}
+
+export function relevantTaskIdsOf(
+    stateMachine: Pick<TechnicalChallengeStateMachine, 'transitions'>
+): Task['id'][] {
+    return Object.values(stateMachine.transitions)
+        .filter((t) => t.guard.type === 'progressGuard')
+        .map((t) => (t.guard as ProgressGuard).taskId);
+}
+
+export function relevantTasksOf(
+    stateMachine: TechnicalChallengeStateMachine,
+    exerciseState: ExerciseState
+): Task[] {
+    return relevantTaskIdsOf(stateMachine).map((id) =>
+        getElement(exerciseState, 'task', id)
+    );
 }
 
 export function currentlyPossibleTaskIds(
@@ -212,7 +242,7 @@ export function simulateTechnicalChallenge(
 
     // the next transition is not necessarily the first one to have its guard
     // fulfilled
-    const nextTransition = technicalChallenge.transitions
+    const nextTransition = Object.values(technicalChallenge.transitions)
         .filter(fromCurrentState)
         .find(guardFulfilled);
 

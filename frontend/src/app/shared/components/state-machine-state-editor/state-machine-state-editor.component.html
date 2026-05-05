@@ -9,16 +9,53 @@
     <div>
         <label>Übergänge:</label>
         <ol class="list-group list-group-numbered">
-            @for (transition of transitions(); track transition) {
-                <li class="list-group-item">
-                    <div class="d-flex flex-column">
-                        <div class="fw-bold">{{ transition.guard.name }}</div>
-                        <div>
-                            --> {{ transition.toName }}
+            @for (transition of transitions(); track transition.id) {
+                <li class="list-group-item d-flex flex-row gap-2">
+                    <div class="d-flex flex-column flex-grow-1 flex-shrink-1 gap-2 ">
+                            <span>
+                                Wenn <span class="fw-bold bg-dark-subtle p-1">{{ transition.guard.name }}</span>
+                            </span>
+                        <div class="ms-2 d-flex flex-row gap-1 align-items-baseline">
+                            <span>dann</span>
+                            <button [ngbPopover]="selectTransitionTargetTemplate"
+                                    #selectTransitionTargetPopover="ngbPopover"
+                                    type="button"
+                                    class="btn btn-outline-primary btn-sm d-flex flex-row"
+                            >
+                                <i class="bi bi-arrow-right"></i>
+                                <span class="mx-1 flex-shrink-1 overflow-hidden" style="text-wrap: nowrap">
+                                        {{ transition.toName }}
+                                    </span>
+                                <i class="bi bi-caret-down-fill"></i>
+                            </button>
+                            <ng-template #selectTransitionTargetTemplate>
+                                <app-searchable-dropdown
+                                    [options]="transitionOptions()"
+                                    [initialSelection]="{key: transition.to, name: transition.toName ?? ''}"
+                                    (selected)="updateStateTransition(transition.id , $event); selectTransitionTargetPopover.close()"
+                                />
+                            </ng-template>
                         </div>
                     </div>
+                    <button class="btn btn-outline-danger" type="button" (click)="deleteStateTransition(transition.id)">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
                 </li>
             }
         </ol>
+        <button [ngbPopover]="selectGuardTemplate"
+                #selectTransitionTargetPopover="ngbPopover"
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+        >
+            <i class="bi bi-plus"></i>
+            Übergang hinzufügen
+        </button>
+        <ng-template #selectGuardTemplate>
+            <app-searchable-dropdown
+                [options]="guardOptions()"
+                (selected)="addTransition($event)"
+            />
+        </ng-template>
     </div>
 </div>

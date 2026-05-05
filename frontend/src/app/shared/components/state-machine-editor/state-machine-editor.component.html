@@ -1,4 +1,4 @@
-<div class="row p-2" style="width: 700px; height: 500px">
+<div class="row p-2 state-machine-editor">
     <div class="col" style="height: 100%">
         <div class="card" style="max-height: 100%">
             <h6 class="card-header">Zustände</h6>
@@ -29,8 +29,11 @@
         <div class="card">
             <h6 class="card-header">Aufgaben</h6>
             <ul class="list-group list-group-flush">
-                @for (task of tasks(); track task.id) {
-                    <li class="list-group-item">{{ task.taskName }}</li>
+                @for (task of availableProgressGuards(); track task.id) {
+                    <li class="list-group-item">
+                        <div>{{ task.taskName }}</div>
+                        <div>Dauer: {{task}}</div>
+                    </li>
                 }
             </ul>
         </div>

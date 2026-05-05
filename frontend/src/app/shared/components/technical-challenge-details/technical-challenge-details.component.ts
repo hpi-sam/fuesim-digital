@@ -18,6 +18,7 @@ import {
     NgbNavLinkBase,
     NgbNavOutlet,
 } from '@ng-bootstrap/ng-bootstrap';
+import { relevantTaskIdsOf } from 'fuesim-digital-shared/dist/src/models/technical-challenge/state-machine.js';
 import type { AppState } from '../../../state/app.state';
 import {
     createSelectPersonnel,
@@ -79,13 +80,15 @@ export class TechnicalChallengeDetailsComponent {
     }
 
     public readonly tasksProgress = computed(() =>
-        Object.values(this.technicalChallenge().relevantTasks).map((task) => ({
-            ...task,
-            ...this.calculateProgress(
-                this.technicalChallenge().taskProgress[task.id] ?? 0,
-                this.progressGuardsByTaskId().get(task.id)?.minProgress ?? 0
-            ),
-        }))
+        Object.values(relevantTaskIdsOf(this.technicalChallenge())).map(
+            (task) => ({
+                ...task,
+                ...this.calculateProgress(
+                    this.technicalChallenge().taskProgress[task.id] ?? 0,
+                    this.progressGuardsByTaskId().get(task.id)?.minProgress ?? 0
+                ),
+            })
+        )
     );
 
     public readonly assignedPersonnel = computed<[Personnel, Task][]>(() => {
@@ -97,11 +100,13 @@ export class TechnicalChallengeDetailsComponent {
     });
 
     public readonly guards = computed<Guard[]>(() =>
-        this.technicalChallenge().transitions.map(({ guard }) => guard)
+        Object.values(this.technicalChallenge().transitions).map(
+            ({ guard }) => guard
+        )
     );
     public readonly visibleGuards = computed<Guard[]>(() =>
-        this.technicalChallenge()
-            .transitions.filter((t) => t.from === this.currentState().id)
+        Object.values(this.technicalChallenge().transitions)
+            .filter((t) => t.from === this.currentState().id)
             .map(({ guard }) => guard)
     );
     public readonly progressGuards = computed(() =>

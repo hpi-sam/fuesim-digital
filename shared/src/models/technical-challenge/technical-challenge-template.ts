@@ -10,6 +10,7 @@ import type {
     TechnicalChallengeId,
 } from './technical-challenge.js';
 import {
+    relevantTaskIdsOf,
     stateMachineSchema,
     technicalChallengeStateIdSchema,
 } from './state-machine.js';
@@ -30,8 +31,8 @@ export function newTechnicalChallengeFromTemplate(
     template: TechnicalChallengeTemplate,
     creationTime: number
 ): WritableDraft<TechnicalChallenge> {
-    const { states, relevantTasks, transitions, name, image } =
-        cloneDeep(template);
+    const taskIds = relevantTaskIdsOf(template);
+    const { states, transitions, name, image } = cloneDeep(template);
 
     return {
         id: uuid() as TechnicalChallengeId,
@@ -39,13 +40,10 @@ export function newTechnicalChallengeFromTemplate(
         templateId: template.id,
         position: newNoPosition(),
         size: newSize(40, 40),
-        taskProgress: Object.fromEntries(
-            Object.values(relevantTasks).map((task) => [task.id, 0])
-        ),
+        taskProgress: Object.fromEntries(taskIds.map((id) => [id, 0])),
         currentStateId: template.initialStateId,
         assignedPersonnel: {},
         states,
-        relevantTasks,
         transitions,
         name,
         image,

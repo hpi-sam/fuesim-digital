@@ -40,19 +40,21 @@ export function registerCollectionHandler(
             if (!relationship) {
                 callback({
                     success: false,
-                    message: 'You have no access to this collection',
+                    message:
+                        'User doesnt have sufficient permissions to access this collection',
                     expected: false,
                 });
                 return;
             }
 
             const rolecheck =
-                checkCollectionRole(relationship).isAtLeast('viewer');
+                checkCollectionRole(relationship).isAtLeast('other');
 
             if (!rolecheck) {
                 callback({
                     success: false,
-                    message: 'You have no access to this collection',
+                    message:
+                        'User doesnt have sufficient permissions to access this collection',
                     expected: false,
                 });
                 return;

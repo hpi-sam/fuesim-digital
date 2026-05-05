@@ -36,10 +36,7 @@ export class MarketplaceSelectCollectionModalComponent {
     public showInfoBanner = false;
 
     public readonly userAvailableCollections = resource({
-        loader: async () =>
-            this.collectionService.getMyCollections({
-                includeDraftState: false,
-            }),
+        loader: async () => this.collectionService.getUsableCollections(),
     });
 
     public readonly selectedCollectionData = resource({

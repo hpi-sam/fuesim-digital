@@ -83,6 +83,8 @@ async function main() {
         repositories.collectionRepository
     );
 
+    await collectionService.initialize();
+
     let authService: AuthService;
     try {
         authService = await new AuthService(

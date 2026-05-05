@@ -674,6 +674,32 @@ export class CollectionService {
         return typedData.result;
     }
 
+    public async getPublicCollections() {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Collection.LoadPublic.Response
+            >(`${this.ENDPOINT}/public`)
+        );
+
+        const typedData =
+            Marketplace.Collection.LoadPublic.responseSchema.parse(data);
+
+        return typedData.result;
+    }
+
+    public async getUsableCollections() {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Collection.LoadUsable.Response
+            >(`${this.ENDPOINT}/usable`)
+        );
+
+        const typedData =
+            Marketplace.Collection.LoadUsable.responseSchema.parse(data);
+
+        return typedData.result;
+    }
+
     public async getCollectionInviteCode(
         collectionEntityId: CollectionEntityId
     ) {
@@ -762,17 +788,15 @@ export class CollectionService {
         return typedData.result;
     }
 
-    public async checkIsCollectionMember(
-        collectionEntityId: CollectionEntityId
-    ) {
+    public async getUserCollectionRole(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.get<
-                typeof Marketplace.Collection.GetIsMember.Response
-            >(`${this.ENDPOINT}/${collectionEntityId}/isMember`)
+                typeof Marketplace.Collection.GetCollectionRole.Response
+            >(`${this.ENDPOINT}/${collectionEntityId}/user-role`)
         );
 
         const typedData =
-            Marketplace.Collection.GetIsMember.responseSchema.parse(data);
+            Marketplace.Collection.GetCollectionRole.responseSchema.parse(data);
 
         return typedData.result;
     }

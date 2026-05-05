@@ -19,6 +19,10 @@ export class MarketplaceComponent {
         loader: async () => this.collectionService.getMyCollections(),
     });
 
+    public readonly publicCollections = resource({
+        loader: async () => this.collectionService.getPublicCollections(),
+    });
+
     public async createNewCollection() {
         const title = await this.promptModalService.prompt({
             title: 'Neue Sammlung erstellen',

@@ -25,5 +25,5 @@
     [collectionElements]="collectionData().objects"
     [publishedElements]="collectionData().publishedElements.direct"
     [editable]="checkRole(collectionData().ownRole).isAtLeast('editor')"
-    [allowCreation]="true"
+    [allowCreation]="checkRole(collectionData().ownRole).isAtLeast('editor')"
 />

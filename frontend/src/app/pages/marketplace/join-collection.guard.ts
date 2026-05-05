@@ -22,18 +22,20 @@ export class JoinCollectionGuard {
         state: RouterStateSnapshot
     ) {
         const collectionEntityId = route.params['collectionEntityId'];
-        const isMember =
-            await this.collectionService.checkIsCollectionMember(
+        const collectionRole =
+            await this.collectionService.getUserCollectionRole(
                 collectionEntityId
             );
+        const canOpenCollection = collectionRole !== null;
+
         const joinCode = route.queryParams['join'];
 
         if (!joinCode) {
-            return isMember;
+            return canOpenCollection;
         }
 
         // Do not show join collection modal if the user is already a member of the collection
-        if (isMember) {
+        if (canOpenCollection) {
             return true;
         }
         try {

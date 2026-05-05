@@ -31,7 +31,10 @@
                 >
                     <i class="bi bi-copy"></i>
                 </button>
-                @if (checkRole(collectionData.ownRole).isAtMost('editor')) {
+                @if (
+                    checkRole(collectionData.ownRole).isAtMost('editor') &&
+                    checkRole(collectionData.ownRole).isAtLeast('viewer')
+                ) {
                     <button
                         type="button"
                         class="btn btn-outline-danger"

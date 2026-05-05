@@ -116,6 +116,10 @@ export class CollectionService {
         >()
     ) {}
 
+    public async initialize() {
+        await this.collectionRepository.setDefaultCollectionData();
+    }
+
     public async getCollectionInviteCode(
         collectionEntityId: CollectionEntityId
     ) {
@@ -183,8 +187,8 @@ export class CollectionService {
             })
         );
 
-        // if we dont have direct rights, the highest role we can get is viewer
-        return rolesInParents.some((r) => r) ? 'viewer' : null;
+        // if we dont have direct rights, the highest role we can get is other
+        return rolesInParents.some((r) => r) ? 'other' : null;
     }
 
     public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
@@ -657,6 +661,36 @@ export class CollectionService {
             allowDraftState: opts.includeDraftState,
             archived: opts.archived,
         });
+    }
+
+    public async getLatestPublicCollections(): Promise<
+        ExtendedCollectionDto[]
+    > {
+        return this.collectionRepository.getLatestPublicCollections();
+    }
+
+    public async getLatestUsableCollections(
+        userId: string
+    ): Promise<ExtendedCollectionDto[]> {
+        const userCollections =
+            await this.collectionRepository.getLatestCollectionForUser(userId, {
+                allowDraftState: false,
+                archived: false,
+            });
+        const publicCollections =
+            await this.collectionRepository.getLatestPublicCollections();
+
+        return [
+            ...userCollections,
+            ...publicCollections.filter(
+                (publicCollection) =>
+                    !userCollections.some(
+                        (userCollection) =>
+                            userCollection.entityId ===
+                            publicCollection.entityId
+                    )
+            ),
+        ];
     }
 
     public async getLatestCollectionById(

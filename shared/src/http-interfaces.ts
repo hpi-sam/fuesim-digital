@@ -346,9 +346,9 @@ export namespace Marketplace {
             }),
         });
 
-        export const GetIsMember = new Route({
+        export const GetCollectionRole = new Route({
             response: z.object({
-                result: z.boolean(),
+                result: collectionRelationshipTypeSchema.nullable(),
             }),
         });
 
@@ -424,6 +424,18 @@ export namespace Marketplace {
         });
 
         export const LoadMy = new Route({
+            response: z.object({
+                result: z.array(extendedCollectionDtoSchema),
+            }),
+        });
+
+        export const LoadPublic = new Route({
+            response: z.object({
+                result: z.array(extendedCollectionDtoSchema),
+            }),
+        });
+
+        export const LoadUsable = new Route({
             response: z.object({
                 result: z.array(extendedCollectionDtoSchema),
             }),

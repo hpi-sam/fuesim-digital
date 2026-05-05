@@ -1,8 +1,10 @@
 import { z } from 'zod';
 import { collectionEntityIdSchema } from './versioned-id-schema.js';
 
-// This is sorted by permission level, so the order matters
+// INFO: This is sorted by permission level, so the order matters
 export const collectionRelationshipTypeAllowedValues = [
+    // assined, when collection is public and user has no specific role
+    'other',
     'viewer',
     'editor',
     'admin',
@@ -30,6 +32,7 @@ export const collectionRelationshipTypesDisplayNames: {
     admin: 'Besitzer',
     editor: 'Bearbeiter',
     viewer: 'Betrachter',
+    other: 'Sonstige',
 };
 
 export function checkCollectionRole(currentRole: CollectionRelationshipType) {

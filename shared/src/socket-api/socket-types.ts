@@ -45,6 +45,9 @@ export interface ClientToServerEvents {
         action: 'pause' | 'start',
         callback: (response: SocketResponse) => void
     ) => void;
+    registerCollectionListenerClient: (
+        callback: (response: SocketResponse) => void
+    ) => void;
     joinCollectionRoom: (
         collectionEntityId: CollectionEntityId,
         callback: (

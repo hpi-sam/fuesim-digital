@@ -8,7 +8,6 @@ import { LoadingModalComponent } from './loading-modal.component';
 export class LoadingModalService {
     private readonly ngbModalService = inject(NgbModal);
 
-    private isLoadingModalOpen = false;
     private loadingModalRef: NgbModalRef | null = null;
 
     /**
@@ -18,22 +17,22 @@ export class LoadingModalService {
      * null - the modal has been closed (cross/click on background/Esc)
      */
     public async showLoading(options: LoadingOptions) {
-        const modalRef = this.ngbModalService.open(LoadingModalComponent, {
-            // do not close on backdrop click
-            backdrop: 'static',
-        });
-        const componentInstance =
-            modalRef.componentInstance as LoadingModalComponent;
+        this.loadingModalRef ??= this.ngbModalService.open(
+            LoadingModalComponent,
+            {
+                // do not close on backdrop click
+                backdrop: 'static',
+            }
+        );
+        const componentInstance = this.loadingModalRef
+            .componentInstance as LoadingModalComponent;
         componentInstance.title = options.title;
         componentInstance.description = options.description;
-
-        this.isLoadingModalOpen = true;
-        this.loadingModalRef = modalRef;
     }
 
     public async closeLoading() {
         this.loadingModalRef?.close();
-        this.isLoadingModalOpen = false;
+        this.loadingModalRef = null;
     }
 }
 

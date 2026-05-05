@@ -9,6 +9,30 @@ export function registerCollectionHandler(
     socket: ExerciseSocket,
     services: Services
 ) {
+    secureOn(socket, 'registerCollectionListenerClient', async (callback) => {
+        const clientWrapper = ClientWrapper.init(
+            CollectionClientWrapper,
+            socket,
+            services
+        );
+        if (!clientWrapper) return;
+
+        await clientWrapper.getSessionInformation();
+
+        if (clientWrapper.session === undefined) {
+            callback({
+                success: false,
+                message: 'You are not authenticated',
+                expected: false,
+            });
+            return;
+        }
+
+        callback({
+            success: true,
+        });
+    });
+
     secureOn(
         socket,
         'joinCollectionRoom',
@@ -20,9 +44,7 @@ export function registerCollectionHandler(
             );
             if (!clientWrapper) return;
 
-            await clientWrapper.getSessionInformation();
-
-            if (clientWrapper.session === undefined) {
+            if (!clientWrapper.session) {
                 callback({
                     success: false,
                     message: 'You are not authenticated',

@@ -19,4 +19,8 @@
         <i class="bi bi-play-fill"></i>
     }
     {{ currentTime() | date: 'H:mm:ss' : 'UTC' }}
+
+    @if (isDevMode()) {
+        <app-single-tick-button />
+    }
 </span>

@@ -2,7 +2,7 @@ import type { Type, ViewContainerRef } from '@angular/core';
 import type { Feature } from 'ol';
 import { Overlay } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
-import { Subject, takeUntil } from 'rxjs';
+import { pairwise, Subject, takeUntil } from 'rxjs';
 import type OlMap from 'ol/Map';
 import type { UUID } from 'fuesim-digital-shared';
 import { isEqual } from 'lodash-es';
@@ -17,13 +17,9 @@ import type { PopupService } from './popup.service';
 export class PopupManager {
     public readonly popupOverlay: Overlay;
     private readonly destroy$ = new Subject<void>();
-    private currentlyOpenPopupOptions?: OpenPopupOptions;
     private popupsEnabled = true;
     public get currentClosingIds(): UUID[] {
-        if (this.currentlyOpenPopupOptions === undefined) {
-            return [];
-        }
-        return this.currentlyOpenPopupOptions.closingUUIDs;
+        return this.popupService.currentPopupOptions?.closingUUIDs ?? [];
     }
     private featureNameFeatureManagerDictionary!: Map<
         string,
@@ -38,32 +34,54 @@ export class PopupManager {
         this.popupOverlay = new Overlay({
             element: this.popoverContainer,
         });
-        this.popupService.proposePopup$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((options) => {
-                this.togglePopup(options);
-            });
-        this.popupService.currentPopup$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((popupOptions) => {
-                popupOptions.previousPopup?.changedLayers.forEach(
-                    (featureName) =>
-                        this.featureNameFeatureManagerDictionary
-                            .get(featureName)
-                            ?.layer.changed()
-                );
-                popupOptions.nextPopup?.changedLayers.forEach((featureName) =>
-                    this.featureNameFeatureManagerDictionary
-                        .get(featureName)
-                        ?.layer.changed()
-                );
+        this.popupService.nextProposal$
+            .pipe(pairwise(), takeUntil(this.destroy$))
+            .subscribe(([oldProposal, newProposal]) => {
+                if (newProposal.action === 'dismiss') {
+                    oldProposal.options?.onDismissCallback?.call(undefined);
+                }
+
+                if (
+                    newProposal.action === 'toggle' &&
+                    this.isSamePopup(oldProposal.options, newProposal.options)
+                ) {
+                    this.popupService.dismissPopup();
+                    return;
+                }
+
+                if (newProposal.action === 'toggle') {
+                    // opening a new popup dismisses the previous one
+                    oldProposal.options?.onDismissCallback?.call(undefined);
+
+                    this.openPopup(newProposal.options);
+                } else {
+                    this.closePopup();
+                }
+
+                this.handleLayerChanges(oldProposal, newProposal);
             });
     }
+
+    private handleLayerChanges(
+        oldProposal?: { options?: { changedLayers?: string[] } },
+        newProposal?: { options?: { changedLayers?: string[] } }
+    ) {
+        const changedLayers = new Set([
+            ...(oldProposal?.options?.changedLayers ?? []),
+            ...(newProposal?.options?.changedLayers ?? []),
+        ]);
+        changedLayers.forEach((featureName) => {
+            this.featureNameFeatureManagerDictionary
+                .get(featureName)
+                ?.layer.changed();
+        });
+    }
+
     public setPopupsEnabled(enabled: boolean) {
         this.popupsEnabled = enabled;
         if (!enabled) {
             // Close all open popups
-            this.closePopup();
+            this.popupService.dismissPopup();
         }
     }
 
@@ -98,7 +116,7 @@ export class PopupManager {
                 { hitTolerance: 10 }
             );
             if (!hasBeenHandled) {
-                this.closePopup();
+                this.popupService.dismissPopup();
             }
         });
 
@@ -109,40 +127,30 @@ export class PopupManager {
         });
     }
 
-    public togglePopup(options: OpenPopupOptions | undefined) {
-        if (!options) {
-            this.closePopup();
-            return;
-        }
+    private isSamePopup(
+        currentlyOpenPopupOptions: OpenPopupOptions | undefined,
+        newOpenPopupOptions: OpenPopupOptions | undefined
+    ): boolean {
+        if (!currentlyOpenPopupOptions || !newOpenPopupOptions) return false;
+        const {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            position: _,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            positioning: _1,
+            ...oldOptionsWithoutPosition
+        } = currentlyOpenPopupOptions;
+        const {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            position: _2,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            positioning: _3,
+            ...newOptionsWithoutPosition
+        } = newOpenPopupOptions;
 
-        if (this.currentlyOpenPopupOptions) {
-            const {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                position: newPosition,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                positioning: newPositioning,
-                ...newOptionsWithoutPosition
-            } = options;
-            const {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                position: oldPosition,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                positioning: oldPositioning,
-                ...oldOptionsWithoutPosition
-            } = this.currentlyOpenPopupOptions;
-            if (isEqual(newOptionsWithoutPosition, oldOptionsWithoutPosition)) {
-                // All the openPopup buttons should be toggles
-                this.closePopup();
-                return;
-            }
-        }
-
-        this.openPopup(options);
+        return isEqual(oldOptionsWithoutPosition, newOptionsWithoutPosition);
     }
 
     private openPopup(options: OpenPopupOptions) {
-        this.currentlyOpenPopupOptions = options;
-        this.popupService.popupOpened(options);
         this.popoverContent.clear();
         const componentRef = this.popoverContent.createComponent(
             options.component
@@ -160,8 +168,6 @@ export class PopupManager {
     }
 
     private closePopup() {
-        this.popupService.popupOpened(undefined);
-        this.currentlyOpenPopupOptions = undefined;
         this.popoverContent.clear();
         this.popupOverlay.setPosition(undefined);
     }
@@ -172,20 +178,37 @@ export class PopupManager {
     }
 }
 
-/**
- * {@link closingUUIDs} is an array containing the UUIDs of elements that when clicked shall close the pop-up
- * {@link markedForParticipantUUIDs} is an array containing the UUIDs of elements that are to be marked while the pop-up is open and in participant mode
- * {@link markedForTrainerUUIDs}  is an array containing the UUIDs of elements that are to be marked while the pop-up is open and in trainer mode
- * {@link changedLayers} is an array of feature types of which the corresponding layers are to be marked as changed upon pop-up opening and closing
- */
 export interface OpenPopupOptions<Component = unknown> {
     elementUUID: UUID | undefined;
     position: number[];
     positioning: Positioning;
+    /**
+     * the angular component to be instantiated
+     */
     component: Type<Component>;
+    /**
+     * an array containing the UUIDs of elements that when clicked shall close the pop-up
+     */
     closingUUIDs: UUID[];
+    /**
+     * an array containing the UUIDs of elements that are to be marked while the pop-up is open and in participant mode
+     */
     markedForParticipantUUIDs: UUID[];
+    /**
+     *  an array containing the UUIDs of elements that are to be marked while the pop-up is open and in trainer mode
+     */
     markedForTrainerUUIDs: UUID[];
+    /**
+     * an array of feature types of which the corresponding layers are to be marked as changed upon pop-up opening and closing
+     */
     changedLayers: string[];
+    /**
+     * properties that are set on {@link component} at the time of creation
+     */
     context?: Partial<Component>;
+
+    /**
+     * is called, if the popup is closed without {@link PopupService.submitPopup()}
+     */
+    onDismissCallback?: () => void;
 }

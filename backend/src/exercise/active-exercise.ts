@@ -309,6 +309,7 @@ export class ActiveExercise {
      * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
      */
     private restoreState(keepActions: boolean) {
+        // TODO: switch to use cloneDeep() and then produce()
         let currentState = cloneDeepMutable(this.exercise.initialStateString);
 
         this.temporaryActionHistory.forEach((actionWrapper) => {

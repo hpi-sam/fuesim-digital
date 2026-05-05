@@ -81,6 +81,12 @@ import {
     exerciseRadiogramSchema,
 } from './models/radiogram/exercise-radiogram.js';
 import { type Scoutable, scoutableSchema } from './models/scoutable.js';
+import {
+    type TechnicalChallenge,
+    technicalChallengeSchema,
+} from './models/technical-challenge/technical-challenge.js';
+import { type Task, taskSchema } from './models/task.js';
+import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 
 export class ExerciseState {
     @IsZodSchema(uuidSchema)
@@ -134,6 +140,14 @@ export class ExerciseState {
 
     @IsZodSchema(z.record(uuidSchema, mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
+
+    @IsZodSchema(z.record(taskSchema.shape.id, taskSchema))
+    public tasks: { [key: UUID]: Task } = getDefaultTasks();
+
+    @IsZodSchema(
+        z.record(technicalChallengeSchema.shape.id, technicalChallengeSchema)
+    )
+    public technicalChallenges: { [key: UUID]: TechnicalChallenge } = {};
 
     @IsZodSchema(z.record(uuidSchema, transferPointSchema))
     public readonly transferPoints: { readonly [key: UUID]: TransferPoint } =
@@ -243,5 +257,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 52;
+    static readonly currentStateVersion = 54;
 }

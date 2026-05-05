@@ -89,7 +89,7 @@ export class MapImageFeatureManager extends MoveableFeatureManager<MapImage> {
         ) {
             return;
         }
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 MapImagePopupComponent,
                 feature,

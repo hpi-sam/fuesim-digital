@@ -11,6 +11,7 @@ import type {
     WithPosition,
     RestrictedZone,
     Viewport,
+    TechnicalChallenge,
 } from 'fuesim-digital-shared';
 import {
     newMapCoordinatesAt,
@@ -18,6 +19,7 @@ import {
     isOnMap,
     isInViewport,
     isElementGenericScoutable,
+    scoutableImages,
 } from 'fuesim-digital-shared';
 
 import { pickBy } from 'lodash-es';
@@ -38,6 +40,7 @@ import {
     selectViewports,
     selectScoutables,
     scoutableElementSelectors,
+    selectTechnicalChallenges,
 } from './exercise.selectors';
 
 /**
@@ -122,6 +125,8 @@ export const selectVisibleMapImages = selectVisibleElementsFactory<MapImage>(
     // TODO: MapImages could get very big. Therefore its size must be taken into account. The current implementation is a temporary solution.
     (element, viewport) => true
 );
+export const selectVisibleTechnicalChallenges =
+    selectVisibleElementsFactory<TechnicalChallenge>(selectTechnicalChallenges);
 export const selectVisibleTransferPoints =
     selectVisibleElementsFactory<TransferPoint>(selectTransferPoints);
 export const selectVisibleSimulatedRegions =
@@ -186,8 +191,15 @@ export const selectVisibleScoutableIndicators = createSelector(
                             // Hide the indicator for map images that already have the generic scoutable icon as image
                             !isElementGenericScoutable(element)
                     )
-                    .map((element): ScoutableIndicator => {
+                    .map((element): ScoutableIndicator | null => {
                         const scoutable = scoutables[element.scoutableId!]!;
+
+                        if (
+                            currentRole !== 'trainer' &&
+                            !scoutable.isVisibleForParticipants
+                        ) {
+                            return null;
+                        }
                         const elementPos = currentCoordinatesOf(element);
 
                         let offset;
@@ -202,29 +214,35 @@ export const selectVisibleScoutableIndicators = createSelector(
                             elementPos.x + offset.x,
                             elementPos.y + offset.y
                         );
+
+                        const imageKey1 =
+                            scoutable.viewedByParticipants &&
+                            currentRole === 'trainer'
+                                ? 'viewed'
+                                : 'unviewed';
+                        const imageKey2 =
+                            element.type === 'patient' ? 'patient' : 'generic';
                         return {
                             id: `${scoutable.id}:${element.id}`,
                             position: indicatorPos,
                             scoutableElementType: element.type,
                             scoutableElementId: element.id,
-                            isVisibleForParticipants:
-                                scoutable.isVisibleForParticipants,
+                            imageUrl: scoutableImages[imageKey1][imageKey2],
                             height,
                         };
                     })
             )
-            /* for performance, we dont select indicators out of view. */
+            /* for performance, we don't select indicators out of view. */
             .filter(
                 (scoutableIndicator) =>
+                    scoutableIndicator !== null &&
                     (!viewport ||
-                        isInViewport(viewport, scoutableIndicator.position)) &&
-                    (scoutableIndicator.isVisibleForParticipants ||
-                        currentRole === 'trainer')
+                        isInViewport(viewport, scoutableIndicator.position))
             )
             .reduce<{ [id: `${UUID}:${UUID}`]: ScoutableIndicator }>(
                 (scoutableIndicatorsObject, scoutableIndicator) => {
-                    scoutableIndicatorsObject[scoutableIndicator.id] =
-                        scoutableIndicator;
+                    scoutableIndicatorsObject[scoutableIndicator!.id] =
+                        scoutableIndicator!;
                     return scoutableIndicatorsObject;
                 },
                 {}

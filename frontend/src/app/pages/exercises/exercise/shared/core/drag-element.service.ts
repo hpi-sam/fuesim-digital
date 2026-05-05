@@ -6,6 +6,7 @@ import type {
     ImageProperties,
     MapImageTemplate,
     PatientCategory,
+    TechnicalChallengeTemplate,
     VehicleTemplate,
 } from 'fuesim-digital-shared';
 import {
@@ -19,6 +20,8 @@ import {
     defaultViewportSize,
     newTransferPoint,
     newPatientFromTemplate,
+    CreateTechnicalChallengeAction,
+    newTechnicalChallengeFromTemplate,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -35,6 +38,7 @@ import {
     selectMaterialTemplates,
     selectPersonnelTemplates,
     selectExerciseState,
+    selectCurrentTime,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 
@@ -315,8 +319,23 @@ export class DragElementService {
                 }
                 break;
 
-            default:
+            case 'technicalChallenge': {
+                const currentTime = selectStateSnapshot(
+                    selectCurrentTime,
+                    this.store
+                );
+                const technicalChallenge = newTechnicalChallengeFromTemplate(
+                    this.transferringTemplate.template,
+                    currentTime
+                );
+                technicalChallenge.position = newMapPositionAt(position);
+                this.exerciseService.proposeAction({
+                    type: '[TechnicalChallenge] Create technical challenge',
+                    technicalChallenge,
+                } satisfies CreateTechnicalChallengeAction);
+                createdElement = technicalChallenge;
                 break;
+            }
         }
 
         this.executeDropSideEffects(pixel, createdElement, event);
@@ -386,6 +405,10 @@ type TransferTemplate =
     | {
           type: 'simulatedRegion';
           template: SimulatedRegionDragTemplate;
+      }
+    | {
+          type: 'technicalChallenge';
+          template: TechnicalChallengeTemplate;
       }
     | {
           type: 'transferPoint';

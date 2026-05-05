@@ -79,3 +79,9 @@ License: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 [scoutable-generic.png](scoutable-generic.png), [scoutable-patient.png](scoutable-patient.png):
 edited by Jonathan Weth, based on Bootstrap Icons <https://icons.getbootstrap.com/>
 License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)
+
+[blue_car_broken.png](blue_car_broken.png),
+[blue_car_broken_burning.png](blue_car_broken_burning.png),
+[blue_car_burned_out.png](blue_car_burned_out.png)
+Felix Koch, based on <https://illustoon.com/?dl=9476> and <https://illustoon.com/?id=2723> by [DESIGNALIKE](https://illustoon.com)
+License: CC0 1.0

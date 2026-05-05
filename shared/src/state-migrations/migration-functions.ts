@@ -48,6 +48,8 @@ import { participantIdToKey47 } from './47-participant-id-to-key.js';
 import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
 import { addScoutables50 } from './50-add-scoutables.js';
+import { addTechnicalChallenges53 } from './53-add-technical-challenges.js';
+import { extendScoutables54 } from './54-extend-scoutables.js';
 import { addUUIDtoAddEocLogEntryAction51 } from './51-add-uuid-to-add-eoc-log-action.js';
 import { fixInfinity52 } from './52-fix-infinity.js';
 
@@ -128,4 +130,6 @@ export const migrations: {
     50: addScoutables50,
     51: addUUIDtoAddEocLogEntryAction51,
     52: fixInfinity52,
+    53: addTechnicalChallenges53,
+    54: extendScoutables54,
 };

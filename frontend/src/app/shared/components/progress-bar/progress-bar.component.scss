@@ -1,0 +1,12 @@
+.progress {
+    height: fit-content;
+    font-size: unset;
+
+    span {
+        padding: 0.1rem 0.5rem;
+    }
+}
+
+.progress-bar {
+    overflow: visible;
+}

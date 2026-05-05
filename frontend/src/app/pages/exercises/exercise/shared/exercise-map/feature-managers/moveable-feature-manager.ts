@@ -4,8 +4,7 @@ import type { TranslateEvent } from 'ol/interaction/Translate';
 import type VectorLayer from 'ol/layer/Vector';
 import type OlMap from 'ol/Map';
 import type { Observable, Subject } from 'rxjs';
-// eslint-disable-next-line @typescript-eslint/no-shadow
-import type { Element, UUID } from 'fuesim-digital-shared';
+import type { Element as StateElement, UUID } from 'fuesim-digital-shared';
 import type { FeatureLike } from 'ol/Feature';
 import type Style from 'ol/style/Style';
 import type { FeatureManager } from '../utility/feature-manager';
@@ -20,6 +19,7 @@ import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-ma
 import { TranslateInteraction } from '../utility/translate-interaction';
 import { selectCurrentMainRole } from '../../../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
+import type { PopupService } from '../utility/popup.service';
 import { ElementManager } from './element-manager';
 
 /**
@@ -34,15 +34,15 @@ export abstract class MoveableFeatureManager<
     extends ElementManager<ManagedElement, FeatureType>
     implements FeatureManager<FeatureType>
 {
-    protected movementAnimator: MovementAnimator<FeatureType>;
+    public readonly movementAnimator: MovementAnimator<FeatureType>;
     public layer: VectorLayer;
-    constructor(
+    protected constructor(
         protected readonly olMap: OlMap,
         private readonly proposeMovementAction: (
             newPosition: Positions<FeatureType>,
             element: ManagedElement
         ) => Promise<{ success: boolean }>,
-        protected readonly geometryHelper: GeometryHelper<
+        public readonly geometryHelper: GeometryHelper<
             FeatureType,
             ManagedElement
         >,
@@ -62,27 +62,35 @@ export abstract class MoveableFeatureManager<
         );
     }
 
+    /**
+     * Callback called on {@link TranslateInteraction.onTranslateEnd}.
+     * @protected
+     */
+    protected async onTranslateEnd(
+        newPosition: Positions<FeatureType>,
+        element: ManagedElement,
+        elementFeature: Feature<FeatureType>
+    ) {
+        if (!(await this.proposeMovementAction(newPosition, element)).success) {
+            // Roll back movement if it wasn't successful
+            const oldPosition =
+                this.geometryHelper.getElementCoordinates(element);
+            this.movementAnimator.animateFeatureMovement(
+                elementFeature,
+                oldPosition
+            );
+            elementFeature.changed();
+        }
+    }
+
     createFeature(element: ManagedElement): Feature<FeatureType> {
         const elementFeature = this.geometryHelper.create(element);
         elementFeature.setId(element.id);
         this.layer.getSource()!.addFeature(elementFeature);
         TranslateInteraction.onTranslateEnd<FeatureType>(
             elementFeature,
-            async (newPosition) => {
-                if (
-                    !(await this.proposeMovementAction(newPosition, element))
-                        .success
-                ) {
-                    // Roll back movement if it wasn't successful
-                    this.movementAnimator.animateFeatureMovement(
-                        elementFeature,
-                        this.geometryHelper.getElementCoordinates(
-                            this.getElementFromFeature(elementFeature)
-                        )
-                    );
-                    elementFeature.changed();
-                }
-            },
+            async (newCoordinates) =>
+                this.onTranslateEnd(newCoordinates, element, elementFeature),
             this.geometryHelper.getFeaturePosition
         );
         return elementFeature;
@@ -126,17 +134,18 @@ export abstract class MoveableFeatureManager<
     protected addMarking(
         feature: FeatureLike,
         styles: Style[],
-        popupService: any,
+        popupService: PopupService,
         store: any,
         markingStyle: any
     ) {
+        const currentPopup = popupService.currentPopupOptions;
         if (
-            (popupService.currentPopup?.markedForTrainerUUIDs.includes(
+            (currentPopup?.markedForTrainerUUIDs.includes(
                 feature.getId() as UUID
             ) &&
                 selectStateSnapshot(selectCurrentMainRole, store) ===
                     'trainer') ||
-            (popupService.currentPopup?.markedForParticipantUUIDs.includes(
+            (currentPopup?.markedForParticipantUUIDs.includes(
                 feature.getId() as UUID
             ) &&
                 selectStateSnapshot(selectCurrentMainRole, store) ===
@@ -157,7 +166,7 @@ export abstract class MoveableFeatureManager<
      * The standard implementation is to ignore these events.
      */
     public onFeatureDrop(
-        droppedElement: Element,
+        droppedElement: StateElement,
         droppedOnFeature: Feature<FeatureType>,
         dropEvent: MouseEvent | TranslateEvent
     ): boolean {

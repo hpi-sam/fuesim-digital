@@ -12,18 +12,21 @@ import {
     NgbDropdownButtonItem,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { AppState } from '../../../../../../state/app.state';
-import { selectEvalResults } from '../../../../../../state/application/selectors/exercise.selectors';
 import { form, FormField } from '@angular/forms/signals';
-import { PatientStatus } from 'fuesim-digital-shared';
-import { patientStatusAllowedValues, statusNames } from 'fuesim-digital-shared';
+import {
+    PatientStatus,
+    patientStatusAllowedValues,
+    statusNames,
+} from 'fuesim-digital-shared';
+import { selectEvalResults } from '../../../../../../state/application/selectors/exercise.selectors';
+import { AppState } from '../../../../../../state/app.state';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
     EvalCriterion,
     EvalcriterionType,
     newXPatientsAtStatusEvalCriterion,
 } from '../../../../../../../../../shared/dist/models/evaluation-criterion';
-interface inputData {
+interface InputData {
     countInput: number;
     patientStatusInput: PatientStatus;
 }
@@ -39,9 +42,6 @@ interface inputData {
         NgbAccordionCollapse,
         NgbAccordionBody,
         FormField,
-        NgbDropdown,
-        NgbDropdownMenu,
-        NgbDropdownButtonItem,
     ],
 })
 export class DidacticOverviewModalComponent {
@@ -55,7 +55,7 @@ export class DidacticOverviewModalComponent {
     public readonly statusNames = statusNames;
     updatesCount = 0;
     creatingcriterion = false;
-    inputModel = signal<inputData>({
+    readonly inputModel = signal<InputData>({
         countInput: 0,
         patientStatusInput: 'black',
     });
@@ -78,7 +78,7 @@ export class DidacticOverviewModalComponent {
     private async createCriterion(criterion: EvalCriterion) {
         await this.exerciseService.proposeAction({
             type: '[EvalCriterion] New Criterion',
-            criterion: criterion,
+            criterion,
         });
         this.updateResults();
     }

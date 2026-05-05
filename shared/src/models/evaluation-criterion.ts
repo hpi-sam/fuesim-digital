@@ -1,14 +1,12 @@
-import z from 'zod';
-import { UUID, uuid, uuidSchema } from '../utils/uuid.js';
-import {
-    TechnicalChallengeStateId,
-    technicalChallengeStateIdSchema,
-} from './technical-challenge/state-machine.js';
-import {
-    TechnicalChallengeId,
-    technicalChallengeIdSchema,
-} from './technical-challenge/technical-challenge.js';
-import { PatientStatus, patientStatusSchema } from './utils/patient-status.js';
+import { z } from 'zod';
+import type { UUID } from '../utils/uuid.js';
+import { uuid, uuidSchema } from '../utils/uuid.js';
+import type { TechnicalChallengeStateId } from './technical-challenge/state-machine.js';
+import { technicalChallengeStateIdSchema } from './technical-challenge/state-machine.js';
+import type { TechnicalChallengeId } from './technical-challenge/technical-challenge.js';
+import { technicalChallengeIdSchema } from './technical-challenge/technical-challenge.js';
+import type { PatientStatus } from './utils/patient-status.js';
+import { patientStatusSchema } from './utils/patient-status.js';
 
 export const evalCriterionBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -94,11 +92,11 @@ export function newDoMeasureXTimesEvalCriterion(
 ): DoMeasureXTimesEvalCriterion {
     return {
         id: uuid(),
-        name: name,
+        name,
         type: 'evalCriterion',
         criterionType: 'doMeasureXTimesEvalCriterion',
-        count: count,
-        targetMeasureId: targetMeasureId,
+        count,
+        targetMeasureId,
     };
 }
 export function newReachTechnicalChallengeStateEvalCriterion(
@@ -108,11 +106,11 @@ export function newReachTechnicalChallengeStateEvalCriterion(
 ): ReachTechnicalChallengeStateEvalCriterion {
     return {
         id: uuid(),
-        name: name,
+        name,
         type: 'evalCriterion',
         criterionType: 'reachTechnicalChallengeStateEvalCriterion',
-        targetTechnicalChallengeId: targetTechnicalChallengeId,
-        targetTechnicalChallengeStateId: targetTechnicalChallengeStateId,
+        targetTechnicalChallengeId,
+        targetTechnicalChallengeStateId,
     };
 }
 export function newPatientAtStatusEvalCriterion(
@@ -122,11 +120,11 @@ export function newPatientAtStatusEvalCriterion(
 ): PatientAtStatusEvalCriterion {
     return {
         id: uuid(),
-        name: name,
+        name,
         type: 'evalCriterion',
         criterionType: 'patientAtStatusEvalCriterion',
-        targetPatientId: targetPatientId,
-        targetStatus: targetStatus,
+        targetPatientId,
+        targetStatus,
     };
 }
 export function newXPatientsAtStatusEvalCriterion(
@@ -136,11 +134,11 @@ export function newXPatientsAtStatusEvalCriterion(
 ): XPatientsAtStatusEvalCriterion {
     return {
         id: uuid(),
-        name: name,
+        name,
         type: 'evalCriterion',
         criterionType: 'xPatientsAtStatusEvalCriterion',
-        count: count,
-        targetStatus: targetStatus,
+        count,
+        targetStatus,
     };
 }
 export function newViewScoutableEvalCriterion(
@@ -149,9 +147,9 @@ export function newViewScoutableEvalCriterion(
 ): ViewScoutableEvalCriterion {
     return {
         id: uuid(),
-        name: name,
+        name,
         type: 'evalCriterion',
         criterionType: 'viewScoutableEvalCriterion',
-        targetScoutableId: targetScoutableId,
+        targetScoutableId,
     };
 }

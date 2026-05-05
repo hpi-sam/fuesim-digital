@@ -23,14 +23,10 @@ import {
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
 import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
-import {
+import type {
     EvalCriterion,
-    PatientAtStatusEvalCriterion,
-    ReachTechnicalChallengeStateEvalCriterion,
-    ViewScoutableEvalCriterion,
-    XPatientsAtStatusEvalCriterion,
 } from '../../../../../../shared/dist/models/evaluation-criterion';
-import { EvalResult } from '../../../shared/types/evaluation-result';
+import type { EvalResult } from '../../../shared/types/evaluation-result';
 
 // Properties
 
@@ -466,7 +462,7 @@ export const selectEvalResults = createSelector(
                     }
                     case 'reachTechnicalChallengeStateEvalCriterion': {
                         const criterion =
-                            evalCriterion as ReachTechnicalChallengeStateEvalCriterion;
+                            evalCriterion;
                         const targetId = criterion.targetTechnicalChallengeId;
                         const technicalChallenge =
                             technicalChallenges[targetId]!;
@@ -476,7 +472,7 @@ export const selectEvalResults = createSelector(
                     }
                     case 'patientAtStatusEvalCriterion': {
                         const criterion =
-                            evalCriterion as PatientAtStatusEvalCriterion;
+                            evalCriterion;
                         const targetId = criterion.targetPatientId;
                         const patient = patients[targetId]!;
                         isCompleted =
@@ -485,7 +481,7 @@ export const selectEvalResults = createSelector(
                     }
                     case 'xPatientsAtStatusEvalCriterion': {
                         const criterion =
-                            evalCriterion as XPatientsAtStatusEvalCriterion;
+                            evalCriterion;
                         const currentCount = Object.values(patients).filter(
                             (patient) =>
                                 patient.realStatus === criterion.targetStatus
@@ -496,7 +492,7 @@ export const selectEvalResults = createSelector(
                     }
                     case 'viewScoutableEvalCriterion': {
                         const criterion =
-                            evalCriterion as ViewScoutableEvalCriterion;
+                            evalCriterion;
                         const scoutable =
                             scoutables[criterion.targetScoutableId]!;
                         isCompleted = scoutable.viewedByParticipants;
@@ -505,9 +501,11 @@ export const selectEvalResults = createSelector(
                     default:
                         break;
                 }
+                const id = evalCriterion.criterionId!;
                 return {
-                    isCompleted: isCompleted,
-                    criterionId: evalCriterion.criterionId!,
+                    criterionId: id,
+                    criterion: evalCriteria[id],
+                    isCompleted,
                     timestamp: currentTime,
                     count: count !== -1 ? count : undefined,
                 };

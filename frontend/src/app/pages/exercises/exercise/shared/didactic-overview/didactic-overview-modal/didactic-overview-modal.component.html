@@ -3,7 +3,129 @@
     <button type="button" class="btn-close" (click)="close()"></button>
 </div>
 <div class="modal-body">
-    <!-- TODO @JohannesPotzi @Jogius : Make a table of completed criteria-->
-    <p>Getroffene Maßnahmen:</p>
+    <button
+        class="ms-3 btn btn-outline-primary"
+        data-cy="didacticOverviewAddEvalCriterionButton"
+        (click)="creatingcriterion = !creatingcriterion"
+    >
+        <i class="bi bi-plus"></i> Auswertungskriterium Hinzufügen
+    </button>
+    <!-- TODO @JohannesPotzi @Jogius : criterion form -->
+    <!-- The EvalCriteria at criterionType are:
+    doMeasureXTimesEvalCriterion
+    reachTechnicalChallengeStateEvalCriterion
+    patientAtStatusEvalCriterion
+    xPatientsAtStatusEvalCriterion
+    viewScoutableEvalCriterion
+    -->
+    @if (creatingcriterion) {
+        <div class="container-fluid d-flex flex-column h-100 mt-3 ms-1">
+            <div
+                class="card col-3 p-0 rounded-0 rounded-end"
+                style="min-width: 400px"
+            >
+                <div class="card-header text-center">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        Neues Kriterium
+                    </h5>
+                </div>
+                <!-- bare form for xPatientsAtSk without Accordion -->
+                <form class="ms-3">
+                    <label>
+                        Anzahl:
+                        <input
+                            type="number"
+                            [formField]="criterionForm.countInput"
+                        />
+                    </label>
+                    <label class="mt-1">
+                        Sichtungskategorie:
+                        <select [formField]="criterionForm.patientStatusInput">
+                            @for (
+                                status of patientStatusAllowedValues;
+                                track status
+                            ) {
+                                <option value="{{ status }}">
+                                    {{ statusNames[status] }}
+                                </option>
+                            }
+                        </select></label
+                    >
+                </form>
+                <button
+                    class="btn btn-outline-success mt-1"
+                    (click)="submitCriterion('xPatientsAtStatus')"
+                >
+                    Bestätigen
+                </button>
+
+                <!-- TODO @JohannesPotzi @Jogius : Als Accordion -->
+                <div
+                    ngbAccordion
+                    [closeOthers]="true"
+                    style="flex: auto; height: 0; overflow-y: auto"
+                >
+                    <div
+                        ngbAccordionItem="xPatientsAtStatusEvalCriterion"
+                        [collapsed]="false"
+                    >
+                        <h5 ngbAccordionHeader>
+                            <button
+                                ngbAccordionButton
+                                data-cy="xPatientsAtSkCriterionAccordionButton"
+                            >
+                                Anzahl an Patienten mit bestimmter
+                                Sichtungskategorie
+                            </button>
+                        </h5>
+                        <div ngbAccordionCollapse>
+                            <div ngbAccordionBody>
+                                <form class="ms-3">
+                                    <label>
+                                        Anzahl:
+                                        <input
+                                            type="number"
+                                            [formField]="
+                                                criterionForm.countInput
+                                            "
+                                        />
+                                    </label>
+                                    <label class="mt-1">
+                                        Sichtungskategorie:
+                                        <select
+                                            [formField]="
+                                                criterionForm.patientStatusInput
+                                            "
+                                        >
+                                            @for (
+                                                status of patientStatusAllowedValues;
+                                                track status
+                                            ) {
+                                                <option value="{{ status }}">
+                                                    {{ statusNames[status] }}
+                                                </option>
+                                            }
+                                        </select></label
+                                    >
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <h5 class="ms-3 mt-3">Getroffene Maßnahmen:</h5>
+    <!-- TODO @JohannesPotzi @Jogius : Make a table of the criteria with results-->
+    @if (!this.results()) {
+        <p class="ms-3">
+            Es sind aktuell keine Auswertungskriterien festgelegt.
+        </p>
+    } @else {
+        @for (result of this.results(); track result.criterionId) {
+            <p>{{ result }}</p>
+        }
+    }
+
     <!-- TODO @JohannesPotzi @Jogius : Idea-Pitch: area-burn-down-chart similarly to the statistics area chart-->
 </div>

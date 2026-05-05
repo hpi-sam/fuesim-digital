@@ -26,7 +26,7 @@ const updateCriterionActionSchema = z.strictObject({
 export type UpdateCriterionAction = z.infer<typeof updateCriterionActionSchema>;
 
 export namespace EvalCriterionActionReducers {
-    export const CreateNewCriterion: ActionReducer<NewCriterionAction> = {
+    export const createNewCriterion: ActionReducer<NewCriterionAction> = {
         type: createNewCriterionActionSchema.shape.type.value,
         actionSchema: createNewCriterionActionSchema,
         reducer: (draftState, { criterion }) => {

@@ -86,12 +86,63 @@ const gfPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
     abbreviation: 'GF',
 });
 
+const sfPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
+    id: 'cbb8af31-05f0-49d8-8224-1711e0216017',
+    type: 'personnelTemplate',
+    personnelType: 'sf',
+    name: 'Staffelführung',
+    image: {
+        url: '/assets/sf-personnel.svg',
+        height: 80,
+        aspectRatio: 1,
+    },
+    canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
+    overrideTreatmentRange: 0,
+    treatmentRange: 0,
+    abbreviation: 'SF',
+});
+
+const fireSinglePersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
+    id: '3fc0e389-0f0d-4d83-b8d1-88f59e68bb17',
+    type: 'personnelTemplate',
+    personnelType: 'fireSingle',
+    name: 'Feuerwehrkraft',
+    image: {
+        url: '/assets/fire-single-personnel.svg',
+        height: 80,
+        aspectRatio: 1,
+    },
+    canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
+    overrideTreatmentRange: 0,
+    treatmentRange: 0,
+    abbreviation: 'FSi',
+});
+
+const fireSquadPersonnelTemplate: PersonnelTemplate = cloneDeepImmutable({
+    id: '4ce35c25-e528-4e36-a002-1eb8b25f64fb',
+    type: 'personnelTemplate',
+    personnelType: 'fireSquad',
+    name: 'Trupp',
+    image: {
+        url: '/assets/fire-squad-personnel.svg',
+        height: 80,
+        aspectRatio: 1,
+    },
+    canCaterFor: newCanCaterFor(0, 0, 0, 'and'),
+    overrideTreatmentRange: 0,
+    treatmentRange: 0,
+    abbreviation: 'FSq',
+});
+
 export const defaultPersonnelTemplates = {
     san: sanPersonnelTemplate,
     rettSan: rettSanPersonnelTemplate,
     notSan: notSanPersonnelTemplate,
     notarzt: notarztPersonnelTemplate,
     gf: gfPersonnelTemplate,
+    sf: sfPersonnelTemplate,
+    fireSingle: fireSinglePersonnelTemplate,
+    fireSquad: fireSquadPersonnelTemplate,
 } as const;
 
 export const defaultPersonnelTemplatesById = Object.fromEntries(

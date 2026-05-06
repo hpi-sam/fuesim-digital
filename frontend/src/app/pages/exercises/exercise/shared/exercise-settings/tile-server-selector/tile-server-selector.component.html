@@ -6,16 +6,43 @@
     >, <code>{{ '{' }}y{{ '}' }}</code> oder <code>{{ '{' }}-y{{ '}' }}</code
     >, sowie der Zoomstufe <code>{{ '{' }}z{{ '}' }}</code> enthalten. Bitte
     beachten Sie die Lizenzbedingungen der entsprechenden Karten-Server.
+    <br />
+    Über Klick auf <i class="bi bi-list-stars"></i> können Sie aus einer Liste
+    vorgeschlagener Kartenserver wählen.
 </p>
-<input
-    #tileUrlInput="ngModel"
-    [(ngModel)]="url"
-    [appAutofocus]="autofocus()"
-    appUrlValidator
-    [pattern]="tileUrlRegex"
-    required
-    type="url"
-    class="form-control"
-    placeholder="https://a.tile.openstreetmap.de/{z}/{x}/{y}.png"
-/>
+<div class="input-group">
+    <input
+        #tileUrlInput="ngModel"
+        [(ngModel)]="url"
+        [appAutofocus]="autofocus()"
+        appUrlValidator
+        [pattern]="tileUrlRegex"
+        required
+        type="url"
+        class="form-control"
+        placeholder="https://a.tile.openstreetmap.de/{z}/{x}/{y}.png"
+    />
+    <button class="btn btn-outline-secondary" (click)="collapse.toggle()">
+        <i class="bi bi-list-stars"></i>
+    </button>
+</div>
+<div #collapse="ngbCollapse" [(ngbCollapse)]="suggestionsCollapsed">
+    <div class="card mt-2">
+        <div class="card-body">
+            <ul class="list-group">
+                @for (suggestion of suggestions; track suggestion.url) {
+                    <button
+                        type="button"
+                        class="list-group-item list-group-item-action"
+                        (click)="selectSuggestion(suggestion.url)"
+                    >
+                        {{ suggestion.name }}
+                        <br />
+                        <span class="small">{{ suggestion.description }}</span>
+                    </button>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
 <app-display-validation [ngModelInput]="tileUrlInput"></app-display-validation>

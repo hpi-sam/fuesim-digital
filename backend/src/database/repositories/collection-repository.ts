@@ -594,7 +594,7 @@ export class CollectionRepository extends BaseRepository {
     public async updateElementContent(
         elementVersionId: ElementVersionId,
         data: VersionedElementContent
-    ) {
+    ): Promise<ElementDto | null> {
         return this.databaseConnection.transaction(async (tx) => {
             const isEditable =
                 await this.checkElementVersionEditable(elementVersionId);
@@ -1351,7 +1351,7 @@ export class CollectionRepository extends BaseRepository {
             sqlChunks.push(sql`(case`);
 
             for (const content of elementContents) {
-                if (content.versionId === undefined) {
+                if (content.entity?.versionId === undefined) {
                     console.error(
                         'versionId is required for UNSAFE_overwriteElements',
                         content
@@ -1359,9 +1359,9 @@ export class CollectionRepository extends BaseRepository {
                     continue;
                 }
                 sqlChunks.push(
-                    sql`when ${elementTable.versionId} = ${content.versionId} then ${JSON.stringify(content)}::jsonb`
+                    sql`when ${elementTable.versionId} = ${content.entity.versionId} then ${JSON.stringify(content)}::jsonb`
                 );
-                ids.push(content.versionId);
+                ids.push(content.entity.versionId);
             }
 
             sqlChunks.push(sql`end)`);

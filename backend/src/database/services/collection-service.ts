@@ -21,13 +21,12 @@ import {
     ExerciseState,
     gatherCollectionElements,
     getCollectionElementDiff,
-    getDependencyChecker,
     getElementDependencies,
     isVersionedElementContent,
     replaceDependencies,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 
 interface EventBuffer {
@@ -513,19 +512,10 @@ export class CollectionService {
                     dependingElements.map(async (dependingElement) => {
                         const dependencies =
                             await tx.getDependenciesOfElement(dependingElement);
-                        const dependencyCheck = getDependencyChecker(
-                            dependingElement.content.type
-                        );
-                        if (!dependencyCheck) {
-                            if (dependencies.length > 0) {
-                                throw new Error(
-                                    `Element with type ${dependingElement.content.type} has dependencies but no dependency checker is implemented for this type.`
-                                );
-                            }
-                            return;
-                        }
 
-                        const newContent = replaceDependencies(
+                        const newContent = replaceDependencies<
+                            WritableDraft<VersionedElementContent>
+                        >(
                             dependingElement.content,
                             dependencies.map((d) => ({
                                 old: d.versionId,
@@ -538,11 +528,10 @@ export class CollectionService {
 
                         await tx.updateElement(
                             dependingElement.entityId,
-                            cloneDeepMutable(newContent)
+                            newContent
                         );
                     })
                 );
-
                 await tx.collectionRepository.removeCollectionVersionDependency(
                     draftState.versionId,
                     existingCollectionDependency.versionId
@@ -641,7 +630,7 @@ export class CollectionService {
                             data: result,
                             collectionEntityId,
                         });
-                        results.push(result);
+                        results.push(cloneDeepMutable(result));
                     })
                 );
 
@@ -756,7 +745,9 @@ export class CollectionService {
         const foundElements: CollectionElementsSingle[] = [];
         await Promise.all(
             elements.map(async (element) => {
-                const elementVersions = getElementDependencies(element.content);
+                const elementVersions = getElementDependencies<
+                    WritableDraft<VersionedElementContent>
+                >(element.content);
 
                 const foundSubElements: ElementDto[] = (
                     await Promise.all(
@@ -1080,7 +1071,7 @@ export class CollectionService {
      * Finds all directly AND TRANSITIVELY referenced element versions in the content of an element
      */
     private async getDependenciesOfElement(
-        element: ElementDto,
+        element: Immutable<ElementDto>,
         opts: { transitive?: boolean } = { transitive: true }
     ): Promise<ElementDto[]> {
         const directElementReferences = (
@@ -1256,13 +1247,14 @@ export class CollectionService {
                             containingElement
                         )
                     );
-                    const newContent = replaceDependencies(
-                        containingElementData.content,
-                        [{ old: removeElementVersionId, new: null }]
-                    );
+                    const newContent = replaceDependencies<
+                        WritableDraft<VersionedElementContent>
+                    >(containingElementData.content, [
+                        { old: removeElementVersionId, new: null },
+                    ]);
                     await tx.updateElement(
                         containingElementData.entityId,
-                        cloneDeepMutable(newContent)
+                        newContent
                     );
                 })
             );
@@ -1382,7 +1374,7 @@ export class CollectionService {
                     )
                 );
 
-                const content = sourceElement.content;
+                const content = cloneDeepMutable(sourceElement.content);
                 content.name = `Kopie von ${content.name}`;
 
                 const duplicatedElement = this.exists(
@@ -1401,7 +1393,7 @@ export class CollectionService {
                     event: 'element:create',
                     data: duplicatedElement,
                     collectionEntityId: targetCollectionEntity,
-                });
+                } satisfies typeof Marketplace.Collection.Events.ElementCreate.Type);
 
                 return {
                     duplicatedElement,
@@ -1546,8 +1538,11 @@ export class CollectionService {
                     if (element.content.type !== 'vehicleTemplate') return acc;
                     acc[element.entityId] = {
                         ...cloneDeepMutable(element.content),
-                        versionId: element.versionId,
-                        entityId: element.entityId,
+                        entity: {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                            type: 'direct',
+                        },
                     };
                     return acc;
                 }, {}),
@@ -1557,8 +1552,11 @@ export class CollectionService {
                     if (element.content.type !== 'vehicleTemplate') return acc;
                     acc[element.entityId] = {
                         ...cloneDeepMutable(element.content),
-                        versionId: element.versionId,
-                        entityId: element.entityId,
+                        entity: {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                            type: 'direct',
+                        },
                     };
                     return acc;
                 }, {}),

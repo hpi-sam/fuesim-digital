@@ -364,7 +364,7 @@ registerMarketplaceElement('vehicleTemplate', {
 
             for (const affectedVehicle of affectedVehicles) {
                 const editedValues = checkEditableValueEdited({
-                    template: change.new.content,
+                    template: cloneDeepMutable(change.new.content),
                     element: cloneDeepMutable(affectedVehicle),
                 });
 

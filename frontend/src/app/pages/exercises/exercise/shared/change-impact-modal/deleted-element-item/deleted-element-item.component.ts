@@ -1,5 +1,6 @@
 import { Component, effect, input, output, signal } from '@angular/core';
 import {
+    cloneDeepMutable,
     CollectionUpgradeChangeElement,
     ElementVersionId,
     RemoveReplaceChangeApply,
@@ -128,7 +129,7 @@ export class DeletedElementChangeApplyItemComponent {
             type: 'removed',
             action: 'replace',
             replaceWith: {
-                ...entity.content,
+                ...cloneDeepMutable(entity.content),
                 // we need to set the uuid here bc we cant in the reducer
                 id: uuid(),
                 entity: {

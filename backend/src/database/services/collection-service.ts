@@ -1,4 +1,5 @@
 import type {
+    AlarmGroup,
     CollectionDto,
     CollectionElementsDto,
     CollectionElementsSingle,
@@ -21,7 +22,6 @@ import {
     ExerciseState,
     gatherCollectionElements,
     getCollectionElementDiff,
-    getDependencyChecker,
     getElementDependencies,
     isVersionedElementContent,
     replaceDependencies,
@@ -76,10 +76,20 @@ export class CollectionService {
         });
     }
 
+    /**
+     * Observable to emit events regarding collections so
+     * that the websocket handler can hook into
+     * this and emit a fitting subset of these
+     * events to the subscribed clients
+     */
     public get events() {
         return this.eventSubject.asObservable();
     }
 
+    /**
+     * Buffers events during a transaction and only emits them with flush`
+     * e.g. for when after the transaction is completed successfully.
+     */
     private readonly newDeferredEventBuffer = (): EventBuffer => {
         // I opted against a ReplaySubject here to not worry about completing correctly if a functions throws
         // and doesnt complete this subject
@@ -455,6 +465,10 @@ export class CollectionService {
                         existingCollectionDependency.versionId,
                         { allowDraftState: false }
                     );
+                const oldDirectElements = gatherCollectionElements(
+                    oldCollectionVersionElements
+                ).allDirectElements();
+
                 const newCollectionVersionElements =
                     await tx.getElementsOfCollectionVersion(
                         upgradeToCollection.versionId,
@@ -462,14 +476,13 @@ export class CollectionService {
                             allowDraftState: false,
                         }
                     );
+                const newDirectElements = gatherCollectionElements(
+                    newCollectionVersionElements
+                ).allDirectElements();
 
                 const changesBetweenVersions = getCollectionElementDiff(
-                    gatherCollectionElements(
-                        oldCollectionVersionElements
-                    ).allDirectElements(),
-                    gatherCollectionElements(
-                        newCollectionVersionElements
-                    ).allDirectElements()
+                    oldDirectElements,
+                    newDirectElements
                 );
 
                 // Fetch, which elements of our Collection depend on the collection we want to upgrade
@@ -486,22 +499,11 @@ export class CollectionService {
                         )
                 );
 
-                console.log(
-                    JSON.stringify(
-                        {
-                            changesBetweenVersions,
-                            dependingElements,
-                            changedDependingElements,
-                        },
-                        null,
-                        2
-                    )
-                );
-
                 // Check if the provided acceptedElementDeletions actually account for all depending elements
                 if (
-                    !changedDependingElements.every((ed) =>
-                        data.acceptedElementChanges.includes(ed.versionId)
+                    changedDependingElements.some(
+                        (ed) =>
+                            !data.acceptedElementChanges.includes(ed.versionId)
                     )
                 ) {
                     throw new Error(
@@ -513,17 +515,6 @@ export class CollectionService {
                     dependingElements.map(async (dependingElement) => {
                         const dependencies =
                             await tx.getDependenciesOfElement(dependingElement);
-                        const dependencyCheck = getDependencyChecker(
-                            dependingElement.content.type
-                        );
-                        if (!dependencyCheck) {
-                            if (dependencies.length > 0) {
-                                throw new Error(
-                                    `Element with type ${dependingElement.content.type} has dependencies but no dependency checker is implemented for this type.`
-                                );
-                            }
-                            return;
-                        }
 
                         const newContent = replaceDependencies(
                             dependingElement.content,
@@ -543,11 +534,13 @@ export class CollectionService {
                     })
                 );
 
+                // Remove the mapping to the old collection version dependency
                 await tx.collectionRepository.removeCollectionVersionDependency(
                     draftState.versionId,
                     existingCollectionDependency.versionId
                 );
 
+                // Add a mapping to the new collection version dependency
                 await tx.collectionRepository.addCollectionVersionDependency(
                     draftState.versionId,
                     data.upgradeTo
@@ -561,7 +554,6 @@ export class CollectionService {
 
                 return {
                     collection: upgradeToCollection,
-                    elements: [], // TODO: ,
                     newCollectionVersion: draftState,
                 };
             }
@@ -631,7 +623,7 @@ export class CollectionService {
                             })
                         );
 
-                        await tx.collectionRepository.addElementToCollection(
+                        await tx.collectionRepository.attachElementToCollectionVersion(
                             result.versionId,
                             draftState.versionId
                         );
@@ -1036,7 +1028,7 @@ export class CollectionService {
                 // we dont need to care about removing the old element from the collection,
                 // because it is not mapped as base reference and therefore
                 // belongs to a different collection version
-                await tx.collectionRepository.addElementToCollection(
+                await tx.collectionRepository.attachElementToCollectionVersion(
                     newElementVersion.versionId,
                     draftState.versionId
                 );
@@ -1109,106 +1101,111 @@ export class CollectionService {
 
     public async deleteElementFromCollection(
         elementEntityId: ElementEntityId,
+        collectionEntityId: CollectionEntityId,
         acceptedCascadingDeletions: ElementVersionId[] = []
     ): Promise<typeof Marketplace.Element.Delete.Response> {
-        return this.transaction(async (tx) => {
-            const eventBuffer = tx.newDeferredEventBuffer();
-
-            const containingSet = tx.exists(
-                await tx.collectionRepository.getLatestCollectionOfElementEntity(
-                    elementEntityId
-                )
-            );
-
-            const [elementIsInLatestCollectionVersion] =
-                await this.isElementInLatestCollectionVersion(elementEntityId);
-
-            if (!elementIsInLatestCollectionVersion) {
-                throw new Error(
-                    `Element with id ${elementEntityId} does not exist in the latest version of the containing collection and can therefore not be deleted.`
+        return this.reduce(
+            collectionEntityId,
+            async (tx, draftState, eventBuffer) => {
+                // we need a collectionEntityId as a parameter for the function for this.reducer,
+                // but we only want to allow deletion if the element is actually part of said collection
+                const containingSet = tx.exists(
+                    await tx.collectionRepository.getLatestCollectionOfElementEntity(
+                        elementEntityId
+                    )
                 );
-            }
+                if (containingSet.entityId !== collectionEntityId) {
+                    throw new Error(
+                        'Element to be deleted is not part of provided collection.'
+                    );
+                }
 
-            const [draftState, createdNewDraftState] =
-                await tx.collectionRepository.getOrCreateDraftState(
-                    containingSet.entityId
+                const [elementIsInLatestCollectionVersion] =
+                    await this.isElementInLatestCollectionVersion(
+                        elementEntityId
+                    );
+
+                if (!elementIsInLatestCollectionVersion) {
+                    throw new Error(
+                        `Element with id ${elementEntityId} does not exist in the latest version of the containing collection and can therefore not be deleted.`
+                    );
+                }
+
+                const latestElementVersion = tx.exists(
+                    await tx.collectionRepository.getLatestElementVersion(
+                        elementEntityId
+                    )
                 );
-            if (createdNewDraftState) {
+
+                // We want to fail the deletion if the element we want to delete is being referenced by other elements
+                // that have not been picked up by the frontend and as such not been shown to the user
+                //
+                // (possible reason: the collection was updated AFTER the frontend fetched the data for
+                // the deletion dialog and BEFORE the user confirmed the deletion
+                const dependingElements = await tx.getDependingElements(
+                    latestElementVersion,
+                    draftState.versionId
+                );
+                if (
+                    dependingElements.some(
+                        (de) =>
+                            !acceptedCascadingDeletions.includes(de.versionId)
+                    )
+                ) {
+                    return {
+                        newSetVersionId: null,
+                        requiresConfirmation: dependingElements,
+                    };
+                }
+
+                const elementMapping =
+                    await tx.collectionRepository.getElementCollectionMapping(
+                        latestElementVersion.versionId,
+                        draftState.versionId
+                    );
+
+                if (elementMapping.isBaseReference === true) {
+                    // just delete the element, when it's the only reference in the current draftstate
+                    // (no other collection version references this element version)
+                    await tx.collectionRepository.deleteElementVersion(
+                        latestElementVersion
+                    );
+                } else {
+                    // unmap the reference to the element since it is not the base reference
+                    // and therefore belongs to a different collection version
+                    await tx.collectionRepository.unmapElementFromCollection(
+                        elementEntityId,
+                        draftState.versionId
+                    );
+                }
+
+                if (dependingElements.length > 0) {
+                    await tx.removeReferenceFromElements(
+                        // We are able to use the latest version here,
+                        // bc we are only working inside the same collection
+                        // and all elements should always be using the same,
+                        // latest version of the referenced element
+                        latestElementVersion.versionId,
+                        dependingElements.map((de) => de.versionId)
+                    );
+                }
+
                 eventBuffer.next({
-                    event: 'collection:update',
-                    data: draftState,
-                    collectionEntityId: containingSet.entityId,
+                    event: 'element:delete',
+                    data: {
+                        entityId: elementEntityId,
+                    },
+                    collectionEntityId,
                 });
-            }
 
-            const latestElementVersion = tx.exists(
-                await tx.collectionRepository.getLatestElementVersion(
-                    elementEntityId
-                )
-            );
+                eventBuffer.flush();
 
-            const dependingElements = await tx.getDependingElements(
-                latestElementVersion,
-                draftState.versionId
-            );
-            if (
-                dependingElements.some(
-                    (de) => !acceptedCascadingDeletions.includes(de.versionId)
-                )
-            ) {
                 return {
-                    newSetVersionId: null,
-                    requiresConfirmation: dependingElements,
+                    newSetVersionId: draftState.versionId,
+                    requiresConfirmation: [],
                 };
             }
-
-            const elementMapping =
-                await tx.collectionRepository.getElementCollectionMapping(
-                    latestElementVersion.versionId,
-                    draftState.versionId
-                );
-
-            if (elementMapping.isBaseReference === true) {
-                // just delete the element, when it's the only reference in the current draftstate
-                // (no other collection version references this element version)
-                await tx.collectionRepository.deleteElementVersion(
-                    latestElementVersion
-                );
-            } else {
-                // unmap the reference to the element since it is not the base reference
-                // and therefore belongs to a different collection version
-                await tx.collectionRepository.unmapElementFromCollection(
-                    elementEntityId,
-                    draftState.versionId
-                );
-            }
-
-            if (dependingElements.length > 0) {
-                await tx.removeReferenceFromElements(
-                    // We are able to use the latest version here,
-                    // bc we are only working inside the same collection
-                    // and all elements should always be using the same,
-                    // latest version of the referenced element
-                    latestElementVersion.versionId,
-                    dependingElements.map((de) => de.versionId)
-                );
-            }
-
-            eventBuffer.next({
-                event: 'element:delete',
-                data: {
-                    entityId: elementEntityId,
-                },
-                collectionEntityId: containingSet.entityId,
-            });
-
-            eventBuffer.flush();
-
-            return {
-                newSetVersionId: draftState.versionId,
-                requiresConfirmation: [],
-            };
-        });
+        );
     }
 
     public async restoreDeletedElementVersion(
@@ -1218,7 +1215,7 @@ export class CollectionService {
         return this.reduce(
             collectionEntityId,
             async (tx, draftState, eventBuffer) => {
-                await tx.collectionRepository.addElementToCollection(
+                await tx.collectionRepository.attachElementToCollectionVersion(
                     elementVersionId,
                     draftState.versionId,
                     false
@@ -1243,6 +1240,9 @@ export class CollectionService {
 
     /**
      * INFO: Should only be used for deleting references inside the same collection
+     *
+     * This removes a reference/dependency (Element Version Id)
+     * from the content of all provided elements
      */
     private async removeReferenceFromElements(
         removeElementVersionId: ElementVersionId,
@@ -1392,7 +1392,7 @@ export class CollectionService {
                     })
                 );
 
-                await tx.collectionRepository.addElementToCollection(
+                await tx.collectionRepository.attachElementToCollectionVersion(
                     duplicatedElement.versionId,
                     draftState.versionId
                 );
@@ -1426,7 +1426,6 @@ export class CollectionService {
             }
 
             const newCollection = await tx.createFirstCollectionVersion(
-                // TODO: Quixelation : also duplicate description (visbility should stay private)
                 `Kopie von ${latestCollectionEntity.title}`,
                 true
             );
@@ -1510,10 +1509,16 @@ export class CollectionService {
         );
     }
 
+    /**
+     * WARNING: This function is meant to be used on startup to upgrade
+     * all element versions in the database to the lastest stateVersion
+     */
     public async upgradeAllElementStateVersionsToLatest(): Promise<number> {
         return this.collectionRepository.transaction(async (tx) => {
             const allElements = await tx.UNSAFE_getAllElements();
 
+            // We want to prevent a situation where we have multiple
+            // state versions present in the element table.
             const allElementVersions = new Set<number>();
             allElements.forEach((element) =>
                 allElementVersions.add(element.stateVersion)
@@ -1532,45 +1537,44 @@ export class CollectionService {
                 return 0;
             }
 
-            let state = cloneDeepMutable(
+            const state = cloneDeepMutable(
                 ExerciseState.create(
                     '123456' as ParticipantKey
                 ) as WritableDraft<ExerciseState>
             );
 
-            // TODO: Change this as soon as we have the new state structure with step 2 of marketplace
-            state = Object.assign(state, {
-                templates: allElements.reduce<{
-                    [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
-                }>((acc, element) => {
-                    if (element.content.type !== 'vehicleTemplate') return acc;
-                    acc[element.entityId] = {
-                        ...cloneDeepMutable(element.content),
-                        entity: {
-                            versionId: element.versionId,
-                            entityId: element.entityId,
-                            type: 'direct',
-                        },
-                    };
-                    return acc;
-                }, {}),
-                alarmGroups: allElements.reduce<{
-                    [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
-                }>((acc, element) => {
-                    if (element.content.type !== 'vehicleTemplate') return acc;
-                    acc[element.entityId] = {
-                        ...cloneDeepMutable(element.content),
-                        entity: {
-                            versionId: element.versionId,
-                            entityId: element.entityId,
-                            type: 'direct',
-                        },
-                    };
-                    return acc;
-                }, {}),
-            } satisfies { [T in keyof ExerciseState]?: any });
+            // We put the elements into the state in order
+            // to reuse the existing migration logic
+            state.templates = allElements.reduce<{
+                [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
+            }>((acc, element) => {
+                if (element.content.type !== 'vehicleTemplate') return acc;
+                acc[element.entityId] = {
+                    ...cloneDeepMutable(element.content),
+                    entity: {
+                        versionId: element.versionId,
+                        entityId: element.entityId,
+                        type: 'direct',
+                    },
+                };
+                return acc;
+            }, {});
 
-            // Asserted value as we check for set-size of =1 above
+            state.alarmGroups = allElements.reduce<{
+                [T in ElementEntityId]: WritableDraft<AlarmGroup>;
+            }>((acc, element) => {
+                if (element.content.type !== 'alarmGroup') return acc;
+                acc[element.entityId] = {
+                    ...cloneDeepMutable(element.content as AlarmGroup),
+                    entity: {
+                        versionId: element.versionId,
+                        entityId: element.entityId,
+                        type: 'direct',
+                    },
+                };
+                return acc;
+            }, {});
+
             const migratedState = applyMigrations(currentElementVersion, {
                 currentState: state,
                 history: undefined,
@@ -1581,6 +1585,10 @@ export class CollectionService {
                 [
                     ...Object.values(
                         migratedState.migratedProperties.currentState.templates
+                    ).filter(isVersionedElementContent),
+                    ...Object.values(
+                        migratedState.migratedProperties.currentState
+                            .alarmGroups
                     ).filter(isVersionedElementContent),
                 ]
             );

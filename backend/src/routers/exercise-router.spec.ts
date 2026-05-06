@@ -13,6 +13,7 @@ import {
     createExercise,
     createTestEnvironment,
 } from '../test/utils.js';
+import type { SessionInformation } from '../auth/auth-service.js';
 
 describe('exercise router', () => {
     const environment = createTestEnvironment();
@@ -135,6 +136,7 @@ describe('exercise router', () => {
 
         describe('exercise template', () => {
             let session: string;
+            let sessionInformation: SessionInformation;
             let exerciseTemplate: GetExerciseTemplateResponseData;
             beforeEach(async () => {
                 session = await createTestUserSession(environment);
@@ -142,6 +144,10 @@ describe('exercise router', () => {
                     environment,
                     session
                 );
+                sessionInformation =
+                    (await environment.services.authService.getDataFromSessionToken(
+                        session
+                    ))!;
             });
 
             it('fails with trainer key if not logged in', async () => {
@@ -183,9 +189,11 @@ describe('exercise router', () => {
             });
 
             it('fails with participant key if not logged in', async () => {
-                const exercise = environment.services.exerciseService
-                    .TESTING_getExerciseMap()
-                    .get(exerciseTemplate.trainerKey)!;
+                const exercise =
+                    await environment.services.exerciseService.getExerciseByKey(
+                        exerciseTemplate.trainerKey,
+                        sessionInformation
+                    );
                 await environment
                     .httpRequest(
                         'get',
@@ -195,9 +203,11 @@ describe('exercise router', () => {
             });
 
             it('fails with participant key if logged in', async () => {
-                const exercise = environment.services.exerciseService
-                    .TESTING_getExerciseMap()
-                    .get(exerciseTemplate.trainerKey)!;
+                const exercise =
+                    await environment.services.exerciseService.getExerciseByKey(
+                        exerciseTemplate.trainerKey,
+                        sessionInformation
+                    );
                 await environment
                     .httpRequest(
                         'get',

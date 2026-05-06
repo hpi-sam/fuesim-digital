@@ -14,14 +14,20 @@ import {
     createTestEnvironment,
     createExerciseTemplate,
 } from '../test/utils.js';
+import type { SessionInformation } from '../auth/auth-service.js';
 
 describe('exercise manager router', () => {
     const environment = createTestEnvironment();
     let session: string;
+    let sessionInformation: SessionInformation;
     beforeEach(async () => {
         await environment.repositories.accessKeyRepository.freeAll();
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
         session = await createTestUserSession(environment);
+        sessionInformation =
+            (await environment.services.authService.getDataFromSessionToken(
+                session
+            ))!;
     });
     describe('GET /api/exercises', () => {
         it('fails with 403 if not authenticated', async () => {
@@ -172,9 +178,11 @@ describe('exercise manager router', () => {
             expect(parsed.lastUpdatedAt.getTime()).toBeLessThan(Date.now());
             expect(parsed.lastExerciseCreatedAt).toBe(null);
 
-            const importedExercise = environment.services.exerciseService
-                .TESTING_getExerciseMap()
-                .get(parsed.trainerKey)!;
+            const importedExercise =
+                await environment.services.exerciseService.getExerciseByKey(
+                    parsed.trainerKey,
+                    sessionInformation
+                );
             expect(importedExercise.exercise.currentStateString).toMatchObject({
                 ...exercise.exercise.currentStateString,
                 participantKey: importedExercise.participantKey,

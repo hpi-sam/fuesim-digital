@@ -21,10 +21,11 @@ describe('exercise manager service', () => {
             environment,
             session
         );
-        const exercise = environment.services.exerciseService.getExerciseByKey(
-            exerciseTemplate.trainerKey,
-            sessionInformation
-        );
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseTemplate.trainerKey,
+                sessionInformation
+            );
         const action: ExerciseAction = {
             type: '[AlarmGroup] Add AlarmGroup',
             alarmGroup: {
@@ -45,6 +46,10 @@ describe('exercise manager service', () => {
                 'standalone',
                 sessionInformation
             );
+        await environment.services.exerciseService.getExerciseByKey(
+            newActiveExercise.trainerKey,
+            sessionInformation
+        );
         expect(
             environment.services.exerciseService.TESTING_getExerciseMap().size
         ).toBe(6);

@@ -144,7 +144,6 @@ export class ExerciseManagerService {
         const newExercise =
             await this.exerciseService.createExercise(newExerciseEntry);
         const activeExercise = new ActiveExercise(newExercise, []);
-        await this.exerciseService.loadExercise(activeExercise);
         await this.exerciseRepository.updateExerciseTemplate(
             exerciseTemplate.id,
             { lastExerciseCreatedAt: new Date() }
@@ -164,7 +163,7 @@ export class ExerciseManagerService {
         if (exerciseTemplate.user !== session.user.id) {
             throw new PermissionDeniedError();
         }
-        const activeExercise = this.exerciseService.getExerciseByKey(
+        const activeExercise = await this.exerciseService.getExerciseByKey(
             exerciseTemplate.trainerKey,
             session
         );
@@ -189,7 +188,8 @@ export class ExerciseManagerService {
             throw new PermissionDeniedError();
         }
         return this.exerciseService.getExercisesViewportsById(
-            exerciseTemplate.exercise.id
+            exerciseTemplate.exercise.id,
+            session
         );
     }
 }

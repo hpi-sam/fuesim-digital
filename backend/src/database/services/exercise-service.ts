@@ -45,11 +45,19 @@ export class ExerciseService {
         ActiveExercise
     >();
 
-    public getExerciseByKey(
+    /*
+     * NOTE: This does NOT load the exercise into the in-memory
+     * map if it is fetched from the database. If you make changes
+     * to the exercise and are unsure if it's currently loaded,
+     * call exerciseService.loadExercise() after modification.
+     */
+    public async getExerciseByKey(
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ) {
-        const exercise = this.exerciseMap.get(exerciseKey);
+        const exercise =
+            this.exerciseMap.get(exerciseKey) ??
+            (await this.restoreExerciseByKey(exerciseKey));
         if (!exercise) {
             throw new NotFoundError();
         }
@@ -61,6 +69,31 @@ export class ExerciseService {
         ) {
             throw new PermissionDeniedError();
         }
+        this.loadExercise(exercise);
+        return exercise;
+    }
+
+    /*
+     * NOTE: This does NOT load the exercise into the in-memory
+     * map if it is fetched from the database. If you make changes
+     * to the exercise and are unsure if it's currently loaded,
+     * call exerciseService.loadExercise() after modification.
+     */
+    public async getExerciseById(
+        exerciseId: ExerciseId,
+        session?: SessionInformation
+    ) {
+        const exercise =
+            this.exerciseMap.get(exerciseId) ??
+            (await this.restoreExerciseById(exerciseId));
+        if (!exercise) {
+            throw new NotFoundError();
+        }
+
+        if (exercise.template && exercise.template.user !== session?.user.id) {
+            throw new PermissionDeniedError();
+        }
+        this.loadExercise(exercise);
         return exercise;
     }
 
@@ -125,7 +158,6 @@ export class ExerciseService {
         } satisfies ExerciseInsert;
         const exerciseEntry = await this.createExercise(exerciseInsert);
         const activeExercise = new ActiveExercise(exerciseEntry);
-        await this.loadExercise(activeExercise);
         return activeExercise;
     }
 
@@ -182,8 +214,6 @@ export class ExerciseService {
             // The actions haven't been saved in the database yet -> keep them
             activeExercise.restore(true);
 
-            await this.loadExercise(activeExercise);
-
             return activeExercise;
         } catch (err) {
             if (err instanceof ValidationErrorWrapper) {
@@ -223,9 +253,9 @@ export class ExerciseService {
     }
 
     /**
-     * Restore all Exercises from Database; called on startup
+     * Migrate all outdated Exercises in Database; called on startup
      */
-    public async restoreAllExercises(): Promise<ActiveExercise[]> {
+    public async migrateAllExercises(): Promise<number> {
         return this.exerciseRepository.transaction(
             async (exerciseRepoTransaction) => {
                 console.log('Migrate outdated exercises in database…');
@@ -254,49 +284,61 @@ export class ExerciseService {
                     'Finished migrating outdated exercises in database…'
                 );
 
-                const exercises = await Promise.all(
-                    (await exerciseRepoTransaction.getAllExercises()).map(
-                        async (exerciseEntity) => {
-                            const exercise = new ActiveExercise(exerciseEntity);
-                            exercise.template = exerciseEntity.template ?? null;
-
-                            // Load all actions
-                            pushAll(
-                                exercise.temporaryActionHistory,
-                                (
-                                    await this.actionRepository
-                                        .withConnection(exerciseRepoTransaction)
-                                        .getActionsForExerciseId(
-                                            exerciseEntity.id
-                                        )
-                                ).map(
-                                    (actionEntity) =>
-                                        new ActionWrapper(
-                                            actionEntity.actionString,
-                                            actionEntity.emitterId,
-                                            exercise,
-                                            actionEntity.index,
-                                            actionEntity.id
-                                        )
-                                )
-                            );
-                            return exercise;
-                        }
-                    )
-                );
-                await Promise.all(
-                    // The actions have already been saved in the database -> do not keep them
-                    exercises.map(async (exercise) => exercise.restore(false))
-                );
-                exercises.forEach((exercise) => {
-                    this.exerciseMap.set(exercise.participantKey, exercise);
-                    this.exerciseMap.set(exercise.trainerKey, exercise);
-                    this.exerciseMap.set(exercise.exercise.id, exercise);
-                    this.loadExercise(exercise);
-                });
-                return exercises;
+                return outdatedExercises.length;
             }
         );
+    }
+
+    /**
+     * Attempt to restore an Exercise from Database by its key
+     */
+    public async restoreExerciseByKey(key: ExerciseKey) {
+        return this.restoreExerciseFrom(async (tx) => tx.getExerciseByKey(key));
+    }
+
+    /**
+     * Attempt to restore an Exercise from Database by its id
+     */
+    public async restoreExerciseById(id: ExerciseId) {
+        return this.restoreExerciseFrom(async (tx) => tx.getExerciseById(id));
+    }
+
+    private async restoreExerciseFrom(
+        lookup: (
+            tx: ExerciseRepository
+        ) => ReturnType<ExerciseRepository['getExerciseByKey']> // TODO: Find better way to type this
+    ): Promise<ActiveExercise | null> {
+        return this.exerciseRepository.transaction(async (tx) => {
+            const exerciseEntity = await lookup(tx);
+            if (!exerciseEntity) return null;
+
+            const exercise = new ActiveExercise(exerciseEntity);
+            exercise.template = exerciseEntity.template ?? null;
+
+            // Load all actions
+            pushAll(
+                exercise.temporaryActionHistory,
+                (
+                    await this.actionRepository
+                        .withConnection(tx)
+                        .getActionsForExerciseId(exerciseEntity.id)
+                ).map(
+                    (actionEntity) =>
+                        new ActionWrapper(
+                            actionEntity.actionString,
+                            actionEntity.emitterId,
+                            exercise,
+                            actionEntity.index,
+                            actionEntity.id
+                        )
+                )
+            );
+
+            // The actions have already been saved in the database -> do not keep them
+            exercise.restore(false);
+
+            return exercise;
+        });
     }
 
     /**
@@ -314,7 +356,10 @@ export class ExerciseService {
             throw new PermissionDeniedError();
         }
 
-        const activeExercise = this.getExerciseByKey(exerciseKey, session);
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
 
         const exerciseEntry = await this.exerciseRepository.getExerciseById(
             activeExercise.exercise.id
@@ -365,11 +410,20 @@ export class ExerciseService {
         });
     }
 
+    public async unloadEmptyExercises() {
+        new Set(this.exerciseMap.values()).forEach((exercise) => {
+            if (exercise.clients.size === 0) this.unloadExercise(exercise);
+        });
+    }
+
     public async getTimeline(
         exerciseKey: ExerciseKey,
         session?: SessionInformation
     ): Promise<ExerciseTimeline> {
-        const activeExercise = this.getExerciseByKey(exerciseKey, session);
+        const activeExercise = await this.getExerciseByKey(
+            exerciseKey,
+            session
+        );
         const completeHistory: ExerciseTimeline['actionsWrappers'] = [
             ...(
                 await this.actionRepository.getActionsForExerciseId(
@@ -395,11 +449,11 @@ export class ExerciseService {
         };
     }
 
-    public getExercisesViewportsById(id: ExerciseId) {
-        const activeExercise = this.exerciseMap.get(id);
-        if (!activeExercise) {
-            throw new NotFoundError();
-        }
+    public async getExercisesViewportsById(
+        id: ExerciseId,
+        session?: SessionInformation
+    ) {
+        const activeExercise = await this.getExerciseById(id, session);
         return Object.values(
             activeExercise.exercise.currentStateString.viewports
         );

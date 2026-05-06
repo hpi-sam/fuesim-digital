@@ -1,6 +1,12 @@
-<div class="container-fluid position-relative d-flex flex-column h-100">
+<div
+    #fullscreenWrapper
+    class="container-fluid position-relative d-flex flex-column h-100"
+>
     <div class="flex-fill row">
-        <app-exercise-map class="h-100 rounded overflow-hidden" />
+        <app-exercise-map
+            class="h-100 rounded overflow-hidden"
+            [fullscreenContainer]="fullscreenWrapper"
+        />
     </div>
 
     @if (exerciseStatus() === 'running' && doMeasuresExist()) {

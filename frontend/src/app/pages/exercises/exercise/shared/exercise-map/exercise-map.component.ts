@@ -4,6 +4,7 @@ import {
     ElementRef,
     ViewContainerRef,
     inject,
+    input,
     signal,
     viewChild,
 } from '@angular/core';
@@ -50,6 +51,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     readonly openLayersContainer = viewChild.required<
         ElementRef<HTMLDivElement>
     >('openLayersContainer');
+    readonly fullscreenContainer = input<HTMLElement>();
     readonly popoverContainer =
         viewChild.required<ElementRef<HTMLDivElement>>('popoverContainer');
     readonly popoverContent = viewChild.required('popoverContent', {
@@ -86,12 +88,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
         );
 
         // Check whether the map is fullscreen
-        this.openLayersContainer().nativeElement.addEventListener(
-            'fullscreenchange',
-            (event) => {
-                this.fullscreenEnabled.set(document.fullscreenElement !== null);
-            }
-        );
+        document.addEventListener('fullscreenchange', this.onFullscreenChange);
 
         const queryParams = this.route.snapshot.queryParams;
         const result = olMapCoordinatesSchema.safeParse(queryParams);
@@ -103,9 +100,15 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     }
 
     public readonly fullscreenEnabled = signal(false);
+    private readonly onFullscreenChange = () => {
+        this.fullscreenEnabled.set(document.fullscreenElement !== null);
+    };
     public toggleFullscreen() {
         if (!this.fullscreenEnabled()) {
-            this.openLayersContainer().nativeElement.requestFullscreen();
+            (
+                this.fullscreenContainer() ??
+                this.openLayersContainer().nativeElement
+            ).requestFullscreen();
         } else {
             document.exitFullscreen();
         }
@@ -119,6 +122,10 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.destroy$.next();
+        document.removeEventListener(
+            'fullscreenchange',
+            this.onFullscreenChange
+        );
         this.dragElementService.unregisterMap();
         this.dragElementService.unregisterLayerFeatureManagerDictionary();
     }

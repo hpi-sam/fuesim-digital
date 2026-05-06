@@ -835,7 +835,7 @@ export class CollectionRepository extends BaseRepository {
         );
     }
 
-    public async addElementToCollection(
+    public async attachElementToCollectionVersion(
         elementVersionId: ElementVersionId,
         collectionVersionId: CollectionVersionId,
         isBaseReference: boolean = true
@@ -939,7 +939,7 @@ export class CollectionRepository extends BaseRepository {
             .select(
                 this.databaseConnection
                     .select({
-                        // INFO: This is order-sensitive, based on the order in the schema
+                        // WARNING: This is order-sensitive, based on the order in the schema
                         // and requires ALL fields (even defaulted ones) to be selected
                         setEntityId: elementCollectionMappingTable.setEntityId,
                         setVersionId: sql<string>`${targetSetVersionId}`.as(
@@ -949,6 +949,11 @@ export class CollectionRepository extends BaseRepository {
                             elementCollectionMappingTable.elementEntityId,
                         elementVersionId:
                             elementCollectionMappingTable.elementVersionId,
+                        // We now want to set the base reference flag to false
+                        // as these are not the original mappings of the element
+                        //
+                        // This is important so that if we write or delete the element(-reference!)
+                        // we know not to affect the original collection version, but copy-on-write
                         isBaseReference: sql<boolean>`FALSE`.as(
                             'isBaseReference'
                         ),
@@ -965,6 +970,13 @@ export class CollectionRepository extends BaseRepository {
             );
     }
 
+    /**
+     * INFO: This method should really only be used
+     * for creating a copy of a collection version
+     *
+     *   It creates copies of all elements inside the source collection
+     *   version and maps those copies to the target collection version.
+     */
     public async copyElementsBetweenCollections(data: {
         source: {
             entityId: CollectionEntityId;
@@ -998,7 +1010,7 @@ export class CollectionRepository extends BaseRepository {
                 .select(
                     tx
                         .select({
-                            // INFO: This is order-sensitive, based on the order in the schema
+                            // WARNING: This is order-sensitive, based on the order in the schema
                             // and requires ALL fields (even defaulted ones) to be selected
                             versionId:
                                 sql`'element_version_' || uuid_generate_v4()`.as(

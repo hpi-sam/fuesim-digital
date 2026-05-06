@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { uuidSchema, type UUID } from '../../utils/uuid.js';
 import { type Element as FuesimElement } from '../../models/element.js';
+import type { ImmutableInfer } from '../../utils/infer.js';
 import { collectionUpgradeChangeElementTypesSchema } from './exercise-collection-change-element.js';
 
 export const changeAlarmgroupTargetSchema = z.object({
@@ -10,7 +11,7 @@ export const changeAlarmgroupTargetSchema = z.object({
     alarmGrupVehicleId: uuidSchema,
 });
 
-export type ChangeAlarmgroupTarget = z.infer<
+export type ChangeAlarmgroupTarget = ImmutableInfer<
     typeof changeAlarmgroupTargetSchema
 >;
 
@@ -33,7 +34,7 @@ export const changeMapTargetSchema = z.object({
     elementType: collectionUpgradeChangeElementTypesSchema,
 });
 
-export type ChangeMapTarget = z.infer<typeof changeMapTargetSchema>;
+export type ChangeMapTarget = ImmutableInfer<typeof changeMapTargetSchema>;
 
 export function newChangeMapTarget(
     type: FuesimElement['type'],
@@ -51,4 +52,4 @@ export const changeTargetSchema = z.discriminatedUnion('kind', [
     changeMapTargetSchema,
 ]);
 
-export type ChangeTarget = z.infer<typeof changeTargetSchema>;
+export type ChangeTarget = ImmutableInfer<typeof changeTargetSchema>;

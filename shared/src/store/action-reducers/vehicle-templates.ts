@@ -117,7 +117,9 @@ export namespace VehicleTemplateActionReducers {
                     personnelTemplateIds,
                 }
             ) => {
-                const vehicleTemplate = getVehicleTemplate(draftState, id);
+                const vehicleTemplate = cloneDeepMutable(
+                    getVehicleTemplate(draftState, id)
+                );
                 vehicleTemplate.image = cloneDeepMutable(image);
                 vehicleTemplate.name = name;
                 vehicleTemplate.patientCapacity = patientCapacity;
@@ -194,7 +196,7 @@ export namespace VehicleTemplateActionReducers {
 function getVehicleTemplate(
     state: WritableDraft<ExerciseState>,
     id: UUID
-): WritableDraft<VehicleTemplate> {
+): VehicleTemplate {
     const vehicleTemplate = getTemplates(state, 'vehicleTemplate')[id];
     if (!vehicleTemplate) {
         throw new ReducerError(`VehicleTemplate with id ${id} does not exist`);

@@ -10,6 +10,7 @@ import {
     VersionedElementContent,
 } from 'fuesim-digital-shared';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Immutable } from 'immer';
 import { VersionedElementDisplayNamePipe } from '../../../../shared/pipes/versioned-element-type-display-name.pipe';
 import { ElementCardComponent } from '../cards/element-card/element-card.component';
 import { CreatingVersionedElementModalData } from '../modals/editor-modals/base-versioned-element-submodal';
@@ -30,7 +31,9 @@ export class CollectionElementsListComponent {
     public readonly collection = input.required<VersionedCollectionPartial>();
     public readonly collectionElements =
         input.required<CollectionElementsDto>();
-    public readonly publishedElements = input<ElementDto[] | null>(null);
+    public readonly publishedElements = input<Immutable<ElementDto[]> | null>(
+        null
+    );
     public readonly editable = input(true);
     public readonly showImportedElements = input(false);
     public readonly allowCreation = input(false);

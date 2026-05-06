@@ -9,6 +9,7 @@ import {
     type RemoveChangeApply,
     type RemovedElementChangeImpact,
 } from 'fuesim-digital-shared';
+import { Immutable } from 'immer';
 import { MapEditorCardComponent } from '../../../../../../shared/components/map-editor-card/map-editor-card.component';
 import { ElementCardComponent } from '../../../../../marketplace/shared/cards/element-card/element-card.component';
 
@@ -21,14 +22,15 @@ import { ElementCardComponent } from '../../../../../marketplace/shared/cards/el
 export class DeletedElementChangeApplyItemComponent {
     public readonly change = input.required<RemovedElementChangeImpact>();
     public readonly applyingChange = input<ChangeApply>();
-    public readonly elementsOfNewCollection = input.required<ElementDto[]>();
+    public readonly elementsOfNewCollection =
+        input.required<Immutable<ElementDto[]>>();
 
     public readonly applyChange = output<RemoveChangeApply>();
     public readonly applyForAll = output();
 
     public readonly elementTypes: {
         [T in CollectionUpgradeChangeElement['type']]?: {
-            replaceFilter: (elements: ElementDto[]) => ElementDto[];
+            replaceFilter: (elements: Immutable<ElementDto[]>) => ElementDto[];
             orphanable: boolean;
         };
     } = {

@@ -1,6 +1,9 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
+import type { ImmutableInfer } from '../utils/infer.js';
 import type {
     CollectionVersionId,
+    ElementVersionId,
     VersionedCollectionPartial,
 } from './models/versioned-id-schema.js';
 import { elementVersionIdSchema } from './models/versioned-id-schema.js';
@@ -36,20 +39,22 @@ export const changedElementDtoSchema = z.union([
     addedElementDtoSchema,
 ]);
 
-export type ChangeElementType = z.infer<typeof changedElementDtoSchema>['type'];
+export type ChangeElementType = ImmutableInfer<
+    typeof changedElementDtoSchema
+>['type'];
 
-export type ChangedElementDto = z.infer<typeof changedElementDtoSchema>;
+export type ChangedElementDto = ImmutableInfer<typeof changedElementDtoSchema>;
 
 export const changeDependenciesSchema = z.record(
     elementVersionIdSchema,
     z.array(elementDtoSchema)
 );
 
-export type ChangeDependencies = z.infer<typeof changeDependenciesSchema>;
+export type ChangeDependencies = { [T in ElementVersionId]: ElementDto[] };
 
 export function getCollectionElementDiff(
-    currentElements: ElementDto[],
-    newElements: ElementDto[]
+    currentElements: Immutable<ElementDto[]>,
+    newElements: Immutable<ElementDto[]>
 ): ChangedElementDto[] {
     const changes: ChangedElementDto[] = [];
 

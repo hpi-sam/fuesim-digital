@@ -28,6 +28,7 @@ import {
     gt,
     inArray,
 } from 'drizzle-orm';
+import { castImmutable } from 'immer';
 import {
     collectionDependencyMappingTable,
     elementCollectionMappingTable,
@@ -795,7 +796,7 @@ export class CollectionRepository extends BaseRepository {
         content: VersionedElementContent;
         version: number;
         entityId?: ElementEntityId;
-    }) {
+    }): Promise<ElementDto | null> {
         const result = await this.databaseConnection
             .insert(elementTable)
             .values({
@@ -808,7 +809,7 @@ export class CollectionRepository extends BaseRepository {
             })
             .returning();
 
-        return this.onlySingle(result);
+        return castImmutable(this.onlySingle(result));
     }
 
     public async getElementCollectionMapping(

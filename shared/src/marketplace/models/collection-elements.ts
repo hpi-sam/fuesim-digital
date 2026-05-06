@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
+import type { ImmutableInfer } from '../../utils/infer.js';
 import { collectionDtoSchema } from './collection.js';
 import type { ElementDto } from './versioned-elements.js';
 import { elementDtoSchema } from './versioned-elements.js';
@@ -34,28 +36,30 @@ export const collectionElementsDtoSchema = z.strictObject({
     references: z.array(collectionElementsSingleSchema),
 } satisfies { [T in CollectionElementType]: unknown });
 
-export type CollectionElementsDto = z.infer<typeof collectionElementsDtoSchema>;
+export type CollectionElementsDto = ImmutableInfer<
+    typeof collectionElementsDtoSchema
+>;
 
 export function gatherCollectionElements(elements: CollectionElementsDto) {
     return {
-        allDirectElements(): ElementDto[] {
+        allDirectElements(): Immutable<ElementDto[]> {
             return elements.direct;
         },
-        allImportedElements(): ElementDto[] {
+        allImportedElements(): Immutable<ElementDto[]> {
             return elements.imported.flatMap((imported) => imported.elements);
         },
-        allReferenceElements(): ElementDto[] {
+        allReferenceElements(): Immutable<ElementDto[]> {
             return elements.references.flatMap(
                 (reference) => reference.elements
             );
         },
-        allVisibleElements(): ElementDto[] {
+        allVisibleElements(): Immutable<ElementDto[]> {
             return [
                 ...elements.direct,
                 ...elements.imported.flatMap((imported) => imported.elements),
             ];
         },
-        allElements(): ElementDto[] {
+        allElements(): Immutable<ElementDto[]> {
             return [
                 ...this.allVisibleElements(),
                 ...elements.references.flatMap(

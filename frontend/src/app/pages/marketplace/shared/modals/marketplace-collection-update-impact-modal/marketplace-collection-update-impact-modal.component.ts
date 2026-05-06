@@ -7,6 +7,7 @@ import {
     VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
+import { Immutable } from 'immer';
 import { VersionedElementFormComponent } from '../editor-modals/versioned-element-form/versioned-element-form.component';
 import { VersionedElementModalData } from '../editor-modals/base-versioned-element-submodal';
 import { VersionedElementDisplayNamePipe } from '../../../../../shared/pipes/versioned-element-type-display-name.pipe';
@@ -22,7 +23,7 @@ export class CollectionUpgradeImpactModalComponent {
 
     public collection!: VersionedCollectionPartial;
     public changes!: ChangedElementDto[];
-    public collectionElements!: ElementDto[];
+    public collectionElements!: Immutable<ElementDto[]>;
     public changeDependencies!: ChangeDependencies | undefined;
     public confirmationButtonText = 'OK';
     public readonly confirmationResult$ = new Subject<boolean | null>();

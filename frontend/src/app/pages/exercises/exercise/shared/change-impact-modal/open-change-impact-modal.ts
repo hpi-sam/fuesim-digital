@@ -2,6 +2,7 @@ import type { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import type { ChangeImpact, ElementDto } from 'fuesim-digital-shared';
 import type { ObservedValueOf } from 'rxjs';
 import { firstValueFrom } from 'rxjs';
+import type { Immutable } from 'immer';
 import { ChangeImpactModalComponent } from './change-impact-modal.component';
 
 /**
@@ -11,7 +12,7 @@ export async function openChangeImpactModal(
     ngbModalService: NgbModal,
     data: {
         changeImpacts: ChangeImpact[];
-        visibleAvailableElements: ElementDto[];
+        visibleAvailableElements: Immutable<ElementDto[]>;
     }
 ): Promise<ObservedValueOf<ChangeImpactModalComponent['submitChanges']>> {
     if (data.changeImpacts.length === 0) {

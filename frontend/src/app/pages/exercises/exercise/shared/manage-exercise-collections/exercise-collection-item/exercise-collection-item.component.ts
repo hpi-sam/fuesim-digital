@@ -7,9 +7,11 @@ import {
     CollectionElementsDto,
     calculateChangeImpacts,
     CollectionDto,
+    cloneDeepMutable,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Immutable, WritableDraft } from 'immer';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
@@ -54,7 +56,7 @@ export class ExerciseColletionItemComponent {
             this.collectionService.checkNewerVersionAvailable(collection),
     });
 
-    private async fetchCollectionElements(): Promise<ElementDto[]> {
+    private async fetchCollectionElements(): Promise<Immutable<ElementDto[]>> {
         const collectionElements =
             await this.collectionService.getElementsOfCollectionVersion(
                 this.collection()
@@ -240,7 +242,9 @@ export class ExerciseColletionItemComponent {
                 )
             )
         );
-        return elements.reduce<CollectionElementsDto>(
+        return cloneDeepMutable(elements).reduce<
+            WritableDraft<CollectionElementsDto>
+        >(
             (acc, collectionElements) => {
                 acc.direct.push(...collectionElements.direct);
 

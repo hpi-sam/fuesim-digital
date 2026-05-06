@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { elementDtoSchema } from '../models/versioned-elements.js';
 import { versionedElementContentSchema } from '../models/versioned-element-content.js';
 import { collectionElementTypeSchema } from '../models/collection-element-type.js';
+import type { ImmutableInfer } from './../../utils/infer.js';
 import { changeTargetSchema } from './exercise-collection-change-target.js';
 
 export const sharedChangeApplySchema = z.object({
@@ -16,7 +17,7 @@ export const removeReplaceChangeApplySchema = z.object({
     ...sharedChangeApplySchema.shape,
 });
 
-export type RemoveReplaceChangeApply = z.infer<
+export type RemoveReplaceChangeApply = ImmutableInfer<
     typeof removeReplaceChangeApplySchema
 >;
 
@@ -35,7 +36,7 @@ export const removeChangeApplySchema = z.discriminatedUnion('action', [
     removeReplaceChangeApplySchema,
 ]);
 
-export type RemoveChangeApply = z.infer<typeof removeChangeApplySchema>;
+export type RemoveChangeApply = ImmutableInfer<typeof removeChangeApplySchema>;
 
 export const editableChangeApplyActionSchema = z.literal(['keep', 'update']);
 
@@ -57,7 +58,9 @@ export const editableChangeApplySchema = z.discriminatedUnion('action', [
     editableCustomChangeApplySchema,
 ]);
 
-export type EditableChangeApply = z.infer<typeof editableChangeApplySchema>;
+export type EditableChangeApply = ImmutableInfer<
+    typeof editableChangeApplySchema
+>;
 
 export const addedChangeApplySchema = z.object({
     type: z.literal('added'),
@@ -66,7 +69,7 @@ export const addedChangeApplySchema = z.object({
     ...sharedChangeApplySchema.shape,
 });
 
-export type AddedChangeApply = z.infer<typeof addedChangeApplySchema>;
+export type AddedChangeApply = ImmutableInfer<typeof addedChangeApplySchema>;
 
 export const changeApplySchema = z.discriminatedUnion('type', [
     removeChangeApplySchema,
@@ -74,4 +77,4 @@ export const changeApplySchema = z.discriminatedUnion('type', [
     addedChangeApplySchema,
 ]);
 
-export type ChangeApply = z.infer<typeof changeApplySchema>;
+export type ChangeApply = ImmutableInfer<typeof changeApplySchema>;

@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import type { Immutable } from 'immer';
 import { versionedElementPartialSchema } from './versioned-id-schema.js';
 import { stateVersionedEntitySchema } from './state-versioned-entity.js';
 import { versionedElementContentSchema } from './versioned-element-content.js';
@@ -11,7 +12,7 @@ export const elementDtoSchema = z.object({
     content: versionedElementContentSchema,
 });
 
-export type ElementDto = z.infer<typeof elementDtoSchema>;
+export type ElementDto = Immutable<z.infer<typeof elementDtoSchema>>;
 export type TypedElementDto<TContent> = Omit<ElementDto, 'content'> & {
     content: TContent;
 };

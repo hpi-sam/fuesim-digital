@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { ExerciseState } from '../state.js';
 import { vehicleTemplateSchema } from './vehicle-template.js';
 import { personnelTemplateSchema } from './personnel-template.js';
@@ -14,7 +15,7 @@ export const templateSchema = z.union([
     alarmGroupSchema,
 ]);
 
-export type Template = z.infer<typeof templateSchema>;
+export type Template = Immutable<z.infer<typeof templateSchema>>;
 
 export const templateTypeSchema = z.union(
     templateSchema.options.map((option) => z.literal(option.shape.type.value))

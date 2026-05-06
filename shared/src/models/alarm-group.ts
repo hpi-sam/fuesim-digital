@@ -3,6 +3,7 @@ import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
 import { isElementVersionId } from '../marketplace/models/versioned-id-schema.js';
+import { cloneDeepMutable } from '../utils/clone-deep.js';
 import { alarmGroupVehicleSchema } from './utils/alarm-group-vehicle.js';
 import { registerDependency } from './utils/dependency-registry.js';
 
@@ -23,7 +24,8 @@ registerDependency('alarmGroup', {
             .map((vehicle) => vehicle.vehicleTemplateId)
             .filter((id) => isElementVersionId(id)),
     replace: (content, replacements) => {
-        content.alarmGroupVehicles = Object.fromEntries(
+        const mutableContent = cloneDeepMutable(content);
+        mutableContent.alarmGroupVehicles = Object.fromEntries(
             Object.entries(content.alarmGroupVehicles)
                 .filter((f) => {
                     const replacement = replacements.find(
@@ -32,11 +34,12 @@ registerDependency('alarmGroup', {
                     return replacement?.new !== null;
                 })
                 .map(([key, vehicle]) => {
+                    const mutableVehicle = cloneDeepMutable(vehicle);
                     const replacement = replacements.find(
                         (r) => r.old === vehicle.vehicleTemplateId
                     );
                     if (replacement && replacement.new !== null) {
-                        vehicle.vehicleTemplateId = replacement.new;
+                        mutableVehicle.vehicleTemplateId = replacement.new;
                     }
                     return [key, vehicle];
                 })

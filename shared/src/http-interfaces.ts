@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { exerciseTemplateIdSchema, parallelExerciseIdSchema } from './ids.js';
 import {
     groupParticipantKeySchema,
@@ -525,7 +526,7 @@ export namespace Marketplace {
             public readonly Type!: T extends z.ZodType
                 ? // if D is defined (override type), use D, otherwise infer from T
                   D extends unknown
-                    ? z.infer<T>
+                    ? Immutable<z.infer<T>>
                     : D
                 : never;
 

@@ -5,6 +5,7 @@ import { ChangeApply, ChangeImpact, ElementDto } from 'fuesim-digital-shared';
 import { NgbActiveModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { CdkTreeModule } from '@angular/cdk/tree';
+import { Immutable } from 'immer';
 import { CollectionService } from '../../../../../core/exercise-element.service';
 import { VersionedElementDisplayNamePipe } from '../../../../../shared/pipes/versioned-element-type-display-name.pipe';
 import { DeletedElementChangeApplyItemComponent } from './deleted-element-item/deleted-element-item.component';
@@ -43,7 +44,7 @@ export class ChangeImpactModalComponent implements OnInit {
 
     // This data must be provided when opening the modal via NgbModal.
     public changes: ChangeImpact[] = [];
-    public collectionElements!: ElementDto[];
+    public collectionElements!: Immutable<ElementDto[]>;
 
     public readonly submitChanges = new Subject<{
         /*

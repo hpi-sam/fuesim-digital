@@ -1,0 +1,21 @@
+<p class="small text-muted mb-2">
+    <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
+    Unter dieser Adresse werden die Karten-Kacheln für
+    {{ description() }} geladen. Die URL muss die Platzhalter für die
+    Koordinaten <code>{{ '{' }}x{{ '}' }}</code
+    >, <code>{{ '{' }}y{{ '}' }}</code> oder <code>{{ '{' }}-y{{ '}' }}</code
+    >, sowie der Zoomstufe <code>{{ '{' }}z{{ '}' }}</code> enthalten. Bitte
+    beachten Sie die Lizenzbedingungen der entsprechenden Karten-Server.
+</p>
+<input
+    #tileUrlInput="ngModel"
+    [(ngModel)]="url"
+    [appAutofocus]="autofocus()"
+    appUrlValidator
+    [pattern]="tileUrlRegex"
+    required
+    type="url"
+    class="form-control"
+    placeholder="https://a.tile.openstreetmap.de/{z}/{x}/{y}.png"
+/>
+<app-display-validation [ngModelInput]="tileUrlInput"></app-display-validation>

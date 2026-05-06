@@ -1,0 +1,137 @@
+<div class="container-fluid d-flex flex-column h-100 mt-3 ms-1">
+    <div class="card col-3 p-0 rounded-2" style="min-width: 300px">
+        <div class="card-header text-center">
+            <h5 class="mb-0 d-flex align-items-center">Neues Kriterium</h5>
+        </div>
+        @switch (criterionCreationType()) {
+            @case ('xPatientsAtStatusEvalCriterion') {
+                <form class="ms-3">
+                    <label>
+                        Art:
+                        {{
+                            evalCriterionTypesNames.xPatientsAtStatusEvalCriterion
+                        }}
+                    </label>
+                    <label>
+                        Anzahl:
+                        <input
+                            type="number"
+                            [formField]="criterionForm.countInput"
+                        />
+                    </label>
+                    <label class="mt-1">
+                        Sichtungskategorie:
+                        <select [formField]="criterionForm.patientStatusInput">
+                            @for (
+                                status of patientStatusAllowedValues;
+                                track status
+                            ) {
+                                <option value="{{ status }}">
+                                    {{ statusNames[status] }}
+                                </option>
+                            }
+                        </select></label
+                    >
+                </form>
+            }
+            @case ('doMeasureXTimesEvalCriterion') {
+                <form class="ms-3">
+                    <label>
+                        Art:
+                        {{
+                            evalCriterionTypesNames.doMeasureXTimesEvalCriterion
+                        }}
+                    </label>
+                </form>
+            }
+            @case ('reachTechnicalChallengeStateEvalCriterion') {
+                <form class="ms-3">
+                    <label>
+                        Art:
+                        {{
+                            evalCriterionTypesNames.reachTechnicalChallengeStateEvalCriterion
+                        }}
+                    </label>
+                </form>
+            }
+            @case ('patientAtStatusEvalCriterion') {
+                <form class="ms-3">
+                    <label>
+                        Art:
+                        {{
+                            evalCriterionTypesNames.patientAtStatusEvalCriterion
+                        }}
+                    </label>
+                </form>
+            }
+            @case ('viewScoutableEvalCriterion') {
+                <form class="ms-3">
+                    <label>
+                        Art:
+                        {{ evalCriterionTypesNames.viewScoutableEvalCriterion }}
+                    </label>
+                </form>
+            }
+        }
+
+        <button
+            class="btn btn-outline-success mt-1 ms-1 me-1 mb-1"
+            (click)="submitCriterion('xPatientsAtStatusEvalCriterion')"
+        >
+            Bestätigen
+        </button>
+
+        <!-- TODO @JohannesPotzi @Jogius : Als Accordion ??? -->
+        <!--
+        <div
+            ngbAccordion
+            [closeOthers]="true"
+            style="flex: auto; height: 0; overflow-y: auto"
+        >
+            <div
+                ngbAccordionItem="xPatientsAtStatusEvalCriterion"
+                [collapsed]="false"
+            >
+                <h5 ngbAccordionHeader>
+                    <button
+                        ngbAccordionButton
+                        data-cy="xPatientsAtSkCriterionAccordionButton"
+                    >
+                        Anzahl an Patienten mit bestimmter Sichtungskategorie
+                    </button>
+                </h5>
+                <div ngbAccordionCollapse>
+                    <div ngbAccordionBody>
+                        <form class="ms-3">
+                            <label>
+                                Anzahl:
+                                <input
+                                    type="number"
+                                    [formField]="criterionForm.countInput"
+                                />
+                            </label>
+
+                            <label class="mt-1">
+                                Sichtungskategorie:
+                                <select
+                                    [formField]="
+                                        criterionForm.patientStatusInput
+                                    "
+                                >
+                                    @for (
+                                        status of patientStatusAllowedValues;
+                                        track status
+                                    ) {
+                                        <option value="{{ status }}">
+                                            {{ statusNames[status] }}
+                                        </option>
+                                    }
+                                </select>
+                            </label>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+</div>

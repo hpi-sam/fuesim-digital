@@ -13,10 +13,9 @@ import type {
 } from './geometry-helper';
 import { interpolate } from './geometry-helper';
 
-export class PolygonGeometryHelper implements GeometryHelper<
-    Polygon,
-    ResizableElement
-> {
+export class PolygonGeometryHelper
+    implements GeometryHelper<Polygon, ResizableElement>
+{
     create = (element: ResizableElement): Feature<Polygon> =>
         new Feature(new Polygon(this.getElementCoordinates(element)));
 

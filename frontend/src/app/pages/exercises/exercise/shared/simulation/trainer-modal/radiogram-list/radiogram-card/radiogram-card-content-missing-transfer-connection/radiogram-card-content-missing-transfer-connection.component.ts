@@ -23,7 +23,9 @@ import {
     ],
     imports: [AsyncPipe],
 })
-export class RadigoramCardContentMissingTransferConnectionComponent implements OnInit {
+export class RadigoramCardContentMissingTransferConnectionComponent
+    implements OnInit
+{
     private readonly store = inject<Store<AppState>>(Store);
 
     readonly radiogramId = input.required<UUID>();

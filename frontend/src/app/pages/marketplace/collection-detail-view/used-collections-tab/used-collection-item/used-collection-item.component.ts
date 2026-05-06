@@ -134,11 +134,13 @@ export class UsedCollectionItemComponent {
         const result = await firstValueFrom(modalInstance.confirmationResult$);
         if (!result) return;
 
+        console.log({ changeDependencies });
+
         const newVersion = value.latestVersion;
         await this.collectionService.upgradeCollectionDependency({
             importTo: this.currentCollectionEntityId(),
             importFrom: newVersion.versionId,
-            acceptedElementDeletions: Object.values(changeDependencies).flatMap(
+            acceptedElementChanges: Object.values(changeDependencies).flatMap(
                 (changeApply) => changeApply.map((m) => m.versionId)
             ),
         });

@@ -346,9 +346,9 @@ export namespace Marketplace {
             }),
         });
 
-        export const GetIsMember = new Route({
+        export const GetCollectionRole = new Route({
             response: z.object({
-                result: z.boolean(),
+                result: collectionRelationshipTypeSchema.nullable(),
             }),
         });
 
@@ -429,6 +429,18 @@ export namespace Marketplace {
             }),
         });
 
+        export const LoadPublic = new Route({
+            response: z.object({
+                result: z.array(extendedCollectionDtoSchema),
+            }),
+        });
+
+        export const LoadUsable = new Route({
+            response: z.object({
+                result: z.array(extendedCollectionDtoSchema),
+            }),
+        });
+
         export const GetByEntityId = new Route({
             response: z.object({
                 result: collectionDtoSchema,
@@ -454,7 +466,7 @@ export namespace Marketplace {
 
         export const UpgradeDependency = new Route({
             request: z.object({
-                acceptedElementDeletions: z.array(elementVersionIdSchema),
+                acceptedElementChanges: z.array(elementVersionIdSchema),
             }),
             response: z.object({
                 importedSet: collectionElementsSingleSchema,
@@ -515,6 +527,10 @@ export namespace Marketplace {
                   D extends unknown
                     ? z.infer<T>
                     : D
+                : never;
+
+            public readonly InputType!: T extends z.ZodType
+                ? z.input<T>
                 : never;
         }
 
@@ -596,7 +612,7 @@ export namespace Marketplace {
             );
 
             export const SSEvent = new TypedSchema(
-                z.union([
+                z.discriminatedUnion('event', [
                     CollectionRefreshData.schema,
                     CollectionUpdate.schema,
                     DependencyChange.schema,

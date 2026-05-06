@@ -9,7 +9,7 @@ import type {
     TechnicalChallenge,
     TechnicalChallengeTemplate,
     VehicleTemplate,
-    VersionedElementPartial,
+    VersionedElementModel,
 } from 'fuesim-digital-shared';
 import {
     uuid,
@@ -24,6 +24,7 @@ import {
     newPatientFromTemplate,
     CreateTechnicalChallengeAction,
     newTechnicalChallengeFromTemplate,
+    hasEntityProperties,
 } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import type VectorLayer from 'ol/layer/Vector';
@@ -79,20 +80,21 @@ export class DragElementService {
     private dragElement?: HTMLImageElement;
     private imageDimensions?: { width: number; height: number };
     private transferringTemplate?: TransferTemplate;
-    private transferingEntityVersion?: VersionedElementPartial;
+    private transferringEntityVersion?: VersionedElementModel['entity'];
 
     /**
      * Should be called on the mousedown event of the element to be dragged
      * @param event the mouse event
      * @param transferTemplate the template to be added
      */
-    public onMouseDown(
-        event: MouseEvent,
-        transferTemplate: TransferTemplate,
-        entityVersion?: VersionedElementPartial
-    ) {
+    public onMouseDown(event: MouseEvent, transferTemplate: TransferTemplate) {
         this.transferringTemplate = transferTemplate;
-        this.transferingEntityVersion = entityVersion;
+        console.log(transferTemplate);
+        if (hasEntityProperties(transferTemplate.template)) {
+            console.log('YIPPE - entity');
+            this.transferringEntityVersion = transferTemplate.template.entity;
+        }
+
         // Create the drag image
         const imageProperties = transferTemplate.template.image;
         const zoom = this.olMap!.getView().getZoom()!;
@@ -191,7 +193,7 @@ export class DragElementService {
                             this.store
                         ),
                         position,
-                        this.transferingEntityVersion
+                        this.transferringEntityVersion
                     );
                     this.exerciseService.proposeAction(
                         {
@@ -400,7 +402,7 @@ export class DragElementService {
     }
 }
 
-type TransferTemplate =
+export type TransferTemplate =
     | {
           type: 'mapImage';
           template: MapImageTemplate;

@@ -38,10 +38,11 @@ export function newMaterialFromTemplate(
     materialTemplate: MaterialTemplate,
     vehicleId: UUID,
     vehicleName: string,
-    position: Position
+    position: Position,
+    id?: UUID
 ): Material {
     return {
-        id: uuid(),
+        id: id ?? uuid(),
         type: 'material',
         templateId: materialTemplate.id,
         typeName: materialTemplate.name,

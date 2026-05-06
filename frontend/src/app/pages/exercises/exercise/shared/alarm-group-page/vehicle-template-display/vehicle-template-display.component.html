@@ -1,0 +1,11 @@
+@if (vehicleTemplate()(); as template) {
+    <div class="preview-image-container pb-0">
+        <img [src]="template.image.url" />
+    </div>
+    {{ template.vehicleType }}
+} @else {
+    <div class="d-flex flex-column align-items-center gap-1">
+        <i class="bi bi-truck"></i>
+        <span>Fahrzeugvorlage nicht gefunden</span>
+    </div>
+}

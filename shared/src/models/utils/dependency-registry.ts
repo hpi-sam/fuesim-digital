@@ -1,8 +1,8 @@
 import type { Immutable } from 'immer';
 import type { ElementVersionId } from '../../marketplace/models/versioned-id-schema.js';
 import type { Element as FuesimElement } from '../element.js';
+import type { Template as FuesimTemplate } from '../template.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
-import type { Template as FuesimTemplate } from './../template.js';
 
 type FuesimCombined = FuesimElement | FuesimTemplate;
 
@@ -21,7 +21,7 @@ interface ReplaceOpts {
 }
 
 export interface DependencyRegistryEntry<Model extends FuesimCombined> {
-    detect: (data: Model) => ElementVersionId[];
+    detect: (data: Immutable<Model>) => ElementVersionId[];
     replace: (data: Model, replace: ReplaceOpts[]) => Model;
 }
 
@@ -59,8 +59,8 @@ export function getDependencyChecker<ModelType extends FuesimCombinedType>(
     return getDependencyRegistryEntry(model);
 }
 
-export function getElementDependencies<Model extends FuesimCombined>(
-    data: Model
+export function getElementDependencies<Model extends Immutable<FuesimCombined>>(
+    data: Immutable<Model>
 ): ElementVersionId[] {
     const checker = getDependencyChecker(data.type);
     if (!checker) {

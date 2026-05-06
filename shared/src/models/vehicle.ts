@@ -2,7 +2,8 @@ import type { Immutable } from 'immer';
 import { z } from 'zod';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { type UUIDSet, uuidSetSchema } from '../utils/uuid-set.js';
-import { versionedElementModel } from '../marketplace/models/versioned-element-model.js';
+import { versionedElementModelSchema } from '../marketplace/models/versioned-element-model.js';
+import { hybridIdSchema } from '../utils/hybrid-id.js';
 import { type Position, positionSchema } from './utils/position/position.js';
 import {
     type ImageProperties,
@@ -15,12 +16,12 @@ import {
 import { operationalAssignmentSchema } from './operational-section.js';
 
 export const vehicleSchema = z.strictObject({
-    ...versionedElementModel.partial().shape,
+    ...versionedElementModelSchema.partial().shape,
     id: uuidSchema,
     type: z.literal('vehicle'),
     vehicleType: z.string(),
     name: z.string(),
-    templateId: uuidSchema,
+    templateId: hybridIdSchema,
     materialIds: uuidSetSchema,
     patientCapacity: z.int().nonnegative(),
     position: positionSchema,

@@ -9,11 +9,9 @@ import {
     isElementVersionId,
     Marketplace,
 } from 'fuesim-digital-shared';
-import { z } from 'zod';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { NotFoundError } from '../utils/http.js';
 import type { CollectionService } from '../database/services/collection-service.js';
-import { CollectionEventSender } from '../collections/collection-event-sender.js';
 
 export function createCollectionsRouter(collectionService: CollectionService) {
     const router = Router();
@@ -97,7 +95,13 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
     const adminRouter = createRoleRouter('admin');
     const editorRouter = createRoleRouter('editor');
+    // used when only people who are actually members of the collection
+    // should have access
     const viewerRouter = createRoleRouter('viewer');
+    // used when all people with access to this collection
+    // (either transitive via dependency imports or direct if the collection is public)
+    // should have access
+    const otherAccessRouter = createRoleRouter('other');
 
     router.get('/my', async (req, res) => {
         const includeDraftState = req.query['includeDraftState'] === 'true';
@@ -125,6 +129,28 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
         return res.send(
             Marketplace.Collection.LoadMy.responseSchema.encode({
+                result,
+            })
+        );
+    });
+
+    router.get('/public', async (req, res) => {
+        const result = await collectionService.getLatestPublicCollections();
+
+        return res.send(
+            Marketplace.Collection.LoadPublic.responseSchema.encode({
+                result,
+            })
+        );
+    });
+
+    router.get('/usable', async (req, res) => {
+        const result = await collectionService.getLatestUsableCollections(
+            req.session!.user.id
+        );
+
+        return res.send(
+            Marketplace.Collection.LoadUsable.responseSchema.encode({
                 result,
             })
         );
@@ -179,14 +205,10 @@ export function createCollectionsRouter(collectionService: CollectionService) {
     /*
      * Get the metadata of the latest version of the collection
      */
-    viewerRouter.get('/:collectionEntityId', async (req, res) => {
+    otherAccessRouter.get('/:collectionEntityId', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 
-        const allowDraftState = z.coerce
-            .boolean()
-            .optional()
-            .default(false)
-            .parse(req.query['allowdraftstate']);
+        const allowDraftState = req.query['allowdraftstate'] === 'true';
 
         const result = await collectionService.getLatestCollectionById(
             collectionEntityId,
@@ -288,15 +310,17 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         );
     });
 
-    router.get('/:collectionEntityId/isMember', async (req, res) => {
+    router.get('/:collectionEntityId/user-role', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 
-        const data =
-            await collectionService.getCollectionMembers(collectionEntityId);
+        const role = await collectionService.getUserRoleInCollectionTransitive(
+            collectionEntityId,
+            req.session!.user.id
+        );
 
         res.send(
-            Marketplace.Collection.GetIsMember.responseSchema.encode({
-                result: data.some((s) => s.id === req.session!.user.id),
+            Marketplace.Collection.GetCollectionRole.responseSchema.encode({
+                result: role,
             })
         );
     });
@@ -415,7 +439,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             const data = await collectionService.upgradeCollectionDependency({
                 upgradeIn: collectionEntityId,
                 upgradeTo: importSetVersionId,
-                acceptedElementDeletions: parsedBody.acceptedElementDeletions,
+                acceptedElementChanges: parsedBody.acceptedElementChanges,
             });
 
             res.send(
@@ -459,7 +483,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    viewerRouter.get('/:collectionEntityId/latest', async (req, res) => {
+    otherAccessRouter.get('/:collectionEntityId/latest', async (req, res) => {
         const collectionEntityId = getCollectionEntityId(req);
 
         const data =
@@ -471,19 +495,6 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             Marketplace.Collection.GetLatestElementsBySetVersionId.responseSchema.encode(
                 data
             )
-        );
-    });
-
-    viewerRouter.get('/:collectionEntityId/events', async (req, res) => {
-        const collectionEntityId = getCollectionEntityId(req);
-
-        // eslint-disable-next-line no-new
-        new CollectionEventSender(
-            req,
-            res,
-            collectionEntityId,
-            collectionService,
-            req.session!.user.id
         );
     });
 
@@ -568,7 +579,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    viewerRouter.post(
+    otherAccessRouter.post(
         '/:collectionEntityId/version/:collectionVersionId/duplicate',
         async (req, res) => {
             const collectionVersionId = getCollectionVersionId(req);
@@ -587,7 +598,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    viewerRouter.get(
+    otherAccessRouter.get(
         '/:collectionEntityId/version/:collectionVersionId',
         async (req, res) => {
             const collectionVersionId = getCollectionVersionId(req);
@@ -610,7 +621,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    viewerRouter.get(
+    otherAccessRouter.get(
         '/:collectionEntityId/version/:collectionVersionId/elements',
         async (req, res) => {
             const collectionVersionId = getCollectionVersionId(req);
@@ -710,7 +721,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    viewerRouter.get(
+    otherAccessRouter.get(
         '/:collectionEntityId/version/:collectionVersionId/element/:elementEntityId/version/:elementVersionId/internaldependencies',
         async (req, res) => {
             const collectionVersionId = getCollectionVersionId(req);
@@ -757,7 +768,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
-    viewerRouter.get(
+    otherAccessRouter.get(
         '/:collectionEntityId/element/:elementEntityId/versions',
         async (req, res) => {
             const elementEntityId = getElementEntityId(req);
@@ -775,6 +786,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         }
     );
 
+    router.use(otherAccessRouter);
     router.use(viewerRouter);
     router.use(editorRouter);
     router.use(adminRouter);

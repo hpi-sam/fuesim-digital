@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { collectionDtoSchema } from './collection.js';
 import type { ElementDto } from './versioned-elements.js';
 import { elementDtoSchema } from './versioned-elements.js';
+import type { CollectionElementType } from './collection-element-type.js';
 
 // TODO: Improve this naming
 export const collectionElementsSingleSchema = z.strictObject({
@@ -31,7 +32,7 @@ export const collectionElementsDtoSchema = z.strictObject({
      * (e.g. elements being used in elements of collections in collections)
      */
     references: z.array(collectionElementsSingleSchema),
-});
+} satisfies { [T in CollectionElementType]: unknown });
 
 export type CollectionElementsDto = z.infer<typeof collectionElementsDtoSchema>;
 
@@ -39,6 +40,14 @@ export function gatherCollectionElements(elements: CollectionElementsDto) {
     return {
         allDirectElements(): ElementDto[] {
             return elements.direct;
+        },
+        allImportedElements(): ElementDto[] {
+            return elements.imported.flatMap((imported) => imported.elements);
+        },
+        allReferenceElements(): ElementDto[] {
+            return elements.references.flatMap(
+                (reference) => reference.elements
+            );
         },
         allVisibleElements(): ElementDto[] {
             return [

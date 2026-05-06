@@ -32,6 +32,7 @@ import { type UUID, uuid, uuidValidationOptions } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import { simulateAllTechnicalChallenges } from '../../models/technical-challenge/state-machine.js';
+import { getTemplates } from '../../models/template.js';
 import { PatientUpdate } from './utils/patient-updates.js';
 import {
     logPatientVisibleStatusChanged,
@@ -204,10 +205,16 @@ export namespace ExerciseActionReducers {
             const mutablePartialExport = cloneDeepMutable(partialExport);
             if (mutablePartialExport.mapImageTemplates !== undefined) {
                 if (mode !== 'append') {
-                    draftState.mapImageTemplates = {};
+                    // Remove all mapImageTemplates
+                    draftState.templates = Object.fromEntries(
+                        Object.entries(draftState.templates).filter(
+                            ([_, template]) =>
+                                template.type !== 'mapImageTemplate'
+                        )
+                    );
                 }
                 for (const mapImageTemplate of mutablePartialExport.mapImageTemplates) {
-                    draftState.mapImageTemplates[mapImageTemplate.id] =
+                    draftState.templates[mapImageTemplate.id] =
                         mapImageTemplate;
                 }
             }
@@ -229,11 +236,16 @@ export namespace ExerciseActionReducers {
                     )) {
                         alarmGroup.alarmGroupVehicles = {};
                     }
-                    draftState.vehicleTemplates = {};
+                    // Remove all vehicle templates
+                    draftState.templates = Object.fromEntries(
+                        Object.entries(draftState.templates).filter(
+                            ([_, template]) =>
+                                template.type !== 'vehicleTemplate'
+                        )
+                    );
                 }
                 for (const vehicleTemplate of mutablePartialExport.vehicleTemplates) {
-                    draftState.vehicleTemplates[vehicleTemplate.id] =
-                        vehicleTemplate;
+                    draftState.templates[vehicleTemplate.id] = vehicleTemplate;
                 }
             }
             return draftState;
@@ -323,10 +335,9 @@ function calculateTreatmentAssignment(
         Object.keys(draftState.patients).map((patientId) => [
             patientId,
             Object.fromEntries(
-                Object.values(draftState.personnelTemplates).map((template) => [
-                    template.id,
-                    0,
-                ])
+                Object.values(
+                    getTemplates(draftState, 'personnelTemplate')
+                ).map((template) => [template.id, 0])
             ),
         ])
     ) as TreatmentAssignment;
@@ -353,7 +364,7 @@ function evaluateTreatmentReassignment(
     if (!draftState.previousTreatmentAssignment) return;
     Object.keys(newTreatmentAssignment)
         .filter((patientId) =>
-            Object.values(draftState.personnelTemplates).some(
+            Object.values(getTemplates(draftState, 'personnelTemplate')).some(
                 (personnelTemplate) =>
                     newTreatmentAssignment[patientId]![personnelTemplate.id] !==
                     draftState.previousTreatmentAssignment![patientId]?.[
@@ -369,7 +380,9 @@ function evaluateTreatmentReassignment(
                     .map(([personnelTemplateId]) =>
                         createPersonnelTypeTag(
                             draftState,
-                            draftState.personnelTemplates[personnelTemplateId]!
+                            getTemplates(draftState, 'personnelTemplate')[
+                                personnelTemplateId
+                            ]!
                         )
                     ),
                 `Diese Einsatzkräfte wurden dem Patienten neu zugeteilt: ${
@@ -378,9 +391,8 @@ function evaluateTreatmentReassignment(
                         .map(
                             ([personnelTemplateId, count]) =>
                                 `${+count.toFixed(2)} ${
-                                    draftState.personnelTemplates[
-                                        personnelTemplateId
-                                    ]!.name
+                                    draftState.templates[personnelTemplateId]!
+                                        .name
                                 }`
                         )
                         .join(', ') || 'Keine Einsatzkräfte'

@@ -11,6 +11,8 @@ import { PartialExport } from '../export-import/file-format/partial-export.js';
 import { applyAction } from '../store/reduce-exercise-state.js';
 import { ReducerError } from '../store/reducer-error.js';
 import type { UUID } from '../utils/uuid.js';
+import { getTemplates } from '../models/template.js';
+import { defaultPersonnelTemplatesById } from '../data/default-state/personnel-templates.js';
 import { migrations } from './migration-functions.js';
 import type { Migration } from './migration-functions.js';
 
@@ -66,32 +68,41 @@ export function migratePartialExport(
             mapImageTemplates: mutablePartialExport.mapImageTemplates ?? [],
             patientCategories: mutablePartialExport.patientCategories ?? [],
             vehicleTemplates: mutablePartialExport.vehicleTemplates ?? [],
+            // We need this, bc migration 44 needs this and we've removed the default templates from the ExerciseState
+            // in exchange for the marketplace
+            personnelTemplates: defaultPersonnelTemplatesById,
             // We need this hotfix since otherwise migration 44 is not happy
             materialTemplates: Object.fromEntries(
-                Object.entries(dummyState.materialTemplates).map(
-                    ([id, template]) => [
-                        id,
-                        {
-                            ...template,
-                            materialType:
-                                template.image.url === '/assets/material.svg'
-                                    ? 'standard'
-                                    : 'big',
-                        },
-                    ]
-                )
+                Object.entries(
+                    getTemplates(dummyState, 'materialTemplate')
+                ).map(([id, template]) => [
+                    id,
+                    {
+                        ...template,
+                        materialType:
+                            template.image.url === '/assets/material.svg'
+                                ? 'standard'
+                                : 'big',
+                    },
+                ])
             ),
         })
     );
     stateExport.fileVersion = mutablePartialExport.fileVersion;
     stateExport.dataVersion = mutablePartialExport.dataVersion;
+
     const migratedStateExport = migrateStateExport(stateExport as StateExport);
     // Check for `undefined` in the original partial export here as `undefined` has the meaning of `no changes`
     // compared to `[]` with the meaning of `nothing`. If later choosing to override using this partial export,
     // `undefined` will be ignored while `[]` would remove all existing entries.
     const mapImageTemplates =
         mutablePartialExport.mapImageTemplates !== undefined
-            ? Object.values(migratedStateExport.currentState.mapImageTemplates)
+            ? Object.values(
+                  getTemplates(
+                      migratedStateExport.currentState,
+                      'mapImageTemplate'
+                  )
+              )
             : undefined;
     const patientCategories =
         mutablePartialExport.patientCategories !== undefined
@@ -99,7 +110,12 @@ export function migratePartialExport(
             : undefined;
     let vehicleTemplates =
         mutablePartialExport.vehicleTemplates !== undefined
-            ? Object.values(migratedStateExport.currentState.vehicleTemplates)
+            ? Object.values(
+                  getTemplates(
+                      migratedStateExport.currentState,
+                      'vehicleTemplate'
+                  )
+              )
             : undefined;
 
     // Fix template id lookups, since migration 44 always computes new template IDs
@@ -107,20 +123,22 @@ export function migratePartialExport(
         vehicleTemplates = vehicleTemplates.map((t) => ({
             ...t,
             personnelTemplateIds: t.personnelTemplateIds.map((id) => {
-                const requiredType =
-                    migratedStateExport.currentState.personnelTemplates[id]!
-                        .personnelType;
-                return Object.values(currentState.personnelTemplates).find(
-                    (pt) => pt.personnelType === requiredType
-                )!.id;
+                const requiredType = getTemplates(
+                    migratedStateExport.currentState,
+                    'personnelTemplate'
+                )[id]!.personnelType;
+                return Object.values(
+                    getTemplates(currentState, 'personnelTemplate')
+                ).find((pt) => pt.personnelType === requiredType)!.id;
             }),
             materialTemplateIds: t.materialTemplateIds.map((id) => {
-                const requiredType =
-                    migratedStateExport.currentState.materialTemplates[id]!
-                        .image.url;
-                return Object.values(currentState.materialTemplates).find(
-                    (mt) => mt.image.url === requiredType
-                )!.id;
+                const requiredType = getTemplates(
+                    migratedStateExport.currentState,
+                    'materialTemplate'
+                )[id]!.image.url;
+                return Object.values(
+                    getTemplates(currentState, 'materialTemplate')
+                ).find((mt) => mt.image.url === requiredType)!.id;
             }),
         }));
 
@@ -172,7 +190,15 @@ export function applyMigrations<
         const intermediaryState = cloneDeepMutable(
             history.initialState
         ) as WritableDraft<ExerciseState>;
+        const cannotMigrateHistory = migrationsToApply.some(
+            (migration) => migration.unmigratableActions
+        );
         try {
+            if (cannotMigrateHistory) {
+                throw new ReducerError(
+                    'Migrating history from this version is not possible'
+                );
+            }
             history.actions.forEach((action, index) => {
                 if (action !== null) {
                     const deleteAction = !migrateAction(

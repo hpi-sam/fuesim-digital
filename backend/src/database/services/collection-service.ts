@@ -19,12 +19,14 @@ import {
     applyMigrations,
     cloneDeepMutable,
     ExerciseState,
-    getDependencyChecker,
+    gatherCollectionElements,
+    getCollectionElementDiff,
     getElementDependencies,
+    isVersionedElementContent,
     replaceDependencies,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import type { CollectionRepository } from '../repositories/collection-repository.js';
 
 interface EventBuffer {
@@ -113,6 +115,10 @@ export class CollectionService {
         >()
     ) {}
 
+    public async initialize() {
+        await this.collectionRepository.setDefaultCollectionData();
+    }
+
     public async getCollectionInviteCode(
         collectionEntityId: CollectionEntityId
     ) {
@@ -154,17 +160,11 @@ export class CollectionService {
         collectionEntityId: CollectionEntityId,
         userId: string
     ): Promise<CollectionRelationshipType | null> {
-        console.log(
-            `Checking permissions for user ${userId} in collection ${collectionEntityId} and its parent collections.`
-        );
         const directRole = await this.getUserRoleInCollection(
             collectionEntityId,
             userId
         );
         if (directRole !== null) return directRole;
-        console.log(
-            `No direct permissions found for user ${userId} in collection ${collectionEntityId}. Checking parent collections…`
-        );
 
         const parentCollections =
             await this.collectionRepository.getParentCollectionsOfCollectionVersion(
@@ -174,9 +174,6 @@ export class CollectionService {
                 // but there is no need to check further up the chain, since there is no UI for that.
                 false
             );
-        console.log(
-            `Found ${parentCollections.length} parent collections for collection ${collectionEntityId}. Checking permissions for user ${userId} in these collections…`
-        );
 
         const rolesInParents = await Promise.all(
             parentCollections.map(async (parentCollection) => {
@@ -189,8 +186,8 @@ export class CollectionService {
             })
         );
 
-        // if we dont have direct rights, the highest role we can get is viewer
-        return rolesInParents.some((r) => r) ? 'viewer' : null;
+        // if we dont have direct rights, the highest role we can get is other
+        return rolesInParents.some((r) => r) ? 'other' : null;
     }
 
     public async getCollectionMembers(collectionEntityId: CollectionEntityId) {
@@ -428,7 +425,7 @@ export class CollectionService {
     public async upgradeCollectionDependency(data: {
         upgradeIn: CollectionEntityId;
         upgradeTo: CollectionVersionId;
-        acceptedElementDeletions: ElementVersionId[];
+        acceptedElementChanges: ElementVersionId[];
     }) {
         return this.reduce(
             data.upgradeIn,
@@ -438,14 +435,6 @@ export class CollectionService {
                         data.upgradeTo
                     )
                 );
-
-                const newCollectionVersionElements =
-                    await tx.getElementsOfCollectionVersion(
-                        upgradeToCollection.versionId,
-                        {
-                            allowDraftState: false,
-                        }
-                    );
 
                 // Only allow upgrading if we already depend on the collection
                 const existingDependencies = await tx.getCollectionDependencies(
@@ -460,6 +449,28 @@ export class CollectionService {
                     );
                 }
 
+                const oldCollectionVersionElements =
+                    await tx.getElementsOfCollectionVersion(
+                        existingCollectionDependency.versionId,
+                        { allowDraftState: false }
+                    );
+                const newCollectionVersionElements =
+                    await tx.getElementsOfCollectionVersion(
+                        upgradeToCollection.versionId,
+                        {
+                            allowDraftState: false,
+                        }
+                    );
+
+                const changesBetweenVersions = getCollectionElementDiff(
+                    gatherCollectionElements(
+                        oldCollectionVersionElements
+                    ).allDirectElements(),
+                    gatherCollectionElements(
+                        newCollectionVersionElements
+                    ).allDirectElements()
+                );
+
                 // Fetch, which elements of our Collection depend on the collection we want to upgrade
                 const dependingElements =
                     await tx.getDependingElementsForCollection({
@@ -467,10 +478,29 @@ export class CollectionService {
                         dependency: existingCollectionDependency.versionId,
                     });
 
+                const changedDependingElements = dependingElements.filter(
+                    (de) =>
+                        changesBetweenVersions.some(
+                            (change) => change.old?.versionId === de.versionId
+                        )
+                );
+
+                console.log(
+                    JSON.stringify(
+                        {
+                            changesBetweenVersions,
+                            dependingElements,
+                            changedDependingElements,
+                        },
+                        null,
+                        2
+                    )
+                );
+
                 // Check if the provided acceptedElementDeletions actually account for all depending elements
                 if (
-                    !dependingElements.every((ed) =>
-                        data.acceptedElementDeletions.includes(ed.versionId)
+                    !changedDependingElements.every((ed) =>
+                        data.acceptedElementChanges.includes(ed.versionId)
                     )
                 ) {
                     throw new Error(
@@ -482,19 +512,10 @@ export class CollectionService {
                     dependingElements.map(async (dependingElement) => {
                         const dependencies =
                             await tx.getDependenciesOfElement(dependingElement);
-                        const dependencyCheck = getDependencyChecker(
-                            dependingElement.content.type
-                        );
-                        if (!dependencyCheck) {
-                            if (dependencies.length > 0) {
-                                throw new Error(
-                                    `Element with type ${dependingElement.content.type} has dependencies but no dependency checker is implemented for this type.`
-                                );
-                            }
-                            return;
-                        }
 
-                        const newContent = replaceDependencies(
+                        const newContent = replaceDependencies<
+                            WritableDraft<VersionedElementContent>
+                        >(
                             dependingElement.content,
                             dependencies.map((d) => ({
                                 old: d.versionId,
@@ -507,11 +528,10 @@ export class CollectionService {
 
                         await tx.updateElement(
                             dependingElement.entityId,
-                            cloneDeepMutable(newContent)
+                            newContent
                         );
                     })
                 );
-
                 await tx.collectionRepository.removeCollectionVersionDependency(
                     draftState.versionId,
                     existingCollectionDependency.versionId
@@ -610,7 +630,7 @@ export class CollectionService {
                             data: result,
                             collectionEntityId,
                         });
-                        results.push(result);
+                        results.push(cloneDeepMutable(result));
                     })
                 );
 
@@ -630,6 +650,36 @@ export class CollectionService {
             allowDraftState: opts.includeDraftState,
             archived: opts.archived,
         });
+    }
+
+    public async getLatestPublicCollections(): Promise<
+        ExtendedCollectionDto[]
+    > {
+        return this.collectionRepository.getLatestPublicCollections();
+    }
+
+    public async getLatestUsableCollections(
+        userId: string
+    ): Promise<ExtendedCollectionDto[]> {
+        const userCollections =
+            await this.collectionRepository.getLatestCollectionForUser(userId, {
+                allowDraftState: false,
+                archived: false,
+            });
+        const publicCollections =
+            await this.collectionRepository.getLatestPublicCollections();
+
+        return [
+            ...userCollections,
+            ...publicCollections.filter(
+                (publicCollection) =>
+                    !userCollections.some(
+                        (userCollection) =>
+                            userCollection.entityId ===
+                            publicCollection.entityId
+                    )
+            ),
+        ];
     }
 
     public async getLatestCollectionById(
@@ -695,7 +745,9 @@ export class CollectionService {
         const foundElements: CollectionElementsSingle[] = [];
         await Promise.all(
             elements.map(async (element) => {
-                const elementVersions = getElementDependencies(element.content);
+                const elementVersions = getElementDependencies<
+                    WritableDraft<VersionedElementContent>
+                >(element.content);
 
                 const foundSubElements: ElementDto[] = (
                     await Promise.all(
@@ -991,7 +1043,7 @@ export class CollectionService {
                                 newElementVersion.versionId
                             )
                         );
-                        tx.updateElement(
+                        await tx.updateElement(
                             dependingElement.entityId,
                             newContent,
                             resolutionStrategy
@@ -1019,7 +1071,7 @@ export class CollectionService {
      * Finds all directly AND TRANSITIVELY referenced element versions in the content of an element
      */
     private async getDependenciesOfElement(
-        element: ElementDto,
+        element: Immutable<ElementDto>,
         opts: { transitive?: boolean } = { transitive: true }
     ): Promise<ElementDto[]> {
         const directElementReferences = (
@@ -1195,13 +1247,14 @@ export class CollectionService {
                             containingElement
                         )
                     );
-                    const newContent = replaceDependencies(
-                        containingElementData.content,
-                        [{ old: removeElementVersionId, new: null }]
-                    );
+                    const newContent = replaceDependencies<
+                        WritableDraft<VersionedElementContent>
+                    >(containingElementData.content, [
+                        { old: removeElementVersionId, new: null },
+                    ]);
                     await tx.updateElement(
                         containingElementData.entityId,
-                        cloneDeepMutable(newContent)
+                        newContent
                     );
                 })
             );
@@ -1321,7 +1374,7 @@ export class CollectionService {
                     )
                 );
 
-                const content = sourceElement.content;
+                const content = cloneDeepMutable(sourceElement.content);
                 content.name = `Kopie von ${content.name}`;
 
                 const duplicatedElement = this.exists(
@@ -1340,7 +1393,7 @@ export class CollectionService {
                     event: 'element:create',
                     data: duplicatedElement,
                     collectionEntityId: targetCollectionEntity,
-                });
+                } satisfies typeof Marketplace.Collection.Events.ElementCreate.Type);
 
                 return {
                     duplicatedElement,
@@ -1479,14 +1532,17 @@ export class CollectionService {
 
             // TODO: Change this as soon as we have the new state structure with step 2 of marketplace
             state = Object.assign(state, {
-                vehicleTemplates: allElements.reduce<{
+                templates: allElements.reduce<{
                     [T in ElementEntityId]: WritableDraft<VehicleTemplate>;
                 }>((acc, element) => {
                     if (element.content.type !== 'vehicleTemplate') return acc;
                     acc[element.entityId] = {
-                        ...element.content,
-                        versionId: element.versionId,
-                        entityId: element.entityId,
+                        ...cloneDeepMutable(element.content),
+                        entity: {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                            type: 'direct',
+                        },
                     };
                     return acc;
                 }, {}),
@@ -1495,9 +1551,12 @@ export class CollectionService {
                 }>((acc, element) => {
                     if (element.content.type !== 'vehicleTemplate') return acc;
                     acc[element.entityId] = {
-                        ...element.content,
-                        versionId: element.versionId,
-                        entityId: element.entityId,
+                        ...cloneDeepMutable(element.content),
+                        entity: {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                            type: 'direct',
+                        },
                     };
                     return acc;
                 }, {}),
@@ -1513,9 +1572,8 @@ export class CollectionService {
                 migratedState.newVersion,
                 [
                     ...Object.values(
-                        migratedState.migratedProperties.currentState
-                            .vehicleTemplates
-                    ),
+                        migratedState.migratedProperties.currentState.templates
+                    ).filter(isVersionedElementContent),
                 ]
             );
 

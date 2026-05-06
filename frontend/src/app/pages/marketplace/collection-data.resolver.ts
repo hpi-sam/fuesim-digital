@@ -12,9 +12,9 @@ export interface CollectionDataResolverResult {
     collectionEntityId: CollectionEntityId;
 }
 
-export const collectionDataResolver: ResolveFn<CollectionDataResolverResult> = (
-    route: ActivatedRouteSnapshot
-) => {
+export const collectionDataResolver: ResolveFn<
+    CollectionDataResolverResult
+> = async (route: ActivatedRouteSnapshot) => {
     const router = inject(Router);
     const collectionService = inject(CollectionService);
     const collectionEntityId = route.paramMap.get('collectionEntityId') ?? '';
@@ -25,7 +25,7 @@ export const collectionDataResolver: ResolveFn<CollectionDataResolverResult> = (
     }
 
     const collectionSubject =
-        collectionService.subscribeToCollection(collectionEntityId);
+        await collectionService.subscribeToCollection(collectionEntityId);
 
     return {
         subject: collectionSubject,

@@ -1,5 +1,11 @@
 import { Component, input, output } from '@angular/core';
 
+export type GenericElementCardIndicator =
+    | 'changed'
+    | 'created'
+    | 'ghost'
+    | 'selected';
+
 @Component({
     selector: 'app-generic-element-card',
     imports: [],
@@ -17,7 +23,6 @@ export class GenericElementCardComponent {
     public readonly duplicate = output();
     public readonly restore = output();
 
-    public readonly showCreatedIndicator = input<boolean>(false);
-    public readonly showChangedIndicator = input<boolean>(false);
-    public readonly showAsGhost = input<boolean>(false);
+    public readonly showIndicator = input<GenericElementCardIndicator>();
+    public readonly small = input<boolean>(false);
 }

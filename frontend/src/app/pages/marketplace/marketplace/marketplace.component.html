@@ -31,8 +31,32 @@
             } @empty {
                 <div class="col flex-grow-1">
                     <p class="bg-light p-4 rounded-3 lead mb-0">
-                        Sie haben noch keine Sammlungen.
+                        Sie haben noch keine eigenen Sammlungen.
                     </p>
+                </div>
+            }
+        </div>
+    }
+    <div class="d-flex flex-row gap-2 mt-4 mb-3">
+        <h5 class="mb-0">Öffentliche Sammlungen</h5>
+        @if (publicCollections.isLoading()) {
+            <div class="spinner-border spinner-border-sm text-secondary">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        }
+        <span class="flex-grow-1 divider"></span>
+    </div>
+    @if (publicCollections.hasValue()) {
+        <div class="row row-cols-3">
+            @for (
+                collection of publicCollections.value();
+                track collection.versionId
+            ) {
+                <div class="col mb-4">
+                    <app-collection-card
+                        [collection]="collection"
+                        fromLocation="mycollections"
+                    />
                 </div>
             }
         </div>

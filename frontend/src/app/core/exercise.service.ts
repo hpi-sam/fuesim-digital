@@ -8,6 +8,7 @@ import type {
     JoinExerciseResponseData,
     ServerToClientEvents,
     SocketResponse,
+    VersionedCollectionPartial,
 } from 'fuesim-digital-shared';
 import {
     joinExerciseResponseDataSchema,
@@ -48,6 +49,7 @@ import { websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 import { OptimisticActionHandler } from './optimistic-action-handler';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
+import { CollectionService } from './exercise-element.service';
 
 /**
  * This Service deals with the state synchronization of a live exercise.
@@ -62,6 +64,7 @@ import { openConnectionLostModal } from './connection-lost-modal/open-connection
 export class ExerciseService {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly messageService = inject(MessageService);
+    private readonly collectionService = inject(CollectionService);
     private readonly ngbModalService = inject(NgbModal);
 
     private readonly socket: Socket<
@@ -240,6 +243,21 @@ export class ExerciseService {
 
         // TODO: throw if `response.success` is false
         return this.optimisticActionHandler.proposeAction(action, optimistic);
+    }
+
+    public async addCollection(collection: VersionedCollectionPartial) {
+        const elements =
+            await this.collectionService.getElementsOfCollectionVersion(
+                collection
+            );
+        await this.proposeAction({
+            type: '[Collection] Add Collection',
+            elements,
+            collectionVersion: {
+                versionId: collection.versionId,
+                entityId: collection.entityId,
+            },
+        });
     }
 
     private readonly stopNotifications$ = new Subject<void>();

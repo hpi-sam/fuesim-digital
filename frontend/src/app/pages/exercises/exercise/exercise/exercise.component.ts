@@ -1,4 +1,4 @@
-import type { OnDestroy } from '@angular/core';
+import type { OnDestroy, OnInit } from '@angular/core';
 import { Component, computed, inject } from '@angular/core';
 import {
     NgbModal,
@@ -35,12 +35,12 @@ import {
 import {
     selectParticipantKey,
     selectExerciseState,
+    selectSelectedCollections,
 } from '../../../../state/application/selectors/exercise.selectors';
 import { selectOwnClient } from '../../../../state/application/selectors/shared.selectors';
 import { selectStateSnapshot } from '../../../../state/get-state-snapshot';
 import { TimeTravelComponent } from '../shared/time-travel/time-travel.component';
 import { ExerciseMapComponent } from '../shared/exercise-map/exercise-map.component';
-import { TrainerMapEditorComponent } from '../shared/trainer-map-editor/trainer-map-editor.component';
 import { EmergencyOperationsCenterFullComponent } from '../shared/emergency-operations-center/emergency-operations-center-full/emergency-operations-center-full.component';
 import { FormatDurationPipe } from '../../../../shared/pipes/format-duration.pipe';
 import { OperationsTabletViewComponent } from '../shared/operations-tablet-view/operations-tablet-view.component';
@@ -52,6 +52,9 @@ import {
     openParticipantsModal,
     openTrainersModal,
 } from '../shared/clients-modal/open-clients-modal';
+import { TrainerMapEditorComponent } from '../shared/trainer-map-editor/trainer-map-editor.component';
+import { openSelectCollectionModal } from '../../../marketplace/shared/modals/marketplace-select-collection-modal/select-collection-modal';
+import { LoadingModalService } from '../../../../core/loading-modal/loading-modal.service';
 
 @Component({
     selector: 'app-exercise',
@@ -77,13 +80,14 @@ import {
         CopyButtonComponent,
     ],
 })
-export class ExerciseComponent implements OnDestroy {
+export class ExerciseComponent implements OnDestroy, OnInit {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly apiService = inject(ApiService);
     private readonly applicationService = inject(ApplicationService);
     readonly exerciseService = inject(ExerciseService);
     private readonly messageService = inject(MessageService);
     private readonly modalService = inject(NgbModal);
+    private readonly loadingModalService = inject(LoadingModalService);
 
     private readonly destroy = new Subject<void>();
 
@@ -105,6 +109,29 @@ export class ExerciseComponent implements OnDestroy {
     public readonly trainerUrl = computed(
         () => `${location.origin}/exercises/${this.exerciseKey()}`
     );
+
+    public ngOnInit() {
+        const selectedCollections = selectStateSnapshot(
+            selectSelectedCollections,
+            this.store
+        );
+        if (selectedCollections.length === 0) {
+            openSelectCollectionModal(this.modalService, {
+                showDependencyElements: true,
+                allowLeave: false,
+                allowCreate: true,
+                showInfoBanner: true,
+            }).then(async (result) => {
+                if (result === null) return;
+                this.loadingModalService.showLoading({
+                    title: 'Sammlung wird hinzugefügt',
+                    description: 'Ihre Übungselemente werden vorbereitet',
+                });
+                await this.exerciseService.addCollection(result);
+                this.loadingModalService.closeLoading();
+            });
+        }
+    }
 
     readonly version: string = Package.version;
 

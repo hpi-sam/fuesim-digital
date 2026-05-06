@@ -77,9 +77,7 @@ export class VehicleTemplateFormMarketplaceComponent
         effect(() => {
             const data = this.data();
             if (data.mode !== 'create') {
-                this.values.set(
-                    cloneDeepMutable(data.element.content as VehicleTemplate)
-                );
+                this.values.set(cloneDeepMutable(data.element.content));
             }
         });
     }

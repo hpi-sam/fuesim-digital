@@ -26,7 +26,9 @@ import {
     ],
     imports: [FormsModule, AsyncPipe],
 })
-export class ManagePatientTransportToHospitalRequestTargetEditorComponent implements OnChanges {
+export class ManagePatientTransportToHospitalRequestTargetEditorComponent
+    implements OnChanges
+{
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 

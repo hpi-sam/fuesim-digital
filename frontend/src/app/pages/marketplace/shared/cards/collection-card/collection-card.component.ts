@@ -11,5 +11,6 @@ import { ExtendedCollectionDto } from 'fuesim-digital-shared';
 })
 export class CollectionCardComponent {
     public readonly collection = input.required<ExtendedCollectionDto>();
-    public readonly fromLocation = input.required<string>();
+    public readonly fromLocation = input<string>('mycollections');
+    public readonly noLink = input(false);
 }

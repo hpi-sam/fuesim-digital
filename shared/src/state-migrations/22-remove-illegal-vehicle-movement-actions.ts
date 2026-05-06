@@ -1,8 +1,5 @@
-import type { WritableDraft } from 'immer';
 import { isCompletelyLoaded } from '../store/action-reducers/utils/completely-load-vehicle.js';
-import type { ExerciseState } from '../state.js';
 import type { UUID } from '../utils/uuid.js';
-import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { Migration } from './migration-functions.js';
 
 /**
@@ -12,16 +9,21 @@ import type { Migration } from './migration-functions.js';
  */
 export const removeIllegalVehicleMovementActions22: Migration = {
     action: (intermediaryState, action) => {
+        const typedState = intermediaryState as {
+            vehicles: {
+                [vehicleId in UUID]: any;
+            };
+        };
+
         switch ((action as { type: string }).type) {
             case '[Hospital] Transport patient to hospital': {
                 const { vehicleId } = action as { vehicleId: UUID };
-                const vehicle = getElement(
-                    intermediaryState,
-                    'vehicle',
-                    vehicleId
-                ) as WritableDraft<any>;
+
+                const vehicle = typedState.vehicles[vehicleId];
+
                 return isCompletelyLoaded(
-                    intermediaryState as WritableDraft<ExerciseState>,
+                    // @ts-expect-error: TODO: Refactor to not require ExerciseState & external dependencies
+                    intermediaryState,
                     vehicle
                 );
             }
@@ -31,13 +33,10 @@ export const removeIllegalVehicleMovementActions22: Migration = {
                     elementToBeAddedId: UUID;
                 };
                 if (elementToBeAddedType === 'vehicle') {
-                    const vehicle = getElement(
-                        intermediaryState,
-                        'vehicle',
-                        elementToBeAddedId
-                    ) as WritableDraft<any>;
+                    const vehicle = typedState.vehicles[elementToBeAddedId];
                     return isCompletelyLoaded(
-                        intermediaryState as WritableDraft<ExerciseState>,
+                        // @ts-expect-error: TODO: Refactor to not require ExerciseState & external dependencies
+                        intermediaryState,
                         vehicle
                     );
                 }

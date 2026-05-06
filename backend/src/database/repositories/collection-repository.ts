@@ -17,7 +17,7 @@ import {
     collectionRelationshipTypeAllowedValues,
     ExerciseState,
 } from 'fuesim-digital-shared';
-import type { SQL } from 'drizzle-orm';
+import type { InferInsertModel, SQL } from 'drizzle-orm';
 import {
     eq,
     desc,
@@ -37,10 +37,126 @@ import {
     collectionUserMappingTable,
     userTable,
 } from '../schema.js';
+import { defaultCollectionData } from '../default-data/collection-default-data.js';
 import { BaseRepository } from './base-repository.js';
 
 export class CollectionRepository extends BaseRepository {
     public readonly INVITE_CODE_VALIDITY_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 DAYS
+
+    public async setDefaultCollectionData() {
+        await this.transaction(async (tx) => {
+            // This is slow with seperate queries, but we dont have that much default data and it is only run once,
+            // so it should be fine for now :3
+
+            // CLEANUP existing default data to avoid conflicts
+            const existingCollections = await tx.databaseConnection
+                .select()
+                .from(collectionTable)
+                .where(eq(collectionTable.visibility, 'embedded'));
+
+            const existingConnections = await tx.databaseConnection
+                .select()
+                .from(elementCollectionMappingTable)
+                .where(
+                    inArray(
+                        elementCollectionMappingTable.setVersionId,
+                        existingCollections.map((c) => c.versionId)
+                    )
+                );
+
+            await Promise.all(
+                existingConnections.map(async (connections) => {
+                    await tx.databaseConnection
+                        .delete(elementTable)
+                        .where(
+                            eq(
+                                elementTable.versionId,
+                                connections.elementVersionId
+                            )
+                        );
+                    await tx.databaseConnection
+                        .delete(elementCollectionMappingTable)
+                        .where(
+                            eq(
+                                elementCollectionMappingTable.elementVersionId,
+                                connections.elementVersionId
+                            )
+                        );
+                })
+            );
+
+            await Promise.all(
+                defaultCollectionData.map(async (collection) => {
+                    const dataToInsert: InferInsertModel<
+                        typeof collectionTable
+                    > = {
+                        entityId: collection.entityId,
+                        versionId: collection.versionId,
+                        title: collection.title,
+                        description: collection.description,
+                        archived: collection.archived,
+                        createdAt: collection.createdAt,
+                        editedAt: collection.editedAt,
+                        draftState: collection.draftState,
+                        elementCount: collection.elementCount,
+                        version: collection.version,
+                        visibility: collection.visibility,
+                        stateVersion: ExerciseState.currentStateVersion,
+                    };
+                    await tx.databaseConnection
+                        .insert(collectionTable)
+                        .values(dataToInsert)
+                        .onConflictDoUpdate({
+                            target: collectionTable.versionId,
+                            set: dataToInsert,
+                        });
+                })
+            );
+
+            await Promise.all(
+                defaultCollectionData.map(async (collection) =>
+                    collection.elements.map(async (element) => {
+                        const elementDataToInsert: InferInsertModel<
+                            typeof elementTable
+                        > = {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                            version: element.version,
+                            stateVersion: ExerciseState.currentStateVersion,
+                            createdAt: element.createdAt,
+                            editedAt: element.editedAt,
+                            title: element.title,
+                            description: element.description,
+                            content: element.content,
+                        };
+                        const createdElement = this.onlySingleStrict(
+                            await tx.databaseConnection
+                                .insert(elementTable)
+                                .values(elementDataToInsert)
+                                .onConflictDoUpdate({
+                                    target: elementTable.versionId,
+                                    set: elementDataToInsert,
+                                })
+                                .returning()
+                        );
+                        await tx.databaseConnection
+                            .insert(elementCollectionMappingTable)
+                            .values({
+                                setEntityId: collection.entityId,
+                                setVersionId: collection.versionId,
+                                elementEntityId: createdElement.entityId,
+                                elementVersionId: createdElement.versionId,
+                                isBaseReference: true,
+                            });
+                    })
+                )
+            );
+        });
+
+        console.log(
+            '[CollectionRepository]: Default collection data has been set'
+        );
+    }
 
     public async getJoinCode(collectionEntitiyId: CollectionEntityId) {
         return this.onlySingle(
@@ -107,7 +223,30 @@ export class CollectionRepository extends BaseRepository {
         collectionEntityId: CollectionEntityId,
         userId: string
     ): Promise<CollectionRelationshipType | null> {
-        const data = this.onlySingle(
+        const latestCollectionVersionNumbers =
+            this.latestCollectionVersionNumbers({
+                allowDraftState: true,
+            });
+
+        const data = await Promise.all([
+            await this.databaseConnection
+                .with(latestCollectionVersionNumbers)
+                .select(getTableColumns(collectionTable))
+                .from(collectionTable)
+                .innerJoin(
+                    latestCollectionVersionNumbers,
+                    and(
+                        eq(
+                            collectionTable.entityId,
+                            latestCollectionVersionNumbers.entityId
+                        ),
+                        eq(
+                            collectionTable.version,
+                            latestCollectionVersionNumbers.latestversion
+                        )
+                    )
+                )
+                .where(eq(collectionTable.entityId, collectionEntityId)),
             await this.databaseConnection
                 .select({ role: collectionUserMappingTable.role })
                 .from(collectionUserMappingTable)
@@ -119,9 +258,19 @@ export class CollectionRepository extends BaseRepository {
                             collectionEntityId
                         )
                     )
-                )
-        );
-        if (data) return data.role;
+                ),
+        ]);
+
+        const collectionData = this.onlySingle(data[0]);
+        const userRoleMapping = this.onlySingle(data[1]);
+
+        if (userRoleMapping) return userRoleMapping.role;
+        if (
+            collectionData &&
+            ['public', 'embedded'].includes(collectionData.visibility)
+        )
+            return 'other';
+
         return null;
     }
 
@@ -445,7 +594,7 @@ export class CollectionRepository extends BaseRepository {
     public async updateElementContent(
         elementVersionId: ElementVersionId,
         data: VersionedElementContent
-    ) {
+    ): Promise<ElementDto | null> {
         return this.databaseConnection.transaction(async (tx) => {
             const isEditable =
                 await this.checkElementVersionEditable(elementVersionId);
@@ -993,6 +1142,40 @@ export class CollectionRepository extends BaseRepository {
         });
     }
 
+    public async getLatestPublicCollections() {
+        return this.transaction(async (tx) => {
+            const latestCollections = tx.latestCollections({
+                allowDraftState: false,
+            });
+
+            const result = await tx.databaseConnection
+                .with(latestCollections)
+                .select(getTableColumns(collectionTable))
+                .from(collectionTable)
+                .innerJoin(
+                    latestCollections,
+                    eq(latestCollections.entityId, collectionTable.entityId)
+                )
+                .where(
+                    and(
+                        inArray(collectionTable.visibility, [
+                            'public',
+                            'embedded',
+                        ]),
+                        eq(collectionTable.archived, false)
+                    )
+                );
+
+            return result.map(
+                (collection) =>
+                    ({
+                        ...collection,
+                        relationship: 'viewer',
+                    }) satisfies ExtendedCollectionDto
+            );
+        });
+    }
+
     public async getElementsOfCollectionVersion(
         setVersionId: CollectionVersionId
     ) {
@@ -1168,7 +1351,7 @@ export class CollectionRepository extends BaseRepository {
             sqlChunks.push(sql`(case`);
 
             for (const content of elementContents) {
-                if (content.versionId === undefined) {
+                if (content.entity?.versionId === undefined) {
                     console.error(
                         'versionId is required for UNSAFE_overwriteElements',
                         content
@@ -1176,9 +1359,9 @@ export class CollectionRepository extends BaseRepository {
                     continue;
                 }
                 sqlChunks.push(
-                    sql`when ${elementTable.versionId} = ${content.versionId} then ${JSON.stringify(content)}::jsonb`
+                    sql`when ${elementTable.versionId} = ${content.entity.versionId} then ${JSON.stringify(content)}::jsonb`
                 );
-                ids.push(content.versionId);
+                ids.push(content.entity.versionId);
             }
 
             sqlChunks.push(sql`end)`);

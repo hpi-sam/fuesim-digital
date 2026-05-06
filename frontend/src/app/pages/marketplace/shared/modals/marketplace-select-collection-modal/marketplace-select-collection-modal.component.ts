@@ -8,14 +8,21 @@ import {
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { CollectionElementsListComponent } from '../../collection-elements-list/collection-elements-list.component';
 import { CollectionService } from '../../../../../core/exercise-element.service';
+import { CollectionCardComponent } from '../../cards/collection-card/collection-card.component';
 
 @Component({
     selector: 'app-select-collection-modal',
     templateUrl: './marketplace-select-collection-modal.component.html',
     styleUrl: './marketplace-select-collection-modal.component.scss',
-    imports: [CollectionElementsListComponent, DatePipe],
+    imports: [
+        CollectionElementsListComponent,
+        DatePipe,
+        CollectionCardComponent,
+        RouterLink,
+    ],
 })
 export class MarketplaceSelectCollectionModalComponent {
     private readonly collectionService = inject(CollectionService);
@@ -24,12 +31,12 @@ export class MarketplaceSelectCollectionModalComponent {
     public disallowedCollections: CollectionEntityId[] = [];
     public collectionSelectionResult$ = new Subject<CollectionDto | null>();
     public showDependencyElements = false;
+    public allowLeave = true;
+    public allowCreate = false;
+    public showInfoBanner = false;
 
     public readonly userAvailableCollections = resource({
-        loader: async () =>
-            this.collectionService.getMyCollections({
-                includeDraftState: false,
-            }),
+        loader: async () => this.collectionService.getUsableCollections(),
     });
 
     public readonly selectedCollectionData = resource({
@@ -56,6 +63,7 @@ export class MarketplaceSelectCollectionModalComponent {
     public readonly selectedCollectionDataElements = computed(() => {
         const data = this.selectedCollectionData.value();
         if (!data) return [];
+
         if (this.showDependencyElements) {
             return gatherCollectionElements(data[1]).allVisibleElements();
         }
@@ -65,7 +73,7 @@ export class MarketplaceSelectCollectionModalComponent {
     public readonly selectedCollection =
         signal<VersionedCollectionPartial | null>(null);
 
-    public selectCollection(id: VersionedCollectionPartial) {
+    public selectCollection(id: VersionedCollectionPartial | null) {
         this.selectedCollection.set(id);
     }
 

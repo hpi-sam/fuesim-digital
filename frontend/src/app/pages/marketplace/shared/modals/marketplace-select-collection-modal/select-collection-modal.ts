@@ -8,12 +8,16 @@ export async function openSelectCollectionModal(
     opts?: {
         showDependencyElements?: boolean;
         disallowedCollections?: CollectionEntityId[];
+        allowLeave?: boolean;
+        allowCreate?: boolean;
+        showInfoBanner?: boolean;
     }
 ) {
     const modal = ngbModalService.open(
         MarketplaceSelectCollectionModalComponent,
         {
             size: 'xl',
+            backdrop: opts?.allowLeave === false ? 'static' : true,
         }
     );
     const component =
@@ -21,6 +25,9 @@ export async function openSelectCollectionModal(
 
     component.showDependencyElements = opts?.showDependencyElements ?? false;
     component.disallowedCollections = opts?.disallowedCollections ?? [];
+    component.allowLeave = opts?.allowLeave ?? true;
+    component.allowCreate = opts?.allowCreate ?? false;
+    component.showInfoBanner = opts?.showInfoBanner ?? false;
 
     const result = await lastValueFrom(component.collectionSelectionResult$);
     return result;

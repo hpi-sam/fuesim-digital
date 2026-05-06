@@ -1,9 +1,8 @@
 import type { WritableDraft } from 'immer';
 import { nextUUID } from '../simulation/utils/randomness.js';
-import type { ExerciseState } from '../state.js';
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
 import { uuid, type UUID } from '../utils/uuid.js';
-import { getElement } from '../store/action-reducers/utils/get-element.js';
+import { ReducerError } from '../store/reducer-error.js';
 import type { VehicleTemplate } from '../models/vehicle-template.js';
 import type { Migration } from './migration-functions.js';
 
@@ -188,6 +187,30 @@ function createVehicleParameters(
 
 export const deterministicAlarmGroups38: Migration = {
     action: (intermediaryState, action) => {
+        const typedState = intermediaryState as {
+            vehicleTemplates: {
+                [key in UUID]: VehicleTemplate;
+            };
+            personnelTemplates: {
+                [key in UUID]: PersonnelTemplate;
+            };
+            materialTemplates: {
+                [key in UUID]: MaterialTemplate;
+            };
+            alarmGroups: {
+                [key in UUID]: {
+                    alarmGroupVehicles: {
+                        [vehicleKey in UUID]: {
+                            id: UUID;
+                            vehicleTemplateId: UUID;
+                            name: string;
+                            time: number;
+                        };
+                    };
+                };
+            };
+        };
+
         switch ((action as { type: string }).type) {
             case '[Vehicle] Add vehicle': {
                 const typedAction = action as VehicleParameters & {
@@ -214,11 +237,14 @@ export const deterministicAlarmGroups38: Migration = {
                     firstVehiclesTargetTransferPointId: UUID | undefined;
                 };
 
-                const alarmGroup = getElement(
-                    intermediaryState,
-                    'alarmGroup',
-                    typedAction.alarmGroupId
-                );
+                const alarmGroup =
+                    typedState.alarmGroups[typedAction.alarmGroupId];
+
+                if (!alarmGroup) {
+                    throw new ReducerError(
+                        `Alarm group with id ${typedAction.alarmGroupId} does not exist`
+                    );
+                }
 
                 const alarmGroupVehicles = Object.values(
                     alarmGroup.alarmGroupVehicles as {
@@ -233,8 +259,10 @@ export const deterministicAlarmGroups38: Migration = {
 
                 // Build personnel templates and material templates from current state as state version 38
                 const personnelTemplates = Object.fromEntries(
-                    Object.values(intermediaryState.personnelTemplates).map(
+                    Object.values(typedState.personnelTemplates).map(
                         (template) => [
+                            // @ts-expect-error - We needed to manually type this,
+                            // please check the history of this file for more context
                             template.id,
                             {
                                 personnelType: template.personnelType,
@@ -250,13 +278,15 @@ export const deterministicAlarmGroups38: Migration = {
                 );
 
                 const materialTemplates = Object.fromEntries(
-                    Object.values(intermediaryState.materialTemplates).map(
+                    Object.values(typedState.materialTemplates).map(
                         (template) => {
                             const materialType: MaterialType =
                                 template.image.url === '/assets/material.svg'
                                     ? 'standard'
                                     : 'big';
                             return [
+                                // @ts-expect-error - We needed to manually type this,
+                                // please check the history of this file for more context
                                 template.id,
                                 {
                                     materialType,
@@ -285,9 +315,7 @@ export const deterministicAlarmGroups38: Migration = {
                 const vehicleIds = Object.fromEntries(
                     alarmGroupVehicles.map((alarmGroupVehicle) => [
                         alarmGroupVehicle.id,
-                        nextUUID(
-                            intermediaryState as WritableDraft<ExerciseState>
-                        ),
+                        nextUUID(intermediaryState as WritableDraft<any>),
                     ])
                 );
 
@@ -300,7 +328,7 @@ export const deterministicAlarmGroups38: Migration = {
                         createVehicleParameters(
                             vehicleIds[alarmGroupVehicle.id]!,
                             {
-                                ...intermediaryState.vehicleTemplates[
+                                ...typedState.vehicleTemplates[
                                     alarmGroupVehicle.vehicleTemplateId
                                 ]!,
                                 name: alarmGroupVehicle.name,

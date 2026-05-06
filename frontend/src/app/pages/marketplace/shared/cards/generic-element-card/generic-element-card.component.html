@@ -1,33 +1,44 @@
 <div
     class="card h-100"
     style="cursor: pointer"
-    [class.border-success]="showCreatedIndicator()"
-    [class.border-warning]="showChangedIndicator()"
-    [class.ghost]="showAsGhost()"
-    [class.border-2]="
-        showChangedIndicator() || showCreatedIndicator() || showAsGhost()
-    "
+    [class.border-success]="showIndicator() === 'created'"
+    [class.border-warning]="showIndicator() === 'changed'"
+    [class.ghost]="showIndicator() === 'ghost'"
+    [class.border-2]="showIndicator()"
 >
-    <div style="height: 100px" class="d-flex">
-        <img
-            [src]="image()"
-            class="card-img-top p-3 m-auto"
-            style="max-height: 100px"
-        />
-    </div>
-    <div class="card-body d-flex flex-column justify-content-between">
+    @if (image()) {
+        @let imgHeight = small() ? 80 : 100;
+        <div class="d-flex" [style.height.px]="imgHeight">
+            <img
+                [src]="image()"
+                class="card-img-top p-3 m-auto object-fit-contain"
+                [style.max-height.px]="imgHeight"
+            />
+        </div>
+    }
+    <div
+        class="card-body d-flex flex-column justify-content-between"
+        [class.small]="small()"
+    >
         <div>
-            <h5 class="card-title">
+            <span
+                class="card-title d-block mb-0"
+                [class.h5]="!small()"
+                [class.fw-medium]="small()"
+            >
                 {{ title() }}
-            </h5>
+            </span>
             @if (subtitle(); as subtitle) {
-                <h6 class="card-subtitle mb-2 text-body-secondary">
+                <span
+                    class="card-subtitle mb-2 text-body-secondary"
+                    [class.h6]="!small()"
+                >
                     {{ subtitle }}
-                </h6>
+                </span>
             }
         </div>
         @if (editable()) {
-            @if (showAsGhost()) {
+            @if (showIndicator() === 'ghost') {
                 <button
                     class="btn btn-outline-secondary btn-sm"
                     (click)="$event.stopPropagation(); restore.emit()"

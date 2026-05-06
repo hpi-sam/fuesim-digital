@@ -42,7 +42,9 @@ import { PatientStatusBadgeComponent } from '../../../../../../../../../../../..
         AsyncPipe,
     ],
 })
-export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent implements OnChanges {
+export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent
+    implements OnChanges
+{
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 

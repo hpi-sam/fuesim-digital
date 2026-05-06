@@ -1,0 +1,45 @@
+<div class="p-3 h-100 d-flex flex-column">
+    <div>
+        <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary mb-2"
+            (click)="closeView.emit()"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            <i class="bi bi-map me-1"></i> Zurück zur Karte
+        </button>
+    </div>
+    <div class="d-flex align-items-center mb-3">
+        <h3 class="modal-title">
+            Alarmierungsgruppen
+            <button
+                class="ms-3 btn btn-outline-primary"
+                (click)="addAlarmGroup()"
+                data-cy="alarmGroupAddButton"
+            >
+                <i class="bi bi-plus"></i> Hinzufügen
+            </button>
+        </h3>
+    </div>
+    <ul
+        class="list-group list-group-flush flex-grow-1"
+        cdkDropList
+        [cdkDropListEnterPredicate]="onlyAlarmGroupDropPredicate.bind(this)"
+        (cdkDropListDropped)="drop($event)"
+    >
+        @for (
+            alarmGroup of alarmGroups$ | async | values;
+            track alarmGroup.id
+        ) {
+            <li class="list-group-item" cdkDrag cdkDragDisabled>
+                <app-alarm-group-item
+                    [alarmGroup]="alarmGroup"
+                ></app-alarm-group-item>
+            </li>
+        } @empty {
+            <div class="text-muted mt-3 mb-3">
+                Es sind noch keine Alarmierungsgruppen vorhanden.
+            </div>
+        }
+    </ul>
+</div>

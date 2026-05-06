@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
+    ClientToServerEvents,
     CollectionDto,
     CollectionElementsDto,
     CollectionEntityId,
@@ -9,13 +10,19 @@ import {
     ElementEntityId,
     ElementVersionId,
     Marketplace,
+    ServerToClientEvents,
+    socketIoTransports,
     VersionedCollectionPartial,
     versionedElementContentSchema,
     VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
-import { httpOrigin } from './api-origins';
+import { io, Socket } from 'socket.io-client';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { httpOrigin, websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
+import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
+import { LoadingModalService } from './loading-modal/loading-modal.service';
 
 export interface CollectionSubscriptionData {
     collection: CollectionDto;
@@ -31,6 +38,15 @@ export interface CollectionSubscriptionData {
 export class CollectionService {
     private readonly httpClient = inject(HttpClient);
     private readonly messageService = inject(MessageService);
+    private readonly ngbModalService = inject(NgbModal);
+    private readonly loadingModalService = inject(LoadingModalService);
+
+    private readonly socket: Socket<
+        ServerToClientEvents,
+        ClientToServerEvents
+    > = io(websocketOrigin, {
+        ...socketIoTransports,
+    });
 
     public readonly ENDPOINT = `${httpOrigin}/api/collections`;
     private readonly _collectionSubscriptions = new Map<
@@ -38,162 +54,199 @@ export class CollectionService {
         BehaviorSubject<CollectionSubscriptionData | null>
     >();
 
-    public subscribeToCollection(
-        setEntityId: CollectionEntityId
-    ): BehaviorSubject<CollectionSubscriptionData | null> {
-        const collectionEventSource = new EventSource(
-            `${this.ENDPOINT}/${setEntityId}/events`,
-            { withCredentials: true }
-        );
+    constructor() {
+        this.socket.emit('registerCollectionListenerClient', (response) => {
+            if (response.success) return;
+            this.socketErrorHandler(
+                `Failed to init collection listener${response.message}`
+            );
+        });
+        this.socket.on('collectionUpdate', (update) => {
+            const changeEvent =
+                Marketplace.Collection.Events.SSEvent.schema.decode(update);
+            this.handleCollectionUpdateEvent(changeEvent);
+        });
+        this.socket.on('disconnect', (reason) => {
+            if (reason === 'io client disconnect') {
+                return;
+            }
+            this.socketErrorHandler(reason);
+        });
+    }
 
+    private socketErrorHandler(error: any) {
+        console.error(error);
+        openConnectionLostModal(this.ngbModalService);
+    }
+
+    private handleCollectionUpdateEvent(
+        changeEvent: typeof Marketplace.Collection.Events.SSEvent.Type
+    ) {
+        const subject = this._collectionSubscriptions.get(
+            changeEvent.collectionEntityId
+        );
+        if (!subject) {
+            console.warn(
+                `Received collection update for collection ${changeEvent.collectionEntityId} but no subscription found.`
+            );
+            return;
+        }
+
+        switch (changeEvent.event) {
+            case 'initialdata': {
+                // will be handled differently
+                break;
+            }
+            case 'element:create': {
+                const currentValue = subject.getValue();
+                if (!currentValue) return;
+                const newValue = {
+                    ...currentValue,
+                    objects: {
+                        ...currentValue.objects,
+                        direct: [
+                            ...currentValue.objects.direct,
+                            changeEvent.data,
+                        ],
+                    },
+                };
+                subject.next(newValue);
+                break;
+            }
+            case 'element:update': {
+                const currentValue = subject.getValue();
+                if (!currentValue) return;
+                const newValue = {
+                    ...currentValue,
+                    objects: {
+                        ...currentValue.objects,
+                        direct: currentValue.objects.direct.map((object) =>
+                            object.entityId === changeEvent.data.entityId
+                                ? changeEvent.data
+                                : object
+                        ),
+                    },
+                };
+                subject.next(newValue);
+                break;
+            }
+
+            case 'element:delete': {
+                const currentValue = subject.getValue();
+                if (!currentValue) return;
+                const newValue = {
+                    ...currentValue,
+                    objects: {
+                        ...currentValue.objects,
+                        direct: currentValue.objects.direct.filter(
+                            (object) =>
+                                object.entityId !== changeEvent.data.entityId
+                        ),
+                    },
+                };
+                subject.next(newValue);
+                break;
+            }
+
+            case 'dependency:change': {
+                // THIS EVENT DOES NOT NEED TO BE HANDLED BY FRONTEND
+                // dependency:replace-data is the important event here
+                break;
+            }
+
+            case 'dependency:replace-data': {
+                const currentValue = subject.getValue();
+                if (!currentValue) return;
+                const newValue = {
+                    ...currentValue,
+                    objects: {
+                        direct: currentValue.objects.direct,
+                        imported: changeEvent.data.imported,
+                        references: changeEvent.data.references,
+                    },
+                } satisfies CollectionSubscriptionData;
+                subject.next(newValue);
+                break;
+            }
+
+            case 'collection:update': {
+                const currentValue = subject.getValue();
+                if (!currentValue) return;
+                const newValue = {
+                    ...currentValue,
+                    collection: changeEvent.data,
+                };
+                subject.next(newValue);
+                break;
+            }
+            case 'collection:refresh-data': {
+                const currentValue = subject.getValue();
+                if (!currentValue) return;
+                const newValue = {
+                    ...currentValue,
+                    publishedElements:
+                        changeEvent.data.publishedElements ??
+                        currentValue.publishedElements,
+                    objects:
+                        changeEvent.data.draftElements ?? currentValue.objects,
+                    collection:
+                        changeEvent.data.draftCollection ??
+                        currentValue.collection,
+                    publishedCollection:
+                        changeEvent.data.publishedCollection ??
+                        currentValue.publishedCollection,
+                } satisfies CollectionSubscriptionData;
+                subject.next(newValue);
+                break;
+            }
+            default: {
+                console.warn(`Unhandled event type`, changeEvent);
+            }
+        }
+    }
+
+    public async subscribeToCollection(
+        setEntityId: CollectionEntityId
+    ): Promise<BehaviorSubject<CollectionSubscriptionData | null>> {
         const subject = new BehaviorSubject<CollectionSubscriptionData | null>(
             null
         );
         this._collectionSubscriptions.set(setEntityId, subject);
-        collectionEventSource.addEventListener('change', (event) => {
-            const changeEvent =
-                Marketplace.Collection.Events.SSEvent.schema.parse(
-                    JSON.parse(event.data)
+
+        while (!this.socket.connected) {
+            this.loadingModalService.showLoading({
+                title: 'Elemente werden geladen',
+                description: 'Verbindung zum Server wird hergestellt…',
+            });
+            // eslint-disable-next-line no-await-in-loop
+            await new Promise((resolve) => {
+                setTimeout(resolve, 250);
+            });
+        }
+        this.loadingModalService.closeLoading();
+
+        console.log(this.socket.connected);
+        this.socket.emit('joinCollectionRoom', setEntityId, (response) => {
+            if (!response.success) return;
+            const initialData =
+                Marketplace.Collection.Events.InitialData.schema.decode(
+                    response.payload
                 );
 
-            switch (changeEvent.event) {
-                case 'initialdata': {
-                    subject.next({
-                        collection: changeEvent.data.collection,
-                        objects: changeEvent.data.elements,
-                        publishedCollection:
-                            changeEvent.data.publishedCollection,
-                        publishedElements: changeEvent.data.publishedElements,
-                        ownRole: changeEvent.data.userRelationship,
-                    });
-                    break;
-                }
-                case 'element:create': {
-                    const currentValue = subject.getValue();
-                    if (!currentValue) return;
-                    const newValue = {
-                        ...currentValue,
-                        objects: {
-                            ...currentValue.objects,
-                            direct: [
-                                ...currentValue.objects.direct,
-                                changeEvent.data,
-                            ],
-                        },
-                    };
-                    subject.next(newValue);
-                    break;
-                }
-                case 'element:update': {
-                    const currentValue = subject.getValue();
-                    if (!currentValue) return;
-                    const newValue = {
-                        ...currentValue,
-                        objects: {
-                            ...currentValue.objects,
-                            direct: currentValue.objects.direct.map((object) =>
-                                object.entityId === changeEvent.data.entityId
-                                    ? changeEvent.data
-                                    : object
-                            ),
-                        },
-                    };
-                    subject.next(newValue);
-                    break;
-                }
-
-                case 'element:delete': {
-                    const currentValue = subject.getValue();
-                    if (!currentValue) return;
-                    const newValue = {
-                        ...currentValue,
-                        objects: {
-                            ...currentValue.objects,
-                            direct: currentValue.objects.direct.filter(
-                                (object) =>
-                                    object.entityId !==
-                                    changeEvent.data.entityId
-                            ),
-                        },
-                    };
-                    subject.next(newValue);
-                    break;
-                }
-
-                case 'dependency:change': {
-                    // THIS EVENT DOES NOT NEED TO BE HANDLED BY FRONTEND
-                    // dependency:replace-data is the important event here
-                    break;
-                }
-
-                case 'dependency:replace-data': {
-                    const currentValue = subject.getValue();
-                    if (!currentValue) return;
-                    const newValue = {
-                        ...currentValue,
-                        objects: {
-                            direct: currentValue.objects.direct,
-                            imported: changeEvent.data.imported,
-                            references: changeEvent.data.references,
-                        },
-                    } satisfies CollectionSubscriptionData;
-                    subject.next(newValue);
-                    break;
-                }
-
-                case 'collection:update': {
-                    const currentValue = subject.getValue();
-                    if (!currentValue) return;
-                    const newValue = {
-                        ...currentValue,
-                        collection: changeEvent.data,
-                    };
-                    subject.next(newValue);
-                    break;
-                }
-                case 'collection:refresh-data': {
-                    const currentValue = subject.getValue();
-                    if (!currentValue) return;
-                    const newValue = {
-                        ...currentValue,
-                        publishedElements:
-                            changeEvent.data.publishedElements ??
-                            currentValue.publishedElements,
-                        objects:
-                            changeEvent.data.draftElements ??
-                            currentValue.objects,
-                        collection:
-                            changeEvent.data.draftCollection ??
-                            currentValue.collection,
-                        publishedCollection:
-                            changeEvent.data.publishedCollection ??
-                            currentValue.publishedCollection,
-                    } satisfies CollectionSubscriptionData;
-                    subject.next(newValue);
-                    break;
-                }
-                default: {
-                    console.warn(
-                        `Unhandled event type ${changeEvent} for setEntityId ${setEntityId}`
-                    );
-                }
-            }
-        });
-
-        collectionEventSource.onerror = (error) => {
-            console.error(
-                `Error in EventSource for setEntityId ${setEntityId}:`,
-                error
-            );
-            this.messageService.postError({
-                title: 'Verbindungsfehler',
-                body: 'Die Verbindung zum Server wurde unterbrochen. Bitte überprüfen Sie Ihre Internetverbindung und laden Sie die Seite neu.',
+            subject.next({
+                collection: initialData.data.collection,
+                objects: initialData.data.elements,
+                publishedCollection: initialData.data.publishedCollection,
+                publishedElements: initialData.data.publishedElements,
+                ownRole: initialData.data.userRelationship,
             });
-        };
+        });
 
         this._collectionSubscriptions.get(setEntityId)?.subscribe({
             complete: () => {
-                collectionEventSource.close();
+                this.socket.emit('leaveCollectionRoom', setEntityId, () => {
+                    /* nop */
+                });
                 this._collectionSubscriptions.delete(setEntityId);
             },
         });
@@ -458,15 +511,15 @@ export class CollectionService {
     public async upgradeCollectionDependency(opts: {
         importTo: CollectionEntityId;
         importFrom: CollectionVersionId;
-        acceptedElementDeletions: ElementVersionId[];
+        acceptedElementChanges: ElementVersionId[];
     }) {
-        const data = await lastValueFrom(
+        await lastValueFrom(
             this.httpClient.post<
                 typeof Marketplace.Collection.UpgradeDependency.Response
             >(
                 `${this.ENDPOINT}/${opts.importTo}/dependencies/${opts.importFrom}/upgrade`,
                 Marketplace.Collection.UpgradeDependency.requestSchema.encode({
-                    acceptedElementDeletions: opts.acceptedElementDeletions,
+                    acceptedElementChanges: opts.acceptedElementChanges,
                 })
             )
         );
@@ -669,6 +722,32 @@ export class CollectionService {
         return typedData.result;
     }
 
+    public async getPublicCollections() {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Collection.LoadPublic.Response
+            >(`${this.ENDPOINT}/public`)
+        );
+
+        const typedData =
+            Marketplace.Collection.LoadPublic.responseSchema.parse(data);
+
+        return typedData.result;
+    }
+
+    public async getUsableCollections() {
+        const data = await lastValueFrom(
+            this.httpClient.get<
+                typeof Marketplace.Collection.LoadUsable.Response
+            >(`${this.ENDPOINT}/usable`)
+        );
+
+        const typedData =
+            Marketplace.Collection.LoadUsable.responseSchema.parse(data);
+
+        return typedData.result;
+    }
+
     public async getCollectionInviteCode(
         collectionEntityId: CollectionEntityId
     ) {
@@ -757,17 +836,15 @@ export class CollectionService {
         return typedData.result;
     }
 
-    public async checkIsCollectionMember(
-        collectionEntityId: CollectionEntityId
-    ) {
+    public async getUserCollectionRole(collectionEntityId: CollectionEntityId) {
         const data = await lastValueFrom(
             this.httpClient.get<
-                typeof Marketplace.Collection.GetIsMember.Response
-            >(`${this.ENDPOINT}/${collectionEntityId}/isMember`)
+                typeof Marketplace.Collection.GetCollectionRole.Response
+            >(`${this.ENDPOINT}/${collectionEntityId}/user-role`)
         );
 
         const typedData =
-            Marketplace.Collection.GetIsMember.responseSchema.parse(data);
+            Marketplace.Collection.GetCollectionRole.responseSchema.parse(data);
 
         return typedData.result;
     }

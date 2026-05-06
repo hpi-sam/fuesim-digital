@@ -1,0 +1,63 @@
+<div class="modal-header">
+    <h4 class="modal-title">Didaktische Übersicht</h4>
+    <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+    <div>
+        <div ngbDropdown class="d-inline-block">
+            <button
+                type="button"
+                ngbDropdownToggle
+                class="btn btn-outline-primary ms-3"
+                data-cy="didacticOverviewAddEvalCriterionButton"
+            >
+                <i class="bi bi-plus"></i> Auswertungskriterium Hinzufügen
+            </button>
+            <div ngbDropdownMenu class="position-absolute">
+                @for (type of evalCriterionTypes; track type) {
+                    <button
+                        ngbDropdownItem
+                        (click)="
+                            criterionCreationType = type;
+                            creatingcriterion = true
+                        "
+                    >
+                        {{ evalCriterionTypesNames[type] }}
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+    @if (creatingcriterion) {
+        <app-eval-criterion-creation-form
+            [criterionCreationType]="criterionCreationType"
+        />
+    }
+    <div class="card col-3 p-0 rounded-2 ms-3 mt-3" style="min-width: 600px">
+        <div class="card-header text-center">
+            <h5 class="mb-0 d-flex align-items-center">Getroffene Maßnahmen</h5>
+        </div>
+        @if (!this.results()) {
+            <p class="ms-3">
+                Es sind aktuell keine Auswertungskriterien festgelegt.
+            </p>
+        } @else {
+            @for (result of this.resultValues(); track result.criterionId) {
+                <div class="card col-3 p-0 rounded-0" style="min-width: 600px">
+                    <span class="ms-1">{{
+                        evalCriterionTypesNames[
+                            result.criterion.criterionType
+                        ] +
+                            ': (' +
+                            result.count +
+                            '/' +
+                            '???' +
+                            ')'
+                    }}</span>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- TODO @JohannesPotzi @Jogius : Idea-Pitch: area-burn-down-chart similarly to the statistics area chart-->
+</div>

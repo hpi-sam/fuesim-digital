@@ -12,7 +12,7 @@ import {
     validateExerciseExport,
     VehicleTemplate,
 } from 'fuesim-digital-shared';
-import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import {
     CollectionService,
     CollectionSubscriptionData,
@@ -34,7 +34,6 @@ import { CollectionElementsListComponent } from '../../shared/collection-element
 export class CollectionElementsTabComponent {
     private readonly collectionService = inject(CollectionService);
     private readonly messageService = inject(MessageService);
-    private readonly ngbModalService = inject(NgbModal);
 
     public readonly collectionData =
         input.required<CollectionSubscriptionData>();

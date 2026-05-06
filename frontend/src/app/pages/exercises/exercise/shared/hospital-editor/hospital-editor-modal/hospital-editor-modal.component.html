@@ -1,0 +1,97 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        Krankenhäuser
+        <button
+            class="ms-3 btn btn-outline-primary"
+            (click)="addHospital()"
+            data-cy="hospitalAddButton"
+        >
+            <i class="bi bi-plus"></i> Hinzufügen
+        </button>
+    </h4>
+    <button
+        type="button"
+        class="btn-close"
+        (click)="close()"
+        data-cy="hospitalClosePopupButton"
+    ></button>
+</div>
+@if (hospitals$ | async | values; as hospitals) {
+    <div class="modal-body" style="min-height: 60vh">
+        @if (hospitals.length > 0) {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Transportzeit</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (hospital of hospitals; track hospital.id) {
+                        <tr>
+                            <td>
+                                <input
+                                    #nameInput="ngModel"
+                                    [ngModel]="hospital.name"
+                                    (appSaveOnTyping)="
+                                        renameHospital(hospital.id, $event)
+                                    "
+                                    required
+                                    placeholder="Name"
+                                    type="text"
+                                    class="form-control"
+                                    data-cy="hospitalRenameInput"
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    required
+                                    [min]="0"
+                                    [max]="24 * 60"
+                                    [ngModel]="
+                                        hospital.transportDuration / 1000 / 60
+                                    "
+                                    (appSaveOnTyping)="
+                                        editTransportDurationToHospital(
+                                            hospital.id,
+                                            $event * 1000 * 60
+                                        )
+                                    "
+                                    class="form-control d-inline-block"
+                                    step="1"
+                                    type="number"
+                                    style="width: 100px"
+                                    placeholder="Transportzeit"
+                                    data-cy="hospitalUpdateTransportTimeInput"
+                                />
+                                <span class="ps-2 pe-2" title="Minuten"
+                                    >min</span
+                                >
+                            </td>
+                            <td class="align-middle">
+                                @if (hospital.id !== catchAllHospitalId) {
+                                    <button
+                                        (click)="removeHospital(hospital.id)"
+                                        class="btn btn-outline-danger float-end"
+                                        data-cy="hospitalDeleteButton"
+                                    >
+                                        <i class="bi bi-trash"></i> Löschen
+                                    </button>
+                                } @else {
+                                    <span class="badge text-bg-secondary"
+                                        >Standard</span
+                                    >
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        } @else {
+            <div class="text-muted mt-3 mb-3">
+                Es sind noch keine Krankenhäuser vorhanden.
+            </div>
+        }
+    </div>
+}

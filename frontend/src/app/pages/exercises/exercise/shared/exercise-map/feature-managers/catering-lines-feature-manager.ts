@@ -8,7 +8,6 @@ import type OlMap from 'ol/Map';
 import type { Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from 'fuesim-digital-shared';
-import type { Immutable } from 'immer';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import { LineStyleHelper } from '../utility/style-helper/line-style-helper';
@@ -105,7 +104,7 @@ export class CateringLinesFeatureManager
     ) {}
 
     onFeatureDrop(
-        droppedElement: Immutable<Element>,
+        droppedElement: Element,
         droppedOnFeature: Feature<LineString>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

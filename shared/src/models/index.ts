@@ -1,5 +1,4 @@
 export * from './alarm-group.js';
-export * from './alarm-group.marketplace.js';
 export * from './client.js';
 export * from './eoc-log-entry.js';
 export * from './hospital.js';
@@ -15,7 +14,6 @@ export * from './personnel.js';
 export * from './transfer-point.js';
 export * from './vehicle.js';
 export * from './vehicle-template.js';
-export * from './vehicle-template.marketplace.js';
 export * from './viewport.js';
 export * from './patient-category.js';
 export * from './simulated-region.js';

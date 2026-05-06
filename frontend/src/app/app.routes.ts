@@ -20,14 +20,6 @@ export const appRoutes: Routes = [
             import('./pages/exercises/exercises.routes').then((m) => m.routes),
     },
     {
-        path: 'collections',
-        // eslint-disable-next-line @typescript-eslint/promise-function-async
-        loadChildren: () =>
-            import('./pages/marketplace/marketplace.routes').then(
-                (m) => m.routes
-            ),
-    },
-    {
         path: 'health',
         component: HealthPageComponent,
     },

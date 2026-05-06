@@ -29,6 +29,7 @@ import {
     collectionElementsSingleSchema,
 } from './marketplace/models/collection-elements.js';
 import { collectionVisibilitySchema } from './marketplace/models/collection-visibility.js';
+import type { ImmutableInfer } from './utils/infer.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -232,10 +233,10 @@ class Route<TRequest = never, TResponse = never> {
     public readonly requestSchema: TRequest;
     public readonly responseSchema: TResponse;
     public readonly Request!: TRequest extends z.ZodType
-        ? z.infer<TRequest>
+        ? ImmutableInfer<TRequest>
         : never;
     public readonly Response!: TResponse extends z.ZodType
-        ? z.infer<TResponse>
+        ? ImmutableInfer<TResponse>
         : never;
 }
 
@@ -413,7 +414,7 @@ export namespace Marketplace {
             description: z.string().trim().nonempty().optional(),
         });
 
-        export type EditableCollectionProperties = z.infer<
+        export type EditableCollectionProperties = ImmutableInfer<
             typeof editableCollectionPropertiesSchema
         >;
 
@@ -526,12 +527,12 @@ export namespace Marketplace {
             public readonly Type!: T extends z.ZodType
                 ? // if D is defined (override type), use D, otherwise infer from T
                   D extends unknown
-                    ? Immutable<z.infer<T>>
+                    ? ImmutableInfer<T>
                     : D
                 : never;
 
             public readonly InputType!: T extends z.ZodType
-                ? z.input<T>
+                ? Immutable<z.input<T>>
                 : never;
         }
 
@@ -550,7 +551,7 @@ export namespace Marketplace {
                     {
                         event: TName;
                         collectionEntityId: CollectionEntityId;
-                        data: z.infer<TData>;
+                        data: ImmutableInfer<TData>;
                     },
                     typeof schema
                 >(schema);

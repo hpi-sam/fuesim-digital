@@ -1382,7 +1382,7 @@ export class CollectionService {
                     )
                 );
 
-                const content = sourceElement.content;
+                const content = cloneDeepMutable(sourceElement.content);
                 content.name = `Kopie von ${content.name}`;
 
                 const duplicatedElement = this.exists(
@@ -1546,8 +1546,11 @@ export class CollectionService {
                     if (element.content.type !== 'vehicleTemplate') return acc;
                     acc[element.entityId] = {
                         ...cloneDeepMutable(element.content),
-                        versionId: element.versionId,
-                        entityId: element.entityId,
+                        entity: {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                            type: 'direct',
+                        },
                     };
                     return acc;
                 }, {}),
@@ -1557,8 +1560,11 @@ export class CollectionService {
                     if (element.content.type !== 'vehicleTemplate') return acc;
                     acc[element.entityId] = {
                         ...cloneDeepMutable(element.content),
-                        versionId: element.versionId,
-                        entityId: element.entityId,
+                        entity: {
+                            versionId: element.versionId,
+                            entityId: element.entityId,
+                            type: 'direct',
+                        },
                     };
                     return acc;
                 }, {}),

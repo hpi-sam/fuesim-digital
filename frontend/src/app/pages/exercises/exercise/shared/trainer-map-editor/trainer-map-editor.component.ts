@@ -1,12 +1,4 @@
-import {
-    OnInit,
-    inject,
-    Component,
-    Signal,
-    signal,
-    viewChild,
-    ElementRef,
-} from '@angular/core';
+import { OnInit, inject, Component, Signal, signal } from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,
@@ -16,7 +8,6 @@ import {
     NgbAccordionCollapse,
     NgbAccordionBody,
     NgbTooltip,
-    NgbOffcanvas,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import {
@@ -36,22 +27,15 @@ import type {
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { AsyncPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
-import {
-    CdkDrag,
-    CdkDragPlaceholder,
-    CdkDropList,
-    CdkDropListGroup,
-} from '@angular/cdk/drag-drop';
-import {
-    DragElementService,
-    TransferTemplate,
-} from '../core/drag-element.service';
+import { AsyncPipe, KeyValuePipe } from '@angular/common';
+import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
+import { openCreateVehicleTemplateModal } from '../editor-panel/create-vehicle-template-modal/open-create-vehicle-template-modal';
 import { openEditImageTemplateModal } from '../editor-panel/edit-image-template-modal/open-edit-image-template-modal';
 import { openPartialImportOverwriteModal } from '../partial-import/open-partial-import-overwrite-modal';
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
+import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
 import { restrictedZoneDragTemplates } from '../editor-panel/templates/restricted-zone';
 import { ExerciseService } from '../../../../../core/exercise.service';
 import { MessageService } from '../../../../../core/messages/message.service';
@@ -61,19 +45,15 @@ import {
     selectVehicleTemplates,
     selectMapImagesTemplates,
     selectExerciseState,
-    selectAlarmgroupTemplates,
 } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { ExerciseMapComponent } from '../exercise-map/exercise-map.component';
 import { FileInputDirective } from '../../../../../shared/directives/file-input.directive';
+import { MapEditorCardComponent } from '../editor-panel/map-editor-card/map-editor-card.component';
 import { PatientStatusBadgeComponent } from '../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 import { PatientStatusDisplayComponent } from '../../../../../shared/components/patient-status-displayl/patient-status-display/patient-status-display.component';
 import { TrainerToolbarComponent } from '../trainer-toolbar/trainer-toolbar.component';
 import { ValuesPipe } from '../../../../../shared/pipes/values.pipe';
-import { MapEditorCardComponent } from '../../../../../shared/components/map-editor-card/map-editor-card.component';
-import { AlarmGroupOverviewPageComponent } from '../alarm-group-page/alarm-group-overview-page.component';
-import { HospitalEditorPageComponent } from '../hospital-editor-page/hospital-editor-page.component';
-import { ManageExerciseCollectionsModalComponent } from '../manage-exercise-collections/manage-exercise-collections-modal.component';
 
 const categories = ['green', 'yellow', 'red'] as const;
 const colorCodeOfCategories = {
@@ -107,13 +87,6 @@ type FilterCategory =
         AsyncPipe,
         KeyValuePipe,
         ValuesPipe,
-        CdkDrag,
-        CdkDropList,
-        CdkDropListGroup,
-        NgTemplateOutlet,
-        CdkDragPlaceholder,
-        AlarmGroupOverviewPageComponent,
-        HospitalEditorPageComponent,
     ],
 })
 /**
@@ -121,18 +94,11 @@ type FilterCategory =
  */
 export class TrainerMapEditorComponent implements OnInit {
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly dragElementService = inject(DragElementService);
+    readonly dragElementService = inject(DragElementService);
     readonly transferLinesService = inject(TransferLinesService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly messageService = inject(MessageService);
     private readonly exerciseService = inject(ExerciseService);
-    private readonly offcanvasService = inject(NgbOffcanvas);
-
-    private readonly mapRef = viewChild<ElementRef<HTMLDivElement>>('mapRef');
-
-    public readonly overwriteTrainerMap = signal<
-        'alarmgroups' | 'hospitals' | null
-    >(null);
 
     public selectedCategories$: BehaviorSubject<{
         [key in FilterCategory]: boolean;
@@ -158,10 +124,6 @@ export class TrainerMapEditorComponent implements OnInit {
 
     public readonly mapImageTemplates$ = this.store.select(
         selectMapImagesTemplates
-    );
-
-    public readonly alarmGroupTemplates$ = this.store.select(
-        selectAlarmgroupTemplates
     );
 
     public readonly technicalChallengeTemplates: Signal<
@@ -220,8 +182,16 @@ export class TrainerMapEditorComponent implements OnInit {
         openCreateImageTemplateModal(this.ngbModalService);
     }
 
+    public addVehicleTemplate() {
+        openCreateVehicleTemplateModal(this.ngbModalService);
+    }
+
     public editMapImageTemplate(mapImageTemplateId: UUID) {
         openEditImageTemplateModal(this.ngbModalService, mapImageTemplateId);
+    }
+
+    public editVehicleTemplate(mapImageTemplateId: UUID) {
+        openEditVehicleTemplateModal(this.ngbModalService, mapImageTemplateId);
     }
 
     public setCurrentCategory(
@@ -231,20 +201,6 @@ export class TrainerMapEditorComponent implements OnInit {
         this.selectedCategories$.next({
             ...this.selectedCategories$.value,
             [this.colorCodeOfCategories[category]]: status,
-        });
-    }
-
-    public startElementDrag(
-        event: MouseEvent,
-        transferTemplate: TransferTemplate
-    ) {
-        this.overwriteTrainerMap.set(null);
-        this.dragElementService.onMouseDown(event, transferTemplate);
-    }
-
-    public openTemplateManagementModal() {
-        this.ngbModalService.open(ManageExerciseCollectionsModalComponent, {
-            size: 'xl',
         });
     }
 

@@ -5,7 +5,6 @@ import type VectorLayer from 'ol/layer/Vector';
 import type { Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from 'fuesim-digital-shared';
-import type { Immutable } from 'immer';
 import type { OlMapInteractionsManager } from './ol-map-interactions-manager';
 
 /**
@@ -36,7 +35,7 @@ export interface FeatureManager<T extends Geometry> {
      * @returns wether the event should not propagate further (to the features behind {@link droppedOnFeature}).
      */
     onFeatureDrop: (
-        droppedElement: Immutable<Element>,
+        droppedElement: Element,
         droppedOnFeature: Feature<T>,
         dropEvent: MouseEvent | TranslateEvent
     ) => boolean;

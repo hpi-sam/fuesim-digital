@@ -37,8 +37,6 @@ export class ConfirmationModalComponent implements OnDestroy {
 
     public confirmationStringValue = '';
 
-    public confirmationButtonText = 'OK';
-
     ngOnDestroy() {
         this.confirmation$.complete();
     }

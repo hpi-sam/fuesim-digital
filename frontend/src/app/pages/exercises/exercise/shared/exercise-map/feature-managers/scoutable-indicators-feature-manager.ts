@@ -18,7 +18,6 @@ import {
     patientScoutableImageUrl,
 } from 'fuesim-digital-shared';
 import type { TranslateEvent } from 'ol/interaction/Translate';
-import type { Immutable } from 'immer';
 import { ImageStyleHelper } from '../utility/style-helper/image-style-helper';
 import { selectVisibleScoutableIndicators } from '../../../../../../state/application/selectors/shared.selectors';
 import type { AppState } from '../../../../../../state/app.state';
@@ -154,7 +153,7 @@ export class ScoutableIndicatorsFeatureManager
     }
 
     onFeatureDrop(
-        droppedElement: Immutable<Element>,
+        droppedElement: Element,
         droppedOnFeature: Feature<Point>,
         dropEvent?: MouseEvent | TranslateEvent
     ) {

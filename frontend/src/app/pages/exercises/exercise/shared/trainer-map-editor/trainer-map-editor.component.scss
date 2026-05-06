@@ -13,30 +13,3 @@
     justify-content: start;
     align-items: start;
 }
-
-.trainer-map-editor-overwrite-panel {
-    flex: 0 0 auto;
-    width: 0;
-    min-width: 0;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateX(-1rem);
-    transition:
-        width 320ms ease,
-        opacity 320ms ease,
-        transform 320ms ease;
-}
-
-.trainer-map-editor-overwrite-panel.is-open {
-    width: clamp(24rem, 32vw, 40rem);
-    max-width: 100%;
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.trainer-map-editor-overwrite-panel-content {
-    flex: 1 1 auto;
-    height: 0;
-    width: clamp(24rem, 32vw, 40rem);
-    overflow-y: auto;
-}

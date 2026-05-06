@@ -1,0 +1,37 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        Alarmierungsgruppen
+        <button
+            class="ms-3 btn btn-outline-primary"
+            (click)="addAlarmGroup()"
+            data-cy="alarmGroupAddButton"
+        >
+            <i class="bi bi-plus"></i> Hinzufügen
+        </button>
+    </h4>
+    <button
+        type="button"
+        class="btn-close"
+        (click)="close()"
+        data-cy="alarmGroupClosePopupButton"
+    ></button>
+</div>
+@if (alarmGroups$ | async | values; as alarmGroups) {
+    <div class="modal-body" style="min-height: 60vh">
+        @if (alarmGroups.length > 0) {
+            <ul class="list-group list-group-flush">
+                @for (alarmGroup of alarmGroups; track alarmGroup.id) {
+                    <li class="list-group-item">
+                        <app-alarm-group-item
+                            [alarmGroup]="alarmGroup"
+                        ></app-alarm-group-item>
+                    </li>
+                }
+            </ul>
+        } @else {
+            <div class="text-muted mt-3 mb-3">
+                Es sind noch keine Alarmierungsgruppen vorhanden.
+            </div>
+        }
+    </div>
+}

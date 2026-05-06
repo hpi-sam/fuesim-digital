@@ -10,7 +10,6 @@ import type OlMap from 'ol/Map';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
-import type { Immutable } from 'immer';
 import type { TransferLinesService } from '../../core/transfer-lines.service';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
@@ -112,7 +111,7 @@ export class TransferLinesFeatureManager
     ) {}
 
     onFeatureDrop(
-        droppedElement: Immutable<Element>,
+        droppedElement: Element,
         droppedOnFeature: Feature<LineString>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

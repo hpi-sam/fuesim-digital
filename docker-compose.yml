@@ -23,8 +23,8 @@ services:
         volumes:
             - db:/var/lib/postgresql
         # Use this to expose the database to your host machine
-        ports:
-            - 127.0.0.1:${DFM_DB_PORT}:5432
+        #ports:
+        #    - 127.0.0.1:${DFM_DB_PORT}:5432
         environment:
             - POSTGRES_USER=${DFM_DB_USER}
             - POSTGRES_PASSWORD=${DFM_DB_PASSWORD}

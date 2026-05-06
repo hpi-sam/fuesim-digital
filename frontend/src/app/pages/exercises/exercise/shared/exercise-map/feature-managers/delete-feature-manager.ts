@@ -12,7 +12,6 @@ import Style from 'ol/style/Style';
 import type { Subject } from 'rxjs';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import type { Element } from 'fuesim-digital-shared';
-import type { Immutable } from 'immer';
 import type { FeatureManager } from '../utility/feature-manager';
 import type { OlMapInteractionsManager } from '../utility/ol-map-interactions-manager';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
@@ -86,7 +85,7 @@ export class DeleteFeatureManager implements FeatureManager<Point> {
     }
 
     public onFeatureDrop(
-        droppedElement: Immutable<Element>,
+        droppedElement: Element,
         droppedOnFeature: Feature<Point>,
         dropEvent: MouseEvent | TranslateEvent
     ) {

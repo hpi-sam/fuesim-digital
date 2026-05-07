@@ -7,6 +7,7 @@ import type { TechnicalChallengeId } from './technical-challenge/technical-chall
 import { technicalChallengeIdSchema } from './technical-challenge/technical-challenge.js';
 import type { PatientStatus } from './utils/patient-status.js';
 import { patientStatusSchema } from './utils/patient-status.js';
+import { logicalOperatorSchema } from './utils/cater-for.js';
 
 export const evalCriterionBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -20,6 +21,9 @@ export const doMeasureXTimesEvalCriterionSchema = z.strictObject({
     count: z.int(),
     targetMeasureId: uuidSchema,
 });
+export type DoMeasureXTimesEvalCriterion = z.infer<
+    typeof doMeasureXTimesEvalCriterionSchema
+>;
 
 export const reachTechnicalChallengeStateEvalCriterionSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
@@ -27,6 +31,9 @@ export const reachTechnicalChallengeStateEvalCriterionSchema = z.strictObject({
     targetTechnicalChallengeId: technicalChallengeIdSchema,
     targetTechnicalChallengeStateId: technicalChallengeStateIdSchema,
 });
+export type ReachTechnicalChallengeStateEvalCriterion = z.infer<
+    typeof reachTechnicalChallengeStateEvalCriterionSchema
+>;
 
 export const patientAtStatusEvalCriterionSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
@@ -34,6 +41,9 @@ export const patientAtStatusEvalCriterionSchema = z.strictObject({
     targetPatientId: uuidSchema,
     targetStatus: patientStatusSchema,
 });
+export type PatientAtStatusEvalCriterion = z.infer<
+    typeof patientAtStatusEvalCriterionSchema
+>;
 
 export const xPatientsAtStatusEvalCriterionSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
@@ -41,40 +51,48 @@ export const xPatientsAtStatusEvalCriterionSchema = z.strictObject({
     count: z.int(),
     targetStatus: patientStatusSchema,
 });
+export type XPatientsAtStatusEvalCriterion = z.infer<
+    typeof xPatientsAtStatusEvalCriterionSchema
+>;
 
 export const viewScoutableEvalCriterionSchema = z.strictObject({
     ...evalCriterionBaseSchema.shape,
     criterionType: z.literal('viewScoutableEvalCriterion'),
     targetScoutableId: uuidSchema,
 });
-
-/* TODO @JohannesPotzi @Jogius : lessThanXUnqualifiedMeasuresEvalCriterion */
-
-export type DoMeasureXTimesEvalCriterion = z.infer<
-    typeof doMeasureXTimesEvalCriterionSchema
->;
-export type ReachTechnicalChallengeStateEvalCriterion = z.infer<
-    typeof reachTechnicalChallengeStateEvalCriterionSchema
->;
-export type PatientAtStatusEvalCriterion = z.infer<
-    typeof patientAtStatusEvalCriterionSchema
->;
-export type XPatientsAtStatusEvalCriterion = z.infer<
-    typeof xPatientsAtStatusEvalCriterionSchema
->;
 export type ViewScoutableEvalCriterion = z.infer<
     typeof viewScoutableEvalCriterionSchema
 >;
-/* TODO @JohannesPotzi @Jogius : Is there a magical way to do this? */
+
+/* TODO @JohannesPotzi @Jogius : lessThanXUnqualifiedMeasuresEvalCriterion */
+
+export const combinedEvalCriterionSchema = z.strictObject({
+    ...evalCriterionBaseSchema.shape,
+    criterionType: z.literal('combinedEvalCriterion'),
+    criteriaIds: z.array(uuidSchema),
+    logicalOperator: logicalOperatorSchema,
+});
+export type CombinedEvalCriterion = z.infer<typeof combinedEvalCriterionSchema>;
+
+export const evalCriterionSchema = z.discriminatedUnion('criterionType', [
+    doMeasureXTimesEvalCriterionSchema,
+    reachTechnicalChallengeStateEvalCriterionSchema,
+    patientAtStatusEvalCriterionSchema,
+    xPatientsAtStatusEvalCriterionSchema,
+    viewScoutableEvalCriterionSchema,
+    combinedEvalCriterionSchema,
+]);
+
+export type EvalCriterion = z.infer<typeof evalCriterionSchema>;
+export type EvalcriterionType = EvalCriterion['criterionType'];
 export const evalCritrionTypes = [
     'doMeasureXTimesEvalCriterion',
     'reachTechnicalChallengeStateEvalCriterion',
     'patientAtStatusEvalCriterion',
     'xPatientsAtStatusEvalCriterion',
     'viewScoutableEvalCriterion',
-] as const;
-export const evalCriterionTypesSchema = z.literal(evalCritrionTypes);
-export type EvalcriterionType = z.infer<typeof evalCriterionTypesSchema>;
+    'combinedEvalCriterion',
+] satisfies EvalcriterionType[];
 export const evalCriterionTypesNames: {
     [key in EvalcriterionType]: string;
 } = {
@@ -84,17 +102,8 @@ export const evalCriterionTypesNames: {
     patientAtStatusEvalCriterion: 'Patient mit SK',
     xPatientsAtStatusEvalCriterion: 'X Patienten mit SK',
     viewScoutableEvalCriterion: 'Erkunde auf der Karte',
+    combinedEvalCriterion: 'Kombiniertes Kriterium',
 } as const;
-export const evalCriterionSchema = z.discriminatedUnion('criterionType', [
-    doMeasureXTimesEvalCriterionSchema,
-    reachTechnicalChallengeStateEvalCriterionSchema,
-    patientAtStatusEvalCriterionSchema,
-    xPatientsAtStatusEvalCriterionSchema,
-    viewScoutableEvalCriterionSchema,
-]);
-
-export type EvalCriterion = z.infer<typeof evalCriterionSchema>;
-
 export function newDoMeasureXTimesEvalCriterion(
     name: string,
     count: number,

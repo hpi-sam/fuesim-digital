@@ -8,7 +8,10 @@ import type {
     ExerciseSimulationBehaviorType,
     ExerciseState,
     MeasureTemplate,
+    Patient,
+    Scoutable,
     ScoutableElementType,
+    TechnicalChallenge,
     TechnicalChallengeId,
     UUID,
     Vehicle,
@@ -26,6 +29,7 @@ import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
 import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
 import type {
+    CombinedEvalCriterion,
     EvalCriterion,
     PatientAtStatusEvalCriterion,
     ReachTechnicalChallengeStateEvalCriterion,
@@ -469,6 +473,110 @@ export const selectWorkingPersonnel = createSelector(
         return workingPersonnel;
     }
 );
+export function evalResultFromCriterion(
+    evalCriterion: EvalCriterion,
+    evalCriteria: { [key: string]: EvalCriterion },
+    technicalChallenges: { [key: string]: TechnicalChallenge },
+    patients: { [key: string]: Patient },
+    scoutables: { [key: string]: Scoutable },
+    currentTime: number
+): EvalResult {
+    let isCompleted = false;
+    let count = -1;
+    switch (evalCriterion.criterionType) {
+        case 'doMeasureXTimesEvalCriterion': {
+            /* TODO @JohannesPotzi @Jogius */
+            break;
+        }
+        case 'reachTechnicalChallengeStateEvalCriterion': {
+            const criterion =
+                evalCriterion as ReachTechnicalChallengeStateEvalCriterion;
+            const targetChallengeId = criterion.targetTechnicalChallengeId;
+            const targetStateId = criterion.targetTechnicalChallengeStateId;
+            const technicalChallenge = technicalChallenges[targetChallengeId]!;
+            isCompleted = technicalChallenge.currentStateId === targetStateId;
+            break;
+        }
+        case 'patientAtStatusEvalCriterion': {
+            const criterion = evalCriterion as PatientAtStatusEvalCriterion;
+            const targetId = criterion.targetPatientId;
+            const patient = patients[targetId]!;
+            isCompleted = patient.realStatus === criterion.targetStatus;
+            break;
+        }
+        case 'xPatientsAtStatusEvalCriterion': {
+            const criterion = evalCriterion as XPatientsAtStatusEvalCriterion;
+            const currentCount = Object.values(patients).filter(
+                (patient) => patient.realStatus === criterion.targetStatus
+            ).length;
+            count = currentCount;
+            isCompleted = currentCount === criterion.count;
+            break;
+        }
+        case 'viewScoutableEvalCriterion': {
+            const criterion = evalCriterion as ViewScoutableEvalCriterion;
+            const scoutable = scoutables[criterion.targetScoutableId]!;
+            isCompleted = scoutable.viewedByParticipants;
+            break;
+        }
+        case 'combinedEvalCriterion': {
+            const criterion = evalCriterion as CombinedEvalCriterion;
+            const combinedCriteria = Object.values(evalCriteria).filter(
+                (crit) => {
+                    criterion.criteriaIds.find((id) => crit.id === id);
+                }
+            );
+            if (combinedCriteria.length === 0) {
+                break;
+            }
+            const results = combinedCriteria.flatMap((crit) =>
+                evalResultFromCriterion(
+                    crit,
+                    evalCriteria,
+                    technicalChallenges,
+                    patients,
+                    scoutables,
+                    currentTime
+                )
+            );
+            switch (criterion.logicalOperator) {
+                case 'and': {
+                    isCompleted = true;
+                    for (let i = 0; i < results.length; i += 1) {
+                        if (results[i]!.isCompleted === false)
+                            isCompleted = false;
+                    }
+                    break;
+                }
+                case 'not': {
+                    if (results.length === 1) {
+                        isCompleted = !results[0]?.isCompleted;
+                    }
+                    break;
+                }
+                case 'or': {
+                    for (let i = 0; i < results.length; i += 1) {
+                        if (results[i]!.isCompleted) isCompleted = true;
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    const id = evalCriterion.id;
+    return {
+        criterionId: id,
+        criterion: evalCriterion,
+        isCompleted,
+        timestamp: currentTime,
+        count: count !== -1 ? count : undefined,
+    };
+}
 
 export const selectEvalResults = createSelector(
     selectEvalCriteria,
@@ -479,64 +587,20 @@ export const selectEvalResults = createSelector(
     (evalCriteria, technicalChallenges, patients, scoutables, currentTime) =>
         Object.values(evalCriteria)
             .flatMap((evalCriterion: EvalCriterion): EvalResult => {
-                let isCompleted = false;
-                let count = -1;
-                switch (evalCriterion.criterionType) {
-                    case 'doMeasureXTimesEvalCriterion': {
-                        /* TODO @JohannesPotzi @Jogius */
-                        break;
-                    }
-                    case 'reachTechnicalChallengeStateEvalCriterion': {
-                        const criterion =
-                            evalCriterion as ReachTechnicalChallengeStateEvalCriterion;
-                        const targetChallengeId =
-                            criterion.targetTechnicalChallengeId;
-                        const targetStateId =
-                            criterion.targetTechnicalChallengeStateId;
-                        const technicalChallenge =
-                            technicalChallenges[targetChallengeId]!;
-                        isCompleted =
-                            technicalChallenge.currentStateId === targetStateId;
-                        break;
-                    }
-                    case 'patientAtStatusEvalCriterion': {
-                        const criterion =
-                            evalCriterion as PatientAtStatusEvalCriterion;
-                        const targetId = criterion.targetPatientId;
-                        const patient = patients[targetId]!;
-                        isCompleted =
-                            patient.realStatus === criterion.targetStatus;
-                        break;
-                    }
-                    case 'xPatientsAtStatusEvalCriterion': {
-                        const criterion =
-                            evalCriterion as XPatientsAtStatusEvalCriterion;
-                        const currentCount = Object.values(patients).filter(
-                            (patient) =>
-                                patient.realStatus === criterion.targetStatus
-                        ).length;
-                        count = currentCount;
-                        isCompleted = currentCount === criterion.count;
-                        break;
-                    }
-                    case 'viewScoutableEvalCriterion': {
-                        const criterion =
-                            evalCriterion as ViewScoutableEvalCriterion;
-                        const scoutable =
-                            scoutables[criterion.targetScoutableId]!;
-                        isCompleted = scoutable.viewedByParticipants;
-                        break;
-                    }
-                    default:
-                        break;
-                }
-                const id = evalCriterion.id;
+                const result = evalResultFromCriterion(
+                    evalCriterion,
+                    evalCriteria,
+                    technicalChallenges,
+                    patients,
+                    scoutables,
+                    currentTime
+                );
                 return {
-                    criterionId: id,
+                    criterionId: result.criterionId,
                     criterion: evalCriterion,
-                    isCompleted,
+                    isCompleted: result.isCompleted,
                     timestamp: currentTime,
-                    count: count !== -1 ? count : undefined,
+                    count: result.count,
                 };
             })
             .reduce<{ [evalCriterionId: UUID]: EvalResult }>(

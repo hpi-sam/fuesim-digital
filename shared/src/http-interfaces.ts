@@ -470,7 +470,7 @@ export namespace Marketplace {
                 acceptedElementChanges: z.array(elementVersionIdSchema),
             }),
             response: z.object({
-                importedSet: collectionElementsSingleSchema,
+                importedSet: collectionVersionIdSchema,
                 newCollectionVersionId: collectionVersionIdSchema,
             }),
         });

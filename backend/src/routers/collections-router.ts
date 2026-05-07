@@ -444,10 +444,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
             res.send(
                 Marketplace.Collection.UpgradeDependency.responseSchema.encode({
-                    importedSet: {
-                        collection: data.collection,
-                        elements: data.elements,
-                    },
+                    importedSet: data.collection.versionId,
                     newCollectionVersionId: data.newCollectionVersion.versionId,
                 })
             );
@@ -750,6 +747,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         '/:collectionEntityId/element/:elementEntityId',
         async (req, res) => {
             const elementEntityId = getElementEntityId(req);
+            const collectionEntityId = getCollectionEntityId(req);
             const body = Marketplace.Element.Delete.requestSchema.parse(
                 req.body
             );
@@ -757,6 +755,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             const deletionResult =
                 await collectionService.deleteElementFromCollection(
                     elementEntityId,
+                    collectionEntityId,
                     body.conflictResolution?.acceptedCascadingDeletions ?? []
                 );
             return res.send(

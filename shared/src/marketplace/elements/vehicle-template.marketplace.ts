@@ -1,31 +1,36 @@
 import type { Immutable, WritableDraft } from 'immer';
-import type { UUID } from '../utils/uuid.js';
-import { uuid } from '../utils/uuid.js';
-import { createVehicleParameters } from '../state-helpers/create-vehicle-parameters.js';
-import { ReducerError } from '../store/reducer-error.js';
-import { cloneDeepMutable } from '../utils/clone-deep.js';
-import { getElement } from '../store/action-reducers/utils/get-element.js';
-import { hasEntityProperties } from '../marketplace/models/versioned-element-content.js';
-import type { ExerciseState } from '../state.js';
+import type { UUID } from '../../utils/uuid.js';
+import { uuid } from '../../utils/uuid.js';
+import { createVehicleParameters } from '../../state-helpers/create-vehicle-parameters.js';
+import { ReducerError } from '../../store/reducer-error.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
+import { getElement } from '../../store/action-reducers/utils/get-element.js';
+import type { ExerciseState } from '../../state.js';
 import type {
     ChangeImpact,
     EditableElementChangeImpact,
     RemovedElementChangeImpact,
-} from '../marketplace/exercise-collection-upgrade/exercise-collection-change-impact.js';
-import { newChangeMapTarget } from '../marketplace/exercise-collection-upgrade/exercise-collection-change-target.js';
+} from '../exercise-collection-upgrade/exercise-collection-change-impact.js';
+import { newChangeMapTarget } from '../exercise-collection-upgrade/exercise-collection-change-target.js';
 import {
     checkEditableValueEdited,
     getEditableValueCheckers,
-} from './utils/editable-values-registry.js';
-import { registerMarketplaceElement } from './utils/marketplace-registry.js';
-import { getTemplates } from './template-helpers.js';
-import { changePosition } from './utils/position/position-helpers-mutable.js';
-import { newVehiclePositionIn } from './utils/position/vehicle-position.js';
-import { newMapCoordinatesAt } from './utils/position/map-coordinates.js';
-import type { VehicleTemplate } from './vehicle-template.js';
-import type { Material } from './material.js';
-import type { Personnel } from './personnel.js';
-import type { Vehicle } from './vehicle.js';
+} from '../../models/utils/editable-values-registry.js';
+import { getTemplates } from '../../models/template-helpers.js';
+import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
+import { newVehiclePositionIn } from '../../models/utils/position/vehicle-position.js';
+import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
+import {
+    
+    type VehicleTemplate,
+} from '../../models/vehicle-template.js';
+import type { Material } from '../../models/material.js';
+import type { Personnel } from '../../models/personnel.js';
+import type { Vehicle } from '../../models/vehicle.js';
+import {
+    hasEntityProperties,
+    type MarketplaceRegistryEntry,
+} from './marketplace-elements.js';
 
 function findIdArrayDifferences<T extends string>(
     oldArray: Immutable<T[]>,
@@ -222,7 +227,11 @@ function updateVehicleOnMap(
     );
 }
 
-registerMarketplaceElement('vehicleTemplate', {
+export const marketplaceVehicleTemplate: MarketplaceRegistryEntry = {
+    naming: {
+        singular: 'Fahrzeug',
+        plural: 'Fahrzeuge',
+    },
     changeApply: (state, changeApply) => {
         if (
             !(
@@ -409,4 +418,4 @@ registerMarketplaceElement('vehicleTemplate', {
 
         return impacts;
     },
-});
+};

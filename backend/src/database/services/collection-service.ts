@@ -12,7 +12,7 @@ import type {
     Marketplace,
     ParticipantKey,
     VehicleTemplate,
-    VersionedElementContent,
+    MarketplaceElementContent,
     VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import {
@@ -23,7 +23,7 @@ import {
     getCollectionElementDiff,
     getDependencyChecker,
     getElementDependencies,
-    isVersionedElementContent,
+    isMarketplaceElementContent,
     replaceDependencies,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
@@ -615,7 +615,7 @@ export class CollectionService {
 
     public async createExerciseObjects(
         collectionEntityId: CollectionEntityId,
-        contents: VersionedElementContent[]
+        contents: MarketplaceElementContent[]
     ) {
         return this.reduce(
             collectionEntityId,
@@ -935,7 +935,7 @@ export class CollectionService {
 
     public async updateElement(
         entityId: ElementEntityId,
-        content: VersionedElementContent,
+        content: MarketplaceElementContent,
         resolutionStrategy?: Marketplace.Element.EditConflictResolution
     ) {
         return this.transaction(async (tx) => {
@@ -1581,7 +1581,7 @@ export class CollectionService {
                 [
                     ...Object.values(
                         migratedState.migratedProperties.currentState.templates
-                    ).filter(isVersionedElementContent),
+                    ).filter(isMarketplaceElementContent),
                 ]
             );
 

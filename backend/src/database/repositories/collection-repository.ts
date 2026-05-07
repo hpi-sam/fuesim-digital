@@ -10,7 +10,7 @@ import type {
     ElementVersionId,
     ExtendedCollectionDto,
     Marketplace,
-    VersionedElementContent,
+    MarketplaceElementContent,
     VersionedElementPartial,
 } from 'fuesim-digital-shared';
 import {
@@ -594,7 +594,7 @@ export class CollectionRepository extends BaseRepository {
 
     public async updateElementContent(
         elementVersionId: ElementVersionId,
-        data: VersionedElementContent
+        data: MarketplaceElementContent
     ) {
         return this.databaseConnection.transaction(async (tx) => {
             const isEditable =
@@ -793,7 +793,7 @@ export class CollectionRepository extends BaseRepository {
     }
 
     public async createElementVersion(data: {
-        content: VersionedElementContent;
+        content: MarketplaceElementContent;
         version: number;
         entityId?: ElementEntityId;
     }): Promise<ElementDto | null> {
@@ -1338,7 +1338,7 @@ export class CollectionRepository extends BaseRepository {
      */
     public async UNSAFE_overwriteElements(
         stateVersion: number,
-        elementContents: VersionedElementContent[]
+        elementContents: MarketplaceElementContent[]
     ): Promise<number> {
         return this.databaseConnection.transaction(async (tx) => {
             // from https://orm.drizzle.team/docs/guides/update-many-with-different-value

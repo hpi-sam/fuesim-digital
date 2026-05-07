@@ -7,8 +7,8 @@ import type {
     VersionedCollectionPartial,
 } from './models/versioned-id-schema.js';
 import { elementVersionIdSchema } from './models/versioned-id-schema.js';
-import { elementDtoSchema } from './models/versioned-elements.js';
-import type { ElementDto } from './models/versioned-elements.js';
+import { elementDtoSchema } from './models/marketplace-element.js';
+import type { ElementDto } from './models/marketplace-element.js';
 import type { CollectionElementsDto } from './models/collection-elements.js';
 import { gatherCollectionElements } from './models/collection-elements.js';
 

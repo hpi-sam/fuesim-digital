@@ -2,8 +2,8 @@ import { z } from 'zod';
 import type { Immutable } from 'immer';
 import type { ImmutableInfer } from '../../utils/infer.js';
 import { collectionDtoSchema } from './collection.js';
-import type { ElementDto } from './versioned-elements.js';
-import { elementDtoSchema } from './versioned-elements.js';
+import type { ElementDto } from './marketplace-element.js';
+import { elementDtoSchema } from './marketplace-element.js';
 import type { CollectionElementType } from './collection-element-type.js';
 
 // TODO: Improve this naming

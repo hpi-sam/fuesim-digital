@@ -1,14 +1,20 @@
-import { uuid } from '../utils/uuid.js';
+import { uuid } from '../../utils/uuid.js';
 import type {
     ChangeImpact,
     RemovedElementChangeImpact,
-} from '../marketplace/exercise-collection-upgrade/exercise-collection-change-impact.js';
-import { newChangeAlarmgroupVehicleTarget } from '../marketplace/exercise-collection-upgrade/exercise-collection-change-target.js';
-import { hasEntityProperties } from '../marketplace/models/versioned-element-content.js';
-import { ReducerError } from '../store/reducer-error.js';
-import { registerMarketplaceElement } from './utils/marketplace-registry.js';
+} from '../exercise-collection-upgrade/exercise-collection-change-impact.js';
+import { newChangeAlarmgroupVehicleTarget } from '../exercise-collection-upgrade/exercise-collection-change-target.js';
+import { ReducerError } from '../../store/reducer-error.js';
+import {
+    hasEntityProperties,
+    type MarketplaceRegistryEntry,
+} from './marketplace-elements.js';
 
-registerMarketplaceElement('alarmGroup', {
+export const marketplaceAlarmGroup: MarketplaceRegistryEntry = {
+    naming: {
+        singular: 'Alarmgruppe',
+        plural: 'Alarmgruppen',
+    },
     changeApply: (draftState, change) => {
         if (change.target.kind === 'alarm-group-vehicle') {
             if (change.type === 'added' || change.type === 'editable') {
@@ -96,4 +102,4 @@ registerMarketplaceElement('alarmGroup', {
 
         return impacts;
     },
-});
+};

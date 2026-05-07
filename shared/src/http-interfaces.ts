@@ -14,7 +14,7 @@ import {
     collectionDtoSchema,
     extendedCollectionDtoSchema,
 } from './marketplace/models/collection.js';
-import { elementDtoSchema } from './marketplace/models/versioned-elements.js';
+import { elementDtoSchema } from './marketplace/models/marketplace-element.js';
 import type { CollectionEntityId } from './marketplace/models/versioned-id-schema.js';
 import {
     collectionVersionIdSchema,
@@ -23,13 +23,13 @@ import {
     elementEntityIdSchema,
 } from './marketplace/models/versioned-id-schema.js';
 import { collectionRelationshipTypeSchema } from './marketplace/models/collection-relationship.js';
-import { versionedElementContentSchema } from './marketplace/models/versioned-element-content.js';
 import {
     collectionElementsDtoSchema,
     collectionElementsSingleSchema,
 } from './marketplace/models/collection-elements.js';
 import { collectionVisibilitySchema } from './marketplace/models/collection-visibility.js';
 import type { ImmutableInfer } from './utils/infer.js';
+import { marketplaceElementContentSchema } from './marketplace/elements/marketplace-elements.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -247,7 +247,7 @@ export namespace Marketplace {
     export namespace Element {
         export const Create = new Route({
             request: z.object({
-                data: z.array(versionedElementContentSchema),
+                data: z.array(marketplaceElementContentSchema),
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
@@ -278,7 +278,7 @@ export namespace Marketplace {
 
         export const Edit = new Route({
             request: z.object({
-                data: versionedElementContentSchema,
+                data: marketplaceElementContentSchema,
                 conflictResolution: editConflictResolutionSchema.optional(),
             }),
             response: z.object({

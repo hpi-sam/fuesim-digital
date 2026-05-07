@@ -4,7 +4,7 @@ import {
     ElementDto,
     gatherCollectionElements,
     VersionedCollectionPartial,
-    VersionedElementContent,
+    MarketplaceElementContent,
 } from 'fuesim-digital-shared';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
@@ -78,7 +78,7 @@ export class ElementCardComponent {
                 this.collectionElements()!
             ).allElements(),
             hideVersionHistory: this.hideVersionHistory(),
-        } satisfies EditingVersionedElementModalData<VersionedElementContent>;
+        } satisfies EditingVersionedElementModalData<MarketplaceElementContent>;
     }
 
     public async deleteElement() {

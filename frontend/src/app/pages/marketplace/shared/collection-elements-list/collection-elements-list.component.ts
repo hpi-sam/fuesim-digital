@@ -7,7 +7,7 @@ import {
     gatherCollectionElements,
     getCollectionElementDiff,
     VersionedCollectionPartial,
-    VersionedElementContent,
+    MarketplaceElementContent,
 } from 'fuesim-digital-shared';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Immutable } from 'immer';
@@ -42,7 +42,7 @@ export class CollectionElementsListComponent {
     // This array defined the order in which the element types are displayed in the UI.
     // Types not included in this array will NOT be displayed in the UI
     public visibleElementTypes: {
-        type: VersionedElementContent['type'];
+        type: MarketplaceElementContent['type'];
         create: () => void;
     }[] = [
         {
@@ -74,7 +74,7 @@ export class CollectionElementsListComponent {
         }
     }
 
-    private createElementHelper(type: VersionedElementContent['type']) {
+    private createElementHelper(type: MarketplaceElementContent['type']) {
         const modal = this.ngbModalService.open(
             VersionedElementModalComponent,
             {

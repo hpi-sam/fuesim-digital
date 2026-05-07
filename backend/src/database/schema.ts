@@ -12,7 +12,7 @@ import type {
     ParticipantKey,
     AccessKey,
     TrainerKey,
-    VersionedElementContent,
+    MarketplaceElementContent,
     GroupParticipantKey,
     ParallelExerciseId,
 } from 'fuesim-digital-shared';
@@ -267,7 +267,7 @@ export const elementTable = pgTable(
         ...stateVersionedEntity<ElementEntityId, ElementVersionId>('element'),
         title: varchar().notNull(),
         description: varchar().notNull(),
-        content: json().$type<VersionedElementContent>().notNull(),
+        content: json().$type<MarketplaceElementContent>().notNull(),
     },
     (table) => [
         unique('unique_template_version').on(table.entityId, table.version),

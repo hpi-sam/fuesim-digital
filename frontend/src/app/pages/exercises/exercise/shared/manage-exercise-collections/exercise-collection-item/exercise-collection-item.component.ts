@@ -7,10 +7,10 @@ import {
     CollectionElementsDto,
     CollectionDto,
     cloneDeepMutable,
-    marketplaceElements,
     ChangeImpact,
     ChangedElementDto,
     ExerciseState,
+    marketplaceElementsDefinitions,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -284,7 +284,7 @@ export class ExerciseColletionItemComponent {
         changes: ChangedElementDto[]
     ): ChangeImpact[] {
         const changeImpacts: ChangeImpact[] = [];
-        for (const element of marketplaceElements) {
+        for (const element of Object.values(marketplaceElementsDefinitions)) {
             for (const change of changes) {
                 changeImpacts.push(
                     ...element.changeImpact(currentState, change)

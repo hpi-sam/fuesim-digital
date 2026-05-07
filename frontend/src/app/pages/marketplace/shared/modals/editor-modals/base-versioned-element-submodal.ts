@@ -2,9 +2,9 @@ import type { InputSignal, OutputEmitterRef } from '@angular/core';
 import type {
     ElementDto,
     Marketplace,
+    MarketplaceElementContent,
     TypedElementDto,
     VersionedCollectionPartial,
-    VersionedElementContent,
 } from 'fuesim-digital-shared';
 import type { Immutable } from 'immer';
 
@@ -21,7 +21,7 @@ export interface SharedVersionedElementModalData<T> {
         values: T,
         conflictResolution?: Marketplace.Element.EditConflictResolution
     ) => void;
-    type: VersionedElementContent['type'];
+    type: MarketplaceElementContent['type'];
     collection: VersionedCollectionPartial;
     availableCollectionElements: Immutable<ElementDto[]>;
 }

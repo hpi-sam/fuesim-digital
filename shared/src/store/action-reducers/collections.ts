@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { IsValue } from '../../utils/validators/is-value.js';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
-import { ElementDto } from '../../marketplace/models/versioned-elements.js';
+import { ElementDto } from '../../marketplace/models/marketplace-element.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import {
     type CollectionElementsDto,
@@ -11,12 +11,14 @@ import {
 } from '../../marketplace/models/collection-elements.js';
 import { CollectionElementType } from '../../marketplace/models/collection-element-type.js';
 import { ExerciseState } from '../../state.js';
-import { hasEntityProperties } from '../../marketplace/models/versioned-element-content.js';
-import { getAllMarketplaceRegistryEntries } from '../../models/utils/marketplace-registry.js';
 import {
     ChangeApply,
     changeApplySchema,
 } from '../../marketplace/exercise-collection-upgrade/exercise-collection-change-apply.js';
+import {
+    hasEntityProperties,
+    marketplaceElementsDefinitions,
+} from '../../marketplace/elements/marketplace-elements.js';
 import {
     versionedCollectionPartialSchema,
     type VersionedCollectionPartial,
@@ -166,8 +168,7 @@ function applyAllChangeApplies(
     changeApplies: Immutable<ChangeApply[]>
 ) {
     for (const changeApply of changeApplies) {
-        const marketplaceEntries = getAllMarketplaceRegistryEntries();
-        for (const entry of Object.values(marketplaceEntries)) {
+        for (const entry of Object.values(marketplaceElementsDefinitions)) {
             entry.changeApply(draftState, changeApply);
         }
     }

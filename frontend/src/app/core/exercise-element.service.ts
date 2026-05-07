@@ -13,9 +13,9 @@ import {
     ServerToClientEvents,
     socketIoTransports,
     VersionedCollectionPartial,
-    versionedElementContentSchema,
     VersionedElementPartial,
     cloneDeepMutable,
+    marketplaceElementContentSchema,
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
@@ -922,7 +922,7 @@ export class CollectionService {
     ) {
         const nonParsedElements: { type: string }[] = [];
         for (const element of elements) {
-            const result = versionedElementContentSchema.safeParse(element);
+            const result = marketplaceElementContentSchema.safeParse(element);
             if (!result.success) {
                 nonParsedElements.push(element);
             }

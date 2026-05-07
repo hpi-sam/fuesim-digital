@@ -50,10 +50,10 @@ export class EvalCriterionCreationForm {
         patientStatusInput: 'black',
     });
     criterionForm = form(this.inputModel);
-    private async createCriterion(criterion: EvalCriterion) {
+    private async createCriterions(criterions: EvalCriterion[]) {
         await this.exerciseService.proposeAction({
-            type: '[EvalCriterion] New Criterion',
-            criterion,
+            type: '[EvalCriterion] New Criterions',
+            criterions: criterions,
         });
     }
     public submitCriterion(criterionType: EvalcriterionType) {
@@ -64,7 +64,7 @@ export class EvalCriterionCreationForm {
                     this.criterionForm.countInput().value(),
                     this.criterionForm.patientStatusInput().value()
                 );
-                this.createCriterion(criterion);
+                this.createCriterions([criterion]);
                 break;
             }
             default:

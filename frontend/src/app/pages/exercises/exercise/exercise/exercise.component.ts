@@ -52,6 +52,7 @@ import {
     openParticipantsModal,
     openTrainersModal,
 } from '../shared/clients-modal/open-clients-modal';
+import { openDidacticOverviewModal } from '../shared/didactic-overview/tag/open-didacti-overview-modal';
 
 @Component({
     selector: 'app-exercise',
@@ -126,6 +127,10 @@ export class ExerciseComponent implements OnDestroy {
             title: 'Zurück in die Zukunft!',
             color: 'info',
         });
+    }
+
+    public openDidacticOverviewModal() {
+        openDidacticOverviewModal(this.modalService);
     }
 
     public async exportExerciseWithHistory() {

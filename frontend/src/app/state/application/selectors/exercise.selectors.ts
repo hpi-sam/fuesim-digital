@@ -7,7 +7,10 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
+    Patient,
+    Scoutable,
     ScoutableElementType,
+    TechnicalChallenge,
     TechnicalChallengeId,
     UUID,
     Vehicle,
@@ -23,6 +26,16 @@ import {
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
 import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
+import type {
+    CombinedEvalCriteriaTree,
+    CombinedEvalCriterion,
+    EvalCriterion,
+    PatientAtStatusEvalCriterion,
+    ReachTechnicalChallengeStateEvalCriterion,
+    ViewScoutableEvalCriterion,
+    XPatientsAtStatusEvalCriterion,
+} from '../../../../../../shared/dist/models/evaluation-criterion';
+import type { EvalResult } from '../../../shared/types/evaluation-result';
 
 // Properties
 
@@ -71,6 +84,7 @@ export const selectMaterialTemplates =
     selectPropertyFactory('materialTemplates');
 export const selectMapImagesTemplates =
     selectPropertyFactory('mapImageTemplates');
+export const selectEvalCriteria = selectPropertyFactory('evalCriteria');
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');
@@ -140,6 +154,9 @@ export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
 );
 export const createSelectScoutable =
     createSelectElementFromMapFactory(selectScoutables);
+export const createSelectEvalCriterion =
+    createSelectElementFromMapFactory(selectEvalCriteria);
+
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,
@@ -434,4 +451,223 @@ export const selectWorkingPersonnel = createSelector(
         }
         return workingPersonnel;
     }
+);
+export function getIsCompletedFromCombinedEvalCriteriaTree(
+    tree: CombinedEvalCriteriaTree,
+    evalCriteria: {
+        [key: string]: EvalCriterion;
+    },
+    technicalChallenges: { [key: string]: TechnicalChallenge },
+    patients: { [key: string]: Patient },
+    scoutables: { [key: string]: Scoutable },
+    currentTime: number,
+    depth: number
+): boolean {
+    if (depth !== 0 && tree.criteriaIds.length === 0) {
+        return false;
+    }
+    const combinedCriteria = Object.values(evalCriteria).filter((crit) =>
+        tree.criteriaIds.find((id) => id === crit.id)
+    );
+    if (combinedCriteria.length === 0) {
+        return false;
+    }
+    let isLCompleted = false;
+    if (tree.lChild) {
+        isLCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
+            tree.lChild,
+            evalCriteria,
+            technicalChallenges,
+            patients,
+            scoutables,
+            currentTime,
+            depth + 1
+        );
+    }
+    let isRCompleted = false;
+    if (tree.rChild) {
+        isRCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
+            tree.rChild,
+            evalCriteria,
+            technicalChallenges,
+            patients,
+            scoutables,
+            currentTime,
+            depth + 1
+        );
+    }
+    switch (tree.logicalOperator) {
+        case 'and': {
+            let isCompleted = isLCompleted && isRCompleted;
+            /* TODO @JohannesPotzi */
+            throw new Error('TODO');
+            return true;
+        }
+        case 'or': {
+            let isCompleted = isLCompleted || isLCompleted;
+            if (isCompleted) {
+                return true;
+            }
+            /* TODO @JohannesPotzi */
+            throw new Error('TODO');
+            return false;
+        }
+        case 'not': {
+            if (
+                tree.criteriaIds.length > 1 ||
+                (tree.rChild && tree.lChild) ||
+                (tree.lChild && tree.criteriaIds.length > 0) ||
+                (tree.rChild && tree.criteriaIds.length > 0)
+            ) {
+                throw new Error(
+                    "[logic error] Attempting logical 'not' operation on multiple litarals."
+                );
+            }
+            /* Case with just one criterionId and no children */
+            if (!tree.lChild && !tree.rChild) {
+                const criterion = Object.values(evalCriteria).filter(
+                    (crit) => crit.id === tree.criteriaIds[0]!
+                )[0] as EvalCriterion;
+                let criterionIsCompleted = getEvalResultFromCriterion(
+                    criterion,
+                    evalCriteria,
+                    technicalChallenges,
+                    patients,
+                    scoutables,
+                    currentTime
+                ).isCompleted;
+                return !criterionIsCompleted;
+            }
+            /* case with no criterionIds and just lChild */
+            if (tree.lChild) {
+                return getIsCompletedFromCombinedEvalCriteriaTree(
+                    tree.lChild,
+                    evalCriteria,
+                    technicalChallenges,
+                    patients,
+                    scoutables,
+                    currentTime,
+                    depth + 1
+                );
+            }
+            /* case with no criterionIds and just rChild */
+            return getIsCompletedFromCombinedEvalCriteriaTree(
+                tree.rChild!,
+                evalCriteria,
+                technicalChallenges,
+                patients,
+                scoutables,
+                currentTime,
+                depth + 1
+            );
+        }
+        default:
+            break;
+    }
+    return false;
+}
+export function getEvalResultFromCriterion(
+    evalCriterion: EvalCriterion,
+    evalCriteria: { [key: string]: EvalCriterion },
+    technicalChallenges: { [key: string]: TechnicalChallenge },
+    patients: { [key: string]: Patient },
+    scoutables: { [key: string]: Scoutable },
+    currentTime: number
+): EvalResult {
+    let isCompleted = false;
+    let count = -1;
+    switch (evalCriterion.criterionType) {
+        case 'doMeasureXTimesEvalCriterion': {
+            /* TODO @JohannesPotzi @Jogius */
+            break;
+        }
+        case 'reachTechnicalChallengeStateEvalCriterion': {
+            const criterion =
+                evalCriterion as ReachTechnicalChallengeStateEvalCriterion;
+            const targetChallengeId = criterion.targetTechnicalChallengeId;
+            const targetStateId = criterion.targetTechnicalChallengeStateId;
+            const technicalChallenge = technicalChallenges[targetChallengeId]!;
+            isCompleted = technicalChallenge.currentStateId === targetStateId;
+            break;
+        }
+        case 'patientAtStatusEvalCriterion': {
+            const criterion = evalCriterion as PatientAtStatusEvalCriterion;
+            const targetId = criterion.targetPatientId;
+            const patient = patients[targetId]!;
+            isCompleted = patient.realStatus === criterion.targetStatus;
+            break;
+        }
+        case 'xPatientsAtStatusEvalCriterion': {
+            const criterion = evalCriterion as XPatientsAtStatusEvalCriterion;
+            const currentCount = Object.values(patients).filter(
+                (patient) => patient.realStatus === criterion.targetStatus
+            ).length;
+            count = currentCount;
+            isCompleted = currentCount === criterion.count;
+            break;
+        }
+        case 'viewScoutableEvalCriterion': {
+            const criterion = evalCriterion as ViewScoutableEvalCriterion;
+            const scoutable = scoutables[criterion.targetScoutableId]!;
+            isCompleted = scoutable.viewedByParticipants;
+            break;
+        }
+        case 'combinedEvalCriterion': {
+            const criterion = evalCriterion as CombinedEvalCriterion;
+            isCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
+                criterion.combinedEvalCriteriaTree,
+                evalCriteria,
+                technicalChallenges,
+                patients,
+                scoutables,
+                currentTime,
+                0
+            );
+            break;
+        }
+        default:
+            break;
+    }
+    const id = evalCriterion.id;
+    return {
+        criterionId: id,
+        criterion: evalCriterion,
+        isCompleted,
+        timestamp: currentTime,
+        count: count !== -1 ? count : undefined,
+    };
+}
+
+export const selectEvalResults = createSelector(
+    selectEvalCriteria,
+    selectTechnicalChallenges,
+    selectPatients,
+    selectScoutables,
+    selectCurrentTime,
+    (evalCriteria, technicalChallenges, patients, scoutables, currentTime) =>
+        Object.values(evalCriteria)
+            .flatMap((evalCriterion: EvalCriterion): EvalResult => {
+                const result = getEvalResultFromCriterion(
+                    evalCriterion,
+                    evalCriteria,
+                    technicalChallenges,
+                    patients,
+                    scoutables,
+                    currentTime
+                );
+                return {
+                    criterionId: result.criterionId,
+                    criterion: evalCriterion,
+                    isCompleted: result.isCompleted,
+                    timestamp: currentTime,
+                    count: result.count,
+                };
+            })
+            .reduce<{ [evalCriterionId: UUID]: EvalResult }>(
+                (evalResultObject, evalResult) => {
+                    evalResultObject[evalResult.criterionId] = evalResult;
+                    return evalResultObject;
+                },
+                {}
+            )
 );

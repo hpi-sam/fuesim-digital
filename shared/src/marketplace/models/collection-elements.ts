@@ -11,7 +11,7 @@ export const collectionElementsSingleSchema = z.strictObject({
     collection: collectionDtoSchema,
     elements: z.array(elementDtoSchema),
 });
-export type CollectionElementsSingle = z.infer<
+export type CollectionElementsSingle = ImmutableInfer<
     typeof collectionElementsSingleSchema
 >;
 

@@ -13,6 +13,7 @@ import {
     ReducerError,
     newClient,
     newClientRole,
+    cloneDeepMutable,
 } from 'fuesim-digital-shared';
 import { filter, Subject, takeUntil, type Subscription } from 'rxjs';
 import cookie from 'cookie';
@@ -322,10 +323,12 @@ export class CollectionClientWrapper extends ClientWrapper {
                                     event: 'dependency:replace-data',
                                     collectionEntityId,
                                     data: {
-                                        imported:
-                                            latestDependencyElements.imported,
-                                        references:
-                                            latestDependencyElements.references,
+                                        imported: cloneDeepMutable(
+                                            latestDependencyElements.imported
+                                        ),
+                                        references: cloneDeepMutable(
+                                            latestDependencyElements.references
+                                        ),
                                     },
                                 } satisfies typeof Marketplace.Collection.Events.DependencyReplaceData.Type
                             )
@@ -335,7 +338,7 @@ export class CollectionClientWrapper extends ClientWrapper {
                     default:
                         this.notifyChange(
                             Marketplace.Collection.Events.SSEvent.schema.encode(
-                                update
+                                cloneDeepMutable(update)
                             )
                         );
                 }
@@ -407,10 +410,10 @@ export class CollectionClientWrapper extends ClientWrapper {
             event: 'initialdata',
             data: {
                 collection: latestDraftStateVersion,
-                elements: draftStateElements,
+                elements: cloneDeepMutable(draftStateElements),
                 userRelationship,
                 publishedCollection: latestPubishedVersion,
-                publishedElements,
+                publishedElements: cloneDeepMutable(publishedElements),
             },
         });
     }

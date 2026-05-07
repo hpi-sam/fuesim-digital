@@ -15,6 +15,7 @@ import {
     VersionedCollectionPartial,
     versionedElementContentSchema,
     VersionedElementPartial,
+    cloneDeepMutable
 } from 'fuesim-digital-shared';
 import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
@@ -23,6 +24,7 @@ import { httpOrigin, websocketOrigin } from './api-origins';
 import { MessageService } from './messages/message.service';
 import { openConnectionLostModal } from './connection-lost-modal/open-connection-lost-modal';
 import { LoadingModalService } from './loading-modal/loading-modal.service';
+import { castImmutable } from 'immer';
 
 export interface CollectionSubscriptionData {
     collection: CollectionDto;
@@ -230,7 +232,7 @@ export class CollectionService {
             if (!response.success) return;
             const initialData =
                 Marketplace.Collection.Events.InitialData.schema.decode(
-                    response.payload
+                    cloneDeepMutable(response.payload)
                 );
 
             subject.next({

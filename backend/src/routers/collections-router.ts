@@ -8,6 +8,7 @@ import {
     isElementEntityId,
     isElementVersionId,
     Marketplace,
+    cloneDeepMutable,
 } from 'fuesim-digital-shared';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
 import { NotFoundError } from '../utils/http.js';
@@ -265,7 +266,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         res.send(
             Marketplace.Element.Create.responseSchema.encode({
                 newSetVersionId: data.newSetVersionId,
-                result: data.results,
+                result: cloneDeepMutable(data.results),
             })
         );
     });
@@ -409,7 +410,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
                 Marketplace.Collection.AddDependency.responseSchema.encode({
                     importedSet: {
                         collection: data.collection,
-                        elements: data.elements,
+                        elements: cloneDeepMutable(data.elements),
                     },
                     newCollectionVersionId: data.newCollectionVersion.versionId,
                 })
@@ -444,7 +445,10 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
             res.send(
                 Marketplace.Collection.UpgradeDependency.responseSchema.encode({
-                    importedSet: data.collection.versionId,
+                    importedSet: {
+                        collection: data.collection,
+                        elements: data.elements,
+                    },
                     newCollectionVersionId: data.newCollectionVersion.versionId,
                 })
             );
@@ -471,7 +475,9 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             res.send(
                 Marketplace.Collection.RemoveDependency.responseSchema.encode({
                     result: {
-                        blockingElements: result.blockingElements,
+                        blockingElements: cloneDeepMutable(
+                            result.blockingElements
+                        ),
                         newCollectionVersionId:
                             result.newCollection?.versionId ?? null,
                     },
@@ -490,7 +496,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
         res.send(
             Marketplace.Collection.GetLatestElementsBySetVersionId.responseSchema.encode(
-                data
+                cloneDeepMutable(data)
             )
         );
     });
@@ -630,7 +636,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
             res.send(
                 Marketplace.Collection.GetElementsOfCollectionVersion.responseSchema.encode(
-                    data
+                    cloneDeepMutable(data)
                 )
             );
         }
@@ -666,7 +672,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             res.send(
                 Marketplace.Element.Edit.responseSchema.encode({
                     newSetVersionId: data.newSetVersionId,
-                    result: data.newElement,
+                    result: cloneDeepMutable(data.newElement),
                 })
             );
         }
@@ -692,7 +698,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             res.send(
                 Marketplace.Element.Restore.responseSchema.encode({
                     newCollectionVersionId: data.newCollectionVersion.versionId,
-                    result: data.restoredElement,
+                    result: cloneDeepMutable(data.restoredElement),
                 })
             );
         }
@@ -712,7 +718,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             res.send(
                 Marketplace.Element.Duplicate.responseSchema.encode({
                     newSetVersionId: data.draftState.versionId,
-                    result: data.duplicatedElement,
+                    result: cloneDeepMutable(data.duplicatedElement),
                 })
             );
         }
@@ -736,7 +742,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             res.send(
                 Marketplace.Element.GetInternalDependencies.responseSchema.encode(
                     {
-                        result: data,
+                        result: cloneDeepMutable(data),
                     }
                 )
             );
@@ -747,7 +753,6 @@ export function createCollectionsRouter(collectionService: CollectionService) {
         '/:collectionEntityId/element/:elementEntityId',
         async (req, res) => {
             const elementEntityId = getElementEntityId(req);
-            const collectionEntityId = getCollectionEntityId(req);
             const body = Marketplace.Element.Delete.requestSchema.parse(
                 req.body
             );
@@ -755,13 +760,14 @@ export function createCollectionsRouter(collectionService: CollectionService) {
             const deletionResult =
                 await collectionService.deleteElementFromCollection(
                     elementEntityId,
-                    collectionEntityId,
                     body.conflictResolution?.acceptedCascadingDeletions ?? []
                 );
             return res.send(
                 Marketplace.Element.Delete.responseSchema.encode({
                     newSetVersionId: deletionResult.newSetVersionId,
-                    requiresConfirmation: deletionResult.requiresConfirmation,
+                    requiresConfirmation: cloneDeepMutable(
+                        deletionResult.requiresConfirmation
+                    ),
                 })
             );
         }
@@ -779,7 +785,7 @@ export function createCollectionsRouter(collectionService: CollectionService) {
 
             return res.send(
                 Marketplace.Element.GetByEntityId.responseSchema.encode({
-                    result: data,
+                    result: cloneDeepMutable(data),
                 })
             );
         }

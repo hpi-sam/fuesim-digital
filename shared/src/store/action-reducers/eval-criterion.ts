@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import type { ActionReducer } from '../action-reducer.js';
-import { evalCriterionSchema } from '../../models/evaluation-criterion.js';
+import {
+    EvalCriterion,
+    evalCriterionSchema,
+} from '../../models/evaluation-criterion.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { uuidSchema } from '../../utils/uuid.js';
 import { ReducerError } from '../reducer-error.js';
@@ -13,11 +16,13 @@ patientAtStatusEvalCriterion
 xPatientsAtStatusEvalCriterion
 viewScoutableEvalCriterion
 */
-const createNewCriterionActionSchema = z.strictObject({
-    type: z.literal('[EvalCriterion] New Criterion'),
-    criterion: evalCriterionSchema,
+const createNewCriterionsActionSchema = z.strictObject({
+    type: z.literal('[EvalCriterion] New Criterions'),
+    criterions: z.array(evalCriterionSchema).min(1),
 });
-export type NewCriterionAction = z.infer<typeof createNewCriterionActionSchema>;
+export type NewCriterionAction = z.infer<
+    typeof createNewCriterionsActionSchema
+>;
 const updateCriterionActionSchema = z.strictObject({
     type: z.literal('[EvalCriterion] Update Criterion'),
     id: uuidSchema,
@@ -26,11 +31,14 @@ const updateCriterionActionSchema = z.strictObject({
 export type UpdateCriterionAction = z.infer<typeof updateCriterionActionSchema>;
 
 export namespace EvalCriterionActionReducers {
-    export const createNewCriterion: ActionReducer<NewCriterionAction> = {
-        type: createNewCriterionActionSchema.shape.type.value,
-        actionSchema: createNewCriterionActionSchema,
-        reducer: (draftState, { criterion }) => {
-            draftState.evalCriteria[criterion.id] = cloneDeepMutable(criterion);
+    export const createNewCriterions: ActionReducer<NewCriterionAction> = {
+        type: createNewCriterionsActionSchema.shape.type.value,
+        actionSchema: createNewCriterionsActionSchema,
+        reducer: (draftState, { criterions }) => {
+            for (let i = 0; i < criterions.length; i += 1) {
+                const criterion = cloneDeepMutable(criterions[i]!);
+                draftState.evalCriteria[criterion.id] = criterion;
+            }
             return draftState;
         },
         rights: 'trainer',

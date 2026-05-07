@@ -7,7 +7,7 @@ import type { TechnicalChallengeId } from './technical-challenge/technical-chall
 import { technicalChallengeIdSchema } from './technical-challenge/technical-challenge.js';
 import type { PatientStatus } from './utils/patient-status.js';
 import { patientStatusSchema } from './utils/patient-status.js';
-import { logicalOperatorSchema } from './utils/cater-for.js';
+import { LogicalOperator, logicalOperatorSchema } from './utils/cater-for.js';
 
 export const evalCriterionBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -65,14 +65,73 @@ export type ViewScoutableEvalCriterion = z.infer<
 >;
 
 /* TODO @JohannesPotzi @Jogius : lessThanXUnqualifiedMeasuresEvalCriterion */
+const Activity = z.object({
+    name: z.string(),
+    get subactivities(): z.ZodNullable<z.ZodArray<typeof Activity>> {
+        return z.nullable(z.array(Activity));
+    },
+});
 
-export const combinedEvalCriterionSchema = z.strictObject({
-    ...evalCriterionBaseSchema.shape,
-    criterionType: z.literal('combinedEvalCriterion'),
+export const combinedEvalCriteriaTreeSchema = z.object({
     criteriaIds: z.array(uuidSchema),
     logicalOperator: logicalOperatorSchema,
+    get lChild(): z.ZodNullable<typeof combinedEvalCriteriaTreeSchema> {
+        return combinedEvalCriteriaTreeSchema.nullable();
+    },
+    get rChild(): z.ZodNullable<typeof combinedEvalCriteriaTreeSchema> {
+        return combinedEvalCriteriaTreeSchema.nullable();
+    },
+});
+export type CombinedEvalCriteriaTree = z.infer<
+    typeof combinedEvalCriteriaTreeSchema
+>;
+
+export const combinedEvalCriterionSchema = z.object({
+    ...evalCriterionBaseSchema.shape,
+    criterionType: z.literal('combinedEvalCriterion'),
+    combinedEvalCriteriaTree: combinedEvalCriteriaTreeSchema,
 });
 export type CombinedEvalCriterion = z.infer<typeof combinedEvalCriterionSchema>;
+
+export function newCombinedEvalCriteriaTree(
+    criteriaIds: UUID[],
+    logicalOperator: LogicalOperator,
+    lChild?: CombinedEvalCriteriaTree,
+    rChild?: CombinedEvalCriteriaTree
+): CombinedEvalCriteriaTree {
+    return {
+        criteriaIds: criteriaIds,
+        logicalOperator: logicalOperator,
+        lChild: lChild
+            ? newCombinedEvalCriteriaTree(
+                  lChild.criteriaIds,
+                  lChild.logicalOperator,
+                  lChild.lChild ?? undefined,
+                  lChild.rChild ?? undefined
+              )
+            : null,
+        rChild: rChild
+            ? newCombinedEvalCriteriaTree(
+                  rChild.criteriaIds,
+                  rChild.logicalOperator,
+                  rChild.lChild ?? undefined,
+                  rChild.lChild ?? undefined
+              )
+            : null,
+    };
+}
+export function newcombinedEvalCriterion(
+    name: string,
+    combinedEvalCriteriaTree: CombinedEvalCriteriaTree
+): CombinedEvalCriterion {
+    return {
+        id: uuid(),
+        name: name,
+        type: 'evalCriterion',
+        criterionType: 'combinedEvalCriterion',
+        combinedEvalCriteriaTree: combinedEvalCriteriaTree,
+    };
+}
 
 export const evalCriterionSchema = z.discriminatedUnion('criterionType', [
     doMeasureXTimesEvalCriterionSchema,

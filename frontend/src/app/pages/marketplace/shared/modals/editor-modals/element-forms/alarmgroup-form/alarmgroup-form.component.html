@@ -1,30 +1,27 @@
 <div class="form-group mb-3">
     <label class="form-label">Bezeichnung der Alarmgruppe</label>
     <input
-        #nameInput="ngModel"
-        [(ngModel)]="values().name"
-        [disabled]="disabled()"
-        required
+        [formField]="agForm.name"
         type="text"
         class="form-control"
         placeholder="z.B. MANV-25"
     />
-    <app-display-validation [ngModelInput]="nameInput"></app-display-validation>
+    <app-display-model-validation
+        [field]="agForm.name()"
+    ></app-display-model-validation>
 </div>
 
 <div class="form-group mb-3">
     <label class="form-label">Anzahl der Auslösungen beschränken auf</label>
     <input
-        #limitInput="ngModel"
-        [(ngModel)]="values().triggerLimit"
-        [disabled]="disabled()"
+        [formField]="agForm.triggerLimit"
         type="number"
         class="form-control"
         placeholder="z.B. 3"
     />
-    <app-display-validation
-        [ngModelInput]="limitInput"
-    ></app-display-validation>
+    <app-display-model-validation
+        [field]="agForm.triggerLimit()"
+    ></app-display-model-validation>
 </div>
 
 <div class="form-group mb-3">
@@ -97,7 +94,7 @@
 @if (!disabled()) {
     <button
         class="btn btn-primary"
-        [disabled]="nameInput.invalid"
+        [disabled]="agForm().invalid()"
         (click)="submitData()"
     >
         {{ btnText() }}

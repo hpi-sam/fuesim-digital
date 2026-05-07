@@ -1,81 +1,68 @@
 <div class="form-group mb-3">
     <label class="form-label">Standardname von neuen Fahrzeugen:</label>
     <input
-        #nameInput="ngModel"
-        [(ngModel)]="values().name"
-        [disabled]="disabled()"
-        required
+        [formField]="vehicleForm.name"
         type="text"
         class="form-control"
         placeholder="Fahrzeugname"
     />
-    <app-display-validation [ngModelInput]="nameInput"></app-display-validation>
+    <app-display-model-validation
+        [field]="vehicleForm.name()"
+    ></app-display-model-validation>
 </div>
 <div class="form-group mb-3">
     <label class="form-label">Typ:</label>
     <input
-        #typeInput="ngModel"
-        [(ngModel)]="values().vehicleType"
-        [disabled]="disabled()"
-        required
+        [formField]="vehicleForm.vehicleType"
         type="text"
         class="form-control"
         placeholder="Fahrzeugtyp"
     />
-    <app-display-validation [ngModelInput]="typeInput"></app-display-validation>
+    <app-display-model-validation
+        [field]="vehicleForm.vehicleType()"
+    ></app-display-model-validation>
 </div>
 <div class="form-group mb-3">
     <label class="form-label">Bildadresse:</label>
     <input
-        #imageUrlInput="ngModel"
-        [(ngModel)]="values().image.url"
+        [formField]="vehicleForm.image.url"
         [appAutofocus]="true"
         appImageExistsValidator
-        [disabled]="disabled()"
-        required
         type="url"
         class="form-control"
         placeholder="https://example.com/image.png"
     />
-    <app-display-validation
-        [ngModelInput]="imageUrlInput"
-    ></app-display-validation>
+    <app-display-model-validation
+        [field]="vehicleForm.image.url()"
+    ></app-display-model-validation>
 </div>
 <div class="form-group mb-3">
     <label class="form-label">Bildhöhe:</label>
     <input
-        #heightInput="ngModel"
-        [(ngModel)]="values().image.height"
-        [disabled]="disabled()"
-        required
-        min="1"
+        [formField]="vehicleForm.image.height"
         step="1"
         appIntegerValidator
         type="number"
         class="form-control"
         placeholder="100"
     />
-    <app-display-validation
-        [ngModelInput]="heightInput"
-    ></app-display-validation>
+    <app-display-model-validation
+        [field]="vehicleForm.image.height()"
+    ></app-display-model-validation>
 </div>
 <div class="form-group mb-3">
     <label class="form-label">Patientenkapazität:</label>
     <input
-        #patientCapacityInput="ngModel"
-        [(ngModel)]="values().patientCapacity"
-        [disabled]="disabled()"
-        required
-        min="0"
+        [formField]="vehicleForm.patientCapacity"
         step="1"
         appIntegerValidator
         type="number"
         class="form-control"
         placeholder="1"
     />
-    <app-display-validation
-        [ngModelInput]="patientCapacityInput"
-    ></app-display-validation>
+    <app-display-model-validation
+        [field]="vehicleForm.patientCapacity()"
+    ></app-display-model-validation>
 </div>
 <div class="form-group mb-3">
     <label class="form-label"
@@ -199,13 +186,7 @@
     <!-- If the button is not disabled the vehicleTemplate is correct -->
     <button
         (click)="submitData()"
-        [disabled]="
-            nameInput.invalid ||
-            typeInput.invalid ||
-            imageUrlInput.invalid ||
-            heightInput.invalid ||
-            patientCapacityInput.invalid
-        "
+        [disabled]="vehicleForm().invalid()"
         class="btn btn-primary"
     >
         {{ btnText() }}

@@ -9,12 +9,12 @@ import {
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ElementDto } from 'fuesim-digital-shared';
 import { DatePipe } from '@angular/common';
+import { Immutable } from 'immer';
 import { EditConflictResolutionComponent } from '../edit-conflict-resolution/edit-conflict-resolution.component';
 import { VersionedElementModalData } from '../base-versioned-element-submodal';
 import { VersionedElementFormComponent } from '../versioned-element-form/versioned-element-form.component';
 import { CollectionService } from '../../../../../../core/exercise-element.service';
 import { MessageService } from '../../../../../../core/messages/message.service';
-import { Immutable } from 'immer';
 
 @Component({
     selector: 'app-versioned-element-modal',
@@ -51,7 +51,8 @@ export class VersionedElementModalComponent implements OnInit {
         return this.selectedVersion() !== this.data.element.version;
     });
 
-    public readonly versionHistory = signal<Immutable<ElementDto[] | null>>(null);
+    public readonly versionHistory =
+        signal<Immutable<ElementDto[] | null>>(null);
 
     public readonly dependentElements = resource({
         params: () => ({ data: this.data }),

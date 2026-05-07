@@ -5,9 +5,12 @@ import {
     VersionedCollectionPartial,
     getCollectionElementDiff,
     CollectionElementsDto,
-    calculateChangeImpacts,
     CollectionDto,
     cloneDeepMutable,
+    marketplaceElements,
+    ChangeImpact,
+    ChangedElementDto,
+    ExerciseState,
 } from 'fuesim-digital-shared';
 import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -99,7 +102,7 @@ export class ExerciseColletionItemComponent {
                 this.store
             );
 
-            const changeImpacts = calculateChangeImpacts(
+            const changeImpacts = this.calculateChangeImpacts(
                 currentState,
                 elementsChanges
             );
@@ -195,7 +198,10 @@ export class ExerciseColletionItemComponent {
                 })
             );
 
-            const changeImpacts = calculateChangeImpacts(currentState, changes);
+            const changeImpacts = this.calculateChangeImpacts(
+                currentState,
+                changes
+            );
 
             console.log({ changes, changeImpacts });
 
@@ -271,5 +277,20 @@ export class ExerciseColletionItemComponent {
             },
             { direct: [], imported: [], references: [] }
         );
+    }
+
+    private calculateChangeImpacts(
+        currentState: ExerciseState,
+        changes: ChangedElementDto[]
+    ): ChangeImpact[] {
+        const changeImpacts: ChangeImpact[] = [];
+        for (const element of marketplaceElements) {
+            for (const change of changes) {
+                changeImpacts.push(
+                    ...element.changeImpact(currentState, change)
+                );
+            }
+        }
+        return changeImpacts;
     }
 }

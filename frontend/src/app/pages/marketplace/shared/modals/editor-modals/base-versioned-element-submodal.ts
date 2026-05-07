@@ -26,13 +26,15 @@ export interface SharedVersionedElementModalData<T> {
     availableCollectionElements: Immutable<ElementDto[]>;
 }
 
-export interface CreatingVersionedElementModalData<T>
-    extends SharedVersionedElementModalData<T> {
+export interface CreatingVersionedElementModalData<
+    T,
+> extends SharedVersionedElementModalData<T> {
     mode: 'create';
 }
 
-export interface EditingVersionedElementModalData<T>
-    extends SharedVersionedElementModalData<T> {
+export interface EditingVersionedElementModalData<
+    T,
+> extends SharedVersionedElementModalData<T> {
     mode: 'edit' | 'view';
     element: TypedElementDto<T>;
     hideVersionHistory?: boolean;

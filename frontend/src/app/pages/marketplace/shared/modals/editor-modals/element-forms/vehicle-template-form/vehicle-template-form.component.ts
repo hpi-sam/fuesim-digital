@@ -15,38 +15,43 @@ import {
     type PersonnelTemplate,
     type VehicleTemplate,
 } from 'fuesim-digital-shared';
-import { cloneDeep } from 'lodash-es';
 import { WritableDraft } from 'immer';
 import { FormsModule } from '@angular/forms';
 
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import {
+    disabled,
+    form,
+    FormField,
+    min,
+    required,
+} from '@angular/forms/signals';
+import {
     BaseVersionedElementSubmodal,
     VersionedElementModalData,
-} from '../base-versioned-element-submodal';
-import { MessageService } from '../../../../../../core/messages/message.service';
-import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
-import { getImageAspectRatio } from '../../../../../../shared/functions/get-image-aspect-ratio';
-import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
-import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
-import { MapEditorCardComponent } from '../../../../../../shared/components/map-editor-card/map-editor-card.component';
+} from '../../base-versioned-element-submodal';
+import { MessageService } from '../../../../../../../core/messages/message.service';
+import { AutofocusDirective } from '../../../../../../../shared/directives/autofocus.directive';
+import { getImageAspectRatio } from '../../../../../../../shared/functions/get-image-aspect-ratio';
+import { ValuesPipe } from '../../../../../../../shared/pipes/values.pipe';
+import { MapEditorCardComponent } from '../../../../../../../shared/components/map-editor-card/map-editor-card.component';
+import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 
 @Component({
     selector: 'app-vehicle-template-form-marketplace',
     imports: [
-        DisplayValidationComponent,
+        DisplayModelValidationComponent,
         FormsModule,
         NgbDropdownModule,
         AutofocusDirective,
         MapEditorCardComponent,
         ValuesPipe,
+        FormField,
     ],
     templateUrl: './vehicle-template-form.component.html',
     styleUrls: ['./vehicle-template-form.component.scss'],
 })
-export class VehicleTemplateFormMarketplaceComponent
-    implements BaseVersionedElementSubmodal<VehicleTemplate>
-{
+export class VehicleTemplateFormMarketplaceComponent implements BaseVersionedElementSubmodal<VehicleTemplate> {
     private readonly messageService = inject(MessageService);
 
     public readonly data =
@@ -70,6 +75,17 @@ export class VehicleTemplateFormMarketplaceComponent
 
     public readonly dataSubmit = output<VehicleTemplate>();
 
+    public readonly vehicleForm = form(this.values, (schema) => {
+        disabled(schema, this.disabled);
+        required(schema.name);
+        required(schema.vehicleType);
+        required(schema.image.url);
+        required(schema.image.height);
+        min(schema.image.height, 1);
+        min(schema.patientCapacity, 0);
+        required(schema.patientCapacity);
+    });
+
     public materialTemplates = defaultMaterialTemplatesById;
     public personnelTemplates = defaultPersonnelTemplatesById;
 
@@ -87,7 +103,7 @@ export class VehicleTemplateFormMarketplaceComponent
      * This method must only be called if all values are valid
      */
     public async submitData() {
-        const valuesOnSubmit = cloneDeep(this.values());
+        const valuesOnSubmit = cloneDeepMutable(this.vehicleForm().value());
         const aspectRatio = await getImageAspectRatio(
             this.values().image.url
         ).catch((error) => {
@@ -117,18 +133,30 @@ export class VehicleTemplateFormMarketplaceComponent
     }
 
     public addPersonnel(personnelTemplate: PersonnelTemplate) {
-        this.values().personnelTemplateIds.push(personnelTemplate.id);
+        this.vehicleForm.personnelTemplateIds().value.update((ids) => {
+            ids.push(personnelTemplate.id);
+            return ids;
+        });
     }
 
     public removePersonnel(index: number) {
-        this.values().personnelTemplateIds.splice(index, 1);
+        this.vehicleForm.personnelTemplateIds().value.update((ids) => {
+            ids.splice(index, 1);
+            return ids;
+        });
     }
 
     public addMaterial(materialTemplate: MaterialTemplate) {
-        this.values().materialTemplateIds.push(materialTemplate.id);
+        this.vehicleForm.materialTemplateIds().value.update((ids) => {
+            ids.push(materialTemplate.id);
+            return ids;
+        });
     }
 
     public removeMaterial(index: number) {
-        this.values().materialTemplateIds.splice(index, 1);
+        this.vehicleForm.materialTemplateIds().value.update((ids) => {
+            ids.splice(index, 1);
+            return ids;
+        });
     }
 }

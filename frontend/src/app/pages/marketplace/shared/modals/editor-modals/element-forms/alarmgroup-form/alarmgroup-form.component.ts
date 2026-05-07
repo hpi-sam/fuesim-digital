@@ -17,29 +17,29 @@ import {
 } from 'fuesim-digital-shared';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { disabled, form, FormField, required } from '@angular/forms/signals';
 import {
     BaseVersionedElementSubmodal,
     VersionedElementModalData,
-} from '../base-versioned-element-submodal';
-import { MapEditorCardComponent } from '../../../../../../shared/components/map-editor-card/map-editor-card.component';
-import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
-import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
+} from '../../base-versioned-element-submodal';
+import { MapEditorCardComponent } from '../../../../../../../shared/components/map-editor-card/map-editor-card.component';
+import { ValuesPipe } from '../../../../../../../shared/pipes/values.pipe';
+import { DisplayModelValidationComponent } from '../../../../../../../shared/validation/display-model-validation/display-model-validation.component';
 
 @Component({
-    selector: 'app-alarmgroup-element-modal',
+    selector: 'app-alarmgroup-form',
     imports: [
         MapEditorCardComponent,
-        DisplayValidationComponent,
+        DisplayModelValidationComponent,
         FormsModule,
         NgbDropdownModule,
         ValuesPipe,
+        FormField,
     ],
-    templateUrl: './alarmgroup-element-modal.component.html',
-    styleUrl: './alarmgroup-element-modal.component.scss',
+    templateUrl: './alarmgroup-form.component.html',
+    styleUrl: './alarmgroup-form.component.scss',
 })
-export class AlarmgroupElementModalComponent
-    implements BaseVersionedElementSubmodal<AlarmGroup>
-{
+export class AlarmgroupFormComponent implements BaseVersionedElementSubmodal<AlarmGroup> {
     public readonly data =
         input.required<VersionedElementModalData<AlarmGroup>>();
     public readonly btnText = input.required<string>();
@@ -55,6 +55,11 @@ export class AlarmgroupElementModalComponent
         name: '',
         triggerCount: 0,
         triggerLimit: null,
+    });
+
+    public readonly agForm = form(this.values, (schema) => {
+        disabled(schema, this.disabled);
+        required(schema.name);
     });
 
     public readonly availableVehicles = computed(() => {
@@ -75,28 +80,23 @@ export class AlarmgroupElementModalComponent
 
     public addVehicle(vehicle: TypedElementDto<VehicleTemplate>) {
         const id = uuid();
-        this.values.update((ag) => ({
-            ...ag,
-            alarmGroupVehicles: {
-                ...ag.alarmGroupVehicles,
-                [id]: newAlarmGroupVehicle(
-                    vehicle.versionId,
-                    0,
-                    vehicle.content.name,
-                    id
-                ),
-            },
+
+        this.agForm.alarmGroupVehicles().value.update((vehicles) => ({
+            ...vehicles,
+            [id]: newAlarmGroupVehicle(
+                vehicle.versionId,
+                0,
+                vehicle.content.name,
+                id
+            ),
         }));
     }
 
     public removeVehicle(id: string) {
-        this.values.update((ag) => {
-            const newAlarmGroupVehicles = { ...ag.alarmGroupVehicles };
-            delete newAlarmGroupVehicles[id];
-            return {
-                ...ag,
-                alarmGroupVehicles: newAlarmGroupVehicles,
-            };
+        this.agForm.alarmGroupVehicles().value.update((vehicles) => {
+            const newVehicles = cloneDeepMutable(vehicles);
+            delete newVehicles[id];
+            return newVehicles;
         });
     }
 
@@ -109,6 +109,6 @@ export class AlarmgroupElementModalComponent
     }
 
     public submitData() {
-        this.dataSubmit.emit(this.values());
+        this.dataSubmit.emit(this.agForm().value());
     }
 }

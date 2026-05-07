@@ -20,9 +20,7 @@ import { ExerciseService } from '../../../../../../../../../../../../core/exerci
     ],
     imports: [AsyncPipe],
 })
-export class ManagePatientTransportToHospitalStatusEditorComponent
-    implements OnChanges
-{
+export class ManagePatientTransportToHospitalStatusEditorComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 

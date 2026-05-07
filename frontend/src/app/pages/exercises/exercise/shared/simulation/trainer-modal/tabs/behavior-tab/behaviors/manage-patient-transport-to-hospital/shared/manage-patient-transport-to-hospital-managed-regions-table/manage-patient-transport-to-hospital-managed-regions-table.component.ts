@@ -47,9 +47,7 @@ import { AppSaveOnTypingDirective } from '../../../../../../../../../../../../sh
         AsyncPipe,
     ],
 })
-export class ManagePatientTransportToHospitalManagedRegionsTableComponent
-    implements OnChanges
-{
+export class ManagePatientTransportToHospitalManagedRegionsTableComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 

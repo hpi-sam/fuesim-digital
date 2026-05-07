@@ -6,9 +6,7 @@ import {
 } from 'fuesim-digital-shared';
 
 @Pipe({ name: 'collectionRelationshipType' })
-export class CollectionRelationshipTypeDisplayNamePipe
-    implements PipeTransform
-{
+export class CollectionRelationshipTypeDisplayNamePipe implements PipeTransform {
     transform(relationshipType: CollectionRelationshipType): string {
         return collectionRelationshipTypesDisplayNames[relationshipType];
     }

@@ -21,8 +21,11 @@ import { VehicleTemplateActionReducers } from './vehicle-templates.js';
 import { RestrictedZoneActionReducers } from './restricted-zone.js';
 import { OperationalSectionActionReducers } from './operational-section.js';
 import { ScoutableActionReducers } from './scoutable.js';
+import { MeasureActionReducers } from './measure.js';
+import { MeasureTemplateActionReducers } from './measure-templates.js';
+import { MeasureTemplateActionReducers as MeasureTemplateCategoryActionReducers } from './measure-template-categories.js';
+import { DrawingActionReducers } from './drawing.js';
 import { TechnicalChallengeActionReducers } from './technical-challenge.js';
-
 /**
  * All action reducers of the exercise must be registered here
  */
@@ -50,6 +53,10 @@ const actionReducers = {
     ...OperationalSectionActionReducers,
     ...ScoutableActionReducers,
     ...TechnicalChallengeActionReducers,
+    ...MeasureActionReducers,
+    ...MeasureTemplateActionReducers,
+    ...MeasureTemplateCategoryActionReducers,
+    ...DrawingActionReducers,
 } as const;
 
 type ExerciseActionReducer =

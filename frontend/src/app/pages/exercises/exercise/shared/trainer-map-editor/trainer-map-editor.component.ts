@@ -37,7 +37,6 @@ import { openPartialImportOverwriteModal } from '../partial-import/open-partial-
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
 import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
 import { restrictedZoneDragTemplates } from '../editor-panel/templates/restricted-zone';
-import { ExerciseService } from '../../../../../core/exercise.service';
 import { MessageService } from '../../../../../core/messages/message.service';
 import type { AppState } from '../../../../../state/app.state';
 import {
@@ -98,7 +97,6 @@ export class TrainerMapEditorComponent implements OnInit {
     readonly transferLinesService = inject(TransferLinesService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly messageService = inject(MessageService);
-    private readonly exerciseService = inject(ExerciseService);
 
     public selectedCategories$: BehaviorSubject<{
         [key in FilterCategory]: boolean;

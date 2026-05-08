@@ -82,6 +82,15 @@ import {
 } from './models/radiogram/exercise-radiogram.js';
 import { type Scoutable, scoutableSchema } from './models/scoutable.js';
 import {
+    Measure,
+    measureSchema,
+    MeasureTemplateCategory,
+    measureTemplateCategorySchema,
+} from './models/measure/measures.js';
+import type { Drawing } from './models/drawing.js';
+import { drawingSchema } from './models/drawing.js';
+import { defaultMeasureTemplateCategories } from './data/default-state/measure-templates.js';
+import {
     type TechnicalChallenge,
     technicalChallengeSchema,
 } from './models/technical-challenge/technical-challenge.js';
@@ -137,6 +146,14 @@ export class ExerciseState {
     @IsZodSchema(z.record(uuidSchema, restrictedZoneSchema))
     public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
         {};
+
+    @IsZodSchema(z.record(measureSchema.shape.id, measureSchema))
+    public readonly measures: {
+        readonly [key: UUID]: Measure;
+    } = {};
+
+    @IsZodSchema(z.record(drawingSchema.shape.id, drawingSchema))
+    public readonly drawings: { readonly [key: UUID]: Drawing } = {};
 
     @IsZodSchema(z.record(uuidSchema, mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
@@ -199,6 +216,11 @@ export class ExerciseState {
         readonly [key: UUID]: PersonnelTemplate;
     } = defaultPersonnelTemplatesById;
 
+    @IsZodSchema(z.record(z.string(), measureTemplateCategorySchema))
+    public readonly measureTemplates: {
+        readonly [key: string]: MeasureTemplateCategory;
+    } = defaultMeasureTemplateCategories;
+
     @IsZodSchema(z.record(uuidSchema, mapImageTemplateSchema))
     public readonly mapImageTemplates: {
         readonly [key: UUID]: MapImageTemplate;
@@ -257,5 +279,5 @@ export class ExerciseState {
      *
      * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
      */
-    static readonly currentStateVersion = 54;
+    static readonly currentStateVersion = 55;
 }

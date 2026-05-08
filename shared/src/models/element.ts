@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { alarmGroupSchema } from './alarm-group.js';
 import { clientSchema } from './client.js';
+import { drawingSchema } from './drawing.js';
 import { hospitalSchema } from './hospital.js';
 import { mapImageSchema } from './map-image.js';
 import { materialSchema } from './material.js';
@@ -18,6 +19,7 @@ import { taskSchema } from './task.js';
 export const elementSchema = z.discriminatedUnion('type', [
     alarmGroupSchema,
     clientSchema,
+    drawingSchema,
     hospitalSchema,
     mapImageSchema,
     materialSchema,

@@ -20,6 +20,7 @@ import {
     createVehicleTag,
     createVehicleTypeTag,
     createPersonnelTypeTag,
+    createMeasureTemplateTag,
     createScoutableTag,
     createTechnicalChallengeTag,
     createTaskTag,
@@ -50,6 +51,7 @@ import {
     getExerciseBehaviorById,
     getExerciseRadiogramById,
 } from './get-element.js';
+import { getMeasureTemplate } from './measures.js';
 
 export function log(
     state: WritableDraft<ExerciseState>,
@@ -66,6 +68,23 @@ export function log(
     if (state.type === 'parallel') {
         state.lastLogEntry = logEntry;
     }
+}
+
+export function logMeasure(
+    state: WritableDraft<ExerciseState>,
+    measureId: UUID
+) {
+    const measure = state.measures[measureId];
+
+    if (!measure) return;
+
+    const measureTemplate = getMeasureTemplate(state, measure.templateId);
+
+    log(
+        state,
+        [createMeasureTemplateTag(state, measureTemplate)],
+        `Die Maßnahme '${measureTemplate.name}' wurde von '${measure.clientName}' getroffen.`
+    );
 }
 
 export function logAlarmGroup(

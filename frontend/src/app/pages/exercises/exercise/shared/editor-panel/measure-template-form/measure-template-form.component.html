@@ -1,0 +1,352 @@
+<div class="form-group mb-3">
+    <label class="form-label">Name</label>
+    <input
+        [formField]="measureTemplateForm.name"
+        type="text"
+        class="form-control"
+        placeholder="Maßnahmenname"
+    />
+    <app-display-model-validation
+        [field]="measureTemplateForm.name()"
+        [hide]="true"
+    />
+</div>
+<div class="form-group mb-3">
+    <label class="form-label">Kategorie</label>
+    <input
+        type="text"
+        class="form-control"
+        [formField]="measureTemplateForm.categoryName"
+    />
+</div>
+<div class="form-group mb-3">
+    Vorherige Maßnahme ersetzen?
+    <div class="form-switch">
+        <input
+            [formField]="measureTemplateForm.replacePrevious"
+            class="form-check-input"
+            type="checkbox"
+        />
+    </div>
+    <p class="small text-muted">
+        Wenn aktiviert, werden durch das wiederholte Ausführen der Maßnahme alte
+        Zeichnungen durch die neu erstellten ersetzt.
+    </p>
+</div>
+<div class="form-group mb-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <label class="form-label">
+            Schritte
+            <p class="small text-muted mb-0">
+                Die Schritte werden beim Durchführen der Maßnahme hintereinander
+                ausgeführt.
+            </p>
+        </label>
+        <div ngbDropdown autoClose="outside" class="d-inline-block">
+            <button
+                ngbDropdownToggle
+                type="button"
+                class="btn btn-sm btn-outline-primary ms-3"
+            >
+                <i class="bi bi-plus"></i>
+                Schritt hinzufügen
+            </button>
+            <div ngbDropdownMenu>
+                @for (property of measurePropertyTypes; track property) {
+                    <button
+                        ngbDropdownItem
+                        (click)="addProperty(property)"
+                        type="button"
+                        class="btn"
+                    >
+                        <i class="bi bi-plus"></i>
+                        {{ humanReadablePropertyName(property) }}
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+    @if (values().properties.length > 0) {
+        <div class="d-flex flex-column gap-3 mt-3">
+            @for (
+                formProperty of measureTemplateForm.properties;
+                let index = $index;
+                track $index
+            ) {
+                @let property = values().properties[index]!;
+                <div class="card">
+                    <div class="card-body">
+                        <div
+                            class="d-flex align-items-center justify-content-between property-header"
+                        >
+                            <h6 class="mb-0">
+                                {{ humanReadablePropertyName(property.type) }}
+                            </h6>
+                            <div class="d-flex align-items-center gap-1">
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-sm me-2"
+                                    (click)="removeProperty(index)"
+                                    ngbTooltip="Schritt entfernen"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary btn-sm"
+                                    (click)="moveUp(index)"
+                                    [disabled]="index === 0"
+                                    ngbTooltip="Nach oben"
+                                >
+                                    <i class="bi bi-arrow-up"></i>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary btn-sm"
+                                    (click)="moveDown(index)"
+                                    [disabled]="
+                                        index === values().properties.length - 1
+                                    "
+                                    ngbTooltip="Nach unten"
+                                >
+                                    <i class="bi bi-arrow-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="property-fields">
+                            <div class="mb-3">
+                                <label class="form-label mb-0"
+                                    >Hinweistext</label
+                                >
+                                <p class="small text-muted mb-1">
+                                    Der Hinweistext wird dem Nutzer angezeigt,
+                                    während dieser Schritt der Maßnahme
+                                    durchgeführt wird.
+                                </p>
+                                <input
+                                    [formField]="formProperty.hint"
+                                    type="text"
+                                    class="form-control"
+                                />
+                                <app-display-model-validation
+                                    [field]="formProperty.hint()"
+                                    [hide]="true"
+                                />
+                            </div>
+                            @switch (property.type) {
+                                @case ('manualConfirm') {
+                                    @let manualConfirmProperty =
+                                        narrowProperty(
+                                            formProperty,
+                                            'manualConfirm'
+                                        );
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                            >Bestätigungstext</label
+                                        >
+                                        <textarea
+                                            [formField]="
+                                                manualConfirmProperty.prompt
+                                            "
+                                            class="form-control"
+                                            rows="3"
+                                        ></textarea>
+                                        <app-display-model-validation
+                                            [field]="
+                                                manualConfirmProperty.prompt()
+                                            "
+                                            [hide]="true"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="form-label"
+                                            >Bestätigungs-Code (optional)</label
+                                        >
+                                        <input
+                                            [formField]="
+                                                manualConfirmProperty.confirmationString!
+                                            "
+                                            type="text"
+                                            class="form-control"
+                                        />
+                                        <app-display-model-validation
+                                            [field]="
+                                                manualConfirmProperty.confirmationString!()
+                                            "
+                                            [hide]="true"
+                                        />
+                                    </div>
+                                }
+                                @case ('response') {
+                                    @let responseProperty =
+                                        narrowProperty(
+                                            formProperty,
+                                            'response'
+                                        );
+                                    <label class="form-label"
+                                        >Rückmeldung</label
+                                    >
+                                    <textarea
+                                        [formField]="responseProperty.response"
+                                        class="form-control"
+                                        rows="3"
+                                        placeholder="Text für die Rückmeldung"
+                                    ></textarea>
+                                    <app-display-model-validation
+                                        [field]="responseProperty.response()"
+                                        [hide]="true"
+                                    />
+                                }
+                                @case ('delay') {
+                                    @let delayProperty =
+                                        narrowProperty(formProperty, 'delay');
+                                    <label class="form-label"
+                                        >Dauer in Sekunden</label
+                                    >
+                                    <input
+                                        [formField]="delayProperty.delay"
+                                        type="number"
+                                        class="form-control"
+                                        step="1"
+                                        placeholder="z. B. 30"
+                                    />
+                                    <app-display-model-validation
+                                        [field]="delayProperty.delay()"
+                                        [hide]="true"
+                                    />
+                                }
+                                @case ('alarm') {
+                                    <app-alarm-property-editor
+                                        [alarmGroupIds]="property.alarmGroups"
+                                        [targetTransferPointIds]="
+                                            property.targetTransferPointIds
+                                        "
+                                        (alarmGroupIdsChange)="
+                                            updateAlarmGroups(index, $event)
+                                        "
+                                        (targetTransferPointIdsChange)="
+                                            updateTargetTransferPoints(
+                                                index,
+                                                $event
+                                            )
+                                        "
+                                    />
+                                }
+                                @case ('eocLog') {
+                                    @let eocLogProperty =
+                                        narrowProperty(formProperty, 'eocLog');
+                                    <label class="form-label"
+                                        >Einsatztagebuch-Nachricht
+                                        (optional)</label
+                                    >
+                                    <textarea
+                                        [formField]="eocLogProperty.message!"
+                                        class="form-control"
+                                        rows="3"
+                                        placeholder="Text für den Eintrag"
+                                    ></textarea>
+                                    <app-display-model-validation
+                                        [field]="eocLogProperty.message!()"
+                                        [hide]="true"
+                                    />
+                                    <div class="d-flex flex-row gap-2">
+                                        <div class="form-group mb-3">
+                                            Editierbar
+                                            <div class="form-switch">
+                                                <input
+                                                    [formField]="
+                                                        eocLogProperty.editable
+                                                    "
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            Bestätigung
+                                            <div class="form-switch">
+                                                <input
+                                                    [formField]="
+                                                        eocLogProperty.confirm
+                                                    "
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <app-display-model-validation
+                                        [field]="eocLogProperty()"
+                                        [hide]="true"
+                                    />
+                                }
+                                @case ('drawFreehand') {
+                                    @let drawFreehandProperty =
+                                        narrowProperty(
+                                            formProperty,
+                                            'drawFreehand'
+                                        );
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                            >Strichfarbe</label
+                                        >
+                                        <input
+                                            [formField]="
+                                                drawFreehandProperty.strokeColor
+                                            "
+                                            type="color"
+                                            class="form-control form-control-color"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="form-label"
+                                            >Füllfarbe</label
+                                        >
+                                        <input
+                                            [formField]="
+                                                drawFreehandProperty.fillColor
+                                            "
+                                            type="color"
+                                            class="form-control form-control-color"
+                                        />
+                                    </div>
+                                }
+                                @case ('drawLine') {
+                                    @let drawLineProperty =
+                                        narrowProperty(
+                                            formProperty,
+                                            'drawLine'
+                                        );
+                                    <label class="form-label"
+                                        >Strichfarbe</label
+                                    >
+                                    <input
+                                        [formField]="
+                                            drawLineProperty.strokeColor
+                                        "
+                                        type="color"
+                                        class="form-control form-control-color"
+                                    />
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    } @else {
+        <div class="text-muted my-3">Keine Schritte vorhanden</div>
+    }
+    <app-display-model-validation [field]="measureTemplateForm.properties()" />
+</div>
+
+<button
+    (click)="onSubmit()"
+    [disabled]="measureTemplateForm().invalid()"
+    class="btn btn-primary"
+>
+    {{ btnText() }}
+</button>
+
+<app-display-model-validation [field]="measureTemplateForm()" />

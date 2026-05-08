@@ -7,6 +7,7 @@ import type {
     ExerciseSimulationBehaviorState,
     ExerciseSimulationBehaviorType,
     ExerciseState,
+    MeasureTemplate,
     ScoutableElementType,
     TechnicalChallengeId,
     UUID,
@@ -51,6 +52,7 @@ export const selectVehicles = selectPropertyFactory('vehicles');
 export const selectPersonnel = selectPropertyFactory('personnel');
 export const selectAlarmGroups = selectPropertyFactory('alarmGroups');
 export const selectMaterials = selectPropertyFactory('materials');
+export const selectMeasures = selectPropertyFactory('measures');
 export const selectTasks = selectPropertyFactory('tasks');
 export const selectTransferPoints = selectPropertyFactory('transferPoints');
 export const selectHospitals = selectPropertyFactory('hospitals');
@@ -58,6 +60,7 @@ export const selectHospitalPatients = selectPropertyFactory('hospitalPatients');
 export const selectClients = selectPropertyFactory('clients');
 export const selectRadiograms = selectPropertyFactory('radiograms');
 export const selectRestrictedZones = selectPropertyFactory('restrictedZones');
+export const selectDrawings = selectPropertyFactory('drawings');
 export const selectOperationalSections = selectPropertyFactory(
     'operationalSections'
 );
@@ -71,6 +74,13 @@ export const selectMaterialTemplates =
     selectPropertyFactory('materialTemplates');
 export const selectMapImagesTemplates =
     selectPropertyFactory('mapImageTemplates');
+export const selectMeasureTemplateCategories =
+    selectPropertyFactory('measureTemplates');
+export const selectMeasureTemplates = createSelector(
+    selectMeasureTemplateCategories,
+    (categories): { [key: UUID]: MeasureTemplate } =>
+        Object.assign({}, ...Object.values(categories).map((c) => c.templates))
+);
 // Array properties
 export const selectPatientCategories =
     selectPropertyFactory('patientCategories');
@@ -140,6 +150,9 @@ export const createSelectMapImageTemplate = createSelectElementFromMapFactory(
 );
 export const createSelectScoutable =
     createSelectElementFromMapFactory(selectScoutables);
+export const createSelectMeasureTemplate = createSelectElementFromMapFactory(
+    selectMeasureTemplates
+);
 export function createSelectRadiogram<R extends ExerciseRadiogram>(id: UUID) {
     return createSelector(
         selectRadiograms,

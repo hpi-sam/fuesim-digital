@@ -56,6 +56,7 @@ export class MapOperatorToolbarComponent {
         }
         this.selectedCategoryName.set(name);
         this.isToolbarVisible.set(true);
+        document.exitFullscreen();
     }
 
     @HostListener('document:mousedown', ['$event'])

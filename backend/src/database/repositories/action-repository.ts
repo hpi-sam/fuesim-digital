@@ -1,6 +1,6 @@
-import { eq, asc, and, inArray } from 'drizzle-orm';
-import type { ExerciseAction, ExerciseId } from 'fuesim-digital-shared';
-import { actionTable } from '../schema.js';
+import { eq, asc } from 'drizzle-orm';
+import type { ExerciseId } from 'fuesim-digital-shared';
+import { type ActionEntry, actionTable } from '../schema.js';
 import type { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { BaseRepository } from './base-repository.js';
 import { DatabaseService } from './../services/database-service.js';
@@ -66,37 +66,10 @@ export class ActionRepository extends BaseRepository {
         }
     }
 
-    public async updateActionIndex(
-        exerciseId: ExerciseId,
-        previousIndex: number,
-        newIndex: number,
-        actionString: ExerciseAction
-    ) {
+    public async insertActions(actions: ActionEntry[]) {
         return this.databaseConnection
-            .update(actionTable)
-            .set({
-                index: newIndex,
-                actionString,
-            })
-            .where(
-                and(
-                    eq(actionTable.exerciseId, exerciseId),
-                    eq(actionTable.index, previousIndex)
-                )
-            );
-    }
-
-    public async deleteActionIndices(
-        exerciseId: ExerciseId,
-        indicesToRemove: number[]
-    ) {
-        return this.databaseConnection
-            .delete(actionTable)
-            .where(
-                and(
-                    eq(actionTable.exerciseId, exerciseId),
-                    inArray(actionTable.index, indicesToRemove)
-                )
-            );
+            .insert(actionTable)
+            .values(actions)
+            .returning();
     }
 }

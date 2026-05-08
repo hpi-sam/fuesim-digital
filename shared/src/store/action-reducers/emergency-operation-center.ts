@@ -36,6 +36,8 @@ export class AddLogEntryAction implements Action {
     public readonly message!: string;
     @IsBoolean()
     public readonly isPrivate: boolean = false;
+    @IsUUID(4, uuidValidationOptions)
+    public readonly id!: UUID;
 }
 
 export class SendAlarmGroupAction implements Action {
@@ -62,13 +64,17 @@ export class SendAlarmGroupAction implements Action {
     @IsOptional()
     @IsUUID(4, uuidValidationOptions)
     public readonly firstVehiclesTargetTransferPointId: UUID | undefined;
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly eocLogId!: UUID;
 }
 
 export namespace EmergencyOperationCenterActionReducers {
     export const addLogEntry: ActionReducer<AddLogEntryAction> = {
         action: AddLogEntryAction,
-        reducer: (draftState, { name, message, isPrivate }) => {
+        reducer: (draftState, { name, message, isPrivate, id }) => {
             const logEntry = newEocLogEntry(
+                id,
                 draftState.currentTime,
                 message,
                 name,
@@ -95,6 +101,7 @@ export namespace EmergencyOperationCenterActionReducers {
                 targetTransferPointId,
                 firstVehiclesCount,
                 firstVehiclesTargetTransferPointId,
+                eocLogId,
             }
         ) => {
             const alarmGroup = getElement(
@@ -161,6 +168,7 @@ export namespace EmergencyOperationCenterActionReducers {
                 message: logEntry,
                 name: clientName,
                 isPrivate: false,
+                id: eocLogId,
             });
 
             logAlarmGroupSent(draftState, alarmGroupId);

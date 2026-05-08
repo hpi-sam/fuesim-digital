@@ -76,7 +76,7 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
     public getTransferPointOrderByValue = (transferPoint: TransferPoint) =>
         getTransferPointFullName(transferPoint);
 
-    public readonly infinity = Number.MAX_VALUE;
+    public readonly infinity = Number.MAX_SAFE_INTEGER;
 
     ngOnInit(): void {
         const automaticallyDistributeVehiclesBehaviorStateSelector =

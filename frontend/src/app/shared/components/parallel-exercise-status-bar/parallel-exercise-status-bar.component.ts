@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
     GetParallelExerciseResponseData,
@@ -22,7 +22,6 @@ import { ApiService } from '../../../core/api.service';
 import { ParallelExerciseService } from '../../../core/parallel-exercise.service';
 import { OlMapManagerService } from '../../../pages/exercises/exercise/shared/exercise-map/utility/ol-map-manager.service';
 import { ExerciseStateBadgeComponent } from '../exercise-state-badge/exercise-state-badge.component';
-import { selectStateSnapshot } from '../../../state/get-state-snapshot';
 import { selectCurrentMainRole } from '../../../state/application/selectors/shared.selectors';
 
 @Component({
@@ -38,7 +37,7 @@ import { selectCurrentMainRole } from '../../../state/application/selectors/shar
         NgbDropdownItem,
     ],
 })
-export class ParallelExerciseStatusBarComponent implements OnInit {
+export class ParallelExerciseStatusBarComponent {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly apiService = inject(ApiService);
     protected readonly parallelExerciseService = inject(
@@ -56,24 +55,26 @@ export class ParallelExerciseStatusBarComponent implements OnInit {
     protected collectedClientNames = this.store.selectSignal(
         selectCollectedClientNames
     );
+    private readonly currentMainRole = this.store.selectSignal(
+        selectCurrentMainRole
+    );
+
+    constructor() {
+        effect(async () => {
+            if (this.currentMainRole() !== 'trainer') return;
+            const id = this.parallelExerciseId();
+            if (this.parallelExercise()?.id === id) return;
+            this.parallelExercise.set(
+                await this.apiService.getParallelExercise(id)
+            );
+            await this.parallelExerciseService.joinParallelExercise(id);
+        });
+    }
 
     openExerciseInstance(exerciseInstance: ParallelExerciseInstanceSummary) {
         this.router.navigate(['/exercises', exerciseInstance.trainerKey], {
             queryParams:
                 this.olMapManagerService.olMapManager?.getCoordinatesAsQueryParams(),
         });
-    }
-
-    async ngOnInit() {
-        if (
-            selectStateSnapshot(selectCurrentMainRole, this.store) !== 'trainer'
-        )
-            return;
-        this.parallelExercise.set(
-            await this.apiService.getParallelExercise(this.parallelExerciseId())
-        );
-        await this.parallelExerciseService.joinParallelExercise(
-            this.parallelExerciseId()
-        );
     }
 }

@@ -5,7 +5,7 @@ interface Scoutable {
     name?: string;
     viewedByParticipants?: boolean;
 }
-export const extendScoutables52: Migration = {
+export const extendScoutables54: Migration = {
     action: (intermediateState, action) => {
         const typedAction = action as { type: string };
         if (typedAction.type === '[Scoutable] Make scoutable') {

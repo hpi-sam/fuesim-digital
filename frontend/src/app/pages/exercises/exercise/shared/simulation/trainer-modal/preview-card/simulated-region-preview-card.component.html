@@ -4,6 +4,13 @@
     [attr.data-cy]="dataCy()"
 >
     <ng-content>
+        @if (patient(); as patient) {
+            <div class="d-flex mx-2">
+                <app-patient-health-point-display [patientId]="patient.id" />
+                <div class="flex-grow-1"></div>
+                <app-patient-status-badge [status]="patient.pretriageStatus" />
+            </div>
+        }
         <div
             class="preview-image-container"
             [class.bg-secondary]="darkBackground()"

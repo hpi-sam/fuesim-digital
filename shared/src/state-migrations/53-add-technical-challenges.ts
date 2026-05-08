@@ -3,7 +3,7 @@ import type { TechnicalChallenge } from '../models/technical-challenge/technical
 import type { Task } from '../models/task.js';
 import type { Migration } from './migration-functions.js';
 
-export const addTechnicalChallenges51: Migration = {
+export const addTechnicalChallenges53: Migration = {
     action: (intermediateState, action) => true,
     state: (state: any) => {
         const typedState = state as {

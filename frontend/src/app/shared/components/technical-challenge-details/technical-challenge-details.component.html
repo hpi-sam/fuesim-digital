@@ -1,73 +1,115 @@
 @if (this.currentRole() === 'trainer') {
     <nav #nav="ngbNav" ngbNav class="nav-tabs">
-        <ng-container ngbNavItem ngbNavItem="properties">
+        <ng-container ngbNavItem="properties">
             <a ngbNavLink data-cy="technicalDetailsPopUpPropertiesNav"
                 >Eigenschaften</a
             >
             <ng-template ngbNavContent>
-                <div class="mb-2">
-                    <h6>Zustand:</h6>
-                    {{ currentState().title }}
-                </div>
+                <div class="p-2 row">
+                    <div class="col-6">
+                        <div class="card mb-2">
+                            <div class="card-body d-flex">
+                                <div class="col-8">
+                                    <h6 class="card-title">
+                                        Aktueller Zustand
+                                    </h6>
+                                    <p class="card-text">
+                                        {{ currentState().title }}
+                                    </p>
+                                </div>
+                                <div class="col-4">
+                                    <img
+                                        alt=""
+                                        [src]="currentState().image.url"
+                                        class="w-100"
+                                    />
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="mb-3">
-                    <h6>Aufgaben:</h6>
-                    <ul>
-                        @for (
-                            task of technicalChallenge().relevantTasks | values;
-                            track task.id
-                        ) {
-                            <li [attr.data-taskId]="task.id">
-                                {{ task.taskName }}:
-                                {{
-                                    technicalChallenge().taskProgress[
-                                        task.id
-                                    ] ?? 'unknown'
-                                }}
-                                |
-                                {{
-                                    progressGuardsByTaskId().get(task.id)
-                                        ?.minProgress
-                                }}
-                            </li>
-                        } @empty {
-                            <li><em>Keine Aufgaben</em></li>
-                        }
-                    </ul>
-                </div>
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h6 class="card-title mb-0">Timer</h6>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                @for (
+                                    guard of visibleTimerGuards();
+                                    track $index
+                                ) {
+                                    <li class="list-group-item">
+                                        {{ guard.name ?? 'unbenannt' }}
+                                        <app-progress-bar
+                                            class="mt-1"
+                                            [paused]="!exerciseRunning()"
+                                            [max]="guard.max"
+                                            [current]="guard.current"
+                                        ></app-progress-bar>
+                                    </li>
+                                } @empty {
+                                    <li class="list-group-item">
+                                        <em>Keine Timer</em>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h6 class="card-title mb-0">Aufgaben</h6>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                @for (task of tasksProgress(); track task.id) {
+                                    <li
+                                        [attr.data-taskId]="task.id"
+                                        class="list-group-item flex-column"
+                                    >
+                                        {{ task.taskName }}
+                                        <app-progress-bar
+                                            [current]="task.current"
+                                            [max]="task.max"
+                                            [paused]="!exerciseRunning()"
+                                        ></app-progress-bar>
+                                    </li>
+                                } @empty {
+                                    <li class="list-group-item">
+                                        <em>Keine Aufgaben</em>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
 
-                <div class="mb-3">
-                    <h6>Timer:</h6>
-                    Time since creation of challenge: {{ challengeAge() }}
-                    <ul>
-                        @for (guard of timerGuards(); track $index) {
-                            <li>
-                                {{ guard.name ?? 'unnamed' }} needs
-                                {{ guard.minTimePassed }}
-                            </li>
-                        }
-                    </ul>
-                </div>
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    Zugewiesenes Personal
+                                </h6>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                @for (
+                                    assignment of assignedPersonnel();
+                                    track assignment[0].id + assignment[1].id
+                                ) {
+                                    @let personnel = assignment[0];
+                                    @let task = assignment[1];
 
-                <div class="mb-3">
-                    <h6>Zugewiesenes Personal:</h6>
-                    <ul>
-                        @for (
-                            assignment of assignedPersonnel();
-                            track assignment[0].id + assignment[1].id
-                        ) {
-                            @let personnel = assignment[0];
-                            @let task = assignment[1];
-
-                            <li>
-                                {{ personnel.typeName }}: {{ task.taskName }}
-                            </li>
-                        }
-                    </ul>
+                                    <li class="list-group-item">
+                                        <img
+                                            alt=""
+                                            [src]="personnel.image.url"
+                                            style="max-height: 40px"
+                                        />
+                                        {{ personnel.typeName }}:
+                                        {{ task.taskName }}
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </ng-template>
         </ng-container>
-        <ng-container ngbNavItem ngbNavItem="scout-Info">
+        <ng-container ngbNavItem="scout-Info">
             <a ngbNavLink data-cy="mapImagePopUpScoutNav">Erkundung</a>
             <ng-template ngbNavContent>
                 <app-user-generated-content-editor

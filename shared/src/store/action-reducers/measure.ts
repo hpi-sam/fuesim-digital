@@ -55,6 +55,7 @@ export namespace MeasureActionReducers {
                                     firstVehiclesCount: 0,
                                     firstVehiclesTargetTransferPointId:
                                         undefined,
+                                    eocLogId: measure.id, // TODO: clean this up
                                 }
                             );
                         break;
@@ -67,6 +68,7 @@ export namespace MeasureActionReducers {
                                     name: measure.clientName,
                                     isPrivate: false,
                                     message: instance.message,
+                                    id: measure.id, // TODO: clean this up
                                 }
                             );
                         break;

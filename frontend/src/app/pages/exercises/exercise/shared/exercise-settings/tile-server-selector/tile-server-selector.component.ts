@@ -1,6 +1,6 @@
 import { Component, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapse, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { AutofocusDirective } from '../../../../../../shared/directives/autofocus.directive';
 import { DisplayValidationComponent } from '../../../../../../shared/validation/display-validation/display-validation.component';
 
@@ -11,6 +11,7 @@ import { DisplayValidationComponent } from '../../../../../../shared/validation/
         AutofocusDirective,
         DisplayValidationComponent,
         NgbCollapse,
+        NgbTooltip,
     ],
     templateUrl: './tile-server-selector.component.html',
     styleUrl: './tile-server-selector.component.scss',
@@ -26,7 +27,7 @@ export class TileServerSelectorComponent {
     protected readonly suggestions = [
         {
             name: 'Arcgis',
-            description: 'Satellitenbilder (standardmäßig ausgewählt',
+            description: 'Satellitenbilder (standardmäßig ausgewählt)',
             url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         },
         {

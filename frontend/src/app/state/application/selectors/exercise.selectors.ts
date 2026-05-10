@@ -485,18 +485,19 @@ export function getIsCompletedFromCombinedEvalCriteriaTree(
     currentTime: number,
     depth: number
 ): boolean {
-    if (depth !== 0 && tree.criteriaIds.length === 0) {
-        return false;
+    function criterionToResult(criterion: EvalCriterion): EvalResult {
+        return getEvalResultFromCriterion(
+            criterion,
+            evalCriteria,
+            technicalChallenges,
+            patients,
+            scoutables,
+            currentTime
+        );
     }
-    const combinedCriteria = Object.values(evalCriteria).filter((crit) =>
-        tree.criteriaIds.find((id) => id === crit.id)
-    );
-    if (combinedCriteria.length === 0) {
-        return false;
-    }
-    let isLCompleted = false;
+    let isLeftCompleted = false;
     if (tree.lChild) {
-        isLCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
+        isLeftCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
             tree.lChild,
             evalCriteria,
             technicalChallenges,
@@ -506,9 +507,9 @@ export function getIsCompletedFromCombinedEvalCriteriaTree(
             depth + 1
         );
     }
-    let isRCompleted = false;
+    let isRightCompleted = false;
     if (tree.rChild) {
-        isRCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
+        isRightCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
             tree.rChild,
             evalCriteria,
             technicalChallenges,
@@ -518,20 +519,38 @@ export function getIsCompletedFromCombinedEvalCriteriaTree(
             depth + 1
         );
     }
+    const combinedCriteria = Object.values(evalCriteria).filter((crit) =>
+        tree.criteriaIds.find((id) => id === crit.id)
+    );
     switch (tree.logicalOperator) {
         case 'and': {
-            let isCompleted = isLCompleted && isRCompleted;
-            /* TODO @JohannesPotzi */
-            throw new Error('TODO');
+            let isCompleted = isLeftCompleted && isRightCompleted;
+            if (!isCompleted) {
+                return false;
+            }
+            for (let i = 0; i < combinedCriteria.length; i += 1) {
+                if (
+                    criterionToResult(combinedCriteria[i] as EvalCriterion)
+                        .isCompleted === false
+                ) {
+                    return false;
+                }
+            }
             return true;
         }
         case 'or': {
-            let isCompleted = isLCompleted || isLCompleted;
+            let isCompleted = isLeftCompleted || isRightCompleted;
             if (isCompleted) {
                 return true;
             }
-            /* TODO @JohannesPotzi */
-            throw new Error('TODO');
+            for (let i = 0; i < combinedCriteria.length; i += 1) {
+                if (
+                    criterionToResult(combinedCriteria[i] as EvalCriterion)
+                        .isCompleted
+                ) {
+                    return true;
+                }
+            }
             return false;
         }
         case 'not': {
@@ -545,43 +564,20 @@ export function getIsCompletedFromCombinedEvalCriteriaTree(
                     "[logic error] Attempting logical 'not' operation on multiple litarals."
                 );
             }
-            /* Case with just one criterionId and no children */
-            if (!tree.lChild && !tree.rChild) {
+            if (!tree.lChild && !tree.rChild && tree.criteriaIds.length === 1) {
                 const criterion = Object.values(evalCriteria).filter(
-                    (crit) => crit.id === tree.criteriaIds[0]!
+                    (crit) => crit.id === tree.criteriaIds[0]
                 )[0] as EvalCriterion;
-                let criterionIsCompleted = getEvalResultFromCriterion(
-                    criterion,
-                    evalCriteria,
-                    technicalChallenges,
-                    patients,
-                    scoutables,
-                    currentTime
-                ).isCompleted;
+                let criterionIsCompleted =
+                    criterionToResult(criterion).isCompleted;
                 return !criterionIsCompleted;
             }
             /* case with no criterionIds and just lChild */
             if (tree.lChild) {
-                return getIsCompletedFromCombinedEvalCriteriaTree(
-                    tree.lChild,
-                    evalCriteria,
-                    technicalChallenges,
-                    patients,
-                    scoutables,
-                    currentTime,
-                    depth + 1
-                );
+                return isLeftCompleted;
             }
             /* case with no criterionIds and just rChild */
-            return getIsCompletedFromCombinedEvalCriteriaTree(
-                tree.rChild!,
-                evalCriteria,
-                technicalChallenges,
-                patients,
-                scoutables,
-                currentTime,
-                depth + 1
-            );
+            return isRightCompleted;
         }
         default:
             break;
@@ -601,6 +597,9 @@ export function getEvalResultFromCriterion(
     switch (evalCriterion.criterionType) {
         case 'doMeasureXTimesEvalCriterion': {
             /* TODO @JohannesPotzi @Jogius */
+            console.log(
+                'TODO: implement evaluation of doMeasureXTimesEvalCriterion'
+            );
             break;
         }
         case 'reachTechnicalChallengeStateEvalCriterion': {
@@ -621,11 +620,10 @@ export function getEvalResultFromCriterion(
         }
         case 'xPatientsAtStatusEvalCriterion': {
             const criterion = evalCriterion as XPatientsAtStatusEvalCriterion;
-            const currentCount = Object.values(patients).filter(
+            count = Object.values(patients).filter(
                 (patient) => patient.realStatus === criterion.targetStatus
             ).length;
-            count = currentCount;
-            isCompleted = currentCount === criterion.count;
+            isCompleted = count === criterion.count;
             break;
         }
         case 'viewScoutableEvalCriterion': {
@@ -654,7 +652,7 @@ export function getEvalResultFromCriterion(
     return {
         criterionId: id,
         criterion: evalCriterion,
-        isCompleted,
+        isCompleted: isCompleted,
         timestamp: currentTime,
         count: count !== -1 ? count : undefined,
     };
@@ -669,7 +667,7 @@ export const selectEvalResults = createSelector(
     (evalCriteria, technicalChallenges, patients, scoutables, currentTime) =>
         Object.values(evalCriteria)
             .flatMap((evalCriterion: EvalCriterion): EvalResult => {
-                const result = getEvalResultFromCriterion(
+                return getEvalResultFromCriterion(
                     evalCriterion,
                     evalCriteria,
                     technicalChallenges,
@@ -677,13 +675,6 @@ export const selectEvalResults = createSelector(
                     scoutables,
                     currentTime
                 );
-                return {
-                    criterionId: result.criterionId,
-                    criterion: evalCriterion,
-                    isCompleted: result.isCompleted,
-                    timestamp: currentTime,
-                    count: result.count,
-                };
             })
             .reduce<{ [evalCriterionId: UUID]: EvalResult }>(
                 (evalResultObject, evalResult) => {

@@ -1,8 +1,14 @@
 import Papa from 'papaparse';
 import { z } from 'zod';
+import { toLonLat } from 'ol/proj.js';
 import type { ExerciseState } from '../../state.js';
 import type { Sex } from '../../models/utils/sex.js';
 import type { PatientStatus } from '../../models/utils/patient-status.js';
+import {
+    coordinateStringSchema,
+    coordinateStringToNumber,
+} from '../../utils/string-coordinates.js';
+import { isInViewport } from '../../models/viewport.js';
 
 const statusCodeToExportMap: { [key in PatientStatus]: string } = {
     red: '1',
@@ -49,6 +55,10 @@ const csvExportSchema = z.object({
     hasTransportPriority: boolToExport,
     ventilated: z.literal(''),
     doctorEscort: z.literal(''),
+    patientTray: z.literal(''),
+    section: z.string(),
+    latitude: z.union([coordinateStringSchema, z.literal('')]),
+    longitude: z.union([coordinateStringSchema, z.literal('')]),
 });
 export type CSVExportType = z.infer<typeof csvExportSchema>;
 export type CSVExportInput = z.input<typeof csvExportSchema>;
@@ -64,24 +74,53 @@ export const patientsCsvExportColumns = [
     'Transportpriorität',
     'Beatmet',
     'Arztbegleitung',
+    'Patientenablage',
+    'Abschnitt',
+    'Breitengrad',
+    'Laengengrad',
 ];
 
 export function preparePatientsForCSVExport(state: ExerciseState) {
+    const sortedViewports = Object.values(state.viewports).sort(
+        (a, b) => a.size.width * a.size.height - b.size.width * b.size.height
+    );
     const patients = Object.values(state.patients).map(
-        (patient): CSVExportInput => ({
-            id: patient.identifier,
-            status:
-                patient.pretriageStatus === 'white'
-                    ? patient.realStatus
-                    : patient.pretriageStatus,
-            sex: patient.biometricInformation.sex,
-            age: patient.biometricInformation.age,
-            pzc: '',
-            remarks: patient.remarks,
-            hasTransportPriority: patient.hasTransportPriority,
-            ventilated: '',
-            doctorEscort: '',
-        })
+        (patient): CSVExportInput => {
+            let longitude = '';
+            let latitude = '';
+            let section = '';
+            if (patient.position.type === 'coordinates') {
+                const coords = patient.position.coordinates;
+                const lonLat = toLonLat([coords.x, coords.y]);
+                longitude = coordinateStringToNumber.encode(lonLat[0]!);
+                latitude = coordinateStringToNumber.encode(lonLat[1]!);
+
+                const viewport = sortedViewports.find((vp) =>
+                    isInViewport(vp, coords)
+                );
+                if (viewport) {
+                    section = viewport.name;
+                }
+            }
+            return {
+                id: patient.identifier,
+                status:
+                    patient.pretriageStatus === 'white'
+                        ? patient.realStatus
+                        : patient.pretriageStatus,
+                sex: patient.biometricInformation.sex,
+                age: patient.biometricInformation.age,
+                pzc: '',
+                remarks: patient.remarks,
+                hasTransportPriority: patient.hasTransportPriority,
+                ventilated: '',
+                doctorEscort: '',
+                patientTray: '',
+                section,
+                latitude,
+                longitude,
+            };
+        }
     );
     return csvExportListSchema.parse(patients);
 }

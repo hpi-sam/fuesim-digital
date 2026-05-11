@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Changed
+
+- Extend patients export for IVENA MANV with new fields (e. g. location).
+
 ### Fixed
 
 - `DFM_UPLOAD_LIMIT` values are now correctly applied again, after a bug in version 0.11.0

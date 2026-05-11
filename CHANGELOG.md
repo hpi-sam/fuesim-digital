@@ -16,6 +16,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Map tile servers can now be selected from a list of suggested servers
 
+### Changed
+
+- Docker Images are now pushed exclusively to GHCR. Images on Dockerhub are no longer updated. If you're selfhosting and still using the `digitalfuesimmanv/dfm` image, please switch to `ghcr.io/hpi-sam/fuesim-digital`.
+
 ## [0.11.1] - 2026-04-30
 
 ### Fixed

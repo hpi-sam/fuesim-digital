@@ -348,11 +348,6 @@ jobs:
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version
-            - name: Login to Dockerhub
-              uses: docker/login-action@v3
-              with:
-                  username: ${{ secrets.DOCKER_HUB_USERNAME }}
-                  password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
             - name: Login to GitHub Container Registry
               uses: docker/login-action@v3
               with:
@@ -366,7 +361,6 @@ jobs:
                   file: docker/Dockerfile
                   push: true
                   tags: >
-                      ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:dev ,
                       ghcr.io/${{ github.repository }}:dev ,
 
     deploy-dev-next:
@@ -386,11 +380,6 @@ jobs:
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version
-            - name: Login to Dockerhub
-              uses: docker/login-action@v3
-              with:
-                  username: ${{ secrets.DOCKER_HUB_USERNAME }}
-                  password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
             - name: Login to GitHub Container Registry
               uses: docker/login-action@v3
               with:
@@ -404,7 +393,6 @@ jobs:
                   file: docker/Dockerfile
                   push: true
                   tags: >
-                      ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:dev-next ,
                       ghcr.io/${{ github.repository }}:dev-next ,
 
     deploy-main:
@@ -423,11 +411,6 @@ jobs:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/extract-version
             # Source: https://docs.docker.com/ci-cd/github-actions/
-            - name: Login to Dockerhub
-              uses: docker/login-action@v3
-              with:
-                  username: ${{ secrets.DOCKER_HUB_USERNAME }}
-                  password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
             - name: Login to GitHub Container Registry
               uses: docker/login-action@v3
               with:
@@ -441,8 +424,6 @@ jobs:
                   file: docker/Dockerfile
                   push: true
                   tags: >
-                      ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:latest ,
-                      ${{ secrets.DOCKER_HUB_USERNAME }}/dfm:${{ env.VERSION_NAME }} ,
                       ghcr.io/${{ github.repository }}:latest ,
                       ghcr.io/${{ github.repository }}:${{ env.VERSION_NAME }}
 

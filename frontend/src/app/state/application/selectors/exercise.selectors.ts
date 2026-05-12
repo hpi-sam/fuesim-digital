@@ -15,6 +15,7 @@ import type {
 import {
     isInSpecificSimulatedRegion,
     isInTransfer,
+    isOnMap,
     isPositionInSimulatedRegion,
     nestedCoordinatesOf,
     scoutableElementTypes,
@@ -223,11 +224,14 @@ export function createSelectVehiclesInOperationalSection(
     );
 }
 
-export const selectVehiclesInSimulatedRegions = createSelector(
+export const selectVehiclesOnOperationsLocation = createSelector(
     selectVehicles,
     (vehicles) =>
-        Object.values(vehicles).filter((vehicle) =>
-            isPositionInSimulatedRegion(vehicle.position)
+        Object.values(vehicles).filter(
+            (vehicle) =>
+                isOnMap(vehicle) ||
+                isPositionInSimulatedRegion(vehicle.position) ||
+                isInTransfer(vehicle)
         )
 );
 

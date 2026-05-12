@@ -36,7 +36,7 @@ export function createExerciseRouter(exerciseService: ExerciseService): Router {
             }
             let exercise = null;
             try {
-                exercise = exerciseService.getExerciseByKey(
+                exercise = await exerciseService.getExerciseByKey(
                     req.params.exerciseKey,
                     req.session
                 );

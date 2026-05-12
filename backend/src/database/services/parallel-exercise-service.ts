@@ -89,6 +89,9 @@ export class ParallelExerciseService {
         };
         exercise.applyAction(setAutojoinViewportAction, null);
 
+        // Ensure exercise is in-memory to persist changes
+        this.exerciseService.loadExercise(exercise);
+
         this.newJoin.next({
             parallelExerciseId: parallelExercise.id,
             activeExercise: exercise,
@@ -186,8 +189,12 @@ export class ParallelExerciseService {
             await this.parallelExerciseRepository.getParallelExerciseInstancesById(
                 parallelExercise.id
             );
-        const activeExercises = exerciseInstances.map((exerciseEntry) =>
-            this.exerciseService.getExerciseByKey(exerciseEntry.participantKey)
+        const activeExercises = await Promise.all(
+            exerciseInstances.map(async (exerciseEntry) =>
+                this.exerciseService.getExerciseByKey(
+                    exerciseEntry.participantKey
+                )
+            )
         );
         return activeExercises;
     }

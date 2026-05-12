@@ -22,13 +22,19 @@ import {
     createViewport,
     joinParallelExercise,
 } from '../test/parallel-exercise-utils.js';
+import type { SessionInformation } from '../auth/auth-service.js';
 
 describe('parallel exercise router', () => {
     const environment = createTestEnvironment();
     let session: string;
+    let sessionInformation: SessionInformation;
     beforeEach(async () => {
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
         session = await createTestUserSession(environment);
+        sessionInformation =
+            (await environment.services.authService.getDataFromSessionToken(
+                session
+            ))!;
     });
     describe('GET /api/parallel_exercises', () => {
         it('fails with 403 if not authenticated', async () => {
@@ -153,9 +159,10 @@ describe('parallel exercise router', () => {
             const template = await createExerciseTemplate(environment, session);
 
             const viewport = createViewport(
-                environment.services.exerciseService
-                    .TESTING_getExerciseMap()
-                    .get(template.trainerKey)!
+                await environment.services.exerciseService.getExerciseByKey(
+                    template.trainerKey,
+                    sessionInformation
+                )
             );
             const testData = {
                 name: 'Test Parallel Exercise',

@@ -37,10 +37,16 @@ export async function createParallelExercise(
     const exerciseTemplate =
         template ?? (await createExerciseTemplate(environment, session));
 
+    const sessionInformation =
+        (await environment.services.authService.getDataFromSessionToken(
+            session
+        ))!;
+
     const viewport = createViewport(
-        environment.services.exerciseService
-            .TESTING_getExerciseMap()
-            .get(exerciseTemplate.trainerKey)!
+        await environment.services.exerciseService.getExerciseByKey(
+            exerciseTemplate.trainerKey,
+            sessionInformation
+        )
     );
     const response = await environment
         .httpRequest('post', '/api/parallel_exercises/', session)

@@ -1,17 +1,12 @@
-import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import type { Personnel, Vehicle } from 'fuesim-digital-shared';
+import type { Vehicle } from 'fuesim-digital-shared';
 import {
     getPatientVisibleStatus,
     isInSpecificVehicle,
     SimulatedRegion,
 } from 'fuesim-digital-shared';
-import type { Observable } from 'rxjs';
-import { combineLatest, map } from 'rxjs';
 import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
-import { AsyncPipe } from '@angular/common';
-import type { PatientWithVisibleStatus } from '../../../patients-table/simulated-region-overview-patients-table.component';
 import { StartTransferService } from '../../../start-transfer.service';
 import { ExerciseService } from '../../../../../../../../../core/exercise.service';
 import type { AppState } from '../../../../../../../../../state/app.state';
@@ -37,10 +32,9 @@ import { SimulatedRegionOverviewPatientsTableComponent } from '../../../patients
         VehicleAvailableSlotsDisplayComponent,
         SimulatedRegionOverviewPatientsTableComponent,
         NgbTooltip,
-        AsyncPipe,
     ],
 })
-export class SimulatedRegionOverviewVehicleDetailsComponent implements OnInit {
+export class SimulatedRegionOverviewVehicleDetailsComponent {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
     readonly startTransferService = inject(StartTransferService);
@@ -49,51 +43,38 @@ export class SimulatedRegionOverviewVehicleDetailsComponent implements OnInit {
 
     readonly vehicle = input<Vehicle>();
 
-    selection$!: Observable<{
-        vehicle: Vehicle;
-        personnel: (Personnel & { isInVehicle: boolean })[];
-        patients: PatientWithVisibleStatus[];
-    } | null>;
+    public readonly selection = computed(() => {
+        const vehicle = this.vehicle();
+        if (!vehicle) return null;
 
-    ngOnInit() {
-        const personnel$ = this.store.select(selectPersonnel);
-        const patients$ = this.store.select(selectPatients);
-        const configuration$ = this.store.select(selectConfiguration);
+        const personnel = this.store.selectSignal(selectPersonnel)();
+        const patients = this.store.selectSignal(selectPatients)();
+        const configuration = this.store.selectSignal(selectConfiguration)();
 
-        this.selection$ = combineLatest([
-            personnel$,
-            patients$,
-            configuration$,
-        ]).pipe(
-            map(([personnel, patients, configuration]) => {
-                const vehicle = this.vehicle();
-                if (!vehicle) return null;
-                const vehiclePersonnel = Object.keys(vehicle.personnelIds)
-                    .map((id) => personnel[id]!)
-                    .map((pers) => ({
-                        ...pers,
-                        isInVehicle: isInSpecificVehicle(pers, vehicle.id),
-                    }));
+        const vehiclePersonnel = Object.keys(vehicle.personnelIds)
+            .map((id) => personnel[id]!)
+            .map((pers) => ({
+                ...pers,
+                isInVehicle: isInSpecificVehicle(pers, vehicle.id),
+            }));
 
-                const vehiclePatients = Object.keys(vehicle.patientIds)
-                    .map((id) => patients[id]!)
-                    .map((patient) => ({
-                        ...patient,
-                        visibleStatus: getPatientVisibleStatus(
-                            patient,
-                            configuration.pretriageEnabled,
-                            configuration.bluePatientsEnabled
-                        ),
-                    }));
+        const vehiclePatients = Object.keys(vehicle.patientIds)
+            .map((id) => patients[id]!)
+            .map((patient) => ({
+                ...patient,
+                visibleStatus: getPatientVisibleStatus(
+                    patient,
+                    configuration.pretriageEnabled,
+                    configuration.bluePatientsEnabled
+                ),
+            }));
 
-                return {
-                    vehicle,
-                    personnel: vehiclePersonnel,
-                    patients: vehiclePatients,
-                };
-            })
-        );
-    }
+        return {
+            vehicle,
+            personnel: vehiclePersonnel,
+            patients: vehiclePatients,
+        };
+    });
 
     removeVehicle() {
         this.exerciseService.proposeAction({

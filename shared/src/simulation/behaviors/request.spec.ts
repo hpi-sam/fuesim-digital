@@ -75,12 +75,12 @@ const withOldTime = ['withOldPromises', 'withOldAndNewPromises'] as const;
 // helper functions
 function setupStateAndInteract(
     initializeRequestsAndPromises: (
-        state: WritableDraft<ExerciseState>,
+        state: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => void,
     interaction: (
-        state: WritableDraft<ExerciseState>,
+        state: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => void
@@ -159,7 +159,7 @@ function setupStateAndInteract(
 }
 
 function updateRequestInterval(
-    draftState: WritableDraft<ExerciseState>,
+    draftState: ExerciseState,
     simulatedRegion: WritableDraft<SimulatedRegion>,
     behaviorState: WritableDraft<RequestBehaviorState>
 ) {
@@ -172,7 +172,7 @@ function updateRequestInterval(
 }
 
 function updateRequestTarget(
-    draftState: WritableDraft<ExerciseState>,
+    draftState: ExerciseState,
     simulatedRegion: WritableDraft<SimulatedRegion>,
     behaviorState: WritableDraft<RequestBehaviorState>
 ) {
@@ -201,7 +201,7 @@ function updateRequestTarget(
 }
 
 function updateInvalidationInterval(
-    draftState: WritableDraft<ExerciseState>,
+    draftState: ExerciseState,
     simulatedRegion: WritableDraft<SimulatedRegion>,
     behaviorState: WritableDraft<RequestBehaviorState>
 ) {
@@ -213,13 +213,13 @@ function updateInvalidationInterval(
 // factories
 const addRequestsAndPromises = {
     withoutRequestsAndPromises: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
         // eslint-disable-next-line @typescript-eslint/no-empty-function
     ) => {},
     withRequests: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -230,7 +230,7 @@ const addRequestsAndPromises = {
         );
     },
     withPromises: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -242,7 +242,7 @@ const addRequestsAndPromises = {
         ]);
     },
     withOldPromises: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -251,7 +251,7 @@ const addRequestsAndPromises = {
         ]);
     },
     withOldAndNewPromises: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -264,7 +264,7 @@ const addRequestsAndPromises = {
         ]);
     },
     withRequestsAndEnoughPromises: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -281,7 +281,7 @@ const addRequestsAndPromises = {
         ]);
     },
     withRequestsAndNotEnoughPromises: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -298,7 +298,7 @@ const addRequestsAndPromises = {
         ]);
     },
     withPromiseOfOtherType: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -310,7 +310,7 @@ const addRequestsAndPromises = {
         ]);
     },
     withPromisesOfMultipleTypes: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -329,7 +329,7 @@ const addRequestsAndPromises = {
 
 const sendEvent = {
     resourceRequiredEvent: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -343,7 +343,7 @@ const sendEvent = {
         );
     },
     resourceRequiredEventWithKnownKey: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -357,7 +357,7 @@ const sendEvent = {
         );
     },
     vehiclesSendEvent: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -371,7 +371,7 @@ const sendEvent = {
         );
     },
     ktwVehicleArrivedEvent: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {
@@ -393,7 +393,7 @@ const sendEvent = {
         );
     },
     sendRequestEvent: (
-        draftState: WritableDraft<ExerciseState>,
+        draftState: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<RequestBehaviorState>
     ) => {

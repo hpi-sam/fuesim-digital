@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
 import {
     newTransferVehiclesRequestEvent,
@@ -25,8 +26,8 @@ export const answerRequestsBehaviorStateSchema = z.strictObject({
     requestsHandled: z.int().nonnegative(),
 });
 
-export type AnswerRequestsBehaviorState = z.infer<
-    typeof answerRequestsBehaviorStateSchema
+export type AnswerRequestsBehaviorState = Immutable<
+    z.infer<typeof answerRequestsBehaviorStateSchema>
 >;
 
 export function newAnswerRequestsBehaviorState(): AnswerRequestsBehaviorState {

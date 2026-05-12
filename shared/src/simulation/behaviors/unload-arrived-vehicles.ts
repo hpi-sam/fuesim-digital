@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { addActivity, terminateActivity } from '../activities/utils.js';
 import { nextUUID } from '../utils/randomness.js';
 import { uuid, type UUID, uuidSchema } from '../../utils/uuid.js';
@@ -19,8 +20,8 @@ export const unloadArrivingVehiclesBehaviorStateSchema = z.strictObject({
     unloadDelay: z.int().nonnegative(),
     vehicleActivityMap: z.record(uuidSchema, uuidSchema),
 });
-export type UnloadArrivingVehiclesBehaviorState = z.infer<
-    typeof unloadArrivingVehiclesBehaviorStateSchema
+export type UnloadArrivingVehiclesBehaviorState = Immutable<
+    z.infer<typeof unloadArrivingVehiclesBehaviorStateSchema>
 >;
 
 export function newUnloadArrivingVehiclesBehaviorState(

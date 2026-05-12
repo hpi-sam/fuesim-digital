@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { VehicleResource } from '../../models/utils/rescue-resource.js';
 import { vehicleResourceSchema } from '../../models/utils/rescue-resource.js';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
@@ -11,7 +12,9 @@ export const vehiclesSentEventSchema = z.strictObject({
     destinationTransferPointId: uuidSchema,
     key: z.string().optional(),
 });
-export type VehiclesSentEvent = z.infer<typeof vehiclesSentEventSchema>;
+export type VehiclesSentEvent = Immutable<
+    z.infer<typeof vehiclesSentEventSchema>
+>;
 
 export function newVehiclesSentEvent(
     vehiclesSent: VehicleResource,

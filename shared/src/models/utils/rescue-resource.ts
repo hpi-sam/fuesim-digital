@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { StrictObject } from '../../utils/strict-object.js';
 import {
     type ResourceDescription,
@@ -10,7 +11,7 @@ export const vehicleResourceSchema = z.strictObject({
     vehicleCounts: resourceDescriptionSchema,
 });
 
-export type VehicleResource = z.infer<typeof vehicleResourceSchema>;
+export type VehicleResource = Immutable<z.infer<typeof vehicleResourceSchema>>;
 
 export function newVehicleResource(
     vehicleCounts: ResourceDescription
@@ -23,7 +24,9 @@ export const personnelResourceSchema = z.strictObject({
     personnelCounts: resourceDescriptionSchema,
 });
 
-export type PersonnelResource = z.infer<typeof personnelResourceSchema>;
+export type PersonnelResource = Immutable<
+    z.infer<typeof personnelResourceSchema>
+>;
 
 export function newPersonnelResource(
     personnelCounts: ResourceDescription
@@ -36,8 +39,8 @@ export const exerciseRescueResourceSchema = z.discriminatedUnion('type', [
     personnelResourceSchema,
 ]);
 
-export type ExerciseRescueResource = z.infer<
-    typeof exerciseRescueResourceSchema
+export type ExerciseRescueResource = Immutable<
+    z.infer<typeof exerciseRescueResourceSchema>
 >;
 
 export function isEmptyResource(resource: ExerciseRescueResource) {

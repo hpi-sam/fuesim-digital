@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { alarmGroupSchema } from './alarm-group.js';
 import { clientSchema } from './client.js';
 import { hospitalSchema } from './hospital.js';
@@ -30,4 +31,4 @@ export const elementSchema = z.discriminatedUnion('type', [
     scoutableSchema,
     userGeneratedContentSchema,
 ]);
-export type Element = z.infer<typeof elementSchema>;
+export type Element = Immutable<z.infer<typeof elementSchema>>;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 /**
  * A letter that defines the color of a patient in a patient status.
@@ -10,7 +11,7 @@ import { z } from 'zod';
  */
 const colorCodeAllowedValues = ['V', 'W', 'X', 'Y', 'Z'] as const;
 export const colorCodeSchema = z.literal(colorCodeAllowedValues);
-export type ColorCode = z.infer<typeof colorCodeSchema>;
+export type ColorCode = Immutable<z.infer<typeof colorCodeSchema>>;
 
 /**
  * A letter that defines how a patients changes
@@ -22,18 +23,18 @@ export type ColorCode = z.infer<typeof colorCodeSchema>;
  */
 const behaviourCodeAllowedValues = ['A', 'B', 'C', 'D', 'E'] as const;
 export const behaviourCodeSchema = z.literal(behaviourCodeAllowedValues);
-export type BehaviourCode = z.infer<typeof behaviourCodeSchema>;
+export type BehaviourCode = Immutable<z.infer<typeof behaviourCodeSchema>>;
 
 const patientTagAllowedValues = ['P'] as const;
 export const patientTagSchema = z.literal(patientTagAllowedValues);
-export type PatientTag = z.infer<typeof patientTagSchema>;
+export type PatientTag = Immutable<z.infer<typeof patientTagSchema>>;
 
 export const patientStatusDataFieldSchema = z.strictObject({
     colorCode: colorCodeSchema,
     behaviourCode: behaviourCodeSchema,
 });
-export type PatientStatusDataField = z.infer<
-    typeof patientStatusDataFieldSchema
+export type PatientStatusDataField = Immutable<
+    z.infer<typeof patientStatusDataFieldSchema>
 >;
 
 export function newPatientStatusDataField(
@@ -49,7 +50,9 @@ export const patientStatusCodeSchema = z.strictObject({
     thirdField: patientStatusDataFieldSchema,
     tags: z.array(patientTagSchema),
 });
-export type PatientStatusCode = z.infer<typeof patientStatusCodeSchema>;
+export type PatientStatusCode = Immutable<
+    z.infer<typeof patientStatusCodeSchema>
+>;
 
 export function newPatientStatusCode(code: string) {
     return {

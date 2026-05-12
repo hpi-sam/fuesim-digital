@@ -1,16 +1,15 @@
-import type { WritableDraft } from 'immer';
-import { ExerciseState } from '../state.js';
+import { type WritableDraft } from 'immer';
+import { type ExerciseState } from '../state.js';
+import { newExerciseState } from '../state.js';
 import type { ParticipantKey } from '../exercise-keys.js';
-import {
-    StateExport,
-    type MigratedStateExport,
-} from '../export-import/file-format/state-export.js';
-import { cloneDeepMutable } from '../utils/clone-deep.js';
+import type { MigratedStateExport } from '../export-import/file-format/state-export.js';
+import { StateExport } from '../export-import/file-format/state-export.js';
 import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
 import { PartialExport } from '../export-import/file-format/partial-export.js';
 import { applyAction } from '../store/reduce-exercise-state.js';
 import { ReducerError } from '../store/reducer-error.js';
 import type { UUID } from '../utils/uuid.js';
+import { cloneDeepMutable } from '../utils/clone-deep.js';
 import { migrations } from './migration-functions.js';
 import type { Migration } from './migration-functions.js';
 
@@ -54,11 +53,11 @@ export function migrateStateExport(
 export function migratePartialExport(
     partialExportToMigrate: PartialExport,
     currentState: ExerciseState
-): WritableDraft<PartialExport> {
+): PartialExport {
     // Encapsulate the partial export in a state export and migrate it
     const mutablePartialExport = cloneDeepMutable(partialExportToMigrate);
     const dummyState = cloneDeepMutable(
-        ExerciseState.create('123456' as ParticipantKey)
+        newExerciseState('123456' as ParticipantKey)
     );
     const stateExport = cloneDeepMutable(
         new StateExport({
@@ -129,7 +128,7 @@ export function migratePartialExport(
         vehicleTemplates,
         mapImageTemplates
     );
-    return cloneDeepMutable(migratedPartialExport);
+    return migratedPartialExport;
 }
 
 /**
@@ -159,7 +158,7 @@ export function applyMigrations<
                   | undefined;
     };
 } {
-    const newVersion = ExerciseState.currentStateVersion;
+    const newVersion = currentStateVersion;
 
     const migrationsToApply: Migration[] = [];
     for (let i = currentStateVersion + 1; i <= newVersion; i++) {

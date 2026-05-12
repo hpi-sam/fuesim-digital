@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { newGenerateReportActivityState } from '../activities/generate-report.js';
 import { nextUUID } from '../utils/randomness.js';
 import { addActivity } from '../activities/utils.js';
@@ -26,7 +27,9 @@ export const reportBehaviorStateSchema = z.strictObject({
     reportTransferOfCategoryInMultipleRegionsCompleted: z.boolean(),
 });
 
-export type ReportBehaviorState = z.infer<typeof reportBehaviorStateSchema>;
+export type ReportBehaviorState = Immutable<
+    z.infer<typeof reportBehaviorStateSchema>
+>;
 
 export function newReportBehaviorState(): ReportBehaviorState {
     return {

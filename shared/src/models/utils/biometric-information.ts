@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { sexSchema } from './sex.js';
 
 export const biometricInformationSchema = z.strictObject({
@@ -10,4 +11,6 @@ export const biometricInformationSchema = z.strictObject({
      */
     externalFeatures: z.string(),
 });
-export type BiometricInformation = z.infer<typeof biometricInformationSchema>;
+export type BiometricInformation = Immutable<
+    z.infer<typeof biometricInformationSchema>
+>;

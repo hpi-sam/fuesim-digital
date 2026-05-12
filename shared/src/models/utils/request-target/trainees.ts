@@ -1,4 +1,4 @@
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
 import { cloneDeepMutable } from '../../../utils/clone-deep.js';
 import { newRadiogramUnpublishedStatus } from '../../radiogram/status/radiogram-unpublished-status.js';
@@ -16,8 +16,8 @@ export const traineesRequestTargetConfigurationSchema = z.strictObject({
     ...requestTargetConfigurationSchema.shape,
     type: z.literal('traineesRequestTarget'),
 });
-export type TraineesRequestTargetConfiguration = z.infer<
-    typeof traineesRequestTargetConfigurationSchema
+export type TraineesRequestTargetConfiguration = Immutable<
+    z.infer<typeof traineesRequestTargetConfigurationSchema>
 >;
 
 export function newTraineesRequestTargetConfiguration(): TraineesRequestTargetConfiguration {

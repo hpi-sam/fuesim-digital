@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { Transfer } from '../transfer.js';
 import { transferSchema } from '../transfer.js';
 
@@ -7,7 +8,9 @@ export const transferPositionSchema = z.strictObject({
     transfer: transferSchema,
 });
 
-export type TransferPosition = z.infer<typeof transferPositionSchema>;
+export type TransferPosition = Immutable<
+    z.infer<typeof transferPositionSchema>
+>;
 
 export function newTransferPositionFor(transfer: Transfer): TransferPosition {
     return {

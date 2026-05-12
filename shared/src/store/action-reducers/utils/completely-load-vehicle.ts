@@ -25,7 +25,7 @@ import { getElement } from './get-element.js';
  * @returns `true` if everything is in the vehicle, `false` otherwise
  */
 export function isCompletelyLoaded(
-    draftState: WritableDraft<ExerciseState>,
+    draftState: ExerciseState | WritableDraft<ExerciseState>,
     vehicle: WritableDraft<Vehicle>
 ) {
     const materialsLoaded = Object.keys(vehicle.materialIds).map((materialId) =>

@@ -1,4 +1,5 @@
 import { IsBoolean, IsUUID } from 'class-validator';
+import type { Immutable } from 'immer';
 import { IsValue } from '../../utils/validators/is-value.js';
 import { Action, ActionReducer } from '../action-reducer.js';
 
@@ -22,7 +23,7 @@ export class MakeElementScoutableAction implements Action {
     public readonly type = '[Scoutable] Make scoutable';
 
     @IsZodSchema(scoutableElementSchema)
-    public readonly element!: ScoutableElement;
+    public readonly element!: Immutable<ScoutableElement>;
 
     @IsZodSchema(scoutableSchema)
     public readonly scoutable!: Scoutable;

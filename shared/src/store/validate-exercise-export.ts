@@ -33,9 +33,5 @@ export function validateExerciseExport(
         exportImportClass as Constructor<ExportImportFile>,
         exportImportFile
     );
-    const validationErrors = validateSync(
-        exportImportFileInstance,
-        defaultValidateOptions
-    );
-    return validationErrors;
+    return validateSync(exportImportFileInstance, defaultValidateOptions);
 }

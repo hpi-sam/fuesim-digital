@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import type { Patient, UUID } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import type { Immutable } from 'immer';
 import type { AppState } from '../../../state/app.state';
 import { createSelectPatient } from '../../../state/application/selectors/exercise.selectors';
 
@@ -18,7 +19,7 @@ export class PatientIdentifierComponent implements OnChanges {
 
     readonly patientId = input.required<UUID>();
 
-    patient$!: Observable<Patient>;
+    patient$!: Observable<Immutable<Patient>>;
 
     ngOnChanges(): void {
         this.patient$ = this.store.select(

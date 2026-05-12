@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     transferDestinationTypeSchema,
     type TransferDestination,
@@ -18,7 +19,9 @@ export const requestReceivedEventSchema = z.strictObject({
     transferDestinationId: uuidSchema,
     key: z.string().optional(),
 });
-export type RequestReceivedEvent = z.infer<typeof requestReceivedEventSchema>;
+export type RequestReceivedEvent = Immutable<
+    z.infer<typeof requestReceivedEventSchema>
+>;
 
 export function newRequestReceivedEvent(
     availableVehicles: ResourceDescription,

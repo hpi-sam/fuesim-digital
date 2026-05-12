@@ -111,7 +111,7 @@ async function main() {
             if (e instanceof ValidationErrorWrapper) {
                 console.error(
                     'The validation of the exercises and actions in the database failed:',
-                    util.inspect(e.errors, false, null, true)
+                    util.inspect(e.error, false, null, true)
                 );
                 return;
             } else if (e instanceof ReducerError) {

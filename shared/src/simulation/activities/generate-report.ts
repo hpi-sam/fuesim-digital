@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { ExerciseRadiogram } from '../../models/radiogram/exercise-radiogram.js';
 import { exerciseRadiogramSchema } from '../../models/radiogram/exercise-radiogram.js';
 import { publishRadiogram } from '../../models/radiogram/radiogram-helpers-mutable.js';
@@ -19,8 +20,8 @@ export const generateReportActivityStateSchema = z.strictObject({
     hasSendEvent: z.boolean(),
 });
 
-export type GenerateReportActivityState = z.infer<
-    typeof generateReportActivityStateSchema
+export type GenerateReportActivityState = Immutable<
+    z.infer<typeof generateReportActivityStateSchema>
 >;
 
 export function newGenerateReportActivityState(

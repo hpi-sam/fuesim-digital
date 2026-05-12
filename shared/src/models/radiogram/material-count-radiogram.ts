@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { canCaterForSchema } from '../utils/cater-for.js';
 import type { UUID } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
@@ -9,8 +10,8 @@ export const materialCountRadiogramSchema = z.strictObject({
     type: z.literal('materialCountRadiogram'),
     materialForPatients: canCaterForSchema,
 });
-export type MaterialCountRadiogram = z.infer<
-    typeof materialCountRadiogramSchema
+export type MaterialCountRadiogram = Immutable<
+    z.infer<typeof materialCountRadiogramSchema>
 >;
 
 export function newMaterialCountRadiogram(

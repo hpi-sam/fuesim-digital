@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { scoutableSchema } from './scoutable.js';
 
@@ -8,13 +9,15 @@ export const userGeneratedContentSchema = z.strictObject({
     content: z.string(),
 });
 
-export type UserGeneratedContent = z.infer<typeof userGeneratedContentSchema>;
+export type UserGeneratedContent = Immutable<
+    z.infer<typeof userGeneratedContentSchema>
+>;
 
 export const userGeneratedContentAssignableElementSchema = z.union([
     scoutableSchema,
 ]);
-export type UserGeneratedContentAssignableElement = z.infer<
-    typeof userGeneratedContentAssignableElementSchema
+export type UserGeneratedContentAssignableElement = Immutable<
+    z.infer<typeof userGeneratedContentAssignableElementSchema>
 >;
 
 export type UserGeneratedContentAssignableElementType =

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     newVehicleResource,
     vehicleResourceSchema,
@@ -16,8 +17,8 @@ export const resourceRequestRadiogramSchema = z.strictObject({
     canBeGranted: z.boolean(),
     resourceRequestKey: z.string(),
 });
-export type ResourceRequestRadiogram = z.infer<
-    typeof resourceRequestRadiogramSchema
+export type ResourceRequestRadiogram = Immutable<
+    z.infer<typeof resourceRequestRadiogramSchema>
 >;
 
 export function newResourceRequestRadiogram(

@@ -10,7 +10,7 @@ export const scoutableSchema = z.strictObject({
     userGeneratedContentId: uuidSchema.nullable(),
     isVisibleForParticipants: z.boolean(),
 });
-export type Scoutable = Immutable<z.infer<typeof scoutableSchema>>;
+export type Scoutable = Immutable<Immutable<z.infer<typeof scoutableSchema>>>;
 
 /* When adding a new ElementType (refered to as it) to become a functioning Scoutable element, do the following:
 1) add the scoutableId attribute to its class;
@@ -21,7 +21,9 @@ export type Scoutable = Immutable<z.infer<typeof scoutableSchema>>;
     so refer to the mapImages popup component for a simple implemtation.
 */
 export const scoutableElementSchema = z.union([mapImageSchema, patientSchema]);
-export type ScoutableElement = z.infer<typeof scoutableElementSchema>;
+export type ScoutableElement = Immutable<
+    z.infer<typeof scoutableElementSchema>
+>;
 
 export const scoutableElementKeys = [
     'patient',

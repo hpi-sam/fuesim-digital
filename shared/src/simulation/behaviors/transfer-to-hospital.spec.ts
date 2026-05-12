@@ -37,7 +37,7 @@ const currentTime = 10_000;
 
 function setupStateAndInteract(
     mutateBeforeState?: (
-        state: WritableDraft<ExerciseState>,
+        state: ExerciseState,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<TransferToHospitalBehaviorState>
     ) => void

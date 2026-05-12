@@ -1,4 +1,3 @@
-import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
 import { ExerciseState } from '../../state.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
@@ -12,9 +11,7 @@ import {
 
 const emptyState = ExerciseState.create('123456' as ParticipantKey);
 
-function setupState(
-    mutateBeforeState: (state: WritableDraft<ExerciseState>) => void
-) {
+function setupState(mutateBeforeState: (state: ExerciseState) => void) {
     return produce(emptyState, (draftState) => {
         mutateBeforeState(draftState);
     });
@@ -25,7 +22,7 @@ describe('csv export', () => {
         [
             'red patient',
             [
-                (draftState: WritableDraft<ExerciseState>) => {
+                (draftState: ExerciseState) => {
                     const patient = addPatient(draftState, 'red', 'red');
                     patient.biometricInformation.sex = 'female';
                 },
@@ -40,7 +37,7 @@ describe('csv export', () => {
         [
             'yellow patient',
             [
-                (draftState: WritableDraft<ExerciseState>) => {
+                (draftState: ExerciseState) => {
                     const patient = addPatient(draftState, 'yellow', 'yellow');
                     patient.biometricInformation.sex = 'male';
                     patient.remarks = 'unique_remarks';
@@ -55,7 +52,7 @@ describe('csv export', () => {
         [
             'green patient',
             [
-                (draftState: WritableDraft<ExerciseState>) => {
+                (draftState: ExerciseState) => {
                     const patient = addPatient(draftState, 'green', 'green');
                     patient.biometricInformation.sex = 'diverse';
                     patient.hasTransportPriority = true;
@@ -70,7 +67,7 @@ describe('csv export', () => {
         [
             'blue patient',
             [
-                (draftState: WritableDraft<ExerciseState>) => {
+                (draftState: ExerciseState) => {
                     const patient = addPatient(draftState, 'blue', 'blue');
                     patient.biometricInformation.sex = 'female';
                 },
@@ -82,7 +79,7 @@ describe('csv export', () => {
         [
             'black patient',
             [
-                (draftState: WritableDraft<ExerciseState>) => {
+                (draftState: ExerciseState) => {
                     const patient = addPatient(draftState, 'black', 'black');
                     patient.biometricInformation.sex = 'female';
                 },
@@ -94,7 +91,7 @@ describe('csv export', () => {
         [
             'white patient',
             [
-                (draftState: WritableDraft<ExerciseState>) => {
+                (draftState: ExerciseState) => {
                     const patient = addPatient(draftState, 'white', 'red');
                     patient.biometricInformation.sex = 'female';
                 },
@@ -106,7 +103,7 @@ describe('csv export', () => {
         [
             'red triaged, but real yellow',
             [
-                (draftState: WritableDraft<ExerciseState>) => {
+                (draftState: ExerciseState) => {
                     const patient = addPatient(draftState, 'red', 'yellow');
                     patient.biometricInformation.sex = 'female';
                 },
@@ -143,7 +140,7 @@ describe('csv export', () => {
     });
     it('at least one correct patient in CSV', () => {
         let patient: Patient;
-        const state = setupState((draftState: WritableDraft<ExerciseState>) => {
+        const state = setupState((draftState: ExerciseState) => {
             patient = addPatient(draftState, 'red', 'red');
             patient.identifier = 'xyz';
         });
@@ -153,7 +150,7 @@ describe('csv export', () => {
     });
     it('multiple patients', () => {
         let patients: Patient[] = [];
-        const state = setupState((draftState: WritableDraft<ExerciseState>) => {
+        const state = setupState((draftState: ExerciseState) => {
             patients = [
                 addPatient(draftState, 'red', 'red'),
                 addPatient(draftState, 'yellow', 'yellow'),

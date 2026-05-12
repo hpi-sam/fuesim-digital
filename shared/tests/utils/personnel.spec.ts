@@ -1,4 +1,3 @@
-import type { WritableDraft } from 'immer';
 import type { Personnel } from '../../src/models/personnel.js';
 import type { ExerciseState } from '../../src/state.js';
 import { cloneDeepMutable } from '../../src/utils/clone-deep.js';
@@ -8,10 +7,7 @@ import {
 } from '../../src/models/utils/position/position-helpers.js';
 import { SpatialTree } from '../../src/models/utils/spatial-tree.js';
 
-export function addPersonnel(
-    state: WritableDraft<ExerciseState>,
-    personnel: Personnel
-) {
+export function addPersonnel(state: ExerciseState, personnel: Personnel) {
     const mutablePersonnel = cloneDeepMutable(personnel);
     if (isOnMap(mutablePersonnel)) {
         SpatialTree.addElement(

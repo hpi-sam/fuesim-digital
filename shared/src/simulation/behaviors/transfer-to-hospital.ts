@@ -1,5 +1,5 @@
 import { difference, groupBy } from 'lodash-es';
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
 import { z } from 'zod';
 import type { Patient } from '../../models/patient.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
@@ -37,8 +37,8 @@ export const transferToHospitalBehaviorStateSchema = z.strictObject({
         z.int().nonnegative()
     ),
 });
-export type TransferToHospitalBehaviorState = z.infer<
-    typeof transferToHospitalBehaviorStateSchema
+export type TransferToHospitalBehaviorState = Immutable<
+    z.infer<typeof transferToHospitalBehaviorStateSchema>
 >;
 
 export function newTransferToHospitalBehaviorState(): TransferToHospitalBehaviorState {
@@ -250,7 +250,10 @@ function getOwnPatients(
     );
 }
 
-function getVisiblePatientStatus(patient: Patient, state: ExerciseState) {
+function getVisiblePatientStatus(
+    patient: Patient,
+    state: ExerciseState | WritableDraft<ExerciseState>
+) {
     return getPatientVisibleStatus(
         patient,
         state.configuration.pretriageEnabled,

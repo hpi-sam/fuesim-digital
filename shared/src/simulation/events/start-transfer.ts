@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import type { TransferDestination } from '../utils/transfer-destination.js';
 import { transferDestinationTypeSchema } from '../utils/transfer-destination.js';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
@@ -18,7 +19,9 @@ export const startTransferEventSchema = z.strictObject({
     successorOccupation: exerciseOccupationSchema.optional(),
 });
 
-export type StartTransferEvent = z.infer<typeof startTransferEventSchema>;
+export type StartTransferEvent = Immutable<
+    z.infer<typeof startTransferEventSchema>
+>;
 
 export function newStartTransferEvent(
     vehicleId: UUID,

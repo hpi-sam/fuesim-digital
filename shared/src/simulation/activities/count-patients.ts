@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { groupBy } from 'lodash-es';
+import type { Immutable } from 'immer';
 import { isInSpecificSimulatedRegion } from '../../models/utils/position/position-helpers.js';
 import { getPatientVisibleStatus } from '../../models/patient.js';
 import { sendSimulationEvent } from '../events/utils.js';
@@ -18,8 +19,8 @@ export const countPatientsActivityStateSchema = z.strictObject({
     ...simulationActivityStateSchema.shape,
     type: z.literal('countPatientsActivity'),
 });
-export type CountPatientsActivityState = z.infer<
-    typeof countPatientsActivityStateSchema
+export type CountPatientsActivityState = Immutable<
+    z.infer<typeof countPatientsActivityStateSchema>
 >;
 
 export function newCountPatientsActivityState(

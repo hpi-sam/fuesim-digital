@@ -1,4 +1,4 @@
-# 23 Übungselemente
+# 2.3. Übungselemente
 
 Mit Übungselementen sind all jene Objekte gemeint, die im Laufe einer Übung durch die Teilnehmenden direkt oder indirekt verwaltet oder betrachtet werden. Ein Großteil ist auf der Übungskarte zu sehen.
 
@@ -22,17 +22,19 @@ Im Einstellungs-Popup kann einer Ansicht ein Name zugewiesen werden.
 
 Bei Übungen werden Ansichten üblicherweise genutzt, um Abschnitte darzustellen, in denen ein Teilnehmender als Führungskraft die Verantwortung übernehmen soll.
 
-Bei der [Verwaltung der Übungsteilnehmenden](https://outline.jonathanweth.de./24%20Durchf%C3%BChrung.md#h-teilnehmerubersicht) kann den Teilnehmenden jeweils eine Ansicht zugewiesen werden, über deren Grenzen sie dann während der Übung nicht hinaus scrollen oder zoomen können. Auch in den [Statistiken](https://outline.jonathanweth.de./25%20Auswertung.md#h-statistik) lassen sich die Patienten-, Fahrzeug- und Personalzahlen nach Ansicht filtern. 
+Bei der [Verwaltung der Übungsteilnehmenden](4_conduction.md#teilnehmende-verwalten) kann den Teilnehmenden jeweils eine Ansicht zugewiesen werden, über deren Grenzen sie dann während der Übung nicht hinaus scrollen oder zoomen können. Auch in den [Statistiken](5_evaluation.md#statistiken) lassen sich die Patienten-, Fahrzeug- und Personalzahlen nach Ansicht filtern. 
 
-> \[!TIP\]\nFür Übungsleitende wird die Karte standardmäßig auf die platzierten Ansichten zentriert. Wenn Übungselemente außerhalb der von Teilnehmenden bespielten Ansichten platziert werden, kann es sich für Übungsleitende daher lohnen, zusätzliche Ansichten um diese Elemente oder um die relevante Übungsfläche als ganzes zu ziehen.
+> [!TIP]
+> Für Übungsleitende wird die Karte standardmäßig auf die platzierten Ansichten zentriert. Wenn Übungselemente außerhalb der von Teilnehmenden bespielten Ansichten platziert werden, kann es sich für Übungsleitende daher lohnen, zusätzliche Ansichten um diese Elemente oder um die relevante Übungsfläche als ganzes zu ziehen.
 
-> \[!TIP\]\nWenn eine Übung einen größeren Einsatz mit einer mehrstufigen Hierarchie abgebildet wird, sollten auch für die Zwischenebenen Ansichten angelegt werden, um z. B. die Patienten und anwesenden Einsatzkräfte auf allen Ebenen statistisch auszuwerten.
+> [!TIP]
+> Wenn eine Übung einen größeren Einsatz mit einer mehrstufigen Hierarchie abgebildet wird, sollten auch für die Zwischenebenen Ansichten angelegt werden, um z. B. die Patienten und anwesenden Einsatzkräfte auf allen Ebenen statistisch auszuwerten.
 
 ## Transferpunkte
 
 <<TODO Screenshot Transferpunkt mit Konfigurations-Popup>>
 
-Transferpunkte sind ovale Punkte auf der Karte, die mit einem blauen Rahmen und einem blauen Mittelstreifen gekennzeichnet sind. Sie markieren für Übungsteilnehmende die Eintreff- und Abfahrtspunkte von [Einsatzkräften](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-fahrzeuge-mit-personal-und-material). 
+Transferpunkte sind ovale Punkte auf der Karte, die mit einem blauen Rahmen und einem blauen Mittelstreifen gekennzeichnet sind. Sie markieren für Übungsteilnehmende die Eintreff- und Abfahrtspunkte von [Einsatzkräften](#fahrzeuge-mit-personal-und-material). 
 
 ### Interaktion auf der Übungskarte
 
@@ -40,19 +42,21 @@ Transferpunkte können im Editor platziert und anschließend von Übungsleitende
 
 In der Übungsleitungsansicht werden standardmäßig Verbindungslinien zwischen verbundenen Transferpunkten angezeigt (siehe Einstellungsmöglichkeiten). Diese sind für Teilnehmende nicht sichtbar. Sie können im Editor aktiviert oder deaktiviert werden. 
 
-Teilnehmende interagieren mit Transferpunkten, indem sie einzelne [Fahrzeuge oder Personal](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-fahrzeuge-mit-personal-und-material) auf die Punkte ziehen und anschließend aus einer Auswahlliste das designierte Transferziel auswählen.
+Teilnehmende interagieren mit Transferpunkten, indem sie einzelne [Fahrzeuge oder Personal](#fahrzeuge-mit-personal-und-material) auf die Punkte ziehen und anschließend aus einer Auswahlliste das designierte Transferziel auswählen.
 
 ### Einstellungsmöglichkeiten
 
 Im Einstellungs-Popup kann im Tab "Namen" für jeden Transferpunkt ein interner und ein externer Name festgelegt werden. Der interne Name wird auf der Karte angezeigt und darf daher nur 16 Zeichen lang sein. Der externe Name wird bei anderen Transferpunkten angezeigt, wenn Einsatzkräfte dorthin geschickt werden. Im Tab "Transferpunkte" des Einstellungs-Popups kann angegeben werden, zu welchen anderen Transferpunkten eine Verbindung besteht und wie viele Minuten der Transfer dauert. Die Zeitangabe wirkt in beide Richtungen. Im Tab "Krankenhäuser" können verbundene Krankenhäuser ausgewählt werden.
 
-> \[!TIP\]\nDer interne Name sollte so gewählt werden, dass es der Funktion für Übungsteilnehmende entspricht. z. B. "Neue Kräfte" (wenn dort alarmiertes Personal ankommt), "von/nach Süden" (wenn darüber Transferpunkte in der entsprechenden Richtung angebunden sind) oder "Krankenhäuser" (wenn darüber Krankenhäuser angebunden sind)
+> [!TIP]
+> Der interne Name sollte so gewählt werden, dass es der Funktion für Übungsteilnehmende entspricht. z. B. "Neue Kräfte" (wenn dort alarmiertes Personal ankommt), "von/nach Süden" (wenn darüber Transferpunkte in der entsprechenden Richtung angebunden sind) oder "Krankenhäuser" (wenn darüber Krankenhäuser angebunden sind)
 
-> \[!TIP\]\nDer externe Name sollte dem Standort des Transferpunktes entsprechen, also z. B. dem Namen der Ansicht, in der sich der Transferpunkt befinden (z. B. "Abschnitt Nord").
+> [!TIP]
+> Der externe Name sollte dem Standort des Transferpunktes entsprechen, also z. B. dem Namen der Ansicht, in der sich der Transferpunkt befinden (z. B. "Abschnitt Nord").
 
 ### Nutzung in Übungen
 
-Transferpunkte können als Eintreffpunkte für Kräfte dienen, die über die [Leitstelle](https://outline.jonathanweth.de./24%20Durchf%C3%BChrung.md#h-leitstelle) alarmiert wurden. Wenn Transferpunkte untereinander verbunden sind, können über sie Kräfte zwischen verschiedenen Orten in der Übung verschoben werden, was eine gewisse Zeit in Anspruch nimmt (siehe [Transferübersicht](https://outline.jonathanweth.de./24%20Durchf%C3%BChrung.md#h-transferubersicht)). Dazu müssen Teilnehmende oder Übungsleitende ein Fahrzeug oder Personal auf den Ausgangs-Transferpunkt verschieben; es taucht dann entsprechend verzögert am anderen Transferpunkt wieder auf. Zuletzt können Fahrzeuge von Transferpunkten zu einem verbundenen Krankenhaus geschickt werden.
+Transferpunkte können als Eintreffpunkte für Kräfte dienen, die über die [Leitstelle](4_conduction.md#alarmierungen) alarmiert wurden. Wenn Transferpunkte untereinander verbunden sind, können über sie Kräfte zwischen verschiedenen Orten in der Übung verschoben werden, was eine gewisse Zeit in Anspruch nimmt (siehe [Transferübersicht](4_conduction.md#transfers-verwalten)). Dazu müssen Teilnehmende oder Übungsleitende ein Fahrzeug oder Personal auf den Ausgangs-Transferpunkt verschieben; es taucht dann entsprechend verzögert am anderen Transferpunkt wieder auf. Zuletzt können Fahrzeuge von Transferpunkten zu einem verbundenen Krankenhaus geschickt werden.
 
 ## Zonen
 
@@ -76,13 +80,14 @@ Sofern es entsprechend eingestellt ist, wird zu einer Zone den Teilnehmenden die
 
 Zusätzlich wird die Kapazitätsbeschränkung durchgehend überprüft. Wenn Fahrzeuge, die verboten oder über der erlaubten Kapazität sind, in einen Bereich verschoben werden sollen, schlägt das fehl und das Fahrzeug wird an den Ausgangspunkt zurückgeschoben.
 
-> \[!WARNING\]\nDie Beschränkungen der Zone gelten nur für das Verschieben von Fahrzeugen auf der Karte. Das heißt, wenn sich ein Transferpunkt auf einer Zone befindet und ein Fahrzeug an dem Transferpunkt ankommt, welches eigentlich nicht erlaubt ist oder die Kapazität überschreitet, erscheint es trotzdem in der Zone.
+> [!WARNING]
+> Die Beschränkungen der Zone gelten nur für das Verschieben von Fahrzeugen auf der Karte. Das heißt, wenn sich ein Transferpunkt auf einer Zone befindet und ein Fahrzeug an dem Transferpunkt ankommt, welches eigentlich nicht erlaubt ist oder die Kapazität überschreitet, erscheint es trotzdem in der Zone.
 
 ## Fahrzeuge (mit Personal und Material)
 
 <<TODO Fahrzeug mit Personal und Material und Spieler-Popup>>
 
-Fahrzeuge sind die wichtigste taktische Einheit, die in der FüSim Digital von den Teilnehmenden verwaltet wird. Fahrzeuge beinhalten Personal und Materialien. Fahrzeuge können auf der Karte platziert, aber vor allem auch über [Alarmgruppen](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-alarmierungsgruppe) in den Einsatz geschickt werden.
+Fahrzeuge sind die wichtigste taktische Einheit, die in der FüSim Digital von den Teilnehmenden verwaltet wird. Fahrzeuge beinhalten Personal und Materialien. Fahrzeuge können auf der Karte platziert, aber vor allem auch über [Alarmgruppen](#alarmierungsgruppen) in den Einsatz geschickt werden.
 
 ### Interaktion auf der Übungskarte
 
@@ -92,9 +97,10 @@ Fahrzeuge und ausgestiegenes Personal können von Teilnehmenden und Übungsleite
 
 Mit einem Klick auf das Fahrzeug öffnet sich ein Popup, in dem das Personal und die Patienten im Fahrzeug aufgelistet werden. Teilnehmende haben einen Button "Alle aussteigen", mit dem Personal, Material und Patienten das Fahrzeug verlassen. Für Übungsleitende gibt es einen zusätzlichen Button "Alle einsteigen", um das Personal und Material mit einem Klick wieder "an Bord" zu holen.
 
-Das ausgestiegene Personal und Material können auf der Karte gleichermaßen per Drag-and-Drop bewegt werden. Wenn es in der Nähe von [Patienten](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-patient) platziert wird, erscheint eine Verbindungslinie, um die Behandlungszuordnung darzustellen. Mit einem Klick auf das Personal oder Material sehen Teilnehmende zudem in einem Pop-up die möglichen Behandlungskapazitäten.
+Das ausgestiegene Personal und Material können auf der Karte gleichermaßen per Drag-and-Drop bewegt werden. Wenn es in der Nähe von [Patienten](#patienten) platziert wird, erscheint eine Verbindungslinie, um die Behandlungszuordnung darzustellen. Mit einem Klick auf das Personal oder Material sehen Teilnehmende zudem in einem Pop-up die möglichen Behandlungskapazitäten.
 
-> \[!WARNING\]\nEs gibt keine automatischen Kontrollmechanismen für die Bewegung von Fahrzeugen, Personal und Material in der Übung. Das heißt, sofern keine [Zone](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-zonen) eingerichtet wurde, können sie auch auf Bereiche der Karte bewegt werden, die in der realen Welt unerreichbar wären (z. B. auf Hausdächer). Gleichermaßen können Fahrzeuge zudem auch dann bewegt werden, wenn kein Personal als Kraftfahrer an Bord ist.
+> [!WARNING]
+> Es gibt keine automatischen Kontrollmechanismen für die Bewegung von Fahrzeugen, Personal und Material in der Übung. Das heißt, sofern keine [Zone](#zonen) eingerichtet wurde, können sie auch auf Bereiche der Karte bewegt werden, die in der realen Welt unerreichbar wären (z. B. auf Hausdächer). Gleichermaßen können Fahrzeuge zudem auch dann bewegt werden, wenn kein Personal als Kraftfahrer an Bord ist.
 
 ### Einstellungsmöglichkeiten
 
@@ -112,7 +118,8 @@ Am unteren Rand des Bearbeitungsfenster befindet sich ein Button zum "Hinzufüge
 
 Nach dem Platzieren auf der Karte können Übungsleitende nur den Namen des Fahrzeugs noch anpassen; alle anderen Einstellungen sind wie oben genannt auf Ebene der Vorlage zu treffen.
 
-> \[!WARNING\]\nÄnderungen an Fahrzeugvorlagen wirken nur für die Zukunft. Fahrzeuge, die zum Zeitpunkt der Änderung bereits auf der Karte platziert wurden, bleiben unverändert. 
+> [!WARNING]
+> Änderungen an Fahrzeugvorlagen wirken nur für die Zukunft. Fahrzeuge, die zum Zeitpunkt der Änderung bereits auf der Karte platziert wurden, bleiben unverändert. 
 
 ### Nutzung in Übungen
 
@@ -120,7 +127,7 @@ Fahrzeuge sind die wichtigste taktische Einheit in der FüSim Digital.
 
 Fahrzeuge, die manuell auf der Karte platziert sind, stellen Kräfte dar, die bei Übungsbeginn (entspricht der Übernahme der Führung durch die Teilnehmenden) bereits vor Ort sind. Dabei handelt es sich typischerweise um ersteintreffende Einsatzmittel, die verstreut und noch ohne zentrale Taktik arbeiten.
 
-Da FüSim Digital Übungen meistens die Frühphase eines Einsatzes umfassen, wo das Nachalarmieren von Einsatzkräften ein wichtiges Lernziel ist, werden die meisten Fahrzeuge in [Alarmgruppen](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-alarmierungsgruppe) hinterlegt und über diese durch die Leitstelle in den Einsatz geschickt.
+Da FüSim Digital Übungen meistens die Frühphase eines Einsatzes umfassen, wo das Nachalarmieren von Einsatzkräften ein wichtiges Lernziel ist, werden die meisten Fahrzeuge in [Alarmgruppen](#alarmierungsgruppen) hinterlegt und über diese durch die Leitstelle in den Einsatz geschickt.
 
 ## Patienten
 
@@ -132,15 +139,16 @@ Die Behandlung von Patienten ist die zentrale Herausforderung in einer MANV-Lage
 
 Übungsleitende können Patienten aus dem Editor heraus auf der Karte platzieren. Sowohl Übungsleitende als auch Teilnehmende können Patienten per Drag-and-Drop auf der Karte verschieben.
 
-Das Patientensymbol auf der Karte zeigt, ob ein Patient gehfähig ist (stehendes Icon) oder nicht (liegendes Icon). Zusätzlich zeigt ein Punkt in der Mitte die aktuelle Sichtungsfarbe an. Wenn [Personal und Material](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-fahrzeuge-mit-personal-und-material) neben einen Patienten geschoben werden, erscheinen Verbindungslinien, die anzeigen, welches medizinische Personal welchen Patienten aktuell behandelt. 
+Das Patientensymbol auf der Karte zeigt, ob ein Patient gehfähig ist (stehendes Icon) oder nicht (liegendes Icon). Zusätzlich zeigt ein Punkt in der Mitte die aktuelle Sichtungsfarbe an. Wenn [Personal und Material](#fahrzeuge-mit-personal-und-material) neben einen Patienten geschoben werden, erscheinen Verbindungslinien, die anzeigen, welches medizinische Personal welchen Patienten aktuell behandelt. 
 
 Teilnehmende sehen, wenn sie Patienten anklicken, ein Pop-up mit der Patienten-ID und dem Sichtungsstatus in der Überschrift sowie vier Tabs für den Inhalt. Im Tab "Allgemein" sind die Stammdaten (ID, Name, Alter, Geschlecht, Anschrift, Biometrie) sowie ein Feld für Anmerkungen zu finden, das durch die Teilnehmenden ausgefüllt werden kann. Im Tab "Vorsichtung" sind medizinische Informationen sowie ein Auswahlmenü zu finden, in dem eine Sichtungskategorie ausgewählt und Patienten als Transportpriorität markiert werden können. Im Tab "QR-Code" ist ein QR-Code zu sehen, der standardmäßig die Patienten-ID repräsentiert. Der als QR-Code angezeigte Text kann manuell überschrieben werden. Im Tab „Erkundung" können Übungsleitende zusätzliche Informationen hinterlegen, die Teilnehmende dann während der Übung aufrufen können. Die Patienten erhalten dann ein zusätzliches Sprechblasen-Symbol, welches das Vorhandensein von Erkundungsinformationen kennzeichnet.
 
-Übungsleitende sehen ein identisches Popup, wobei im Tab "Allgemein" zusätzlich als "Beschreibung" der zu erwartende medizinische Verlauf mit einigen Icons angezeigt wird (quasi die "Musterlösung", siehe [Einstellungsmöglichkeiten](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-einstellungsmoglichkeiten-4)).
+Übungsleitende sehen ein identisches Popup, wobei im Tab "Allgemein" zusätzlich als "Beschreibung" der zu erwartende medizinische Verlauf mit einigen Icons angezeigt wird (quasi die "Musterlösung", siehe [Einstellungsmöglichkeiten](#einstellungsmoglichkeiten-4)).
 
 ### Einstellungsmöglichkeiten
 
-> \[!IMPORTANT\]\nPatienten können in der FüSim Digital derzeit nicht bearbeitet werden.
+> [!IMPORTANT]
+> Patienten können in der FüSim Digital derzeit nicht bearbeitet werden.
 
 Die Patienten sind in der FüSim nach medizinischem Verlauf sortiert, wobei der Verlauf immer durch eine Folge von drei Icons gekennzeichnet wird:
 
@@ -201,37 +209,40 @@ Es ist auch möglich, ein großes Bild als Hintergrund für eine Übung zu verwe
 
 <<TODO Screenshot>>
 
-Krankenhäuser können in der FüSim Digital als mögliche Transportziele für den Abtransport von [Patienten](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-patienten) hinterlegt werden.
+Krankenhäuser können in der FüSim Digital als mögliche Transportziele für den Abtransport von [Patienten](#patienten) hinterlegt werden.
 
 ### Einstellungsmöglichkeiten
 
-Krankenhäuser werden im Fenster "Krankenhäuser" erstellt, das von Übungsleitenden im [Hauptmenü in der unteren Menüleiste](https://outline.jonathanweth.de/doc/22-ansichten-Say3tcwyfv#h-konfigurations-und-ubersichtsfenster-nur-in-ubungsleitenden-ansicht) in der Kategorie "Erstellung" aufgerufen werden kann.
+Krankenhäuser werden im Fenster "Krankenhäuser" erstellt, das von Übungsleitenden im [Hauptmenü in der unteren Menüleiste](2_user_interfaces.md#konfigurations-und-ubersichtsfenster-nur-in-ubungsleitenden-ansicht) in der Kategorie "Erstellung" aufgerufen werden kann.
 
 In dem Fenster können in einer Liste Krankenhäuser mit Namen und einer Transportzeit angelegt werden. Alle Namen und Zeiten können nachträglich angepasst werden; neu erstellte Krankenhäuser können wieder gelöscht werden.
 
-> \[!IMPORTANT\]\nDa für bestimmte Aspekte der [simulierten Bereiche](https://outline.jonathanweth.de./../3%20Simulation.md) mindestens ein Krankenhaus erforderlich ist, kann das erste Krankenhaus in der Liste nicht gelöscht werden. 
+> [!IMPORTANT]
+> Da für bestimmte Aspekte der [simulierten Bereiche](../3_simulation/index.md) mindestens ein Krankenhaus erforderlich ist, kann das erste Krankenhaus in der Liste nicht gelöscht werden. 
 
 ### Nutzung in Übungen
 
-Wenn es für das Übungsziel dienlich ist, kann eine große Anzahl von Krankenhäusern angelegt werden. Im [Statistik](https://outline.jonathanweth.de./25%20Auswertung.md#h-statistik)-Fenster wird dann die Transferzeit genutzt, um die Ankunftszeiten im jeweiligen Krankenhaus auszuwerten.
+Wenn es für das Übungsziel dienlich ist, kann eine große Anzahl von Krankenhäusern angelegt werden. Im [Statistik](5_evaluation.md#statistiken)-Fenster wird dann die Transferzeit genutzt, um die Ankunftszeiten im jeweiligen Krankenhaus auszuwerten.
 
-In einer Übung können Krankenhäuser als Ziel bei einem [Transferpunkt](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-transferpunkte) hinterlegt werden. 
+In einer Übung können Krankenhäuser als Ziel bei einem [Transferpunkt](#transferpunkte) hinterlegt werden. 
 
-> \[!TIP\]\nZu einem Krankenhaus geschickte Fahrzeuge sind permanent aus der Übung entfernt. Es wird daher empfohlen, nicht den selben Transferpunkt für Transfers an der Einsatzstelle und zu Krankenhäusern zu nutzen.
+> [!TIP]
+> Zu einem Krankenhaus geschickte Fahrzeuge sind permanent aus der Übung entfernt. Es wird daher empfohlen, nicht den selben Transferpunkt für Transfers an der Einsatzstelle und zu Krankenhäusern zu nutzen.
 
 Übende können einen Patiententransport in ein Krankenhaus auslösen, indem sie ein Fahrzeug mit einem eingeladenen Patienten per Drag-and-Drop auf einen entsprechend verknüpften Transferpunkt ziehen und anschließend den Transport beauftragen.
 
-> \[!WARNING\]\nAuch Fahrzeuge *ohne* Patient können ins Krankenhaus geschickt werden und sind dann nicht mehr verfügbar. Es sollte darauf geachtet werden, das das nicht aus versehen passiert.
+> [!WARNING]
+> Auch Fahrzeuge *ohne* Patient können ins Krankenhaus geschickt werden und sind dann nicht mehr verfügbar. Es sollte darauf geachtet werden, das das nicht aus versehen passiert.
 
-## Alarmierungsgruppe
+## Alarmierungsgruppen
 
 <<TODO Screenshot>>
 
-Über Alarmierungsgruppen werden in Übungen [Einsatzmittel (Fahrzeuge)](https://outline.jonathanweth.de/doc/23-ubungselemente-Vui2CqCp9T#h-fahrzeuge-mit-personal-und-material) in strukturiertem Rahmen dem Einsatzort zugeführt. 
+Über Alarmierungsgruppen werden in Übungen [Einsatzmittel (Fahrzeuge)](#fahrzeuge-mit-personal-und-material) in strukturiertem Rahmen dem Einsatzort zugeführt. 
 
 ### Einstellungsmöglichkeiten
 
-Alarmierungsgruppen werden im Fenster "Alarmierungsgruppen" erstellt, das von Übungsleitenden im [Hauptmenü in der unteren Menüleiste](https://outline.jonathanweth.de/doc/22-ansichten-Say3tcwyfv#h-konfigurations-und-ubersichtsfenster-nur-in-ubungsleitenden-ansicht) in der Kategorie "Erstellung" aufgerufen werden kann.
+Alarmierungsgruppen werden im Fenster "Alarmierungsgruppen" erstellt, das von Übungsleitenden im [Hauptmenü in der unteren Menüleiste](2_user_interfaces.md#konfigurations-und-ubersichtsfenster-nur-in-ubungsleitenden-ansicht) in der Kategorie "Erstellung" aufgerufen werden kann.
 
 In dem Fenster können neue Alarmierungsgruppen hinzugefügt sowie wieder gelöscht werden. Jeder Gruppe kann ein individueller Name zugewiesen werden (standardmäßig "???"). Mit einem Klick auf das entsprechende Häkchen kann zudem ein Limit für die maximale Anzahl an Auslösungen festgelegt werden, wodurch sich versehentliche Doppelarmierungen vermeiden lassen. 
 
@@ -245,6 +256,6 @@ Typische Alarmgruppen für generische MANV-Übungen sind beispielsweise "MANV-10
 
 Alternativ ist es möglich, mit Alarmgruppen sehr konkret die Stichwörter der örtlichen Alarm- und Ausrückeordnung nachzubilden. Dabei ist zu beachten, dass, je kleinteiliger die Stichwörter sind, desto stärker die Eintreffzeiten an den jeweiligen Einsatzort angepasst werden müssen. Eine Wiederverwendung an einem anderen Ort im selben Leitstellengebiet ist somit ohne Mehraufwand nicht möglich.
 
-In beiden hier beschriebenen Anwendungen sollten die Alarmgruppen auf eine Auslösung begrenzt werden. Das gilt insbesondere für die [von Teilnehmenden verwaltete Leitstelle](https://outline.jonathanweth.de/doc/22-ansichten-Say3tcwyfv#h-leistellenansicht-fur-teilnehmende). Wenn die örtliche Alarm- und Ausrückeordnung mehrfach alarmierbare Module umfasst, sollten jeweils mehrere Alarmierungsgruppen für "xxx (erster Alarm)", "xxx (zweiter Alarm)", etc. angelegt werden, um den zunehmend langen Anfahrtswegen Rechnung zu tragen.
+In beiden hier beschriebenen Anwendungen sollten die Alarmgruppen auf eine Auslösung begrenzt werden. Das gilt insbesondere für die [von Teilnehmenden verwaltete Leitstelle](2_user_interfaces.md#leistellenansicht-fur-teilnehmende). Wenn die örtliche Alarm- und Ausrückeordnung mehrfach alarmierbare Module umfasst, sollten jeweils mehrere Alarmierungsgruppen für "xxx (erster Alarm)", "xxx (zweiter Alarm)", etc. angelegt werden, um den zunehmend langen Anfahrtswegen Rechnung zu tragen.
 
 Alarmgruppen ohne Auslösungsbeschränkung oder mit einer hohen Anzahl möglicher Auslösungen sind beispielsweise für Szenarien sinnvoll, in denen mit Alarmgruppen das Nachfordern von Kräften aus einem voll besetzten Bereitstellungsraum abgebildet wird.

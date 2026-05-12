@@ -47,25 +47,25 @@ export class SimulatedRegionOverviewVehicleDetailsComponent {
         const vehicle = this.vehicle();
         if (!vehicle) return null;
 
-        const personnel = this.store.selectSignal(selectPersonnel);
-        const patients = this.store.selectSignal(selectPatients);
-        const configuration = this.store.selectSignal(selectConfiguration);
+        const personnel = this.store.selectSignal(selectPersonnel)();
+        const patients = this.store.selectSignal(selectPatients)();
+        const configuration = this.store.selectSignal(selectConfiguration)();
 
         const vehiclePersonnel = Object.keys(vehicle.personnelIds)
-            .map((id) => personnel()[id]!)
+            .map((id) => personnel[id]!)
             .map((pers) => ({
                 ...pers,
                 isInVehicle: isInSpecificVehicle(pers, vehicle.id),
             }));
 
         const vehiclePatients = Object.keys(vehicle.patientIds)
-            .map((id) => patients()[id]!)
+            .map((id) => patients[id]!)
             .map((patient) => ({
                 ...patient,
                 visibleStatus: getPatientVisibleStatus(
                     patient,
-                    configuration().pretriageEnabled,
-                    configuration().bluePatientsEnabled
+                    configuration.pretriageEnabled,
+                    configuration.bluePatientsEnabled
                 ),
             }));
 

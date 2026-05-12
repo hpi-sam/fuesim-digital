@@ -20,8 +20,8 @@ export class OperationsVehiclesComponent {
         selectVehiclesInTransfer
     );
 
-    public readonly vehiclesOnLocation = computed(() =>
-        Object.values(this.store.selectSignal(selectVehiclesOnLocation))
+    public readonly vehiclesOnLocation = this.store.selectSignal(
+        selectVehiclesOnLocation
     );
 
     public readonly alarmGroupVehiclesInTransfer = computed(() =>

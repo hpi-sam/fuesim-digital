@@ -16,9 +16,7 @@ export class VehiclesOnLocationComponent {
     private readonly store = inject(Store<AppState>);
 
     public readonly vehiclesOnLocation = computed(() => {
-        const data = Object.values(
-            this.store.selectSignal(selectVehiclesOnLocation)
-        );
+        const data = this.store.selectSignal(selectVehiclesOnLocation)();
         return data.filter((vehicle) => vehicle.operationalAssignment === null);
     });
 

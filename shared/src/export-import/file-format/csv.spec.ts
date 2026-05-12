@@ -10,6 +10,7 @@ import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates
 import { coordinateStringToNumber } from '../../utils/string-coordinates.js';
 import { newNoPosition } from '../../models/utils/position/no-position.js';
 import { defaultViewportSize, newViewport } from '../../models/viewport.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import {
     exportPatientsToCSV,
     patientsCsvExportColumns,
@@ -233,8 +234,7 @@ describe('csv export', () => {
             expect(exportedPatient.doctorEscort).toBe('');
             expect(exportedPatient.patientTray).toBe('');
 
-            for (const key of Object.keys(expectedState)) {
-                // @ts-expect-error: string
+            for (const key of TypeAssertedObject.keys(expectedState)) {
                 expect(exportedPatient[key]).toBe(expectedState[key]);
             }
         });

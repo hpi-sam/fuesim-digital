@@ -1,6 +1,6 @@
 import './utils/dotenv-config.js';
 import dotenv from 'dotenv';
-import { bool, cleanEnv, makeValidator, num, str, url } from 'envalid';
+import { bool, cleanEnv, makeValidator, str, url } from 'envalid';
 
 export class Config {
     private static _websocketPort?: number;
@@ -11,7 +11,7 @@ export class Config {
 
     private static _httpFrontendUrl?: string;
 
-    private static _uploadLimit?: number;
+    private static _uploadLimit?: string;
 
     private static _useDb?: boolean;
 
@@ -61,7 +61,7 @@ export class Config {
         return this._httpFrontendUrl!;
     }
 
-    public static get uploadLimit(): number {
+    public static get uploadLimit(): string {
         this.throwIfNotInitialized();
         return this._uploadLimit!;
     }
@@ -167,7 +167,7 @@ export class Config {
             DFM_HTTP_FRONTEND_URL_TESTING: url({
                 default: 'http://localhost:14200',
             }),
-            DFM_UPLOAD_LIMIT: num({ default: 200 }),
+            DFM_UPLOAD_LIMIT: str({ default: '200m' }),
             DFM_USE_DB: bool(),
             DFM_USE_DB_TESTING: bool({ default: undefined }),
             DFM_DB_USER: str(

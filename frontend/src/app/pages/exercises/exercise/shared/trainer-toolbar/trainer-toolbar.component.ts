@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
     NgbModal,
@@ -57,6 +57,10 @@ export class TrainerToolbarComponent {
     private readonly messageService = inject(MessageService);
 
     public exerciseStatus$ = this.store.select(selectExerciseStatus);
+
+    public readonly isTemplate = computed<boolean>(
+        () => !!this.exerciseService.additionalExerciseMeta()?.exerciseTemplate
+    );
 
     public openClientsModal() {
         openClientsModal(this.modalService);

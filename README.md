@@ -201,7 +201,7 @@ With every significant PR into `dev`, the change must be briefly described in [C
 
 The `Create Release PR` workflow accepts a new version number, updates the version in all relevant source files and moves the `Unreleased` section in [CHANGELOG.md](./CHANGELOG.md) to a release heading, creating a new `Unreleased` section. It then prepares two draft PRs, one into `dev` and one into `main` with these changes. They have to be marked as ready to run the pipeline and need approval. Merge them without rebase (use merge commit option).
 
-Upon pushing to `main` or `dev`, GitHub Actions will build and push docker containers to Docker Hub tagged `latest` and `dev`. `latest` is additionally tagged with the current version number on `main` and a GitHub release is created.
+Upon pushing to `main`, `dev`, and `dev-next`, GitHub Actions will build and push docker containers to the GitHub Container Registry (GHCR) tagged `latest`, `dev`, and `dev-next`, respectively. `latest` is additionally tagged with the current version number on `main` and a GitHub release is created.
 
 ## Architecture
 

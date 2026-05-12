@@ -1,6 +1,6 @@
 {
     "name": "fuesim-digital-backend",
-    "version": "0.11.0",
+    "version": "0.11.1",
     "type": "module",
     "scripts": {
         "start:once:linux-macos": "NODE_ENV=production node dist/src/index.js",

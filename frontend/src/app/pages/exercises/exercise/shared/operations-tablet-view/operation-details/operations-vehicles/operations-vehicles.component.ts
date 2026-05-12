@@ -20,21 +20,17 @@ export class OperationsVehiclesComponent {
         selectVehiclesInTransfer
     );
 
-    private readonly vehiclesOnLocationMap = this.store.selectSignal(
-        selectVehiclesOnOperationsLocation
-    );
     public readonly vehiclesOnLocation = computed(() =>
-        Object.values(this.vehiclesOnLocationMap()).sort((a, b) =>
-            a.name.localeCompare(b.name)
-        )
-    );
+        Object.values(this.store.selectSignal(
+            selectVehiclesOnOperationsLocation
+        )));
 
     public readonly alarmGroupVehiclesInTransfer = computed(() =>
         Object.values(this.vehiclesInTransfer()).filter(
             (vehicle) =>
                 vehicle.position.type === 'transfer' &&
                 vehicle.position.transfer.startPoint.type ===
-                    'alarmGroupStartPoint'
+                'alarmGroupStartPoint'
         )
     );
 }

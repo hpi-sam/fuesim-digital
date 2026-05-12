@@ -232,7 +232,7 @@ export const selectVehiclesOnOperationsLocation = createSelector(
                 isOnMap(vehicle) ||
                 isPositionInSimulatedRegion(vehicle.position) ||
                 isInTransfer(vehicle)
-        )
+        ).sort((a, b) => a.name.localeCompare(b.name))
 );
 
 export const selectVehiclesInTransfer = createSelector(

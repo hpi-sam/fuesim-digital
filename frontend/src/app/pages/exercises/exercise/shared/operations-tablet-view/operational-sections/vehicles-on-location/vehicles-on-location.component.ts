@@ -15,13 +15,10 @@ export class VehiclesOnLocationComponent {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject(Store<AppState>);
 
-    private readonly vehiclesOnLocationMap = this.store.selectSignal(
-        selectVehiclesOnOperationsLocation
-    );
     public readonly vehiclesOnLocation = computed(() => {
-        const data = Object.values(this.vehiclesOnLocationMap()).sort((a, b) =>
-            a.name.localeCompare(b.name)
-        );
+        const data = Object.values(this.store.selectSignal(
+            selectVehiclesOnOperationsLocation
+        ));
         return data.filter((vehicle) => vehicle.operationalAssignment === null);
     });
 

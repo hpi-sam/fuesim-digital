@@ -15,6 +15,7 @@ import type {
 import {
     isInSpecificSimulatedRegion,
     isInTransfer,
+    isPositionInSimulatedRegion,
     nestedCoordinatesOf,
     scoutableElementTypes,
 } from 'fuesim-digital-shared';
@@ -221,6 +222,14 @@ export function createSelectVehiclesInOperationalSection(
         )
     );
 }
+
+export const selectVehiclesInSimulatedRegions = createSelector(
+    selectVehicles,
+    (vehicles) =>
+        Object.values(vehicles).filter((vehicle) =>
+            isPositionInSimulatedRegion(vehicle.position)
+        )
+);
 
 export const selectVehiclesInTransfer = createSelector(
     selectVehicles,

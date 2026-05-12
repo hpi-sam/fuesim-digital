@@ -1,7 +1,10 @@
 import { Component, computed, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../../../state/app.state';
-import { selectVehiclesInTransfer } from '../../../../../../../state/application/selectors/exercise.selectors';
+import {
+    selectVehiclesInSimulatedRegions,
+    selectVehiclesInTransfer,
+} from '../../../../../../../state/application/selectors/exercise.selectors';
 import { selectVisibleVehicles } from '../../../../../../../state/application/selectors/shared.selectors';
 import { OperationsVehicleItemComponent } from './operations-vehicle-item/operations-vehicle-item.component';
 
@@ -33,10 +36,18 @@ export class OperationsVehiclesComponent {
         )
     );
 
+    private readonly vehiclesInSimulatedRegionMap = this.store.selectSignal(
+        selectVehiclesInSimulatedRegions
+    );
+    private readonly vehiclesInSimulatedRegions = computed(() =>
+        Object.values(this.vehiclesInSimulatedRegionMap())
+    );
+
     public readonly vehiclesOnLocation = computed(() =>
         [
             ...this.visibleVehicles(),
             ...this.vehiclesInBetweenTransferpoints(),
+            ...this.vehiclesInSimulatedRegions(),
         ].sort((a, b) => a.name.localeCompare(b.name))
     );
 

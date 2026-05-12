@@ -13,6 +13,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - The vehicle status display now uses the correct visible status of a patient. Thus, after a patient that has been triaged by personnel on the map, the color determined in this triage is used.
 - Permissions for multiple actions around simulated regions that were mistakenly allowed for participants have been changed to trainers only.
 - Vehicles inside a simulated region can now be properly selected again
+- Vehicles inside simulated regions are now shown inside the "operations detail view"
 
 ### Added
 

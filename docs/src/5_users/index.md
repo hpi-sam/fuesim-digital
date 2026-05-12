@@ -1,4 +1,4 @@
-# 5 Benutzerverwaltung
+# 5. Benutzerverwaltung
 
 Um das Erstellen und Verwalten von Übungen zu erleichtern, besitzt die FüSim Digital eine Benutzerverwaltung. Nutzer können sich auf der Website ein Benutzerkonto erstellen und dort Übungen sowie Übungsvorlagen erstellen.
 
@@ -8,7 +8,7 @@ Um ein neues Benutzerkonto zu erstellen, kann mit dem Button „Registrieren" ob
 
 ## Anmeldung
 
-Nach der Registrierung kann man sich mit dem Benutzerkonto auf der Startseite über [„Anmelden"](/api/auth/oidc-redirect) jederzeit anmelden, um Zugriff auf seine [Übungen und Übungsvorlagen](https://outline.jonathanweth.de./4%20Elemente%20und%20Vorlagen.md) zu erhalten. Es tauchen dann oben in der Mitte zwei zusätzliche Menüpunkte auf, wo die entsprechenden Objekte aufgelistet werden.
+Nach der Registrierung kann man sich mit dem Benutzerkonto auf der Startseite über [„Anmelden"](/api/auth/oidc-redirect) jederzeit anmelden, um Zugriff auf seine [Übungen und Übungsvorlagen](../4_editing/) zu erhalten. Es tauchen dann oben in der Mitte zwei zusätzliche Menüpunkte auf, wo die entsprechenden Objekte aufgelistet werden.
 
 ## Benutzerkonto verwalten
 

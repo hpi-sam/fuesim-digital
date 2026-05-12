@@ -2,7 +2,7 @@
 
 ## Übungen verwalten
 
-Wenn man mit einem [Benutzerkonto](../5_users/index.md) angemeldet ist, werden sowohl über die Startseite als auch über die [Übungsliste](/exercises) neu erstellte Übungen automatisch mit dem Benutzerkonto verknüpft und dort gespeichert. Sie sind dann über die eben erwähnte Übungsliste jederzeit wieder abrufbar. 
+Wenn man mit einem [Benutzerkonto](../5_users/) angemeldet ist, werden sowohl über die Startseite als auch über die [Übungsliste](/exercises) neu erstellte Übungen automatisch mit dem Benutzerkonto verknüpft und dort gespeichert. Sie sind dann über die eben erwähnte Übungsliste jederzeit wieder abrufbar. 
 
 
  ![Liste der Übungen im Benutzerkonto](./exercises_list.png)

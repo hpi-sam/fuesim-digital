@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Changed
+
+- Extend patients export for IVENA MANV with new fields (e. g. location).
+
 ### Fixed
 
 - `DFM_UPLOAD_LIMIT` values are now correctly applied again, after a bug in version 0.11.0
@@ -14,6 +18,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Permissions for multiple actions around simulated regions that were mistakenly allowed for participants have been changed to trainers only.
 - Vehicles inside a simulated region can now be properly selected again
 - Vehicles inside simulated regions are now shown inside the "operations detail view"
+- The exercise map now fits on mobile device screens
 
 ### Added
 

@@ -7,9 +7,16 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Added
+
+- Map tile servers can now be selected from a list of suggested servers
+- Alarm groups can now be sent when preparing an exercise template.
+- Vehicles in transfer can now be managed when preparing an exercise template.
+
 ### Changed
 
 - Extend patients export for IVENA MANV with new fields (e. g. location).
+- Docker Images are now pushed exclusively to GHCR. Images on Dockerhub are no longer updated. If you're selfhosting and still using the `digitalfuesimmanv/dfm` image, please switch to `ghcr.io/hpi-sam/fuesim-digital`.
 
 ### Fixed
 
@@ -19,16 +26,6 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - The exercise map now fits on mobile device screens
 - Vehicles inside a simulated region can now be properly selected again
 - Vehicles inside simulated regions are now shown inside the "operations detail view"
-
-### Added
-
-- Map tile servers can now be selected from a list of suggested servers
-- Alarm groups can now be sent when preparing an exercise template.
-- Vehicles in transfer can now be managed when preparing an exercise template.
-
-### Changed
-
-- Docker Images are now pushed exclusively to GHCR. Images on Dockerhub are no longer updated. If you're selfhosting and still using the `digitalfuesimmanv/dfm` image, please switch to `ghcr.io/hpi-sam/fuesim-digital`.
 
 ## [0.11.1] - 2026-04-30
 

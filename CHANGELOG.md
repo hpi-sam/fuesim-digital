@@ -23,6 +23,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Added
 
 - Map tile servers can now be selected from a list of suggested servers
+- Alarm groups can now be sent when preparing an exercise template.
+- Vehicles in transfer can now be managed when preparing an exercise template.
 
 ### Changed
 

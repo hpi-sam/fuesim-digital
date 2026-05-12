@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../../../state/app.state';
 import {
     selectVehiclesInTransfer,
-    selectVehiclesOnOperationsLocation,
+    selectVehiclesOnLocation,
 } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { OperationsVehicleItemComponent } from './operations-vehicle-item/operations-vehicle-item.component';
 
@@ -21,16 +21,15 @@ export class OperationsVehiclesComponent {
     );
 
     public readonly vehiclesOnLocation = computed(() =>
-        Object.values(this.store.selectSignal(
-            selectVehiclesOnOperationsLocation
-        )));
+        Object.values(this.store.selectSignal(selectVehiclesOnLocation))
+    );
 
     public readonly alarmGroupVehiclesInTransfer = computed(() =>
         Object.values(this.vehiclesInTransfer()).filter(
             (vehicle) =>
                 vehicle.position.type === 'transfer' &&
                 vehicle.position.transfer.startPoint.type ===
-                'alarmGroupStartPoint'
+                    'alarmGroupStartPoint'
         )
     );
 }

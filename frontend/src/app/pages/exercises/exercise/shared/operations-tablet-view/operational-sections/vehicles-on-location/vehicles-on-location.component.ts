@@ -1,6 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectVehiclesOnOperationsLocation } from '../../../../../../../state/application/selectors/exercise.selectors';
+import { selectVehiclesOnLocation } from '../../../../../../../state/application/selectors/exercise.selectors';
 import { ExerciseService } from '../../../../../../../core/exercise.service';
 import { AppState } from '../../../../../../../state/app.state';
 import { VehiclesZoneComponent } from '../vehicles-zone/vehicles-zone.component';
@@ -16,9 +16,9 @@ export class VehiclesOnLocationComponent {
     private readonly store = inject(Store<AppState>);
 
     public readonly vehiclesOnLocation = computed(() => {
-        const data = Object.values(this.store.selectSignal(
-            selectVehiclesOnOperationsLocation
-        ));
+        const data = Object.values(
+            this.store.selectSignal(selectVehiclesOnLocation)
+        );
         return data.filter((vehicle) => vehicle.operationalAssignment === null);
     });
 

@@ -1,22 +1,24 @@
-# Über dieses Projekt
+## Was ist die FüSim Digital?
 
-Diese Webanwendung entstand im Rahmen mehrerer Bachelorprojekte am [Hasso-Plattner-Institut Potsdam](https://hpi.de) in den Jahren 2021, 2022, 2023, 2025 und 2026. Sie basiert auf der Führungssimulation MANV (FüSim MANV), einer von der [Bundesakademie für Bevölkerungsschutz und Zivile Verteidigung](https://www.bbk.bund.de/DE/Themen/Akademie-BABZ/akademie-babz_node.html) am [Bundesamt für Bevölkerungsschutz und Katastrophenhilfe](https://www.bbk.bund.de/) entwickelten Simulation für medizinische Führungskräfte für den Fall eines Massenanfalls von Verletzten (MANV). Sie ermöglicht zunehmend auch das Üben anderer Großschadenslagen.
+Die FüSim Digital ist ein neues Hilfsmittel für regelmäßige, niederschwellige Führungssimulationsübungen. Es ist eine digitale Umsetzung des analogen, auf Whiteboards, Magnetkarten und Aufklebern basierenden FüSim-Planspiels, das an der [Bundesakademie für Bevölkerungsschutz und Zivile Verteidigung (BABZ)](https://www.bbk.bund.de/DE/Themen/Akademie-BABZ/akademie-babz_node.html) entwickelt wurde und dort und anderswo seit Jahren erfolgreich eingesetzt wird.
 
-Der Quelltext dieser Webseite und die dahinterstehenden Technologien stehen als Open-Source-Software auf [GitHub](https://github.com/hpi-sam/fuesim-digital) zur Verfügung. Weitere Informationen über dieses und weitere Projekte finden Sie auf der [Projektwebseite](https://manv-simulation.de).
+Die digitale FüSim wurde und wird von Informatikstudierenden am Potsdamer [Hasso-Plattner-Institut](https://hpi.de/) entwickelt und ist Teil einer [Serie von Projekten für digitale MANV-Übungen](https://manv-simulation.de/). Sie ist als Open-Source-Software unter dem Projektnamen "FüSim Digital" [zur freien Nutzung und Weiterentwicklung verfügbar](https://github.com/hpi-sam/fuesim-digital).
 
-## Projektpartner
+> [!NOTE]
+> Bei Open-Source-Software ist der Quelltext öffentlich einsehbar, sodass man die Software ohne Einschränkungen oder Gebühren sowohl selbst nutzen als auch für den eigenen Bedarf weiterentwickeln oder anpassen kann. Oft bildet sich um Open-Source-Project eine Community, die die Software ehrenamtlich pflegt und weiterentwickelt.
 
-<div style="display: flex; align-items: center;">
-<a style="flex: 1; margin: 10px;" href="https://hpi.de/"><img src="./partners/hpi-logo.jpg" alt="HPI"></a>
-<a style="flex: 1; margin: 10px;" href="https://www.bbk.bund.de/"><img src="./partners/bbk-logo.jpg" alt="BBK"></a>
-<a style="flex: 1; margin: 10px;" href="https://www.berliner-feuerwehr.de/"><img src="./partners/logo_berliner-feuerwehr.svg" alt="Berliner Feuerwehr"></a>
-<a style="flex: 1; margin: 10px;" href="https://www.johanniter.de/bildungseinrichtungen/johanniter-akademie/johanniter-akademie-nordrhein-westfalen/standorte-der-akademie-in-nordrhein-westfalen/campus-muenster/"><img src="./partners/johanniter-akademie-nrw-logo.png" alt="Johanniter Akademie NRW, Campus Münster"></a>
-<a style="flex: 1; margin: 10px;" href="https://www.malteser-berlin.de/"><img src="./partners/malteser-logo.jpg" alt="Malteser Berlin"></a>
-</div>
+Die digitale FüSim wird bereits von Einrichtungen wie der [BABZ](https://www.bbk.bund.de/DE/Themen/Akademie-BABZ/akademie-babz_node.html), der [Johanniter-Akademie NRW](https://www.johanniter.de/bildungseinrichtungen/johanniter-akademie/johanniter-akademie-nordrhein-westfalen/) und der [Berliner Feuerwehr- und Rettungsdienst-Akademie (BFRA)](https://www.berliner-feuerwehr.de/ueber-uns/ausbildung-an-der-bfra/) erfolgreich eingesetzt. Während das analoge Planspiel und die ersten Versionen der digitalen Fassung ausschließlich MANV-Lagen abbilden, wird bei der digitalen FüSim zunehmend auch an Nutzungsmöglichkeiten für andere Einsatzlagen und Szenarien – zum Beispiel aus dem technischen Bereich – gearbeitet.
 
-## Projektbeteiligte
+Dank der Verfügbarkeit als Open-Source-Software und des geringen Materialaufwandes kann die digitale FüSim quasi überall verwendet werden, um mit Gruppen von Führungskräften zu üben, vom professionellen Ausbildungszentrum bis zur Ortsgruppe einer Hilfsorganisation.
 
-**Projektteam 2025/26:** [Felix Koch](https://github.com/fekoch), [Johannes Potzi](https://github.com/JohannesPotzi), [Robert Stündl](https://github.com/Quixelation) und [Jonathan Weth](https://github.com/hansegucker)  
-**Projektteam 2022/23:** [Lukas Hagen](https://github.com/Greenscreen23), [Nils Hanff](https://github.com/Nils1729), [Benildur Nickel](https://github.com/benn02) und [Lukas Radermacher](https://github.com/lukasrad02)  
-**Projektteam 2021/22:** [Julian Schmidt](https://github.com/Dassderdie), [Clemens Schielicke](https://github.com/ClFeSc), Florian Krummrey und Marvin Müller-Mettnau  
-**Betreuende:** [Matthias Barkowsky](https://hpi.de/giese/people/matthias-barkowsky.html) und [Christian Schäffer](https://hpi.de/giese/people/christian-schaeffer.html)
+## Nutzung der FüSim Digital
+
+Die digitale FüSim wird über diese Webseite genutzt und enthält einen Szenario-Editor, mit dem Übungsleitungen Einsatzszenarien definieren können. Zum Durchführen eines Szenarios werden internetfähige Geräte wie Tablets, Laptops oder Smartboards benötigt, die jeweils einen Einsatzabschnitt darstellen. Die Übungsteilnehmenden "bespielen" die Abschnitte und trainieren insbesondere die Kommunikation zwischen den Abschnitten und mit übergeordneten Einsatzleitungen, z. B. über Funk. Die von der Software eingespielten dynamischen Veränderungen der Patientinnen und Patienten sowie realistische Fahrzeiten für Einsatzmittel zum Einsatz und zwischen den Abschnitten machen das Übungsgeschehen dabei herausfordernd.
+
+## Struktur der Anleitung
+
+Die Anleitung zur FüSim Digital ist wie folgt strukturiert:
+
+* Im ersten Teil [Tutorial](./1_tutorial/index.md) wird das Erstellen und Durchführen einer beispielhaften Übung Schritt für Schritt beschrieben.
+* Im zweiten Teil [Übungen](./2_exercises/index.md) werden alle wichtigen Aspekte für das Vorbereiten, Durchführen und Auswerten von Übungen beschrieben.
+<!-- * Im dritten Teil [Simulation](./3_simulation/index.md) werden die Möglichkeiten vorgestellt, um in einzelnen Bereichen auf der Karte die Aktivitäten der zuständigen Führungskraft simulieren zu lassen, sodass größere Übungsszenarien durchgeführt werden können, ohne dass jeder Einsatzabschnitt von einem menschlichen Teilnehmenden bespielt werden muss. -->

@@ -1,6 +1,6 @@
 # 2.5. Auswertung
 
-Zur Auswertung stehen zwei Fenster bereit, die im [Hauptmenü](2_user_interfaces.md#hauptmenu) unter "Auswertung" geöffnet werden können.
+Zur Auswertung stehen zwei Fenster bereit, die im [Hauptmenü](2_user_interfaces.md#hauptmenü) unter "Auswertung" geöffnet werden können.
 
 ## Statistiken
 
@@ -68,9 +68,9 @@ Filter(-Kategorien) sowie die darin aufgelisteten Übungselemente können jederz
 
 ## Aufzeichnung
 
-Durch Klick auf "Auswertung" → "Aufzeichnung" wird eine Unteransicht der [Übungsansicht](2_user_interfaces.md#ubungsansicht) geöffnet, in der es keine Interaktionsmöglichkeiten mit den Übungselementen gibt und anstelle der unteren Menüleiste ein Zeitstrahl zu sehen ist. In dieser Ansicht kann eine Aufzeichnung der Übung abgespielt werden.
+Durch Klick auf "Auswertung" → "Aufzeichnung" wird eine Unteransicht der [Übungsansicht](2_user_interfaces.md#übungsansichtkartenansicht) geöffnet, in der es keine Interaktionsmöglichkeiten mit den Übungselementen gibt und anstelle der unteren Menüleiste ein Zeitstrahl zu sehen ist. In dieser Ansicht kann eine Aufzeichnung der Übung abgespielt werden.
 
-Durch einen Klick auf "Übung wieder betreten" in der oberen Menüleiste neben der Überschrift kann jederzeit zur [normalen Übungsansicht](2_user_interfaces.md#ubungsansicht) zurückgekehrt werden.
+Durch einen Klick auf "Übung wieder betreten" in der oberen Menüleiste neben der Überschrift kann jederzeit zur [normalen Übungsansicht](2_user_interfaces.md#übungsansichtkartenansicht) zurückgekehrt werden.
 
 ### Aufzeichnung abspielen
 
@@ -89,6 +89,3 @@ Innerhalb der Aufzeichnung können zudem über die entsprechenden Buttons in der
 Mit dem Button "Neue Übung an dieser Stelle erstellen" wird eine neue Übung (d.h. mit neuen PINs) erstellt, die vom aktuell in der Aufzeichnung betrachteten Zeitpunkt ausgeht. Dabei wird die Übungszeit übernommen (das heißt, die neue Übung beginnt nicht bei 0:00:00, sondern bei der in der Aufzeichnung gewählten Zeit, aber die Details vor diesem Zeitpunkt werden abgeschnitten, sodass die Diagramme und die Aufzeichnung keine Veränderungen anzeigen).
 
 Das Starten der neuen Übung soll es ermöglichen, gemeinsam mit den Teilnehmenden die kritischen Stellen einer vergangenen Übung erneut zu behandeln. Wichtig ist dabei, dass die Teilnehmenden, bevor die neu erstellte Übung gestartet wird, erneut hinzugefügt und eingeteilt werden müssen.
-
-
-\

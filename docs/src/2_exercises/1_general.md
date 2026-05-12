@@ -4,7 +4,7 @@
 
 Eine neue Übung kann auf der Startseite durch Klicken auf den Button "Übung erstellen" erstellt werden. Dazu sind weder ein Benutzerkonto noch eine anderweitige besondere Berechtigung notwendig. Nach dem erfolgreichen Erstellen werden die Übungsleitungs- und die Teilnehmenden-PIN unterhalb des Buttons angezeigt. Die Übungsleitungs-PIN wird zudem automatisch in das Formularfeld "Übungs-PIN" im linken Teil der Seite eingetragen, sodass ein [Beitritt zur neu erstellten Übung](#übungssbeitritt) als Übungsleitung mit nur einem Klick möglich ist. 
 
-Für Nutzende mit einem Benutzerkonto ist es zudem möglich, Übungsvorlagen zu erstellen und zu bearbeiten. Aus Vorlagen lassen sich dann durchführbare Übungen erstellen. Näheres dazu in [Übungselemente und -vorlagen](../4_editing/index.md).
+Für Nutzende mit einem Benutzerkonto ist es zudem möglich, Übungsvorlagen zu erstellen und zu bearbeiten. Aus Vorlagen lassen sich dann durchführbare Übungen erstellen. Näheres dazu in [Übungselemente und -vorlagen](../4_editing/).
 
 ## Einer Übung beitreten
 
@@ -40,8 +40,9 @@ Für die Übungsleitung sind hingegen sämtliche Interaktionen mit Patienten, Fa
 
 ### Vorlage
 
-Eine Übungsvorlage ist eine Übung in einer speziellen Variante des "Vorbereitung"-Zustands.
+Eine Übungsvorlage ist eine Übung in einer speziellen Variante des "Vorbereitung"-Zustands. Vorlagen können analog bearbeitet werden.
 
+Übungsvorlagen können allerdings nicht direkt gestartet werden. In der [Vorlagenverwaltung](../4_editing/#übungsvorlagen-verwalten) kann allerdings auf Basis einer Vorlage eine neue Übung erstellt werden, die dann gestartet werden kann.
  
 
 ### Gestartet/Laufend
@@ -64,7 +65,7 @@ In der FüSim Digital gibt es kein explizites Übungsende. Eine Übung kann ledi
 Ein Übungsleiter kann eine Übung jederzeit löschen. Das Löschen ist dauerhaft und unwiderruflich. Ein automatisches Löschen von Übungen findet aktuell nicht statt; bestehende Übungen bleiben unter ihren PINs dauerhaft aufrufbar. 
 
 > [!WARNING] 
-> Für eines der nächsten Updates ist geplant, dass nicht genutzte Übungen von Nutzenden ohne Konto nach einer gewissen Zeit ohne Verwendung automatisch gelöscht werden. Es wird deshalb empfohlen, relevante Übungsinhalte zu [exportieren](#übungsinhalte-exportieren) oder ein [Benutzerkonto anzulegen](../5_users/index.md#registrierung), in dem die Übung verwaltet wird. 
+> Für eines der nächsten Updates ist geplant, dass nicht genutzte Übungen von Nutzenden ohne Konto nach einer gewissen Zeit ohne Verwendung automatisch gelöscht werden. Es wird deshalb empfohlen, relevante Übungsinhalte zu [exportieren](#übungsinhalte-exportieren) oder ein [Benutzerkonto anzulegen](../5_users/#registrierung), in dem die Übung verwaltet wird. 
 
 ## Übungsinhalte exportieren
 
@@ -72,7 +73,7 @@ Durch Klick auf den Button "Exportieren" in der oberen Menüleiste innerhalb ein
 
 ### Übungen exportieren
 
-Die Optionen "kompletter Verlauf" und "aktueller Zustand" ermöglichen jeweils den Export der jeweiligen Übung, die dann über die Startseite zur [Erstellung einer neuen Übung](#übungen-importieren) importiert werden können. Alternativ kann ein Übungsexport auch als [neue Übungsvorlage in das eigene Benutzerkonto](../4_editing/index.md#übungsvorlagen-verwalten) importiert werden.
+Die Optionen "kompletter Verlauf" und "aktueller Zustand" ermöglichen jeweils den Export der jeweiligen Übung, die dann über die Startseite zur [Erstellung einer neuen Übung](#übungen-importieren) importiert werden können. Alternativ kann ein Übungsexport auch als [neue Übungsvorlage in das eigene Benutzerkonto](../4_editing/#übungsvorlagen-verwalten) importiert werden.
 
 Der "aktuelle Zustand" umfasst dabei nur den Ist-Stand der aktuellen Übung zum Zeitpunkt des Exports. Diese Option ist dann nützlich, wenn die exportierte Übung als Vorlage für spätere Übungen verwendet werden soll.
 

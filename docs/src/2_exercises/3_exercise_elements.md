@@ -2,7 +2,7 @@
 
 Mit Übungselementen sind all jene Objekte gemeint, die im Laufe einer Übung durch die Teilnehmenden direkt oder indirekt verwaltet oder betrachtet werden. Ein Großteil ist auf der Übungskarte zu sehen.
 
-## Ansicht
+## Ansichten
 
 <<TODO Screenshot Ansicht mit Konfigurations-Popup>>
 
@@ -213,12 +213,12 @@ Krankenhäuser können in der FüSim Digital als mögliche Transportziele für d
 
 ### Einstellungsmöglichkeiten
 
-Krankenhäuser werden im Fenster "Krankenhäuser" erstellt, das von Übungsleitenden im [Hauptmenü in der unteren Menüleiste](2_user_interfaces.md#konfigurations-und-ubersichtsfenster-nur-in-ubungsleitenden-ansicht) in der Kategorie "Erstellung" aufgerufen werden kann.
+Krankenhäuser werden im Fenster "Krankenhäuser" erstellt, das von Übungsleitenden im [Hauptmenü in der unteren Menüleiste](2_user_interfaces.md#konfigurations--und-übersichtsfenster-nur-in-übungsleitenden-ansicht) in der Kategorie "Erstellung" aufgerufen werden kann.
 
 In dem Fenster können in einer Liste Krankenhäuser mit Namen und einer Transportzeit angelegt werden. Alle Namen und Zeiten können nachträglich angepasst werden; neu erstellte Krankenhäuser können wieder gelöscht werden.
 
 > [!IMPORTANT]
-> Da für bestimmte Aspekte der [simulierten Bereiche](../3_simulation/index.md) mindestens ein Krankenhaus erforderlich ist, kann das erste Krankenhaus in der Liste nicht gelöscht werden. 
+> Da für bestimmte Aspekte der [simulierten Bereiche](../3_simulation/) mindestens ein Krankenhaus erforderlich ist, kann das erste Krankenhaus in der Liste nicht gelöscht werden. 
 
 ### Nutzung in Übungen
 
@@ -242,7 +242,7 @@ In einer Übung können Krankenhäuser als Ziel bei einem [Transferpunkt](#trans
 
 ### Einstellungsmöglichkeiten
 
-Alarmierungsgruppen werden im Fenster "Alarmierungsgruppen" erstellt, das von Übungsleitenden im [Hauptmenü in der unteren Menüleiste](2_user_interfaces.md#konfigurations-und-ubersichtsfenster-nur-in-ubungsleitenden-ansicht) in der Kategorie "Erstellung" aufgerufen werden kann.
+Alarmierungsgruppen werden im Fenster "Alarmierungsgruppen" erstellt, das von Übungsleitenden im [Hauptmenü in der unteren Menüleiste](2_user_interfaces.md#konfigurations--und-übersichtsfenster-nur-in-übungsleitenden-ansicht) in der Kategorie "Erstellung" aufgerufen werden kann.
 
 In dem Fenster können neue Alarmierungsgruppen hinzugefügt sowie wieder gelöscht werden. Jeder Gruppe kann ein individueller Name zugewiesen werden (standardmäßig "???"). Mit einem Klick auf das entsprechende Häkchen kann zudem ein Limit für die maximale Anzahl an Auslösungen festgelegt werden, wodurch sich versehentliche Doppelarmierungen vermeiden lassen. 
 
@@ -256,6 +256,6 @@ Typische Alarmgruppen für generische MANV-Übungen sind beispielsweise "MANV-10
 
 Alternativ ist es möglich, mit Alarmgruppen sehr konkret die Stichwörter der örtlichen Alarm- und Ausrückeordnung nachzubilden. Dabei ist zu beachten, dass, je kleinteiliger die Stichwörter sind, desto stärker die Eintreffzeiten an den jeweiligen Einsatzort angepasst werden müssen. Eine Wiederverwendung an einem anderen Ort im selben Leitstellengebiet ist somit ohne Mehraufwand nicht möglich.
 
-In beiden hier beschriebenen Anwendungen sollten die Alarmgruppen auf eine Auslösung begrenzt werden. Das gilt insbesondere für die [von Teilnehmenden verwaltete Leitstelle](2_user_interfaces.md#leistellenansicht-fur-teilnehmende). Wenn die örtliche Alarm- und Ausrückeordnung mehrfach alarmierbare Module umfasst, sollten jeweils mehrere Alarmierungsgruppen für "xxx (erster Alarm)", "xxx (zweiter Alarm)", etc. angelegt werden, um den zunehmend langen Anfahrtswegen Rechnung zu tragen.
+In beiden hier beschriebenen Anwendungen sollten die Alarmgruppen auf eine Auslösung begrenzt werden. Das gilt insbesondere für die [von Teilnehmenden verwaltete Leitstelle](2_user_interfaces.md#leitstellenansicht-für-teilnehmende). Wenn die örtliche Alarm- und Ausrückeordnung mehrfach alarmierbare Module umfasst, sollten jeweils mehrere Alarmierungsgruppen für "xxx (erster Alarm)", "xxx (zweiter Alarm)", etc. angelegt werden, um den zunehmend langen Anfahrtswegen Rechnung zu tragen.
 
 Alarmgruppen ohne Auslösungsbeschränkung oder mit einer hohen Anzahl möglicher Auslösungen sind beispielsweise für Szenarien sinnvoll, in denen mit Alarmgruppen das Nachfordern von Kräften aus einem voll besetzten Bereitstellungsraum abgebildet wird.

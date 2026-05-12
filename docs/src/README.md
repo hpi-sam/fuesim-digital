@@ -21,6 +21,8 @@ Die digitale FüSim wird über diese Webseite genutzt und enthält einen Szenari
 
 Die Anleitung zur FüSim Digital ist wie folgt strukturiert:
 
-* Im ersten Teil [Tutorial](./1_tutorial/index.md) wird das Erstellen und Durchführen einer beispielhaften Übung Schritt für Schritt beschrieben.
-* Im zweiten Teil [Übungen](./2_exercises/index.md) werden alle wichtigen Aspekte für das Vorbereiten, Durchführen und Auswerten von Übungen beschrieben.
-<!-- * Im dritten Teil [Simulation](./3_simulation/index.md) werden die Möglichkeiten vorgestellt, um in einzelnen Bereichen auf der Karte die Aktivitäten der zuständigen Führungskraft simulieren zu lassen, sodass größere Übungsszenarien durchgeführt werden können, ohne dass jeder Einsatzabschnitt von einem menschlichen Teilnehmenden bespielt werden muss. -->
+* Im ersten Teil [Tutorial](./1_tutorial/) wird das Erstellen und Durchführen einer beispielhaften Übung Schritt für Schritt beschrieben.
+* Im zweiten Teil [Übungen](./2_exercises/) werden alle wichtigen Aspekte für das Vorbereiten, Durchführen und Auswerten von Übungen beschrieben.
+* Im dritten Teil [Simulation](./3_simulation/) werden die Möglichkeiten vorgestellt, um in einzelnen Bereichen auf der Karte die Aktivitäten der zuständigen Führungskraft simulieren zu lassen, sodass größere Übungsszenarien durchgeführt werden können, ohne dass jeder Einsatzabschnitt von einem menschlichen Teilnehmenden bespielt werden muss.
+* Im vierten Teil [Übungselemente- und Vorlagen](./4_editing/) wird beschreiben, wie individualisierte Übungselemente sowie (Vorlagen für) ganze Übungen verwaltet werden können.
+* Im fünften Teil [Benutzerverwaltung](./5_users/) werden beschreiben, wie Benutzeraccounts angelegt, genutzt und verwaltet werden.

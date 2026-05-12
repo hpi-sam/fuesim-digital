@@ -60,13 +60,13 @@ Neben beiden Buttons befindet sich jeweils ein kleiner Ergänzungs-Button mit de
 
 #### Export und Server-Informationen
 
-Im rechten Bereich der oberen Menüleiste befindet sich ein blauer Button zum Exportieren von ganzen Übungen bzw. einzelnen Übungsinhalten (siehe [Übungsinhalte exportieren](1_general.md#h-ubungsinhalte-exportieren)) sowie weitere Buttons, die zu Datenschutzerklärung, Impressum und Nutzungsbedingungen des jeweiligen Servers führen. Zusätzlich gibt es hier einen Link zum Übermitteln von Feedback.
+Im rechten Bereich der oberen Menüleiste befindet sich ein blauer Button zum Exportieren von ganzen Übungen bzw. einzelnen Übungsinhalten (siehe [Übungsinhalte exportieren](1_general.md#übungsinhalte-exportieren)) sowie weitere Buttons, die zu Datenschutzerklärung, Impressum und Nutzungsbedingungen des jeweiligen Servers führen. Zusätzlich gibt es hier einen Link zum Übermitteln von Feedback.
 
 ### Untere Menüleiste (nur in Übungsleitenden-Ansicht)
 
 #### Hauptmenü
 
-Im linken Bereich der unteren Menüleiste befindet sich ein Hauptmenü für Übungsleitungen, das Zugriff auf sämtliche [Konfigurations- und Übersichtsfenster](#konfigurations-und-ubersichtsfenster) bietet. Das Menü ist unterteilt in "Einstellungen" sowie in die drei Phasen eines typischen Übungs-Lebenszyklus: "Erstellung", „Durchführung" und "Auswertung".
+Im linken Bereich der unteren Menüleiste befindet sich ein Hauptmenü für Übungsleitungen, das Zugriff auf sämtliche [Konfigurations- und Übersichtsfenster](#konfigurations--und-übersichtsfenster-nur-in-übungsleitenden-ansicht) bietet. Das Menü ist unterteilt in "Einstellungen" sowie in die drei Phasen eines typischen Übungs-Lebenszyklus: "Erstellung", „Durchführung" und "Auswertung".
 
 #### Übungssteuerung
 
@@ -87,12 +87,12 @@ Im rechten Bereich der unteren Menüleiste befindet sich ein roter Button, mit d
 
 Der Editor ist in folgende Kategorien unterteilt:
 
-* **Ansicht/Transferpunkt**: Hier befinden sich Vorlagen für [Ansichten](3_exercise_elements.md#ansicht) (Bereiche einer Übung, denen ein Teilnehmender zugeordnet werden kann) und [Transferpunkte](3_exercise_elements.md#transferpunkt) (verbindbare Punkte, bei denen alarmierte Kräfte eintreffen und zwischen denen Personal und Fahrzeuge transferiert werden können) platziert werden. Optional können hier die (nur für Übungsleitende sichtbaren) Verbindungslinien zwischen Transferpunkten deaktiviert werden. 
-* **Simulierte Bereiche**: Mithilfe der Vorlagen "Patientenablage", "Bereitstellungsraum" oder "Transportorganisation" können vorkonfigurierte [simulierte Bereiche](../3_simulation/index.md) ausgewählt werden. Als letztes in der Liste steht die Vorlage für einen generischen simulierten Bereich, der manuell konfiguriert werden kann.
-* **Zonen**: Es können [Zonen](3_exercise_elements.md#zone) platziert werden, wobei es sich um Bereiche auf der Übungskarte handelt, die benannt, farblich markiert sowie auf eine bestimmte Anzahl und bestimmte Arten von Fahrzeugen beschränkt werden können. Die zuerst stehende Vorlage "Eingeschränkte Zone" erzeugt generische und frei konfigurierbare Zonen. Die drei anderen zur Auswahl stehenden Vorlagen sind vorkonfiguriert als mögliche "Ladezone", "Pufferzone" und "RTH-Landeplatz", können aber weiter verfeinert werden.
-* **Patienten:** Hier befinden sich Vorlagen für [Patienten](3_exercise_elements.md#h-patient), sortiert nach initialer Sichtungskategorie und gekennzeichnet mit dem zu erwartenden Verlauf. Eine Zahl bei jeder Vorlage zeigt, wie viele Ausprägungen für diesen medizinischen Verlauf hinterlegt sind, wobei die Ausprägungen sich durch verschiedene Texte zu den medizinischen Details unterscheiden. Beim Platzieren auf der Karte wird eine der Ausprägungen für den gewählten Verlauf zufällig ausgesucht sowie Name und Stammdaten des Patienten zufällig generiert.
-* **Fahrzeuge**: Hier kann aus den Vorlagen für [Fahrzeuge](3_exercise_elements.md#fahrzeug) ausgewählt werden, wobei auch neue Vorlagen erstellt und Vorlagen bearbeitet und gelöscht werden können. Es ist zu beachten, dass Änderungen einer Vorlage sich nicht auf bereits platzierte Fahrzeuge auswirken.
-* **Bilder**: Bei den [Bildern](3_exercise_elements.md#bild) handelt es sich um frei platzierbare, dekorative Übungselemente. In diesem Teil des Editors befindet sich eine Liste aller Bild-Vorlagen, wobei auch neue Vorlagen erstellt und Vorlagen bearbeitet und gelöscht werden können. Sämtliche Bilder können nach dem Platzieren noch beliebig modifiziert werden. 
+* **Ansicht/Transferpunkt**: Hier befinden sich Vorlagen für [Ansichten](3_exercise_elements.md#ansichten) (Bereiche einer Übung, denen ein Teilnehmender zugeordnet werden kann) und [Transferpunkte](3_exercise_elements.md#transferpunkte) (verbindbare Punkte, bei denen alarmierte Kräfte eintreffen und zwischen denen Personal und Fahrzeuge transferiert werden können) platziert werden. Optional können hier die (nur für Übungsleitende sichtbaren) Verbindungslinien zwischen Transferpunkten deaktiviert werden. 
+* **Simulierte Bereiche**: Mithilfe der Vorlagen "Patientenablage", "Bereitstellungsraum" oder "Transportorganisation" können vorkonfigurierte [simulierte Bereiche](../3_simulation/) ausgewählt werden. Als letztes in der Liste steht die Vorlage für einen generischen simulierten Bereich, der manuell konfiguriert werden kann.
+* **Zonen**: Es können [Zonen](3_exercise_elements.md#zonen) platziert werden, wobei es sich um Bereiche auf der Übungskarte handelt, die benannt, farblich markiert sowie auf eine bestimmte Anzahl und bestimmte Arten von Fahrzeugen beschränkt werden können. Die zuerst stehende Vorlage "Eingeschränkte Zone" erzeugt generische und frei konfigurierbare Zonen. Die drei anderen zur Auswahl stehenden Vorlagen sind vorkonfiguriert als mögliche "Ladezone", "Pufferzone" und "RTH-Landeplatz", können aber weiter verfeinert werden.
+* **Patienten:** Hier befinden sich Vorlagen für [Patienten](3_exercise_elements.md#patienten), sortiert nach initialer Sichtungskategorie und gekennzeichnet mit dem zu erwartenden Verlauf. Eine Zahl bei jeder Vorlage zeigt, wie viele Ausprägungen für diesen medizinischen Verlauf hinterlegt sind, wobei die Ausprägungen sich durch verschiedene Texte zu den medizinischen Details unterscheiden. Beim Platzieren auf der Karte wird eine der Ausprägungen für den gewählten Verlauf zufällig ausgesucht sowie Name und Stammdaten des Patienten zufällig generiert.
+* **Fahrzeuge**: Hier kann aus den Vorlagen für [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) ausgewählt werden, wobei auch neue Vorlagen erstellt und Vorlagen bearbeitet und gelöscht werden können. Es ist zu beachten, dass Änderungen einer Vorlage sich nicht auf bereits platzierte Fahrzeuge auswirken.
+* **Bilder**: Bei den [Bildern](3_exercise_elements.md#bilder) handelt es sich um frei platzierbare, dekorative Übungselemente. In diesem Teil des Editors befindet sich eine Liste aller Bild-Vorlagen, wobei auch neue Vorlagen erstellt und Vorlagen bearbeitet und gelöscht werden können. Sämtliche Bilder können nach dem Platzieren noch beliebig modifiziert werden. 
 
 #### Import von Übungselementen
 
@@ -100,35 +100,35 @@ In der Überschrift vom Editor befindet sich ein Button zum [Import von Vorlagen
 
 ### Konfigurations- und Übersichtsfenster (nur in Übungsleitenden-Ansicht)
 
-Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-menuleiste-nur-in-ubungsleitungs-ansicht) für Übungsleitende verfügbar:
+Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-menüleiste-nur-in-übungsleitenden-ansicht) für Übungsleitende verfügbar:
 
 * **Einstellungen**: Hier können die allgemeinen [Übungseinstellungen](1_general.md#übungseinstellungen) vorgenommen werden.
 * #### Erstellung
-  * **Alarmierungsgruppen**: In diesem Fenster können [Alarmierungsgruppen](3_exercise_elements.md#alarmierungsgruppe) erstellt, bearbeitet und wieder gelöscht werden.
-  * **Krankenhäuser**: In diesem Fenster können [Krankenhäuser](3_exercise_elements.md#krankenhaus) erstellt, bearbeitet und wieder gelöscht werden.
+  * **Alarmierungsgruppen**: In diesem Fenster können [Alarmierungsgruppen](3_exercise_elements.md#alarmierungsgruppen) erstellt, bearbeitet und wieder gelöscht werden.
+  * **Krankenhäuser**: In diesem Fenster können [Krankenhäuser](3_exercise_elements.md#krankenhäuser) erstellt, bearbeitet und wieder gelöscht werden.
 * **Durchführung**
   * **Teilnehmende**: Fenster zur [Verwaltung der Übungsteilnehmenden](4_conduction.md#teilnehmende-verwalten).
   * **Transferübersicht**: Fenster zur [Verwaltung von laufenden Transfers](4_conduction.md#transfers-verwalten) zwischen Transferpunkten
   * **Leitstelle**: Fenster mit allen [Leitstellenfunktionen](4_conduction.md#alarmierungen), über das Übungsleitende Nachalarmierungen starten und ein Einsatztagebuch führen können.
-  * **Simulationseinstellungen (Übungsleitung)**: Einstellungen zur [Simulation](../3_simulation/index.md) von Übungsbestandteilen.
-  * **Simulationsübersicht (Funker)**: Schließt die Übungsansicht und öffnet stattdessen die Ansicht für [Schnittstellenfunker](../3_simulation/index.md) zur Kommunikation zwischen Teilnehmenden und simulierten Bereichen.
+  * **Simulationseinstellungen (Übungsleitung)**: Einstellungen zur [Simulation](../3_simulation/) von Übungsbestandteilen.
+  * **Simulationsübersicht (Funker)**: Schließt die Übungsansicht und öffnet stattdessen die Ansicht für [Schnittstellenfunker](../3_simulation/) zur Kommunikation zwischen Teilnehmenden und simulierten Bereichen.
 * **Auswertung**
   * **Statistik**: Fenster mit den [Statistiken](5_evaluation.md#statistiken) zur aktuellen Übung. Beinhaltet auch ein detailliertes Protokoll.
   * **Aufzeichnung**: Schließt die Übungsansicht und öffnet stattdessen die Replay-Ansicht, in der die [Aufzeichnung](5_evaluation.md#aufzeichnung) der aktuellen Übung betrachtet werden kann.
 
-## Leistellenansicht (für Teilnehmende)
+## Leitellenansicht (für Teilnehmende)
 
 Teilnehmende, die von den Übungsleitenden der Rolle "Leitstelle" zugeordnet wurden, sehen diese Oberfläche. 
 
 ### Einsatztagebuch
 
-In der linken Hälfte des Fensters befindet sich das [Einsatztagebuch](4_conduction.md#einatztagebuch). Bei kleinen Bildschirmen (z.B. einem Tablet hochkant) befindet es sich unten statt links. Hier können Einträge verfasst und mit Knopfdruck im Tagebuch gespeichert werden.  Wenn mehrere Teilnehmende in der Leitstellenansicht sind, können sie gegenseitig ihre Einträge sehen. 
+In der linken Hälfte des Fensters befindet sich das [Einsatztagebuch](4_conduction.md#einsatztagebuch). Bei kleinen Bildschirmen (z.B. einem Tablet hochkant) befindet es sich unten statt links. Hier können Einträge verfasst und mit Knopfdruck im Tagebuch gespeichert werden.  Wenn mehrere Teilnehmende in der Leitstellenansicht sind, können sie gegenseitig ihre Einträge sehen. 
 
 ### Alarmierungen
 
 In der rechten Hälfte des Fensters befindet sich das Menü zur [Alarmierung](4_conduction.md#alarmierungen) weiterer Einsatzkräfte. Bei kleinen Bildschirmen (z.B. einem Tablet hochkant) befindet es sich oben statt rechts. 
 
-In dem Menü muss zunächst ein [Transferpunkt](3_exercise_elements.md#transferpunkt) als Ziel ausgewählt werden und dann eine Alarmgruppe angeklickt werden. Optional kann eine komplexe Ansicht aktiviert werden, bei der ein Teil der alarmierten Fahrzeuge zu einem abweichenden [Transferpunkt](3_exercise_elements.md#transferpunkt) geschickt werden kann.
+In dem Menü muss zunächst ein [Transferpunkt](3_exercise_elements.md#transferpunkte) als Ziel ausgewählt werden und dann eine Alarmgruppe angeklickt werden. Optional kann eine komplexe Ansicht aktiviert werden, bei der ein Teil der alarmierten Fahrzeuge zu einem abweichenden [Transferpunkt](3_exercise_elements.md#transferpunkte) geschickt werden kann.
 
 ## Einsatzübersicht (für Teilnehmende)
 
@@ -144,9 +144,7 @@ In diesem Tab können die vor Ort befindlichen Fahrzeuge in mehrere logische Ein
 
 <SCREENSHOT Einsatzansicht Karte>
 
-In diesem Tag sehen Übungsteilnehmende, neben einer Liste der alarmierten und eingetroffenen Fahrzeuge, eine Karte des Einsatzortes. Die Karte ist initial auf die platzierten [Ansichten](3_exercise_elements.md#ansicht) zentriert, es kann auf ihr beliebig gezoomt und navigiert werden. Mit dem Button "Zurück zum Einsatzort" am unteren Rand der Karte kann die Karte zudem neu zentriert werden.
+In diesem Tag sehen Übungsteilnehmende, neben einer Liste der alarmierten und eingetroffenen Fahrzeuge, eine Karte des Einsatzortes. Die Karte ist initial auf die platzierten [Ansichten](3_exercise_elements.md#ansichten) zentriert, es kann auf ihr beliebig gezoomt und navigiert werden. Mit dem Button "Zurück zum Einsatzort" am unteren Rand der Karte kann die Karte zudem neu zentriert werden.
 
 Mit dem Button "3D" in der unteren linken Ecke der Karte kann zudem eine 3D-Ansicht mit den Silhouetten der Gebäude am Einsatzort aktiviert oder deaktiviert werden.
 
-
-\

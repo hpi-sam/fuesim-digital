@@ -19,6 +19,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - The exercise map now fits on mobile device screens
 - Vehicles inside a simulated region can now be properly selected again
 - Vehicles inside simulated regions are now shown inside the "operations detail view"
+- Exercise instances that are part of a parallel exercise no longer get paused when all participants have left, i.e. due to connection issues. This ensures that all instances stay synchronized.
 
 ### Added
 

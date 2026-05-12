@@ -9,6 +9,10 @@ import {
     coordinateStringToNumber,
 } from '../../utils/string-coordinates.js';
 import { isInViewport } from '../../models/viewport.js';
+import {
+    currentCoordinatesOf,
+    isOnMap,
+} from '../../models/utils/position/position-helpers.js';
 
 const statusCodeToExportMap: { [key in PatientStatus]: string } = {
     red: '1',
@@ -89,8 +93,8 @@ export function preparePatientsForCSVExport(state: ExerciseState) {
             let longitude = '';
             let latitude = '';
             let section = '';
-            if (patient.position.type === 'coordinates') {
-                const coords = patient.position.coordinates;
+            if (isOnMap(patient)) {
+                const coords = currentCoordinatesOf(patient);
                 const lonLat = toLonLat([coords.x, coords.y]);
                 longitude = coordinateStringToNumber.encode(lonLat[0]!);
                 latitude = coordinateStringToNumber.encode(lonLat[1]!);

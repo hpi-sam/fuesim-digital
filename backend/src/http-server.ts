@@ -39,7 +39,9 @@ export class ApiHttpServer {
         app.use(cookieParser());
         app.use(createSessionMiddleware(services.authService));
 
-        app.use(express.json({ limit: `${Config.uploadLimit}mb` }));
+        // The upload limit is specified as a Nginx compatible size (https://nginx.org/en/docs/syntax.html#size) (i.e., can have a "k", "m", or "g" suffix)
+        // Express parses the limit using https://github.com/visionmedia/bytes.js#bytesparsestringnumber-value-numbernull, so we have to append "b"
+        app.use(express.json({ limit: `${Config.uploadLimit}b` }));
 
         app.use('/api', healthRouter);
 

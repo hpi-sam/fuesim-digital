@@ -1,6 +1,6 @@
 {
     "name": "fuesim-digital",
-    "version": "0.11.0",
+    "version": "0.11.1",
     "type": "module",
     "scripts": {
         "build": "cd shared && npm run build && cd .. && concurrently \"cd frontend && npm run build\" \"cd backend && npm run build\"",

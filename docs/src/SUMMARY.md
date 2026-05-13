@@ -2,9 +2,7 @@
 <!-- How to structure docs: https://rust-lang.github.io/mdBook/format/summary.html -->
 <!-- How to format docs with markdown: https://rust-lang.github.io/mdBook/format/markdown.html -->
 
-# FüSim Digital Anleitung
-
-<!-- [zurück zur FüSim Digital](/) -->
+# Anleitung für die FüSim Digital
 
 [Startseite](README.md)
 

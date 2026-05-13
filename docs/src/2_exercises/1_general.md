@@ -1,20 +1,20 @@
-# 2.1. Allgemeines
+# Allgemeines
 
 ## Übungen anlegen
 
-Eine neue Übung kann auf der Startseite durch Klicken auf den Button "Übung erstellen" erstellt werden. Dazu sind weder ein Benutzerkonto noch eine anderweitige besondere Berechtigung notwendig. Nach dem erfolgreichen Erstellen werden die Übungsleitungs- und die Teilnehmenden-PIN unterhalb des Buttons angezeigt. Die Übungsleitungs-PIN wird zudem automatisch in das Formularfeld "Übungs-PIN" im linken Teil der Seite eingetragen, sodass ein [Beitritt zur neu erstellten Übung](#übungssbeitritt) als Übungsleitung mit nur einem Klick möglich ist. 
+Eine neue Übung kann auf der Startseite durch Klicken auf den Button "Übung erstellen" erstellt werden. Dazu sind weder ein Benutzerkonto noch eine anderweitige besondere Berechtigung notwendig. Nach dem erfolgreichen Erstellen werden die Übungsleitungs- und die Teilnehmenden-PIN unterhalb des Buttons angezeigt. Die Übungsleitungs-PIN wird zudem automatisch in das Formularfeld "Übungs-PIN" im linken Teil der Seite eingetragen, sodass ein [Beitritt zur neu erstellten Übung](#übungsbeitritt) als Übungsleitung mit nur einem Klick möglich ist.
 
 Für Nutzende mit einem Benutzerkonto ist es zudem möglich, Übungsvorlagen zu erstellen und zu bearbeiten. Aus Vorlagen lassen sich dann durchführbare Übungen erstellen. Näheres dazu in [Übungselemente und -vorlagen](../4_editing/).
 
-## Einer Übung beitreten
+## Übungsbeitritt
 
-Um einer Übung über die Startseite beizutreten, muss die entsprechende [Übungs-PIN](#übungs-pins) in das Formularfeld "Übungs-PIN" im linken Teil der Seite eingegeben und auf "Übung beitreten" geklickt werden. 
+Um einer Übung über die Startseite beizutreten, muss die entsprechende [Übungs-PIN](#übungs-pins) in das Formularfeld "Übungs-PIN" im linken Teil der Seite eingegeben und auf "Übung beitreten" geklickt werden.
 
 Nach dem Klick öffnet sich ein Fenster, in dem optional ein Name eingegeben werden. Den Namen sehen in der Übung nur die Übungsleitenden. Mit erneutem Klick auf "Übung beitreten" wird der Name bestätigt und man erklärt seine Zustimmung zu den Nutzungsbedingungen und der Datenschutzerklärung.
 
 ## Übungs-PINs
 
-Für das Beitreten zu einer Übung gibt es verschiedene Arten von PINs für unterschiedliche Berechtigungen bzw. Teilnahmearten. Ein Beitritt ist sowohl über die Eingabe der PIN [auf der Startseite](#übungssbeitritt) als auch direkt über das Öffnen der [teilbaren Links](2_user_interfaces.md#einladungs-buttons) (Format: `fuesim-manv.de/exercises/<PIN>`) möglich.
+Für das Beitreten zu einer Übung gibt es verschiedene Arten von PINs für unterschiedliche Berechtigungen bzw. Teilnahmearten. Ein Beitritt ist sowohl über die Eingabe der PIN [auf der Startseite](#übungsbeitritt) als auch direkt über das Öffnen der [teilbaren Links](2_user_interfaces.md#einladungs-buttons) (Format: `fuesim-manv.de/exercises/<PIN>`) möglich.
 
 ### Teilnehmenden-PIN
 
@@ -34,7 +34,7 @@ Um die jeweiligen PINs einfach an weitere Nutzende weiterzugeben und diese zur �
 
 In einer neu angelegte Übung kann die Übungsleitung zunächst das Szenario vorbereiten. In diesem Zustand bleibt der Timer auf `0:00:00` und ist die Karte für Teilnehmende ausgegraut, sodass sie keine Aktionen durchführen können.
 
-Für die Übungsleitung sind hingegen sämtliche Interaktionen mit Patienten, Fahrzeugen und Personal bereits möglich. Allerdings beginnen die Sichtung und Behandlung bzw. Verschlechterung der Patienten noch nicht, selbst wenn das Rettungspersonal korrekt platziert wird. Auch gestartete Transfers laufen noch nicht. Mit einem Klick auf "Sofort" in der [Transferübersicht](4_conduction.md#transfers-verwalten) können Fahrzeuge und Personal allerdings aus dem Transfer herausgenommen und wieder auf der Karte platziert werden. 
+Für die Übungsleitung sind hingegen sämtliche Interaktionen mit Patienten, Fahrzeugen und Personal bereits möglich. Allerdings beginnen die Sichtung und Behandlung bzw. Verschlechterung der Patienten noch nicht, selbst wenn das Rettungspersonal korrekt platziert wird. Auch gestartete Transfers laufen noch nicht. Mit einem Klick auf "Sofort" in der [Transferübersicht](4_conduction.md#transfers-verwalten) können Fahrzeuge und Personal allerdings aus dem Transfer herausgenommen und wieder auf der Karte platziert werden.
 
 Übungsleitende können im Zustand „Vorbereitung" bereits Teilnehmende zu einer Übung hinzufügen und diese in Vorbereitung auf den Übungsstart in bestimmte Ansichten einteilen (siehe [Teilnehmende verwalten](4_conduction.html#teilnehmende-verwalten)).
 
@@ -43,7 +43,6 @@ Für die Übungsleitung sind hingegen sämtliche Interaktionen mit Patienten, Fa
 Eine Übungsvorlage ist eine Übung in einer speziellen Variante des "Vorbereitung"-Zustands. Vorlagen können analog bearbeitet werden.
 
 Übungsvorlagen können allerdings nicht direkt gestartet werden. In der [Vorlagenverwaltung](../4_editing/#übungsvorlagen-verwalten) kann allerdings auf Basis einer Vorlage eine neue Übung erstellt werden, die dann gestartet werden kann.
- 
 
 ### Gestartet/Laufend
 
@@ -55,17 +54,17 @@ Ein Übungsleiter kann eine Übung jederzeit pausieren. Im pausierten Modus ist 
 
 ### Beendet
 
-In der FüSim Digital gibt es kein explizites Übungsende. Eine Übung kann lediglich pausiert werden. 
+In der FüSim Digital gibt es kein explizites Übungsende. Eine Übung kann lediglich pausiert werden.
 
 > [!TIP]
 > Es wird unbedingt empfohlen, die Übung auch am Ende zu pausieren, damit bei der [Auswertung](5_evaluation.md) nur die relevanten Zeiträume in Statistik und Zeitstrahl betrachtet werden.
 
 ### Gelöscht
 
-Ein Übungsleiter kann eine Übung jederzeit löschen. Das Löschen ist dauerhaft und unwiderruflich. Ein automatisches Löschen von Übungen findet aktuell nicht statt; bestehende Übungen bleiben unter ihren PINs dauerhaft aufrufbar. 
+Ein Übungsleiter kann eine Übung jederzeit löschen. Das Löschen ist dauerhaft und unwiderruflich. Ein automatisches Löschen von Übungen findet aktuell nicht statt; bestehende Übungen bleiben unter ihren PINs dauerhaft aufrufbar.
 
-> [!WARNING] 
-> Für eines der nächsten Updates ist geplant, dass nicht genutzte Übungen von Nutzenden ohne Konto nach einer gewissen Zeit ohne Verwendung automatisch gelöscht werden. Es wird deshalb empfohlen, relevante Übungsinhalte zu [exportieren](#übungsinhalte-exportieren) oder ein [Benutzerkonto anzulegen](../5_users/#registrierung), in dem die Übung verwaltet wird. 
+> [!WARNING]
+> Für eines der nächsten Updates ist geplant, dass nicht genutzte Übungen von Nutzenden ohne Konto nach einer gewissen Zeit ohne Verwendung automatisch gelöscht werden. Es wird deshalb empfohlen, relevante Übungsinhalte zu [exportieren](#übungsinhalte-exportieren) oder ein [Benutzerkonto anzulegen](../5_users/#registrierung), in dem die Übung verwaltet wird.
 
 ## Übungsinhalte exportieren
 
@@ -77,7 +76,7 @@ Die Optionen "kompletter Verlauf" und "aktueller Zustand" ermöglichen jeweils d
 
 Der "aktuelle Zustand" umfasst dabei nur den Ist-Stand der aktuellen Übung zum Zeitpunkt des Exports. Diese Option ist dann nützlich, wenn die exportierte Übung als Vorlage für spätere Übungen verwendet werden soll.
 
-Der "komplette Verlauf" enthält dagegen zusätzlich ein vollständiges Protokoll aller bisherigen Aktionen durch Übungsleitende und Teilnehmende. Ein Export des Verlaufs ist dann sinnvoll, wenn eine abgeschlossene Übung für eine spätere [Auswertung](5_evaluation.md) gesichert werden soll. 
+Der "komplette Verlauf" enthält dagegen zusätzlich ein vollständiges Protokoll aller bisherigen Aktionen durch Übungsleitende und Teilnehmende. Ein Export des Verlaufs ist dann sinnvoll, wenn eine abgeschlossene Übung für eine spätere [Auswertung](5_evaluation.md) gesichert werden soll.
 
 > [!NOTE]
 > Der Verlauf einer Übung umfasst auch ein Protokoll jedes einzelnen (Zwischen-)Schrittes während der Übungserstellung durch die Übungsleitung (z.B. das Platzieren, Verschieben, Löschen, Benennen und Umbenennen von Elementen). Da alle diese Schritte zum Zeitpunkt 0:00 passieren, kann dieses Erstellungsprotokoll nicht als [Aufzeichnung](5_evaluation.md#aufzeichnung) in der FüSim Digital abgespielt werden, es kann aber von technisch versierten Personen aus der `.json`-Datei ausgelesen werden.
@@ -86,12 +85,12 @@ Der "komplette Verlauf" enthält dagegen zusätzlich ein vollständiges Protokol
 
 ~~Mit der Option "Vorlagen exportieren" ist es möglich, die bereits erstellten Vorlagen für Patienten, Fahrzeuge und Bilder (siehe~~ [Übungselemente](3_exercise_elements.md)~~) zu exportieren, um diese für andere Übungen wiederzuverwenden (siehe~~ [~~Vorlagen importieren~~](#vorlagen-importieren)~~). Es kann ausgewählt werden, welche dieser Vorlagentypen Teil des (partiellen) Exports sein sollen.~~
 
-> [!WARNING] 
+> [!WARNING]
 > Der **partielle Export** von Vorlagen steht aufgrund von Umbauarbeiten für eine neue Version der Software, welche umfangreiche Funktionen zum Verwalten von Vorlagen enthalten wird, **nicht mehr zur Verfügung**. Als Alternative besteht die Möglichkeit, eine [vollen Übungsexport](#übungen-exportieren) durchzuführen und in der `.json`-Datei nicht benötigte Elemente zu löschen. Der Import von alten partiellen Exporten ist weiterhin unter [Vorlagen importieren](#vorlagen-importieren) möglich.
 
 ### Patientendaten für IVENA MANV exportieren
 
-Mit der Option "Patientendaten für IVENA MANV" wird eine `.csv`-Datei generiert, die die IDs, Sichtungskategorie und weitere relevante Daten aller in der Übung platzierten Patienten enthält. 
+Mit der Option "Patientendaten für IVENA MANV" wird eine `.csv`-Datei generiert, die die IDs, Sichtungskategorie und weitere relevante Daten aller in der Übung platzierten Patienten enthält.
 
 Die Datei kann in IVENA MANV importiert werden. Dadurch können beispielsweise Evakuierungs- und Abtransport-Szenarien geübt werden, bei denen die Übungsteilnehmenden einen laufenden Einsatz übernehmen und somit bereits zum Übungsstart vor dem Scannen der Patienten erste Daten in IVENA MANV vorliegen.
 
@@ -106,18 +105,15 @@ Auf der Startseite gibt es (neben dem Button zum [Anlegen einer neuen Übung](#�
 
 ### Vorlagen importieren
 
-Um bereits erstellte Patienten, Fahrzeuge und Bilder (siehe [Übungselemente](3_exercise_elements.md)) wiederzuverwenden, gibt es am oberen Rand des [Editors](2_user_interfaces.md#editor) den Button "Vorlagen importieren". 
+Um bereits erstellte Patienten, Fahrzeuge und Bilder (siehe [Übungselemente](3_exercise_elements.md)) wiederzuverwenden, gibt es am oberen Rand des [Editors](2_user_interfaces.md#editor) den Button "Vorlagen importieren".
 
 Nach Klick auf diesen Button muss eine Vorlage `.json`-Datei ausgewählt werden. Bevor der Import erfolgt, muss entschieden werden, ob die bestehenden Patienten-, Fahrzeug- und Bildvorlagen ergänzt oder ob sie gelöscht und vollständig durch die neuen überschrieben werden sollen.
 
-> [!WARNING] 
-> Wenn die Option "Ergänzen" zum Vorlagen-Import ausgewählt wird werden Patienten-, Fahrzeug- und Bildvorlagen, die in der derzeitigen Übung *und* in der `.json`-Datei existieren, möglicherweise doppelt angezeigt, auch wenn die Objekte identisch sind. Dadurch kann der Editor unübersichtlich werden
+> [!WARNING]
+> Wenn die Option "Ergänzen" zum Vorlagen-Import ausgewählt wird, werden Patienten-, Fahrzeug- und Bildvorlagen, die in der derzeitigen Übung _und_ in der `.json`-Datei existieren, möglicherweise doppelt angezeigt, auch wenn die Objekte identisch sind. Dadurch kann der Editor unübersichtlich werden.
 
- 
-
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > Das Überschreiben von Vorlagen ändert nicht die bereits in einer Übung platzierten Inhalte.
-
 
 ## Übungseinstellungen
 
@@ -129,17 +125,17 @@ Die meisten Einstellungen werden sofort nach Eingabe übernommen, lediglich die 
 
 In diesem Bereich kann die Karte für die primäre [Übungsansicht](2_user_interfaces.md#übungsansichtkartenansicht) konfiguriert werden.
 
-Die wichtigste Einstellung ist die **Serveradresse**, die bestimmt, von welchem Server die Kartendaten geladen werden. Die URL muss die Platzhalter für die Koordinaten `{x}`, `{y}` oder `{-y}`, sowie der Zoomstufe `{z}` enthalten. Die meisten Anbieter von Kartendaten bieten hierzu standardisierte URLs an. 
+Die wichtigste Einstellung ist die **Serveradresse**, die bestimmt, von welchem Server die Kartendaten geladen werden. Die URL muss die Platzhalter für die Koordinaten `{x}`, `{y}` oder `{-y}`, sowie der Zoomstufe `{z}` enthalten. Die meisten Anbieter von Kartendaten bieten hierzu standardisierte URLs an.
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > Bitte beachten Sie die Lizenzbedingungen der entsprechenden Karten-Server.
 
-> [!WARNING] 
-> Der Anbieter des genutzten Kartenservers erhält zwar keinen Zugriff auf die Übungsinhalte, aber er kann verfolgen, welche Orte Übungsleitende und Teilnehmende betrachten sowie deren IP-Addressen sammeln und auswerten. Letztes ist ein personenbezogenes Datum im Sinne der DSGVO. Es ist daher erforderlich, die Datenschutzbedingungen des jeweiligen Anbieters zu beachten und die Zustimmung der Nutzenden einzuholen (siehe [Nutzungsbedingungen](https://fuesim-manv.de/about/terms)). 
+> [!WARNING]
+> Der Anbieter des genutzten Kartenservers erhält zwar keinen Zugriff auf die Übungsinhalte, aber er kann verfolgen, welche Orte Übungsleitende und Teilnehmende betrachten sowie deren IP-Addressen sammeln und auswerten. Letztes ist ein personenbezogenes Datum im Sinne der DSGVO. Es ist daher erforderlich, die Datenschutzbedingungen des jeweiligen Anbieters zu beachten und die Zustimmung der Nutzenden einzuholen (siehe [Nutzungsbedingungen](https://fuesim-manv.de/about/terms)).
 
 Neben der Serveradresse kann der **maximale Zoom** eingestellt werden. Dabei handelt es sich um die höchste Zoomstufe, für die Kartendaten vom Server geholt werden. Wird ein zu höher, nicht unterstützter Wert eingegeben, werden von vielen Servern Fehlerbilder statt Kartenmaterial ausgeliefert, was bei starkem Hereinzoomen eine Übung unbenutzbar macht. Es wird daher empfohlen, die für den jeweiligen Kartenserver maximale Zoomstufe zu recherchieren und hier einzugeben.
 
-Die Einstellungen „Serveradresse" und „maximaler Zoom" müssen nach einer Änderung durch einen Klick auf "Karteneinstellungen speichern" manuell bestätigt werden. 
+Die Einstellungen „Serveradresse" und „maximaler Zoom" müssen nach einer Änderung durch einen Klick auf "Karteneinstellungen speichern" manuell bestätigt werden.
 
 ### Einsatzübersicht
 
@@ -151,7 +147,7 @@ Zusätzlich kann eine **Serveradresse für Gebäudedaten** angegeben werden. Hie
 
 Zuletzt kann mit der Einstellung "**3D-Gebäude anzeigen?**" die 3D-Ansicht mit den Gebäudedaten von der oben genannten Serveradresse aktiviert werden.
 
-Die Einstellungen „Serveradresse", "Serveradresse für Gebäudedaten" und „3D-Gebäude anzeigen?" müssen nach einer Änderung durch einen Klick auf "Karteneinstellungen für die Einsatzübersicht speichern" manuell bestätigt werden. 
+Die Einstellungen „Serveradresse", "Serveradresse für Gebäudedaten" und „3D-Gebäude anzeigen?" müssen nach einer Änderung durch einen Klick auf "Karteneinstellungen für die Einsatzübersicht speichern" manuell bestätigt werden.
 
 ### Patienten
 

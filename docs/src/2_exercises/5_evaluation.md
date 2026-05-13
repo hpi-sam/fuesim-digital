@@ -1,4 +1,4 @@
-# 2.5. Auswertung
+# Auswertung
 
 Zur Auswertung stehen zwei Fenster bereit, die im [Hauptmenü](2_user_interfaces.md#hauptmenü) unter "Auswertung" geöffnet werden können.
 
@@ -6,19 +6,19 @@ Zur Auswertung stehen zwei Fenster bereit, die im [Hauptmenü](2_user_interfaces
 
 ### Einsatzverlauf
 
-Im Tab "Ansichten & simulierte Bereiche" des Fensters "Statistiken" wird die Anzahl an [Patienten](3_exercise_elements.md#patienten), [Fahrzeugen und Personal](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) im Übungsverlauf als Diagramm visualisiert. 
+Im Tab "Ansichten & simulierte Bereiche" des Fensters "Statistiken" wird die Anzahl an [Patienten](3_exercise_elements.md#patienten), [Fahrzeugen und Personal](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) im Übungsverlauf als Diagramm visualisiert.
 
 #### Diagramme
 
 Es gibt drei Diagramme:
 
-* **Patienten**: Anzahl an Patienten, sortiert nach (tatsächlicher) Sichtungskategorie. Bei Abtransport werden die Patienten aus dem Diagramm entnommen, sodass eine fallende Kurve entsteht.
+- **Patienten**: Anzahl an Patienten, sortiert nach (tatsächlicher) Sichtungskategorie. Bei Abtransport werden die Patienten aus dem Diagramm entnommen, sodass eine fallende Kurve entsteht.
 
 > [!NOTE]
-> Mit tatsächlicher Sichtungskategorie ist die als "Musterlösung" hinterlegte Sichtungsfarbe gemeint. Eventuelle Fehlsichtungen der Übenden sind nicht berücksichtigt. 
+> Mit tatsächlicher Sichtungskategorie ist die als "Musterlösung" hinterlegte Sichtungsfarbe gemeint. Eventuelle Fehlsichtungen der Übenden sind nicht berücksichtigt.
 
-* **Fahrzeuge**: Anzahl Fahrzeuge, sortiert nach Typ. Sofern die Auswahl nicht auf eine Ansicht oder einen Bereich eingeschränkt wurde, werden auch Fahrzeuge im Transfer (als z.B. alarmierte Fahrzeuge) mitgezählt.
-* **Einsatzkräfte**: Anzahl an eingesetztem Personal, sortiert nach Typ bzw. Qualifikation. Personal, das sich noch im Fahrzeug befindet oder gerade transferiert wird, wird ignoriert.
+- **Fahrzeuge**: Anzahl Fahrzeuge, sortiert nach Typ. Sofern die Auswahl nicht auf eine Ansicht oder einen Bereich eingeschränkt wurde, werden auch Fahrzeuge im Transfer (als z.B. alarmierte Fahrzeuge) mitgezählt.
+- **Einsatzkräfte**: Anzahl an eingesetztem Personal, sortiert nach Typ bzw. Qualifikation. Personal, das sich noch im Fahrzeug befindet oder gerade transferiert wird, wird ignoriert.
 
 In den Diagrammen wird die Entwicklung der entsprechenden Anzahlen über den Übungsverlauf hinweg als Flächendiagramm dargestellt. Wenn man die Maus über die Diagramme fährt, werden die genauen Zahlen zu diesem Zeitpunkt angezeigt.
 
@@ -31,14 +31,14 @@ Oberhalb der Diagramme befindet sich links ein Dropdown-Menü, in dem entweder d
 Neben dem Dropdown-Menü befindet sich ein Button "aktualisieren", mit dem die Diagramme aktualisiert werden können. Das ist nur relevant, wenn die Übung weiterhin läuft und die Diagramme so auf den neuesten Stand gebracht werden sollen.
 
 > [!IMPORTANT]
-> Die Diagramme werden beim ersten Öffnen des Fensters "Statistiken" automatisch generiert. Es ist nicht erforderlich, manuell den Button "aktualisieren" zu drücken. 
+> Die Diagramme werden beim ersten Öffnen des Fensters "Statistiken" automatisch generiert. Es ist nicht erforderlich, manuell den Button "aktualisieren" zu drücken.
 
 > [!WARNING]
 > Je nach System und Übungsgröße kann das Generieren der Diagramme eine gewisse Zeit in Anspruch nehmen.
 
 ### Krankenhäuser
 
-Im Tab "Krankenhäuser" des Fensters "Statistiken" wird eine Liste aller Patienten angezeigt, die aus der Übung heraus an ein [Krankenhaus](3_exercise_elements.md#krankenhäuser) geschickt wurden.  Zu jedem Transport werden die ID des Patienten, die (tatsächliche) Sichtungskategorie, die Typbezeichnung des transportierenden Fahrzeugs, die Abfahrtszeit und die Ankunftszeit am Krankenhaus sowie der Name des Zielkrankenhauses angezeigt.
+Im Tab "Krankenhäuser" des Fensters "Statistiken" wird eine Liste aller Patienten angezeigt, die aus der Übung heraus an ein [Krankenhaus](3_exercise_elements.md#krankenhäuser) geschickt wurden. Zu jedem Transport werden die ID des Patienten, die (tatsächliche) Sichtungskategorie, die Typbezeichnung des transportierenden Fahrzeugs, die Abfahrtszeit und die Ankunftszeit am Krankenhaus sowie der Name des Zielkrankenhauses angezeigt.
 
 > [!TIP]
 > Bei den Zeiten handelt es sich um die verstrichene Zeit seit Übungsbeginn. Die Eintreffzeit wird aus der für das jeweilige Krankenhaus hinterlegten Transportdauer berechnet.
@@ -51,11 +51,11 @@ In der rechten Hälfte des Fensters "Statistiken" wird aktuell das Übungslog an
 > Das Log wurde ursprünglich entwickelt, um technische Details in der Software schnell nachzuvollziehen. Deshalb sind die Log-Ereignisse sehr kleinteilig und die Filtermechnaik sehr präzise.
 
 > [!WARNING]
-> Es werden aktuell nicht *alle* Ereignisse im Log angezeigt, sondern derzeit nur eine technisch bedingte Auswahl.
+> Es werden aktuell nicht _alle_ Ereignisse im Log angezeigt, sondern derzeit nur eine technisch bedingte Auswahl.
 
 #### Filter
 
-Oberhalb der Liste können Filter konfiguriert werden. 
+Oberhalb der Liste können Filter konfiguriert werden.
 
 Beim Hinzufügen eines Filters wird zunächst eine Kategorie von Übungsobjekten gewählt (z.B. "Patient", „Fahrzeug" oder "Transferpunkt"), was bereits dazu führt, dass nur noch Ergebnisse, die ein Übungselement dieses Typs betreffen, angezeigt werden.
 
@@ -74,7 +74,7 @@ Durch einen Klick auf "Übung wieder betreten" in der oberen Menüleiste neben d
 
 ### Aufzeichnung abspielen
 
-Im Zeitstrahl kann ein beliebiger Zeitpunkt markiert werden, um die Übungslage zu dieser Zeit entsprechend nachzustellen. Zudem kann die Übung durch einen Klick auf den Play/Pause-Button links oberhalb des Zeitstrahls abgespielt oder wieder angehalten werden. Das Abspielen ist auf Wunsch nicht nur mit einfacher, sondern auch mit doppelter, vierfacher, achtfacher oder 16-facher Geschwindigkeit möglich. 
+Im Zeitstrahl kann ein beliebiger Zeitpunkt markiert werden, um die Übungslage zu dieser Zeit entsprechend nachzustellen. Zudem kann die Übung durch einen Klick auf den Play/Pause-Button links oberhalb des Zeitstrahls abgespielt oder wieder angehalten werden. Das Abspielen ist auf Wunsch nicht nur mit einfacher, sondern auch mit doppelter, vierfacher, achtfacher oder 16-facher Geschwindigkeit möglich.
 
 > [!WARNING]
 > Das Springen zu einem bestimmten Zeitpunkt kann je nach System und Übungsgröße eine gewisse Zeit in Anspruch nehmen. Gerade bei größeren Zeitsprüngen oder bei Sprüngen zu Zeitpunkten, die hinter dem aktuell gezeigten Zeitpunkt liegen, ist mit etwas Wartezeit zu rechnen.

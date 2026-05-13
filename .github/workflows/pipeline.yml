@@ -141,6 +141,11 @@ jobs:
             - name: Run Prettier
               if: always()
               run: npm run prettier:check
+            - name: Lint mdBook
+              uses: joshrotenberg/mdbook-lint-action@v1
+              with:
+                  files: docs/src/**/*.md
+                  config: docs/.mdbook-lint.toml
 
     test:
         timeout-minutes: 4

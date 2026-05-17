@@ -207,7 +207,8 @@ export class ActiveExercise {
         });
         if (
             this.clients.size === 0 &&
-            this.exercise.currentStateString.currentStatus === 'running'
+            this.exercise.currentStateString.currentStatus === 'running' &&
+            this.exercise.parallelExerciseId === null
         ) {
             // Pause the exercise
             this.applyAction(

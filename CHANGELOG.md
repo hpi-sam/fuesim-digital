@@ -7,6 +7,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-05-17
+
 ### Added
 
 - Map tile servers can now be selected from a list of suggested servers
@@ -399,7 +401,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.1...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.9.0...v0.10.0

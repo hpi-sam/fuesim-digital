@@ -1,7 +1,7 @@
 @if ((exerciseStatus$ | async) === 'running') {
     <button
         (click)="pauseExercise()"
-        class="btn btn-primary ms-3"
+        class="btn btn-primary"
         data-cy="trainerToolbarPauseButton"
     >
         Pause
@@ -10,7 +10,7 @@
 @if ((exerciseStatus$ | async) !== 'running') {
     <button
         (click)="startExercise()"
-        class="btn btn-primary ms-3"
+        class="btn btn-primary"
         data-cy="trainerToolbarStartButton"
     >
         Start

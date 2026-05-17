@@ -8,31 +8,11 @@
         <div class="card-body">
             <div class="form-group mb-3">
                 <label class="form-label mb-1">Serveradresse:</label>
-                <p class="small text-muted mb-2">
-                    <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
-                    Unter dieser Adresse werden die Karten-Kacheln geladen. Die
-                    URL muss die Platzhalter für die Koordinaten
-                    <code>{{ '{' }}x{{ '}' }}</code
-                    >, <code>{{ '{' }}y{{ '}' }}</code> oder
-                    <code>{{ '{' }}-y{{ '}' }}</code
-                    >, sowie der Zoomstufe
-                    <code>{{ '{' }}z{{ '}' }}</code> enthalten. Bitte beachten
-                    Sie die Lizenzbedingungen der entsprechenden Karten-Server.
-                </p>
-                <input
-                    #tileUrlInput="ngModel"
-                    [(ngModel)]="tileMapProperties.tileUrl"
-                    [appAutofocus]="true"
-                    appUrlValidator
-                    [pattern]="tileUrlRegex"
-                    required
-                    type="url"
-                    class="form-control"
-                    placeholder="https://a.tile.openstreetmap.de/{z}/{x}/{y}.png"
+                <app-tile-server-selector
+                    [(url)]="tileMapProperties.tileUrl"
+                    description="die Kartenansicht"
+                    [autofocus]="true"
                 />
-                <app-display-validation
-                    [ngModelInput]="tileUrlInput"
-                ></app-display-validation>
             </div>
             <div class="form-group mb-3">
                 <label class="form-label">Maximaler Zoom:</label>
@@ -67,32 +47,10 @@
         <div class="card-body">
             <div class="form-group mb-3">
                 <label class="form-label mb-1">Serveradresse:</label>
-                <p class="small text-muted mb-2">
-                    <!-- Yes, this is seemingly the only way to escape curly braces https://github.com/angular/angular/issues/11859 -->
-                    Unter dieser Adresse werden die Karten-Kacheln für die
-                    Einsatzübersicht geladen. Die URL muss die Platzhalter für
-                    die Koordinaten
-                    <code>{{ '{' }}x{{ '}' }}</code
-                    >, <code>{{ '{' }}y{{ '}' }}</code> oder
-                    <code>{{ '{' }}-y{{ '}' }}</code
-                    >, sowie der Zoomstufe
-                    <code>{{ '{' }}z{{ '}' }}</code> enthalten. Bitte beachten
-                    Sie die Lizenzbedingungen der entsprechenden Karten-Server.
-                </p>
-                <input
-                    #operationsMapTileUrlInput="ngModel"
-                    [(ngModel)]="operationsMapProperties.tileUrl"
-                    [appAutofocus]="true"
-                    appUrlValidator
-                    [pattern]="tileUrlRegex"
-                    required
-                    type="url"
-                    class="form-control"
-                    placeholder="https://a.tile.openstreetmap.de/{z}/{x}/{y}.png"
+                <app-tile-server-selector
+                    [(url)]="operationsMapProperties.tileUrl"
+                    description="die Einsatzübersicht"
                 />
-                <app-display-validation
-                    [ngModelInput]="operationsMapTileUrlInput"
-                ></app-display-validation>
             </div>
             <div class="form-group mb-3">
                 <label class="form-label mb-1">
@@ -106,7 +64,6 @@
                 <input
                     #operationsUrlInput="ngModel"
                     [(ngModel)]="operationsMapProperties.dataUrl"
-                    [appAutofocus]="true"
                     appUrlValidator
                     required
                     type="url"

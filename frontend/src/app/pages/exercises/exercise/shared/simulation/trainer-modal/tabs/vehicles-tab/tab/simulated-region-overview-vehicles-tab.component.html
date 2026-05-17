@@ -20,8 +20,7 @@
                                 style="cursor: pointer"
                                 (click)="selectVehicle(vehicle)"
                                 [class.table-primary]="
-                                    (selectedVehicle$ | async)?.id ===
-                                    vehicle.id
+                                    selectedVehicle()?.id === vehicle.id
                                 "
                             >
                                 <td>
@@ -40,7 +39,7 @@
     </div>
     <div class="vr"></div>
     <div class="col h-100" style="max-width: 70%">
-        @if (selectedVehicle$ | async; as selectedVehicle) {
+        @if (selectedVehicle(); as selectedVehicle) {
             <app-simulated-region-overview-vehicle-details
                 [simulatedRegion]="simulatedRegion()"
                 [vehicle]="selectedVehicle"

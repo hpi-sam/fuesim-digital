@@ -5,6 +5,7 @@ import {
     lowerRightCornerOf,
     isInViewport,
     getBoundingBox,
+    coordinateStringToNumber,
 } from 'fuesim-digital-shared';
 import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
@@ -45,14 +46,6 @@ import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
 import { SatelliteLayerManager } from './satellite-layer-manager';
 import type { PopupService } from './popup.service';
-
-export const coordinateStringSchema = z
-    .string()
-    .regex(/^-?\d{1,3}(.\d+)?$/u, 'Die Eingabe ist keine gültige Koordinate.');
-const coordinateStringToNumber = z.codec(coordinateStringSchema, z.number(), {
-    decode: (str) => Number.parseFloat(str),
-    encode: (num) => num.toFixed(6),
-});
 
 export const olMapCoordinatesSchema = z.object({
     longitude: coordinateStringToNumber,

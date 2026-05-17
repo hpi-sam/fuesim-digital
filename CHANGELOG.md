@@ -7,6 +7,29 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-05-17
+
+### Added
+
+- Map tile servers can now be selected from a list of suggested servers
+- Alarm groups can now be sent when preparing an exercise template.
+- Vehicles in transfer can now be managed when preparing an exercise template.
+
+### Changed
+
+- Extend patients export for IVENA MANV with new fields (e. g. location).
+- Docker Images are now pushed exclusively to GHCR. Images on Dockerhub are no longer updated. If you're selfhosting and still using the `digitalfuesimmanv/dfm` image, please switch to `ghcr.io/hpi-sam/fuesim-digital`.
+
+### Fixed
+
+- `DFM_UPLOAD_LIMIT` values are now correctly applied again, after a bug in version 0.11.0
+- The vehicle status display now uses the correct visible status of a patient. Thus, after a patient that has been triaged by personnel on the map, the color determined in this triage is used.
+- Permissions for multiple actions around simulated regions that were mistakenly allowed for participants have been changed to trainers only.
+- The exercise map now fits on mobile device screens
+- Vehicles inside a simulated region can now be properly selected again
+- Vehicles inside simulated regions are now shown inside the "operations detail view"
+- Exercise instances that are part of a parallel exercise no longer get paused when all participants have left, i.e. due to connection issues. This ensures that all instances stay synchronized.
+
 ## [0.11.1] - 2026-04-30
 
 ### Fixed
@@ -378,7 +401,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.1...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.9.0...v0.10.0

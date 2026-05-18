@@ -1,3 +1,5 @@
+# Anleitung für die FüSim Digital
+
 ## Was ist die FüSim Digital?
 
 Die FüSim Digital ist ein neues Hilfsmittel für regelmäßige, niederschwellige Führungssimulationsübungen. Es ist eine digitale Umsetzung des analogen, auf Whiteboards, Magnetkarten und Aufklebern basierenden FüSim-Planspiels, das an der [Bundesakademie für Bevölkerungsschutz und Zivile Verteidigung (BABZ)](https://www.bbk.bund.de/DE/Themen/Akademie-BABZ/akademie-babz_node.html) entwickelt wurde und dort und anderswo seit Jahren erfolgreich eingesetzt wird.

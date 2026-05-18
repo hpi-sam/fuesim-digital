@@ -12,12 +12,12 @@ Für jede Übung werden neben der [Teilnehmenden-PIN](../2_exercises/1_general.m
 
 Um Übungen für wiederkehrende Verwendungen zu erstellen, bietet es sich an, eine Übungsvorlage einzusetzen. Übungsvorlagen sehen im Übungseditor genauso wie Übungen aus, können jedoch nicht gestartet werden. Darauf weist im Editor für Übungsvorlagen auch ein Warnhinweis hin.
 
-Die Liste der Übungsvorlagen kann unter dem Menüpunkt [„Übungsvorlagen"](https://fuesim-manv.de/exercises/templates) gefunden werden und ist zunächst leer. Neue Vorlagen können hier entweder direkt erstellt werden oder durch das Hochladen von alten [Übungsexports](../2_exercises/1_general.md#übungen-exportieren) erzeugt werden. Zum Leichteren Wiederfinden kann ein Name und eine Beschreibung vergeben werden. In der Liste tauchen die Vorlagen dann mit Namen, Beschreibung, dem Erstellungsdatum, dem Datum der letzten Änderung und dem Zeitpunkt, zu dem die letzte Übung erstellt wurde, auf.
+Die Liste der Übungsvorlagen kann unter dem Menüpunkt [<kbd>Übungsvorlagen</kbd>](https://fuesim-manv.de/exercises/templates) gefunden werden und ist zunächst leer. Neue Vorlagen können hier entweder direkt erstellt werden oder durch das Hochladen von alten [Übungsexports](../2_exercises/1_general.md#übungen-exportieren) erzeugt werden. Zum leichteren Wiederfinden kann ein Name und eine Beschreibung vergeben werden. In der Liste tauchen die Vorlagen dann mit Namen, Beschreibung, dem Erstellungsdatum, dem Datum der letzten Änderung und dem Zeitpunkt, zu dem die letzte Übung erstellt wurde, auf.
 
 ![Liste der Übungsvorlagen im Benutzerkonto](./exercise_templates_list.png)
 
-Über „Öffnen" kann die Vorlage im Übungseditor geöffnet werden und das Szenario wie im Abschnitt „Übungen" beschrieben erstellt werden.
+Über <kbd>Öffnen</kbd> kann die Vorlage im Übungseditor geöffnet werden und das Szenario wie im Abschnitt [Übungen](../2_exercises/index.md) beschrieben erstellt werden.
 
 ![Übungseditor für Übungsvorlagen](./exercise_template_editor.png)
 
-Über „Neue Übung" kann dann die Vorlage genutzt werden, um aus ihr eine Übungsinstanz zu erstellen, die dann mit Teilnehmenden bespielt werden kann. Weiterhin ist hier auch das Löschen von Übungsvorlagen möglich.
+Über <kbd>Neue Übung</kbd> kann dann die Vorlage genutzt werden, um aus ihr eine Übungsinstanz zu erstellen, die dann mit Teilnehmenden bespielt werden kann. Weiterhin ist hier auch das Löschen von Übungsvorlagen möglich.

@@ -5,7 +5,7 @@
 Auf der Startseite der FüSim Digital befinden sich ein Button, um [einer Übung mit einer gegebenen PIN beizutreten](1_general.html#einer-übung-beitreten), und ein Button, um eine [neue Übung zu erstellen](1_general.html#übungen-anlegen).
 
 > [!TIP]
-> Angemeldete Benutzer können können Übungen und Vorlagen statt über die Startseite über die Benutzeroberflächen für [Übungs- und Vorlagenverwaltung](../4_editing/index.html) neu erstellen bzw. öffnen.
+> Angemeldete Benutzer können Übungen und Vorlagen statt über die Startseite über die Benutzeroberflächen für [Übungs- und Vorlagenverwaltung](../4_editing/index.html) neu erstellen bzw. öffnen.
 
 ## Übungsansicht/Kartenansicht
 
@@ -27,7 +27,7 @@ Die Karte kann sowohl mit Maus und Tastatur als auch mit Touch-Gesten bedient we
 
 Für die Bewegung auf der Karte kann die linke Maustaste an irgendeiner Stelle gedrückt und die Maus bei gedrückter Maustaste bewegt werden. Bei Touch-Geräten wird statt der gedrückten Maustaste ein Fingerdruck verwendet, um den Kartenausschnitt zu verschieben. Wenn eine Tastatur zur Verfügung steht, können zudem die Pfeiltasten genutzt werden.
 
-An einem Gerät mit Maus kann zum Zoomen das Mausrad genutzt werden, wobei beim nach oben Drehen reingezoomt und beim nach unten Drehen rausgezoomt wird. Auf einer Tastatur können die Tasten "+" und "-" verwendet werden. Bei Touch-Geräten sind zwei Finger für eine Pinch-Geste erforderlich. Wenn die beiden Finger auseinander bewegt werden, entspricht das dem Reinzoomen; wenn die Finger zueinander bewegt werden, entspricht das dem Herauszoomen.
+An einem Gerät mit Maus kann zum Zoomen das Mausrad genutzt werden, wobei beim nach oben Drehen reingezoomt und beim nach unten Drehen rausgezoomt wird. Auf einer Tastatur können die Tasten <kbd>+</kbd> und <kbd>-</kbd> verwendet werden. Bei Touch-Geräten sind zwei Finger für eine Pinch-Geste erforderlich. Wenn die beiden Finger auseinander bewegt werden, entspricht das dem Reinzoomen; wenn die Finger zueinander bewegt werden, entspricht das dem Herauszoomen.
 
 > [!WARNING]
 > Bei mehreren Nutzenden, die gleichzeitig mit einem Touch-Geräte (z.B. Smartboard) interagieren, kann es passieren, das unabhängige Interaktionen als starkes Reinzoomen interpretiert wird und die Karte auf einen sehr kleinen Ausschnitt reduziert wird.
@@ -36,11 +36,11 @@ An einem Gerät mit Maus kann zum Zoomen das Mausrad genutzt werden, wobei beim 
 
 In der oberen linken Ecke der Karte befindet sich eine Gruppe von Buttons zur Bedienung der Karte.
 
-- "Vergrößern" ("+"): Um eine Stufe hereinzoomen.
-- "Verkleinern" ("-"): Um eine Stufe herauszoomen.
-- "Alle Ansichten anzeigen": Wählt die Kartenposition und die Zoomstufe so, dass alle Ansichten zusammen sichtbar sind. Nur für Übungsleitende verfügbar.
-- "Zu Koordinaten springen": Öffnet ein Fenster, in dem Koordinaten (Breiten- und Längengrad) eingegeben werden können. Nur für Übungsleitende verfügbar und für die erste Ortsauswahl beim Erstellen einer Übung vorgesehen.
-- "Vollbildmodus": Öffnet einen Vollbildmodus, in dem auf dem gesamten Bildschirm nur die Karte (ohne Menüleisten und Editor) sichtbar ist.
+- <kbd>Vergrößern</kbd> (<kbd>+</kbd>): Um eine Stufe hereinzoomen.
+- <kbd>Verkleinern</kbd> (<kbd>-</kbd>): Um eine Stufe herauszoomen.
+- <kbd>Alle Ansichten anzeigen</kbd>: Wählt die Kartenposition und die Zoomstufe so, dass alle Ansichten zusammen sichtbar sind. Nur für Übungsleitende verfügbar.
+- <kbd>Zu Koordinaten springen</kbd>: Öffnet ein Fenster, in dem Koordinaten (Breiten- und Längengrad) eingegeben werden können. Nur für Übungsleitende verfügbar und für die erste Ortsauswahl beim Erstellen einer Übung vorgesehen.
+- <kbd>Vollbildmodus</kbd>: Öffnet einen Vollbildmodus, in dem auf dem gesamten Bildschirm nur die Karte (ohne Menüleisten und Editor) sichtbar ist.
 
 ### Obere Menüleiste
 
@@ -52,9 +52,9 @@ Im linken Bereich der oberen Menüleiste werden die Teilnehmenden-PIN der Übung
 
 In der Mitte der oberen Menüleiste befinden sich Buttons zur Einleitung weiterer Teilnehmender.
 
-Dort ist insbesondere ein grauer Button mit der Beschriftung "Teilnehmende einladen" zu sehen. Klickt man auf diesen, wird in einem Popup die Teilnehmenden-PIN noch einmal in groß angezeigt, zusammen mit einem QR-Code, dessen Scannen andere Nutzende direkt zur Übung führt. Übungsleitende sehen an dieser Stelle neben PIN und QR-Code eine Liste aller Teilnehmenden und können diese [einteilen.](4_conduction.html#teilnehmende-verwalten)
+Dort ist insbesondere ein grauer Button mit der Beschriftung <kbd>Teilnehmende einladen</kbd> zu sehen. Klickt man auf diesen, wird in einem Popup die Teilnehmenden-PIN noch einmal in groß angezeigt, zusammen mit einem QR-Code, dessen Scannen andere Nutzende direkt zur Übung führt. Übungsleitende sehen an dieser Stelle neben PIN und QR-Code eine Liste aller Teilnehmenden und können diese [einteilen.](4_conduction.html#teilnehmende-verwalten)
 
-Übungsleitende sehen zusätzlich einen zweiten gelben Button mit dem Titel "Übungsleitende einladen". Dieser öffnet ein Popup mit der Übungsleitungs-PIN und einem zugehörigen QR-Code, über den die Übung direkt als Mitglied der Übungsleitung betreten werden kann.
+Übungsleitende sehen zusätzlich einen zweiten gelben Button mit dem Titel <kbd>Übungsleitende einladen</kbd>. Dieser öffnet ein Popup mit der Übungsleitungs-PIN und einem zugehörigen QR-Code, über den die Übung direkt als Mitglied der Übungsleitung betreten werden kann.
 
 Neben beiden Buttons befindet sich jeweils ein kleiner Ergänzungs-Button mit dem Link-Symbol, mit dem ein Link zur Übung direkt, ohne das Pop-up zu öffnen, in die Zwischenablage kopiert wird.
 
@@ -66,7 +66,7 @@ Im rechten Bereich der oberen Menüleiste befindet sich ein blauer Button zum Ex
 
 #### Hauptmenü
 
-Im linken Bereich der unteren Menüleiste befindet sich ein Hauptmenü für Übungsleitungen, das Zugriff auf sämtliche [Konfigurations- und Übersichtsfenster](#konfigurations--und-übersichtsfenster-nur-in-übungsleitenden-ansicht) bietet. Das Menü ist unterteilt in "Einstellungen" sowie in die drei Phasen eines typischen Übungs-Lebenszyklus: "Erstellung", „Durchführung" und "Auswertung".
+Im linken Bereich der unteren Menüleiste befindet sich ein Hauptmenü für Übungsleitungen, das Zugriff auf sämtliche [Konfigurations- und Übersichtsfenster](#konfigurations--und-übersichtsfenster-nur-in-übungsleitenden-ansicht) bietet. Das Menü ist unterteilt in <kbd>Einstellungen</kbd> sowie in die drei Phasen eines typischen Übungs-Lebenszyklus: <kbd>Erstellung</kbd>, <kbd>Durchführung</kbd> und <kbd>Auswertung</kbd>.
 
 #### Übungssteuerung
 
@@ -78,7 +78,7 @@ Im rechten Bereich der unteren Menüleiste befindet sich ein roter Button, mit d
 
 ### Editor (nur in Übungsleitenden-Ansicht)
 
-Übungsleitende sehen am rechten Rand der Karte den sogenannten "Editor". Dieser besteht aus einem Auswahlmenü mit Vorlagen für alle in der Übung platzierbaren [Übungselemente](3_exercise_elements.md). Wenn diese angeklickt und auf die Übungskarte "gezogen" werden wird basierend auf der Vorlage ein entsprechendes Übungselement entstellt.
+Übungsleitende sehen am rechten Rand der Karte den sogenannten Editor. Dieser besteht aus einem Auswahlmenü mit Vorlagen für alle in der Übung platzierbaren [Übungselemente](3_exercise_elements.md). Wenn diese angeklickt und auf die Übungskarte "gezogen" werden, wird basierend auf der Vorlage ein entsprechendes Übungselement entstellt.
 
 > [!IMPORTANT]
 > Der Editor kann aus technischen Gründen nicht auf Touch-Geräten benutzt werden. Übungsleitende müssen eine Maus verwenden, um Übungselemente aus dem Editor auf der Karte zu platzieren. Die Interaktion mit allen anderen Teilen der Übung ist für Übungsleitende allerdings auch auf Touch-Geräten möglich.
@@ -88,7 +88,7 @@ Im rechten Bereich der unteren Menüleiste befindet sich ein roter Button, mit d
 Der Editor ist in folgende Kategorien unterteilt:
 
 - **Ansicht/Transferpunkt**: Hier befinden sich Vorlagen für [Ansichten](3_exercise_elements.md#ansichten) (Bereiche einer Übung, denen ein Teilnehmender zugeordnet werden kann) und [Transferpunkte](3_exercise_elements.md#transferpunkte) (verbindbare Punkte, bei denen alarmierte Kräfte eintreffen und zwischen denen Personal und Fahrzeuge transferiert werden können) platziert werden. Optional können hier die (nur für Übungsleitende sichtbaren) Verbindungslinien zwischen Transferpunkten deaktiviert werden.
-- **Simulierte Bereiche**: Mithilfe der Vorlagen "Patientenablage", "Bereitstellungsraum" oder "Transportorganisation" können vorkonfigurierte [simulierte Bereiche](../3_simulation/) ausgewählt werden. Als letztes in der Liste steht die Vorlage für einen generischen simulierten Bereich, der manuell konfiguriert werden kann.
+- **Simulierte Bereiche**: Mithilfe der Vorlagen _Patientenablage_, _Bereitstellungsraum_ oder _Transportorganisation_ können vorkonfigurierte [simulierte Bereiche](../3_simulation/) ausgewählt werden. Als Letztes in der Liste steht die Vorlage für einen generischen simulierten Bereich, der manuell konfiguriert werden kann.
 - **Zonen**: Es können [Zonen](3_exercise_elements.md#zonen) platziert werden, wobei es sich um Bereiche auf der Übungskarte handelt, die benannt, farblich markiert sowie auf eine bestimmte Anzahl und bestimmte Arten von Fahrzeugen beschränkt werden können. Die zuerst stehende Vorlage "Eingeschränkte Zone" erzeugt generische und frei konfigurierbare Zonen. Die drei anderen zur Auswahl stehenden Vorlagen sind vorkonfiguriert als mögliche "Ladezone", "Pufferzone" und "RTH-Landeplatz", können aber weiter verfeinert werden.
 - **Patienten:** Hier befinden sich Vorlagen für [Patienten](3_exercise_elements.md#patienten), sortiert nach initialer Sichtungskategorie und gekennzeichnet mit dem zu erwartenden Verlauf. Eine Zahl bei jeder Vorlage zeigt, wie viele Ausprägungen für diesen medizinischen Verlauf hinterlegt sind, wobei die Ausprägungen sich durch verschiedene Texte zu den medizinischen Details unterscheiden. Beim Platzieren auf der Karte wird eine der Ausprägungen für den gewählten Verlauf zufällig ausgesucht sowie Name und Stammdaten des Patienten zufällig generiert.
 - **Fahrzeuge**: Hier kann aus den Vorlagen für [Fahrzeuge](3_exercise_elements.md#fahrzeuge-mit-personal-und-material) ausgewählt werden, wobei auch neue Vorlagen erstellt und Vorlagen bearbeitet und gelöscht werden können. Es ist zu beachten, dass Änderungen einer Vorlage sich nicht auf bereits platzierte Fahrzeuge auswirken.
@@ -104,7 +104,7 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
 
 - **Einstellungen**: Hier können die allgemeinen [Übungseinstellungen](1_general.md#übungseinstellungen) vorgenommen werden.
 - **Erstellung**
-    - **Alarmierungsgruppen**: In diesem Fenster können [Alarmierungsgruppen](3_exercise_elements.md#alarmierungsgruppen) erstellt, bearbeitet und wieder gelöscht werden.
+    - **Alarmierungsgruppen**: In diesem Fenster können [Alarmierungsgruppen](3_exercise_elements.md#alarmierungsgruppen) erstellt, bearbeitet und wieder gelöscht werden.
     - **Krankenhäuser**: In diesem Fenster können [Krankenhäuser](3_exercise_elements.md#krankenhäuser) erstellt, bearbeitet und wieder gelöscht werden.
 - **Durchführung**
     - **Teilnehmende**: Fenster zur [Verwaltung der Übungsteilnehmenden](4_conduction.md#teilnehmende-verwalten).
@@ -118,7 +118,7 @@ Folgende Fenster sind über das Hauptmenü in der [unteren Menüleiste](#untere-
 
 ## Leitellenansicht (für Teilnehmende)
 
-Teilnehmende, die von den Übungsleitenden der Rolle "Leitstelle" zugeordnet wurden, sehen diese Oberfläche.
+Teilnehmende, die von den Übungsleitenden der Rolle <kbd>Leitstelle</kbd> zugeordnet wurden, sehen diese Oberfläche.
 
 ### Einsatztagebuch
 
@@ -132,7 +132,7 @@ In dem Menü muss zunächst ein [Transferpunkt](3_exercise_elements.md#transferp
 
 ## Einsatzübersicht (für Teilnehmende)
 
-Teilnehmende können der Rolle „Einsatzübersicht" zugeordnet werden und sehen dann eine Benutzeroberfläche, die einer typischen Einsatzapp auf Tablets (z. B. der „FireApp") nachempfunden ist. Sie bietet zwei Ansichten in separaten Tabs.
+Teilnehmende können der Rolle <kbd>Einsatzübersicht</kbd> zugeordnet werden und sehen dann eine Benutzeroberfläche, die einer typischen Einsatzapp auf Tablets (z. B. der FireApp) nachempfunden ist. Sie bietet zwei Ansichten in separaten Tabs.
 
 ### Einsatzabschnitte
 
@@ -144,6 +144,6 @@ In diesem Tab können die vor Ort befindlichen Fahrzeuge in mehrere logische Ein
 
 <SCREENSHOT Einsatzansicht Karte>
 
-In diesem Tag sehen Übungsteilnehmende, neben einer Liste der alarmierten und eingetroffenen Fahrzeuge, eine Karte des Einsatzortes. Die Karte ist initial auf die platzierten [Ansichten](3_exercise_elements.md#ansichten) zentriert, es kann auf ihr beliebig gezoomt und navigiert werden. Mit dem Button "Zurück zum Einsatzort" am unteren Rand der Karte kann die Karte zudem neu zentriert werden.
+In diesem Tag sehen Übungsteilnehmende, neben einer Liste der alarmierten und eingetroffenen Fahrzeuge, eine Karte des Einsatzortes. Die Karte ist initial auf die platzierten [Ansichten](3_exercise_elements.md#ansichten) zentriert, es kann auf ihr beliebig gezoomt und navigiert werden. Mit dem Button <kbd>Zurück zum Einsatzort</kbd> am unteren Rand der Karte kann die Karte zudem neu zentriert werden.
 
-Mit dem Button "3D" in der unteren linken Ecke der Karte kann zudem eine 3D-Ansicht mit den Silhouetten der Gebäude am Einsatzort aktiviert oder deaktiviert werden.
+Mit dem Button <kbd>3D</kbd> in der unteren linken Ecke der Karte kann zudem eine 3D-Ansicht mit den Silhouetten der Gebäude am Einsatzort aktiviert oder deaktiviert werden.

@@ -16,3 +16,4 @@
 - [Simulation](3_simulation/index.md)
 - [Übungselemente und Vorlagen](4_editing/index.md)
 - [Benutzerverwaltung](5_users/index.md)
+- [Änderungshistorie](release_notes.md)

@@ -3,7 +3,7 @@
     <div class="flex-grow-1">
         <app-vehicles-zone
             class="w-100"
-            [vehicles]="vehicles()"
+            [vehicles]="vehiclesOnLocation()"
             mode="x-scroll"
             (vehicleDropped)="onVehicleDropped($event.vehicleId)"
         />

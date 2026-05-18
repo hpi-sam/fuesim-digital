@@ -17,6 +17,16 @@ import {
     logTechnicalChallengePersonnelUnassigned,
     logTechnicalChallengeStateTransition,
 } from '../../store/action-reducers/utils/log.js';
+import { patientSchema } from '../patient.js';
+import { newPatientFromTemplate } from '../patient-template.js';
+import { newNoPosition } from '../utils/position/no-position.js';
+import { defaultPatientCategories } from '../../data/default-state/patient-templates.js';
+import { PatientActionReducers } from '../../store/action-reducers/patient.js';
+import { ReducerError } from '../../store/reducer-error.js';
+import {
+    type MapPosition,
+    newMapPositionAt,
+} from '../utils/position/map-position.js';
 import type {
     TechnicalChallenge,
     TechnicalChallengeId,
@@ -114,10 +124,145 @@ function isTimerGuardFulfilled(
 export const guardSchema = z.union([progressGuardSchema, timerGuardSchema]);
 export type Guard = ProgressGuard | TimerGuard;
 
+const sideSchema = z.literal(['top', 'bottom', 'left', 'right']);
+type Side = z.infer<typeof sideSchema>;
+
+const patientOffset = 2;
+function getPatientPosition(
+    technicalChallenge: TechnicalChallenge,
+    side: Side
+): MapPosition {
+    if (technicalChallenge.position.type !== 'coordinates')
+        throw new ReducerError('');
+    const coordinates = technicalChallenge.position.coordinates;
+    const size = technicalChallenge.size;
+    let x = 0;
+    let y = 0;
+    if (side === 'top' || side === 'bottom') {
+        x = coordinates.x + size.width / 2;
+    } else {
+        y = coordinates.y - size.height / 2;
+    }
+    switch (side) {
+        case 'top':
+            y = coordinates.y - patientOffset;
+            break;
+        case 'bottom':
+            y = coordinates.y + size.height + patientOffset;
+            break;
+        case 'left':
+            x = coordinates.x - patientOffset;
+            break;
+        case 'right':
+            x = coordinates.x + size.width + patientOffset;
+            break;
+    }
+    return newMapPositionAt({ x, y });
+}
+export const createPatientTechnicalChallengeEventTemplateSchema =
+    z.strictObject({
+        type: z.literal('createPatientEvent'),
+        id: uuidSchema,
+        patientCategory: z.int().nonnegative(),
+        side: sideSchema,
+    });
+export type CreatePatientTechnicalChallengeEventTemplate = z.infer<
+    typeof createPatientTechnicalChallengeEventTemplateSchema
+>;
+
+export const createPatientTechnicalChallengeEventSchema = z.strictObject({
+    type: z.literal('createPatientEvent'),
+    id: uuidSchema,
+    patient: patientSchema,
+    side: sideSchema,
+});
+export type CreatePatientTechnicalChallengeEvent = z.infer<
+    typeof createPatientTechnicalChallengeEventSchema
+>;
+
+export const technicalChallengeEventTemplateSchema = z.union([
+    createPatientTechnicalChallengeEventTemplateSchema,
+]);
+export type TechnicalChallengeEventTemplate = z.infer<
+    typeof technicalChallengeEventTemplateSchema
+>;
+
+export const technicalChallengeEventSchema = z.union([
+    createPatientTechnicalChallengeEventSchema,
+]);
+export type TechnicalChallengeEvent = z.infer<
+    typeof technicalChallengeEventSchema
+>;
+
+type TechnicalChallengeEventTemplateToEventFunction<Key> = (
+    template: TechnicalChallengeEventTemplate & { type: Key }
+) => (TechnicalChallengeEvent & { type: Key }) | null;
+export const technicalChallengeEventTemplateToEventMap: {
+    [Key in TechnicalChallengeEventTemplate['type']]: TechnicalChallengeEventTemplateToEventFunction<Key>;
+} = {
+    createPatientEvent: (template) => {
+        const category = defaultPatientCategories[template.patientCategory];
+        if (!category) return null;
+        const patient = newPatientFromTemplate(
+            category.patientTemplates[
+                Math.floor(Math.random() * category.patientTemplates.length)
+            ]!,
+            category.name,
+            newNoPosition()
+        );
+        return {
+            type: 'createPatientEvent',
+            id: template.id,
+            side: template.side,
+            patient,
+        };
+    },
+};
+
+type ApplyTechnicalChallengeEventFunction<Key> = (
+    draftState: WritableDraft<ExerciseState>,
+    technicalChallenge: WritableDraft<TechnicalChallenge>,
+    event: WritableDraft<TechnicalChallengeEvent & { type: Key }>
+) => void;
+
+export const applyTechnicalChallengeEventMap: {
+    [Key in TechnicalChallengeEvent['type']]: ApplyTechnicalChallengeEventFunction<Key>;
+} = {
+    createPatientEvent: (draftState, technicalChallenge, event) => {
+        PatientActionReducers.addPatient.reducer(draftState, {
+            type: '[Patient] Add patient',
+            patient: {
+                ...event.patient,
+                position: getPatientPosition(technicalChallenge, event.side),
+            },
+        });
+    },
+};
+
+export function applyTechnicalChallengeEvent(
+    draftState: WritableDraft<ExerciseState>,
+    technicalChallengeId: TechnicalChallengeId,
+    eventId: UUID
+) {
+    const technicalChallenge = getElement(
+        draftState,
+        'technicalChallenge',
+        technicalChallengeId
+    );
+    const event = technicalChallenge.events[eventId];
+    if (!event) return;
+    applyTechnicalChallengeEventMap[event.type](
+        draftState,
+        technicalChallenge,
+        event
+    );
+}
+
 export const transitionSchema = z.object({
     to: technicalChallengeStateIdSchema,
     from: technicalChallengeStateIdSchema,
     guard: guardSchema,
+    events: z.array(uuidSchema),
 });
 
 export type Transition = z.infer<typeof transitionSchema>;
@@ -189,7 +334,7 @@ function unassignFromNonexistentTasks(
 
 export function simulateTechnicalChallenge(
     technicalChallenge: WritableDraft<TechnicalChallenge>,
-    exerciseState: WritableDraft<ExerciseState>,
+    draftState: WritableDraft<ExerciseState>,
     tickInterval: number
 ) {
     const state = currentStateOf(technicalChallenge);
@@ -204,7 +349,7 @@ export function simulateTechnicalChallenge(
     const fromCurrentState = (t: Transition) =>
         t.from === technicalChallenge.currentStateId;
     const guardFulfilled = (t: Transition) =>
-        isGuardFulfilled(t.guard, technicalChallenge.id, exerciseState);
+        isGuardFulfilled(t.guard, technicalChallenge.id, draftState);
 
     // the next transition is not necessarily the first one to have its guard
     // fulfilled
@@ -215,7 +360,7 @@ export function simulateTechnicalChallenge(
     if (!nextTransition) return;
 
     logTechnicalChallengeStateTransition(
-        exerciseState,
+        draftState,
         technicalChallenge.id,
         technicalChallenge.currentStateId,
         nextTransition.to
@@ -223,12 +368,20 @@ export function simulateTechnicalChallenge(
 
     technicalChallenge.currentStateId = nextTransition.to;
 
+    for (const eventId of nextTransition.events) {
+        applyTechnicalChallengeEvent(
+            draftState,
+            technicalChallenge.id,
+            eventId
+        );
+    }
+
     const unassignedPersonnel =
         unassignFromNonexistentTasks(technicalChallenge);
     if (unassignedPersonnel.length > 0) {
         for (const { personnelId, taskId } of unassignedPersonnel) {
             logTechnicalChallengePersonnelUnassigned(
-                exerciseState,
+                draftState,
                 technicalChallenge.id,
                 personnelId,
                 taskId

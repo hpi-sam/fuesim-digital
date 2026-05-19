@@ -1,9 +1,8 @@
 import { z } from 'zod';
+import type { ImmutableInfer } from '../../utils/infer.js';
 import { collectionVersionSchema } from './collection.js';
 import type { TemplateVersion } from './versioned-elements.js';
 import { templateVersionSchema } from './versioned-elements.js';
-import type { Immutable } from 'immer';
-import type { ImmutableInfer } from '../../utils/infer.js';
 import type { CollectionElementType } from './collection-element-type.js';
 
 // TODO: Improve this naming

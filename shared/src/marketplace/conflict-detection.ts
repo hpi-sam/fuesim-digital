@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import type { Immutable } from 'immer';
-import type { ImmutableInfer } from '../utils/infer.js';
 import type {
     CollectionVersionId,
     ElementVersionId,

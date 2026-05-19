@@ -1,5 +1,4 @@
 import * as z from 'zod';
-import type { Immutable } from 'immer';
 import { versionedElementPartialSchema } from './versioned-id-schema.js';
 import { stateVersionedEntitySchema } from './state-versioned-entity.js';
 import { versionedElementContentSchema } from './versioned-element-content.js';

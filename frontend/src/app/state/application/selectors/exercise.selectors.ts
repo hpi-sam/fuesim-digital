@@ -26,14 +26,14 @@ import {
 import type { AppState } from '../../app.state';
 import type { TransferLine } from '../../../shared/types/transfer-line';
 import { elementTypePluralMap } from '../../../../../../shared/dist/utils/element-type-plural-map';
-import type {
-    CombinedEvalCriteriaTree,
-    CombinedEvalCriterion,
-    EvalCriterion,
-    PatientAtStatusEvalCriterion,
-    ReachTechnicalChallengeStateEvalCriterion,
-    ViewScoutableEvalCriterion,
-    XPatientsAtStatusEvalCriterion,
+import {
+    type CombinedEvalCriterion,
+    type CriterionNode,
+    type EvalCriterion,
+    type PatientAtStatusEvalCriterion,
+    type ReachTechnicalChallengeStateEvalCriterion,
+    type ViewScoutableEvalCriterion,
+    type XPatientsAtStatusEvalCriterion,
 } from '../../../../../../shared/dist/models/evaluation-criterion';
 import type { EvalResult } from '../../../shared/types/evaluation-result';
 
@@ -452,20 +452,19 @@ export const selectWorkingPersonnel = createSelector(
         return workingPersonnel;
     }
 );
-export function getIsCompletedFromCombinedEvalCriteriaTree(
-    tree: CombinedEvalCriteriaTree,
+export function getIsCompletedFromCriterionNode(
+    tree: CriterionNode,
     evalCriteria: {
         [key: string]: EvalCriterion;
     },
     technicalChallenges: { [key: string]: TechnicalChallenge },
     patients: { [key: string]: Patient },
     scoutables: { [key: string]: Scoutable },
-    currentTime: number,
-    depth: number
+    currentTime: number
 ): boolean {
-    function criterionToResult(criterion: EvalCriterion): EvalResult {
-        return getEvalResultFromCriterion(
-            criterion,
+    function shortIsCompletedFromNode(tree: CriterionNode): boolean {
+        return getIsCompletedFromCriterionNode(
+            tree,
             evalCriteria,
             technicalChallenges,
             patients,
@@ -473,94 +472,40 @@ export function getIsCompletedFromCombinedEvalCriteriaTree(
             currentTime
         );
     }
-    let isLeftCompleted = false;
-    if (tree.lChild) {
-        isLeftCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
-            tree.lChild,
-            evalCriteria,
-            technicalChallenges,
-            patients,
-            scoutables,
-            currentTime,
-            depth + 1
-        );
-    }
-    let isRightCompleted = false;
-    if (tree.rChild) {
-        isRightCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
-            tree.rChild,
-            evalCriteria,
-            technicalChallenges,
-            patients,
-            scoutables,
-            currentTime,
-            depth + 1
-        );
-    }
-    const combinedCriteria = Object.values(evalCriteria).filter((crit) =>
-        tree.criteriaIds.find((id) => id === crit.id)
-    );
-    switch (tree.logicalOperator) {
-        case 'and': {
-            let isCompleted = isLeftCompleted && isRightCompleted;
-            if (!isCompleted) {
-                return false;
+    let isCompleted = false;
+    switch (tree.type) {
+        case 'andNode': {
+            for (let i = 0; i < tree.children.length; i += 1) {
+                if (!shortIsCompletedFromNode(tree.children[i]!))
+                    isCompleted = false;
             }
-            for (let i = 0; i < combinedCriteria.length; i += 1) {
-                if (
-                    criterionToResult(combinedCriteria[i] as EvalCriterion)
-                        .isCompleted === false
-                ) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        case 'or': {
-            let isCompleted = isLeftCompleted || isRightCompleted;
-            if (isCompleted) {
-                return true;
-            }
-            for (let i = 0; i < combinedCriteria.length; i += 1) {
-                if (
-                    criterionToResult(combinedCriteria[i] as EvalCriterion)
-                        .isCompleted
-                ) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        case 'not': {
-            if (
-                tree.criteriaIds.length > 1 ||
-                (tree.rChild && tree.lChild) ||
-                (tree.lChild && tree.criteriaIds.length > 0) ||
-                (tree.rChild && tree.criteriaIds.length > 0)
-            ) {
-                throw new Error(
-                    "[logic error] Attempting logical 'not' operation on multiple litarals."
-                );
-            }
-            if (!tree.lChild && !tree.rChild && tree.criteriaIds.length === 1) {
-                const criterion = Object.values(evalCriteria).filter(
-                    (crit) => crit.id === tree.criteriaIds[0]
-                )[0] as EvalCriterion;
-                let criterionIsCompleted =
-                    criterionToResult(criterion).isCompleted;
-                return !criterionIsCompleted;
-            }
-            /* case with no criterionIds and just lChild */
-            if (tree.lChild) {
-                return isLeftCompleted;
-            }
-            /* case with no criterionIds and just rChild */
-            return isRightCompleted;
-        }
-        default:
             break;
+        }
+        case 'orNode': {
+            for (let i = 0; i < tree.children.length; i += 1) {
+                if (shortIsCompletedFromNode(tree.children[i]!))
+                    isCompleted = true;
+            }
+            break;
+        }
+        case 'notNode': {
+            return !shortIsCompletedFromNode(tree.child);
+        }
+        case 'leafNode': {
+            const criterion = Object.values(evalCriteria).filter(
+                (crit) => crit.id === tree.criterionId
+            )[0] as EvalCriterion;
+            return getEvalResultFromCriterion(
+                criterion,
+                evalCriteria,
+                technicalChallenges,
+                patients,
+                scoutables,
+                currentTime
+            ).isCompleted;
+        }
     }
-    return false;
+    return isCompleted;
 }
 export function getEvalResultFromCriterion(
     evalCriterion: EvalCriterion,
@@ -612,23 +557,21 @@ export function getEvalResultFromCriterion(
         }
         case 'combinedEvalCriterion': {
             const criterion = evalCriterion as CombinedEvalCriterion;
-            isCompleted = getIsCompletedFromCombinedEvalCriteriaTree(
+            isCompleted = getIsCompletedFromCriterionNode(
                 criterion.combinedEvalCriteriaTree,
                 evalCriteria,
                 technicalChallenges,
                 patients,
                 scoutables,
-                currentTime,
-                0
+                currentTime
             );
             break;
         }
         default:
             break;
     }
-    const id = evalCriterion.id;
     return {
-        criterionId: id,
+        criterionId: evalCriterion.id,
         criterion: evalCriterion,
         isCompleted: isCompleted,
         timestamp: currentTime,

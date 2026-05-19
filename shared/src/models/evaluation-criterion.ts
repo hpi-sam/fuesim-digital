@@ -7,7 +7,6 @@ import type { TechnicalChallengeId } from './technical-challenge/technical-chall
 import { technicalChallengeIdSchema } from './technical-challenge/technical-challenge.js';
 import type { PatientStatus } from './utils/patient-status.js';
 import { patientStatusSchema } from './utils/patient-status.js';
-import { LogicalOperator, logicalOperatorSchema } from './utils/cater-for.js';
 
 export const evalCriterionBaseSchema = z.strictObject({
     id: uuidSchema,
@@ -65,64 +64,80 @@ export type ViewScoutableEvalCriterion = z.infer<
 >;
 
 /* TODO @JohannesPotzi @Jogius : lessThanXUnqualifiedMeasuresEvalCriterion */
-const Activity = z.object({
-    name: z.string(),
-    get subactivities(): z.ZodNullable<z.ZodArray<typeof Activity>> {
-        return z.nullable(z.array(Activity));
-    },
-});
 
-export const combinedEvalCriteriaTreeSchema = z.object({
-    criteriaIds: z.array(uuidSchema),
-    logicalOperator: logicalOperatorSchema,
-    get lChild(): z.ZodNullable<typeof combinedEvalCriteriaTreeSchema> {
-        return combinedEvalCriteriaTreeSchema.nullable();
-    },
-    get rChild(): z.ZodNullable<typeof combinedEvalCriteriaTreeSchema> {
-        return combinedEvalCriteriaTreeSchema.nullable();
-    },
+export type CriterionAndNode = {
+    type: 'andNode';
+    children: CriterionNode[];
+};
+export type CriterionOrNode = {
+    type: 'orNode';
+    children: CriterionNode[];
+};
+export type CriterionNotNode = {
+    type: 'notNode';
+    child: CriterionNode;
+};
+export type CriterionLeafNode = {
+    type: 'leafNode';
+    criterionId: UUID;
+};
+export type CriterionNode =
+    | CriterionAndNode
+    | CriterionOrNode
+    | CriterionNotNode
+    | CriterionLeafNode;
+
+export const criterionNodeSchema: z.ZodType<CriterionNode> = z.lazy(() =>
+    z.discriminatedUnion('type', [
+        criterionAndNodeSchema,
+        criterionOrNodeSchema,
+        criterionNotNodeSchema,
+        criterionLeafNodeSchema,
+    ])
+);
+export const criterionAndNodeSchema = z.strictObject({
+    type: z.literal('andNode'),
+    children: z.array(criterionNodeSchema).min(1),
 });
-export type CombinedEvalCriteriaTree = z.infer<
-    typeof combinedEvalCriteriaTreeSchema
->;
+export function newCrriterionAndNode(
+    children: CriterionNode[]
+): CriterionAndNode {
+    return {
+        type: 'andNode',
+        children: children,
+    };
+}
+export const criterionOrNodeSchema = z.strictObject({
+    type: z.literal('orNode'),
+    children: z.array(criterionNodeSchema).min(1),
+});
+export function newCriterionOrNode(children: CriterionNode[]): CriterionOrNode {
+    return { type: 'orNode', children: children };
+}
+export const criterionNotNodeSchema = z.strictObject({
+    type: z.literal('notNode'),
+    child: criterionNodeSchema,
+});
+export function newCriterionNotNode(child: CriterionNode): CriterionNotNode {
+    return { type: 'notNode', child: child };
+}
+export const criterionLeafNodeSchema = z.strictObject({
+    type: z.literal('leafNode'),
+    criterionId: uuidSchema,
+});
+export function newCriterionLeafNode(criterionId: UUID): CriterionLeafNode {
+    return { type: 'leafNode', criterionId: criterionId };
+}
 
 export const combinedEvalCriterionSchema = z.object({
     ...evalCriterionBaseSchema.shape,
     criterionType: z.literal('combinedEvalCriterion'),
-    combinedEvalCriteriaTree: combinedEvalCriteriaTreeSchema,
+    combinedEvalCriteriaTree: criterionNodeSchema,
 });
 export type CombinedEvalCriterion = z.infer<typeof combinedEvalCriterionSchema>;
-
-export function newCombinedEvalCriteriaTree(
-    criteriaIds: UUID[],
-    logicalOperator: LogicalOperator,
-    lChild?: CombinedEvalCriteriaTree,
-    rChild?: CombinedEvalCriteriaTree
-): CombinedEvalCriteriaTree {
-    return {
-        criteriaIds: criteriaIds,
-        logicalOperator: logicalOperator,
-        lChild: lChild
-            ? newCombinedEvalCriteriaTree(
-                  lChild.criteriaIds,
-                  lChild.logicalOperator,
-                  lChild.lChild ?? undefined,
-                  lChild.rChild ?? undefined
-              )
-            : null,
-        rChild: rChild
-            ? newCombinedEvalCriteriaTree(
-                  rChild.criteriaIds,
-                  rChild.logicalOperator,
-                  rChild.lChild ?? undefined,
-                  rChild.lChild ?? undefined
-              )
-            : null,
-    };
-}
 export function newcombinedEvalCriterion(
     name: string,
-    combinedEvalCriteriaTree: CombinedEvalCriteriaTree
+    combinedEvalCriteriaTree: CriterionNode
 ): CombinedEvalCriterion {
     return {
         id: uuid(),

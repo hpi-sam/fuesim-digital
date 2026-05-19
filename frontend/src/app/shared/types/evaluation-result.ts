@@ -5,5 +5,6 @@ export interface EvalResult {
     criterion: EvalCriterion;
     isCompleted: boolean;
     count?: number;
+    /* TODO @JohannesPotzi @Jogius : Do we drop this? */
     timestamp?: number;
 }

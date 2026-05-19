@@ -1,5 +1,5 @@
 import { Component, inject, input, signal } from '@angular/core';
-import { form, FormField } from '@angular/forms/signals';
+import { FieldTree, form, FormField } from '@angular/forms/signals';
 import {
     NgbAccordionBody,
     NgbAccordionButton,
@@ -20,6 +20,8 @@ import {
     evalCriterionTypesNames,
     newXPatientsAtStatusEvalCriterion,
 } from '../../../../../../../../../shared/dist/models/evaluation-criterion';
+import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
+import { FormsModule } from '@angular/forms';
 
 interface InputData {
     countInput: number;
@@ -37,6 +39,8 @@ interface InputData {
         NgbAccordionCollapse,
         NgbAccordionBody, */
         FormField,
+        FormsModule,
+        AppSaveOnTypingDirective,
     ],
 })
 export class EvalCriterionCreationForm {
@@ -45,6 +49,7 @@ export class EvalCriterionCreationForm {
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
     public readonly patientStatusAllowedValues = patientStatusAllowedValues;
     public readonly statusNames = statusNames;
+    public countInput: number | null = null;
     readonly inputModel = signal<InputData>({
         countInput: 0,
         patientStatusInput: 'black',

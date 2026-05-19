@@ -15,6 +15,10 @@
                     <label>
                         Anzahl:
                         <input
+                            [ngModel]="countInput"
+                            (appSaveOnTyping)="
+                                criterionForm.countInput().value.set($event)
+                            "
                             type="number"
                             [formField]="criterionForm.countInput"
                         />

@@ -14,5 +14,13 @@ export const exerciseTypeAllowedValues = [
     'template',
     'parallel',
 ] as const;
+
 export const exerciseTypeSchema = z.literal(exerciseTypeAllowedValues);
 export type ExerciseType = z.infer<typeof exerciseTypeSchema>;
+export const exerciseTypeGermanNameDictionary: {
+    [K in ExerciseType]: string;
+} = {
+    standalone: 'Übung',
+    template: 'Vorlage',
+    parallel: 'Parallelübung',
+} as const;

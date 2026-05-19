@@ -21,6 +21,7 @@ import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../../state/app.state';
 import { selectTechnicalChallenges } from '../../../../../../state/application/selectors/exercise.selectors';
+import { PatientAtSKCriterionComponent } from './patient-at-sk-criterion/patient-at-sk-criterion.component';
 
 interface InputData {
     countInput: number;
@@ -32,7 +33,12 @@ interface InputData {
     selector: 'app-eval-criterion-creation-form',
     templateUrl: './eval-criterion-creation-form.component.html',
     styleUrls: ['./eval-criterion-creation-form.component.scss'],
-    imports: [FormField, FormsModule, AppSaveOnTypingDirective],
+    imports: [
+        FormField,
+        FormsModule,
+        AppSaveOnTypingDirective,
+        PatientAtSKCriterionComponent,
+    ],
 })
 export class EvalCriterionCreationForm {
     private readonly exerciseService = inject(ExerciseService);
@@ -99,7 +105,6 @@ export class EvalCriterionCreationForm {
                         );
                     this.createCriterions([criterion]);
                 }
-
                 break;
             }
             default:

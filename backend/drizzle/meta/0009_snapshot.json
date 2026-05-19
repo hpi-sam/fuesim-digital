@@ -1,5 +1,5 @@
 {
-    "id": "8d9e8326-6cf6-4141-ab39-e9c92d920083",
+    "id": "3a48bf56-c08e-4cce-9c61-bf781de2c8c2",
     "prevId": "e56bbf33-1ae2-4414-94ad-aae73ed93a6d",
     "version": "7",
     "dialect": "postgresql",
@@ -31,8 +31,7 @@
                     "name": "id",
                     "type": "uuid",
                     "primaryKey": true,
-                    "notNull": true,
-                    "default": "uuid_generate_v4()"
+                    "notNull": true
                 },
                 "emitterId": {
                     "name": "emitterId",
@@ -81,18 +80,6 @@
             "name": "collection_dependency_mapping",
             "schema": "",
             "columns": {
-                "collectionEntityId": {
-                    "name": "collectionEntityId",
-                    "type": "varchar",
-                    "primaryKey": false,
-                    "notNull": true
-                },
-                "collectionVersionId": {
-                    "name": "collectionVersionId",
-                    "type": "varchar",
-                    "primaryKey": false,
-                    "notNull": true
-                },
                 "dependentCollectionEntityId": {
                     "name": "dependentCollectionEntityId",
                     "type": "varchar",
@@ -104,24 +91,36 @@
                     "type": "varchar",
                     "primaryKey": false,
                     "notNull": true
+                },
+                "collectionEntityId": {
+                    "name": "collectionEntityId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "collectionVersionId": {
+                    "name": "collectionVersionId",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
                 }
             },
             "indexes": {},
             "foreignKeys": {
-                "collection_dependency_mapping_collectionVersionId_collections_versionId_fk": {
-                    "name": "collection_dependency_mapping_collectionVersionId_collections_versionId_fk",
-                    "tableFrom": "collection_dependency_mapping",
-                    "tableTo": "collections",
-                    "columnsFrom": ["collectionVersionId"],
-                    "columnsTo": ["versionId"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
-                },
                 "collection_dependency_mapping_dependentCollectionVersionId_collections_versionId_fk": {
                     "name": "collection_dependency_mapping_dependentCollectionVersionId_collections_versionId_fk",
                     "tableFrom": "collection_dependency_mapping",
                     "tableTo": "collections",
                     "columnsFrom": ["dependentCollectionVersionId"],
+                    "columnsTo": ["versionId"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "collection_dependency_mapping_collectionVersionId_collections_versionId_fk": {
+                    "name": "collection_dependency_mapping_collectionVersionId_collections_versionId_fk",
+                    "tableFrom": "collection_dependency_mapping",
+                    "tableTo": "collections",
+                    "columnsFrom": ["collectionVersionId"],
                     "columnsTo": ["versionId"],
                     "onDelete": "cascade",
                     "onUpdate": "no action"
@@ -135,6 +134,14 @@
                     "columns": [
                         "collectionVersionId",
                         "dependentCollectionVersionId"
+                    ]
+                },
+                "unique_collection_dependency_2": {
+                    "name": "unique_collection_dependency_2",
+                    "nullsNotDistinct": false,
+                    "columns": [
+                        "collectionVersionId",
+                        "dependentCollectionEntityId"
                     ]
                 }
             },
@@ -252,13 +259,6 @@
                     "primaryKey": false,
                     "notNull": true,
                     "default": false
-                },
-                "elementCount": {
-                    "name": "elementCount",
-                    "type": "integer",
-                    "primaryKey": false,
-                    "notNull": true,
-                    "default": 0
                 }
             },
             "indexes": {},
@@ -270,15 +270,10 @@
                     "nullsNotDistinct": false,
                     "columns": ["versionId"]
                 },
-                "unique_set_version": {
-                    "name": "unique_set_version",
+                "unique_collection_version": {
+                    "name": "unique_collection_version",
                     "nullsNotDistinct": false,
                     "columns": ["entityId", "version"]
-                },
-                "unique_set_id": {
-                    "name": "unique_set_id",
-                    "nullsNotDistinct": false,
-                    "columns": ["entityId", "versionId"]
                 }
             },
             "policies": {},
@@ -293,8 +288,7 @@
                     "name": "id",
                     "type": "uuid",
                     "primaryKey": true,
-                    "notNull": true,
-                    "default": "uuid_generate_v4()"
+                    "notNull": true
                 },
                 "collection": {
                     "name": "collection",
@@ -343,14 +337,14 @@
             "name": "element_to_collection_mapping",
             "schema": "",
             "columns": {
-                "setEntityId": {
-                    "name": "setEntityId",
+                "collectionEntityId": {
+                    "name": "collectionEntityId",
                     "type": "varchar",
                     "primaryKey": false,
                     "notNull": true
                 },
-                "setVersionId": {
-                    "name": "setVersionId",
+                "collectionVersionId": {
+                    "name": "collectionVersionId",
                     "type": "varchar",
                     "primaryKey": false,
                     "notNull": true
@@ -377,11 +371,11 @@
             },
             "indexes": {},
             "foreignKeys": {
-                "element_to_collection_mapping_setVersionId_collections_versionId_fk": {
-                    "name": "element_to_collection_mapping_setVersionId_collections_versionId_fk",
+                "element_to_collection_mapping_collectionVersionId_collections_versionId_fk": {
+                    "name": "element_to_collection_mapping_collectionVersionId_collections_versionId_fk",
                     "tableFrom": "element_to_collection_mapping",
                     "tableTo": "collections",
-                    "columnsFrom": ["setVersionId"],
+                    "columnsFrom": ["collectionVersionId"],
                     "columnsTo": ["versionId"],
                     "onDelete": "cascade",
                     "onUpdate": "no action"
@@ -398,15 +392,15 @@
             },
             "compositePrimaryKeys": {},
             "uniqueConstraints": {
-                "unique_element_set_mapping": {
-                    "name": "unique_element_set_mapping",
+                "unique_element_collection_mapping": {
+                    "name": "unique_element_collection_mapping",
                     "nullsNotDistinct": false,
-                    "columns": ["setVersionId", "elementVersionId"]
+                    "columns": ["collectionVersionId", "elementVersionId"]
                 },
-                "unique_element_set_mapping_2": {
-                    "name": "unique_element_set_mapping_2",
+                "unique_element_collection_mapping_2": {
+                    "name": "unique_element_collection_mapping_2",
                     "nullsNotDistinct": false,
-                    "columns": ["setVersionId", "elementEntityId"]
+                    "columns": ["collectionVersionId", "elementEntityId"]
                 }
             },
             "policies": {},
@@ -506,8 +500,7 @@
                     "name": "id",
                     "type": "uuid",
                     "primaryKey": true,
-                    "notNull": true,
-                    "default": "uuid_generate_v4()"
+                    "notNull": true
                 },
                 "tickCounter": {
                     "name": "tickCounter",
@@ -638,8 +631,7 @@
                     "name": "id",
                     "type": "uuid",
                     "primaryKey": true,
-                    "notNull": true,
-                    "default": "uuid_generate_v4()"
+                    "notNull": true
                 },
                 "user": {
                     "name": "user",
@@ -707,8 +699,7 @@
                     "name": "id",
                     "type": "uuid",
                     "primaryKey": true,
-                    "notNull": true,
-                    "default": "uuid_generate_v4()"
+                    "notNull": true
                 },
                 "user": {
                     "name": "user",

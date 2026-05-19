@@ -27,6 +27,7 @@ import {
     max,
     gt,
     inArray,
+    count,
 } from 'drizzle-orm';
 import { castImmutable } from 'immer';
 import {
@@ -346,6 +347,34 @@ export class CollectionRepository extends BaseRepository {
             );
     }
 
+    private collectionElementCounts() {
+        return this.databaseConnection.$with('collection_element_counts').as(
+            this.databaseConnection
+                .select({
+                    elementCount: count(elementTable.versionId).as(
+                        'elementCount'
+                    ),
+                    collectionVersionId: collectionTable.versionId,
+                })
+                .from(collectionTable)
+                .leftJoin(
+                    elementCollectionMappingTable,
+                    eq(
+                        collectionTable.versionId,
+                        elementCollectionMappingTable.collectionVersionId
+                    )
+                )
+                .leftJoin(
+                    elementTable,
+                    eq(
+                        elementCollectionMappingTable.elementVersionId,
+                        elementTable.versionId
+                    )
+                )
+                .groupBy(collectionTable.versionId)
+        );
+    }
+
     private latestCollections(opts: { allowDraftState?: boolean }) {
         const latestCollectionVersionNumbers =
             this.latestCollectionVersionNumbers({
@@ -550,7 +579,7 @@ export class CollectionRepository extends BaseRepository {
             .innerJoin(
                 collectionTable,
                 eq(
-                    elementCollectionMappingTable.setVersionId,
+                    elementCollectionMappingTable.collectionVersionId,
                     collectionTable.versionId
                 )
             )
@@ -658,7 +687,7 @@ export class CollectionRepository extends BaseRepository {
                 .where(
                     and(
                         eq(
-                            elementCollectionMappingTable.setVersionId,
+                            elementCollectionMappingTable.collectionVersionId,
                             draftStateToBeDeleted.versionId
                         ),
                         // Only delete mappings for element-versions that
@@ -827,7 +856,7 @@ export class CollectionRepository extends BaseRepository {
                             elementVersionId
                         ),
                         eq(
-                            elementCollectionMappingTable.setVersionId,
+                            elementCollectionMappingTable.collectionVersionId,
                             collectionVersionId
                         )
                     )
@@ -868,7 +897,7 @@ export class CollectionRepository extends BaseRepository {
             .where(
                 and(
                     eq(
-                        elementCollectionMappingTable.setVersionId,
+                        elementCollectionMappingTable.collectionVersionId,
                         collectionVersionId
                     ),
                     eq(
@@ -878,18 +907,11 @@ export class CollectionRepository extends BaseRepository {
                 )
             );
 
-        await this.databaseConnection
-            .update(collectionTable)
-            .set({
-                elementCount: sql`${collectionTable.elementCount} + 1`,
-            })
-            .where(eq(collectionTable.versionId, collectionVersionId));
-
         return this.databaseConnection
             .insert(elementCollectionMappingTable)
             .values({
-                setEntityId: set.entityId,
-                setVersionId: collectionVersionId,
+                collectionEntityId: set.entityId,
+                collectionVersionId,
                 elementEntityId: element.entityId,
                 elementVersionId,
                 isBaseReference,
@@ -941,10 +963,12 @@ export class CollectionRepository extends BaseRepository {
                     .select({
                         // WARNING: This is order-sensitive, based on the order in the schema
                         // and requires ALL fields (even defaulted ones) to be selected
-                        setEntityId: elementCollectionMappingTable.setEntityId,
-                        setVersionId: sql<string>`${targetSetVersionId}`.as(
-                            'setVersionId'
-                        ),
+                        collectionEntityId:
+                            elementCollectionMappingTable.collectionEntityId,
+                        collectionVersionId:
+                            sql<string>`${targetSetVersionId}`.as(
+                                'collectionVersionId'
+                            ),
                         elementEntityId:
                             elementCollectionMappingTable.elementEntityId,
                         elementVersionId:
@@ -963,7 +987,7 @@ export class CollectionRepository extends BaseRepository {
                     .from(elementCollectionMappingTable)
                     .where(
                         eq(
-                            elementCollectionMappingTable.setVersionId,
+                            elementCollectionMappingTable.collectionVersionId,
                             sourceSetVersionId
                         )
                     )
@@ -1040,7 +1064,7 @@ export class CollectionRepository extends BaseRepository {
                         )
                         .where(
                             eq(
-                                elementCollectionMappingTable.setVersionId,
+                                elementCollectionMappingTable.collectionVersionId,
                                 source.versionId
                             )
                         )
@@ -1050,8 +1074,8 @@ export class CollectionRepository extends BaseRepository {
             if (createdElements.length > 0) {
                 await tx.insert(elementCollectionMappingTable).values(
                     createdElements.map((element) => ({
-                        setEntityId: target.entityId,
-                        setVersionId: target.versionId,
+                        collectionEntityId: target.entityId,
+                        collectionVersionId: target.versionId,
                         elementEntityId: element.entityId,
                         elementVersionId: element.versionId,
                         isBaseReference: false,
@@ -1073,28 +1097,11 @@ export class CollectionRepository extends BaseRepository {
     }
 
     public async deleteElementVersion(element: VersionedElementPartial) {
-        return this.transaction(async (tx) => {
-            const containingCollection =
-                await tx.getLatestCollectionOfElementEntity(element.entityId);
-
-            if (containingCollection) {
-                await tx.databaseConnection
-                    .update(collectionTable)
-                    .set({
-                        elementCount: sql`${collectionTable.elementCount} - 1`,
-                    })
-                    .where(
-                        eq(
-                            collectionTable.versionId,
-                            containingCollection.versionId
-                        )
-                    );
-            }
-
-            return tx.databaseConnection
+        return this.transaction(async (tx) =>
+            tx.databaseConnection
                 .delete(elementTable)
-                .where(eq(elementTable.versionId, element.versionId));
-        });
+                .where(eq(elementTable.versionId, element.versionId))
+        );
     }
 
     public async getCollectionByVersionId(versionId: CollectionVersionId) {
@@ -1115,9 +1122,14 @@ export class CollectionRepository extends BaseRepository {
                 allowDraftState: opts?.allowDraftState ?? true,
             });
 
+            const elementCounts = tx.collectionElementCounts();
+
             const result = await tx.databaseConnection
-                .with(latestCollections)
-                .select(getTableColumns(collectionTable))
+                .with(latestCollections, elementCounts)
+                .select({
+                    ...getTableColumns(collectionTable),
+                    elementCount: elementCounts.elementCount,
+                })
                 .from(collectionUserMappingTable)
                 .innerJoin(
                     latestCollections,
@@ -1129,6 +1141,13 @@ export class CollectionRepository extends BaseRepository {
                 .innerJoin(
                     collectionTable,
                     eq(collectionTable.versionId, latestCollections.versionId)
+                )
+                .innerJoin(
+                    elementCounts,
+                    eq(
+                        elementCounts.collectionVersionId,
+                        collectionTable.versionId
+                    )
                 )
                 .where(
                     and(
@@ -1190,7 +1209,7 @@ export class CollectionRepository extends BaseRepository {
     }
 
     public async getElementsOfCollectionVersion(
-        setVersionId: CollectionVersionId
+        collectionVersionId: CollectionVersionId
     ) {
         return this.databaseConnection
             .select(getTableColumns(elementTable))
@@ -1203,7 +1222,10 @@ export class CollectionRepository extends BaseRepository {
                 )
             )
             .where(
-                eq(elementCollectionMappingTable.setVersionId, setVersionId)
+                eq(
+                    elementCollectionMappingTable.collectionVersionId,
+                    collectionVersionId
+                )
             );
     }
 
@@ -1232,18 +1254,11 @@ export class CollectionRepository extends BaseRepository {
                             elementEntityId
                         ),
                         eq(
-                            elementCollectionMappingTable.setVersionId,
+                            elementCollectionMappingTable.collectionVersionId,
                             collectionVersionId
                         )
                     )
                 );
-
-            await tx
-                .update(collectionTable)
-                .set({
-                    elementCount: sql`${collectionTable.elementCount} - 1`,
-                })
-                .where(eq(collectionTable.versionId, collectionVersionId));
         });
     }
 
@@ -1264,7 +1279,7 @@ export class CollectionRepository extends BaseRepository {
     }
 
     public async setCollectionVisibility(
-        setEntityId: CollectionEntityId,
+        collectionEntityId: CollectionEntityId,
         visibility: CollectionVisibility
     ) {
         return this.onlySingleStrict(
@@ -1273,13 +1288,13 @@ export class CollectionRepository extends BaseRepository {
                 .set({
                     visibility,
                 })
-                .where(eq(collectionTable.entityId, setEntityId))
+                .where(eq(collectionTable.entityId, collectionEntityId))
                 .returning()
         );
     }
 
     public async getLatestCollectionByEntityId(
-        setEntityId: CollectionEntityId,
+        collectionEntityId: CollectionEntityId,
         opts?: { allowDraftState?: boolean }
     ) {
         const latestCollections = this.latestCollections({
@@ -1291,7 +1306,7 @@ export class CollectionRepository extends BaseRepository {
                 .with(latestCollections)
                 .select()
                 .from(latestCollections)
-                .where(eq(latestCollections.entityId, setEntityId))
+                .where(eq(latestCollections.entityId, collectionEntityId))
         );
     }
 
@@ -1306,7 +1321,7 @@ export class CollectionRepository extends BaseRepository {
                     elementCollectionMappingTable,
                     eq(
                         collectionTable.versionId,
-                        elementCollectionMappingTable.setVersionId
+                        elementCollectionMappingTable.collectionVersionId
                     )
                 )
                 .where(

@@ -1,11 +1,11 @@
 <div class="container-fluid d-flex flex-column h-100 mt-3 ms-1">
-    <div class="card col-3 p-0 rounded-2" style="min-width: 300px">
+    <div class="card col-3 p-0 rounded-2" style="min-width: 400px">
         <div class="card-header text-center">
-            <h5 class="mb-0 d-flex align-items-center">Neues Kriterium</h5>
+            <h5 class="mb-0 ms-0 d-flex align-items-center">Neues Kriterium</h5>
         </div>
         @switch (criterionCreationType()) {
             @case ('xPatientsAtStatusEvalCriterion') {
-                <form class="ms-3">
+                <form class="ms-2">
                     <label>
                         Art:
                         {{
@@ -39,7 +39,7 @@
                 </form>
             }
             @case ('doMeasureXTimesEvalCriterion') {
-                <form class="ms-3">
+                <form class="ms-2">
                     <label>
                         Art:
                         {{
@@ -49,17 +49,76 @@
                 </form>
             }
             @case ('reachTechnicalChallengeStateEvalCriterion') {
-                <form class="ms-3">
+                <form class="ms-2">
                     <label>
                         Art:
                         {{
                             evalCriterionTypesNames.reachTechnicalChallengeStateEvalCriterion
                         }}
                     </label>
+                    <div>
+                        @if (technicalChallengesValues().length === 0) {
+                            <hr />
+                            <span class="mt-3 text-muted"
+                                >Es befinden sich aktuell keine technischen
+                                Herausforderungen auf der Karte.</span
+                            >
+                            <hr />
+                        } @else {
+                            <select
+                                class="form-select"
+                                [formField]="
+                                    this.criterionForm.technicalChallengeId
+                                "
+                            >
+                                <option value="" disabled>
+                                    Keine Technische Herausforderung ausgewählt
+                                </option>
+                                @for (
+                                    challenge of this.technicalChallengesValues();
+                                    track challenge.id
+                                ) {
+                                    <option value="{{ challenge.id }}">
+                                        {{ challenge.name }}
+                                    </option>
+                                }
+                            </select>
+                        }
+
+                        @if (
+                            this.criterionForm
+                                .technicalChallengeId()
+                                .value() !== ''
+                        ) {
+                            <label class="mt-1">
+                                Ziel-Zustand:
+                                <!-- TODO @JohannesPotzi @Jogius : Make the me-2 work -->
+                                <select
+                                    class="form-select me-2"
+                                    [formField]="
+                                        this.criterionForm
+                                            .targetTechnicalChallengeState
+                                    "
+                                >
+                                    <option value="" disabled>
+                                        Kein Zustand ausgewählt
+                                    </option>
+                                    @for (
+                                        state of this.selectedTechnicalChallengeStates();
+                                        track state.id
+                                    ) {
+                                        <option value="{{ state.id }}">
+                                            {{ state.title }}
+                                        </option>
+                                    }
+                                </select>
+                            </label>
+                        }
+                    </div>
                 </form>
             }
             @case ('patientAtStatusEvalCriterion') {
-                <form class="ms-3">
+                <form class="ms-2">
                     <label>
                         Art:
                         {{
@@ -69,7 +128,7 @@
                 </form>
             }
             @case ('viewScoutableEvalCriterion') {
-                <form class="ms-3">
+                <form class="ms-2">
                     <label>
                         Art:
                         {{ evalCriterionTypesNames.viewScoutableEvalCriterion }}
@@ -77,7 +136,7 @@
                 </form>
             }
             @case ('combinedEvalCriterion') {
-                <form class="ms-3">
+                <form class="ms-2">
                     <label>
                         Art:
                         {{ evalCriterionTypesNames.combinedEvalCriterion }}
@@ -87,63 +146,10 @@
         }
 
         <button
-            class="btn btn-outline-success mt-1 ms-1 me-1 mb-1"
-            (click)="submitCriterion('xPatientsAtStatusEvalCriterion')"
+            class="btn btn-outline-success mt-1 ms-2 me-2 mb-1"
+            (click)="submitCriterion(criterionCreationType())"
         >
             Bestätigen
         </button>
-
-        <!-- TODO @JohannesPotzi @Jogius : Als Accordion ??? -->
-        <!--
-        <div
-            ngbAccordion
-            [closeOthers]="true"
-            style="flex: auto; height: 0; overflow-y: auto"
-        >
-            <div
-                ngbAccordionItem="xPatientsAtStatusEvalCriterion"
-                [collapsed]="false"
-            >
-                <h5 ngbAccordionHeader>
-                    <button
-                        ngbAccordionButton
-                        data-cy="xPatientsAtSkCriterionAccordionButton"
-                    >
-                        Anzahl an Patienten mit bestimmter Sichtungskategorie
-                    </button>
-                </h5>
-                <div ngbAccordionCollapse>
-                    <div ngbAccordionBody>
-                        <form class="ms-3">
-                            <label>
-                                Anzahl:
-                                <input
-                                    type="number"
-                                    [formField]="criterionForm.countInput"
-                                />
-                            </label>
-
-                            <label class="mt-1">
-                                Sichtungskategorie:
-                                <select
-                                    [formField]="
-                                        criterionForm.patientStatusInput
-                                    "
-                                >
-                                    @for (
-                                        status of patientStatusAllowedValues;
-                                        track status
-                                    ) {
-                                        <option value="{{ status }}">
-                                            {{ statusNames[status] }}
-                                        </option>
-                                    }
-                                </select>
-                            </label>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div> -->
     </div>
 </div>

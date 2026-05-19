@@ -45,11 +45,7 @@
             @for (result of this.resultValues(); track result.criterionId) {
                 <div class="card col-3 p-0 rounded-0" style="min-width: 600px">
                     <span class="ms-1"
-                        >{{
-                            evalCriterionTypesNames[
-                                result.criterion.criterionType
-                            ]
-                        }}
+                        >{{ result.criterion.name }}
                         @if (
                             result.criterion.criterionType ===
                             'xPatientsAtStatusEvalCriterion'
@@ -71,6 +67,11 @@
                             }}
                         }
                     </span>
+                    @if (result.isCompleted) {
+                        <i class="bi bi-check"></i>
+                    } @else {
+                        <i class="bi bi-x-lg"></i>
+                    }
                 </div>
             }
         }

@@ -172,7 +172,7 @@ export const evalCriterionTypesNames: {
 } = {
     doMeasureXTimesEvalCriterion: 'Maßnahme X Mal',
     reachTechnicalChallengeStateEvalCriterion:
-        'Zustand Technischer Herrausvorderung',
+        'Zustand Technischer Herausforderung',
     patientAtStatusEvalCriterion: 'Patient mit SK',
     xPatientsAtStatusEvalCriterion: 'X Patienten mit SK',
     viewScoutableEvalCriterion: 'Erkunde auf der Karte',

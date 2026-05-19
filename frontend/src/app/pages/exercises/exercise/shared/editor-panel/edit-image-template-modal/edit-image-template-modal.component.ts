@@ -11,12 +11,13 @@ import type { AppState } from '../../../../../../state/app.state';
 import { createSelectMapImageTemplate } from '../../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import { ImageTemplateFormComponent } from '../image-template-form/image-template-form.component';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-edit-image-template-modal',
     templateUrl: './edit-image-template-modal.component.html',
     styleUrls: ['./edit-image-template-modal.component.scss'],
-    imports: [ImageTemplateFormComponent],
+    imports: [ImageTemplateFormComponent, HelpButtonComponent],
 })
 export class EditImageTemplateModalComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);

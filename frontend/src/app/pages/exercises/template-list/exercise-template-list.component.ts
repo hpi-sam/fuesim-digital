@@ -13,6 +13,7 @@ import { ExerciseTemplateCardComponent } from '../../../shared/components/exerci
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { FileInputDirective } from '../../../shared/directives/file-input.directive';
 import { MessageService } from '../../../core/messages/message.service';
+import { HelpButtonComponent } from '../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-exercise-template-list',
@@ -23,6 +24,7 @@ import { MessageService } from '../../../core/messages/message.service';
         ExerciseTemplateCardComponent,
         FooterComponent,
         FileInputDirective,
+        HelpButtonComponent,
     ],
 })
 export class ExerciseTemplateListComponent {

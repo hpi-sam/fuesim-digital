@@ -4,7 +4,10 @@
 </div>
 <div class="modal-body">
     <div class="card">
-        <div class="card-header">Karte</div>
+        <div class="card-header d-flex justify-content-between">
+            Karte
+            <app-help-button url="2_exercises/1_general.html#karte" />
+        </div>
         <div class="card-body">
             <div class="form-group mb-3">
                 <label class="form-label mb-1">Serveradresse:</label>
@@ -43,7 +46,12 @@
     </div>
     <br />
     <div class="card">
-        <div class="card-header">Einsatzübersicht</div>
+        <div class="card-header d-flex justify-content-between">
+            Einsatzübersicht
+            <app-help-button
+                url="2_exercises/1_general.html#einsatzübersicht"
+            />
+        </div>
         <div class="card-body">
             <div class="form-group mb-3">
                 <label class="form-label mb-1">Serveradresse:</label>
@@ -99,7 +107,10 @@
     <br />
     @if (configuration$ | async; as configuration) {
         <div class="card">
-            <div class="card-header">Patienten</div>
+            <div class="card-header d-flex justify-content-between">
+                Patienten
+                <app-help-button url="2_exercises/1_general.html#patienten" />
+            </div>
             <div class="card-body">
                 <div class="form-group mb-3">
                     Mit Vorsichtung üben?
@@ -173,7 +184,12 @@
     <br />
     @if (configuration$ | async; as configuration) {
         <div class="card">
-            <div class="card-header">Statusanzeige für Fahrzeuge</div>
+            <div class="card-header d-flex justify-content-between">
+                Statusanzeige für Fahrzeuge
+                <app-help-button
+                    url="2_exercises/1_general.html#statusanzeige-für-fahrzeuge"
+                />
+            </div>
             <div class="card-body">
                 <p class="small text-muted">
                     Die Statusanzeige zeigt über jedem Fahrzeug an, wie viele

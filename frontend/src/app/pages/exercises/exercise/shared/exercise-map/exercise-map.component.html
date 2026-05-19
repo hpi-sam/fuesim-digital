@@ -16,16 +16,33 @@
         <button
             (click)="olMapManagerService.olMapManager?.changeZoom('zoomIn')"
             class="btn btn-sm btn-light"
-            title="Vergrößern"
+            ngbTooltip="Vergrößern"
+            triggers="hover"
         >
             <i class="bi-zoom-in"></i>
         </button>
         <button
             (click)="olMapManagerService.olMapManager?.changeZoom('zoomOut')"
             class="btn btn-sm btn-light"
-            title="Verkleinern"
+            ngbTooltip="Verkleinern"
+            triggers="hover"
         >
             <i class="bi-zoom-out"></i>
+        </button>
+        @let lockZoom =
+            (olMapManagerService.olMapManager?.lockZoom$ | async) ?? false;
+        <button
+            (click)="olMapManagerService.olMapManager?.toggleZoomLock()"
+            class="btn btn-sm btn-light"
+            [class.active]="lockZoom"
+            [ngbTooltip]="
+                lockZoom
+                    ? 'Zoom per Touchscreen gesperrt. Zum Aktivieren klicken.'
+                    : 'Zoom per Touchscreen aktiv. Zum Sperren klicken.'
+            "
+            triggers="hover"
+        >
+            <i class="bi" [ngClass]="lockZoom ? 'bi-lock' : 'bi-unlock2'"></i>
         </button>
         @if (
             (currentRole$ | async) !== 'participant' &&
@@ -36,7 +53,8 @@
                     olMapManagerService.olMapManager?.tryToFitViewForOverview()
                 "
                 class="btn btn-sm btn-light"
-                title="Alle Ansichten anzeigen"
+                ngbTooltip="Alle Ansichten anzeigen"
+                triggers="hover"
             >
                 <i class="bi-aspect-ratio"></i>
             </button>
@@ -48,7 +66,8 @@
             <button
                 (click)="goToCoordinates()"
                 class="btn btn-sm btn-light"
-                title="Zu Koordinaten springen"
+                ngbTooltip="Zu Koordinaten springen"
+                triggers="hover"
             >
                 <i class="bi bi-pin-map"></i>
             </button>
@@ -56,7 +75,8 @@
         <button
             (click)="toggleFullscreen()"
             class="btn btn-sm btn-light"
-            title="Vollbildmodus"
+            ngbTooltip="Vollbildmodus"
+            triggers="hover"
         >
             <i
                 [class.bi-fullscreen]="!fullscreenEnabled()"

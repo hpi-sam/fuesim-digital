@@ -24,11 +24,20 @@ import { IncrementIdGenerator } from '../utils/increment-id-generator.js';
 import { ValidationErrorWrapper } from '../utils/validation-error-wrapper.js';
 import { RestoreError } from '../utils/restore-error.js';
 import { ActionWrapper } from './action-wrapper.js';
-import type { ExerciseClientWrapper } from './client-wrapper.js';
+import {
+    THROTTLED_ACTIONS,
+    type ExerciseClientWrapper,
+} from './client-wrapper.js';
 import { patientTick } from './patient-ticking.js';
 import { PeriodicEventHandler } from './periodic-events/periodic-event-handler.js';
 
 export class ActiveExercise {
+    /**
+     * Emits for every action, `true` if it's throttled, `false` if not.
+     *
+     * Throttled actions are those that are executed by all instances
+     * of a parallel exercise simultaneously, i.e. `Pause`, `Tick`, ...
+     */
     public readonly actionApplied = new Subject<boolean>();
     public template: ExerciseTemplateEntry | null = null;
 
@@ -241,7 +250,8 @@ export class ActiveExercise {
         this.reduce(action, emitterId);
         intermediateAction?.();
         this.emitAction(action);
-        this.actionApplied.next(true);
+        const isThrottledAction = THROTTLED_ACTIONS.has(action.type);
+        this.actionApplied.next(isThrottledAction);
     }
 
     /**

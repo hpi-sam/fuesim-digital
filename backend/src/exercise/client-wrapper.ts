@@ -8,7 +8,16 @@ import type {
     Client,
 } from 'fuesim-digital-shared';
 import { ReducerError, newClient, newClientRole } from 'fuesim-digital-shared';
-import { filter, type Subscription } from 'rxjs';
+import {
+    BehaviorSubject,
+    filter,
+    merge,
+    partition,
+    scan,
+    Subject,
+    withLatestFrom,
+    type Subscription,
+} from 'rxjs';
 import cookie from 'cookie';
 import type { ExerciseSocket } from '../exercise-server.js';
 import { Config, isDevelopment } from '../config.js';
@@ -121,6 +130,12 @@ export class ExerciseClientWrapper extends ClientWrapper {
     }
 }
 
+export const THROTTLED_ACTIONS: Set<ExerciseAction['type']> = new Set([
+    '[Exercise] Tick',
+    '[Exercise] Start',
+    '[Exercise] Pause',
+]);
+
 export class ParallelExerciseClientWrapper extends ClientWrapper {
     private chosenExercise: ParallelExercise | null = null;
     private readonly subscriptions: Subscription[] = [];
@@ -140,29 +155,50 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
                 this.session
             );
 
+        const exerciseCount = new BehaviorSubject(activeExercises.length);
+
+        // Combine actions from all exercises into one stream
+        const aggregatedActions = new Subject<boolean>();
+        for (const activeExercise of activeExercises) {
+            const sub = activeExercise.actionApplied.subscribe((v) =>
+                aggregatedActions.next(v)
+            );
+            this.subscriptions.push(sub);
+        }
+
         // We watch for new exercise instances to join the parallel exercise
         // to register watchers for them
         const joinSub = this.services.parallelExerciseService.newJoin
             .pipe(filter((join) => id === join.parallelExerciseId))
             .subscribe((join) => {
-                const sub = join.activeExercise.actionApplied.subscribe(
-                    async () => this.onActionApplied()
+                const sub = join.activeExercise.actionApplied.subscribe((v) =>
+                    aggregatedActions.next(v)
                 );
+                exerciseCount.next(exerciseCount.value + 1);
                 this.subscriptions.push(sub);
-                this.onActionApplied();
+                aggregatedActions.next(false);
             });
         this.subscriptions.push(joinSub);
 
-        // Watch for changes in the exercise instances to send updates
-        for (const activeExercise of activeExercises) {
-            const sub = activeExercise.actionApplied.subscribe(async () =>
-                this.onActionApplied()
-            );
-            this.subscriptions.push(sub);
-        }
+        const [throttledActions$, unthrottledActions$] = partition(
+            aggregatedActions.asObservable(),
+            Boolean
+        );
+
+        const filteredThrottledActions$ = throttledActions$.pipe(
+            withLatestFrom(exerciseCount),
+            scan((counter, [, n]) => (counter + 1) % n, 0),
+            filter((counter) => counter === 0)
+        );
+
+        const actionSub = merge(
+            unthrottledActions$,
+            filteredThrottledActions$
+        ).subscribe(async () => this.onActionApplied());
+        this.subscriptions.push(actionSub);
     }
 
-    public async onActionApplied() {
+    public async onActionApplied(action: ExerciseAction | null = null) {
         this.socket.emit('updateExerciseInstances', {
             exerciseInstances: await this.getInstanceSummaries(),
         });

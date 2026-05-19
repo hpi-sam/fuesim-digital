@@ -4,7 +4,7 @@ import { versionedElementPartialSchema } from './versioned-id-schema.js';
 import { stateVersionedEntitySchema } from './state-versioned-entity.js';
 import { versionedElementContentSchema } from './versioned-element-content.js';
 
-export const elementDtoSchema = z.object({
+export const templateVersionSchema = z.object({
     ...stateVersionedEntitySchema.shape,
     ...versionedElementPartialSchema.shape,
     title: z.string(),
@@ -12,7 +12,10 @@ export const elementDtoSchema = z.object({
     content: versionedElementContentSchema,
 });
 
-export type ElementDto = Immutable<z.infer<typeof elementDtoSchema>>;
-export type TypedElementDto<TContent> = Omit<ElementDto, 'content'> & {
+export type TemplateVersion = z.infer<typeof templateVersionSchema>;
+export type TypedTemplateVersion<TContent> = Omit<
+    TemplateVersion,
+    'content'
+> & {
     content: TContent;
 };

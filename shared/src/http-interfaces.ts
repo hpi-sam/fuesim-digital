@@ -11,10 +11,10 @@ import { exerciseStatusSchema } from './models/utils/exercise-status.js';
 import { logEntrySchema } from './models/log-entry.js';
 import { stringToDate } from './models/utils/date.js';
 import {
-    collectionDtoSchema,
-    extendedCollectionDtoSchema,
+    collectionVersionSchema,
+    extendedCollectionVersionSchema,
 } from './marketplace/models/collection.js';
-import { elementDtoSchema } from './marketplace/models/versioned-elements.js';
+import { templateVersionSchema } from './marketplace/models/versioned-elements.js';
 import type { CollectionEntityId } from './marketplace/models/versioned-id-schema.js';
 import {
     collectionVersionIdSchema,
@@ -25,7 +25,7 @@ import {
 import { collectionRelationshipTypeSchema } from './marketplace/models/collection-relationship.js';
 import { versionedElementContentSchema } from './marketplace/models/versioned-element-content.js';
 import {
-    collectionElementsDtoSchema,
+    collectionElementsSchema,
     collectionElementsSingleSchema,
 } from './marketplace/models/collection-elements.js';
 import { collectionVisibilitySchema } from './marketplace/models/collection-visibility.js';
@@ -251,17 +251,17 @@ export namespace Marketplace {
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
-                result: z.array(elementDtoSchema),
+                result: z.array(templateVersionSchema),
             }),
         });
 
         export const Import = new Route({
             request: z.object({
-                objects: z.array(elementDtoSchema),
+                objects: z.array(templateVersionSchema),
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
-                result: z.array(elementDtoSchema),
+                result: z.array(templateVersionSchema),
             }),
         });
 
@@ -283,21 +283,21 @@ export namespace Marketplace {
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
-                result: elementDtoSchema,
+                result: templateVersionSchema,
             }),
         });
 
         export const Restore = new Route({
             response: z.object({
                 newCollectionVersionId: collectionVersionIdSchema,
-                result: elementDtoSchema,
+                result: templateVersionSchema,
             }),
         });
 
         export const Duplicate = new Route({
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema,
-                result: elementDtoSchema,
+                result: templateVersionSchema,
             }),
         });
 
@@ -313,38 +313,36 @@ export namespace Marketplace {
             }),
             response: z.object({
                 newSetVersionId: collectionVersionIdSchema.nullable(),
-                requiresConfirmation: z.array(elementDtoSchema),
+                requiresConfirmation: z.array(templateVersionSchema),
             }),
         });
 
         export const GetByEntityId = new Route({
             response: z.object({
-                result: z.array(elementDtoSchema),
+                result: z.array(templateVersionSchema),
             }),
         });
 
         export const GetInternalDependencies = new Route({
             response: z.object({
-                result: z.array(elementDtoSchema),
+                result: z.array(templateVersionSchema),
             }),
         });
     }
 
     export namespace Collection {
-        export const inviteCodeDtoSchema = z.object({
+        export const inviteCodeSchema = z.object({
             code: z.string(),
             expiresAt: stringToDate,
             collection: collectionEntityIdSchema,
         });
-
-        export type InviteCodeDto = z.infer<typeof inviteCodeDtoSchema>;
 
         export const Create = new Route({
             request: z.object({
                 title: z.string().trim().nonempty(),
             }),
             response: z.object({
-                result: collectionDtoSchema,
+                result: collectionVersionSchema,
             }),
         });
 
@@ -362,7 +360,7 @@ export namespace Marketplace {
 
         export const GetPreviewByJoinCode = new Route({
             response: z.object({
-                result: collectionDtoSchema,
+                result: collectionVersionSchema,
             }),
         });
 
@@ -393,13 +391,13 @@ export namespace Marketplace {
 
         export const GetInviteCode = new Route({
             response: z.object({
-                result: inviteCodeDtoSchema.nullable(),
+                result: inviteCodeSchema.nullable(),
             }),
         });
 
         export const PutInviteCode = new Route({
             response: z.object({
-                result: inviteCodeDtoSchema,
+                result: inviteCodeSchema,
             }),
         });
 
@@ -421,13 +419,13 @@ export namespace Marketplace {
         export const Edit = new Route({
             request: editableCollectionPropertiesSchema,
             response: z.object({
-                result: collectionDtoSchema,
+                result: collectionVersionSchema,
             }),
         });
 
         export const LoadMy = new Route({
             response: z.object({
-                result: z.array(extendedCollectionDtoSchema),
+                result: z.array(extendedCollectionVersionSchema),
             }),
         });
 
@@ -445,17 +443,17 @@ export namespace Marketplace {
 
         export const GetByEntityId = new Route({
             response: z.object({
-                result: collectionDtoSchema,
+                result: collectionVersionSchema,
             }),
         });
 
         export const GetLatestElementsBySetVersionId = new Route({
-            response: collectionElementsDtoSchema,
+            response: collectionElementsSchema,
         });
 
         export const GetCollectionVersion = new Route({
             response: z.object({
-                result: collectionDtoSchema,
+                result: collectionVersionSchema,
             }),
         });
 
@@ -482,7 +480,7 @@ export namespace Marketplace {
                     z.object({
                         newCollectionVersionId:
                             collectionVersionIdSchema.nullable(),
-                        blockingElements: z.array(elementDtoSchema),
+                        blockingElements: z.array(templateVersionSchema),
                     }),
                 ]),
             }),
@@ -499,26 +497,26 @@ export namespace Marketplace {
 
         export const Duplicate = new Route({
             response: z.object({
-                createdSet: collectionDtoSchema,
+                createdSet: collectionVersionSchema,
             }),
         });
 
         export const SaveDraftState = new Route({
             response: z.object({
-                result: collectionDtoSchema.nullable(),
+                result: collectionVersionSchema.nullable(),
                 saved: z.boolean().default(true),
             }),
         });
 
         export const DeleteDraftState = new Route({
             response: z.object({
-                result: collectionDtoSchema.nullable(),
+                result: collectionVersionSchema.nullable(),
                 reverted: z.boolean().default(true),
             }),
         });
 
         export const GetElementsOfCollectionVersion = new Route({
-            response: collectionElementsDtoSchema,
+            response: collectionElementsSchema,
         });
 
         class TypedSchema<D, T> {
@@ -573,22 +571,22 @@ export namespace Marketplace {
             export const InitialData = defineEvent(
                 'initialdata',
                 z.object({
-                    collection: collectionDtoSchema,
-                    elements: collectionElementsDtoSchema,
-                    publishedCollection: collectionDtoSchema,
-                    publishedElements: collectionElementsDtoSchema,
+                    collection: collectionVersionSchema,
+                    elements: collectionElementsSchema,
+                    publishedCollection: collectionVersionSchema,
+                    publishedElements: collectionElementsSchema,
                     userRelationship: collectionRelationshipTypeSchema,
                 })
             );
 
             export const ElementCreate = defineEvent(
                 'element:create',
-                elementDtoSchema
+                templateVersionSchema
             );
 
             export const ElementUpdate = defineEvent(
                 'element:update',
-                elementDtoSchema
+                templateVersionSchema
             );
 
             export const ElementDelete = defineEvent(
@@ -600,16 +598,16 @@ export namespace Marketplace {
 
             export const CollectionUpdate = defineEvent(
                 'collection:update',
-                collectionDtoSchema
+                collectionVersionSchema
             );
 
             export const CollectionRefreshData = defineEvent(
                 'collection:refresh-data',
                 z.object({
-                    draftElements: collectionElementsDtoSchema.optional(),
-                    publishedElements: collectionElementsDtoSchema.optional(),
-                    draftCollection: collectionDtoSchema.optional(),
-                    publishedCollection: collectionDtoSchema.optional(),
+                    draftElements: collectionElementsSchema.optional(),
+                    publishedElements: collectionElementsSchema.optional(),
+                    draftCollection: collectionVersionSchema.optional(),
+                    publishedCollection: collectionVersionSchema.optional(),
                 })
             );
 

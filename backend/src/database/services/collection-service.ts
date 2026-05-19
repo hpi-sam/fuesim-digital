@@ -1,15 +1,15 @@
 import type {
     AlarmGroup,
-    CollectionDto,
-    CollectionElementsDto,
+    CollectionVersion,
+    CollectionElements,
     CollectionElementsSingle,
     CollectionEntityId,
     CollectionRelationshipType,
     CollectionVersionId,
-    ElementDto,
+    TemplateVersion,
     ElementEntityId,
     ElementVersionId,
-    ExtendedCollectionDto,
+    ExtendedCollectionVersion,
     Marketplace,
     ParticipantKey,
     VehicleTemplate,
@@ -49,7 +49,7 @@ export class CollectionService {
         collectionEntityId: CollectionEntityId,
         operation: (
             tx: CollectionService,
-            draftState: CollectionDto,
+            draftState: CollectionVersion,
             eventBuffer: EventBuffer
         ) => Promise<T>
     ): Promise<T> {
@@ -564,8 +564,8 @@ export class CollectionService {
         removeFrom: CollectionEntityId;
         dependencyEntityId: CollectionVersionId;
     }): Promise<{
-        newCollection: CollectionDto | null;
-        blockingElements: ElementDto[];
+        newCollection: CollectionVersion | null;
+        blockingElements: TemplateVersion[];
     }> {
         return this.reduce(
             data.removeFrom,
@@ -612,7 +612,7 @@ export class CollectionService {
         return this.reduce(
             collectionEntityId,
             async (tx, draftState, eventBuffer) => {
-                const results: ElementDto[] = [];
+                const results: TemplateVersion[] = [];
 
                 await Promise.all(
                     contents.map(async (content) => {
@@ -648,7 +648,7 @@ export class CollectionService {
     public async getLatestCollectionsForUser(
         userId: string,
         opts: { includeDraftState: boolean; archived?: boolean }
-    ): Promise<ExtendedCollectionDto[]> {
+    ): Promise<ExtendedCollectionVersion[]> {
         return this.collectionRepository.getLatestCollectionForUser(userId, {
             allowDraftState: opts.includeDraftState,
             archived: opts.archived,
@@ -688,7 +688,7 @@ export class CollectionService {
     public async getLatestCollectionById(
         collectionEntityId: CollectionEntityId,
         opts: { draftState: boolean }
-    ): Promise<CollectionDto | null> {
+    ): Promise<CollectionVersion | null> {
         return this.collectionRepository.getLatestCollectionByEntityId(
             collectionEntityId,
             { allowDraftState: opts.draftState }
@@ -718,7 +718,7 @@ export class CollectionService {
 
     public async getLatestDraftElementsOfCollection(
         entity: CollectionEntityId
-    ): Promise<CollectionElementsDto> {
+    ): Promise<CollectionElements> {
         const latestConnection = this.exists(
             await this.collectionRepository.getLatestCollectionByEntityId(
                 entity,
@@ -743,14 +743,14 @@ export class CollectionService {
      * where we do not want to show the user all dependencies, but still need to know about them.
      */
     private async getUsedElementsDeep(
-        elements: ElementDto[]
+        elements: TemplateVersion[]
     ): Promise<CollectionElementsSingle[]> {
         const foundElements: CollectionElementsSingle[] = [];
         await Promise.all(
             elements.map(async (element) => {
                 const elementVersions = getElementDependencies(element.content);
 
-                const foundSubElements: ElementDto[] = (
+                const foundSubElements: TemplateVersion[] = (
                     await Promise.all(
                         elementVersions.map(async (m) =>
                             this.collectionRepository.getElementVersionByVersionId(
@@ -833,7 +833,7 @@ export class CollectionService {
         opts: {
             allowDraftState: boolean;
         }
-    ): Promise<CollectionElementsDto> {
+    ): Promise<CollectionElements> {
         const baseCollection = this.exists(
             await this.collectionRepository.getCollectionByVersionId(
                 collectionVersionId
@@ -902,7 +902,7 @@ export class CollectionService {
 
     private async isElementInLatestCollectionVersion(
         elementEntityId: ElementEntityId
-    ): Promise<[boolean, CollectionDto]> {
+    ): Promise<[boolean, CollectionVersion]> {
         const latestContainingCollection = this.exists(
             await this.collectionRepository.getLatestCollectionOfElementEntity(
                 elementEntityId
@@ -962,7 +962,7 @@ export class CollectionService {
                 await tx.collectionRepository.getLatestElementVersion(entityId)
             );
 
-            let newElementVersion: ElementDto;
+            let newElementVersion: TemplateVersion;
 
             // Check if we have other elements in this collection, which
             // depend on the element we want to update.
@@ -1072,9 +1072,9 @@ export class CollectionService {
      * Finds all directly AND TRANSITIVELY referenced element versions in the content of an element
      */
     private async getDependenciesOfElement(
-        element: ElementDto,
+        element: TemplateVersion,
         opts: { transitive?: boolean } = { transitive: true }
-    ): Promise<ElementDto[]> {
+    ): Promise<TemplateVersion[]> {
         const directElementReferences = (
             await Promise.all(
                 getElementDependencies(element.content).map(
@@ -1327,7 +1327,7 @@ export class CollectionService {
             }
         );
 
-        const dependingElements: ElementDto[] = [];
+        const dependingElements: TemplateVersion[] = [];
         await Promise.all(
             elementsInDependency.direct.map(async (dependencyElement) => {
                 const dependencies = await this.getDependingElements(
@@ -1339,7 +1339,7 @@ export class CollectionService {
             })
         );
 
-        return dependingElements.reduce<ElementDto[]>(
+        return dependingElements.reduce<TemplateVersion[]>(
             (uniqueDependingElements, current) => {
                 if (
                     !uniqueDependingElements.some(
@@ -1456,15 +1456,15 @@ export class CollectionService {
     }
 
     private async getRelevantTransitiveDependenciesForElementVersion(
-        element: ElementDto,
+        element: TemplateVersion,
         collectionVersionId: CollectionVersionId
-    ): Promise<ElementDto[]> {
+    ): Promise<TemplateVersion[]> {
         const elementDependencies =
             await this.getDependenciesOfElement(element);
 
         const relevantDependencies: {
             collection: CollectionVersionId;
-            element: ElementDto;
+            element: TemplateVersion;
         }[] = [];
 
         await Promise.all(

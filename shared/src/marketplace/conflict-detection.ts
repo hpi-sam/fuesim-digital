@@ -7,56 +7,57 @@ import type {
     VersionedCollectionPartial,
 } from './models/versioned-id-schema.js';
 import { elementVersionIdSchema } from './models/versioned-id-schema.js';
-import { elementDtoSchema } from './models/versioned-elements.js';
-import type { ElementDto } from './models/versioned-elements.js';
-import type { CollectionElementsDto } from './models/collection-elements.js';
+import { templateVersionSchema } from './models/versioned-elements.js';
+import type { TemplateVersion } from './models/versioned-elements.js';
 import { gatherCollectionElements } from './models/collection-elements.js';
 
-const deletedElementDtoSchema = z.object({
+const deletedTemplateVersionSchema = z.object({
     id: elementVersionIdSchema,
     type: z.literal('remove'),
-    old: elementDtoSchema,
+    old: templateVersionSchema,
     new: z.null(),
 });
 
-const updatedElementDtoSchema = z.object({
+const updatedTemplateVersionSchema = z.object({
     id: elementVersionIdSchema,
     type: z.literal('update'),
-    old: elementDtoSchema,
-    new: elementDtoSchema,
+    old: templateVersionSchema,
+    new: templateVersionSchema,
 });
 
-const addedElementDtoSchema = z.object({
+const addedTemplateVersionSchema = z.object({
     id: elementVersionIdSchema,
     type: z.literal('create'),
     old: z.null(),
-    new: elementDtoSchema,
+    new: templateVersionSchema,
 });
 
-export const changedElementDtoSchema = z.union([
-    deletedElementDtoSchema,
-    updatedElementDtoSchema,
-    addedElementDtoSchema,
+export const changedTemplateVersionSchema = z.union([
+    deletedTemplateVersionSchema,
+    updatedTemplateVersionSchema,
+    addedTemplateVersionSchema,
 ]);
 
-export type ChangeElementType = ImmutableInfer<
-    typeof changedElementDtoSchema
+export type ChangeElementType = z.infer<
+    typeof changedTemplateVersionSchema
 >['type'];
 
-export type ChangedElementDto = ImmutableInfer<typeof changedElementDtoSchema>;
+export type ChangedTemplateVersion = z.infer<
+    typeof changedTemplateVersionSchema
+>;
 
 export const changeDependenciesSchema = z.record(
     elementVersionIdSchema,
-    z.array(elementDtoSchema)
+    z.array(templateVersionSchema)
 );
 
 export type ChangeDependencies = { [T in ElementVersionId]: ElementDto[] };
 
 export function getCollectionElementDiff(
-    currentElements: Immutable<ElementDto[]>,
-    newElements: Immutable<ElementDto[]>
-): ChangedElementDto[] {
-    const changes: ChangedElementDto[] = [];
+    currentElements: TemplateVersion[],
+    newElements: TemplateVersion[]
+): ChangedTemplateVersion[] {
+    const changes: ChangedTemplateVersion[] = [];
 
     const currentElementEntityIds = new Set(
         currentElements.map((element) => element.entityId)
@@ -186,13 +187,13 @@ export async function dependencyTreeConflictResolution(
         ) => Promise<VersionedCollectionPartial[]>;
         getCollectionElements: (
             collectionVersionId: CollectionVersionId
-        ) => Promise<ElementDto[]>;
+        ) => Promise<TemplateVersion[]>;
     }
 ) {
     // -- STRICT LEVEL --
     const strictLevelCollections: VersionedCollectionPartial[] = [];
     const looseLevelCollections: VersionedCollectionPartial[] = [];
-    const strictLevelElements: ElementDto[] = [];
+    const strictLevelElements: TemplateVersion[] = [];
 
     const loadDeps = async (
         collection: VersionedCollectionPartial,
@@ -239,7 +240,7 @@ export async function dependencyTreeConflictResolution(
 
     // -- LOOSE LEVEL --
 
-    const looseLevelElements: ElementDto[] = [];
+    const looseLevelElements: TemplateVersion[] = [];
 
     const loadLooseDeps = async (collection: VersionedCollectionPartial) => {
         const elements = await retrievers.getCollectionElements(

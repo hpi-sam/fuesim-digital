@@ -1,15 +1,15 @@
 import { z } from 'zod';
+import { collectionVersionSchema } from './collection.js';
+import type { TemplateVersion } from './versioned-elements.js';
+import { templateVersionSchema } from './versioned-elements.js';
 import type { Immutable } from 'immer';
 import type { ImmutableInfer } from '../../utils/infer.js';
-import { collectionDtoSchema } from './collection.js';
-import type { ElementDto } from './versioned-elements.js';
-import { elementDtoSchema } from './versioned-elements.js';
 import type { CollectionElementType } from './collection-element-type.js';
 
 // TODO: Improve this naming
 export const collectionElementsSingleSchema = z.strictObject({
-    collection: collectionDtoSchema,
-    elements: z.array(elementDtoSchema),
+    collection: collectionVersionSchema,
+    elements: z.array(templateVersionSchema),
 });
 export type CollectionElementsSingle = ImmutableInfer<
     typeof collectionElementsSingleSchema
@@ -42,11 +42,11 @@ export type CollectionElementsSingle = ImmutableInfer<
  *   references: [c1, c2, c3] (if any of b1, b2, b3 use any of c1, c2, c3)
  *
  */
-export const collectionElementsDtoSchema = z.strictObject({
+export const collectionElementsSchema = z.strictObject({
     /**
      * Elements directly included in the collection
      */
-    direct: z.array(elementDtoSchema),
+    direct: z.array(templateVersionSchema),
 
     /**
      * Elements included in the collection via imports.
@@ -63,30 +63,25 @@ export const collectionElementsDtoSchema = z.strictObject({
     references: z.array(collectionElementsSingleSchema),
 } satisfies { [T in CollectionElementType]: unknown });
 
-export type CollectionElementsDto = ImmutableInfer<
-    typeof collectionElementsDtoSchema
->;
+export type CollectionElements = z.infer<typeof collectionElementsSchema>;
 
-export function gatherCollectionElements(elements: CollectionElementsDto) {
+export function gatherCollectionElements(elements: CollectionElements) {
     return {
-        allDirectElements(): Immutable<ElementDto[]> {
+        allDirectElements(): TemplateVersion[] {
             return elements.direct;
         },
-        allImportedElements(): Immutable<ElementDto[]> {
-            return elements.imported.flatMap((imported) => imported.elements);
-        },
-        allReferenceElements(): Immutable<ElementDto[]> {
+        allReferenceElements(): TemplateVersion[] {
             return elements.references.flatMap(
                 (reference) => reference.elements
             );
         },
-        allVisibleElements(): Immutable<ElementDto[]> {
+        allVisibleElements(): TemplateVersion[] {
             return [
                 ...elements.direct,
                 ...elements.imported.flatMap((imported) => imported.elements),
             ];
         },
-        allElements(): Immutable<ElementDto[]> {
+        allElements(): TemplateVersion[] {
             return [
                 ...this.allVisibleElements(),
                 ...elements.references.flatMap(

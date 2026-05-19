@@ -1,14 +1,14 @@
 import crypto from 'node:crypto';
 import type {
-    CollectionDto,
+    CollectionVersion,
     CollectionEntityId,
     CollectionRelationshipType,
     CollectionVersionId,
     CollectionVisibility,
-    ElementDto,
+    TemplateVersion,
     ElementEntityId,
     ElementVersionId,
-    ExtendedCollectionDto,
+    ExtendedCollectionVersion,
     Marketplace,
     VersionedElementContent,
     VersionedElementPartial,
@@ -430,7 +430,7 @@ export class CollectionRepository extends BaseRepository {
 
     public async getOrCreateDraftState(
         collectionEntityId: CollectionEntityId
-    ): Promise<[CollectionDto, boolean]> {
+    ): Promise<[CollectionVersion, boolean]> {
         const result = this.onlySingle(
             await this.databaseConnection
                 .select()
@@ -1087,7 +1087,7 @@ export class CollectionRepository extends BaseRepository {
 
     public async getElementVersionByVersionId(
         elementVersionId: ElementVersionId
-    ): Promise<ElementDto | null> {
+    ): Promise<TemplateVersion | null> {
         const result = await this.databaseConnection
             .select()
             .from(elementTable)
@@ -1116,7 +1116,7 @@ export class CollectionRepository extends BaseRepository {
     public async getLatestCollectionForUser(
         userId: string,
         opts?: { allowDraftState?: boolean; archived?: boolean }
-    ): Promise<ExtendedCollectionDto[]> {
+    ): Promise<ExtendedCollectionVersion[]> {
         return this.transaction(async (tx) => {
             const latestCollections = tx.latestCollections({
                 allowDraftState: opts?.allowDraftState ?? true,
@@ -1166,7 +1166,7 @@ export class CollectionRepository extends BaseRepository {
                     return {
                         ...collection,
                         relationship: relationship!,
-                    } satisfies ExtendedCollectionDto;
+                    } satisfies ExtendedCollectionVersion;
                 })
             );
 

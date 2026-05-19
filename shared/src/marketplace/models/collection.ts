@@ -7,7 +7,7 @@ import {
 import { collectionVisibilitySchema } from './collection-visibility.js';
 import { collectionRelationshipTypeSchema } from './collection-relationship.js';
 
-export const collectionDtoSchema = z.object({
+export const collectionVersionSchema = z.object({
     ...stateVersionedEntitySchema.shape,
     versionId: collectionVersionIdSchema,
     entityId: collectionEntityIdSchema,
@@ -18,12 +18,14 @@ export const collectionDtoSchema = z.object({
     archived: z.boolean(),
 });
 
-export type CollectionDto = z.infer<typeof collectionDtoSchema>;
+export type CollectionVersion = z.infer<typeof collectionVersionSchema>;
 
-export const extendedCollectionDtoSchema = z.object({
-    ...collectionDtoSchema.shape,
+export const extendedCollectionVersionSchema = z.object({
+    ...collectionVersionSchema.shape,
     elementCount: z.number(),
     relationship: collectionRelationshipTypeSchema,
 });
 
-export type ExtendedCollectionDto = z.infer<typeof extendedCollectionDtoSchema>;
+export type ExtendedCollectionVersion = z.infer<
+    typeof extendedCollectionVersionSchema
+>;

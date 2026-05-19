@@ -108,7 +108,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
 
         // Always show the chooseTransferPopup
         // Show a popup to choose the transferPoint or hospital
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 ChooseTransferTargetPopupComponent,
                 droppedOnFeature,
@@ -164,7 +164,7 @@ export class TransferPointFeatureManager extends MoveableFeatureManager<Transfer
         ) {
             return;
         }
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 TransferPointPopupComponent,
                 feature,

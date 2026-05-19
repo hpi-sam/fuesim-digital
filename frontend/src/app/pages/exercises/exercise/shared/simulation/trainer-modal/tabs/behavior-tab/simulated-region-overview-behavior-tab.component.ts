@@ -7,7 +7,7 @@ import type {
 } from 'fuesim-digital-shared';
 import {
     simulationBehaviorDictionary,
-    StrictObject,
+    TypeAssertedObject,
     SimulatedRegion,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -112,7 +112,7 @@ export class SimulatedRegionOverviewBehaviorTabComponent
                     const currentTypes = new Set(
                         states.map((state) => state.type)
                     );
-                    return StrictObject.keys(
+                    return TypeAssertedObject.keys(
                         simulationBehaviorDictionary
                     ).filter((type) => !currentTypes.has(type));
                 })

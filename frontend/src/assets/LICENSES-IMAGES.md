@@ -67,6 +67,17 @@ and Fry1989
 [notarzt-personnel.svg](notarzt-personnel.svg):  
 <https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited) + <https://commons.wikimedia.org/wiki/File:Encircled_Rod_of_Asclepius.svg> (edited)
 
+[fire-squad-personnel.svg](fire-squad-personnel.svg)
+<https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited)
+
+[fire-single-personnel.svg](fire-single-personnel.svg)
+<https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited)
+
+[fire-sf-personnel.svg](fire-sf-personnel.svg)
+<https://commons.wikimedia.org/wiki/File:Person_(63361)_-_The_Noun_Project.svg> (edited)
+and Fry1989  
+<https://commons.wikimedia.org/wiki/File:MUTCD_RS-094.svg> (edited)
+
 [trash-can.svg](trash-can.svg):  
 Bootstrap-Icon `bi-trash-fill` (edited)
 
@@ -76,7 +87,15 @@ License: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 [favicon.png](favicon.png): created by Freepik - Flaticon <https://www.flaticon.com/de/kostenlose-icons/alarm>
 
-[Magnifying-glass.svg](Magnifying-glass.svg):
-<https://commons.wikimedia.org/wiki/File:Magnifying-glass.svg#/media/File:Magnifying-glass.svg>
-RRZEicons
-License: [CC-BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/deed.en)
+[scoutable-generic.png](scoutable-generic.png), [scoutable-patient.png](scoutable-patient.png):
+edited by Jonathan Weth, based on Bootstrap Icons <https://icons.getbootstrap.com/>
+License: [MIT](https://github.com/twbs/icons/blob/main/LICENSE)
+
+[blue_car_broken.png](blue_car_broken.png),
+[blue_car_broken_burning.png](blue_car_broken_burning.png),
+[blue_car_burned_out.png](blue_car_burned_out.png)
+Felix Koch, based on <https://illustoon.com/?dl=9476> and <https://illustoon.com/?id=2723> by [DESIGNALIKE](https://illustoon.com)
+License: CC0 1.0
+
+[lhf-vehicle](lhf-vehicle.svg):
+provided by Berliner Feuerwehr with permit to use within FüSim Digital

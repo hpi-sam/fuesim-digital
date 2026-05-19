@@ -1,14 +1,31 @@
-import type { WritableDraft } from 'immer';
+import type { Immutable, WritableDraft } from 'immer';
+import type { ZodType } from 'zod';
 import type { Client } from '../models/client.js';
 import type { Role, SpecificRole } from '../models/utils/role.js';
 import type { ExerciseState } from '../state.js';
 import type { Constructor } from '../utils/constructor.js';
 
-export interface ActionReducer<A extends Action = Action> {
-    readonly action: Constructor<A>;
-    readonly reducer: ReducerFunction<InstanceType<this['action']>>;
-    readonly rights: ReducerRights<InstanceType<this['action']>>;
+interface BaseActionReducer<A extends Action = Action> {
+    readonly reducer: ReducerFunction<A>;
+    readonly rights: ReducerRights<A>;
 }
+
+interface LegacyActionReducer<
+    A extends Action = Action,
+> extends BaseActionReducer<A> {
+    readonly action: Constructor<A>;
+}
+
+interface SchemaBasedActionReducer<
+    A extends Action = Action,
+> extends BaseActionReducer<A> {
+    readonly type: A['type'];
+    readonly actionSchema: ZodType<A>;
+}
+
+export type ActionReducer<A extends Action = Action> =
+    | LegacyActionReducer<A>
+    | SchemaBasedActionReducer<A>;
 
 /**
  *  An action is an interface for immutable JSON objects used to update the store in the frontend and
@@ -70,7 +87,7 @@ export interface Action {
 type ReducerFunction<A extends Action> = (
     // These functions can only work with a mutable state object, because we expect them to be executed in immers produce context.
     draftState: WritableDraft<ExerciseState>,
-    action: A
+    action: Immutable<A>
 ) => WritableDraft<ExerciseState>;
 
 export type ReducerRights<A extends Action> =

@@ -1,5 +1,3 @@
-import { StrictObject } from './strict-object.js';
-
 /**
  *
  * @param obj The object to sort. It will not be mutated.
@@ -20,5 +18,5 @@ export function sortObject<T extends { [key: string]: any }>(
     obj: T,
     compareFn: (a: [keyof T, T[keyof T]], b: [keyof T, T[keyof T]]) => number
 ): T {
-    return Object.fromEntries(StrictObject.entries(obj).sort(compareFn)) as T;
+    return Object.fromEntries(Object.entries(obj).sort(compareFn)) as T;
 }

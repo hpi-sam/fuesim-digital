@@ -245,7 +245,7 @@ export class RestrictedZoneFeatureManager
         super.onFeatureClicked(event, feature);
 
         const restrictedZoneId = feature.getId() as UUID;
-        this.popupService.openPopup(
+        this.popupService.togglePopup(
             this.popupHelper.getPopupOptions(
                 RestrictedZonePopupComponent,
                 event.coordinate,

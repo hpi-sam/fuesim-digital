@@ -1,8 +1,15 @@
 import { produce } from 'immer';
+import { toLonLat } from 'ol/proj.js';
 import { ExerciseState } from '../../state.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
 import type { Patient } from '../../models/patient.js';
+import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
+import { coordinateStringToNumber } from '../../utils/string-coordinates.js';
+import { newNoPosition } from '../../models/utils/position/no-position.js';
+import { defaultViewportSize, newViewport } from '../../models/viewport.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import {
     exportPatientsToCSV,
     patientsCsvExportColumns,
@@ -17,13 +24,36 @@ function setupState(mutateBeforeState: (state: ExerciseState) => void) {
     });
 }
 
+const noPosition = newNoPosition();
+const mapPosition = newMapPositionAt(
+    newMapCoordinatesAt(1461702.742011243, 6871506.040852688)
+);
+const realPosition = toLonLat([
+    mapPosition.coordinates.x,
+    mapPosition.coordinates.y,
+]);
+
 describe('csv export', () => {
     describe.each([
         [
             'red patient',
             [
-                (draftState: ExerciseState) => {
-                    const patient = addPatient(draftState, 'red', 'red');
+                (draftState: WritableDraft<ExerciseState>) => {
+                    // patient is inside of viewport
+                    const viewport = newViewport(
+                        {
+                            x: mapPosition.coordinates.x - 1,
+                            y: mapPosition.coordinates.y + 1,
+                        },
+                        'Test Viewport'
+                    );
+                    draftState.viewports[viewport.id] = viewport;
+                    const patient = addPatient(
+                        draftState,
+                        'red',
+                        'red',
+                        mapPosition
+                    );
                     patient.biometricInformation.sex = 'female';
                 },
                 {
@@ -31,14 +61,33 @@ describe('csv export', () => {
                     sex: 'W',
                     remarks: '',
                     hasTransportPriority: '0',
+                    longitude: coordinateStringToNumber.encode(
+                        realPosition[0]!
+                    ),
+                    latitude: coordinateStringToNumber.encode(realPosition[1]!),
+                    section: 'Test Viewport',
                 },
             ],
         ],
         [
             'yellow patient',
             [
-                (draftState: ExerciseState) => {
-                    const patient = addPatient(draftState, 'yellow', 'yellow');
+                (draftState: WritableDraft<ExerciseState>) => {
+                    // patient is outside of viewport
+                    const viewport = newViewport(
+                        {
+                            x: mapPosition.coordinates.x + 1,
+                            y: mapPosition.coordinates.y + 1,
+                        },
+                        'Test Viewport'
+                    );
+                    draftState.viewports[viewport.id] = viewport;
+                    const patient = addPatient(
+                        draftState,
+                        'yellow',
+                        'yellow',
+                        mapPosition
+                    );
                     patient.biometricInformation.sex = 'male';
                     patient.remarks = 'unique_remarks';
                 },
@@ -46,14 +95,47 @@ describe('csv export', () => {
                     status: '2',
                     sex: 'M',
                     remarks: 'unique_remarks',
+                    longitude: coordinateStringToNumber.encode(
+                        realPosition[0]!
+                    ),
+                    latitude: coordinateStringToNumber.encode(realPosition[1]!),
+                    section: '',
                 },
             ],
         ],
         [
             'green patient',
             [
-                (draftState: ExerciseState) => {
-                    const patient = addPatient(draftState, 'green', 'green');
+                (draftState: WritableDraft<ExerciseState>) => {
+                    // patient is in both viewports, select smaller
+                    const largerViewport = newViewport(
+                        {
+                            x: mapPosition.coordinates.x - 1,
+                            y: mapPosition.coordinates.y + 1,
+                        },
+                        'large'
+                    );
+                    largerViewport.size = {
+                        width: defaultViewportSize.width * 2,
+                        height: defaultViewportSize.height * 2,
+                    };
+                    draftState.viewports[largerViewport.id] = largerViewport;
+
+                    const smallerViewport = newViewport(
+                        {
+                            x: mapPosition.coordinates.x - 1,
+                            y: mapPosition.coordinates.y + 1,
+                        },
+                        'small'
+                    );
+                    draftState.viewports[smallerViewport.id] = smallerViewport;
+
+                    const patient = addPatient(
+                        draftState,
+                        'green',
+                        'green',
+                        mapPosition
+                    );
                     patient.biometricInformation.sex = 'diverse';
                     patient.hasTransportPriority = true;
                 },
@@ -61,26 +143,39 @@ describe('csv export', () => {
                     status: '3',
                     sex: '',
                     hasTransportPriority: '1',
+                    section: 'small',
                 },
             ],
         ],
         [
             'blue patient',
             [
-                (draftState: ExerciseState) => {
-                    const patient = addPatient(draftState, 'blue', 'blue');
+                (draftState: WritableDraft<ExerciseState>) => {
+                    const patient = addPatient(
+                        draftState,
+                        'blue',
+                        'blue',
+                        noPosition
+                    );
                     patient.biometricInformation.sex = 'female';
                 },
                 {
                     status: '1',
+                    longitude: '',
+                    latitude: '',
                 },
             ],
         ],
         [
             'black patient',
             [
-                (draftState: ExerciseState) => {
-                    const patient = addPatient(draftState, 'black', 'black');
+                (draftState: WritableDraft<ExerciseState>) => {
+                    const patient = addPatient(
+                        draftState,
+                        'black',
+                        'black',
+                        noPosition
+                    );
                     patient.biometricInformation.sex = 'female';
                 },
                 {
@@ -91,8 +186,13 @@ describe('csv export', () => {
         [
             'white patient',
             [
-                (draftState: ExerciseState) => {
-                    const patient = addPatient(draftState, 'white', 'red');
+                (draftState: WritableDraft<ExerciseState>) => {
+                    const patient = addPatient(
+                        draftState,
+                        'white',
+                        'red',
+                        noPosition
+                    );
                     patient.biometricInformation.sex = 'female';
                 },
                 {
@@ -103,8 +203,13 @@ describe('csv export', () => {
         [
             'red triaged, but real yellow',
             [
-                (draftState: ExerciseState) => {
-                    const patient = addPatient(draftState, 'red', 'yellow');
+                (draftState: WritableDraft<ExerciseState>) => {
+                    const patient = addPatient(
+                        draftState,
+                        'red',
+                        'yellow',
+                        noPosition
+                    );
                     patient.biometricInformation.sex = 'female';
                 },
                 {
@@ -124,9 +229,9 @@ describe('csv export', () => {
             expect(exportedPatient.pzc).toBe('');
             expect(exportedPatient.ventilated).toBe('');
             expect(exportedPatient.doctorEscort).toBe('');
+            expect(exportedPatient.patientTray).toBe('');
 
-            for (const key of Object.keys(expectedState)) {
-                // @ts-expect-error: string
+            for (const key of TypeAssertedObject.keys(expectedState)) {
                 expect(exportedPatient[key]).toBe(expectedState[key]);
             }
         });

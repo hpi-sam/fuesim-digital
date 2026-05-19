@@ -13,7 +13,7 @@ export const vehicleParametersSchema = z.strictObject({
     personnel: z.array(personnelSchema),
 });
 export type VehicleParameters = Immutable<
-    Immutable<z.infer<typeof vehicleParametersSchema>>
+    z.infer<typeof vehicleParametersSchema>
 >;
 
 export function newVehicleParameters(

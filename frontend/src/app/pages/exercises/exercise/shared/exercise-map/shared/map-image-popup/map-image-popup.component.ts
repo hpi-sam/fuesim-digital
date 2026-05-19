@@ -23,6 +23,6 @@ export class MapImagePopupComponent {
     readonly currentRole = this.store.selectSignal(selectCurrentMainRole);
 
     public closePopup() {
-        this.popupService.closePopup();
+        this.popupService.dismissPopup();
     }
 }

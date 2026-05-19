@@ -1,0 +1,121 @@
+<div class="mb-3">
+    <label class="form-label">Alarmgruppen</label>
+    @if (alarmGroupIds().length === 0) {
+        <p class="text-muted small">
+            Keine Alarmgruppen ausgewählt. Alle Alarmgruppen stehen zur
+            Verfügung.
+        </p>
+    }
+    <ul class="list-group mb-2">
+        @for (alarmGroupId of alarmGroupIds(); track alarmGroupId) {
+            <li
+                class="list-group-item d-flex align-items-center justify-content-between p-1 ps-2"
+            >
+                <span class="text-truncate">
+                    <app-alarm-group-name
+                        [alarmGroupId]="alarmGroupId"
+                    ></app-alarm-group-name>
+                </span>
+                <button
+                    class="btn btn-link text-danger text-decoration-none"
+                    title="Entfernen"
+                    (click)="removeAlarmGroup(alarmGroupId)"
+                >
+                    <i class="bi-trash"></i>
+                </button>
+            </li>
+        }
+    </ul>
+    @if (alarmGroupsToAdd().length > 0) {
+        <div
+            ngbDropdown
+            placement="bottom-start"
+            autoClose="outside"
+            class="d-inline-block"
+        >
+            <button
+                ngbDropdownToggle
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+            >
+                <span class="bi-plus me-1"></span>
+                Hinzufügen
+            </button>
+            <div ngbDropdownMenu>
+                @for (alarmGroup of alarmGroupsToAdd(); track alarmGroup.id) {
+                    <button
+                        ngbDropdownItem
+                        (click)="addAlarmGroup(alarmGroup.id)"
+                    >
+                        <span class="bi-plus me-1"></span>
+                        {{ alarmGroup.name }}
+                    </button>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<div>
+    <label class="form-label">Ziel-Transferpunkte</label>
+    @if (targetTransferPointIds().length === 0) {
+        <p class="text-muted small">
+            Keine Transferpunkte ausgewählt. Alle Transferpunkte stehen zur
+            Verfügung.
+        </p>
+    }
+    <ul class="list-group mb-2">
+        @for (
+            transferPointId of targetTransferPointIds();
+            track transferPointId
+        ) {
+            <li
+                class="list-group-item d-flex align-items-center justify-content-between p-1 ps-2"
+            >
+                <span class="text-truncate">
+                    <app-transfer-point-name
+                        [transferPointId]="transferPointId"
+                    ></app-transfer-point-name>
+                </span>
+                <button
+                    class="btn btn-link text-danger text-decoration-none"
+                    title="Entfernen"
+                    (click)="removeTransferPoint(transferPointId)"
+                >
+                    <i class="bi-trash"></i>
+                </button>
+            </li>
+        }
+    </ul>
+    @if (transferPointsToAdd().length > 0) {
+        <div
+            ngbDropdown
+            placement="bottom-start"
+            autoClose="outside"
+            class="d-inline-block"
+        >
+            <button
+                ngbDropdownToggle
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+            >
+                <span class="bi-plus me-1"></span>
+                Hinzufügen
+            </button>
+            <div ngbDropdownMenu>
+                @for (
+                    transferPoint of transferPointsToAdd();
+                    track transferPoint.id
+                ) {
+                    <button
+                        ngbDropdownItem
+                        (click)="addTransferPoint(transferPoint.id)"
+                    >
+                        <span class="bi-plus me-1"></span>
+                        {{ getTransferPointFullName(transferPoint) }}
+                    </button>
+                }
+            </div>
+        </div>
+    }
+</div>

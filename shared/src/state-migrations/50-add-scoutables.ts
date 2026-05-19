@@ -1,12 +1,8 @@
 import type { UUID } from '../utils/uuid.js';
 import type { Migration } from './migration-functions.js';
 
-interface Patient {
-    scoutableId: UUID | null;
-}
-
-interface MapImage {
-    scoutableId: UUID | null;
+interface WithScoutableId {
+    scoutableId: null;
 }
 
 export const addScoutables50: Migration = {
@@ -15,14 +11,14 @@ export const addScoutables50: Migration = {
         switch (typedAction.type) {
             case '[Patient] Add patient': {
                 const typedPatientAction = action as {
-                    patient: Patient;
+                    patient: WithScoutableId;
                 };
                 typedPatientAction.patient.scoutableId = null;
                 break;
             }
             case '[MapImage] Add MapImage': {
                 const typedMapImageAction = action as {
-                    mapImage: MapImage;
+                    mapImage: WithScoutableId;
                 };
                 typedMapImageAction.mapImage.scoutableId = null;
                 break;
@@ -36,13 +32,11 @@ export const addScoutables50: Migration = {
         const typedState = state as {
             scoutables: { [key in UUID]: any } | undefined;
 
-            userGeneratedContents: { [key in UUID]: any } | undefined;
             patients: { [key in UUID]: { scoutableId: null | undefined } };
             mapImages: { [key in UUID]: { scoutableId: null | undefined } };
         };
 
         typedState.scoutables = {};
-        typedState.userGeneratedContents = {};
         Object.values(typedState.patients).forEach((patient) => {
             patient.scoutableId = null;
         });

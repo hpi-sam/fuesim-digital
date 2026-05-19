@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { Immutable } from 'immer';
 import { alarmGroupSchema } from './alarm-group.js';
 import { clientSchema } from './client.js';
+import { drawingSchema } from './drawing.js';
 import { hospitalSchema } from './hospital.js';
 import { mapImageSchema } from './map-image.js';
 import { materialSchema } from './material.js';
@@ -12,12 +13,14 @@ import { simulatedRegionSchema } from './simulated-region.js';
 import { transferPointSchema } from './transfer-point.js';
 import { vehicleSchema } from './vehicle.js';
 import { viewportSchema } from './viewport.js';
-import { userGeneratedContentSchema } from './user-generated-content.js';
 import { scoutableSchema } from './scoutable.js';
+import { technicalChallengeSchema } from './technical-challenge/technical-challenge.js';
+import { taskSchema } from './task.js';
 
 export const elementSchema = z.discriminatedUnion('type', [
     alarmGroupSchema,
     clientSchema,
+    drawingSchema,
     hospitalSchema,
     mapImageSchema,
     materialSchema,
@@ -25,10 +28,11 @@ export const elementSchema = z.discriminatedUnion('type', [
     personnelSchema,
     restrictedZoneSchema,
     simulatedRegionSchema,
+    taskSchema,
+    technicalChallengeSchema,
     transferPointSchema,
     vehicleSchema,
     viewportSchema,
     scoutableSchema,
-    userGeneratedContentSchema,
 ]);
 export type Element = Immutable<z.infer<typeof elementSchema>>;

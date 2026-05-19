@@ -2,10 +2,8 @@ import { produce, type WritableDraft } from 'immer';
 import type { ExerciseState } from '../state.js';
 import {
     type ExerciseAction,
-    getExerciseActionTypeDictionary,
+    lookupReducerFor,
 } from './action-reducers/action-reducers.js';
-
-const exerciseActionTypeDictionary = getExerciseActionTypeDictionary();
 
 /**
  * A pure reducer function that applies the action on the state without mutating it.
@@ -32,10 +30,6 @@ export function reduceExerciseState(
 export function applyAction(
     draftState: WritableDraft<ExerciseState>,
     action: ExerciseAction
-): void {
-    exerciseActionTypeDictionary[action.type].reducer(
-        draftState,
-        // typescript doesn't narrow action and the reducer to the correct ones based on action.type
-        action as any
-    );
+) {
+    return lookupReducerFor(action.type).reducer(draftState, action);
 }

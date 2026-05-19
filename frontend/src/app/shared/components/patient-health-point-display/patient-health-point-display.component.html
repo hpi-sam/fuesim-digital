@@ -1,7 +1,9 @@
-@if (
-    (currentRole$ | async) === 'participant'
-        ? (status$ | async)?.visible
-        : (status$ | async)?.real;
+@if (isBystander()) {
+    <span [ngStyle]="{ 'background-color': 'grey' }" class="badge rounded-pill">
+        Passant
+    </span>
+} @else if (
+    currentRole() === 'participant' ? status().visible : status().real;
     as displayedStatus
 ) {
     <span
@@ -12,9 +14,8 @@
         class="badge rounded-pill font-monospace"
     >
         {{
-            (currentRole$ | async) !== 'participant'
-                ? (((status$ | async)?.health ?? 0) / healthPointsDefaults.max
-                  | percent)
+            currentRole() !== 'participant'
+                ? (status().health / healthPointsDefaults.max | percent)
                 : statusNames[displayedStatus]
         }}
     </span>

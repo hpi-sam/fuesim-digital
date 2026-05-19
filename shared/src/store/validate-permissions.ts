@@ -2,11 +2,8 @@ import type { ExerciseState } from '../state.js';
 import type { Client } from '../models/client.js';
 import {
     type ExerciseAction,
-    getExerciseActionTypeDictionary,
+    lookupReducerFor,
 } from './action-reducers/action-reducers.js';
-import type { ReducerRights } from './action-reducer.js';
-
-const exerciseActionTypeDictionary = getExerciseActionTypeDictionary();
 
 /**
  *
@@ -20,10 +17,8 @@ export function validatePermissions(
     action: ExerciseAction,
     state: ExerciseState
 ) {
-    const reducer = exerciseActionTypeDictionary[action.type];
-    let rights = reducer.rights as ReducerRights<
-        InstanceType<typeof reducer.action>
-    >;
+    const reducer = lookupReducerFor(action.type);
+    let rights = reducer.rights;
 
     if (typeof rights === 'function') {
         rights = rights(client, action);

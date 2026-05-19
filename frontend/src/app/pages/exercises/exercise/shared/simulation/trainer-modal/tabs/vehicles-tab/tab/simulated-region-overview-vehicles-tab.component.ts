@@ -1,11 +1,11 @@
 import type { OnInit } from '@angular/core';
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Vehicle, VehicleTemplate } from 'fuesim-digital-shared';
 import { SimulatedRegion } from 'fuesim-digital-shared';
 import { groupBy } from 'lodash-es';
 import type { Observable } from 'rxjs';
-import { combineLatest, map, Subject } from 'rxjs';
+import { combineLatest, map } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { StartTransferService } from '../../../start-transfer.service';
 import { ExerciseService } from '../../../../../../../../../core/exercise.service';
@@ -30,15 +30,13 @@ export class SimulatedRegionOverviewVehiclesTabComponent implements OnInit {
 
     readonly simulatedRegion = input.required<SimulatedRegion>();
 
-    selectedVehicle$ = new Subject<Vehicle | null>();
+    public readonly selectedVehicle = signal<Vehicle | null>(null);
 
     groupedVehicles$!: Observable<
         { vehicleType: string; vehicles: Vehicle[] }[]
     >;
 
     ngOnInit() {
-        this.selectedVehicle$.next(null);
-
         const vehicles$ = this.store.select(
             createSelectElementsInSimulatedRegion(
                 selectVehicles,
@@ -81,7 +79,7 @@ export class SimulatedRegionOverviewVehiclesTabComponent implements OnInit {
     }
 
     selectVehicle(vehicle: Vehicle) {
-        this.selectedVehicle$.next(vehicle);
+        this.selectedVehicle.set(vehicle);
     }
 
     private indexOfTemplate(

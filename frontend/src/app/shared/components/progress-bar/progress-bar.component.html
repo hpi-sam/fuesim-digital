@@ -1,0 +1,18 @@
+<div class="progress">
+    <div
+        class="progress-bar"
+        [class.progress-bar-striped]="!paused() && !finished()"
+        [class.progress-bar-animated]="!paused() && !finished()"
+        [class.bg-info]="!finished()"
+        [class.text-bg-info]="!finished()"
+        [class.bg-success]="finished()"
+        [class.text-bg-success]="finished()"
+        role="progressbar"
+        aria-valuemin="0"
+        [attr.aria-valuenow]="current()"
+        [attr.aria-valuemax]="max()"
+        [style.width]="`${progressPercentage()}%`"
+    >
+        <span> {{ current() }}s / {{ max() }}s </span>
+    </div>
+</div>

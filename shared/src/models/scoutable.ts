@@ -1,14 +1,20 @@
 import * as z from 'zod';
 import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
-import { patientSchema } from './patient.js';
+import { type Patient, patientSchema } from './patient.js';
 import { mapImageSchema } from './map-image.js';
+import {
+    newUserGeneratedContent,
+    userGeneratedContentSchema,
+} from './user-generated-content.js';
 
 export const scoutableSchema = z.strictObject({
     id: uuidSchema,
     type: z.literal('scoutable'),
-    userGeneratedContentId: uuidSchema.nullable(),
+    name: z.string(),
+    userGeneratedContent: userGeneratedContentSchema,
     isVisibleForParticipants: z.boolean(),
+    viewedByParticipants: z.boolean(),
 });
 export type Scoutable = Immutable<Immutable<z.infer<typeof scoutableSchema>>>;
 
@@ -20,23 +26,46 @@ export type Scoutable = Immutable<Immutable<z.infer<typeof scoutableSchema>>>;
     You might want the scoutable indicator to navigate to the scoutble nav directly,
     so refer to the mapImages popup component for a simple implemtation.
 */
-export const scoutableElementSchema = z.union([mapImageSchema, patientSchema]);
+export const scoutableElementSchema = z.discriminatedUnion('type', [
+    mapImageSchema,
+    patientSchema,
+]);
 export type ScoutableElement = Immutable<
     z.infer<typeof scoutableElementSchema>
 >;
+export type ScoutableElementType = ScoutableElement['type'];
 
-export const scoutableElementKeys = [
+export const scoutableElementTypes = [
     'patient',
     'mapImage',
-] satisfies Array<ScoutableElementType>;
-
-export type ScoutableElementType = ScoutableElement['type'];
+] satisfies ScoutableElementType[];
+export const scoutableElementTypeSchema = z.literal(scoutableElementTypes);
 
 export function newScoutable(): Scoutable {
     return {
         id: uuid(),
         type: 'scoutable',
-        userGeneratedContentId: null,
+        name: '',
+        userGeneratedContent: newUserGeneratedContent(),
         isVisibleForParticipants: true,
+        viewedByParticipants: false,
     };
+}
+
+export const scoutableImages = {
+    unviewed: {
+        generic: '/assets/scoutable-generic.png',
+        patient: '/assets/scoutable-patient.png',
+    },
+    viewed: {
+        generic: '/assets/scoutable-generic-viewed.png',
+        patient: '/assets/scoutable-patient-viewed.png',
+    },
+} as const;
+
+export function isPatientBystander(patient: Patient) {
+    return patient.patientStatusCode.firstField.colorCode === 'B';
+}
+export function isElementGenericScoutable(element: ScoutableElement) {
+    return element.image.url.endsWith(scoutableImages.unviewed.generic);
 }

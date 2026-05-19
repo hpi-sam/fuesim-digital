@@ -8,7 +8,7 @@ import {
     Min,
 } from 'class-validator';
 import { z } from 'zod';
-import { WritableDraft } from 'immer';
+import { type Immutable, WritableDraft } from 'immer';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import type { ExerciseState } from '../../state.js';
 import { IsZodSchema } from '../../utils/validators/is-zod-object.js';
@@ -19,7 +19,6 @@ import {
     type VehicleParameters,
     vehicleParametersSchema,
 } from '../../models/utils/vehicle-parameters.js';
-import { StrictObject } from '../../utils/strict-object.js';
 import { newAlarmGroupStartPoint } from '../../models/utils/start-points.js';
 import { getElement } from './utils/get-element.js';
 import { logAlarmGroupSent } from './utils/log.js';
@@ -37,6 +36,8 @@ export class AddLogEntryAction implements Action {
     public readonly message!: string;
     @IsBoolean()
     public readonly isPrivate: boolean = false;
+    @IsUUID(4, uuidValidationOptions)
+    public readonly id!: UUID;
 }
 
 export class SendAlarmGroupAction implements Action {
@@ -63,13 +64,17 @@ export class SendAlarmGroupAction implements Action {
     @IsOptional()
     @IsUUID(4, uuidValidationOptions)
     public readonly firstVehiclesTargetTransferPointId: UUID | undefined;
+
+    @IsUUID(4, uuidValidationOptions)
+    public readonly eocLogId!: UUID;
 }
 
 export namespace EmergencyOperationCenterActionReducers {
     export const addLogEntry: ActionReducer<AddLogEntryAction> = {
         action: AddLogEntryAction,
-        reducer: (draftState, { name, message, isPrivate }) => {
+        reducer: (draftState, { name, message, isPrivate, id }) => {
             const logEntry = newEocLogEntry(
+                id,
                 draftState.currentTime,
                 message,
                 name,
@@ -96,6 +101,7 @@ export namespace EmergencyOperationCenterActionReducers {
                 targetTransferPointId,
                 firstVehiclesCount,
                 firstVehiclesTargetTransferPointId,
+                eocLogId,
             }
         ) => {
             const alarmGroup = getElement(
@@ -104,7 +110,7 @@ export namespace EmergencyOperationCenterActionReducers {
                 alarmGroupId
             );
 
-            const sortedAlarmGroupVehicles = StrictObject.values(
+            const sortedAlarmGroupVehicles = Object.values(
                 alarmGroup.alarmGroupVehicles
             ).sort((a, b) => a.time - b.time);
 
@@ -162,6 +168,7 @@ export namespace EmergencyOperationCenterActionReducers {
                 message: logEntry,
                 name: clientName,
                 isPrivate: false,
+                id: eocLogId,
             });
 
             logAlarmGroupSent(draftState, alarmGroupId);
@@ -175,7 +182,7 @@ export namespace EmergencyOperationCenterActionReducers {
 
 function sendAlarmGroupVehicle(
     draftState: WritableDraft<ExerciseState>,
-    vehicleParameters: VehicleParameters,
+    vehicleParameters: Immutable<VehicleParameters>,
     time: number,
     alarmGroupId: UUID,
     targetTransferPointId: UUID

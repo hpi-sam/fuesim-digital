@@ -6,7 +6,6 @@ import type {
     PatientStatusForTransport,
     UUID,
 } from 'fuesim-digital-shared';
-import { StrictObject } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { combineLatest, map } from 'rxjs';
 import {
@@ -43,9 +42,7 @@ import { PatientStatusBadgeComponent } from '../../../../../../../../../../../..
         AsyncPipe,
     ],
 })
-export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent
-    implements OnChanges
-{
+export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 
@@ -84,7 +81,7 @@ export class ManagePatientTransportToHospitalVehiclesForCategoriesEditorComponen
         ]).pipe(
             map(
                 ([behaviorState, vehicleTypes]) =>
-                    StrictObject.fromEntries(
+                    Object.fromEntries(
                         this.patientStatusForTransport.map(
                             (patientStatusForTransport) => [
                                 patientStatusForTransport,

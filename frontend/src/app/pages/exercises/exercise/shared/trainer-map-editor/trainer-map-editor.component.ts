@@ -1,10 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { OnInit, inject, Component, Signal, signal } from '@angular/core';
 import {
     NgbModal,
     NgbAccordionDirective,
     NgbAccordionItem,
     NgbAccordionHeader,
-    NgbAccordionToggle,
     NgbAccordionButton,
     NgbAccordionCollapse,
     NgbAccordionBody,
@@ -17,10 +16,16 @@ import {
     transferPointImage,
     validateExerciseExport,
     viewportImage,
+    getDefaultTechnicalChallengeTemplate,
+    bystanderCategories,
+    scoutableMapImageTemplate,
 } from 'fuesim-digital-shared';
-import type { PatientCategory, UUID } from 'fuesim-digital-shared';
+import type {
+    PatientCategory,
+    UUID,
+    TechnicalChallengeTemplate,
+} from 'fuesim-digital-shared';
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
-import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap/collapse';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import type { Immutable } from 'immer';
@@ -33,7 +38,6 @@ import { openPartialImportOverwriteModal } from '../partial-import/open-partial-
 import { simulatedRegionDragTemplates } from '../editor-panel/templates/simulated-region';
 import { openEditVehicleTemplateModal } from '../editor-panel/edit-vehicle-template-modal/open-edit-vehicle-template-modal';
 import { restrictedZoneDragTemplates } from '../editor-panel/templates/restricted-zone';
-import { ExerciseService } from '../../../../../core/exercise.service';
 import { MessageService } from '../../../../../core/messages/message.service';
 import type { AppState } from '../../../../../state/app.state';
 import {
@@ -71,9 +75,7 @@ type FilterCategory =
         NgbAccordionDirective,
         NgbAccordionItem,
         NgbAccordionHeader,
-        NgbAccordionToggle,
         NgbAccordionButton,
-        NgbCollapse,
         NgbAccordionCollapse,
         NgbAccordionBody,
         MapEditorCardComponent,
@@ -96,7 +98,6 @@ export class TrainerMapEditorComponent implements OnInit {
     readonly transferLinesService = inject(TransferLinesService);
     private readonly ngbModalService = inject(NgbModal);
     private readonly messageService = inject(MessageService);
-    private readonly exerciseService = inject(ExerciseService);
 
     public selectedCategories$: BehaviorSubject<{
         [key in FilterCategory]: boolean;
@@ -124,9 +125,16 @@ export class TrainerMapEditorComponent implements OnInit {
         selectMapImagesTemplates
     );
 
+    public readonly technicalChallengeTemplates: Signal<
+        TechnicalChallengeTemplate[]
+    > = signal([getDefaultTechnicalChallengeTemplate()]);
+
     public patientCategories$?: Observable<{
         [key in FilterCategory]?: Immutable<PatientCategory[]>;
     }>;
+
+    public bystanderCategories = bystanderCategories;
+    public scoutableMapImageTemplate = scoutableMapImageTemplate;
 
     ngOnInit() {
         this.patientCategories$ = combineLatest([

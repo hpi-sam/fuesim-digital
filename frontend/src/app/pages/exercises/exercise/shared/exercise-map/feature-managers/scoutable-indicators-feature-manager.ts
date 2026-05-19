@@ -86,10 +86,11 @@ export class ScoutableIndicatorsFeatureManager
         const indicatorElement = this.getElementFromFeature(
             feature
         ) as ScoutableIndicator;
+
         return newImageProperties(
-            '/assets/magnifying-glass.svg',
+            indicatorElement.imageUrl,
             indicatorElement.height,
-            313 / 427
+            1
         );
     });
     public readonly layer: VectorLayer;

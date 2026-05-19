@@ -5,6 +5,7 @@ import type { ExerciseState } from '../state.js';
 export const elementTypePluralMap = {
     alarmGroup: 'alarmGroups',
     client: 'clients',
+    drawing: 'drawings',
     hospital: 'hospitals',
     restrictedZone: 'restrictedZones',
     mapImage: 'mapImages',
@@ -12,11 +13,12 @@ export const elementTypePluralMap = {
     patient: 'patients',
     personnel: 'personnel',
     simulatedRegion: 'simulatedRegions',
+    task: 'tasks',
+    technicalChallenge: 'technicalChallenges',
     transferPoint: 'transferPoints',
     vehicle: 'vehicles',
     viewport: 'viewports',
     scoutable: 'scoutables',
-    userGeneratedContent: 'userGeneratedContents',
 } as const satisfies { [Key in Element['type']]: keyof ExerciseState };
 
 export type ElementTypePluralMap = typeof elementTypePluralMap;

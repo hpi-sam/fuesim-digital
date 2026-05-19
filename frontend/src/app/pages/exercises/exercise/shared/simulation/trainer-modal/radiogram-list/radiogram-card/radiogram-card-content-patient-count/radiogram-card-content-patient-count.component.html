@@ -1,119 +1,96 @@
-@if (totalPatientCount$ | async; as totalPatientCount) {
-    @if (radiogram$ | async; as radiogram) {
-        <h5 class="card-title">Meldung über Patientenanzahlen</h5>
-        @if (totalPatientCount === 0) {
-            <p class="card-text">Derzeit befinden sich hier keine Patienten.</p>
-        }
-        @if (
-            totalPatientCount > 0 &&
-            radiogram.patientCount.white === totalPatientCount
-        ) {
-            <p class="card-text">
-                Derzeit befinden sich hier
-                <strong>{{ totalPatientCount }} Patienten</strong>, die jedoch
-                noch nicht gesichtet wurden.
-            </p>
-        }
-        @if (totalPatientCount > 0 && radiogram.patientCount.white === 0) {
-            <p class="card-text">
-                Derzeit befinden sich hier
-                <strong>{{ totalPatientCount }} Patienten</strong>, die wie
-                folgt gesichtet wurden:
-            </p>
-        }
-        @if (
-            totalPatientCount > 0 &&
-            radiogram.patientCount.white > 0 &&
-            radiogram.patientCount.white !== totalPatientCount
-        ) {
-            <p class="card-text">
-                Derzeit befinden sich hier
-                <strong>{{ totalPatientCount }} Patienten</strong>, von denen
-                {{ totalPatientCount - radiogram.patientCount.white }} wie folgt
-                gesichtet wurden:
-            </p>
-        }
-        @if (totalPatientCount > 0) {
-            <table class="table card-text">
-                <thead>
-                    <tr>
-                        <th class="w-75">SK</th>
-                        <th class="w-25">Anzahl</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (radiogram.patientCount.white !== totalPatientCount) {
-                        <tr>
-                            <td>
-                                <app-patient-status-badge
-                                    [status]="'red'"
-                                ></app-patient-status-badge>
-                            </td>
-                            <td>
-                                {{
-                                    radiogram.patientCount.red +
-                                        ((bluePatientsEnabled$ | async)
-                                            ? 0
-                                            : radiogram.patientCount.blue)
-                                }}
-                            </td>
-                        </tr>
-                    }
-                    @if (radiogram.patientCount.white !== totalPatientCount) {
-                        <tr>
-                            <td>
-                                <app-patient-status-badge
-                                    [status]="'yellow'"
-                                ></app-patient-status-badge>
-                            </td>
-                            <td>{{ radiogram.patientCount.yellow }}</td>
-                        </tr>
-                    }
-                    @if (radiogram.patientCount.white !== totalPatientCount) {
-                        <tr>
-                            <td>
-                                <app-patient-status-badge
-                                    [status]="'green'"
-                                ></app-patient-status-badge>
-                            </td>
-                            <td>{{ radiogram.patientCount.green }}</td>
-                        </tr>
-                    }
-                    @if (
-                        (bluePatientsEnabled$ | async) &&
-                        radiogram.patientCount.white !== totalPatientCount
-                    ) {
-                        <tr>
-                            <td>
-                                <app-patient-status-badge
-                                    [status]="'blue'"
-                                ></app-patient-status-badge>
-                            </td>
-                            <td>{{ radiogram.patientCount.blue }}</td>
-                        </tr>
-                    }
-                    @if (radiogram.patientCount.white !== totalPatientCount) {
-                        <tr>
-                            <td>
-                                <app-patient-status-badge
-                                    [status]="'black'"
-                                ></app-patient-status-badge>
-                            </td>
-                            <td>{{ radiogram.patientCount.black }}</td>
-                        </tr>
-                    }
-                    @if (radiogram.patientCount.white !== 0) {
-                        <tr>
-                            <td>
-                                <app-patient-status-badge
-                                    [status]="'white'"
-                                ></app-patient-status-badge>
-                            </td>
-                            <td>{{ radiogram.patientCount.white }}</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+<h5 class="card-title">Meldung über Patientenanzahlen</h5>
+@if (totalPatientCount() === 0) {
+    <p class="card-text">Derzeit befinden sich hier keine Patienten.</p>
+} @else {
+    @if (radiogram().patientCount.white === totalPatientCount()) {
+        <p class="card-text">
+            Derzeit befinden sich hier
+            <strong>{{ totalPatientCount() }} Patienten</strong>, die jedoch
+            noch nicht gesichtet wurden.
+        </p>
+    } @else if (radiogram().patientCount.white === 0) {
+        <p class="card-text">
+            Derzeit befinden sich hier
+            <strong>{{ totalPatientCount() }} Patienten</strong>, die wie folgt
+            gesichtet wurden:
+        </p>
+    } @else {
+        <p class="card-text">
+            Derzeit befinden sich hier
+            <strong>{{ totalPatientCount() }} Patienten</strong>, von denen
+            {{ totalPatientCount() - radiogram().patientCount.white }} wie folgt
+            gesichtet wurden:
+        </p>
     }
+    <table class="table card-text">
+        <thead>
+            <tr>
+                <th class="w-75">SK</th>
+                <th class="w-25">Anzahl</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (radiogram().patientCount.white !== totalPatientCount()) {
+                <tr>
+                    <td>
+                        <app-patient-status-badge
+                            [status]="'red'"
+                        ></app-patient-status-badge>
+                    </td>
+                    <td>
+                        {{
+                            radiogram().patientCount.red +
+                                (bluePatientsEnabled()
+                                    ? 0
+                                    : radiogram().patientCount.blue)
+                        }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <app-patient-status-badge
+                            [status]="'yellow'"
+                        ></app-patient-status-badge>
+                    </td>
+                    <td>{{ radiogram().patientCount.yellow }}</td>
+                </tr>
+                <tr>
+                    <td>
+                        <app-patient-status-badge
+                            [status]="'green'"
+                        ></app-patient-status-badge>
+                    </td>
+                    <td>{{ radiogram().patientCount.green }}</td>
+                </tr>
+                @if (bluePatientsEnabled()) {
+                    <tr>
+                        <td>
+                            <app-patient-status-badge
+                                [status]="'blue'"
+                            ></app-patient-status-badge>
+                        </td>
+                        <td>{{ radiogram().patientCount.blue }}</td>
+                    </tr>
+                }
+                <tr>
+                    <td>
+                        <app-patient-status-badge
+                            [status]="'black'"
+                        ></app-patient-status-badge>
+                    </td>
+                    <td>{{ radiogram().patientCount.black }}</td>
+                </tr>
+            }
+            @if (radiogram().patientCount.white > 0) {
+                <tr>
+                    <td>
+                        <app-patient-status-badge
+                            [status]="'white'"
+                        ></app-patient-status-badge>
+                    </td>
+                    <td>{{ radiogram().patientCount.white }}</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }

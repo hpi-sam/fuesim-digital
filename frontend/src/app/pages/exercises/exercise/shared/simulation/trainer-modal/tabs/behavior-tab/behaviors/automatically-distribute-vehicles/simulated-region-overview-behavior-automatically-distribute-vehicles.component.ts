@@ -54,9 +54,7 @@ import { OrderByPipe } from '../../../../../../../../../../shared/pipes/order-by
         AsyncPipe,
     ],
 })
-export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent
-    implements OnInit
-{
+export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
 
@@ -78,7 +76,7 @@ export class SimulatedRegionOverviewBehaviorAutomaticallyDistributeVehiclesCompo
     public getTransferPointOrderByValue = (transferPoint: TransferPoint) =>
         getTransferPointFullName(transferPoint);
 
-    public readonly infinity = Number.MAX_VALUE;
+    public readonly infinity = Number.MAX_SAFE_INTEGER;
 
     ngOnInit(): void {
         const automaticallyDistributeVehiclesBehaviorStateSelector =

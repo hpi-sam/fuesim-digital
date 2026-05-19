@@ -4,6 +4,7 @@ import { createSelector, Store } from '@ngrx/store';
 import type { PatientStatus, UUID } from 'fuesim-digital-shared';
 import {
     getPatientVisibleStatus,
+    isPatientBystander,
     isPretriageStatusLocked,
 } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
@@ -81,6 +82,7 @@ export class PatientsDetailsComponent implements OnChanges {
     readonly patient = computed(() =>
         this.store.selectSignal(createSelectPatient(this.patientId()))()
     );
+    readonly isBystander = computed(() => isPatientBystander(this.patient()));
     visibleStatus$!: Observable<PatientStatus>;
     readonly pretriageStatusIsLocked = computed(() =>
         isPretriageStatusLocked(this.patient())

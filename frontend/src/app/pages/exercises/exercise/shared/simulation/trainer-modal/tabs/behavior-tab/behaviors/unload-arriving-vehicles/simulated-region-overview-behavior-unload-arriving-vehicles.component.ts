@@ -6,7 +6,6 @@ import type {
     UnloadVehicleActivityState,
     UUID,
 } from 'fuesim-digital-shared';
-import { StrictObject } from 'fuesim-digital-shared';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -38,9 +37,7 @@ import { FormatDurationPipe } from '../../../../../../../../../../shared/pipes/f
         AsyncPipe,
     ],
 })
-export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent
-    implements OnInit
-{
+export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent implements OnInit {
     private readonly exerciseService = inject(ExerciseService);
     readonly store = inject<Store<AppState>>(Store);
 
@@ -66,7 +63,7 @@ export class SimulatedRegionOverviewBehaviorUnloadArrivingVehiclesComponent
             selectBehavior,
             selectVehicles,
             (activities, behavior, vehicles) =>
-                StrictObject.values(behavior.vehicleActivityMap)
+                Object.values(behavior.vehicleActivityMap)
                     .map(
                         (activityId) =>
                             activities[activityId] as

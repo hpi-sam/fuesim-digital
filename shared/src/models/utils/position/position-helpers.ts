@@ -4,6 +4,7 @@ import type { SimulatedRegion } from '../../simulated-region.js';
 import type { Transfer } from '../transfer.js';
 import type { UUID } from '../../../utils/uuid.js';
 import { getElement } from '../../../store/action-reducers/utils/get-element.js';
+import type { StartPoint } from '../start-points.js';
 import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
 import type { Position } from './position.js';
@@ -22,8 +23,36 @@ export function isInVehicle(withPosition: WithPosition): boolean {
 export function isInTransfer(withPosition: WithPosition): boolean {
     return isPositionInTransfer(withPosition.position);
 }
+export function isInTransferFromAlarmgroup(
+    withPosition: WithPosition
+): boolean {
+    return (
+        isPositionInTransfer(withPosition.position) &&
+        isAlarmgroupStartPoint(
+            transferOfPosition(withPosition.position).startPoint
+        )
+    );
+}
 export function isInSimulatedRegion(withPosition: WithPosition): boolean {
     return isPositionInSimulatedRegion(withPosition.position);
+}
+
+export function isWithinExtent(
+    element: WithExtent,
+    coordinates: MapCoordinates
+): boolean {
+    const upperLeftCorner = upperLeftCornerOf(element);
+    const lowerRightCorner = lowerRightCornerOf(element);
+    return (
+        upperLeftCorner.x <= coordinates.x &&
+        coordinates.x <= lowerRightCorner.x &&
+        lowerRightCorner.y <= coordinates.y &&
+        coordinates.y <= upperLeftCorner.y
+    );
+}
+
+export function isAlarmgroupStartPoint(startPoint: StartPoint) {
+    return startPoint.type === 'alarmGroupStartPoint';
 }
 
 export function isInSpecificVehicle(
@@ -241,4 +270,14 @@ export function nestedCoordinatesOf(
     throw new Error(
         `Expected element to have (nested) map position, but position was of type ${withPosition.position.type}`
     );
+}
+
+export function calculateDelta(
+    from: MapCoordinates,
+    to: MapCoordinates
+): { deltaX: number; deltaY: number } {
+    return {
+        deltaX: to.x - from.x,
+        deltaY: to.y - from.y,
+    };
 }

@@ -4,6 +4,7 @@ import {
     ElementRef,
     ViewContainerRef,
     inject,
+    input,
     signal,
     viewChild,
 } from '@angular/core';
@@ -16,6 +17,7 @@ import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCoordinatePickerModal } from '../coordinate-picker/open-coordinate-picker-modal';
 import { ExerciseService } from '../../../../../core/exercise.service';
+import { DrawingInteractionService } from '../../../../../core/drawing-interaction.service';
 import type { AppState } from '../../../../../state/app.state';
 import {
     selectRestrictedViewport,
@@ -42,10 +44,14 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     private readonly modalService = inject(NgbModal);
     private readonly route = inject(ActivatedRoute);
     readonly olMapManagerService = inject(OlMapManagerService);
+    private readonly drawingInteractionService = inject(
+        DrawingInteractionService
+    );
 
     readonly openLayersContainer = viewChild.required<
         ElementRef<HTMLDivElement>
     >('openLayersContainer');
+    readonly fullscreenContainer = input<HTMLElement>();
     readonly popoverContainer =
         viewChild.required<ElementRef<HTMLDivElement>>('popoverContainer');
     readonly popoverContent = viewChild.required('popoverContent', {
@@ -71,7 +77,8 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
             this.openLayersContainer().nativeElement,
             this.transferLinesService,
             this.popupManager,
-            this.popupService
+            this.popupService,
+            this.drawingInteractionService
         );
         this.dragElementService.registerMap(
             this.olMapManagerService.olMapManager.olMap
@@ -81,12 +88,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
         );
 
         // Check whether the map is fullscreen
-        this.openLayersContainer().nativeElement.addEventListener(
-            'fullscreenchange',
-            (event) => {
-                this.fullscreenEnabled.set(document.fullscreenElement !== null);
-            }
-        );
+        document.addEventListener('fullscreenchange', this.onFullscreenChange);
 
         const queryParams = this.route.snapshot.queryParams;
         const result = olMapCoordinatesSchema.safeParse(queryParams);
@@ -98,9 +100,15 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     }
 
     public readonly fullscreenEnabled = signal(false);
+    private readonly onFullscreenChange = () => {
+        this.fullscreenEnabled.set(document.fullscreenElement !== null);
+    };
     public toggleFullscreen() {
         if (!this.fullscreenEnabled()) {
-            this.openLayersContainer().nativeElement.requestFullscreen();
+            (
+                this.fullscreenContainer() ??
+                this.openLayersContainer().nativeElement
+            ).requestFullscreen();
         } else {
             document.exitFullscreen();
         }
@@ -114,6 +122,10 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.destroy$.next();
+        document.removeEventListener(
+            'fullscreenchange',
+            this.onFullscreenChange
+        );
         this.dragElementService.unregisterMap();
         this.dragElementService.unregisterLayerFeatureManagerDictionary();
     }

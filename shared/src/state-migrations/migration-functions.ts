@@ -45,9 +45,14 @@ import { generalizeMaterialsPersonnel44 } from './44-generalize-materials-person
 import { addRestrictedZones45 } from './45-add-restricted-zones.js';
 import { limitedAlarmgroups46 } from './46-limited-alarm-groups.js';
 import { participantIdToKey47 } from './47-participant-id-to-key.js';
-import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addAutojoinViewport48 } from './48-autojoin-viewport.js';
+import { addOperationsTabletView49 } from './49-add-operations-tablet-view.js';
 import { addScoutables50 } from './50-add-scoutables.js';
+import { addTechnicalChallenges53 } from './53-add-technical-challenges.js';
+import { extendScoutables54 } from './54-extend-scoutables.js';
+import { addUUIDtoAddEocLogEntryAction51 } from './51-add-uuid-to-add-eoc-log-action.js';
+import { fixInfinity52 } from './52-fix-infinity.js';
+import { addMeasures55 } from './55-add-measures.js';
 
 /**
  * Migrate a single action
@@ -124,4 +129,9 @@ export const migrations: {
     48: addAutojoinViewport48,
     49: addOperationsTabletView49,
     50: addScoutables50,
+    51: addUUIDtoAddEocLogEntryAction51,
+    52: fixInfinity52,
+    53: addTechnicalChallenges53,
+    54: extendScoutables54,
+    55: addMeasures55,
 };

@@ -37,9 +37,7 @@ import { PatientStatusBadgeComponent } from '../../../../../../../../../../../..
         AsyncPipe,
     ],
 })
-export class ManagePatientTransportToHospitalMaximumCategoryEditorComponent
-    implements OnChanges
-{
+export class ManagePatientTransportToHospitalMaximumCategoryEditorComponent implements OnChanges {
     private readonly store = inject<Store<AppState>>(Store);
     private readonly exerciseService = inject(ExerciseService);
 

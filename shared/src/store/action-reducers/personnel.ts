@@ -9,6 +9,7 @@ import {
     mapCoordinatesSchema,
 } from '../../models/utils/position/map-coordinates.js';
 import { newMapPositionAt } from '../../models/utils/position/map-position.js';
+import { removeInvalidAssignments } from '../../state-helpers/technical-challenge-assignment.js';
 
 export class MovePersonnelAction implements Action {
     @IsValue('[Personnel] Move personnel' as const)
@@ -31,6 +32,9 @@ export namespace PersonnelActionReducers {
                 'personnel',
                 draftState
             );
+
+            removeInvalidAssignments(personnelId, draftState);
+
             return draftState;
         },
         rights: 'participant',

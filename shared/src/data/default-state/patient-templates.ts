@@ -8,7 +8,7 @@ import { newPatientTemplate } from '../../models/patient-template.js';
 import { healthPointsDefaults } from '../../models/utils/health-points.js';
 import type { ImageProperties } from '../../models/utils/image-properties.js';
 
-const defaultPatientImage: ImageProperties = {
+export const defaultPatientImage: ImageProperties = {
     url: '/assets/patient.svg',
     height: 80,
     aspectRatio: 1,
@@ -1534,6 +1534,62 @@ export const defaultPatientCategories: readonly PatientCategory[] = [
             defaultPatientImage,
             healthPointsDefaults.redAverage,
             redInstantTransportState.id
+        ),
+    ]),
+];
+
+export const bystanderStatusCode = 'BABABA';
+export const bystanderCategories = [
+    newPatientCategory(bystanderStatusCode, defaultPatientImage, [
+        newPatientTemplate(
+            {
+                sex: 'female',
+                externalFeatures: '',
+                age: 1,
+            },
+            {
+                injuries: '',
+                bodyCheck: '',
+                breathing: '',
+                awareness: '',
+                pulse: '',
+                skin: '',
+                pain: '',
+                pupils: '',
+                psyche: '',
+                hearing: '',
+                isWalkable: true,
+            },
+            { [noChangesState.id]: noChangesState },
+            defaultPatientImage,
+            healthPointsDefaults.greenMax,
+            noChangesState.id
+        ),
+    ]),
+    newPatientCategory(bystanderStatusCode, defaultPatientImage, [
+        newPatientTemplate(
+            {
+                sex: 'male',
+                externalFeatures: '',
+                age: 1,
+            },
+            {
+                injuries: '',
+                bodyCheck: '',
+                breathing: '',
+                awareness: '',
+                pulse: '',
+                skin: '',
+                pain: '',
+                pupils: '',
+                psyche: '',
+                hearing: '',
+                isWalkable: true,
+            },
+            { [noChangesState.id]: noChangesState },
+            defaultPatientImage,
+            healthPointsDefaults.greenMax,
+            noChangesState.id
         ),
     ]),
 ];

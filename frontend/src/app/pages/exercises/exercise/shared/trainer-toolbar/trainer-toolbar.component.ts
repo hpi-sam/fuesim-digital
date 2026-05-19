@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
     NgbModal,
@@ -29,6 +29,7 @@ import { selectExerciseKey } from '../../../../../state/application/selectors/ap
 import { selectExerciseStatus } from '../../../../../state/application/selectors/exercise.selectors';
 import { selectStateSnapshot } from '../../../../../state/get-state-snapshot';
 import { StartPauseButtonComponent } from '../../../../../shared/components/start-pause-button/start-pause-button.component';
+import { openMeasuresOverviewModal } from '../measures-overview/open-measures-overview-modal';
 
 @Component({
     selector: 'app-trainer-toolbar',
@@ -57,6 +58,10 @@ export class TrainerToolbarComponent {
 
     public exerciseStatus$ = this.store.select(selectExerciseStatus);
 
+    public readonly isTemplate = computed<boolean>(
+        () => !!this.exerciseService.additionalExerciseMeta()?.exerciseTemplate
+    );
+
     public openClientsModal() {
         openClientsModal(this.modalService);
     }
@@ -71,6 +76,10 @@ export class TrainerToolbarComponent {
 
     public openHospitalEditor() {
         openHospitalEditorModal(this.modalService);
+    }
+
+    public openMeasuresOverview() {
+        openMeasuresOverviewModal(this.modalService);
     }
 
     public openEmergencyOperationsCenter() {

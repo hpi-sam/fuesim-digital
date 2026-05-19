@@ -17,7 +17,6 @@ import {
     newAutomaticallyDistributeVehiclesBehaviorState,
     cloneDeepMutable,
     uuid,
-    StrictObject,
     newNoPosition,
     simulatedRegionImage,
     newManagePatientTransportToHospitalBehaviorState,
@@ -144,7 +143,7 @@ function reconstituteBehavior(
     behavior.id = uuid();
     switch (behavior.type) {
         case 'providePersonnelBehavior':
-            behavior.vehicleTemplatePriorities = StrictObject.values(
+            behavior.vehicleTemplatePriorities = Object.values(
                 state.vehicleTemplates
             ).map((template) => template.id);
             break;

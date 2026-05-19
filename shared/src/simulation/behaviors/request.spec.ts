@@ -17,7 +17,7 @@ import {
     newSimulatedRegion,
     type SimulatedRegion,
 } from '../../models/simulated-region.js';
-import { StrictObject } from '../../utils/strict-object.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 import { newVehicleResource } from '../../models/utils/rescue-resource.js';
 import { newMapCoordinatesAt } from '../../models/utils/position/map-coordinates.js';
 import { newSize } from '../../models/utils/size.js';
@@ -404,7 +404,7 @@ const sendEvent = {
 // tests
 describe('request behavior', () => {
     describe('on a resource required event', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should note the request', () => {
@@ -422,7 +422,7 @@ describe('request behavior', () => {
     });
 
     describe('on a resource required event with a known key', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should overwrite any existing requests', () => {
@@ -441,7 +441,7 @@ describe('request behavior', () => {
     });
 
     describe('on a vehicle send event', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should note the promise', () => {
@@ -504,10 +504,10 @@ describe('request behavior', () => {
 
                 const activities = afterSimulatedRegion.activities;
                 expect(
-                    StrictObject.keys(activities).length
+                    TypeAssertedObject.keys(activities).length
                 ).toBeGreaterThanOrEqual(1);
 
-                const activity = StrictObject.values(activities).find(
+                const activity = TypeAssertedObject.values(activities).find(
                     (a) => a.type === 'createRequestActivity'
                 );
                 expect(activity).toBeDefined();
@@ -524,7 +524,7 @@ describe('request behavior', () => {
     });
 
     describe('when the request interval is updated', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should update the request interval', () => {
@@ -544,9 +544,10 @@ describe('request behavior', () => {
                         updateRequestInterval
                     );
 
-                    const afterRecurringEventActivity = StrictObject.values(
-                        afterSimulatedRegion.activities
-                    ).find((a) => a.type === 'recurringEventActivity')!;
+                    const afterRecurringEventActivity =
+                        TypeAssertedObject.values(
+                            afterSimulatedRegion.activities
+                        ).find((a) => a.type === 'recurringEventActivity')!;
 
                     expect(
                         afterRecurringEventActivity.recurrenceIntervalTime
@@ -557,7 +558,7 @@ describe('request behavior', () => {
     });
 
     describe('when the request target is updated', () => {
-        describe.each(StrictObject.keys(addRequestsAndPromises))(
+        describe.each(TypeAssertedObject.keys(addRequestsAndPromises))(
             '%s',
             (requestsAndPromises) => {
                 it('should update the request target', () => {

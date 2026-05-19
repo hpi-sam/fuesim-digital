@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import { uuid, uuidSchema } from '../utils/uuid.js';
+import type { UUID } from '../utils/uuid.js';
+import { uuidSchema } from '../utils/uuid.js';
 
 export const eocLogEntrySchema = z.strictObject({
     id: uuidSchema,
@@ -15,13 +16,14 @@ export const eocLogEntrySchema = z.strictObject({
 export type EocLogEntry = Immutable<z.infer<typeof eocLogEntrySchema>>;
 
 export function newEocLogEntry(
+    id: UUID,
     exerciseTimestamp: number,
     message: string,
     clientName: string,
     isPrivate: boolean
 ): EocLogEntry {
     return {
-        id: uuid(),
+        id,
         type: 'eocLogEntry',
         exerciseTimestamp,
         message,

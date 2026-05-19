@@ -9,6 +9,6 @@ export interface ScoutableIndicator {
     readonly position: MapCoordinates;
     readonly scoutableElementType: ScoutableElementType;
     readonly scoutableElementId: UUID;
-    readonly isVisibleForParticipants: boolean;
+    readonly imageUrl: string;
     readonly height: number;
 }

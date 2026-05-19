@@ -16,15 +16,19 @@
                             {{ patient().personalInformation.name }}
                         </td>
                     </tr>
-                    <tr>
-                        <th scope="col">Alter</th>
-                        <td class="font-monospace">
-                            {{ patient().biometricInformation.age }}
-                            <small>
-                                {{ patient().personalInformation.birthdate }}
-                            </small>
-                        </td>
-                    </tr>
+                    @if (!isBystander()) {
+                        <tr>
+                            <th scope="col">Alter</th>
+                            <td class="font-monospace">
+                                {{ patient().biometricInformation.age }}
+                                <small>
+                                    {{
+                                        patient().personalInformation.birthdate
+                                    }}
+                                </small>
+                            </td>
+                        </tr>
+                    }
                     <tr>
                         <th scope="col">Geschlecht</th>
                         @let sex = patient().biometricInformation.sex;
@@ -38,21 +42,24 @@
                             }}
                         </td>
                     </tr>
-                    <tr>
-                        <th scope="col">Biometrie</th>
-                        <td class="font-monospace">
-                            {{
-                                patient().biometricInformation.externalFeatures
-                            }}
-                        </td>
-                    </tr>
+                    @if (!isBystander()) {
+                        <tr>
+                            <th scope="col">Biometrie</th>
+                            <td class="font-monospace">
+                                {{
+                                    patient().biometricInformation
+                                        .externalFeatures
+                                }}
+                            </td>
+                        </tr>
+                    }
                     <tr>
                         <th scope="col">Adresse</th>
                         <td class="font-monospace">
                             {{ patient().personalInformation.address }}
                         </td>
                     </tr>
-                    @if (currentRole() !== 'participant') {
+                    @if (currentRole() !== 'participant' && !isBystander()) {
                         <tr>
                             <th scope="col">Beschreibung</th>
                             <td
@@ -89,175 +96,186 @@
             </div>
         </ng-template>
     </ng-container>
-    <ng-container ngbNavItem [ngbNavItem]="'triage'">
-        <a ngbNavLink data-cy="patientPopupTriageNav">{{
-            (configuration$ | async)?.pretriageEnabled
-                ? 'Vorsichtung'
-                : 'Erstbefund'
-        }}</a>
-        <ng-template ngbNavContent>
-            <table class="table table-sm small mb-0">
-                <tbody>
-                    @if ((configuration$ | async)?.pretriageEnabled) {
-                        <tr>
-                            <th>Vorsichtung</th>
-                            <td>
-                                <div
-                                    ngbDropdown
-                                    placement="bottom-end"
-                                    class="d-inline-block float-end"
-                                >
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-outline-secondary"
-                                        style="min-width: 150px"
-                                        ngbDropdownToggle
-                                        [disabled]="pretriageStatusIsLocked()"
-                                        data-cy="patientPopupPretriageButton"
-                                    >
-                                        @if (
-                                            visibleStatus$ | async;
-                                            as currentStatus
-                                        ) {
-                                            <app-patient-status-badge
-                                                [status]="currentStatus"
-                                            >
-                                            </app-patient-status-badge>
-                                        }
-                                    </button>
+    @if (!isBystander()) {
+        <ng-container ngbNavItem [ngbNavItem]="'triage'">
+            <a ngbNavLink data-cy="patientPopupTriageNav">{{
+                (configuration$ | async)?.pretriageEnabled
+                    ? 'Vorsichtung'
+                    : 'Erstbefund'
+            }}</a>
+            <ng-template ngbNavContent>
+                <table class="table table-sm small mb-0">
+                    <tbody>
+                        @if ((configuration$ | async)?.pretriageEnabled) {
+                            <tr>
+                                <th>Vorsichtung</th>
+                                <td>
                                     <div
-                                        ngbDropdownMenu
-                                        class="position-absolute"
+                                        ngbDropdown
+                                        placement="bottom-end"
+                                        class="d-inline-block float-end"
                                     >
-                                        @for (
-                                            option of pretriageOptions$ | async;
-                                            track option
-                                        ) {
-                                            <button
-                                                ngbDropdownItem
-                                                (click)="
-                                                    setPretriageCategory(option)
-                                                "
-                                                class="btn-outline-secondary"
-                                                data-cy="patientPopupPretriageButtonDropdown"
-                                            >
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-secondary"
+                                            style="min-width: 150px"
+                                            ngbDropdownToggle
+                                            [disabled]="
+                                                pretriageStatusIsLocked()
+                                            "
+                                            data-cy="patientPopupPretriageButton"
+                                        >
+                                            @if (
+                                                visibleStatus$ | async;
+                                                as currentStatus
+                                            ) {
                                                 <app-patient-status-badge
-                                                    [status]="option"
-                                                    class="float-end"
+                                                    [status]="currentStatus"
                                                 >
                                                 </app-patient-status-badge>
-                                            </button>
-                                        }
+                                            }
+                                        </button>
+                                        <div
+                                            ngbDropdownMenu
+                                            class="position-absolute"
+                                        >
+                                            @for (
+                                                option of pretriageOptions$
+                                                    | async;
+                                                track option
+                                            ) {
+                                                <button
+                                                    ngbDropdownItem
+                                                    (click)="
+                                                        setPretriageCategory(
+                                                            option
+                                                        )
+                                                    "
+                                                    class="btn-outline-secondary"
+                                                    data-cy="patientPopupPretriageButtonDropdown"
+                                                >
+                                                    <app-patient-status-badge
+                                                        [status]="option"
+                                                        class="float-end"
+                                                    >
+                                                    </app-patient-status-badge>
+                                                </button>
+                                            }
+                                        </div>
                                     </div>
+                                </td>
+                            </tr>
+                        }
+                        <tr>
+                            <th scope="col">Transportpriorität</th>
+                            <td class="font-monospace">
+                                <div class="form-switch">
+                                    <input
+                                        [ngModel]="
+                                            patient().hasTransportPriority
+                                        "
+                                        (ngModelChange)="
+                                            setTransportPriority($event)
+                                        "
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        data-cy="settingsTransportPriorityCheckbox"
+                                    />
                                 </div>
                             </td>
                         </tr>
-                    }
-                    <tr>
-                        <th scope="col">Transportpriorität</th>
-                        <td class="font-monospace">
-                            <div class="form-switch">
-                                <input
-                                    [ngModel]="patient().hasTransportPriority"
-                                    (ngModelChange)="
-                                        setTransportPriority($event)
-                                    "
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    data-cy="settingsTransportPriorityCheckbox"
-                                />
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">Verletzungen</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.injuries }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">ausführlicher Body-Check</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.bodyCheck }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">Atmung</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.breathing }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">Bewusstsein</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.awareness }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">Puls</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.pulse }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">Haut</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.skin }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">Schmerzen</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.pain }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">Pupillen</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.pupils }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">Psyche</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.psyche }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col">Hörvermögen</th>
-                        <td class="font-monospace">
-                            {{ patient().pretriageInformation.hearing }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </ng-template>
-    </ng-container>
-    <ng-container ngbNavItem [ngbNavItem]="'qr-code'">
-        <a ngbNavLink data-cy="patientPopupQRCodeNav">QR-Code</a>
-        <ng-template ngbNavContent>
-            <div class="form-group p-1">
-                <label class="form-label small fw-bold"> QR-Code-Inhalt </label>
-                <input
-                    #customQRCodeInput="ngModel"
-                    [ngModel]="patient().customQRCode"
-                    (appSaveOnTyping)="updateCustomQRCode($event)"
-                    maxlength="65535"
-                    [placeholder]="patient().identifier"
-                    class="form-control form-control-sm w-100"
-                    data-cy="patientPopupCustomQRCodeInput"
+                        <tr>
+                            <th scope="col">Verletzungen</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.injuries }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="col">ausführlicher Body-Check</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.bodyCheck }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="col">Atmung</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.breathing }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="col">Bewusstsein</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.awareness }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="col">Puls</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.pulse }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="col">Haut</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.skin }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="col">Schmerzen</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.pain }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="col">Pupillen</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.pupils }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="col">Psyche</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.psyche }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="col">Hörvermögen</th>
+                            <td class="font-monospace">
+                                {{ patient().pretriageInformation.hearing }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </ng-template>
+        </ng-container>
+        <ng-container ngbNavItem [ngbNavItem]="'qr-code'">
+            <a ngbNavLink data-cy="patientPopupQRCodeNav">QR-Code</a>
+            <ng-template ngbNavContent>
+                <div class="form-group p-1">
+                    <label class="form-label small fw-bold">
+                        QR-Code-Inhalt
+                    </label>
+                    <input
+                        #customQRCodeInput="ngModel"
+                        [ngModel]="patient().customQRCode"
+                        (appSaveOnTyping)="updateCustomQRCode($event)"
+                        maxlength="65535"
+                        [placeholder]="patient().identifier"
+                        class="form-control form-control-sm w-100"
+                        data-cy="patientPopupCustomQRCodeInput"
+                    />
+                    <app-display-validation
+                        [ngModelInput]="customQRCodeInput"
+                    ></app-display-validation>
+                </div>
+                <qr-code
+                    [value]="patient().customQRCode || patient().identifier"
+                    size="350"
+                    errorCorrectionLevel="M"
                 />
-                <app-display-validation
-                    [ngModelInput]="customQRCodeInput"
-                ></app-display-validation>
-            </div>
-            <qr-code
-                [value]="patient().customQRCode || patient().identifier"
-                size="350"
-                errorCorrectionLevel="M"
-            />
-        </ng-template>
-    </ng-container>
+            </ng-template>
+        </ng-container>
+    }
     @if (isScoutableTabVisible()) {
         <ng-container ngbNavItem [ngbNavItem]="'scout-Info'">
             <a ngbNavLink data-cy="patientPopupScoutNav">Erkundung</a>

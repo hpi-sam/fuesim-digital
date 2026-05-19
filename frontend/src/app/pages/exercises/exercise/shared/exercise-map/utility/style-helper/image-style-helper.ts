@@ -3,6 +3,7 @@ import { normalZoom } from 'fuesim-digital-shared';
 import type { Feature } from 'ol';
 import Icon from 'ol/style/Icon';
 import Style from 'ol/style/Style';
+import type { Polygon } from 'ol/geom';
 import { StyleHelper } from './style-helper';
 
 export class ImageStyleHelper extends StyleHelper<Style, Feature> {
@@ -49,7 +50,13 @@ export class ImageStyleHelper extends StyleHelper<Style, Feature> {
     ) {
         const imageProperties = this.getImageProperties(feature);
         const imageStyle = initialStyle;
-        imageStyle.setGeometry(feature.getGeometry()!);
+
+        let geometry = feature.getGeometry()!;
+        if (geometry.getType() === 'Polygon') {
+            geometry = (geometry as Polygon).getInteriorPoint();
+        }
+        imageStyle.setGeometry(geometry);
+
         const image = imageStyle.getImage();
 
         if (!image) return imageStyle;

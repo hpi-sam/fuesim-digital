@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
-import { StrictObject } from '../../utils/strict-object.js';
 import {
     type ResourceDescription,
     resourceDescriptionSchema,
@@ -53,7 +52,5 @@ export function isEmptyResource(resource: ExerciseRescueResource) {
             resourceDescription = resource.vehicleCounts;
             break;
     }
-    return StrictObject.values(resourceDescription).every(
-        (count) => count === 0
-    );
+    return Object.values(resourceDescription).every((count) => count === 0);
 }

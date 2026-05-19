@@ -8,14 +8,19 @@ import {
     NgbDropdownItem,
 } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
-import { selectEvalResults } from '../../../../../../state/application/selectors/exercise.selectors';
+import {
+    createSelectEvalCriterion,
+    selectEvalResults,
+} from '../../../../../../state/application/selectors/exercise.selectors';
 import { AppState } from '../../../../../../state/app.state';
 import { EvalCriterionCreationForm } from '../eval-criterion-creation-form/eval-criterion-creation-form.component';
 import {
     type EvalcriterionType,
     evalCritrionTypes,
     evalCriterionTypesNames,
+    XPatientsAtStatusEvalCriterion,
 } from '../../../../../../../../../shared/dist/models/evaluation-criterion';
+import { type UUID, statusNames } from 'fuesim-digital-shared';
 @Component({
     selector: 'app-didactic-overview',
     templateUrl: './didactic-overview-modal.component.html',
@@ -38,6 +43,7 @@ export class DidacticOverviewModalComponent {
     creatingcriterion = false;
     public readonly evalCriterionTypes = evalCritrionTypes;
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
+    public readonly statusNames = statusNames;
     /* this is set on selection of the criterion type to be created. */
     criterionCreationType!: EvalcriterionType;
     constructor() {
@@ -47,6 +53,11 @@ export class DidacticOverviewModalComponent {
                 this.updatesCount += 1;
             }
         });
+    }
+    getTypedCriterion(id: UUID) {
+        return this.store.selectSignal(
+            createSelectEvalCriterion(id)
+        )() as XPatientsAtStatusEvalCriterion;
     }
     public close() {
         this.activeModal.close();

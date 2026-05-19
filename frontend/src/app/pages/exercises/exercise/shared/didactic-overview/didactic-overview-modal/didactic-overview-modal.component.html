@@ -44,16 +44,33 @@
         } @else {
             @for (result of this.resultValues(); track result.criterionId) {
                 <div class="card col-3 p-0 rounded-0" style="min-width: 600px">
-                    <span class="ms-1">{{
-                        evalCriterionTypesNames[
-                            result.criterion.criterionType
-                        ] +
-                            ': (' +
-                            result.count +
-                            '/' +
-                            '???' +
-                            ')'
-                    }}</span>
+                    <span class="ms-1"
+                        >{{
+                            evalCriterionTypesNames[
+                                result.criterion.criterionType
+                            ]
+                        }}
+                        @if (
+                            result.criterion.criterionType ===
+                            'xPatientsAtStatusEvalCriterion'
+                        ) {
+                            {{ statusNames[result.criterion.targetStatus] }}
+                        }
+                        @if (
+                            result.criterion.criterionType ===
+                                'doMeasureXTimesEvalCriterion' ||
+                            result.criterion.criterionType ===
+                                'xPatientsAtStatusEvalCriterion'
+                        ) {
+                            {{
+                                ': (' +
+                                    result.count +
+                                    '/' +
+                                    result.criterion.count +
+                                    ')'
+                            }}
+                        }
+                    </span>
                 </div>
             }
         }

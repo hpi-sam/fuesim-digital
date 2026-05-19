@@ -129,12 +129,12 @@ describe('join parallel exercise', () => {
         await environment.withWebsocket(async (socket) => {
             await socket.emit('joinParallelExercise', parallelExercise.id);
 
+            const responsePromise = socket.waitOn('updateExerciseInstances');
             const joinedParticipant = await joinParallelExercise(
                 environment,
                 parallelExercise
             );
-
-            const response = await socket.waitOn('updateExerciseInstances');
+            const response = await responsePromise;
 
             expect(response.exerciseInstances.length).toBe(1);
             const exerciseInstance = response.exerciseInstances[0]!;
@@ -155,16 +155,17 @@ describe('join parallel exercise', () => {
                 parallelExercise
             );
 
-            socket.spyOn('updateExerciseInstances');
-
             await environment.withWebsocket(async (clientSocket) => {
+                const responsePromise = socket.waitOn(
+                    'updateExerciseInstances'
+                );
                 await clientSocket.emit(
                     'joinExercise',
                     joinedParticipant.participantKey,
                     clientName
                 );
 
-                const response = await socket.waitOn('updateExerciseInstances');
+                const response = await responsePromise;
                 expect(response.exerciseInstances.length).toBe(1);
                 const exerciseInstance = response.exerciseInstances[0]!;
                 expect(exerciseInstance.participantKey).toBe(
@@ -188,16 +189,17 @@ describe('join parallel exercise', () => {
                 parallelExercise
             );
 
-            socket.spyOn('updateExerciseInstances');
-
             await environment.withWebsocket(async (clientSocket) => {
+                const responsePromise = socket.waitOn(
+                    'updateExerciseInstances'
+                );
                 await clientSocket.emit(
                     'joinExercise',
                     joinedParticipant.participantKey,
                     clientName
                 );
 
-                await socket.waitOn('updateExerciseInstances');
+                await responsePromise;
             });
 
             const response = await socket.waitOn('updateExerciseInstances');

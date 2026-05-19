@@ -1,0 +1,9 @@
+fail-on-warnings = true
+disabled-rules = ["CONTENT001", "MD013", "CONTENT003", "CONTENT004", "MD024", "MDBOOK004", "CONTENT005", "MDBOOK023", "MD028", "MDBOOK006", "MD051", "CONTENT006", "MD033"]
+
+[MD007]
+indent = 4
+
+[MD013]
+line-length = 100
+code-blocks = false

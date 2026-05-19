@@ -1,16 +1,25 @@
 @let authData = auth.authData();
 @if (authData.user) {
     <div ngbDropdown>
-        <span ngbDropdownToggle style="cursor: pointer">{{
-            authData.user.displayName
-        }}</span>
+        <button ngbDropdownToggle class="btn">
+            <i class="bi bi-person me-1"></i> {{ authData.user.displayName }}
+        </button>
         <div ngbDropdownMenu>
             @if (authData?.userSelfServiceEnabled) {
                 <a ngbDropdownItem [href]="userSelfServiceUrl">
+                    <i class="bi bi-person-gear me-1"></i>
                     Konto verwalten
                 </a>
             }
-            <a ngbDropdownItem [href]="logoutUrl">Ausloggen</a>
+            <a ngbDropdownItem href="/about/help" target="_blank">
+                <i class="bi bi-question-circle me-1"></i>
+                Hilfe
+            </a>
+
+            <a ngbDropdownItem [href]="logoutUrl">
+                <i class="bi bi-box-arrow-right me-1"></i>
+                Abmelden
+            </a>
         </div>
     </div>
 } @else if (authData.user === null) {

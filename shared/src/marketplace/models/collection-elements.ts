@@ -74,6 +74,9 @@ export function gatherCollectionElements(elements: CollectionElements) {
                 (reference) => reference.elements
             );
         },
+        allImportedElements(): TemplateVersion[] {
+            return elements.imported.flatMap((imported) => imported.elements);
+        },
         allVisibleElements(): TemplateVersion[] {
             return [
                 ...elements.direct,

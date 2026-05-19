@@ -61,7 +61,7 @@ export class CollectionRepository extends BaseRepository {
                 .from(elementCollectionMappingTable)
                 .where(
                     inArray(
-                        elementCollectionMappingTable.setVersionId,
+                        elementCollectionMappingTable.collectionVersionId,
                         existingCollections.map((c) => c.versionId)
                     )
                 );
@@ -100,7 +100,6 @@ export class CollectionRepository extends BaseRepository {
                         createdAt: collection.createdAt,
                         editedAt: collection.editedAt,
                         draftState: collection.draftState,
-                        elementCount: collection.elementCount,
                         version: collection.version,
                         visibility: collection.visibility,
                         stateVersion: ExerciseState.currentStateVersion,
@@ -144,8 +143,8 @@ export class CollectionRepository extends BaseRepository {
                         await tx.databaseConnection
                             .insert(elementCollectionMappingTable)
                             .values({
-                                setEntityId: collection.entityId,
-                                setVersionId: collection.versionId,
+                                collectionEntityId: collection.entityId,
+                                collectionVersionId: collection.versionId,
                                 elementEntityId: createdElement.entityId,
                                 elementVersionId: createdElement.versionId,
                                 isBaseReference: true,
@@ -825,7 +824,7 @@ export class CollectionRepository extends BaseRepository {
         content: VersionedElementContent;
         version: number;
         entityId?: ElementEntityId;
-    }): Promise<ElementDto | null> {
+    }): Promise<TemplateVersion | null> {
         const result = await this.databaseConnection
             .insert(elementTable)
             .values({

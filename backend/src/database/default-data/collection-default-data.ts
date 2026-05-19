@@ -1,4 +1,4 @@
-import type { CollectionDto, ElementDto } from 'fuesim-digital-shared';
+import type { CollectionVersion, TemplateVersion } from 'fuesim-digital-shared';
 import {
     collectionEntityIdSchema,
     collectionVersionIdSchema,
@@ -8,9 +8,9 @@ import {
 } from 'fuesim-digital-shared';
 import type { Immutable } from 'immer';
 
-export type DefaultElement = Immutable<Omit<ElementDto, 'stateVersion'>>;
+export type DefaultElement = Immutable<Omit<TemplateVersion, 'stateVersion'>>;
 
-export type DefaultCollection = Omit<CollectionDto, 'stateVersion'> & {
+export type DefaultCollection = Omit<CollectionVersion, 'stateVersion'> & {
     elements: DefaultElement[];
 };
 
@@ -39,7 +39,6 @@ const fuesimManvDefaultCollectionData: DefaultCollection = {
     createdAt: new Date(2022, 6, 27), // 27.07.2022 (date where, notsan was added e.g.)
     editedAt: new Date(2023, 6, 10), // 10.07.2023 (date where, nef-vehicle was edited e.g.)
     draftState: false,
-    elementCount: 0,
     version: 1,
     visibility: 'embedded',
     elements: Object.values(defaultVehicleTemplatesById).map((template) => ({

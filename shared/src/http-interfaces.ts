@@ -431,13 +431,13 @@ export namespace Marketplace {
 
         export const LoadPublic = new Route({
             response: z.object({
-                result: z.array(extendedCollectionDtoSchema),
+                result: z.array(extendedCollectionVersionSchema),
             }),
         });
 
         export const LoadUsable = new Route({
             response: z.object({
-                result: z.array(extendedCollectionDtoSchema),
+                result: z.array(extendedCollectionVersionSchema),
             }),
         });
 

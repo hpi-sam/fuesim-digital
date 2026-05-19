@@ -9,8 +9,8 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AsyncPipe } from '@angular/common';
+import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { AsyncPipe, NgClass } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
@@ -31,7 +31,7 @@ import { OlMapManagerService } from './utility/ol-map-manager.service';
     selector: 'app-exercise-map',
     templateUrl: './exercise-map.component.html',
     styleUrls: ['./exercise-map.component.scss'],
-    imports: [DisplayMessagesComponent, AsyncPipe],
+    imports: [DisplayMessagesComponent, AsyncPipe, NgClass, NgbTooltip],
 })
 export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     private readonly store = inject<Store<AppState>>(Store);

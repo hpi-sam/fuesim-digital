@@ -11,7 +11,7 @@ import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
 import OlMap from 'ol/Map';
-import { Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { z } from 'zod';
 import type { Coordinate } from 'ol/coordinate';
@@ -60,6 +60,7 @@ export class OlMapManager {
     private featureManagers: FeatureManager<any>[];
     private readonly mapInteractionsManager: OlMapInteractionsManager;
     private static readonly defaultZoom = 20;
+    public readonly lockZoom$ = new BehaviorSubject(false);
     private readonly destroy$ = new Subject<void>();
 
     /**
@@ -138,10 +139,20 @@ export class OlMapManager {
             this.layerFeatureManagerDictionary,
             this.featureNameFeatureManagerDictionary
         );
+
+        this.lockZoom$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(
+                (lockZoom) => (this.mapInteractionsManager.lockZoom = lockZoom)
+            );
     }
 
     public get olMap(): OlMap {
         return this._olMap;
+    }
+
+    public toggleZoomLock() {
+        this.lockZoom$.next(!this.lockZoom$.value);
     }
 
     private isInViewport(coordinate: Coordinate, viewport: Viewport): boolean {

@@ -94,7 +94,10 @@ export class ExerciseService {
                 const trainerKey =
                     await accessKeyRepository.generateKey<TrainerKey>(8);
 
-                const initialState = ExerciseState.create(participantKey);
+                const initialState: ExerciseState = {
+                    ...ExerciseState.create(participantKey),
+                    type: optionalData.templateId ? 'template' : 'standalone',
+                };
                 const exerciseInsert = {
                     ...optionalData,
                     participantKey,
@@ -148,6 +151,12 @@ export class ExerciseService {
                     // Set new participant id
                     newInitialState.participantKey = participantKey;
                     newCurrentState.participantKey = participantKey;
+
+                    const exerciseType = optionalData.templateId
+                        ? 'template'
+                        : 'standalone';
+                    newInitialState.type = exerciseType;
+                    newCurrentState.type = exerciseType;
 
                     const exerciseInsert = {
                         ...optionalData,

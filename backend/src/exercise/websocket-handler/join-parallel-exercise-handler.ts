@@ -49,17 +49,13 @@ export function registerJoinParallelExerciseHandler(
             clientWrapper
                 .joinParallelExercise(parsedId.data)
                 .then(() => {
-                    clientWrapper
-                        .getInstanceSummaries()
-                        .then((exerciseInstanceSummaries) => {
-                            callback({
-                                success: true,
-                                payload: {
-                                    exerciseInstances:
-                                        exerciseInstanceSummaries,
-                                },
-                            });
-                        });
+                    callback({
+                        success: true,
+                        payload: {
+                            exerciseInstances:
+                                clientWrapper.getInstanceSummaries(),
+                        },
+                    });
                 })
                 .catch((e: unknown) => {
                     if (

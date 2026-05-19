@@ -120,9 +120,7 @@ export class UpdateTreatPatientsIntervalsAction implements Action {
     public readonly countingTimePerPatient?: number;
 }
 
-export class ProvidePersonnelBehaviorUpdateVehiclePrioritiesAction
-    implements Action
-{
+export class ProvidePersonnelBehaviorUpdateVehiclePrioritiesAction implements Action {
     @IsValue('[ProvidePersonnelBehavior] Update VehiclePriorities' as const)
     public readonly type =
         '[ProvidePersonnelBehavior] Update VehiclePriorities';
@@ -137,9 +135,7 @@ export class ProvidePersonnelBehaviorUpdateVehiclePrioritiesAction
     public readonly priorities!: readonly UUID[];
 }
 
-export class UnloadArrivingVehiclesBehaviorUpdateUnloadDelayAction
-    implements Action
-{
+export class UnloadArrivingVehiclesBehaviorUpdateUnloadDelayAction implements Action {
     @IsValue('[UnloadArrivingVehiclesBehavior] Update UnloadDelay' as const)
     public readonly type =
         '[UnloadArrivingVehiclesBehavior] Update UnloadDelay';
@@ -185,9 +181,7 @@ export class UpdateReportTreatmentStatusChangesAction implements Action {
     public readonly reportChanges!: boolean;
 }
 
-export class UpdateReportTransferOfCategoryInSingleRegionCompletedAction
-    implements Action
-{
+export class UpdateReportTransferOfCategoryInSingleRegionCompletedAction implements Action {
     @IsValue(
         '[ReportBehavior] Update report transfer of category in single region completed'
     )
@@ -204,9 +198,7 @@ export class UpdateReportTransferOfCategoryInSingleRegionCompletedAction
     public readonly reportChanges!: boolean;
 }
 
-export class UpdateReportTransferOfCategoryInMultipleRegionsCompletedAction
-    implements Action
-{
+export class UpdateReportTransferOfCategoryInMultipleRegionsCompletedAction implements Action {
     @IsValue(
         '[ReportBehavior] Update report transfer of category in multiple regions completed'
     )
@@ -486,9 +478,7 @@ export class AddSimulatedRegionToManageForTransportAction implements Action {
     public readonly managedSimulatedRegionId!: UUID;
 }
 
-export class RemoveSimulatedRegionToManageFromTransportAction
-    implements Action
-{
+export class RemoveSimulatedRegionToManageFromTransportAction implements Action {
     @IsValue(
         '[ManagePatientsTransportToHospitalBehavior] Remove Simulated Region To Manage From Transport'
     )
@@ -505,9 +495,7 @@ export class RemoveSimulatedRegionToManageFromTransportAction
     public readonly managedSimulatedRegionId!: UUID;
 }
 
-export class UpdatePatientsExpectedInRegionForTransportAction
-    implements Action
-{
+export class UpdatePatientsExpectedInRegionForTransportAction implements Action {
     @IsValue(
         '[ManagePatientsTransportToHospitalBehavior] Update Patients Expected In Region For Transport'
     )
@@ -571,9 +559,7 @@ export class RemoveVehicleTypeForPatientTransportAction implements Action {
     public readonly patientStatus!: PatientStatusForTransport;
 }
 
-export class UpdateRequestVehicleDelayForPatientTransportAction
-    implements Action
-{
+export class UpdateRequestVehicleDelayForPatientTransportAction implements Action {
     @IsValue(
         '[ManagePatientsTransportToHospitalBehavior] Update Request Vehicle Delay For Patient Transport'
     )
@@ -591,9 +577,7 @@ export class UpdateRequestVehicleDelayForPatientTransportAction
     public readonly requestVehicleDelay!: number;
 }
 
-export class UpdateRequestPatientCountDelayForPatientTransportAction
-    implements Action
-{
+export class UpdateRequestPatientCountDelayForPatientTransportAction implements Action {
     @IsValue(
         '[ManagePatientsTransportToHospitalBehavior] Update Request Patient Count Delay For Patient Transport'
     )
@@ -611,9 +595,7 @@ export class UpdateRequestPatientCountDelayForPatientTransportAction
     public readonly requestPatientCountDelay!: number;
 }
 
-export class UpdatePromiseInvalidationIntervalForPatientTransportAction
-    implements Action
-{
+export class UpdatePromiseInvalidationIntervalForPatientTransportAction implements Action {
     @IsValue(
         '[ManagePatientsTransportToHospitalBehavior] Update Promise Invalidation Interval For Patient Transport'
     )

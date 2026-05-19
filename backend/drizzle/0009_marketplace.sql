@@ -35,7 +35,7 @@ CREATE TABLE "collection_user_mapping" (
 	"collection" varchar NOT NULL,
 	"userId" varchar NOT NULL,
 	"role" varchar NOT NULL,
-	CONSTRAINT "unique_collection_user" UNIQUE("userId","collection")
+	CONSTRAINT "collection_user_mapping_collection_userId_pk" PRIMARY KEY("collection","userId")
 );
 --> statement-breakpoint
 CREATE TABLE "element_to_collection_mapping" (

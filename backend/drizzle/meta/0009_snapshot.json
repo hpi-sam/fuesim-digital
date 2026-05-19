@@ -1,5 +1,5 @@
 {
-    "id": "3a48bf56-c08e-4cce-9c61-bf781de2c8c2",
+    "id": "7409d168-24c4-4bd8-8bef-178f40c34b43",
     "prevId": "e56bbf33-1ae2-4414-94ad-aae73ed93a6d",
     "version": "7",
     "dialect": "postgresql",
@@ -321,14 +321,13 @@
                     "onUpdate": "no action"
                 }
             },
-            "compositePrimaryKeys": {},
-            "uniqueConstraints": {
-                "unique_collection_user": {
-                    "name": "unique_collection_user",
-                    "nullsNotDistinct": false,
-                    "columns": ["userId", "collection"]
+            "compositePrimaryKeys": {
+                "collection_user_mapping_collection_userId_pk": {
+                    "name": "collection_user_mapping_collection_userId_pk",
+                    "columns": ["collection", "userId"]
                 }
             },
+            "uniqueConstraints": {},
             "policies": {},
             "checkConstraints": {},
             "isRLSEnabled": false

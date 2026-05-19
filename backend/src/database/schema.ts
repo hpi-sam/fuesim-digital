@@ -32,6 +32,7 @@ import {
     unique,
     text,
     boolean,
+    primaryKey,
 } from 'drizzle-orm/pg-core';
 
 function typedUUID<T = string>() {
@@ -326,9 +327,7 @@ export const collectionUserMappingTable = pgTable(
             .references(() => userTable.id, { onDelete: 'cascade' }),
         role: varchar().notNull().$type<CollectionRelationshipType>(),
     },
-    (table) => [
-        unique('unique_collection_user').on(table.userId, table.collection),
-    ]
+    (table) => [primaryKey({ columns: [table.collection, table.userId] })]
 );
 
 export const collectionJoinCodesTable = pgTable('collection_join_codes', {

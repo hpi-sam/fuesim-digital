@@ -12,11 +12,17 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Add documentation for most features and integrate it with the software.
 - Zooming the map via touch input can be disabled by both trainers and participants per device. This helps preventing accidental zooming if multiple participants are working on a single device simultaneously.
 
+### Changed
+
+- Exercises can be directly created when editing exercise templates.
+- Templates can be directly deleted when editing them.
+
 ### Fixed
 
 - Creating a parallel exercise with many (>10) exercise instances no longer slows down the server significantly.
 - Massively reduce the server start up time with many exercises.
 - Old exercise exports don't fail the validation anymore
+- Exercises can no longer be accidentally started from the simulation overview.
 
 ## [0.12.1] - 2026-05-21
 

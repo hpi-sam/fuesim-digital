@@ -1,0 +1,40 @@
+version: 2
+updates:
+    - package-ecosystem: 'npm'
+      directory: '/'
+      schedule:
+          interval: 'daily'
+
+    - package-ecosystem: 'npm'
+      directory: '/backend'
+      schedule:
+          interval: 'daily'
+
+    - package-ecosystem: 'npm'
+      directory: '/benchmark'
+      schedule:
+          interval: 'daily'
+
+    - package-ecosystem: 'npm'
+      directory: '/frontend'
+      schedule:
+          interval: 'daily'
+      groups:
+          angular:
+              applies-to: version-updates
+              patterns:
+                  - '@angular*'
+                  - '@ng-bootstrap*'
+                  - '@ngrx*'
+                  - 'ng-qrcode'
+                  - 'angular-eslint'
+
+    - package-ecosystem: 'npm'
+      directory: '/shared'
+      schedule:
+          interval: 'daily'
+
+    - package-ecosystem: 'github-actions'
+      directory: '/'
+      schedule:
+          interval: 'weekly'

@@ -111,11 +111,15 @@ export class ExerciseService {
     }
 
     public async createExerciseFromBlank(
-        optionalData: Partial<ExerciseInsert> = {}
+        optionalData: Partial<Pick<ExerciseInsert, 'templateId' | 'user'>> = {}
     ) {
         const exerciseKeys = await this.createKeys();
 
-        const initialState = ExerciseState.create(exerciseKeys.participantKey);
+        const initialState: ExerciseState = {
+            ...ExerciseState.create(exerciseKeys.participantKey),
+            type: optionalData.templateId ? 'template' : 'standalone',
+        };
+
         const exerciseInsert = {
             ...optionalData,
             ...exerciseKeys,
@@ -131,7 +135,7 @@ export class ExerciseService {
 
     public async createExerciseFromFile(
         file: StateExport,
-        optionalData: Partial<ExerciseInsert> = {}
+        optionalData: Partial<Pick<ExerciseInsert, 'templateId' | 'user'>> = {}
     ): Promise<ActiveExercise> {
         try {
             const exerciseKeys = await this.createKeys();
@@ -146,7 +150,13 @@ export class ExerciseService {
             const newInitialState =
                 migratedImportObject.history?.initialState ??
                 migratedImportObject.currentState;
+            newInitialState.type = optionalData.templateId
+                ? 'template'
+                : 'standalone';
             const newCurrentState = migratedImportObject.currentState;
+            newCurrentState.type = optionalData.templateId
+                ? 'template'
+                : 'standalone';
 
             // Set new participant id
             newInitialState.participantKey = exerciseKeys.participantKey;

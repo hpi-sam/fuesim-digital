@@ -19,6 +19,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 - Extend patients export for IVENA MANV with new fields (e. g. location).
 - Docker Images are now pushed exclusively to GHCR. Images on Dockerhub are no longer updated. If you're selfhosting and still using the `digitalfuesimmanv/dfm` image, please switch to `ghcr.io/hpi-sam/fuesim-digital`.
+- Exercises can be directly created when editing exercise templates.
 
 ### Fixed
 
@@ -29,6 +30,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Vehicles inside a simulated region can now be properly selected again
 - Vehicles inside simulated regions are now shown inside the "operations detail view"
 - Exercise instances that are part of a parallel exercise no longer get paused when all participants have left, i.e. due to connection issues. This ensures that all instances stay synchronized.
+- Exercises can no longer be accidentally started from the simulation overview.
 
 ## [0.11.1] - 2026-04-30
 

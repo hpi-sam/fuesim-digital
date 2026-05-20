@@ -39,29 +39,18 @@ import {
     exerciseStatusSchema,
     exerciseTypeSchema,
 } from './models/utils/exercise-status.js';
+import { simulatedRegionSchema } from './models/simulated-region.js';
+import { exerciseRadiogramSchema } from './models/radiogram/exercise-radiogram.js';
+import { scoutableSchema } from './models/scoutable.js';
 import {
-    
-    simulatedRegionSchema,
-} from './models/simulated-region.js';
-import {
-    
-    exerciseRadiogramSchema,
-} from './models/radiogram/exercise-radiogram.js';
-import {  scoutableSchema } from './models/scoutable.js';
-import {
-    
     measureSchema,
     measureTemplateCategorySchema,
 } from './models/measure/measures.js';
 import { drawingSchema } from './models/drawing.js';
 import { defaultMeasureTemplateCategories } from './data/default-state/measure-templates.js';
-import {
-    
-    technicalChallengeSchema,
-} from './models/technical-challenge/technical-challenge.js';
-import {  taskSchema } from './models/task.js';
+import { technicalChallengeSchema } from './models/technical-challenge/technical-challenge.js';
+import { taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
-import { userGeneratedContentSchema } from './models/user-generated-content.js';
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
@@ -105,10 +94,7 @@ export const exerciseStateSchema = z.strictObject({
 
     tasks: z.record(taskSchema.shape.id, taskSchema),
 
-    technicalChallenges: z.record(
-        technicalChallengeSchema.shape.id,
-        technicalChallengeSchema
-    ),
+    technicalChallenges: z.record(uuidSchema, technicalChallengeSchema),
 
     transferPoints: z.record(uuidSchema, transferPointSchema),
 
@@ -132,11 +118,6 @@ export const exerciseStateSchema = z.strictObject({
     mapImageTemplates: z.record(uuidSchema, mapImageTemplateSchema),
 
     scoutables: z.record(scoutableSchema.shape.id, scoutableSchema),
-
-    userGeneratedContents: z.record(
-        userGeneratedContentSchema.shape.id,
-        userGeneratedContentSchema
-    ),
 
     eocLog: z.array(eocLogEntrySchema),
 
@@ -196,7 +177,6 @@ export function newExerciseState(
         measureTemplates: defaultMeasureTemplateCategories,
         mapImageTemplates: defaultMapImagesTemplatesById,
         scoutables: {},
-        userGeneratedContents: {},
         eocLog: [],
         participantKey,
         spatialTrees: {

@@ -5,6 +5,7 @@ import {
 } from '../../models/measure/measures.js';
 import type { ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
+import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { getCategory } from './utils/measures.js';
 
 export const addMeasureTemplateCategoryActionSchema = z.strictObject({
@@ -43,9 +44,8 @@ export namespace MeasureTemplateActionReducers {
                         `MeasureTemplateCategory with name ${name} already exist`
                     );
                 }
-                draftState.measureTemplates[name] = newMeasureTemplateCategory(
-                    name,
-                    []
+                draftState.measureTemplates[name] = cloneDeepMutable(
+                    newMeasureTemplateCategory(name, [])
                 );
                 return draftState;
             },

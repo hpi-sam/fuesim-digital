@@ -1,6 +1,7 @@
 import type { OnChanges } from '@angular/core';
 import { Component, inject, input, output, signal } from '@angular/core';
 import {
+    cloneDeepMutable,
     measurePropertyTypeSchema,
     measurePropertyTypeToGermanNameDictionary,
     measureTemplateSchema,
@@ -8,7 +9,6 @@ import {
     type MeasureProperty,
     type MeasurePropertyType,
 } from 'fuesim-digital-shared';
-import { cloneDeep } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
 import {
     NgbDropdown,
@@ -25,6 +25,7 @@ import {
     validateStandardSchema,
     disabled,
 } from '@angular/forms/signals';
+import type { Immutable } from 'immer';
 import { MessageService } from '../../../../../../core/messages/message.service';
 import type { SimpleChangesGeneric } from '../../../../../../shared/types/simple-changes-generic';
 import { DisplayModelValidationComponent } from '../../../../../../shared/validation/display-model-validation/display-model-validation.component';
@@ -59,7 +60,9 @@ export class MeasureTemplateFormComponent implements OnChanges {
     /**
      * Emits the changed values
      */
-    readonly submitMeasureTemplate = output<MeasureTemplateValues>();
+    readonly submitMeasureTemplate = output<
+        Immutable<MeasureTemplateValues> | MeasureTemplateValues
+    >();
 
     public readonly values = signal<MeasureTemplateValues>({
         name: '',
@@ -150,7 +153,7 @@ export class MeasureTemplateFormComponent implements OnChanges {
             ...v,
             properties: [
                 ...v.properties,
-                cloneDeep(emptyPropertyDefaults[propertyType]),
+                cloneDeepMutable(emptyPropertyDefaults[propertyType]),
             ],
         }));
     }

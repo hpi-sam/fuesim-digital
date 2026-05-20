@@ -21,7 +21,8 @@
         "migration:run": "npx drizzle-kit migrate",
         "migration:check": "npx drizzle-kit check",
         "db:studio": "npx drizzle-kit studio",
-        "db:purge": "tsx src/database/scripts/purge.ts"
+        "db:purge": "tsx src/database/scripts/purge.ts",
+        "thesis:pre-process": "tsx --experimental-vm-modules src/scripts/pre-process.ts"
     },
     "private": true,
     "devEngines": {

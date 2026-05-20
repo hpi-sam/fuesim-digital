@@ -17,7 +17,8 @@
         "lint:fix": "eslint --fix \"./**/*.{ts,js,yml,html}\"",
         "test:ci": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --ci",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage --verbose --no-cache",
-        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --verbose --watch"
+        "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --verbose --watch",
+        "thesis:extract-actions": "tsx --experimental-vm-modules src/scripts/extract-actions.ts"
     },
     "private": true,
     "devEngines": {
@@ -42,6 +43,7 @@
         "rbush": "^4.0.1",
         "rbush-knn": "^4.0.0",
         "reflect-metadata": "^0.2.2",
+        "tsx": "^4.21.0",
         "uuid": "^11.1.0",
         "zod": "^4.1.13"
     },

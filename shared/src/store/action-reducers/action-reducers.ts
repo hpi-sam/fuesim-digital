@@ -29,7 +29,7 @@ import { TechnicalChallengeActionReducers } from './technical-challenge.js';
 /**
  * All action reducers of the exercise must be registered here
  */
-const actionReducers = {
+export const actionReducers = {
     ...ClientActionReducers,
     ...ExerciseActionReducers,
     ...MaterialActionReducers,
@@ -74,7 +74,7 @@ type ExerciseActionTypeDictionary = {
 /**
  * This dictionary maps the action type to the ActionReducer.
  */
-const exerciseActionTypeDictionary: ExerciseActionTypeDictionary =
+export const exerciseActionTypeDictionary: ExerciseActionTypeDictionary =
     Object.values(actionReducers)
         .map((actionReducer) => {
             if ('type' in actionReducer) {

@@ -200,7 +200,11 @@ export class ParallelExerciseService {
             id,
             session
         );
-        return activeExercises.map((exercise) => {
+        return this.getParallelExerciseInstanceSummaries(activeExercises);
+    }
+
+    public getParallelExerciseInstanceSummaries(exercises: ActiveExercise[]) {
+        return exercises.map((exercise) => {
             const state = exercise.exercise.currentStateString;
             return parallelExerciseInstanceSummarySchema.parse({
                 participantKey: exercise.participantKey,

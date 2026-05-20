@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     type PatientStatus,
     patientStatusSchema,
@@ -12,8 +13,8 @@ export const patientTransferToHospitalSuccessfulEventSchema = z.strictObject({
     patientCategory: patientStatusSchema,
     patientOriginSimulatedRegion: uuidSchema,
 });
-export type PatientTransferToHospitalSuccessfulEvent = z.infer<
-    typeof patientTransferToHospitalSuccessfulEventSchema
+export type PatientTransferToHospitalSuccessfulEvent = Immutable<
+    z.infer<typeof patientTransferToHospitalSuccessfulEventSchema>
 >;
 
 export function newPatientTransferToHospitalSuccessfulEvent(

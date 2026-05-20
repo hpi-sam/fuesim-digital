@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { unloadVehicle } from '../utils/vehicle.js';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { tryGetElement } from '../../store/action-reducers/utils/get-element.js';
@@ -15,8 +16,8 @@ export const unloadVehicleActivityStateSchema = z.strictObject({
     startTime: z.int().nonnegative(),
     duration: z.int().nonnegative(),
 });
-export type UnloadVehicleActivityState = z.infer<
-    typeof unloadVehicleActivityStateSchema
+export type UnloadVehicleActivityState = Immutable<
+    z.infer<typeof unloadVehicleActivityStateSchema>
 >;
 
 export function newUnloadVehicleActivityState(

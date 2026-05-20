@@ -20,7 +20,9 @@ export const vehicleRestrictionSchema = z.literal([
     'restrict',
 ]);
 
-export type VehicleRestriction = z.infer<typeof vehicleRestrictionSchema>;
+export type VehicleRestriction = Immutable<
+    z.infer<typeof vehicleRestrictionSchema>
+>;
 
 export const vehicleRestrictionAllowedValues: AllowedValues<VehicleRestriction> =
     {
@@ -34,7 +36,9 @@ export const vehicleRestrictionsSchema = z.record(
     vehicleRestrictionSchema
 );
 
-export type VehicleRestrictions = z.infer<typeof vehicleRestrictionsSchema>;
+export type VehicleRestrictions = Immutable<
+    z.infer<typeof vehicleRestrictionsSchema>
+>;
 
 export const restrictedZoneSchema = z.strictObject({
     id: uuidSchema,
@@ -49,7 +53,9 @@ export const restrictedZoneSchema = z.strictObject({
     vehicleRestrictions: vehicleRestrictionsSchema,
 });
 
-export type RestrictedZone = Immutable<z.infer<typeof restrictedZoneSchema>>;
+export type RestrictedZone = Immutable<
+    Immutable<z.infer<typeof restrictedZoneSchema>>
+>;
 
 export const restrictedZoneImage = {
     url: 'assets/restricted-zone.svg',

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable, WritableDraft } from 'immer';
 import type { ExerciseState } from '../../state.js';
 import { sendSimulationEvent } from '../events/utils.js';
 import {
@@ -23,8 +24,8 @@ export const providePersonnelFromVehiclesActivitySchema = z.strictObject({
     vehiclePriorities: z.array(uuidSchema),
     key: z.string(),
 });
-export type ProvidePersonnelFromVehiclesActivityState = z.infer<
-    typeof providePersonnelFromVehiclesActivitySchema
+export type ProvidePersonnelFromVehiclesActivityState = Immutable<
+    z.infer<typeof providePersonnelFromVehiclesActivitySchema>
 >;
 
 export function newProvidePersonnelFromVehiclesActivityState(
@@ -124,7 +125,7 @@ export const providePersonnelFromVehicleActivity: SimulationActivity<ProvidePers
     };
 
 function personnelInVehicleTemplate(
-    draftState: ExerciseState,
+    draftState: ExerciseState | WritableDraft<ExerciseState>,
     templateId: UUID
 ): {
     vehicleType: string | undefined;
@@ -145,7 +146,7 @@ function personnelInVehicleTemplate(
 }
 
 function personnelInUnloadingVehicles(
-    draftState: ExerciseState,
+    draftState: ExerciseState | WritableDraft<ExerciseState>,
     simulatedRegion: SimulatedRegion
 ): ResourceDescription {
     const resource: ResourceDescription = {};

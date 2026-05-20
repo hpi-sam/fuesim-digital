@@ -28,6 +28,7 @@ import type {
 import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, KeyValuePipe } from '@angular/common';
+import type { Immutable } from 'immer';
 import { DragElementService } from '../core/drag-element.service';
 import { TransferLinesService } from '../core/transfer-lines.service';
 import { openCreateImageTemplateModal } from '../editor-panel/create-image-template-modal/open-create-image-template-modal';
@@ -129,7 +130,7 @@ export class TrainerMapEditorComponent implements OnInit {
     > = signal([getDefaultTechnicalChallengeTemplate()]);
 
     public patientCategories$?: Observable<{
-        [key in FilterCategory]?: PatientCategory[];
+        [key in FilterCategory]?: Immutable<PatientCategory[]>;
     }>;
 
     public bystanderCategories = bystanderCategories;
@@ -142,7 +143,7 @@ export class TrainerMapEditorComponent implements OnInit {
         ]).pipe(
             map(([patientCategories, selectedCategories]) => {
                 const filteredCategories: {
-                    [key in FilterCategory]?: PatientCategory[];
+                    [key in FilterCategory]?: Immutable<PatientCategory[]>;
                 } = {};
                 for (const category of Object.keys(
                     selectedCategories

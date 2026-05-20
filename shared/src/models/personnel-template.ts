@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { type CanCaterFor, canCaterForSchema } from './utils/cater-for.js';
@@ -27,7 +28,9 @@ export const personnelTemplateSchema = z.strictObject({
     image: imagePropertiesSchema,
 });
 
-export type PersonnelTemplate = z.infer<typeof personnelTemplateSchema>;
+export type PersonnelTemplate = Immutable<
+    z.infer<typeof personnelTemplateSchema>
+>;
 
 export function newPersonnelTemplate(
     personnelType: string,

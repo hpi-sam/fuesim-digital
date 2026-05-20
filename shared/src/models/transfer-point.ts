@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, uuidSchema } from '../utils/uuid.js';
 import { uuidSetSchema } from '../utils/uuid-set.js';
 import { type Position, positionSchema } from './utils/position/position.js';
@@ -14,8 +15,8 @@ export const reachableTransferPointsSchema = z.record(
         duration: z.number().nonnegative(),
     })
 );
-export type ReachableTransferPoints = z.infer<
-    typeof reachableTransferPointsSchema
+export type ReachableTransferPoints = Immutable<
+    z.infer<typeof reachableTransferPointsSchema>
 >;
 
 export const transferPointSchema = z.strictObject({
@@ -27,7 +28,7 @@ export const transferPointSchema = z.strictObject({
     internalName: z.string(),
     externalName: z.string(),
 });
-export type TransferPoint = z.infer<typeof transferPointSchema>;
+export type TransferPoint = Immutable<z.infer<typeof transferPointSchema>>;
 
 export const transferPointImage: ImageProperties = {
     url: 'assets/transfer-point.svg',

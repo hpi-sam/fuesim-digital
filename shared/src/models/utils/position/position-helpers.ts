@@ -242,7 +242,7 @@ export function getBoundingBox(elements: WithExtent[]): BoundingBox {
 
 export function nestedCoordinatesOf(
     withPosition: WithPosition,
-    state: ExerciseState
+    state: ExerciseState | WritableDraft<ExerciseState>
 ): MapCoordinates {
     if (isOnMap(withPosition)) {
         return currentCoordinatesOf(withPosition);

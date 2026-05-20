@@ -1,5 +1,5 @@
-import { WritableDraft } from 'immer';
 import { IsBoolean, IsString, IsUUID, MaxLength } from 'class-validator';
+import type { WritableDraft } from 'immer';
 import type { Action, ActionReducer } from '../action-reducer.js';
 import { ReducerError } from '../reducer-error.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';

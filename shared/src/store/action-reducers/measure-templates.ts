@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     measureTemplateCategorySchema,
     measureTemplateSchema,
@@ -17,8 +18,8 @@ export const addMeasureTemplateActionSchema = z.strictObject({
     measureTemplate: measureTemplateSchema,
     categoryName: measureTemplateCategorySchema.shape.name,
 });
-export type AddMeasureTemplateAction = z.infer<
-    typeof addMeasureTemplateActionSchema
+export type AddMeasureTemplateAction = Immutable<
+    z.infer<typeof addMeasureTemplateActionSchema>
 >;
 
 export const editMeasureTemplateActionSchema = z.strictObject({
@@ -28,8 +29,8 @@ export const editMeasureTemplateActionSchema = z.strictObject({
     properties: measureTemplateSchema.shape.properties,
     replacePrevious: measureTemplateSchema.shape.replacePrevious,
 });
-export type EditMeasureTemplateAction = z.infer<
-    typeof editMeasureTemplateActionSchema
+export type EditMeasureTemplateAction = Immutable<
+    z.infer<typeof editMeasureTemplateActionSchema>
 >;
 
 export const changeCategoryOfMeasureTemplateActionSchema = z.strictObject({
@@ -37,16 +38,16 @@ export const changeCategoryOfMeasureTemplateActionSchema = z.strictObject({
     id: measureTemplateSchema.shape.id,
     categoryName: measureTemplateCategorySchema.shape.name,
 });
-export type ChangeCategoryOfMeasureTemplateAction = z.infer<
-    typeof changeCategoryOfMeasureTemplateActionSchema
+export type ChangeCategoryOfMeasureTemplateAction = Immutable<
+    z.infer<typeof changeCategoryOfMeasureTemplateActionSchema>
 >;
 
 export const removeMeasureTemplateActionSchema = z.strictObject({
     type: z.literal('[MeasureTemplate] Remove MeasureTemplate'),
     id: measureTemplateSchema.shape.id,
 });
-export type RemoveMeasureTemplateAction = z.infer<
-    typeof removeMeasureTemplateActionSchema
+export type RemoveMeasureTemplateAction = Immutable<
+    z.infer<typeof removeMeasureTemplateActionSchema>
 >;
 export namespace MeasureTemplateActionReducers {
     export const addMeasureTemplate: ActionReducer<AddMeasureTemplateAction> = {

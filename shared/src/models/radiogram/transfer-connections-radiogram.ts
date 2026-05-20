@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { type UUID, uuidSchema } from '../../utils/uuid.js';
 import { radiogramSchema } from './radiogram.js';
 import type { ExerciseRadiogramStatus } from './status/exercise-radiogram-status.js';
@@ -8,8 +9,8 @@ export const transferConnectionsRadiogramSchema = z.strictObject({
     type: z.literal('transferConnectionsRadiogram'),
     connectedRegions: z.record(uuidSchema, z.number()),
 });
-export type TransferConnectionsRadiogram = z.infer<
-    typeof transferConnectionsRadiogramSchema
+export type TransferConnectionsRadiogram = Immutable<
+    z.infer<typeof transferConnectionsRadiogramSchema>
 >;
 
 export function newTransferConnectionsRadiogram(

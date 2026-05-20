@@ -1,10 +1,10 @@
 import type { WritableDraft } from 'immer';
 import { nextUUID } from '../simulation/utils/randomness.js';
-import type { ExerciseState } from '../state.js';
 import { arrayToUUIDSet } from '../utils/array-to-uuid-set.js';
 import { uuid, type UUID } from '../utils/uuid.js';
 import { getElement } from '../store/action-reducers/utils/get-element.js';
 import type { VehicleTemplate } from '../models/vehicle-template.js';
+import type { ExerciseState } from '../state.js';
 import type { Migration } from './migration-functions.js';
 
 interface VehicleParameters {
@@ -188,6 +188,9 @@ function createVehicleParameters(
 
 export const deterministicAlarmGroups38: Migration = {
     action: (intermediaryState, action) => {
+        const mutableIntermediaryState =
+            intermediaryState as WritableDraft<ExerciseState>;
+
         switch ((action as { type: string }).type) {
             case '[Vehicle] Add vehicle': {
                 const typedAction = action as VehicleParameters & {
@@ -285,9 +288,7 @@ export const deterministicAlarmGroups38: Migration = {
                 const vehicleIds = Object.fromEntries(
                     alarmGroupVehicles.map((alarmGroupVehicle) => [
                         alarmGroupVehicle.id,
-                        nextUUID(
-                            intermediaryState as WritableDraft<ExerciseState>
-                        ),
+                        nextUUID(mutableIntermediaryState),
                     ])
                 );
 

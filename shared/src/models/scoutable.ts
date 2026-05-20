@@ -16,7 +16,7 @@ export const scoutableSchema = z.strictObject({
     isVisibleForParticipants: z.boolean(),
     viewedByParticipants: z.boolean(),
 });
-export type Scoutable = Immutable<z.infer<typeof scoutableSchema>>;
+export type Scoutable = Immutable<Immutable<z.infer<typeof scoutableSchema>>>;
 
 /* When adding a new ElementType (refered to as it) to become a functioning Scoutable element, do the following:
 1) add the scoutableId attribute to its class;
@@ -30,7 +30,9 @@ export const scoutableElementSchema = z.discriminatedUnion('type', [
     mapImageSchema,
     patientSchema,
 ]);
-export type ScoutableElement = z.infer<typeof scoutableElementSchema>;
+export type ScoutableElement = Immutable<
+    z.infer<typeof scoutableElementSchema>
+>;
 export type ScoutableElementType = ScoutableElement['type'];
 
 export const scoutableElementTypes = [

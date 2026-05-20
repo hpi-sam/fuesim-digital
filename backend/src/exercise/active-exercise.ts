@@ -5,15 +5,16 @@ import type {
     ExerciseKey,
     ParticipantKey,
     TrainerKey,
+    ExerciseState,
 } from 'fuesim-digital-shared';
 import {
-    ExerciseState,
     validateExerciseState,
     applyAction,
-    cloneDeepMutable,
     reduceExerciseState,
     ReducerError,
     validateExerciseAction,
+    currentStateVersion,
+    cloneDeepMutable,
 } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type {
@@ -288,17 +289,18 @@ export class ActiveExercise {
 
     public restore(keepActions: boolean): void {
         // Check State Version
-        if (this.exercise.stateVersion !== ExerciseState.currentStateVersion) {
+        if (this.exercise.stateVersion !== currentStateVersion) {
             throw new RestoreError(
-                `The exercise was created with an incompatible version of the state (got version ${this.exercise.stateVersion}, required version ${ExerciseState.currentStateVersion})`,
+                `The exercise was created with an incompatible version of the state (got version ${this.exercise.stateVersion}, required version ${currentStateVersion})`,
                 this.exercise.id
             );
         }
 
         // Validate initial state
-        const errors = validateExerciseState(this.exercise.initialStateString);
-        if (errors.length > 0) {
-            throw new ValidationErrorWrapper(errors);
+        const result = validateExerciseState(this.exercise.initialStateString);
+        console.log(result);
+        if (result !== true) {
+            throw new ValidationErrorWrapper(result);
         }
 
         this.restoreState(keepActions);
@@ -310,13 +312,12 @@ export class ActiveExercise {
      * as well as adding actions to the end to gracefully mark the end of the previous exercise session.
      */
     private restoreState(keepActions: boolean) {
-        // TODO: switch to use cloneDeep() and then produce()
-        let currentState = cloneDeepMutable(this.exercise.initialStateString);
+        const currentState = cloneDeepMutable(this.exercise.initialStateString);
 
         this.temporaryActionHistory.forEach((actionWrapper) => {
             this.validateAction(actionWrapper.getAction().actionString);
             try {
-                currentState = applyAction(
+                applyAction(
                     currentState,
                     actionWrapper.getAction().actionString
                 );

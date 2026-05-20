@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const sizeSchema = z.strictObject({
     /**
@@ -12,7 +13,7 @@ export const sizeSchema = z.strictObject({
     height: z.number(),
 });
 
-export type Size = z.infer<typeof sizeSchema>;
+export type Size = Immutable<z.infer<typeof sizeSchema>>;
 
 export function newSize(width: number, height: number): Size {
     return { width, height };

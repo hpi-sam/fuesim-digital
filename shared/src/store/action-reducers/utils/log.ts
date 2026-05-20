@@ -1,5 +1,5 @@
 import type { WritableDraft } from 'immer';
-import { newLogEntry } from '../../../models/log-entry.js';
+import { type LogEntry, newLogEntry } from '../../../models/log-entry.js';
 import type { Tag } from '../../../models/tag.js';
 import {
     type PatientStatus,
@@ -60,7 +60,11 @@ export function log(
 ) {
     if (!logActive(state)) return;
 
-    const logEntry = newLogEntry(description, tags, state.currentTime);
+    const logEntry = newLogEntry(
+        description,
+        tags,
+        state.currentTime
+    ) as WritableDraft<LogEntry>;
 
     if (state.logEntries) {
         state.logEntries.push(logEntry);

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuidSchema } from '../utils/uuid.js';
 
 export const taskSchema = z.object({
@@ -7,4 +8,4 @@ export const taskSchema = z.object({
     taskName: z.string(),
 });
 
-export type Task = z.infer<typeof taskSchema>;
+export type Task = Immutable<z.infer<typeof taskSchema>>;

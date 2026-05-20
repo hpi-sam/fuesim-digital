@@ -1,12 +1,13 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const intermediateOccupationSchema = z.strictObject({
     type: z.literal('intermediateOccupation'),
     unoccupiedUntil: z.int().nonnegative(),
 });
 
-export type IntermediateOccupation = z.infer<
-    typeof intermediateOccupationSchema
+export type IntermediateOccupation = Immutable<
+    z.infer<typeof intermediateOccupationSchema>
 >;
 
 export function newIntermediateOccupation(

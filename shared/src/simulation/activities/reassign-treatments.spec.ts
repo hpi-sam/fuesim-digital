@@ -39,7 +39,7 @@ function setupStateAndApplyTreatments(
     activityState: ReassignTreatmentsActivityState,
     leaderId?: UUID,
     mutateBeforeState?: (
-        state: WritableDraft<ExerciseState>,
+        state: ExerciseState,
         simulatedRegion: SimulatedRegion
     ) => void
 ) {
@@ -81,7 +81,7 @@ function setupStateAndApplyTreatments(
     const newState = produce(beforeState, (draftState) => {
         reassignTreatmentsActivity.tick(
             draftState,
-            draftState.simulatedRegions[simulatedRegion.id]!,
+            draftState.simulatedRegions[simulatedRegion.id],
             newActivityState,
             1000,
             terminate
@@ -107,7 +107,7 @@ describe('reassign treatment', () => {
                     );
                 const shouldState = produce(beforeState, (draftState) => {
                     sendSimulationEvent(
-                        draftState.simulatedRegions[simulatedRegion!.id]!,
+                        draftState.simulatedRegions[simulatedRegion!.id],
                         newTreatmentProgressChangedEvent('noTreatment')
                     );
                 });
@@ -131,7 +131,7 @@ describe('reassign treatment', () => {
                     );
                 const shouldState = produce(beforeState, (draftState) => {
                     sendSimulationEvent(
-                        draftState.simulatedRegions[simulatedRegion!.id]!,
+                        draftState.simulatedRegions[simulatedRegion!.id],
                         newTreatmentProgressChangedEvent('noTreatment')
                     );
                 });
@@ -165,7 +165,7 @@ describe('reassign treatment', () => {
                     );
                 const shouldState = produce(beforeState, (draftState) => {
                     sendSimulationEvent(
-                        draftState.simulatedRegions[simulatedRegion!.id]!,
+                        draftState.simulatedRegions[simulatedRegion!.id],
                         newTreatmentProgressChangedEvent('noTreatment')
                     );
                 });
@@ -1288,7 +1288,7 @@ describe('reassign treatment', () => {
 
     describe('in triaged state', () => {
         function setupPatientsAndPersonnel(
-            draftState: WritableDraft<ExerciseState>,
+            draftState: ExerciseState,
             simulatedRegion: SimulatedRegion,
             patients: readonly {
                 readonly state: PatientStatus;

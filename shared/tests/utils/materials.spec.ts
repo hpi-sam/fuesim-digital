@@ -1,4 +1,3 @@
-import type { WritableDraft } from 'immer';
 import { defaultMaterialTemplates } from '../../src/data/default-state/material-templates.js';
 import type { ExerciseState } from '../../src/state.js';
 import type { Position } from '../../src/models/utils/position/position.js';
@@ -10,10 +9,7 @@ import {
 import { SpatialTree } from '../../src/models/utils/spatial-tree.js';
 import { uuid } from '../../src/utils/uuid.js';
 
-export function addMaterial(
-    state: WritableDraft<ExerciseState>,
-    position: Position
-) {
+export function addMaterial(state: ExerciseState, position: Position) {
     const material = newMaterialFromTemplate(
         defaultMaterialTemplates.standard,
         uuid(),

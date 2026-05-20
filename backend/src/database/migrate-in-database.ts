@@ -1,6 +1,5 @@
 import type { ExerciseId, ExerciseState } from 'fuesim-digital-shared';
 import { applyMigrations } from 'fuesim-digital-shared';
-import type { WritableDraft } from 'immer';
 import { RestoreError } from '../utils/restore-error.js';
 import type { ExerciseRepository } from './repositories/exercise-repository.js';
 import type { ActionRepository } from './repositories/action-repository.js';
@@ -34,8 +33,7 @@ export async function migrateInDatabase(
         },
     });
 
-    const initialState: WritableDraft<ExerciseState> =
-        history?.initialState ?? currentState;
+    const initialState: ExerciseState = history?.initialState ?? currentState;
     const actions = history?.actions ?? [];
 
     exercise.stateVersion = newVersion;

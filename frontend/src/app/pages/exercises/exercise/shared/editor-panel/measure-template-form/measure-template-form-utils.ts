@@ -3,10 +3,11 @@ import {
     type MeasureProperty,
     type MeasurePropertyType,
 } from 'fuesim-digital-shared';
+import type { WritableDraft } from 'immer';
 
 export interface MeasureTemplateValues {
     name: string;
-    properties: MeasureProperty[];
+    properties: WritableDraft<MeasureProperty>[];
     categoryName: string;
     replacePrevious: boolean;
 }

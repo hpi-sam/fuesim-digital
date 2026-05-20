@@ -8,10 +8,11 @@ import {
     isTrainerKey,
     type ExerciseKey,
     type ExerciseTimeline,
-    ExerciseState,
     migrateStateExport,
     validateExerciseExport,
     ReducerError,
+    newExerciseState,
+    currentStateVersion,
 } from 'fuesim-digital-shared';
 import { ActionWrapper } from '../../exercise/action-wrapper.js';
 import { ActiveExercise } from '../../exercise/active-exercise.js';
@@ -115,13 +116,13 @@ export class ExerciseService {
     ) {
         const exerciseKeys = await this.createKeys();
 
-        const initialState = ExerciseState.create(exerciseKeys.participantKey);
+        const initialState = newExerciseState(exerciseKeys.participantKey);
         const exerciseInsert = {
             ...optionalData,
             ...exerciseKeys,
             initialStateString: initialState,
             currentStateString: initialState,
-            stateVersion: ExerciseState.currentStateVersion,
+            stateVersion: currentStateVersion,
         } satisfies ExerciseInsert;
         const exerciseEntry = await this.createExercise(exerciseInsert);
         const activeExercise = new ActiveExercise(exerciseEntry);
@@ -139,25 +140,27 @@ export class ExerciseService {
             const migratedImportObject = migrateStateExport(file);
             const validationErrors =
                 validateExerciseExport(migratedImportObject);
+            console.log(validationErrors);
             if (validationErrors.length > 0) {
                 throw new ValidationErrorWrapper(validationErrors);
             }
 
-            const newInitialState =
-                migratedImportObject.history?.initialState ??
-                migratedImportObject.currentState;
-            const newCurrentState = migratedImportObject.currentState;
-
-            // Set new participant id
-            newInitialState.participantKey = exerciseKeys.participantKey;
-            newCurrentState.participantKey = exerciseKeys.participantKey;
+            const newInitialState = {
+                ...(migratedImportObject.history?.initialState ??
+                    migratedImportObject.currentState),
+                participantKey: exerciseKeys.participantKey,
+            };
+            const newCurrentState = {
+                ...migratedImportObject.currentState,
+                participantKey: exerciseKeys.participantKey,
+            };
 
             const exerciseEntry = {
                 ...optionalData,
                 ...exerciseKeys,
                 initialStateString: newInitialState,
                 currentStateString: newCurrentState,
-                stateVersion: ExerciseState.currentStateVersion,
+                stateVersion: currentStateVersion,
             } satisfies ExerciseInsert;
             const exercise = await this.createExercise(exerciseEntry);
             const activeExercise = new ActiveExercise(exercise);
@@ -188,7 +191,7 @@ export class ExerciseService {
         } catch (err) {
             if (err instanceof ValidationErrorWrapper) {
                 throw new ApiError(
-                    `The validation of the import failed: ${err.errors}`
+                    `The validation of the import failed: ${err.error}`
                 );
             }
             if (err instanceof ReducerError) {

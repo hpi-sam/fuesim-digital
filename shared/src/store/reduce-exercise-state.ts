@@ -1,5 +1,4 @@
-import type { WritableDraft } from 'immer';
-import { freeze, produce } from 'immer';
+import { produce, type WritableDraft } from 'immer';
 import type { ExerciseState } from '../state.js';
 import {
     type ExerciseAction,
@@ -17,8 +16,6 @@ export function reduceExerciseState(
     state: ExerciseState,
     action: ExerciseAction
 ): ExerciseState {
-    // Make sure that the state isn't mutated in the reducer (short circuits if the state is already frozen)
-    freeze(state, true);
     // use immer to convert mutating operations to immutable ones (https://immerjs.github.io/immer/produce)
     return produce(state, (draftState) => applyAction(draftState, action));
 }
@@ -34,24 +31,5 @@ export function applyAction(
     draftState: WritableDraft<ExerciseState>,
     action: ExerciseAction
 ) {
-    // Make sure that the action isn't mutated in the reducer (short circuits if the action is already frozen)
-    freeze(action, true);
     return lookupReducerFor(action.type).reducer(draftState, action);
-}
-
-/**
- * @param actions all the actions that were applied to the {@link initialState} to get to the present state
- * @returns the state after applying all the actions
- */
-export function applyAllActions(
-    initialState: ExerciseState,
-    actions: readonly ExerciseAction[]
-): ExerciseState {
-    // TODO: find a heuristic for whether using produce or deepCloning it
-    // Default is produce
-    return produce(initialState, (draftState) => {
-        for (const action of actions) {
-            applyAction(draftState, action);
-        }
-    });
 }

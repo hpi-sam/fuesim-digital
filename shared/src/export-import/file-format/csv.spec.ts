@@ -1,4 +1,3 @@
-import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
 import { toLonLat } from 'ol/proj.js';
 import { ExerciseState } from '../../state.js';
@@ -19,9 +18,7 @@ import {
 
 const emptyState = ExerciseState.create('123456' as ParticipantKey);
 
-function setupState(
-    mutateBeforeState: (state: WritableDraft<ExerciseState>) => void
-) {
+function setupState(mutateBeforeState: (state: ExerciseState) => void) {
     return produce(emptyState, (draftState) => {
         mutateBeforeState(draftState);
     });
@@ -248,7 +245,7 @@ describe('csv export', () => {
     });
     it('at least one correct patient in CSV', () => {
         let patient: Patient;
-        const state = setupState((draftState: WritableDraft<ExerciseState>) => {
+        const state = setupState((draftState: ExerciseState) => {
             patient = addPatient(draftState, 'red', 'red');
             patient.identifier = 'xyz';
         });
@@ -258,7 +255,7 @@ describe('csv export', () => {
     });
     it('multiple patients', () => {
         let patients: Patient[] = [];
-        const state = setupState((draftState: WritableDraft<ExerciseState>) => {
+        const state = setupState((draftState: ExerciseState) => {
             patients = [
                 addPatient(draftState, 'red', 'red'),
                 addPatient(draftState, 'yellow', 'yellow'),

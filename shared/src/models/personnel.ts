@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { maxTreatmentRange } from '../state-helpers/max-treatment-range.js';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { uuidSetSchema } from '../utils/uuid-set.js';
@@ -38,7 +39,7 @@ export const personnelSchema = z.strictObject({
     position: positionSchema,
 });
 
-export type Personnel = z.infer<typeof personnelSchema>;
+export type Personnel = Immutable<z.infer<typeof personnelSchema>>;
 
 export function newPersonnelFromTemplate(
     personnelTemplate: PersonnelTemplate,

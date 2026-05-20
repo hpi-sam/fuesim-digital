@@ -1,5 +1,5 @@
 import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
-import { ExerciseState } from 'fuesim-digital-shared';
+import { currentStateVersion } from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
@@ -128,12 +128,7 @@ export class ExerciseRepository extends BaseRepository {
         return this.databaseConnection
             .select()
             .from(exerciseTable)
-            .where(
-                lt(
-                    exerciseTable.stateVersion,
-                    ExerciseState.currentStateVersion
-                )
-            );
+            .where(lt(exerciseTable.stateVersion, currentStateVersion));
     }
 
     public async saveExerciseState(exercise: ExerciseInsert) {

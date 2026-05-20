@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 
 export const noPositionSchema = z.strictObject({
     type: z.literal('no'),
@@ -8,7 +9,7 @@ export const noPositionSchema = z.strictObject({
  * A null-object for cases in which a position is needed.
  * Can be used to indicate that an element is not yet part of the exercise.
  */
-export type NoPosition = z.infer<typeof noPositionSchema>;
+export type NoPosition = Immutable<z.infer<typeof noPositionSchema>>;
 
 export function newNoPosition(): NoPosition {
     return {

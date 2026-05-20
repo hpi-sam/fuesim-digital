@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     femaleFirstNames,
     maleFirstNames,
@@ -18,7 +19,9 @@ export const personalInformationSchema = z.strictObject({
      */
     birthdate: z.string(),
 });
-export type PersonalInformation = z.infer<typeof personalInformationSchema>;
+export type PersonalInformation = Immutable<
+    z.infer<typeof personalInformationSchema>
+>;
 
 export function generatePersonalInformation(sex: Sex): PersonalInformation {
     return {

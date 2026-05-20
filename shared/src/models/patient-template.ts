@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { cloneDeepMutable } from '../utils/clone-deep.js';
 import { generatePersonalInformation } from './utils/personal-information.js';
@@ -37,7 +38,7 @@ export const patientTemplateSchema = z.strictObject({
     startingHealthStateId: uuidSchema,
     health: healthPointsSchema,
 });
-export type PatientTemplate = z.infer<typeof patientTemplateSchema>;
+export type PatientTemplate = Immutable<z.infer<typeof patientTemplateSchema>>;
 
 export function newPatientTemplate(
     biometricInformation: BiometricInformation,

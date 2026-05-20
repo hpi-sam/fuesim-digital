@@ -1,105 +1,69 @@
 import { z } from 'zod';
-import { Equals, IsObject, IsOptional, IsUUID } from 'class-validator';
+import type { Immutable } from 'immer';
 import { defaultMaterialTemplatesById } from './data/default-state/material-templates.js';
 import { defaultPersonnelTemplatesById } from './data/default-state/personnel-templates.js';
 import {
     newSeededRandomState,
-    type RandomState,
     randomStateSchema,
 } from './simulation/utils/randomness.js';
-import type { SpatialElementPlural } from './store/action-reducers/utils/spatial-elements.js';
-import { IsZodSchema } from './utils/validators/is-zod-object.js';
-import { Vehicle, vehicleSchema } from './models/vehicle.js';
-import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
-import {
-    RestrictedZone,
-    restrictedZoneSchema,
-} from './models/restricted-zone.js';
-import { Material, materialSchema } from './models/material.js';
-import {
-    type MaterialTemplate,
-    materialTemplateSchema,
-} from './models/material-template.js';
-import {
-    type PersonnelTemplate,
-    personnelTemplateSchema,
-} from './models/personnel-template.js';
-import { Personnel, personnelSchema } from './models/personnel.js';
-import {
-    type VehicleTemplate,
-    vehicleTemplateSchema,
-} from './models/vehicle-template.js';
+import { spatialElementTypePluralSchema } from './store/action-reducers/utils/spatial-elements.js';
+import { vehicleSchema } from './models/vehicle.js';
+import { restrictedZoneSchema } from './models/restricted-zone.js';
+import { materialSchema } from './models/material.js';
+import { materialTemplateSchema } from './models/material-template.js';
+import { personnelTemplateSchema } from './models/personnel-template.js';
+import { personnelSchema } from './models/personnel.js';
+import { vehicleTemplateSchema } from './models/vehicle-template.js';
 import { type ParticipantKey, participantKeySchema } from './exercise-keys.js';
-import {
-    operationalSectionSchema,
-    OperationalSection,
-} from './models/operational-section.js';
-import { Hospital, hospitalSchema } from './models/hospital.js';
-import {
-    type MapImageTemplate,
-    mapImageTemplateSchema,
-} from './models/map-image-template.js';
-import { type MapImage, mapImageSchema } from './models/map-image.js';
-import { Viewport, viewportSchema } from './models/viewport.js';
-import { TransferPoint, transferPointSchema } from './models/transfer-point.js';
-import { type AlarmGroup, alarmGroupSchema } from './models/alarm-group.js';
-import { Client, clientSchema } from './models/client.js';
-import { type EocLogEntry, eocLogEntrySchema } from './models/eoc-log-entry.js';
+import { hospitalSchema } from './models/hospital.js';
+import { mapImageTemplateSchema } from './models/map-image-template.js';
+import { mapImageSchema } from './models/map-image.js';
+import { viewportSchema } from './models/viewport.js';
+import { transferPointSchema } from './models/transfer-point.js';
+import { alarmGroupSchema } from './models/alarm-group.js';
+import { clientSchema } from './models/client.js';
+import { eocLogEntrySchema } from './models/eoc-log-entry.js';
+import { operationalSectionSchema } from './models/operational-section.js';
 import {
     exerciseConfigurationSchema,
     newExerciseConfiguration,
 } from './models/exercise-configuration.js';
-import { Patient, patientSchema } from './models/patient.js';
-import {
-    HospitalPatient,
-    hospitalPatientSchema,
-} from './models/hospital-patient.js';
+import { patientSchema } from './models/patient.js';
+import { hospitalPatientSchema } from './models/hospital-patient.js';
 import { patientCategorySchema } from './models/patient-category.js';
-import { UUID, uuid, uuidSchema, uuidValidationOptions } from './utils/uuid.js';
-import {
-    catchAllHospitalId,
-    createCatchAllHospital,
-} from './data/default-state/catch-all-hospital.js';
-import { defaultPatientCategories } from './data/default-state/patient-templates.js';
+import { uuid, uuidSchema } from './utils/uuid.js';
 import { defaultMapImagesTemplatesById } from './data/default-state/map-images-templates.js';
 import { SpatialTree } from './models/utils/spatial-tree.js';
-import { type LogEntry, logEntrySchema } from './models/log-entry.js';
-import type { TreatmentAssignment } from './store/action-reducers/exercise.js';
-import { getCreate } from './models/utils/get-create.js';
+import { logEntrySchema } from './models/log-entry.js';
 import {
-    type ExerciseStatus,
     exerciseStatusSchema,
-    type ExerciseType,
     exerciseTypeSchema,
 } from './models/utils/exercise-status.js';
+import { simulatedRegionSchema } from './models/simulated-region.js';
+import { exerciseRadiogramSchema } from './models/radiogram/exercise-radiogram.js';
+import { scoutableSchema } from './models/scoutable.js';
 import {
-    type SimulatedRegion,
-    simulatedRegionSchema,
-} from './models/simulated-region.js';
-import {
-    type ExerciseRadiogram,
-    exerciseRadiogramSchema,
-} from './models/radiogram/exercise-radiogram.js';
-import { type Scoutable, scoutableSchema } from './models/scoutable.js';
-import {
-    Measure,
     measureSchema,
-    MeasureTemplateCategory,
     measureTemplateCategorySchema,
 } from './models/measure/measures.js';
-import type { Drawing } from './models/drawing.js';
 import { drawingSchema } from './models/drawing.js';
 import { defaultMeasureTemplateCategories } from './data/default-state/measure-templates.js';
-import {
-    type TechnicalChallenge,
-    technicalChallengeSchema,
-} from './models/technical-challenge/technical-challenge.js';
-import { type Task, taskSchema } from './models/task.js';
+import { technicalChallengeSchema } from './models/technical-challenge/technical-challenge.js';
+import { taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
+import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
+import { resourceDescriptionSchema } from './models/utils/resource-description.js';
+import { defaultPatientCategories } from './data/default-state/patient-templates.js';
 
-export class ExerciseState {
-    @IsZodSchema(uuidSchema)
-    public readonly id = uuid();
+/**
+ * **Important**
+ *
+ * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
+ */
+export const currentStateVersion = 50 as const;
+
+export const exerciseStateSchema = z.strictObject({
+    id: uuidSchema,
     /**
      * The number of ms since the start of the exercise.
      * This time is updated each `tick` by a constant value, is guaranteed to be (a bit) slower than the real time
@@ -107,177 +71,124 @@ export class ExerciseState {
      *
      * It is guaranteed that the `ExerciseTickAction` is the only action that modifies this value.
      */
-    @IsZodSchema(z.int().nonnegative())
-    public readonly currentTime: number = 0;
+    currentTime: z.int().nonnegative(),
+    type: exerciseTypeSchema,
+    currentStatus: exerciseStatusSchema,
+    randomState: randomStateSchema,
 
-    @IsZodSchema(exerciseTypeSchema)
-    public readonly type: ExerciseType = 'standalone';
+    viewports: z.record(uuidSchema, viewportSchema),
+    autojoinViewportId: uuidSchema.nullable(),
 
-    @IsZodSchema(exerciseStatusSchema)
-    public readonly currentStatus: ExerciseStatus = 'notStarted';
+    simulatedRegions: z.record(uuidSchema, simulatedRegionSchema),
 
-    @IsZodSchema(randomStateSchema)
-    public readonly randomState: RandomState = newSeededRandomState();
+    vehicles: z.record(uuidSchema, vehicleSchema),
+    personnel: z.record(uuidSchema, personnelSchema),
+    patients: z.record(uuidSchema, patientSchema),
+    materials: z.record(uuidSchema, materialSchema),
 
-    @IsZodSchema(z.record(uuidSchema, viewportSchema))
-    public readonly viewports: { readonly [key: UUID]: Viewport } = {};
+    restrictedZones: z.record(uuidSchema, restrictedZoneSchema),
+    measures: z.record(measureSchema.shape.id, measureSchema),
+    drawings: z.record(drawingSchema.shape.id, drawingSchema),
 
-    @IsUUID(4, uuidValidationOptions)
-    @IsOptional()
-    public readonly autojoinViewportId: UUID | null = null;
+    mapImages: z.record(uuidSchema, mapImageSchema),
 
-    @IsZodSchema(z.record(uuidSchema, simulatedRegionSchema))
-    public readonly simulatedRegions: {
-        readonly [key: UUID]: SimulatedRegion;
-    } = {};
+    tasks: z.record(taskSchema.shape.id, taskSchema),
 
-    @IsZodSchema(z.record(uuidSchema, vehicleSchema))
-    public readonly vehicles: { readonly [key: UUID]: Vehicle } = {};
+    technicalChallenges: z.record(uuidSchema, technicalChallengeSchema),
 
-    @IsZodSchema(z.record(uuidSchema, personnelSchema))
-    public readonly personnel: { readonly [key: UUID]: Personnel } = {};
+    transferPoints: z.record(uuidSchema, transferPointSchema),
 
-    @IsZodSchema(z.record(uuidSchema, patientSchema))
-    public readonly patients: { readonly [key: UUID]: Patient } = {};
+    hospitals: z.record(uuidSchema, hospitalSchema),
+    hospitalPatients: z.record(uuidSchema, hospitalPatientSchema),
+    alarmGroups: z.record(uuidSchema, alarmGroupSchema),
 
-    @IsZodSchema(z.record(uuidSchema, materialSchema))
-    public readonly materials: { readonly [key: UUID]: Material } = {};
-
-    @IsZodSchema(z.record(uuidSchema, restrictedZoneSchema))
-    public readonly restrictedZones: { readonly [key: UUID]: RestrictedZone } =
-        {};
-
-    @IsZodSchema(z.record(measureSchema.shape.id, measureSchema))
-    public readonly measures: {
-        readonly [key: UUID]: Measure;
-    } = {};
-
-    @IsZodSchema(z.record(drawingSchema.shape.id, drawingSchema))
-    public readonly drawings: { readonly [key: UUID]: Drawing } = {};
-
-    @IsZodSchema(z.record(uuidSchema, mapImageSchema))
-    public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
-
-    @IsZodSchema(z.record(taskSchema.shape.id, taskSchema))
-    public tasks: { [key: UUID]: Task } = getDefaultTasks();
-
-    @IsZodSchema(
-        z.record(technicalChallengeSchema.shape.id, technicalChallengeSchema)
-    )
-    public technicalChallenges: { [key: UUID]: TechnicalChallenge } = {};
-
-    @IsZodSchema(z.record(uuidSchema, transferPointSchema))
-    public readonly transferPoints: { readonly [key: UUID]: TransferPoint } =
-        {};
-
-    @IsZodSchema(z.record(uuidSchema, hospitalSchema))
-    public readonly hospitals: { readonly [key: UUID]: Hospital } = {
-        [catchAllHospitalId]: createCatchAllHospital(),
-    };
-
-    @IsZodSchema(z.record(uuidSchema, hospitalPatientSchema))
-    public readonly hospitalPatients: {
-        readonly [key: UUID]: HospitalPatient;
-    } = {};
-
-    @IsZodSchema(z.record(uuidSchema, alarmGroupSchema))
-    public readonly alarmGroups: { readonly [key: UUID]: AlarmGroup } = {};
-
-    @IsZodSchema(z.record(uuidSchema, clientSchema))
-    public readonly clients: { readonly [key: UUID]: Client } = {};
-
+    clients: z.record(uuidSchema, clientSchema),
     /** All client names that are currently in the exercise or joined the exercise in the past */
-    @IsZodSchema(z.array(z.string()))
-    public readonly collectedClientNames: string[] = [];
+    collectedClientNames: z.array(z.string()),
 
-    @IsZodSchema(z.record(uuidSchema, exerciseRadiogramSchema))
-    public readonly radiograms: { readonly [key: UUID]: ExerciseRadiogram } =
-        {};
-    @IsZodSchema(z.record(uuidSchema, operationalSectionSchema))
-    public readonly operationalSections: {
-        readonly [key: UUID]: OperationalSection;
-    } = {};
+    radiograms: z.record(uuidSchema, exerciseRadiogramSchema),
 
-    @IsZodSchema(z.array(patientCategorySchema))
-    public readonly patientCategories = defaultPatientCategories;
+    operationalSections: z.record(uuidSchema, operationalSectionSchema),
 
-    @IsZodSchema(z.record(uuidSchema, vehicleTemplateSchema))
-    public readonly vehicleTemplates: {
-        readonly [key: UUID]: VehicleTemplate;
-    } = defaultVehicleTemplatesById;
+    patientCategories: z.array(patientCategorySchema),
+    vehicleTemplates: z.record(uuidSchema, vehicleTemplateSchema),
+    materialTemplates: z.record(uuidSchema, materialTemplateSchema),
+    personnelTemplates: z.record(uuidSchema, personnelTemplateSchema),
+    measureTemplates: z.record(z.string(), measureTemplateCategorySchema),
+    mapImageTemplates: z.record(uuidSchema, mapImageTemplateSchema),
 
-    @IsZodSchema(z.record(uuidSchema, materialTemplateSchema))
-    public readonly materialTemplates: {
-        readonly [key: UUID]: MaterialTemplate;
-    } = defaultMaterialTemplatesById;
+    scoutables: z.record(scoutableSchema.shape.id, scoutableSchema),
 
-    @IsZodSchema(z.record(uuidSchema, personnelTemplateSchema))
-    public readonly personnelTemplates: {
-        readonly [key: UUID]: PersonnelTemplate;
-    } = defaultPersonnelTemplatesById;
+    eocLog: z.array(eocLogEntrySchema),
 
-    @IsZodSchema(z.record(z.string(), measureTemplateCategorySchema))
-    public readonly measureTemplates: {
-        readonly [key: string]: MeasureTemplateCategory;
-    } = defaultMeasureTemplateCategories;
+    participantKey: participantKeySchema,
 
-    @IsZodSchema(z.record(uuidSchema, mapImageTemplateSchema))
-    public readonly mapImageTemplates: {
-        readonly [key: UUID]: MapImageTemplate;
-    } = defaultMapImagesTemplatesById;
+    spatialTrees: z.record(spatialElementTypePluralSchema, SpatialTree.schema),
 
-    @IsZodSchema(z.array(eocLogEntrySchema))
-    public readonly eocLog: readonly EocLogEntry[] = [];
+    configuration: exerciseConfigurationSchema,
+    patientCounter: z.int().nonnegative(),
 
-    @IsZodSchema(participantKeySchema)
-    public readonly participantKey: ParticipantKey;
+    logEntries: z.array(logEntrySchema).optional(),
+    lastLogEntry: logEntrySchema.optional(),
 
-    // WritableDraft<ExerciseState>` could still have immutable objects in spatialTree
-    @IsObject()
-    public readonly spatialTrees: {
-        [type in SpatialElementPlural]: SpatialTree;
-    } = {
-        materials: SpatialTree.create(),
-        patients: SpatialTree.create(),
-        personnel: SpatialTree.create(),
+    previousTreatmentAssignment: z
+        .record(uuidSchema, resourceDescriptionSchema)
+        .optional(),
+
+    currentStateVersion: z.literal(currentStateVersion),
+});
+
+export type ExerciseState = Immutable<z.infer<typeof exerciseStateSchema>>;
+
+export function newExerciseState(
+    participantKey: ParticipantKey
+): ExerciseState {
+    return {
+        id: uuid(),
+        currentTime: 0,
+        type: 'standalone',
+        currentStatus: 'notStarted',
+        randomState: newSeededRandomState(),
+        viewports: {},
+        autojoinViewportId: null,
+        simulatedRegions: {},
+        vehicles: {},
+        personnel: {},
+        patients: {},
+        materials: {},
+        restrictedZones: {},
+        measures: {},
+        drawings: {},
+        mapImages: {},
+        tasks: getDefaultTasks(),
+        technicalChallenges: {},
+        transferPoints: {},
+        hospitals: {},
+        hospitalPatients: {},
+        alarmGroups: {},
+        clients: {},
+        collectedClientNames: [],
+        radiograms: {},
+        operationalSections: {},
+        patientCategories: defaultPatientCategories,
+        vehicleTemplates: defaultVehicleTemplatesById,
+        materialTemplates: defaultMaterialTemplatesById,
+        personnelTemplates: defaultPersonnelTemplatesById,
+        measureTemplates: defaultMeasureTemplateCategories,
+        mapImageTemplates: defaultMapImagesTemplatesById,
+        scoutables: {},
+        eocLog: [],
+        participantKey,
+        spatialTrees: {
+            materials: SpatialTree.newSpatialTree(),
+            patients: SpatialTree.newSpatialTree(),
+            personnel: SpatialTree.newSpatialTree(),
+        },
+        configuration: newExerciseConfiguration(),
+        patientCounter: 0,
+        logEntries: undefined,
+        lastLogEntry: undefined,
+        previousTreatmentAssignment: undefined,
+        currentStateVersion,
     };
-
-    @IsZodSchema(exerciseConfigurationSchema)
-    public readonly configuration = newExerciseConfiguration();
-
-    @IsZodSchema(z.int().nonnegative())
-    public readonly patientCounter: number = 0;
-
-    /**
-     * The log entries generated for the statistics.
-     * This must not be defined on a normal state,
-     * unless the statistics are currently being generated.
-     */
-    @IsZodSchema(z.undefined())
-    public logEntries?: LogEntry[];
-
-    @IsZodSchema(z.optional(logEntrySchema))
-    public lastLogEntry?: LogEntry;
-
-    @Equals(undefined)
-    public previousTreatmentAssignment?: TreatmentAssignment;
-
-    @IsZodSchema(z.record(scoutableSchema.shape.id, scoutableSchema))
-    public readonly scoutables: { readonly [key: UUID]: Scoutable } = {};
-
-    /**
-     * @deprecated Use {@link create} instead.
-     */
-    constructor(participantKey: ParticipantKey) {
-        this.participantKey = participantKey;
-    }
-
-    static readonly create = getCreate(this);
-
-    /**
-     * **Important**
-     *
-     * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
-     */
-    static readonly currentStateVersion = 55;
 }

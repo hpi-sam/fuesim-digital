@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Immutable } from 'immer';
 import {
     delayEventActivity,
     delayEventActivityStateSchema,
@@ -71,8 +72,8 @@ export const exerciseSimulationActivityStateSchema = z.discriminatedUnion(
     ]
 );
 
-export type ExerciseSimulationActivityState = z.infer<
-    typeof exerciseSimulationActivityStateSchema
+export type ExerciseSimulationActivityState = Immutable<
+    z.infer<typeof exerciseSimulationActivityStateSchema>
 >;
 
 export type ExerciseSimulationActivityType =

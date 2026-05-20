@@ -50,14 +50,12 @@ export namespace SpatialTree {
     export const rBushNodeSize = 9 as const;
 
     export const schema = z.strictObject({
-        rBushNodeSize: z.literal(rBushNodeSize),
         spatialTreeAsJSON: z.any(), // z.json is bad because the type gets too deep
     });
     export type SpatialTree = Immutable<z.infer<typeof schema>>;
 
     export function newSpatialTree(): SpatialTree {
         return {
-            rBushNodeSize,
             spatialTreeAsJSON: new PointRBush(rBushNodeSize).toJSON(),
         };
     }

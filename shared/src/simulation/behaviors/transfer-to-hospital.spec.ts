@@ -1,6 +1,7 @@
 import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
-import { ExerciseState } from '../../state.js';
+import type { ExerciseState } from '../../state.js';
+import { newExerciseState } from '../../state.js';
 import { handleSimulationEvents } from '../utils/simulation.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
 import { newVehicle } from '../../models/vehicle.js';
@@ -32,12 +33,12 @@ import { newWaitForTransferOccupation } from '../../models/utils/occupations/wai
 import type { TransferToHospitalBehaviorState } from './transfer-to-hospital.js';
 import { newTransferToHospitalBehaviorState } from './transfer-to-hospital.js';
 
-const emptyState = ExerciseState.create('123456' as ParticipantKey);
+const emptyState = newExerciseState('123456' as ParticipantKey);
 const currentTime = 10_000;
 
 function setupStateAndInteract(
     mutateBeforeState?: (
-        state: ExerciseState,
+        state: WritableDraft<ExerciseState>,
         simulatedRegion: WritableDraft<SimulatedRegion>,
         behaviorState: WritableDraft<TransferToHospitalBehaviorState>
     ) => void

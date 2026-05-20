@@ -8,6 +8,5 @@ import { type ExerciseState, exerciseStateSchema } from '../state.js';
  */
 export function validateExerciseState(state: ExerciseState): ZodError | true {
     const res = exerciseStateSchema.safeParse(state);
-    console.log(state.scoutables, res);
     return res.success || res.error;
 }

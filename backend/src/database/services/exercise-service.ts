@@ -140,7 +140,6 @@ export class ExerciseService {
             const migratedImportObject = migrateStateExport(file);
             const validationErrors =
                 validateExerciseExport(migratedImportObject);
-            console.log(validationErrors);
             if (validationErrors.length > 0) {
                 throw new ValidationErrorWrapper(validationErrors);
             }

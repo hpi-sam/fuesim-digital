@@ -39,29 +39,18 @@ import {
     exerciseStatusSchema,
     exerciseTypeSchema,
 } from './models/utils/exercise-status.js';
+import { simulatedRegionSchema } from './models/simulated-region.js';
+import { exerciseRadiogramSchema } from './models/radiogram/exercise-radiogram.js';
+import { scoutableSchema } from './models/scoutable.js';
 import {
-    
-    simulatedRegionSchema,
-} from './models/simulated-region.js';
-import {
-    
-    exerciseRadiogramSchema,
-} from './models/radiogram/exercise-radiogram.js';
-import {  scoutableSchema } from './models/scoutable.js';
-import {
-    
     measureSchema,
     measureTemplateCategorySchema,
 } from './models/measure/measures.js';
 import { drawingSchema } from './models/drawing.js';
 import { defaultMeasureTemplateCategories } from './data/default-state/measure-templates.js';
-import {
-    
-    technicalChallengeSchema,
-} from './models/technical-challenge/technical-challenge.js';
-import {  taskSchema } from './models/task.js';
+import { technicalChallengeSchema } from './models/technical-challenge/technical-challenge.js';
+import { taskSchema } from './models/task.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
-import { userGeneratedContentSchema } from './models/user-generated-content.js';
 import { defaultVehicleTemplatesById } from './data/default-state/vehicle-templates.js';
 import { resourceDescriptionSchema } from './models/utils/resource-description.js';
 import { defaultPatientCategories } from './data/default-state/patient-templates.js';
@@ -71,7 +60,7 @@ import { defaultPatientCategories } from './data/default-state/patient-templates
  *
  * This number MUST be increased every time a change to any object (that is part of the state or the state itself) is made in a way that there may be states valid before that are no longer valid.
  */
-export const currentStateVersion = 50 as const;
+export const currentStateVersion = 55 as const;
 
 export const exerciseStateSchema = z.strictObject({
     id: uuidSchema,
@@ -105,10 +94,7 @@ export const exerciseStateSchema = z.strictObject({
 
     tasks: z.record(taskSchema.shape.id, taskSchema),
 
-    technicalChallenges: z.record(
-        technicalChallengeSchema.shape.id,
-        technicalChallengeSchema
-    ),
+    technicalChallenges: z.record(uuidSchema, technicalChallengeSchema),
 
     transferPoints: z.record(uuidSchema, transferPointSchema),
 
@@ -133,11 +119,6 @@ export const exerciseStateSchema = z.strictObject({
 
     scoutables: z.record(scoutableSchema.shape.id, scoutableSchema),
 
-    userGeneratedContents: z.record(
-        userGeneratedContentSchema.shape.id,
-        userGeneratedContentSchema
-    ),
-
     eocLog: z.array(eocLogEntrySchema),
 
     participantKey: participantKeySchema,
@@ -153,8 +134,6 @@ export const exerciseStateSchema = z.strictObject({
     previousTreatmentAssignment: z
         .record(uuidSchema, resourceDescriptionSchema)
         .optional(),
-
-    currentStateVersion: z.literal(currentStateVersion),
 });
 
 export type ExerciseState = Immutable<z.infer<typeof exerciseStateSchema>>;
@@ -196,7 +175,6 @@ export function newExerciseState(
         measureTemplates: defaultMeasureTemplateCategories,
         mapImageTemplates: defaultMapImagesTemplatesById,
         scoutables: {},
-        userGeneratedContents: {},
         eocLog: [],
         participantKey,
         spatialTrees: {
@@ -209,6 +187,5 @@ export function newExerciseState(
         logEntries: undefined,
         lastLogEntry: undefined,
         previousTreatmentAssignment: undefined,
-        currentStateVersion,
     };
 }

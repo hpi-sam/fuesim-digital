@@ -3,7 +3,7 @@ import type { ValidationError } from 'class-validator';
 
 export class ValidationErrorWrapper extends Error {
     public constructor(
-        public readonly error: (ValidationError | string)[] | ZodError
+        public readonly error: (ValidationError | ZodError | string)[]
     ) {
         super('Errors occurred while validating');
     }

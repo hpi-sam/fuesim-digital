@@ -1,5 +1,5 @@
 import { type WritableDraft } from 'immer';
-import { type ExerciseState } from '../state.js';
+import { currentStateVersion, type ExerciseState } from '../state.js';
 import { newExerciseState } from '../state.js';
 import type { ParticipantKey } from '../exercise-keys.js';
 import type { MigratedStateExport } from '../export-import/file-format/state-export.js';
@@ -19,10 +19,7 @@ export function migrateStateExport(
     const stateExport = cloneDeepMutable(
         stateExportToMigrate
     ) as WritableDraft<MigratedStateExport>;
-    const {
-        newVersion,
-        migratedProperties: { currentState, history },
-    } = applyMigrations(stateExport.dataVersion, {
+    const { currentState, history } = applyMigrations(stateExport.dataVersion, {
         currentState: stateExport.currentState,
         history: stateExport.history
             ? {
@@ -32,7 +29,7 @@ export function migrateStateExport(
             : undefined,
     });
 
-    stateExport.dataVersion = newVersion;
+    stateExport.dataVersion = currentStateVersion;
     stateExport.currentState = currentState;
     if (stateExport.history) {
         if (history) {
@@ -139,29 +136,24 @@ export function migratePartialExport(
 export function applyMigrations<
     H extends { initialState: object; actions: (object | null)[] } | undefined,
 >(
-    currentStateVersion: number,
+    dataVersion: number,
     propertiesToMigrate: {
         currentState: object;
         history: H;
     }
 ): {
-    newVersion: number;
-    migratedProperties: {
-        currentState: WritableDraft<ExerciseState>;
-        history: H extends undefined
-            ? undefined
-            :
-                  | {
-                        initialState: WritableDraft<ExerciseState>;
-                        actions: (WritableDraft<ExerciseAction> | null)[];
-                    }
-                  | undefined;
-    };
+    currentState: WritableDraft<ExerciseState>;
+    history: H extends undefined
+        ? undefined
+        :
+              | {
+                    initialState: WritableDraft<ExerciseState>;
+                    actions: (WritableDraft<ExerciseAction> | null)[];
+                }
+              | undefined;
 } {
-    const newVersion = currentStateVersion;
-
     const migrationsToApply: Migration[] = [];
-    for (let i = currentStateVersion + 1; i <= newVersion; i++) {
+    for (let i = dataVersion + 1; i <= currentStateVersion; i++) {
         migrationsToApply.push(migrations[i]!);
     }
 
@@ -200,12 +192,9 @@ export function applyMigrations<
                 }
             });
             return {
-                newVersion,
-                migratedProperties: {
-                    currentState: intermediaryState,
-                    // history has been migrated in place
-                    history: history as any,
-                },
+                currentState: intermediaryState,
+                // history has been migrated in place
+                history: history as any,
             };
         } catch (e: unknown) {
             if (e instanceof ReducerError) {
@@ -224,11 +213,8 @@ export function applyMigrations<
     const currentState =
         propertiesToMigrate.currentState as WritableDraft<ExerciseState>;
     return {
-        newVersion,
-        migratedProperties: {
-            currentState,
-            history: undefined as any,
-        },
+        currentState,
+        history: undefined as any,
     };
 }
 

@@ -298,9 +298,8 @@ export class ActiveExercise {
 
         // Validate initial state
         const result = validateExerciseState(this.exercise.initialStateString);
-        console.log(result);
         if (result !== true) {
-            throw new ValidationErrorWrapper(result);
+            throw new ValidationErrorWrapper([result]);
         }
 
         this.restoreState(keepActions);

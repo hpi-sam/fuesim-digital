@@ -165,7 +165,9 @@ export namespace TechnicalChallengeActionReducers {
             );
             const state = currentStateOf(technicalChallenge);
 
-            state.userGeneratedContent = action.userGeneratedContent;
+            state.userGeneratedContent = cloneDeepMutable(
+                action.userGeneratedContent
+            );
             return draftState;
         },
         rights: 'trainer',

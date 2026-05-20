@@ -1,6 +1,7 @@
-import { produce } from 'immer';
+import { produce, type WritableDraft } from 'immer';
 import { toLonLat } from 'ol/proj.js';
-import { ExerciseState } from '../../state.js';
+import type { ExerciseState } from '../../state.js';
+import { newExerciseState } from '../../state.js';
 import { addPatient } from '../../../tests/utils/patients.spec.js';
 import type { ParticipantKey } from '../../exercise-keys.js';
 import type { Patient } from '../../models/patient.js';
@@ -16,9 +17,11 @@ import {
     preparePatientsForCSVExport,
 } from './csv.js';
 
-const emptyState = ExerciseState.create('123456' as ParticipantKey);
+const emptyState = newExerciseState('123456' as ParticipantKey);
 
-function setupState(mutateBeforeState: (state: ExerciseState) => void) {
+function setupState(
+    mutateBeforeState: (state: WritableDraft<ExerciseState>) => void
+) {
     return produce(emptyState, (draftState) => {
         mutateBeforeState(draftState);
     });
@@ -245,7 +248,7 @@ describe('csv export', () => {
     });
     it('at least one correct patient in CSV', () => {
         let patient: Patient;
-        const state = setupState((draftState: ExerciseState) => {
+        const state = setupState((draftState: WritableDraft<ExerciseState>) => {
             patient = addPatient(draftState, 'red', 'red');
             patient.identifier = 'xyz';
         });

@@ -1,13 +1,13 @@
+import type {
+    StateExport,
+    ExerciseId,
+    ExerciseKey,
+    ExerciseTimeline,
+    ParticipantKey,
+    TrainerKey,
+} from 'fuesim-digital-shared';
 import {
-    type ExerciseType,
-    type ExerciseKeys,
-    type ParticipantKey,
-    type TrainerKey,
-    type StateExport,
-    type ExerciseId,
     isTrainerKey,
-    type ExerciseKey,
-    type ExerciseTimeline,
     ExerciseState,
     migrateStateExport,
     validateExerciseExport,
@@ -19,11 +19,7 @@ import { pushAll } from '../../utils/array.js';
 import { migrateInDatabase } from '../migrate-in-database.js';
 import type { ActionRepository } from '../repositories/action-repository.js';
 import type { ExerciseRepository } from '../repositories/exercise-repository.js';
-import type {
-    ExerciseEntry,
-    ExerciseInsert,
-    ExerciseTemplateEntry,
-} from '../schema.js';
+import type { ExerciseInsert } from '../schema.js';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import {
     ApiError,
@@ -31,13 +27,12 @@ import {
     PermissionDeniedError,
 } from '../../utils/http.js';
 import { ValidationErrorWrapper } from '../../utils/validation-error-wrapper.js';
-import type { AccessKeyService } from './access-key-service.js';
+import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 
 export class ExerciseService {
     public constructor(
         private readonly exerciseRepository: ExerciseRepository,
-        private readonly actionRepository: ActionRepository,
-        private readonly accessKeyService: AccessKeyService
+        private readonly actionRepository: ActionRepository
     ) {}
 
     private readonly exerciseMap = new Map<
@@ -85,141 +80,128 @@ export class ExerciseService {
         this.exerciseMap.delete(exercise.exercise.id);
     }
 
-    public async freeExerciseKeys(exercise: ActiveExercise) {
-        await this.accessKeyService.free(exercise.participantKey);
-        await this.accessKeyService.free(exercise.trainerKey);
-    }
-
-    public async createExercise(exercise: ExerciseInsert) {
-        const exerciseEntry =
-            await this.exerciseRepository.createExercise(exercise);
-        await this.accessKeyService.lock([
-            exercise.participantKey,
-            exercise.trainerKey,
-        ]);
-        return exerciseEntry!;
-    }
-
-    public async createKeys(): Promise<ExerciseKeys> {
-        const participantKey = (await this.accessKeyService.generateKey(
-            6
-        )) as ParticipantKey;
-        const trainerKey = (await this.accessKeyService.generateKey(
-            8
-        )) as TrainerKey;
-        return { participantKey, trainerKey };
-    }
-
     public async createExerciseFromBlank(
         optionalData: Partial<ExerciseInsert> = {}
-    ) {
-        const exerciseKeys = await this.createKeys();
+    ): Promise<ActiveExercise> {
+        return this.exerciseRepository.transaction(
+            async (exerciseRepository) => {
+                const accessKeyRepository = new AccessKeyRepository(
+                    exerciseRepository
+                );
 
-        const initialState = ExerciseState.create(exerciseKeys.participantKey);
-        const exerciseInsert = {
-            ...optionalData,
-            ...exerciseKeys,
-            initialStateString: initialState,
-            currentStateString: initialState,
-            stateVersion: ExerciseState.currentStateVersion,
-        } satisfies ExerciseInsert;
-        const exerciseEntry = await this.createExercise(exerciseInsert);
-        const activeExercise = new ActiveExercise(exerciseEntry);
-        await this.loadExercise(activeExercise);
-        return activeExercise;
+                const participantKey =
+                    await accessKeyRepository.generateKey<ParticipantKey>(6);
+                const trainerKey =
+                    await accessKeyRepository.generateKey<TrainerKey>(8);
+
+                const initialState = ExerciseState.create(participantKey);
+                const exerciseInsert = {
+                    ...optionalData,
+                    participantKey,
+                    trainerKey,
+                    initialStateString: initialState,
+                    currentStateString: initialState,
+                    stateVersion: ExerciseState.currentStateVersion,
+                } satisfies ExerciseInsert;
+
+                const exerciseEntry =
+                    await exerciseRepository.createExercise(exerciseInsert);
+                if (!exerciseEntry) throw new ApiError();
+
+                const activeExercise = new ActiveExercise(exerciseEntry);
+                await this.loadExercise(activeExercise);
+                return activeExercise;
+            }
+        );
     }
 
     public async createExerciseFromFile(
         file: StateExport,
         optionalData: Partial<ExerciseInsert> = {}
     ): Promise<ActiveExercise> {
-        try {
-            const exerciseKeys = await this.createKeys();
-
-            const migratedImportObject = migrateStateExport(file);
-            const validationErrors =
-                validateExerciseExport(migratedImportObject);
-            if (validationErrors.length > 0) {
-                throw new ValidationErrorWrapper(validationErrors);
-            }
-
-            const newInitialState =
-                migratedImportObject.history?.initialState ??
-                migratedImportObject.currentState;
-            const newCurrentState = migratedImportObject.currentState;
-
-            // Set new participant id
-            newInitialState.participantKey = exerciseKeys.participantKey;
-            newCurrentState.participantKey = exerciseKeys.participantKey;
-
-            const exerciseEntry = {
-                ...optionalData,
-                ...exerciseKeys,
-                initialStateString: newInitialState,
-                currentStateString: newCurrentState,
-                stateVersion: ExerciseState.currentStateVersion,
-            } satisfies ExerciseInsert;
-            const exercise = await this.createExercise(exerciseEntry);
-            const activeExercise = new ActiveExercise(exercise);
-
-            const actions: ActionWrapper[] = (
-                migratedImportObject.history?.actionHistory ?? []
-            ).map(
-                (action) =>
-                    new ActionWrapper(
-                        action,
-                        activeExercise.emitterId, // this is always null
-                        activeExercise
-                    )
-            );
-            pushAll(activeExercise.temporaryActionHistory, actions);
-
-            activeExercise.exercise.tickCounter = actions.filter(
-                (action) =>
-                    action.getAction().actionString.type === '[Exercise] Tick'
-            ).length;
-
-            // The actions haven't been saved in the database yet -> keep them
-            activeExercise.restore(true);
-
-            await this.loadExercise(activeExercise);
-
-            return activeExercise;
-        } catch (err) {
-            if (err instanceof ValidationErrorWrapper) {
-                throw new ApiError(
-                    `The validation of the import failed: ${err.errors}`
+        return this.exerciseRepository.transaction(
+            async (exerciseRepository) => {
+                const accessKeyRepository = new AccessKeyRepository(
+                    exerciseRepository
                 );
-            }
-            if (err instanceof ReducerError) {
-                throw new ApiError(`Error importing exercise: ${err.message}`);
-            }
-            throw err;
-        }
-    }
 
-    public async createExerciseFromExerciseTemplate(
-        exerciseTemplate: ExerciseTemplateEntry,
-        exercise: ExerciseEntry,
-        type: ExerciseType = 'standalone',
-        optionalData: Partial<ExerciseInsert> = {}
-    ): Promise<ActiveExercise> {
-        const exerciseKeys = await this.createKeys();
-        const stateString = {
-            ...exercise.currentStateString,
-            participantKey: exerciseKeys.participantKey,
-            type,
-        };
-        const newExerciseEntry = {
-            ...optionalData,
-            ...exerciseKeys,
-            stateVersion: exercise.stateVersion,
-            initialStateString: stateString,
-            currentStateString: stateString,
-            baseTemplateId: exerciseTemplate.id,
-        };
-        const newExercise = await this.createExercise(newExerciseEntry);
-        return new ActiveExercise(newExercise, []);
+                try {
+                    const participantKey =
+                        await accessKeyRepository.generateKey<ParticipantKey>(
+                            6
+                        );
+                    const trainerKey =
+                        await accessKeyRepository.generateKey<TrainerKey>(8);
+
+                    const migratedImportObject = migrateStateExport(file);
+                    const validationErrors =
+                        validateExerciseExport(migratedImportObject);
+                    if (validationErrors.length > 0) {
+                        throw new ValidationErrorWrapper(validationErrors);
+                    }
+
+                    const newInitialState =
+                        migratedImportObject.history?.initialState ??
+                        migratedImportObject.currentState;
+                    const newCurrentState = migratedImportObject.currentState;
+
+                    // Set new participant id
+                    newInitialState.participantKey = participantKey;
+                    newCurrentState.participantKey = participantKey;
+
+                    const exerciseInsert = {
+                        ...optionalData,
+                        participantKey,
+                        trainerKey,
+                        initialStateString: newInitialState,
+                        currentStateString: newCurrentState,
+                        stateVersion: ExerciseState.currentStateVersion,
+                    } satisfies ExerciseInsert;
+                    const exerciseEntry =
+                        await exerciseRepository.createExercise(exerciseInsert);
+                    if (!exerciseEntry) throw new ApiError();
+
+                    const activeExercise = new ActiveExercise(exerciseEntry);
+
+                    const actions: ActionWrapper[] = (
+                        migratedImportObject.history?.actionHistory ?? []
+                    ).map(
+                        (action) =>
+                            new ActionWrapper(
+                                action,
+                                activeExercise.emitterId, // this is always null
+                                activeExercise
+                            )
+                    );
+                    pushAll(activeExercise.temporaryActionHistory, actions);
+
+                    activeExercise.exercise.tickCounter = actions.filter(
+                        (action) =>
+                            action.getAction().actionString.type ===
+                            '[Exercise] Tick'
+                    ).length;
+
+                    // The actions haven't been saved in the database yet -> keep them
+                    activeExercise.restore(true);
+
+                    await this.loadExercise(activeExercise);
+
+                    return activeExercise;
+                } catch (err) {
+                    if (err instanceof ValidationErrorWrapper) {
+                        throw new ApiError(
+                            `The validation of the import failed: ${err.errors}`
+                        );
+                    }
+                    if (err instanceof ReducerError) {
+                        throw new ApiError(
+                            `Error importing exercise: ${err.message}`
+                        );
+                    }
+                    throw err;
+                }
+            }
+        );
     }
 
     /**
@@ -335,7 +317,6 @@ export class ExerciseService {
         await this.exerciseRepository.deleteExerciseById(
             activeExercise.exercise.id
         );
-        await this.freeExerciseKeys(activeExercise);
     }
 
     public async saveUnsavedExercises() {

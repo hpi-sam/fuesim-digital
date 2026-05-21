@@ -19,7 +19,6 @@ describe('exercise manager router', () => {
     const environment = createTestEnvironment();
     let session: string;
     beforeEach(async () => {
-        await environment.repositories.accessKeyRepository.freeAll();
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
         session = await createTestUserSession(environment);
     });

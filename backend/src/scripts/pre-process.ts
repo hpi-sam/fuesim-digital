@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import type { ParallelExerciseId } from 'fuesim-digital-shared';
 import { applyAction, cloneDeepMutable } from 'fuesim-digital-shared';
 import { DatabaseService } from '../database/services/database-service.js';
@@ -58,6 +59,8 @@ const parallelExerciseInstances =
         parallelExerciseId
     );
 
+const processEvents = [];
+
 for (const parallelExerciseInstance of parallelExerciseInstances) {
     const actions = await repositories.actionRepository.getActionsForExerciseId(
         parallelExerciseInstance.id
@@ -68,7 +71,6 @@ for (const parallelExerciseInstance of parallelExerciseInstances) {
     console.log(`INSTANCE ${parallelExerciseInstance.id}`);
 
     let exerciseRunning = false;
-    const processEvents = [];
     for (const [i, actionEntry] of actions.entries()) {
         const action = actionEntry.actionString;
         applyAction(currentState, action);
@@ -87,7 +89,7 @@ for (const parallelExerciseInstance of parallelExerciseInstances) {
                 action
             );
             console.log(
-                `[EVENT] ${processEvent.timestamp} ${processEvent.name} ${processEvent.verboseName}`
+                `[EVENT] ${processEvent['time:timestamp']} ${processEvent['concept:name']} ${processEvent.verboseName}`
             );
             processEvents.push(processEvent);
         }
@@ -95,5 +97,8 @@ for (const parallelExerciseInstance of parallelExerciseInstances) {
             exerciseRunning = false;
         }
     }
-    break;
 }
+
+fs.writeFile('events.json', JSON.stringify(processEvents), (err) => {
+    if (err) throw err;
+});

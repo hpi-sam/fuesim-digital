@@ -9,16 +9,17 @@ import { z } from 'zod';
 import type { WritableDraft } from 'immer';
 
 export const processEventSchema = z.strictObject({
-    name: z.string(),
+    'concept:name': z.string(),
     verboseName: z.string(),
-    timestamp: z.int().nonnegative(),
+    'time:timestamp': z.string(),
+    'case:concept:name': z.string(),
 });
 export type ProcessEvent = z.infer<typeof processEventSchema>;
 
 type ActionProcessorFunction<T extends ExerciseAction> = (
     currentState: ExerciseState,
     action: T
-) => Omit<ProcessEvent, 'timestamp'>;
+) => Omit<ProcessEvent, 'case:concept:name' | 'time:timestamp'>;
 
 class ActionProcessor<T extends ExerciseAction['type']> {
     public type: ExerciseAction['type'];
@@ -29,7 +30,11 @@ class ActionProcessor<T extends ExerciseAction['type']> {
         action: ExerciseAction & { type: T }
     ): ProcessEvent {
         const partialEvent = this.process(currentState, action);
-        return { ...partialEvent, timestamp: currentState.currentTime };
+        return {
+            ...partialEvent,
+            'time:timestamp': new Date(currentState.currentTime).toISOString(),
+            'case:concept:name': currentState.participantKey,
+        };
     }
 
     public constructor(
@@ -43,11 +48,11 @@ class ActionProcessor<T extends ExerciseAction['type']> {
 
 export const actionProcessors = [
     new ActionProcessor('[Exercise] Start', (currentState, action) => ({
-        name: currentState.type,
+        'concept:name': action.type,
         verboseName: 'Übung starten',
     })),
     new ActionProcessor('[Exercise] Pause', (currentState, action) => ({
-        name: currentState.type,
+        'concept:name': action.type,
         verboseName: 'Übung pausieren',
     })),
     new ActionProcessor('[Measure] Add Measure', (currentState, action) => {
@@ -56,7 +61,7 @@ export const actionProcessors = [
             action.measure.templateId
         );
         return {
-            name: `[Measure] ${template.name}`,
+            'concept:name': `[Measure] ${template.name}`,
             verboseName: template.name,
         };
     }),
@@ -69,7 +74,7 @@ export const actionProcessors = [
                 action.scoutableId
             );
             return {
-                name: `[Scoutable] Viewed ${scoutable.name || scoutable.id}`,
+                'concept:name': `[Scoutable] Viewed ${scoutable.name || scoutable.id}`,
                 verboseName: `${scoutable.name || 'Etwas'} erkundet`,
             };
         }

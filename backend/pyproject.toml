@@ -1,0 +1,17 @@
+[project]
+name = "fuesim-digital-pm"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Jonathan Weth",email = "git@jonathanweth.de"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pm4py (>=2.7.22.3,<3.0.0.0)"
+]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

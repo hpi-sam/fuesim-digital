@@ -18,7 +18,6 @@ describe('exercise router', () => {
     const environment = createTestEnvironment();
 
     beforeEach(async () => {
-        await environment.repositories.accessKeyRepository.freeAll();
         environment.services.exerciseService.TESTING_getExerciseMap().clear();
     });
     describe('POST /api/exercise', () => {
@@ -32,11 +31,6 @@ describe('exercise router', () => {
             );
             expect(exerciseCreationResponse.participantKey).toBeDefined();
             expect(exerciseCreationResponse.trainerKey).toBeDefined();
-        });
-
-        it('fails when no keys are left', async () => {
-            await environment.services.accessKeyService.generateKeys(6, 10_000);
-            await environment.httpRequest('post', '/api/exercise').expect(500);
         });
     });
 
@@ -212,7 +206,7 @@ describe('exercise router', () => {
             const response = await environment
                 .httpRequest(
                     'get',
-                    `/api/exercise/${await environment.services.accessKeyService.generateKey(6)}`
+                    `/api/exercise/${await environment.repositories.accessKeyRepository.generateKey(6)}`
                 )
                 .expect(200);
             const parsed = exerciseExistsResponseDataSchema.parse(
@@ -397,7 +391,9 @@ describe('exercise router', () => {
 
         it('fails with 404 for non-existing exercise', async () => {
             const exerciseKey =
-                await environment.services.accessKeyService.generateKey(6);
+                await environment.repositories.accessKeyRepository.generateKey(
+                    6
+                );
             await environment
                 .httpRequest('get', `/api/exercise/${exerciseKey}/history`)
                 .expect(404);

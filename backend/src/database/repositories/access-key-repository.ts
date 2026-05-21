@@ -1,78 +1,99 @@
-import { eq } from 'drizzle-orm';
-import type { AccessKey } from 'fuesim-digital-shared';
-import { accessKeyTable } from '../schema.js';
+import type {
+    ParallelExerciseKey,
+    ParticipantKey,
+    TrainerKey,
+} from 'fuesim-digital-shared';
+import { exerciseTable, parallelExerciseTable } from '../schema.js';
 import { BaseRepository } from './base-repository.js';
 
+type Key = ParallelExerciseKey | ParticipantKey | TrainerKey;
+type KeyLength<K extends Key> = K extends TrainerKey
+    ? 8
+    : K extends ParallelExerciseKey
+      ? 7
+      : K extends ParticipantKey
+        ? 6
+        : never;
 export class AccessKeyRepository extends BaseRepository {
-    /**
-     * Get all allocated keys
-     */
-    public async getAll() {
-        const res = await this.databaseConnection.select().from(accessKeyTable);
-        return new Set(res.map((x) => x.key));
-    }
-
-    /**
-     * Checks whether a key is allocated
-     * @param key to check
-     */
-    public async exists(key: AccessKey) {
-        const res = await this.databaseConnection
-            .select()
-            .from(accessKeyTable)
-            .where(eq(accessKeyTable.key, key));
-        return res.length === 1;
-    }
-
-    /**
-     * Get count of currently allocated keys
-     */
-    public async getKeyCount() {
-        return this.databaseConnection.$count(accessKeyTable);
-    }
-
-    /**
-     * Free the allocation of a key
-     * @param key to free
-     */
-    public async free(key: AccessKey) {
-        await this.databaseConnection
-            .delete(accessKeyTable)
-            .where(eq(accessKeyTable.key, key));
-    }
-
-    /**
-     * Frees the allocation of every currently allocated key
-     */
-    public async freeAll() {
-        await this.databaseConnection.delete(accessKeyTable);
-    }
-
-    /**
-     * Notes all provided {@link keys} as used.
-     * @param keys to lock
-     */
-    public async lock(keys: AccessKey[]) {
-        if (keys.length === 0) {
-            // Nothing to lock
-            return;
-        }
+    public async getTrainerKeys(): Promise<{ key: TrainerKey }[]> {
         return this.databaseConnection
-            .insert(accessKeyTable)
-            .values(keys.map((key) => ({ key })))
-            .onConflictDoNothing()
-            .returning();
+            .select({ key: exerciseTable.trainerKey })
+            .from(exerciseTable);
     }
 
-    public async generateAndLock(
-        generator: (existingKeys: Set<AccessKey>) => AccessKey[]
-    ): Promise<AccessKey[]> {
-        // Do this in a transaction to ensure that the list of existing keys is correct
-        return this.transaction(async (tx) => {
-            const existingKeys = await tx.getAll();
-            const newKeys = generator(existingKeys);
-            await tx.lock(newKeys);
-            return newKeys;
-        });
+    public async getParticipantKeys(): Promise<{ key: ParticipantKey }[]> {
+        return this.databaseConnection
+            .select({ key: exerciseTable.participantKey })
+            .from(exerciseTable);
+    }
+
+    public async getParallelExerciseKeys(): Promise<
+        { key: ParallelExerciseKey }[]
+    > {
+        return this.databaseConnection
+            .select({ key: parallelExerciseTable.participantKey })
+            .from(parallelExerciseTable);
+    }
+    /**
+     * Generates a new key
+     * @param length The desired length of the output. Defaults to 6. Should be an integer. Must be at least 6.
+     * @returns A random integer string (decimal) in [0, 10^{@link length})
+     */
+    public async generateKey<K extends Key>(length: KeyLength<K>): Promise<K> {
+        return (await this.generateKeys<K, KeyLength<K>>(length, 1))[0]!;
+    }
+
+    /**
+     * Generates a number of new keys
+     * @param length The desired length of the output. Defaults to 6. Should be an integer. Must be at least 6.
+     * @param count The number of keys to generate
+     * @returns A random integer string (decimal) in [0, 10^{@link length})
+     */
+    public async generateKeys<K extends Key, KL extends KeyLength<K>>(
+        length: KL,
+        count: number = 1
+    ): Promise<K[]> {
+        let keys: { key: K }[];
+        if (length === 6) {
+            keys = (await this.getParticipantKeys()) as {
+                key: K;
+            }[];
+        } else if (length === 7) {
+            keys = (await this.getParallelExerciseKeys()) as {
+                key: K;
+            }[];
+        } else {
+            keys = (await this.getTrainerKeys()) as { key: K }[];
+        }
+
+        const existingKeySet = new Set(keys.map((o) => o.key));
+
+        return this.keyGenerator(length, count, existingKeySet);
+    }
+
+    private keyGenerator<K extends Key>(
+        length: KeyLength<K>,
+        count: number,
+        existingKeys: Set<K>
+    ): K[] {
+        const newKeys: K[] = [];
+        for (let i = 0; i < count; i++) {
+            let newKey: K | undefined;
+            do {
+                newKey = this.createRandomInteger(10 ** length)
+                    .toString()
+                    .padStart(length, '0') as K;
+                if (existingKeys.has(newKey)) {
+                    newKey = undefined;
+                }
+            } while (newKey === undefined);
+            newKeys.push(newKey);
+            existingKeys.add(newKey);
+        }
+        return newKeys;
+    }
+
+    private createRandomInteger(maximum: number): number {
+        return Math.floor(Math.random() * maximum);
     }
 }

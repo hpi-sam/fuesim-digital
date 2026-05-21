@@ -7,8 +7,8 @@ import type {
     ParticipantKey,
     AccessKey,
     TrainerKey,
-    GroupParticipantKey,
     ParallelExerciseId,
+    ParallelExerciseKey,
 } from 'fuesim-digital-shared';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { relations, sql } from 'drizzle-orm';
@@ -98,8 +98,11 @@ export const exerciseTable = pgTable('exercise_entity', {
     ...baseTable<ExerciseId>(),
     tickCounter: integer().default(0).notNull(),
     initialStateString: json().$type<ExerciseState>().notNull(),
-    participantKey: char({ length: 6 }).$type<ParticipantKey>().notNull(),
-    trainerKey: char({ length: 8 }).$type<TrainerKey>().notNull(),
+    participantKey: char({ length: 6 })
+        .$type<ParticipantKey>()
+        .notNull()
+        .unique(),
+    trainerKey: char({ length: 8 }).$type<TrainerKey>().notNull().unique(),
     currentStateString: json().$type<ExerciseState>().notNull(),
     stateVersion: integer().notNull(),
     user: varchar().references(() => userTable.id, { onDelete: 'cascade' }),
@@ -175,7 +178,10 @@ export const parallelExerciseTable = pgTable('parallel_exercise', {
         // TODO Cascade dangerous?
         .references(() => exerciseTemplateTable.id, { onDelete: 'cascade' })
         .notNull(),
-    participantKey: char({ length: 7 }).$type<GroupParticipantKey>().notNull(),
+    participantKey: char({ length: 7 })
+        .$type<ParallelExerciseKey>()
+        .notNull()
+        .unique(),
     // Participants will join this viewport
     joinViewportId: uuid().notNull(),
 });

@@ -13,7 +13,10 @@ import { AccessKeyService } from '../database/services/access-key-service.js';
 import { ExerciseService } from '../database/services/exercise-service.js';
 import { ExerciseManagerService } from '../database/services/exercise-manager-service.js';
 import type { Repositories } from '../database/repositories/index.js';
-import { actionProcessorDictionary } from './action-processors.js';
+import {
+    actionProcessorDictionary,
+    type ProcessEvent,
+} from './action-processors.js';
 
 const parallelExerciseId =
     'd4af4336-3c07-46f9-a2de-cdbd6c38785f' as ParallelExerciseId;
@@ -71,6 +74,7 @@ for (const parallelExerciseInstance of parallelExerciseInstances) {
     console.log(`INSTANCE ${parallelExerciseInstance.id}`);
 
     let exerciseRunning = false;
+    let previousEvent: ProcessEvent | null = null;
     for (const [i, actionEntry] of actions.entries()) {
         const action = actionEntry.actionString;
         applyAction(currentState, action);
@@ -83,14 +87,25 @@ for (const parallelExerciseInstance of parallelExerciseInstances) {
         if (!exerciseRunning) continue;
 
         const actionProcessor = actionProcessorDictionary[action.type];
+
         if (actionProcessor !== undefined) {
             const processEvent = actionProcessor.processFull(
                 currentState,
-                action
+                action,
+                i
             );
+            if (
+                actionProcessor.mergeSubsequent &&
+                previousEvent?.['concept:name'] === processEvent['concept:name']
+            ) {
+                previousEvent.endTime = currentState.currentTime;
+                continue;
+            }
+
             console.log(
                 `[EVENT] ${processEvent['time:timestamp']} ${processEvent['concept:name']} ${processEvent.verboseName}`
             );
+            previousEvent = processEvent;
             processEvents.push(processEvent);
         }
         if (action.type === '[Exercise] Pause') {

@@ -1,7 +1,6 @@
 import {
     getElement,
     getMeasureTemplate,
-    getMeasureTemplate,
     type ExerciseAction,
     type ExerciseState,
 } from 'fuesim-digital-shared';
@@ -13,36 +12,56 @@ export const processEventSchema = z.strictObject({
     verboseName: z.string(),
     'time:timestamp': z.string(),
     'case:concept:name': z.string(),
+    actionIndex: z.int().nonnegative(),
+    actionType: z.string(),
+    startTime: z.int().nonnegative(),
+    endTime: z.int().nonnegative(),
 });
 export type ProcessEvent = z.infer<typeof processEventSchema>;
 
 type ActionProcessorFunction<T extends ExerciseAction> = (
     currentState: ExerciseState,
     action: T
-) => Omit<ProcessEvent, 'case:concept:name' | 'time:timestamp'>;
+) => Omit<
+    ProcessEvent,
+    | 'actionIndex'
+    | 'actionType'
+    | 'case:concept:name'
+    | 'endTime'
+    | 'startTime'
+    | 'time:timestamp'
+>;
 
 class ActionProcessor<T extends ExerciseAction['type']> {
     public type: ExerciseAction['type'];
     public process: ActionProcessorFunction<ExerciseAction & { type: T }>;
+    public mergeSubsequent;
 
     processFull(
         currentState: ExerciseState,
-        action: ExerciseAction & { type: T }
+        action: ExerciseAction & { type: T },
+        actionIndex: number
     ): ProcessEvent {
         const partialEvent = this.process(currentState, action);
         return {
             ...partialEvent,
             'time:timestamp': new Date(currentState.currentTime).toISOString(),
             'case:concept:name': currentState.participantKey,
+            actionIndex,
+            actionType: action.type,
+            startTime: currentState.currentTime,
+            endTime: currentState.currentTime,
         };
     }
 
     public constructor(
         type: T,
-        processor: ActionProcessorFunction<ExerciseAction & { type: T }>
+        processor: ActionProcessorFunction<ExerciseAction & { type: T }>,
+        mergeSubsequent: boolean = false
     ) {
         this.type = type;
         this.process = processor;
+        this.mergeSubsequent = mergeSubsequent;
     }
 }
 
@@ -75,9 +94,17 @@ export const actionProcessors = [
             );
             return {
                 'concept:name': `[Scoutable] Viewed ${scoutable.name || scoutable.id}`,
-                verboseName: `${scoutable.name || 'Etwas'} erkundet`,
+                verboseName: `${scoutable.name || 'Etwas'} erkunden`,
             };
         }
+    ),
+    new ActionProcessor(
+        '[Patient] Set Visible Status',
+        (currentState, action) => ({
+            'concept:name': action.type,
+            verboseName: `Patienten vorsichten`,
+        }),
+        true
     ),
 ];
 

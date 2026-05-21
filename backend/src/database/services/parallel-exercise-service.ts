@@ -1,12 +1,12 @@
 import type {
-    GroupParticipantKey,
     ParallelExerciseId,
     SetAutojoinViewportAction,
+    ParallelExerciseKey,
 } from 'fuesim-digital-shared';
 import { parallelExerciseInstanceSummarySchema } from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
-import type { ParallelExerciseInsert } from '../schema.js';
+import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
 import {
     ApiError,
     NotFoundError,
@@ -14,7 +14,7 @@ import {
 } from '../../utils/http.js';
 import type { ParallelExerciseRepository } from '../repositories/parallel-exercise-repository.js';
 import type { ActiveExercise } from '../../exercise/active-exercise.js';
-import type { AccessKeyService } from './access-key-service.js';
+import { AccessKeyRepository } from '../repositories/access-key-repository.js';
 import type { ExerciseManagerService } from './exercise-manager-service.js';
 import type { ExerciseService } from './exercise-service.js';
 
@@ -26,16 +26,9 @@ export class ParallelExerciseService {
     public newJoin = new Subject<ParallelExerciseJoin>();
     public constructor(
         private readonly parallelExerciseRepository: ParallelExerciseRepository,
-        private readonly accessKeyService: AccessKeyService,
         private readonly exerciseManagerService: ExerciseManagerService,
         private readonly exerciseService: ExerciseService
     ) {}
-
-    public async generateParticipantKey() {
-        return (await this.accessKeyService.generateKey(
-            7
-        )) as GroupParticipantKey;
-    }
 
     public async getParallelExercisesOfOwner(session: SessionInformation) {
         return this.parallelExerciseRepository.getParallelExercisesOfOwner(
@@ -58,7 +51,7 @@ export class ParallelExerciseService {
         return parallelExercise;
     }
 
-    public async getParallelExerciseByParticipantKey(key: GroupParticipantKey) {
+    public async getParallelExerciseByParticipantKey(key: ParallelExerciseKey) {
         const parallelExercise =
             await this.parallelExerciseRepository.getParallelExerciseByParticipantKey(
                 key
@@ -70,7 +63,7 @@ export class ParallelExerciseService {
     }
 
     public async joinParallelExerciseByParticipantKey(
-        key: GroupParticipantKey
+        key: ParallelExerciseKey
     ) {
         const parallelExercise =
             await this.getParallelExerciseByParticipantKey(key);
@@ -102,21 +95,23 @@ export class ParallelExerciseService {
             'joinViewportId' | 'name' | 'templateId'
         >,
         session: SessionInformation
-    ) {
-        const created =
-            await this.parallelExerciseRepository.createParallelExercise({
+    ): Promise<ParallelExercise> {
+        return this.parallelExerciseRepository.transaction(async (tx) => {
+            const created = await tx.createParallelExercise({
                 ...data,
-                participantKey: await this.generateParticipantKey(),
+                participantKey: await new AccessKeyRepository(tx).generateKey(
+                    7
+                ),
                 user: session.user.id,
             });
-        if (!created) {
-            throw new ApiError();
-        }
-        const parallelExercise =
-            await this.parallelExerciseRepository.getParallelExerciseById(
+            if (!created) {
+                throw new ApiError();
+            }
+            const parallelExercise = await tx.getParallelExerciseById(
                 created.id
             );
-        return parallelExercise!;
+            return parallelExercise!;
+        });
     }
 
     public async updateParallelExercise(
@@ -171,7 +166,6 @@ export class ParallelExerciseService {
         );
 
         await this.parallelExerciseRepository.deleteParallelExerciseById(id);
-        await this.accessKeyService.free(parallelExercise.participantKey);
     }
 
     public async getParallelExerciseInstancesById(

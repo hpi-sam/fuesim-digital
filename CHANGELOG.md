@@ -10,6 +10,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - Deleting exercise templates which have exercise instances doesn't crash the server anymore.
+- Malformed database entries are no longer created when an exercise import fails.
 
 ## [0.12.0] - 2026-05-17
 

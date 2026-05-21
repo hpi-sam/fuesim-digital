@@ -114,6 +114,16 @@ for (const parallelExerciseInstance of parallelExerciseInstances) {
     }
 }
 
-fs.writeFile('events.json', JSON.stringify(processEvents), (err) => {
+const jsonContent = JSON.stringify(processEvents);
+fs.writeFile('events.json', jsonContent, (err) => {
     if (err) throw err;
 });
+
+const result = await fetch('http://localhost:4202/process', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: jsonContent,
+});
+console.log(await result.json());

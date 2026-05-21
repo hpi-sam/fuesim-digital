@@ -20,9 +20,10 @@ describe('Exercise-Service', () => {
     // In a naive implementation it can happen that such actions get removed from memory without being saved to the database.
     it('does not throw away actions while saving', async () => {
         const exerciseKeys = await createExercise(environment);
-        const exercise = environment.services.exerciseService.getExerciseByKey(
-            exerciseKeys.trainerKey
-        );
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseKeys.trainerKey
+            );
         const markAsAboutToBeSaved =
             exercise.markAsAboutToBeSaved.bind(exercise);
 
@@ -50,25 +51,25 @@ describe('Exercise-Service', () => {
             null
         );
 
-        const saveTick: () => Promise<void> = (
-            environment.server as any
-        ).saveTick.bind(environment.server);
-        await saveTick();
+        const saveUnsavedExercises = async () =>
+            environment.services.exerciseService.saveUnsavedExercises();
+        await saveUnsavedExercises();
 
         expect(markAsAboutToBeSavedMock).toHaveBeenCalledTimes(1);
         // one action still unsaved
         expect(exercise.temporaryActionHistory.length).toBe(1);
 
         markAsAboutToBeSaved();
-        await saveTick();
+        await saveUnsavedExercises();
         expect(markAsAboutToBeSavedMock).toHaveBeenCalledTimes(2);
         expect(exercise.temporaryActionHistory.length).toBe(0);
     });
     it('does correctly update lastUsedAt', async () => {
         const exerciseKeys = await createExercise(environment);
-        const exercise = environment.services.exerciseService.getExerciseByKey(
-            exerciseKeys.trainerKey
-        );
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseKeys.trainerKey
+            );
         const beforeAction = Date.now();
         exercise.applyAction(
             {
@@ -85,7 +86,7 @@ describe('Exercise-Service', () => {
             null
         );
 
-        await environment.server.saveTick();
+        await environment.services.exerciseService.saveUnsavedExercises();
 
         const exerciseEntry =
             await environment.repositories.exerciseRepository.getExerciseById(
@@ -99,13 +100,20 @@ describe('Exercise-Service', () => {
     });
     it('does correctly update lastUpdatedAt for exercise templates', async () => {
         const session = await createTestUserSession(environment);
+        const sessionInformation =
+            (await environment.services.authService.getDataFromSessionToken(
+                session
+            ))!;
+
         const exerciseTemplate = await createExerciseTemplate(
             environment,
             session
         );
-        const exercise = environment.services.exerciseService
-            .TESTING_getExerciseMap()
-            .get(exerciseTemplate.trainerKey)!;
+        const exercise =
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseTemplate.trainerKey,
+                sessionInformation
+            );
         const beforeAction = Date.now();
         exercise.applyAction(
             {
@@ -122,7 +130,7 @@ describe('Exercise-Service', () => {
             null
         );
 
-        await environment.server.saveTick();
+        await environment.services.exerciseService.saveUnsavedExercises();
 
         const exerciseTemplateEntry =
             await environment.repositories.exerciseRepository.getExerciseTemplateById(
@@ -135,5 +143,42 @@ describe('Exercise-Service', () => {
         expect(exerciseTemplateEntry!.lastUpdatedAt.getTime()).toBeLessThan(
             Date.now()
         );
+    });
+
+    describe('upkeep tick', () => {
+        it('unloads exercises with no clients', async () => {
+            const exerciseKeys = await createExercise(environment);
+            const exerciseMap =
+                environment.services.exerciseService.TESTING_getExerciseMap();
+            // Ensure exercise is loaded into in-memory map
+            await environment.services.exerciseService.getExerciseByKey(
+                exerciseKeys.trainerKey
+            );
+            expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(true);
+
+            await environment.server.exerciseUpkeepTick();
+
+            expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(false);
+            expect(exerciseMap.has(exerciseKeys.participantKey)).toBe(false);
+        });
+
+        it('keeps exercises with active clients', async () => {
+            const exerciseKeys = await createExercise(environment);
+            const exerciseMap =
+                environment.services.exerciseService.TESTING_getExerciseMap();
+
+            await environment.withWebsocket(async (socket) => {
+                const join = await socket.emit(
+                    'joinExercise',
+                    exerciseKeys.trainerKey,
+                    'Test'
+                );
+                expect(join.success).toBe(true);
+
+                await environment.server.exerciseUpkeepTick();
+
+                expect(exerciseMap.has(exerciseKeys.trainerKey)).toBe(true);
+            });
+        });
     });
 });

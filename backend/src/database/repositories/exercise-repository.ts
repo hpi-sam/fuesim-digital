@@ -1,5 +1,11 @@
-import type { ExerciseId, ExerciseTemplateId } from 'fuesim-digital-shared';
-import { ExerciseState } from 'fuesim-digital-shared';
+import type {
+    ExerciseId,
+    ExerciseKey,
+    ExerciseTemplateId,
+    ParticipantKey,
+    TrainerKey,
+} from 'fuesim-digital-shared';
+import { ExerciseState, isTrainerKey } from 'fuesim-digital-shared';
 import { getTableColumns, sql, eq, lt, and, isNull, desc } from 'drizzle-orm';
 import type { ExerciseInsert, ExerciseTemplateInsert } from '../schema.js';
 import { exerciseTable, exerciseTemplateTable } from '../schema.js';
@@ -38,6 +44,25 @@ export class ExerciseRepository extends BaseRepository {
     public async getExerciseById(id: ExerciseId) {
         return this.onlySingle(
             await this.exerciseQuery.where(eq(exerciseTable.id, id))
+        );
+    }
+
+    public async getExerciseByKey(key: ExerciseKey) {
+        if (isTrainerKey(key)) return this.getExerciseByTrainerKey(key);
+        return this.getExerciseByParticipantKey(key);
+    }
+
+    public async getExerciseByTrainerKey(key: TrainerKey) {
+        return this.onlySingle(
+            await this.exerciseQuery.where(eq(exerciseTable.trainerKey, key))
+        );
+    }
+
+    public async getExerciseByParticipantKey(key: ParticipantKey) {
+        return this.onlySingle(
+            await this.exerciseQuery.where(
+                eq(exerciseTable.participantKey, key)
+            )
         );
     }
 

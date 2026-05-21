@@ -1,5 +1,5 @@
 <div class="row h-100">
-    <div class="col-md-2 h-00" style="overflow-y: scroll">
+    <div class="col-md-8 col-md-5 h-100" style="overflow-y: scroll">
         <div class="cards">
             @for (patient of this.patients(); track patient.id) {
                 <app-simulated-region-preview-card
@@ -9,33 +9,41 @@
                     [title]="patient.identifier"
                     (elementMousedown)="selectPatient(patient)"
                 >
-                    @if (selectedPatients().includes(patient)) {
-                        <button
-                            class="btn btn-outline-success p-1 ms-5"
-                            (click)="removePatient(patient.id)"
-                        >
-                            <i class="bi bi-check"></i>
-                        </button>
-                    } @else {
-                        <button
-                            class="btn btn-outline-secondary p-1 ms-5"
-                            (click)="addPatient(patient)"
-                        ></button>
-                    }
+                    <div class="d-flex">
+                        <div class="flex-grow-1"></div>
+                        @if (selectedPatients().includes(patient)) {
+                            <button
+                                style="max-width: 25%; min-width: 25%"
+                                class="btn btn-outline-success p-1 me-2"
+                                (click)="removePatient(patient.id)"
+                            >
+                                <i class="bi bi-check2-square"></i>
+                            </button>
+                        } @else {
+                            <button
+                                style="max-width: 25%; min-width: 25%"
+                                class="btn btn-outline-secondary p-1 me-2"
+                                (click)="addPatient(patient)"
+                            >
+                                <i class="bi bi-square"></i>
+                            </button>
+                        }
+                    </div>
                 </app-simulated-region-preview-card>
             }
         </div>
-        <div class="h-100" style="border-left: 1px solid darkgrey">
-            @if (selected(); as selected) {
-                <h4>
-                    Patient <app-patient-header [patientId]="selected.id" />
-                </h4>
-                <app-patients-details
-                    class="overflow-auto w-100 d-inline-block flex-grow-1"
-                    [patientId]="selected.id"
-                />
-                <!-- TODO @JohannesPotzi : app-criterion-form-patient-interaction-bar -->
-            }
-        </div>
+    </div>
+    <div class="col-md-4 h-100" style="border-left: 1px solid darkgrey">
+        @if (selected(); as selected) {
+            <h4>Patient <app-patient-header [patientId]="selected.id" /></h4>
+            <app-patients-details
+                class="overflow-auto w-100 d-inline-block flex-grow-1"
+                [patientId]="selected.id"
+            />
+            <app-didactic-overview-patient-interaction-bar
+                [patient]="selected"
+                (targetPatient)="addPatient($event)"
+            />
+        }
     </div>
 </div>

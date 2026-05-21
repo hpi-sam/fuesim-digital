@@ -122,7 +122,9 @@
                     </form>
                 }
                 @case ('patientAtStatusEvalCriterion') {
-                    <app-patient-at-sk-criterion />
+                    <app-patient-at-sk-criterion
+                        (selectedPatientsOut)="addPatients($event)"
+                    />
                 }
                 @case ('viewScoutableEvalCriterion') {
                     <form class="ms-2">

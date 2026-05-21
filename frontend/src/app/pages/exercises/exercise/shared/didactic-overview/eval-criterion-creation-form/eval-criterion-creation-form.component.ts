@@ -2,17 +2,20 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
+    Patient,
     PatientStatus,
     patientStatusAllowedValues,
     statusNames,
     TechnicalChallenge,
     TechnicalChallengeId,
     TechnicalChallengeStateId,
+    UUID,
 } from 'fuesim-digital-shared';
 import {
     EvalCriterion,
     type EvalcriterionType,
     evalCriterionTypesNames,
+    newPatientAtStatusEvalCriterion,
     newReachTechnicalChallengeStateEvalCriterion,
     newXPatientsAtStatusEvalCriterion,
 } from '../../../../../../../../../shared/dist/models/evaluation-criterion';
@@ -25,7 +28,9 @@ import { PatientAtSKCriterionComponent } from './patient-at-sk-criterion/patient
 
 interface InputData {
     countInput: number;
+    targetPatients: Patient[];
     patientStatusInput: PatientStatus;
+    patientTargetStatusMap: { [id: UUID]: PatientStatus };
     technicalChallengeId: TechnicalChallengeId | '';
     targetTechnicalChallengeState: TechnicalChallengeStateId | '';
 }
@@ -70,15 +75,25 @@ export class EvalCriterionCreationForm {
     public countInput: number | null = null;
     readonly inputModel = signal<InputData>({
         countInput: 0,
+        targetPatients: [],
         patientStatusInput: 'black',
+        patientTargetStatusMap: {},
         technicalChallengeId: '',
         targetTechnicalChallengeState: '',
     });
     criterionForm = form(this.inputModel);
-    private async createCriterions(criterions: EvalCriterion[]) {
+    public addPatients(patients: Patient[]) {
+        patients = patients.filter(
+            (pat) => !this.criterionForm.targetPatients().value().includes(pat)
+        );
+        this.criterionForm
+            .targetPatients()
+            .value.update((vals) => [...vals, ...patients]);
+    }
+    private async createCriteria(criteria: EvalCriterion[]) {
         await this.exerciseService.proposeAction({
             type: '[EvalCriterion] New Criterions',
-            criterions: criterions,
+            criterions: criteria,
         });
     }
     public submitCriterion(criterionType: EvalcriterionType) {
@@ -89,7 +104,7 @@ export class EvalCriterionCreationForm {
                     this.criterionForm.countInput().value(),
                     this.criterionForm.patientStatusInput().value()
                 );
-                this.createCriterions([criterion]);
+                this.createCriteria([criterion]);
                 break;
             }
             case 'reachTechnicalChallengeStateEvalCriterion': {
@@ -103,8 +118,36 @@ export class EvalCriterionCreationForm {
                             this.selectedTechnicalChallenge()!.id,
                             stateId
                         );
-                    this.createCriterions([criterion]);
+                    this.createCriteria([criterion]);
                 }
+                break;
+            }
+            case 'patientAtStatusEvalCriterion': {
+                const criteria = this.criterionForm
+                    .targetPatients()
+                    .value()
+                    .map((pat) =>
+                        newPatientAtStatusEvalCriterion(
+                            'Patient ' +
+                                pat.identifier +
+                                'mit Sichtungskategorie',
+                            pat.id,
+                            this.criterionForm.patientStatusInput().value()
+                        )
+                    );
+                this.createCriteria(criteria);
+                break;
+            }
+            case 'viewScoutableEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'doMeasureXTimesEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
+                break;
+            }
+            case 'combinedEvalCriterion': {
+                /* TODO @JohannesPotzi @Jogius */
                 break;
             }
             default:

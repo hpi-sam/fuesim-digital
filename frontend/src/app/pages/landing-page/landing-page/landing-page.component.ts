@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import {
     isAccessKey,
     isExerciseKey,
-    isGroupParticipantKey,
+    isParallelExerciseKey,
     type ExportImportFile,
 } from 'fuesim-digital-shared';
 import { escapeRegExp } from 'lodash-es';
@@ -75,7 +75,7 @@ export class LandingPageComponent {
                             return (
                                 await this.apiService.exerciseExists(params)
                             ).exists;
-                        } else if (isGroupParticipantKey(params)) {
+                        } else if (isParallelExerciseKey(params)) {
                             return (
                                 await this.apiService.parallelExerciseExists(
                                     params
@@ -180,7 +180,7 @@ export class LandingPageComponent {
         const key = this.model().joinKey;
         if (isExerciseKey(key)) {
             this.router.navigate(['/exercises', this.model().joinKey]);
-        } else if (isGroupParticipantKey(key)) {
+        } else if (isParallelExerciseKey(key)) {
             this.router.navigate([
                 '/exercises/parallel/join',
                 this.model().joinKey,

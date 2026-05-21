@@ -6,7 +6,7 @@ import {
     parallelExerciseIdSchema,
     postJoinParallelExerciseResponseDataSchema,
     patchParallelExerciseRequestDataSchema,
-    isGroupParticipantKey,
+    isParallelExerciseKey,
     exerciseExistsResponseDataSchema,
 } from 'fuesim-digital-shared';
 import { isAuthenticatedMiddleware } from '../utils/http-handlers.js';
@@ -64,7 +64,7 @@ export function createParallelExerciseRouter(
         .route('/join/:key')
         .all(areParallelExercisesEnabled)
         .get(async (req, res) => {
-            if (!isGroupParticipantKey(req.params.key)) {
+            if (!isParallelExerciseKey(req.params.key)) {
                 throw new ApiError();
             }
             let exercise = null;
@@ -85,7 +85,7 @@ export function createParallelExerciseRouter(
             );
         })
         .post(async (req, res) => {
-            if (!isGroupParticipantKey(req.params.key)) throw new ApiError();
+            if (!isParallelExerciseKey(req.params.key)) throw new ApiError();
             const exercise =
                 await parallelExerciseService.joinParallelExerciseByParticipantKey(
                     req.params.key

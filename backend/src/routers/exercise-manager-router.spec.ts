@@ -79,6 +79,35 @@ describe('exercise manager router', () => {
             );
             expect(parsed.lastUsedAt.getTime()).toBeLessThan(Date.now());
         });
+        it('works with deleted base templates', async () => {
+            const exerciseTemplate = await createExerciseTemplate(
+                environment,
+                session
+            );
+            await environment
+                .httpRequest(
+                    'post',
+                    `/api/exercise_templates/${exerciseTemplate.id}/new`,
+                    session
+                )
+                .expect(201);
+            await environment
+                .httpRequest(
+                    'delete',
+                    `/api/exercise_templates/${exerciseTemplate.id}`,
+                    session
+                )
+                .expect(204);
+
+            const response = await environment
+                .httpRequest('get', '/api/exercises', session)
+                .expect(200);
+            const parsed = getExercisesResponseDataSchema.parse(
+                response.body
+            )[0]!;
+
+            expect(parsed.baseTemplate).toBe(null);
+        });
     });
     describe('POST /api/exercise_templates', () => {
         it('fails with 403 if not authenticated', async () => {

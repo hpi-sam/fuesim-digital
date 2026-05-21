@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Fixed
+
+- Deleting exercise templates which have exercise instances doesn't crash the server anymore.
+
 ## [0.12.0] - 2026-05-17
 
 ### Added

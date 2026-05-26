@@ -1,4 +1,12 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    effect,
+    inject,
+    Signal,
+    signal,
+    WritableSignal,
+} from '@angular/core';
 import {
     NgbActiveModal,
     NgbDropdown,
@@ -20,7 +28,12 @@ import {
     evalCriterionTypesNames,
     XPatientsAtStatusEvalCriterion,
 } from '../../../../../../../../../shared/dist/models/evaluation-criterion';
-import { type UUID, statusNames } from 'fuesim-digital-shared';
+import {
+    type EvalResult,
+    Patient,
+    type UUID,
+    statusNames,
+} from 'fuesim-digital-shared';
 @Component({
     selector: 'app-didactic-overview',
     templateUrl: './didactic-overview-modal.component.html',
@@ -37,23 +50,16 @@ import { type UUID, statusNames } from 'fuesim-digital-shared';
 export class DidacticOverviewModalComponent {
     private readonly activeModal = inject(NgbActiveModal);
     private readonly store = inject<Store<AppState>>(Store);
-    public readonly results = this.store.selectSignal(selectEvalResults);
-    public readonly resultValues = signal(Object.values(this.results()));
-    updatesCount = 0;
+    public readonly results = computed(() =>
+        Object.values(this.store.selectSignal(selectEvalResults)())
+    ) as Signal<EvalResult[]>;
+
     creatingcriterion = false;
     public readonly evalCriterionTypes = evalCritrionTypes;
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
     public readonly statusNames = statusNames;
     /* this is set on selection of the criterion type to be created. */
     criterionCreationType!: EvalcriterionType;
-    constructor() {
-        effect(() => {
-            if (this.results()) {
-                this.resultValues.set(Object.values(this.results()));
-                this.updatesCount += 1;
-            }
-        });
-    }
     getTypedCriterion(id: UUID) {
         return this.store.selectSignal(
             createSelectEvalCriterion(id)

@@ -42,36 +42,43 @@
                 Es sind aktuell keine Auswertungskriterien festgelegt.
             </p>
         } @else {
-            @for (result of this.resultValues(); track result.criterionId) {
+            @for (result of this.results(); track result.criterionId) {
                 <div class="card col-3 p-0 rounded-0" style="min-width: 600px">
-                    <span class="ms-1"
-                        >{{ result.criterion.name }}
-                        @if (
-                            result.criterion.criterionType ===
-                            'xPatientsAtStatusEvalCriterion'
-                        ) {
-                            {{ statusNames[result.criterion.targetStatus] }}
-                        }
-                        @if (
-                            result.criterion.criterionType ===
-                                'doMeasureXTimesEvalCriterion' ||
-                            result.criterion.criterionType ===
+                    <div class="d-flex mx-2">
+                        <span class="ms-1"
+                            >{{ result.criterion.name }}
+                            @if (
+                                result.criterion.criterionType ===
                                 'xPatientsAtStatusEvalCriterion'
-                        ) {
-                            {{
-                                ': (' +
-                                    result.count +
-                                    '/' +
-                                    result.criterion.count +
-                                    ')'
-                            }}
+                            ) {
+                                {{ statusNames[result.criterion.targetStatus] }}
+                            }
+                            @if (
+                                result.criterion.criterionType ===
+                                    'doMeasureXTimesEvalCriterion' ||
+                                result.criterion.criterionType ===
+                                    'xPatientsAtStatusEvalCriterion'
+                            ) {
+                                {{
+                                    ': (' +
+                                        result.count +
+                                        '/' +
+                                        result.criterion.count +
+                                        ')'
+                                }}
+                            }
+                        </span>
+                        <div class="flex-grow-1"></div>
+                        @if (result.isCompleted) {
+                            <button class="btn btn-success mt-1 mb-1" disabled>
+                                <i class="bi bi-check"></i>
+                            </button>
+                        } @else {
+                            <button class="btn btn-danger mt-1 mb-1" disabled>
+                                <i class="bi bi-x-lg"></i>
+                            </button>
                         }
-                    </span>
-                    @if (result.isCompleted) {
-                        <i class="bi bi-check"></i>
-                    } @else {
-                        <i class="bi bi-x-lg"></i>
-                    }
+                    </div>
                 </div>
             }
         }

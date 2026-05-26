@@ -51,6 +51,13 @@
         >
             Krankenhäuser
         </button>
+        <button
+            (click)="openOperationsTabletModal()"
+            class="btn btn-outline-primary"
+            data-cy="trainerToolbarOperationsTabletButton"
+        >
+            Einsatztablet
+        </button>
     } @else {
         <div ngbDropdown placement="top-start" class="d-inline-block">
             <button
@@ -114,6 +121,14 @@
                     data-cy="trainerToolbarControlCenterButton"
                 >
                     Leitstelle
+                </button>
+                <button
+                    ngbDropdownItem
+                    (click)="openOperationsTabletModal()"
+                    class="btn btn-primary"
+                    data-cy="trainerToolbarOperationsTabletButton"
+                >
+                    Einsatztablet
                 </button>
                 <button
                     ngbDropdownItem

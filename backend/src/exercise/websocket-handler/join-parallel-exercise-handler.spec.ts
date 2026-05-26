@@ -159,11 +159,10 @@ describe('join parallel exercise', () => {
                 const responsePromise = socket.waitOn(
                     'updateExerciseInstances'
                 );
-                await clientSocket.emit(
-                    'joinExercise',
-                    joinedParticipant.participantKey,
-                    clientName
-                );
+                await clientSocket.emit('joinExercise', {
+                    exerciseKey: joinedParticipant.participantKey,
+                    clientName,
+                });
 
                 const response = await responsePromise;
                 expect(response.exerciseInstances.length).toBe(1);
@@ -193,11 +192,10 @@ describe('join parallel exercise', () => {
                 const responsePromise = socket.waitOn(
                     'updateExerciseInstances'
                 );
-                await clientSocket.emit(
-                    'joinExercise',
-                    joinedParticipant.participantKey,
-                    clientName
-                );
+                await clientSocket.emit('joinExercise', {
+                    exerciseKey: joinedParticipant.participantKey,
+                    clientName,
+                });
 
                 await responsePromise;
             });
@@ -228,18 +226,16 @@ describe('join parallel exercise', () => {
             );
 
             await environment.withWebsocket(async (clientSocket1) => {
-                await clientSocket1.emit(
-                    'joinExercise',
-                    joinedParticipant1.participantKey,
-                    ''
-                );
+                await clientSocket1.emit('joinExercise', {
+                    exerciseKey: joinedParticipant1.participantKey,
+                    clientName: '',
+                });
 
                 await environment.withWebsocket(async (clientSocket2) => {
-                    await clientSocket2.emit(
-                        'joinExercise',
-                        joinedParticipant2.participantKey,
-                        ''
-                    );
+                    await clientSocket2.emit('joinExercise', {
+                        exerciseKey: joinedParticipant2.participantKey,
+                        clientName: '',
+                    });
 
                     await socket.emit('controlParallelExercise', 'start');
 

@@ -72,4 +72,11 @@ export class ClientOverviewTableComponent {
             shouldBeInWaitingRoom,
         });
     }
+
+    public removeClient(clientId: UUID): void {
+        this.exerciseService.proposeAction({
+            type: '[Client] Remove client',
+            clientId,
+        });
+    }
 }

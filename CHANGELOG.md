@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Changed
+
+- Clients now automatically rejoin the exercise with the same view and role when disconnecting due to network issues / reloads.
+
 ### Fixed
 
 - The server no longer crashes on startup when using `DFM_USE_DB=false`

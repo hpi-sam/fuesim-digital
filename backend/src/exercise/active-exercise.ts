@@ -219,6 +219,39 @@ export class ActiveExercise {
         }
     }
 
+    public setClientInactive(clientWrapper: ExerciseClientWrapper) {
+        if (!this.clients.has(clientWrapper)) {
+            return;
+        }
+        const client = clientWrapper.client!;
+        const inactiveAction: ExerciseAction = {
+            type: '[Client] Set client inactive',
+            clientId: client.id,
+        };
+        this.applyAction(inactiveAction, client.id, () => {
+            this.clients.delete(clientWrapper);
+        });
+        if (
+            this.clients.size === 0 &&
+            this.exercise.currentStateString.currentStatus === 'running' &&
+            this.exercise.parallelExerciseId === null
+        ) {
+            this.applyAction({ type: '[Exercise] Pause' }, null);
+        }
+    }
+
+    public reactivateClient(clientWrapper: ExerciseClientWrapper) {
+        if (clientWrapper.client === undefined) {
+            return;
+        }
+        const reactivateAction: ExerciseAction = {
+            type: '[Client] Reactivate client',
+            clientId: clientWrapper.client.id,
+        };
+        this.applyAction(reactivateAction, clientWrapper.client.id);
+        this.clients.add(clientWrapper);
+    }
+
     public start() {
         this.tickHandler.start();
     }

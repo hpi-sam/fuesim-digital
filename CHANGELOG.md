@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Added
+
+- There are now notifications when viewing an exercise replay whenever a measure is taken or a scoutable element is viewed.
+
 ### Changed
 
 - Trainers now have access to the 'Einsatzübersicht' in Exercises and Exercise Templates.

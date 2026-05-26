@@ -14,7 +14,7 @@ export class TimeJumpHelper {
 
     constructor(private readonly exerciseTimeLine: ExerciseTimeline) {
         this.exerciseStateCache.add(exerciseTimeLine.initialState.currentTime, {
-            state: exerciseTimeLine.initialState,
+            state: { ...exerciseTimeLine.initialState, logEntries: [] },
             nextActionIndex: 0,
         });
     }

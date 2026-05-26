@@ -3,20 +3,24 @@
         class="btn btn-outline-danger ms-1"
         type="button"
         (click)="deleteSelectedPatient()"
+        [disabled]="this.deleteDisabled"
     >
         <span class="bi bi-trash me-1"></span>
         Patient Löschen
     </button>
     <button
         class="btn btn-outline-success ms-1"
-        (click)="targetPatient.emit(this.patient())"
-        [disabled]="this.deleteDisabled"
+        (click)="targetPatient.emit(this.patient()); emitTargetStatus()"
     >
         Auswählen
     </button>
     <div ngbDropdown class="d-inline-block">
         <button ngbDropdownToggle class="btn btn-outline-primary ms-3">
-            Ziel SK
+            @if (this.selectedTargetStatus(); as status) {
+                Ziel: <app-patient-status-badge [status]="status" />
+            } @else {
+                Ziel SK
+            }
         </button>
         <div ngbDropdownMenu class="position-absolute">
             @for (value of this.patientStatusAllowedValues; track value) {

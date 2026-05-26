@@ -8,7 +8,14 @@ import {
 } from '@angular/core';
 import { createSelector, Store } from '@ngrx/store';
 import { AppState } from '../../../../../../../state/app.state';
-import { getPatientVisibleStatus, Patient, UUID } from 'fuesim-digital-shared';
+import {
+    getPatientVisibleStatus,
+    Patient,
+    PatientStatus,
+    patientStatusAllowedValues,
+    statusNames,
+    UUID,
+} from 'fuesim-digital-shared';
 import {
     selectConfiguration,
     selectPatients,
@@ -18,6 +25,15 @@ import { SimulatedRegionPreviewCardComponent } from '../../../simulation/trainer
 import { PatientHeaderComponent } from '../../../../../../../shared/components/patient-header/patient-header.component';
 import { PatientsDetailsComponent } from '../../../../../../../shared/components/patients-details/patients-details.component';
 import { DidacticOverviewPatientInteractionBarComponent } from './interaction-bar/didactic-overview-patient-interaction-bar.component';
+import { PatientStatusBadgeComponent } from '../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
+import {
+    NgbDropdown,
+    NgbDropdownButtonItem,
+    NgbDropdownItem,
+    NgbDropdownMenu,
+    NgbDropdownToggle,
+} from '@ng-bootstrap/ng-bootstrap';
+import { elementAt } from 'rxjs';
 
 @Component({
     selector: 'app-patient-at-sk-criterion',
@@ -28,14 +44,30 @@ import { DidacticOverviewPatientInteractionBarComponent } from './interaction-ba
         PatientHeaderComponent,
         PatientsDetailsComponent,
         DidacticOverviewPatientInteractionBarComponent,
+        PatientStatusBadgeComponent,
+        NgbDropdown,
+        NgbDropdownToggle,
+        NgbDropdownMenu,
+        NgbDropdownButtonItem,
+        NgbDropdownItem,
     ],
 })
 export class PatientAtSKCriterionComponent {
     readonly selectedPatientsOut = output<Patient[]>();
+    readonly selectedPatientStatusMapOut = output<{
+        [id: UUID]: PatientStatus;
+    }>();
 
     private readonly store = inject<Store<AppState>>(Store);
     readonly selected = signal<Patient | null>(null);
     readonly selectedPatients = signal<Patient[]>([]);
+    readonly selectedTargetStatus = signal<PatientStatus | null>(null);
+    readonly selectedPatientStatusMap = signal<{
+        [id: UUID]: PatientStatus;
+    }>({});
+
+    public readonly patientStatusAllowedValues = patientStatusAllowedValues;
+    public readonly statusNames = statusNames;
 
     readonly patients = computed(() =>
         this.store.selectSignal(
@@ -71,17 +103,27 @@ export class PatientAtSKCriterionComponent {
                     this.selected.set(null);
                 }
             }
-            if (this.selectedPatients()) {
-                this.selectedPatientsOut.emit(this.selectedPatients());
-            }
         });
     }
-    addPatient(patient: Patient) {
-        this.selectedPatients.update((pat) => {
-            return [...pat, patient];
-        });
+    public selectPatient(patient: Patient) {
+        const currentlySelected = this.selected();
+        if (currentlySelected?.id === patient.id) {
+            this.selected.set(null);
+        } else {
+            this.selected.set(patient);
+        }
     }
-    removePatient(patientId: UUID) {
+    public addPatient(patient: Patient) {
+        if (this.selectedPatients().find((pat) => pat.id === patient.id)) {
+            this.removePatient(patient.id);
+        } else {
+            this.selectedPatients.update((pat) => {
+                return [...pat, patient];
+            });
+            this.selectedPatientsOut.emit(this.selectedPatients());
+        }
+    }
+    public removePatient(patientId: UUID) {
         this.selectedPatients.update((patients) => {
             patients.splice(
                 patients.findIndex((pat) => pat.id === patientId),
@@ -89,13 +131,29 @@ export class PatientAtSKCriterionComponent {
             );
             return patients;
         });
+        this.selectedPatientsOut.emit(this.selectedPatients());
     }
-    selectPatient(patient: Patient) {
-        const currentlySelected = this.selected();
-        if (currentlySelected?.id === patient.id) {
-            this.selected.set(null);
-        } else {
-            this.selected.set(patient);
+    public updateSelectedPatientStatusMap(
+        id: UUID,
+        status: PatientStatus | null
+    ) {
+        if (!this.selectedPatients().find((pat) => pat.id === id)) {
+            console.log(
+                'trying to assign a PatientStatus to a Patient not in selection.'
+            );
+            return;
         }
+        if (this.selectedPatientStatusMap()[id] === status) {
+            return;
+        }
+        this.selectedPatientStatusMap.update((val) => {
+            if (!status) {
+                delete val[id];
+            } else {
+                val[id] = status;
+            }
+            return val;
+        });
+        this.selectedPatientStatusMapOut.emit(this.selectedPatientStatusMap());
     }
 }

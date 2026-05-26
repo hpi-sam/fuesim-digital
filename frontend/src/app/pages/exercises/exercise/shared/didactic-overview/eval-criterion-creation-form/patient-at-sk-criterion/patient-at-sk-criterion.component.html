@@ -1,3 +1,23 @@
+<div ngbDropdown class="d-inline-block">
+    <button ngbDropdownToggle class="btn btn-outline-primary ms-3">
+        @if (this.selectedTargetStatus(); as status) {
+            Ziel: <app-patient-status-badge [status]="status" />
+        } @else {
+            Ziel SK auswählen
+        }
+    </button>
+    <div ngbDropdownMenu class="position-absolute">
+        @for (value of this.patientStatusAllowedValues; track value) {
+            <button
+                ngbDropdownItem
+                (click)="this.selectedTargetStatus.set(value)"
+            >
+                {{ this.statusNames[value] }}
+            </button>
+        }
+    </div>
+</div>
+<hr />
 <div class="row h-100">
     <div class="col-md-8 col-md-5 h-100" style="overflow-y: scroll">
         <div class="cards">
@@ -15,7 +35,13 @@
                             <button
                                 style="max-width: 25%; min-width: 25%"
                                 class="btn btn-outline-success p-1 me-2"
-                                (click)="removePatient(patient.id)"
+                                (click)="
+                                    removePatient(patient.id);
+                                    updateSelectedPatientStatusMap(
+                                        patient.id,
+                                        null
+                                    )
+                                "
                             >
                                 <i class="bi bi-check2-square"></i>
                             </button>
@@ -23,7 +49,13 @@
                             <button
                                 style="max-width: 25%; min-width: 25%"
                                 class="btn btn-outline-secondary p-1 me-2"
-                                (click)="addPatient(patient)"
+                                (click)="
+                                    addPatient(patient);
+                                    updateSelectedPatientStatusMap(
+                                        patient.id,
+                                        this.selectedTargetStatus()
+                                    )
+                                "
                             >
                                 <i class="bi bi-square"></i>
                             </button>

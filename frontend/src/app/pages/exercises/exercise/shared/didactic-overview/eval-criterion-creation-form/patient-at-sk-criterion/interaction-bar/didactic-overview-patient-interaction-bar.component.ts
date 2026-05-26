@@ -15,6 +15,7 @@ import {
     NgbDropdownMenu,
     NgbDropdownToggle,
 } from '@ng-bootstrap/ng-bootstrap';
+import { PatientStatusBadgeComponent } from '../../../../../../../../shared/components/patient-status-badge/patient-status-badge.component';
 
 @Component({
     selector: 'app-didactic-overview-patient-interaction-bar',
@@ -26,6 +27,7 @@ import {
         NgbDropdownMenu,
         NgbDropdownButtonItem,
         NgbDropdownItem,
+        PatientStatusBadgeComponent,
     ],
 })
 export class DidacticOverviewPatientInteractionBarComponent {
@@ -41,6 +43,12 @@ export class DidacticOverviewPatientInteractionBarComponent {
     readonly targetPatient = output<Patient>();
     readonly targetStatus = output<PatientStatus>();
     readonly selectedTargetStatus = signal<PatientStatus | null>(null);
+
+    public emitTargetStatus() {
+        if (this.selectedTargetStatus()) {
+            this.targetStatus.emit(this.selectedTargetStatus()!);
+        }
+    }
 
     public async deleteSelectedPatient() {
         await this.exerciseService.proposeAction({

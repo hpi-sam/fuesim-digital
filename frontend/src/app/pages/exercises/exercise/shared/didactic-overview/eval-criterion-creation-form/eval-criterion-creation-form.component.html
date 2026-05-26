@@ -124,6 +124,9 @@
                 @case ('patientAtStatusEvalCriterion') {
                     <app-patient-at-sk-criterion
                         (selectedPatientsOut)="addPatients($event)"
+                        (selectedPatientStatusMapOut)="
+                            updateSelectedPatientStatusMap($event)
+                        "
                     />
                 }
                 @case ('viewScoutableEvalCriterion') {

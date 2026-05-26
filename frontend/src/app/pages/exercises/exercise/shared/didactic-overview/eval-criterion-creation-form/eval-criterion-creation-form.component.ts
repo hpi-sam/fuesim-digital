@@ -55,6 +55,9 @@ interface InputData {
 export class EvalCriterionCreationForm {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
+
+    public readonly criterionCreationType = input.required<EvalcriterionType>();
+
     private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
     public readonly technicalChallenges = signal(Object.values(this.tcs()));
     public readonly selectedTechnicalChallengeStates = computed(() => {
@@ -67,8 +70,10 @@ export class EvalCriterionCreationForm {
         }
         return null;
     });
+    readonly selectedPatientStatusMap = signal<{
+        [id: UUID]: PatientStatus;
+    }>({});
 
-    public readonly criterionCreationType = input.required<EvalcriterionType>();
     public readonly evalCriterionTypesNames = evalCriterionTypesNames;
     public readonly patientStatusAllowedValues = patientStatusAllowedValues;
     public readonly statusNames = statusNames;
@@ -89,6 +94,46 @@ export class EvalCriterionCreationForm {
         this.criterionForm
             .targetPatients()
             .value.update((vals) => [...vals, ...patients]);
+    }
+    public updateSelectedPatientStatusMapEntry(
+        id: UUID,
+        status: PatientStatus | null
+    ) {
+        if (
+            !this.criterionForm
+                .targetPatients()
+                .value()
+                .find((pat) => pat.id === id)
+        ) {
+            console.log(
+                'trying to assign a PatientStatus to a Patient not in selection.'
+            );
+            return;
+        }
+        if (this.selectedPatientStatusMap()[id] === status) {
+            return;
+        }
+        this.selectedPatientStatusMap.update((val) => {
+            if (!status) {
+                delete val[id];
+            } else {
+                val[id] = status;
+            }
+            return val;
+        });
+    }
+    public updateSelectedPatientStatusMap(mapIn: {
+        [id: UUID]: PatientStatus;
+    }) {
+        const patients = this.criterionForm.targetPatients().value();
+        const patientCount = patients.length;
+        for (let i = 0; i < patientCount; i += 1) {
+            const id = patients[i]!.id;
+            const status = mapIn[id];
+            if (status) {
+                this.updateSelectedPatientStatusMapEntry(id, status);
+            }
+        }
     }
     private async createCriteria(criteria: EvalCriterion[]) {
         await this.exerciseService.proposeAction({
@@ -132,15 +177,18 @@ export class EvalCriterionCreationForm {
                 const criteria = this.criterionForm
                     .targetPatients()
                     .value()
-                    .map((pat) =>
-                        newPatientAtStatusEvalCriterion(
+                    .map((pat) => {
+                        let status =
+                            this.selectedPatientStatusMap()[pat.id] ?? 'black';
+                        return newPatientAtStatusEvalCriterion(
                             'Patient ' +
                                 pat.identifier +
-                                'mit Sichtungskategorie',
+                                ' erreicht Status ' +
+                                statusNames[status],
                             pat.id,
-                            this.criterionForm.patientStatusInput().value()
-                        )
-                    );
+                            status
+                        );
+                    });
                 this.createCriteria(criteria);
                 break;
             }

@@ -24,7 +24,6 @@ export class InviteMemberModalComponent {
     public readonly created = output<boolean>();
 
     public async invite() {
-        // await this.apiService.createOrganisation(this.model());
         const inviteLink = await this.apiService.createOrganisationInviteLink(
             this.organisation()!.id
         );

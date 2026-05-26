@@ -5,7 +5,6 @@ import type {
 } from 'express';
 import { toFrontend } from '../utils/frontend-http-helper.js';
 import { Config } from '../config.js';
-import type { OrganisationService } from '../database/services/organisation-service.js';
 import type { AuthService } from './auth-service.js';
 
 export namespace OidcService {
@@ -25,10 +24,7 @@ export class OidcService {
     private _publicUrl: string = Config.httpBackendUrl;
     private static readonly redirectPath = '/api/auth/oidc-callback';
 
-    public constructor(
-        private readonly authService: AuthService,
-        private readonly organisationService: OrganisationService
-    ) {}
+    public constructor(private readonly authService: AuthService) {}
 
     public get config(): oidc.Configuration {
         if (this._config === null) {
@@ -194,7 +190,7 @@ export class OidcService {
             accessToken: tokens.access_token,
         });
 
-        await this.authService.ensureUser(userInfo);
+        await this.authService.onLoginSuccess(userInfo);
 
         const returnTo =
             state.length > this.OIDC_RANDOM_STATE_LENGTH

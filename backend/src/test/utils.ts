@@ -247,7 +247,10 @@ export function createTestEnvironment(): TestEnvironment {
             databaseService.databaseConnection
         );
 
-        organisationService = new OrganisationService(organisationRepository);
+        organisationService = new OrganisationService(
+            organisationRepository,
+            userRepository
+        );
         authService = await new AuthService(
             userRepository,
             sessionRepository,

@@ -14,10 +14,10 @@
     <ul class="list-group list-group-flush">
         <li class="list-group-item d-flex small">
             @if (organisation().personalOrganisationOf) {
-                <span class="badge bg-primary"
-                    ><i class="bi bi-house me-1"></i> Persönliche
-                    Organisation</span
-                >
+                <span class="badge bg-primary">
+                    <i class="bi bi-house me-1"></i>
+                    Persönliche Organisation
+                </span>
             } @else {
                 @if (organisation().description) {
                     {{ organisation().description }}

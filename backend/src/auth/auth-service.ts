@@ -22,7 +22,7 @@ export class AuthService {
         private readonly sessionRepository: SessionRepository,
         private readonly organisationService: OrganisationService
     ) {
-        this.oidcService = new OidcService(this, organisationService);
+        this.oidcService = new OidcService(this);
 
         this.sessionClearHandler = new PeriodicEventHandler(
             this.clearExpiredSessions.bind(this),
@@ -103,15 +103,7 @@ export class AuthService {
         await this.sessionRepository.deleteExpiredSessions();
     }
 
-    public async ensureUser(user: OidcService.UserInfo) {
+    public async onLoginSuccess(user: OidcService.UserInfo) {
         await this.organisationService.ensurePersonalOrganisation(user);
-    }
-
-    public async ensureAllUsers() {
-        await Promise.all(
-            (await this.userRepository.getAllUsers()).map(async (user) =>
-                this.organisationService.ensurePersonalOrganisation(user)
-            )
-        );
     }
 }

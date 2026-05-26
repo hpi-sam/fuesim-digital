@@ -11,13 +11,15 @@ import {
     PermissionDeniedError,
 } from '../../utils/http.js';
 import type { OrganisationRepository } from '../repositories/organisation-repository.js';
-import type { OrganisationInsert } from '../schema.js';
+import { type OrganisationInsert } from '../schema.js';
 import { Config } from '../../config.js';
 import type { OidcService } from '../../auth/oidc-service.js';
+import type { UserRepository } from '../repositories/user-repository.js';
 
 export class OrganisationService {
     public constructor(
-        private readonly organisationRepository: OrganisationRepository
+        private readonly organisationRepository: OrganisationRepository,
+        private readonly userRepository: UserRepository
     ) {}
 
     public async getOrganisationsForUser(
@@ -56,14 +58,16 @@ export class OrganisationService {
         if (!organisation) {
             throw new NotFoundError();
         }
-        if (
-            !(await this.organisationRepository.isMemberOfOrganisationById(
+
+        const isMember =
+            await this.organisationRepository.isMemberOfOrganisationById(
                 id,
                 session.user.id
-            ))
-        ) {
+            );
+        if (!isMember) {
             throw new PermissionDeniedError();
         }
+
         const members =
             await this.organisationRepository.getOrganisationMembersById(id);
         const userRole =
@@ -71,6 +75,7 @@ export class OrganisationService {
                 id,
                 session.user.id
             );
+
         return {
             ...organisation,
             userRole,
@@ -89,16 +94,17 @@ export class OrganisationService {
         if (!organisation) {
             throw new NotFoundError();
         }
-        if (
-            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+
+        const isAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                 id,
                 session.user.id,
                 ['admin']
-            )) ||
-            organisation.personalOrganisationOf
-        ) {
+            );
+        if (!isAdmin || organisation.personalOrganisationOf) {
             throw new PermissionDeniedError();
         }
+
         organisation = await this.organisationRepository.updateOrganisation(
             organisation.id,
             data
@@ -118,16 +124,17 @@ export class OrganisationService {
         if (!organisation) {
             throw new NotFoundError();
         }
-        if (
-            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+
+        const isAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                 id,
                 session.user.id,
                 ['admin']
-            )) ||
-            organisation.personalOrganisationOf
-        ) {
+            );
+        if (!isAdmin || organisation.personalOrganisationOf) {
             throw new PermissionDeniedError();
         }
+
         const inviteLink =
             await this.organisationRepository.createOrganisationInviteLink({
                 organisationId: organisation.id,
@@ -135,6 +142,7 @@ export class OrganisationService {
         if (!inviteLink) {
             throw new ApiError();
         }
+
         return {
             ...inviteLink,
             inviteLink: `${Config.httpFrontendUrl}/organisations/join/${inviteLink.token}`,
@@ -155,16 +163,18 @@ export class OrganisationService {
         if (data.organisation_invite_link.expirationDate < new Date()) {
             throw new ApiError('Dieser Einladungslink ist leider abgelaufen.');
         }
-        if (
+
+        const isMember =
             await this.organisationRepository.isMemberOfOrganisationById(
                 data.organisation.id,
                 session.user.id
-            )
-        ) {
+            );
+        if (isMember) {
             throw new ApiError(
                 'Sie sind bereits Mitglied dieser Organisation.'
             );
         }
+
         await this.organisationRepository.addMemberToOrganisation(
             data.organisation.id,
             session.user.id
@@ -197,14 +207,14 @@ export class OrganisationService {
         if (!membership) {
             throw new NotFoundError();
         }
-        if (
-            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+
+        const isAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                 membership.organisation.id,
                 session.user.id,
                 ['admin']
-            )) ||
-            membership.organisation.personalOrganisationOf
-        ) {
+            );
+        if (!isAdmin || membership.organisation.personalOrganisationOf) {
             throw new PermissionDeniedError();
         }
 
@@ -226,14 +236,14 @@ export class OrganisationService {
         if (!membership) {
             throw new NotFoundError();
         }
-        if (
-            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+
+        const isAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                 membership.organisation.id,
                 session.user.id,
                 ['admin']
-            )) ||
-            membership.organisation.personalOrganisationOf
-        ) {
+            );
+        if (!isAdmin || membership.organisation.personalOrganisationOf) {
             throw new PermissionDeniedError();
         }
 
@@ -285,14 +295,14 @@ export class OrganisationService {
         if (!organisation) {
             throw new NotFoundError();
         }
-        if (
-            !(await this.organisationRepository.isMemberWithRoleOfOrganisationById(
+
+        const isAdmin =
+            await this.organisationRepository.isMemberWithRoleOfOrganisationById(
                 id,
                 session.user.id,
                 ['admin']
-            )) ||
-            organisation.personalOrganisationOf
-        ) {
+            );
+        if (!isAdmin || organisation.personalOrganisationOf) {
             throw new PermissionDeniedError();
         }
         await this.organisationRepository.deleteOrganisationById(
@@ -318,5 +328,13 @@ export class OrganisationService {
             );
         }
         return organisation;
+    }
+
+    public async ensurePersonalOrganisationsForAllUsers() {
+        await Promise.all(
+            (await this.userRepository.getAllUsers()).map(async (user) =>
+                this.ensurePersonalOrganisation(user)
+            )
+        );
     }
 }

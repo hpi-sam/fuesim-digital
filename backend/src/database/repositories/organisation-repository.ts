@@ -21,7 +21,7 @@ export class OrganisationRepository extends BaseRepository {
         userId: string,
         allowedRoles: readonly OrganisationMembershipRole[]
     ) {
-        const subquery = this.databaseConnection
+        const membershipsSubquery = this.databaseConnection
             .select()
             .from(organisationMembershipTable)
             .where(
@@ -34,7 +34,7 @@ export class OrganisationRepository extends BaseRepository {
         return this.databaseConnection
             .select({
                 ...getTableColumns(organisationTable),
-                userRole: subquery.role,
+                userRole: membershipsSubquery.role,
                 membersCount: this.databaseConnection.$count(
                     organisationMembershipTable,
                     eq(
@@ -45,8 +45,10 @@ export class OrganisationRepository extends BaseRepository {
             })
             .from(organisationTable)
             .innerJoin(
-                subquery,
-                and(eq(organisationTable.id, subquery.organisationId))
+                membershipsSubquery,
+                and(
+                    eq(organisationTable.id, membershipsSubquery.organisationId)
+                )
             )
             .orderBy(asc(organisationTable.name));
     }

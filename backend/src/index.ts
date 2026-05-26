@@ -76,7 +76,8 @@ async function main() {
         exerciseService
     );
     const organisationService = new OrganisationService(
-        repositories.organisationRepository
+        repositories.organisationRepository,
+        repositories.userRepository
     );
 
     let authService: AuthService;
@@ -134,7 +135,7 @@ async function main() {
             throw e;
         }
 
-        await authService.ensureAllUsers();
+        await organisationService.ensurePersonalOrganisationsForAllUsers();
     }
 
     // eslint-disable-next-line no-new

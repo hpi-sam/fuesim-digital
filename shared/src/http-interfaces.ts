@@ -8,6 +8,8 @@ import {
 import { validationMessages } from './validation-messages.js';
 import { exerciseStatusSchema } from './models/utils/exercise-status.js';
 import { logEntrySchema } from './models/log-entry.js';
+import { uuidSchema } from './utils/uuid.js';
+import { evalResultSchema } from './utils/eval-results.js';
 
 export const exerciseKeysSchema = z.object({
     participantKey: participantKeySchema,
@@ -187,6 +189,7 @@ export const parallelExerciseInstanceSummarySchema = z.object({
     currentTime: z.number(),
     currentStatus: exerciseStatusSchema,
     lastLogEntry: z.optional(logEntrySchema),
+    evalResults: z.record(uuidSchema, evalResultSchema),
     isActive: z.boolean(),
 });
 export type ParallelExerciseInstanceSummary = z.infer<

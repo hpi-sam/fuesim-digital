@@ -3,7 +3,10 @@ import type {
     ParallelExerciseId,
     SetAutojoinViewportAction,
 } from 'fuesim-digital-shared';
-import { parallelExerciseInstanceSummarySchema } from 'fuesim-digital-shared';
+import {
+    getEvalResultsFromCriteria,
+    parallelExerciseInstanceSummarySchema,
+} from 'fuesim-digital-shared';
 import { Subject } from 'rxjs';
 import type { SessionInformation } from '../../auth/auth-service.js';
 import type { ParallelExerciseInsert } from '../schema.js';
@@ -209,6 +212,13 @@ export class ParallelExerciseService {
                 currentTime: state.currentTime,
                 currentStatus: state.currentStatus,
                 lastLogEntry: state.lastLogEntry,
+                evalResults: getEvalResultsFromCriteria(
+                    state.evalCriteria,
+                    state.technicalChallenges,
+                    state.patients,
+                    state.scoutables,
+                    state.currentTime
+                ),
                 isActive: Object.values(state.clients).some(
                     (client) => client.role.mainRole === 'participant'
                 ),

@@ -6,6 +6,7 @@ import { cloneDeepMutable, StateExport } from 'fuesim-digital-shared';
 import { throttle } from 'lodash-es';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
+import type { LogEntry } from 'fuesim-digital-shared';
 import { openClientsModal } from '../clients-modal/open-clients-modal';
 import { openExerciseStatisticsModal } from '../exercise-statistics/open-exercise-statistics-modal';
 import { openTransferOverviewModal } from '../transfer-overview/open-transfer-overview-modal';
@@ -85,9 +86,36 @@ export class TimeTravelComponent implements OnDestroy {
                 this.stopReplay();
                 return;
             }
+            const prevLogEntries =
+                selectStateSnapshot(selectExerciseState, this.store).logEntries
+                    ?.length ?? 0;
             this.timeTravelService.jumpToTime(
                 timeConstraints.current + 1000 * this.replaySpeed
             );
+            const nextLogEntries =
+                selectStateSnapshot(selectExerciseState, this.store)
+                    .logEntries ?? [];
+            const newLogEntries = nextLogEntries.slice(prevLogEntries);
+
+            const onlyMeasures = (e: LogEntry): boolean =>
+                e.tags.some((t) => t.category === 'Maßnahme');
+            for (const entry of newLogEntries.filter(onlyMeasures)) {
+                this.messageService.postMessage({
+                    color: 'info',
+                    title: 'Maßnahme getroffen',
+                    body: entry.description,
+                });
+            }
+
+            const onlyScoutings = (e: LogEntry): boolean =>
+                e.tags.some((t) => t.category === 'Erkundungselement');
+            for (const entry of newLogEntries.filter(onlyScoutings)) {
+                this.messageService.postMessage({
+                    color: 'info',
+                    title: 'Element erkundet',
+                    body: entry.description,
+                });
+            }
         }, 1000);
     }
 

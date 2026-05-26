@@ -60,7 +60,7 @@
                             }}
                         </label>
                         <div>
-                            @if (technicalChallengesValues().length === 0) {
+                            @if (technicalChallenges().length === 0) {
                                 <hr />
                                 <span class="mt-3 text-muted"
                                     >Es befinden sich aktuell keine technischen
@@ -79,7 +79,7 @@
                                         ausgewählt
                                     </option>
                                     @for (
-                                        challenge of this.technicalChallengesValues();
+                                        challenge of this.technicalChallenges();
                                         track challenge.id
                                     ) {
                                         <option value="{{ challenge.id }}">

@@ -1,4 +1,11 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+    Component,
+    computed,
+    inject,
+    input,
+    Signal,
+    signal,
+} from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import {
@@ -48,21 +55,14 @@ interface InputData {
 export class EvalCriterionCreationForm {
     private readonly exerciseService = inject(ExerciseService);
     private readonly store = inject<Store<AppState>>(Store);
-    private readonly technicalChalleges = this.store.selectSignal(
-        selectTechnicalChallenges
-    );
-    public readonly technicalChallengesValues = signal(
-        Object.values(this.technicalChalleges())
-    );
-    public readonly selectedTechnicalChallenge =
-        signal<TechnicalChallenge | null>(null);
+    private readonly tcs = this.store.selectSignal(selectTechnicalChallenges);
+    public readonly technicalChallenges = signal(Object.values(this.tcs()));
     public readonly selectedTechnicalChallengeStates = computed(() => {
         if (this.criterionForm.technicalChallengeId().value() !== '') {
             const id = this.criterionForm.technicalChallengeId().value();
             const tc =
-                this.technicalChallengesValues().filter(
-                    (tc) => tc.id === id
-                )[0] ?? null;
+                this.technicalChallenges().filter((tc) => tc.id === id)[0] ??
+                null;
             return Object.values(tc!.states);
         }
         return null;
@@ -112,13 +112,19 @@ export class EvalCriterionCreationForm {
                     .targetTechnicalChallengeState()
                     .value();
                 if (stateId !== '') {
-                    const criterion =
-                        newReachTechnicalChallengeStateEvalCriterion(
-                            'Technische Herausforderung mit Zustand',
-                            this.selectedTechnicalChallenge()!.id,
-                            stateId
-                        );
-                    this.createCriteria([criterion]);
+                    const technicalChallengeId =
+                        this.criterionForm.technicalChallengeId().value() !== ''
+                            ? this.criterionForm.technicalChallengeId().value()
+                            : null;
+
+                    const criterion = technicalChallengeId
+                        ? newReachTechnicalChallengeStateEvalCriterion(
+                              'TH',
+                              technicalChallengeId,
+                              stateId
+                          )
+                        : null;
+                    if (criterion) this.createCriteria([criterion]);
                 }
                 break;
             }

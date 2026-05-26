@@ -35,9 +35,18 @@
     }
     <div class="card col-3 p-0 rounded-2 ms-3 mt-3" style="min-width: 600px">
         <div class="card-header text-center">
-            <h5 class="mb-0 d-flex align-items-center">Getroffene Maßnahmen</h5>
+            <h5 class="mb-0 d-flex align-items-center">
+                Getroffene Maßnahmen:
+                {{
+                    '(' +
+                        this.completedCriteriaCount() +
+                        '/' +
+                        this.results().length +
+                        ')'
+                }}
+            </h5>
         </div>
-        @if (!this.results()) {
+        @if (this.results().length === 0) {
             <p class="ms-3">
                 Es sind aktuell keine Auswertungskriterien festgelegt.
             </p>
@@ -52,6 +61,25 @@
                                 'xPatientsAtStatusEvalCriterion'
                             ) {
                                 {{ statusNames[result.criterion.targetStatus] }}
+                            }
+                            @if (
+                                result.criterion.criterionType ===
+                                'reachTechnicalChallengeStateEvalCriterion'
+                            ) {
+                                {{
+                                    ' - ' +
+                                        getTechnicalChallengeNamebyId(
+                                            result.criterion
+                                                .targetTechnicalChallengeId
+                                        ) +
+                                        ' - ' +
+                                        getTechnicalChallengeStateTitlebyId(
+                                            result.criterion
+                                                .targetTechnicalChallengeId,
+                                            result.criterion
+                                                .targetTechnicalChallengeStateId
+                                        )
+                                }}
                             }
                             @if (
                                 result.criterion.criterionType ===
@@ -83,6 +111,4 @@
             }
         }
     </div>
-
-    <!-- TODO @JohannesPotzi @Jogius : Idea-Pitch: area-burn-down-chart similarly to the statistics area chart-->
 </div>

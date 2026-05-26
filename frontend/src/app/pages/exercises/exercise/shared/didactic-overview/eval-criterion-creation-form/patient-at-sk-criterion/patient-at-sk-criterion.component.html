@@ -44,6 +44,17 @@
                                 "
                             >
                                 <i class="bi bi-check2-square"></i>
+                                @if (
+                                    selectedPatientStatusMap()[patient.id];
+                                    as status
+                                ) {
+                                    <app-patient-status-badge
+                                        class="ms-1"
+                                        [status]="status"
+                                    />
+                                } @else {
+                                    no status selected
+                                }
                             </button>
                         } @else {
                             <button

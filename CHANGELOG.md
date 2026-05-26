@@ -10,6 +10,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Fixed
 
 - Creating a parallel exercise with many (>10) exercise instances no longer slows down the server significantly.
+- Massively reduce the server start up time with many exercises.
 
 ## [0.12.1] - 2026-05-21
 

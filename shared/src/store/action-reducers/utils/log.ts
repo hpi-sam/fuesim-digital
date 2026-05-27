@@ -973,7 +973,7 @@ export function logTechnicalChallengePersonnelAssigned(
     if (!logActive(state)) return;
 
     const personnel = getElement(state, 'personnel', personnelId);
-    const task = getElement(state, 'task', taskId);
+    const task = getElement(state, 'taskType', taskId);
     logTechnicalChallenge(
         state,
         [createPersonnelTypeTag(state, personnel), createTaskTag(state, task)],
@@ -991,7 +991,7 @@ export function logTechnicalChallengePersonnelUnassigned(
     if (!logActive(state)) return;
 
     const personnel = getElement(state, 'personnel', personnelId);
-    const task = getElement(state, 'task', taskId);
+    const task = getElement(state, 'taskType', taskId);
     logTechnicalChallenge(
         state,
         [createPersonnelTypeTag(state, personnel), createTaskTag(state, task)],

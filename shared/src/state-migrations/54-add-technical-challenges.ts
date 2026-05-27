@@ -1,16 +1,11 @@
-import type { UUID } from '../utils/uuid.js';
-import type { TechnicalChallenge } from '../models/technical-challenge/technical-challenge.js';
-import type { Task } from '../models/task.js';
 import type { Migration } from './migration-functions.js';
 
 export const addTechnicalChallenges54: Migration = {
     action: (intermediateState, action) => true,
     state: (state: any) => {
         const typedState = state as {
-            technicalChallenges:
-                | { [key: UUID]: TechnicalChallenge }
-                | undefined;
-            tasks: { [key: UUID]: Task } | undefined;
+            technicalChallenges: object | undefined;
+            tasks: object | undefined;
         };
 
         typedState.technicalChallenges = {};

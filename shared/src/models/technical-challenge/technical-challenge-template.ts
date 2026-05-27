@@ -30,7 +30,7 @@ export function newTechnicalChallengeFromTemplate(
     template: TechnicalChallengeTemplate,
     creationTime: number
 ): WritableDraft<TechnicalChallenge> {
-    const { states, relevantTasks, transitions, name, image } =
+    const { states, tasks, timers, name, image, initialStateId } =
         cloneDeep(template);
 
     return {
@@ -39,14 +39,13 @@ export function newTechnicalChallengeFromTemplate(
         templateId: template.id,
         position: newNoPosition(),
         size: newSize(40, 40),
-        taskProgress: Object.fromEntries(
-            Object.values(relevantTasks).map((task) => [task.id, 0])
-        ),
-        currentStateId: template.initialStateId,
+        currentStateId: initialStateId,
         assignedPersonnel: {},
+        taskTimeSpent: {},
+        initialStateId,
         states,
-        relevantTasks,
-        transitions,
+        tasks,
+        timers,
         name,
         image,
         simulationStartTime: creationTime,

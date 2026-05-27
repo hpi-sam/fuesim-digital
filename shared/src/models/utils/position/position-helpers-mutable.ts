@@ -20,7 +20,7 @@ import type { UserGeneratedContent } from '../../user-generated-content.js';
 import type { UUID } from '../../../utils/uuid.js';
 import { getElement } from '../../../store/action-reducers/utils/get-element.js';
 import { cloneDeepMutable } from '../../../utils/clone-deep.js';
-import type { Task } from '../../task.js';
+import type { TaskType } from '../../task-type.js';
 import type { MapCoordinates } from './map-coordinates.js';
 import type { MapPosition } from './map-position.js';
 import { newMapPositionAt } from './map-position.js';
@@ -36,7 +36,7 @@ import type { WithPosition } from './with-position.js';
 
 type MovableElement = Exclude<
     Element,
-    AlarmGroup | Client | Hospital | Scoutable | Task | UserGeneratedContent
+    AlarmGroup | Client | Hospital | Scoutable | TaskType | UserGeneratedContent
 >;
 type MovableType = MovableElement['type'];
 

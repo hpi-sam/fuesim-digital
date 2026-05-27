@@ -94,7 +94,7 @@ import {
     type TechnicalChallenge,
     technicalChallengeSchema,
 } from './models/technical-challenge/technical-challenge.js';
-import { type Task, taskSchema } from './models/task.js';
+import { type TaskType, taskTypeSchema } from './models/task-type.js';
 import { getDefaultTasks } from './data/default-state/tmp-default-technical-challenge.js';
 
 export class ExerciseState {
@@ -158,8 +158,8 @@ export class ExerciseState {
     @IsZodSchema(z.record(uuidSchema, mapImageSchema))
     public readonly mapImages: { readonly [key: UUID]: MapImage } = {};
 
-    @IsZodSchema(z.record(taskSchema.shape.id, taskSchema))
-    public tasks: { [key: UUID]: Task } = getDefaultTasks();
+    @IsZodSchema(z.record(taskTypeSchema.shape.id, taskTypeSchema))
+    public taskTypes: { [key: UUID]: TaskType } = getDefaultTasks();
 
     @IsZodSchema(
         z.record(technicalChallengeSchema.shape.id, technicalChallengeSchema)

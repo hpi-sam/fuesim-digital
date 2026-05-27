@@ -15,7 +15,7 @@ import {
     currentStateOf,
     technicalChallengeStateIdSchema,
 } from '../../models/technical-challenge/state-machine.js';
-import { taskSchema } from '../../models/task.js';
+import { taskTypeSchema } from '../../models/task-type.js';
 import { cloneDeepMutable } from '../../utils/clone-deep.js';
 import { userGeneratedContentSchema } from '../../models/user-generated-content.js';
 import { createScoutableTag } from '../../models/utils/tag-helpers.js';
@@ -53,7 +53,7 @@ const assignTechnicalChallengeActionSchema = z.strictObject({
      * assigned personnel is also moved to specified position
      */
     targetPosition: mapCoordinatesSchema,
-    taskId: taskSchema.shape.id,
+    taskId: taskTypeSchema.shape.id,
 });
 
 const resizeTechnicalChallengeActionSchema = z.strictObject({

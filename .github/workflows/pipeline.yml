@@ -349,6 +349,11 @@ jobs:
 
         steps:
             - uses: actions/checkout@v6
+            # We need the correct node/npm version for add-commit-hash-to-version to work properly
+            - uses: ./.github/actions/setup-install
+              with:
+                  download-shared: false
+                  install-command: ''
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version
@@ -381,6 +386,11 @@ jobs:
 
         steps:
             - uses: actions/checkout@v6
+            # We need the correct node/npm version for add-commit-hash-to-version to work properly
+            - uses: ./.github/actions/setup-install
+              with:
+                  download-shared: false
+                  install-command: ''
             # Source: https://docs.docker.com/ci-cd/github-actions/
             - name: Add commit hash to version
               uses: ./.github/actions/add-commit-hash-to-version

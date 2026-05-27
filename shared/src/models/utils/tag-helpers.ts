@@ -25,8 +25,8 @@ import type { PersonnelTemplate } from '../personnel-template.js';
 import type { UUID } from '../../utils/uuid.js';
 import type { MeasureTemplate } from '../measure/measures.js';
 import type { TechnicalChallenge } from '../technical-challenge/technical-challenge.js';
-import type { Task } from '../task.js';
-import type { TechnicalChallengeState } from '../technical-challenge/state-machine.js';
+import type { TaskType } from '../task-type.js';
+import type { StateMachineState } from '../technical-challenge/state-machine.js';
 import {
     type ExerciseOccupation,
     occupationToGermanDictionary,
@@ -347,13 +347,13 @@ export function createTechnicalChallengeTag(
 
 export function createTaskTag(
     draftState: WritableDraft<ExerciseState>,
-    task: Task
+    task: TaskType
 ): Tag {
     return newTag('Aufgabe', 'purple', 'white', task.taskName, task.id);
 }
 export function createStateTag(
     draftState: WritableDraft<ExerciseState>,
-    state: TechnicalChallengeState,
+    state: StateMachineState,
     label: string
 ): Tag {
     return newTag(label, 'pink', 'black', state.title, state.id);

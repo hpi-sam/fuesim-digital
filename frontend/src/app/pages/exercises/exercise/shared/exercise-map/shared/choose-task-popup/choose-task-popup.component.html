@@ -1,12 +1,12 @@
 <div class="dropdown-menu chooser-popup-component">
-    @for (task of availableTasks(); track task.id) {
+    @for (task of availableTasks(); track task[0].id+task[1].id) {
         <button
-            (click)="assignTask(task.id)"
+            (click)="assignTask(task[0].id, task[1].id)"
             type="button"
             class="dropdown-item"
             data-cy="chooseTaskPopupAssignTaskButton"
         >
-            {{ task.taskName }}
+            {{ task[0].name }}: {{ task[1].taskName }}
         </button>
     } @empty {
         <div class="text-muted p-1 fst-italic">Keine Aktion möglich.</div>

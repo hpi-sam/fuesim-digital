@@ -16,6 +16,7 @@ import { newMapCoordinatesAt } from '../utils/position/map-coordinates.js';
 import { uuid } from '../../utils/uuid.js';
 import { isPersonnelAssigned } from '../../state-helpers/technical-challenge-assignment.js';
 import { newTechnicalChallengeFromTemplate } from './technical-challenge-template.js';
+import { getTaskProgress } from './state-machine.js';
 
 const tickInterval = 1000;
 const simulateOneTick = produce((draftState: WritableDraft<ExerciseState>) => {
@@ -97,29 +98,33 @@ describe('TechnicalChallenges', () => {
             state.technicalChallenges[challenge.id];
 
         expect(
-            resultingTechnicalChallenge!.taskProgress[
-                StateMachineTesting.rescuePatientTask.id
-            ]
-        ).toBe(0);
+            getTaskProgress(
+                StateMachineTesting.rescuePatientTask.id,
+                resultingTechnicalChallenge!
+            )
+        ).toStrictEqual({ timeSpent: 0, progressPercentage: 0 });
         expect(
-            resultingTechnicalChallenge!.taskProgress[
-                StateMachineTesting.extinguishFireTask.id
-            ]
-        ).toBe(0);
+            getTaskProgress(
+                StateMachineTesting.extinguishFireTask.id,
+                resultingTechnicalChallenge!
+            )
+        ).toStrictEqual({ timeSpent: 0, progressPercentage: 0 });
     });
 
     it('should progress assigned tasks', () => {
         const oneTickState = simulateOneTick(stateWithAssignedPersonnel);
         const oneTickChallenge = oneTickState.technicalChallenges[challenge.id];
         expect(
-            oneTickChallenge?.taskProgress[
-                StateMachineTesting.extinguishFireTask.id
-            ]
+            getTaskProgress(
+                StateMachineTesting.extinguishFireTask.id,
+                oneTickChallenge!
+            ).timeSpent
         ).toBe(tickInterval);
         expect(
-            oneTickChallenge?.taskProgress[
-                StateMachineTesting.rescuePatientTask.id
-            ]
+            getTaskProgress(
+                StateMachineTesting.rescuePatientTask.id,
+                oneTickChallenge!
+            ).timeSpent
         ).toBe(0);
         expect(oneTickChallenge?.currentStateId).toBe(
             StateMachineTesting.initialState.id
@@ -131,14 +136,16 @@ describe('TechnicalChallenges', () => {
             StateMachineTesting.onlyExtinguished.id
         );
         expect(
-            tenTickChallenge?.taskProgress[
-                StateMachineTesting.extinguishFireTask.id
-            ]
+            getTaskProgress(
+                StateMachineTesting.extinguishFireTask.id,
+                tenTickChallenge!
+            ).timeSpent
         ).toBe(tickInterval * 10);
         expect(
-            tenTickChallenge?.taskProgress[
-                StateMachineTesting.rescuePatientTask.id
-            ]
+            getTaskProgress(
+                StateMachineTesting.rescuePatientTask.id,
+                tenTickChallenge!
+            ).timeSpent
         ).toBe(0);
     });
 
@@ -234,7 +241,7 @@ describe('TechnicalChallenges', () => {
 
     it('should unassign personnel, if the assigned task is no more available', () => {
         const secondsBeforeStateChange =
-            StateMachineTesting.isPatientDead.minTimePassed / 1_000;
+            StateMachineTesting.patientDeadTimerDuration / 1_000;
         const nearlyStateChangedState = simulateNTicks(
             initialState,
             secondsBeforeStateChange - 1

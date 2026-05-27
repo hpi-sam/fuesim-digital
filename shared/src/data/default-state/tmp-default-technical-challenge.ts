@@ -1,132 +1,114 @@
 import {
-    type Guard,
     newTechnicalChallengeState,
-    type Transition,
+    type StateMachine,
+    type StateMachineState,
+    type TimerGuard,
 } from '../../models/technical-challenge/state-machine.js';
-import type { Task } from '../../models/task.js';
+import type { TaskType } from '../../models/task-type.js';
 import type { TechnicalChallengeTemplate } from '../../models/technical-challenge/technical-challenge-template.js';
 import { newImageProperties } from '../../models/utils/image-properties.js';
 import type { UUID } from '../../utils/uuid.js';
 import type { UserGeneratedContent } from '../../models/user-generated-content.js';
+import { TypeAssertedObject } from '../../utils/type-asserted-object.js';
 
 // TODO@Felix: move into state-machine.spec.ts
 export namespace StateMachineTesting {
     // --- Tasks ---
-    export const extinguishFireTask: Task = {
-        id: '7eac4a83-99cd-406a-a4a3-d61b4d5b72bd',
-        type: 'task',
+    export const extinguishFireTask: TaskType = {
+        id: '7eac4a83-99cd-406a-a4a3-d61b4d5b72bd' as TaskType['id'],
+        type: 'taskType',
         taskName: 'Feuer löschen',
     };
-    export const rescuePatientTask: Task = {
-        id: '86fcf9d4-33b3-469e-9b4c-5bf25d88387b',
-        type: 'task',
+    export const extinguishFireTaskDuration = 10_000;
+    export const rescuePatientTask: TaskType = {
+        id: '86fcf9d4-33b3-469e-9b4c-5bf25d88387b' as TaskType['id'],
+        type: 'taskType',
         taskName: 'Patient retten',
     };
+    export const rescuePatientTaskDuration = 10_000;
+
+    // --- Timers ---
+    export const patientDeadTimerId =
+        '2a5d1c1e-9f2d-4e4f-a86c-3f6a06a57f1b' as TimerGuard['timerId'];
+    export const patientDeadTimerDuration = 30_000;
+    export const vehicleBurnedOutTimerId =
+        'c4b7e7f5-4f23-4d84-b8db-51c1c5cdb6ac' as TimerGuard['timerId'];
+    export const vehicleBurnedOutTimerDuration = 60_000;
 
     // --- Guards ---
     // A guard is fulfilled when the task's progress exceeds minProgress.
     export const isFireExtinguished = {
-        type: 'progressGuard',
-        minProgress: 10000,
+        type: 'taskGuard',
+        minProgress: 1,
         taskId: extinguishFireTask.id,
-        name: 'ist das Feuer gelöscht?',
-    } satisfies Guard;
+    } as const;
     export const isPatientRescued = {
-        type: 'progressGuard',
-        minProgress: 10000,
+        type: 'taskGuard',
+        minProgress: 1,
         taskId: rescuePatientTask.id,
-        name: 'ist der Patient gerettet?',
-    } satisfies Guard;
+    } as const;
     export const isPatientDead = {
         type: 'timerGuard',
-        minTimePassed: 30_000,
-        name: 'ist der Patient tot?',
-    } satisfies Guard;
+        minProgress: 1,
+        timerId: patientDeadTimerId,
+    } as const;
     export const isVehicleBurnedOut = {
         type: 'timerGuard',
-        minTimePassed: 60_000,
-        name: 'ist das Fahrzeug ausgebrannt?',
-    } satisfies Guard;
+        minProgress: 1,
+        timerId: vehicleBurnedOutTimerId,
+    } as const;
 
     // --- Contents ---
     const initialContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Was eine Schweinerei, jetzt mach mal was draus.</p>',
+        content: '<p>Ein brennender PKW. Der Lenker ist eingeklemmt.</p>',
     };
-    const onlyExtiguishedContent: UserGeneratedContent = {
+    const onlyExtinguishedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Feuer is nun weg, aber pass auf! Da is noch wer drin.</p>',
+        content: '<p>Ein gelöschter PKW. Der Lenker ist eingeklemmt.</p>',
     };
     const onlyDeadContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Der hat schon seinen Körper verlassen.</p>',
+        content:
+            '<p>Ein brennender PKW. Der Lenker schaut schwer verletzt aus und reagiert nicht.</p>',
     };
     const onlyTreatedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Da is noch Feuer. Zum glück steckt keiner mehr drin.</p>',
-    };
-    const onlyBurnedOutContent: UserGeneratedContent = {
-        type: 'userGeneratedContent',
-        content: '<p>Ein Wunder.</p>',
+        content: '<p>Ein brennender PKW. Der Lenker wurde bereits befreit.</p>',
     };
     const patientDeadButExtinguishedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Feuer is weg, aber zu spät.</p>',
+        content:
+            '<p>Der PKW ist gelöscht. Der Patient gibt keine Lebenszeichen von sich.</p>',
     };
     const treatedAndExtinguishedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Sehr vorbildlich, besser gehts kaum.</p>',
+        content:
+            '<p>Der PKW ist gelöscht. Der Lenker wurde erfolgreich befreit.</p>',
     };
     const burnedOutAndPatientDeadContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
-        content: '<p>Wo waren eingentlich das Personal?</p>',
+        content:
+            '<p>Ein ausgebrannter PKW mit einem leblosen Patienten am Steuer.</p>',
     };
     const burnedOutButRescuedContent: UserGeneratedContent = {
         type: 'userGeneratedContent',
         content:
-            '<p>Grad noch mal glück gehabt. Hätte schlimmer kommen können.</p>',
+            '<p>Ein ausgebrannter PKW. Der Lenker wurde bereits befreit.</p>',
     };
 
     // --- States ---
-    export const initialState = newTechnicalChallengeState(
-        'Ausgangslage',
-        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
-        [extinguishFireTask.id, rescuePatientTask.id],
-        initialContent
-    );
-    export const onlyExtinguished = newTechnicalChallengeState(
-        'Feuer geloescht',
-        newImageProperties('/assets/blue_car_broken.png', 100, 1),
-        [rescuePatientTask.id],
-        onlyExtiguishedContent
-    );
-    export const onlyDead = newTechnicalChallengeState(
-        'Patient verstorben',
-        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
-        [extinguishFireTask.id],
-        onlyDeadContent
-    );
-    export const onlyTreated = newTechnicalChallengeState(
-        'Patient gerettet',
-        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
-        [extinguishFireTask.id],
-        onlyTreatedContent
-    );
-    export const onlyBurnedOut = newTechnicalChallengeState(
-        'Fahrzeug ausgebrannt',
-        newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
-        [rescuePatientTask.id],
-        onlyBurnedOutContent
-    );
     export const patientDeadButExtinguished = newTechnicalChallengeState(
-        'Patient verstorben, Feuer geloescht',
+        'Patient verstorben, Feuer gelöscht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [],
         [],
         patientDeadButExtinguishedContent
     );
     export const treatedAndExtinguished = newTechnicalChallengeState(
-        'Patient gerettet und Feuer geloescht',
+        'Patient gerettet und Feuer gelöscht',
         newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [],
         [],
         treatedAndExtinguishedContent
     );
@@ -134,23 +116,107 @@ export namespace StateMachineTesting {
         'Fahrzeug ausgebrannt und Patient verstorben',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
         [],
+        [],
         burnedOutAndPatientDeadContent
     );
     export const burnedOutButRescued = newTechnicalChallengeState(
         'Fahrzeug ausgebrannt, Patient gerettet',
         newImageProperties('/assets/blue_car_burned_out.png', 100, 1),
         [],
+        [],
         burnedOutButRescuedContent
+    );
+    export const onlyExtinguished = newTechnicalChallengeState(
+        'Feuer gelöscht',
+        newImageProperties('/assets/blue_car_broken.png', 100, 1),
+        [
+            {
+                targetState: patientDeadButExtinguished.id,
+                guard: isPatientDead,
+            },
+            {
+                targetState: treatedAndExtinguished.id,
+                guard: isPatientRescued,
+            },
+        ],
+        [rescuePatientTask.id],
+        onlyExtinguishedContent
+    );
+    export const onlyDead = newTechnicalChallengeState(
+        'Patient verstorben',
+        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
+        [
+            {
+                targetState: patientDeadButExtinguished.id,
+                guard: {
+                    type: 'taskGuard',
+                    taskId: extinguishFireTask.id,
+                    minProgress: 1,
+                },
+            },
+            {
+                targetState: burnedOutAndPatientDead.id,
+                guard: {
+                    type: 'timerGuard',
+                    minProgress: 1,
+                    timerId: vehicleBurnedOutTimerId,
+                },
+            },
+        ],
+        [extinguishFireTask.id],
+        onlyDeadContent
+    );
+    export const onlyTreated = newTechnicalChallengeState(
+        'Patient gerettet',
+        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
+        [
+            {
+                targetState: treatedAndExtinguished.id,
+                guard: isFireExtinguished,
+            },
+            {
+                targetState: burnedOutAndPatientDead.id,
+                guard: isVehicleBurnedOut,
+            },
+        ],
+        [extinguishFireTask.id],
+        onlyTreatedContent
+    );
+    export const initialState = newTechnicalChallengeState(
+        'Ausgangslage',
+        newImageProperties('/assets/blue_car_broken_burning.png', 100, 1),
+        [
+            {
+                targetState: onlyExtinguished.id,
+                guard: isFireExtinguished,
+            },
+            {
+                targetState: onlyDead.id,
+                guard: isPatientDead,
+            },
+            {
+                targetState: onlyTreated.id,
+                guard: isPatientRescued,
+            },
+        ],
+        [extinguishFireTask.id, rescuePatientTask.id],
+        initialContent
     );
 }
 
 function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     const extinguishFireTask = StateMachineTesting.extinguishFireTask;
     const rescuePatientTask = StateMachineTesting.rescuePatientTask;
-    const isFireExtinguished = StateMachineTesting.isFireExtinguished;
-    const isVehicleBurnedOut = StateMachineTesting.isVehicleBurnedOut;
-    const isPatientDead = StateMachineTesting.isPatientDead;
-    const isPatientRescued = StateMachineTesting.isPatientRescued;
+    const extinguishFireTaskDuration =
+        StateMachineTesting.extinguishFireTaskDuration;
+    const rescuePatientTaskDuration =
+        StateMachineTesting.rescuePatientTaskDuration;
+    const patientDeadTimerId = StateMachineTesting.patientDeadTimerId;
+    const patientDeadTimerDuration =
+        StateMachineTesting.patientDeadTimerDuration;
+    const vehicleBurnedOutTimerId = StateMachineTesting.vehicleBurnedOutTimerId;
+    const vehicleBurnedOutTimerDuration =
+        StateMachineTesting.vehicleBurnedOutTimerDuration;
     const onlyExtinguished = StateMachineTesting.onlyExtinguished;
     const patientDeadButExtinguished =
         StateMachineTesting.patientDeadButExtinguished;
@@ -158,99 +224,65 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
     const treatedAndExtinguished = StateMachineTesting.treatedAndExtinguished;
     const onlyTreated = StateMachineTesting.onlyTreated;
     const burnedOutAndPatientDead = StateMachineTesting.burnedOutAndPatientDead;
-    const onlyBurnedOut = StateMachineTesting.onlyBurnedOut;
     const burnedOutButRescued = StateMachineTesting.burnedOutButRescued;
     const initialState = StateMachineTesting.initialState;
 
-    const relevantTasks = Object.fromEntries(
-        [extinguishFireTask, rescuePatientTask].map((task) => [task.id, task])
-    );
+    const tasks: StateMachine['tasks'] = {
+        [extinguishFireTask.id]: {
+            taskTypeId: extinguishFireTask.id,
+            totalDuration: extinguishFireTaskDuration,
+        },
+        [rescuePatientTask.id]: {
+            taskTypeId: rescuePatientTask.id,
+            totalDuration: rescuePatientTaskDuration,
+        },
+    };
 
-    const states = Object.fromEntries(
+    const timers: StateMachine['timers'] = {
+        [patientDeadTimerId]: {
+            id: patientDeadTimerId,
+            totalDuration: patientDeadTimerDuration,
+            name: 'Patient verstirbt',
+        },
+        [vehicleBurnedOutTimerId]: {
+            id: vehicleBurnedOutTimerId,
+            totalDuration: vehicleBurnedOutTimerDuration,
+            name: 'Fahrzeug brennt aus',
+        },
+    };
+
+    const states = TypeAssertedObject.fromEntries(
         [
             initialState,
             onlyExtinguished,
             onlyDead,
             onlyTreated,
-            onlyBurnedOut,
             patientDeadButExtinguished,
             treatedAndExtinguished,
             burnedOutAndPatientDead,
             burnedOutButRescued,
-        ].map((state) => [state.id, state])
-    );
+        ].map<[StateMachineState['id'], StateMachineState]>(
+            (state: StateMachineState) => [state.id, state]
+        )
+    ) as { [key: StateMachineState['id']]: StateMachineState };
 
-    // --- Transitions ---
-    const transitions: Transition[] = [
-        // From initial state
-        {
-            from: initialState.id,
-            to: onlyExtinguished.id,
-            guard: isFireExtinguished,
-        },
-        { from: initialState.id, to: onlyDead.id, guard: isPatientDead },
-        {
-            from: initialState.id,
-            to: onlyTreated.id,
-            guard: isPatientRescued,
-        },
-        {
-            from: initialState.id,
-            to: onlyBurnedOut.id,
-            guard: isVehicleBurnedOut,
-        },
-
-        // From onlyExtinguished
-        {
-            from: onlyExtinguished.id,
-            to: patientDeadButExtinguished.id,
-            guard: isPatientDead,
-        },
-        {
-            from: onlyExtinguished.id,
-            to: treatedAndExtinguished.id,
-            guard: isPatientRescued,
-        },
-
-        // From onlyDead
-        {
-            from: onlyDead.id,
-            to: patientDeadButExtinguished.id,
-            guard: isFireExtinguished,
-        },
-        {
-            from: onlyDead.id,
-            to: burnedOutAndPatientDead.id,
-            guard: isVehicleBurnedOut,
-        },
-
-        // From onlyTreated
-        {
-            from: onlyTreated.id,
-            to: treatedAndExtinguished.id,
-            guard: isFireExtinguished,
-        },
-        {
-            from: onlyTreated.id,
-            to: burnedOutAndPatientDead.id,
-            guard: isVehicleBurnedOut,
-        },
-
-        // From onlyBurnedOut
-        {
-            from: onlyBurnedOut.id,
-            to: burnedOutAndPatientDead.id,
-            guard: isPatientDead,
-        },
-        {
-            from: onlyBurnedOut.id,
-            to: burnedOutButRescued.id,
-            guard: isPatientRescued,
-        },
-    ];
-
+    const stateMachineId =
+        'd4c67365-0195-48ac-8514-c343353ffeb7' as StateMachine['id'];
     return {
-        initialStateId: initialState.id,
+        stateMachines: {
+            [stateMachineId]: {
+                id: stateMachineId,
+                name: 'Beispiel Automat',
+                initialStateId: initialState.id,
+                currentStateId: initialState.id,
+                states,
+                tasks,
+                timers,
+                simulationStartTime: 0,
+                taskTimeSpent: {},
+                assignedPersonnel: {},
+            },
+        },
         id: '9d629cfb-440e-4fe1-9155-ffdb6f97248f',
         image: newImageProperties(
             '/assets/blue_car_broken_burning.png',
@@ -258,10 +290,6 @@ function buildDefaultTechnicalChallengeTemplate(): TechnicalChallengeTemplate {
             1
         ),
         name: 'Brennendes Fahrzeug mit eingeklemmter Person',
-        states,
-        relevantTasks,
-        transitions,
-        simulationStartTime: 0,
     };
 }
 
@@ -276,6 +304,11 @@ export function getDefaultTechnicalChallengeTemplate(): TechnicalChallengeTempla
     return _cachedTemplate;
 }
 
-export function getDefaultTasks(): { [key: UUID]: Task } {
-    return getDefaultTechnicalChallengeTemplate().relevantTasks;
+export function getDefaultTasks(): { [key: UUID]: TaskType } {
+    return {
+        [StateMachineTesting.extinguishFireTask.id]:
+            StateMachineTesting.extinguishFireTask,
+        [StateMachineTesting.rescuePatientTask.id]:
+            StateMachineTesting.rescuePatientTask,
+    };
 }

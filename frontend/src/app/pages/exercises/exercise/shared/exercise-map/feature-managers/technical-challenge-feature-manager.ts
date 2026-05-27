@@ -3,11 +3,14 @@ import {
     currentStateOf,
     newMapCoordinatesAt,
     newSize,
-    type TechnicalChallengeState,
-    type TechnicalChallenge,
-    type TechnicalChallengeId,
-    type UUID,
-    type Element as StateElement,
+} from 'fuesim-digital-shared';
+import type {
+    StateMachine,
+    StateMachineState,
+    TechnicalChallenge,
+    TechnicalChallengeId,
+    Element as StateElement,
+    TaskType,
 } from 'fuesim-digital-shared';
 import type { Feature, MapBrowserEvent } from 'ol';
 import type OlMap from 'ol/Map';
@@ -56,9 +59,12 @@ export class TechnicalChallengeFeatureManager
         );
     }
 
-    private currentStateOfFeature(feature: Feature): TechnicalChallengeState {
+    private currentStateOfFeature(feature: Feature): StateMachineState {
         return currentStateOf(
-            this.getElementFromFeature(feature) as TechnicalChallenge
+            Object.values(
+                (this.getElementFromFeature(feature) as TechnicalChallenge)
+                    .stateMachines
+            ).at(0)!
         );
     }
 
@@ -187,12 +193,16 @@ export class TechnicalChallengeFeatureManager
                 translateEvent.startCoordinate
             );
         };
-        const assignTaskCallback = async (taskId: UUID) => {
+        const assignTaskCallback = async (
+            stateMachineId: StateMachine['id'],
+            taskId: TaskType['id']
+        ) => {
             const response = await this.exerciseService.proposeAction(
                 {
                     type: '[TechnicalChallenge] Assign a personnel to technical challenge',
                     technicalChallengeId: technicalChallenge.id,
                     personnelId: droppedElement.id,
+                    stateMachineId,
                     taskId,
                     targetPosition:
                         personnelManager.geometryHelper.getFeaturePosition(

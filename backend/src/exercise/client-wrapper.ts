@@ -14,7 +14,7 @@ import type { ExerciseSocket } from '../exercise-server.js';
 import { Config, isDevelopment } from '../config.js';
 import type { SessionInformation } from '../auth/auth-service.js';
 import type { ParallelExercise } from '../database/schema.js';
-import { PermissionDeniedError } from '../utils/http.js';
+import { ApiError, PermissionDeniedError } from '../utils/http.js';
 import type { Services } from '../database/services/index.js';
 import type { ActiveExercise } from './active-exercise.js';
 import { clientMap } from './client-map.js';
@@ -212,6 +212,13 @@ export class ParallelExerciseClientWrapper extends ClientWrapper {
         await this.applyActionToAll({
             type: '[Exercise] Pause',
         } satisfies PauseExerciseAction);
+    }
+
+    public async getParallelTracesOverview() {
+        if (!this.chosenExercise) throw new ApiError();
+        return this.services.parallelExerciseService.getParallelTracesOverviewById(
+            this.chosenExercise.id
+        );
     }
 
     /**

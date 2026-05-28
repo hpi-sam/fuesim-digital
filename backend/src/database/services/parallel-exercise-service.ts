@@ -303,7 +303,7 @@ export class ParallelExerciseService {
         }
         return processEvents;
     }
-    public async getParallelExerciseTracesOverviewById(
+    public async getParallelTracesOverviewById(
         parallelExerciseId: ParallelExerciseId
     ): Promise<ParallelTracesOverview> {
         const processEvents = await this.preProcessTraces(parallelExerciseId);

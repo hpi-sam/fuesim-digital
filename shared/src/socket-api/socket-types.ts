@@ -40,7 +40,7 @@ export interface ClientToServerEvents {
         action: 'pause' | 'start',
         callback: (response: SocketResponse) => void
     ) => void;
-    getParallelExerciseTraces: (
+    getParallelTracesOverview: (
         callback: (response: SocketResponse<ParallelTracesOverview>) => void
     ) => void;
 }

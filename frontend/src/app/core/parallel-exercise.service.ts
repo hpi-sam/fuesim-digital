@@ -4,10 +4,12 @@ import {
     ClientToServerEvents,
     ParallelExerciseId,
     ParallelExerciseInstanceSummary,
+    ParallelTracesOverview,
     ServerToClientEvents,
     SocketResponse,
     UpdateParallelExerciseResponseData,
     joinParallelExerciseResponseDataSchema,
+    parallelTracesOverviewSchema,
     socketIoTransports,
 } from 'fuesim-digital-shared';
 import type { Socket } from 'socket.io-client';
@@ -43,6 +45,8 @@ export class ParallelExerciseService {
     >([]);
     private readonly joinedParallelExerciseId =
         signal<ParallelExerciseId | null>(null);
+    public readonly parallelTracesOverview =
+        signal<ParallelTracesOverview | null>(null);
 
     constructor() {
         this.socket.on(
@@ -129,6 +133,26 @@ export class ParallelExerciseService {
             return false;
         }
         return true;
+    }
+
+    public async getParallelTracesOverview() {
+        console.log('GET');
+        const response = await new Promise<SocketResponse<object>>(
+            (resolve) => {
+                this.socket.emit('getParallelTracesOverview', resolve);
+            }
+        );
+        if (!response.success) {
+            this.messageService.postError({
+                title: 'Fehler beim Abrufen der Parallelübungsverläufe',
+                error: response.message,
+            });
+            return;
+        }
+        const parsedResponse = parallelTracesOverviewSchema.parse(
+            response.payload
+        );
+        this.parallelTracesOverview.set(parsedResponse);
     }
 
     public leaveParallelExercise() {

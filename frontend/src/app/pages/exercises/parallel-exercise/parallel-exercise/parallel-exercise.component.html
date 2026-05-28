@@ -155,7 +155,25 @@
             </ng-container>
             <ng-container ngbNavItem="traces">
                 <a ngbNavLink>Übungsverläufe</a>
-                <ng-template ngbNavContent> test </ng-template>
+                <ng-template ngbNavContent>
+                    <button
+                        class="btn btn-outline-primary"
+                        (click)="fetchParallelTracesOverview()"
+                    >
+                        Aktualisieren
+                    </button>
+                    @if (
+                        parallelExerciseService.parallelTracesOverview();
+                        as parallelTracesOverview
+                    ) {
+                        @for (
+                            entry of parallelTracesOverview.events | keyvalue;
+                            track entry.key
+                        ) {
+                            {{ entry.key }}
+                        }
+                    }
+                </ng-template>
             </ng-container>
         </nav>
         <div [ngbNavOutlet]="nav" class="mt-2"></div>

@@ -16,6 +16,8 @@ import {
 } from 'fuesim-digital-shared';
 import { ActivatedRoute } from '@angular/router';
 import { QrCodeComponent } from 'ng-qrcode';
+import { entries } from 'lodash-es';
+import { KeyValuePipe } from '@angular/common';
 import { ApiService } from '../../../../core/api.service';
 import { ParallelExerciseService } from '../../../../core/parallel-exercise.service';
 import { shareLink } from '../../../../shared/functions/share';
@@ -44,6 +46,7 @@ import { InlineTextEditorComponent } from '../../../../shared/components/inline-
         NgbNavLinkBase,
         NgbNavContent,
         NgbNavOutlet,
+        KeyValuePipe,
     ],
 })
 export class ParallelExerciseComponent {
@@ -72,6 +75,10 @@ export class ParallelExerciseComponent {
         this.parallelExercise.reload();
     }
 
+    async fetchParallelTracesOverview() {
+        await this.parallelExerciseService.getParallelTracesOverview();
+    }
+
     constructor() {
         this.parallelExercise = this.apiService.getParallelExerciseResource(
             this.route.snapshot.params['id']
@@ -86,4 +93,7 @@ export class ParallelExerciseComponent {
             }
         });
     }
+
+    protected readonly event = event;
+    protected readonly entries = entries;
 }

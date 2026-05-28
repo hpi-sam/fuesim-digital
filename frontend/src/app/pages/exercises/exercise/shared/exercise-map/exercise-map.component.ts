@@ -22,6 +22,7 @@ import {
     selectCurrentMainRole,
 } from '../../../../../state/application/selectors/shared.selectors';
 import { DisplayMessagesComponent } from '../../../../../feature/messages/display-messages/display-messages.component';
+import { MessageService } from '../../../../../core/messages/message.service';
 import { OlMapManager, olMapCoordinatesSchema } from './utility/ol-map-manager';
 import { PopupManager } from './utility/popup-manager';
 import { PopupService } from './utility/popup.service';
@@ -42,6 +43,7 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
     private readonly modalService = inject(NgbModal);
     private readonly route = inject(ActivatedRoute);
     readonly olMapManagerService = inject(OlMapManagerService);
+    private readonly messageService = inject(MessageService);
 
     readonly openLayersContainer = viewChild.required<
         ElementRef<HTMLDivElement>
@@ -71,7 +73,8 @@ export class ExerciseMapComponent implements AfterViewInit, OnDestroy {
             this.openLayersContainer().nativeElement,
             this.transferLinesService,
             this.popupManager,
-            this.popupService
+            this.popupService,
+            this.messageService
         );
         this.dragElementService.registerMap(
             this.olMapManagerService.olMapManager.olMap

@@ -41,6 +41,7 @@ import {
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import { ScoutableIndicatorsFeatureManager } from '../feature-managers/scoutable-indicators-feature-manager';
+import type { MessageService } from '../../../../../../core/messages/message.service';
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
@@ -87,7 +88,8 @@ export class OlMapManager {
         private readonly openLayersContainer: HTMLDivElement,
         private readonly transferLinesService: TransferLinesService,
         private readonly popupManager: PopupManager,
-        private readonly popupService: PopupService
+        private readonly popupService: PopupService,
+        private readonly messageService: MessageService
     ) {
         this._olMap = new OlMap({
             interactions: new Collection<Interaction>(),
@@ -153,6 +155,10 @@ export class OlMapManager {
 
     public toggleZoomLock() {
         this.lockZoom$.next(!this.lockZoom$.value);
+        this.messageService.postMessage({
+            title: `Zoom per Touchscreen ${this.lockZoom$.value ? 'gesperrt' : 'freigegeben'}`,
+            color: 'info',
+        });
     }
 
     private isInViewport(coordinate: Coordinate, viewport: Viewport): boolean {

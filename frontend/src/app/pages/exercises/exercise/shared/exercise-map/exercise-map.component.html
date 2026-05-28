@@ -14,16 +14,24 @@
         (click)="$event.stopPropagation()"
     >
         <button
-            (click)="olMapManagerService.olMapManager?.changeZoom('zoomIn')"
+            (click)="
+                olMapManagerService.olMapManager?.changeZoom('zoomIn');
+                zoomInTooltip.close()
+            "
             class="btn btn-sm btn-light"
+            #zoomInTooltip="ngbTooltip"
             ngbTooltip="Vergrößern"
             triggers="hover"
         >
             <i class="bi-zoom-in"></i>
         </button>
         <button
-            (click)="olMapManagerService.olMapManager?.changeZoom('zoomOut')"
+            (click)="
+                olMapManagerService.olMapManager?.changeZoom('zoomOut');
+                zoomOutTooltip.close()
+            "
             class="btn btn-sm btn-light"
+            #zoomOutTooltip="ngbTooltip"
             ngbTooltip="Verkleinern"
             triggers="hover"
         >
@@ -32,14 +40,14 @@
         @let lockZoom =
             (olMapManagerService.olMapManager?.lockZoom$ | async) ?? false;
         <button
-            (click)="olMapManagerService.olMapManager?.toggleZoomLock()"
+            (click)="
+                olMapManagerService.olMapManager?.toggleZoomLock();
+                lockZoomTooltip.close()
+            "
             class="btn btn-sm btn-light"
             [class.active]="lockZoom"
-            [ngbTooltip]="
-                lockZoom
-                    ? 'Zoom per Touchscreen gesperrt. Zum Aktivieren klicken.'
-                    : 'Zoom per Touchscreen aktiv. Zum Sperren klicken.'
-            "
+            #lockZoomTooltip="ngbTooltip"
+            ngbTooltip="Zoom per Touchscreen sperren/freigeben."
             triggers="hover"
         >
             <i class="bi" [ngClass]="lockZoom ? 'bi-lock' : 'bi-unlock2'"></i>
@@ -50,9 +58,11 @@
         ) {
             <button
                 (click)="
-                    olMapManagerService.olMapManager?.tryToFitViewForOverview()
+                    olMapManagerService.olMapManager?.tryToFitViewForOverview();
+                    fitViewTooltip.close()
                 "
                 class="btn btn-sm btn-light"
+                #fitViewTooltip="ngbTooltip"
                 ngbTooltip="Alle Ansichten anzeigen"
                 triggers="hover"
             >
@@ -64,8 +74,9 @@
             (restrictedToViewport$ | async) === undefined
         ) {
             <button
-                (click)="goToCoordinates()"
+                (click)="goToCoordinates(); goToCoordinatesTooltip.close()"
                 class="btn btn-sm btn-light"
+                #goToCoordinatesTooltip="ngbTooltip"
                 ngbTooltip="Zu Koordinaten springen"
                 triggers="hover"
             >
@@ -73,8 +84,9 @@
             </button>
         }
         <button
-            (click)="toggleFullscreen()"
+            (click)="toggleFullscreen(); fullscreenTooltip.close()"
             class="btn btn-sm btn-light"
+            #fullscreenTooltip="ngbTooltip"
             ngbTooltip="Vollbildmodus"
             triggers="hover"
         >

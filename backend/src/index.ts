@@ -72,7 +72,8 @@ async function main() {
         repositories.parallelExerciseRepository,
         accessKeyService,
         exerciseManagerService,
-        exerciseService
+        exerciseService,
+        repositories.actionRepository
     );
 
     let authService: AuthService;

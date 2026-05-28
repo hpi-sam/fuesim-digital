@@ -12,7 +12,7 @@ def do_process_mining():
         return "No data submitted", 400
 
     dataframe = DataFrame.from_dict(request.json)
-    dataframe = pm4py.format_dataframe(dataframe, case_id='case:concept:name', activity_key='concept:name', timestamp_key='time:timestamp')
+    dataframe = pm4py.format_dataframe(dataframe, case_id='participantKey', activity_key='name', timestamp_key='timestamp')
     event_log = pm4py.convert_to_event_log(dataframe)
     dfg, sa, ea = pm4py.discover_directly_follows_graph(event_log)
 

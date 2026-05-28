@@ -253,7 +253,8 @@ export function createTestEnvironment(): TestEnvironment {
             parallelExerciseRepository,
             accessKeyService,
             exerciseManagerService,
-            exerciseService
+            exerciseService,
+            actionRepository
         );
 
         const repositories: Repositories = {

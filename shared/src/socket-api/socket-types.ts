@@ -7,6 +7,7 @@ import type {
 import type { ExerciseKey } from '../exercise-keys.js';
 import type { ExerciseAction } from '../store/action-reducers/action-reducers.js';
 import type { UUID } from '../utils/uuid.js';
+import type { ParallelTracesOverview } from '../parallel-traces.js';
 
 export interface ServerToClientEvents {
     performAction: (action: ExerciseAction) => void;
@@ -38,6 +39,9 @@ export interface ClientToServerEvents {
     controlParallelExercise: (
         action: 'pause' | 'start',
         callback: (response: SocketResponse) => void
+    ) => void;
+    getParallelExerciseTraces: (
+        callback: (response: SocketResponse<ParallelTracesOverview>) => void
     ) => void;
 }
 

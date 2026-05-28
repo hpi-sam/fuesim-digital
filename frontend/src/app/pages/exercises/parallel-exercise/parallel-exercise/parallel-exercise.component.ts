@@ -1,6 +1,15 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { HttpResourceRef } from '@angular/common/http';
-import { NgbModal, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbModal,
+    NgbNav,
+    NgbNavContent,
+    NgbNavItem,
+    NgbNavLink,
+    NgbNavLinkBase,
+    NgbNavOutlet,
+    NgbTooltip,
+} from '@ng-bootstrap/ng-bootstrap';
 import {
     GetParallelExerciseResponseData,
     PatchParallelExerciseRequestData,
@@ -29,6 +38,12 @@ import { InlineTextEditorComponent } from '../../../../shared/components/inline-
         FooterComponent,
         NgbTooltip,
         InlineTextEditorComponent,
+        NgbNav,
+        NgbNavItem,
+        NgbNavLink,
+        NgbNavLinkBase,
+        NgbNavContent,
+        NgbNavOutlet,
     ],
 })
 export class ParallelExerciseComponent {

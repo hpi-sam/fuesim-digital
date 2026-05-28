@@ -261,33 +261,35 @@ export class ExerciseService {
                             exercise.template = exerciseEntity.template ?? null;
 
                             // Load all actions
-                            pushAll(
-                                exercise.temporaryActionHistory,
-                                (
-                                    await this.actionRepository
-                                        .withConnection(exerciseRepoTransaction)
-                                        .getActionsForExerciseId(
-                                            exerciseEntity.id
-                                        )
-                                ).map(
-                                    (actionEntity) =>
-                                        new ActionWrapper(
-                                            actionEntity.actionString,
-                                            actionEntity.emitterId,
-                                            exercise,
-                                            actionEntity.index,
-                                            actionEntity.id
-                                        )
-                                )
-                            );
+                            // pushAll(
+                            //     exercise.temporaryActionHistory,
+                            //     (
+                            //         await this.actionRepository
+                            //             .withConnection(exerciseRepoTransaction)
+                            //             .getActionsForExerciseId(
+                            //                 exerciseEntity.id
+                            //             )
+                            //     ).map(
+                            //         (actionEntity) =>
+                            //             new ActionWrapper(
+                            //                 actionEntity.actionString,
+                            //                 actionEntity.emitterId,
+                            //                 exercise,
+                            //                 actionEntity.index,
+                            //                 actionEntity.id
+                            //             )
+                            //     )
+                            // );
                             return exercise;
                         }
                     )
                 );
-                await Promise.all(
-                    // The actions have already been saved in the database -> do not keep them
-                    exercises.map(async (exercise) => exercise.restore(false))
-                );
+                console.log('Finished loading exercises in memory');
+                // await Promise.all(
+                //     // The actions have already been saved in the database -> do not keep them
+                //     exercises.map(async (exercise) => exercise.restore(false))
+                // );
+                console.log('Finished restoring exercises');
                 exercises.forEach((exercise) => {
                     this.exerciseMap.set(exercise.participantKey, exercise);
                     this.exerciseMap.set(exercise.trainerKey, exercise);

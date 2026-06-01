@@ -293,11 +293,16 @@ export class ExerciseService {
             throw new PermissionDeniedError();
         }
 
-        this.unloadExercise(activeExercise);
+        await this.deleteExerciseById(activeExercise.exercise.id);
+    }
 
-        await this.exerciseRepository.deleteExerciseById(
-            activeExercise.exercise.id
-        );
+    public async deleteExerciseById(exerciseId: ExerciseId) {
+        const activeExercise = this.exerciseMap.get(exerciseId);
+        if (activeExercise) {
+            this.unloadExercise(activeExercise);
+        }
+
+        await this.exerciseRepository.deleteExerciseById(exerciseId);
     }
 
     public async saveUnsavedExercises() {
@@ -325,6 +330,27 @@ export class ExerciseService {
                     })
             );
         });
+    }
+
+    public async deleteUnusedExercises() {
+        try {
+            const exerciseToDelete =
+                await this.exerciseRepository.getUnusedExercises();
+
+            await Promise.all(
+                exerciseToDelete.map(async (exercise) => {
+                    this.deleteExerciseById(exercise.id);
+                })
+            );
+
+            if (exerciseToDelete.length > 0) {
+                console.log(
+                    `Successfully deleted ${exerciseToDelete.length} unused exercises.`
+                );
+            }
+        } catch (error) {
+            console.error('Error during deletion of unused exercises:', error);
+        }
     }
 
     public async getTimeline(

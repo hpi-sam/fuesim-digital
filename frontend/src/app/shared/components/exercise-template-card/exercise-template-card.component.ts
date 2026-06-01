@@ -17,7 +17,6 @@ import { MessageService } from '../../../core/messages/message.service';
 import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service';
 import { InlineTextEditorComponent } from '../inline-text-editor/inline-text-editor.component';
 import { CreateParallelExerciseModalComponent } from '../../../pages/exercises/shared/create-parallel-exercise-modal/create-parallel-exercise-modal.component';
-import { ParallelExerciseService } from '../../../core/parallel-exercise.service.js';
 
 @Component({
     selector: 'app-exercise-template-card',
@@ -41,9 +40,7 @@ export class ExerciseTemplateCardComponent {
         ConfirmationModalService
     );
     private readonly ngbModalService = inject(NgbModal);
-    private readonly parallelExerciseService = inject(ParallelExerciseService);
-    protected readonly parallelExercisesEnabled =
-        this.parallelExerciseService.parallelExercisesEnabled.value;
+    protected readonly exerciseConfig = this.apiService.exerciseConfig.value;
 
     readonly exerciseTemplate = input<GetExerciseTemplateResponseData>();
     readonly updated = output();

@@ -15,7 +15,7 @@
                     Bitte geben Sie hier die Übungs-PIN ein, die sie von der
                     Übungsleitung erhalten haben:
                 </p>
-                <div class="input-group">
+                <div class="input-group mb-4">
                     <input
                         [appAutofocus]="true"
                         (keydown.enter)="joinExercise()"
@@ -122,6 +122,15 @@
                             >{{ participantKey }}</span
                         >
                         erstellt.
+                    </div>
+                } @else if (!auth.authData().user) {
+                    <div
+                        class="alert alert-warning small mb-0 px-2 py-1 d-flex align-items-center"
+                    >
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Übungen, die ohne Benutzerkonto erstellt werden, werden
+                        nach {{ exerciseConfig()?.autoDeleteDays }} Tagen
+                        Inaktivität automatisch gelöscht.
                     </div>
                 }
             </div>

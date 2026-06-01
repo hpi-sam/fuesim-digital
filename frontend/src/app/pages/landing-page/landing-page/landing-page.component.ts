@@ -23,6 +23,7 @@ import { FileInputDirective } from '../../../shared/directives/file-input.direct
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { DisplayModelValidationComponent } from '../../../shared/validation/display-model-validation/display-model-validation.component';
 import { HelpButtonComponent } from '../../../help-button/help-button.component.js';
+import { ConfirmationModalService } from '../../../core/confirmation-modal/confirmation-modal.service.js';
 
 @Component({
     selector: 'app-landing-page',
@@ -45,6 +46,11 @@ export class LandingPageComponent {
     private readonly router = inject(Router);
     private readonly messageService = inject(MessageService);
     readonly auth = inject(AuthService);
+    private readonly confirmationModalService = inject(
+        ConfirmationModalService
+    );
+
+    protected readonly exerciseConfig = this.apiService.exerciseConfig.value;
 
     public loginUrl = this.auth.loginUrl;
 

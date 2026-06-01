@@ -10,7 +10,7 @@ export const clientSchema = z.strictObject({
     role: clientRoleSchema,
     viewRestrictedToViewportId: uuidSchema.optional(),
     isInWaitingRoom: z.boolean(),
-    isInactive: z.boolean(),
+    isActive: z.boolean(),
 });
 export type Client = z.infer<typeof clientSchema>;
 
@@ -26,6 +26,6 @@ export function newClient(
         role,
         viewRestrictedToViewportId: undefined,
         isInWaitingRoom,
-        isInactive: false,
+        isActive: false,
     };
 }

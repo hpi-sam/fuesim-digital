@@ -9,7 +9,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Changed
 
-- Clients now automatically rejoin the exercise with the same view and role when disconnecting due to network issues / reloads.
+- Clients now automatically rejoin the exercise with the same view and role when disconnecting due to network issues/reloads.
 
 ### Fixed
 

@@ -61,9 +61,9 @@ export class SetClientInactiveAction implements Action {
     public readonly clientId!: UUID;
 }
 
-export class ReactivateClientAction implements Action {
-    @IsValue('[Client] Reactivate client' as const)
-    public readonly type = '[Client] Reactivate client';
+export class SetClientActiveAction implements Action {
+    @IsValue('[Client] Set client active' as const)
+    public readonly type = '[Client] Set client active';
     @IsUUID(4, uuidValidationOptions)
     public readonly clientId!: UUID;
 }
@@ -145,17 +145,17 @@ export namespace ClientActionReducers {
         action: SetClientInactiveAction,
         reducer: (draftState, { clientId }) => {
             const client = getElement(draftState, 'client', clientId);
-            client.isInactive = true;
+            client.isActive = false;
             return draftState;
         },
         rights: 'server',
     };
 
-    export const reactivateClient: ActionReducer<ReactivateClientAction> = {
-        action: ReactivateClientAction,
+    export const setClientActive: ActionReducer<SetClientActiveAction> = {
+        action: SetClientActiveAction,
         reducer: (draftState, { clientId }) => {
             const client = getElement(draftState, 'client', clientId);
-            client.isInactive = false;
+            client.isActive = true;
             return draftState;
         },
         rights: 'server',

@@ -210,7 +210,7 @@ export class ParallelExerciseService {
                 isActive: Object.values(state.clients).some(
                     (client) =>
                         client.role.mainRole === 'participant' &&
-                        !client.isInactive
+                        client.isActive
                 ),
             });
         });

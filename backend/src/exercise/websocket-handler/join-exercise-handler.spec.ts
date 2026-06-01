@@ -290,6 +290,6 @@ describe('join exercise', () => {
         const state = activeExercise.getStateSnapshot();
         const clients = Object.values(state.clients);
         expect(clients.length).toBeGreaterThan(0);
-        expect(clients.every((c) => c.isInactive)).toBe(true);
+        expect(clients.every((c) => !c.isActive)).toBe(true);
     });
 });

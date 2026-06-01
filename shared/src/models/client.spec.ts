@@ -2,16 +2,16 @@ import { newClient, clientSchema } from './client.js';
 import { newClientRole } from './client-role.js';
 
 describe('Client model', () => {
-    it('newClient sets isInactive to false', () => {
+    it('newClient sets isActive to true', () => {
         const client = newClient(
             'Alice',
             newClientRole('participant', 'mapOperator'),
             false
         );
-        expect(client.isInactive).toBe(false);
+        expect(client.isActive).toBe(true);
     });
 
-    it('clientSchema accepts isInactive field', () => {
+    it('clientSchema accepts isActive field', () => {
         const result = clientSchema.safeParse({
             id: '00000000-0000-4000-a000-000000000001',
             type: 'client',
@@ -22,7 +22,7 @@ describe('Client model', () => {
                 specificRole: 'mapOperator',
             },
             isInWaitingRoom: false,
-            isInactive: true,
+            isActive: true,
         });
         expect(result.success).toBe(true);
     });

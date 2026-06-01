@@ -58,7 +58,7 @@ export const selectActiveClients = createSelector(
     selectClients,
     (clients) =>
         Object.fromEntries(
-            Object.entries(clients).filter(([, client]) => !client.isInactive)
+            Object.entries(clients).filter(([, client]) => client.isActive)
         ) as typeof clients
 );
 export const selectRadiograms = selectPropertyFactory('radiograms');

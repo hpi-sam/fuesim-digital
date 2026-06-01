@@ -10,10 +10,10 @@
     </thead>
     <tbody>
         @for (client of clients$ | async | values; track client.id) {
-            <tr [class.text-muted]="client.isInactive">
+            <tr [class.text-muted]="!client.isActive">
                 <td class="align-middle">
                     {{ client.name }}
-                    @if (client.isInactive) {
+                    @if (!client.isActive) {
                         <span class="badge bg-secondary ms-1">Getrennt</span>
                     }
                 </td>
@@ -31,7 +31,7 @@
                         <button
                             class="btn btn-outline-primary btn-sm"
                             ngbDropdownToggle
-                            [disabled]="client.isInactive"
+                            [disabled]="!client.isActive"
                             data-cy="clientPopupSetRoleButton"
                         >
                             {{
@@ -75,7 +75,7 @@
                 <td ngbDropdown>
                     <button
                         [class.d-none]="
-                            client.isInactive ||
+                            client.isActive ||
                             (client.role.specificRole !== 'mapOperator' &&
                                 client.role.mainRole !== 'trainer')
                         "
@@ -118,7 +118,7 @@
                     </div>
                 </td>
                 <td class="align-middle">
-                    @if (!client.isInactive) {
+                    @if (client.isActive) {
                         <div class="form-switch">
                             <input
                                 [ngModel]="!client.isInWaitingRoom"
@@ -133,7 +133,7 @@
                     }
                 </td>
                 <td class="align-middle">
-                    @if (client.isInactive) {
+                    @if (!client.isActive) {
                         <button
                             class="btn btn-outline-danger btn-sm"
                             (click)="removeClient(client.id)"

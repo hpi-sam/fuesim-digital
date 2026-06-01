@@ -93,7 +93,7 @@ export class ExerciseClientWrapper extends ClientWrapper {
     /**
      * Reconnect to an existing inactive client in an exercise.
      * @param exerciseKey The exercise key to use.
-     * @param clientId The id of the existing (inactive) client to reactivate.
+     * @param clientId The id of the existing (inactive) client to set active.
      * @returns The client's id on success, or null if the client could not be reconnected.
      */
     public reconnectToExercise(
@@ -106,12 +106,12 @@ export class ExerciseClientWrapper extends ClientWrapper {
         );
         const existingClient =
             this.chosenExercise.getStateSnapshot().clients[clientId];
-        if (!existingClient?.isInactive) {
+        if (existingClient?.isActive) {
             this.chosenExercise = undefined;
             return null;
         }
         this.relatedExerciseClient = existingClient;
-        this.chosenExercise.reactivateClient(this);
+        this.chosenExercise.setClientActive(this);
         return existingClient.id;
     }
 

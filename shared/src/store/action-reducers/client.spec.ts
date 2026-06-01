@@ -24,10 +24,10 @@ describe('ClientActionReducers', () => {
     });
 
     describe('SetClientInactiveAction', () => {
-        it('sets isInactive to true and keeps client in state', () => {
+        it('sets isActive to false and keeps client in state', () => {
             // Verify client is initially active
             expect(state.clients[clientId]).toBeDefined();
-            expect(state.clients[clientId]!.isInactive).toBe(false);
+            expect(state.clients[clientId]!.isActive).toBe(true);
 
             // Apply the action
             state = reduceExerciseState(state, {
@@ -35,29 +35,29 @@ describe('ClientActionReducers', () => {
                 clientId,
             });
 
-            // Verify client still exists and isInactive is now true
+            // Verify client still exists and isActive is now false
             expect(state.clients[clientId]).toBeDefined();
-            expect(state.clients[clientId]!.isInactive).toBe(true);
+            expect(state.clients[clientId]!.isActive).toBe(false);
         });
     });
 
-    describe('ReactivateClientAction', () => {
-        it('sets isInactive to false', () => {
+    describe('SetClientActiveAction', () => {
+        it('sets isActive to true', () => {
             // First set the client as inactive
             state = reduceExerciseState(state, {
                 type: '[Client] Set client inactive',
                 clientId,
             });
-            expect(state.clients[clientId]!.isInactive).toBe(true);
+            expect(state.clients[clientId]!.isActive).toBe(false);
 
-            // Apply the reactivate action
+            // Apply the action
             state = reduceExerciseState(state, {
-                type: '[Client] Reactivate client',
+                type: '[Client] Set client active',
                 clientId,
             });
 
             // Verify client is now active
-            expect(state.clients[clientId]!.isInactive).toBe(false);
+            expect(state.clients[clientId]!.isActive).toBe(true);
         });
     });
 });

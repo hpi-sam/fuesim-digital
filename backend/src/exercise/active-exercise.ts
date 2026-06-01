@@ -240,15 +240,15 @@ export class ActiveExercise {
         }
     }
 
-    public reactivateClient(clientWrapper: ExerciseClientWrapper) {
+    public setClientActive(clientWrapper: ExerciseClientWrapper) {
         if (clientWrapper.client === undefined) {
             return;
         }
-        const reactivateAction: ExerciseAction = {
-            type: '[Client] Reactivate client',
+        const activeAction: ExerciseAction = {
+            type: '[Client] Set client active',
             clientId: clientWrapper.client.id,
         };
-        this.applyAction(reactivateAction, clientWrapper.client.id);
+        this.applyAction(activeAction, clientWrapper.client.id);
         this.clients.add(clientWrapper);
     }
 

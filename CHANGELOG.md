@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Fixed
+
+- Previously created templates are now correctly recognized as templates when editing.
+
 ## [0.13.0] - 2026-06-01
 
 ### Added

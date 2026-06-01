@@ -365,7 +365,9 @@ describe('parallel exercise router', () => {
 
         it('fails joining with invalid key', async () => {
             const invalidKey =
-                await environment.services.accessKeyService.generateKey(7);
+                await environment.repositories.accessKeyRepository.generateKey(
+                    7
+                );
             await environment
                 .httpRequest(
                     'post',

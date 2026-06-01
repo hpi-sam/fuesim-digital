@@ -7,6 +7,13 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-05-21
+
+### Fixed
+
+- Deleting exercise templates which have exercise instances doesn't crash the server anymore.
+- Malformed database entries are no longer created when an exercise import fails.
+
 ## [0.12.0] - 2026-05-17
 
 ### Added
@@ -401,7 +408,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.0...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.10.0...v0.11.0

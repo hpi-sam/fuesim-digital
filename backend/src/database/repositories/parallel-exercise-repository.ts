@@ -1,6 +1,6 @@
 import { eq, desc, getTableColumns } from 'drizzle-orm';
 import type {
-    GroupParticipantKey,
+    ParallelExerciseKey,
     ParallelExerciseId,
 } from 'fuesim-digital-shared';
 import type { ParallelExercise, ParallelExerciseInsert } from '../schema.js';
@@ -40,7 +40,7 @@ export class ParallelExerciseRepository extends BaseRepository {
     }
 
     public async getParallelExerciseByParticipantKey(
-        key: GroupParticipantKey
+        key: ParallelExerciseKey
     ): Promise<ParallelExercise | null> {
         return this.onlySingle(
             await this.parallelExerciseQuery.where(

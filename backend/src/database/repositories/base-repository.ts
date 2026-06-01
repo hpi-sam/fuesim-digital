@@ -5,11 +5,22 @@ import type {
 } from '../services/database-service.js';
 
 export abstract class BaseRepository {
+    protected readonly databaseConnection:
+        | DatabaseConnection
+        | DatabaseTransaction;
+
     public constructor(
-        protected readonly databaseConnection:
+        databaseConnection:
+            | BaseRepository
             | DatabaseConnection
             | DatabaseTransaction
-    ) {}
+    ) {
+        if (databaseConnection instanceof BaseRepository) {
+            this.databaseConnection = databaseConnection.databaseConnection;
+        } else {
+            this.databaseConnection = databaseConnection;
+        }
+    }
 
     /**
      * Starts a new transaction
@@ -39,14 +50,9 @@ export abstract class BaseRepository {
     public withConnection(
         connection: BaseRepository | DatabaseConnection | DatabaseTransaction
     ): typeof this {
-        let newConnection = connection;
-        if (connection instanceof BaseRepository) {
-            newConnection = connection.databaseConnection;
-        }
-
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const RepositoryClass = this.constructor as Constructor<typeof this>;
-        return new RepositoryClass(newConnection);
+        return new RepositoryClass(connection);
     }
 
     protected onlySingle<T>(array: T[]): T | null {

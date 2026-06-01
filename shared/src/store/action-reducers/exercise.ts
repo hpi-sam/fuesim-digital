@@ -6,6 +6,7 @@ import {
     IsInt,
     IsPositive,
     IsUUID,
+    IsString,
 } from 'class-validator';
 import { WritableDraft } from 'immer';
 import { changePosition } from '../../models/utils/position/position-helpers-mutable.js';
@@ -31,6 +32,7 @@ import {
 import { type UUID, uuid, uuidValidationOptions } from '../../utils/uuid.js';
 import { newTransferPositionFor } from '../../models/utils/position/transfer-position.js';
 import type { ResourceDescription } from '../../models/utils/resource-description.js';
+import { ParticipantKey } from '../../exercise-keys.js';
 import { PatientUpdate } from './utils/patient-updates.js';
 import {
     logPatientVisibleStatusChanged,
@@ -95,6 +97,21 @@ export class ImportTemplatesAction implements Action {
     @ValidateNested()
     @Type(() => PartialExport)
     public readonly partialExport!: PartialExport;
+}
+
+/**
+ * WARNING: THIS IS ABSOLUTELY LEGACY
+ * --- DO NOT USE ---
+ * This is used only for legacy purposes for exercises created with an empty intitialState participantId (stateVersion <4)
+ * We cannot migrate them properly without this action
+ *
+ * @deprecated
+ */
+export class SetParticipantIdAction implements Action {
+    @IsString()
+    public readonly type = `[Exercise] Set Participant Id`;
+    @IsString()
+    public readonly participantId!: string;
 }
 
 export namespace ExerciseActionReducers {
@@ -236,6 +253,22 @@ export namespace ExerciseActionReducers {
             return draftState;
         },
         rights: 'trainer',
+    };
+    /**
+     * WARNING: THIS IS ABSOLUTELY LEGACY
+     * --- DO NOT USE ---
+     * This is used only for legacy purposes for exercises created with an empty intitialState participantId (stateVersion <4)
+     * We cannot migrate them properly without this action
+     *
+     * @deprecated
+     */
+    export const setParticipantId: ActionReducer<SetParticipantIdAction> = {
+        action: SetParticipantIdAction,
+        reducer: (draftState, { participantId }) => {
+            draftState.participantKey = participantId as ParticipantKey;
+            return draftState;
+        },
+        rights: 'server',
     };
 }
 

@@ -14,7 +14,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Changed
 
-- In the client overview table, the following has been renamed: 'Rolle' to 'Modus', 'Ansicht' to Kartenansicht', 'nicht zugewiesen' to 'Gesamte Karte'.
+- In the client overview table, the following has been renamed for more consistency: 'Rolle' to 'Modus', 'Ansicht' to 'Kartenansicht', 'nicht zugewiesen' to 'Gesamte Karte'.
 
 ### Fixed
 

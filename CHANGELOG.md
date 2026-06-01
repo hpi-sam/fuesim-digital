@@ -7,6 +7,26 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-06-01
+
+### Added
+
+- Add documentation for most features and integrate it with the software.
+- Zooming the map via touch input can be disabled by both trainers and participants per device. This helps preventing accidental zooming if multiple participants are working on a single device simultaneously.
+
+### Changed
+
+- In the client overview table, the following has been renamed for more consistency: 'Rolle' to 'Modus', 'Ansicht' to 'Kartenansicht', 'nicht zugewiesen' to 'Gesamte Karte'.
+- Exercises can be directly created when editing exercise templates.
+- Templates can be directly deleted when editing them.
+
+### Fixed
+
+- Creating a parallel exercise with many (>10) exercise instances no longer slows down the server significantly.
+- Massively reduce the server start up time with many exercises.
+- Old exercise exports don't fail the validation anymore
+- Exercises can no longer be accidentally started from the simulation overview.
+
 ## [0.12.1] - 2026-05-21
 
 ### Fixed
@@ -408,7 +428,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.1...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.0...v0.11.1

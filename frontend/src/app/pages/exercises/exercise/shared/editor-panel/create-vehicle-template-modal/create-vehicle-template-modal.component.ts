@@ -7,12 +7,13 @@ import type {
 } from '../vehicle-template-form/vehicle-template-form.component';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import { VehicleTemplateFormComponent } from '../vehicle-template-form/vehicle-template-form.component';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-create-vehicle-template-modal',
     templateUrl: './create-vehicle-template-modal.component.html',
     styleUrls: ['./create-vehicle-template-modal.component.scss'],
-    imports: [VehicleTemplateFormComponent],
+    imports: [VehicleTemplateFormComponent, HelpButtonComponent],
 })
 export class CreateVehicleTemplateModalComponent {
     private readonly activeModal = inject(NgbActiveModal);

@@ -12,6 +12,7 @@ import { createSelectViewport } from '../../../../../../../state/application/sel
 import { selectCurrentMainRole } from '../../../../../../../state/application/selectors/shared.selectors';
 import { AppSaveOnTypingDirective } from '../../../../../../../shared/directives/app-save-on-typing.directive';
 import { DisplayValidationComponent } from '../../../../../../../shared/validation/display-validation/display-validation.component';
+import { HelpButtonComponent } from '../../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-viewport-popup',
@@ -22,6 +23,7 @@ import { DisplayValidationComponent } from '../../../../../../../shared/validati
         AppSaveOnTypingDirective,
         DisplayValidationComponent,
         AsyncPipe,
+        HelpButtonComponent,
     ],
 })
 export class ViewportPopupComponent implements OnInit {

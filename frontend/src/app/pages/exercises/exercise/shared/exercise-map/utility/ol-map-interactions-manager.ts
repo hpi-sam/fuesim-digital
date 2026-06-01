@@ -31,6 +31,7 @@ export class OlMapInteractionsManager {
     private lastStatus: ExerciseStatus | undefined;
     private lastRole: Role | undefined;
     private lastExerciseStateMode: 'exercise' | 'timeTravel' | undefined;
+    private _lockZoom = false;
 
     constructor(
         private readonly mapInteractions: Collection<Interaction>,
@@ -54,6 +55,15 @@ export class OlMapInteractionsManager {
 
     public addTrainerInteraction(interaction: Interaction) {
         this.trainerInteractions.push(interaction);
+        this.syncInteractionsAndHandler();
+    }
+
+    public get lockZoom() {
+        return this._lockZoom;
+    }
+
+    public set lockZoom(value) {
+        this._lockZoom = value;
         this.syncInteractionsAndHandler();
     }
 
@@ -92,6 +102,7 @@ export class OlMapInteractionsManager {
         this.updateParticipantInteractions();
         this.interactions = defaultInteractions({
             pinchRotate: false,
+            pinchZoom: !this._lockZoom,
             altShiftDragRotate: false,
             keyboard: true,
         }).extend(

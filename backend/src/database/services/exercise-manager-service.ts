@@ -160,7 +160,7 @@ export class ExerciseManagerService {
             if (!exerciseEntry) throw new ApiError();
 
             const activeExercise = new ActiveExercise(exerciseEntry, []);
-            await this.exerciseService.loadExercise(activeExercise);
+            this.exerciseService.loadExercise(activeExercise);
 
             await this.exerciseRepository.updateExerciseTemplate(
                 exerciseTemplate.id,

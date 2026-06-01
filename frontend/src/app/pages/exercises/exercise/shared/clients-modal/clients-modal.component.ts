@@ -10,6 +10,7 @@ import { selectExerciseKey } from '../../../../../state/application/selectors/ap
 import { ClientOverviewTableComponent } from '../client-overview-table/client-overview-table.component';
 import { CopyButtonComponent } from '../../../../../shared/components/copy-button/copy-button.component';
 import { selectOwnClient } from '../../../../../state/application/selectors/shared.selectors';
+import { HelpButtonComponent } from '../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-clients-modal',
@@ -19,6 +20,7 @@ import { selectOwnClient } from '../../../../../state/application/selectors/shar
         ClientOverviewTableComponent,
         CopyButtonComponent,
         QrCodeComponent,
+        HelpButtonComponent,
     ],
     templateUrl: './clients-modal.component.html',
     styleUrl: './clients-modal.component.scss',

@@ -8,7 +8,7 @@
         Einstellungen
     </button>
 
-    @if (isTemplate()) {
+    @if (isExerciseTemplate()) {
         <div ngbDropdown placement="top-start" [style.display]="'contents'">
             <button
                 type="button"
@@ -80,9 +80,7 @@
                 </button>
             </div>
         </div>
-    }
 
-    @if (!isTemplate()) {
         <div ngbDropdown placement="top-start" class="d-inline-block">
             <button
                 type="button"
@@ -162,19 +160,13 @@
                 </button>
             </div>
         </div>
-
-        <app-start-pause-button />
-
-        <div class="flex-grow-1"></div>
-
-        <button (click)="deleteExercise()" class="btn btn-danger">
-            Übung löschen
-        </button>
-    } @else {
-        <div class="d-flex alert alert-warning p-2 mb-0 px-3" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            Dies ist eine Übungsvorlage. Erstellen Sie eine Übung aus dieser
-            Vorlage, um sie zu starten.
-        </div>
     }
+
+    <app-start-pause-button />
+
+    <div class="flex-grow-1"></div>
+
+    <button (click)="deleteExercise()" class="btn btn-danger">
+        {{ exerciseTypeName() }} löschen
+    </button>
 </div>

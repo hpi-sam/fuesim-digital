@@ -5,6 +5,11 @@
     >
         <h5 class="popover-header d-flex align-items-center gap-1">
             <app-patient-header [patientId]="patientId" />
+            @if (currentRole() === 'trainer') {
+                <app-help-button
+                    url="2_exercises/3_exercise_elements.html#patienten"
+                />
+            }
             <div class="flex-grow-1"></div>
             <button
                 (click)="closePopup()"

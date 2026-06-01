@@ -2,8 +2,8 @@
     <thead>
         <tr>
             <th scope="col">Name</th>
-            <th scope="col">Rolle</th>
-            <th scope="col">Ansicht</th>
+            <th scope="col">Modus</th>
+            <th scope="col">Kartenansicht</th>
             <th scope="col">In der Übung</th>
         </tr>
     </thead>
@@ -69,7 +69,7 @@
                 <!-- Choose the viewport -->
                 <td ngbDropdown>
                     <button
-                        [disabled]="
+                        [class.d-none]="
                             client.role.specificRole !== 'mapOperator' &&
                             client.role.mainRole !== 'trainer'
                         "
@@ -84,7 +84,7 @@
                                 ]?.name
                             }}
                         } @else {
-                            <i> Nicht zugewiesen </i>
+                            <em> Gesamte Karte </em>
                         }
                     </button>
                     <div ngbDropdownMenu>
@@ -107,7 +107,7 @@
                             (click)="restrictToViewport(client.id, undefined)"
                             data-cy="clientPopupUnsetViewportDropdownButton"
                         >
-                            <i> Nicht zugewiesen </i>
+                            <em> Gesamte Karte </em>
                         </button>
                     </div>
                 </td>

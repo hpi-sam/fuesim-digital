@@ -7,12 +7,13 @@ import type {
 } from '../image-template-form/image-template-form.component';
 import { ExerciseService } from '../../../../../../core/exercise.service';
 import { ImageTemplateFormComponent } from '../image-template-form/image-template-form.component';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-create-image-template-modal',
     templateUrl: './create-image-template-modal.component.html',
     styleUrls: ['./create-image-template-modal.component.scss'],
-    imports: [ImageTemplateFormComponent],
+    imports: [ImageTemplateFormComponent, HelpButtonComponent],
 })
 export class CreateImageTemplateModalComponent {
     readonly activeModal = inject(NgbActiveModal);

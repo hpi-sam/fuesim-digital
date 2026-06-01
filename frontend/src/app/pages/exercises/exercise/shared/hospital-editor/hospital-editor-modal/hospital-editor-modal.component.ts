@@ -10,12 +10,19 @@ import type { AppState } from '../../../../../../state/app.state';
 import { selectHospitals } from '../../../../../../state/application/selectors/exercise.selectors';
 import { AppSaveOnTypingDirective } from '../../../../../../shared/directives/app-save-on-typing.directive';
 import { ValuesPipe } from '../../../../../../shared/pipes/values.pipe';
+import { HelpButtonComponent } from '../../../../../../help-button/help-button.component.js';
 
 @Component({
     selector: 'app-hospital-editor-modal',
     templateUrl: './hospital-editor-modal.component.html',
     styleUrls: ['./hospital-editor-modal.component.scss'],
-    imports: [FormsModule, AppSaveOnTypingDirective, AsyncPipe, ValuesPipe],
+    imports: [
+        FormsModule,
+        AppSaveOnTypingDirective,
+        AsyncPipe,
+        ValuesPipe,
+        HelpButtonComponent,
+    ],
 })
 export class HospitalEditorModalComponent {
     private readonly store = inject<Store<AppState>>(Store);

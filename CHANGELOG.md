@@ -7,6 +7,12 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-06-01
+
+### Fixed
+
+- Previously created templates are now correctly recognized as templates when editing.
+
 ## [0.13.0] - 2026-06-01
 
 ### Added
@@ -428,7 +434,8 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ### Initial unstable release of Digitale FüSim MANV
 
-[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.0...HEAD
+[unreleased]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.1...HEAD
+[0.13.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/hpi-sam/fuesim-digital/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/hpi-sam/fuesim-digital/compare/v0.11.1...v0.12.0

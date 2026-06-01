@@ -75,7 +75,7 @@
                 <td ngbDropdown>
                     <button
                         [class.d-none]="
-                            client.isActive ||
+                            !client.isActive ||
                             (client.role.specificRole !== 'mapOperator' &&
                                 client.role.mainRole !== 'trainer')
                         "
@@ -137,7 +137,7 @@
                         <button
                             class="btn btn-outline-danger btn-sm"
                             (click)="removeClient(client.id)"
-                            title="Teilnehmer entfernen"
+                            ngbTooltip="Entfernen"
                         >
                             <i class="bi bi-trash-fill"></i>
                         </button>

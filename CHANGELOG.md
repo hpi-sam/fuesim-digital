@@ -12,6 +12,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 - Add documentation for most features and integrate it with the software.
 - Zooming the map via touch input can be disabled by both trainers and participants per device. This helps preventing accidental zooming if multiple participants are working on a single device simultaneously.
 
+### Changed
+
+- In the client overview table, the following has been renamed: 'Rolle' to 'Modus', 'Ansicht' to Kartenansicht', 'nicht zugewiesen' to 'Gesamte Karte'.
+
 ### Fixed
 
 - Creating a parallel exercise with many (>10) exercise instances no longer slows down the server significantly.

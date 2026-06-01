@@ -206,6 +206,7 @@ describe('exercise manager router', () => {
             expect(importedExercise.exercise.currentStateString).toMatchObject({
                 ...exercise.exercise.currentStateString,
                 participantKey: importedExercise.participantKey,
+                type: 'template',
             });
         });
     });

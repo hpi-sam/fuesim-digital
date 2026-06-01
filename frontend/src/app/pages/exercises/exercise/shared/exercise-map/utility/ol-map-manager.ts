@@ -11,7 +11,7 @@ import { Collection, View } from 'ol';
 import type { Interaction } from 'ol/interaction';
 import type VectorLayer from 'ol/layer/Vector';
 import OlMap from 'ol/Map';
-import { Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { z } from 'zod';
 import type { Coordinate } from 'ol/coordinate';
@@ -41,6 +41,7 @@ import {
 import { selectStateSnapshot } from '../../../../../../state/get-state-snapshot';
 import type { ExerciseService } from '../../../../../../core/exercise.service';
 import { ScoutableIndicatorsFeatureManager } from '../feature-managers/scoutable-indicators-feature-manager';
+import type { MessageService } from '../../../../../../core/messages/message.service';
 import type { FeatureManager } from './feature-manager';
 import type { PopupManager } from './popup-manager';
 import { OlMapInteractionsManager } from './ol-map-interactions-manager';
@@ -60,6 +61,7 @@ export class OlMapManager {
     private featureManagers: FeatureManager<any>[];
     private readonly mapInteractionsManager: OlMapInteractionsManager;
     private static readonly defaultZoom = 20;
+    public readonly lockZoom$ = new BehaviorSubject(false);
     private readonly destroy$ = new Subject<void>();
 
     /**
@@ -86,7 +88,8 @@ export class OlMapManager {
         private readonly openLayersContainer: HTMLDivElement,
         private readonly transferLinesService: TransferLinesService,
         private readonly popupManager: PopupManager,
-        private readonly popupService: PopupService
+        private readonly popupService: PopupService,
+        private readonly messageService: MessageService
     ) {
         this._olMap = new OlMap({
             interactions: new Collection<Interaction>(),
@@ -138,10 +141,24 @@ export class OlMapManager {
             this.layerFeatureManagerDictionary,
             this.featureNameFeatureManagerDictionary
         );
+
+        this.lockZoom$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(
+                (lockZoom) => (this.mapInteractionsManager.lockZoom = lockZoom)
+            );
     }
 
     public get olMap(): OlMap {
         return this._olMap;
+    }
+
+    public toggleZoomLock() {
+        this.lockZoom$.next(!this.lockZoom$.value);
+        this.messageService.postMessage({
+            title: `Zoom per Touchscreen ${this.lockZoom$.value ? 'gesperrt' : 'freigegeben'}`,
+            color: 'info',
+        });
     }
 
     private isInViewport(coordinate: Coordinate, viewport: Viewport): boolean {

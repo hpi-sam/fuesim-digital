@@ -10,6 +10,7 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 ### Added
 
 - Add documentation for most features and integrate it with the software.
+- Zooming the map via touch input can be disabled by both trainers and participants per device. This helps preventing accidental zooming if multiple participants are working on a single device simultaneously.
 
 ### Fixed
 

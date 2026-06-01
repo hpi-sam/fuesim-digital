@@ -7,6 +7,10 @@ and this project does **not** adhere to [Semantic Versioning](https://semver.org
 
 ## [Unreleased]
 
+### Added
+
+- Trainers now have access to the 'Einsatzübersicht' in Exercises and Exercise Templates.
+
 ## [0.13.1] - 2026-06-01
 
 ### Fixed

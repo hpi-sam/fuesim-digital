@@ -74,28 +74,12 @@ type ExerciseActionTypeDictionary = {
 /**
  * This dictionary maps the action type to the ActionReducer.
  */
-const exerciseActionTypeDictionary: ExerciseActionTypeDictionary =
-    Object.values(actionReducers)
-        .map((actionReducer) => {
-            if ('type' in actionReducer) {
-                return {
-                    type: actionReducer.type,
-                    reducer: actionReducer,
-                } as const;
-            }
-            return {
-                // the generated ts code from class default values adds them only in the constructor: https://github.com/microsoft/TypeScript/issues/15607
-                // therefore we have to call the constructor (An ActionClass constructor is therefore required to not throw an error when called without arguments)
-                type: new actionReducer.action().type,
-                reducer: actionReducer,
-            } as const;
-        })
-        .reduce((accumulator, value) => {
-            // TODO: Dig into this error and look at plausible workarounds
-            // @ts-expect-error Results in TS2590; too complex union type ¯\_(ツ)_/¯
-            accumulator[value.type] = value.reducer;
-            return accumulator;
-        }, {} as ExerciseActionTypeDictionary);
+export const exerciseActionTypeDictionary: ExerciseActionTypeDictionary =
+    Object.fromEntries(
+        Object.values(actionReducers).map(
+            (actionReducer) => [actionReducer.type, actionReducer] as const
+        )
+    ) as ExerciseActionTypeDictionary;
 
 export function isActionType(
     actionType: string

@@ -124,9 +124,7 @@ export class ExerciseManagerService {
             const accessKeyRepository = new AccessKeyRepository(tx);
 
             const exerciseTemplate =
-                await this.exerciseRepository.getExerciseTemplateById(
-                    templateId
-                );
+                await tx.getExerciseTemplateById(templateId);
             if (!exerciseTemplate) {
                 throw new NotFoundError();
             }
@@ -155,17 +153,15 @@ export class ExerciseManagerService {
                 baseTemplateId: exerciseTemplate.id,
             } satisfies ExerciseInsert;
 
-            const exerciseEntry =
-                await this.exerciseRepository.createExercise(exerciseInsert);
+            const exerciseEntry = await tx.createExercise(exerciseInsert);
             if (!exerciseEntry) throw new ApiError();
 
             const activeExercise = new ActiveExercise(exerciseEntry, []);
             this.exerciseService.loadExercise(activeExercise);
 
-            await this.exerciseRepository.updateExerciseTemplate(
-                exerciseTemplate.id,
-                { lastExerciseCreatedAt: new Date() }
-            );
+            await tx.updateExerciseTemplate(exerciseTemplate.id, {
+                lastExerciseCreatedAt: new Date(),
+            });
             return activeExercise;
         });
     }

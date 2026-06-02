@@ -1,4 +1,4 @@
-import { computed, type OnDestroy, type OnInit } from '@angular/core';
+import { computed, signal, type OnDestroy, type OnInit } from '@angular/core';
 import { Component, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
@@ -106,7 +106,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
             this.exerciseStatus() !== 'running'
     );
 
-    public loading = false;
+    public readonly loading = signal(false);
 
     public readonly alarmGroups$ = this.store.select(selectAlarmGroups);
 
@@ -218,14 +218,14 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
     }
 
     public async sendAlarmGroup() {
-        this.loading = true;
+        this.loading.set(true);
 
         if (!this.canSubmit) {
             this.messageService.postError({
                 title: 'Fehler beim Senden der Alarmgruppe',
                 body: 'Bitte geben Sie alle notwendigen Informationen an!',
             });
-            this.loading = false;
+            this.loading.set(false);
             return;
         }
 
@@ -293,7 +293,7 @@ export class SendAlarmGroupInterfaceComponent implements OnInit, OnDestroy {
             eocLogId: uuid(),
         });
 
-        this.loading = false;
+        this.loading.set(false);
 
         if (request.success) {
             this.messageService.postMessage({

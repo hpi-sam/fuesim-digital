@@ -355,11 +355,10 @@ describe('exercise router', () => {
         it('disconnects clients of the removed exercise', async () => {
             const exerciseKey = (await createExercise(environment)).trainerKey;
             await environment.withWebsocket(async (socket) => {
-                const joinExercise = await socket.emit(
-                    'joinExercise',
+                const joinExercise = await socket.emit('joinExercise', {
                     exerciseKey,
-                    ''
-                );
+                    clientName: '',
+                });
 
                 expect(joinExercise.success).toBe(true);
 

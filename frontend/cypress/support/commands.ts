@@ -153,8 +153,7 @@ export function initializeParticipantSocket() {
                         (resolve) => {
                             participantSocket.emit(
                                 'joinExercise',
-                                participantKey,
-                                '',
+                                { exerciseKey: participantKey, clientName: '' },
                                 (
                                     response: SocketResponse<JoinExerciseResponseDataInput>
                                 ) => resolve(response)
@@ -204,8 +203,7 @@ export function initializeTrainerSocket() {
                     (resolve) => {
                         trainerSocket.emit(
                             'joinExercise',
-                            trainerKey,
-                            '',
+                            { exerciseKey: trainerKey, clientName: '' },
                             (
                                 response: SocketResponse<JoinExerciseResponseDataInput>
                             ) => resolve(response)

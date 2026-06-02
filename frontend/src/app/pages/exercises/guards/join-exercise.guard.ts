@@ -12,6 +12,10 @@ import { ApiService } from '../../../core/api.service';
 import type { AppState } from '../../../state/app.state';
 import { selectExerciseStateMode } from '../../../state/application/selectors/application.selectors';
 import { selectStateSnapshot } from '../../../state/get-state-snapshot';
+import {
+    getReconnectToken,
+    clearReconnectToken,
+} from '../../../core/reconnect-token';
 
 @Injectable({
     providedIn: 'root',
@@ -37,6 +41,29 @@ export class JoinExerciseGuard {
             const exerciseExists = await this.apiService.exerciseExists(
                 route.params['exerciseId']
             );
+
+            // Attempt auto-reconnect if a stored token exists
+            if (exerciseExists.exists) {
+                const storedClientId = getReconnectToken(
+                    route.params['exerciseId']
+                );
+                if (storedClientId) {
+                    try {
+                        const reconnected =
+                            await this.applicationService.joinExercise(
+                                route.params['exerciseId'],
+                                '',
+                                storedClientId
+                            );
+                        if (reconnected) return true;
+                        // Token was stale/invalid — clear it and fall through to normal join
+                        clearReconnectToken(route.params['exerciseId']);
+                    } catch (error) {
+                        clearReconnectToken(route.params['exerciseId']);
+                        throw error; // re-throw so outer catch still navigates to '/'
+                    }
+                }
+            }
 
             let successfullyJoined = false;
             if (exerciseExists.autojoin) {

@@ -208,7 +208,9 @@ export class ParallelExerciseService {
                 currentStatus: state.currentStatus,
                 lastLogEntry: state.lastLogEntry,
                 isActive: Object.values(state.clients).some(
-                    (client) => client.role.mainRole === 'participant'
+                    (client) =>
+                        client.role.mainRole === 'participant' &&
+                        client.isActive
                 ),
             });
         });

@@ -20,17 +20,14 @@ import { getElement } from './get-element.js';
 /**
  * Checks whether all materials and personnel belonging to a vehicle are in it.
  *
- * @param draftState The state to operate in
+ * @param state The state to operate in
  * @param vehicle The vehicle to check
  * @returns `true` if everything is in the vehicle, `false` otherwise
  */
-export function isCompletelyLoaded(
-    draftState: ExerciseState | WritableDraft<ExerciseState>,
-    vehicle: WritableDraft<Vehicle>
-) {
+export function isCompletelyLoaded(state: ExerciseState, vehicle: Vehicle) {
     const materialsLoaded = Object.keys(vehicle.materialIds).map((materialId) =>
         isInSpecificVehicle(
-            getElement(draftState, 'material', materialId),
+            getElement(state, 'material', materialId),
             vehicle.id
         )
     );
@@ -38,7 +35,7 @@ export function isCompletelyLoaded(
     const personnelLoaded = Object.keys(vehicle.personnelIds).map(
         (personnelId) =>
             isInSpecificVehicle(
-                getElement(draftState, 'personnel', personnelId),
+                getElement(state, 'personnel', personnelId),
                 vehicle.id
             )
     );

@@ -781,13 +781,18 @@ describe('A trainer on the exercise page', () => {
         cy.wait(commonErrorTimeout);
         cy.get('@trainerSocketPerformedActions')
             .lastElement()
-            .should('have.property', 'type', '[Client] Remove client');
+            .should('have.property', 'type', '[Client] Set client inactive');
 
-        cy.getState()
-            .its('exerciseState')
-            .its('clients')
-            .itsValues()
-            .should('have.length', 2);
+        cy.get('@participantSocketUUID', { log: false }).then(
+            (participantSocketUUID: any) => {
+                cy.getState()
+                    .its('exerciseState')
+                    .its('clients')
+                    .its(participantSocketUUID)
+                    .its('isActive')
+                    .should('equal', false);
+            }
+        );
     });
 
     it('can manage an exercise settings', () => {

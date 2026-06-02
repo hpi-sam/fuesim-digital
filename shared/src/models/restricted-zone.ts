@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { Immutable } from 'immer';
 import type { ExerciseState } from '../state.js';
-import type { AllowedValues } from '../utils/validators/is-literal-union.js';
 import { uuid, type UUID, uuidSchema } from '../utils/uuid.js';
 import { type Size, sizeSchema } from './utils/size.js';
 import { positionSchema } from './utils/position/position.js';
@@ -23,13 +22,6 @@ export const vehicleRestrictionSchema = z.literal([
 export type VehicleRestriction = Immutable<
     z.infer<typeof vehicleRestrictionSchema>
 >;
-
-export const vehicleRestrictionAllowedValues: AllowedValues<VehicleRestriction> =
-    {
-        ignore: true,
-        prohibit: true,
-        restrict: true,
-    };
 
 export const vehicleRestrictionsSchema = z.record(
     uuidSchema,
